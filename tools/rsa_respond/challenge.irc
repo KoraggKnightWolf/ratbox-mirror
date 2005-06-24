@@ -1,0 +1,113 @@
+/******************************************************************************\
+$Id$
+
+	CHALLENGE.IRC
+
+	Original code/idea by xyst
+	Rewritten by BlackJac@EFNet [September 10, 2003]
+
+\******************************************************************************/
+
+package challenge
+
+# private key filename
+@ challenge.keypath = [~/.irc/challenge.key]
+
+# use private key passphrase (yes/no)
+@ challenge.passphrase = [yes]
+
+# 'respond' location
+@ challenge.resppath = [~/.irc/respond]
+
+# saved configuration filename
+@ challenge.savepath = [~/.irc/challenge.cfg]
+
+/******************************************************************************/
+
+alias challenge (nick default "$servernick()", void) {
+	if ((fexist($challenge.keypath) != -1) && (fexist($challenge.resppath) != -1)) {
+		quote challenge $nick
+	} else {
+		xecho -b Challenge error - make sure keypath and resppath are set correctly
+		rsaconfig
+	}
+}
+
+alias rsaconfig (args) {
+	@ :choice = shift(args)
+	if (match($choice keypath passphrase resppath save)) {
+		switch ($choice) {
+			(keypath) (passphrase) (resppath) {
+				if (args) {
+					@ challenge[$choice] = word(0 $args)
+					xecho -b Challenge $choice set to $challenge[$choice]
+					xecho -b Use "/rsaconfig save" to save
+				} else {
+					rsaconfig.help
+				}
+			}
+			(save) {
+				if (fexist($challenge.savepath) == 1) {
+					@ unlink($challenge.savepath)
+				}
+				@ :fd = open($challenge.savepath W)
+				if (fd != -1) {
+					fe (keypath passphrase resppath) rr {
+						@ write($fd @ challenge.$rr = [${challenge[$rr]}])
+					}
+					@ close($fd)
+					xecho -b Challenge settings saved
+				} else {
+					xecho -b Error saving settings
+				}
+			}
+		}
+	} else {
+		rsaconfig.help
+	}
+}
+
+alias rsaconfig.help (void) {
+	xecho -b Current settings:
+	fe (keypath passphrase resppath) rr {
+		xecho -b   $rr: ${challenge[$rr]}
+	}
+	xecho -b Type "/rsaconfig keypath|passphrase|resppath <value>" to change values, "/rsaconfig save" to save
+}
+
+^on ^386 "% %" {
+	@ challenge.num++
+	^on ^exec "chall$challenge.num *" {
+		if ([$2]) {
+			xecho -b Challenge error: $1-
+		} else {
+			quote challenge +$1
+		}
+		^on ^exec -"chall$challenge.num *"
+	}
+	^on ^exec_exit "chall$challenge.num *" {
+		^on exec_exit -"chall$challenge.num *"
+	}
+	^exec -name chall$challenge.num $challenge.resppath $challenge.keypath $1
+	if (challenge.passphrase == [yes]) {
+		input -noecho "Enter passphrase for challenge: " {
+			^msg %chall$challenge.num $*
+		}
+	}
+}
+
+^on ^464 * {
+	xecho -b Challenge password incorrect\; check your key
+}
+
+if (fexist($challenge.savepath) != -1) {
+	xecho -b Loading settings from $challenge.savepath\...
+	load $challenge.savepath
+} else {
+	xecho -b Challenge config file not found -- using defaults\; use "/rsaconfig save" to save
+}
+
+rsaconfig.help
+
+# EOF
+

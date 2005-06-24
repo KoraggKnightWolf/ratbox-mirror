@@ -1,0 +1,15 @@
+REHASH [option]
+
+When no [option] is given, ircd will re-read the
+ircd.conf file.
+
+[option] can be one of the following:
+  DNS      - Re-read the /etc/resolv.conf file
+  MOTD     - Re-reads MOTD file
+  OMOTD    - Re-reads Oper MOTD file
+  CHANNELS - Forces a channel cleanup
+  TDLINES  - Clears temporary D Lines
+  TKLINES  - Clears temporary K Lines
+  PGLINES  - Clears pending G Lines
+
+- Requires Oper Priv: H

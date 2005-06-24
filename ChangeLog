@@ -1,0 +1,3864 @@
+androsyn    2005/06/23 01:18:56 UTC	(20050623_0)
+
+  Modified files:
+    libircd              commio.c commio.h ircd_lib.c ircd_lib.h 
+    src                  dns.c ircd.c packet.c s_auth.c 
+    src/ident            ident.c 
+    src/resolver         resolver.c 
+  Log:
+  Various library related cleanups.
+  
+  Revision  Changes    Path
+  1.45      +14 -2     ircd-ratbox/libircd/commio.c
+  1.30      +1 -0      ircd-ratbox/libircd/commio.h
+  7.2       +10 -2     ircd-ratbox/libircd/ircd_lib.c
+  7.2       +1 -1      ircd-ratbox/libircd/ircd_lib.h
+  7.15      +1 -1      ircd-ratbox/src/dns.c
+  1.17      +2 -5      ircd-ratbox/src/ident/ident.c
+  7.389     +21 -8     ircd-ratbox/src/ircd.c
+  7.149     +4 -4      ircd-ratbox/src/packet.c
+  1.7       +3 -13     ircd-ratbox/src/resolver/resolver.c
+  7.223     +1 -1      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/06/22 06:37:11 UTC	(20050622_5)
+
+  Modified files:
+    .                    Makefile.in 
+    adns                 Makefile.in 
+    libircd              Makefile.in 
+    modules              Makefile.am Makefile.in 
+    src                  Makefile.in 
+    src/ident            Makefile.in 
+    src/resolver         Makefile.in 
+    tools                Makefile.in 
+  Log:
+  Fix an include path
+  
+  Revision  Changes    Path
+  7.72      +1 -1      ircd-ratbox/Makefile.in
+  1.34      +0 -0      ircd-ratbox/adns/Makefile.in
+  7.2       +1 -1      ircd-ratbox/libircd/Makefile.in
+  1.7       +1 -1      ircd-ratbox/modules/Makefile.am
+  1.142     +2 -2      ircd-ratbox/modules/Makefile.in
+  7.178     +1 -1      ircd-ratbox/src/Makefile.in
+  1.11      +1 -1      ircd-ratbox/src/ident/Makefile.in
+  1.5       +1 -1      ircd-ratbox/src/resolver/Makefile.in
+  7.60      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/06/22 01:01:09 UTC	(20050622_4)
+
+  Modified files:
+    libircd              ports.c 
+  Log:
+  this should compile as well i think
+  
+  Revision  Changes    Path
+  1.6       +2 -13     ircd-ratbox/libircd/ports.c
+
+
+
+androsyn    2005/06/22 00:56:52 UTC	(20050622_3)
+
+  Modified files:
+    libircd              devpoll.c kqueue.c poll.c sigio.c 
+  Log:
+  I think this should make these compile
+  
+  Revision  Changes    Path
+  7.45      +3 -32     ircd-ratbox/libircd/devpoll.c
+  1.60      +4 -16     ircd-ratbox/libircd/kqueue.c
+  7.92      +2 -14     ircd-ratbox/libircd/poll.c
+  7.53      +2 -16     ircd-ratbox/libircd/sigio.c
+
+
+
+androsyn    2005/06/22 00:52:37 UTC	(20050622_2)
+
+  Removed files:
+    src/ident            defs.h 
+  Log:
+  file be gone
+  
+  Revision  Changes    Path
+  1.2       +0 -49     ircd-ratbox/src/ident/defs.h (dead)
+
+
+
+androsyn    2005/06/22 00:45:44 UTC	(20050622_1)
+
+  Modified files:
+    .                    Makefile.am Makefile.in configure 
+                         configure.ac 
+    adns                 Makefile.in event.c general.c parse.c 
+                         query.c types.c 
+    include              irc_string.h ircd_defs.h stdinc.h 
+    modules              Makefile.am Makefile.in m_accept.c 
+                         m_away.c m_cap.c m_capab.c m_challenge.c 
+                         m_dline.c m_encap.c m_gline.c m_ison.c 
+                         m_kline.c m_map.c m_names.c m_operspy.c 
+                         m_pass.c m_rehash.c m_restart.c m_resv.c 
+                         m_stats.c m_testline.c m_time.c m_topic.c 
+                         m_trace.c m_user.c m_userhost.c m_who.c 
+                         m_whois.c m_xline.c 
+    modules/core         m_join.c m_kill.c m_message.c m_mode.c 
+                         m_quit.c m_server.c 
+    src                  Makefile.am Makefile.in cache.c channel.c 
+                         class.c client.c dns.c hash.c hook.c 
+                         hostmask.c irc_string.c ircd.c 
+                         ircd_parser.y ircd_signal.c kdparse.c 
+                         listener.c match.c modules.c monitor.c 
+                         newconf.c packet.c parse.c patricia.c 
+                         ports.c reject.c restart.c s_auth.c 
+                         s_conf.c s_log.c s_newconf.c s_serv.c 
+                         s_user.c scache.c send.c whowas.c 
+    src/ident            Makefile.am Makefile.in ident.c 
+    src/resolver         Makefile.am Makefile.in resolver.c 
+    tools                Makefile.in 
+  Removed files:
+    include              commio.h event.h linebuf.h memory.h 
+                         sprintf_irc.h tools.h 
+    src                  balloc.c commio.c devpoll.c epoll.c 
+                         event.c kqueue.c linebuf.c memory.c 
+                         poll.c select.c sigio.c snprintf.c 
+                         tools.c 
+  Log:
+  Part two of the library commit stuff...weee...
+  
+  Revision  Changes    Path
+  7.4       +1 -1      ircd-ratbox/Makefile.am
+  7.71      +1 -1      ircd-ratbox/Makefile.in
+  1.33      +0 -0      ircd-ratbox/adns/Makefile.in
+  1.34      +0 -1      ircd-ratbox/adns/event.c
+  1.22      +10 -9     ircd-ratbox/adns/general.c
+  1.17      +0 -1      ircd-ratbox/adns/parse.c
+  1.30      +0 -1      ircd-ratbox/adns/query.c
+  1.25      +0 -2      ircd-ratbox/adns/types.c
+  7.267     +4 -3      ircd-ratbox/configure
+  7.78      +3 -2      ircd-ratbox/configure.ac
+  1.29      +0 -224    ircd-ratbox/include/commio.h (dead)
+  1.25      +0 -68     ircd-ratbox/include/event.h (dead)
+  7.67      +0 -21     ircd-ratbox/include/irc_string.h
+  7.64      +13 -0     ircd-ratbox/include/ircd_defs.h
+  1.37      +0 -86     ircd-ratbox/include/linebuf.h (dead)
+  7.57      +0 -75     ircd-ratbox/include/memory.h (dead)
+  7.23      +0 -49     ircd-ratbox/include/sprintf_irc.h (dead)
+  1.26      +23 -0     ircd-ratbox/include/stdinc.h
+  1.59      +0 -385    ircd-ratbox/include/tools.h (dead)
+  1.6       +1 -1      ircd-ratbox/modules/Makefile.am
+  1.141     +1 -1      ircd-ratbox/modules/Makefile.in
+  1.177     +2 -2      ircd-ratbox/modules/core/m_join.c
+  1.111     +2 -2      ircd-ratbox/modules/core/m_kill.c
+  1.175     +1 -2      ircd-ratbox/modules/core/m_message.c
+  1.131     +2 -2      ircd-ratbox/modules/core/m_mode.c
+  1.58      +2 -2      ircd-ratbox/modules/core/m_quit.c
+  1.166     +2 -3      ircd-ratbox/modules/core/m_server.c
+  1.68      +2 -2      ircd-ratbox/modules/m_accept.c
+  1.69      +2 -2      ircd-ratbox/modules/m_away.c
+  1.14      +2 -2      ircd-ratbox/modules/m_cap.c
+  1.56      +2 -2      ircd-ratbox/modules/m_capab.c
+  1.81      +3 -4      ircd-ratbox/modules/m_challenge.c
+  1.60      +3 -3      ircd-ratbox/modules/m_dline.c
+  1.31      +2 -2      ircd-ratbox/modules/m_encap.c
+  1.161     +2 -3      ircd-ratbox/modules/m_gline.c
+  1.60      +2 -2      ircd-ratbox/modules/m_ison.c
+  1.210     +2 -3      ircd-ratbox/modules/m_kline.c
+  1.46      +2 -2      ircd-ratbox/modules/m_map.c
+  1.91      +2 -2      ircd-ratbox/modules/m_names.c
+  1.16      +2 -2      ircd-ratbox/modules/m_operspy.c
+  1.57      +2 -2      ircd-ratbox/modules/m_pass.c
+  1.100     +2 -2      ircd-ratbox/modules/m_rehash.c
+  1.56      +2 -2      ircd-ratbox/modules/m_restart.c
+  1.85      +3 -3      ircd-ratbox/modules/m_resv.c
+  1.257     +10 -3     ircd-ratbox/modules/m_stats.c
+  1.65      +2 -2      ircd-ratbox/modules/m_testline.c
+  1.56      +2 -2      ircd-ratbox/modules/m_time.c
+  1.100     +2 -2      ircd-ratbox/modules/m_topic.c
+  1.117     +2 -1      ircd-ratbox/modules/m_trace.c
+  1.54      +2 -3      ircd-ratbox/modules/m_user.c
+  1.65      +2 -2      ircd-ratbox/modules/m_userhost.c
+  1.126     +2 -2      ircd-ratbox/modules/m_who.c
+  1.157     +2 -2      ircd-ratbox/modules/m_whois.c
+  1.80      +2 -3      ircd-ratbox/modules/m_xline.c
+  7.7       +4 -12     ircd-ratbox/src/Makefile.am
+  7.177     +30 -53    ircd-ratbox/src/Makefile.in
+  7.93      +0 -652    ircd-ratbox/src/balloc.c (dead)
+  1.32      +1 -2      ircd-ratbox/src/cache.c
+  7.445     +1 -2      ircd-ratbox/src/channel.c
+  7.77      +1 -1      ircd-ratbox/src/class.c
+  7.506     +3 -4      ircd-ratbox/src/client.c
+  1.44      +0 -786    ircd-ratbox/src/commio.c (dead)
+  7.45      +0 -309    ircd-ratbox/src/devpoll.c (dead)
+  7.14      +2 -4      ircd-ratbox/src/dns.c
+  1.44      +0 -248    ircd-ratbox/src/epoll.c (dead)
+  7.58      +0 -366    ircd-ratbox/src/event.c (dead)
+  7.124     +1 -1      ircd-ratbox/src/hash.c
+  7.37      +1 -1      ircd-ratbox/src/hook.c
+  7.117     +1 -1      ircd-ratbox/src/hostmask.c
+  1.6       +3 -12     ircd-ratbox/src/ident/Makefile.am
+  1.10      +7 -281    ircd-ratbox/src/ident/Makefile.in
+  1.16      +1 -28     ircd-ratbox/src/ident/ident.c
+  7.83      +1 -623    ircd-ratbox/src/irc_string.c
+  7.388     +1 -27     ircd-ratbox/src/ircd.c
+  1.282     +1 -1      ircd-ratbox/src/ircd_parser.y
+  7.36      +0 -1      ircd-ratbox/src/ircd_signal.c
+  7.49      +1 -1      ircd-ratbox/src/kdparse.c
+  1.60      +0 -293    ircd-ratbox/src/kqueue.c (dead)
+  7.136     +0 -845    ircd-ratbox/src/linebuf.c (dead)
+  7.140     +1 -2      ircd-ratbox/src/listener.c
+  7.49      +1 -1      ircd-ratbox/src/match.c
+  7.54      +0 -84     ircd-ratbox/src/memory.c (dead)
+  7.163     +2 -2      ircd-ratbox/src/modules.c
+  7.10      +0 -1      ircd-ratbox/src/monitor.c
+  7.210     +1 -2      ircd-ratbox/src/newconf.c
+  7.148     +1 -2      ircd-ratbox/src/packet.c
+  7.199     +2 -2      ircd-ratbox/src/parse.c
+  7.36      +1 -1      ircd-ratbox/src/patricia.c
+  7.92      +0 -290    ircd-ratbox/src/poll.c (dead)
+  1.5       +0 -1      ircd-ratbox/src/ports.c
+  1.43      +0 -1      ircd-ratbox/src/reject.c
+  1.3       +3 -12     ircd-ratbox/src/resolver/Makefile.am
+  1.4       +6 -227    ircd-ratbox/src/resolver/Makefile.in
+  1.6       +5 -42     ircd-ratbox/src/resolver/resolver.c
+  7.41      +0 -1      ircd-ratbox/src/restart.c
+  7.222     +1 -2      ircd-ratbox/src/s_auth.c
+  7.526     +1 -2      ircd-ratbox/src/s_conf.c
+  7.86      +1 -1      ircd-ratbox/src/s_log.c
+  7.78      +1 -4      ircd-ratbox/src/s_newconf.c
+  7.442     +1 -2      ircd-ratbox/src/s_serv.c
+  7.356     +1 -2      ircd-ratbox/src/s_user.c
+  7.34      +1 -1      ircd-ratbox/src/scache.c
+  7.53      +0 -219    ircd-ratbox/src/select.c (dead)
+  7.300     +1 -2      ircd-ratbox/src/send.c
+  7.53      +0 -361    ircd-ratbox/src/sigio.c (dead)
+  1.17      +0 -981    ircd-ratbox/src/snprintf.c (dead)
+  7.53      +0 -120    ircd-ratbox/src/tools.c (dead)
+  7.40      +0 -1      ircd-ratbox/src/whowas.c
+  7.59      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/06/22 00:25:46 UTC	(20050622_0)
+
+  Modified files:
+    libircd              balloc.c commio.c commio.h epoll.c 
+                         event.c event.h ircd_memory.c 
+                         ircd_memory.h linebuf.c snprintf.c 
+                         snprintf.h tools.c tools.h 
+  Added files:
+    libircd              Makefile.am Makefile.in ircd_lib.c 
+                         ircd_lib.h 
+  Log:
+  part one of my ircd library commit
+  
+  Revision  Changes    Path
+  7.1       +20 -0     ircd-ratbox/libircd/Makefile.am (new)
+  7.1       +492 -0    ircd-ratbox/libircd/Makefile.in (new)
+  7.93      +9 -12     ircd-ratbox/libircd/balloc.c
+  1.44      +608 -25   ircd-ratbox/libircd/commio.c
+  1.29      +14 -0     ircd-ratbox/libircd/commio.h
+  1.44      +6 -19     ircd-ratbox/libircd/epoll.c
+  7.58      +21 -47    ircd-ratbox/libircd/event.c
+  1.25      +2 -2      ircd-ratbox/libircd/event.h
+  7.1       +86 -0     ircd-ratbox/libircd/ircd_lib.c (new)
+  7.1       +57 -0     ircd-ratbox/libircd/ircd_lib.h (new)
+  7.54      +4 -9      ircd-ratbox/libircd/ircd_memory.c
+  7.57      +0 -0      ircd-ratbox/libircd/ircd_memory.h
+  7.136     +70 -91    ircd-ratbox/libircd/linebuf.c
+  1.17      +1 -1      ircd-ratbox/libircd/snprintf.c
+  7.23      +0 -0      ircd-ratbox/libircd/snprintf.h
+  7.53      +34 -3     ircd-ratbox/libircd/tools.c
+  1.59      +9 -0      ircd-ratbox/libircd/tools.h
+
+
+
+androsyn    2005/06/20 07:08:39 UTC	(20050620_0)
+
+  ircd-ratbox/libircd - New directory
+
+
+
+androsyn    2005/06/15 18:53:20 UTC	(20050615_0)
+
+  Modified files:
+    modules              m_time.c 
+  Log:
+  Fix the December 31st /TIME bug.  It would output fun things like the
+  following:
+  
+  Saturday December 31 2005 -- 20:46:40 +43:00
+  
+  Somebody along the way never though to check if the years were the same or
+  not. This is probably one of the oldest bugs in an ircd I've ever found.
+  
+  Revision  Changes    Path
+  1.55      +2 -2      ircd-ratbox/modules/m_time.c
+
+
+
+androsyn    2005/06/12 09:21:49 UTC	(20050612_1)
+
+  Modified files:
+    src                  s_user.c 
+  Log:
+  introduce_client() didn't need to be shoving in a 0 for ::1 as inetntop
+  already takes care of this.
+  
+  Revision  Changes    Path
+  7.355     +1 -10     ircd-ratbox/src/s_user.c
+
+
+
+androsyn    2005/06/12 03:10:28 UTC	(20050612_0)
+
+  Modified files:
+    include              commio.h send.h 
+    modules              m_accept.c m_admin.c m_away.c m_cap.c 
+                         m_challenge.c m_close.c m_cmessage.c 
+                         m_connect.c m_dline.c m_etrace.c 
+                         m_gline.c m_help.c m_info.c m_invite.c 
+                         m_ison.c m_kline.c m_knock.c m_links.c 
+                         m_list.c m_lusers.c m_map.c m_monitor.c 
+                         m_motd.c m_names.c m_oper.c m_ping.c 
+                         m_pong.c m_rehash.c m_restart.c m_resv.c 
+                         m_set.c m_stats.c m_testline.c 
+                         m_testmask.c m_time.c m_topic.c m_trace.c 
+                         m_unreject.c m_userhost.c m_users.c 
+                         m_version.c m_wallops.c m_who.c m_whois.c 
+                         m_whowas.c m_xline.c 
+    modules/core         m_die.c m_join.c m_kick.c m_kill.c 
+                         m_message.c m_mode.c m_nick.c m_part.c 
+                         m_server.c m_squit.c 
+    src                  cache.c channel.c class.c client.c 
+                         event.c hash.c hostmask.c listener.c 
+                         modules.c monitor.c parse.c reject.c 
+                         s_auth.c s_conf.c s_newconf.c s_serv.c 
+                         s_user.c send.c 
+    src/ident            ident.c 
+    src/resolver         resolver.c 
+  Log:
+  Expand on the sendto_one queueing idea a bit here.
+  
+  Revision  Changes    Path
+  1.28      +2 -2      ircd-ratbox/include/commio.h
+  7.88      +6 -4      ircd-ratbox/include/send.h
+  1.54      +6 -6      ircd-ratbox/modules/core/m_die.c
+  1.176     +11 -11    ircd-ratbox/modules/core/m_join.c
+  1.90      +6 -6      ircd-ratbox/modules/core/m_kick.c
+  1.110     +13 -13    ircd-ratbox/modules/core/m_kill.c
+  1.174     +28 -28    ircd-ratbox/modules/core/m_message.c
+  1.130     +26 -26    ircd-ratbox/modules/core/m_mode.c
+  1.175     +25 -25    ircd-ratbox/modules/core/m_nick.c
+  1.104     +3 -3      ircd-ratbox/modules/core/m_part.c
+  1.165     +42 -42    ircd-ratbox/modules/core/m_server.c
+  1.91      +4 -4      ircd-ratbox/modules/core/m_squit.c
+  1.67      +10 -10    ircd-ratbox/modules/m_accept.c
+  1.70      +8 -7      ircd-ratbox/modules/m_admin.c
+  1.68      +4 -4      ircd-ratbox/modules/m_away.c
+  1.13      +9 -9      ircd-ratbox/modules/m_cap.c
+  1.80      +8 -8      ircd-ratbox/modules/m_challenge.c
+  1.50      +3 -3      ircd-ratbox/modules/m_close.c
+  1.10      +9 -9      ircd-ratbox/modules/m_cmessage.c
+  1.79      +14 -14    ircd-ratbox/modules/m_connect.c
+  1.59      +19 -19    ircd-ratbox/modules/m_dline.c
+  1.24      +9 -9      ircd-ratbox/modules/m_etrace.c
+  1.160     +13 -13    ircd-ratbox/modules/m_gline.c
+  1.76      +7 -7      ircd-ratbox/modules/m_help.c
+  1.131     +18 -18    ircd-ratbox/modules/m_info.c
+  1.93      +12 -12    ircd-ratbox/modules/m_invite.c
+  1.59      +2 -2      ircd-ratbox/modules/m_ison.c
+  1.209     +20 -20    ircd-ratbox/modules/m_kline.c
+  1.96      +11 -11    ircd-ratbox/modules/m_knock.c
+  1.79      +6 -6      ircd-ratbox/modules/m_links.c
+  1.88      +32 -20    ircd-ratbox/modules/m_list.c
+  1.54      +2 -2      ircd-ratbox/modules/m_lusers.c
+  1.45      +5 -4      ircd-ratbox/modules/m_map.c
+  1.12      +18 -18    ircd-ratbox/modules/m_monitor.c
+  1.66      +3 -3      ircd-ratbox/modules/m_motd.c
+  1.90      +8 -8      ircd-ratbox/modules/m_names.c
+  1.100     +4 -4      ircd-ratbox/modules/m_oper.c
+  1.66      +7 -7      ircd-ratbox/modules/m_ping.c
+  1.68      +5 -5      ircd-ratbox/modules/m_pong.c
+  1.99      +5 -5      ircd-ratbox/modules/m_rehash.c
+  1.55      +6 -6      ircd-ratbox/modules/m_restart.c
+  1.84      +20 -20    ircd-ratbox/modules/m_resv.c
+  1.90      +22 -22    ircd-ratbox/modules/m_set.c
+  1.256     +102 -102  ircd-ratbox/modules/m_stats.c
+  1.64      +9 -9      ircd-ratbox/modules/m_testline.c
+  1.12      +3 -3      ircd-ratbox/modules/m_testmask.c
+  1.54      +2 -2      ircd-ratbox/modules/m_time.c
+  1.99      +9 -9      ircd-ratbox/modules/m_topic.c
+  1.116     +15 -15    ircd-ratbox/modules/m_trace.c
+  1.11      +5 -5      ircd-ratbox/modules/m_unreject.c
+  1.64      +2 -2      ircd-ratbox/modules/m_userhost.c
+  1.53      +3 -3      ircd-ratbox/modules/m_users.c
+  1.76      +4 -4      ircd-ratbox/modules/m_version.c
+  1.64      +2 -2      ircd-ratbox/modules/m_wallops.c
+  1.125     +9 -9      ircd-ratbox/modules/m_who.c
+  1.156     +17 -16    ircd-ratbox/modules/m_whois.c
+  1.60      +7 -7      ircd-ratbox/modules/m_whowas.c
+  1.79      +20 -20    ircd-ratbox/modules/m_xline.c
+  1.31      +7 -7      ircd-ratbox/src/cache.c
+  7.444     +5 -3      ircd-ratbox/src/channel.c
+  7.76      +3 -2      ircd-ratbox/src/class.c
+  7.505     +11 -11    ircd-ratbox/src/client.c
+  7.57      +4 -3      ircd-ratbox/src/event.c
+  7.123     +9 -7      ircd-ratbox/src/hash.c
+  7.116     +3 -2      ircd-ratbox/src/hostmask.c
+  1.15      +19 -16    ircd-ratbox/src/ident/ident.c
+  7.139     +2 -86     ircd-ratbox/src/listener.c
+  7.162     +15 -15    ircd-ratbox/src/modules.c
+  7.9       +4 -2      ircd-ratbox/src/monitor.c
+  7.198     +10 -9     ircd-ratbox/src/parse.c
+  1.42      +1 -1      ircd-ratbox/src/reject.c
+  1.5       +4 -0      ircd-ratbox/src/resolver/resolver.c
+  7.221     +1 -1      ircd-ratbox/src/s_auth.c
+  7.525     +8 -8      ircd-ratbox/src/s_conf.c
+  7.77      +1 -1      ircd-ratbox/src/s_newconf.c
+  7.441     +9 -9      ircd-ratbox/src/s_serv.c
+  7.354     +44 -43    ircd-ratbox/src/s_user.c
+  7.299     +13 -35    ircd-ratbox/src/send.c
+
+
+
+androsyn    2005/06/09 22:57:29 UTC	(20050609_0)
+
+  Modified files:
+    .                    configure configure.ac 
+    adns                 event.c general.c internal.h parse.c 
+                         query.c reply.c transmit.c types.c 
+    include              hash.h ircd.h listener.h newconf.h 
+                         s_conf.h 
+    modules              m_links.c m_map.c 
+    src                  hash.c listener.c monitor.c whowas.c 
+  Log:
+  minor little cleanups to make gcc 4 happy
+  
+  Revision  Changes    Path
+  1.33      +2 -1      ircd-ratbox/adns/event.c
+  1.21      +4 -4      ircd-ratbox/adns/general.c
+  1.19      +2 -2      ircd-ratbox/adns/internal.h
+  1.16      +3 -3      ircd-ratbox/adns/parse.c
+  1.29      +2 -2      ircd-ratbox/adns/query.c
+  1.13      +1 -1      ircd-ratbox/adns/reply.c
+  1.16      +2 -2      ircd-ratbox/adns/transmit.c
+  1.24      +3 -3      ircd-ratbox/adns/types.c
+  7.266     +5 -3      ircd-ratbox/configure
+  7.77      +5 -3      ircd-ratbox/configure.ac
+  7.59      +4 -4      ircd-ratbox/include/hash.h
+  7.89      +0 -1      ircd-ratbox/include/ircd.h
+  7.23      +1 -0      ircd-ratbox/include/listener.h
+  7.37      +0 -2      ircd-ratbox/include/newconf.h
+  7.324     +0 -1      ircd-ratbox/include/s_conf.h
+  1.78      +1 -2      ircd-ratbox/modules/m_links.c
+  1.44      +2 -2      ircd-ratbox/modules/m_map.c
+  7.122     +9 -9      ircd-ratbox/src/hash.c
+  7.138     +84 -0     ircd-ratbox/src/listener.c
+  7.8       +1 -1      ircd-ratbox/src/monitor.c
+  7.39      +1 -1      ircd-ratbox/src/whowas.c
+
+
+
+androsyn    2005/06/03 19:09:21 UTC	(20050603_0)
+
+  Modified files:
+    src                  match.c 
+  Log:
+  passing a pointer to a pointer is not what was intended, oops
+  
+  Revision  Changes    Path
+  7.48      +3 -3      ircd-ratbox/src/match.c
+
+
+
+androsyn    2005/05/30 16:46:50 UTC	(20050530_1)
+
+  Modified files:
+    modules              m_resv.c 
+  Log:
+  use target_server and not parv[3] to check if the target server is us. thanks to jilles for the patch
+  
+  Revision  Changes    Path
+  1.83      +2 -2      ircd-ratbox/modules/m_resv.c
+
+
+
+androsyn    2005/05/30 05:58:34 UTC	(20050530_0)
+
+  Modified files:
+    .                    configure configure.ac 
+    include              setup.h.in 
+    src                  linebuf.c 
+  Log:
+  Add writev checks
+  
+  Revision  Changes    Path
+  7.265     +5 -3      ircd-ratbox/configure
+  7.76      +3 -3      ircd-ratbox/configure.ac
+  7.101     +6 -0      ircd-ratbox/include/setup.h.in
+  7.135     +0 -1      ircd-ratbox/src/linebuf.c
+
+
+
+androsyn    2005/05/29 22:39:30 UTC	(20050529_0)
+
+  Modified files:
+    include              send.h 
+    modules              m_help.c 
+    src                  linebuf.c s_user.c send.c 
+  Log:
+  Experimenting with some things.  I wonder if it is an optimization to
+  queue up messages from one command, rather than trying to send it out each
+  system call. Basically implement sendto_one_queue which doesn't try to write
+  out.  To uncork the queue, just do a normal sendto_one().  Also put writev
+  back in.  Somebody might want to take a look at the writev code and make
+  sure I didn't mess it up
+  
+  Revision  Changes    Path
+  7.87      +1 -0      ircd-ratbox/include/send.h
+  1.75      +3 -3      ircd-ratbox/modules/m_help.c
+  7.134     +104 -20   ircd-ratbox/src/linebuf.c
+  7.353     +7 -7      ircd-ratbox/src/s_user.c
+  7.298     +52 -21    ircd-ratbox/src/send.c
+
+
+
+androsyn    2005/05/18 22:00:32 UTC	(20050518_0)
+
+  Modified files:
+    modules              m_monitor.c 
+  Log:
+  Don't allow monitor to be used as an unregistered client.
+  
+  Revision  Changes    Path
+  1.11      +2 -2      ircd-ratbox/modules/m_monitor.c
+
+
+
+androsyn    2005/05/17 22:53:47 UTC	(20050517_0)
+
+  Modified files:
+    src                  send.c 
+  Log:
+  make send.c compile again
+  
+  Revision  Changes    Path
+  7.297     +4 -7      ircd-ratbox/src/send.c
+
+
+
+androsyn    2005/05/15 22:02:37 UTC	(20050515_0)
+
+  Modified files:
+    src                  send.c 
+  Log:
+  Port changes from 2.1 forward for amd64
+  
+  Revision  Changes    Path
+  7.296     +57 -48    ircd-ratbox/src/send.c
+
+
+
+leeh        2005/05/09 13:25:50 UTC	(20050509_0)
+
+  Modified files:
+    adns                 internal.h 
+  Log:
+  - #include setup.h
+  
+  Revision  Changes    Path
+  1.18      +1 -0      ircd-ratbox/adns/internal.h
+
+
+
+androsyn    2005/04/27 01:07:58 UTC	(20050427_2)
+
+  Modified files:
+    src/ident            ident.c 
+  Log:
+  i hate freebsd
+  
+  Revision  Changes    Path
+  1.14      +1 -1      ircd-ratbox/src/ident/ident.c
+
+
+
+androsyn    2005/04/27 00:56:08 UTC	(20050427_1)
+
+  Modified files:
+    src/ident            ident.c 
+  Log:
+  get the socket family type from the sockaddr
+  
+  Revision  Changes    Path
+  1.13      +1 -2      ircd-ratbox/src/ident/ident.c
+
+
+
+androsyn    2005/04/27 00:23:54 UTC	(20050427_0)
+
+  Modified files:
+    src/ident            ident.c 
+  Log:
+  using sizeof(struct sockaddr_in) isnt gonna work for ipv6
+  
+  Revision  Changes    Path
+  1.12      +2 -2      ircd-ratbox/src/ident/ident.c
+
+
+
+androsyn    2005/04/26 19:30:20 UTC	(20050426_2)
+
+  Modified files:
+    src                  s_conf.c 
+    src/resolver         resolver.c 
+  Log:
+  add a missing ( in s_conf.c and initialize tv to NULL in resolver.c
+  
+  Revision  Changes    Path
+  1.4       +1 -1      ircd-ratbox/src/resolver/resolver.c
+  7.524     +1 -1      ircd-ratbox/src/s_conf.c
+
+
+
+androsyn    2005/04/26 15:57:51 UTC	(20050426_1)
+
+  Modified files:
+    src                  s_conf.c 
+  Log:
+  also helps if you use the right field.  This is why typecasting is bad
+  
+  Revision  Changes    Path
+  7.523     +2 -2      ircd-ratbox/src/s_conf.c
+
+
+
+androsyn    2005/04/26 15:54:04 UTC	(20050426_0)
+
+  Modified files:
+    src                  s_conf.c 
+  Log:
+  convert port to host order before display it in Unauthorised connection message
+  
+  Revision  Changes    Path
+  7.522     +2 -2      ircd-ratbox/src/s_conf.c
+
+
+
+androsyn    2005/04/25 04:41:43 UTC	(20050425_3)
+
+  Modified files:
+    src/resolver         resolver.c 
+  Log:
+  only set select if you've got a sendq..
+  
+  Revision  Changes    Path
+  1.3       +2 -1      ircd-ratbox/src/resolver/resolver.c
+
+
+
+androsyn    2005/04/25 04:37:11 UTC	(20050425_2)
+
+  Modified files:
+    src/resolver         resolver.c 
+  Log:
+  dont need defs.h in there
+  
+  Revision  Changes    Path
+  1.2       +1 -2      ircd-ratbox/src/resolver/resolver.c
+
+
+
+androsyn    2005/04/25 04:17:44 UTC	(20050425_1)
+
+  Modified files:
+    .                    Makefile.in 
+    adns                 Makefile.in 
+    modules              Makefile.in 
+    src                  Makefile.in 
+    src/ident            Makefile.in 
+    src/resolver         Makefile.am Makefile.in 
+    tools                Makefile.in 
+  Log:
+  forgot to include include
+  
+  Revision  Changes    Path
+  7.70      +0 -0      ircd-ratbox/Makefile.in
+  1.32      +1 -1      ircd-ratbox/adns/Makefile.in
+  1.140     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.176     +0 -0      ircd-ratbox/src/Makefile.in
+  1.9       +0 -0      ircd-ratbox/src/ident/Makefile.in
+  1.2       +2 -2      ircd-ratbox/src/resolver/Makefile.am
+  1.3       +1 -1      ircd-ratbox/src/resolver/Makefile.in
+  7.58      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/04/25 04:14:33 UTC	(20050425_0)
+
+  Modified files:
+    .                    Makefile.in 
+    adns                 Makefile.am Makefile.in 
+    modules              Makefile.in 
+    src                  Makefile.in 
+    src/ident            Makefile.in 
+    src/resolver         Makefile.in 
+    tools                Makefile.in 
+  Log:
+  rerun automake
+  
+  Revision  Changes    Path
+  7.69      +0 -0      ircd-ratbox/Makefile.in
+  1.5       +0 -5      ircd-ratbox/adns/Makefile.am
+  1.31      +20 -66    ircd-ratbox/adns/Makefile.in
+  1.139     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.175     +1 -1      ircd-ratbox/src/Makefile.in
+  1.8       +0 -0      ircd-ratbox/src/ident/Makefile.in
+  1.2       +1 -1      ircd-ratbox/src/resolver/Makefile.in
+  7.57      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/04/18 01:39:49 UTC	(20050418_0)
+
+  Modified files:
+    .                    Makefile.in configure configure.ac 
+    adns                 Makefile.in 
+    include              commio.h setup.h.in 
+    modules              Makefile.in 
+    src                  Makefile.in commio.c sigio.c 
+    src/ident            Makefile.in 
+    tools                Makefile.in 
+  Log:
+  more sigio fixes
+  
+  Revision  Changes    Path
+  7.67      +0 -0      ircd-ratbox/Makefile.in
+  1.29      +0 -0      ircd-ratbox/adns/Makefile.in
+  7.263     +298 -242  ircd-ratbox/configure
+  7.74      +39 -3     ircd-ratbox/configure.ac
+  1.26      +5 -2      ircd-ratbox/include/commio.h
+  7.100     +4 -3      ircd-ratbox/include/setup.h.in
+  1.137     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.173     +0 -0      ircd-ratbox/src/Makefile.in
+  1.43      +3 -2      ircd-ratbox/src/commio.c
+  1.6       +1 -1      ircd-ratbox/src/ident/Makefile.in
+  7.52      +16 -6     ircd-ratbox/src/sigio.c
+  7.55      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/04/17 18:51:12 UTC	(20050417_4)
+
+  Modified files:
+    include              commio.h 
+    src                  commio.c linebuf.c s_auth.c send.c 
+    src/ident            ident.c 
+  Log:
+  more ident/commio related goodies.  make ident use pipes
+  
+  Revision  Changes    Path
+  1.25      +2 -1      ircd-ratbox/include/commio.h
+  1.42      +19 -1     ircd-ratbox/src/commio.c
+  1.10      +25 -20    ircd-ratbox/src/ident/ident.c
+  7.133     +1 -1      ircd-ratbox/src/linebuf.c
+  7.220     +38 -23    ircd-ratbox/src/s_auth.c
+  7.295     +1 -1      ircd-ratbox/src/send.c
+
+
+
+androsyn    2005/04/17 17:25:43 UTC	(20050417_3)
+
+  Modified files:
+    include              s_auth.h 
+    src                  s_auth.c 
+  Log:
+  i think i got the rest of this ident stuff sorted...
+  
+  Revision  Changes    Path
+  7.34      +9 -19     ircd-ratbox/include/s_auth.h
+  7.219     +11 -18    ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/04/17 07:20:02 UTC	(20050417_2)
+
+  Modified files:
+    .                    Makefile.in 
+    adns                 Makefile.in 
+    modules              Makefile.in 
+    src                  Makefile.in 
+    src/ident            Makefile.am Makefile.in ident.c 
+    tools                Makefile.in 
+  Log:
+  more fun and excitement in identd land
+  
+  Revision  Changes    Path
+  7.66      +0 -0      ircd-ratbox/Makefile.in
+  1.28      +0 -0      ircd-ratbox/adns/Makefile.in
+  1.136     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.172     +0 -0      ircd-ratbox/src/Makefile.in
+  1.5       +1 -1      ircd-ratbox/src/ident/Makefile.am
+  1.5       +2 -2      ircd-ratbox/src/ident/Makefile.in
+  1.9       +21 -21    ircd-ratbox/src/ident/ident.c
+  7.54      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/04/17 06:43:12 UTC	(20050417_1)
+
+  Modified files:
+    src                  s_auth.c 
+  Log:
+  don't do a release_auth_client from auth_error
+  
+  Revision  Changes    Path
+  7.218     +0 -1      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/04/17 06:26:42 UTC	(20050417_0)
+
+  Modified files:
+    .                    Makefile.in 
+    adns                 Makefile.in 
+    include              balloc.h commio.h linebuf.h struct.h 
+    modules              Makefile.in m_stats.c 
+    src                  Makefile.in commio.c event.c linebuf.c 
+                         s_auth.c tools.c 
+    src/ident            Makefile.am Makefile.in ident.c 
+    tools                Makefile.in 
+  Log:
+  Make the ident daemon and associated code in s_auth.c use linebufs when
+  talking to each other to deal with nasties like EAGAIN...
+  
+  Revision  Changes    Path
+  7.65      +0 -0      ircd-ratbox/Makefile.in
+  1.27      +2 -2      ircd-ratbox/adns/Makefile.in
+  1.38      +1 -0      ircd-ratbox/include/balloc.h
+  1.24      +3 -2      ircd-ratbox/include/commio.h
+  1.36      +26 -0     ircd-ratbox/include/linebuf.h
+  7.5       +1 -23     ircd-ratbox/include/struct.h
+  1.135     +0 -0      ircd-ratbox/modules/Makefile.in
+  1.255     +16 -4     ircd-ratbox/modules/m_stats.c
+  7.171     +0 -0      ircd-ratbox/src/Makefile.in
+  1.41      +4 -6      ircd-ratbox/src/commio.c
+  7.56      +6 -2      ircd-ratbox/src/event.c
+  1.4       +15 -2     ircd-ratbox/src/ident/Makefile.am
+  1.4       +124 -4    ircd-ratbox/src/ident/Makefile.in
+  1.8       +97 -134   ircd-ratbox/src/ident/ident.c
+  7.132     +77 -0     ircd-ratbox/src/linebuf.c
+  7.217     +77 -89    ircd-ratbox/src/s_auth.c
+  7.52      +1 -1      ircd-ratbox/src/tools.c
+  7.53      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/04/15 20:49:25 UTC	(20050415_1)
+
+  Modified files:
+    src                  listener.c 
+  Log:
+  remove a stupid check that isn't really needed
+  
+  Revision  Changes    Path
+  7.137     +4 -13     ircd-ratbox/src/listener.c
+
+
+
+androsyn    2005/04/15 19:32:26 UTC	(20050415_0)
+
+  Modified files:
+    include              commio.h setup.h.in tools.h 
+    src                  commio.c dns.c ircd_signal.c listener.c 
+                         s_auth.c tools.c 
+  Log:
+  add in some changes that make things a little more stable.  also add in some
+  rather slow sanity checking code to check the auth_poll_list
+  
+  Revision  Changes    Path
+  1.23      +2 -0      ircd-ratbox/include/commio.h
+  7.99      +2 -0      ircd-ratbox/include/setup.h.in
+  1.58      +12 -5     ircd-ratbox/include/tools.h
+  1.40      +40 -1     ircd-ratbox/src/commio.c
+  7.12      +19 -15    ircd-ratbox/src/dns.c
+  7.35      +1 -0      ircd-ratbox/src/ircd_signal.c
+  7.136     +2 -2      ircd-ratbox/src/listener.c
+  7.216     +41 -19    ircd-ratbox/src/s_auth.c
+  7.51      +19 -0     ircd-ratbox/src/tools.c
+
+
+
+androsyn    2005/04/14 02:03:10 UTC	(20050414_0)
+
+  Modified files:
+    src/ident            ident.c 
+  Log:
+  make the ilog in ident match the one in ircd
+  
+  Revision  Changes    Path
+  1.7       +5 -5      ircd-ratbox/src/ident/ident.c
+
+
+
+ejb         2005/04/13 22:14:42 UTC	(20050413_4)
+
+  Modified files:
+    src                  event.c ports.c 
+  Log:
+  remove debug cruft
+  
+  Revision  Changes    Path
+  7.55      +0 -2      ircd-ratbox/src/event.c
+  1.4       +2 -4      ircd-ratbox/src/ports.c
+
+
+
+androsyn    2005/04/13 22:13:43 UTC	(20050413_3)
+
+  Modified files:
+    src                  listener.c packet.c send.c 
+  Added files:
+    src                  sigio.c 
+  Log:
+  add rt sigio support for linux back in.  still need to do autoconf junk for
+  it though
+  
+  Revision  Changes    Path
+  7.135     +68 -62    ircd-ratbox/src/listener.c
+  7.146     +56 -58    ircd-ratbox/src/packet.c
+  7.294     +23 -15    ircd-ratbox/src/send.c
+  7.51      +351 -0    ircd-ratbox/src/sigio.c (new)
+
+
+
+ejb         2005/04/13 21:44:10 UTC	(20050413_2)
+
+  Modified files:
+    .                    configure configure.ac 
+    include              commio.h event.h setup.h.in 
+    src                  event.c ircd.c ports.c 
+  Log:
+  support commio-based events.
+  
+  some i/o mechanisms (at least ports and kqueue) allow the user to queue
+  timers as well as i/o events.  by using this instead of our own event loop,
+  we can ask the OS to schedule events for us and avoid the cost of polling
+  the event table.  only implemented for ports at the moment.
+  
+  Revision  Changes    Path
+  7.262     +7 -2      ircd-ratbox/configure
+  7.73      +3 -2      ircd-ratbox/configure.ac
+  1.22      +19 -0     ircd-ratbox/include/commio.h
+  1.23      +5 -0      ircd-ratbox/include/event.h
+  7.98      +6 -2      ircd-ratbox/include/setup.h.in
+  7.54      +37 -1     ircd-ratbox/src/event.c
+  7.387     +2 -1      ircd-ratbox/src/ircd.c
+  1.3       +80 -15    ircd-ratbox/src/ports.c
+
+
+
+ejb         2005/04/13 18:58:43 UTC	(20050413_1)
+
+  Modified files:
+    src                  ports.c 
+  Log:
+  fix header comment
+  
+  Revision  Changes    Path
+  1.2       +1 -2      ircd-ratbox/src/ports.c
+
+
+
+ejb         2005/04/13 18:53:57 UTC	(20050413_0)
+
+  Modified files:
+    .                    configure configure.ac 
+    adns                 Makefile.am resolver.c 
+    include              stdinc.h 
+    src/ident            ident.c 
+  Added files:
+    src                  ports.c 
+  Log:
+  - don't use inet_aton, Solaris doesn't have it.
+  - define INADDR_NONE in stdinc.h if the system doesn't have it.
+  - support Solaris ports IO, the replacement for the deprecated /dev/poll.
+  
+  Revision  Changes    Path
+  1.4       +1 -1      ircd-ratbox/adns/Makefile.am
+  1.11      +1 -1      ircd-ratbox/adns/resolver.c
+  7.261     +487 -137  ircd-ratbox/configure
+  7.72      +18 -2     ircd-ratbox/configure.ac
+  1.25      +4 -0      ircd-ratbox/include/stdinc.h
+  1.6       +2 -2      ircd-ratbox/src/ident/ident.c
+  1.1       +170 -0    ircd-ratbox/src/ports.c (new)
+
+
+
+androsyn    2005/04/11 03:51:52 UTC	(20050411_0)
+
+  Modified files:
+    include              s_auth.h 
+    modules              m_rehash.c 
+    src                  dns.c s_auth.c 
+  Log:
+  Add a REHASH IDENT command to restart the ident daemon.  Also make REHASH
+  DNS restart the resolver daemon.
+  
+  Revision  Changes    Path
+  7.33      +1 -0      ircd-ratbox/include/s_auth.h
+  1.98      +15 -3     ircd-ratbox/modules/m_rehash.c
+  7.11      +1 -4      ircd-ratbox/src/dns.c
+  7.215     +5 -0      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/04/10 19:20:32 UTC	(20050410_3)
+
+  Modified files:
+    .                    Makefile.in 
+    adns                 Makefile.in 
+    include              setup.h.in 
+    modules              Makefile.in 
+    src                  Makefile.in 
+    src/ident            Makefile.am Makefile.in 
+    tools                Makefile.in 
+  Log:
+  Allow for ident to override MAX_CLIENTS when building commio.c
+  
+  Revision  Changes    Path
+  7.64      +0 -0      ircd-ratbox/Makefile.in
+  1.26      +0 -0      ircd-ratbox/adns/Makefile.in
+  7.97      +2 -0      ircd-ratbox/include/setup.h.in
+  1.134     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.170     +0 -0      ircd-ratbox/src/Makefile.in
+  1.3       +1 -1      ircd-ratbox/src/ident/Makefile.am
+  1.3       +2 -2      ircd-ratbox/src/ident/Makefile.in
+  7.52      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/04/10 19:02:50 UTC	(20050410_2)
+
+  Modified files:
+    src                  dns.c s_auth.c 
+  Log:
+  when doing the exec on the resolver and ident daemons, shove something
+  useful in argv[0] that says what the heck the things are to the clueless
+  
+  Revision  Changes    Path
+  7.10      +1 -1      ircd-ratbox/src/dns.c
+  7.214     +1 -1      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/04/10 00:26:15 UTC	(20050410_1)
+
+  Modified files:
+    src                  s_auth.c s_serv.c 
+  Log:
+  helps if you change port numbers to network order...
+  
+  Revision  Changes    Path
+  7.213     +2 -2      ircd-ratbox/src/s_auth.c
+  7.440     +2 -2      ircd-ratbox/src/s_serv.c
+
+
+
+androsyn    2005/04/10 00:00:33 UTC	(20050410_0)
+
+  Removed files:
+    src/ident            commio.c commio.h 
+  Log:
+  remove the files too
+  
+  Revision  Changes    Path
+  1.6       +0 -798    ircd-ratbox/src/ident/commio.c (dead)
+  1.2       +0 -194    ircd-ratbox/src/ident/commio.h (dead)
+
+
+
+androsyn    2005/04/09 23:57:47 UTC	(20050409_1)
+
+  Modified files:
+    .                    Makefile.in 
+    adns                 Makefile.in 
+    include              client.h commio.h defaults.h ircd_defs.h 
+                         s_auth.h 
+    modules              Makefile.in 
+    src                  Makefile.in commio.c poll.c s_serv.c 
+    src/ident            Makefile.am Makefile.in ident.c 
+    tools                Makefile.in 
+  Added files:
+    .                    compile 
+  Removed files:
+    src/ident            mem.c mem.h tools.c tools.h 
+  Log:
+  Have the ident daemon uses the commio stuff from the main tree, amazingly
+  it builds like this without too much pain.  Also changed the calling
+  convention for comm_connect_tcp(). We were already looking up the hostname
+  when parsing the config, if needed, so why look it up again in
+  comm_connect_tcp.  This also untangled any dns code from commio.c
+  
+  Revision  Changes    Path
+  7.63      +1 -1      ircd-ratbox/Makefile.in
+  1.25      +0 -0      ircd-ratbox/adns/Makefile.in
+  7.1       +136 -0    ircd-ratbox/compile (new)
+  7.277     +1 -1      ircd-ratbox/include/client.h
+  1.21      +2 -3      ircd-ratbox/include/commio.h
+  7.19      +1 -1      ircd-ratbox/include/defaults.h
+  7.63      +1 -1      ircd-ratbox/include/ircd_defs.h
+  7.32      +1 -1      ircd-ratbox/include/s_auth.h
+  1.133     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.169     +1 -1      ircd-ratbox/src/Makefile.in
+  1.39      +14 -75    ircd-ratbox/src/commio.c
+  1.2       +4 -1      ircd-ratbox/src/ident/Makefile.am
+  1.2       +192 -12   ircd-ratbox/src/ident/Makefile.in
+  1.5       +24 -16    ircd-ratbox/src/ident/ident.c
+  1.3       +0 -24     ircd-ratbox/src/ident/mem.c (dead)
+  1.2       +0 -12     ircd-ratbox/src/ident/mem.h (dead)
+  1.3       +0 -97     ircd-ratbox/src/ident/tools.c (dead)
+  1.2       +0 -372    ircd-ratbox/src/ident/tools.h (dead)
+  7.91      +0 -1      ircd-ratbox/src/poll.c
+  7.439     +14 -7     ircd-ratbox/src/s_serv.c
+  7.51      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/04/09 19:12:24 UTC	(20050409_0)
+
+  Modified files:
+    src                  ircd_signal.c s_auth.c 
+  Log:
+  add a sigchld handler for ident
+  
+  Revision  Changes    Path
+  7.34      +2 -0      ircd-ratbox/src/ircd_signal.c
+  7.212     +12 -6     ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/04/08 22:22:49 UTC	(20050408_9)
+
+  Modified files:
+    src                  s_auth.c 
+  Log:
+  Do SetGotId() on the client, not the auth
+  
+  Revision  Changes    Path
+  7.211     +1 -1      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/04/08 22:19:24 UTC	(20050408_8)
+
+  Modified files:
+    src                  s_auth.c 
+  Log:
+  clear the point in the auth table when delete auth queries..
+  
+  Revision  Changes    Path
+  7.210     +45 -37    ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/04/08 22:07:34 UTC	(20050408_7)
+
+  Modified files:
+    src                  s_auth.c 
+  Log:
+  handle the ircd getting rid of the client before ident
+  
+  Revision  Changes    Path
+  7.209     +3 -0      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/04/08 22:00:56 UTC	(20050408_6)
+
+  Modified files:
+    src                  commio.c 
+  Log:
+  typo..
+  
+  Revision  Changes    Path
+  1.38      +1 -1      ircd-ratbox/src/commio.c
+
+
+
+androsyn    2005/04/08 21:56:39 UTC	(20050408_5)
+
+  Modified files:
+    src                  commio.c 
+    src/ident            commio.c 
+  Log:
+  Lets use the data pointer we saved, not the one we just nulled...
+  
+  Revision  Changes    Path
+  1.37      +1 -1      ircd-ratbox/src/commio.c
+  1.5       +1 -1      ircd-ratbox/src/ident/commio.c
+
+
+
+androsyn    2005/04/08 21:49:22 UTC	(20050408_4)
+
+  Modified files:
+    src/ident            commio.c 
+  Log:
+  sys/types.h needs to be before socket.h doh
+  
+  Revision  Changes    Path
+  1.4       +1 -1      ircd-ratbox/src/ident/commio.c
+
+
+
+androsyn    2005/04/08 21:47:10 UTC	(20050408_3)
+
+  Modified files:
+    src/ident            commio.c 
+  Log:
+  I'm making the identd code use poll().  If you're system doesn't support
+  poll() by now, you really don't need ircd on it. Sorry.
+  
+  Revision  Changes    Path
+  1.3       +229 -157  ircd-ratbox/src/ident/commio.c
+
+
+
+androsyn    2005/04/08 20:05:07 UTC	(20050408_2)
+
+  Modified files:
+    src/ident            commio.c ident.c tools.c 
+  Log:
+  fix compile errors on freebsd
+  
+  Revision  Changes    Path
+  1.2       +1 -2      ircd-ratbox/src/ident/commio.c
+  1.4       +1 -1      ircd-ratbox/src/ident/ident.c
+  1.2       +1 -1      ircd-ratbox/src/ident/tools.c
+
+
+
+androsyn    2005/04/08 19:41:03 UTC	(20050408_1)
+
+  Modified files:
+    src                  s_auth.c 
+  Log:
+  change that 3 to a 0
+  
+  Revision  Changes    Path
+  7.208     +1 -1      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/04/08 19:40:19 UTC	(20050408_0)
+
+  Modified files:
+    .                    Makefile.in configure configure.ac 
+    adns                 Makefile.in resolver.c 
+    include              s_auth.h 
+    modules              Makefile.in 
+    src                  .indent.pro Makefile.am Makefile.in dns.c 
+                         ircd.c s_auth.c 
+    src/ident            ident.c mem.c 
+    tools                Makefile.in 
+  Added files:
+    src/ident            Makefile.am Makefile.in 
+  Log:
+  The rest of the new ident checking code, this should all mostly work.  The
+  ident daemon failure checking needs to be made more robust though.
+  
+  Revision  Changes    Path
+  7.62      +0 -0      ircd-ratbox/Makefile.in
+  1.24      +0 -0      ircd-ratbox/adns/Makefile.in
+  1.10      +1 -9      ircd-ratbox/adns/resolver.c
+  7.260     +4 -3      ircd-ratbox/configure
+  7.71      +3 -2      ircd-ratbox/configure.ac
+  7.31      +1 -1      ircd-ratbox/include/s_auth.h
+  1.132     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.4       +1 -1      ircd-ratbox/src/.indent.pro
+  7.5       +2 -0      ircd-ratbox/src/Makefile.am
+  7.168     +129 -30   ircd-ratbox/src/Makefile.in
+  7.9       +8 -10     ircd-ratbox/src/dns.c
+  1.1       +6 -0      ircd-ratbox/src/ident/Makefile.am (new)
+  1.1       +496 -0    ircd-ratbox/src/ident/Makefile.in (new)
+  1.3       +29 -8     ircd-ratbox/src/ident/ident.c
+  1.2       +0 -1      ircd-ratbox/src/ident/mem.c
+  7.386     +1 -1      ircd-ratbox/src/ircd.c
+  7.207     +236 -263  ircd-ratbox/src/s_auth.c
+  7.50      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/04/07 19:54:36 UTC	(20050407_1)
+
+  Modified files:
+    src/ident            ident.c 
+  Log:
+  more ident stuff
+  
+  Revision  Changes    Path
+  1.2       +145 -44   ircd-ratbox/src/ident/ident.c
+
+
+
+androsyn    2005/04/07 16:16:26 UTC	(20050407_0)
+
+  Modified files:
+    adns                 resolver.c 
+  Log:
+  handle general resolver failures
+  
+  Revision  Changes    Path
+  1.9       +1 -1      ircd-ratbox/adns/resolver.c
+
+
+
+androsyn    2005/04/06 20:46:01 UTC	(20050406_3)
+
+  Added files:
+    src/ident            commio.c commio.h defs.h ident.c mem.c 
+                         mem.h tools.c tools.h 
+  Log:
+  beginnings of my ident checking daemon thingy
+  
+  Revision  Changes    Path
+  1.1       +727 -0    ircd-ratbox/src/ident/commio.c (new)
+  1.1       +194 -0    ircd-ratbox/src/ident/commio.h (new)
+  1.1       +49 -0     ircd-ratbox/src/ident/defs.h (new)
+  1.1       +335 -0    ircd-ratbox/src/ident/ident.c (new)
+  1.1       +25 -0     ircd-ratbox/src/ident/mem.c (new)
+  1.1       +12 -0     ircd-ratbox/src/ident/mem.h (new)
+  1.1       +97 -0     ircd-ratbox/src/ident/tools.c (new)
+  1.1       +372 -0    ircd-ratbox/src/ident/tools.h (new)
+
+
+
+androsyn    2005/04/06 20:43:24 UTC	(20050406_2)
+
+  ircd-ratbox/src/ident - New directory
+
+
+
+leeh        2005/04/06 10:59:44 UTC	(20050406_1)
+
+  Modified files:
+    adns                 resolver.c 
+    src                  dns.c 
+  Log:
+  - fix some compilation warnings
+  
+  Revision  Changes    Path
+  1.8       +1 -1      ircd-ratbox/adns/resolver.c
+  7.8       +5 -5      ircd-ratbox/src/dns.c
+
+
+
+androsyn    2005/04/06 04:00:34 UTC	(20050406_0)
+
+  Modified files:
+    src                  dns.c 
+  Log:
+  make that IDTABLE-1, clobbering your dns_fd with an overflow is bad
+  
+  Revision  Changes    Path
+  7.7       +10 -1     ircd-ratbox/src/dns.c
+
+
+
+leeh        2005/04/05 12:18:40 UTC	(20050405_1)
+
+  Modified files:
+    doc                  monitor.txt 
+    include              ircd_defs.h 
+    modules              m_resv.c m_xline.c 
+    modules/core         m_nick.c 
+  Log:
+  - fix propagation of unxline/unresv
+  - make sockhost always v6 sized
+  - update monitor documentation
+  
+  Revision  Changes    Path
+  1.4       +1 -1      ircd-ratbox/doc/monitor.txt
+  7.62      +1 -4      ircd-ratbox/include/ircd_defs.h
+  1.174     +2 -13     ircd-ratbox/modules/core/m_nick.c
+  1.82      +2 -2      ircd-ratbox/modules/m_resv.c
+  1.78      +2 -2      ircd-ratbox/modules/m_xline.c
+
+
+
+leeh        2005/04/05 01:22:59 UTC	(20050405_0)
+
+  Modified files:
+    src                  newconf.c 
+  Log:
+  - reset flags to 0 before trying to add shared privs..
+  
+  Revision  Changes    Path
+  7.209     +1 -1      ircd-ratbox/src/newconf.c
+
+
+
+androsyn    2005/03/30 18:02:06 UTC	(20050330_1)
+
+  Modified files:
+    src                  dns.c 
+  Log:
+  more minor things to the resolver to make it a bit more reliable
+  
+  Revision  Changes    Path
+  7.6       +34 -4     ircd-ratbox/src/dns.c
+
+
+
+androsyn    2005/03/30 01:47:27 UTC	(20050330_0)
+
+  Modified files:
+    src                  s_auth.c 
+  Log:
+  Got to start the auth query before dns...bleh
+  
+  Revision  Changes    Path
+  7.206     +11 -2     ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/03/28 21:10:53 UTC	(20050328_9)
+
+  Modified files:
+    src                  s_auth.c 
+  Log:
+  removing from the auth_poll_list twice is bad....
+  
+  Revision  Changes    Path
+  7.205     +1 -3      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/03/28 18:45:34 UTC	(20050328_8)
+
+  Modified files:
+    adns                 resolver.c 
+    src                  dns.c s_auth.c 
+  Log:
+  apparently i screwed stuff up somehow. this works on flamed anyways..
+  
+  Revision  Changes    Path
+  1.7       +2 -2      ircd-ratbox/adns/resolver.c
+  7.5       +8 -2      ircd-ratbox/src/dns.c
+  7.204     +4 -3      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/03/28 18:14:34 UTC	(20050328_7)
+
+  Modified files:
+    src                  s_auth.c 
+  Log:
+  fix some minor goof ups
+  
+  Revision  Changes    Path
+  7.203     +2 -1      ircd-ratbox/src/s_auth.c
+
+
+
+androsyn    2005/03/28 13:42:26 UTC	(20050328_6)
+
+  Modified files:
+    src                  dns.c ircd_signal.c s_conf.c 
+  Log:
+  fix a minor IPV6 goof up and add a few includes back
+  
+  Revision  Changes    Path
+  7.4       +3 -1      ircd-ratbox/src/dns.c
+  7.33      +1 -1      ircd-ratbox/src/ircd_signal.c
+  7.521     +1 -0      ircd-ratbox/src/s_conf.c
+
+
+
+androsyn    2005/03/28 03:44:07 UTC	(20050328_5)
+
+  Modified files:
+    src                  dns.c 
+  Log:
+  fix a fd leak when we refork the resolver
+  
+  Revision  Changes    Path
+  7.3       +2 -1      ircd-ratbox/src/dns.c
+
+
+
+androsyn    2005/03/28 03:15:28 UTC	(20050328_4)
+
+  Modified files:
+    modules              m_stats.c 
+  Log:
+  stats A is hosed right now, i'll make it do something useful again, maybe
+  
+  Revision  Changes    Path
+  1.254     +2 -2      ircd-ratbox/modules/m_stats.c
+
+
+
+androsyn    2005/03/28 03:13:57 UTC	(20050328_3)
+
+  Modified files:
+    src                  client.c commio.c devpoll.c dns.c epoll.c 
+                         ircd.c kqueue.c listener.c poll.c 
+                         s_auth.c s_conf.c s_newconf.c s_serv.c 
+                         select.c send.c 
+  Log:
+  Remove res.h/adns.h from a bunch of places that didn't need it
+  
+  Revision  Changes    Path
+  7.504     +0 -2      ircd-ratbox/src/client.c
+  1.36      +1 -3      ircd-ratbox/src/commio.c
+  7.44      +0 -1      ircd-ratbox/src/devpoll.c
+  7.2       +1 -1      ircd-ratbox/src/dns.c
+  1.42      +0 -2      ircd-ratbox/src/epoll.c
+  7.385     +1 -2      ircd-ratbox/src/ircd.c
+  1.59      +0 -2      ircd-ratbox/src/kqueue.c
+  7.134     +0 -2      ircd-ratbox/src/listener.c
+  7.90      +0 -2      ircd-ratbox/src/poll.c
+  7.202     +1 -2      ircd-ratbox/src/s_auth.c
+  7.520     +0 -2      ircd-ratbox/src/s_conf.c
+  7.76      +1 -2      ircd-ratbox/src/s_newconf.c
+  7.438     +0 -2      ircd-ratbox/src/s_serv.c
+  7.52      +0 -2      ircd-ratbox/src/select.c
+  7.293     +0 -3      ircd-ratbox/src/send.c
+
+
+
+androsyn    2005/03/28 02:57:49 UTC	(20050328_2)
+
+  Modified files:
+    adns                 resolver.c 
+  Log:
+  make the resolver die if the control channel dies..
+  
+  Revision  Changes    Path
+  1.6       +41 -4     ircd-ratbox/adns/resolver.c
+
+
+
+androsyn    2005/03/28 00:41:08 UTC	(20050328_1)
+
+  Modified files:
+    .                    Makefile.in configure configure.ac 
+    adns                 Makefile.in 
+    modules              Makefile.in 
+    src                  Makefile.in 
+    tools                Makefile.in 
+  Log:
+  Regenerate autoconf foo
+  
+  Revision  Changes    Path
+  7.61      +0 -0      ircd-ratbox/Makefile.in
+  1.23      +1 -1      ircd-ratbox/adns/Makefile.in
+  7.259     +4 -4      ircd-ratbox/configure
+  7.70      +4 -4      ircd-ratbox/configure.ac
+  1.131     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.167     +1 -1      ircd-ratbox/src/Makefile.in
+  7.49      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/03/28 00:36:16 UTC	(20050328_0)
+
+  Modified files:
+    .                    Makefile.in configure configure.ac 
+    adns                 Makefile.am Makefile.in adns.h event.c 
+                         resolver.c setup.c 
+    include              commio.h parse.h res.h s_auth.h 
+                         s_newconf.h 
+    modules              Makefile.in 
+    src                  Makefile.am Makefile.in commio.c 
+                         ircd_signal.c parse.c s_auth.c 
+                         s_newconf.c 
+    tools                Makefile.in 
+  Added files:
+    src                  dns.c 
+  Removed files:
+    src                  adns.c 
+  Log:
+  the rest of the resolver
+  
+  Revision  Changes    Path
+  7.60      +1 -1      ircd-ratbox/Makefile.in
+  1.3       +5 -0      ircd-ratbox/adns/Makefile.am
+  1.22      +66 -20    ircd-ratbox/adns/Makefile.in
+  1.22      +12 -11    ircd-ratbox/adns/adns.h
+  1.32      +4 -5      ircd-ratbox/adns/event.c
+  1.5       +40 -114   ircd-ratbox/adns/resolver.c
+  1.45      +4 -6      ircd-ratbox/adns/setup.c
+  7.258     +2 -0      ircd-ratbox/configure
+  7.69      +4 -2      ircd-ratbox/configure.ac
+  1.20      +1 -1      ircd-ratbox/include/commio.h
+  7.27      +1 -0      ircd-ratbox/include/parse.h
+  7.40      +9 -16     ircd-ratbox/include/res.h
+  7.30      +1 -1      ircd-ratbox/include/s_auth.h
+  7.52      +1 -1      ircd-ratbox/include/s_newconf.h
+  1.130     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.4       +5 -5      ircd-ratbox/src/Makefile.am
+  7.166     +11 -11    ircd-ratbox/src/Makefile.in
+  7.83      +0 -288    ircd-ratbox/src/adns.c (dead)
+  1.35      +12 -42    ircd-ratbox/src/commio.c
+  7.1       +304 -0    ircd-ratbox/src/dns.c (new)
+  7.32      +1 -0      ircd-ratbox/src/ircd_signal.c
+  7.197     +1 -1      ircd-ratbox/src/parse.c
+  7.201     +20 -56    ircd-ratbox/src/s_auth.c
+  7.75      +8 -15     ircd-ratbox/src/s_newconf.c
+  7.48      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+leeh        2005/03/27 02:19:49 UTC	(20050327_3)
+
+  Added files:
+    doc                  tgchange.txt 
+  Log:
+  - add tgchange documentation
+  
+  Revision  Changes    Path
+  1.2       +38 -0     ircd-ratbox/doc/tgchange.txt (new)
+
+
+
+leeh        2005/03/27 01:09:17 UTC	(20050327_2)
+
+  Modified files:
+    modules/core         m_message.c 
+  Log:
+  - disallow clients messaging uids
+  
+  Revision  Changes    Path
+  1.173     +11 -3     ircd-ratbox/modules/core/m_message.c
+
+
+
+leeh        2005/03/27 01:05:55 UTC	(20050327_1)
+
+  Modified files:
+    modules/core         m_join.c 
+  Log:
+  - moved modebuf and parabuf down to function scope in m_join.c
+  
+  Revision  Changes    Path
+  1.175     +26 -31    ircd-ratbox/modules/core/m_join.c
+
+
+
+leeh        2005/03/27 00:54:42 UTC	(20050327_0)
+
+  Modified files:
+    modules/core         m_join.c 
+  Log:
+  - make set_final_mode() use internal function buffers and send the mode
+    change itself.
+  
+  Revision  Changes    Path
+  1.174     +47 -38    ircd-ratbox/modules/core/m_join.c
+
+
+
+androsyn    2005/03/26 22:38:50 UTC	(20050326_1)
+
+  Modified files:
+    adns                 resolver.c 
+  Log:
+  update resolver.c a bit more...
+  
+  Revision  Changes    Path
+  1.4       +13 -167   ircd-ratbox/adns/resolver.c
+
+
+
+androsyn    2005/03/26 19:04:02 UTC	(20050326_0)
+
+  Modified files:
+    adns                 resolver.c 
+  Log:
+  Commit some more work on resolver.c
+  
+  Revision  Changes    Path
+  1.3       +53 -14    ircd-ratbox/adns/resolver.c
+
+
+
+androsyn    2005/03/25 19:42:05 UTC	(20050325_5)
+
+  Modified files:
+    adns                 resolver.c 
+  Log:
+  change the resolver command to be I and H, just a little faster
+  
+  Revision  Changes    Path
+  1.2       +11 -8     ircd-ratbox/adns/resolver.c
+
+
+
+androsyn    2005/03/25 19:29:51 UTC	(20050325_4)
+
+  Added files:
+    adns                 resolver.c 
+  Log:
+  add the initial version of the resolver daemon
+  
+  Revision  Changes    Path
+  1.1       +789 -0    ircd-ratbox/adns/resolver.c (new)
+
+
+
+leeh        2005/03/25 19:23:53 UTC	(20050325_3)
+
+  Modified files:
+    include              hostmask.h 
+    modules              m_stats.c 
+    src                  hostmask.c 
+  Log:
+  - duplicate find_conf_by_address() into find_auth()
+  - remove precedence checking when hunting for anything but auth
+  
+  Revision  Changes    Path
+  1.46      +2 -0      ircd-ratbox/include/hostmask.h
+  1.253     +8 -9      ircd-ratbox/modules/m_stats.c
+  7.115     +105 -9    ircd-ratbox/src/hostmask.c
+
+
+
+leeh        2005/03/25 15:42:21 UTC	(20050325_2)
+
+  Modified files:
+    include              s_conf.h 
+    modules/core         m_server.c 
+    src                  hostmask.c 
+  Log:
+  - apply CONF_SKIPUSER to the hostname hash, whenever we add something with a
+    username that will always match, ie a dline, or *@host kline, set
+    arec->type |= CONF_SKIPUSER, so we can skip a match()
+  
+  Revision  Changes    Path
+  7.323     +1 -0      ircd-ratbox/include/s_conf.h
+  1.164     +1 -2      ircd-ratbox/modules/core/m_server.c
+  7.114     +26 -20    ircd-ratbox/src/hostmask.c
+
+
+
+leeh        2005/03/25 15:12:33 UTC	(20050325_1)
+
+  Modified files:
+    include              client.h s_conf.h 
+    src                  hostmask.c s_conf.c s_user.c 
+  Log:
+  - remove some unused defines
+  
+  Revision  Changes    Path
+  7.276     +0 -6      ircd-ratbox/include/client.h
+  7.322     +0 -22     ircd-ratbox/include/s_conf.h
+  7.113     +0 -8      ircd-ratbox/src/hostmask.c
+  7.519     +0 -6      ircd-ratbox/src/s_conf.c
+  7.352     +0 -9      ircd-ratbox/src/s_user.c
+
+
+
+leeh        2005/03/25 14:18:18 UTC	(20050325_0)
+
+  Modified files:
+    src                  parse.c 
+  Log:
+  - fix a parser bug causing us to be one parameter short of the allowed limit
+  
+  Revision  Changes    Path
+  7.196     +7 -4      ircd-ratbox/src/parse.c
+
+
+
+leeh        2005/03/24 17:09:42 UTC	(20050324_0)
+
+  Modified files:
+    modules/core         m_message.c 
+  Log:
+  - exempt users messaging themselves from target change
+  
+  Revision  Changes    Path
+  1.172     +5 -1      ircd-ratbox/modules/core/m_message.c
+
+
+
+leeh        2005/03/23 13:56:28 UTC	(20050323_6)
+
+  Modified files:
+    doc                  Makefile.in 
+  Log:
+  - add an empty 'all' target
+  
+  Revision  Changes    Path
+  7.27      +2 -1      ircd-ratbox/doc/Makefile.in
+
+
+
+androsyn    2005/03/23 13:41:06 UTC	(20050323_5)
+
+  Modified files:
+    .                    Makefile.am Makefile.in 
+    adns                 Makefile.in 
+    modules              Makefile.in 
+    src                  Makefile.in 
+    tools                Makefile.in 
+  Log:
+  Damnit, forgot to add help/
+  
+  Revision  Changes    Path
+  7.3       +1 -1      ircd-ratbox/Makefile.am
+  7.59      +2 -2      ircd-ratbox/Makefile.in
+  1.21      +0 -0      ircd-ratbox/adns/Makefile.in
+  1.129     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.165     +0 -0      ircd-ratbox/src/Makefile.in
+  7.47      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/03/23 13:31:35 UTC	(20050323_4)
+
+  Modified files:
+    .                    Makefile.am Makefile.in configure 
+    adns                 Makefile.in 
+    modules              Makefile.in 
+    src                  Makefile.in 
+    tools                Makefile.in 
+  Log:
+  Add doc to the list of subdirs so make install actually installs example
+  configs.
+  
+  Revision  Changes    Path
+  7.2       +1 -1      ircd-ratbox/Makefile.am
+  7.58      +1 -1      ircd-ratbox/Makefile.in
+  1.20      +0 -0      ircd-ratbox/adns/Makefile.in
+  7.257     +2 -2      ircd-ratbox/configure
+  1.128     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.164     +0 -0      ircd-ratbox/src/Makefile.in
+  7.46      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/03/23 03:33:14 UTC	(20050323_3)
+
+  Modified files:
+    .                    Makefile.in configure configure.ac 
+    adns                 Makefile.in 
+    modules              Makefile.in 
+    src                  Makefile.in 
+    tools                Makefile.in 
+  Log:
+  fix a typo in configure.ac
+  
+  Revision  Changes    Path
+  7.57      +0 -0      ircd-ratbox/Makefile.in
+  1.19      +0 -0      ircd-ratbox/adns/Makefile.in
+  7.256     +3 -3      ircd-ratbox/configure
+  7.68      +3 -3      ircd-ratbox/configure.ac
+  1.127     +0 -0      ircd-ratbox/modules/Makefile.in
+  7.163     +0 -0      ircd-ratbox/src/Makefile.in
+  7.45      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/03/23 02:49:02 UTC	(20050323_2)
+
+  Removed files:
+    modules              .depend 
+    src                  .depend 
+  Log:
+  remove .depend as we no longer need them
+  
+  Revision  Changes    Path
+  1.49      +0 -664    ircd-ratbox/modules/.depend (dead)
+  7.52      +0 -364    ircd-ratbox/src/.depend (dead)
+
+
+
+leeh        2005/03/23 00:37:42 UTC	(20050323_1)
+
+  Modified files:
+    .                    .cvsignore 
+    adns                 .cvsignore 
+    include              .cvsignore 
+    modules              .cvsignore 
+    servlink             .cvsignore 
+    src                  .cvsignore 
+    tools                .cvsignore 
+  Added files:
+    libltdl              .cvsignore 
+    modules/core         .cvsignore 
+  Log:
+  - update .cvsignore files
+  
+  Revision  Changes    Path
+  1.7       +1 -0      ircd-ratbox/.cvsignore
+  1.2       +1 -0      ircd-ratbox/adns/.cvsignore
+  1.2       +1 -0      ircd-ratbox/include/.cvsignore
+  1.1       +9 -0      ircd-ratbox/libltdl/.cvsignore (new)
+  1.6       +2 -2      ircd-ratbox/modules/.cvsignore
+  1.1       +4 -0      ircd-ratbox/modules/core/.cvsignore (new)
+  1.2       +1 -0      ircd-ratbox/servlink/.cvsignore
+  1.3       +2 -1      ircd-ratbox/src/.cvsignore
+  1.3       +3 -1      ircd-ratbox/tools/.cvsignore
+
+
+
+leeh        2005/03/23 00:30:54 UTC	(20050323_0)
+
+  Modified files:
+    .                    configure configure.ac 
+  Log:
+  - remove some extra spaces sh doesnt like
+  
+  Revision  Changes    Path
+  7.255     +3 -3      ircd-ratbox/configure
+  7.67      +3 -3      ircd-ratbox/configure.ac
+
+
+
+leeh        2005/03/22 22:29:07 UTC	(20050322_6)
+
+  Added files:
+    include              struct.h 
+  Log:
+  - add back struct.h
+  
+  Revision  Changes    Path
+  7.4       +264 -0    ircd-ratbox/include/struct.h (new)
+
+
+
+androsyn    2005/03/22 22:25:47 UTC	(20050322_5)
+
+  Modified files:
+    .                    configure 
+  Log:
+  cvs == craq++
+  
+  Revision  Changes    Path
+  7.254     +2 -2      ircd-ratbox/configure
+
+
+
+androsyn    2005/03/22 22:25:16 UTC	(20050322_4)
+
+  Modified files:
+    .                    Makefile.in aclocal.m4 configure 
+                         configure.ac 
+    adns                 Makefile.in 
+    modules              Makefile.in 
+    servlink             Makefile.in 
+    src                  Makefile.in 
+    tools                Makefile.in 
+  Log:
+  throw in AM_MAINTAINER_MODE to disable autorebuild rules
+  
+  Revision  Changes    Path
+                       
+  7.56      +7 -4      ircd-ratbox/Makefile.in
+  7.3       +40 -0     ircd-ratbox/aclocal.m4
+  1.18      +6 -3      ircd-ratbox/adns/Makefile.in
+  7.66      +3 -3      ircd-ratbox/configure.ac
+  1.126     +6 -3      ircd-ratbox/modules/Makefile.in
+  1.25      +6 -3      ircd-ratbox/servlink/Makefile.in
+  7.162     +6 -3      ircd-ratbox/src/Makefile.in
+  7.44      +6 -3      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/03/22 21:41:45 UTC	(20050322_3)
+
+  Modified files:
+    .                    Makefile.in 
+    adns                 Makefile.in 
+    modules              Makefile.in 
+    src                  Makefile.in 
+    tools                Makefile.in 
+  Log:
+  regenerate automake stuff..
+  
+  Revision  Changes    Path
+  7.55      +0 -0      ircd-ratbox/Makefile.in
+  1.17      +0 -0      ircd-ratbox/adns/Makefile.in
+  1.125     +3 -3      ircd-ratbox/modules/Makefile.in
+  7.161     +1 -1      ircd-ratbox/src/Makefile.in
+  7.43      +0 -0      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/03/22 21:40:02 UTC	(20050322_2)
+
+  Modified files:
+    modules              Makefile.am 
+  Removed files:
+    modules              instdso.sh 
+  Log:
+  backout last change
+  
+  Revision  Changes    Path
+  1.5       +4 -2      ircd-ratbox/modules/Makefile.am
+  1.2       +0 -94     ircd-ratbox/modules/instdso.sh (dead)
+
+
+
+androsyn    2005/03/22 20:13:55 UTC	(20050322_1)
+
+  Modified files:
+    modules              Makefile.am Makefile.in 
+  Added files:
+    modules              instdso.sh 
+  Log:
+  Add a helper script for installing modules, swipped from apache
+  
+  Revision  Changes    Path
+  1.4       +2 -4      ircd-ratbox/modules/Makefile.am
+  1.124                ircd-ratbox/modules/Makefile.in
+  1.1       +94 -0     ircd-ratbox/modules/instdso.sh (new)
+
+
+
+androsyn    2005/03/22 16:27:52 UTC	(20050322_0)
+
+  Modified files:
+    .                    Makefile.in 
+    adns                 Makefile.in 
+    modules              Makefile.in 
+    servlink             Makefile.in 
+    src                  Makefile.am Makefile.in ircd_lexer.l 
+                         ircd_parser.y 
+    tools                Makefile.in viconf.c 
+  Log:
+  Fix the remaining issues in the tree after the disaster of a merge
+  
+  Revision  Changes    Path
+  7.54      +0 -0      ircd-ratbox/Makefile.in
+  1.16      +2 -2      ircd-ratbox/adns/Makefile.in
+  1.123     +3 -3      ircd-ratbox/modules/Makefile.in
+  1.24      +2 -2      ircd-ratbox/servlink/Makefile.in
+  7.3       +14 -7     ircd-ratbox/src/Makefile.am
+  7.160     +17 -54    ircd-ratbox/src/Makefile.in
+  1.173     +3 -1      ircd-ratbox/src/ircd_lexer.l
+  1.281     +4 -1      ircd-ratbox/src/ircd_parser.y
+  7.42      +2 -2      ircd-ratbox/tools/Makefile.in
+  7.9       +2 -1      ircd-ratbox/tools/viconf.c
+
+
+
+androsyn    2005/03/21 23:27:25 UTC	(20050321_10)
+
+  Modified files:
+    .                    Makefile.in configure 
+    adns                 Makefile.in adns.h event.c general.c 
+                         parse.c query.c setup.c types.c 
+    include              balloc.h cache.h channel.h class.h 
+                         client.h commio.h common.h config.h 
+                         defaults.h event.h hash.h hostmask.h 
+                         irc_string.h ircd.h ircd_defs.h 
+                         ircd_getopt.h ircd_signal.h linebuf.h 
+                         listener.h m_info.h memory.h modules.h 
+                         monitor.h numeric.h packet.h parse.h 
+                         patchlevel.h reject.h res.h restart.h 
+                         s_auth.h s_gline.h s_log.h s_serv.h 
+                         s_stats.h s_user.h s_zip.h scache.h 
+                         send.h serno.h sprintf_irc.h stdinc.h 
+                         supported.h tools.h whowas.h 
+    modules              Makefile.am Makefile.in m_accept.c 
+                         m_admin.c m_away.c m_cap.c m_capab.c 
+                         m_challenge.c m_close.c m_cmessage.c 
+                         m_connect.c m_dline.c m_encap.c 
+                         m_etrace.c m_help.c m_info.c m_invite.c 
+                         m_ison.c m_kline.c m_knock.c m_links.c 
+                         m_list.c m_locops.c m_lusers.c m_map.c 
+                         m_monitor.c m_motd.c m_names.c m_oper.c 
+                         m_operspy.c m_pass.c m_ping.c m_pong.c 
+                         m_post.c m_rehash.c m_restart.c m_resv.c 
+                         m_services.c m_set.c m_stats.c m_svinfo.c 
+                         m_tb.c m_testline.c m_testmask.c m_time.c 
+                         m_topic.c m_trace.c m_unreject.c m_user.c 
+                         m_userhost.c m_users.c m_version.c 
+                         m_wallops.c m_who.c m_whois.c m_whowas.c 
+                         m_xline.c 
+    modules/core         m_die.c m_error.c m_kick.c m_kill.c 
+                         m_message.c m_mode.c m_nick.c m_part.c 
+                         m_quit.c m_server.c m_squit.c 
+    servlink             Makefile.in 
+    src                  Makefile.am Makefile.in adns.c balloc.c 
+                         cache.c channel.c class.c client.c 
+                         commio.c devpoll.c epoll.c event.c 
+                         getopt.c hash.c hostmask.c irc_string.c 
+                         ircd.c ircd_signal.c kdparse.c kqueue.c 
+                         linebuf.c listener.c match.c memory.c 
+                         modules.c monitor.c newconf.c numeric.c 
+                         packet.c parse.c patricia.c poll.c 
+                         reject.c restart.c s_auth.c s_conf.c 
+                         s_log.c s_newconf.c s_serv.c s_user.c 
+                         scache.c select.c send.c tools.c whowas.c 
+    tools                Makefile.in 
+  Log:
+  this is mostly sorted now..i've got some funky stuff with lex going on
+  still..
+  
+  Revision  Changes    Path
+  7.53      +1 -1      ircd-ratbox/Makefile.in
+  1.15      +3 -3      ircd-ratbox/adns/Makefile.in
+  1.21      +0 -5      ircd-ratbox/adns/adns.h
+  1.31      +1 -0      ircd-ratbox/adns/event.c
+  1.20      +1 -0      ircd-ratbox/adns/general.c
+  1.15      +1 -0      ircd-ratbox/adns/parse.c
+  1.28      +1 -2      ircd-ratbox/adns/query.c
+  1.44      +2 -0      ircd-ratbox/adns/setup.c
+  1.23      +2 -0      ircd-ratbox/adns/types.c
+  7.252     +2 -2      ircd-ratbox/configure
+  1.37      +1 -6      ircd-ratbox/include/balloc.h
+  1.10      +0 -3      ircd-ratbox/include/cache.h
+  7.169     +1 -4      ircd-ratbox/include/channel.h
+  7.29      +1 -3      ircd-ratbox/include/class.h
+  7.275     +8 -228    ircd-ratbox/include/client.h
+  1.19      +1 -5      ircd-ratbox/include/commio.h
+  7.12      +1 -1      ircd-ratbox/include/common.h
+  7.186     +1 -3      ircd-ratbox/include/config.h
+  7.18      +1 -1      ircd-ratbox/include/defaults.h
+  1.22      +1 -1      ircd-ratbox/include/event.h
+  7.58      +1 -3      ircd-ratbox/include/hash.h
+  1.45      +1 -1      ircd-ratbox/include/hostmask.h
+  7.66      +1 -4      ircd-ratbox/include/irc_string.h
+  7.88      +1 -5      ircd-ratbox/include/ircd.h
+  7.61      +8 -7      ircd-ratbox/include/ircd_defs.h
+  1.12      +1 -1      ircd-ratbox/include/ircd_getopt.h
+  7.10      +1 -1      ircd-ratbox/include/ircd_signal.h
+  1.35      +3 -29     ircd-ratbox/include/linebuf.h
+  7.22      +1 -3      ircd-ratbox/include/listener.h
+  7.60      +1 -3      ircd-ratbox/include/m_info.h
+  7.56      +1 -5      ircd-ratbox/include/memory.h
+  7.67      +9 -9      ircd-ratbox/include/modules.h
+  7.5       +3 -1      ircd-ratbox/include/monitor.h
+  7.62      +1 -3      ircd-ratbox/include/numeric.h
+  7.31      +1 -2      ircd-ratbox/include/packet.h
+  7.26      +119 -2    ircd-ratbox/include/parse.h
+  7.77      +2 -2      ircd-ratbox/include/patchlevel.h
+  1.13      +1 -1      ircd-ratbox/include/reject.h
+  7.39      +2 -4      ircd-ratbox/include/res.h
+  7.13      +1 -1      ircd-ratbox/include/restart.h
+  7.29      +1 -3      ircd-ratbox/include/s_auth.h
+  7.26      +1 -7      ircd-ratbox/include/s_gline.h
+  7.29      +1 -3      ircd-ratbox/include/s_log.h
+  7.103     +1 -6      ircd-ratbox/include/s_serv.h
+  7.25      +3 -9      ircd-ratbox/include/s_stats.h
+  7.39      +1 -3      ircd-ratbox/include/s_user.h
+  7.14      +1 -3      ircd-ratbox/include/s_zip.h
+  7.18      +1 -1      ircd-ratbox/include/scache.h
+  7.86      +1 -4      ircd-ratbox/include/send.h
+  7.5490    +1 -1      ircd-ratbox/include/serno.h
+  7.22      +1 -1      ircd-ratbox/include/sprintf_irc.h
+  1.24      +6 -47     ircd-ratbox/include/stdinc.h
+  7.11      +1 -5      ircd-ratbox/include/supported.h
+  1.57      +1 -1      ircd-ratbox/include/tools.h
+  7.23      +1 -6      ircd-ratbox/include/whowas.h
+  1.3       +0 -1      ircd-ratbox/modules/Makefile.am
+  1.122     +3 -4      ircd-ratbox/modules/Makefile.in
+  1.53      +3 -4      ircd-ratbox/modules/core/m_die.c
+  1.20      +5 -7      ircd-ratbox/modules/core/m_error.c
+  1.89      +3 -4      ircd-ratbox/modules/core/m_kick.c
+  1.109     +4 -4      ircd-ratbox/modules/core/m_kill.c
+  1.171     +5 -8      ircd-ratbox/modules/core/m_message.c
+  1.129     +3 -5      ircd-ratbox/modules/core/m_mode.c
+  1.173     +29 -20    ircd-ratbox/modules/core/m_nick.c
+  1.103     +3 -5      ircd-ratbox/modules/core/m_part.c
+  1.57      +4 -5      ircd-ratbox/modules/core/m_quit.c
+  1.163     +1012 -7   ircd-ratbox/modules/core/m_server.c
+  1.90      +4 -6      ircd-ratbox/modules/core/m_squit.c
+  1.66      +5 -5      ircd-ratbox/modules/m_accept.c
+  1.69      +5 -3      ircd-ratbox/modules/m_admin.c
+  1.67      +5 -5      ircd-ratbox/modules/m_away.c
+  1.12      +4 -3      ircd-ratbox/modules/m_cap.c
+  1.55      +5 -4      ircd-ratbox/modules/m_capab.c
+  1.79      +6 -4      ircd-ratbox/modules/m_challenge.c
+  1.49      +3 -4      ircd-ratbox/modules/m_close.c
+  1.9       +5 -2      ircd-ratbox/modules/m_cmessage.c
+  1.78      +4 -5      ircd-ratbox/modules/m_connect.c
+  1.58      +56 -9     ircd-ratbox/modules/m_dline.c
+  1.30      +4 -9      ircd-ratbox/modules/m_encap.c
+  1.23      +4 -9      ircd-ratbox/modules/m_etrace.c
+  1.74      +5 -5      ircd-ratbox/modules/m_help.c
+  1.130     +3 -6      ircd-ratbox/modules/m_info.c
+  1.92      +3 -6      ircd-ratbox/modules/m_invite.c
+  1.58      +4 -6      ircd-ratbox/modules/m_ison.c
+  1.208     +4 -8      ircd-ratbox/modules/m_kline.c
+  1.95      +3 -4      ircd-ratbox/modules/m_knock.c
+  1.77      +5 -4      ircd-ratbox/modules/m_links.c
+  1.87      +4 -5      ircd-ratbox/modules/m_list.c
+  1.58      +4 -7      ircd-ratbox/modules/m_locops.c
+  1.53      +4 -4      ircd-ratbox/modules/m_lusers.c
+  1.43      +6 -1      ircd-ratbox/modules/m_map.c
+  1.10      +5 -2      ircd-ratbox/modules/m_monitor.c
+  1.65      +3 -4      ircd-ratbox/modules/m_motd.c
+  1.89      +3 -5      ircd-ratbox/modules/m_names.c
+  1.99      +3 -6      ircd-ratbox/modules/m_oper.c
+  1.15      +4 -11     ircd-ratbox/modules/m_operspy.c
+  1.56      +5 -5      ircd-ratbox/modules/m_pass.c
+  1.65      +4 -3      ircd-ratbox/modules/m_ping.c
+  1.67      +4 -5      ircd-ratbox/modules/m_pong.c
+  1.35      +4 -6      ircd-ratbox/modules/m_post.c
+  1.97      +6 -5      ircd-ratbox/modules/m_rehash.c
+  1.54      +4 -5      ircd-ratbox/modules/m_restart.c
+  1.81      +6 -3      ircd-ratbox/modules/m_resv.c
+  1.14      +4 -8      ircd-ratbox/modules/m_services.c
+  1.89      +4 -6      ircd-ratbox/modules/m_set.c
+  1.252     +321 -9    ircd-ratbox/modules/m_stats.c
+  1.71      +4 -5      ircd-ratbox/modules/m_svinfo.c
+  1.19      +4 -5      ircd-ratbox/modules/m_tb.c
+  1.63      +6 -4      ircd-ratbox/modules/m_testline.c
+  1.11      +3 -6      ircd-ratbox/modules/m_testmask.c
+  1.53      +4 -5      ircd-ratbox/modules/m_time.c
+  1.98      +3 -5      ircd-ratbox/modules/m_topic.c
+  1.115     +4 -7      ircd-ratbox/modules/m_trace.c
+  1.10      +6 -4      ircd-ratbox/modules/m_unreject.c
+  1.53      +5 -7      ircd-ratbox/modules/m_user.c
+  1.63      +4 -5      ircd-ratbox/modules/m_userhost.c
+  1.52      +4 -4      ircd-ratbox/modules/m_users.c
+  1.75      +5 -4      ircd-ratbox/modules/m_version.c
+  1.63      +4 -6      ircd-ratbox/modules/m_wallops.c
+  1.124     +4 -5      ircd-ratbox/modules/m_who.c
+  1.155     +4 -6      ircd-ratbox/modules/m_whois.c
+  1.59      +4 -8      ircd-ratbox/modules/m_whowas.c
+  1.77      +43 -8     ircd-ratbox/modules/m_xline.c
+  1.23      +2 -2      ircd-ratbox/servlink/Makefile.in
+  7.2       +0 -2      ircd-ratbox/src/Makefile.am
+  7.159     +8 -14     ircd-ratbox/src/Makefile.in
+  7.82      +6 -4      ircd-ratbox/src/adns.c
+  7.92      +2 -4      ircd-ratbox/src/balloc.c
+  1.30      +7 -4      ircd-ratbox/src/cache.c
+  7.443     +2 -66     ircd-ratbox/src/channel.c
+  7.75      +2 -4      ircd-ratbox/src/class.c
+  7.503     +62 -188   ircd-ratbox/src/client.c
+  1.34      +4 -5      ircd-ratbox/src/commio.c
+  7.43      +2 -7      ircd-ratbox/src/devpoll.c
+  1.41      +4 -7      ircd-ratbox/src/epoll.c
+  7.53      +3 -3      ircd-ratbox/src/event.c
+  7.27      +1 -1      ircd-ratbox/src/getopt.c
+  7.121     +2 -4      ircd-ratbox/src/hash.c
+  7.112     +4 -2      ircd-ratbox/src/hostmask.c
+  7.82      +2 -4      ircd-ratbox/src/irc_string.c
+  7.384     +7 -11     ircd-ratbox/src/ircd.c
+  7.31      +1 -2      ircd-ratbox/src/ircd_signal.c
+  7.48      +2 -2      ircd-ratbox/src/kdparse.c
+  1.58      +4 -5      ircd-ratbox/src/kqueue.c
+  7.131     +2 -2      ircd-ratbox/src/linebuf.c
+  7.133     +9 -6      ircd-ratbox/src/listener.c
+  7.47      +1 -2      ircd-ratbox/src/match.c
+  7.53      +2 -4      ircd-ratbox/src/memory.c
+  7.161     +5 -7      ircd-ratbox/src/modules.c
+  7.7       +4 -1      ircd-ratbox/src/monitor.c
+  7.208     +6 -4      ircd-ratbox/src/newconf.c
+  7.41      +1 -7      ircd-ratbox/src/numeric.c
+  7.145     +3 -20     ircd-ratbox/src/packet.c
+  7.195     +8 -8      ircd-ratbox/src/parse.c
+  7.35      +2 -2      ircd-ratbox/src/patricia.c
+  7.89      +3 -5      ircd-ratbox/src/poll.c
+  1.41      +9 -4      ircd-ratbox/src/reject.c
+  7.40      +2 -2      ircd-ratbox/src/restart.c
+  7.200     +10 -9     ircd-ratbox/src/s_auth.c
+  7.518     +11 -9     ircd-ratbox/src/s_conf.c
+  7.85      +5 -2      ircd-ratbox/src/s_log.c
+  7.74      +32 -4     ircd-ratbox/src/s_newconf.c
+  7.437     +6 -999    ircd-ratbox/src/s_serv.c
+  7.351     +8 -8      ircd-ratbox/src/s_user.c
+  7.33      +2 -3      ircd-ratbox/src/scache.c
+  7.51      +3 -5      ircd-ratbox/src/select.c
+  7.292     +3 -3      ircd-ratbox/src/send.c
+  7.50      +2 -1      ircd-ratbox/src/tools.c
+  7.38      +3 -5      ircd-ratbox/src/whowas.c
+  7.41      +3 -3      ircd-ratbox/tools/Makefile.in
+
+
+
+androsyn    2005/03/21 23:00:18 UTC	(20050321_10)
+
+  Modified files:
+    .                    .cvsignore Makefile.in RELNOTES 
+                         aclocal.m4 configure configure.ac 
+                         install-sh 
+    adns                 Makefile.in adns.h event.c general.c 
+                         parse.c query.c setup.c types.c 
+    doc                  example.conf example.efnet.conf 
+    include              balloc.h cache.h channel.h class.h 
+                         client.h commio.h common.h config.h 
+                         config.h.dist defaults.h event.h hash.h 
+                         hostmask.h irc_string.h ircd.h 
+                         ircd_defs.h ircd_getopt.h ircd_signal.h 
+                         linebuf.h listener.h m_info.h memory.h 
+                         modules.h monitor.h numeric.h packet.h 
+                         parse.h patchlevel.h reject.h res.h 
+                         restart.h s_auth.h s_gline.h s_log.h 
+                         s_serv.h s_stats.h s_user.h s_zip.h 
+                         scache.h send.h setup.h.in sprintf_irc.h 
+                         stdinc.h supported.h tools.h whowas.h 
+    modules              .cvsignore .depend Makefile.in m_accept.c 
+                         m_admin.c m_away.c m_cap.c m_capab.c 
+                         m_challenge.c m_close.c m_cmessage.c 
+                         m_connect.c m_dline.c m_encap.c 
+                         m_etrace.c m_help.c m_info.c m_invite.c 
+                         m_ison.c m_kline.c m_knock.c m_links.c 
+                         m_list.c m_locops.c m_lusers.c m_map.c 
+                         m_monitor.c m_motd.c m_names.c m_oper.c 
+                         m_operspy.c m_pass.c m_ping.c m_pong.c 
+                         m_post.c m_rehash.c m_restart.c m_resv.c 
+                         m_services.c m_set.c m_stats.c m_svinfo.c 
+                         m_tb.c m_testline.c m_testmask.c m_time.c 
+                         m_topic.c m_trace.c m_unreject.c m_user.c 
+                         m_userhost.c m_users.c m_version.c 
+                         m_wallops.c m_who.c m_whois.c m_whowas.c 
+                         m_xline.c static_modules.c.SH 
+    modules/core         m_die.c m_error.c m_kick.c m_kill.c 
+                         m_message.c m_mode.c m_nick.c m_part.c 
+                         m_quit.c m_server.c m_squit.c 
+    servlink             Makefile.in 
+    src                  .cvsignore .depend Makefile.in adns.c 
+                         balloc.c cache.c channel.c class.c 
+                         client.c commio.c devpoll.c epoll.c 
+                         event.c getopt.c hash.c hostmask.c 
+                         irc_string.c ircd.c ircd_lexer.l 
+                         ircd_parser.y ircd_signal.c kdparse.c 
+                         kqueue.c linebuf.c listener.c match.c 
+                         memory.c modules.c monitor.c newconf.c 
+                         numeric.c packet.c parse.c patricia.c 
+                         poll.c reject.c restart.c s_auth.c 
+                         s_conf.c s_log.c s_newconf.c s_serv.c 
+                         s_user.c scache.c select.c send.c tools.c 
+                         version.c.SH whowas.c 
+    tools                Makefile.in viconf.c 
+  Added files:
+    .                    Makefile.am acinclude.m4 config.guess 
+                         config.sub depcomp ltmain.sh missing 
+                         mkinstalldirs 
+    adns                 Makefile.am 
+    libltdl              Makefile.am Makefile.in README aclocal.m4 
+                         config-h.in config.guess config.sub 
+                         configure configure.ac install-sh ltdl.c 
+                         ltdl.h ltmain.sh missing 
+    modules              Makefile.am 
+    servlink             Makefile.am 
+    src                  Makefile.am 
+    tools                Makefile.am 
+  Removed files:
+    include              struct.h 
+  Log:
+  Merge the automake stuff..i hope this doesn't fuck up
+  
+  Revision  Changes       Path
+  1.6       +3 -0         ircd-ratbox/.cvsignore
+  7.1       +8 -0         ircd-ratbox/Makefile.am (new)
+  7.52      +636 -138     ircd-ratbox/Makefile.in
+  1.116     +15 -0        ircd-ratbox/RELNOTES
+  7.1       +22 -0        ircd-ratbox/acinclude.m4 (new)
+  7.2       +6881 -21     ircd-ratbox/aclocal.m4
+  1.2       +5 -0         ircd-ratbox/adns/Makefile.am (new)
+  1.14      +476 -79      ircd-ratbox/adns/Makefile.in
+  1.20      +5 -0         ircd-ratbox/adns/adns.h
+  1.30      +0 -1         ircd-ratbox/adns/event.c
+  1.19      +0 -1         ircd-ratbox/adns/general.c
+  1.14      +0 -1         ircd-ratbox/adns/parse.c
+  1.27      +2 -1         ircd-ratbox/adns/query.c
+  1.43      +0 -2         ircd-ratbox/adns/setup.c
+  1.22      +0 -2         ircd-ratbox/adns/types.c
+  7.1       +1453 -0      ircd-ratbox/config.guess (new)
+  7.1       +1566 -0      ircd-ratbox/config.sub (new)
+  7.251     +21181 -4944  ircd-ratbox/configure
+  7.65      +72 -398      ircd-ratbox/configure.ac
+  7.1       +526 -0       ircd-ratbox/depcomp (new)
+  7.263     +1 -1         ircd-ratbox/doc/example.conf
+  7.91      +1 -1         ircd-ratbox/doc/example.efnet.conf
+  1.36      +6 -1         ircd-ratbox/include/balloc.h
+  1.9       +3 -0         ircd-ratbox/include/cache.h
+  7.168     +4 -1         ircd-ratbox/include/channel.h
+  7.28      +3 -1         ircd-ratbox/include/class.h
+  7.274     +228 -8       ircd-ratbox/include/client.h
+  1.18      +5 -1         ircd-ratbox/include/commio.h
+  7.11      +1 -1         ircd-ratbox/include/common.h
+  7.185     +3 -1         ircd-ratbox/include/config.h
+  7.82      +3 -1         ircd-ratbox/include/config.h.dist
+  7.17      +1 -1         ircd-ratbox/include/defaults.h
+  1.21      +1 -1         ircd-ratbox/include/event.h
+  7.57      +3 -1         ircd-ratbox/include/hash.h
+  1.44      +1 -1         ircd-ratbox/include/hostmask.h
+  7.65      +4 -1         ircd-ratbox/include/irc_string.h
+  7.87      +5 -1         ircd-ratbox/include/ircd.h
+  7.60      +7 -8         ircd-ratbox/include/ircd_defs.h
+  1.11      +1 -1         ircd-ratbox/include/ircd_getopt.h
+  7.9       +1 -1         ircd-ratbox/include/ircd_signal.h
+  1.34      +29 -3        ircd-ratbox/include/linebuf.h
+  7.21      +3 -1         ircd-ratbox/include/listener.h
+  7.59      +3 -1         ircd-ratbox/include/m_info.h
+  7.55      +5 -1         ircd-ratbox/include/memory.h
+  7.66      +9 -9         ircd-ratbox/include/modules.h
+  7.4       +1 -3         ircd-ratbox/include/monitor.h
+  7.61      +3 -1         ircd-ratbox/include/numeric.h
+  7.30      +2 -1         ircd-ratbox/include/packet.h
+  7.25      +2 -119       ircd-ratbox/include/parse.h
+  7.76      +2 -2         ircd-ratbox/include/patchlevel.h
+  1.12      +1 -1         ircd-ratbox/include/reject.h
+  7.38      +4 -2         ircd-ratbox/include/res.h
+  7.12      +1 -1         ircd-ratbox/include/restart.h
+  7.28      +3 -1         ircd-ratbox/include/s_auth.h
+  7.25      +7 -1         ircd-ratbox/include/s_gline.h
+  7.28      +3 -1         ircd-ratbox/include/s_log.h
+  7.102     +6 -1         ircd-ratbox/include/s_serv.h
+  7.24      +9 -3         ircd-ratbox/include/s_stats.h
+  7.38      +3 -1         ircd-ratbox/include/s_user.h
+  7.13      +3 -1         ircd-ratbox/include/s_zip.h
+  7.17      +1 -1         ircd-ratbox/include/scache.h
+  7.85      +4 -1         ircd-ratbox/include/send.h
+  7.96      +6 -22        ircd-ratbox/include/setup.h.in
+  7.21      +1 -1         ircd-ratbox/include/sprintf_irc.h
+  1.23      +47 -6        ircd-ratbox/include/stdinc.h
+  7.3       +0 -264       ircd-ratbox/include/struct.h (dead)
+  7.10      +5 -1         ircd-ratbox/include/supported.h
+  1.56      +1 -1         ircd-ratbox/include/tools.h
+  7.22      +6 -1         ircd-ratbox/include/whowas.h
+  1.2       +257 -202     ircd-ratbox/install-sh
+  1.2       +51 -0        ircd-ratbox/libltdl/Makefile.am (new)
+  1.2       +656 -0       ircd-ratbox/libltdl/Makefile.in (new)
+  1.2       +10 -0        ircd-ratbox/libltdl/README (new)
+  1.2       +974 -0       ircd-ratbox/libltdl/aclocal.m4 (new)
+  1.2       +195 -0       ircd-ratbox/libltdl/config-h.in (new)
+  1.2       +1459 -0      ircd-ratbox/libltdl/config.guess (new)
+  1.2       +1549 -0      ircd-ratbox/libltdl/config.sub (new)
+  1.2       +23706 -0     ircd-ratbox/libltdl/configure (new)
+  1.2       +80 -0        ircd-ratbox/libltdl/configure.ac (new)
+  1.2       +325 -0       ircd-ratbox/libltdl/install-sh (new)
+  1.2       +4478 -0      ircd-ratbox/libltdl/ltdl.c (new)
+  1.2       +366 -0       ircd-ratbox/libltdl/ltdl.h (new)
+  1.2       +6426 -0      ircd-ratbox/libltdl/ltmain.sh (new)
+  1.2       +360 -0       ircd-ratbox/libltdl/missing (new)
+  7.1       +6426 -0      ircd-ratbox/ltmain.sh (new)
+  7.1       +360 -0       ircd-ratbox/missing (new)
+  7.1       +150 -0       ircd-ratbox/mkinstalldirs (new)
+  1.5       +5 -1         ircd-ratbox/modules/.cvsignore
+  1.48      +655 -513     ircd-ratbox/modules/.depend
+  1.2       +160 -0       ircd-ratbox/modules/Makefile.am (new)
+  1.121     +381 -116     ircd-ratbox/modules/Makefile.in
+  1.52      +4 -3         ircd-ratbox/modules/core/m_die.c
+  1.19      +7 -5         ircd-ratbox/modules/core/m_error.c
+  1.88      +4 -3         ircd-ratbox/modules/core/m_kick.c
+  1.108     +4 -4         ircd-ratbox/modules/core/m_kill.c
+  1.170     +8 -5         ircd-ratbox/modules/core/m_message.c
+  1.128     +5 -3         ircd-ratbox/modules/core/m_mode.c
+  1.172     +20 -29       ircd-ratbox/modules/core/m_nick.c
+  1.102     +5 -3         ircd-ratbox/modules/core/m_part.c
+  1.56      +5 -4         ircd-ratbox/modules/core/m_quit.c
+  1.162     +7 -1012      ircd-ratbox/modules/core/m_server.c
+  1.89      +6 -4         ircd-ratbox/modules/core/m_squit.c
+  1.65      +5 -5         ircd-ratbox/modules/m_accept.c
+  1.68      +3 -5         ircd-ratbox/modules/m_admin.c
+  1.66      +5 -5         ircd-ratbox/modules/m_away.c
+  1.11      +3 -4         ircd-ratbox/modules/m_cap.c
+  1.54      +4 -5         ircd-ratbox/modules/m_capab.c
+  1.78      +4 -6         ircd-ratbox/modules/m_challenge.c
+  1.48      +4 -3         ircd-ratbox/modules/m_close.c
+  1.8       +2 -5         ircd-ratbox/modules/m_cmessage.c
+  1.77      +5 -4         ircd-ratbox/modules/m_connect.c
+  1.57      +9 -56        ircd-ratbox/modules/m_dline.c
+  1.29      +9 -4         ircd-ratbox/modules/m_encap.c
+  1.22      +9 -4         ircd-ratbox/modules/m_etrace.c
+  1.73      +5 -5         ircd-ratbox/modules/m_help.c
+  1.129     +6 -3         ircd-ratbox/modules/m_info.c
+  1.91      +6 -3         ircd-ratbox/modules/m_invite.c
+  1.57      +6 -4         ircd-ratbox/modules/m_ison.c
+  1.207     +8 -4         ircd-ratbox/modules/m_kline.c
+  1.94      +4 -3         ircd-ratbox/modules/m_knock.c
+  1.76      +4 -5         ircd-ratbox/modules/m_links.c
+  1.86      +5 -4         ircd-ratbox/modules/m_list.c
+  1.57      +7 -4         ircd-ratbox/modules/m_locops.c
+  1.52      +4 -4         ircd-ratbox/modules/m_lusers.c
+  1.42      +1 -6         ircd-ratbox/modules/m_map.c
+  1.9       +2 -5         ircd-ratbox/modules/m_monitor.c
+  1.64      +4 -3         ircd-ratbox/modules/m_motd.c
+  1.88      +5 -3         ircd-ratbox/modules/m_names.c
+  1.98      +6 -3         ircd-ratbox/modules/m_oper.c
+  1.14      +11 -4        ircd-ratbox/modules/m_operspy.c
+  1.55      +5 -5         ircd-ratbox/modules/m_pass.c
+  1.64      +3 -4         ircd-ratbox/modules/m_ping.c
+  1.66      +5 -4         ircd-ratbox/modules/m_pong.c
+  1.34      +6 -4         ircd-ratbox/modules/m_post.c
+  1.96      +5 -6         ircd-ratbox/modules/m_rehash.c
+  1.53      +5 -4         ircd-ratbox/modules/m_restart.c
+  1.80      +3 -6         ircd-ratbox/modules/m_resv.c
+  1.13      +8 -4         ircd-ratbox/modules/m_services.c
+  1.88      +6 -4         ircd-ratbox/modules/m_set.c
+  1.251     +9 -321       ircd-ratbox/modules/m_stats.c
+  1.70      +5 -4         ircd-ratbox/modules/m_svinfo.c
+  1.18      +5 -4         ircd-ratbox/modules/m_tb.c
+  1.62      +4 -6         ircd-ratbox/modules/m_testline.c
+  1.10      +6 -3         ircd-ratbox/modules/m_testmask.c
+  1.52      +5 -4         ircd-ratbox/modules/m_time.c
+  1.97      +5 -3         ircd-ratbox/modules/m_topic.c
+  1.114     +7 -4         ircd-ratbox/modules/m_trace.c
+  1.9       +4 -6         ircd-ratbox/modules/m_unreject.c
+  1.52      +7 -5         ircd-ratbox/modules/m_user.c
+  1.62      +5 -4         ircd-ratbox/modules/m_userhost.c
+  1.51      +4 -4         ircd-ratbox/modules/m_users.c
+  1.74      +4 -5         ircd-ratbox/modules/m_version.c
+  1.62      +6 -4         ircd-ratbox/modules/m_wallops.c
+  1.123     +5 -4         ircd-ratbox/modules/m_who.c
+  1.154     +6 -4         ircd-ratbox/modules/m_whois.c
+  1.58      +8 -4         ircd-ratbox/modules/m_whowas.c
+  1.76      +8 -43        ircd-ratbox/modules/m_xline.c
+  1.11      +1 -2         ircd-ratbox/modules/static_modules.c.SH
+  1.2       +13 -0        ircd-ratbox/servlink/Makefile.am (new)
+  1.22      +490 -80      ircd-ratbox/servlink/Makefile.in
+  1.2       +4 -0         ircd-ratbox/src/.cvsignore
+  7.51      +359 -293     ircd-ratbox/src/.depend
+  7.1       +79 -0        ircd-ratbox/src/Makefile.am (new)
+  7.158     +628 -108     ircd-ratbox/src/Makefile.in
+  7.81      +4 -6         ircd-ratbox/src/adns.c
+  7.91      +4 -2         ircd-ratbox/src/balloc.c
+  1.29      +4 -7         ircd-ratbox/src/cache.c
+  7.442     +66 -2        ircd-ratbox/src/channel.c
+  7.74      +4 -2         ircd-ratbox/src/class.c
+  7.502     +188 -62      ircd-ratbox/src/client.c
+  1.33      +5 -4         ircd-ratbox/src/commio.c
+  7.42      +7 -2         ircd-ratbox/src/devpoll.c
+  1.40      +7 -4         ircd-ratbox/src/epoll.c
+  7.52      +3 -3         ircd-ratbox/src/event.c
+  7.26      +1 -1         ircd-ratbox/src/getopt.c
+  7.120     +4 -2         ircd-ratbox/src/hash.c
+  7.111     +2 -4         ircd-ratbox/src/hostmask.c
+  7.81      +4 -2         ircd-ratbox/src/irc_string.c
+  7.383     +11 -7        ircd-ratbox/src/ircd.c
+  1.172     +4 -2         ircd-ratbox/src/ircd_lexer.l
+  1.280     +5 -4         ircd-ratbox/src/ircd_parser.y
+  7.30      +2 -1         ircd-ratbox/src/ircd_signal.c
+  7.47      +2 -2         ircd-ratbox/src/kdparse.c
+  1.57      +5 -4         ircd-ratbox/src/kqueue.c
+  7.130     +2 -2         ircd-ratbox/src/linebuf.c
+  7.132     +6 -9         ircd-ratbox/src/listener.c
+  7.46      +2 -1         ircd-ratbox/src/match.c
+  7.52      +4 -2         ircd-ratbox/src/memory.c
+  7.160     +77 -193      ircd-ratbox/src/modules.c
+  7.6       +1 -4         ircd-ratbox/src/monitor.c
+  7.207     +4 -6         ircd-ratbox/src/newconf.c
+  7.40      +7 -1         ircd-ratbox/src/numeric.c
+  7.144     +20 -3        ircd-ratbox/src/packet.c
+  7.194     +8 -8         ircd-ratbox/src/parse.c
+  7.34      +2 -2         ircd-ratbox/src/patricia.c
+  7.88      +5 -3         ircd-ratbox/src/poll.c
+  1.40      +4 -9         ircd-ratbox/src/reject.c
+  7.39      +2 -2         ircd-ratbox/src/restart.c
+  7.199     +9 -10        ircd-ratbox/src/s_auth.c
+  7.517     +9 -11        ircd-ratbox/src/s_conf.c
+  7.84      +2 -5         ircd-ratbox/src/s_log.c
+  7.73      +4 -32        ircd-ratbox/src/s_newconf.c
+  7.436     +999 -6       ircd-ratbox/src/s_serv.c
+  7.350     +8 -8         ircd-ratbox/src/s_user.c
+  7.32      +3 -2         ircd-ratbox/src/scache.c
+  7.50      +5 -3         ircd-ratbox/src/select.c
+  7.291     +3 -3         ircd-ratbox/src/send.c
+  7.49      +1 -2         ircd-ratbox/src/tools.c
+  7.30      +2 -2         ircd-ratbox/src/version.c.SH
+  7.37      +5 -3         ircd-ratbox/src/whowas.c
+  7.1       +17 -0        ircd-ratbox/tools/Makefile.am (new)
+  7.40      +514 -99      ircd-ratbox/tools/Makefile.in
+  7.8       +1 -2         ircd-ratbox/tools/viconf.c
+
+
+
+leeh        2005/03/21 22:52:10 UTC	(20050321_9)
+
+  Modified files:
+    include              s_conf.h s_newconf.h 
+  Log:
+  - these two can keep including openssl/rsa.h until I decide what I want to
+    do with it..
+  
+  Revision  Changes    Path
+  7.321     +4 -0      ircd-ratbox/include/s_conf.h
+  7.51      +4 -0      ircd-ratbox/include/s_newconf.h
+
+
+
+leeh        2005/03/21 22:42:11 UTC	(20050321_8)
+
+  Modified files:
+    include              newconf.h patricia.h s_conf.h s_newconf.h 
+                         sprintf_irc.h 
+  Log:
+  - stop some headers including system headers
+  
+  Revision  Changes    Path
+  7.36      +0 -4      ircd-ratbox/include/newconf.h
+  7.24      +0 -9      ircd-ratbox/include/patricia.h
+  7.320     +0 -5      ircd-ratbox/include/s_conf.h
+  7.50      +0 -4      ircd-ratbox/include/s_newconf.h
+  7.20      +0 -2      ircd-ratbox/include/sprintf_irc.h
+
+
+
+leeh        2005/03/21 22:02:58 UTC	(20050321_7)
+
+  Modified files:
+    modules              Makefile.in 
+    modules/core         m_join.c 
+    src                  modules.c 
+  Removed files:
+    modules/core         m_sjoin.c 
+  Log:
+  - merge m_sjoin.c into m_join.c, theres just too much TS related code shared
+    between them to keep them seperate
+  
+  Revision  Changes    Path
+  1.120     +1 -2      ircd-ratbox/modules/Makefile.in
+  1.173     +503 -2    ircd-ratbox/modules/core/m_join.c
+  1.212     +0 -753    ircd-ratbox/modules/core/m_sjoin.c (dead)
+  7.159     +0 -1      ircd-ratbox/src/modules.c
+
+
+
+leeh        2005/03/21 21:21:12 UTC	(20050321_6)
+
+  Modified files:
+    include              s_serv.h 
+    modules/core         m_server.c 
+    src                  s_serv.c 
+  Log:
+  - move check_server() -> m_server.c
+  
+  Revision  Changes    Path
+  7.101     +0 -2      ircd-ratbox/include/s_serv.h
+  1.161     +96 -1     ircd-ratbox/modules/core/m_server.c
+  7.435     +0 -93     ircd-ratbox/src/s_serv.c
+
+
+
+leeh        2005/03/21 21:08:25 UTC	(20050321_5)
+
+  Modified files:
+    modules/core         m_server.c 
+    src                  s_serv.c 
+  Log:
+  - move inet_socketpair() -> m_server.c
+  
+  Revision  Changes    Path
+  1.160     +61 -1     ircd-ratbox/modules/core/m_server.c
+  7.434     +0 -60     ircd-ratbox/src/s_serv.c
+
+
+
+leeh        2005/03/21 20:42:58 UTC	(20050321_4)
+
+  Modified files:
+    include              s_serv.h 
+    modules/core         m_server.c 
+    src                  s_serv.c 
+  Log:
+  - move some code from s_serv.c -> m_server.c
+  
+  Revision  Changes    Path
+  7.100     +0 -1      ircd-ratbox/include/s_serv.h
+  1.159     +854 -1    ircd-ratbox/modules/core/m_server.c
+  7.433     +0 -840    ircd-ratbox/src/s_serv.c
+
+
+
+leeh        2005/03/21 20:24:39 UTC	(20050321_3)
+
+  Modified files:
+    include              s_stats.h 
+    modules              m_stats.c 
+    modules/core         m_nick.c 
+    src                  Makefile.in client.c ircd.c listener.c 
+                         parse.c reject.c s_auth.c s_conf.c 
+                         s_serv.c s_user.c 
+  Removed files:
+    src                  s_stats.c 
+  Log:
+  - stop declaring a ServerStats structure, as well as a pointer to it and
+    linking them together.
+  - merge tstats() and count_memory() into m_stats.c
+  - move the ServerStats definition to ircd.c
+  - remove s_stats.c
+  
+  Revision  Changes    Path
+  7.23      +2 -6      ircd-ratbox/include/s_stats.h
+  1.171     +13 -13    ircd-ratbox/modules/core/m_nick.c
+  1.250     +316 -4    ircd-ratbox/modules/m_stats.c
+  7.157     +1 -2      ircd-ratbox/src/Makefile.in
+  7.501     +25 -25    ircd-ratbox/src/client.c
+  7.382     +2 -1      ircd-ratbox/src/ircd.c
+  7.131     +3 -3      ircd-ratbox/src/listener.c
+  7.193     +5 -5      ircd-ratbox/src/parse.c
+  1.39      +1 -1      ircd-ratbox/src/reject.c
+  7.198     +4 -4      ircd-ratbox/src/s_auth.c
+  7.516     +6 -6      ircd-ratbox/src/s_conf.c
+  7.432     +1 -1      ircd-ratbox/src/s_serv.c
+  7.44      +0 -390    ircd-ratbox/src/s_stats.c (dead)
+  7.349     +5 -5      ircd-ratbox/src/s_user.c
+
+
+
+leeh        2005/03/21 17:09:08 UTC	(20050321_2)
+
+  Modified files:
+    include              client.h 
+    modules              m_dline.c m_gline.c m_xline.c 
+    src                  client.c 
+  Log:
+  - move check_xlines() -> m_xline.c, check_dlines() -> m_dline.c and
+    check_glines() -> m_gline.c
+  
+  Revision  Changes    Path
+  7.273     +5 -3      ircd-ratbox/include/client.h
+  1.56      +53 -1     ircd-ratbox/modules/m_dline.c
+  1.159     +50 -1     ircd-ratbox/modules/m_gline.c
+  1.75      +41 -1     ircd-ratbox/modules/m_xline.c
+  7.500     +10 -156   ircd-ratbox/src/client.c
+
+
+
+leeh        2005/03/21 14:38:16 UTC	(20050321_1)
+
+  Modified files:
+    include              channel.h 
+    modules/core         m_join.c 
+    src                  channel.c 
+  Log:
+  - move can_join() -> m_join.c
+  
+  Revision  Changes    Path
+  7.167     +0 -1      ircd-ratbox/include/channel.h
+  1.172     +69 -5     ircd-ratbox/modules/core/m_join.c
+  7.441     +0 -64     ircd-ratbox/src/channel.c
+
+
+
+leeh        2005/03/21 14:30:43 UTC	(20050321_0)
+
+  Modified files:
+    include              s_gline.h 
+    modules              m_gline.c 
+    src                  Makefile.in ircd.c s_newconf.c 
+  Removed files:
+    src                  s_gline.c 
+  Log:
+  - move most of the gline code from s_gline.c -> m_gline.c
+  - make find_is_glined() use irccmp() rather than match()
+  - rewrite remaining gline code (triggered expiry) and put it in s_newconf.c
+  
+  Revision  Changes    Path
+  7.24      +0 -3      ircd-ratbox/include/s_gline.h
+  1.158     +82 -6     ircd-ratbox/modules/m_gline.c
+  7.156     +0 -1      ircd-ratbox/src/Makefile.in
+  7.381     +0 -3      ircd-ratbox/src/ircd.c
+  7.8       +0 -164    ircd-ratbox/src/s_gline.c (dead)
+  7.72      +23 -0     ircd-ratbox/src/s_newconf.c
+
+
+
+androsyn    2005/03/20 18:06:59 UTC	(20050320_13)
+
+  ircd-ratbox/libltdl - New directory
+
+
+
+leeh        2005/03/20 17:40:17 UTC	(20050320_12)
+
+  Modified files:
+    modules/core         m_nick.c 
+  Log:
+  - dont store an ipv6 sockhost if we arent compiled with v6 support
+  
+  Revision  Changes    Path
+  1.170     +13 -2     ircd-ratbox/modules/core/m_nick.c
+
+
+
+leeh        2005/03/20 17:25:08 UTC	(20050320_11)
+
+  Modified files:
+    include              modules.h 
+    modules              m_accept.c m_admin.c m_away.c m_cap.c 
+                         m_capab.c m_challenge.c m_close.c 
+                         m_cmessage.c m_connect.c m_dline.c 
+                         m_encap.c m_etrace.c m_gline.c m_help.c 
+                         m_info.c m_invite.c m_ison.c m_kline.c 
+                         m_knock.c m_links.c m_list.c m_locops.c 
+                         m_lusers.c m_map.c m_monitor.c m_motd.c 
+                         m_names.c m_oper.c m_operspy.c m_pass.c 
+                         m_ping.c m_pong.c m_post.c m_rehash.c 
+                         m_restart.c m_resv.c m_services.c m_set.c 
+                         m_stats.c m_svinfo.c m_tb.c m_testline.c 
+                         m_testmask.c m_time.c m_topic.c m_trace.c 
+                         m_unreject.c m_user.c m_userhost.c 
+                         m_users.c m_version.c m_wallops.c m_who.c 
+                         m_whois.c m_whowas.c m_xline.c 
+    modules/core         m_die.c m_error.c m_join.c m_kick.c 
+                         m_kill.c m_message.c m_mode.c m_nick.c 
+                         m_part.c m_quit.c m_server.c m_sjoin.c 
+                         m_squit.c 
+    src                  modules.c 
+  Log:
+  - more #include cleanups
+  
+  Revision  Changes    Path
+  7.65      +1 -1      ircd-ratbox/include/modules.h
+  1.51      +1 -4      ircd-ratbox/modules/core/m_die.c
+  1.18      +1 -5      ircd-ratbox/modules/core/m_error.c
+  1.171     +1 -4      ircd-ratbox/modules/core/m_join.c
+  1.87      +1 -3      ircd-ratbox/modules/core/m_kick.c
+  1.107     +1 -4      ircd-ratbox/modules/core/m_kill.c
+  1.169     +1 -6      ircd-ratbox/modules/core/m_message.c
+  1.127     +1 -4      ircd-ratbox/modules/core/m_mode.c
+  1.169     +1 -4      ircd-ratbox/modules/core/m_nick.c
+  1.101     +1 -3      ircd-ratbox/modules/core/m_part.c
+  1.55      +1 -5      ircd-ratbox/modules/core/m_quit.c
+  1.158     +1 -5      ircd-ratbox/modules/core/m_server.c
+  1.211     +1 -5      ircd-ratbox/modules/core/m_sjoin.c
+  1.88      +1 -5      ircd-ratbox/modules/core/m_squit.c
+  1.64      +1 -5      ircd-ratbox/modules/m_accept.c
+  1.67      +1 -2      ircd-ratbox/modules/m_admin.c
+  1.65      +1 -3      ircd-ratbox/modules/m_away.c
+  1.10      +1 -4      ircd-ratbox/modules/m_cap.c
+  1.53      +1 -4      ircd-ratbox/modules/m_capab.c
+  1.77      +2 -3      ircd-ratbox/modules/m_challenge.c
+  1.47      +1 -4      ircd-ratbox/modules/m_close.c
+  1.7       +1 -2      ircd-ratbox/modules/m_cmessage.c
+  1.76      +1 -5      ircd-ratbox/modules/m_connect.c
+  1.55      +1 -8      ircd-ratbox/modules/m_dline.c
+  1.28      +1 -6      ircd-ratbox/modules/m_encap.c
+  1.21      +1 -7      ircd-ratbox/modules/m_etrace.c
+  1.157     +1 -5      ircd-ratbox/modules/m_gline.c
+  1.72      +1 -4      ircd-ratbox/modules/m_help.c
+  1.128     +1 -4      ircd-ratbox/modules/m_info.c
+  1.90      +1 -4      ircd-ratbox/modules/m_invite.c
+  1.56      +1 -5      ircd-ratbox/modules/m_ison.c
+  1.206     +1 -7      ircd-ratbox/modules/m_kline.c
+  1.93      +1 -5      ircd-ratbox/modules/m_knock.c
+  1.75      +1 -2      ircd-ratbox/modules/m_links.c
+  1.85      +1 -5      ircd-ratbox/modules/m_list.c
+  1.56      +1 -7      ircd-ratbox/modules/m_locops.c
+  1.51      +1 -3      ircd-ratbox/modules/m_lusers.c
+  1.41      +1 -2      ircd-ratbox/modules/m_map.c
+  1.8       +1 -2      ircd-ratbox/modules/m_monitor.c
+  1.63      +1 -2      ircd-ratbox/modules/m_motd.c
+  1.87      +1 -4      ircd-ratbox/modules/m_names.c
+  1.97      +1 -4      ircd-ratbox/modules/m_oper.c
+  1.13      +1 -8      ircd-ratbox/modules/m_operspy.c
+  1.54      +1 -5      ircd-ratbox/modules/m_pass.c
+  1.63      +1 -3      ircd-ratbox/modules/m_ping.c
+  1.65      +1 -5      ircd-ratbox/modules/m_pong.c
+  1.33      +1 -6      ircd-ratbox/modules/m_post.c
+  1.95      +1 -4      ircd-ratbox/modules/m_rehash.c
+  1.52      +1 -4      ircd-ratbox/modules/m_restart.c
+  1.79      +1 -3      ircd-ratbox/modules/m_resv.c
+  1.12      +1 -6      ircd-ratbox/modules/m_services.c
+  1.87      +1 -5      ircd-ratbox/modules/m_set.c
+  1.249     +1 -2      ircd-ratbox/modules/m_stats.c
+  1.69      +1 -4      ircd-ratbox/modules/m_svinfo.c
+  1.17      +1 -2      ircd-ratbox/modules/m_tb.c
+  1.61      +1 -2      ircd-ratbox/modules/m_testline.c
+  1.9       +1 -6      ircd-ratbox/modules/m_testmask.c
+  1.51      +1 -4      ircd-ratbox/modules/m_time.c
+  1.96      +1 -4      ircd-ratbox/modules/m_topic.c
+  1.113     +1 -5      ircd-ratbox/modules/m_trace.c
+  1.8       +1 -2      ircd-ratbox/modules/m_unreject.c
+  1.51      +1 -7      ircd-ratbox/modules/m_user.c
+  1.61      +1 -5      ircd-ratbox/modules/m_userhost.c
+  1.50      +1 -3      ircd-ratbox/modules/m_users.c
+  1.73      +1 -3      ircd-ratbox/modules/m_version.c
+  1.61      +1 -6      ircd-ratbox/modules/m_wallops.c
+  1.122     +1 -2      ircd-ratbox/modules/m_who.c
+  1.153     +1 -3      ircd-ratbox/modules/m_whois.c
+  1.57      +1 -6      ircd-ratbox/modules/m_whowas.c
+  1.74      +1 -6      ircd-ratbox/modules/m_xline.c
+  7.158     +2 -2      ircd-ratbox/src/modules.c
+
+
+
+leeh        2005/03/20 16:09:09 UTC	(20050320_10)
+
+  Modified files:
+    include              monitor.h 
+    modules              m_cmessage.c m_map.c m_monitor.c m_tb.c 
+                         m_testline.c m_unreject.c 
+    modules/core         m_error.c m_nick.c 
+    src                  s_user.c 
+  Log:
+  - more include cleanups
+  
+  Revision  Changes    Path
+  7.3       +3 -1      ircd-ratbox/include/monitor.h
+  1.17      +2 -2      ircd-ratbox/modules/core/m_error.c
+  1.168                ircd-ratbox/modules/core/m_nick.c
+  1.6       +2 -2      ircd-ratbox/modules/m_cmessage.c
+  1.40      +2 -2      ircd-ratbox/modules/m_map.c
+  1.7       +1 -3      ircd-ratbox/modules/m_monitor.c
+  1.16      +2 -2      ircd-ratbox/modules/m_tb.c
+  1.60      +2 -2      ircd-ratbox/modules/m_testline.c
+  1.7       +2 -2      ircd-ratbox/modules/m_unreject.c
+  7.348     +0 -1      ircd-ratbox/src/s_user.c
+
+
+
+leeh        2005/03/20 16:02:10 UTC	(20050320_9)
+
+  Modified files:
+    include              parse.h 
+    modules              .depend m_accept.c m_admin.c m_away.c 
+                         m_cap.c m_capab.c m_challenge.c m_close.c 
+                         m_cmessage.c m_connect.c m_dline.c 
+                         m_encap.c m_etrace.c m_gline.c m_help.c 
+                         m_info.c m_invite.c m_ison.c m_kline.c 
+                         m_knock.c m_links.c m_list.c m_locops.c 
+                         m_lusers.c m_map.c m_monitor.c m_motd.c 
+                         m_names.c m_oper.c m_operspy.c m_pass.c 
+                         m_ping.c m_pong.c m_post.c m_rehash.c 
+                         m_restart.c m_resv.c m_services.c m_set.c 
+                         m_stats.c m_svinfo.c m_tb.c m_testline.c 
+                         m_testmask.c m_time.c m_topic.c m_trace.c 
+                         m_unreject.c m_user.c m_userhost.c 
+                         m_users.c m_version.c m_wallops.c m_who.c 
+                         m_whois.c m_whowas.c m_xline.c 
+    modules/core         m_die.c m_error.c m_join.c m_kick.c 
+                         m_kill.c m_message.c m_mode.c m_nick.c 
+                         m_part.c m_quit.c m_server.c m_sjoin.c 
+                         m_squit.c 
+    src                  .depend client.c hash.c ircd.c modules.c 
+                         parse.c reject.c s_gline.c s_serv.c 
+                         s_user.c 
+  Removed files:
+    include              msg.h 
+  Log:
+  - merge msg.h into parse.h
+  
+  Revision  Changes    Path
+  7.56      +0 -150    ircd-ratbox/include/msg.h (dead)
+  7.24      +118 -1    ircd-ratbox/include/parse.h
+  1.47      +168 -194  ircd-ratbox/modules/.depend
+  1.50      +2 -2      ircd-ratbox/modules/core/m_die.c
+  1.16      +2 -2      ircd-ratbox/modules/core/m_error.c
+  1.170     +2 -2      ircd-ratbox/modules/core/m_join.c
+  1.86      +2 -2      ircd-ratbox/modules/core/m_kick.c
+  1.106     +2 -2      ircd-ratbox/modules/core/m_kill.c
+  1.168     +3 -3      ircd-ratbox/modules/core/m_message.c
+  1.126     +2 -2      ircd-ratbox/modules/core/m_mode.c
+  1.167     +2 -2      ircd-ratbox/modules/core/m_nick.c
+  1.100     +2 -2      ircd-ratbox/modules/core/m_part.c
+  1.54      +2 -2      ircd-ratbox/modules/core/m_quit.c
+  1.157     +2 -2      ircd-ratbox/modules/core/m_server.c
+  1.210     +2 -2      ircd-ratbox/modules/core/m_sjoin.c
+  1.87      +2 -2      ircd-ratbox/modules/core/m_squit.c
+  1.63      +2 -2      ircd-ratbox/modules/m_accept.c
+  1.66      +2 -2      ircd-ratbox/modules/m_admin.c
+  1.64      +2 -2      ircd-ratbox/modules/m_away.c
+  1.9       +2 -2      ircd-ratbox/modules/m_cap.c
+  1.52      +2 -2      ircd-ratbox/modules/m_capab.c
+  1.76      +3 -3      ircd-ratbox/modules/m_challenge.c
+  1.46      +2 -2      ircd-ratbox/modules/m_close.c
+  1.5       +2 -2      ircd-ratbox/modules/m_cmessage.c
+  1.75      +2 -2      ircd-ratbox/modules/m_connect.c
+  1.54      +2 -2      ircd-ratbox/modules/m_dline.c
+  1.27      +2 -2      ircd-ratbox/modules/m_encap.c
+  1.20      +2 -2      ircd-ratbox/modules/m_etrace.c
+  1.156     +2 -2      ircd-ratbox/modules/m_gline.c
+  1.71      +2 -2      ircd-ratbox/modules/m_help.c
+  1.127     +2 -2      ircd-ratbox/modules/m_info.c
+  1.89      +2 -2      ircd-ratbox/modules/m_invite.c
+  1.55      +2 -2      ircd-ratbox/modules/m_ison.c
+  1.205     +2 -2      ircd-ratbox/modules/m_kline.c
+  1.92      +2 -2      ircd-ratbox/modules/m_knock.c
+  1.74      +2 -2      ircd-ratbox/modules/m_links.c
+  1.84      +2 -2      ircd-ratbox/modules/m_list.c
+  1.55      +2 -2      ircd-ratbox/modules/m_locops.c
+  1.50      +2 -2      ircd-ratbox/modules/m_lusers.c
+  1.39      +2 -2      ircd-ratbox/modules/m_map.c
+  1.6       +2 -2      ircd-ratbox/modules/m_monitor.c
+  1.62      +2 -2      ircd-ratbox/modules/m_motd.c
+  1.86      +2 -2      ircd-ratbox/modules/m_names.c
+  1.96      +2 -2      ircd-ratbox/modules/m_oper.c
+  1.12      +2 -2      ircd-ratbox/modules/m_operspy.c
+  1.53      +2 -2      ircd-ratbox/modules/m_pass.c
+  1.62      +2 -2      ircd-ratbox/modules/m_ping.c
+  1.64      +2 -2      ircd-ratbox/modules/m_pong.c
+  1.32      +2 -2      ircd-ratbox/modules/m_post.c
+  1.94      +2 -2      ircd-ratbox/modules/m_rehash.c
+  1.51      +2 -2      ircd-ratbox/modules/m_restart.c
+  1.78      +2 -2      ircd-ratbox/modules/m_resv.c
+  1.11      +2 -2      ircd-ratbox/modules/m_services.c
+  1.86      +2 -2      ircd-ratbox/modules/m_set.c
+  1.248     +1 -2      ircd-ratbox/modules/m_stats.c
+  1.68      +2 -2      ircd-ratbox/modules/m_svinfo.c
+  1.15      +2 -2      ircd-ratbox/modules/m_tb.c
+  1.59      +2 -2      ircd-ratbox/modules/m_testline.c
+  1.8       +2 -2      ircd-ratbox/modules/m_testmask.c
+  1.50      +2 -2      ircd-ratbox/modules/m_time.c
+  1.95      +2 -2      ircd-ratbox/modules/m_topic.c
+  1.112     +2 -2      ircd-ratbox/modules/m_trace.c
+  1.6       +2 -2      ircd-ratbox/modules/m_unreject.c
+  1.50      +2 -2      ircd-ratbox/modules/m_user.c
+  1.60      +2 -2      ircd-ratbox/modules/m_userhost.c
+  1.49      +2 -2      ircd-ratbox/modules/m_users.c
+  1.72      +2 -2      ircd-ratbox/modules/m_version.c
+  1.60      +2 -2      ircd-ratbox/modules/m_wallops.c
+  1.121     +2 -2      ircd-ratbox/modules/m_who.c
+  1.152     +2 -2      ircd-ratbox/modules/m_whois.c
+  1.56      +2 -2      ircd-ratbox/modules/m_whowas.c
+  1.73      +2 -2      ircd-ratbox/modules/m_xline.c
+  7.50      +25 -26    ircd-ratbox/src/.depend
+  7.499     +1 -1      ircd-ratbox/src/client.c
+  7.119     +0 -1      ircd-ratbox/src/hash.c
+  7.380     +0 -1      ircd-ratbox/src/ircd.c
+  7.157     +0 -1      ircd-ratbox/src/modules.c
+  7.192     +0 -1      ircd-ratbox/src/parse.c
+  1.38      +1 -1      ircd-ratbox/src/reject.c
+  7.7       +0 -1      ircd-ratbox/src/s_gline.c
+  7.431     +1 -1      ircd-ratbox/src/s_serv.c
+  7.347     +1 -1      ircd-ratbox/src/s_user.c
+
+
+
+leeh        2005/03/20 15:38:17 UTC	(20050320_8)
+
+  Modified files:
+    include              client.h ircd_defs.h linebuf.h 
+    modules              .depend m_accept.c m_admin.c m_away.c 
+                         m_cap.c m_capab.c m_challenge.c m_close.c 
+                         m_cmessage.c m_connect.c m_dline.c 
+                         m_encap.c m_etrace.c m_gline.c m_help.c 
+                         m_info.c m_invite.c m_ison.c m_kline.c 
+                         m_knock.c m_links.c m_list.c m_locops.c 
+                         m_lusers.c m_map.c m_monitor.c m_motd.c 
+                         m_names.c m_oper.c m_operspy.c m_pass.c 
+                         m_ping.c m_pong.c m_post.c m_rehash.c 
+                         m_restart.c m_resv.c m_services.c m_set.c 
+                         m_stats.c m_svinfo.c m_tb.c m_testline.c 
+                         m_testmask.c m_time.c m_topic.c m_trace.c 
+                         m_unreject.c m_user.c m_userhost.c 
+                         m_users.c m_version.c m_wallops.c m_who.c 
+                         m_whois.c m_whowas.c m_xline.c 
+    modules/core         m_die.c m_error.c m_join.c m_kick.c 
+                         m_kill.c m_message.c m_mode.c m_nick.c 
+                         m_part.c m_quit.c m_server.c m_sjoin.c 
+                         m_squit.c 
+    src                  .depend adns.c balloc.c cache.c channel.c 
+                         class.c client.c commio.c devpoll.c 
+                         epoll.c event.c hash.c hostmask.c 
+                         irc_string.c ircd.c ircd_parser.y 
+                         ircd_signal.c kdparse.c kqueue.c 
+                         linebuf.c listener.c match.c memory.c 
+                         modules.c monitor.c newconf.c packet.c 
+                         parse.c poll.c reject.c restart.c 
+                         s_auth.c s_conf.c s_gline.c s_log.c 
+                         s_newconf.c s_serv.c s_stats.c s_user.c 
+                         scache.c select.c send.c whowas.c 
+  Added files:
+    include              struct.h 
+  Log:
+  - move the linebuf.h and client.h structs to struct.h
+  
+  Revision  Changes    Path
+  7.272     +0 -218    ircd-ratbox/include/client.h
+  7.59      +7 -0      ircd-ratbox/include/ircd_defs.h
+  1.33      +0 -26     ircd-ratbox/include/linebuf.h
+  7.2       +264 -0    ircd-ratbox/include/struct.h (new)
+  1.46      +538 -654  ircd-ratbox/modules/.depend
+  1.49      +2 -2      ircd-ratbox/modules/core/m_die.c
+  1.15      +2 -2      ircd-ratbox/modules/core/m_error.c
+  1.169     +2 -2      ircd-ratbox/modules/core/m_join.c
+  1.85      +2 -2      ircd-ratbox/modules/core/m_kick.c
+  1.105     +2 -2      ircd-ratbox/modules/core/m_kill.c
+  1.167     +2 -2      ircd-ratbox/modules/core/m_message.c
+  1.125     +2 -2      ircd-ratbox/modules/core/m_mode.c
+  1.166     +2 -2      ircd-ratbox/modules/core/m_nick.c
+  1.99      +2 -2      ircd-ratbox/modules/core/m_part.c
+  1.53      +2 -2      ircd-ratbox/modules/core/m_quit.c
+  1.156     +2 -2      ircd-ratbox/modules/core/m_server.c
+  1.209     +2 -2      ircd-ratbox/modules/core/m_sjoin.c
+  1.86      +2 -2      ircd-ratbox/modules/core/m_squit.c
+  1.62      +2 -2      ircd-ratbox/modules/m_accept.c
+  1.65      +2 -2      ircd-ratbox/modules/m_admin.c
+  1.63      +2 -2      ircd-ratbox/modules/m_away.c
+  1.8       +2 -2      ircd-ratbox/modules/m_cap.c
+  1.51      +2 -2      ircd-ratbox/modules/m_capab.c
+  1.75      +3 -3      ircd-ratbox/modules/m_challenge.c
+  1.45      +2 -2      ircd-ratbox/modules/m_close.c
+  1.4       +2 -2      ircd-ratbox/modules/m_cmessage.c
+  1.74      +2 -2      ircd-ratbox/modules/m_connect.c
+  1.53      +2 -2      ircd-ratbox/modules/m_dline.c
+  1.26      +2 -3      ircd-ratbox/modules/m_encap.c
+  1.19      +2 -2      ircd-ratbox/modules/m_etrace.c
+  1.155     +2 -2      ircd-ratbox/modules/m_gline.c
+  1.70      +2 -3      ircd-ratbox/modules/m_help.c
+  1.126     +2 -2      ircd-ratbox/modules/m_info.c
+  1.88      +2 -2      ircd-ratbox/modules/m_invite.c
+  1.54      +2 -3      ircd-ratbox/modules/m_ison.c
+  1.204     +2 -2      ircd-ratbox/modules/m_kline.c
+  1.91      +2 -2      ircd-ratbox/modules/m_knock.c
+  1.73      +2 -2      ircd-ratbox/modules/m_links.c
+  1.83      +2 -2      ircd-ratbox/modules/m_list.c
+  1.54      +2 -2      ircd-ratbox/modules/m_locops.c
+  1.49      +2 -3      ircd-ratbox/modules/m_lusers.c
+  1.38      +2 -2      ircd-ratbox/modules/m_map.c
+  1.5       +2 -2      ircd-ratbox/modules/m_monitor.c
+  1.61      +2 -3      ircd-ratbox/modules/m_motd.c
+  1.85      +2 -2      ircd-ratbox/modules/m_names.c
+  1.95      +2 -2      ircd-ratbox/modules/m_oper.c
+  1.11      +2 -3      ircd-ratbox/modules/m_operspy.c
+  1.52      +2 -2      ircd-ratbox/modules/m_pass.c
+  1.61      +2 -2      ircd-ratbox/modules/m_ping.c
+  1.63      +2 -2      ircd-ratbox/modules/m_pong.c
+  1.31      +2 -2      ircd-ratbox/modules/m_post.c
+  1.93      +2 -2      ircd-ratbox/modules/m_rehash.c
+  1.50      +2 -2      ircd-ratbox/modules/m_restart.c
+  1.77      +2 -2      ircd-ratbox/modules/m_resv.c
+  1.10      +2 -2      ircd-ratbox/modules/m_services.c
+  1.85      +2 -2      ircd-ratbox/modules/m_set.c
+  1.247     +2 -2      ircd-ratbox/modules/m_stats.c
+  1.67      +2 -2      ircd-ratbox/modules/m_svinfo.c
+  1.14      +2 -2      ircd-ratbox/modules/m_tb.c
+  1.58      +2 -3      ircd-ratbox/modules/m_testline.c
+  1.7       +2 -2      ircd-ratbox/modules/m_testmask.c
+  1.49      +2 -2      ircd-ratbox/modules/m_time.c
+  1.94      +2 -2      ircd-ratbox/modules/m_topic.c
+  1.111     +2 -2      ircd-ratbox/modules/m_trace.c
+  1.5       +2 -3      ircd-ratbox/modules/m_unreject.c
+  1.49      +2 -2      ircd-ratbox/modules/m_user.c
+  1.59      +2 -2      ircd-ratbox/modules/m_userhost.c
+  1.48      +2 -3      ircd-ratbox/modules/m_users.c
+  1.71      +2 -2      ircd-ratbox/modules/m_version.c
+  1.59      +2 -2      ircd-ratbox/modules/m_wallops.c
+  1.120     +2 -2      ircd-ratbox/modules/m_who.c
+  1.151     +2 -2      ircd-ratbox/modules/m_whois.c
+  1.55      +2 -2      ircd-ratbox/modules/m_whowas.c
+  1.72      +2 -2      ircd-ratbox/modules/m_xline.c
+  7.49      +295 -360  ircd-ratbox/src/.depend
+  7.80      +2 -2      ircd-ratbox/src/adns.c
+  7.90      +0 -2      ircd-ratbox/src/balloc.c
+  1.28      +1 -1      ircd-ratbox/src/cache.c
+  7.440     +1 -1      ircd-ratbox/src/channel.c
+  7.73      +1 -2      ircd-ratbox/src/class.c
+  7.498     +2 -2      ircd-ratbox/src/client.c
+  1.32      +1 -2      ircd-ratbox/src/commio.c
+  7.41      +0 -2      ircd-ratbox/src/devpoll.c
+  1.39      +0 -2      ircd-ratbox/src/epoll.c
+  7.51      +1 -1      ircd-ratbox/src/event.c
+  7.118     +1 -1      ircd-ratbox/src/hash.c
+  7.110     +1 -1      ircd-ratbox/src/hostmask.c
+  7.80      +1 -3      ircd-ratbox/src/irc_string.c
+  7.379     +1 -1      ircd-ratbox/src/ircd.c
+  1.279     +0 -2      ircd-ratbox/src/ircd_parser.y
+  7.29      +0 -3      ircd-ratbox/src/ircd_signal.c
+  7.46      +0 -2      ircd-ratbox/src/kdparse.c
+  1.56      +0 -2      ircd-ratbox/src/kqueue.c
+  7.129     +1 -1      ircd-ratbox/src/linebuf.c
+  7.130     +1 -1      ircd-ratbox/src/listener.c
+  7.45      +0 -2      ircd-ratbox/src/match.c
+  7.51      +0 -2      ircd-ratbox/src/memory.c
+  7.156     +1 -1      ircd-ratbox/src/modules.c
+  7.5       +1 -2      ircd-ratbox/src/monitor.c
+  7.206     +1 -1      ircd-ratbox/src/newconf.c
+  7.143     +1 -0      ircd-ratbox/src/packet.c
+  7.191     +1 -1      ircd-ratbox/src/parse.c
+  7.87      +0 -2      ircd-ratbox/src/poll.c
+  1.37      +1 -1      ircd-ratbox/src/reject.c
+  7.38      +1 -1      ircd-ratbox/src/restart.c
+  7.197     +1 -1      ircd-ratbox/src/s_auth.c
+  7.515     +1 -1      ircd-ratbox/src/s_conf.c
+  7.6       +1 -2      ircd-ratbox/src/s_gline.c
+  7.83      +1 -1      ircd-ratbox/src/s_log.c
+  7.71      +1 -1      ircd-ratbox/src/s_newconf.c
+  7.430     +1 -1      ircd-ratbox/src/s_serv.c
+  7.43      +1 -0      ircd-ratbox/src/s_stats.c
+  7.346     +1 -1      ircd-ratbox/src/s_user.c
+  7.31      +0 -2      ircd-ratbox/src/scache.c
+  7.49      +0 -2      ircd-ratbox/src/select.c
+  7.290     +1 -0      ircd-ratbox/src/send.c
+  7.36      +1 -2      ircd-ratbox/src/whowas.c
+
+
+
+leeh        2005/03/20 12:29:50 UTC	(20050320_7)
+
+  Modified files:
+    doc                  example.conf example.efnet.conf 
+    include              balloc.h channel.h class.h client.h 
+                         commio.h common.h config.h config.h.dist 
+                         defaults.h event.h hash.h hostmask.h 
+                         irc_string.h ircd.h ircd_defs.h 
+                         ircd_getopt.h ircd_signal.h linebuf.h 
+                         listener.h m_info.h memory.h modules.h 
+                         msg.h numeric.h packet.h parse.h 
+                         patchlevel.h reject.h res.h restart.h 
+                         s_auth.h s_conf.h s_gline.h s_log.h 
+                         s_newconf.h s_serv.h s_stats.h s_user.h 
+                         s_zip.h scache.h send.h sprintf_irc.h 
+                         supported.h tools.h whowas.h 
+    modules              m_accept.c m_admin.c m_away.c m_capab.c 
+                         m_challenge.c m_close.c m_connect.c 
+                         m_dline.c m_encap.c m_etrace.c m_gline.c 
+                         m_help.c m_info.c m_invite.c m_ison.c 
+                         m_kline.c m_knock.c m_links.c m_list.c 
+                         m_locops.c m_lusers.c m_motd.c m_names.c 
+                         m_oper.c m_operspy.c m_pass.c m_ping.c 
+                         m_pong.c m_post.c m_rehash.c m_restart.c 
+                         m_resv.c m_set.c m_stats.c m_svinfo.c 
+                         m_tb.c m_testline.c m_time.c m_topic.c 
+                         m_trace.c m_unreject.c m_user.c 
+                         m_userhost.c m_users.c m_version.c 
+                         m_wallops.c m_who.c m_whois.c m_whowas.c 
+                         m_xline.c 
+    modules/core         m_die.c m_error.c m_join.c m_kick.c 
+                         m_kill.c m_message.c m_mode.c m_nick.c 
+                         m_part.c m_quit.c m_server.c m_sjoin.c 
+                         m_squit.c 
+    src                  adns.c balloc.c cache.c channel.c class.c 
+                         client.c commio.c devpoll.c epoll.c 
+                         event.c getopt.c hash.c hostmask.c 
+                         irc_string.c ircd.c kdparse.c kqueue.c 
+                         linebuf.c listener.c memory.c modules.c 
+                         numeric.c packet.c parse.c poll.c 
+                         reject.c restart.c s_auth.c s_conf.c 
+                         s_gline.c s_log.c s_newconf.c s_serv.c 
+                         s_stats.c s_user.c scache.c select.c 
+                         send.c tools.c version.c.SH whowas.c 
+  Log:
+  - update copyrights to 2005.
+  
+  Revision  Changes    Path
+                       
+  7.262     +1 -1      ircd-ratbox/doc/example.conf
+  7.90      +1 -1      ircd-ratbox/doc/example.efnet.conf
+  1.35      +1 -1      ircd-ratbox/include/balloc.h
+  7.166     +1 -1      ircd-ratbox/include/channel.h
+  7.27      +1 -1      ircd-ratbox/include/class.h
+  7.271     +1 -1      ircd-ratbox/include/client.h
+  1.17      +1 -1      ircd-ratbox/include/commio.h
+  7.10      +1 -1      ircd-ratbox/include/common.h
+  7.184     +1 -1      ircd-ratbox/include/config.h
+  7.81      +1 -1      ircd-ratbox/include/config.h.dist
+  7.16      +1 -1      ircd-ratbox/include/defaults.h
+  1.20      +1 -1      ircd-ratbox/include/event.h
+  7.56      +1 -1      ircd-ratbox/include/hash.h
+  1.43      +1 -1      ircd-ratbox/include/hostmask.h
+  7.64      +1 -1      ircd-ratbox/include/irc_string.h
+  7.86      +1 -1      ircd-ratbox/include/ircd.h
+  7.58      +1 -1      ircd-ratbox/include/ircd_defs.h
+  1.10      +1 -1      ircd-ratbox/include/ircd_getopt.h
+  7.8       +1 -1      ircd-ratbox/include/ircd_signal.h
+  1.32      +1 -1      ircd-ratbox/include/linebuf.h
+  7.20      +1 -1      ircd-ratbox/include/listener.h
+  7.58      +1 -1      ircd-ratbox/include/m_info.h
+  7.54      +1 -1      ircd-ratbox/include/memory.h
+  7.64      +1 -1      ircd-ratbox/include/modules.h
+  7.55      +1 -1      ircd-ratbox/include/msg.h
+  7.60      +1 -1      ircd-ratbox/include/numeric.h
+  7.29      +1 -1      ircd-ratbox/include/packet.h
+  7.23      +1 -1      ircd-ratbox/include/parse.h
+  7.75      +1 -1      ircd-ratbox/include/patchlevel.h
+  1.11      +1 -1      ircd-ratbox/include/reject.h
+  7.37      +1 -1      ircd-ratbox/include/res.h
+  7.11      +1 -1      ircd-ratbox/include/restart.h
+  7.27      +1 -1      ircd-ratbox/include/s_auth.h
+  7.319     +1 -1      ircd-ratbox/include/s_conf.h
+  7.23      +1 -1      ircd-ratbox/include/s_gline.h
+  7.27      +1 -1      ircd-ratbox/include/s_log.h
+  7.49      +1 -1      ircd-ratbox/include/s_newconf.h
+  7.99      +1 -1      ircd-ratbox/include/s_serv.h
+  7.22      +1 -1      ircd-ratbox/include/s_stats.h
+  7.37      +1 -1      ircd-ratbox/include/s_user.h
+  7.12      +1 -1      ircd-ratbox/include/s_zip.h
+  7.16      +1 -1      ircd-ratbox/include/scache.h
+  7.84      +1 -1      ircd-ratbox/include/send.h
+  7.19      +1 -1      ircd-ratbox/include/sprintf_irc.h
+  7.9       +1 -1      ircd-ratbox/include/supported.h
+  1.55      +1 -1      ircd-ratbox/include/tools.h
+  7.21      +1 -1      ircd-ratbox/include/whowas.h
+  1.48      +2 -2      ircd-ratbox/modules/core/m_die.c
+  1.14      +2 -2      ircd-ratbox/modules/core/m_error.c
+  1.168     +2 -2      ircd-ratbox/modules/core/m_join.c
+  1.84      +2 -2      ircd-ratbox/modules/core/m_kick.c
+  1.104     +2 -2      ircd-ratbox/modules/core/m_kill.c
+  1.166     +2 -2      ircd-ratbox/modules/core/m_message.c
+  1.124     +2 -2      ircd-ratbox/modules/core/m_mode.c
+  1.165     +2 -2      ircd-ratbox/modules/core/m_nick.c
+  1.98      +2 -2      ircd-ratbox/modules/core/m_part.c
+  1.52      +2 -2      ircd-ratbox/modules/core/m_quit.c
+  1.155     +2 -2      ircd-ratbox/modules/core/m_server.c
+  1.208     +2 -2      ircd-ratbox/modules/core/m_sjoin.c
+  1.85      +2 -2      ircd-ratbox/modules/core/m_squit.c
+  1.61      +2 -2      ircd-ratbox/modules/m_accept.c
+  1.64      +2 -2      ircd-ratbox/modules/m_admin.c
+  1.62      +2 -2      ircd-ratbox/modules/m_away.c
+  1.50      +2 -2      ircd-ratbox/modules/m_capab.c
+  1.74      +3 -3      ircd-ratbox/modules/m_challenge.c
+  1.44      +2 -2      ircd-ratbox/modules/m_close.c
+  1.73      +2 -2      ircd-ratbox/modules/m_connect.c
+  1.52      +2 -2      ircd-ratbox/modules/m_dline.c
+  1.25      +2 -2      ircd-ratbox/modules/m_encap.c
+  1.18      +2 -2      ircd-ratbox/modules/m_etrace.c
+  1.154     +2 -2      ircd-ratbox/modules/m_gline.c
+  1.69      +2 -2      ircd-ratbox/modules/m_help.c
+  1.125     +2 -2      ircd-ratbox/modules/m_info.c
+  1.87      +2 -2      ircd-ratbox/modules/m_invite.c
+  1.53      +2 -2      ircd-ratbox/modules/m_ison.c
+  1.203     +2 -2      ircd-ratbox/modules/m_kline.c
+  1.90      +2 -2      ircd-ratbox/modules/m_knock.c
+  1.72      +2 -2      ircd-ratbox/modules/m_links.c
+  1.82      +2 -2      ircd-ratbox/modules/m_list.c
+  1.53      +2 -2      ircd-ratbox/modules/m_locops.c
+  1.48      +2 -2      ircd-ratbox/modules/m_lusers.c
+  1.60      +2 -2      ircd-ratbox/modules/m_motd.c
+  1.84      +2 -2      ircd-ratbox/modules/m_names.c
+  1.94      +2 -2      ircd-ratbox/modules/m_oper.c
+  1.10      +2 -2      ircd-ratbox/modules/m_operspy.c
+  1.51      +2 -2      ircd-ratbox/modules/m_pass.c
+  1.60      +2 -2      ircd-ratbox/modules/m_ping.c
+  1.62      +2 -2      ircd-ratbox/modules/m_pong.c
+  1.30      +2 -2      ircd-ratbox/modules/m_post.c
+  1.92      +2 -2      ircd-ratbox/modules/m_rehash.c
+  1.49      +2 -2      ircd-ratbox/modules/m_restart.c
+  1.76      +2 -2      ircd-ratbox/modules/m_resv.c
+  1.84      +2 -2      ircd-ratbox/modules/m_set.c
+  1.246     +2 -2      ircd-ratbox/modules/m_stats.c
+  1.66      +2 -2      ircd-ratbox/modules/m_svinfo.c
+  1.13      +2 -2      ircd-ratbox/modules/m_tb.c
+  1.57      +2 -2      ircd-ratbox/modules/m_testline.c
+  1.48      +2 -2      ircd-ratbox/modules/m_time.c
+  1.93      +2 -2      ircd-ratbox/modules/m_topic.c
+  1.110     +2 -2      ircd-ratbox/modules/m_trace.c
+  1.4       +2 -2      ircd-ratbox/modules/m_unreject.c
+  1.48      +2 -2      ircd-ratbox/modules/m_user.c
+  1.58      +2 -2      ircd-ratbox/modules/m_userhost.c
+  1.47      +2 -2      ircd-ratbox/modules/m_users.c
+  1.70      +2 -2      ircd-ratbox/modules/m_version.c
+  1.58      +2 -2      ircd-ratbox/modules/m_wallops.c
+  1.119     +2 -2      ircd-ratbox/modules/m_who.c
+  1.150     +2 -2      ircd-ratbox/modules/m_whois.c
+  1.54      +2 -2      ircd-ratbox/modules/m_whowas.c
+  1.71      +2 -2      ircd-ratbox/modules/m_xline.c
+  7.79      +1 -1      ircd-ratbox/src/adns.c
+  7.89      +1 -1      ircd-ratbox/src/balloc.c
+  1.27      +1 -1      ircd-ratbox/src/cache.c
+  7.439     +1 -1      ircd-ratbox/src/channel.c
+  7.72      +1 -1      ircd-ratbox/src/class.c
+  1.31      +1 -1      ircd-ratbox/src/commio.c
+  7.40      +1 -1      ircd-ratbox/src/devpoll.c
+  1.38      +1 -1      ircd-ratbox/src/epoll.c
+  7.50      +1 -1      ircd-ratbox/src/event.c
+  7.25      +1 -1      ircd-ratbox/src/getopt.c
+  7.117     +1 -1      ircd-ratbox/src/hash.c
+  7.109     +1 -1      ircd-ratbox/src/hostmask.c
+  7.79      +1 -1      ircd-ratbox/src/irc_string.c
+  7.378     +1 -1      ircd-ratbox/src/ircd.c
+  7.45      +1 -1      ircd-ratbox/src/kdparse.c
+  1.55                 ircd-ratbox/src/kqueue.c
+  7.128     +1 -1      ircd-ratbox/src/linebuf.c
+  7.129     +1 -1      ircd-ratbox/src/listener.c
+  7.50      +1 -1      ircd-ratbox/src/memory.c
+  7.155     +1 -1      ircd-ratbox/src/modules.c
+  7.39      +1 -1      ircd-ratbox/src/numeric.c
+  7.142     +1 -1      ircd-ratbox/src/packet.c
+  7.190     +1 -1      ircd-ratbox/src/parse.c
+  7.86      +1 -1      ircd-ratbox/src/poll.c
+  1.36      +1 -1      ircd-ratbox/src/reject.c
+  7.37      +1 -1      ircd-ratbox/src/restart.c
+  7.196     +1 -1      ircd-ratbox/src/s_auth.c
+  7.514     +1 -1      ircd-ratbox/src/s_conf.c
+  7.5       +1 -1      ircd-ratbox/src/s_gline.c
+  7.82      +1 -1      ircd-ratbox/src/s_log.c
+  7.70      +1 -1      ircd-ratbox/src/s_newconf.c
+  7.429     +1 -1      ircd-ratbox/src/s_serv.c
+  7.42      +1 -1      ircd-ratbox/src/s_stats.c
+  7.345     +1 -1      ircd-ratbox/src/s_user.c
+  7.30      +1 -1      ircd-ratbox/src/scache.c
+  7.48      +1 -1      ircd-ratbox/src/select.c
+  7.289     +1 -1      ircd-ratbox/src/send.c
+  7.48      +1 -1      ircd-ratbox/src/tools.c
+  7.29      +2 -2      ircd-ratbox/src/version.c.SH
+  7.35      +1 -1      ircd-ratbox/src/whowas.c
+
+
+
+leeh        2005/03/20 12:18:15 UTC	(20050320_6)
+
+  Modified files:
+    adns                 types.c 
+    src                  devpoll.c epoll.c kqueue.c 
+  Log:
+  - fix some more include warnings
+  
+  Revision  Changes    Path
+  1.21      +1 -0      ircd-ratbox/adns/types.c
+  7.39      +2 -1      ircd-ratbox/src/devpoll.c
+  1.37      +1 -2      ircd-ratbox/src/epoll.c
+  1.54      +1 -1      ircd-ratbox/src/kqueue.c
+
+
+
+leeh        2005/03/20 03:20:40 UTC	(20050320_5)
+
+  Modified files:
+    adns                 adns.h event.c general.c parse.c query.c 
+                         setup.c types.c 
+    include              res.h 
+    src                  adns.c balloc.c cache.c channel.c class.c 
+                         client.c commio.c epoll.c event.c hash.c 
+                         hostmask.c irc_string.c ircd.c 
+                         ircd_lexer.l ircd_parser.y ircd_signal.c 
+                         kdparse.c kqueue.c linebuf.c listener.c 
+                         match.c memory.c modules.c monitor.c 
+                         newconf.c numeric.c packet.c parse.c 
+                         patricia.c poll.c reject.c restart.c 
+                         s_auth.c s_conf.c s_gline.c s_log.c 
+                         s_newconf.c s_serv.c s_stats.c s_user.c 
+                         scache.c select.c send.c tools.c whowas.c 
+  Log:
+  - fix up adns/ and src/ for the #include mess.
+  
+  Revision  Changes    Path
+                       
+  1.19      +0 -5      ircd-ratbox/adns/adns.h
+  1.29      +1 -0      ircd-ratbox/adns/event.c
+  1.18      +1 -0      ircd-ratbox/adns/general.c
+  1.13      +1 -0      ircd-ratbox/adns/parse.c
+  1.26      +1 -2      ircd-ratbox/adns/query.c
+  1.42      +2 -0      ircd-ratbox/adns/setup.c
+  1.20      +1 -0      ircd-ratbox/adns/types.c
+  7.36      +2 -0      ircd-ratbox/include/res.h
+  7.78      +5 -1      ircd-ratbox/src/adns.c
+  7.88      +2 -0      ircd-ratbox/src/balloc.c
+  1.26      +6 -1      ircd-ratbox/src/cache.c
+  7.438     +1 -0      ircd-ratbox/src/channel.c
+  7.71      +1 -0      ircd-ratbox/src/class.c
+  7.496     +5 -2      ircd-ratbox/src/client.c
+  1.30      +3 -1      ircd-ratbox/src/commio.c
+  1.36      +3 -1      ircd-ratbox/src/epoll.c
+  7.49      +2 -1      ircd-ratbox/src/event.c
+  7.116     +1 -0      ircd-ratbox/src/hash.c
+  7.108     +3 -0      ircd-ratbox/src/hostmask.c
+  7.78      +1 -0      ircd-ratbox/src/irc_string.c
+  7.377     +3 -1      ircd-ratbox/src/ircd.c
+  1.171     +1 -0      ircd-ratbox/src/ircd_lexer.l
+  1.278     +5 -0      ircd-ratbox/src/ircd_parser.y
+  7.28      +2 -0      ircd-ratbox/src/ircd_signal.c
+  7.44      +2 -0      ircd-ratbox/src/kdparse.c
+  1.53      +3 -1      ircd-ratbox/src/kqueue.c
+  7.127     +1 -1      ircd-ratbox/src/linebuf.c
+  7.128     +5 -0      ircd-ratbox/src/listener.c
+  7.44      +2 -0      ircd-ratbox/src/match.c
+  7.49      +2 -1      ircd-ratbox/src/memory.c
+  7.4       +4 -0      ircd-ratbox/src/monitor.c
+  7.205     +6 -1      ircd-ratbox/src/newconf.c
+  7.38      +0 -3      ircd-ratbox/src/numeric.c
+  7.141     +1 -0      ircd-ratbox/src/packet.c
+  7.189     +2 -0      ircd-ratbox/src/parse.c
+  7.33      +2 -0      ircd-ratbox/src/patricia.c
+  7.85      +3 -1      ircd-ratbox/src/poll.c
+  1.35      +6 -0      ircd-ratbox/src/reject.c
+  7.36      +1 -0      ircd-ratbox/src/restart.c
+  7.195     +5 -2      ircd-ratbox/src/s_auth.c
+  7.513     +4 -0      ircd-ratbox/src/s_conf.c
+  7.4       +1 -0      ircd-ratbox/src/s_gline.c
+  7.81      +4 -0      ircd-ratbox/src/s_log.c
+  7.69      +8 -1      ircd-ratbox/src/s_newconf.c
+  7.428     +3 -1      ircd-ratbox/src/s_serv.c
+  7.41      +4 -0      ircd-ratbox/src/s_stats.c
+  7.344     +2 -0      ircd-ratbox/src/s_user.c
+  7.29      +2 -0      ircd-ratbox/src/scache.c
+  7.47      +3 -0      ircd-ratbox/src/select.c
+  7.288     +1 -1      ircd-ratbox/src/send.c
+  7.47      +1 -0      ircd-ratbox/src/tools.c
+  7.34      +2 -1      ircd-ratbox/src/whowas.c
+
+
+
+leeh        2005/03/20 02:41:01 UTC	(20050320_4)
+
+  Modified files:
+    include              balloc.h cache.h class.h client.h hash.h 
+                         ircd.h ircd_defs.h linebuf.h memory.h 
+                         modules.h newconf.h patricia.h res.h 
+                         s_auth.h s_conf.h s_newconf.h supported.h 
+                         whowas.h 
+    modules              m_accept.c m_admin.c m_away.c m_cap.c 
+                         m_capab.c m_challenge.c m_close.c 
+                         m_cmessage.c m_connect.c m_dline.c 
+                         m_encap.c m_etrace.c m_gline.c m_help.c 
+                         m_info.c m_invite.c m_ison.c m_kline.c 
+                         m_knock.c m_links.c m_list.c m_locops.c 
+                         m_lusers.c m_map.c m_monitor.c m_motd.c 
+                         m_names.c m_oper.c m_operspy.c m_pass.c 
+                         m_ping.c m_pong.c m_post.c m_rehash.c 
+                         m_restart.c m_resv.c m_services.c m_set.c 
+                         m_stats.c m_svinfo.c m_tb.c m_testline.c 
+                         m_testmask.c m_time.c m_topic.c m_trace.c 
+                         m_unreject.c m_user.c m_userhost.c 
+                         m_users.c m_version.c m_wallops.c m_who.c 
+                         m_whois.c m_whowas.c m_xline.c 
+    modules/core         m_die.c m_error.c m_join.c m_kick.c 
+                         m_kill.c m_message.c m_mode.c m_nick.c 
+                         m_part.c m_quit.c m_server.c m_sjoin.c 
+                         m_squit.c 
+  Log:
+  - stop files in include/ including other files.
+  
+  Revision  Changes    Path
+  1.34      +0 -3      ircd-ratbox/include/balloc.h
+  1.8       +0 -3      ircd-ratbox/include/cache.h
+  7.26      +0 -2      ircd-ratbox/include/class.h
+  7.270     +0 -3      ircd-ratbox/include/client.h
+  7.55      +0 -2      ircd-ratbox/include/hash.h
+  7.85      +0 -3      ircd-ratbox/include/ircd.h
+  7.57      +0 -4      ircd-ratbox/include/ircd_defs.h
+  1.31      +2 -2      ircd-ratbox/include/linebuf.h
+  7.53      +0 -2      ircd-ratbox/include/memory.h
+  7.63      +0 -5      ircd-ratbox/include/modules.h
+  7.35      +0 -3      ircd-ratbox/include/newconf.h
+  7.23      +0 -10     ircd-ratbox/include/patricia.h
+  7.35      +0 -2      ircd-ratbox/include/res.h
+  7.26      +0 -1      ircd-ratbox/include/s_auth.h
+  7.318     +1 -5      ircd-ratbox/include/s_conf.h
+  7.48      +1 -3      ircd-ratbox/include/s_newconf.h
+  7.8       +0 -2      ircd-ratbox/include/supported.h
+  7.20      +0 -2      ircd-ratbox/include/whowas.h
+  1.47      +3 -1      ircd-ratbox/modules/core/m_die.c
+  1.13      +4 -1      ircd-ratbox/modules/core/m_error.c
+  1.167     +3 -1      ircd-ratbox/modules/core/m_join.c
+  1.83      +3 -1      ircd-ratbox/modules/core/m_kick.c
+  1.103     +4 -1      ircd-ratbox/modules/core/m_kill.c
+  1.165     +5 -1      ircd-ratbox/modules/core/m_message.c
+  1.123     +3 -1      ircd-ratbox/modules/core/m_mode.c
+  1.164     +6 -1      ircd-ratbox/modules/core/m_nick.c
+  1.97      +3 -1      ircd-ratbox/modules/core/m_part.c
+  1.51      +4 -1      ircd-ratbox/modules/core/m_quit.c
+  1.154     +3 -1      ircd-ratbox/modules/core/m_server.c
+  1.207     +3 -1      ircd-ratbox/modules/core/m_sjoin.c
+  1.84      +4 -1      ircd-ratbox/modules/core/m_squit.c
+  1.60      +5 -1      ircd-ratbox/modules/m_accept.c
+  1.63      +4 -1      ircd-ratbox/modules/m_admin.c
+  1.61      +5 -1      ircd-ratbox/modules/m_away.c
+  1.7       +5 -1      ircd-ratbox/modules/m_cap.c
+  1.49      +5 -1      ircd-ratbox/modules/m_capab.c
+  1.73      +5 -2      ircd-ratbox/modules/m_challenge.c
+  1.43      +3 -1      ircd-ratbox/modules/m_close.c
+  1.3       +5 -1      ircd-ratbox/modules/m_cmessage.c
+  1.72      +4 -1      ircd-ratbox/modules/m_connect.c
+  1.51      +4 -1      ircd-ratbox/modules/m_dline.c
+  1.24      +4 -1      ircd-ratbox/modules/m_encap.c
+  1.17      +3 -1      ircd-ratbox/modules/m_etrace.c
+  1.153     +4 -1      ircd-ratbox/modules/m_gline.c
+  1.68      +5 -1      ircd-ratbox/modules/m_help.c
+  1.124     +2 -1      ircd-ratbox/modules/m_info.c
+  1.86      +3 -1      ircd-ratbox/modules/m_invite.c
+  1.52      +4 -1      ircd-ratbox/modules/m_ison.c
+  1.202     +4 -1      ircd-ratbox/modules/m_kline.c
+  1.89      +4 -1      ircd-ratbox/modules/m_knock.c
+  1.71      +4 -2      ircd-ratbox/modules/m_links.c
+  1.81      +4 -1      ircd-ratbox/modules/m_list.c
+  1.52      +4 -1      ircd-ratbox/modules/m_locops.c
+  1.47      +4 -1      ircd-ratbox/modules/m_lusers.c
+  1.37      +7 -1      ircd-ratbox/modules/m_map.c
+  1.4       +7 -1      ircd-ratbox/modules/m_monitor.c
+  1.59      +3 -2      ircd-ratbox/modules/m_motd.c
+  1.83      +3 -1      ircd-ratbox/modules/m_names.c
+  1.93      +3 -1      ircd-ratbox/modules/m_oper.c
+  1.9       +4 -1      ircd-ratbox/modules/m_operspy.c
+  1.50      +5 -1      ircd-ratbox/modules/m_pass.c
+  1.59      +4 -1      ircd-ratbox/modules/m_ping.c
+  1.61      +4 -1      ircd-ratbox/modules/m_pong.c
+  1.29      +4 -1      ircd-ratbox/modules/m_post.c
+  1.91      +6 -1      ircd-ratbox/modules/m_rehash.c
+  1.48      +4 -1      ircd-ratbox/modules/m_restart.c
+  1.75      +6 -1      ircd-ratbox/modules/m_resv.c
+  1.9       +4 -1      ircd-ratbox/modules/m_services.c
+  1.83      +4 -1      ircd-ratbox/modules/m_set.c
+  1.245     +5 -2      ircd-ratbox/modules/m_stats.c
+  1.65      +4 -1      ircd-ratbox/modules/m_svinfo.c
+  1.12      +3 -1      ircd-ratbox/modules/m_tb.c
+  1.56      +5 -1      ircd-ratbox/modules/m_testline.c
+  1.6       +4 -1      ircd-ratbox/modules/m_testmask.c
+  1.47      +4 -1      ircd-ratbox/modules/m_time.c
+  1.92      +3 -1      ircd-ratbox/modules/m_topic.c
+  1.109     +3 -1      ircd-ratbox/modules/m_trace.c
+  1.3       +5 -1      ircd-ratbox/modules/m_unreject.c
+  1.47      +5 -1      ircd-ratbox/modules/m_user.c
+  1.57      +4 -1      ircd-ratbox/modules/m_userhost.c
+  1.46      +4 -1      ircd-ratbox/modules/m_users.c
+  1.69      +5 -2      ircd-ratbox/modules/m_version.c
+  1.57      +4 -1      ircd-ratbox/modules/m_wallops.c
+  1.118     +3 -1      ircd-ratbox/modules/m_who.c
+  1.149     +3 -2      ircd-ratbox/modules/m_whois.c
+  1.53      +4 -1      ircd-ratbox/modules/m_whowas.c
+  1.70      +3 -1      ircd-ratbox/modules/m_xline.c
+
+
+
+leeh        2005/03/20 01:57:01 UTC	(20050320_3)
+
+  Modified files:
+    include              balloc.h channel.h client.h commio.h 
+                         irc_string.h listener.h memory.h 
+                         patricia.h res.h s_conf.h s_gline.h 
+                         s_log.h send.h stdinc.h supported.h 
+                         whowas.h 
+    modules              m_dline.c m_encap.c m_etrace.c m_gline.c 
+                         m_info.c m_invite.c m_kline.c m_names.c 
+                         m_oper.c m_operspy.c m_rehash.c 
+                         m_restart.c m_services.c m_set.c 
+                         m_stats.c m_svinfo.c m_tb.c m_testmask.c 
+                         m_trace.c m_who.c m_whois.c m_whowas.c 
+                         m_xline.c 
+    modules/core         m_error.c m_join.c m_message.c m_nick.c 
+                         m_part.c m_server.c m_sjoin.c m_squit.c 
+    src                  adns.c balloc.c cache.c channel.c class.c 
+                         client.c commio.c devpoll.c epoll.c 
+                         hash.c hostmask.c ircd.c ircd_lexer.l 
+                         ircd_parser.y kqueue.c listener.c 
+                         memory.c modules.c newconf.c numeric.c 
+                         packet.c parse.c patricia.c poll.c 
+                         restart.c s_auth.c s_conf.c s_gline.c 
+                         s_log.c s_newconf.c s_serv.c s_user.c 
+                         scache.c select.c send.c whowas.c 
+  Log:
+  - have stdinc.h include common.h and ircd_defs.h, stop anything else
+    including them.
+  
+  Revision  Changes    Path
+  1.33      +0 -1      ircd-ratbox/include/balloc.h
+  7.165     +0 -1      ircd-ratbox/include/channel.h
+  7.269     +0 -1      ircd-ratbox/include/client.h
+  1.16      +0 -2      ircd-ratbox/include/commio.h
+  7.63      +0 -2      ircd-ratbox/include/irc_string.h
+  7.19      +0 -2      ircd-ratbox/include/listener.h
+  7.52      +0 -1      ircd-ratbox/include/memory.h
+  7.22      +0 -1      ircd-ratbox/include/patricia.h
+  7.34      +0 -1      ircd-ratbox/include/res.h
+  7.317     +0 -2      ircd-ratbox/include/s_conf.h
+  7.22      +0 -2      ircd-ratbox/include/s_gline.h
+  7.26      +0 -2      ircd-ratbox/include/s_log.h
+  7.83      +0 -2      ircd-ratbox/include/send.h
+  1.22      +5 -0      ircd-ratbox/include/stdinc.h
+  7.7       +0 -1      ircd-ratbox/include/supported.h
+  7.19      +0 -1      ircd-ratbox/include/whowas.h
+  1.12      +1 -2      ircd-ratbox/modules/core/m_error.c
+  1.166     +1 -2      ircd-ratbox/modules/core/m_join.c
+  1.164     +1 -2      ircd-ratbox/modules/core/m_message.c
+  1.163     +1 -2      ircd-ratbox/modules/core/m_nick.c
+  1.96      +1 -2      ircd-ratbox/modules/core/m_part.c
+  1.153     +1 -2      ircd-ratbox/modules/core/m_server.c
+  1.206     +1 -2      ircd-ratbox/modules/core/m_sjoin.c
+  1.83      +1 -2      ircd-ratbox/modules/core/m_squit.c
+  1.50      +1 -2      ircd-ratbox/modules/m_dline.c
+  1.23      +1 -2      ircd-ratbox/modules/m_encap.c
+  1.16      +1 -2      ircd-ratbox/modules/m_etrace.c
+  1.152     +1 -2      ircd-ratbox/modules/m_gline.c
+  1.123     +1 -2      ircd-ratbox/modules/m_info.c
+  1.85      +1 -2      ircd-ratbox/modules/m_invite.c
+  1.201     +1 -2      ircd-ratbox/modules/m_kline.c
+  1.82      +1 -2      ircd-ratbox/modules/m_names.c
+  1.92      +1 -2      ircd-ratbox/modules/m_oper.c
+  1.8       +1 -2      ircd-ratbox/modules/m_operspy.c
+  1.90      +1 -2      ircd-ratbox/modules/m_rehash.c
+  1.47      +1 -2      ircd-ratbox/modules/m_restart.c
+  1.8       +1 -2      ircd-ratbox/modules/m_services.c
+  1.82      +1 -2      ircd-ratbox/modules/m_set.c
+  1.244     +1 -2      ircd-ratbox/modules/m_stats.c
+  1.64      +1 -2      ircd-ratbox/modules/m_svinfo.c
+  1.11      +1 -2      ircd-ratbox/modules/m_tb.c
+  1.5       +1 -2      ircd-ratbox/modules/m_testmask.c
+  1.108     +1 -2      ircd-ratbox/modules/m_trace.c
+  1.117     +1 -2      ircd-ratbox/modules/m_who.c
+  1.148     +1 -2      ircd-ratbox/modules/m_whois.c
+  1.52      +1 -3      ircd-ratbox/modules/m_whowas.c
+  1.69      +1 -2      ircd-ratbox/modules/m_xline.c
+  7.77      +0 -1      ircd-ratbox/src/adns.c
+  7.87      +0 -1      ircd-ratbox/src/balloc.c
+  1.25      +0 -2      ircd-ratbox/src/cache.c
+  7.437     +0 -1      ircd-ratbox/src/channel.c
+  7.70      +0 -1      ircd-ratbox/src/class.c
+  7.495     +0 -1      ircd-ratbox/src/client.c
+  1.29      +0 -1      ircd-ratbox/src/commio.c
+  7.38      +0 -1      ircd-ratbox/src/devpoll.c
+  1.35      +0 -1      ircd-ratbox/src/epoll.c
+  7.115     +0 -2      ircd-ratbox/src/hash.c
+  7.107     +0 -1      ircd-ratbox/src/hostmask.c
+  7.376     +0 -1      ircd-ratbox/src/ircd.c
+  1.170     +0 -2      ircd-ratbox/src/ircd_lexer.l
+  1.277     +0 -2      ircd-ratbox/src/ircd_parser.y
+  1.52      +0 -1      ircd-ratbox/src/kqueue.c
+  7.127     +0 -1      ircd-ratbox/src/listener.c
+  7.48      +0 -1      ircd-ratbox/src/memory.c
+  7.153     +0 -1      ircd-ratbox/src/modules.c
+  7.204     +0 -2      ircd-ratbox/src/newconf.c
+  7.37      +0 -1      ircd-ratbox/src/numeric.c
+  7.140     +0 -1      ircd-ratbox/src/packet.c
+  7.188     +0 -1      ircd-ratbox/src/parse.c
+  7.32      +0 -1      ircd-ratbox/src/patricia.c
+  7.84      +0 -1      ircd-ratbox/src/poll.c
+  7.35      +0 -1      ircd-ratbox/src/restart.c
+  7.194     +0 -1      ircd-ratbox/src/s_auth.c
+  7.512     +0 -2      ircd-ratbox/src/s_conf.c
+  7.3       +0 -1      ircd-ratbox/src/s_gline.c
+  7.80      +0 -1      ircd-ratbox/src/s_log.c
+  7.68      +0 -2      ircd-ratbox/src/s_newconf.c
+  7.427     +0 -2      ircd-ratbox/src/s_serv.c
+  7.343     +0 -1      ircd-ratbox/src/s_user.c
+  7.28      +0 -1      ircd-ratbox/src/scache.c
+  7.46      +0 -1      ircd-ratbox/src/select.c
+  7.287     +0 -1      ircd-ratbox/src/send.c
+  7.33      +0 -2      ircd-ratbox/src/whowas.c
+
+
+
+leeh        2005/03/20 01:32:58 UTC	(20050320_2)
+
+  Modified files:
+    include              balloc.h channel.h client.h commio.h 
+                         config.h config.h.dist irc_string.h 
+                         ircd.h ircd_defs.h m_info.h memory.h 
+                         modules.h msg.h numeric.h patricia.h 
+                         res.h s_auth.h s_conf.h s_gline.h 
+                         s_newconf.h s_serv.h s_stats.h s_user.h 
+                         s_zip.h send.h stdinc.h supported.h 
+                         whowas.h 
+    modules              m_encap.c m_gline.c m_operspy.c 
+                         m_services.c m_tb.c m_xline.c 
+    src                  adns.c balloc.c class.c client.c commio.c 
+                         devpoll.c epoll.c event.c irc_string.c 
+                         ircd.c ircd_lexer.l ircd_parser.y 
+                         listener.c match.c newconf.c numeric.c 
+                         patricia.c poll.c reject.c s_auth.c 
+                         s_gline.c select.c 
+    tools                viconf.c 
+  Log:
+  - stop config.h including setup.h, have stdinc.h do it instead.
+  - stop including config.h/setup.h where we use stdinc.h
+  
+  Revision  Changes    Path
+  1.32      +0 -1      ircd-ratbox/include/balloc.h
+  7.164     +0 -1      ircd-ratbox/include/channel.h
+  7.268     +0 -2      ircd-ratbox/include/client.h
+  1.15      +0 -2      ircd-ratbox/include/commio.h
+  7.183     +0 -2      ircd-ratbox/include/config.h
+  7.80      +0 -2      ircd-ratbox/include/config.h.dist
+  7.62      +0 -1      ircd-ratbox/include/irc_string.h
+  7.84      +0 -1      ircd-ratbox/include/ircd.h
+  7.56      +0 -2      ircd-ratbox/include/ircd_defs.h
+  7.57      +0 -2      ircd-ratbox/include/m_info.h
+  7.51      +0 -1      ircd-ratbox/include/memory.h
+  7.62      +0 -2      ircd-ratbox/include/modules.h
+  7.54      +0 -2      ircd-ratbox/include/msg.h
+  7.59      +0 -2      ircd-ratbox/include/numeric.h
+  7.21      +0 -1      ircd-ratbox/include/patricia.h
+  7.33      +0 -1      ircd-ratbox/include/res.h
+  7.25      +0 -1      ircd-ratbox/include/s_auth.h
+  7.316     +0 -2      ircd-ratbox/include/s_conf.h
+  7.21      +0 -1      ircd-ratbox/include/s_gline.h
+  7.47      +0 -1      ircd-ratbox/include/s_newconf.h
+  7.98      +0 -2      ircd-ratbox/include/s_serv.h
+  7.21      +0 -2      ircd-ratbox/include/s_stats.h
+  7.36      +0 -2      ircd-ratbox/include/s_user.h
+  7.11      +0 -2      ircd-ratbox/include/s_zip.h
+  7.82      +0 -1      ircd-ratbox/include/send.h
+  1.21      +1 -1      ircd-ratbox/include/stdinc.h
+  7.6       +0 -1      ircd-ratbox/include/supported.h
+  7.18      +0 -2      ircd-ratbox/include/whowas.h
+  1.22      +1 -2      ircd-ratbox/modules/m_encap.c
+  1.151     +1 -2      ircd-ratbox/modules/m_gline.c
+  1.7       +1 -2      ircd-ratbox/modules/m_operspy.c
+  1.7       +1 -2      ircd-ratbox/modules/m_services.c
+  1.10      +1 -2      ircd-ratbox/modules/m_tb.c
+  1.68      +1 -2      ircd-ratbox/modules/m_xline.c
+  7.76      +0 -1      ircd-ratbox/src/adns.c
+  7.86      +0 -1      ircd-ratbox/src/balloc.c
+  7.69      +0 -1      ircd-ratbox/src/class.c
+  7.494     +0 -1      ircd-ratbox/src/client.c
+  1.28      +0 -1      ircd-ratbox/src/commio.c
+  7.37      +0 -3      ircd-ratbox/src/devpoll.c
+  1.34      +0 -1      ircd-ratbox/src/epoll.c
+  7.48      +0 -1      ircd-ratbox/src/event.c
+  7.77      +1 -2      ircd-ratbox/src/irc_string.c
+  7.375     +0 -2      ircd-ratbox/src/ircd.c
+  1.169     +0 -1      ircd-ratbox/src/ircd_lexer.l
+  1.276     +0 -2      ircd-ratbox/src/ircd_parser.y
+  7.126     +0 -1      ircd-ratbox/src/listener.c
+  7.43      +0 -1      ircd-ratbox/src/match.c
+  7.203     +0 -1      ircd-ratbox/src/newconf.c
+  7.36      +0 -2      ircd-ratbox/src/numeric.c
+  7.31      +0 -1      ircd-ratbox/src/patricia.c
+  7.83      +0 -1      ircd-ratbox/src/poll.c
+  1.34      +0 -1      ircd-ratbox/src/reject.c
+  7.193     +0 -1      ircd-ratbox/src/s_auth.c
+  7.2       +0 -1      ircd-ratbox/src/s_gline.c
+  7.45      +0 -2      ircd-ratbox/src/select.c
+  7.7       +2 -1      ircd-ratbox/tools/viconf.c
+
+
+
+leeh        2005/03/20 01:20:18 UTC	(20050320_1)
+
+  Modified files:
+    include              client.h packet.h 
+    modules              m_away.c m_invite.c m_oper.c m_time.c 
+                         m_topic.c m_who.c 
+    modules/core         m_join.c m_kick.c m_message.c m_mode.c 
+                         m_nick.c m_part.c 
+    src                  client.c packet.c 
+  Log:
+  - move flood_endgrace() to client.h/c, stop anything including packet.h that
+    was just using it for this
+  
+  Revision  Changes    Path
+  7.267     +2 -0      ircd-ratbox/include/client.h
+  7.28      +0 -1      ircd-ratbox/include/packet.h
+  1.165     +1 -2      ircd-ratbox/modules/core/m_join.c
+  1.82      +1 -2      ircd-ratbox/modules/core/m_kick.c
+  1.163     +1 -2      ircd-ratbox/modules/core/m_message.c
+  1.122     +1 -2      ircd-ratbox/modules/core/m_mode.c
+  1.162     +1 -2      ircd-ratbox/modules/core/m_nick.c
+  1.95      +1 -2      ircd-ratbox/modules/core/m_part.c
+  1.60      +1 -3      ircd-ratbox/modules/m_away.c
+  1.84      +1 -2      ircd-ratbox/modules/m_invite.c
+  1.91      +1 -2      ircd-ratbox/modules/m_oper.c
+  1.46      +1 -2      ircd-ratbox/modules/m_time.c
+  1.91      +1 -2      ircd-ratbox/modules/m_topic.c
+  1.116     +1 -2      ircd-ratbox/modules/m_who.c
+  7.493     +19 -0     ircd-ratbox/src/client.c
+  7.139     +0 -18     ircd-ratbox/src/packet.c
+
+
+
+leeh        2005/03/20 00:32:37 UTC	(20050320_0)
+
+  Modified files:
+    include              stdinc.h 
+  Log:
+  - remove some vms includes
+  
+  Revision  Changes    Path
+  1.20      +0 -46     ircd-ratbox/include/stdinc.h
+
+
+
+leeh        2005/03/18 17:01:11 UTC	(20050318_1)
+
+  Modified files:
+    .                    ChangeLog RELNOTES configure configure.ac 
+    include              patchlevel.h 
+  Log:
+  - this is now 2.2, so clear changelog and update release stuff
+  
+  Revision  Changes    Path
+  1.1695    +0 -2073   ircd-ratbox/ChangeLog
+  1.115     +2 -21     ircd-ratbox/RELNOTES
+  7.250     +11 -11    ircd-ratbox/configure
+  7.64      +3 -3      ircd-ratbox/configure.ac
+  7.74      +1 -1      ircd-ratbox/include/patchlevel.h
+
+
+
+

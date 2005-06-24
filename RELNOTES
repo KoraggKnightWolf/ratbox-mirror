@@ -1,0 +1,43 @@
+
+This is the current version of the 'devel' tree of ircd-ratbox.  This code
+is not suitable for use on production servers.
+
+If you are upgrading from 2.0, you must read doc/whats-new-2.1.txt
+If you are upgrading from 1.x, you must read doc/whats-new-2.1.txt and
+doc/whats-new-2.0.txt
+
+-- ircd-ratbox-2.1.0beta2
+- fix a few compile warnings
+- added multi-prefix clicap, for showing "@+" in NAMES/WHO replies
+- remove split_delay, make split servers now work on how many servers have
+  issued EOB, rather than how many exist.
+- server-side notify lists.  See doc/monitor.txt
+- fix undline core
+- remove an unwanted space from beginning of second 005
+- fix a potential core with the patricia when removing classes
+- when we're handling global NAMES, dont output channels whose users are all
+  invisible
+
+-- ircd-ratbox-2.1.0beta1
+- No release notes, see doc/whats-new-2.1.txt
+
+--------------------------------------------------------------------------------
+
+BUGS: Major bugs in this release are listed in BUGS
+
+BUG REPORTS: If you run this code and encounter problems, you must report
+the bug by EMAIL to ircd-ratbox@lists.ratbox.org
+
+Please include a gdb backtrace and keep the core file, binaries and 
+modules in case the developers need them.
+
+DISCUSSION: There is a mailing list for discussion of ratbox issues,
+ To subscribe, visit:
+      http://lists.ratbox.org/cgi-bin/mailman/listinfo/ircd-ratbox
+
+You may also (if youre lucky) find us on #ratbox@EFNet
+
+Other files recommended for reading: BUGS, README.FIRST, INSTALL
+
+--------------------------------------------------------------------------------
+$Id$

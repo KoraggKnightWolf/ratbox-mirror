@@ -1,0 +1,6 @@
+Makefile
+static_modules.c
+.deps
+.libs
+*.lo
+*.la
