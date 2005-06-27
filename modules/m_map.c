@@ -46,7 +46,7 @@ struct Message map_msgtab = {
 };
 
 mapi_clist_av1 map_clist[] = { &map_msgtab, NULL };
-DECLARE_MODULE_AV1(map, NULL, NULL, map_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(map, NULL, NULL, map_clist, NULL, NULL, "$Revision: 19295 $");
 
 static void dump_map(struct Client *client_p, struct Client *root, char *pbuf);
 

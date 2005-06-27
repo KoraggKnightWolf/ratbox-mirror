@@ -55,7 +55,7 @@ struct Message cap_msgtab = {
 };
 
 mapi_clist_av1 cap_clist[] = { &cap_msgtab, NULL };
-DECLARE_MODULE_AV1(cap, modinit, NULL, cap_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(cap, modinit, NULL, cap_clist, NULL, NULL, "$Revision: 19295 $");
 
 #define _CLICAP(name, capserv, capclient, flags)	\
 	{ (name), (capserv), (capclient), (flags), sizeof(name) - 1 }

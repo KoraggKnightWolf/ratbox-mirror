@@ -57,7 +57,7 @@ mapi_hlist_av1 trace_hlist[] = {
 	{ "doing_trace",	&doing_trace_hook },
 	{ NULL, NULL }
 };
-DECLARE_MODULE_AV1(trace, NULL, NULL, trace_clist, trace_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV1(trace, NULL, NULL, trace_clist, trace_hlist, NULL, "$Revision: 19295 $");
 
 static int report_this_status(struct Client *source_p, struct Client *target_p, int dow,
 			      int link_u_p, int link_u_s);

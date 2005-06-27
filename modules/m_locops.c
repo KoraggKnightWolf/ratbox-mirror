@@ -46,7 +46,7 @@ struct Message locops_msgtab = {
 };
 
 mapi_clist_av1 locops_clist[] = { &locops_msgtab, NULL };
-DECLARE_MODULE_AV1(locops, NULL, NULL, locops_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(locops, NULL, NULL, locops_clist, NULL, NULL, "$Revision: 18720 $");
 
 /*
  * m_locops - LOCOPS message handler

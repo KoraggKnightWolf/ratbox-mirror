@@ -51,7 +51,7 @@ struct Message accept_msgtab = {
 mapi_clist_av1 accept_clist[] = {
 	&accept_msgtab, NULL
 };
-DECLARE_MODULE_AV1(accept, NULL, NULL, accept_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(accept, NULL, NULL, accept_clist, NULL, NULL, "$Revision: 19295 $");
 
 /*
  * m_accept - ACCEPT command handler

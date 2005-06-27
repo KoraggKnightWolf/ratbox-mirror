@@ -57,6 +57,8 @@ m_owhois.c     - OWHOIS - Allows an oper to do a whois on any user and see
 m_tburst.c     - TBURST - module that will make servers send channel topics
                           to each other after a netsplit/restart.
 
+m_42.c		- 42 - The Answer to Life, the Universe, and Everything.
+
 example_module.c - An example module to be used for creating your own.
                    Syntax: TEST
 

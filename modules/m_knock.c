@@ -46,7 +46,7 @@ struct Message knock_msgtab = {
 };
 
 mapi_clist_av1 knock_clist[] = { &knock_msgtab, NULL };
-DECLARE_MODULE_AV1(knock, NULL, NULL, knock_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(knock, NULL, NULL, knock_clist, NULL, NULL, "$Revision: 19256 $");
 
 /* m_knock
  *    parv[0] = sender prefix

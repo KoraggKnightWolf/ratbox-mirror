@@ -50,7 +50,7 @@ struct Message set_msgtab = {
 };
 
 mapi_clist_av1 set_clist[] = { &set_msgtab, NULL };
-DECLARE_MODULE_AV1(set, NULL, NULL, set_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(set, NULL, NULL, set_clist, NULL, NULL, "$Revision: 19256 $");
 
 /* Structure used for the SET table itself */
 struct SetStruct

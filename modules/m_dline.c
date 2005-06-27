@@ -54,7 +54,7 @@ struct Message undline_msgtab = {
 };
 
 mapi_clist_av1 dline_clist[] = { &dline_msgtab, &undline_msgtab, NULL };
-DECLARE_MODULE_AV1(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision: 19295 $");
 
 static int valid_comment(char *comment);
 static int flush_write(struct Client *, FILE *, char *, char *);

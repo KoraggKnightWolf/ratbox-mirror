@@ -47,7 +47,7 @@ struct Message pong_msgtab = {
 };
 
 mapi_clist_av1 pong_clist[] = { &pong_msgtab, NULL };
-DECLARE_MODULE_AV1(pong, NULL, NULL, pong_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(pong, NULL, NULL, pong_clist, NULL, NULL, "$Revision: 19256 $");
 
 static int
 ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])

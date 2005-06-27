@@ -45,7 +45,7 @@ struct Message pass_msgtab = {
 };
 
 mapi_clist_av1 pass_clist[] = { &pass_msgtab, NULL };
-DECLARE_MODULE_AV1(pass, NULL, NULL, pass_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(pass, NULL, NULL, pass_clist, NULL, NULL, "$Revision: 19295 $");
 
 /*
  * m_pass() - Added Sat, 4 March 1989

@@ -43,7 +43,7 @@ struct Message users_msgtab = {
 };
 
 mapi_clist_av1 users_clist[] = { &users_msgtab, NULL };
-DECLARE_MODULE_AV1(users, NULL, NULL, users_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(users, NULL, NULL, users_clist, NULL, NULL, "$Revision: 19256 $");
 
 /*
  * m_users

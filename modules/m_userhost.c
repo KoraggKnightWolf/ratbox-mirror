@@ -46,7 +46,7 @@ struct Message userhost_msgtab = {
 };
 
 mapi_clist_av1 userhost_clist[] = { &userhost_msgtab, NULL };
-DECLARE_MODULE_AV1(userhost, NULL, NULL, userhost_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(userhost, NULL, NULL, userhost_clist, NULL, NULL, "$Revision: 19295 $");
 
 /*
  * m_userhost added by Darren Reed 13/8/91 to aid clients and reduce

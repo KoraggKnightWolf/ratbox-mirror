@@ -51,7 +51,7 @@ struct Message monitor_msgtab = {
 };
 
 mapi_clist_av1 monitor_clist[] = { &monitor_msgtab, NULL };
-DECLARE_MODULE_AV1(monitor, NULL, NULL, monitor_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(monitor, NULL, NULL, monitor_clist, NULL, NULL, "$Revision: 19256 $");
 
 static void
 add_monitor(struct Client *client_p, const char *nicks)

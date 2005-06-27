@@ -64,7 +64,7 @@ struct Message ungline_msgtab = {
 
 
 mapi_clist_av1 gline_clist[] = { &gline_msgtab, &ungline_msgtab, NULL };
-DECLARE_MODULE_AV1(gline, modinit, moddeinit, gline_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(gline, modinit, moddeinit, gline_clist, NULL, NULL, "$Revision: 19295 $");
 
 static int majority_gline(struct Client *source_p, const char *user,
 			  const char *host, const char *reason);

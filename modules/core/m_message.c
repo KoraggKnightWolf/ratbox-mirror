@@ -71,7 +71,7 @@ struct Message notice_msgtab = {
 };
 
 mapi_clist_av1 message_clist[] = { &privmsg_msgtab, &notice_msgtab, NULL };
-DECLARE_MODULE_AV1(message, modinit, moddeinit, message_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(message, modinit, moddeinit, message_clist, NULL, NULL, "$Revision: 19295 $");
 
 struct entity
 {

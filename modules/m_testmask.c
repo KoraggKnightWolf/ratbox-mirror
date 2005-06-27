@@ -54,7 +54,7 @@ struct Message testmask_msgtab = {
 };
 
 mapi_clist_av1 testmask_clist[] = { &testmask_msgtab, NULL };
-DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision: 19256 $");
 
 static int
 mo_testmask(struct Client *client_p, struct Client *source_p,

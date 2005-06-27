@@ -55,7 +55,7 @@ struct Message rehash_msgtab = {
 };
 
 mapi_clist_av1 rehash_clist[] = { &rehash_msgtab, NULL };
-DECLARE_MODULE_AV1(rehash, NULL, NULL, rehash_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(rehash, NULL, NULL, rehash_clist, NULL, NULL, "$Revision: 19295 $");
 
 struct hash_commands
 {

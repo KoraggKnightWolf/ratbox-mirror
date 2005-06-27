@@ -59,7 +59,7 @@ struct Message cnotice_msgtab = {
 };
 
 mapi_clist_av1 cmessage_clist[] = { &cprivmsg_msgtab, &cnotice_msgtab, NULL };
-DECLARE_MODULE_AV1(cmessage, NULL, NULL, cmessage_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(cmessage, NULL, NULL, cmessage_clist, NULL, NULL, "$Revision: 19256 $");
 
 #define PRIVMSG 0
 #define NOTICE 1

@@ -47,7 +47,7 @@ struct Message ojoin_msgtab = {
 
 mapi_clist_av1 ojoin_clist[] = { &ojoin_msgtab, NULL };
 
-DECLARE_MODULE_AV1(ojoin, NULL, NULL, ojoin_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(ojoin, NULL, NULL, ojoin_clist, NULL, NULL, "$Revision: 16480 $");
 
 /*
 ** mo_ojoin

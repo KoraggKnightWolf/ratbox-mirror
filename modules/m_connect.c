@@ -48,7 +48,7 @@ struct Message connect_msgtab = {
 };
 
 mapi_clist_av1 connect_clist[] = { &connect_msgtab, NULL };
-DECLARE_MODULE_AV1(connect, NULL, NULL, connect_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(connect, NULL, NULL, connect_clist, NULL, NULL, "$Revision: 19256 $");
 
 /*
  * mo_connect - CONNECT command handler

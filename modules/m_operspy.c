@@ -48,7 +48,7 @@ struct Message operspy_msgtab = {
 };
 
 mapi_clist_av1 operspy_clist[] = { &operspy_msgtab, NULL };
-DECLARE_MODULE_AV1(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision: 19295 $");
 
 /* ms_operspy()
  *
