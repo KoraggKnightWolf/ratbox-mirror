@@ -1,24 +1,5 @@
 $Id$
 
-The ircd-ratbox CVS repository is available for anonymous access.
+CVS is dead :)
 
-One can checkout the tree as follows:
-
-cvs -d :pserver:cvs@cvs.ratbox.org:/cvsroot login
-
-Type enter when prompted for a password.
-
-From there you can checkout the stable tree as follows:
-
-cvs -z3 -d :pserver:cvs@cvs.ratbox.org:/cvsroot co -r RATBOX_1 ircd-ratbox
-
-Or if you prefer the bleeding edge stuff:
-
-cvs -z3 -d :pserver:cvs@cvs.ratbox.org:/cvsroot co ircd-ratbox
-
-Of course at any given time the CVS tree could be broken.  If you are
-planning on using the CVS tree you very well may want to be on the mailing
-list, you can subscribe at:
-
-http://lists.ratbox.org/cgi-bin/mailman/listinfo/ircd-ratbox
 
