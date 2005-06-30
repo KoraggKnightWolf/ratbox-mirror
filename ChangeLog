@@ -1,3 +1,13 @@
+androsyn    2005/06/30 20:50:11 UTC	(20050630_3-19359)
+  Log:
+  Change the properties on this so its Id tag 
+  gets updated
+  
+
+  Modified:
+	ircd-ratbox/trunk/SVN-Access  (Property Modified)
+
+
 androsyn    2005/06/30 19:45:04 UTC	(20050630_1)
   Log:
   Remove CVS-Access file.  Port forward the whois parameter count fix.
