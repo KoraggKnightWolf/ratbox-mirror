@@ -52,7 +52,7 @@ static int ms_whois(struct Client *, struct Client *, int, const char **);
 
 struct Message whois_msgtab = {
 	"WHOIS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_whois, 2}, {ms_whois, 3}, mg_ignore, mg_ignore, {m_whois, 2}}
+	{mg_unreg, {m_whois, 2}, {ms_whois, 2}, mg_ignore, mg_ignore, {m_whois, 2}}
 };
 
 int doing_whois_hook;
@@ -79,6 +79,13 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(parc > 2)
 	{
+                if(EmptyString(parv[2]))
+                {
+                        sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
+                                        me.name, source_p->name);
+                        return 0;
+                }
+
 		if(!IsOper(source_p))
 		{
 			/* seeing as this is going across servers, we should limit it */
@@ -116,6 +123,18 @@ static int
 ms_whois(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
+
+        /* note: early versions of ratbox allowed users to issue a remote
+         * whois with a blank parv[2], so we cannot treat it as a protocol
+         * violation. --anfl
+         */
+        if(parc < 3 || EmptyString(parv[2]))
+        {
+                sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
+                                me.name, source_p->name);
+                return 0;
+        }  
+	
 
 	/* check if parv[1] exists */
 	if((target_p = find_client(parv[1])) == NULL)
