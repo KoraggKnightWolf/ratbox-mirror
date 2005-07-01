@@ -1,3 +1,34 @@
+androsyn    2005/07/01 14:45:34 UTC	(20050701_0-19361)
+  Log:
+  Make things work on solaris 10 again.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/aclocal.m4 (File Modified) 
+	ircd-ratbox/trunk/adns/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/doc/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/install-sh  (Property Modified)
+	ircd-ratbox/trunk/libircd/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/event.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.h (File Modified) 
+	ircd-ratbox/trunk/libircd/ports.c (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/servlink/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/ident/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/ident/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/resolver/resolver.c (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2005/06/30 20:50:11 UTC	(20050630_3-19359)
   Log:
   Change the properties on this so its Id tag 
