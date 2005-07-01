@@ -43,12 +43,12 @@ CPPFLAGS	= ${INCLUDES} @CPPFLAGS@
  
 install-mkdirs:
 	-@if test ! -d $(DESTDIR)$(confdir); then \
-		echo "mkdir $(confdir)"; \
+		echo "mkdir -p $(confdir)"; \
 		mkdir $(DESTDIR)$(confdir); \
 	fi
 
 	-@if test ! -d $(DESTDIR)$(mandir); then \
-		echo "mkdir $(mandir)"; \
+		echo "mkdir -p $(mandir)"; \
 		mkdir $(DESTDIR)$(mandir); \
 	fi
 

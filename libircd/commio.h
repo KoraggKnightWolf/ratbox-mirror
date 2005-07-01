@@ -30,10 +30,6 @@
 #include "setup.h"
 #include "ircd_lib.h"
 
-#if defined(HAVE_PORTS) && !defined(NO_IRCD)
-# define COMM_DOES_EVENTS
-#endif
-
 /* Callback for completed IO events */
 typedef void PF(int fd, void *);
 
@@ -160,7 +156,9 @@ extern void comm_note(int fd, const char *format, ...);
 #else
 extern void comm_note(int fd, const char *format, ...) __attribute__ ((format(printf, 2, 3)));
 #endif
-#ifdef COMM_DOES_EVENTS
+
+
+#ifdef HAVE_PORTS
 typedef void (*comm_event_cb_t)(void *);
 
 typedef struct timer_data {

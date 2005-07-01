@@ -254,8 +254,6 @@ struct lgetopt myopts[] = {
 static void
 io_loop(void)
 {
-	time_t delay;
-
 	while (ServerRunning)
 
 	{
@@ -263,11 +261,7 @@ io_loop(void)
 		 * event
 		 */
 
-#ifndef COMM_DOES_EVENTS
-		delay = eventNextTime();
-		if(delay <= CurrentTime)
-			eventRun();
-#endif
+		eventRun();
 
 		comm_select(250);
 

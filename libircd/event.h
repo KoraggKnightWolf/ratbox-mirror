@@ -27,9 +27,9 @@
 #ifndef INCLUDED_event_h
 #define INCLUDED_event_h
 
-#ifndef NO_IRCD
+#include "setup.h"
 #include "commio.h"
-#endif
+
 /*
  * How many event entries we need to allocate at a time in the block
  * allocator. 16 should be plenty at a time.
@@ -38,6 +38,7 @@
 
 
 typedef void EVH(void *);
+struct timer_data; 
 
 /* The list of event processes */
 struct ev_entry
@@ -48,8 +49,8 @@ struct ev_entry
 	time_t frequency;
 	time_t when;
 	int active;
-#if defined(COMM_DOES_EVENTS)
-	comm_event_id comm_id;
+#ifdef HAVE_PORTS
+	struct timer_data * comm_id;
 #endif
 };
 
@@ -57,7 +58,6 @@ extern void eventAdd(const char *name, EVH * func, void *arg, time_t when);
 extern void eventAddOnce(const char *name, EVH * func, void *arg, time_t when);
 extern void eventAddIsh(const char *name, EVH * func, void *arg, time_t delta_ish);
 extern void eventRun(void);
-extern time_t eventNextTime(void);
 extern void eventInit(void);
 extern void eventDelete(EVH * func, void *);
 extern int eventFind(EVH * func, void *);

@@ -325,7 +325,6 @@ static void
 read_io(void)
 {
 	struct timeval *tv = NULL, tvbuf, now, tvx;
-	time_t delay;
 	int select_result;
 	int maxfd = -1;
 
@@ -344,9 +343,7 @@ read_io(void)
 
 		set_time();
 
-                delay = eventNextTime();
-                if(delay <= SystemTime.tv_sec)
-			eventRun();
+		eventRun();
                                                         
 		adns_beforeselect(dns_state, &maxfd, &readfds, &writefds, &exceptfds, &tv, &tvbuf, &now);
 		tvx.tv_sec = 1;

@@ -76,7 +76,7 @@ void
 init_netio(void)
 {
 	if((pe = port_create()) < 0) {
-		ilog(L_IOERROR, "init_netio: Couldn't open port fd!\n");
+		lib_ilog("init_netio: Couldn't open port fd!\n");
 		exit(115);	/* Whee! */
 	}
 	pemax = getdtablesize();
@@ -181,7 +181,6 @@ struct	timer_data	*tdata;
 struct	sigevent	 ev;
 	port_notify_t	 not;
 struct	itimerspec	 ts;
-	time_t		 relwhen;
 	
 	memset(&ev, 0, sizeof(ev));
 	ev.sigev_notify = SIGEV_PORT;
@@ -195,7 +194,7 @@ struct	itimerspec	 ts;
 	not.portnfy_user = tdata;
 
 	if (timer_create(CLOCK_REALTIME, &ev, &id) < 0)
-		ilog(L_IOERROR, "timer_create: %s\n", strerror(errno));
+		lib_ilog("timer_create: %s\n", strerror(errno));
 
 	tdata->td_timer_id = id;
 
@@ -208,7 +207,7 @@ struct	itimerspec	 ts;
 	tdata->td_repeat = repeat;
 
 	if (timer_settime(id, 0, &ts, NULL) < 0)
-		ilog(L_IOERROR, "timer_settime: %s\n", strerror(errno));
+		lib_ilog("timer_settime: %s\n", strerror(errno));
 	return tdata;
 }
 

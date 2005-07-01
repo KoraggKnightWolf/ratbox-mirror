@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = resolver
 
-resolver_CFLAGS = -DNO_IRCD -I../../adns -I../../include -I../../libircd
+resolver_CFLAGS = -I../../adns -I../../include -I../../libircd
 # we recycle a lot of code from ircd itself..
 # perhaps we should move this stuff into a lib someday
 # oh well...

@@ -38,6 +38,10 @@
 #define INADDR_NONE ((unsigned int) 0xffffffff)
 #endif
 
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
+
 const char *const NONB_ERROR_MSG = "set_non_blocking failed for %s:%s";
 const char *const SETBUF_ERROR_MSG = "set_sock_buffers failed for server %s:%s";
 
@@ -454,7 +458,7 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 	if(socketpair(family, sock_type, proto, nfd))
 		return -1;
 	
-	comm_fd_hack(nfd[0]);
+	comm_fd_hack(&nfd[0]);
 	if(nfd[0] < 0)
 	{
 		close(nfd[1]);

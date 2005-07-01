@@ -378,7 +378,6 @@ int main(int argc, char **argv)
 {
 	char *tifd;
 	char *tofd;
-	time_t delay;
 	tifd = getenv("IFD");
 	tofd = getenv("OFD");
 	if(tifd == NULL || tofd == NULL)
@@ -400,12 +399,7 @@ int main(int argc, char **argv)
 	while(1) {
 		comm_select(1000);
 		comm_checktimeouts(NULL);
-#ifndef COMM_DOES_EVENTS
-                delay = eventNextTime();
-                if(delay <= SystemTime.tv_sec)
-			eventRun();
-#endif
-                                                        
+		eventRun();
 	}
 	exit(0);
 }
