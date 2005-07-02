@@ -538,12 +538,6 @@ main(int argc, char *argv[])
 	if (testing_conf)
 		server_state_foreground = 1;
 
-	/* We need this to initialise the fd array before anything else */
-	fdlist_init();
-	if(!server_state_foreground)
-	{
-		comm_close_all();
-	}
 
 
 	/* Check if there is pidfile and daemon already running */
@@ -557,8 +551,10 @@ main(int argc, char *argv[])
 			print_startup(getpid());
 	}
 
+	/* This must be after we daemonize.. */
+	ircd_lib(ilogcb, restartcb, diecb, 1);
+
 	init_sys();
-	ircd_lib(ilogcb, restartcb, diecb);
 	init_main_logfile();
 	init_patricia();
 	newconf_init();

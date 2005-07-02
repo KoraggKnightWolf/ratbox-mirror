@@ -32,12 +32,11 @@
 #include "ircd_memory.h"
 
 
-#define POLL_LENGTH	HARD_FDLIMIT
-
 
 static void devpoll_update_events(int, short, PF *);
 static int dpfd;
-static short fdmask[POLL_LENGTH];
+static int maxfd;
+static short *fdmask;
 static void devpoll_update_events(int, short, PF *);
 static void devpoll_write_update(int, int);
 
@@ -142,7 +141,6 @@ devpoll_update_events(int fd, short filter, PF * handler)
 void
 init_netio(void)
 {
-	memset(&fdmask, 0, sizeof(fdmask));
 	dpfd = open("/dev/poll", O_RDWR);
 	if(dpfd < 0)
 	{
@@ -151,6 +149,9 @@ init_netio(void)
 		     errno, strerror(errno));
 		exit(115);	/* Whee! */
 	}
+	maxfd = getdtablesize() - 2; /* This makes more sense than HARD_FDLIMIT */
+	fdmask = MyMalloc(sizeof(fdmask) * maxfd + 1);
+	comm_note(dpfd, "poll file descriptor");
 }
 
 /*
@@ -205,7 +206,7 @@ int
 comm_select(unsigned long delay)
 {
 	int num, i;
-	struct pollfd pollfds[POLL_LENGTH];
+	struct pollfd pollfds[maxfd];
 	struct dvpoll dopoll;
 
 	do
@@ -213,7 +214,7 @@ comm_select(unsigned long delay)
 		for (;;)
 		{
 			dopoll.dp_timeout = delay;
-			dopoll.dp_nfds = POLL_LENGTH;
+			dopoll.dp_nfds = maxfd;
 			dopoll.dp_fds = &pollfds[0];
 			num = ioctl(dpfd, DP_POLL, &dopoll);
 			if(num >= 0)

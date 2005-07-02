@@ -24,7 +24,7 @@ void lib_ilog(const char *, ...);
 void lib_restart(const char *, ...);
 void lib_die(const char *, ...);
 void set_time(void);
-void ircd_lib(log_cb *xilog, restart_cb *irestart, die_cb *idie);
+void ircd_lib(log_cb *xilog, restart_cb *irestart, die_cb *idie, int closeall);
 struct timeval SystemTime;  
 #ifndef CurrentTime
 #define CurrentTime SystemTime.tv_sec

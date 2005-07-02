@@ -385,7 +385,7 @@ int main(int argc, char **argv)
 	irc_ifd = atoi(tifd);
 	irc_ofd = atoi(tofd);
 
-	ircd_lib(NULL, NULL, NULL); /* XXX fix me */
+	ircd_lib(NULL, NULL, NULL, 0); /* XXX fix me */
 	linebuf_newbuf(&sendq);
 	linebuf_newbuf(&recvq);
 	authheap = BlockHeapCreate(sizeof(struct auth_request), 2048);

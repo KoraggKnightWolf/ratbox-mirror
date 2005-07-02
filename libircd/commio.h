@@ -146,7 +146,7 @@ struct _fde
 
 extern fde_t *fd_table;
 
-void fdlist_init(void);
+void fdlist_init(int);
 
 extern void comm_open(int, unsigned int, const char *);
 extern void comm_close(int);
@@ -187,7 +187,6 @@ extern int readcalls;
 extern const char *const NONB_ERROR_MSG;
 extern const char *const SETBUF_ERROR_MSG;
 
-extern void comm_close_all(void);
 extern int comm_set_nb(int);
 extern int comm_set_buffers(int, int);
 

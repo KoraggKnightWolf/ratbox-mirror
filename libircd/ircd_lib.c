@@ -78,13 +78,13 @@ set_time(void)
 
 
 void
-ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie)
+ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall)
 {
 	ircd_log = ilog;
 	ircd_restart = irestart;
 	ircd_die = idie;
 
-	fdlist_init();
+	fdlist_init(closeall);
 	init_netio();
 	eventInit();
 	initBlockHeap();

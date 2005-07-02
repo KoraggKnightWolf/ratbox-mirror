@@ -88,7 +88,7 @@ static void comm_fd_hack(int *fd)
 
 /* close_all_connections() can be used *before* the system come up! */
 
-void
+static void
 comm_close_all(void)
 {
 	int i;
@@ -101,9 +101,6 @@ comm_close_all(void)
 
 	for (i = 4; i < MAXCONNECTIONS; ++i)
 	{
-		if(fd_table[i].flags.open)
-			comm_close(i);
-		else
 			close(i);
 	}
 
@@ -662,17 +659,18 @@ fdlist_update_biggest(int fd, int opening)
 
 
 void
-fdlist_init(void)
+fdlist_init(int closeall)
 {
 	static int initialized = 0;
 
 	if(!initialized)
 	{
+		if(closeall)
+			comm_close_all();
 		/* Since we're doing this once .. */
 		fd_table = MyMalloc((MAXCONNECTIONS + 1) * sizeof(fde_t));
 		initialized = 1;
 	}
-	init_netio();
 }
 
 /* Called to open a given filedescriptor */
