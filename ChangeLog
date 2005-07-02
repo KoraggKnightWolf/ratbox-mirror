@@ -1,3 +1,19 @@
+androsyn    2005/07/02 20:54:32 UTC	(20050702_0-19363)
+  Log:
+  Make devpoll work again. Hopefully I haven't broken the other i/o loops now
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/devpoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/src/ident/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver/resolver.c (File Modified) 
+
+
 androsyn    2005/07/01 14:45:34 UTC	(20050701_0-19361)
   Log:
   Make things work on solaris 10 again.
