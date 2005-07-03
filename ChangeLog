@@ -1,3 +1,34 @@
+androsyn    2005/07/03 05:01:22 UTC	(20050703_8-19381)
+  Log:
+  Reorganized some things a bit.  Unbroke the 
+  ban notification code.  rtsigio is broken again
+  for the moment..
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/ident/ (File Added) 
+	ircd-ratbox/trunk/ident/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/ident/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/event.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.h (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_gline.c (File Modified) 
+	ircd-ratbox/trunk/resolver/ (File Added) 
+	ircd-ratbox/trunk/resolver/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/ident/ (File Deleted) 
+	ircd-ratbox/trunk/src/resolver/ (File Deleted) 
+
+
 androsyn    2005/07/03 02:07:09 UTC	(20050703_7-19379)
   Log:
   use strcmp instead of irccmp here
