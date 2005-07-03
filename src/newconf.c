@@ -1461,11 +1461,26 @@ conf_set_serverhide_links_delay(void *data)
 }
 
 #ifdef ENABLE_SERVICES
+static int
+conf_begin_service(struct TopConf *tc)
+{
+	struct Client *target_p;
+	dlink_node *ptr;
+  	 
+	DLINK_FOREACH(ptr, global_serv_list.head)
+	{
+		target_p = ptr->data;
+  	        target_p->flags &= ~FLAGS_SERVICE;
+  	}
+	return 0;
+}
+
 static void
 conf_set_service_name(void *data)
 {
+	struct Client *target_p;
 	const char *s;
-	char *gcc_sucks_nuts;
+	char *tmp;
 	int dots = 0;
 
 	 for(s = data; *s != '\0'; s++)
@@ -1486,8 +1501,11 @@ conf_set_service_name(void *data)
 		 return;
 	 }
 
-	 DupString(gcc_sucks_nuts, data);
-	 dlinkAddAlloc(gcc_sucks_nuts, &service_list);
+	 DupString(tmp, data);
+	 dlinkAddAlloc(tmp, &service_list);
+
+	if((target_p = find_server(NULL, tmp)))
+		target_p->flags |= FLAGS_SERVICE;
 }
 #endif
 
@@ -1947,7 +1965,7 @@ newconf_init()
 	add_top_conf("serverhide", NULL, NULL, conf_serverhide_table);
 
 #ifdef ENABLE_SERVICES
-	add_top_conf("service", NULL, NULL, NULL);
+	add_top_conf("service", conf_begin_service, NULL, NULL);
 	add_conf_item("service", "name", CF_QSTRING, conf_set_service_name);
 #endif
 }
