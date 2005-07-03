@@ -44,7 +44,7 @@ static fde_t **index_to_fde;
 static int sigio_signal;
 static int sigio_is_screwed = 0;	/* We overflowed our sigio queue */
 static sigset_t our_sigset;
-
+static void handle_timer(struct siginfo *si);
 static void poll_update_pollfds(int, short, PF *);
 
 /* 
@@ -219,14 +219,20 @@ comm_select(unsigned long delay)
 	PF *hdl;
 	fde_t *F;
 	struct siginfo si;
+#if 0
 	struct timespec timeout;
+
 	timeout.tv_sec = (delay / 1000);
 	timeout.tv_nsec = (delay % 1000) * 1000000;
+#endif
 	for (;;)
 	{
 		if(!sigio_is_screwed)
 		{
+#if 0
 			if((sig = sigtimedwait(&our_sigset, &si, &timeout)) > 0)
+#endif
+			if((sig = sigwaitinfo(&our_sigset, &si)) > 0)
 			{
 				if(sig == SIGIO)
 				{
@@ -234,6 +240,12 @@ comm_select(unsigned long delay)
 					sigio_is_screwed = 1;
 					break;
 				}
+				if(si.si_code == SI_TIMER)
+				{
+					handle_timer(&si);
+					continue;					
+				}
+				
 				fd = si.si_fd;
 				pfds[fd].revents |= si.si_band;
 				revents = pfds[fd].revents;
@@ -341,3 +353,56 @@ comm_select(unsigned long delay)
 	return 0;
 }
 
+
+static void 
+handle_timer(struct siginfo *si)
+{
+	struct timer_data *tdata;
+	tdata = si->si_ptr;
+	tdata->td_cb(tdata->td_udata);
+	if (!tdata->td_repeat)
+		free(tdata);
+}
+
+comm_event_id
+comm_schedule_event(time_t when, int repeat, comm_event_cb_t cb, void *udata)
+{
+	timer_t	 	 id;
+struct	timer_data	*tdata;
+struct	sigevent	 ev;
+struct	itimerspec	 ts;
+	
+	memset(&ev, 0, sizeof(ev));
+
+	tdata = malloc(sizeof(struct timer_data));
+	tdata->td_cb = cb;
+	tdata->td_udata = udata;
+
+	ev.sigev_notify = SIGEV_SIGNAL;
+	ev.sigev_signo = SIGRTMIN;
+	ev.sigev_value.sival_ptr = tdata;
+	
+	if (timer_create(CLOCK_REALTIME, &ev, &id) < 0)
+		lib_ilog("timer_create: %s\n", strerror(errno));
+
+	tdata->td_timer_id = id;
+
+	memset(&ts, 0, sizeof(ts));
+	ts.it_value.tv_sec = when;
+	ts.it_value.tv_nsec = 0;
+
+	if (repeat)
+		ts.it_interval = ts.it_value;
+	tdata->td_repeat = repeat;
+
+	if (timer_settime(id, 0, &ts, NULL) < 0)
+		lib_ilog("timer_settime: %s\n", strerror(errno));
+	return tdata;
+}
+
+void
+comm_unschedule_event(comm_event_id id)
+{
+	timer_delete(id->td_timer_id);
+	free(id);
+}

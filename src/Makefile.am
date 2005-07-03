@@ -2,8 +2,6 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = ident resolver
-
 bin_PROGRAMS = ircd
 
 INCLUDES = -I../adns $(INCLTDL) -I../libircd/ 

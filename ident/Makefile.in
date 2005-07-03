@@ -16,7 +16,7 @@
 
 # $Id$
 
-SOURCES = $(resolver_SOURCES)
+SOURCES = $(ident_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -24,7 +24,7 @@ VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = ../..
+top_builddir = ..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = @INSTALL@
 install_sh_DATA = $(install_sh) -c -m 644
@@ -39,8 +39,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-bin_PROGRAMS = resolver$(EXEEXT)
-subdir = src/resolver
+bin_PROGRAMS = ident$(EXEEXT)
+subdir = ident
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -53,13 +53,13 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_resolver_OBJECTS = resolver-resolver.$(OBJEXT)
-resolver_OBJECTS = $(am_resolver_OBJECTS)
-resolver_DEPENDENCIES =
+am_ident_OBJECTS = ident-ident.$(OBJEXT)
+ident_OBJECTS = $(am_ident_OBJECTS)
+ident_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/resolver-resolver.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/ident-ident.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -68,8 +68,8 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(resolver_SOURCES)
-DIST_SOURCES = $(resolver_SOURCES)
+SOURCES = $(ident_SOURCES)
+DIST_SOURCES = $(ident_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -211,12 +211,13 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
-resolver_CFLAGS = -I../../adns -I../../include -I../../libircd
+
 # we recycle a lot of code from ircd itself..
 # perhaps we should move this stuff into a lib someday
 # oh well...
-resolver_SOURCES = resolver.c 
-resolver_LDADD = -L../../adns -ladns -L../../libircd -lircd
+ident_CFLAGS = -I../libircd
+ident_SOURCES = ident.c 		
+ident_LDADD = -L../libircd -lircd
 all: all-am
 
 .SUFFIXES:
@@ -230,9 +231,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/resolver/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  ident/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  src/resolver/Makefile
+	  $(AUTOMAKE) --foreign  ident/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -278,9 +279,9 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-resolver$(EXEEXT): $(resolver_OBJECTS) $(resolver_DEPENDENCIES) 
-	@rm -f resolver$(EXEEXT)
-	$(LINK) $(resolver_LDFLAGS) $(resolver_OBJECTS) $(resolver_LDADD) $(LIBS)
+ident$(EXEEXT): $(ident_OBJECTS) $(ident_DEPENDENCIES) 
+	@rm -f ident$(EXEEXT)
+	$(LINK) $(ident_LDFLAGS) $(ident_OBJECTS) $(ident_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -288,7 +289,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resolver-resolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ident-ident.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -314,29 +315,29 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-resolver-resolver.o: resolver.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(resolver_CFLAGS) $(CFLAGS) -MT resolver-resolver.o -MD -MP -MF "$(DEPDIR)/resolver-resolver.Tpo" -c -o resolver-resolver.o `test -f 'resolver.c' || echo '$(srcdir)/'`resolver.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/resolver-resolver.Tpo" "$(DEPDIR)/resolver-resolver.Po"; else rm -f "$(DEPDIR)/resolver-resolver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='resolver.c' object='resolver-resolver.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/resolver-resolver.Po' tmpdepfile='$(DEPDIR)/resolver-resolver.TPo' @AMDEPBACKSLASH@
+ident-ident.o: ident.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ident_CFLAGS) $(CFLAGS) -MT ident-ident.o -MD -MP -MF "$(DEPDIR)/ident-ident.Tpo" -c -o ident-ident.o `test -f 'ident.c' || echo '$(srcdir)/'`ident.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/ident-ident.Tpo" "$(DEPDIR)/ident-ident.Po"; else rm -f "$(DEPDIR)/ident-ident.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ident.c' object='ident-ident.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/ident-ident.Po' tmpdepfile='$(DEPDIR)/ident-ident.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(resolver_CFLAGS) $(CFLAGS) -c -o resolver-resolver.o `test -f 'resolver.c' || echo '$(srcdir)/'`resolver.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ident_CFLAGS) $(CFLAGS) -c -o ident-ident.o `test -f 'ident.c' || echo '$(srcdir)/'`ident.c
 
-resolver-resolver.obj: resolver.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(resolver_CFLAGS) $(CFLAGS) -MT resolver-resolver.obj -MD -MP -MF "$(DEPDIR)/resolver-resolver.Tpo" -c -o resolver-resolver.obj `if test -f 'resolver.c'; then $(CYGPATH_W) 'resolver.c'; else $(CYGPATH_W) '$(srcdir)/resolver.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/resolver-resolver.Tpo" "$(DEPDIR)/resolver-resolver.Po"; else rm -f "$(DEPDIR)/resolver-resolver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='resolver.c' object='resolver-resolver.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/resolver-resolver.Po' tmpdepfile='$(DEPDIR)/resolver-resolver.TPo' @AMDEPBACKSLASH@
+ident-ident.obj: ident.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ident_CFLAGS) $(CFLAGS) -MT ident-ident.obj -MD -MP -MF "$(DEPDIR)/ident-ident.Tpo" -c -o ident-ident.obj `if test -f 'ident.c'; then $(CYGPATH_W) 'ident.c'; else $(CYGPATH_W) '$(srcdir)/ident.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/ident-ident.Tpo" "$(DEPDIR)/ident-ident.Po"; else rm -f "$(DEPDIR)/ident-ident.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ident.c' object='ident-ident.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/ident-ident.Po' tmpdepfile='$(DEPDIR)/ident-ident.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(resolver_CFLAGS) $(CFLAGS) -c -o resolver-resolver.obj `if test -f 'resolver.c'; then $(CYGPATH_W) 'resolver.c'; else $(CYGPATH_W) '$(srcdir)/resolver.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ident_CFLAGS) $(CFLAGS) -c -o ident-ident.obj `if test -f 'ident.c'; then $(CYGPATH_W) 'ident.c'; else $(CYGPATH_W) '$(srcdir)/ident.c'; fi`
 
-resolver-resolver.lo: resolver.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(resolver_CFLAGS) $(CFLAGS) -MT resolver-resolver.lo -MD -MP -MF "$(DEPDIR)/resolver-resolver.Tpo" -c -o resolver-resolver.lo `test -f 'resolver.c' || echo '$(srcdir)/'`resolver.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/resolver-resolver.Tpo" "$(DEPDIR)/resolver-resolver.Plo"; else rm -f "$(DEPDIR)/resolver-resolver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='resolver.c' object='resolver-resolver.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/resolver-resolver.Plo' tmpdepfile='$(DEPDIR)/resolver-resolver.TPlo' @AMDEPBACKSLASH@
+ident-ident.lo: ident.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ident_CFLAGS) $(CFLAGS) -MT ident-ident.lo -MD -MP -MF "$(DEPDIR)/ident-ident.Tpo" -c -o ident-ident.lo `test -f 'ident.c' || echo '$(srcdir)/'`ident.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/ident-ident.Tpo" "$(DEPDIR)/ident-ident.Plo"; else rm -f "$(DEPDIR)/ident-ident.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ident.c' object='ident-ident.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/ident-ident.Plo' tmpdepfile='$(DEPDIR)/ident-ident.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(resolver_CFLAGS) $(CFLAGS) -c -o resolver-resolver.lo `test -f 'resolver.c' || echo '$(srcdir)/'`resolver.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ident_CFLAGS) $(CFLAGS) -c -o ident-ident.lo `test -f 'ident.c' || echo '$(srcdir)/'`ident.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

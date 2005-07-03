@@ -49,7 +49,7 @@ struct ev_entry
 	time_t frequency;
 	time_t when;
 	int active;
-#ifdef HAVE_PORTS
+#if defined(HAVE_PORTS) || defined(HAVE_SIGIO)
 	struct timer_data * comm_id;
 #endif
 };

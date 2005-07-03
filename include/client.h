@@ -305,13 +305,20 @@ struct exit_client_hook
 /*
  * definitions for get_client_name
  */
-#define HIDE_IP 0
-#define SHOW_IP 1
-#define MASK_IP 2
+enum
+{
+	HIDE_IP,
+	SHOW_IP,
+	MASK_IP
+};
 
-#define NOTIFY_BANNED_DLINE	0
-#define NOTIFY_BANNED_GLINE	1
-#define NOTIFY_BANNED_KLINE	2
+
+enum
+{
+	D_LINED,
+        K_LINED,
+        G_LINED
+};                     
 
 extern void check_banned_lines(void);
 extern void check_klines_event(void *unused);
@@ -337,6 +344,8 @@ extern struct Client *find_chasing(struct Client *, const char *, int *);
 extern struct Client *find_person(const char *);
 extern struct Client *find_named_person(const char *);
 extern struct Client *next_client(struct Client *, const char *);
+extern void notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban);
+
 extern int accept_message(struct Client *source, struct Client *target);
 extern void del_from_accept(struct Client *source, struct Client *target);
 

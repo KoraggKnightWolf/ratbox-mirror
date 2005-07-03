@@ -205,7 +205,7 @@ extern void comm_note(int fd, const char *format, ...) __attribute__ ((format(pr
 #endif
 
 
-#ifdef HAVE_PORTS
+#if defined(HAVE_PORTS) || defined(HAVE_SIGIO)
 typedef void (*comm_event_cb_t)(void *);
 
 typedef struct timer_data {

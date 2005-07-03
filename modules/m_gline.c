@@ -609,7 +609,7 @@ check_glines(void)
 					     "GLINE active for %s",
 					     get_client_name(client_p, HIDE_IP));
 
-			notify_banned_client(client_p, aconf, NOTIFY_BANNED_GLINE);
+			notify_banned_client(client_p, aconf, G_LINED);
 			continue;
 		}
 	}

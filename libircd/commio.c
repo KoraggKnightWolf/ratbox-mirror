@@ -187,33 +187,6 @@ comm_set_nb(int fd)
 #endif
 }
 
-/*
- * stolen from squid - its a neat (but overused! :) routine which we
- * can use to see whether we can ignore this errno or not. It is
- * generally useful for non-blocking network IO related errnos.
- *     -- adrian
- */
-int
-comm_ignore_errno(int ierrno)
-{
-	switch (ierrno)
-	{
-	case EINPROGRESS:
-	case EWOULDBLOCK:
-#if EAGAIN != EWOULDBLOCK
-	case EAGAIN:
-#endif
-	case EALREADY:
-	case EINTR:
-#ifdef ERESTART
-	case ERESTART:
-#endif
-		return 1;
-	default:
-		return 0;
-	}
-}
-
 
 /*
  * comm_settimeout() - set the socket timeout

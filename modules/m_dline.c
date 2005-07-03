@@ -493,7 +493,7 @@ check_dlines(void)
 					     "DLINE active for %s",
 					     get_client_name(client_p, HIDE_IP));
 
-			notify_banned_client(client_p, aconf, NOTIFY_BANNED_DLINE);
+			notify_banned_client(client_p, aconf, D_LINED);
 			continue;
 		}
 	}
@@ -508,7 +508,7 @@ check_dlines(void)
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;
 
-			notify_banned_client(client_p, aconf, NOTIFY_BANNED_DLINE);
+			notify_banned_client(client_p, aconf, D_LINED);
 		}
 	}
 }

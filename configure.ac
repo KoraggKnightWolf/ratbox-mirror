@@ -45,7 +45,6 @@ AC_PROG_LIBTOOL
 AC_CONFIG_SUBDIRS(libltdl)
 
 
-
 AC_ISC_POSIX
 AC_C_INLINE
 AC_PROG_GCC_TRADITIONAL
@@ -921,8 +920,8 @@ AC_CONFIG_FILES(		\
 	servlink/Makefile	\
 	contrib/Makefile	\
 	src/Makefile		\
-	src/ident/Makefile	\
-	src/resolver/Makefile	\
+	ident/Makefile		\
+	resolver/Makefile	\
 	modules/Makefile	\
 	tools/Makefile		\
 	doc/Makefile		\

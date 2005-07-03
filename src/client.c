@@ -77,14 +77,6 @@ static BlockHeap *lclient_heap = NULL;
 
 static char current_uid[IDLEN];
 
-enum
-{
-       D_LINED,
-       K_LINED,
-       G_LINED
-};
-
-
 
 dlink_list dead_list;
 #ifdef DEBUG_EXITED_CLIENTS
@@ -384,7 +376,7 @@ check_unknowns_list(dlink_list * list)
 	}
 }
 
-static void
+void
 notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban)
 {
 	static const char conn_closed[] = "Connection closed";
