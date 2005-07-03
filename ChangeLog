@@ -1,3 +1,31 @@
+leeh        2005/07/03 09:45:20 UTC	(20050703_9-19383)
+  Log:
+  sync from 2.1:
+    - move stats L back to RPL_STATSLINKINFO, im not quite sure why this got
+      changed to RPL_STATSDEBUG
+    - force the monitor spec to state RPL_MONONLINE must give n!u@h
+    - sync up remote kline reasons, so theyre consistent with what happens
+      when we add local klines - notably the "Temporary K-line x min" and
+      date added to reason.
+    - fix missing closing comment tag in example confs
+    - tidy up kline/dline help to note they dont accept nick as a target
+    - remove the CLIENT_FLOOD define from m_info.h, as the informations
+      already
+      contained in the client_flood conf option
+    - remove a couple of unused defines from info
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/doc/monitor.txt (File Modified) 
+	ircd-ratbox/trunk/help/opers/dline (File Modified) 
+	ircd-ratbox/trunk/help/opers/kline (File Modified) 
+	ircd-ratbox/trunk/include/m_info.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2005/07/03 05:01:22 UTC	(20050703_8-19381)
   Log:
   Reorganized some things a bit.  Unbroke the 
