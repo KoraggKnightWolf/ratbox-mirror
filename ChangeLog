@@ -1,3 +1,14 @@
+androsyn    2005/07/03 01:52:40 UTC	(20050703_3-19371)
+  Log:
+  From 2.1:
+  - make the conf parser apply service {}; on rehash
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2005/07/03 01:46:44 UTC	(20050703_2-19369)
   Log:
   From 2.1
