@@ -1,3 +1,55 @@
+leeh        2005/07/03 10:28:51 UTC	(20050703_10-19385)
+  Log:
+  sync from 2.1:
+    - first stab at a FNC implementation for rserv
+    - add RSFNC capability
+    - disallow bans beginning with ':' over bmask
+    - disallow bans with a space in chm_ban
+    - stop counting hidden opers in stats p
+    - match() parameters in remote unresv were inverted, causing it to fail
+    - fix possibility of clients setting blank keys
+    - fix various UID problems with trace
+    - raise default topiclen to 160.
+    - remove sendq_eob, its become more of a hindrance than a benefit.
+    - sync example.efnet.conf cluster {}; with example.conf
+    - add some uniqueness into auth process for bopm
+    - raise max temptime to a year
+    - tidy up BMASK
+    - remove no_oper_resvs from general {};
+    - add resv_exempt to auth {}; flags, exempts a user from nick/channel
+      resvs
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/doc/services.txt (File Modified) 
+	ircd-ratbox/trunk/include/class.h (File Modified) 
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/include/s_serv.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/class.c (File Modified) 
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 leeh        2005/07/03 09:45:20 UTC	(20050703_9-19383)
   Log:
   sync from 2.1:
