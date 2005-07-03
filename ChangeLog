@@ -1,3 +1,30 @@
+androsyn    2005/07/03 00:52:04 UTC	(20050703_0-19365)
+  Log:
+  Fix rt sigio.  Fix the m_whois bug correctly.
+  Fixed epoll/rtsigio detection as well as ports
+  detection.
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/aclocal.m4 (File Modified) 
+	ircd-ratbox/trunk/adns/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+	ircd-ratbox/trunk/servlink/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/ident/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2005/07/02 20:54:32 UTC	(20050702_0-19363)
   Log:
   Make devpoll work again. Hopefully I haven't broken the other i/o loops now
