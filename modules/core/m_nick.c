@@ -38,6 +38,7 @@
 #include "hash.h"
 #include "whowas.h"
 #include "s_serv.h"
+#include "s_log.h"
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
@@ -311,8 +312,18 @@ ms_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	struct Client *target_p;
 	time_t newts = 0;
 
-	if(parc < 9)
+        if(parc != 9)
+        {
+                sendto_realops_flags(UMODE_ALL, L_ALL,
+                                "Dropping server %s due to (invalid) command 'NICK' "
+                                "with %d arguments (expecting 9)",
+                                client_p->name, parc);
+                ilog(L_SERVER, "Excess parameters (%d) for command 'NICK' from %s.",
+                        parc, client_p->name);
+                exit_client(client_p, client_p, client_p,
+                                "Excess parameters to NICK command");
 		return 0;
+	}
 
 	/* if nicks empty, erroneous, or too long, kill */
 	if(!clean_nick(parv[1], 0))
@@ -399,8 +410,18 @@ ms_uid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	newts = atol(parv[3]);
 
-	if(parc < 10)
-		return 0;
+        if(parc != 10)
+        {
+                sendto_realops_flags(UMODE_ALL, L_ALL,
+                                "Dropping server %s due to (invalid) command 'UID' "
+                                "with %d arguments (expecting 10)",
+                                client_p->name, parc);    
+                ilog(L_SERVER, "Excess parameters (%d) for command 'UID' from %s.",
+                        parc, client_p->name);
+                exit_client(client_p, client_p, client_p,
+                                "Excess parameters to UID command");
+                return 0;
+        }
 
 	/* if nicks erroneous, or too long, kill */
 	if(!clean_nick(parv[1], 0))
@@ -601,6 +622,9 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 static void
 change_local_nick(struct Client *client_p, struct Client *source_p, char *nick)
 {
+	struct Client *target_p;
+	dlink_node *ptr, *next_ptr;
+
 	int samenick;
 	if((source_p->localClient->last_nick_change + ConfigFileEntry.max_nick_time) < CurrentTime)
 		source_p->localClient->number_of_nick_changes = 0;
@@ -653,10 +677,17 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	if(!samenick)
 		monitor_signon(source_p);
 
-	/* Make sure everyone that has this client on its accept list
-	 * loses that reference. 
-	 */
-	del_all_accepts(source_p);
+        /* we used to call del_all_accepts() here, but theres no real reason
+         * to clear a clients own list of accepted clients.  So just remove
+         * them from everyone elses list --anfl
+         */
+        DLINK_FOREACH_SAFE(ptr, next_ptr, source_p->on_allow_list.head)
+        {
+                target_p = ptr->data;
+
+                dlinkFindDestroy(source_p, &target_p->localClient->allow_list);
+                dlinkDestroy(ptr, &source_p->on_allow_list);
+        }
 
 	/* fd_desc is long enough */
 	comm_note(client_p->localClient->fd, "Nick: %s", nick);

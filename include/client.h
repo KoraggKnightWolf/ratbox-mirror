@@ -316,7 +316,6 @@ struct exit_client_hook
 extern void check_banned_lines(void);
 extern void check_klines_event(void *unused);
 extern void check_klines(void);
-void notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban);
 
 extern const char *get_client_name(struct Client *client, int show_ip);
 extern const char *get_server_name(struct Client *client, int show_ip);
@@ -340,6 +339,8 @@ extern struct Client *find_named_person(const char *);
 extern struct Client *next_client(struct Client *, const char *);
 extern int accept_message(struct Client *source, struct Client *target);
 extern void del_from_accept(struct Client *source, struct Client *target);
+
+#define accept_message(s, t) ((s) == (t) || (dlinkFind((s), &((t)->localClient->allow_list))))
 extern void del_all_accepts(struct Client *client_p);
 
 extern void dead_link(struct Client *client_p);

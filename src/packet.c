@@ -461,3 +461,21 @@ client_dopacket(struct Client *client_p, char *buffer, size_t length)
 
 	parse(client_p, buffer, buffer + length);
 }
+
+/* flood_endgrace()
+ *
+ * marks the end of the clients grace period
+ */
+void
+flood_endgrace(struct Client *client_p)
+{
+	SetFloodDone(client_p);
+
+	/* Drop their flood limit back down */
+	client_p->localClient->allow_read = MAX_FLOOD;
+
+	/* sent_parsed could be way over MAX_FLOOD but under MAX_FLOOD_BURST,
+	 * so reset it.
+	 */
+	client_p->localClient->sent_parsed = 0;
+}

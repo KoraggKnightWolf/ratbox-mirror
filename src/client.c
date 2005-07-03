@@ -77,6 +77,15 @@ static BlockHeap *lclient_heap = NULL;
 
 static char current_uid[IDLEN];
 
+enum
+{
+       D_LINED,
+       K_LINED,
+       G_LINED
+};
+
+
+
 dlink_list dead_list;
 #ifdef DEBUG_EXITED_CLIENTS
 static dlink_list dead_remote_list;
@@ -375,7 +384,7 @@ check_unknowns_list(dlink_list * list)
 	}
 }
 
-void
+static void
 notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban)
 {
 	static const char conn_closed[] = "Connection closed";
@@ -392,12 +401,12 @@ notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban)
 	}
 	else
 	{
-		switch (ban)
+		switch (aconf->status)
 		{
-		case NOTIFY_BANNED_DLINE:
+		case D_LINED:
 			reason = d_lined;
 			break;
-		case NOTIFY_BANNED_GLINE:
+		case G_LINED:
 			reason = g_lined;
 			break;
 		default:
@@ -406,7 +415,7 @@ notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban)
 		}
 	}
 
-	if(ban == NOTIFY_BANNED_DLINE && !IsPerson(client_p))
+	if(ban == D_LINED && !IsPerson(client_p))
 		sendto_one(client_p, POP_QUEUE, "NOTICE DLINE :*** You have been D-lined");
 	else
 		sendto_one(client_p, POP_QUEUE, form_str(ERR_YOUREBANNEDCREEP),
@@ -448,7 +457,7 @@ check_banned_lines(void)
 					     "DLINE active for %s",
 					     get_client_name(client_p, HIDE_IP));
 
-			notify_banned_client(client_p, aconf, NOTIFY_BANNED_DLINE);
+			notify_banned_client(client_p, aconf, D_LINED);
 			continue;	/* and go examine next fd/client_p */
 		}
 
@@ -469,7 +478,7 @@ check_banned_lines(void)
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"KLINE active for %s",
 					get_client_name(client_p, HIDE_IP));
-			notify_banned_client(client_p, aconf, NOTIFY_BANNED_KLINE);
+			notify_banned_client(client_p, aconf, K_LINED);
 			continue;
 		}
 		else if((aconf = find_gline(client_p)) != NULL)
@@ -496,7 +505,7 @@ check_banned_lines(void)
 					"GLINE active for %s",
 					get_client_name(client_p, HIDE_IP));
 
-			notify_banned_client(client_p, aconf, NOTIFY_BANNED_GLINE);
+			notify_banned_client(client_p, aconf, G_LINED);
 			continue;
 		}
 		else if((aconf = find_xline(client_p->info, 1)) != NULL)
@@ -528,7 +537,7 @@ check_banned_lines(void)
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;
 
-			notify_banned_client(client_p, aconf, NOTIFY_BANNED_DLINE);
+			notify_banned_client(client_p, aconf, D_LINED);
 		}
 	}
 
@@ -582,7 +591,7 @@ check_klines(void)
 					     "KLINE active for %s",
 					     get_client_name(client_p, HIDE_IP));
 
-			notify_banned_client(client_p, aconf, NOTIFY_BANNED_KLINE);
+			notify_banned_client(client_p, aconf, K_LINED);
 			continue;
 		}
 	}
@@ -1564,62 +1573,6 @@ count_remote_client_memory(size_t * count, size_t * remote_client_memory_used)
  * from any client having an accept on them. 
  */
 
-/*
- * accept_message
- *
- * inputs	- pointer to source client
- * 		- pointer to target client
- * output	- 1 if accept this message 0 if not
- * side effects - See if source is on target's allow list
- */
-int
-accept_message(struct Client *source, struct Client *target)
-{
-	if((target == source) || dlinkFind(source, &target->localClient->allow_list) != NULL)
-		return 1;
-
-	return 0;
-}
-
-
-/*
- * del_from_accept
- *
- * inputs	- pointer to source client
- * 		- pointer to target client
- * output	- NONE
- * side effects - Delete's source pointer to targets allow list
- *
- * Walk through the target's accept list, remove if source is found,
- * Then walk through the source's on_accept_list remove target if found.
- */
-void
-del_from_accept(struct Client *source, struct Client *target)
-{
-	dlink_node *ptr;
-	dlink_node *ptr2;
-	dlink_node *next_ptr;
-	dlink_node *next_ptr2;
-	struct Client *target_p;
-
-	DLINK_FOREACH_SAFE(ptr, next_ptr, target->localClient->allow_list.head)
-	{
-		target_p = ptr->data;
-		if(source == target_p)
-		{
-			dlinkDestroy(ptr, &target->localClient->allow_list);
-
-			DLINK_FOREACH_SAFE(ptr2, next_ptr2, source->on_allow_list.head)
-			{
-				target_p = ptr2->data;
-				if(target == target_p)
-				{
-					dlinkDestroy(ptr2, &source->on_allow_list);
-				}
-			}
-		}
-	}
-}
 
 /*
  * del_all_accepts
@@ -1636,21 +1589,26 @@ del_all_accepts(struct Client *client_p)
 	dlink_node *next_ptr;
 	struct Client *target_p;
 
-	if(MyClient(client_p))
+	if(MyClient(client_p) && client_p->localClient->allow_list.head)
 	{
+                /* clear this clients accept list, and remove them from
+                 * everyones on_accept_list
+                 */
+
 		DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->allow_list.head)
 		{
 			target_p = ptr->data;
-			if(target_p != NULL)
-				del_from_accept(target_p, client_p);
+                        dlinkFindDestroy(client_p, &target_p->on_allow_list);
+                        dlinkDestroy(ptr, &client_p->localClient->allow_list);
 		}
 	}
 
+	/* remove this client from everyones accept list */
 	DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->on_allow_list.head)
 	{
 		target_p = ptr->data;
-		if(target_p != NULL)
-			del_from_accept(client_p, target_p);
+                dlinkFindDestroy(client_p, &target_p->localClient->allow_list);
+                dlinkDestroy(ptr, &client_p->on_allow_list);
 	}
 }
 
@@ -2077,21 +2035,4 @@ error_exit_client(struct Client *client_p, int error)
 	exit_client(client_p, client_p, &me, errmsg);
 }
 
-/* flood_endgrace()
- *
- * marks the end of the clients grace period
- */
-void
-flood_endgrace(struct Client *client_p)
-{
-	SetFloodDone(client_p);
-
-	/* Drop their flood limit back down */
-	client_p->localClient->allow_read = MAX_FLOOD;
-
-	/* sent_parsed could be way over MAX_FLOOD but under MAX_FLOOD_BURST,
-	 * so reset it.
-	 */
-	client_p->localClient->sent_parsed = 0;
-}
 
