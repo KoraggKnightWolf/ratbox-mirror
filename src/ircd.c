@@ -658,7 +658,7 @@ main(int argc, char *argv[])
 	eventAddIsh("comm_checktimeouts", comm_checktimeouts, NULL, 1);
 
 	if(ConfigServerHide.links_delay > 0)
-		eventAddIsh("cache_links", cache_links, NULL,
+		eventAdd("cache_links", cache_links, NULL,
 			    ConfigServerHide.links_delay);
 	else
 		ConfigServerHide.links_disabled = 1;

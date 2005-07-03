@@ -320,3 +320,26 @@ set_back_events(time_t by)
 			event_table[i].when = 0;
 	}
 }
+
+void
+eventUpdate(const char *name, time_t freq)
+{
+        int i;
+  
+        for(i = 0; i < MAX_EVENTS; i++)
+        {
+                if(event_table[i].active && 
+                   !irccmp(event_table[i].name, name))
+                {
+                        event_table[i].frequency = freq;
+
+                        /* update when its scheduled to run if its higher
+                         * than the new frequency
+                         */
+                        if((CurrentTime + freq) < event_table[i].when)  
+                                event_table[i].when = CurrentTime + freq;
+
+                        return;
+                }
+        }
+}
