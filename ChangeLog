@@ -1,3 +1,19 @@
+androsyn    2005/07/03 02:02:50 UTC	(20050703_5-19375)
+  Log:
+  From 2.1:
+  
+    - via jilles, make m_services.c hook into stats U and display service
+      blocks
+  
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2005/07/03 01:55:27 UTC	(20050703_4-19373)
   Log:
   From 2.1:
