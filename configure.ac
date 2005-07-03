@@ -491,19 +491,11 @@ AC_ARG_ENABLE(epoll, AC_HELP_STRING([--enable-epoll],[Force sys_epoll usage (Lin
   fi
 ],)
 
-AC_ARG_ENABLE(epoll, AC_HELP_STRING([--enable-epoll],[Force sys_epoll usage (Linux only).]),
-[ if test $enableval = yes; then
-        SELECT_TYPE_EXPLICIT="epoll"
-  else
-        use_epoll=no
-  fi
-],)
-
-AC_ARG_ENABLE(epoll, AC_HELP_STRING([--enable-rtsigio],[Force rtsigio usage (Linux only).]),
+AC_ARG_ENABLE(rtsigio, AC_HELP_STRING([--enable-rtsigio],[Force rtsigio usage (Linux only).]),
 [ if test $enableval = yes; then
         SELECT_TYPE_EXPLICIT="sigio"
   else
-        use_epoll=no
+        use_sigio=no
   fi
 ],)
 
@@ -579,9 +571,17 @@ AC_HELP_STRING([--with-moduledir=DIR],
 	  	 AC_SUBST_DIR([moduledir])]
 )
 
+dnl The force type assumes the users knows what they are doing..
+dnl if it doesn't work, their problem.
 if test ! -z "$SELECT_TYPE_EXPLICIT"; then
 	SELECT_TYPE="$SELECT_TYPE_EXPLICIT";
 	echo "Forcing $SELECT_TYPE to be enabled"
+	if test "x$SELECT_TYPE" = "xports" ; then
+		AC_DEFINE(HAVE_PORTS, 1, [using ports])
+	fi
+	if test "x$SELECT_TYPE" = "xsigio" ; then
+		AC_DEFINE(HAVE_SIGIO, 1, [using rtsigio])
+	fi
 else
 
 if test ! "x$use_select" = "xno"; then
@@ -646,6 +646,7 @@ yes
 
 	if test "x$havertsig" = "xyes"; then
 		SELECT_TYPE="sigio"
+		AC_DEFINE(HAVE_SIGIO, 1, [using rtsigio])
 	fi
 fi
 

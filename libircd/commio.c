@@ -168,10 +168,12 @@ comm_set_buffers(int fd, int size)
  * side effects - use POSIX compliant non blocking and
  *                be done with it.
  */
-#ifndef comm_set_nb
 int
 comm_set_nb(int fd)
 {
+#ifdef HAVE_SIGIO
+	return(setup_sigio_fd(fd));
+#else
 	int nonb = 0;
 	int res;
 
@@ -182,8 +184,8 @@ comm_set_nb(int fd)
 
 	fd_table[fd].flags.nonblocking = 1;
 	return 1;
-}
 #endif
+}
 
 /*
  * stolen from squid - its a neat (but overused! :) routine which we
@@ -192,7 +194,7 @@ comm_set_nb(int fd)
  *     -- adrian
  */
 int
-ignoreErrno(int ierrno)
+comm_ignore_errno(int ierrno)
 {
 	switch (ierrno)
 	{

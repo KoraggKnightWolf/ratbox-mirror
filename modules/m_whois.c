@@ -81,7 +81,7 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
                 if(EmptyString(parv[2]))
                 {
-                        sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
+                        sendto_one(source_p, POP_QUEUE, form_str(ERR_NONICKNAMEGIVEN),
                                         me.name, source_p->name);
                         return 0;
                 }
@@ -130,7 +130,7 @@ ms_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
          */
         if(parc < 3 || EmptyString(parv[2]))
         {
-                sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
+                sendto_one(source_p, POP_QUEUE, form_str(ERR_NONICKNAMEGIVEN),
                                 me.name, source_p->name);
                 return 0;
         }  

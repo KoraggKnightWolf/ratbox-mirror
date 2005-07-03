@@ -177,11 +177,7 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 	s_assert(fd >= 0);
 	F = &fd_table[fd];
 	s_assert(F->flags.open);
-	if(F->pflags == 0 && (F->type == FD_SOCKET || F->type == FD_PIPE))
-	{
-		setup_sigio_fd(fd);
-		F->pflags = 1;
-	}
+
 	if(type & COMM_SELECT_READ)
 	{
 		F->read_handler = handler;

@@ -93,6 +93,9 @@
 /* Define to 1 if you have the `sendmsg' function. */
 #undef HAVE_SENDMSG
 
+/* using rtsigio */
+#undef HAVE_SIGIO
+
 /* Define to 1 if you have the `sigtimedwait' function. */
 #undef HAVE_SIGTIMEDWAIT
 

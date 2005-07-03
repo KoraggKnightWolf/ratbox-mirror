@@ -30,6 +30,53 @@
 #include "setup.h"
 #include "ircd_lib.h"
 
+
+#ifdef EINPROGRESS
+#define XEINPROGRESS EINPROGRESS
+#else
+#define XEINPROGRESS 0
+#endif
+
+#ifdef EWOULDBLOCK
+#define XEWOULDBLOCK EWOULDBLOCK
+#else
+#define XEWOULDBLOCK 0
+#endif
+
+#ifdef EAGAIN
+#define XEAGAIN EAGAIN
+#else
+#define XEAGAIN 0
+#endif
+
+#ifdef EINTR
+#define XEINTR EINTR
+#else
+#define XEINTR 0
+#endif
+
+#ifdef ERESTART
+#define XERESTART ERESTART
+#else
+#define XERESTART 0
+#endif
+
+#ifdef ENOBUFS
+#define XENOBUFS ENOBUFS
+#else
+#define XENOBUFS 0
+#endif
+
+#define ignoreErrno(x)	((	\
+x == EINPROGRESS	||	\
+x == EWOULDBLOCK	||	\
+x == EAGAIN		||	\
+x == EINTR       	||	\
+x == ERESTART    	||	\
+x == ENOBUFS) ? 1 : 0)
+
+
+
 /* Callback for completed IO events */
 typedef void PF(int fd, void *);
 
@@ -191,7 +238,6 @@ extern int comm_set_nb(int);
 extern int comm_set_buffers(int, int);
 
 extern int comm_get_sockerr(int);
-extern int ignoreErrno(int ierrno);
 
 extern void comm_settimeout(int fd, time_t, PF *, void *);
 extern void comm_setflush(int fd, time_t, PF *, void *);
@@ -229,8 +275,6 @@ extern void mangle_mapped_sockaddr(struct sockaddr *in);
 #else
 #define mangle_mapped_sockaddr(x) 
 #endif
-#ifdef USING_SIGIO
-#define comm_set_nb(x) setup_sigio_fd(x)
-#endif
+
 
 #endif /* INCLUDED_commio_h */
