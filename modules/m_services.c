@@ -51,6 +51,7 @@ static int me_login(struct Client *, struct Client *, int, const char **);
 static void h_svc_server_introduced(hook_data_client *);
 static void h_svc_burst_client(hook_data_client *);
 static void h_svc_whois(hook_data_client *);
+static void h_svc_stats(hook_data_int *);
 
 struct Message su_msgtab = {
 	"SU", 0, 0, 0, MFLG_SLOW,
@@ -63,6 +64,7 @@ struct Message login_msgtab = {
 
 mapi_clist_av1 services_clist[] = { &su_msgtab, &login_msgtab, NULL };
 mapi_hfn_list_av1 services_hfnlist[] = {
+	{ "doing_stats",        (hookfn) h_svc_stats },
 	{ "doing_whois",	(hookfn) h_svc_whois },
 	{ "doing_whois_global",	(hookfn) h_svc_whois },
 	{ "burst_client",	(hookfn) h_svc_burst_client },
@@ -117,7 +119,7 @@ h_svc_burst_client(hook_data_client *hdata)
 	if(EmptyString(hdata->target->user->suser))
 		return;
 
-	sendto_one(hdata->client, ":%s ENCAP * LOGIN %s",
+	sendto_one(hdata->client, POP_QUEUE, ":%s ENCAP * LOGIN %s",
 			get_id(hdata->target, hdata->client),
 			hdata->target->user->suser);
 }
@@ -142,11 +144,28 @@ h_svc_whois(hook_data_client *data)
 {
 	if(!EmptyString(data->target->user->suser))
 	{
-		sendto_one(data->client, form_str(RPL_WHOISLOGGEDIN),
+		sendto_one(data->client, POP_QUEUE, form_str(RPL_WHOISLOGGEDIN),
 				me.name, data->client->name,
 				data->target->name,
 				data->target->user->suser);
 	}
 }
 
+static void
+h_svc_stats(hook_data_int *data)
+{
+	char statchar = (char) data->arg2;
+  	dlink_node *ptr;
+  	 
+	if (statchar == 'U' && IsOper(data->client))
+	{
+		DLINK_FOREACH(ptr, service_list.head)
+		{
+  	        	sendto_one_numeric(data->client, POP_QUEUE, RPL_STATSULINE,
+  	                			form_str(RPL_STATSULINE),
+  	                			ptr->data, "*", "*", "s");
+  	        }
+  	 }
+}
+  	 
 #endif

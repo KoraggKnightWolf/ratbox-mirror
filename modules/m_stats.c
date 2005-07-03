@@ -216,6 +216,11 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(hunt_server (client_p, source_p, ":%s STATS %s :%s", 2, parc, parv) != HUNTED_ISME)
 		return 0;
 
+	/* Blah, stats L needs the parameters, none of the others do.. */
+	if(statchar == 'L' || statchar == 'l')
+		stats_cmd_table[i].handler (source_p, parc, parv);
+	else
+		stats_cmd_table[i].handler (source_p);
 	for (i = 0; stats_cmd_table[i].handler; i++)
 	{
 		if(stats_cmd_table[i].letter == statchar)
@@ -232,11 +237,6 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 				break;
 			}
 
-			/* Blah, stats L needs the parameters, none of the others do.. */
-			if(statchar == 'L' || statchar == 'l')
-				stats_cmd_table[i].handler (source_p, parc, parv);
-			else
-				stats_cmd_table[i].handler (source_p);
 		}
 	}
 
