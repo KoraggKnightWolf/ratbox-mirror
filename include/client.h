@@ -178,6 +178,7 @@ struct exit_client_hook
 
 /* overflow flags */
 /* EARLIER FLAGS ARE IN s_newconf.h */
+#define FLAGS2_EXEMPTRESV	0x0080000
 #define FLAGS2_EXEMPTGLINE      0x0100000
 #define FLAGS2_EXEMPTKLINE      0x0200000
 #define FLAGS2_EXEMPTFLOOD      0x0400000
@@ -293,6 +294,8 @@ struct exit_client_hook
 #define SetExemptShide(x)	((x)->flags2 |= FLAGS2_EXEMPTSHIDE)
 #define IsExemptJupe(x)		((x)->flags2 & FLAGS2_EXEMPTJUPE)
 #define SetExemptJupe(x)	((x)->flags2 |= FLAGS2_EXEMPTJUPE)
+#define IsExemptResv(x)		((x)->flags2 & FLAGS2_EXEMPTRESV)
+#define SetExemptResv(x)	((x)->flags2 |= FLAGS2_EXEMPTRESV)
 #define IsIPSpoof(x)            ((x)->flags2 & FLAGS2_IP_SPOOFING)
 #define SetIPSpoof(x)           ((x)->flags2 |= FLAGS2_IP_SPOOFING)
 

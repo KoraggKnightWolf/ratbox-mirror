@@ -258,6 +258,7 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 	int mlen;
 	int plen = 0;
 	int tlen;
+	int arglen;
 	int modecount = 0;
 	int needcap = NOCAPS;
 	int mems;
@@ -307,11 +308,26 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 	mbuf = modebuf + mlen;
 	pbuf = parabuf;
 
+	while(*s == ' ')
+		s++;
+
+	/* next char isnt a space, point t to next one */
 	if((t = strchr(s, ' ')) != NULL)
+	{
 		*t++ = '\0';
 
-	while(s != NULL)
+		/* double spaces break parser */
+		while(*t == ' ')
+			t++;
+	}
+
+	/* couldve skipped spaces and got nothing.. */
+	while(!EmptyString(s))
 	{
+		/* ban with a leading ':' -- this will break the protocol */
+		if(*s == ':')
+			goto nextban;
+
 		tlen = strlen(s);
 
 		/* I dont even want to begin parsing this.. */
@@ -321,7 +337,7 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(add_id(source_p, chptr, s, banlist, mode_type))
 		{
 			/* this new one wont fit.. */
-			if(mlen + MAXMODEPARAMS + plen + tlen > BUFSIZE - 4 ||
+			if(mlen + MAXMODEPARAMS + plen + tlen > BUFSIZE - 5 ||
 			   modecount >= MAXMODEPARAMS)
 			{
 				*mbuf = '\0';
@@ -337,21 +353,24 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 			}
 
 			*mbuf++ = parv[3][0];
-			plen = ircsprintf(pbuf, "%s ", s);
-			pbuf += plen;
+			arglen = ircsprintf(pbuf, "%s ", s);
+			pbuf += arglen;
+			plen += arglen;
 			modecount++;
 		}
 
+nextban:
 		s = t;
 
 		if(s != NULL)
 		{
-			/* trailing space marking the end. */
-			if(*s == '\0')
-				break;
-
 			if((t = strchr(s, ' ')) != NULL)
+			{
 				*t++ = '\0';
+
+				while(*t == ' ')
+					t++;
+			}
 		}
 	}
 
@@ -652,7 +671,7 @@ fix_key_remote(char *arg)
 	for (s = t = (u_char *) arg; (c = *s); s++)
 	{
 		c &= 0x7f;
-		if((c != 0x0a) && (c != ':') && (c != 0x0d))
+		if((c != 0x0a) && (c != ':') && (c != 0x0d) && (c != ' '))
 			*t++ = c;
 	}
 
@@ -838,7 +857,12 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 		return;
 
 	if(!MyClient(source_p))
+	{
+		if(strchr(raw_mask, ' '))
+			return;
+
 		mask = raw_mask;
+	}
 	else
 		mask = pretty_mask(raw_mask);
 
@@ -1136,13 +1160,13 @@ chm_key(struct Client *source_p, struct Channel *chptr,
 		key = LOCAL_COPY(parv[(*parn)]);
 		(*parn)++;
 
-		if(EmptyString(key))
-			return;
-
 		if(MyClient(source_p))
 			fix_key(key);
 		else
 			fix_key_remote(key);
+
+		if(EmptyString(key))
+			return;
 
 		s_assert(key[0] != ' ');
 		strlcpy(chptr->mode.key, key, sizeof(chptr->mode.key));

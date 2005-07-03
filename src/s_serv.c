@@ -92,6 +92,7 @@ struct Capability captab[] = {
 	{ "ENCAP",	CAP_ENCAP },
 #ifdef ENABLE_SERVICES
 	{ "SERVICES",	CAP_SERVICE },
+	{ "RSFNC",	CAP_RSFNC },
 #endif
 	{0, 0}
 };

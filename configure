@@ -1072,7 +1072,7 @@ Optional Packages:
   --with-helpdir=DIR      Directory to install help files.
   --with-moduledir=DIR    Directory to install modules.
   --with-nicklen=LENGTH   Set the nick length to LENGTH (default 9, max 50)
-  --with-topiclen=NUMBER  Set the max topic length to NUMBER (default 120, max
+  --with-topiclen=NUMBER  Set the max topic length to NUMBER (default 160, max
                           390)
   --with-maxclients=NUMBER
                           Maximum number of connections the ircd can handle
@@ -26462,7 +26462,7 @@ echo "$as_me: WARNING: TOPICLEN has a hard limit of 390. Setting TOPICLEN=390" >
  fi
 
 else
-  TOPICLEN=120
+  TOPICLEN=160
 fi;
 
 

@@ -216,6 +216,9 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(hunt_server (client_p, source_p, ":%s STATS %s :%s", 2, parc, parv) != HUNTED_ISME)
 		return 0;
 
+	if((statchar != 'L') && (statchar != 'l'))
+		stats_spy(source_p, statchar, NULL);
+
 	/* Blah, stats L needs the parameters, none of the others do.. */
 	if(statchar == 'L' || statchar == 'l')
 		stats_cmd_table[i].handler (source_p, parc, parv);
@@ -243,9 +246,6 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* Send the end of stats notice, and the stats_spy */
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFSTATS, 
 			   form_str(RPL_ENDOFSTATS), statchar);
-
-	if((statchar != 'L') && (statchar != 'l'))
-		stats_spy(source_p, statchar, NULL);
 
 	return 0;
 }
@@ -763,6 +763,7 @@ stats_operedup (struct Client *source_p)
 {
 	struct Client *target_p;
 	dlink_node *oper_ptr;
+	unsigned int count = 0;
 
 	DLINK_FOREACH (oper_ptr, oper_list.head)
 	{
@@ -771,7 +772,9 @@ stats_operedup (struct Client *source_p)
 		if(IsOperInvis(target_p) && !IsOper(source_p))
 			continue;
 
-		if(MyClient (source_p) && IsOper (source_p))
+		count++;
+
+		if(MyClient(source_p) && IsOper(source_p))
 		{
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 					   "p :[%c][%s] %s (%s@%s) Idle: %d",
@@ -791,10 +794,9 @@ stats_operedup (struct Client *source_p)
 	}
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "p :%ld OPER(s)",
-			   dlink_list_length (&oper_list));
+			   "p :%u OPER(s)", count);
 
-	stats_p_spy (source_p);
+	stats_p_spy(source_p);
 }
 
 static void

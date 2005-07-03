@@ -535,12 +535,6 @@ static struct InfoStruct info_table[] = {
 		"Disallow joining channels when split",
 	},
 	{
-		"no_oper_resvs",
-		OUTPUT_BOOLEAN_YN,
-		&ConfigChannel.no_oper_resvs,
-		"Disable channel resvs for operators",
-	},
-	{
 		"quiet_on_ban",
 		OUTPUT_BOOLEAN_YN,
 		&ConfigChannel.quiet_on_ban,

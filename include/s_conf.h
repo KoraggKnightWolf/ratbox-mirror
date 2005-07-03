@@ -91,10 +91,11 @@ struct ConfItem
 #define CONF_FLAGS_SPOOF_NOTICE		0x00000400
 #define CONF_FLAGS_REDIR                0x00000800
 #define CONF_FLAGS_EXEMPTGLINE          0x00001000
+#define CONF_FLAGS_EXEMPTRESV		0x00002000	/* exempt from resvs */
 #define CONF_FLAGS_EXEMPTFLOOD          0x00004000
 #define CONF_FLAGS_EXEMPTSPAMBOT	0x00008000
 #define CONF_FLAGS_EXEMPTSHIDE		0x00010000
-#define CONF_FLAGS_EXEMPTJUPE		0x00020000
+#define CONF_FLAGS_EXEMPTJUPE		0x00020000	/* exempt from resv generating warnings */
 /* server flags */
 #define CONF_FLAGS_ENCRYPTED            0x00100000
 #define CONF_FLAGS_COMPRESSED           0x00200000
@@ -111,6 +112,7 @@ struct ConfItem
 #define IsConfExemptSpambot(x)	((x)->flags & CONF_FLAGS_EXEMPTSPAMBOT)
 #define IsConfExemptShide(x)	((x)->flags & CONF_FLAGS_EXEMPTSHIDE)
 #define IsConfExemptJupe(x)	((x)->flags & CONF_FLAGS_EXEMPTJUPE)
+#define IsConfExemptResv(x)	((x)->flags & CONF_FLAGS_EXEMPTRESV)
 #define IsConfDoSpoofIp(x)      ((x)->flags & CONF_FLAGS_SPOOF_IP)
 #define IsConfSpoofNotice(x)    ((x)->flags & CONF_FLAGS_SPOOF_NOTICE)
 #define IsConfEncrypted(x)      ((x)->flags & CONF_FLAGS_ENCRYPTED)
@@ -179,7 +181,6 @@ struct config_file_entry
 	int pace_wait_simple;
 	int short_motd;
 	int default_invisible;
-	int no_oper_flood;
 	int glines;
 	int gline_time;
 	int gline_min_cidr;

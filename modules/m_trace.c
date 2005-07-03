@@ -92,6 +92,11 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 	else
 		tname = me.name;
 
+	/* if we have 3 parameters, then the command is directed at us.  So
+	 * we shouldnt be forwarding it anywhere. --anfl
+	 */
+	if(parc > 3)
+	{
 	switch (hunt_server(client_p, source_p, ":%s TRACE :%s", 1, parc, parv))
 	{
 	case HUNTED_PASS:	/* note: gets here only if parv[1] exists */
@@ -123,7 +128,8 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 			   !ConfigServerHide.flatten_links)
 				sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACELINK, 
 						   form_str(RPL_TRACELINK),
-						   ircd_version, tname,
+						   ircd_version,
+						   ac2ptr ? ac2ptr->name : tname,
 						   ac2ptr ? ac2ptr->from->name : "EEK!");
 
 			return 0;
@@ -134,6 +140,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	default:
 		return 0;
+	}
 	}
 
 	if(match(tname, me.name))
@@ -155,7 +162,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* specific trace */
 	if(dow == 0)
 	{
-		if(MyClient(source_p))
+		if(MyClient(source_p) || parc > 2)
 			target_p = find_named_person(tname);
 		else
 			target_p = find_person(tname);

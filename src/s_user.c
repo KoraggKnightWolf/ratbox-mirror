@@ -776,6 +776,14 @@ report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
 			   ":%s NOTICE %s :*** You are exempt from serverhiding.",
 			   me.name, source_p->name);
 	}
+
+	if(IsConfExemptResv(aconf))
+	{
+		SetExemptResv(source_p);
+		sendto_one(source_p, POP_QUEUE,
+				":%s NOTICE %s :*** You are exempt from resvs.",
+				me.name, source_p->name);
+	}
 }
 
 /*

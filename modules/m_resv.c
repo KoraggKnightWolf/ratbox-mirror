@@ -413,7 +413,7 @@ ms_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 	propagate_generic(source_p, "UNRESV", parv[1], CAP_CLUSTER,
 			"%s", parv[2]);
 
-	if(!match(me.name, parv[1]))
+	if(!match(parv[1], me.name))
 		return 0;
 
 	if(!IsPerson(source_p))

@@ -69,11 +69,13 @@ struct Capability
 #define CAP_ENCAP	0x04000	/* supports ENCAP */
 #define CAP_TS6		0x08000 /* supports TS6 or above */
 #define CAP_SERVICE	0x10000
+#define CAP_RSFNC	0x20000	/* rserv FNC */
 
 #define CAP_MASK        (CAP_QS  | CAP_EX   | CAP_CHW  | \
                          CAP_IE  | CAP_KLN  | CAP_SERVICE |\
                          CAP_GLN | CAP_CLUSTER | CAP_ENCAP | \
-                         CAP_ZIP  | CAP_KNOCK  | CAP_UNKLN)
+                         CAP_ZIP  | CAP_KNOCK  | CAP_UNKLN |\
+			 CAP_RSFNC)
 
 #ifdef HAVE_LIBZ
 #define CAP_ZIP_SUPPORTED       CAP_ZIP

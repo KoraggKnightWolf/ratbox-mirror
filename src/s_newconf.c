@@ -707,8 +707,8 @@ valid_temp_time(const char *p)
 			return -1;
 	}
 
-	if(result > (24 * 60 * 7 * 4))
-		result = (24 * 60 * 7 * 4);
+	if(result > (60 * 24 * 7 * 52))
+		result = (60 * 24 * 7 * 52);
 
 	return(result * 60);
 }

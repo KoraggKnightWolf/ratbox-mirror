@@ -421,6 +421,11 @@ start_auth(struct Client *client)
 	s_assert(0 != client);
 	if(client == NULL)
 		return;
+
+	/* to aid bopm which needs something unique to match against */
+	sendto_one(client, "NOTICE AUTH :*** Processing connection to %s",
+			me.name);
+
 	auth = make_auth_request(client);
 
 	sendheader(client, REPORT_DO_DNS);

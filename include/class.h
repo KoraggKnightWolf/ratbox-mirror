@@ -40,7 +40,6 @@ struct Class
 	int max_global;
 	int max_ident;
 	int max_sendq;
-	int max_sendq_eob;
 	int con_freq;
 	int ping_freq;
 	int total;
@@ -61,7 +60,6 @@ extern struct Class *default_class;
 #define MaxUsers(x)	((x)->max_total)
 #define PingFreq(x)     ((x)->ping_freq)
 #define MaxSendq(x)     ((x)->max_sendq)
-#define MaxSendqEob(x)	((x)->max_sendq_eob)
 #define CurrUsers(x)    ((x)->total)
 #define IpLimits(x)     ((x)->ip_limits)
 #define CidrBitlen(x)   ((x)->cidr_bitlen)
@@ -76,7 +74,6 @@ extern struct Class *default_class;
 #define ConfMaxUsers(x)  (ClassPtr(x)->max_total)
 #define ConfPingFreq(x)  (ClassPtr(x)->ping_freq)
 #define ConfMaxSendq(x)  (ClassPtr(x)->max_sendq)
-#define ConfMaxSendqEob(x)	(ClassPtr(x)->max_sendq_eob)
 #define ConfCurrUsers(x) (ClassPtr(x)->total)
 #define ConfIpLimits(x) (ClassPtr(x)->ip_limits)
 #define ConfCidrAmount(x) (ClassPtr(x)->cidr_amount)

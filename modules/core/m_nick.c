@@ -122,7 +122,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	}
 
 	/* check if the nick is resv'd */
-	if(find_nick_resv(nick))
+	if(!IsExemptResv(source_p) && find_nick_resv(nick))
 	{
 		sendto_one(source_p, POP_QUEUE, form_str(ERR_ERRONEUSNICKNAME),
 			   me.name, EmptyString(source_p->name) ? "*" : source_p->name, nick);

@@ -44,9 +44,12 @@
 #include "hook.h"
 #include "modules.h"
 #include "irc_string.h"
+#include "whowas.h"
+#include "monitor.h"
 
 static int me_su(struct Client *, struct Client *, int, const char **);
 static int me_login(struct Client *, struct Client *, int, const char **);
+static int me_rsfnc(struct Client *, struct Client *, int, const char **);
 
 static void h_svc_server_introduced(hook_data_client *);
 static void h_svc_burst_client(hook_data_client *);
@@ -61,8 +64,15 @@ struct Message login_msgtab = {
 	"LOGIN", 0, 0, 0, MFLG_SLOW,
 	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_login, 2}, mg_ignore}
 };
+struct Message rsfnc_msgtab = {
+	"RSFNC", 0, 0, 0, MFLG_SLOW,
+	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_rsfnc, 3}, mg_ignore}
+};
 
-mapi_clist_av1 services_clist[] = { &su_msgtab, &login_msgtab, NULL };
+mapi_clist_av1 services_clist[] = { 
+	&su_msgtab, &login_msgtab, &rsfnc_msgtab, NULL 
+};
+
 mapi_hfn_list_av1 services_hfnlist[] = {
 	{ "doing_stats",        (hookfn) h_svc_stats },
 	{ "doing_whois",	(hookfn) h_svc_whois },
@@ -95,6 +105,117 @@ me_su(struct Client *client_p, struct Client *source_p,
 	else
 		strlcpy(target_p->user->suser, parv[2], sizeof(target_p->user->suser));
 
+	return 0;
+}
+
+static int
+clean_nick(const char *nick)
+{
+	int len = 0;
+
+	if(EmptyString(nick) || *nick == '-' || IsDigit(*nick))
+		return 0;
+
+	for(; *nick; nick++)
+	{
+		len++;
+		if(!IsNickChar(*nick))
+			return 0;
+	}
+
+	if(len >= NICKLEN)
+		return 0;
+
+	return 1;
+}
+
+static int
+me_rsfnc(struct Client *client_p, struct Client *source_p,
+	int parc, const char *parv[])
+{
+	struct Client *target_p;
+	struct Client *exist_p;
+	time_t newts, curts;
+
+	if(!(source_p->flags & FLAGS_SERVICE))
+		return 0;
+
+	if((target_p = find_person(parv[1])) == NULL)
+		return 0;
+
+	if(!MyClient(target_p))
+		return 0;
+
+	if(!clean_nick(parv[2]))
+		return 0;
+
+	curts = atol(parv[4]);
+
+	/* if tsinfo is different from what it was when services issued the
+	 * RSFNC, then we ignore it.  This can happen when a client changes
+	 * nicknames before the RSFNC arrives.. --anfl
+	 */
+	if(target_p->tsinfo != curts)
+		return 0;
+
+	if((exist_p = find_person(parv[2])))
+	{
+		char buf[BUFSIZE];
+
+		/* this would be one hell of a race condition to trigger
+		 * this one given the tsinfo check above, but its here for 
+		 * safety --anfl
+		 */
+		if(target_p == exist_p)
+			return 0;
+
+		if(MyClient(exist_p))
+			sendto_one(exist_p, POP_QUEUE, ":%s KILL %s :(Nickname regained by services)",
+				me.name, exist_p->name);
+
+		exist_p->flags |= FLAGS_KILLED;
+		kill_client_serv_butone(NULL, exist_p, "%s (Nickname regained by services)",
+					me.name);
+
+		snprintf(buf, sizeof(buf), "Killed (%s (Nickname regained by services))",
+			me.name);
+		exit_client(NULL, exist_p, &me, buf);
+	}
+
+	newts = atol(parv[3]);
+
+	/* timestamp is older than 15mins, ignore it */
+	if(newts < (CurrentTime - 900))
+		newts = CurrentTime - 900;
+
+	target_p->tsinfo = newts;
+
+	monitor_signoff(target_p);
+
+	sendto_realops_flags(UMODE_NCHANGE, L_ALL,
+			"Nick change: From %s to %s [%s@%s]",
+			target_p->name, parv[2], target_p->username,
+			target_p->host);
+
+	sendto_common_channels_local(target_p, ":%s!%s@%s NICK :%s",
+				target_p->name, target_p->username,
+				target_p->host, parv[2]);
+
+	add_history(target_p, 1);
+	sendto_server(NULL, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
+			use_id(target_p), parv[2], (long) target_p->tsinfo);
+	sendto_server(NULL, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%ld",
+			target_p->name, parv[2], (long) target_p->tsinfo);
+
+	del_from_client_hash(target_p->name, target_p);
+	strcpy(target_p->name, parv[2]);
+	add_to_client_hash(target_p->name, target_p);
+
+	monitor_signon(target_p);
+
+	del_all_accepts(target_p);
+
+	comm_note(target_p->localClient->fd, "Nick: %s", target_p->name);
 	return 0;
 }
 

@@ -146,8 +146,8 @@ extern void cluster_generic(struct Client *, const char *, int cltype,
 #define OPER_SPY	0x10000
 #define OPER_REMOTEBAN	0x20000
 /*			.. 	*/
-/*			0x80000 */
-/* 0x100000 and above are in client.h */
+/*			0x40000 */
+/* 0x80000 and above are in client.h */
 
 #define OPER_FLAGS	(OPER_KLINE|OPER_UNKLINE|OPER_LOCKILL|OPER_GLOBKILL|\
 			 OPER_REMOTE|OPER_GLINE|OPER_XLINE|OPER_RESV|\

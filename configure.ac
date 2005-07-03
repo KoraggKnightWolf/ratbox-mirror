@@ -841,7 +841,7 @@ AC_HELP_STRING([--with-nicklen=LENGTH],[Set the nick length to LENGTH (default 9
 ], [NICKLEN=9])
 
 AC_ARG_WITH(topiclen,           
-AC_HELP_STRING([--with-topiclen=NUMBER],[Set the max topic length to NUMBER (default 120, max 390)]),
+AC_HELP_STRING([--with-topiclen=NUMBER],[Set the max topic length to NUMBER (default 160, max 390)]),
 [
  if test $withval -ge 390; then
 	TOPICLEN=390
@@ -849,7 +849,7 @@ AC_HELP_STRING([--with-topiclen=NUMBER],[Set the max topic length to NUMBER (def
  else
  	TOPICLEN=$withval
  fi
-], [TOPICLEN=120])
+], [TOPICLEN=160])
 
 AC_ARG_WITH(maxclients,
 AC_HELP_STRING([--with-maxclients=NUMBER],[Maximum number of connections the ircd can handle]),

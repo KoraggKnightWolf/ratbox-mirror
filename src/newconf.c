@@ -344,6 +344,7 @@ static struct mode_table auth_table[] = {
 	{"spambot_exempt",	CONF_FLAGS_EXEMPTSPAMBOT },
 	{"shide_exempt",	CONF_FLAGS_EXEMPTSHIDE	},
 	{"jupe_exempt",		CONF_FLAGS_EXEMPTJUPE	},
+	{"resv_exempt",		CONF_FLAGS_EXEMPTRESV	},
 	{"no_tilde",		CONF_FLAGS_NO_TILDE	},
 	{"need_ident",		CONF_FLAGS_NEED_IDENTD	},
 	{"have_ident",		CONF_FLAGS_NEED_IDENTD	},
@@ -720,12 +721,6 @@ static void
 conf_set_class_sendq(void *data)
 {
 	yy_class->max_sendq = *(unsigned int *) data;
-}
-
-static void
-conf_set_class_sendq_eob(void *data)
-{
-	yy_class->max_sendq_eob = *(unsigned int *) data;
 }
 
 static char *listener_address;
@@ -1789,7 +1784,6 @@ static struct ConfEntry conf_class_table[] =
 	{ "connectfreq", 	CF_TIME, conf_set_class_connectfreq,		0, NULL },
 	{ "max_number", 	CF_INT,  conf_set_class_max_number,		0, NULL },
 	{ "sendq", 		CF_TIME, conf_set_class_sendq,			0, NULL },
-	{ "sendq_eob", 		CF_TIME, conf_set_class_sendq_eob,		0, NULL },
 	{ "\0",	0, NULL, 0, NULL }
 };
 
@@ -1909,7 +1903,6 @@ static struct ConfEntry conf_channel_table[] =
 	{ "max_chans_per_user", CF_INT,   NULL, 0, &ConfigChannel.max_chans_per_user 	},
 	{ "no_create_on_split", CF_YESNO, NULL, 0, &ConfigChannel.no_create_on_split 	},
 	{ "no_join_on_split",	CF_YESNO, NULL, 0, &ConfigChannel.no_join_on_split	},
-	{ "no_oper_resvs",	CF_YESNO, NULL, 0, &ConfigChannel.no_oper_resvs		},
 	{ "quiet_on_ban",	CF_YESNO, NULL, 0, &ConfigChannel.quiet_on_ban		},
 	{ "use_except",		CF_YESNO, NULL, 0, &ConfigChannel.use_except		},
 	{ "use_invex",		CF_YESNO, NULL, 0, &ConfigChannel.use_invex		},
