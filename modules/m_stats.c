@@ -1639,7 +1639,7 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 {
 	if(IsAnyServer(target_p))
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG, Lformat,
+		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSLINKIFNO, Lformat,
 				get_server_name(target_p, SHOW_IP),
 				(int) linebuf_len(&target_p->localClient->buf_sendq),
 				(int) target_p->localClient->sendM,
@@ -1654,7 +1654,7 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 
 	else if(IsIPSpoof(target_p))
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG, Lformat,
+		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSLINKIFNO, Lformat,
 #ifndef HIDE_SPOOF_IPS
 				   IsOper(source_p) ?
 				    (IsUpper(statchar) ?
@@ -1675,7 +1675,7 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 
 	else
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG, Lformat,
+		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSLINKIFNO, Lformat,
 				   IsUpper(statchar) ?
 				   get_client_name(target_p, SHOW_IP) :
 				   get_client_name(target_p, HIDE_IP),

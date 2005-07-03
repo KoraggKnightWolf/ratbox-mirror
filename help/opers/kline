@@ -1,4 +1,4 @@
-KLINE <nick|user@host> :[reason] [| oper reason]
+KLINE <user@host> :[reason] [| oper reason]
 
 Adds a KLINE to the ircd.conf or klines.conf file which
 will ban the specified user from using that server.

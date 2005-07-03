@@ -268,6 +268,7 @@ static void
 handle_remote_kline(struct Client *source_p, int tkline_time,
 		const char *user, const char *host, const char *kreason)
 {
+	char buffer[BUFSIZE];
 	const char *current_date;
 	char *reason = LOCAL_COPY(kreason);
 	struct ConfItem *aconf = NULL;
@@ -302,14 +303,23 @@ handle_remote_kline(struct Client *source_p, int tkline_time,
 			DupString(aconf->spasswd, oper_reason);
 	}
 
-	DupString(aconf->passwd, reason);
 	current_date = smalldate();
 
 	if(tkline_time > 0)
+	{
+		ircsnprintf(buffer, sizeof(buffer),
+				"Temporary K-line %d min. - %s (%s)",
+				(int) (tkline_time / 60), reason, current_date);
+		DupString(aconf->passwd, buffer);
 		apply_tkline(source_p, aconf, reason, oper_reason,
 				current_date, tkline_time);
+	}
 	else
-		apply_kline(source_p, aconf, aconf->passwd, oper_reason, current_date);
+	{
+		ircsnprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
+		DupString(aconf->passwd, buffer);
+		apply_kline(source_p, aconf, reason, oper_reason, current_date);
+	}
 
 	if(ConfigFileEntry.kline_delay)
 	{

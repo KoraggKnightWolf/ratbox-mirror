@@ -38,20 +38,6 @@ Info;
 
 Info MyInformation[] = {
 
-#ifdef CLIENT_FLOOD
-	{"CLIENT_FLOOD", "", CLIENT_FLOOD, "Client Excess Flood Threshold"},
-#else
-	{"CLIENT_FLOOD", "OFF", 0, "Client Excess Flood Threshold"},
-#endif /* CLIENT_FLOOD */
-
-#ifdef CMDLINE_CONFIG
-	{"CMDLINE_CONFIG", "ON", 0,
-	 "Allow Command Line Specification of Config File"},
-#else
-	{"CMDLINE_CONFIG", "OFF", 0,
-	 "Allow Command Line Specification of Config File"},
-#endif /* CMDLINE_CONFIG */
-
 #ifdef CPATH
 	{"CPATH", CPATH, 0, "Path to Main Configuration File"},
 #else
@@ -156,12 +142,6 @@ Info MyInformation[] = {
 
 	{"OPER_SPAM_COUNTDOWN", "", OPER_SPAM_COUNTDOWN,
 	 "Anti SpamBot Parameter"},
-
-#ifdef PACE_CONNECT
-	{"PACE_CONNECT", "ON", 0, "Pace connections to the ircd"},
-#else
-	{"PACE_CONNECT", "OFF", 0, "Pace connections to the ircd"},
-#endif
 
 #ifdef HAVE_LIBCRYPTO
 	{"HAVE_LIBCRYPTO", "ON", 0, "Enable OpenSSL CHALLENGE Support"},
