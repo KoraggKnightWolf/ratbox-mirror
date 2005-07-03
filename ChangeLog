@@ -1,3 +1,17 @@
+androsyn    2005/07/03 01:46:44 UTC	(20050703_2-19369)
+  Log:
+  From 2.1
+    - add eventUpdate(), and make links_delay update on rehash
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/event.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.h (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2005/07/03 01:30:10 UTC	(20050703_1-19367)
   Log:
   merged from 2.1 - hopefully I got everything on this one..
