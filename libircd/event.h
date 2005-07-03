@@ -60,7 +60,7 @@ extern void eventAddIsh(const char *name, EVH * func, void *arg, time_t delta_is
 extern void eventRun(void);
 extern void eventInit(void);
 extern void eventDelete(EVH * func, void *);
-void eventUpdate(const char *name, time_t freq)
+void eventUpdate(const char *name, time_t freq);
 extern int eventFind(EVH * func, void *);
 extern void set_back_events(time_t);
 int dump_events(void (*func)(char *, void *), void *ptr);
