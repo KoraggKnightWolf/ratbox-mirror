@@ -1,3 +1,11 @@
+androsyn    2005/07/04 08:26:57 UTC	(20050704_0-19389)
+  Log:
+  set m->prev = NULL in dlinkAdd, as it could possibly cause issues
+
+  Modified:
+	ircd-ratbox/trunk/libircd/tools.h (File Modified) 
+
+
 androsyn    2005/07/03 19:52:35 UTC	(20050703_11-19387)
   Log:
   fix a few compile errors
