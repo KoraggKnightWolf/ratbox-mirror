@@ -423,7 +423,7 @@ start_auth(struct Client *client)
 		return;
 
 	/* to aid bopm which needs something unique to match against */
-	sendto_one(client, "NOTICE AUTH :*** Processing connection to %s",
+	sendto_one(client, POP_QUEUE, "NOTICE AUTH :*** Processing connection to %s",
 			me.name);
 
 	auth = make_auth_request(client);

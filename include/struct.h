@@ -93,8 +93,8 @@ struct Client
 	struct Whowas *whowas;	/* Pointers to whowas structs */
 	time_t tsinfo;		/* TS on the nick, SVINFO on server */
 	unsigned int umodes;	/* opers, normal users subset */
-	unsigned int flags;	/* client flags */
-	unsigned int flags2;	/* ugh. overflow */
+	u_int32_t flags;	/* client flags */
+	u_int32_t operflags;	/* ugh. overflow */
 
 	int hopcount;		/* number of servers to this 0 = local */
 	unsigned short status;	/* Client type */

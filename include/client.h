@@ -131,22 +131,37 @@ struct exit_client_hook
 
 /* housekeeping flags */
 
-#define FLAGS_PINGSENT     0x0001	/* Unreplied ping sent */
-#define FLAGS_DEAD	   0x0002	/* Local socket is dead--Exiting soon */
-#define FLAGS_KILLED       0x0004	/* Prevents "QUIT" from being sent for this */
-#define FLAGS_CLOSING      0x0020	/* set when closing to suppress errors */
-#define FLAGS_GOTID        0x0080	/* successful ident lookup achieved */
-#define FLAGS_NEEDID       0x0100	/* I-lines say must use ident return */
-#define FLAGS_NORMALEX     0x0400	/* Client exited normally */
-#define FLAGS_SENDQEX      0x0800	/* Sendq exceeded */
-#define FLAGS_SERVLINK     0x10000	/* servlink has servlink process */
-#define FLAGS_MARK	   0x20000	/* marked client */
-#define FLAGS_HIDDEN       0x40000	/* hidden server */
-#define FLAGS_EOB          0x80000	/* EOB */
-#define FLAGS_MYCONNECT	   0x100000	/* MyConnect */
-#define FLAGS_IOERROR      0x200000	/* IO error */
-#define FLAGS_SERVICE	   0x400000
-#define FLAGS_TGCHANGE     0x800000	/* we're allowed to clear something */
+#define FLAGS_PINGSENT     	0x00000001	/* Unreplied ping sent */
+#define FLAGS_DEAD	   	0x00000002	/* Local socket is dead--Exiting soon */
+#define FLAGS_KILLED       	0x00000004	/* Prevents "QUIT" from being sent for this */
+#define FLAGS_CLOSING      	0x00000008	/* set when closing to suppress errors */
+#define FLAGS_GOTID        	0x00000010	/* successful ident lookup achieved */
+#define FLAGS_NEEDID       	0x00000020	/* I-lines say must use ident return */
+#define FLAGS_NORMALEX     	0x00000040	/* Client exited normally */
+#define FLAGS_SENDQEX      	0x00000080	/* Sendq exceeded */
+#define FLAGS_SERVLINK     	0x00000100	/* servlink has servlink process */
+#define FLAGS_MARK	   	0x00000200	/* marked client */
+#define FLAGS_HIDDEN       	0x00000400	/* hidden server */
+#define FLAGS_EOB          	0x00000800	/* EOB */
+#define FLAGS_MYCONNECT	   	0x00001000	/* MyConnect */
+#define FLAGS_IOERROR      	0x00002000	/* IO error */
+#define FLAGS_SERVICE	   	0x00004000
+#define FLAGS_TGCHANGE     	0x00008000	/* we're allowed to clear something */
+#define FLAGS_EXEMPTRESV	0x00010000
+#define FLAGS_EXEMPTGLINE       0x00020000
+#define FLAGS_EXEMPTKLINE       0x00040000
+#define FLAGS_EXEMPTFLOOD       0x00080000
+#define FLAGS_NOLIMIT           0x00100000
+#define FLAGS_IDLE_LINED        0x00200000
+#define FLAGS_CLICAP		0x00400000
+#define FLAGS_PING_COOKIE       0x00800000
+#define FLAGS_IP_SPOOFING       0x01000000
+#define FLAGS_FLOODDONE         0x02000000
+#define FLAGS_EXEMPTSPAMBOT	0x04000000
+#define FLAGS_EXEMPTSHIDE	0x08000000
+#define FLAGS_EXEMPTJUPE	0x10000000
+
+
 /* umodes, settable flags */
 
 #define UMODE_SERVNOTICE   0x0001	/* server notices such as kill */
@@ -178,19 +193,6 @@ struct exit_client_hook
 
 /* overflow flags */
 /* EARLIER FLAGS ARE IN s_newconf.h */
-#define FLAGS2_EXEMPTRESV	0x0080000
-#define FLAGS2_EXEMPTGLINE      0x0100000
-#define FLAGS2_EXEMPTKLINE      0x0200000
-#define FLAGS2_EXEMPTFLOOD      0x0400000
-#define FLAGS2_NOLIMIT          0x0800000
-#define FLAGS2_IDLE_LINED       0x1000000
-#define FLAGS2_CLICAP		0x2000000
-#define FLAGS2_PING_COOKIE      0x4000000
-#define FLAGS2_IP_SPOOFING      0x8000000
-#define FLAGS2_FLOODDONE        0x10000000
-#define FLAGS2_EXEMPTSPAMBOT	0x20000000
-#define FLAGS2_EXEMPTSHIDE	0x40000000
-#define FLAGS2_EXEMPTJUPE	0x80000000
 
 #define SEND_UMODES  (UMODE_INVISIBLE | UMODE_OPER | UMODE_WALLOP | \
                       UMODE_ADMIN | UMODE_SERVICE | UMODE_DEAF)
@@ -277,33 +279,30 @@ struct exit_client_hook
 #define SetGotId(x)             ((x)->flags |= FLAGS_GOTID)
 #define IsGotId(x)              (((x)->flags & FLAGS_GOTID) != 0)
 
-/*
- * flags2 macros.
- */
-#define IsExemptKline(x)        ((x)->flags2 & FLAGS2_EXEMPTKLINE)
-#define SetExemptKline(x)       ((x)->flags2 |= FLAGS2_EXEMPTKLINE)
-#define IsExemptLimits(x)       ((x)->flags2 & FLAGS2_NOLIMIT)
-#define SetExemptLimits(x)      ((x)->flags2 |= FLAGS2_NOLIMIT)
-#define IsExemptGline(x)        ((x)->flags2 & FLAGS2_EXEMPTGLINE)
-#define SetExemptGline(x)       ((x)->flags2 |= FLAGS2_EXEMPTGLINE)
-#define IsExemptFlood(x)        ((x)->flags2 & FLAGS2_EXEMPTFLOOD)
-#define SetExemptFlood(x)       ((x)->flags2 |= FLAGS2_EXEMPTFLOOD)
-#define IsExemptSpambot(x)	((x)->flags2 & FLAGS2_EXEMPTSPAMBOT)
-#define SetExemptSpambot(x)	((x)->flags2 |= FLAGS2_EXEMPTSPAMBOT)
-#define IsExemptShide(x)	((x)->flags2 & FLAGS2_EXEMPTSHIDE)
-#define SetExemptShide(x)	((x)->flags2 |= FLAGS2_EXEMPTSHIDE)
-#define IsExemptJupe(x)		((x)->flags2 & FLAGS2_EXEMPTJUPE)
-#define SetExemptJupe(x)	((x)->flags2 |= FLAGS2_EXEMPTJUPE)
-#define IsExemptResv(x)		((x)->flags2 & FLAGS2_EXEMPTRESV)
-#define SetExemptResv(x)	((x)->flags2 |= FLAGS2_EXEMPTRESV)
-#define IsIPSpoof(x)            ((x)->flags2 & FLAGS2_IP_SPOOFING)
-#define SetIPSpoof(x)           ((x)->flags2 |= FLAGS2_IP_SPOOFING)
+#define IsExemptKline(x)        ((x)->flags & FLAGS_EXEMPTKLINE)
+#define SetExemptKline(x)       ((x)->flags |= FLAGS_EXEMPTKLINE)
+#define IsExemptLimits(x)       ((x)->flags & FLAGS_NOLIMIT)
+#define SetExemptLimits(x)      ((x)->flags |= FLAGS_NOLIMIT)
+#define IsExemptGline(x)        ((x)->flags & FLAGS_EXEMPTGLINE)
+#define SetExemptGline(x)       ((x)->flags |= FLAGS_EXEMPTGLINE)
+#define IsExemptFlood(x)        ((x)->flags & FLAGS_EXEMPTFLOOD)
+#define SetExemptFlood(x)       ((x)->flags |= FLAGS_EXEMPTFLOOD)
+#define IsExemptSpambot(x)	((x)->flags & FLAGS_EXEMPTSPAMBOT)
+#define SetExemptSpambot(x)	((x)->flags |= FLAGS_EXEMPTSPAMBOT)
+#define IsExemptShide(x)	((x)->flags & FLAGS_EXEMPTSHIDE)
+#define SetExemptShide(x)	((x)->flags |= FLAGS_EXEMPTSHIDE)
+#define IsExemptJupe(x)		((x)->flags & FLAGS_EXEMPTJUPE)
+#define SetExemptJupe(x)	((x)->flags |= FLAGS_EXEMPTJUPE)
+#define IsExemptResv(x)		((x)->flags & FLAGS_EXEMPTRESV)
+#define SetExemptResv(x)	((x)->flags |= FLAGS_EXEMPTRESV)
+#define IsIPSpoof(x)            ((x)->flags & FLAGS_IP_SPOOFING)
+#define SetIPSpoof(x)           ((x)->flags |= FLAGS_IP_SPOOFING)
 
-#define SetIdlelined(x)         ((x)->flags2 |= FLAGS2_IDLE_LINED)
-#define IsIdlelined(x)          ((x)->flags2 & FLAGS2_IDLE_LINED)
+#define SetIdlelined(x)         ((x)->flags |= FLAGS_IDLE_LINED)
+#define IsIdlelined(x)          ((x)->flags & FLAGS_IDLE_LINED)
 
-#define IsFloodDone(x)          ((x)->flags2 & FLAGS2_FLOODDONE)
-#define SetFloodDone(x)         ((x)->flags2 |= FLAGS2_FLOODDONE)
+#define IsFloodDone(x)          ((x)->flags & FLAGS_FLOODDONE)
+#define SetFloodDone(x)         ((x)->flags |= FLAGS_FLOODDONE)
 
 /*
  * definitions for get_client_name

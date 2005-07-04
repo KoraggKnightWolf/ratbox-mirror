@@ -779,7 +779,7 @@ stats_operedup (struct Client *source_p)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 					   "p :[%c][%s] %s (%s@%s) Idle: %d",
 					   IsAdmin (target_p) ? 'A' : 'O',
-					   get_oper_privs(target_p->flags2),
+					   get_oper_privs(target_p->operflags),
 					   target_p->name, target_p->username, target_p->host,
 					   (int) (CurrentTime - target_p->localClient->last));
 		}

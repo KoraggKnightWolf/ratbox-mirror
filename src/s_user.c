@@ -308,14 +308,14 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 			source_p->flags |= FLAGS_PINGSENT;
 			return -1;
 		}
-		if(!(source_p->flags2 & FLAGS2_PING_COOKIE))
+		if(!(source_p->flags & FLAGS_PING_COOKIE))
 		{
 			return -1;
 		}
 	}
 
 	/* hasnt finished client cap negotiation */
-	if(source_p->flags2 & FLAGS2_CLICAP)
+	if(source_p->flags & FLAGS_CLICAP)
 		return -1;
 
 	client_p->localClient->last = CurrentTime;
@@ -896,7 +896,7 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 
 					if(MyConnect(source_p))
 					{
-						source_p->flags2 &= ~OPER_FLAGS;
+						source_p->operflags &= ~OPER_FLAGS;
 
 						MyFree(source_p->localClient->opername);
 						source_p->localClient->opername = NULL;
@@ -1132,7 +1132,7 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 
 	SetExemptKline(source_p);
 
-	source_p->flags2 |= oper_p->flags;
+	source_p->operflags |= oper_p->flags;
 	DupString(source_p->localClient->opername, oper_p->name);
 
 	dlinkAddAlloc(source_p, &oper_list);
