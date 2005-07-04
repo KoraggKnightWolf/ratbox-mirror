@@ -187,6 +187,7 @@ dlinkAdd(void *data, dlink_node * m, dlink_list * list)
 	assert(list != NULL);
 
 	m->data = data;
+	m->prev = NULL;
 	m->next = list->head;
 
 	/* Assumption: If list->tail != NULL, list->head != NULL */
