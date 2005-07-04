@@ -1,3 +1,24 @@
+androsyn    2005/07/04 10:01:54 UTC	(20050704_1-19395)
+  Log:
+  Make some sense out of this flags/flags2 crap.
+  flags is a 32bit integer, so we can move all
+  of the none oper flags off of flags2 on to flags.
+  flags2 got renamed to operflags and just has 
+  operflags on it.  Hopefully I didn't mess up
+  anything in the process ;)
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2005/07/04 08:26:57 UTC	(20050704_0-19389)
   Log:
   set m->prev = NULL in dlinkAdd, as it could possibly cause issues
