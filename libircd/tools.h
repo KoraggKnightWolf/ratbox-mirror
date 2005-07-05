@@ -65,7 +65,7 @@ void free_dlink_node(dlink_node * lp);
 void init_dlink_nodes(void);
 
 #ifndef NDEBUG
-void mem_frob(void *data, int len);
+void mem_frob(void *ndata, int len);
 #else
 #define mem_frob(x, y)
 #endif
@@ -135,14 +135,14 @@ unsigned long slow_list_length(dlink_list *);
 #endif 
     
 void dlinkMoveNode(dlink_node * m, dlink_list * oldlist, dlink_list * newlist);
-void dlinkAdd(void *data, dlink_node * m, dlink_list * list);
-void dlinkAddBefore(dlink_node * b, void *data, dlink_node * m, dlink_list * list);
+void dlinkAdd(void *ndata, dlink_node * m, dlink_list * list);
+void dlinkAddBefore(dlink_node * b, void *ndata, dlink_node * m, dlink_list * list);
 void dlinkMoveTail(dlink_node *m, dlink_list *list);
-void dlinkAddTail(void *data, dlink_node * m, dlink_list * list);
+void dlinkAddTail(void *ndata, dlink_node * m, dlink_list * list);
 void dlinkDelete(dlink_node * m, dlink_list * list);
-dlink_node *dlinkFindDelete(void *data, dlink_list *list);
-int dlinkFindDestroy(void *data, dlink_list *list);
-dlink_node *dlinkFind(void *data, dlink_list *list);
+dlink_node *dlinkFindDelete(void *ndata, dlink_list *list);
+int dlinkFindDestroy(void *ndata, dlink_list *list);
+dlink_node *dlinkFind(void *ndata, dlink_list *list);
 void dlinkMoveList(dlink_list * from, dlink_list * to);
 
 

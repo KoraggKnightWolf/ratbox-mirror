@@ -49,7 +49,6 @@
 #include "modules.h"
 #include "s_newconf.h"
 #include "hash.h"
-#include "adns.h"
 #include "res.h"
 #include "reject.h"
 #include "whowas.h"
@@ -219,11 +218,6 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if((statchar != 'L') && (statchar != 'l'))
 		stats_spy(source_p, statchar, NULL);
 
-	/* Blah, stats L needs the parameters, none of the others do.. */
-	if(statchar == 'L' || statchar == 'l')
-		stats_cmd_table[i].handler (source_p, parc, parv);
-	else
-		stats_cmd_table[i].handler (source_p);
 	for (i = 0; stats_cmd_table[i].handler; i++)
 	{
 		if(stats_cmd_table[i].letter == statchar)
@@ -239,6 +233,12 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 						   form_str (ERR_NOPRIVILEGES));
 				break;
 			}
+
+			/* Blah, stats L needs the parameters, none of the others do.. */
+			if(statchar == 'L' || statchar == 'l')
+				stats_cmd_table[i].handler (source_p, parc, parv);
+			else
+				stats_cmd_table[i].handler (source_p);
 
 		}
 	}
