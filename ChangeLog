@@ -1,3 +1,12 @@
+androsyn    2005/07/05 04:15:31 UTC	(20050705_3-19403)
+  Log:
+  Add OMOTD command.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_motd.c (File Modified) 
+
+
 androsyn    2005/07/05 04:03:32 UTC	(20050705_2-19401)
   Log:
   Moved the links caching code into m_links.
