@@ -1,3 +1,45 @@
+androsyn    2005/07/05 02:39:10 UTC	(20050705_1-19399)
+  Log:
+  run the source code through unexpand to do whitespace -> tab conversion
+
+  Modified:
+	ircd-ratbox/trunk/ident/ident.c (File Modified) 
+	ircd-ratbox/trunk/include/balloc.h (File Modified) 
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/include/irc_string.h (File Modified) 
+	ircd-ratbox/trunk/include/m_info.h (File Modified) 
+	ircd-ratbox/trunk/include/parse.h (File Modified) 
+	ircd-ratbox/trunk/include/patricia.h (File Modified) 
+	ircd-ratbox/trunk/include/s_serv.h (File Modified) 
+	ircd-ratbox/trunk/include/s_stats.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_error.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_accept.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_challenge.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_etrace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2005/07/05 00:23:51 UTC	(20050705_0-19397)
   Log:
   Fix rtsigio code.  Have it use posix timers
