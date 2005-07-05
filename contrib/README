@@ -81,3 +81,4 @@ spy_whois_notice_global.c - Spy on remote clients who WHOIS you.
 Note: if you have both spy_stats_notice.c and spy_stats_p_notice.c loaded
 you will get two messages.
 
+Kilroy says hello
