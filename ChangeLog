@@ -1,3 +1,22 @@
+androsyn    2005/07/05 04:03:32 UTC	(20050705_2-19401)
+  Log:
+  Moved the links caching code into m_links.
+  Fix some other compile issues.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/tools.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_cap.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_links.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_pong.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2005/07/05 02:39:10 UTC	(20050705_1-19399)
   Log:
   run the source code through unexpand to do whitespace -> tab conversion
