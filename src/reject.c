@@ -58,8 +58,8 @@ reject_exit(void *unused)
 	DLINK_FOREACH_SAFE(ptr, ptr_next, delay_exit.head)
 	{
 		client_p = ptr->data;
-	  	if(IsDead(client_p))
-                	continue;
+		if(IsDead(client_p))
+			continue;
 
 		/* this MUST be here, to prevent the possibility
 		 * sendto_one() generates a write error, and then a client
@@ -68,13 +68,13 @@ reject_exit(void *unused)
 		if(!IsIOError(client_p))
 			sendto_one(client_p, POP_QUEUE, "ERROR :Closing Link: %s (*** Banned (cache))", client_p->host);
 
- 	  	close_connection(client_p);
-        	SetDead(client_p);
-        	dlinkAddAlloc(client_p, &dead_list);
+		close_connection(client_p);
+		SetDead(client_p);
+		dlinkAddAlloc(client_p, &dead_list);
 	}
 
-        delay_exit.head = delay_exit.tail = NULL;
-        delay_exit.length = 0;
+	delay_exit.head = delay_exit.tail = NULL;
+	delay_exit.length = 0;
 }
 
 static void

@@ -155,13 +155,13 @@ struct ChCapCombo
 #define SecretChannel(x)        ((x) && ((x)->mode.mode & MODE_SECRET))
 #define HiddenChannel(x)        ((x) && ((x)->mode.mode & MODE_PRIVATE))
 #define PubChannel(x)           ((!x) || ((x)->mode.mode &\
-                                 (MODE_PRIVATE | MODE_SECRET)) == 0)
+				 (MODE_PRIVATE | MODE_SECRET)) == 0)
 
 /* channel visible */
 #define ShowChannel(v,c)        (PubChannel(c) || IsMember((v),(c)))
 
 #define IsMember(who, chan) ((who && who->user && \
-                find_channel_membership(chan, who)) ? 1 : 0)
+		find_channel_membership(chan, who)) ? 1 : 0)
 
 #define IsChannelName(name) ((name) && (*(name) == '#' || *(name) == '&'))
 

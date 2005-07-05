@@ -140,7 +140,7 @@ show_ports(struct Client *source_p)
 				   form_str(RPL_STATSPLINE), 'P',
 #ifdef IPV6
 			   ntohs(listener->addr.ss_family == AF_INET ? ((struct sockaddr_in *)&listener->addr)->sin_port :
-			   	 ((struct sockaddr_in6 *)&listener->addr)->sin6_port),
+				 ((struct sockaddr_in6 *)&listener->addr)->sin6_port),
 #else
 			   ntohs(((struct sockaddr_in *)&listener->addr)->sin_port),
 #endif
@@ -515,7 +515,7 @@ accept_connection(int pfd, void *data)
 	 while(listener != NULL) /* loop until we again EAGAIN or listener goes null */
 	 {
 
-	 	fd = comm_accept(listener->fd, (struct sockaddr *)&sai, &addrlen);
+		fd = comm_accept(listener->fd, (struct sockaddr *)&sai, &addrlen);
 
 		/* This needs to be done here, otherwise we break dlines */
 		mangle_mapped_sockaddr((struct sockaddr *)&sai);
@@ -557,19 +557,19 @@ accept_connection(int pfd, void *data)
 		{
 			ServerStats.is_ref++;
 			
-		        if(ConfigFileEntry.dline_with_reason)
-		        {
-		            if (ircsnprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd) >= (sizeof(buf)-1))
-		            {
-		                buf[sizeof(buf) - 3] = '\r';
-		                buf[sizeof(buf) - 2] = '\n';
-		                buf[sizeof(buf) - 1] = '\0';
-		            }
-		        }
-		        else
-		           ircsprintf(buf, "ERROR :You have been D-lined.\r\n");
-        
-		        write(fd, buf, strlen(buf));
+			if(ConfigFileEntry.dline_with_reason)
+			{
+			    if (ircsnprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd) >= (sizeof(buf)-1))
+			    {
+				buf[sizeof(buf) - 3] = '\r';
+				buf[sizeof(buf) - 2] = '\n';
+				buf[sizeof(buf) - 1] = '\0';
+			    }
+			}
+			else
+			   ircsprintf(buf, "ERROR :You have been D-lined.\r\n");
+	
+			write(fd, buf, strlen(buf));
 			comm_close(fd);
 			continue;
 			

@@ -79,12 +79,12 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(parc > 2)
 	{
-                if(EmptyString(parv[2]))
-                {
-                        sendto_one(source_p, POP_QUEUE, form_str(ERR_NONICKNAMEGIVEN),
-                                        me.name, source_p->name);
-                        return 0;
-                }
+		if(EmptyString(parv[2]))
+		{
+			sendto_one(source_p, POP_QUEUE, form_str(ERR_NONICKNAMEGIVEN),
+					me.name, source_p->name);
+			return 0;
+		}
 
 		if(!IsOper(source_p))
 		{
@@ -124,16 +124,16 @@ ms_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 {
 	struct Client *target_p;
 
-        /* note: early versions of ratbox allowed users to issue a remote
-         * whois with a blank parv[2], so we cannot treat it as a protocol
-         * violation. --anfl
-         */
-        if(parc < 3 || EmptyString(parv[2]))
-        {
-                sendto_one(source_p, POP_QUEUE, form_str(ERR_NONICKNAMEGIVEN),
-                                me.name, source_p->name);
-                return 0;
-        }  
+	/* note: early versions of ratbox allowed users to issue a remote
+	 * whois with a blank parv[2], so we cannot treat it as a protocol
+	 * violation. --anfl
+	 */
+	if(parc < 3 || EmptyString(parv[2]))
+	{
+		sendto_one(source_p, POP_QUEUE, form_str(ERR_NONICKNAMEGIVEN),
+				me.name, source_p->name);
+		return 0;
+	}  
 	
 
 	/* check if parv[1] exists */

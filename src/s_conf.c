@@ -597,7 +597,7 @@ attach_conf(struct Client *client_p, struct ConfItem *aconf)
 		else
 		{
 			sendto_one(client_p, POP_QUEUE, ":%s NOTICE %s :*** I: line is full, but you have an >I: line!", 
-			                      me.name, client_p->name);
+					      me.name, client_p->name);
 			SetExemptLimits(client_p);
 		}
 
@@ -833,10 +833,10 @@ set_default_conf(void)
 	ConfigFileEntry.client_flood = CLIENT_FLOOD_DEFAULT;
 	ConfigFileEntry.tkline_expire_notices = 0;
 
-        ConfigFileEntry.reject_after_count = 5;
+	ConfigFileEntry.reject_after_count = 5;
 	ConfigFileEntry.reject_ban_time = 300;  
 	ConfigFileEntry.reject_duration = 120;
-                        
+			
 }
 
 #undef YES

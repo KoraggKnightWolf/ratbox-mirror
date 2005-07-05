@@ -295,13 +295,13 @@ load_all_modules(int warn)
 
 	while ((ldirent = readdir(system_module_dir)) != NULL)
 	{
-        	len = strlen(ldirent->d_name);
+		len = strlen(ldirent->d_name);
 
 		if((len > suffix_len) && !strcmp(ldirent->d_name+len-3, found_suffix))
-                {
-		 	(void) ircsnprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", AUTOMODPATH, ldirent->d_name);
-		 	(void) load_a_module(module_fq_name, warn, 0);
-                } 
+		{
+			(void) ircsnprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", AUTOMODPATH, ldirent->d_name);
+			(void) load_a_module(module_fq_name, warn, 0);
+		} 
 	}
 	(void) closedir(system_module_dir);
 }

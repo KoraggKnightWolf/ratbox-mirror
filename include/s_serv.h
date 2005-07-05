@@ -72,9 +72,9 @@ struct Capability
 #define CAP_RSFNC	0x20000	/* rserv FNC */
 
 #define CAP_MASK        (CAP_QS  | CAP_EX   | CAP_CHW  | \
-                         CAP_IE  | CAP_KLN  | CAP_SERVICE |\
-                         CAP_GLN | CAP_CLUSTER | CAP_ENCAP | \
-                         CAP_ZIP  | CAP_KNOCK  | CAP_UNKLN |\
+			 CAP_IE  | CAP_KLN  | CAP_SERVICE |\
+			 CAP_GLN | CAP_CLUSTER | CAP_ENCAP | \
+			 CAP_ZIP  | CAP_KNOCK  | CAP_UNKLN |\
 			 CAP_RSFNC)
 
 #ifdef HAVE_LIBZ

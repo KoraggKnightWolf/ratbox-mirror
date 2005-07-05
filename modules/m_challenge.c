@@ -223,12 +223,12 @@ get_randomness(unsigned char *buf, int length)
 
 	if(RAND_status())
 	{
-	 	if(RAND_bytes(buf, length) > 0)
-	 	        return 1;
+		if(RAND_bytes(buf, length) > 0)
+			return 1;
 	}
 	else {
-	        if(RAND_pseudo_bytes(buf, length) >= 0)
-	                return 1;
+		if(RAND_pseudo_bytes(buf, length) >= 0)
+			return 1;
 	}
 	return 0;
 }

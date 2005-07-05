@@ -85,9 +85,9 @@ static dlink_list dead_remote_list;
 
 struct abort_client
 {
- 	dlink_node node;
-  	struct Client *client;
-  	char notice[REASONLEN];
+	dlink_node node;
+	struct Client *client;
+	char notice[REASONLEN];
 };
 
 static dlink_list abort_list;
@@ -1091,10 +1091,10 @@ void
 exit_aborted_clients(void *unused)
 {
 	struct abort_client *abt;
- 	dlink_node *ptr, *next;
- 	DLINK_FOREACH_SAFE(ptr, next, abort_list.head)
- 	{
- 	 	abt = ptr->data;
+	dlink_node *ptr, *next;
+	DLINK_FOREACH_SAFE(ptr, next, abort_list.head)
+	{
+		abt = ptr->data;
 
 #ifdef DEBUG_EXITED_CLIENTS
 		{
@@ -1112,21 +1112,21 @@ exit_aborted_clients(void *unused)
 		}
 #endif
 
- 		s_assert(*((unsigned long*)abt->client) != 0xdeadbeef); /* This is lame but its a debug thing */
- 	 	dlinkDelete(ptr, &abort_list);
+		s_assert(*((unsigned long*)abt->client) != 0xdeadbeef); /* This is lame but its a debug thing */
+		dlinkDelete(ptr, &abort_list);
 
- 	 	if(IsAnyServer(abt->client))
- 	 	 	sendto_realops_flags(UMODE_ALL, L_ALL,
-  	 	 	                     "Closing link to %s: %s",
-   	 	 	                     get_server_name(abt->client, HIDE_IP), abt->notice);
+		if(IsAnyServer(abt->client))
+			sendto_realops_flags(UMODE_ALL, L_ALL,
+					     "Closing link to %s: %s",
+					     get_server_name(abt->client, HIDE_IP), abt->notice);
 
 		/* its no longer on abort list - we *must* remove
 		 * FLAGS_CLOSING otherwise exit_client() will not run --fl
 		 */
 		abt->client->flags &= ~FLAGS_CLOSING;
- 	 	exit_client(abt->client, abt->client, &me, abt->notice);
- 	 	MyFree(abt);
- 	}
+		exit_client(abt->client, abt->client, &me, abt->notice);
+		MyFree(abt);
+	}
 }
 
 
@@ -1150,7 +1150,7 @@ dead_link(struct Client *client_p)
 	else
 		ircsnprintf(abt->notice, sizeof(abt->notice), "Write error: %s", strerror(errno));
 
-    	abt->client = client_p;
+	abt->client = client_p;
 	SetIOError(client_p);
 	SetDead(client_p);
 	SetClosing(client_p);
@@ -1379,7 +1379,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 
 	ilog(L_SERVER, "%s was connected for %ld seconds.  %d/%d sendK/recvK.",
 	     source_p->name, CurrentTime - source_p->localClient->firsttime, sendk, recvk);
-        
+	
 	if(has_id(source_p))
 		del_from_id_hash(source_p->id, source_p);
 
@@ -1418,7 +1418,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 			     source_p->name,
 			     source_p->username, source_p->host, comment,
 #ifdef HIDE_SPOOF_IPS
-                             IsIPSpoof(source_p) ? "255.255.255.255" :
+			     IsIPSpoof(source_p) ? "255.255.255.255" :
 #endif
 			     source_p->sockhost);
 
@@ -1583,15 +1583,15 @@ del_all_accepts(struct Client *client_p)
 
 	if(MyClient(client_p) && client_p->localClient->allow_list.head)
 	{
-                /* clear this clients accept list, and remove them from
-                 * everyones on_accept_list
-                 */
+		/* clear this clients accept list, and remove them from
+		 * everyones on_accept_list
+		 */
 
 		DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->allow_list.head)
 		{
 			target_p = ptr->data;
-                        dlinkFindDestroy(client_p, &target_p->on_allow_list);
-                        dlinkDestroy(ptr, &client_p->localClient->allow_list);
+			dlinkFindDestroy(client_p, &target_p->on_allow_list);
+			dlinkDestroy(ptr, &client_p->localClient->allow_list);
 		}
 	}
 
@@ -1599,8 +1599,8 @@ del_all_accepts(struct Client *client_p)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->on_allow_list.head)
 	{
 		target_p = ptr->data;
-                dlinkFindDestroy(client_p, &target_p->localClient->allow_list);
-                dlinkDestroy(ptr, &client_p->on_allow_list);
+		dlinkFindDestroy(client_p, &target_p->localClient->allow_list);
+		dlinkDestroy(ptr, &client_p->on_allow_list);
 	}
 }
 

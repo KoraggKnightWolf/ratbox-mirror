@@ -195,14 +195,14 @@ struct exit_client_hook
 /* EARLIER FLAGS ARE IN s_newconf.h */
 
 #define SEND_UMODES  (UMODE_INVISIBLE | UMODE_OPER | UMODE_WALLOP | \
-                      UMODE_ADMIN | UMODE_SERVICE | UMODE_DEAF)
+		      UMODE_ADMIN | UMODE_SERVICE | UMODE_DEAF)
 #define DEFAULT_OPER_UMODES (UMODE_SERVNOTICE | UMODE_OPERWALL | \
-                             UMODE_WALLOP | UMODE_LOCOPS)
+			     UMODE_WALLOP | UMODE_LOCOPS)
 #define ALL_UMODES   (SEND_UMODES | UMODE_SERVNOTICE | UMODE_CCONN | \
-                      UMODE_REJ | UMODE_SKILL | UMODE_FULL | UMODE_SPY | \
-                      UMODE_NCHANGE | UMODE_OPERWALL | UMODE_DEBUG | \
-                      UMODE_BOTS | UMODE_EXTERNAL | UMODE_LOCOPS | \
- 		      UMODE_ADMIN | UMODE_UNAUTH | UMODE_CALLERID | \
+		      UMODE_REJ | UMODE_SKILL | UMODE_FULL | UMODE_SPY | \
+		      UMODE_NCHANGE | UMODE_OPERWALL | UMODE_DEBUG | \
+		      UMODE_BOTS | UMODE_EXTERNAL | UMODE_LOCOPS | \
+		      UMODE_ADMIN | UMODE_UNAUTH | UMODE_CALLERID | \
 		      UMODE_OPERSPY | UMODE_CCONNEXT | UMODE_SERVICE | \
 		      UMODE_DEAF)
 
@@ -318,8 +318,8 @@ enum
 enum
 {
 	D_LINED,
-        K_LINED,
-        G_LINED
+	K_LINED,
+	G_LINED
 };                     
 
 extern void check_banned_lines(void);

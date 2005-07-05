@@ -753,15 +753,15 @@ conf_set_listen_port(void *data)
 				("listener::port argument is not an integer " "-- ignoring.");
 			continue;
 		}
-                if(listener_address == NULL)
-                {
+		if(listener_address == NULL)
+		{
 			add_listener(args->v.number, listener_address, AF_INET);
 #ifdef IPV6
 			add_listener(args->v.number, listener_address, AF_INET6);
 #endif
-                }
+		}
 		else
-                {
+		{
 			int family;
 #ifdef IPV6
 			if(strchr(listener_address, ':') != NULL)
@@ -771,8 +771,8 @@ conf_set_listen_port(void *data)
 				family = AF_INET;
 		
 			add_listener(args->v.number, listener_address, family);
-                
-                }
+		
+		}
 
 	}
 }
@@ -1160,7 +1160,7 @@ conf_set_connect_vhost(void *data)
 	if(inetpton_sock(data, (struct sockaddr *)&yy_server->my_ipnum) <= 0)
 	{
 		conf_report_error("Invalid netmask for server vhost (%s)",
-		    		  (char *) data);
+				  (char *) data);
 		return;
 	}
 
@@ -1442,17 +1442,17 @@ conf_set_general_oper_only_umodes(void *data)
 static void
 conf_set_serverhide_links_delay(void *data)
 {
-        int val = *(unsigned int *) data;
+	int val = *(unsigned int *) data;
 
-        if((val > 0) && ConfigServerHide.links_disabled == 1)
-        {
-                eventAddIsh("cache_links", cache_links, NULL, val);
-                ConfigServerHide.links_disabled = 0;
-        }
-        else if(val != ConfigServerHide.links_delay)
-                eventUpdate("cache_links", val);
+	if((val > 0) && ConfigServerHide.links_disabled == 1)
+	{
+		eventAddIsh("cache_links", cache_links, NULL, val);
+		ConfigServerHide.links_disabled = 0;
+	}
+	else if(val != ConfigServerHide.links_delay)
+		eventUpdate("cache_links", val);
 
-        ConfigServerHide.links_delay = val;
+	ConfigServerHide.links_delay = val;
 }
 
 #ifdef ENABLE_SERVICES
@@ -1461,12 +1461,12 @@ conf_begin_service(struct TopConf *tc)
 {
 	struct Client *target_p;
 	dlink_node *ptr;
-  	 
+	 
 	DLINK_FOREACH(ptr, global_serv_list.head)
 	{
 		target_p = ptr->data;
-  	        target_p->flags &= ~FLAGS_SERVICE;
-  	}
+		target_p->flags &= ~FLAGS_SERVICE;
+	}
 	return 0;
 }
 

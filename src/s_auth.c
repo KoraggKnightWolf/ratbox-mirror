@@ -520,7 +520,7 @@ parse_auth_reply(void)
 	struct AuthRequest *auth;	
 	char *q, *p;
 	while((len = linebuf_get(&auth_recvq, authBuf, sizeof(authBuf), 
-			         LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)	
+				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)	
 	{
 		
 		q = strchr(authBuf, ' ');

@@ -356,7 +356,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		if(ConfigFileEntry.dot_in_ip6_addr == 1)
 			strlcat(source_p->host, ".", sizeof(source_p->host));
 #endif
- 	}
+	}
  
 
 	aconf = source_p->localClient->att_conf;
@@ -443,7 +443,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	/* Except "F:" clients */
 	if(((dlink_list_length(&lclient_list) + 1) >= 
 	   ((unsigned long)GlobalSetOptions.maxclients + MAX_BUFFER) ||
-           (dlink_list_length(&lclient_list) + 1) >= 
+	   (dlink_list_length(&lclient_list) + 1) >= 
 	    ((unsigned long)GlobalSetOptions.maxclients - 5)) && !(IsExemptLimits(source_p)))
 	{
 		sendto_realops_flags(UMODE_FULL, L_ALL,
@@ -636,8 +636,8 @@ valid_hostname(const char *hostname)
 	{
 		if(!IsHostChar(*p))
 			return NO;
-                if(*p == '.' || *p == ':')
-  			found_sep++;
+		if(*p == '.' || *p == ':')
+			found_sep++;
 		p++;
 	}
 

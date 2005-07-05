@@ -89,7 +89,7 @@ struct MessageHash
 extern void parse(struct Client *, char *, char *);
 int string_to_array(char *string, char *parv[]);
 extern void handle_encap(struct Client *, struct Client *, 
-		         const char *, int, const char *parv[]);
+			 const char *, int, const char *parv[]);
 extern void clear_hash_parse(void);
 extern void mod_add_cmd(struct Message *msg);
 extern void mod_del_cmd(struct Message *msg);

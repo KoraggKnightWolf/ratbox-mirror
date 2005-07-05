@@ -635,7 +635,7 @@ valid_wild_card(struct Client *source_p, const char *luser, const char *lhost)
 	}
 
 	sendto_one_notice(source_p, POP_QUEUE,
-		   	  ":Please include at least %d non-wildcard "
+			  ":Please include at least %d non-wildcard "
 			  "characters with the user@host",
 			  ConfigFileEntry.min_nonwildcard);
 	return 0;
@@ -680,7 +680,7 @@ already_placed_kline(struct Client *source_p, const char *luser, const char *lho
 	const char *reason;
 	struct irc_sockaddr_storage iphost, *piphost;
 	struct ConfItem *aconf;
-        int t;
+	int t;
 	if(ConfigFileEntry.non_redundant_klines)
 	{
 		if((t = parse_netmask(lhost, (struct sockaddr *)&iphost, NULL)) != HM_HOST)

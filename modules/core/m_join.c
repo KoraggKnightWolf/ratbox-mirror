@@ -621,7 +621,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		sendto_channel_local(ALL_MEMBERS, chptr,
 				     ":%s NOTICE %s :*** Notice -- TS for %s "
-                                     "changed from %ld to 0",
+				     "changed from %ld to 0",
 				     me.name, chptr->chname, chptr->chname, (long) oldts);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Server %s changing TS on %s from %ld to 0",

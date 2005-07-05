@@ -182,7 +182,7 @@ send_queued_write(int fd, void *data)
 	hd.client = to;
 	if(to->localClient->buf_sendq.list.head)
 		hd.arg1 = ((buf_line_t *) to->localClient->buf_sendq.list.head->data)->buf +
-	                     to->localClient->buf_sendq.writeofs;
+			     to->localClient->buf_sendq.writeofs;
 #endif
 
 	if(linebuf_len(&to->localClient->buf_sendq))
@@ -192,13 +192,13 @@ send_queued_write(int fd, void *data)
 		{
 			/* We have some data written .. update counters */
 #ifdef USE_IODEBUG_HOOKS
-                        hd.arg2 = retlen;
-                        call_hook(h_iosend_id, &hd);
+			hd.arg2 = retlen;
+			call_hook(h_iosend_id, &hd);
 
-                        if(to->localClient->buf_sendq.list.head)
-                                hd.arg1 =
-                                        ((buf_line_t *) to->localClient->buf_sendq.list.head->
-                                         data)->buf + to->localClient->buf_sendq.writeofs;
+			if(to->localClient->buf_sendq.list.head)
+				hd.arg1 =
+					((buf_line_t *) to->localClient->buf_sendq.list.head->
+					 data)->buf + to->localClient->buf_sendq.writeofs;
 #endif
      
 

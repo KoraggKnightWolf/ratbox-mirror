@@ -104,56 +104,56 @@ init_hash(void)
 u_int32_t
 fnv_hash_upper(const unsigned char *s, unsigned int bits)
 {
- 	u_int32_t h = FNV1_32_INIT;
+	u_int32_t h = FNV1_32_INIT;
 
 	while (*s)
 	{
-         	h ^= ToUpper(*s++);
+		h ^= ToUpper(*s++);
 		h += (h<<1) + (h<<4) + (h<<7) + (h << 8) + (h << 24);
 	}
-        h = (h >> bits) ^ (h & ((2^bits)-1));
+	h = (h >> bits) ^ (h & ((2^bits)-1));
 	return h;
 }
 
 u_int32_t
 fnv_hash(const unsigned char *s, unsigned int bits)
 {
- 	u_int32_t h = FNV1_32_INIT;
+	u_int32_t h = FNV1_32_INIT;
 
 	while (*s)
 	{
 		h ^= *s++;
 		h += (h<<1) + (h<<4) + (h<<7) + (h << 8) + (h << 24);
 	}
-        h = (h >> bits) ^ (h & ((2^bits)-1));
+	h = (h >> bits) ^ (h & ((2^bits)-1));
 	return h;
 }
 
 u_int32_t
 fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len)
 {
- 	u_int32_t h = FNV1_32_INIT;
+	u_int32_t h = FNV1_32_INIT;
 	const unsigned char *x = s + len;
 	while (*s && s < x)
 	{
 		h ^= *s++;
 		h += (h<<1) + (h<<4) + (h<<7) + (h << 8) + (h << 24);
 	}
-        h = (h >> bits) ^ (h & ((2^bits)-1));
+	h = (h >> bits) ^ (h & ((2^bits)-1));
 	return h;
 }
 
 u_int32_t
 fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len)
 {
- 	u_int32_t h = FNV1_32_INIT;
+	u_int32_t h = FNV1_32_INIT;
 	const unsigned char *x = s + len;
 	while (*s && s < x)
 	{
-         	h ^= ToUpper(*s++);
+		h ^= ToUpper(*s++);
 		h += (h<<1) + (h<<4) + (h<<7) + (h << 8) + (h << 24);
 	}
-        h = (h >> bits) ^ (h & ((2^bits)-1));
+	h = (h >> bits) ^ (h & ((2^bits)-1));
 	return h;
 }
 
@@ -595,7 +595,7 @@ find_server(struct Client *source_p, const char *name)
 	   IsDigit(*name) && strlen(name) == 3)
 	{
 		target_p = find_id(name);
-      		return(target_p);
+		return(target_p);
 	}
 
 	hashv = hash_nick(name);

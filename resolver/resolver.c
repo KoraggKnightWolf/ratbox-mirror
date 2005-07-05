@@ -95,18 +95,18 @@ adns_state dns_state;
 static void
 dns_select(void)
 {   
-        struct adns_pollfd pollfds[MAXFD_POLL];
-        int npollfds, i, fd;
-        npollfds = adns__pollfds(dns_state, pollfds);
-        for (i = 0; i < npollfds; i++)
-        {
-                fd = pollfds[i].fd;
-                if(pollfds[i].events & ADNS_POLLIN)
-                        comm_setselect(fd, FDLIST_SERVER, COMM_SELECT_READ, dns_readable, NULL, 0);
-                if(pollfds[i].events & ADNS_POLLOUT)
-                        comm_setselect(fd, FDLIST_SERVICE, COMM_SELECT_WRITE,
-                                       dns_writeable, NULL, 0);
-        }
+	struct adns_pollfd pollfds[MAXFD_POLL];
+	int npollfds, i, fd;
+	npollfds = adns__pollfds(dns_state, pollfds);
+	for (i = 0; i < npollfds; i++)
+	{
+		fd = pollfds[i].fd;
+		if(pollfds[i].events & ADNS_POLLIN)
+			comm_setselect(fd, FDLIST_SERVER, COMM_SELECT_READ, dns_readable, NULL, 0);
+		if(pollfds[i].events & ADNS_POLLOUT)
+			comm_setselect(fd, FDLIST_SERVICE, COMM_SELECT_WRITE,
+				       dns_writeable, NULL, 0);
+	}
 }
 
 /* void dns_readable(int fd, void *ptr)
@@ -118,9 +118,9 @@ dns_select(void)
 static void
 dns_readable(int fd, void *ptr)
 {
-        adns_processreadable(dns_state, fd, &SystemTime);
-        process_adns_incoming();
-        dns_select();
+	adns_processreadable(dns_state, fd, &SystemTime);
+	process_adns_incoming();
+	dns_select();
 }   
 
 /* void dns_writeable(int fd, void *ptr)
@@ -132,46 +132,46 @@ dns_readable(int fd, void *ptr)
 static void
 dns_writeable(int fd, void *ptr)
 {
-        adns_processwriteable(dns_state, fd, &SystemTime);
-        process_adns_incoming();
-        dns_select();
+	adns_processwriteable(dns_state, fd, &SystemTime);
+	process_adns_incoming();
+	dns_select();
 }
 
 static void
 restart_resolver(int sig)
 {
-        /* Rehash dns configuration */
-        adns__rereadconfig(dns_state);
+	/* Rehash dns configuration */
+	adns__rereadconfig(dns_state);
 }
 
 
 static void
 setup_signals(void)
 {
-        struct sigaction act;
-        act.sa_flags = 0;
-        act.sa_handler = SIG_IGN;
-        sigemptyset(&act.sa_mask);
-        act.sa_handler = restart_resolver;
-        sigaddset(&act.sa_mask, SIGHUP);
-        sigaction(SIGHUP, &act, 0);
+	struct sigaction act;
+	act.sa_flags = 0;
+	act.sa_handler = SIG_IGN;
+	sigemptyset(&act.sa_mask);
+	act.sa_handler = restart_resolver;
+	sigaddset(&act.sa_mask, SIGHUP);
+	sigaction(SIGHUP, &act, 0);
 }
 
 
 static void
 write_sendq(int fd, void *unused)
 {
-        int retlen;
-        if(linebuf_len(&sendq) > 0)
-        {
-                while((retlen = linebuf_flush(fd, &sendq)) > 0);
-                if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
-                {
-                        exit(1);
-                }
-        }
-        if(linebuf_len(&sendq) > 0)
-        	comm_setselect(fd, FDLIST_IDLECLIENT, COMM_SELECT_WRITE, write_sendq, NULL, 0);
+	int retlen;
+	if(linebuf_len(&sendq) > 0)
+	{
+		while((retlen = linebuf_flush(fd, &sendq)) > 0);
+		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
+		{
+			exit(1);
+		}
+	}
+	if(linebuf_len(&sendq) > 0)
+		comm_setselect(fd, FDLIST_IDLECLIENT, COMM_SELECT_WRITE, write_sendq, NULL, 0);
 }
 
 /*
@@ -199,15 +199,15 @@ REV requestid PASS/FAIL IP or reason
 static void
 parse_request(void)
 {
-        int len;  
-        static char *parv[MAXPARA + 1];
-        int parc;  
-        while((len = linebuf_get(&recvq, readBuf, sizeof(readBuf),
-                                 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
-        {
-                parc = io_to_array(readBuf, parv);
-                if(parc != 4)
-                        exit(1);
+	int len;  
+	static char *parv[MAXPARA + 1];
+	int parc;  
+	while((len = linebuf_get(&recvq, readBuf, sizeof(readBuf),
+				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
+	{
+		parc = io_to_array(readBuf, parv);
+		if(parc != 4)
+			exit(1);
 		switch(*parv[0])
 		{
 			case 'I':
@@ -219,7 +219,7 @@ parse_request(void)
 			default:
 				break;
 		}
-        }
+	}
 	
 
 }
@@ -227,19 +227,19 @@ parse_request(void)
 static void                       
 read_request(int fd, void *unusued)
 {
-        int length;
+	int length;
 
-        while((length = comm_read(fd, readBuf, sizeof(readBuf))) > 0)
-        {
-                linebuf_parse(&recvq, readBuf, length, 0);
-                parse_request();
-        }
-         
-        if(length == 0)
-                exit(1);
+	while((length = comm_read(fd, readBuf, sizeof(readBuf))) > 0)
+	{
+		linebuf_parse(&recvq, readBuf, length, 0);
+		parse_request();
+	}
+	 
+	if(length == 0)
+		exit(1);
 
-        if(length == -1 && !ignoreErrno(errno))
-                exit(1);
+	if(length == -1 && !ignoreErrno(errno))
+		exit(1);
 	comm_setselect(fd, FDLIST_IDLECLIENT, COMM_SELECT_READ, read_request, NULL, 0);
 }
 
@@ -316,12 +316,12 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 		if(req->revfwd == REQREV && req->reqtype == REVIPV6FALLBACK && req->fallback == 0)
 		{
 			req->fallback = 1;
-		        result = adns_submit_reverse(dns_state,
-                                    (struct sockaddr *) &req->sins.in6,
-                                    adns_r_ptr_ip6_old,
-                                    adns_qf_owner | adns_qf_cname_loose |
-                                    adns_qf_quoteok_anshost, req, &req->query);
-              		MyFree(reply);
+			result = adns_submit_reverse(dns_state,
+				    (struct sockaddr *) &req->sins.in6,
+				    adns_r_ptr_ip6_old,
+				    adns_qf_owner | adns_qf_cname_loose |
+				    adns_qf_quoteok_anshost, req, &req->query);
+			MyFree(reply);
 			if(result != 0)
 			{
 				linebuf_put(&sendq, "%s 0 FAILED", req->reqid);
@@ -360,7 +360,7 @@ static void process_adns_incoming(void)
 				send_answer(req, answer);
 				continue;
 			default:
-                        	if(answer != NULL && answer->status == adns_s_systemfail)
+				if(answer != NULL && answer->status == adns_s_systemfail)
 					exit(2);
 				send_answer(req, NULL);
 				break;
@@ -405,8 +405,8 @@ io_to_array(char *string, char **parv)
 
 	parv[x] = NULL;
 
-        if(EmptyString(string))
-                return x;
+	if(EmptyString(string))
+		return x;
 
 	while (*buf == ' ')	/* skip leading spaces */
 		buf++;
@@ -538,11 +538,11 @@ resolve_ip(char **parv)
 			exit(7);
 	}
 
-        result = adns_submit_reverse(dns_state,
-                                    (struct sockaddr *) &req->sins,
-                                    flags,
-                                    adns_qf_owner | adns_qf_cname_loose |
-                                    adns_qf_quoteok_anshost, req, &req->query);
+	result = adns_submit_reverse(dns_state,
+				    (struct sockaddr *) &req->sins,
+				    flags,
+				    adns_qf_owner | adns_qf_cname_loose |
+				    adns_qf_quoteok_anshost, req, &req->query);
 		
 	if(result != 0)
 	{
@@ -554,21 +554,21 @@ resolve_ip(char **parv)
 
 int main(int argc, char **argv)
 {
-        int i;
-        char *tifd;
-        char *tofd;
+	int i;
+	char *tifd;
+	char *tofd;
 
-        tifd = getenv("IFD");
-        tofd = getenv("OFD");
-        if(tifd == NULL || tofd == NULL)
-                exit(1);
-        ifd = atoi(tifd);
-        ofd = atoi(tofd);
+	tifd = getenv("IFD");
+	tofd = getenv("OFD");
+	if(tifd == NULL || tofd == NULL)
+		exit(1);
+	ifd = atoi(tifd);
+	ofd = atoi(tofd);
 
-        ircd_lib(NULL, NULL, NULL, 0); /* XXX fix me */
+	ircd_lib(NULL, NULL, NULL, 0); /* XXX fix me */
 
-        linebuf_newbuf(&sendq);
-        linebuf_newbuf(&recvq);
+	linebuf_newbuf(&sendq);
+	linebuf_newbuf(&recvq);
 
 	if(ifd > 255)
 	{
@@ -600,8 +600,8 @@ int main(int argc, char **argv)
 		}
 	}
 
-        comm_open(ifd, FD_PIPE, "incoming pipe");
-        comm_open(ofd, FD_PIPE, "outgoing pipe");
+	comm_open(ifd, FD_PIPE, "incoming pipe");
+	comm_open(ofd, FD_PIPE, "outgoing pipe");
 	comm_set_nb(ifd);
 	comm_set_nb(ofd);
 	adns_init(&dns_state, adns_if_noautosys, 0);

@@ -57,11 +57,11 @@ Info MyInformation[] = {
 #endif /* DLPATH */
 
 #ifdef ENABLE_SERVICES
-        {"ENABLE_SERVICES", "ON", 0, "ratbox-services compatibility code"},
+	{"ENABLE_SERVICES", "ON", 0, "ratbox-services compatibility code"},
 #else
 	{"ENABLE_SERVICES", "OFF", 0, "ratbox-services compatibility code"},
 #endif
-                
+		
 #ifdef RESVPATH
 	{"RESVPATH", RESVPATH, 0, "Path to resv file"},
 #else

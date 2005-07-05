@@ -276,17 +276,17 @@ static void
 h_svc_stats(hook_data_int *data)
 {
 	char statchar = (char) data->arg2;
-  	dlink_node *ptr;
-  	 
+	dlink_node *ptr;
+	 
 	if (statchar == 'U' && IsOper(data->client))
 	{
 		DLINK_FOREACH(ptr, service_list.head)
 		{
-  	        	sendto_one_numeric(data->client, POP_QUEUE, RPL_STATSULINE,
-  	                			form_str(RPL_STATSULINE),
-  	                			ptr->data, "*", "*", "s");
-  	        }
-  	 }
+			sendto_one_numeric(data->client, POP_QUEUE, RPL_STATSULINE,
+						form_str(RPL_STATSULINE),
+						ptr->data, "*", "*", "s");
+		}
+	 }
 }
-  	 
+	 
 #endif

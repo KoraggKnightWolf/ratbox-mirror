@@ -312,16 +312,16 @@ ms_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	struct Client *target_p;
 	time_t newts = 0;
 
-        if(parc != 9)
-        {
-                sendto_realops_flags(UMODE_ALL, L_ALL,
-                                "Dropping server %s due to (invalid) command 'NICK' "
-                                "with %d arguments (expecting 9)",
-                                client_p->name, parc);
-                ilog(L_SERVER, "Excess parameters (%d) for command 'NICK' from %s.",
-                        parc, client_p->name);
-                exit_client(client_p, client_p, client_p,
-                                "Excess parameters to NICK command");
+	if(parc != 9)
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				"Dropping server %s due to (invalid) command 'NICK' "
+				"with %d arguments (expecting 9)",
+				client_p->name, parc);
+		ilog(L_SERVER, "Excess parameters (%d) for command 'NICK' from %s.",
+			parc, client_p->name);
+		exit_client(client_p, client_p, client_p,
+				"Excess parameters to NICK command");
 		return 0;
 	}
 
@@ -410,18 +410,18 @@ ms_uid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	newts = atol(parv[3]);
 
-        if(parc != 10)
-        {
-                sendto_realops_flags(UMODE_ALL, L_ALL,
-                                "Dropping server %s due to (invalid) command 'UID' "
-                                "with %d arguments (expecting 10)",
-                                client_p->name, parc);    
-                ilog(L_SERVER, "Excess parameters (%d) for command 'UID' from %s.",
-                        parc, client_p->name);
-                exit_client(client_p, client_p, client_p,
-                                "Excess parameters to UID command");
-                return 0;
-        }
+	if(parc != 10)
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				"Dropping server %s due to (invalid) command 'UID' "
+				"with %d arguments (expecting 10)",
+				client_p->name, parc);    
+		ilog(L_SERVER, "Excess parameters (%d) for command 'UID' from %s.",
+			parc, client_p->name);
+		exit_client(client_p, client_p, client_p,
+				"Excess parameters to UID command");
+		return 0;
+	}
 
 	/* if nicks erroneous, or too long, kill */
 	if(!clean_nick(parv[1], 0))
@@ -640,12 +640,12 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick)
 		return;
 	}
 
-        samenick = irccmp(source_p->name, nick) ? 0 : 1;
+	samenick = irccmp(source_p->name, nick) ? 0 : 1;
 
-        /* dont reset TS if theyre just changing case of nick */
-        if(!samenick)
+	/* dont reset TS if theyre just changing case of nick */
+	if(!samenick)
 	{
-                source_p->tsinfo = CurrentTime;
+		source_p->tsinfo = CurrentTime;
 		monitor_signoff(source_p);
 	}
 
@@ -677,17 +677,17 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	if(!samenick)
 		monitor_signon(source_p);
 
-        /* we used to call del_all_accepts() here, but theres no real reason
-         * to clear a clients own list of accepted clients.  So just remove
-         * them from everyone elses list --anfl
-         */
-        DLINK_FOREACH_SAFE(ptr, next_ptr, source_p->on_allow_list.head)
-        {
-                target_p = ptr->data;
+	/* we used to call del_all_accepts() here, but theres no real reason
+	 * to clear a clients own list of accepted clients.  So just remove
+	 * them from everyone elses list --anfl
+	 */
+	DLINK_FOREACH_SAFE(ptr, next_ptr, source_p->on_allow_list.head)
+	{
+		target_p = ptr->data;
 
-                dlinkFindDestroy(source_p, &target_p->localClient->allow_list);
-                dlinkDestroy(ptr, &source_p->on_allow_list);
-        }
+		dlinkFindDestroy(source_p, &target_p->localClient->allow_list);
+		dlinkDestroy(ptr, &source_p->on_allow_list);
+	}
 
 	/* fd_desc is long enough */
 	comm_note(client_p->localClient->fd, "Nick: %s", nick);

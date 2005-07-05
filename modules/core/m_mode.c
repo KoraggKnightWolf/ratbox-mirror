@@ -169,7 +169,7 @@ m_mode(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		}
 
 		set_channel_mode(client_p, source_p, chptr, msptr, 
-			         parc - n, parv + n);
+				 parc - n, parv + n);
 	}
 
 	return 0;
@@ -237,7 +237,7 @@ ms_tmode(struct Client *client_p, struct Client *source_p, int parc, const char 
 			return 0;
 
 		set_channel_mode(client_p, source_p, chptr, msptr, 
-			         parc - 3, parv + 3);
+				 parc - 3, parv + 3);
 	}
 
 	return 0;

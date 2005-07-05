@@ -58,7 +58,7 @@ DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision:
 
 static int
 mo_testmask(struct Client *client_p, struct Client *source_p,
-                        int parc, const char *parv[])
+			int parc, const char *parv[])
 {
 	struct Client *target_p;
 	int lcount = 0;

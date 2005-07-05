@@ -43,7 +43,7 @@ struct Message error_msgtab = {
 };
 
 mapi_clist_av1 error_clist[] = {
-        &error_msgtab, NULL
+	&error_msgtab, NULL
 };
 
 DECLARE_MODULE_AV1(error, NULL, NULL, error_clist, NULL, NULL, "$Revision: 18720 $");
@@ -105,7 +105,7 @@ ms_error(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(!ConfigFileEntry.hide_error_messages)
 			sendto_realops_flags(UMODE_ALL, L_OPER, 
 					"ERROR :from %s -- %s",
-				     	get_server_name(client_p, HIDE_IP), para);
+					get_server_name(client_p, HIDE_IP), para);
 	}
 	else
 	{

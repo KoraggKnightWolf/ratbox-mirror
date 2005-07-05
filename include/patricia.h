@@ -100,18 +100,18 @@ patricia_node_t *make_and_lookup_ip(patricia_tree_t * tree, struct sockaddr *, i
 
 #define PATRICIA_WALK(Xhead, Xnode) \
     do { \
-        patricia_node_t *Xstack[PATRICIA_MAXBITS+1]; \
-        patricia_node_t **Xsp = Xstack; \
-        patricia_node_t *Xrn = (Xhead); \
-        while ((Xnode = Xrn)) { \
-            if (Xnode->prefix)
+	patricia_node_t *Xstack[PATRICIA_MAXBITS+1]; \
+	patricia_node_t **Xsp = Xstack; \
+	patricia_node_t *Xrn = (Xhead); \
+	while ((Xnode = Xrn)) { \
+	    if (Xnode->prefix)
 
 #define PATRICIA_WALK_ALL(Xhead, Xnode) \
 do { \
-        patricia_node_t *Xstack[PATRICIA_MAXBITS+1]; \
-        patricia_node_t **Xsp = Xstack; \
-        patricia_node_t *Xrn = (Xhead); \
-        while ((Xnode = Xrn)) { \
+	patricia_node_t *Xstack[PATRICIA_MAXBITS+1]; \
+	patricia_node_t **Xsp = Xstack; \
+	patricia_node_t *Xrn = (Xhead); \
+	while ((Xnode = Xrn)) { \
 	    if (1)
 
 #define PATRICIA_WALK_BREAK { \
@@ -123,19 +123,19 @@ do { \
 	    continue; }
 
 #define PATRICIA_WALK_END \
-            if (Xrn->l) { \
-                if (Xrn->r) { \
-                    *Xsp++ = Xrn->r; \
-                } \
-                Xrn = Xrn->l; \
-            } else if (Xrn->r) { \
-                Xrn = Xrn->r; \
-            } else if (Xsp != Xstack) { \
-                Xrn = *(--Xsp); \
-            } else { \
-                Xrn = (patricia_node_t *) 0; \
-            } \
-        } \
+	    if (Xrn->l) { \
+		if (Xrn->r) { \
+		    *Xsp++ = Xrn->r; \
+		} \
+		Xrn = Xrn->l; \
+	    } else if (Xrn->r) { \
+		Xrn = Xrn->r; \
+	    } else if (Xsp != Xstack) { \
+		Xrn = *(--Xsp); \
+	    } else { \
+		Xrn = (patricia_node_t *) 0; \
+	    } \
+	} \
     } while (0)
 
 #endif /* _PATRICIA_H */

@@ -161,7 +161,7 @@ print_startup(int pid)
 	printf("ircd: pid %d\n", pid);
 	printf("ircd: running in %s mode from %s\n",
 	       !server_state_foreground ? "background" : "foreground",
-	        ConfigFileEntry.dpath);
+		ConfigFileEntry.dpath);
 }
 
 /*

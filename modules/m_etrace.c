@@ -116,7 +116,7 @@ me_etrace(struct Client *client_p, struct Client *source_p, int parc, const char
 	if((target_p = find_person(parv[1])) && MyClient(target_p))
 		do_single_etrace(source_p, target_p);
 
-        sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), 
+	sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), 
 				target_p ? target_p->name : parv[1]);
 
 	return 0;

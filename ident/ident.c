@@ -73,11 +73,11 @@ static buf_head_t sendq;
 static int
 send_sprintf(int fd, const char *format, ...)
 {
-        va_list args; 
-        va_start(args, format);
-        vsprintf(buf, format, args);
-        va_end(args); 
-        return(send(fd, buf, strlen(buf), 0));
+	va_list args; 
+	va_start(args, format);
+	vsprintf(buf, format, args);
+	va_end(args); 
+	return(send(fd, buf, strlen(buf), 0));
 }
 
 
@@ -97,8 +97,8 @@ io_to_array(char *string, char *parv[MAXPARA])
 
 	parv[x] = NULL;
 
-        if(EmptyString(string))
-                return x;
+	if(EmptyString(string))
+		return x;
 
 	while (*xbuf == ' ')	/* skip leading spaces */
 		xbuf++;
@@ -160,21 +160,21 @@ ID success/failure username
 static void
 write_sendq(int fd, void *unused)
 {
-        int retlen;
-        if(linebuf_len(&sendq) > 0)
-        {
-                while((retlen = linebuf_flush(irc_ofd, &sendq)) > 0);
-                if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
-                {
-                        exit(1);
-                }
-        }
-         
-        if(linebuf_len(&sendq) > 0)
-        {
-                comm_setselect(irc_ofd, FDLIST_SERVICE, COMM_SELECT_WRITE,
-                               write_sendq, NULL, 0);
-        }
+	int retlen;
+	if(linebuf_len(&sendq) > 0)
+	{
+		while((retlen = linebuf_flush(irc_ofd, &sendq)) > 0);
+		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
+		{
+			exit(1);
+		}
+	}
+	 
+	if(linebuf_len(&sendq) > 0)
+	{
+		comm_setselect(irc_ofd, FDLIST_SERVICE, COMM_SELECT_WRITE,
+			       write_sendq, NULL, 0);
+	}
 }
  
 
@@ -193,56 +193,56 @@ read_auth_timeout(int fd, void *data)
 static char *
 GetValidIdent(char *xbuf)
 {
-        int remp = 0;
-        int locp = 0;     
-        char *colon1Ptr;
-        char *colon2Ptr;
-        char *colon3Ptr;
-        char *commaPtr;
-        char *remotePortString;
+	int remp = 0;
+	int locp = 0;     
+	char *colon1Ptr;
+	char *colon2Ptr;
+	char *colon3Ptr;
+	char *commaPtr;
+	char *remotePortString;
 
-        /* All this to get rid of a sscanf() fun. */
-        remotePortString = xbuf;
+	/* All this to get rid of a sscanf() fun. */
+	remotePortString = xbuf;
 
-        colon1Ptr = strchr(remotePortString, ':');
-        if(!colon1Ptr)   
-                return NULL;
+	colon1Ptr = strchr(remotePortString, ':');
+	if(!colon1Ptr)   
+		return NULL;
 
-        *colon1Ptr = '\0';
-        colon1Ptr++;
-        colon2Ptr = strchr(colon1Ptr, ':');
-        if(!colon2Ptr)   
-                return NULL;
+	*colon1Ptr = '\0';
+	colon1Ptr++;
+	colon2Ptr = strchr(colon1Ptr, ':');
+	if(!colon2Ptr)   
+		return NULL;
 
-        *colon2Ptr = '\0';
-        colon2Ptr++;
-        commaPtr = strchr(remotePortString, ',');
+	*colon2Ptr = '\0';
+	colon2Ptr++;
+	commaPtr = strchr(remotePortString, ',');
 
-        if(!commaPtr)
-                return NULL;
+	if(!commaPtr)
+		return NULL;
 
-        *commaPtr = '\0';
-        commaPtr++;
+	*commaPtr = '\0';
+	commaPtr++;
 
-        remp = atoi(remotePortString);
-        if(!remp)
-                return NULL;
+	remp = atoi(remotePortString);
+	if(!remp)
+		return NULL;
 
-        locp = atoi(commaPtr);
-        if(!locp)
-                return NULL;
+	locp = atoi(commaPtr);
+	if(!locp)
+		return NULL;
 
-        /* look for USERID bordered by first pair of colons */
-        if(!strstr(colon1Ptr, "USERID"))
-                return NULL;
+	/* look for USERID bordered by first pair of colons */
+	if(!strstr(colon1Ptr, "USERID"))
+		return NULL;
 
-        colon3Ptr = strchr(colon2Ptr, ':');
-        if(!colon3Ptr)
-                return NULL;
+	colon3Ptr = strchr(colon2Ptr, ':');
+	if(!colon3Ptr)
+		return NULL;
 
-        *colon3Ptr = '\0';
-        colon3Ptr++;
-        return (colon3Ptr);
+	*colon3Ptr = '\0';
+	colon3Ptr++;
+	return (colon3Ptr);
 }
 
 
@@ -335,18 +335,18 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	auth->authfd = comm_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
 	comm_connect_tcp(auth->authfd, (struct sockaddr *)&auth->destaddr, 
 		(struct sockaddr *)&auth->bindaddr, GET_SS_LEN(auth->destaddr), connect_callback, auth, 30);
-                                  
+				  
 }
 
 static void
 parse_auth_request(void)
 {
-        int len;
+	int len;
 	static char *parv[MAXPARA + 1];
 	int parc;
-        while((len = linebuf_get(&recvq, readBuf, sizeof(readBuf),
-                                 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
-        {
+	while((len = linebuf_get(&recvq, readBuf, sizeof(readBuf),
+				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
+	{
 		parc = io_to_array(readBuf, parv);
 		if(parc != 5)
 			exit(1);
@@ -357,21 +357,21 @@ parse_auth_request(void)
 static void
 read_auth_request(int fd, void *data)
 {
-        int length;
+	int length;
 
-        while((length = read(irc_ifd, readBuf, sizeof(readBuf))) > 0)
-        {
-                linebuf_parse(&recvq, readBuf, length, 0);
-                parse_auth_request();
-        }
-         
-        if(length == 0)
-                exit(1);
+	while((length = read(irc_ifd, readBuf, sizeof(readBuf))) > 0)
+	{
+		linebuf_parse(&recvq, readBuf, length, 0);
+		parse_auth_request();
+	}
+	 
+	if(length == 0)
+		exit(1);
 
-        if(length == -1 && !ignoreErrno(errno))
-                exit(1);
+	if(length == -1 && !ignoreErrno(errno))
+		exit(1);
 
-        comm_setselect(irc_ifd, FDLIST_SERVICE, COMM_SELECT_READ, read_auth_request, NULL, 0);
+	comm_setselect(irc_ifd, FDLIST_SERVICE, COMM_SELECT_READ, read_auth_request, NULL, 0);
 }
 
 int main(int argc, char **argv)
