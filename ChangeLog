@@ -1,3 +1,12 @@
+androsyn    2005/07/05 04:52:36 UTC	(20050705_4-19409)
+  Log:
+  A comma really should not be a valid key character for obvious reasons
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+
+
 androsyn    2005/07/05 04:15:31 UTC	(20050705_3-19403)
   Log:
   Add OMOTD command.
