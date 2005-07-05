@@ -1,3 +1,34 @@
+androsyn    2005/07/05 07:13:45 UTC	(20050705_5-19415)
+  Log:
+  make contrib compile again.
+  
+  kilroy was here
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/contrib/example_module.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_42.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_clearchan.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_flags.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_force.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_mkpasswd.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_ojoin.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_okick.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_olist.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_opme.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_admin_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_info_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_links_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_motd_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_stats_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_stats_p_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_trace_notice.c (File Deleted) 
+	ircd-ratbox/trunk/contrib/spy_whois_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_whois_notice_global.c (File Modified) 
+
+
 androsyn    2005/07/05 04:52:36 UTC	(20050705_4-19409)
   Log:
   A comma really should not be a valid key character for obvious reasons
