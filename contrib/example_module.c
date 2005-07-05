@@ -21,7 +21,10 @@
 
 /* List of ircd includes from ../include/ */
 #include "stdinc.h"
+#include "ircd_lib.h"
+#include "struct.h"
 #include "modules.h"
+#include "parse.h"
 #include "hook.h"
 #include "client.h"
 #include "ircd.h"
@@ -163,12 +166,12 @@ munreg_test(struct Client *client_p, struct Client *source_p, int parc, const ch
 {
 	if(parc < 2)
 	{
-		sendto_one(source_p, ":%s NOTICE %s :You are unregistered and sent no parameters",
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :You are unregistered and sent no parameters",
 			   me.name, source_p->name);
 	}
 	else
 	{
-		sendto_one(source_p, ":%s NOTICE %s :You are unregistered and sent parameter: %s",
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :You are unregistered and sent parameter: %s",
 			   me.name, source_p->name, parv[1]);
 	}
 
@@ -188,12 +191,12 @@ mclient_test(struct Client *client_p, struct Client *source_p, int parc, const c
 {
 	if(parc < 2)
 	{
-		sendto_one(source_p, ":%s NOTICE %s :You are a normal user, and sent no parameters",
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :You are a normal user, and sent no parameters",
 			   me.name, source_p->name);
 	}
 	else
 	{
-		sendto_one(source_p,
+		sendto_one(source_p, POP_QUEUE, 
 			   ":%s NOTICE %s :You are a normal user, and send parameters: %s", me.name,
 			   source_p->name, parv[1]);
 	}
@@ -214,13 +217,13 @@ mrclient_test(struct Client *client_p, struct Client *source_p, int parc, const 
 {
 	if(parc < 2)
 	{
-		sendto_one(source_p,
+		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :You are a remote client, and sent no parameters",
 			   me.name, source_p->name);
 	}
 	else
 	{
-		sendto_one(source_p,
+		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :You are a remote client, and sent parameters: %s",
 			   me.name, source_p->name, parv[1]);
 	}
@@ -237,13 +240,13 @@ mserver_test(struct Client *client_p, struct Client *source_p, int parc, const c
 {
 	if(parc < 2)
 	{
-		sendto_one(source_p,
+		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :You are a server, and sent no parameters",
 			   me.name, source_p->name);
 	}
 	else
 	{
-		sendto_one(source_p,
+		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :You are a server, and sent parameters: %s",
 			   me.name, source_p->name, parv[1]);
 	}
@@ -260,12 +263,12 @@ moper_test(struct Client *client_p, struct Client *source_p, int parc, const cha
 {
 	if(parc < 2)
 	{
-		sendto_one(source_p, ":%s NOTICE %s :You are an operator, and sent no parameters",
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :You are an operator, and sent no parameters",
 			   me.name, source_p->name);
 	}
 	else
 	{
-		sendto_one(source_p, ":%s NOTICE %s :You are an operator, and sent parameters: %s",
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :You are an operator, and sent parameters: %s",
 			   me.name, source_p->name, parv[1]);
 	}
 	return 0;

@@ -32,18 +32,17 @@
 
 /* List of ircd includes from ../include/ */
 #include "stdinc.h"
-
+#include "ircd_lib.h"
+#include "struct.h"
 #include "client.h"
 #include "common.h"
 #include "ircd.h"
 #include "irc_string.h"
-#include "sprintf_irc.h"
 #include "numeric.h"
 #include "s_conf.h"
 #include "s_log.h"
 #include "s_serv.h"
 #include "send.h"
-#include "msg.h"
 #include "parse.h"
 #include "modules.h"
 #include "s_user.h"		/* send_umode_out() */
@@ -150,9 +149,9 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 		/* Generate a list of what flags you have and what you are missing,
 		 ** and send it to the user
 		 */
-		sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current flags:%s",
 			   me.name, parv[0], set_flags_to_string(source_p));
-		sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current missing flags:%s",
 			   me.name, parv[0], unset_flags_to_string(source_p));
 		return 1;
 	}
@@ -189,9 +188,9 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 					source_p->umodes |= FL_ALL_USER_FLAGS;
 				else
 					source_p->umodes &= ~FL_ALL_USER_FLAGS;
-				sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
+				sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current flags:%s",
 					   me.name, parv[0], set_flags_to_string(source_p));
-				sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
+				sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current missing flags:%s",
 					   me.name, parv[0], unset_flags_to_string(source_p));
 				send_umode_out(client_p, source_p, setflags);
 				return 1;
@@ -214,7 +213,7 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 			 ** the invalid flag, send a warning and go on.
 			 */
 			if(!isgood)
-				sendto_one(source_p, ":%s NOTICE %s :Invalid FLAGS: %s (IGNORING)",
+				sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid FLAGS: %s (IGNORING)",
 					   me.name, parv[0], flag);
 		}
 	}
@@ -222,9 +221,9 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* All done setting the flags, print the notices out to the user
 	 ** telling what flags they have and what flags they are missing
 	 */
-	sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
+	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current flags:%s",
 		   me.name, parv[0], set_flags_to_string(source_p));
-	sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
+	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current missing flags:%s",
 		   me.name, parv[0], unset_flags_to_string(source_p));
 
 	send_umode_out(client_p, source_p, setflags);
@@ -251,9 +250,9 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* Generate a list of what flags you have and what you are missing,
 		 ** and send it to the user
 		 */
-		sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current flags:%s",
 			   me.name, parv[0], set_flags_to_string(source_p));
-		sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current missing flags:%s",
 			   me.name, parv[0], unset_flags_to_string(source_p));
 		return 1;
 	}
@@ -290,9 +289,9 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 					source_p->umodes |= FL_ALL_OPER_FLAGS;
 				else
 					source_p->umodes &= ~FL_ALL_OPER_FLAGS;
-				sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
+				sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current flags:%s",
 					   me.name, parv[0], set_flags_to_string(source_p));
-				sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
+				sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current missing flags:%s",
 					   me.name, parv[0], unset_flags_to_string(source_p));
 				send_umode_out(client_p, source_p, setflags);
 				return 1;
@@ -302,7 +301,7 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 			{
 				if(!IsOperN(source_p))
 				{
-					sendto_one(source_p,
+					sendto_one(source_p, POP_QUEUE,
 						   ":%s NOTICE %s :*** You need oper and N flag for +n",
 						   me.name, parv[0]);
 					continue;
@@ -332,7 +331,7 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 			 ** the invalid flag, send a warning and go on.
 			 */
 			if(!isgood)
-				sendto_one(source_p, ":%s NOTICE %s :Invalid FLAGS: %s (IGNORING)",
+				sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid FLAGS: %s (IGNORING)",
 					   me.name, parv[0], flag);
 		}
 	}
@@ -340,9 +339,9 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* All done setting the flags, print the notices out to the user
 	 ** telling what flags they have and what flags they are missing
 	 */
-	sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
+	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current flags:%s",
 		   me.name, parv[0], set_flags_to_string(source_p));
-	sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
+	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current missing flags:%s",
 		   me.name, parv[0], unset_flags_to_string(source_p));
 
 	send_umode_out(client_p, source_p, setflags);

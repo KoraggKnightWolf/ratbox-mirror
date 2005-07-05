@@ -22,6 +22,8 @@
  *  $Id$
  */
 #include "stdinc.h"
+#include "ircd_lib.h"
+#include "struct.h"
 #include "modules.h"
 #include "hook.h"
 #include "client.h"
@@ -47,7 +49,7 @@ show_whois_global(hook_data_client *data)
 	if(MyClient(target_p) && IsOper(target_p) && (source_p != target_p) &&
 	   (target_p->umodes & UMODE_SPY))
 	{
-		sendto_one(target_p,
+		sendto_one(target_p, POP_QUEUE,
 				":%s NOTICE %s :*** Notice -- %s (%s@%s) is doing a whois on you [%s]",
 				me.name, target_p->name, source_p->name,
 				source_p->username, source_p->host,

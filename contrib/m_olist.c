@@ -27,7 +27,8 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
+#include "ircd_lib.h"
+#include "struct.h"
 #include "channel.h"
 #include "client.h"
 #include "ircd.h"
@@ -38,11 +39,9 @@
 #include "whowas.h"
 #include "irc_string.h"
 #include "hash.h"
-#include "msg.h"
 #include "parse.h"
 #include "modules.h"
 #include "s_newconf.h"
-#include "sprintf_irc.h"
 
 static int mo_olist(struct Client *, struct Client *, int parc, const char *parv[]);
 
@@ -85,7 +84,7 @@ mo_olist(struct Client *client_p, struct Client *source_p, int parc, const char 
 		}
 	}
 
-	sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
+	sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTEND), me.name, source_p->name);
 	return 0;
 }
 
@@ -101,13 +100,13 @@ list_all_channels(struct Client *source_p)
 {
 	struct Channel *chptr;
 	dlink_node *ptr;
-	sendto_one(source_p, form_str(RPL_LISTSTART), me.name, source_p->name);
+	sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTSTART), me.name, source_p->name);
 
 	DLINK_FOREACH(ptr, global_channel_list.head)
 	{
 		chptr = ptr->data;
 
-		sendto_one(source_p, form_str(RPL_LIST),
+		sendto_one(source_p, POP_QUEUE, form_str(RPL_LIST),
 				me.name, source_p->name, chptr->chname,
 				dlink_list_length(&chptr->members),
 				chptr->topic == NULL ? "" : chptr->topic);
@@ -129,23 +128,23 @@ list_named_channel(struct Client *source_p, const char *name)
 	char *p;
 	char *n = LOCAL_COPY(name);
 
-	sendto_one(source_p, form_str(RPL_LISTSTART), me.name, source_p->name);
+	sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTSTART), me.name, source_p->name);
 
 	if((p = strchr(n, ',')))
 		*p = '\0';
 
 	if(EmptyString(n))
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL, 
+		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL, 
 				form_str(ERR_NOSUCHCHANNEL), n);
 		return;
 	}
 
 	if((chptr = find_channel(n)) == NULL)
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
 				form_str(ERR_NOSUCHCHANNEL), n);
 	else
-		sendto_one(source_p, form_str(RPL_LIST), me.name, source_p->name,
+		sendto_one(source_p, POP_QUEUE, form_str(RPL_LIST), me.name, source_p->name,
 			chptr->chname, dlink_list_length(&chptr->members),
 			chptr->topic ? chptr->topic : "");
 }

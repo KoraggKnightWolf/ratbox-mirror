@@ -22,6 +22,9 @@
  *  $Id$
  */
 #include "stdinc.h"
+#include "ircd_lib.h"
+#include "struct.h"
+#include "irc_string.h"
 #include "modules.h"
 #include "hook.h"
 #include "client.h"

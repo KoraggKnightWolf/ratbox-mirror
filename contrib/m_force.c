@@ -30,13 +30,13 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
+#include "ircd_lib.h"
+#include "struct.h"
 #include "channel.h"
 #include "class.h"
 #include "client.h"
 #include "common.h"
 #include "irc_string.h"
-#include "sprintf_irc.h"
 #include "ircd.h"
 #include "hostmask.h"
 #include "numeric.h"
@@ -47,7 +47,6 @@
 #include "send.h"
 #include "hash.h"
 #include "s_serv.h"
-#include "msg.h"
 #include "parse.h"
 #include "modules.h"
 #include "event.h"
@@ -90,7 +89,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "forcejoin");
+		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS), me.name, source_p->name, "forcejoin");
 		return 0;
 	}
 
@@ -102,7 +101,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 	 */
 	if((target_p = find_client(parv[1])) == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_NOSUCHNICK), me.name, source_p->name, parv[1]);
+		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOSUCHNICK), me.name, source_p->name, parv[1]);
 		return 0;
 	}
 
@@ -136,7 +135,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		if(IsMember(target_p, chptr))
 		{
 			/* debugging is fun... */
-			sendto_one(source_p, ":%s NOTICE %s :*** Notice -- %s is already in %s",
+			sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :*** Notice -- %s is already in %s",
 				   me.name, source_p->name, target_p->name, chptr->chname);
 			return 0;
 		}
@@ -158,9 +157,9 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 
 		if(chptr->topic != NULL)
 		{
-			sendto_one(target_p, form_str(RPL_TOPIC), me.name,
+			sendto_one(target_p, POP_QUEUE, form_str(RPL_TOPIC), me.name,
 				   target_p->name, chptr->chname, chptr->topic);
-			sendto_one(target_p, form_str(RPL_TOPICWHOTIME),
+			sendto_one(target_p, POP_QUEUE, form_str(RPL_TOPICWHOTIME),
 				   me.name, source_p->name, chptr->chname,
 				   chptr->topic_info, chptr->topic_time);
 		}
@@ -172,7 +171,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		newch = LOCAL_COPY(parv[2]);
 		if(!check_channel_name(newch))
 		{
-			sendto_one(source_p, form_str(ERR_BADCHANNAME), me.name,
+			sendto_one(source_p, POP_QUEUE, form_str(ERR_BADCHANNAME), me.name,
 				   source_p->name, (unsigned char *) newch);
 			return 0;
 		}
@@ -180,7 +179,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		/* channel name must begin with & or # */
 		if(!IsChannelName(newch))
 		{
-			sendto_one(source_p, form_str(ERR_BADCHANNAME), me.name,
+			sendto_one(source_p, POP_QUEUE, form_str(ERR_BADCHANNAME), me.name,
 				   source_p->name, (unsigned char *) newch);
 			return 0;
 		}
@@ -188,7 +187,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		/* newch can't be longer than CHANNELLEN */
 		if(strlen(newch) > CHANNELLEN)
 		{
-			sendto_one(source_p, ":%s NOTICE %s :Channel name is too long", me.name,
+			sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Channel name is too long", me.name,
 				   source_p->name);
 			return 0;
 		}
@@ -217,7 +216,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		 * seen from the server handling the command instead of the server that
 		 * the oper is on.
 		 */
-		sendto_one(source_p, ":%s NOTICE %s :*** Notice -- Creating channel %s", me.name,
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :*** Notice -- Creating channel %s", me.name,
 			   source_p->name, chptr->chname);
 	}
 	return 0;
@@ -233,7 +232,7 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "forcepart");
+		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS), me.name, source_p->name, "forcepart");
 		return 0;
 	}
 
@@ -243,7 +242,7 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 	/* if target_p == NULL then let the oper know */
 	if((target_p = find_client(parv[1])) == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_NOSUCHNICK), me.name, source_p->name, parv[1]);
+		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOSUCHNICK), me.name, source_p->name, parv[1]);
 		return 0;
 	}
 
@@ -253,14 +252,14 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if((chptr = find_channel(parv[2])) == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL, 
 				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
 
 	if((msptr = find_channel_membership(chptr, target_p)) == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_USERNOTINCHANNEL),
+		sendto_one(source_p, POP_QUEUE, form_str(ERR_USERNOTINCHANNEL),
 			   me.name, parv[0], parv[1], parv[2]);
 		return 0;
 	}

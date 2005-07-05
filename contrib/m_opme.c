@@ -19,7 +19,8 @@
  *   $Id$
  */
 #include "stdinc.h"
-#include "tools.h"
+#include "ircd_lib.h"
+#include "struct.h"
 #include "channel.h"
 #include "client.h"
 #include "ircd.h"
@@ -30,7 +31,6 @@
 #include "whowas.h"
 #include "irc_string.h"
 #include "hash.h"
-#include "msg.h"
 #include "parse.h"
 #include "modules.h"
 #include "s_newconf.h"
@@ -62,13 +62,13 @@ mo_opme(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* admins only */
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "opme");
+		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS), me.name, source_p->name, "opme");
 		return 0;
 	}
 
 	if((chptr = find_channel(parv[1])) == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
@@ -79,7 +79,7 @@ mo_opme(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		if(is_chanop(msptr))
 		{
-			sendto_one(source_p, ":%s NOTICE %s :%s Channel is not opless",
+			sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :%s Channel is not opless",
 				   me.name, parv[0], parv[1]);
 			return 0;
 		}
