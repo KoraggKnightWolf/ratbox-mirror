@@ -47,8 +47,10 @@ mclient_42(struct Client *client_p, struct Client *source_p, int parc, const cha
 static int
 mclient_kilroy(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Kilroy was here",
-		   me.name, source_p->name);
+	sendto_one(source_p, HOLD_QUEUE, ":%s NOTICE %s :                ___              ", me.name, source_p->name);
+	sendto_one(source_p, HOLD_QUEUE, ":%s NOTICE %s :___________mm__(O O)__mm_________", me.name, source_p->name);
+	sendto_one(source_p, HOLD_QUEUE, ":%s NOTICE %s :           \"\"    U    \"\"         ", me.name, source_p->name);
+	sendto_one(source_p, POP_QUEUE,  ":%s NOTICE %s :Kilroy was here", me.name, source_p->name);
 	return 0;
 }
 
