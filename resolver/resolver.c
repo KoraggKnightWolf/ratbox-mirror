@@ -30,7 +30,7 @@
 #include "setup.h"     
 #include "ircd_lib.h"
 #include "adns.h"
-
+#include "internal.h"
 
 /* data fd from ircd */
 int ifd = -1;
@@ -51,6 +51,9 @@ int ofd = -1;
 
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 
+static void dns_readable(int fd, void *ptr);
+static void dns_writeable(int fd, void *ptr);
+static void process_adns_incoming(void);
 
 static char readBuf[READBUF_SIZE];
 static void resolve_ip(char **parv);
@@ -83,6 +86,56 @@ fd_set exceptfds;
 
 adns_state dns_state;
 
+/* void dns_select(void)
+ * Input: None.
+ * Output: None
+ * Side effects: Re-register ADNS fds with the fd system. Also calls the
+ *               callbacks into core ircd.
+ */
+static void
+dns_select(void)
+{   
+        struct adns_pollfd pollfds[MAXFD_POLL];
+        int npollfds, i, fd;
+        npollfds = adns__pollfds(dns_state, pollfds);
+        for (i = 0; i < npollfds; i++)
+        {
+                fd = pollfds[i].fd;
+                if(pollfds[i].events & ADNS_POLLIN)
+                        comm_setselect(fd, FDLIST_SERVER, COMM_SELECT_READ, dns_readable, NULL, 0);
+                if(pollfds[i].events & ADNS_POLLOUT)
+                        comm_setselect(fd, FDLIST_SERVICE, COMM_SELECT_WRITE,
+                                       dns_writeable, NULL, 0);
+        }
+}
+
+/* void dns_readable(int fd, void *ptr)
+ * Input: An fd which has become readable, ptr not used.
+ * Output: None.
+ * Side effects: Read DNS responses from DNS servers.
+ * Note: Called by the fd system.
+ */
+static void
+dns_readable(int fd, void *ptr)
+{
+        adns_processreadable(dns_state, fd, &SystemTime);
+        process_adns_incoming();
+        dns_select();
+}   
+
+/* void dns_writeable(int fd, void *ptr)
+ * Input: An fd which has become writeable, ptr not used.
+ * Output: None.
+ * Side effects: Write any queued buffers out.
+ * Note: Called by the fd system.
+ */
+static void
+dns_writeable(int fd, void *ptr)
+{
+        adns_processwriteable(dns_state, fd, &SystemTime);
+        process_adns_incoming();
+        dns_select();
+}
 
 static void
 restart_resolver(int sig)
@@ -90,6 +143,7 @@ restart_resolver(int sig)
         /* Rehash dns configuration */
         adns__rereadconfig(dns_state);
 }
+
 
 static void
 setup_signals(void)
@@ -105,19 +159,19 @@ setup_signals(void)
 
 
 static void
-write_sendq(void)
+write_sendq(int fd, void *unused)
 {
         int retlen;
         if(linebuf_len(&sendq) > 0)
         {
-                while((retlen = linebuf_flush(ofd, &sendq)) > 0);
+                while((retlen = linebuf_flush(fd, &sendq)) > 0);
                 if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
                 {
                         exit(1);
                 }
         }
         if(linebuf_len(&sendq) > 0)
-		FD_SET(ofd, &writefds);
+        	comm_setselect(fd, FDLIST_IDLECLIENT, COMM_SELECT_WRITE, write_sendq, NULL, 0);
 }
 
 /*
@@ -171,11 +225,11 @@ parse_request(void)
 }
 
 static void                       
-read_request(void)
+read_request(int fd, void *unusued)
 {
         int length;
 
-        while((length = read(ifd, readBuf, sizeof(readBuf))) > 0)
+        while((length = comm_read(fd, readBuf, sizeof(readBuf))) > 0)
         {
                 linebuf_parse(&recvq, readBuf, length, 0);
                 parse_request();
@@ -186,6 +240,7 @@ read_request(void)
 
         if(length == -1 && !ignoreErrno(errno))
                 exit(1);
+	comm_setselect(fd, FDLIST_IDLECLIENT, COMM_SELECT_READ, read_request, NULL, 0);
 }
 
 
@@ -270,7 +325,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 			if(result != 0)
 			{
 				linebuf_put(&sendq, "%s 0 FAILED", req->reqid);
-				write_sendq();
+				write_sendq(ofd, NULL);
 				MyFree(reply);
 				MyFree(req);
 
@@ -282,7 +337,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 		result = 0;
 	}
 	linebuf_put(&sendq, "%s %d %d %s\n", req->reqid, result, aftype, response);
-	write_sendq();
+	write_sendq(ofd, NULL);
 	MyFree(reply);
 	MyFree(req);
 }
@@ -324,51 +379,13 @@ static void process_adns_incoming(void)
 static void
 read_io(void)
 {
-	struct timeval *tv = NULL, tvbuf, now, tvx;
-	int select_result;
-	int maxfd = -1;
-
+	read_request(ifd, NULL);
 	while(1)
 	{
-		FD_ZERO(&readfds);
-		FD_ZERO(&writefds);
-		FD_ZERO(&exceptfds);
-
-		FD_SET(ifd, &readfds);
-		
-		if(ifd > ofd)
-			maxfd = ifd+1;
-		else
-			maxfd = ofd+1;
-
+		dns_select();
 		set_time();
-
 		eventRun();
-                                                        
-		adns_beforeselect(dns_state, &maxfd, &readfds, &writefds, &exceptfds, &tv, &tvbuf, &now);
-		tvx.tv_sec = 1;
-		tvx.tv_usec = 0;
-		select_result = select(maxfd, &readfds, &writefds, &exceptfds, &tvx);
-		adns_afterselect(dns_state, maxfd, &readfds,&writefds,&exceptfds, &now);
-		process_adns_incoming();
-
-		if(select_result == 0)
-			continue;
-
-		/* have data to parse */
-		if(select_result > 0)
-		{
-			if(FD_ISSET(ifd, &readfds))
-			{
-				read_request();
-				/* incoming requests */
-			}
-			if(FD_ISSET(ofd, &writefds))
-			{
-				write_sendq();
-			}
-		}
-		
+		comm_select(250);
 	}
 }
 
@@ -537,7 +554,7 @@ resolve_ip(char **parv)
 
 int main(int argc, char **argv)
 {
-        int i, res;
+        int i;
         char *tifd;
         char *tofd;
 
@@ -582,13 +599,11 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-	
-	res = fcntl(ifd, F_GETFL, 0);
-	fcntl(ifd, F_SETFL, res | O_NONBLOCK);
 
-	res = fcntl(ofd, F_GETFL, 0);
-	fcntl(ofd, F_SETFL, res | O_NONBLOCK);
-	
+        comm_open(ifd, FD_PIPE, "incoming pipe");
+        comm_open(ofd, FD_PIPE, "outgoing pipe");
+	comm_set_nb(ifd);
+	comm_set_nb(ofd);
 	adns_init(&dns_state, adns_if_noautosys, 0);
 	setup_signals();
 	read_io();	

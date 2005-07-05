@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 
 bin_PROGRAMS = ircd
 
-INCLUDES = -I../adns $(INCLTDL) -I../libircd/ 
+INCLUDES = $(INCLTDL) -I../libircd/ 
 
 version.c: 
 	$(SHELL) ./version.c.SH 

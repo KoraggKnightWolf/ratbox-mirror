@@ -311,6 +311,13 @@ else
 	 AC_DEFINE([HAVE_NANOSLEEP], 1, [Define if nanosleep exists])
 fi
 
+
+dnl check for timer_create
+AC_CHECK_FUNC(timer_create,,[AC_CHECK_LIB(rt, timer_create, AC_DEFINE(HAVE_TIMER_CREATE, 1, [Have timer_create]) 
+LIBS="${LIBS} -lrt",,)])
+
+
+
 dnl OpenSSL support
 AC_MSG_CHECKING(for OpenSSL)
 AC_ARG_ENABLE(openssl,
@@ -648,7 +655,6 @@ yes
 		AC_DEFINE(HAVE_SIGIO, 1, [using rtsigio])
 	fi
 fi
-
 
 if test ! "x$use_epoll" = "xno"; then
 	AC_CHECK_FUNCS(epoll_ctl, [haveepoll=yes], [haveepoll=no])

@@ -60,7 +60,7 @@ static const char *last_event_ran = NULL;
 struct ev_entry event_table[MAX_EVENTS];
 static time_t event_time_min = -1;
 
-#if defined(HAVE_PORTS) || defined(HAVE_SIGIO)
+#ifdef USE_POSIX_TIMERS
 static void 
 event_run_callback(void *data)
 {
@@ -109,7 +109,7 @@ eventAdd(const char *name, EVH * func, void *arg, time_t when)
 			if((event_table[i].when < event_time_min) || (event_time_min == -1))
 				event_time_min = event_table[i].when;
 
-#if defined(HAVE_PORTS) || defined(HAVE_SIGIO)
+#ifdef USE_POSIX_TIMERS
 			event_table[i].comm_id = comm_schedule_event(when, 1, event_run_callback, &event_table[i]);
 #endif
 
@@ -138,7 +138,7 @@ eventAddOnce(const char *name, EVH *func, void *arg, time_t when)
 			if ((event_table[i].when < event_time_min) || (event_time_min == -1))
 				event_time_min = event_table[i].when;
 
-#if defined(HAVE_PORTS) || defined(HAVE_SIGIO)
+#ifdef USE_POSIX_TIMERS
 			event_table[i].comm_id = comm_schedule_event(when, 0, event_run_callback, &event_table[i]);
 #endif
 			return;
@@ -168,7 +168,7 @@ eventDelete(EVH * func, void *arg)
 	event_table[i].arg = NULL;
 	event_table[i].active = 0;
 
-#if defined(HAVE_PORTS) || defined(HAVE_SIGIO)
+#ifdef USE_POSIX_TIMERS
 	comm_unschedule_event(event_table[i].comm_id);
 #endif
 }
@@ -204,7 +204,7 @@ eventAddIsh(const char *name, EVH * func, void *arg, time_t delta_ish)
  * Output: None
  * Side Effects: Runs pending events in the event list
  */
-#ifndef HAVE_PORTS
+#ifndef USE_POSIX_TIMERS
 void
 eventRun(void)
 {

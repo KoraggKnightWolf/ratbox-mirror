@@ -214,7 +214,7 @@ target_alias = @target_alias@
 
 # $Id$
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = libircd adns libltdl modules src $(SERVLINK) tools doc help
+SUBDIRS = libircd adns libltdl modules src resolver ident $(SERVLINK) tools doc help
 all: all-recursive
 
 .SUFFIXES:

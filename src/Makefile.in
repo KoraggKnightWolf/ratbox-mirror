@@ -238,7 +238,7 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
-INCLUDES = -I../adns $(INCLTDL) -I../libircd/ 
+INCLUDES = $(INCLTDL) -I../libircd/ 
 ircd_SOURCES = \
   dns.c                        \
   cache.c                       \

@@ -187,7 +187,7 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 automoduledir = @moduledir@/autoload
-INCLUDES = -I../adns -I../include -I../libircd $(INCLTDL)
+INCLUDES = -I../include -I../libircd $(INCLTDL)
 CORE_SRCS = \
   core/m_die.c \
   core/m_error.c \
