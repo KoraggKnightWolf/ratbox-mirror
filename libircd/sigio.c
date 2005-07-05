@@ -84,7 +84,6 @@ poll_update_pollfds(int fd, short event, PF * handler)
 	/* Update the events */
 	if(handler != NULL)
 	{
-		F->list = FDLIST_IDLECLIENT;
 		pf->events |= event;
 		pf->fd = fd;
 	}
@@ -105,7 +104,6 @@ poll_update_pollfds(int fd, short event, PF * handler)
 				}
 				pfds[used_count - 1].fd = -1;
 				F->comm_index = -1;
-				F->list = FDLIST_NONE;
 				used_count--;
 			}
 		}
@@ -170,7 +168,7 @@ init_netio(void)
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
+comm_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F;

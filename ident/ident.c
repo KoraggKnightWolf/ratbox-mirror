@@ -172,7 +172,7 @@ write_sendq(int fd, void *unused)
 	 
 	if(linebuf_len(&sendq) > 0)
 	{
-		comm_setselect(irc_ofd, FDLIST_SERVICE, COMM_SELECT_WRITE,
+		comm_setselect(irc_ofd, COMM_SELECT_WRITE,
 			       write_sendq, NULL, 0);
 	}
 }
@@ -257,7 +257,7 @@ read_auth(int fd, void *data)
 	if(len < 0 && ignoreErrno(errno))
 	{
 		comm_settimeout(fd, 30, read_auth_timeout, auth);
-		comm_setselect(fd, FDLIST_SERVICE, COMM_SELECT_READ, read_auth, auth, 30);
+		comm_setselect(fd, COMM_SELECT_READ, read_auth, auth, 30);
 		return;
 	} else {
 		buf[len] = '\0';
@@ -371,7 +371,7 @@ read_auth_request(int fd, void *data)
 	if(length == -1 && !ignoreErrno(errno))
 		exit(1);
 
-	comm_setselect(irc_ifd, FDLIST_SERVICE, COMM_SELECT_READ, read_auth_request, NULL, 0);
+	comm_setselect(irc_ifd, COMM_SELECT_READ, read_auth_request, NULL, 0);
 }
 
 int main(int argc, char **argv)

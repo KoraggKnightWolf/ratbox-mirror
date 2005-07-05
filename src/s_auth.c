@@ -332,7 +332,7 @@ auth_write_sendq(int fd, void *unused)
 	
 	if(linebuf_len(&auth_sendq) > 0)
 	{
-		comm_setselect(auth_ofd, FDLIST_SERVICE, COMM_SELECT_WRITE, 
+		comm_setselect(auth_ofd, COMM_SELECT_WRITE, 
 			       auth_write_sendq, NULL, 0);
 	}
 }
@@ -577,6 +577,6 @@ read_auth_reply(int fd, void *data)
 	if(length == -1 && !ignoreErrno(errno))
 		fork_ident();
 	
-	comm_setselect(auth_ifd, FDLIST_SERVICE, COMM_SELECT_READ, read_auth_reply, NULL, 0);	
+	comm_setselect(auth_ifd, COMM_SELECT_READ, read_auth_reply, NULL, 0);	
 }
 

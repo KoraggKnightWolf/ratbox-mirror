@@ -523,7 +523,7 @@ accept_connection(int pfd, void *data)
 		if(fd < 0)
 		{
 			/* Re-register a new IO request for the next accept .. */
-			comm_setselect(listener->fd, FDLIST_SERVICE,
+			comm_setselect(listener->fd,
 				      COMM_SELECT_READ, accept_connection, listener, 0);
 			return;
 		}

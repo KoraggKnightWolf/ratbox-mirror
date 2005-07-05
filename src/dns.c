@@ -295,7 +295,7 @@ read_dns(int fd, void *data)
 	if(length == -1 && !ignoreErrno(errno))
 		fork_resolver(); 
 
-	comm_setselect(dns_ifd, FDLIST_SERVICE, COMM_SELECT_READ, read_dns, NULL, 0);
+	comm_setselect(dns_ifd, COMM_SELECT_READ, read_dns, NULL, 0);
 }
 
 static void
@@ -313,7 +313,7 @@ dns_write_sendq(int fd, void *unused)
 	 
 	if(linebuf_len(&dns_sendq) > 0)
 	{
-		comm_setselect(dns_ofd, FDLIST_SERVICE, COMM_SELECT_WRITE,
+		comm_setselect(dns_ofd, COMM_SELECT_WRITE,
 			       dns_write_sendq, NULL, 0);
 	}
 }

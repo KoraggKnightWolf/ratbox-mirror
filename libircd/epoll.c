@@ -78,7 +78,7 @@ init_netio(void)
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
+comm_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	struct epoll_event ep_event;
@@ -90,7 +90,6 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 	s_assert(F->flags.open);
 	
 	/* Update the list, even though we're not using it .. */
-	F->list = list;
 	if(type & COMM_SELECT_READ)
 	{
 		if(handler != NULL)

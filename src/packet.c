@@ -309,7 +309,7 @@ read_ctrl_packet(int fd, void *data)
 
       nodata:
 	/* If we get here, we need to register for another COMM_SELECT_READ */
-	comm_setselect(fd, FDLIST_SERVER, COMM_SELECT_READ, read_ctrl_packet, server, 0);
+	comm_setselect(fd, COMM_SELECT_READ, read_ctrl_packet, server, 0);
 }
 
 /*
@@ -345,7 +345,7 @@ read_packet(int fd, void *data)
 		{
 			if(ignoreErrno(errno))
 			{
-				comm_setselect(client_p->localClient->fd, FDLIST_IDLECLIENT, 
+				comm_setselect(client_p->localClient->fd, 
 						COMM_SELECT_READ, read_packet, client_p, 0);
 			} else
 				error_exit_client(client_p, length);
@@ -405,7 +405,7 @@ read_packet(int fd, void *data)
 
 		if(length < READBUF_SIZE) 
 		{
-			comm_setselect(client_p->localClient->fd, FDLIST_IDLECLIENT,
+			comm_setselect(client_p->localClient->fd,
 					COMM_SELECT_READ, read_packet, client_p, 0);
 			return;
 		}

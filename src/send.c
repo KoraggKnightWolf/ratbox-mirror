@@ -224,7 +224,7 @@ send_queued_write(int fd, void *data)
 	}
 
 	if(linebuf_len(&to->localClient->buf_sendq))
-	comm_setselect(fd, FDLIST_IDLECLIENT, COMM_SELECT_WRITE,
+	comm_setselect(fd, COMM_SELECT_WRITE,
 			       send_queued_write, to, 0);
 }
 
@@ -287,7 +287,7 @@ send_queued_slink_write(int fd, void *data)
 
 	/* if we have any more data, reschedule a write */
 	if(to->localClient->slinkq_len)
-		comm_setselect(to->localClient->ctrlfd, FDLIST_IDLECLIENT,
+		comm_setselect(to->localClient->ctrlfd,
 			       COMM_SELECT_WRITE, send_queued_slink_write, to, 0);
 }
 

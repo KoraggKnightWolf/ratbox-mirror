@@ -93,7 +93,6 @@ poll_update_pollfds(int fd, short event, PF * handler)
 	/* Update the events */
 	if(handler)
 	{
-		F->list = FDLIST_IDLECLIENT;
 		pollfd_list.pollfds[comm_index].events |= event;
 		pollfd_list.pollfds[comm_index].fd = fd;
 		/* update maxindex here */
@@ -110,7 +109,6 @@ poll_update_pollfds(int fd, short event, PF * handler)
 				pollfd_list.pollfds[comm_index].fd = -1;
 				pollfd_list.pollfds[comm_index].revents = 0;
 				F->comm_index = -1;
-				F->list = FDLIST_NONE;
 
 				/* update pollfd_list.maxindex here */
 				if(comm_index == pollfd_list.maxindex)
@@ -152,7 +150,7 @@ init_netio(void)
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
+comm_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = &fd_table[fd];

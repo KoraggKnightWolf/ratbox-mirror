@@ -120,17 +120,6 @@ enum
 	COMM_ERR_MAX
 };
 
-typedef enum fdlist_t
-{
-	FDLIST_NONE,
-	FDLIST_SERVICE,
-	FDLIST_SERVER,
-	FDLIST_IDLECLIENT,
-	FDLIST_BUSYCLIENT,
-	FDLIST_MAX
-}
-fdlist_t;
-
 typedef struct _fde fde_t;
 
 
@@ -148,7 +137,6 @@ struct _fde
 	 */
 	int fd;			/* So we can use the fde_t as a callback ptr */
 	int type;
-	fdlist_t list;		/* Which list this FD should sit on */
 	int comm_index;		/* where in the poll list we live */
 	char desc[FD_DESC_SZ];
 	PF *read_handler;
@@ -256,7 +244,7 @@ extern int comm_can_writev(int fd);
 extern int comm_pipe(int *fd, const char *desc);
 
 /* These must be defined in the network IO loop code of your choice */
-extern void comm_setselect(int fd, fdlist_t list, unsigned int type,
+extern void comm_setselect(int fd, unsigned int type,
 			   PF * handler, void *client_data, time_t timeout);
 extern void init_netio(void);
 extern int read_message(time_t, unsigned char);

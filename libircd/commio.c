@@ -396,7 +396,7 @@ comm_connect_tryconnect(int fd, void *notused)
 			comm_connect_callback(F->fd, COMM_OK);
 		else if(ignoreErrno(errno))
 			/* Ignore error? Reschedule */
-			comm_setselect(F->fd, FDLIST_SERVER, COMM_SELECT_READ|COMM_SELECT_WRITE,
+			comm_setselect(F->fd, COMM_SELECT_READ|COMM_SELECT_WRITE,
 				       comm_connect_tryconnect, NULL, 0);
 		else
 			/* Error? Fail with COMM_ERR_CONNECT */
@@ -670,7 +670,6 @@ comm_open(int fd, unsigned int type, const char *desc)
 #endif
 	fdlist_update_biggest(fd, 1);
 	F->comm_index = -1;
-	F->list = FDLIST_NONE;
 	if(desc)
 		strlcpy(F->desc, desc, sizeof(F->desc));
 	number_fd++;
@@ -690,7 +689,7 @@ comm_close(int fd)
 		s_assert(F->read_handler == NULL);
 		s_assert(F->write_handler == NULL);
 	}
-	comm_setselect(F->fd, FDLIST_NONE, COMM_SELECT_WRITE | COMM_SELECT_READ, NULL, NULL, 0);
+	comm_setselect(F->fd, COMM_SELECT_WRITE | COMM_SELECT_READ, NULL, NULL, 0);
 	comm_setflush(F->fd, 0, NULL, NULL);
 	
 	F->flags.open = 0;
