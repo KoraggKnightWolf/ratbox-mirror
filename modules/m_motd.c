@@ -39,21 +39,15 @@
 
 static int m_motd(struct Client *, struct Client *, int, const char **);
 static int mo_motd(struct Client *, struct Client *, int, const char **);
-static int mo_omotd(struct Client *, struct Client *, int, const char **);
 
 struct Message motd_msgtab = {
 	"MOTD", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, {m_motd, 0}, {mo_motd, 0}, mg_ignore, mg_ignore, {mo_motd, 0}}
 };
 
-struct Message omotd_msgtab = {
-	"OMOTD", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_ignore, mg_ignore, mg_ignore, mg_ignore, {mo_omotd, 0}}
-};
-
 int doing_motd_hook;
 
-mapi_clist_av1 motd_clist[] = { &motd_msgtab, &omotd_msgtab, NULL };
+mapi_clist_av1 motd_clist[] = { &motd_msgtab, NULL };
 mapi_hlist_av1 motd_hlist[] = {
 	{ "doing_motd",	&doing_motd_hook },
 	{ NULL, NULL }
@@ -108,17 +102,6 @@ mo_motd(struct Client *client_p, struct Client *source_p, int parc, const char *
 	motd_spy(source_p);
 	send_user_motd(source_p);
 
-	return 0;
-}
-
-/*
-** mo_motd
-**      parv[0] = sender prefix
-*/
-static int
-mo_omotd(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
-{
-	send_oper_motd(source_p);
 	return 0;
 }
 
