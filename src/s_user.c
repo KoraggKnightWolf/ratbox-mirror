@@ -302,9 +302,9 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	{
 		if(!(source_p->flags & FLAGS_PINGSENT) && source_p->localClient->random_ping == 0)
 		{
-			source_p->localClient->random_ping = (unsigned long) (rand() * rand()) << 1;
+			source_p->localClient->random_ping = (u_int32_t) (rand() * rand()) << 1;
 			sendto_one(source_p, POP_QUEUE, "PING :%08lX",
-				   (unsigned long) source_p->localClient->random_ping);
+				   (unsigned long)source_p->localClient->random_ping);
 			source_p->flags |= FLAGS_PINGSENT;
 			return -1;
 		}

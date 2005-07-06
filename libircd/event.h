@@ -30,10 +30,11 @@
 #include "setup.h"
 #include "commio.h"
 
-#if (defined(_POSIX_TIMERS) && (_POSIX_TIMERS+0 >= 0)) || (defined(_XOPEN_REALTIME) && (_XOPEN_REALTIME+0 >= 0)) && \
-    (defined(HAVE_PORTS) || defined(HAVE_SIGIO)) && defined(HAVE_TIMER_CREATE) 
+
+#if defined(HAVE_SIGIO) || (HAVE_PORTS) && (HAVE_TIMER_CREATE)
 #define USE_POSIX_TIMERS 1
 #endif
+
 /*
  * How many event entries we need to allocate at a time in the block
  * allocator. 16 should be plenty at a time.
