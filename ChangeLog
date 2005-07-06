@@ -1,3 +1,12 @@
+androsyn    2005/07/06 16:15:59 UTC	(20050706_0-19429)
+  Log:
+  Fix the non- timer_create event stuff
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/event.c (File Modified) 
+
+
 androsyn    2005/07/05 17:11:16 UTC	(20050705_9-19427)
   Log:
   Remove the FDLIST stuff that nothing used at all..
