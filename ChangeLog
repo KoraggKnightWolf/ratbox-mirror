@@ -1,3 +1,14 @@
+androsyn    2005/07/06 16:43:57 UTC	(20050706_1-19431)
+  Log:
+  get the posix timers stuff fixed. Have ping cookies be stored in a u_int32_t
+
+  Modified:
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/libircd/event.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_pong.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2005/07/06 16:15:59 UTC	(20050706_0-19429)
   Log:
   Fix the non- timer_create event stuff
