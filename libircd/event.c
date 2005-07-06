@@ -59,7 +59,7 @@
 static const char *last_event_ran = NULL;
 struct ev_entry event_table[MAX_EVENTS];
 static time_t event_time_min = -1;
-
+ 
 #ifdef USE_POSIX_TIMERS
 static void 
 event_run_callback(void *data)
