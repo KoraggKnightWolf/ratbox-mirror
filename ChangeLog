@@ -1,3 +1,13 @@
+androsyn    2005/07/07 20:41:49 UTC	(20050707_0-20536)
+  Log:
+  Move trunk into rserv directory
+  
+
+  Modified:
+	rserv/trunk/ (File Added) 
+	trunk/ (File Deleted) 
+
+
 androsyn    2005/07/06 16:43:57 UTC	(20050706_1-19431)
   Log:
   get the posix timers stuff fixed. Have ping cookies be stored in a u_int32_t
