@@ -1,3 +1,12 @@
+androsyn    2005/07/07 20:48:50 UTC	(20050707_2-20542)
+  Log:
+  Oops..make ignoreErrno use the X defines
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+
+
 androsyn    2005/07/07 20:45:28 UTC	(20050707_1-20540)
   Log:
   test commit
