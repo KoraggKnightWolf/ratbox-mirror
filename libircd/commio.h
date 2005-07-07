@@ -68,12 +68,12 @@
 #endif
 
 #define ignoreErrno(x)	((	\
-x == EINPROGRESS	||	\
-x == EWOULDBLOCK	||	\
-x == EAGAIN		||	\
-x == EINTR       	||	\
-x == ERESTART    	||	\
-x == ENOBUFS) ? 1 : 0)
+x == XEINPROGRESS	||	\
+x == XEWOULDBLOCK	||	\
+x == XEAGAIN		||	\
+x == XEINTR       	||	\
+x == XERESTART    	||	\
+x == XENOBUFS) ? 1 : 0)
 
 
 
