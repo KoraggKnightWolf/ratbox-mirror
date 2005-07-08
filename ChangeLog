@@ -1,3 +1,11 @@
+androsyn    2005/07/08 00:34:11 UTC	(20050708_0-20551)
+  Log:
+  boy did i mess up those urls
+
+  Modified:
+	ircd-ratbox/trunk/SVN-Access (File Modified) 
+
+
 androsyn    2005/07/07 20:48:50 UTC	(20050707_4-20542)
   Log:
   Oops..make ignoreErrno use the X defines
