@@ -1,3 +1,18 @@
+androsyn    2005/07/10 02:00:55 UTC	(20050710_0-20559)
+  Log:
+  The ircd manpage hasn't been updated in ages and its not installed
+  anywhere that man would pick it up anyways.  Also, I don't think
+  anyone is using viconf anymore.  So out it goes as well.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/doc/ircd.8 (File Deleted) 
+	ircd-ratbox/trunk/tools/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/viconf.c (File Deleted) 
+
+
 androsyn    2005/07/08 00:34:11 UTC	(20050708_0-20551)
   Log:
   boy did i mess up those urls
