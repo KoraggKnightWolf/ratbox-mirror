@@ -16,7 +16,7 @@
 
 # $Id$ 
 
-SOURCES = $(convertilines_SOURCES) $(convertklines_SOURCES) $(mkpasswd_SOURCES) $(viconf_SOURCES)
+SOURCES = $(convertilines_SOURCES) $(convertklines_SOURCES) $(mkpasswd_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -39,8 +39,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-bin_PROGRAMS = viconf$(EXEEXT) mkpasswd$(EXEEXT) \
-	convertilines$(EXEEXT) convertklines$(EXEEXT)
+bin_PROGRAMS = mkpasswd$(EXEEXT) convertilines$(EXEEXT) \
+	convertklines$(EXEEXT)
 subdir = tools
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -63,15 +63,12 @@ convertklines_LDADD = $(LDADD)
 am_mkpasswd_OBJECTS = mkpasswd.$(OBJEXT)
 mkpasswd_OBJECTS = $(am_mkpasswd_OBJECTS)
 mkpasswd_DEPENDENCIES =
-am_viconf_OBJECTS = viconf.$(OBJEXT)
-viconf_OBJECTS = $(am_viconf_OBJECTS)
-viconf_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/convertilines.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/convertklines.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/mkpasswd.Po ./$(DEPDIR)/viconf.Po
+@AMDEP_TRUE@	./$(DEPDIR)/mkpasswd.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -81,9 +78,9 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(convertilines_SOURCES) $(convertklines_SOURCES) \
-	$(mkpasswd_SOURCES) $(viconf_SOURCES)
+	$(mkpasswd_SOURCES)
 DIST_SOURCES = $(convertilines_SOURCES) $(convertklines_SOURCES) \
-	$(mkpasswd_SOURCES) $(viconf_SOURCES)
+	$(mkpasswd_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -225,7 +222,6 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 mkpasswd_SOURCES = mkpasswd.c
-viconf_SOURCES = viconf.c
 convertilines_SOURCES = convertilines.c
 convertklines_SOURCES = convertklines.c
 mkpasswd_LDADD = @CRYPT_LIB@
@@ -299,9 +295,6 @@ convertklines$(EXEEXT): $(convertklines_OBJECTS) $(convertklines_DEPENDENCIES)
 mkpasswd$(EXEEXT): $(mkpasswd_OBJECTS) $(mkpasswd_DEPENDENCIES) 
 	@rm -f mkpasswd$(EXEEXT)
 	$(LINK) $(mkpasswd_LDFLAGS) $(mkpasswd_OBJECTS) $(mkpasswd_LDADD) $(LIBS)
-viconf$(EXEEXT): $(viconf_OBJECTS) $(viconf_DEPENDENCIES) 
-	@rm -f viconf$(EXEEXT)
-	$(LINK) $(viconf_LDFLAGS) $(viconf_OBJECTS) $(viconf_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -312,7 +305,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convertilines.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convertklines.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mkpasswd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/viconf.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

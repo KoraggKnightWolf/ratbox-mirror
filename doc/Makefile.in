@@ -26,10 +26,6 @@ localstatedir	= @localstatedir@
 moduledir	= @moduledir@
 automoduledir	= @moduledir@/autoload
 
-# Local to the etc Makefile
-mandir          = @mandir@/man8
-MANPAGES        = ircd.8
-
 CONFS		= example.conf example.efnet.conf
 DEFAULTCONFS	= kline.conf dline.conf xline.conf resv.conf
 
@@ -45,11 +41,6 @@ install-mkdirs:
 	-@if test ! -d $(DESTDIR)$(confdir); then \
 		echo "mkdir -p $(confdir)"; \
 		mkdir $(DESTDIR)$(confdir); \
-	fi
-
-	-@if test ! -d $(DESTDIR)$(mandir); then \
-		echo "mkdir -p $(mandir)"; \
-		mkdir $(DESTDIR)$(mandir); \
 	fi
 
 install: install-mkdirs build
@@ -76,13 +67,6 @@ install: install-mkdirs build
 	-@if test -f $(DESTDIR)$(confdir)/links.txt; then \
 		$(RM) $(DESTDIR)$(confdir)/links.txt; \
 	fi
-
-	@echo "ircd: installing manpage"
-	@for i in $(MANPAGES); do \
-		if test ! -f $(DESTDIR)$(mandir)/$$i; then \
-			$(INSTALL_DATA) $$i $(DESTDIR)$(mandir); \
-		fi; \
-	done
 
 all:
 build:

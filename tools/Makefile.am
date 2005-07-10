@@ -1,11 +1,9 @@
 # $Id$ 
 
-bin_PROGRAMS = viconf mkpasswd convertilines convertklines 
+bin_PROGRAMS = mkpasswd convertilines convertklines 
 
 
 mkpasswd_SOURCES = mkpasswd.c
-
-viconf_SOURCES = viconf.c
 
 convertilines_SOURCES = convertilines.c
 
