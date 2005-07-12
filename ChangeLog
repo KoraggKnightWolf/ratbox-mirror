@@ -1,3 +1,11 @@
+androsyn    2005/07/12 16:52:35 UTC	(20050712_1-20565)
+  Log:
+   replace a pair of strlcats with ircsnprintf_append
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_rehash.c (File Modified) 
+
+
 androsyn    2005/07/12 16:43:03 UTC	(20050712_0-20563)
   Log:
   Somehow the ircsprintf_append functions got lost...
