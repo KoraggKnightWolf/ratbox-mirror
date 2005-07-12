@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <ctype.h>
 #include "setup.h"
@@ -979,3 +980,60 @@ ircsprintf(char *dest, const char *format, ...)
 
 	return (count);
 }				/* Sprintf() */
+
+/*
+ * ircvsnprintf_append()
+ * appends sprintf formatted string to the end of the buffer but not
+ * exceeding len
+ */
+
+inline int
+ircvsnprintf_append(char *str, size_t len, const char *format, va_list ap)
+{
+        size_t x = strlen(str);
+        return(ircvsnprintf(str+x, len - x, format, ap) + x);
+}
+
+/*
+ * ircvsprintf_append()
+ * appends sprintf formatted string to the end of the buffer
+ */
+ 
+inline int
+ircvsprintf_append(char *str, const char *format, va_list ap)
+{
+        size_t x = strlen(str);
+        return(ircvsprintf(str+x, format, ap) + x);
+}
+
+/*
+ * ircsprintf_append()
+ * appends sprintf formatted string to the end of the buffer
+ */
+int
+ircsprintf_append(char *str, const char *format, ...)
+{
+        int x;
+        va_list ap;
+        va_start(ap, format);
+        x = ircvsprintf_append(str, format, ap);
+        va_end(ap);
+        return(x);
+}
+
+/*
+ * ircsnprintf_append()
+ * appends snprintf formatted string to the end of the buffer but not
+ * exceeding len
+ */
+
+int
+ircsnprintf_append(char *str, size_t len, const char *format, ...)
+{
+        int x;
+        va_list ap;
+        va_start(ap, format);
+        x = ircvsnprintf_append(str, len, format, ap);
+        va_end(ap);
+        return(x); 
+}

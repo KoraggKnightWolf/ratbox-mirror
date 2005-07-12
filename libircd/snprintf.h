@@ -38,12 +38,19 @@
 #ifdef __GNUC__
 int ircsprintf(char *str, const char *fmt, ...) __attribute((format(printf, 2, 3)));
 int ircsnprintf(char *str, const size_t size, const char *, ...) __attribute__ ((format(printf, 3, 4)));
+int ircsprintf_append(char *str, const char *format, ...) __attribute((format(printf, 2, 3)));
+int ircsnprintf_append(char *str, size_t len, const char *format, ...) __attribute__ ((format(printf, 3, 4)));
 #else
 int ircsprintf(char *str, const char *format, ...);
 int ircsnprintf(char *str, const size_t size, const char *, ...);
+int ircsprintf_append(char *str, const char *format, ...);
+int ircsnprintf_append(char *str, const size_t size, const char *, ...);
+
 #endif
 
 int ircvsnprintf(char *str, const size_t size, const char *fmt, va_list args);
 int ircvsprintf(char *str, const char *fmt, va_list args);
+int ircvsnprintf_append(char *str, const size_t size, const char *fmt, va_list args);
+int ircvsprintf_append(char *str, const char *fmt, va_list args);
 
 #endif /* SPRINTF_IRC */
