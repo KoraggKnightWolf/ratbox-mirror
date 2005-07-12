@@ -1,3 +1,13 @@
+androsyn    2005/07/12 16:43:03 UTC	(20050712_0-20563)
+  Log:
+  Somehow the ircsprintf_append functions got lost...
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/snprintf.c (File Modified) 
+	ircd-ratbox/trunk/libircd/snprintf.h (File Modified) 
+
+
 androsyn    2005/07/10 02:00:55 UTC	(20050710_0-20559)
   Log:
   The ircd manpage hasn't been updated in ages and its not installed
