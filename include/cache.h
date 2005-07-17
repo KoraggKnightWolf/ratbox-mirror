@@ -30,7 +30,6 @@ struct cacheline
 extern struct cachefile *user_motd;
 extern struct cachefile *oper_motd;
 extern struct cacheline *emptyline;
-extern dlink_list links_cache_list;
 
 extern char user_motd_changed[MAX_DATE_STRING];
 
