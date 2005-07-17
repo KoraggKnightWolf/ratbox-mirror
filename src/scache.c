@@ -43,7 +43,15 @@
  * -orabidoo
  */
 
-
+/* 
+ * Yes, this does leak a slight bit a memory, but how many server names
+ * is the ircd going to see in its lifetime.  Consider that 256*HOSTLEN
+ * is a rather small amount of memory vs having to have a copy of this
+ * in whowas, struct Client, etc, etc.  Think really hard about what 
+ * this code does, before you think you can go and remove it. It makes 
+ * more sense than you probably realize, really.
+ * -AndroSyn
+ */
 #define SCACHE_HASH_SIZE 257
 
 typedef struct scache_entry
