@@ -1,3 +1,28 @@
+androsyn    2005/07/17 17:44:50 UTC	(20050717_3-20579)
+  Log:
+  Have D/E lines use a patricia tree.  This will
+  need to get merged into the reject cache a bit i think.
+  Also cleanup defines for loop types.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/hostmask.h (File Modified) 
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2005/07/17 15:13:50 UTC	(20050717_2-20571)
   Log:
   remove declaration of links_cache_list from cache.h
