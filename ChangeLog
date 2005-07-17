@@ -1,3 +1,11 @@
+androsyn    2005/07/17 14:12:40 UTC	(20050717_1-20569)
+  Log:
+  put a nice little warning about why scache.c makes sense
+
+  Modified:
+	ircd-ratbox/trunk/src/scache.c (File Modified) 
+
+
 androsyn    2005/07/17 14:07:38 UTC	(20050717_0-20567)
   Log:
   update package name and gpl version number to 2
