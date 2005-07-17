@@ -36,9 +36,13 @@
 #include "ircd.h"
 #include "commio.h"
 #include "send.h"
+#include "numeric.h"
 #include "parse.h"
+#include "hostmask.h"
 
 static patricia_tree_t *reject_tree;
+static patricia_tree_t *dline_tree;
+static patricia_tree_t *eline_tree;
 dlink_list delay_exit;
 static dlink_list reject_list;
 
@@ -48,6 +52,48 @@ struct reject_data
 	time_t time;
 	unsigned int count;
 };
+
+
+
+static patricia_node_t *
+add_line(struct ConfItem *aconf, patricia_tree_t *tree, struct sockaddr *addr, int cidr)
+{
+	patricia_node_t *pnode;
+	pnode = make_and_lookup_ip(tree, addr, cidr);
+	if(pnode == NULL)
+		return NULL;
+	aconf->pnode = pnode;
+	pnode->data = aconf;
+	return (pnode);
+}
+
+int 
+add_dline(struct ConfItem *aconf)
+{
+	struct irc_sockaddr_storage st;
+	int bitlen;
+	if(parse_netmask(aconf->host, (struct sockaddr *)&st, &bitlen) == HM_HOST)
+		return 0;
+
+	if(add_line(aconf, dline_tree, (struct sockaddr *)&st, bitlen) != NULL)
+		return 1;
+	return 0;
+}
+
+int
+add_eline(struct ConfItem *aconf)
+{
+	struct irc_sockaddr_storage st;
+	int bitlen;
+	if(parse_netmask(aconf->host, (struct sockaddr *)&st, &bitlen) == HM_HOST)
+		return 0;
+
+	if(add_line(aconf, eline_tree, (struct sockaddr *)&st, bitlen) != NULL)
+		return 1;
+	return 0;
+}
+
+
 
 static void
 reject_exit(void *unused)
@@ -102,6 +148,8 @@ void
 init_reject(void)
 {
 	reject_tree = New_Patricia(PATRICIA_BITS);
+	dline_tree = New_Patricia(PATRICIA_BITS);
+	eline_tree = New_Patricia(PATRICIA_BITS);
 	eventAdd("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
 	eventAdd("reject_expires", reject_expires, NULL, 60);
 }
@@ -205,5 +253,123 @@ remove_reject(const char *ip)
 		return 1;
 	}
 	return 0;
+}
+
+
+int
+add_ipline(struct ConfItem *aconf, patricia_tree_t *t, struct sockaddr *addr, int cidr)
+{
+	patricia_node_t *pnode;
+
+	pnode = add_line(aconf, t, addr, cidr);
+	if(pnode == NULL)
+		return 0;
+
+	return 1;
+}
+
+void
+delete_ipline(struct ConfItem *aconf, patricia_tree_t *t)
+{
+	patricia_remove(t, aconf->pnode);
+	if(!aconf->clients)
+	{
+		free_conf(aconf);
+	}
+}
+
+
+static struct ConfItem *
+find_ipline(patricia_tree_t *t, struct sockaddr *addr)
+{
+	patricia_node_t *pnode;
+	pnode = match_ip(t, addr);
+	if(pnode != NULL)
+		return (struct ConfItem *) pnode->data;
+	return NULL;
+}
+
+struct ConfItem *
+find_generic_line(patricia_tree_t *t, struct sockaddr *addr)
+{
+	struct ConfItem *aconf;
+	aconf = find_ipline(t, addr);
+	return (aconf);
+}
+
+
+struct ConfItem *
+find_dline(struct sockaddr *addr)
+{
+	struct ConfItem *aconf;
+	aconf = find_ipline(eline_tree, addr);
+	if(aconf != NULL)
+	{
+		return aconf;
+	}
+	return (find_ipline(dline_tree, addr));
+}
+
+void
+report_dlines(struct Client *source_p)
+{
+	patricia_node_t *pnode;
+	struct ConfItem *aconf;
+	char *host, *pass, *user, *oper_reason;
+	PATRICIA_WALK(dline_tree->head, pnode)
+	{
+		aconf = pnode->data;
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
+			PATRICIA_WALK_BREAK;
+		get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
+		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDLINE,
+                            		     form_str (RPL_STATSDLINE),
+                                             'D', host, pass,
+                                             oper_reason ? "|" : "",
+                                             oper_reason ? oper_reason : "");
+
+	}
+	PATRICIA_WALK_END;
+	send_pop_queue(source_p);
+}
+
+void
+report_tdlines(struct Client *source_p)
+{
+	patricia_node_t *pnode;
+	struct ConfItem *aconf;
+	char *host, *pass, *user, *oper_reason;
+	PATRICIA_WALK(dline_tree->head, pnode)
+	{
+		aconf = pnode->data;
+		if(!(aconf->flags & CONF_FLAGS_TEMPORARY))
+			PATRICIA_WALK_BREAK;
+		get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
+		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDLINE,
+                            		     form_str (RPL_STATSDLINE),
+                                             'd', host, pass,
+                                             oper_reason ? "|" : "",
+                                             oper_reason ? oper_reason : "");
+	}
+	PATRICIA_WALK_END;
+	send_pop_queue(source_p);
+}
+
+void
+report_elines(struct Client *source_p)
+{
+	patricia_node_t *pnode;
+	struct ConfItem *aconf;
+	int port;
+	char *name, *host, *pass, *user, *classname;
+	PATRICIA_WALK(eline_tree->head, pnode)
+	{
+		aconf = pnode->data;
+		get_printable_conf(aconf, &name, &host, &pass, &user, &port, &classname);
+		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_STATSDLINE), me.name, source_p->name, 'e', host,
+			   pass);
+	}
+	PATRICIA_WALK_END;
+	send_pop_queue(source_p);
 }
 

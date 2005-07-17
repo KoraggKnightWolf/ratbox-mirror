@@ -341,32 +341,7 @@ stats_connect(struct Client *source_p)
 static void
 stats_tdeny (struct Client *source_p)
 {
-	char *host, *pass, *user, *oper_reason;
-	struct AddressRec *arec;
-	struct ConfItem *aconf;
-	int i;
-
-	for (i = 0; i < ATABLE_SIZE; i++)
-	{
-		for (arec = atable[i]; arec; arec = arec->next)
-		{
-			if(arec->type == CONF_DLINE)
-			{
-				aconf = arec->aconf;
-
-				if(!(aconf->flags & CONF_FLAGS_TEMPORARY))
-					continue;
-
-				get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
-
-				sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDLINE, 
-						   form_str (RPL_STATSDLINE),
-						   'd', host, pass,
-						   oper_reason ? "|" : "",
-						   oper_reason ? oper_reason : "");
-			}
-		}
-	}
+	report_tdlines(source_p);
 }
 
 /* stats_deny()
@@ -378,32 +353,7 @@ stats_tdeny (struct Client *source_p)
 static void
 stats_deny (struct Client *source_p)
 {
-	char *host, *pass, *user, *oper_reason;
-	struct AddressRec *arec;
-	struct ConfItem *aconf;
-	int i;
-
-	for (i = 0; i < ATABLE_SIZE; i++)
-	{
-		for (arec = atable[i]; arec; arec = arec->next)
-		{
-			if(arec->type == CONF_DLINE)
-			{
-				aconf = arec->aconf;
-
-				if(aconf->flags & CONF_FLAGS_TEMPORARY)
-					continue;
-
-				get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
-
-				sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDLINE, 
-						   form_str (RPL_STATSDLINE),
-						   'D', host, pass,
-						   oper_reason ? "|" : "",
-						   oper_reason ? oper_reason : "");
-			}
-		}
-	}
+	report_dlines(source_p);
 }
 
 
@@ -416,11 +366,6 @@ stats_deny (struct Client *source_p)
 static void
 stats_exempt(struct Client *source_p)
 {
-	char *name, *host, *pass, *user, *classname;
-	struct AddressRec *arec;
-	struct ConfItem *aconf;
-	int i, port;
-
 	if(ConfigFileEntry.stats_e_disabled)
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOPRIVILEGES,
@@ -428,22 +373,7 @@ stats_exempt(struct Client *source_p)
 		return;
 	}
 
-	for (i = 0; i < ATABLE_SIZE; i++)
-	{
-		for (arec = atable[i]; arec; arec = arec->next)
-		{
-			if(arec->type == CONF_EXEMPTDLINE)
-			{
-				aconf = arec->aconf;
-				get_printable_conf (aconf, &name, &host, &pass,
-						    &user, &port, &classname);
-
-				sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDLINE, 
-						   form_str(RPL_STATSDLINE),
-						   'e', host, pass, "", "");
-			}
-		}
-	}
+	report_elines(source_p);
 }
 
 static void

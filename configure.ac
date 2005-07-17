@@ -730,6 +730,30 @@ fi
 
 echo "Using $SELECT_TYPE for select loop."
 
+case  $SELECT_TYPE in
+	epoll)
+		AC_DEFINE([USE_EPOLL], 1, [Define to use epoll])
+		;;
+	kqueue) 
+		AC_DEFINE([USE_KQUEUE], 1, [Define to use kqueue])
+		;;
+	ports)
+		AC_DEFINE([USE_PORTS], 1, [Define to use ports])
+		;;
+	poll)
+		AC_DEFINE([USE_POLL], 1, [Define to use poll])
+		;;
+	sigio)
+		AC_DEFINE([USE_SIGIO],1 , [Define to use sigio])
+		;;
+	select)
+		AC_DEFINE([USE_SELECT], 1, [Define to use select])
+		;;
+	*)
+		AC_DEFINE([USE_SELECT], 1, [Define to use select])
+		;;
+esac
+	
 AC_DEFINE_UNQUOTED(SELECT_TYPE, "$SELECT_TYPE", [This is the type of IO loop we are using])
 AC_SUBST(SELECT_TYPE)
 

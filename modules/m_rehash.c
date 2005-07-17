@@ -29,7 +29,7 @@
 #include "struct.h"
 #include "client.h"
 #include "irc_string.h"
-#include "ircd_memory.h"
+#include "ircd_lib.h"
 #include "ircd.h"
 #include "s_gline.h"
 #include "numeric.h"

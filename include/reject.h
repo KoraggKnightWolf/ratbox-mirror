@@ -36,5 +36,12 @@ int check_reject(struct Client *);
 void add_reject(struct Client *);
 void flush_reject(void);
 int remove_reject(const char *ip);
+struct ConfItem *find_dline(struct sockaddr *addr);
+int add_dline(struct ConfItem *aconf);
+int add_eline(struct ConfItem *aconf);
+void report_dlines(struct Client *);
+void report_tdlines(struct Client *);
+void report_elines(struct Client *);
+
 #endif
 

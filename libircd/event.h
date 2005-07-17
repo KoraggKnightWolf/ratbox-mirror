@@ -31,7 +31,7 @@
 #include "commio.h"
 
 
-#if defined(HAVE_SIGIO) || (HAVE_PORTS) && (HAVE_TIMER_CREATE)
+#if defined(USE_SIGIO) || (USE_PORTS) && (HAVE_TIMER_CREATE)
 #define USE_POSIX_TIMERS 1
 #endif
 

@@ -156,7 +156,7 @@
 /* Define to 1 if you have the <sys/wait.h> header file. */
 #undef HAVE_SYS_WAIT_H
 
-/* Use Posix timers */
+/* Have timer_create */
 #undef HAVE_TIMER_CREATE
 
 /* Define to 1 if the system has the type `uintptr_t'. */
@@ -275,8 +275,26 @@
 /* Size of the user heap. */
 #undef USER_HEAP_SIZE
 
+/* Define to use epoll */
+#undef USE_EPOLL
+
 /* Define this to enable IO Debug hooks. */
 #undef USE_IODEBUG_HOOKS
+
+/* Define to use kqueue */
+#undef USE_KQUEUE
+
+/* Define to use poll */
+#undef USE_POLL
+
+/* Define to use ports */
+#undef USE_PORTS
+
+/* Define to use select */
+#undef USE_SELECT
+
+/* Define to use sigio */
+#undef USE_SIGIO
 
 /* Version number of package */
 #undef VERSION

@@ -912,7 +912,7 @@ validate_conf(void)
 struct ConfItem *
 conf_connect_allowed(struct sockaddr *addr, int aftype)
 {
-	struct ConfItem *aconf = find_dline(addr, aftype);
+	struct ConfItem *aconf = find_dline(addr);
 
 	/* DLINE exempt also gets you out of static limits/pacing... */
 	if(aconf && (aconf->status & CONF_EXEMPTDLINE))
@@ -990,7 +990,7 @@ add_temp_dline(struct ConfItem *aconf)
 	}
 
 	aconf->flags |= CONF_FLAGS_TEMPORARY;
-	add_conf_by_address(aconf->host, CONF_DLINE, aconf->user, aconf);
+	add_dline(aconf);
 }
 
 /* expire_tkline()
@@ -1472,14 +1472,10 @@ conf_add_d_conf(struct ConfItem *aconf)
 	 *       need this anyway, so I will disable it for now... -A1kmm
 	 */
 
-	if(parse_netmask(aconf->host, NULL, NULL) == HM_HOST)
+	if(!add_dline(aconf))
 	{
 		ilog(L_MAIN, "Invalid Dline %s ignored", aconf->host);
 		free_conf(aconf);
-	}
-	else
-	{
-		add_conf_by_address(aconf->host, CONF_DLINE, NULL, aconf);
 	}
 }
 

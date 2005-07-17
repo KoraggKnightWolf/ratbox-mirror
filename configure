@@ -24231,6 +24231,7 @@ _ACEOF
 
 fi
 
+
 echo "$as_me:$LINENO: checking for timer_create" >&5
 echo $ECHO_N "checking for timer_create... $ECHO_C" >&6
 if test "${ac_cv_func_timer_create+set}" = set; then
@@ -26343,6 +26344,58 @@ echo "$as_me: error: Unable to find a usable IO interface" >&2;}
 fi
 
 echo "Using $SELECT_TYPE for select loop."
+
+case  $SELECT_TYPE in
+	epoll)
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_EPOLL 1
+_ACEOF
+
+		;;
+	kqueue)
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_KQUEUE 1
+_ACEOF
+
+		;;
+	ports)
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_PORTS 1
+_ACEOF
+
+		;;
+	poll)
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_POLL 1
+_ACEOF
+
+		;;
+	sigio)
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_SIGIO 1
+_ACEOF
+
+		;;
+	select)
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_SELECT 1
+_ACEOF
+
+		;;
+	*)
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_SELECT 1
+_ACEOF
+
+		;;
+esac
 
 
 cat >>confdefs.h <<_ACEOF

@@ -31,6 +31,7 @@
 #include "irc_string.h"
 #include "ircd_memory.h"
 #include "snprintf.h"
+#include "reject.h"
 #include "ircd.h"
 #include "hostmask.h"
 #include "numeric.h"
@@ -159,7 +160,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 #endif
 			t = AF_INET;
 						
-		if((aconf = find_dline((struct sockaddr *)&daddr, t)) != NULL)
+		if((aconf = find_dline((struct sockaddr *)&daddr)) != NULL)
 		{
 			int bx;
 			parse_netmask(aconf->host, NULL, &bx);
@@ -233,7 +234,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	{
 		ircsnprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
 		DupString(aconf->passwd, dlbuffer);
-		add_conf_by_address(aconf->host, CONF_DLINE, NULL, aconf);
+		add_dline(aconf);
 		write_confitem(DLINE_TYPE, source_p, NULL, aconf->host, reason,
 			       oper_reason, current_date, 0);
 	}
@@ -484,7 +485,7 @@ check_dlines(void)
 		if(IsMe(client_p))
 			continue;
 
-		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip,client_p->localClient->ip.ss_family)) != NULL)
+		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)) != NULL)
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;
@@ -503,7 +504,7 @@ check_dlines(void)
 	{
 		client_p = ptr->data;
 
-		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip,client_p->localClient->ip.ss_family)) != NULL)
+		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)) != NULL)
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;

@@ -1281,7 +1281,7 @@ conf_set_exempt_ip(void *data)
 	DupString(yy_tmp->passwd, "*");
 	DupString(yy_tmp->host, data);
 	yy_tmp->status = CONF_EXEMPTDLINE;
-	add_conf_by_address(yy_tmp->host, CONF_EXEMPTDLINE, NULL, yy_tmp);
+	add_eline(yy_tmp);
 }
 
 static int

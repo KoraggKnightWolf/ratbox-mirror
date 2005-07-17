@@ -171,7 +171,7 @@ comm_set_buffers(int fd, int size)
 int
 comm_set_nb(int fd)
 {
-#ifdef HAVE_SIGIO
+#ifdef USE_SIGIO
 	return(setup_sigio_fd(fd));
 #else
 	int nonb = 0;

@@ -51,6 +51,7 @@
 #include "hostmask.h"
 #include "balloc.h"
 #include "listener.h"
+#include "reject.h"
 #include "hook.h"
 #include "monitor.h"
 #include "linebuf.h"
@@ -440,7 +441,7 @@ check_banned_lines(void)
 			continue;
 
 		/* if there is a returned struct ConfItem then kill it */
-		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip, client_p->localClient->ip.ss_family)))
+		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)))
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;
@@ -524,7 +525,7 @@ check_banned_lines(void)
 	{
 		client_p = ptr->data;
 
-		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip,client_p->localClient->ip.ss_family)))
+		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)))
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;
