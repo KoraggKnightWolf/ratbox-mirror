@@ -1,3 +1,13 @@
+androsyn    2005/07/17 14:07:38 UTC	(20050717_0-20567)
+  Log:
+  update package name and gpl version number to 2
+  for version.c.SH
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/version.c.SH (File Modified) 
+
+
 androsyn    2005/07/12 16:52:35 UTC	(20050712_1-20565)
   Log:
    replace a pair of strlcats with ircsnprintf_append
