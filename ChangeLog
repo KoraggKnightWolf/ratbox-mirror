@@ -1,3 +1,24 @@
+androsyn    2005/07/17 20:29:50 UTC	(20050717_5-20589)
+  Log:
+  Don't need .cvsignore files anymore
+  
+
+  Modified:
+	ircd-ratbox/trunk/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/adns/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/contrib/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/doc/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/help/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/include/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/libltdl/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/modules/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/modules/core/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/servlink/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/src/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/tools/.cvsignore (File Deleted) 
+	ircd-ratbox/trunk/tools/rsa_respond/.cvsignore (File Deleted) 
+
+
 androsyn    2005/07/17 19:16:45 UTC	(20050717_4-20585)
   Log:
   Fix a few compile warnings
