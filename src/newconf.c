@@ -30,6 +30,7 @@
 #include "ircd.h"
 #include "irc_string.h"
 #include "class.h"
+#include "reject.h"
 
 #define CF_TYPE(x) ((x) & CF_MTYPE)
 

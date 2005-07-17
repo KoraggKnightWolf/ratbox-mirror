@@ -256,7 +256,7 @@ remove_reject(const char *ip)
 }
 
 
-int
+static int
 add_ipline(struct ConfItem *aconf, patricia_tree_t *t, struct sockaddr *addr, int cidr)
 {
 	patricia_node_t *pnode;
@@ -268,7 +268,7 @@ add_ipline(struct ConfItem *aconf, patricia_tree_t *t, struct sockaddr *addr, in
 	return 1;
 }
 
-void
+static void
 delete_ipline(struct ConfItem *aconf, patricia_tree_t *t)
 {
 	patricia_remove(t, aconf->pnode);
@@ -288,15 +288,6 @@ find_ipline(patricia_tree_t *t, struct sockaddr *addr)
 		return (struct ConfItem *) pnode->data;
 	return NULL;
 }
-
-struct ConfItem *
-find_generic_line(patricia_tree_t *t, struct sockaddr *addr)
-{
-	struct ConfItem *aconf;
-	aconf = find_ipline(t, addr);
-	return (aconf);
-}
-
 
 struct ConfItem *
 find_dline(struct sockaddr *addr)
