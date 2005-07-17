@@ -1,3 +1,13 @@
+androsyn    2005/07/17 19:16:45 UTC	(20050717_4-20585)
+  Log:
+  Fix a few compile warnings
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2005/07/17 17:44:50 UTC	(20050717_3-20579)
   Log:
   Have D/E lines use a patricia tree.  This will
