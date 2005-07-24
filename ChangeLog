@@ -1,3 +1,11 @@
+androsyn    2005/07/24 02:57:33 UTC	(20050724_0-20593)
+  Log:
+  missed removing the list type from select.c
+
+  Modified:
+	ircd-ratbox/trunk/libircd/select.c (File Modified) 
+
+
 androsyn    2005/07/17 20:29:50 UTC	(20050717_5-20589)
   Log:
   Don't need .cvsignore files anymore
