@@ -43,20 +43,18 @@
 #include "event.h"
 
 static int mo_kline(struct Client *, struct Client *, int, const char **);
-static int ms_kline(struct Client *, struct Client *, int, const char **);
 static int me_kline(struct Client *, struct Client *, int, const char **);
 static int mo_unkline(struct Client *, struct Client *, int, const char **);
-static int ms_unkline(struct Client *, struct Client *, int, const char **);
 static int me_unkline(struct Client *, struct Client *, int, const char **);
 
 struct Message kline_msgtab = {
 	"KLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, {ms_kline, 5}, {ms_kline, 5}, {me_kline, 5}, {mo_kline, 3}}
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_kline, 5}, {mo_kline, 3}}
 };
 
 struct Message unkline_msgtab = {
 	"UNKLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, {ms_unkline, 4}, {ms_unkline, 4}, {me_unkline, 3}, {mo_unkline, 2}}
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unkline, 3}, {mo_unkline, 2}}
 };
 
 mapi_clist_av1 kline_clist[] = { &kline_msgtab, &unkline_msgtab, NULL };
@@ -68,8 +66,6 @@ static int valid_comment(struct Client *source_p, char *comment);
 static int valid_user_host(struct Client *source_p, const char *user, const char *host);
 static int valid_wild_card(struct Client *source_p, const char *user, const char *host);
 
-static void handle_remote_kline(struct Client *source_p, int tkline_time,
-		const char *user, const char *host, const char *reason);
 static void apply_kline(struct Client *source_p, struct ConfItem *aconf,
 			const char *reason, const char *oper_reason, const char *current_date);
 static void apply_tkline(struct Client *source_p, struct ConfItem *aconf,
@@ -148,7 +144,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 
 	if(target_server != NULL)
 	{
-		propagate_generic(source_p, "KLINE", target_server, CAP_KLN,
+		propagate_generic(source_p, "KLINE", target_server, 
 				"%d %s %s :%s",
 				tkline_time, user, host, reason);
 
@@ -159,7 +155,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 	/* if we have cluster servers, send it to them.. */
 	else if(dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "KLINE", 
-				(tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE, CAP_KLN,
+				(tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE,
 				"%lu %s %s :%s",
 				tkline_time, user, host, reason);
 
@@ -219,73 +215,38 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 	return 0;
 }
 
-/* ms_kline()
- *
- *   parv[1] - server targeted at
- *   parv[2] - tkline time (0 if perm)
- *   parv[3] - user
- *   parv[4] - host
- *   parv[5] - reason
- */
-static int
-ms_kline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
-{
-	int tkline_time = atoi(parv[2]);
-
-	/* 1.5-3 and earlier contains a bug that allows remote klines to be
-	 * sent with an empty reason field.  This is a protocol violation,
-	 * but its not worth dropping the link over.. --anfl
-	 */
-	if(parc < 6 || EmptyString(parv[5]))
-		return 0;
-
-	propagate_generic(source_p, "KLINE", parv[1], CAP_KLN,
-			"%d %s %s :%s",
-			tkline_time, parv[3], parv[4], parv[5]);
-
-	if(!match(parv[1], me.name))
-		return 0;
-
-	if(!IsPerson(source_p))
-		return 0;
-
-	handle_remote_kline(source_p, tkline_time, parv[3], parv[4], parv[5]);
-	return 0;
-}
-
 static int
 me_kline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
+	char buffer[BUFSIZE];
+	struct ConfItem *aconf = NULL;
+	const char *current_date;
+	const char *user, *host;
+	char *reason;
+	char *oper_reason;
+	int tkline_time;
+
 	/* <tkline_time> <user> <host> :<reason> */
 	if(!IsPerson(source_p))
 		return 0;
 
-	handle_remote_kline(source_p, atoi(parv[1]), parv[2], parv[3], parv[4]);
-	return 0;
-}
-
-static void
-handle_remote_kline(struct Client *source_p, int tkline_time,
-		const char *user, const char *host, const char *kreason)
-{
-	char buffer[BUFSIZE];
-	const char *current_date;
-	char *reason = LOCAL_COPY(kreason);
-	struct ConfItem *aconf = NULL;
-	char *oper_reason;
+	tkline_time = atoi(parv[1]);
+	user = parv[2];
+	host = parv[3];
+	reason = LOCAL_COPY(parv[4]);
 
 	if(!find_shared_conf(source_p->username, source_p->host,
 				source_p->user->server, 
 				(tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE))
-		return;
+		return 0;
 
 	if(!valid_user_host(source_p, user, host) ||
 	   !valid_wild_card(source_p, user, host) ||
 	   !valid_comment(source_p, reason))
-		return;
+		return 0;
 
 	if(already_placed_kline(source_p, user, host, tkline_time))
-		return;
+		return 0;
 
 	aconf = make_conf();
 
@@ -333,7 +294,7 @@ handle_remote_kline(struct Client *source_p, int tkline_time,
 	else
 		check_klines();
 
-	return;
+	return 0;
 }
 
 /* mo_unkline()
@@ -397,14 +358,14 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 			return 0;
 		}
 
-		propagate_generic(source_p, "UNKLINE", parv[3], CAP_UNKLN,
+		propagate_generic(source_p, "UNKLINE", parv[3], 
 				"%s %s", user, host);
 
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
 	else if(dlink_list_length(&cluster_conf_list) > 0)
-		cluster_generic(source_p, "UNKLINE", SHARED_UNKLINE, CAP_UNKLN,
+		cluster_generic(source_p, "UNKLINE", SHARED_UNKLINE, 
 				"%s %s", user, host);
 
 	if(remove_temp_kline(user, host))
@@ -425,47 +386,21 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	return 0;
 }
 
-/* ms_unkline()
- *
- *   parv[1] - target server
- *   parv[2] - user to unkline
- *   parv[3] - host to unkline
- */
-static int
-ms_unkline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
-{
-	/* parv[0]  parv[1]        parv[2]  parv[3]
-	 * oper     target server  user     host    */
-	propagate_generic(source_p, "UNKLINE", parv[1], CAP_UNKLN,
-			"%s %s", parv[2], parv[3]);
-
-	if(!match(parv[1], me.name))
-		return 0;
-
-	if(!IsPerson(source_p))
-		return 0;
-
-	handle_remote_unkline(source_p, parv[2], parv[3]);
-	return 0;
-}
-
 static int
 me_unkline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
+	const char *user, *host;
+
 	/* user host */
 	if(!IsPerson(source_p))
 		return 0;
 
-	handle_remote_unkline(source_p, parv[1], parv[2]);
-	return 0;
-}
+	user = parv[1];
+	host = parv[2];
 
-static void
-handle_remote_unkline(struct Client *source_p, const char *user, const char *host)
-{
 	if(!find_shared_conf(source_p->username, source_p->host,
 				source_p->user->server, SHARED_UNKLINE))
-		return;
+		return 0;
 
 	if(remove_temp_kline(user, host))
 	{
@@ -479,10 +414,11 @@ handle_remote_unkline(struct Client *source_p, const char *user, const char *hos
 
 		ilog(L_KLINE, "UK %s %s %s",
 			get_oper_name(source_p), user, host);
-		return;
+		return 0;
 	}
 
 	remove_permkline_match(source_p, host, user);
+	return 0;
 }
 
 /* apply_kline()

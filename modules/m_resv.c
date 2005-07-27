@@ -43,19 +43,17 @@
 #include "irc_string.h"
 
 static int mo_resv(struct Client *, struct Client *, int, const char **);
-static int ms_resv(struct Client *, struct Client *, int, const char **);
 static int me_resv(struct Client *, struct Client *, int, const char **);
 static int mo_unresv(struct Client *, struct Client *, int, const char **);
-static int ms_unresv(struct Client *, struct Client *, int, const char **);
 static int me_unresv(struct Client *, struct Client *, int, const char **);
 
 struct Message resv_msgtab = {
 	"RESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{mg_ignore, mg_not_oper, {ms_resv, 4}, {ms_resv, 4}, {me_resv, 5}, {mo_resv, 3}}
+	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_resv, 5}, {mo_resv, 3}}
 };
 struct Message unresv_msgtab = {
 	"UNRESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{mg_ignore, mg_not_oper, {ms_unresv, 3}, {ms_unresv, 3}, {me_unresv, 2}, {mo_unresv, 2}}
+	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_unresv, 2}, {mo_unresv, 2}}
 };
 
 mapi_clist_av1 resv_clist[] = {	&resv_msgtab, &unresv_msgtab, NULL };
@@ -63,8 +61,6 @@ DECLARE_MODULE_AV1(resv, NULL, NULL, resv_clist, NULL, NULL, "$Revision: 19295 $
 
 static void parse_resv(struct Client *source_p, const char *name,
 			const char *reason, int temp_time);
-static void propagate_resv(struct Client *source_p, const char *target,
-			int temp_time, const char *name, const char *reason);
 static void cluster_resv(struct Client *source_p, int temp_time, 
 			const char *name, const char *reason);
 
@@ -123,7 +119,9 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* remote resv.. */
 	if(target_server)
 	{
-		propagate_resv(source_p, target_server, temp_time, name, reason);
+		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
+				"ENCAP %s RESV %d %s 0 :%s",
+				target_server, temp_time, name, reason);
 
 		if(match(target_server, me.name) == 0)
 			return 0;
@@ -133,31 +131,6 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	parse_resv(source_p, name, reason, temp_time);
 
-	return 0;
-}
-
-/* ms_resv()
- *     parv[0] = sender prefix
- *     parv[1] = target server
- *     parv[2] = channel/nick to forbid
- *     parv[3] = reason
- */
-static int
-ms_resv(struct Client *client_p, struct Client *source_p,
-	int parc, const char *parv[])
-{
-	/* parv[0]  parv[1]        parv[2]  parv[3]
-	 * oper     target server  resv     reason
-	 */
-	propagate_resv(source_p, parv[1], 0, parv[2], parv[3]);
-
-	if(!match(parv[1], me.name))
-		return 0;
-
-	if(!IsPerson(source_p))
-		return 0;
-
-	parse_resv(source_p, parv[2], parv[3], 0);
 	return 0;
 }
 
@@ -306,28 +279,6 @@ parse_resv(struct Client *source_p, const char *name,
 				  name);
 }
 
-static void 
-propagate_resv(struct Client *source_p, const char *target,
-		int temp_time, const char *name, const char *reason)
-{
-	if(!temp_time)
-	{
-		sendto_match_servs(source_p, target,
-				CAP_CLUSTER, NOCAPS,
-				"RESV %s %s :%s",
-				target, name, reason);
-		sendto_match_servs(source_p, target,
-				CAP_ENCAP, CAP_CLUSTER,
-				"ENCAP %s RESV %d %s 0 :%s",
-				target, temp_time, name, reason);
-	}
-	else
-		sendto_match_servs(source_p, target,
-				CAP_ENCAP, NOCAPS,
-				"ENCAP %s RESV %d %s 0 :%s",
-				target, temp_time, name, reason);
-}
-
 static void
 cluster_resv(struct Client *source_p, int temp_time, const char *name,
 		const char *reason)
@@ -339,20 +290,13 @@ cluster_resv(struct Client *source_p, int temp_time, const char *name,
 	{
 		shared_p = ptr->data;
 
-		/* old protocol cant handle temps, and we dont really want
-		 * to convert them to perm.. --fl
-		 */
 		if(!temp_time)
 		{
 			if(!(shared_p->flags & SHARED_PRESV))
 				continue;
 
 			sendto_match_servs(source_p, shared_p->server,
-					CAP_CLUSTER, NOCAPS,
-					"RESV %s %s :%s",
-					shared_p->server, name, reason);
-			sendto_match_servs(source_p, shared_p->server,
-					CAP_ENCAP, CAP_CLUSTER,
+					CAP_ENCAP, NOCAPS,
 					"ENCAP %s RESV 0 %s 0 :%s",
 					shared_p->server, name, reason);
 		}
@@ -382,14 +326,14 @@ mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 			return 0;
 		}
 
-		propagate_generic(source_p, "UNRESV", parv[3], CAP_CLUSTER,
+		propagate_generic(source_p, "UNRESV", parv[3],
 				"%s", parv[1]);
 
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
 	else if(dlink_list_length(&cluster_conf_list) > 0)
-		cluster_generic(source_p, "UNRESV", SHARED_UNRESV, CAP_CLUSTER,
+		cluster_generic(source_p, "UNRESV", SHARED_UNRESV, 
 				"%s", parv[1]);
 
 	if(remove_temp_resv(source_p, parv[1]))
@@ -399,54 +343,26 @@ mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 	return 0;
 }
 
-/* ms_unresv()
- *     parv[0] = sender prefix
- *     parv[1] = target server
- *     parv[2] = resv to remove
- */
-static int
-ms_unresv(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
-{
-	/* parv[0]  parv[1]        parv[2]
-	 * oper     target server  resv to remove
-	 */
-	propagate_generic(source_p, "UNRESV", parv[1], CAP_CLUSTER,
-			"%s", parv[2]);
-
-	if(!match(parv[1], me.name))
-		return 0;
-
-	if(!IsPerson(source_p))
-		return 0;
-
-	handle_remote_unresv(source_p, parv[2]);
-	return 0;
-}
-
 static int
 me_unresv(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
+	const char *name;
+
 	/* name */
 	if(!IsPerson(source_p))
 		return 0;
 
-	handle_remote_unresv(source_p, parv[1]);
-	return 0;
-}
+	name = parv[1];
 
-static void
-handle_remote_unresv(struct Client *source_p, const char *name)
-{
 	if(!find_shared_conf(source_p->username, source_p->host,
 				source_p->user->server, SHARED_UNRESV))
-		return;
+		return 0;
 
 	if(remove_temp_resv(source_p, name))
-		return;
+		return 0;
 
 	remove_resv(source_p, name);
-
-	return;
+	return 0;
 }
 
 static int

@@ -48,19 +48,17 @@
 #include "s_newconf.h"
 
 static int mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int ms_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int ms_unxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int me_unxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 
 struct Message xline_msgtab = {
 	"XLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, {ms_xline, 5}, {ms_xline, 5}, {me_xline, 5}, {mo_xline, 3}}
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_xline, 5}, {mo_xline, 3}}
 };
 struct Message unxline_msgtab = {
 	"UNXLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, {ms_unxline, 3}, {ms_unxline, 3}, {me_unxline, 2}, {mo_unxline, 2}}
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unxline, 2}, {mo_unxline, 2}}
 };
 
 mapi_clist_av1 xline_clist[] =  { &xline_msgtab, &unxline_msgtab, NULL };
@@ -70,15 +68,8 @@ static int valid_xline(struct Client *, const char *, const char *);
 static void apply_xline(struct Client *client_p, const char *name, 
 			const char *reason, int temp_time);
 static void write_xline(struct Client *source_p, struct ConfItem *aconf);
-static void propagate_xline(struct Client *source_p, const char *target,
-			int temp_time, const char *name, 
-			const char *type, const char *reason);
 static void cluster_xline(struct Client *source_p, int temp_time,
 			const char *name, const char *reason);
-
-static void handle_remote_xline(struct Client *source_p, int temp_time,
-				const char *name, const char *reason);
-static void handle_remote_unxline(struct Client *source_p, const char *name);
 
 static int remove_temp_xline(struct Client *source_p, const char *name);
 static void remove_xline(struct Client *source_p, const char *gecos);
@@ -141,8 +132,9 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(target_server != NULL)
 	{
-		propagate_xline(source_p, target_server, temp_time,
-				name, "2", reason);
+		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
+				"ENCAP %s XLINE %d %s 2 :%s",
+				target_server, temp_time, name, reason);
 
 		if(!match(target_server, me.name))
 			return 0;
@@ -165,53 +157,28 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	return 0;
 }
 
-/* ms_xline()
- *
- * handles a remote xline
- */
-static int
-ms_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
-{
-	/* parv[0]  parv[1]      parv[2]  parv[3]  parv[4]
-	 * oper     target serv  xline    type     reason
-	 */
-	propagate_xline(source_p, parv[1], 0, parv[2], parv[3], parv[4]);
-
-	if(!IsPerson(source_p))
-		return 0;
-
-	/* destined for me? */
-	if(!match(parv[1], me.name))
-		return 0;
-
-	handle_remote_xline(source_p, 0, parv[2], parv[4]);
-	return 0;
-}
-
 static int
 me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
+	struct ConfItem *aconf;
+	const char *name, *reason;
+	int temp_time;
+
 	/* time name type :reason */
 	if(!IsPerson(source_p))
 		return 0;
 
-	handle_remote_xline(source_p, atoi(parv[1]), parv[2], parv[4]);
-	return 0;
-}
-
-static void
-handle_remote_xline(struct Client *source_p, int temp_time,
-			const char *name, const char *reason)
-{
-	struct ConfItem *aconf;
+	temp_time = atoi(parv[1]);
+	name = parv[2];
+	reason = parv[4];
 
 	if(!find_shared_conf(source_p->username, source_p->host,
 				source_p->user->server,
 				(temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE))
-		return;
+		return 0;
 
 	if(!valid_xline(source_p, name, reason))
-		return;
+		return 0;
 
 	/* already xlined */
 	if((aconf = find_xline(name, 0)) != NULL)
@@ -219,10 +186,11 @@ handle_remote_xline(struct Client *source_p, int temp_time,
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :[%s] already X-Lined by [%s] - %s",
 				me.name, source_p->name, name, 
 				aconf->name, aconf->passwd);
-		return;
+		return 0;
 	}
 
 	apply_xline(source_p, name, reason, temp_time);
+	return 0;
 }
 
 /* valid_xline()
@@ -424,26 +392,6 @@ write_xline(struct Client *source_p, struct ConfItem *aconf)
 	fclose(out);
 }
 
-static void 
-propagate_xline(struct Client *source_p, const char *target,
-		int temp_time, const char *name, const char *type,
-		const char *reason)
-{
-	if(!temp_time)
-	{
-		sendto_match_servs(source_p, target, CAP_CLUSTER, NOCAPS,
-					"XLINE %s %s %s :%s",
-					target, name, type, reason);
-		sendto_match_servs(source_p, target, CAP_ENCAP, CAP_CLUSTER,
-				"ENCAP %s XLINE %d %s 2 :%s",
-				target, temp_time, name, reason);
-	}
-	else
-		sendto_match_servs(source_p, target, CAP_ENCAP, NOCAPS,
-				"ENCAP %s XLINE %d %s %s :%s",
-				target, temp_time, name, type, reason);
-}
-			
 static void
 cluster_xline(struct Client *source_p, int temp_time, const char *name,
 		const char *reason)
@@ -455,18 +403,12 @@ cluster_xline(struct Client *source_p, int temp_time, const char *name,
 	{
 		shared_p = ptr->data;
 
-		/* old protocol cant handle temps, and we dont really want
-		 * to convert them to perm.. --fl
-		 */
 		if(!temp_time)
 		{
 			if(!(shared_p->flags & SHARED_PXLINE))
 				continue;
 
-			sendto_match_servs(source_p, shared_p->server, CAP_CLUSTER, NOCAPS,
-					"XLINE %s %s 2 :%s",
-					shared_p->server, name, reason);
-			sendto_match_servs(source_p, shared_p->server, CAP_ENCAP, CAP_CLUSTER,
+			sendto_match_servs(source_p, shared_p->server, CAP_ENCAP, NOCAPS,
 					"ENCAP %s XLINE 0 %s 2 :%s",
 					shared_p->server, name, reason);
 		}
@@ -500,14 +442,14 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 			return 0;
 		}
 
-		propagate_generic(source_p, "UNXLINE", parv[3], CAP_CLUSTER,
+		propagate_generic(source_p, "UNXLINE", parv[3], 
 				"%s", parv[1]);
 
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
 	else if(dlink_list_length(&cluster_conf_list))
-		cluster_generic(source_p, "UNXLINE", SHARED_UNXLINE, CAP_CLUSTER,
+		cluster_generic(source_p, "UNXLINE", SHARED_UNXLINE, 
 				"%s", parv[1]);
 
 	if(remove_temp_xline(source_p, parv[1]))
@@ -518,53 +460,26 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	return 0;
 }
 
-/* ms_unxline()
- *
- * handles a remote unxline
- */
-static int
-ms_unxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
-{
-	/* parv[0]  parv[1]        parv[2]
-	 * oper     target server  gecos
-	 */
-	propagate_generic(source_p, "UNXLINE", parv[1], CAP_CLUSTER,
-			"%s", parv[2]);
-
-	if(!match(parv[1], me.name))
-		return 0;
-
-	if(!IsPerson(source_p))
-		return 0;
-
-	handle_remote_unxline(source_p, parv[2]);
-	return 0;
-}
-
 static int
 me_unxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
+	const char *name;
+
 	/* name */
 	if(!IsPerson(source_p))
 		return 0;
 
-	handle_remote_unxline(source_p, parv[1]);
-	return 0;
-}
+	name = parv[1];
 
-static void
-handle_remote_unxline(struct Client *source_p, const char *name)
-{
 	if(!find_shared_conf(source_p->username, source_p->host,
 				source_p->user->server, SHARED_UNXLINE))
-		return;
+		return 0;
 
 	if(remove_temp_xline(source_p, name))
-		return;
+		return 0;
 
 	remove_xline(source_p, name);
-
-	return;
+	return 0;
 }
 
 static int

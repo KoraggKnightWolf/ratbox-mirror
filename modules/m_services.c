@@ -46,6 +46,8 @@
 #include "irc_string.h"
 #include "whowas.h"
 #include "monitor.h"
+#include "s_serv.h"
+#include "commio.h"
 
 static int me_su(struct Client *, struct Client *, int, const char **);
 static int me_login(struct Client *, struct Client *, int, const char **);

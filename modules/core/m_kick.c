@@ -159,7 +159,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 #ifdef ENABLE_SERVICES
 		if(MyClient(source_p) && IsService(who))
 		{
-			sendto_one(source_p, form_str(ERR_ISCHANSERVICE),
+			sendto_one(source_p, POP_QUEUE, form_str(ERR_ISCHANSERVICE),
 					me.name, source_p->name, who->name,
 					chptr->chname);
 			return 0;

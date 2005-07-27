@@ -205,7 +205,7 @@ find_shared_conf(const char *username, const char *host,
 
 void
 propagate_generic(struct Client *source_p, const char *command,
-		const char *target, int cap, const char *format, ...)
+		const char *target, const char *format, ...)
 {
 	char buffer[BUFSIZE];
 	va_list args;
@@ -214,17 +214,14 @@ propagate_generic(struct Client *source_p, const char *command,
 	ircvsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
-	sendto_match_servs(source_p, target, cap, NOCAPS,
-			"%s %s %s",
-			command, target, buffer);
-	sendto_match_servs(source_p, target, CAP_ENCAP, cap,
+	sendto_match_servs(source_p, target, CAP_ENCAP, NOCAPS,
 			"ENCAP %s %s %s",
 			target, command, buffer);
 }
 			
 void
 cluster_generic(struct Client *source_p, const char *command,
-		int cltype, int cap, const char *format, ...)
+		int cltype, const char *format, ...)
 {
 	char buffer[BUFSIZE];
 	struct remote_conf *shared_p;
@@ -242,10 +239,7 @@ cluster_generic(struct Client *source_p, const char *command,
 		if(!(shared_p->flags & cltype))
 			continue;
 
-		sendto_match_servs(source_p, shared_p->server, cap, NOCAPS,
-				"%s %s %s",
-				command, shared_p->server, buffer);
-		sendto_match_servs(source_p, shared_p->server, CAP_ENCAP, cap,
+		sendto_match_servs(source_p, shared_p->server, CAP_ENCAP, NOCAPS,
 				"ENCAP %s %s %s",
 				shared_p->server, command, buffer);
 	}

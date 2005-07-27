@@ -42,7 +42,7 @@ static int me_locops(struct Client *, struct Client *, int, const char **);
 
 struct Message locops_msgtab = {
 	"LOCOPS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, {ms_locops, 3}, mg_ignore, {me_locops, 2}, {m_locops, 2}}
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_locops, 2}, {m_locops, 2}}
 };
 
 mapi_clist_av1 locops_clist[] = { &locops_msgtab, NULL };
@@ -60,26 +60,8 @@ m_locops(struct Client *client_p, struct Client *source_p, int parc, const char 
 	sendto_wallops_flags(UMODE_LOCOPS, source_p, "LOCOPS - %s", parv[1]);
 	
 	if(dlink_list_length(&cluster_conf_list) > 0)
-		cluster_generic(source_p, "LOCOPS", SHARED_LOCOPS, CAP_CLUSTER,
+		cluster_generic(source_p, "LOCOPS", SHARED_LOCOPS, 
 				":%s", parv[1]);
-
-	return 0;
-}
-
-static int
-ms_locops(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
-{
-	/* parv[0]  parv[1]      parv[2]
-	 * oper     target serv  message
-	 */
-	propagate_generic(source_p, "LOCOPS", parv[1], CAP_CLUSTER, 
-				":%s", parv[2]);
-
-	if(!match(parv[1], me.name))
-		return 0;
-
-	if(find_shared_conf("*", "*", source_p->user->server, SHARED_LOCOPS))
-		sendto_wallops_flags(UMODE_LOCOPS, source_p, "SLOCOPS - %s", parv[2]);
 
 	return 0;
 }

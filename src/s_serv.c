@@ -82,13 +82,10 @@ struct Capability captab[] = {
 	{ "EX",		CAP_EX },
 	{ "CHW",	CAP_CHW},
 	{ "IE", 	CAP_IE},
-	{ "KLN",	CAP_KLN},
 	{ "GLN",	CAP_GLN},
 	{ "KNOCK",	CAP_KNOCK},
 	{ "ZIP",	CAP_ZIP},
 	{ "TB",		CAP_TB},
-	{ "UNKLN",	CAP_UNKLN},
-	{ "CLUSTER",	CAP_CLUSTER},
 	{ "ENCAP",	CAP_ENCAP },
 #ifdef ENABLE_SERVICES
 	{ "SERVICES",	CAP_SERVICE },
