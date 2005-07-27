@@ -1,3 +1,12 @@
+androsyn    2005/07/27 02:34:08 UTC	(20050727_0-20595)
+  Log:
+  m_testline.c needs reject.h for find_dline()
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+
+
 androsyn    2005/07/24 02:57:33 UTC	(20050724_0-20593)
   Log:
   missed removing the list type from select.c
