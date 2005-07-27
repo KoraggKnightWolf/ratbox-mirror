@@ -42,6 +42,7 @@
 #include "snprintf.h"
 #include "irc_string.h"
 #include "ircd.h"
+#include "reject.h"
 
 static int mo_testline(struct Client *, struct Client *, int, const char **);
 static int mo_testgecos(struct Client *, struct Client *, int, const char **);
