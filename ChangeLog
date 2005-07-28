@@ -1,3 +1,14 @@
+leeh        2005/07/28 18:08:11 UTC	(20050728_1-20603)
+  Log:
+  - remove cluster_resv() and cluster_xline(), they can use 
+    cluster_generic() now
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 leeh        2005/07/28 17:57:54 UTC	(20050728_0-20601)
   Log:
   - remove propagate_generic(), just have a simple sendto_match_servs()
