@@ -68,8 +68,6 @@ static int valid_xline(struct Client *, const char *, const char *);
 static void apply_xline(struct Client *client_p, const char *name, 
 			const char *reason, int temp_time);
 static void write_xline(struct Client *source_p, struct ConfItem *aconf);
-static void cluster_xline(struct Client *source_p, int temp_time,
-			const char *name, const char *reason);
 
 static int remove_temp_xline(struct Client *source_p, const char *name);
 static void remove_xline(struct Client *source_p, const char *gecos);
@@ -140,7 +138,10 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 			return 0;
 	}
 	else if(dlink_list_length(&cluster_conf_list) > 0)
-		cluster_xline(source_p, temp_time, name, reason);
+		cluster_generic(source_p, "XLINE",
+				(temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE,
+				"%d %s 2 :%s",
+				temp_time, name, reason);
 
 	if((aconf = find_xline(name, 0)) != NULL)
 	{
@@ -390,33 +391,6 @@ write_xline(struct Client *source_p, struct ConfItem *aconf)
 	}
 
 	fclose(out);
-}
-
-static void
-cluster_xline(struct Client *source_p, int temp_time, const char *name,
-		const char *reason)
-{
-	struct remote_conf *shared_p;
-	dlink_node *ptr;
-
-	DLINK_FOREACH(ptr, cluster_conf_list.head)
-	{
-		shared_p = ptr->data;
-
-		if(!temp_time)
-		{
-			if(!(shared_p->flags & SHARED_PXLINE))
-				continue;
-
-			sendto_match_servs(source_p, shared_p->server, CAP_ENCAP, NOCAPS,
-					"ENCAP %s XLINE 0 %s 2 :%s",
-					shared_p->server, name, reason);
-		}
-		else if(shared_p->flags & SHARED_TXLINE)
-			sendto_match_servs(source_p, shared_p->server, CAP_ENCAP, NOCAPS,
-					"ENCAP %s XLINE %d %s 2 :%s",
-					shared_p->server, temp_time, name, reason);
-	}
 }
 
 /* mo_unxline()

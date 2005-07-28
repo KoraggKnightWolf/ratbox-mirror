@@ -61,8 +61,6 @@ DECLARE_MODULE_AV1(resv, NULL, NULL, resv_clist, NULL, NULL, "$Revision: 19295 $
 
 static void parse_resv(struct Client *source_p, const char *name,
 			const char *reason, int temp_time);
-static void cluster_resv(struct Client *source_p, int temp_time, 
-			const char *name, const char *reason);
 
 static void handle_remote_unresv(struct Client *source_p, const char *name);
 static void remove_resv(struct Client *source_p, const char *name);
@@ -127,7 +125,10 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 			return 0;
 	}
 	else if(dlink_list_length(&cluster_conf_list) > 0)
-		cluster_resv(source_p, temp_time, name, reason);
+		cluster_generic(source_p, "RESV",
+				(temp_time > 0) ? SHARED_TRESV : SHARED_PRESV,
+				"%d %s 0 :%s",
+				temp_time, name, reason);
 
 	parse_resv(source_p, name, reason, temp_time);
 
@@ -278,36 +279,6 @@ parse_resv(struct Client *source_p, const char *name,
 				  ":You have specified an invalid resv: [%s]",
 				  name);
 }
-
-static void
-cluster_resv(struct Client *source_p, int temp_time, const char *name,
-		const char *reason)
-{
-	struct remote_conf *shared_p;
-	dlink_node *ptr;
-
-	DLINK_FOREACH(ptr, cluster_conf_list.head)
-	{
-		shared_p = ptr->data;
-
-		if(!temp_time)
-		{
-			if(!(shared_p->flags & SHARED_PRESV))
-				continue;
-
-			sendto_match_servs(source_p, shared_p->server,
-					CAP_ENCAP, NOCAPS,
-					"ENCAP %s RESV 0 %s 0 :%s",
-					shared_p->server, name, reason);
-		}
-		else if(shared_p->flags & SHARED_TRESV)
-			sendto_match_servs(source_p, shared_p->server,
-					CAP_ENCAP, NOCAPS,
-					"ENCAP %s RESV %d %s 0 :%s",
-					shared_p->server, temp_time, name, reason);
-	}
-}
-
 
 /*
  * mo_unresv()
