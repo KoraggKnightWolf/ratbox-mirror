@@ -326,8 +326,9 @@ mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 			return 0;
 		}
 
-		propagate_generic(source_p, "UNRESV", parv[3],
-				"%s", parv[1]);
+		sendto_match_servs(source_p, parv[3], CAP_ENCAP, NOCAPS,
+				"ENCAP %s UNRESV %s",
+				parv[3], parv[1]);
 
 		if(match(parv[3], me.name) == 0)
 			return 0;

@@ -144,9 +144,10 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 
 	if(target_server != NULL)
 	{
-		propagate_generic(source_p, "KLINE", target_server, 
-				"%d %s %s :%s",
-				tkline_time, user, host, reason);
+		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
+				"ENCAP %s KLINE %d %s %s :%s",
+				target_server, tkline_time,
+				user, host, reason);
 
 		/* If we are sending it somewhere that doesnt include us, stop */
 		if(!match(target_server, me.name))
@@ -358,8 +359,9 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 			return 0;
 		}
 
-		propagate_generic(source_p, "UNKLINE", parv[3], 
-				"%s %s", user, host);
+		sendto_match_servs(source_p, parv[3], CAP_ENCAP, NOCAPS,
+				"ENCAP %s UNKLINE %s %s",
+				parv[3], user, host);
 
 		if(match(parv[3], me.name) == 0)
 			return 0;

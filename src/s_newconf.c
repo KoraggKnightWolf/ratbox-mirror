@@ -204,22 +204,6 @@ find_shared_conf(const char *username, const char *host,
 }
 
 void
-propagate_generic(struct Client *source_p, const char *command,
-		const char *target, const char *format, ...)
-{
-	char buffer[BUFSIZE];
-	va_list args;
-
-	va_start(args, format);
-	ircvsnprintf(buffer, sizeof(buffer), format, args);
-	va_end(args);
-
-	sendto_match_servs(source_p, target, CAP_ENCAP, NOCAPS,
-			"ENCAP %s %s %s",
-			target, command, buffer);
-}
-			
-void
 cluster_generic(struct Client *source_p, const char *command,
 		int cltype, const char *format, ...)
 {
