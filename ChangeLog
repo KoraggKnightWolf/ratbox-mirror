@@ -1,3 +1,11 @@
+androsyn    2005/07/31 05:13:07 UTC	(20050731_0-20609)
+  Log:
+  userhost should allow 5 userhost checks, not 4
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_userhost.c (File Modified) 
+
+
 leeh        2005/07/28 18:08:11 UTC	(20050728_1-20603)
   Log:
   - remove cluster_resv() and cluster_xline(), they can use 
