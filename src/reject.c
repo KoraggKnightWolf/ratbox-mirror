@@ -46,17 +46,11 @@ static patricia_tree_t *eline_tree;
 dlink_list delay_exit;
 static dlink_list reject_list;
 
-typedef enum {
-	dline,
-	reject
-} rtype;
-
 struct reject_data
 {
 	dlink_node rnode;
 	time_t time;
 	unsigned int count;
-	rtype type;	
 };
 
 
