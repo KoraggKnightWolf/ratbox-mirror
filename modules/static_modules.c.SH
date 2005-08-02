@@ -42,7 +42,7 @@ for x in $SYMS; do
 done >> static_modules.c
 
 
-echo static const struct mapi_header_av1 *mapi_headers[] = { >> static_modules.c 
+echo static struct mapi_header_av1 *mapi_headers[] = { >> static_modules.c 
 for x in $SYMS; do 
 	echo \&"$x"_mheader,
 done >> static_modules.c
@@ -91,7 +91,7 @@ void load_static_modules(void)
 				{
 					mapi_hfn_list_av1 *m;
 					for(m = mheader->mapi_hfn_list; m->hapi_name; ++m)
-						add_hook(m->hapi_name, m->fn);
+						add_hook(m->hapi_name, m->hookfn);
 						
 				}
 				
