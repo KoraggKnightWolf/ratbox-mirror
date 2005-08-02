@@ -42,7 +42,6 @@
 #include "snprintf.h"
 #include "ltdl.h"
 
-
 #ifndef STATIC_MODULES
 struct module **modlist = NULL;
 static char unknown_ver[] = "<unknown>";
@@ -104,6 +103,7 @@ extern struct Message error_msgtab;
 void
 modules_init(void)
 {
+	LTDL_SET_PRELOADED_SYMBOLS();
 	if(lt_dlinit())
 	{
 		ilog(L_MAIN, "lt_dlinit failed");
@@ -690,7 +690,7 @@ load_a_module(const char *path, int warn, int core)
 	 */
 	mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, "_mheader");
 	if((mapi_version == NULL
-	    && (mapi_version = (int *) (uintptr_t) dlsym(tmpptr, "__mheader")) == NULL)
+	    && (mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, "__mheader")) == NULL)
 	   || MAPI_MAGIC(*mapi_version) != MAPI_MAGIC_HDR)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -805,8 +805,9 @@ increase_modlist(void)
 	max_mods += MODS_INCREMENT;
 }
 
-#else /* STATIC_MODULES */
 
+#else /* STATIC_MODULES */
+ 
 /* load_all_modules()
  *
  * input        -
@@ -820,3 +821,4 @@ load_all_modules(int warn)
 }
 
 #endif /* STATIC_MODULES */
+ 

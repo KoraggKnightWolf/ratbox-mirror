@@ -60,17 +60,14 @@ ircd_SOURCES =                     \
   whowas.c			\
   version.c			
 
+
 if STATIC_MODULES
-ircd_LDADD = lex.yy.o y.tab.o @SSL_LIBS@ ../modules/libmodules.a @CRYPT_LIB@
+ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
 else
-ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
+ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
 endif
 
 ircd_LDFLAGS = -export-dynamic -L../libircd -lircd
 
-if STATIC_MODULES
-ircd_DEPENDENCIES = version.o ../modules/libmodules.a  lex.yy.o y.tab.o
-else
 ircd_DEPENDENCIES = $(LIBLTDLC) version.o lex.yy.o y.tab.o
-endif
 

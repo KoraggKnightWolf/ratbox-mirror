@@ -135,7 +135,6 @@ STATIC_MODULES_TRUE = @STATIC_MODULES_TRUE@
 STRIP = @STRIP@
 TOUCH = @TOUCH@
 VERSION = @VERSION@
-VICONF = @VICONF@
 WANT_SERVLINK_FALSE = @WANT_SERVLINK_FALSE@
 WANT_SERVLINK_TRUE = @WANT_SERVLINK_TRUE@
 YACC = @YACC@
@@ -346,6 +345,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile
 installdirs:
+@STATIC_MODULES_TRUE@install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -443,7 +443,7 @@ build:		all
 @STATIC_MODULES_TRUE@	/bin/sh ./static_modules.c.SH $(ST_OBJS)
 
 @STATIC_MODULES_TRUE@libmodules.a: $(ST_OBJS) static_modules.lo
-@STATIC_MODULES_TRUE@	$(LIBTOOL) --mode=link  $(CC) --all-static $(CFLAGS) -o $@ $(ST_OBJS) $(SUFFIXES)
+@STATIC_MODULES_TRUE@	$(LIBTOOL) --mode=link  $(CC) --all-static $(CFLAGS) -o $@ $(ST_OBJS) static_modules.lo
 
 @STATIC_MODULES_TRUE@all:	libmodules.a
 
@@ -474,7 +474,7 @@ install-mkdirs:
 	@mkdir -p -m 755 $(DESTDIR)$(moduledir)
 	@mkdir -p -m 755 $(DESTDIR)$(automoduledir)
 
-install: install-mkdirs install_core install_modules
+@STATIC_MODULES_FALSE@install: install-mkdirs install_core install_modules
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -466,7 +466,7 @@ ac_includes_default="\
 #endif"
 
 ac_subdirs_all="$ac_subdirs_all libltdl"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot LEX CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE LEXLIB LEX_OUTPUT_ROOT INCLTDL LIBLTDL MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT STATIC_MODULES_TRUE STATIC_MODULES_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL subdirs AS RM CP MV LN SED LD TOUCH YACC CRYPT_LIB VICONF ALLOCA ENCSPEED ZLIB_LD WANT_SERVLINK_TRUE WANT_SERVLINK_FALSE ETC_DIR confdir LOG_DIR logdir HELP_DIR helpdir MODULE_DIR moduledir SELECT_TYPE M_SERVICES SSL_SRCS_ENABLE SSL_INCLUDES SSL_LIBS PICFLAGS SEDOBJ IRCD_PREFIX LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot LEX CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE LEXLIB LEX_OUTPUT_ROOT INCLTDL LIBLTDL MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT STATIC_MODULES_TRUE STATIC_MODULES_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL subdirs AS RM CP MV LN SED LD TOUCH YACC CRYPT_LIB ALLOCA ENCSPEED ZLIB_LD WANT_SERVLINK_TRUE WANT_SERVLINK_FALSE ETC_DIR confdir LOG_DIR logdir HELP_DIR helpdir MODULE_DIR moduledir SELECT_TYPE M_SERVICES SSL_SRCS_ENABLE SSL_INCLUDES SSL_LIBS PICFLAGS SEDOBJ IRCD_PREFIX LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -21303,28 +21303,6 @@ fi
 # backwards support for IRC_CFLAGS
 CFLAGS="$IRC_CFLAGS $CFLAGS -O0 -Wall"
 
-echo "$as_me:$LINENO: checking for /dev/null" >&5
-echo $ECHO_N "checking for /dev/null... $ECHO_C" >&6
-if test -c /dev/null ; then
-
-cat >>confdefs.h <<\_ACEOF
-#define PATH_DEVNULL "/dev/null"
-_ACEOF
-
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-else
-
-cat >>confdefs.h <<\_ACEOF
-#define PATH_DEVNULL "devnull.log"
-_ACEOF
-
-	echo "$as_me:$LINENO: result: no - using devnull.log" >&5
-echo "${ECHO_T}no - using devnull.log" >&6
-fi
-
-
-
 if test "$libexecdir" = '${exec_prefix}/libexec' &&
    test "$localstatedir" = '${prefix}/var'; then
 	libexecdir='${bindir}'
@@ -22372,14 +22350,6 @@ if test "$CRYPT_LIB" = "none required"; then
 	unset CRYPT_LIB
 elif test "$CRYPT_LIB" = no; then
 	unset CRYPT_LIB
-fi
-
-
-
-if test "$ac_cv_header_sys_wait_h" = yes -o "$ac_cv_header_wait_h" = yes; then
-	VICONF=viconf
-			else
-	VICONF=""
 fi
 
 
@@ -27542,7 +27512,6 @@ s,@LD@,$LD,;t t
 s,@TOUCH@,$TOUCH,;t t
 s,@YACC@,$YACC,;t t
 s,@CRYPT_LIB@,$CRYPT_LIB,;t t
-s,@VICONF@,$VICONF,;t t
 s,@ALLOCA@,$ALLOCA,;t t
 s,@ENCSPEED@,$ENCSPEED,;t t
 s,@ZLIB_LD@,$ZLIB_LD,;t t

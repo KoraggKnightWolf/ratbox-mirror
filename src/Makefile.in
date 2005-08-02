@@ -186,7 +186,6 @@ STATIC_MODULES_TRUE = @STATIC_MODULES_TRUE@
 STRIP = @STRIP@
 TOUCH = @TOUCH@
 VERSION = @VERSION@
-VICONF = @VICONF@
 WANT_SERVLINK_FALSE = @WANT_SERVLINK_FALSE@
 WANT_SERVLINK_TRUE = @WANT_SERVLINK_TRUE@
 YACC = @YACC@
@@ -275,11 +274,10 @@ ircd_SOURCES = \
   whowas.c			\
   version.c			
 
-@STATIC_MODULES_FALSE@ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
-@STATIC_MODULES_TRUE@ircd_LDADD = lex.yy.o y.tab.o @SSL_LIBS@ ../modules/libmodules.a @CRYPT_LIB@
+@STATIC_MODULES_FALSE@ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
+@STATIC_MODULES_TRUE@ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
 ircd_LDFLAGS = -export-dynamic -L../libircd -lircd
-@STATIC_MODULES_FALSE@ircd_DEPENDENCIES = $(LIBLTDLC) version.o lex.yy.o y.tab.o
-@STATIC_MODULES_TRUE@ircd_DEPENDENCIES = version.o ../modules/libmodules.a  lex.yy.o y.tab.o
+ircd_DEPENDENCIES = $(LIBLTDLC) version.o lex.yy.o y.tab.o
 all: all-am
 
 .SUFFIXES:

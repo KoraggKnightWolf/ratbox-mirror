@@ -76,18 +76,6 @@ fi
 # backwards support for IRC_CFLAGS
 CFLAGS="$IRC_CFLAGS $CFLAGS -O0 -Wall"
 
-dnl check for /dev/null so we can use it to hold evil fd's
-AC_MSG_CHECKING([for /dev/null])
-if test -c /dev/null ; then
-	AC_DEFINE(PATH_DEVNULL, "/dev/null", [Path to /dev/null])
-	AC_MSG_RESULT(yes)
-else
-	AC_DEFINE(PATH_DEVNULL, "devnull.log", [Path to /dev/null])
-	AC_MSG_RESULT(no - using devnull.log)
-fi
-
-
-
 dnl use directory structure of cached as default (hack)
 if test "$libexecdir" = '${exec_prefix}/libexec' &&
    test "$localstatedir" = '${prefix}/var'; then
@@ -177,17 +165,6 @@ elif test "$CRYPT_LIB" = no; then
 fi
 
 AC_SUBST(CRYPT_LIB)
-
-if test "$ac_cv_header_sys_wait_h" = yes -o "$ac_cv_header_wait_h" = yes; then
-	VICONF=viconf
-	dnl We need one of the above to build viconf. Just a sanity check,
-	dnl we don't want to stop people from building the rest of ircd
-	dnl just because they can't build viconf.
-else
-	VICONF=""
-fi
-
-AC_SUBST(VICONF)
 
 dnl See whether we can include both string.h and strings.h.
 AC_CACHE_CHECK([whether string.h and strings.h may both be included],

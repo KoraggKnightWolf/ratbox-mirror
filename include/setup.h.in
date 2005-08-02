@@ -237,9 +237,6 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Path to /dev/null */
-#undef PATH_DEVNULL
-
 /* This is the type of IO loop we are using */
 #undef SELECT_TYPE
 

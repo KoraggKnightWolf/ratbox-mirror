@@ -28,8 +28,12 @@ cat > static_modules.c <<EOF
  *  
  */
 #include "stdinc.h"
+#include "ircd_lib.h"
+#include "struct.h"
 #include "modules.h"
+#include "parse.h"
 #include "hash.h"
+#include "hook.h"
 #include "s_log.h"
 
 EOF

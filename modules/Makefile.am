@@ -115,7 +115,7 @@ static_modules.c: static_modules.c.SH
 	/bin/sh ./static_modules.c.SH $(ST_OBJS)
 
 libmodules.a: $(ST_OBJS) static_modules.lo
-	$(LIBTOOL) --mode=link  $(CC) --all-static $(CFLAGS) -o $@ $(ST_OBJS) $(SUFFIXES)
+	$(LIBTOOL) --mode=link  $(CC) --all-static $(CFLAGS) -o $@ $(ST_OBJS) static_modules.lo
 
 all:	libmodules.a
 	
@@ -155,5 +155,6 @@ install-mkdirs:
 	@mkdir -p -m 755 $(DESTDIR)$(moduledir)
 	@mkdir -p -m 755 $(DESTDIR)$(automoduledir)
 
-
+if !STATIC_MODULES
 install: install-mkdirs install_core install_modules
+endif
