@@ -31,7 +31,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "irc_string.h"
@@ -41,7 +40,6 @@
 #include "modules.h"
 #include "s_serv.h"
 #include "s_user.h"
-#include "snprintf.h"
 #include "send.h"
 
 typedef int (*bqcmp)(const void *, const void *);

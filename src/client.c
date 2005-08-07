@@ -24,19 +24,15 @@
  *  $Id$
  */
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "channel.h"
 #include "class.h"
-#include "event.h"
 #include "hash.h"
 #include "irc_string.h"
-#include "snprintf.h"
 #include "ircd.h"
 #include "s_gline.h"
 #include "numeric.h"
-#include "commio.h"
 #include "packet.h"
 #include "s_auth.h"
 #include "s_conf.h"
@@ -49,12 +45,10 @@
 #include "s_user.h"
 #include "hash.h"
 #include "hostmask.h"
-#include "balloc.h"
 #include "listener.h"
 #include "reject.h"
 #include "hook.h"
 #include "monitor.h"
-#include "linebuf.h"
 #include "parse.h"
 
 #define DEBUG_EXITED_CLIENTS

@@ -25,13 +25,12 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
+#include "ircd_lib.h"
 #include "s_log.h"
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "hostmask.h"
 #include "irc_string.h"
-#include "ircd_memory.h"
 #include "hash.h"
 #include "channel.h"
 

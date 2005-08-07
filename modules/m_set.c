@@ -27,14 +27,11 @@
 /* rewritten by jdc */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
-#include "event.h"
 #include "irc_string.h"
 #include "ircd.h"
 #include "numeric.h"
-#include "commio.h"
 #include "send.h"
 #include "channel.h"
 #include "s_conf.h"

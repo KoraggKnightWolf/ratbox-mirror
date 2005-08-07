@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "restart.h"
 #include "ircd.h"

@@ -24,6 +24,10 @@
  *  $Id$
  */
 
+#ifndef IRCD_LIB_H
+# error "Do not use balloc.h directly"
+#endif
+
 #ifndef INCLUDED_blalloc_h
 #define INCLUDED_blalloc_h
 

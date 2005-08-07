@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"		/* dlink_node/dlink_list */
 #include "struct.h"
 #include "class.h"		/* report_classes */
 #include "client.h"		/* Client */
@@ -37,13 +36,10 @@
 #include "hostmask.h"		/* report_mtrie_conf_links */
 #include "numeric.h"		/* ERR_xxx */
 #include "send.h"		/* sendto_one */
-#include "commio.h"		/* highest_fd */
 #include "s_conf.h"		/* ConfItem */
 #include "s_serv.h"		/* hunt_server */
 #include "s_stats.h"		/* tstats */
 #include "s_user.h"		/* show_opers */
-#include "event.h"		/* events */
-#include "linebuf.h"
 #include "parse.h"
 #include "hook.h"
 #include "modules.h"

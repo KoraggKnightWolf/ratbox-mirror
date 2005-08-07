@@ -26,9 +26,7 @@
 #ifndef INCLUDED_struct_h
 #define INCLUDED_struct_h
 
-
-#include "linebuf.h" /* okay shoot me..if i want to reuse the linebuf code i gotta do this */
-
+#include "ircd_lib.h"
 
 /*** client.h ***/
 

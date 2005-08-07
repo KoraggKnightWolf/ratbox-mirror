@@ -14,7 +14,6 @@
 #include <assert.h>
 #include <fcntl.h>
 #include <time.h>
-#define DNODE_HEAP_SIZE 8192
 
 #ifdef __MINGW32__
 #define FD_SETSIZE 16384 /* this is what cygwin uses..it probably sucks too oh well*/
@@ -153,8 +152,9 @@ void lib_ilog(const char *, ...);
 void lib_restart(const char *, ...);
 void lib_die(const char *, ...);
 void set_time(void);
-void ircd_lib(log_cb *xilog, restart_cb *irestart, die_cb *idie, int closeall, int maxfds);
-struct timeval SystemTime;  
+void ircd_lib(log_cb *xilog, restart_cb *irestart, die_cb *idie, int closeall, int maxfds, size_t lb_hp_size, size_t dh_size);
+extern struct timeval SystemTime;  
+
 #ifndef CurrentTime
 #define CurrentTime SystemTime.tv_sec
 #endif

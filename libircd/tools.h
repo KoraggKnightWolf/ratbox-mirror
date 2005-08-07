@@ -24,6 +24,10 @@
  *  $Id$
  */
 
+#ifndef IRCD_LIB_H
+# error "Do not use tools.h directly"                                   
+#endif
+
 #ifndef __TOOLS_H__
 #define __TOOLS_H__
 
@@ -62,7 +66,7 @@ struct _dlink_list
 
 dlink_node *make_dlink_node(void);
 void free_dlink_node(dlink_node * lp);
-void init_dlink_nodes(void);
+void init_dlink_nodes(size_t dh_size);
 
 #ifndef NDEBUG
 void mem_frob(void *ndata, int len);

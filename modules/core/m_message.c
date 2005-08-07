@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "ircd.h"
@@ -37,7 +36,6 @@
 #include "irc_string.h"
 #include "hash.h"
 #include "send.h"
-#include "event.h"
 #include "patricia.h"
 #include "s_newconf.h"
 

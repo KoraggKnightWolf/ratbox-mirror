@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "s_user.h"
 #include "channel.h"
@@ -33,12 +32,10 @@
 #include "client.h"
 #include "hash.h"
 #include "irc_string.h"
-#include "snprintf.h"
 #include "ircd.h"
 #include "listener.h"
 #include "parse.h"
 #include "numeric.h"
-#include "commio.h"
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "s_log.h"

@@ -21,12 +21,11 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
+#include "ircd_lib.h"
 #include "ircd_signal.h"
 #include "ircd.h"		/* dorehash */
 #include "restart.h"		/* server_reboot */
 #include "s_log.h"
-#include "commio.h"
 #include "s_conf.h"
 #include "res.h"
 #include "s_auth.h"

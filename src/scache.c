@@ -25,13 +25,12 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
+#include "ircd_lib.h"
 #include "irc_string.h"
 #include "ircd.h"
 #include "numeric.h"
 #include "send.h"
 #include "scache.h"
-#include "ircd_memory.h"
 
 
 /*

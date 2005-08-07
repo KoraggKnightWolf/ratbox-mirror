@@ -9,11 +9,9 @@
 #include <openssl/rsa.h>
 #endif
 
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "newconf.h"
-#include "snprintf.h"
 #include "s_log.h"
 #include "s_conf.h"
 #include "s_user.h"
@@ -24,7 +22,6 @@
 #include "listener.h"
 #include "hostmask.h"
 #include "s_serv.h"
-#include "event.h"
 #include "hash.h"
 #include "cache.h"
 #include "ircd.h"

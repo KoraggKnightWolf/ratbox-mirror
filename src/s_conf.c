@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "s_conf.h"
 #include "s_newconf.h"
@@ -34,7 +33,6 @@
 #include "channel.h"
 #include "class.h"
 #include "client.h"
-#include "event.h"
 #include "hash.h"
 #include "irc_string.h"
 #include "ircd_lib.h"
@@ -44,11 +42,9 @@
 #include "hook.h"
 #include "modules.h"
 #include "numeric.h"
-#include "commio.h"
 #include "s_log.h"
 #include "send.h"
 #include "s_gline.h"
-#include "balloc.h"
 #include "patricia.h"
 #include "reject.h"
 #include "cache.h"

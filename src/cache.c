@@ -33,15 +33,12 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
+#include "ircd_lib.h"
 #include "struct.h"
 #include "s_conf.h"
 #include "client.h"
-#include "balloc.h"
-#include "event.h"
 #include "hash.h"
 #include "cache.h"
-#include "snprintf.h"
 #include "irc_string.h"
 #include "ircd.h"
 #include "numeric.h"

@@ -565,7 +565,7 @@ int main(int argc, char **argv)
 	ifd = atoi(tifd);
 	ofd = atoi(tofd);
 
-	ircd_lib(NULL, NULL, NULL, 0); /* XXX fix me */
+	ircd_lib(NULL, NULL, NULL, 0, 256, 1024, 256); /* XXX fix me */
 
 	linebuf_newbuf(&sendq);
 	linebuf_newbuf(&recvq);

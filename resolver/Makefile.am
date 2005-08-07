@@ -9,4 +9,4 @@ resolver_CFLAGS = -I../adns -I../include -I../libircd
 # perhaps we should move this stuff into a lib someday
 # oh well...
 resolver_SOURCES = resolver.c 
-resolver_LDADD = -L../adns -ladns -L../libircd -lircd
+resolver_LDFLAGS = -L../adns -ladns -L../libircd -lircd

@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "hash.h"
@@ -45,7 +44,6 @@
 #include "scache.h"
 #include "s_newconf.h"
 #include "monitor.h"
-#include "commio.h"
 
 static int mr_nick(struct Client *, struct Client *, int, const char **);
 static int m_nick(struct Client *, struct Client *, int, const char **);

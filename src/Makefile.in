@@ -274,7 +274,7 @@ ircd_SOURCES = \
   whowas.c			\
   version.c			
 
-@STATIC_MODULES_FALSE@ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
+@STATIC_MODULES_FALSE@ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 @STATIC_MODULES_TRUE@ircd_LDADD = lex.yy.o y.tab.o @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
 ircd_LDFLAGS = -export-dynamic -L../libircd -lircd
 ircd_DEPENDENCIES = $(LIBLTDLC) version.o lex.yy.o y.tab.o

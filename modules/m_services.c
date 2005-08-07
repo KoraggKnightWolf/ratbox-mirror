@@ -32,7 +32,6 @@
 #include "stdinc.h"
 
 #ifdef ENABLE_SERVICES
-#include "tools.h"
 #include "struct.h"
 #include "send.h"
 #include "client.h"
@@ -47,7 +46,6 @@
 #include "whowas.h"
 #include "monitor.h"
 #include "s_serv.h"
-#include "commio.h"
 
 static int me_su(struct Client *, struct Client *, int, const char **);
 static int me_login(struct Client *, struct Client *, int, const char **);

@@ -30,18 +30,13 @@
 #include <openssl/rsa.h>
 #endif
 
-#include "tools.h"
 #include "struct.h"
 #include "s_serv.h"
 #include "class.h"
-#include "linebuf.h"
-#include "event.h"
 #include "hash.h"
 #include "irc_string.h"
-#include "snprintf.h"
 #include "ircd.h"
 #include "numeric.h"
-#include "commio.h"
 #include "packet.h"
 #include "s_conf.h"
 #include "s_newconf.h"

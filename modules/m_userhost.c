@@ -25,14 +25,12 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "ircd.h"
 #include "numeric.h"
 #include "send.h"
 #include "irc_string.h"
-#include "snprintf.h"
 #include "parse.h"
 #include "modules.h"
 

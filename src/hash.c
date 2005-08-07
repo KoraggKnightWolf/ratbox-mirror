@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "s_conf.h"
 #include "channel.h"
@@ -35,7 +34,6 @@
 #include "ircd.h"
 #include "numeric.h"
 #include "send.h"
-#include "ircd_memory.h"
 #include "cache.h"
 #include "s_newconf.h"
 

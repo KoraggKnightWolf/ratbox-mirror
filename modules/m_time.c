@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "ircd.h"
@@ -34,7 +33,6 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
-#include "snprintf.h"
 
 static int m_time(struct Client *, struct Client *, int, const char **);
 static char *date(void);

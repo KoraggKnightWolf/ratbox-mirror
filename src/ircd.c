@@ -25,14 +25,11 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "ircd.h"
 #include "channel.h"
 #include "class.h"
-#include "linebuf.h"
 #include "client.h"
-#include "event.h"
 #include "hash.h"
 #include "irc_string.h"
 #include "ircd_signal.h"
@@ -42,7 +39,6 @@
 #include "parse.h"
 #include "restart.h"
 #include "s_auth.h"
-#include "commio.h"
 #include "s_conf.h"
 #include "s_log.h"
 #include "s_serv.h"		/* try_connections */
@@ -53,7 +49,6 @@
 #include "hook.h"
 #include "modules.h"
 #include "ircd_getopt.h"
-#include "balloc.h"
 #include "newconf.h"
 #include "patricia.h"
 #include "reject.h"
@@ -81,7 +76,6 @@ struct admin_info AdminInfo;
 struct Counter Count;
 struct ServerStatistics ServerStats;
 
-struct timeval SystemTime;
 int ServerRunning;		/* GLOBAL - server execution state */
 struct Client me;		/* That's me */
 struct LocalUser meLocalUser;	/* That's also part of me */
@@ -552,7 +546,7 @@ main(int argc, char *argv[])
 	}
 
 	/* This must be after we daemonize.. */
-	ircd_lib(ilogcb, restartcb, diecb, 1);
+	ircd_lib(ilogcb, restartcb, diecb, 1, MAXCONNECTIONS, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE);
 
 	init_sys();
 	init_main_logfile();

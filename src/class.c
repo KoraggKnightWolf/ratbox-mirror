@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "class.h"
 #include "client.h"
@@ -35,7 +34,6 @@
 #include "s_newconf.h"
 #include "send.h"
 #include "irc_string.h"
-#include "ircd_memory.h"
 #include "patricia.h"
 
 #define BAD_CONF_CLASS          -1

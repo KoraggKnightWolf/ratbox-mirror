@@ -24,10 +24,13 @@
  *  $Id$
  */
 
+#ifndef IRCD_LIB_H
+# error "Do not use commio.h directly"                                   
+#endif
+
+
 #ifndef INCLUDED_commio_h
 #define INCLUDED_commio_h
-
-#include "ircd_lib.h"
 
 
 #ifdef EINPROGRESS

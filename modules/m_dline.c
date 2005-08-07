@@ -25,12 +25,9 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "irc_string.h"
-#include "ircd_memory.h"
-#include "snprintf.h"
 #include "reject.h"
 #include "ircd.h"
 #include "hostmask.h"

@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "channel.h"
 #include "hash.h"
@@ -36,7 +35,6 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
-#include "linebuf.h"
 #include "class.h"
 
 static int m_list(struct Client *, struct Client *, int, const char **);

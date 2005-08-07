@@ -33,7 +33,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "res.h"
 #include "s_conf.h"

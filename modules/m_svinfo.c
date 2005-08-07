@@ -24,7 +24,6 @@
  *  $Id$
  */
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "irc_string.h"

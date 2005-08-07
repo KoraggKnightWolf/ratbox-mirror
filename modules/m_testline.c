@@ -30,7 +30,6 @@
  * $Id$
  */
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "send.h"
 #include "modules.h"
@@ -39,7 +38,6 @@
 #include "numeric.h"
 #include "s_conf.h"
 #include "s_newconf.h"
-#include "snprintf.h"
 #include "irc_string.h"
 #include "ircd.h"
 #include "reject.h"

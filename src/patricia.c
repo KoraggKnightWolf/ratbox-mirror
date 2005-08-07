@@ -22,7 +22,6 @@
 #include "stdinc.h"
 #include "ircd_lib.h"
 #include "patricia.h"
-#include "balloc.h"
 #include "irc_string.h"
 
 static BlockHeap *prefix_heap;

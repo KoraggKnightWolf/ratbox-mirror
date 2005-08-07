@@ -24,12 +24,10 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "channel.h"
 #include "ircd.h"
-#include "ircd_memory.h"
 #include "numeric.h"
 #include "s_serv.h"
 #include "send.h"
@@ -39,7 +37,6 @@
 #include "s_newconf.h"
 #include "hash.h"
 #include "s_log.h"
-#include "snprintf.h"
 #include "irc_string.h"
 
 static int mo_resv(struct Client *, struct Client *, int, const char **);

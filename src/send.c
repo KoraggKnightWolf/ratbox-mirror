@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "send.h"
 #include "channel.h"
@@ -35,12 +34,9 @@
 #include "irc_string.h"
 #include "ircd.h"
 #include "numeric.h"
-#include "commio.h"
 #include "s_serv.h"
-#include "snprintf.h"
 #include "s_conf.h"
 #include "s_newconf.h"
-#include "linebuf.h"
 #include "s_log.h"
 #include "hook.h"
 

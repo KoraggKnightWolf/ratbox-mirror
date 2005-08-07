@@ -24,6 +24,10 @@
  *  $Id$
  */
 
+#ifndef IRCD_LIB_H
+#error "Do not use ircd_memory.h directly"
+#endif
+
 #ifndef _I_MEMORY_H
 #define _I_MEMORY_H
 

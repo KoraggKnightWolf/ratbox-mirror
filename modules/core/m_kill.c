@@ -25,13 +25,11 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "hash.h"		/* for find_client() */
 #include "ircd.h"
 #include "numeric.h"
-#include "snprintf.h"
 #include "s_log.h"
 #include "s_conf.h"
 #include "send.h"

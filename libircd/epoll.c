@@ -26,12 +26,8 @@
  *  $Id$
  */
 
-#include "stdinc.h"
+#include "ircd_lib.h"
 #include <sys/epoll.h>
-#include "tools.h"
-#include "commio.h"
-#include "ircd_memory.h"
-
 
 
 static int ep;			/* epoll file descriptor */
@@ -86,8 +82,8 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 	int old_flags = F->pflags;
 	int op = -1;
 	
-	s_assert(fd >= 0);
-	s_assert(F->flags.open);
+	lircd_assert(fd >= 0);
+	lircd_assert(F->flags.open);
 	
 	/* Update the list, even though we're not using it .. */
 	if(type & COMM_SELECT_READ)

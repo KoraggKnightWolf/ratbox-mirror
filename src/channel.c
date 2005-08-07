@@ -25,14 +25,12 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "channel.h"
 #include "client.h"
 #include "hash.h"
 #include "hook.h"
 #include "irc_string.h"
-#include "snprintf.h"
 #include "ircd.h"
 #include "numeric.h"
 #include "s_serv.h"		/* captab */
@@ -41,8 +39,6 @@
 #include "whowas.h"
 #include "s_conf.h"		/* ConfigFileEntry, ConfigChannel */
 #include "s_newconf.h"
-#include "event.h"
-#include "balloc.h"
 #include "s_log.h"
 
 struct config_channel_entry ConfigChannel;

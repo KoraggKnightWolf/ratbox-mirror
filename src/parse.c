@@ -25,21 +25,18 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "parse.h"
 #include "client.h"
 #include "channel.h"
 #include "hash.h"
 #include "irc_string.h"
-#include "snprintf.h"
 #include "ircd.h"
 #include "numeric.h"
 #include "s_log.h"
 #include "s_stats.h"
 #include "send.h"
 #include "s_conf.h"
-#include "ircd_memory.h"
 #include "s_serv.h"
 
 /*

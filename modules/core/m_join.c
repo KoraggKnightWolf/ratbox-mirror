@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "channel.h"
 #include "client.h"
@@ -38,7 +37,6 @@
 #include "s_conf.h"
 #include "parse.h"
 #include "modules.h"
-#include "snprintf.h"
 
 static int m_join(struct Client *, struct Client *, int, const char **);
 static int ms_join(struct Client *, struct Client *, int, const char **);

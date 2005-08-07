@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "channel.h"
 #include "client.h"
@@ -40,7 +39,6 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
-#include "snprintf.h"
 #include "s_newconf.h"
 
 static int m_mode(struct Client *, struct Client *, int, const char **);

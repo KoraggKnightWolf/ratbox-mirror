@@ -24,17 +24,13 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "patricia.h"
 #include "client.h"
 #include "s_conf.h"
-#include "event.h"
-#include "tools.h"
 #include "reject.h"
 #include "s_stats.h"
 #include "ircd.h"
-#include "commio.h"
 #include "send.h"
 #include "numeric.h"
 #include "parse.h"

@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"		/* client struct */
 #include "channel.h"
@@ -42,10 +41,7 @@
 #include "hook.h"
 #include "modules.h"
 #include "s_stats.h"
-#include "commio.h"
 #include "packet.h"
-#include "snprintf.h"
-#include "linebuf.h"
 #include "s_user.h"
 
 static int mr_server(struct Client *, struct Client *, int, const char **);

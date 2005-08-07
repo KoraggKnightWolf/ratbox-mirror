@@ -55,12 +55,11 @@ static int bufline_count = 0;
  * Initialise the linebuf mechanism
  */
 
-
 void
-linebuf_init(void)
+linebuf_init(size_t heap_size)
 {
 #ifndef NO_BLOCKHEAP
-	linebuf_heap = BlockHeapCreate(sizeof(buf_line_t), LINEBUF_HEAP_SIZE);
+	linebuf_heap = BlockHeapCreate(sizeof(buf_line_t), heap_size);
 #endif
 }
 

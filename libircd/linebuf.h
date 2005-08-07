@@ -24,6 +24,10 @@
  *  $Id$
  */
 
+#ifndef IRCD_LIB_H
+# error "Do not use linebuf.h directly"                                   
+#endif
+
 #ifndef __LINEBUF_H__
 #define __LINEBUF_H__
 
@@ -67,7 +71,7 @@ typedef struct _buf_head
 #define linebuf_alloclen(x)	((x)->alloclen)
 #define linebuf_numlines(x)	((x)->numlines)
 
-extern void linebuf_init(void);
+extern void linebuf_init(size_t heap_size);
 /* declared as static */
 /* extern buf_line_t *linebuf_new_line(buf_head_t *); */
 /* extern void linebuf_done_line(buf_head_t *, buf_line_t *, dlink_node *); */

@@ -25,7 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "hook.h"
 #include "modules.h"
@@ -38,8 +37,6 @@
 #include "numeric.h"
 #include "parse.h"
 #include "irc_string.h"
-#include "ircd_memory.h"
-#include "snprintf.h"
 
 /* Needed to use uintptr_t for some pointer manipulation. */
 #ifdef HAVE_INTTYPES_H
@@ -114,7 +111,6 @@ extern struct Message error_msgtab;
 void
 modules_init(void)
 {
-	LTDL_SET_PRELOADED_SYMBOLS();
 	if(lt_dlinit())
 	{
 		ilog(L_MAIN, "lt_dlinit failed");

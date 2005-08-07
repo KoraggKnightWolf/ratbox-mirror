@@ -23,7 +23,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"
 #include "parse.h"
@@ -31,7 +30,6 @@
 #include "numeric.h"
 #include "send.h"
 #include "s_conf.h"
-#include "snprintf.h"
 #include "ircd.h"
 #include "irc_string.h"
 

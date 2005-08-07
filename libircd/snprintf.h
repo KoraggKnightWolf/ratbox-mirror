@@ -24,6 +24,10 @@
  *  $Id$
  */
 
+#ifndef IRCD_LIB_H
+# error "Do not use snprintf.h directly"                                   
+#endif
+
 #ifndef SPRINTF_IRC
 #define SPRINTF_IRC
 

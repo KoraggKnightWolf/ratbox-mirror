@@ -24,10 +24,12 @@
  *  $Id$
  */
 
+#ifndef IRCD_LIB_H
+# error "Do not use event.h directly"                                   
+#endif
+
 #ifndef INCLUDED_event_h
 #define INCLUDED_event_h
-
-#include "ircd_lib.h"
 
 #if defined(USE_SIGIO) || (USE_PORTS) && (HAVE_TIMER_CREATE)
 #define USE_POSIX_TIMERS 1

@@ -25,15 +25,12 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "listener.h"
 #include "client.h"
 #include "irc_string.h"
-#include "snprintf.h"
 #include "ircd.h"
 #include "numeric.h"
-#include "commio.h"
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "s_stats.h"

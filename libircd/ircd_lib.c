@@ -4,6 +4,8 @@
 
 #include "ircd_lib.h"
 
+struct timeval SystemTime;
+
 static log_cb *ircd_log;
 static restart_cb *ircd_restart;
 static die_cb *ircd_die;
@@ -72,17 +74,17 @@ set_time(void)
 
 
 void
-ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int maxconnections)
+ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int maxcon, size_t lb_heap_size, size_t dh_size)
 {
 	ircd_log = ilog;
 	ircd_restart = irestart;
 	ircd_die = idie;
 	
-	fdlist_init(closeall, maxconnections);
+	fdlist_init(closeall, maxcon);
 	init_netio();
 	eventInit();
 	initBlockHeap();
-	init_dlink_nodes();
-	linebuf_init();
+	init_dlink_nodes(dh_size);
+	linebuf_init(lb_heap_size);
 }
 

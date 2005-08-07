@@ -25,8 +25,6 @@
  */
 
 #include "stdinc.h"
-#include "snprintf.h"
-#include "tools.h"
 #include "struct.h"
 #include "channel.h"
 #include "client.h"

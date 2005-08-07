@@ -25,11 +25,9 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "client.h"		/* client struct */
 #include "irc_string.h"
-#include "ircd_memory.h"
 #include "send.h"		/* sendto_one */
 #include "ircd.h"		/* me */
 #include "parse.h"

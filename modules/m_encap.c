@@ -30,7 +30,6 @@
  */
 
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "send.h"
 #include "ircd.h"
@@ -38,7 +37,6 @@
 #include "hash.h"
 #include "parse.h"
 #include "modules.h"
-#include "snprintf.h"
 #include "irc_string.h"
 
 static int ms_encap(struct Client *client_p, struct Client *source_p,

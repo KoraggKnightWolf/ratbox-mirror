@@ -34,24 +34,19 @@
  *     --Bleep  Thomas Helvey <tomh@inxpress.net>
  */
 #include "stdinc.h"
-#include "tools.h"
 #include "struct.h"
 #include "s_auth.h"
 #include "s_conf.h"
 #include "client.h"
-#include "event.h"
 #include "irc_string.h"
 #include "ircd_lib.h"
 #include "ircd.h"
 #include "numeric.h"
-#include "commio.h"
 #include "packet.h"
 #include "s_log.h"
 #include "s_stats.h"
 #include "send.h"
 #include "hook.h"
-#include "balloc.h"
-#include "linebuf.h"
 #include "res.h"
 
 /*
