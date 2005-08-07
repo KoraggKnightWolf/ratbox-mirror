@@ -1,3 +1,39 @@
+androsyn    2005/08/07 15:54:31 UTC	(20050807_0-20614)
+  Log:
+  Change libircd headers a bit.  Move balloc.h into the libircd directory.
+  Start some minor bit of work on a native win32 port again(don't ask me why
+  but for some reason it seems to amuse me at the moment)
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/balloc.h (File Deleted) 
+	ircd-ratbox/trunk/include/ircd_defs.h (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+	ircd-ratbox/trunk/libircd/balloc.h (File Added) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/event.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.h (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_memory.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_memory.h (File Modified) 
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/select.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/snprintf.c (File Modified) 
+	ircd-ratbox/trunk/libircd/tools.c (File Modified) 
+	ircd-ratbox/trunk/libircd/win32.c (File Added) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2005/07/31 05:13:07 UTC	(20050731_0-20609)
   Log:
   userhost should allow 5 userhost checks, not 4
