@@ -50,11 +50,7 @@
  * to execute it.
  */
 
-#include "stdinc.h"
-#include "tools.h"
-#include "commio.h"
-#include "snprintf.h"
-#include "event.h"
+#include "ircd_lib.h"
 
 static const char *last_event_ran = NULL;
 struct ev_entry event_table[MAX_EVENTS];

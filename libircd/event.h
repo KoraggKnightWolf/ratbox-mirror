@@ -27,9 +27,7 @@
 #ifndef INCLUDED_event_h
 #define INCLUDED_event_h
 
-#include "setup.h"
-#include "commio.h"
-
+#include "ircd_lib.h"
 
 #if defined(USE_SIGIO) || (USE_PORTS) && (HAVE_TIMER_CREATE)
 #define USE_POSIX_TIMERS 1

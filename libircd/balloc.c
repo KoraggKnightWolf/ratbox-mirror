@@ -56,15 +56,10 @@
  *
  *
  */
-
-#include "stdinc.h"
-#include "tools.h"
+#include "ircd_lib.h"
 #include "balloc.h"
-
 #ifndef NOBALLOC
 
-#include "ircd_lib.h"
-#include "ircd_memory.h"
 #include "tools.h"
 #include "event.h"
 
@@ -344,7 +339,7 @@ BlockHeap *
 BlockHeapCreate(size_t elemsize, int elemsperblock)
 {
 	BlockHeap *bh;
-	s_assert(elemsize > 0 && elemsperblock > 0);
+	lircd_assert(elemsize > 0 && elemsperblock > 0);
 
 	/* Catch idiotic requests up front */
 	if((elemsize <= 0) || (elemsperblock <= 0))
@@ -408,7 +403,7 @@ BlockHeapAlloc(BlockHeap * bh)
 	Block *walker;
 	dlink_node *new_node;
 
-	s_assert(bh != NULL);
+	lircd_assert(bh != NULL);
 	if(bh == NULL)
 	{
 		blockheap_fail("Cannot allocate if bh == NULL");
@@ -441,7 +436,7 @@ BlockHeapAlloc(BlockHeap * bh)
 			bh->freeElems--;
 			new_node = walker->free_list.head;
 			dlinkMoveNode(new_node, &walker->free_list, &walker->used_list);
-			s_assert(new_node->data != NULL);
+			lircd_assert(new_node->data != NULL);
 			if(new_node->data == NULL)
 				blockheap_fail("new_node->data is NULL and that shouldn't happen!!!");
 			memset(new_node->data, 0, bh->elemSize);
@@ -480,8 +475,8 @@ BlockHeapFree(BlockHeap * bh, void *ptr)
 	Block *block;
 	struct MemBlock *memblock;
 
-	s_assert(bh != NULL);
-	s_assert(ptr != NULL);
+	lircd_assert(bh != NULL);
+	lircd_assert(ptr != NULL);
 
 	if(bh == NULL)
 	{
@@ -509,7 +504,7 @@ BlockHeapFree(BlockHeap * bh, void *ptr)
 		outofmemory();
 	}
 #endif
-	s_assert(memblock->block != NULL);
+	lircd_assert(memblock->block != NULL);
 	if(memblock->block == NULL)
 	{
 		blockheap_fail("memblock->block == NULL, not a valid block?");

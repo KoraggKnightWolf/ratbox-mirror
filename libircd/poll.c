@@ -41,7 +41,7 @@
 
 struct _pollfd_list
 {
-	struct pollfd pollfds[MAXCONNECTIONS];
+	struct pollfd *pollfds;
 	int maxindex;		/* highest FD number */
 };
 
@@ -62,7 +62,7 @@ static inline int
 poll_findslot(void)
 {
 	int i;
-	for (i = 0; i < MAXCONNECTIONS; i++)
+	for (i = 0; i < maxconnections; i++)
 	{
 		if(pollfd_list.pollfds[i].fd == -1)
 		{
@@ -135,8 +135,8 @@ void
 init_netio(void)
 {
 	int fd;
-
-	for (fd = 0; fd < MAXCONNECTIONS; fd++)
+	pollfd_list.pollfds = MyMalloc(maxconnections * (sizeof struct pollfd));
+	for (fd = 0; fd < maxconnections; fd++)
 	{
 		pollfd_list.pollfds[fd].fd = -1;
 	}

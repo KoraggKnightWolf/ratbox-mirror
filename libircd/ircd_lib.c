@@ -2,13 +2,7 @@
  * $Id$
  */
 
-#include "stdinc.h"
-#include "tools.h"
 #include "ircd_lib.h"
-#include "snprintf.h"
-#include "commio.h"
-#include "balloc.h"
-#include "event.h"
 
 static log_cb *ircd_log;
 static restart_cb *ircd_restart;
@@ -78,13 +72,13 @@ set_time(void)
 
 
 void
-ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall)
+ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int maxconnections)
 {
 	ircd_log = ilog;
 	ircd_restart = irestart;
 	ircd_die = idie;
-
-	fdlist_init(closeall);
+	
+	fdlist_init(closeall, maxconnections);
 	init_netio();
 	eventInit();
 	initBlockHeap();

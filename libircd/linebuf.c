@@ -24,14 +24,7 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "tools.h"
-#include "linebuf.h"
-#include "memory.h"
-#include "event.h"
-#include "balloc.h"
-#include "commio.h"
-#include "snprintf.h"
+#include "ircd_lib.h"
 
 #ifdef STRING_WITH_STRINGS
 # include <string.h>
@@ -52,6 +45,9 @@ static BlockHeap *linebuf_heap;
 
 static int bufline_count = 0;
 
+#ifndef LINEBUF_HEAP_SIZE
+#define LINEBUF_HEAP_SIZE 2048
+#endif
 
 /*
  * linebuf_init
@@ -144,17 +140,17 @@ linebuf_done_line(buf_head_t * bufhead, buf_line_t * bufline, dlink_node * node)
 	/* Update the allocated size */
 	bufhead->alloclen--;
 	bufhead->len -= bufline->len;
-	s_assert(bufhead->len >= 0);
+	lircd_assert(bufhead->len >= 0);
 	bufhead->numlines--;
 
 	bufline->refcount--;
-	s_assert(bufline->refcount >= 0);
+	lircd_assert(bufline->refcount >= 0);
 
 	if(bufline->refcount == 0)
 	{
 		/* and finally, deallocate the buf */
 		--bufline_count;
-		s_assert(bufline_count >= 0);
+		lircd_assert(bufline_count >= 0);
 		linebuf_free(bufline);
 	}
 }
@@ -183,7 +179,7 @@ linebuf_skip_crlf(char *ch, int len)
 		if((*ch != '\r') && (*ch != '\n'))
 			break;
 	}
-	s_assert(orig_len > len);
+	lircd_assert(orig_len > len);
 	return (orig_len - len);
 }
 
@@ -247,7 +243,7 @@ linebuf_copy_line(buf_head_t * bufhead, buf_line_t * bufline, char *data, int le
 	/* If its full or terminated, ignore it */
 
 	bufline->raw = 0;
-	s_assert(bufline->len < BUF_DATA_SIZE);
+	lircd_assert(bufline->len < BUF_DATA_SIZE);
 	if(bufline->terminated == 1)
 		return 0;
 
@@ -320,7 +316,7 @@ linebuf_copy_raw(buf_head_t * bufhead, buf_line_t * bufline, char *data, int len
 	/* If its full or terminated, ignore it */
 
 	bufline->raw = 1;
-	s_assert(bufline->len < BUF_DATA_SIZE);
+	lircd_assert(bufline->len < BUF_DATA_SIZE);
 	if(bufline->terminated == 1)
 		return 0;
 
@@ -390,7 +386,7 @@ linebuf_parse(buf_head_t * bufhead, char *data, int len, int raw)
 	{
 		/* Check we're doing the partial buffer thing */
 		bufline = bufhead->list.tail->data;
-		s_assert(!bufline->flushing);
+		lircd_assert(!bufline->flushing);
 		/* just try, the worst it could do is *reject* us .. */
 		if(!raw)
 			cpylen = linebuf_copy_line(bufhead, bufline, data, len);
@@ -407,7 +403,7 @@ linebuf_parse(buf_head_t * bufhead, char *data, int len, int raw)
 
 		/* Skip the data and update len .. */
 		len -= cpylen;
-		s_assert(len >= 0);
+		lircd_assert(len >= 0);
 		data += cpylen;
 	}
 
@@ -427,7 +423,7 @@ linebuf_parse(buf_head_t * bufhead, char *data, int len, int raw)
 			return -1;
 
 		len -= cpylen;
-		s_assert(len >= 0);
+		lircd_assert(len >= 0);
 		data += cpylen;
 		linecnt++;
 	}
@@ -460,7 +456,7 @@ linebuf_get(buf_head_t * bufhead, char *buf, int buflen, int partial, int raw)
 
 	/* make sure we've got the space, including the NULL */
 	cpylen = bufline->len;
-	s_assert(cpylen + 1 <= buflen);
+	lircd_assert(cpylen + 1 <= buflen);
 
 	/* Copy it */
 	start = bufline->buf;
@@ -490,7 +486,7 @@ linebuf_get(buf_head_t * bufhead, char *buf, int buflen, int partial, int raw)
 	if(bufline->raw && !raw)
 		buf[cpylen] = '\0';
 
-	s_assert(cpylen >= 0);
+	lircd_assert(cpylen >= 0);
 
 	/* Deallocate the line */
 	linebuf_done_line(bufhead, bufline, bufhead->list.head);
@@ -547,7 +543,7 @@ linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list * va_args, cons
 	if(bufhead->list.tail)
 	{
 		bufline = bufhead->list.tail->data;
-		s_assert(bufline->terminated);
+		lircd_assert(bufline->terminated);
 	}
 #endif
 	/* Create a new line */
@@ -609,7 +605,7 @@ linebuf_put(buf_head_t * bufhead, const char *format, ...)
 	if(bufhead->list.tail)
 	{
 		bufline = bufhead->list.tail->data;
-		s_assert(bufline->terminated);
+		lircd_assert(bufline->terminated);
 	}
 #endif
 	/* Create a new line */
@@ -676,6 +672,7 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 
 	if(comm_can_writev(fd))
 	{
+#ifdef HAVE_WRITEV
 		dlink_node *ptr;
 		int x = 0, y;
 		int xret;
@@ -744,7 +741,7 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 					xret -= bufhead->writeofs;
 
 				ptr = ptr->next;
-				s_assert(bufhead->len >= 0);
+				lircd_assert(bufhead->len >= 0);
 				linebuf_done_line(bufhead, bufline, bufhead->list.head);
 			}
 			else
@@ -756,6 +753,7 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 		}
 
 		return retval;
+#endif
 	}
 
 	/* this is the non-writev case */	
@@ -798,7 +796,7 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 	if(bufhead->writeofs == bufline->len)
 	{
 		bufhead->writeofs = 0;
-		s_assert(bufhead->len >= 0);
+		lircd_assert(bufhead->len >= 0);
 		linebuf_done_line(bufhead, bufline, bufhead->list.head);
 	}
 

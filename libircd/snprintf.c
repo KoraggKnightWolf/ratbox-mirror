@@ -9,14 +9,7 @@
  * $Id$
  */
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <ctype.h>
-#include "setup.h"
-#include "snprintf.h"
+#include "ircd_lib.h"
 
 /*
  *  This table is arranged in chronological order from 0-999,

@@ -2,9 +2,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = -I.
+INCLUDES = -I. -I../include
 
-libircd_a_SOURCES =                     	\
+libircd_la_SOURCES =                     	\
 	balloc.c			\
 	commio.c			\
 	event.c				\
@@ -21,6 +21,7 @@ libircd_a_SOURCES =                     	\
 .c.la:
 	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS)
 
-noinst_LIBRARIES = libircd.a
-
+#noinst_LIBRARIES = libircd.a
+libircd_la_LDFLAGS = -avoid-version -no-undefined
+lib_LTLIBRARIES = libircd.la
 

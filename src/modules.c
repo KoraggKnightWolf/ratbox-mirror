@@ -40,9 +40,20 @@
 #include "irc_string.h"
 #include "ircd_memory.h"
 #include "snprintf.h"
-#include "ltdl.h"
+
+/* Needed to use uintptr_t for some pointer manipulation. */
+#ifdef HAVE_INTTYPES_H
+#include <inttypes.h>
+#else /* No inttypes.h */
+#ifndef HAVE_UINTPTR_T
+typedef unsigned long uintptr_t;
+#endif
+#endif
 
 #ifndef STATIC_MODULES
+#include "ltdl.h"
+
+
 struct module **modlist = NULL;
 static char unknown_ver[] = "<unknown>";
 static const char *core_module_table[] = {

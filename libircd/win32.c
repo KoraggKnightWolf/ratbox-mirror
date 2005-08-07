@@ -1,6 +1,6 @@
 /*
  *  ircd-ratbox: A slightly useful ircd.
- *  select.c: select() compatible network routines.
+ *  win32.c: select() compatible network routines.
  *
  *  Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
  *  Copyright (C) 1996-2002 Hybrid Development Team
@@ -22,10 +22,35 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id$
+ *  $Id: select.c 20593 2005-07-24 02:57:33Z androsyn $
  */
 
 #include "ircd_lib.h"
+
+/*
+ * having gettimeofday is nice...
+ */
+
+int 
+gettimeofday(struct timeval *tv, void *unused)
+{	
+    SYSTEMTIME st;
+    struct tm tm;
+    time_t t;
+    GetSystemTime(&st);
+    tm.tm_sec = st.wSecond;
+    tm.tm_min = st.wMinute;
+    tm.tm_hour = st.wHour;
+    tm.tm_mday = st.wDay;
+    tm.tm_mon = st.wMonth - 1;
+    tm.tm_year = st.wYear - 1900;
+    tm.tm_isdst = -1;
+    t = mktime(&tm);
+    tv->tv_sec = t;
+    tv->tv_usec = st.wMilliseconds * 1000;
+    return 0; 
+}
+
 
 /*
  * Note that this is only a single list - multiple lists is kinda pointless
@@ -83,11 +108,16 @@ select_update_selectfds(int fd, short event, PF * handler)
  * This is a needed exported function which will be called to initialise
  * the network loop code.
  */
+HANDLE    hIocp;
+
 void
 init_netio(void)
 {
-	FD_ZERO(&select_readfds);
-	FD_ZERO(&select_writefds);
+	hIocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, (ULONG_PTR)0, 0);
+	if (hIocp == NULL) 
+	{
+		exit(1);
+	};
 }
 
 /*

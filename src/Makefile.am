@@ -62,7 +62,7 @@ ircd_SOURCES =                     \
 
 
 if STATIC_MODULES
-ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
+ircd_LDADD = lex.yy.o y.tab.o @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
 else
 ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
 endif

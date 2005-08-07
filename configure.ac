@@ -37,9 +37,10 @@ AC_LIBTOOL_DLOPEN
 AM_DISABLE_STATIC
 AM_ENABLE_SHARED
 AM_MAINTAINER_MODE
+F77=no
+CXX=no
 
 AM_CONDITIONAL([STATIC_MODULES], test "$enable_static" = "yes")
-
 AC_PROG_LIBTOOL
 
 AC_CONFIG_SUBDIRS(libltdl)
@@ -92,7 +93,6 @@ dnl Networking Functions
 dnl ====================
 
 AC_SEARCH_LIBS(socket, socket, , [AC_MSG_ERROR([You have no socket()! Aborting.])])
-AC_SEARCH_LIBS(inet_ntoa, nsl, , [AC_MSG_ERROR([You have no inet_ntoa()! Aborting.])])
 
 AC_CHECK_MEMBER([struct sockaddr.sa_len], [AC_DEFINE(SOCKADDR_IN_HAS_LEN, 1, [Define to 1 if sockaddr has a 'sa_len'
 member.])],,[[#include <sys/types.h>

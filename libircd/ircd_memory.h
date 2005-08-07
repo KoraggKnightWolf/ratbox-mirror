@@ -27,14 +27,6 @@
 #ifndef _I_MEMORY_H
 #define _I_MEMORY_H
 
-/* Needed to use uintptr_t for some pointer manipulation. */
-#ifdef HAVE_INTTYPES_H
-#include <inttypes.h>
-#else /* No inttypes.h */
-#ifndef HAVE_UINTPTR_T
-typedef unsigned long uintptr_t;
-#endif
-#endif
 
 extern void outofmemory(void);
 

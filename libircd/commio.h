@@ -27,7 +27,6 @@
 #ifndef INCLUDED_commio_h
 #define INCLUDED_commio_h
 
-#include "setup.h"
 #include "ircd_lib.h"
 
 
@@ -181,7 +180,7 @@ struct _fde
 
 extern fde_t *fd_table;
 
-void fdlist_init(int);
+void fdlist_init(int closeall, int maxfds);
 
 extern void comm_open(int, unsigned int, const char *);
 extern void comm_close(int);
@@ -257,7 +256,7 @@ const char *inetntop(int af, const void *src, char *dst, unsigned int size);
 int inetpton(int af, const char *src, void *dst);
 const char *inetntop_sock(struct sockaddr *src, char *dst, unsigned int size);
 int inetpton_sock(const char *src, struct sockaddr *dst);
-
+extern int maxconnections;
 #ifdef IPV6
 extern void mangle_mapped_sockaddr(struct sockaddr *in);
 #else

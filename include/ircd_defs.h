@@ -115,59 +115,11 @@
 #define CLIENT_OK	1
 
 #ifdef IPV6
-#ifndef AF_INET6
-#error "AF_INET6 not defined"
-#endif
-
-
-#else /* #ifdef IPV6 */
-
-#ifndef AF_INET6
-#define AF_INET6 AF_MAX		/* Dummy AF_INET6 declaration */
-#endif
-#endif /* #ifdef IPV6 */
-
-
-#ifdef IPV6
-#define irc_sockaddr_storage sockaddr_storage
-#else
-#define irc_sockaddr_storage sockaddr
-#define ss_family sa_family
-#ifdef SOCKADDR_IN_HAS_LEN
-#define ss_len sa_len
-#endif
-#endif
-
-#ifdef IPV6
 #define PATRICIA_BITS	128
 #else
 #define PATRICIA_BITS	32
 #endif
 
-#ifdef SOCKADDR_IN_HAS_LEN
-#define SET_SS_LEN(x, y) ((struct irc_sockaddr_storage)(x)).ss_len = y
-#define GET_SS_LEN(x) x.ss_len
-#else
-#define SET_SS_LEN(x, y)
-#ifdef IPV6
-#define GET_SS_LEN(x) x.ss_family == AF_INET ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6)
-#else
-#define GET_SS_LEN(x) sizeof(struct sockaddr_in)
-#endif
-#endif
 
-#ifndef INADDRSZ
-#define INADDRSZ 4
-#endif
-
-#ifdef IPV6
-#ifndef IN6ADDRSZ
-#define IN6ADDRSZ 16
-#endif
-#endif 
-  
-#ifndef INT16SZ
-#define INT16SZ 2
-#endif
 
 #endif /* INCLUDED_ircd_defs_h */

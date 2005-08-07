@@ -24,11 +24,7 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "tools.h"
-#include "commio.h"
-#include "ircd_memory.h"
-#include "snprintf.h"
+#include "ircd_lib.h"
 
 #ifndef IN_LOOPBACKNET
 #define IN_LOOPBACKNET        0x7f
@@ -58,7 +54,7 @@ static void fdlist_update_biggest(int fd, int opening);
 /* Highest FD and number of open FDs .. */
 int highest_fd = -1;		/* Its -1 because we haven't started yet -- adrian */
 int number_fd = 0;
-
+int maxconnections = 0;
 
 static void comm_connect_callback(int fd, int status);
 static PF comm_connect_timeout;
@@ -99,7 +95,7 @@ comm_close_all(void)
 	/* XXX someone tell me why we care about 4 fd's ? */
 	/* XXX btw, fd 3 is used for profiler ! */
 
-	for (i = 4; i < MAXCONNECTIONS; ++i)
+	for (i = 4; i < maxconnections; ++i)
 	{
 			close(i);
 	}
@@ -177,10 +173,17 @@ comm_set_nb(int fd)
 	int nonb = 0;
 	int res;
 
+#ifdef O_NONBLOCK
 	nonb |= O_NONBLOCK;
 	res = fcntl(fd, F_GETFL, 0);
 	if(-1 == res || fcntl(fd, F_SETFL, res | nonb) == -1)
 		return 0;
+#else	
+	nonb = 1;
+	res = 0;
+	if(ioctl(fd, FIONBIO, &nonb) == -1)
+		return 0;
+#endif
 
 	fd_table[fd].flags.nonblocking = 1;
 	return 1;
@@ -197,9 +200,9 @@ void
 comm_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 {
 	fde_t *F;
-	s_assert(fd >= 0);
+	lircd_assert(fd >= 0);
 	F = &fd_table[fd];
-	s_assert(F->flags.open);
+	lircd_assert(F->flags.open);
 
 	F->timeout = CurrentTime + (timeout / 1000);
 	F->timeout_handler = callback;
@@ -221,9 +224,9 @@ void
 comm_setflush(int fd, time_t timeout, PF * callback, void *cbdata)
 {
 	fde_t *F;
-	s_assert(fd >= 0);
+	lircd_assert(fd >= 0);
 	F = &fd_table[fd];
-	s_assert(F->flags.open);
+	lircd_assert(F->flags.open);
 
 	F->flush_timeout = CurrentTime + (timeout / 1000);
 	F->flush_handler = callback;
@@ -297,10 +300,10 @@ comm_connect_tcp(int fd, struct sockaddr *dest,
 		 void *data, int timeout)
 {
 	fde_t *F;
-	s_assert(fd >= 0);
+	lircd_assert(fd >= 0);
 	F = &fd_table[fd];
 	F->flags.called_connect = 1;
-	s_assert(callback);
+	lircd_assert(callback);
 	F->connect.callback = callback;
 	F->connect.data = data;
 
@@ -422,7 +425,8 @@ comm_errstr(int error)
 int
 comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note)
 {
-	if(number_fd >= MASTER_MAX)
+#ifndef __MINGW32__
+	if(number_fd >= maxconnections)
 	{
 		errno = ENFILE;
 		return -1;
@@ -456,7 +460,9 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 	/* Next, update things in our fd tracking */
 	comm_open(nfd[0], FD_SOCKET, note);
 	return 0;
-	
+#else
+	return -1;
+#endif	
 }
 
 
@@ -464,7 +470,7 @@ int
 comm_pipe(int *fd, const char *desc)
 {
 
-	if(number_fd >= MASTER_MAX)
+	if(number_fd >= maxconnections)
 	{
 		errno = ENFILE;
 		return -1;
@@ -488,7 +494,7 @@ comm_socket(int family, int sock_type, int proto, const char *note)
 {
 	int fd;
 	/* First, make sure we aren't going to run out of file descriptors */
-	if(number_fd >= MASTER_MAX)
+	if(number_fd >= maxconnections)
 	{
 		errno = ENFILE;
 		return -1;
@@ -546,7 +552,7 @@ int
 comm_accept(int fd, struct sockaddr *pn, socklen_t *addrlen)
 {
 	int newfd;
-	if(number_fd >= MASTER_MAX)
+	if(number_fd >= maxconnections)
 	{
 		errno = ENFILE;
 		return -1;
@@ -610,40 +616,41 @@ fdlist_update_biggest(int fd, int opening)
 {
 	if(fd < highest_fd)
 		return;
-	s_assert(fd < MAXCONNECTIONS);
+	lircd_assert(fd < maxconnections);
 
 	if(fd > highest_fd)
 	{
 		/*  
-		 * s_assert that we are not closing a FD bigger than
+		 * lircd_assert that we are not closing a FD bigger than
 		 * our known biggest FD
 		 */
-		s_assert(opening);
+		lircd_assert(opening);
 		highest_fd = fd;
 		return;
 	}
 	/* if we are here, then fd == Biggest_FD */
 	/*
-	 * s_assert that we are closing the biggest FD; we can't be
+	 * lircd_assert that we are closing the biggest FD; we can't be
 	 * re-opening it
 	 */
-	s_assert(!opening);
+	lircd_assert(!opening);
 	while (highest_fd >= 0 && !fd_table[highest_fd].flags.open)
 		highest_fd--;
 }
 
 
 void
-fdlist_init(int closeall)
+fdlist_init(int closeall, int maxfds)
 {
 	static int initialized = 0;
 
 	if(!initialized)
 	{
+		maxconnections = maxfds;
 		if(closeall)
 			comm_close_all();
 		/* Since we're doing this once .. */
-		fd_table = MyMalloc((MAXCONNECTIONS + 1) * sizeof(fde_t));
+		fd_table = MyMalloc((maxfds + 1) * sizeof(fde_t));
 		initialized = 1;
 	}
 }
@@ -653,13 +660,13 @@ void
 comm_open(int fd, unsigned int type, const char *desc)
 {
 	fde_t *F = &fd_table[fd];
-	s_assert(fd >= 0);
+	lircd_assert(fd >= 0);
 
 	if(F->flags.open)
 	{
 		comm_close(fd);
 	}
-	s_assert(!F->flags.open);
+	lircd_assert(!F->flags.open);
 	F->fd = fd;
 	F->type = type;
 	F->flags.open = 1;
@@ -681,13 +688,13 @@ void
 comm_close(int fd)
 {
 	fde_t *F = &fd_table[fd];
-	s_assert(F->flags.open);
+	lircd_assert(F->flags.open);
 	/* All disk fd's MUST go through file_close() ! */
-	s_assert(F->type != FD_FILE);
+	lircd_assert(F->type != FD_FILE);
 	if(F->type == FD_FILE)
 	{
-		s_assert(F->read_handler == NULL);
-		s_assert(F->write_handler == NULL);
+		lircd_assert(F->read_handler == NULL);
+		lircd_assert(F->write_handler == NULL);
 	}
 	comm_setselect(F->fd, COMM_SELECT_WRITE | COMM_SELECT_READ, NULL, NULL, 0);
 	comm_setflush(F->fd, 0, NULL, NULL);
@@ -817,6 +824,7 @@ comm_write(int fd, void *buf, int count)
 ssize_t
 comm_writev(int fd, struct iovec *vector, int count)
 {
+#ifdef HAVE_WRITEV
 	fde_t *F = &fd_table[fd];
 
 	switch(F->type)
@@ -833,8 +841,10 @@ comm_writev(int fd, struct iovec *vector, int count)
 		default:
 			return writev(fd, vector, count);	
 	}
+#else
+	return 0;
+#endif
 }
-
 
 /* 
  * From: Thomas Helvey <tomh@inxpress.net>

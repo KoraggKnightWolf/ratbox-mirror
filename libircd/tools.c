@@ -31,12 +31,9 @@
  * as well!!!
  */
 
-#include "stdinc.h"
 #define TOOLS_C
-#include "tools.h"
-#include "balloc.h"
-#include "ircd_memory.h"
 #include "ircd_lib.h"
+#include "tools.h"
 
 #ifndef NDEBUG
 /*
