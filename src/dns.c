@@ -208,6 +208,9 @@ fork_resolver(void)
 		comm_close(dns_ifd);
 	if(dns_ofd > 0)
 		comm_close(dns_ofd);
+#ifndef SIGKILL
+#define SIGKILL SIGTERM
+#endif
 	if(res_pid > 0)
 		kill(res_pid, SIGKILL);
 
@@ -350,9 +353,11 @@ void
 resolver_sigchld(void)
 {
 	int status;
+#ifndef __MINGW32__
 	if(waitpid(res_pid, &status, WNOHANG) == res_pid)
 	{
 		need_restart = 1;		
 	}
+#endif
 }
 

@@ -220,6 +220,13 @@ extern void comm_unschedule_event(comm_event_id);
 #define	COMM_SELECT_READ		0x1
 #define	COMM_SELECT_WRITE		0x2
 
+#ifdef __MINGW32__
+#define COMM_SELECT_ACCEPT		0x4
+#define COMM_SELECT_CONNECT		0x8
+#else
+#define COMM_SELECT_ACCEPT		COMM_SELECT_READ|COMM_SELECT_WRITE
+#define COMM_SELECT_LISTEN		COMM_SELECT_READ
+#endif
 extern int readcalls;
 extern const char *const NONB_ERROR_MSG;
 extern const char *const SETBUF_ERROR_MSG;

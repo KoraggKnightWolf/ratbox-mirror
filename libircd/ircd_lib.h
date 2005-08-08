@@ -34,6 +34,9 @@
 #define EMSGSIZE    WSAEMSGSIZE
 #define EALREADY    WSAEALREADY
 #define EISCONN     WSAEISCONN
+#define EADDRINUSE  WSAEADDRINUSE
+#define EAFNOSUPPORT WSAEAFNOSUPPORT
+
 struct iovec { void *dummy; };
 #define pipe(x)  _pipe(x, 1024, O_BINARY)
 #define ioctl(x,y,z)  ioctlsocket(x,y, (u_long *)z)

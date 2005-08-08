@@ -38,6 +38,12 @@
 #define MSG_NOSIGNAL 0
 #endif
 
+#ifndef __MINGW32__
+#define get_errno()
+#else
+#define get_errno()  errno = WSAGetLastError()
+#endif
+
 const char *const NONB_ERROR_MSG = "set_non_blocking failed for %s:%s";
 const char *const SETBUF_ERROR_MSG = "set_sock_buffers failed for server %s:%s";
 
@@ -59,6 +65,8 @@ int maxconnections = 0;
 static void comm_connect_callback(int fd, int status);
 static PF comm_connect_timeout;
 static PF comm_connect_tryconnect;
+static int comm_inet_socketpair(int d, int type, int protocol, int sv[2]);
+
 
 /* 32bit solaris is kinda slow and stdio only supports fds < 256
  * so we got to do this crap below.
@@ -399,7 +407,7 @@ comm_connect_tryconnect(int fd, void *notused)
 			comm_connect_callback(F->fd, COMM_OK);
 		else if(ignoreErrno(errno))
 			/* Ignore error? Reschedule */
-			comm_setselect(F->fd, COMM_SELECT_READ|COMM_SELECT_WRITE,
+			comm_setselect(F->fd, COMM_SELECT_CONNECT,
 				       comm_connect_tryconnect, NULL, 0);
 		else
 			/* Error? Fail with COMM_ERR_CONNECT */
@@ -425,13 +433,17 @@ comm_errstr(int error)
 int
 comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note)
 {
-#ifndef __MINGW32__
 	if(number_fd >= maxconnections)
 	{
 		errno = ENFILE;
 		return -1;
 	}
+
+#ifndef __MINGW32__
 	if(socketpair(family, sock_type, proto, nfd))
+#else
+	if(comm_inet_socketpair(AF_INET, SOCK_STREAM, proto, nfd))
+#endif
 		return -1;
 	
 	comm_fd_hack(&nfd[0]);
@@ -460,16 +472,13 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 	/* Next, update things in our fd tracking */
 	comm_open(nfd[0], FD_SOCKET, note);
 	return 0;
-#else
-	return -1;
-#endif	
 }
 
 
 int 
 comm_pipe(int *fd, const char *desc)
 {
-
+#ifndef __MINGW32__
 	if(number_fd >= maxconnections)
 	{
 		errno = ENFILE;
@@ -480,6 +489,10 @@ comm_pipe(int *fd, const char *desc)
 	comm_open(fd[0], FD_PIPE, desc);
 	comm_open(fd[1], FD_PIPE, desc);
 	return 0;
+#else
+	/* I hate this..but oh well */
+	return comm_socketpair(AF_INET, SOCK_STREAM, 0, fd, "fake pipe");
+#endif
 }
 
 /*
@@ -565,13 +578,14 @@ comm_accept(int fd, struct sockaddr *pn, socklen_t *addrlen)
 	 */
 	newfd = accept(fd, (struct sockaddr *) pn, addrlen);
         comm_fd_hack(&newfd);
-                        
+	get_errno();                        
 	if(newfd < 0)
 		return -1;
 
 	/* Set the socket non-blocking, and other wonderful bits */
 	if(!comm_set_nb(newfd))
 	{
+		get_errno();
 		lib_ilog("comm_accept: Couldn't set FD %d non blocking!", newfd);
 		close(newfd);
 		return -1;
@@ -696,7 +710,7 @@ comm_close(int fd)
 		lircd_assert(F->read_handler == NULL);
 		lircd_assert(F->write_handler == NULL);
 	}
-	comm_setselect(F->fd, COMM_SELECT_WRITE | COMM_SELECT_READ, NULL, NULL, 0);
+	comm_setselect(F->fd, 0, NULL, NULL, 0);
 	comm_setflush(F->fd, 0, NULL, NULL);
 	
 	F->flags.open = 0;
@@ -770,7 +784,12 @@ comm_read(int fd, void *buf, int count)
 	switch(F->type)
 	{
 		case FD_SOCKET:
-			return recv(fd, buf, count, 0);
+		{
+			int ret; 
+			ret = recv(fd, buf, count, 0);
+			get_errno();
+			return ret;
+		}
 		case FD_PIPE:
 		default:
 			return read(fd, buf, count);
@@ -811,7 +830,11 @@ comm_write(int fd, void *buf, int count)
 		}	
 #endif
 		case FD_SOCKET:
-			return send(fd, buf, count, MSG_NOSIGNAL);
+		{
+			int ret = send(fd, buf, count, MSG_NOSIGNAL);
+			get_errno();
+			return ret;
+		}
 		case FD_PIPE:
 		default:
 			return write(fd, buf, count);
@@ -1365,3 +1388,62 @@ inetpton(af, src, dst)
 }
 
 
+#ifndef HAVE_SOCKETPAIR
+static int
+comm_inet_socketpair(int d, int type, int protocol, int sv[2])
+{
+	struct sockaddr_in addr1, addr2, addr3;
+	int addr3_len = sizeof(addr3);
+	int fd, rc;
+	int port_no = 20000;
+	
+	if(d != AF_INET || type != SOCK_STREAM || protocol)
+	{
+		errno = EAFNOSUPPORT;
+		return -1;
+	}
+	if(((sv[0] = socket(AF_INET, SOCK_STREAM, 0)) < 0) || ((sv[1] = socket(AF_INET, SOCK_STREAM, 0)) < 0))
+		return -1;
+	
+	addr1.sin_port = htons(port_no);
+	addr1.sin_family = AF_INET;
+	addr1.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	while ((rc = bind (sv[0], (struct sockaddr *) &addr1, sizeof (addr1))) < 0 && errno == EADDRINUSE)
+		addr1.sin_port = htons(++port_no);
+	
+	if(rc < 0)
+		return -1;
+	
+	if(listen(sv[0], 1) < 0)
+	{
+		get_errno();
+		close(sv[0]);
+		close(sv[1]);
+		return -1;
+	}
+	
+	addr2.sin_port = htons(port_no);
+	addr2.sin_family = AF_INET;
+	addr2.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	if(connect (sv[1], (struct sockaddr *) &addr2, sizeof (addr2)) < 0) 
+	{
+		get_errno();
+		close(sv[0]);
+		close(sv[1]);
+		return -1;
+	}
+	
+	if((fd = accept(sv[1], (struct sockaddr *) &addr3, &addr3_len)) < 0)
+	{
+		get_errno();
+		close(sv[0]);
+		close(sv[1]);
+		return -1;
+	}
+	close(sv[0]);
+	sv[0] = fd;
+	
+	return(0);
+
+}
+#endif

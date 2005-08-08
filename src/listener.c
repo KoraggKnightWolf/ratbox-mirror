@@ -521,7 +521,7 @@ accept_connection(int pfd, void *data)
 		{
 			/* Re-register a new IO request for the next accept .. */
 			comm_setselect(listener->fd,
-				      COMM_SELECT_READ, accept_connection, listener, 0);
+				      COMM_SELECT_ACCEPT, accept_connection, listener, 0);
 			return;
 		}
 		

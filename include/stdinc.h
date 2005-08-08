@@ -80,13 +80,17 @@ char *alloca ();
 #include <stdio.h>
 #include <time.h>
 #include <fcntl.h>
-#include <netdb.h>
+
 #include <stdarg.h>
 #include <signal.h>
 #include <dirent.h>
 #include <ctype.h>
 
 #include <limits.h>
+
+#ifdef HAVE_NETDB_H
+#include <netdb.h>
+#endif
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -100,16 +104,27 @@ char *alloca ();
 #endif
 
 
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
 #include <sys/stat.h>
+
+#ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
+#endif
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
+#ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+#ifdef HAVE_NETINET_TCP_H
 #include <netinet/tcp.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
+#endif
 
 #ifdef HAVE_ERRNO_H
 #include <errno.h>

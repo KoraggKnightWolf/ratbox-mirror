@@ -87,23 +87,40 @@ fi
 dnl Checks for header files.
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS([crypt.h sys/resource.h sys/param.h errno.h sys/syslog.h stddef.h sys/wait.h wait.h sys/epoll.h sys/uio.h])
+AC_CHECK_HEADERS([netdb.h crypt.h sys/types.h sys/socket.h sys/wait.h netinet/in.h netinet/tcp.h arpa/inet.h sys/resource.h sys/param.h errno.h sys/syslog.h stddef.h sys/wait.h wait.h sys/epoll.h sys/uio.h winsock2.h])
 
 dnl Networking Functions
 dnl ====================
 
-AC_SEARCH_LIBS(socket, socket, , [AC_MSG_ERROR([You have no socket()! Aborting.])])
-
+AC_SEARCH_LIBS(socket, [socket],,)
+AC_CHECK_LIB(ws2_32, main)
 AC_CHECK_MEMBER([struct sockaddr.sa_len], [AC_DEFINE(SOCKADDR_IN_HAS_LEN, 1, [Define to 1 if sockaddr has a 'sa_len'
-member.])],,[[#include <sys/types.h>
+member.])],,[[
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif
 ]])
 
 AC_CHECK_TYPE(socklen_t, ,
 [AC_DEFINE([socklen_t], [unsigned int],
 [If we don't have a real socklen_t, unsigned int is good enough.])],
-[#include <sys/types.h>
-#include <sys/socket.h>])
+[
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif
+])
 
 AC_ARG_ENABLE(ipv6,
 AC_HELP_STRING([--enable-ipv6],[Enable IPv6 support]),[ipv6=$enableval],[ipv6=no])
@@ -699,10 +716,9 @@ fi
 
 fi
 
-
-
 if test -z "$SELECT_TYPE"; then
-	AC_MSG_ERROR([Unable to find a usable IO interface],)
+	AC_MSG_WARN([Unable to find an i/o interface using select],)
+	SELECT_TYPE="select"
 fi
 
 echo "Using $SELECT_TYPE for select loop."

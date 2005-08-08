@@ -66,6 +66,9 @@
 /* Define to 1 if you have the `crypto' library (-lcrypto). */
 #undef HAVE_LIBCRYPTO
 
+/* Define to 1 if you have the `ws2_32' library (-lws2_32). */
+#undef HAVE_LIBWS2_32
+
 /* Define to 1 if zlib (-lz) is available. */
 #undef HAVE_LIBZ
 
@@ -77,6 +80,9 @@
 
 /* Define if nanosleep exists */
 #undef HAVE_NANOSLEEP
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#undef HAVE_NETDB_H
 
 /* Define to 1 if you have the `poll' function. */
 #undef HAVE_POLL
