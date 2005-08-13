@@ -40,11 +40,14 @@ static short *fdmask;
 static void devpoll_update_events(int, short, PF *);
 static void devpoll_write_update(int, int);
 
-/* #define NOTYET 1 */
 
-/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
-/* Private functions */
-
+int 
+comm_setup_fd(int fd)
+{
+        return 0;
+}
+        
+        
 /*
  * Write an update to the devpoll filter.
  * See, we end up having to do a seperate (?) remove before we do an

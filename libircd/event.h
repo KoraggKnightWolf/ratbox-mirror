@@ -31,7 +31,7 @@
 #ifndef INCLUDED_event_h
 #define INCLUDED_event_h
 
-#if defined(USE_SIGIO) || (USE_PORTS) && (HAVE_TIMER_CREATE)
+#if (defined(USE_SIGIO) || (USE_PORTS) || (USE_EPOLL))  && defined(HAVE_TIMER_CREATE)
 #define USE_POSIX_TIMERS 1
 #endif
 

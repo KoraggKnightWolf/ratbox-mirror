@@ -225,7 +225,7 @@ extern void comm_unschedule_event(comm_event_id);
 #define COMM_SELECT_CONNECT		0x8
 #else
 #define COMM_SELECT_ACCEPT		COMM_SELECT_READ|COMM_SELECT_WRITE
-#define COMM_SELECT_LISTEN		COMM_SELECT_READ
+#define COMM_SELECT_CONNECT		COMM_SELECT_READ|COMM_SELECT_WRITE
 #endif
 extern int readcalls;
 extern const char *const NONB_ERROR_MSG;
@@ -259,7 +259,7 @@ extern void init_netio(void);
 extern int read_message(time_t, unsigned char);
 extern int comm_select(unsigned long);
 extern int disable_sock_options(int);
-extern int setup_sigio_fd(int fd);
+extern int comm_setup_fd(int fd);
 
 const char *inetntoa(const char *in_addr);
 const char *inetntop(int af, const void *src, char *dst, unsigned int size);

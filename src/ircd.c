@@ -644,16 +644,16 @@ main(int argc, char *argv[])
 	 * nick collisions.  what a stupid idea. set an event for the IO loop --fl
 	 */
 	eventAddIsh("try_connections", try_connections, NULL, STARTUP_CONNECTIONS_TIME);
-	eventAddOnce("try_connections_startup", try_connections, NULL, 0);
+	eventAddOnce("try_connections_startup", try_connections, NULL, 2);
 
 	eventAddIsh("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
 
 	/* Setup the timeout check. I'll shift it later :)  -- adrian */
-	eventAddIsh("comm_checktimeouts", comm_checktimeouts, NULL, 1);
+	eventAddIsh("comm_checktimeouts", comm_checktimeouts, NULL, 5);
 
 
 	if(splitmode)
-		eventAdd("check_splitmode", check_splitmode, NULL, 2);
+		eventAdd("check_splitmode", check_splitmode, NULL, 5);
 
 	ServerRunning = 1;
 

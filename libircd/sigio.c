@@ -30,7 +30,7 @@
 #define _GNU_SOURCE 1		/* Needed for F_SETSIG */
 #endif
 
-#include "stdinc.h"
+#include <signal.h>
 #include <sys/poll.h>
 #include "tools.h"
 #include "commio.h"
@@ -123,7 +123,7 @@ poll_update_pollfds(int fd, short event, PF * handler)
  * Side Effect: Sets the FD up for SIGIO
  */
 int
-setup_sigio_fd(int fd)
+comm_setup_fd(int fd)
 {
 	int flags = 0;
 	flags = fcntl(fd, F_GETFL, 0);

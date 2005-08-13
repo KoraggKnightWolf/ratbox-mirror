@@ -65,8 +65,6 @@ int maxconnections = 0;
 static void comm_connect_callback(int fd, int status);
 static PF comm_connect_timeout;
 static PF comm_connect_tryconnect;
-static int comm_inet_socketpair(int d, int type, int protocol, int sv[2]);
-
 
 /* 32bit solaris is kinda slow and stdio only supports fds < 256
  * so we got to do this crap below.
@@ -175,12 +173,11 @@ comm_set_buffers(int fd, int size)
 int
 comm_set_nb(int fd)
 {
-#ifdef USE_SIGIO
-	return(setup_sigio_fd(fd));
-#else
 	int nonb = 0;
 	int res;
 
+	if((res = comm_setup_fd(fd)))
+		return res;
 #ifdef O_NONBLOCK
 	nonb |= O_NONBLOCK;
 	res = fcntl(fd, F_GETFL, 0);
@@ -195,7 +192,6 @@ comm_set_nb(int fd)
 
 	fd_table[fd].flags.nonblocking = 1;
 	return 1;
-#endif
 }
 
 

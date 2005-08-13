@@ -57,8 +57,11 @@ static int kqmax;		/* max structs to buffer */
 static int kqoff;		/* offset into the buffer */
 
 
-/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
-/* Private functions */
+int 
+comm_setup_fd(int fd)
+{
+	return 0;
+}
 
 void
 kq_update_events(fde_t * F, short filter, PF * handler)

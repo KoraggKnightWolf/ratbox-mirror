@@ -43,8 +43,12 @@ static struct timespec zero_timespec;
 static port_event_t *pelst;	/* port buffer */
 static int pemax;		/* max structs to buffer */
 
-/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
-/* Private functions */
+int 
+comm_setup_fd(int fd)
+{
+        return 0;
+}
+        
 
 void
 pe_update_events(fde_t * F, short filter, PF * handler)

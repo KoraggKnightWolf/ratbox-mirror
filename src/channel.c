@@ -674,7 +674,7 @@ check_splitmode(void *unused)
 				splitmode = 1;
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Network split, activating splitmode");
-				eventAddIsh("check_splitmode", check_splitmode, NULL, 2);
+				eventAddIsh("check_splitmode", check_splitmode, NULL, 5);
 			}
 		}
 		/* in splitmode, check whether its finished */

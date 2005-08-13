@@ -51,9 +51,14 @@ pollfd_list_t pollfd_list;
 static void poll_update_pollfds(int, short, PF *);
 static unsigned long last_count = 0; 
 static unsigned long empty_count = 0;
-/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
-/* Private functions */
 
+int 
+comm_setup_fd(int fd)
+{
+        return 0;
+}
+        
+        
 /*
  * find a spare slot in the fd list. We can optimise this out later!
  *   -- adrian

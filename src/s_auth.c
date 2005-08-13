@@ -205,7 +205,7 @@ init_auth(void)
 		ilog(L_MAIN, "Unable to fork ident daemon");
 	}
 	memset(&auth_poll_list, 0, sizeof(auth_poll_list));
-	eventAddIsh("timeout_auth_queries_event", timeout_auth_queries_event, NULL, 1);
+	eventAddIsh("timeout_auth_queries_event", timeout_auth_queries_event, NULL, 3);
 	auth_heap = BlockHeapCreate(sizeof(struct AuthRequest), LCLIENT_HEAP_SIZE);
 
 }

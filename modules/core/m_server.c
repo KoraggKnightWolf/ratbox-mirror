@@ -802,13 +802,13 @@ fork_server(struct Client *server)
 
 
 	/* ctrl */
-	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, ctrl_fds) < 0)
+	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, ctrl_fds, "slink control fds") < 0)
 		goto fork_error;
 
 	
 
 	/* data */
-	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, data_fds) < 0)
+	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, data_fds, "slink data fds") < 0)
 		goto fork_error;
 
 
