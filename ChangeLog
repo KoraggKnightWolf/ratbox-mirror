@@ -1,3 +1,29 @@
+androsyn    2005/08/13 04:52:50 UTC	(20050813_0-20620)
+  Log:
+  Use posix timers with epoll as well.  This means we need to set O_ASYNC to get sigwaitinfo()
+  to wake up.  This shouldn't be too painful I don't suspect though as we mask the signal off.
+  Also have the server use comm_socketpair() everywhere.  Also back off on the event timeouts 
+  a bit as running some of these every second is a little bit overkill imho.  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/devpoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/epoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.h (File Modified) 
+	ircd-ratbox/trunk/libircd/kqueue.c (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ports.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2005/08/08 13:26:12 UTC	(20050808_0-20618)
   Log:
   move comm_inet_socketpair into libircd.  Also add more autoconf header checks. The tree is probably busticated now..Add get_errno() macro for that other OS *cough*
