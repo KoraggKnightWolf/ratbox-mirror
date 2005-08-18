@@ -66,6 +66,9 @@ static void comm_connect_callback(int fd, int status);
 static PF comm_connect_timeout;
 static PF comm_connect_tryconnect;
 
+#ifndef HAVE_SOCKETPAIR
+static int comm_inet_socketpair(int d, int type, int protocol, int sv[2]);
+#endif
 /* 32bit solaris is kinda slow and stdio only supports fds < 256
  * so we got to do this crap below.
  * (BTW Fuck you Sun, I hate your guts and I hope you go bankrupt soon)

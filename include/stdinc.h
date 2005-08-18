@@ -78,15 +78,43 @@ char *alloca ();
 #include <stdio.h>
 #include <assert.h>
 #include <stdio.h>
-#include <time.h>
 #include <fcntl.h>
+
 
 #include <stdarg.h>
 #include <signal.h>
-#include <dirent.h>
 #include <ctype.h>
 
 #include <limits.h>
+
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
+
+
+#if HAVE_DIRENT_H
+# include <dirent.h>
+# define NAMLEN(dirent) strlen((dirent)->d_name)
+#else
+# define dirent direct
+# define NAMLEN(dirent) (dirent)->d_namlen
+# if HAVE_SYS_NDIR_H
+#  include <sys/ndir.h>
+# endif
+# if HAVE_SYS_DIR_H
+#  include <sys/dir.h>
+# endif
+# if HAVE_NDIR_H
+#  include <ndir.h>
+# endif
+#endif
 
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
@@ -96,7 +124,6 @@ char *alloca ();
 #include <unistd.h>
 #endif
 
-#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/file.h>
 #ifdef HAVE_SYS_RESOURCE_H
@@ -109,8 +136,14 @@ char *alloca ();
 #endif
 #include <sys/stat.h>
 
-#ifdef HAVE_SYS_WAIT_H
-#include <sys/wait.h>
+#if HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
+#ifndef WEXITSTATUS
+# define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)
+#endif
+#ifndef WIFEXITED
+# define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
 #endif
 
 #ifdef HAVE_SYS_PARAM_H

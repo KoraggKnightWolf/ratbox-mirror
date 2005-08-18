@@ -35,7 +35,7 @@
 #include "s_conf.h"
 #include "newconf.h"
 
-#include "y.tab.h"
+#include "ircd_parser.h"
 
 int yylex(void);
 

@@ -34,12 +34,13 @@
  *     --Bleep  Thomas Helvey <tomh@inxpress.net>
  */
 #include "stdinc.h"
+#include "setup.h"
+#include "ircd_lib.h"
 #include "struct.h"
 #include "s_auth.h"
 #include "s_conf.h"
 #include "client.h"
 #include "irc_string.h"
-#include "ircd_lib.h"
 #include "ircd.h"
 #include "numeric.h"
 #include "packet.h"

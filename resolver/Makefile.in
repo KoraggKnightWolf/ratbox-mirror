@@ -55,7 +55,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_resolver_OBJECTS = resolver-resolver.$(OBJEXT)
 resolver_OBJECTS = $(am_resolver_OBJECTS)
-resolver_DEPENDENCIES =
+resolver_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -161,6 +161,8 @@ TOUCH = @TOUCH@
 VERSION = @VERSION@
 WANT_SERVLINK_FALSE = @WANT_SERVLINK_FALSE@
 WANT_SERVLINK_TRUE = @WANT_SERVLINK_TRUE@
+WS2_FALSE = @WS2_FALSE@
+WS2_TRUE = @WS2_TRUE@
 YACC = @YACC@
 ZLIB_LD = @ZLIB_LD@
 ac_ct_AR = @ac_ct_AR@
@@ -215,7 +217,7 @@ resolver_CFLAGS = -I../adns -I../include -I../libircd
 # perhaps we should move this stuff into a lib someday
 # oh well...
 resolver_SOURCES = resolver.c 
-resolver_LDADD = -L../adns -ladns -L../libircd -lircd
+resolver_LDFLAGS = -L../adns -ladns -L../libircd -lircd
 all: all-am
 
 .SUFFIXES:

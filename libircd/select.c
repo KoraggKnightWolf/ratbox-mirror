@@ -76,6 +76,12 @@ select_update_selectfds(int fd, short event, PF * handler)
 /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 /* Public functions */
 
+int
+comm_setup_fd(int fd)
+{
+	return 0;	
+}
+
 
 /*
  * init_netio

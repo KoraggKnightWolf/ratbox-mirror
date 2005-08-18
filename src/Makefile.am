@@ -23,8 +23,10 @@ lex.yy.o: lex.yy.c ircd_lexer.l
 
 lex.yy.c: ircd_lexer.l y.tab.c
 	$(LEX) ircd_lexer.l
+
+ircd_SOURCES = main.c
 	
-ircd_SOURCES =                     \
+libratbox_la_SOURCES =                     \
   dns.c                        \
   cache.c                       \
   channel.c                     \
@@ -58,16 +60,20 @@ ircd_SOURCES =                     \
   scache.c                      \
   send.c                        \
   whowas.c			\
-  version.c			
-
+  version.c			\
+  ircd_lexer.l			\
+  ircd_parser.y		
+  
+lib_LTLIBRARIES = libratbox.la
 
 if STATIC_MODULES
-ircd_LDADD = lex.yy.o y.tab.o @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
+libratbox_la_LIBADD = @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
 else
-ircd_LDADD = lex.yy.o y.tab.o $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
+libratbox_la_LIBADD = $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 endif
 
-ircd_LDFLAGS = -export-dynamic -L../libircd -lircd
+libratbox_la_LDFLAGS = -avoid-version -noundefined  ../libircd/libircd.la
 
-ircd_DEPENDENCIES = $(LIBLTDLC) version.o lex.yy.o y.tab.o
+libratbox_la_DEPENDENCIES = $(LIBLTDLC) ../libircd/libircd.la
 
+ircd_LDADD = libratbox.la ../libircd/libircd.la

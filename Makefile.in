@@ -161,6 +161,8 @@ TOUCH = @TOUCH@
 VERSION = @VERSION@
 WANT_SERVLINK_FALSE = @WANT_SERVLINK_FALSE@
 WANT_SERVLINK_TRUE = @WANT_SERVLINK_TRUE@
+WS2_FALSE = @WS2_FALSE@
+WS2_TRUE = @WS2_TRUE@
 YACC = @YACC@
 ZLIB_LD = @ZLIB_LD@
 ac_ct_AR = @ac_ct_AR@
@@ -212,7 +214,7 @@ target_alias = @target_alias@
 
 # $Id$
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = libircd adns libltdl modules src resolver ident $(SERVLINK) tools doc help
+SUBDIRS = libircd $(ADNS) libltdl src modules resolver ident $(SERVLINK) tools doc help
 all: all-recursive
 
 .SUFFIXES:
@@ -639,6 +641,8 @@ uninstall-info: uninstall-info-recursive
 
 
 @WANT_SERVLINK_TRUE@	SERVLINK = servlink
+
+@WS2_FALSE@	ADNS = adns
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

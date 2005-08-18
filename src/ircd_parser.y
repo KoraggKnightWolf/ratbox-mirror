@@ -16,7 +16,6 @@
 #define WE_ARE_MEMORY_C
 #include "stdinc.h"
 #include "setup.h"
-#include "tools.h"
 #include "struct.h"
 #include "ircd_lib.h"
 #include "common.h"

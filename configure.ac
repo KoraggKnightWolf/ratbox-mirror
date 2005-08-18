@@ -87,13 +87,19 @@ fi
 dnl Checks for header files.
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS([netdb.h crypt.h sys/types.h sys/socket.h sys/wait.h netinet/in.h netinet/tcp.h arpa/inet.h sys/resource.h sys/param.h errno.h sys/syslog.h stddef.h sys/wait.h wait.h sys/epoll.h sys/uio.h winsock2.h])
+AC_HEADER_SYS_WAIT
+AC_HEADER_DIRENT
+AC_HEADER_TIME
+
+AC_CHECK_HEADERS([netdb.h crypt.h sys/time.h sys/types.h sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h sys/resource.h sys/param.h errno.h sys/syslog.h stddef.h  sys/epoll.h sys/uio.h winsock2.h])
+
 
 dnl Networking Functions
 dnl ====================
 
 AC_SEARCH_LIBS(socket, [socket],,)
-AC_CHECK_LIB(ws2_32, main)
+AC_CHECK_LIB(ws2_32, main, AM_CONDITIONAL([WS2], [test true])  LIBS="${LIBS} -lws2_32", AM_CONDITIONAL([WS2], [test false]))
+
 AC_CHECK_MEMBER([struct sockaddr.sa_len], [AC_DEFINE(SOCKADDR_IN_HAS_LEN, 1, [Define to 1 if sockaddr has a 'sa_len'
 member.])],,[[
 #ifdef HAVE_SYS_TYPES_H
@@ -437,7 +443,6 @@ AC_CHECK_HEADER(zlib.h, [
 fi
 
 AM_CONDITIONAL([WANT_SERVLINK], [test "$zlib" = yes])
-
 dnl IO Loop Selection
 dnl =================
 
@@ -946,6 +951,7 @@ AC_CONFIG_FILES(		\
 	ident/Makefile		\
 	resolver/Makefile	\
 	modules/Makefile	\
+	modules/core/Makefile	\
 	tools/Makefile		\
 	doc/Makefile		\
 	help/Makefile		

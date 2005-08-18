@@ -1,28 +1,13 @@
 # $Id$
 
 prefix          = @prefix@
-moduledir       = @moduledir@
-automoduledir   = @moduledir@/autoload
+moduledir       = @moduledir@/autoload
 
 
 INSTALL         = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 
 INCLUDES = -I../include -I../libircd $(INCLTDL)
-
-CORE_SRCS = \
-  core/m_die.c \
-  core/m_error.c \
-  core/m_join.c \
-  core/m_kick.c \
-  core/m_kill.c \
-  core/m_message.c \
-  core/m_mode.c \
-  core/m_nick.c \
-  core/m_part.c \
-  core/m_quit.c \
-  core/m_server.c \
-  core/m_squit.c
 
 TSRCS =		\
   m_accept.c \
@@ -87,20 +72,21 @@ ALL_SRCS = $(SRCS)
 
 S_OBJS = $(ALL_SRCS:.c=.la)
 S_CORE_OBJS = $(CORE_SRCS:.c=.la)
-ST_OBJS = $(ALL_SRCS:.c=.lo) $(CORE_SRCS:.c=.lo)
+ST_OBJS = $(ALL_SRCS:.c=.loa) $(CORE_SRCS:.c=.lo)
 
-SUFFIXES = .c .so .lo .la
+SUFFIXES = .c .so .lo .la .loa
 
 if STATIC_MODULES
 .c.lo:
-	$(LIBTOOL) --mode=compile $(CC) -static -DMODNAME=`basename $< .lo`_mheader -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CC) -static -DMODNAME=`basename $< .lo`_mheader -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@ 
 else
 .c.lo:
-	$(LIBTOOL) --mode=compile $(CC) -prefer-pic -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CC) -prefer-pic -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@ 
 endif
 
 .lo.la:
-	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -module -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS) 
+	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -module -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS) ../src/libratbox.la
+
 
 #BUILD
 default: 	build
@@ -132,11 +118,11 @@ clean-generic:
 	
 	
 		
-install_core: $(S_CORE_OBJS)
-	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_CORE_OBJS) $(DESTDIR)$(moduledir);
+#install_core: $(S_CORE_OBJS)
+#	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_CORE_OBJS) #  $(DESTDIR)$(moduledir);
 
-install_modules: $(S_OBJS)
-	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_OBJS) $(DESTDIR)$(automoduledir);
+#install_modules: $(S_OBJS)
+#	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_OBJS) # $(DESTDIR)$(automoduledir);
 
 
 install-mkdirs:
@@ -155,6 +141,6 @@ install-mkdirs:
 	@mkdir -p -m 755 $(DESTDIR)$(moduledir)
 	@mkdir -p -m 755 $(DESTDIR)$(automoduledir)
 
-if !STATIC_MODULES
-install: install-mkdirs install_core install_modules
-endif
+#if !STATIC_MODULES
+#install: install-mkdirs install_core install_modules
+#endif

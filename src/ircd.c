@@ -452,7 +452,7 @@ diecb(const char *buf)
 }
 
 int
-main(int argc, char *argv[])
+ratbox_main(int argc, char *argv[])
 {
 	/* Check to see if the user is running us as root, which is a nono */
 	if(geteuid() == 0)

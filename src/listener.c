@@ -26,6 +26,7 @@
 
 #include "stdinc.h"
 #include "struct.h"
+#include "ircd_lib.h"
 #include "listener.h"
 #include "client.h"
 #include "irc_string.h"

@@ -137,6 +137,8 @@ TOUCH = @TOUCH@
 VERSION = @VERSION@
 WANT_SERVLINK_FALSE = @WANT_SERVLINK_FALSE@
 WANT_SERVLINK_TRUE = @WANT_SERVLINK_TRUE@
+WS2_FALSE = @WS2_FALSE@
+WS2_TRUE = @WS2_TRUE@
 YACC = @YACC@
 ZLIB_LD = @ZLIB_LD@
 ac_ct_AR = @ac_ct_AR@
@@ -176,7 +178,7 @@ localstatedir = @localstatedir@
 logdir = @logdir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
-moduledir = @moduledir@
+moduledir = @moduledir@/autoload
 oldincludedir = @oldincludedir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
@@ -185,22 +187,7 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-automoduledir = @moduledir@/autoload
 INCLUDES = -I../include -I../libircd $(INCLTDL)
-CORE_SRCS = \
-  core/m_die.c \
-  core/m_error.c \
-  core/m_join.c \
-  core/m_kick.c \
-  core/m_kill.c \
-  core/m_message.c \
-  core/m_mode.c \
-  core/m_nick.c \
-  core/m_part.c \
-  core/m_quit.c \
-  core/m_server.c \
-  core/m_squit.c
-
 TSRCS = \
   m_accept.c \
   m_admin.c \
@@ -262,12 +249,12 @@ SRCS = $(TSRCS) @M_SERVICES@
 ALL_SRCS = $(SRCS)
 S_OBJS = $(ALL_SRCS:.c=.la)
 S_CORE_OBJS = $(CORE_SRCS:.c=.la)
-ST_OBJS = $(ALL_SRCS:.c=.lo) $(CORE_SRCS:.c=.lo)
-SUFFIXES = .c .so .lo .la
+ST_OBJS = $(ALL_SRCS:.c=.loa) $(CORE_SRCS:.c=.lo)
+SUFFIXES = .c .so .lo .la .loa
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .so .lo .la
+.SUFFIXES: .c .so .lo .la .loa
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -345,7 +332,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile
 installdirs:
-@STATIC_MODULES_TRUE@install: install-am
+install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -425,12 +412,12 @@ uninstall-am: uninstall-info-am
 
 
 @STATIC_MODULES_TRUE@.c.lo:
-@STATIC_MODULES_TRUE@	$(LIBTOOL) --mode=compile $(CC) -static -DMODNAME=`basename $< .lo`_mheader -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@
+@STATIC_MODULES_TRUE@	$(LIBTOOL) --mode=compile $(CC) -static -DMODNAME=`basename $< .lo`_mheader -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@ 
 @STATIC_MODULES_FALSE@.c.lo:
-@STATIC_MODULES_FALSE@	$(LIBTOOL) --mode=compile $(CC) -prefer-pic -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@
+@STATIC_MODULES_FALSE@	$(LIBTOOL) --mode=compile $(CC) -prefer-pic -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@ 
 
 .lo.la:
-	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -module -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS) 
+	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -module -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS) ../src/libratbox.la
 
 #BUILD
 default: 	build
@@ -452,11 +439,11 @@ build:		all
 clean-generic:
 	$(LIBTOOL) --mode=clean $(RM) -f $(S_OBJS) $(S_CORE_OBJS)  $(ST_OBJS) static_modules.lo
 
-install_core: $(S_CORE_OBJS)
-	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_CORE_OBJS) $(DESTDIR)$(moduledir);
+#install_core: $(S_CORE_OBJS)
+#	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_CORE_OBJS) #  $(DESTDIR)$(moduledir);
 
-install_modules: $(S_OBJS)
-	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_OBJS) $(DESTDIR)$(automoduledir);
+#install_modules: $(S_OBJS)
+#	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_OBJS) # $(DESTDIR)$(automoduledir);
 
 install-mkdirs:
 	@echo "ircd: setting up modular directory structure"
@@ -474,7 +461,9 @@ install-mkdirs:
 	@mkdir -p -m 755 $(DESTDIR)$(moduledir)
 	@mkdir -p -m 755 $(DESTDIR)$(automoduledir)
 
-@STATIC_MODULES_FALSE@install: install-mkdirs install_core install_modules
+#if !STATIC_MODULES
+#install: install-mkdirs install_core install_modules
+#endif
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
