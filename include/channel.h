@@ -186,6 +186,7 @@ extern const char *find_channel_status(struct membership *msptr, int combine);
 extern void add_user_to_channel(struct Channel *, struct Client *, int flags);
 extern void remove_user_from_channel(struct membership *);
 extern void remove_user_from_channels(struct Client *);
+extern void invalidate_bancache_user(struct Client *);
 
 extern void free_channel_list(dlink_list *);
 

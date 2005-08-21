@@ -192,6 +192,8 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 
 	monitor_signoff(target_p);
 
+	invalidate_bancache_user(target_p);
+
 	sendto_realops_flags(UMODE_NCHANGE, L_ALL,
 			"Nick change: From %s to %s [%s@%s]",
 			target_p->name, parv[2], target_p->username,

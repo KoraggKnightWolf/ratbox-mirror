@@ -268,6 +268,31 @@ remove_user_from_channels(struct Client *client_p)
 	client_p->user->channel.length = 0;
 }
 
+/* invalidate_bancache_user()
+ *
+ * input	- user to invalidate ban cache for
+ * output	-
+ * side effects - ban cache is invalidated for all memberships of that user
+ *                to be used after a nick change
+ */
+void
+invalidate_bancache_user(struct Client *client_p)
+{
+	struct Channel *chptr;
+	struct membership *msptr;
+	dlink_node *ptr;
+
+	if(client_p == NULL)
+		return;
+
+	DLINK_FOREACH(ptr, client_p->user->channel.head)
+	{
+		msptr = ptr->data;
+		msptr->bants = 0;
+		msptr->flags &= ~CHFL_BANNED;
+	}
+}
+
 /* check_channel_name()
  *
  * input	- channel name
