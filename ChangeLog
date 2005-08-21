@@ -1,3 +1,16 @@
+leeh        2005/08/21 12:18:45 UTC	(20050821_0-20628)
+  Log:
+  - via jilles, fix nickchanges not invalidating the bancache for
+    can_send()
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+
+
 androsyn    2005/08/18 04:45:28 UTC	(20050818_0-20622)
   Log:
   Kind of a large commit here so let me break down what I did.
