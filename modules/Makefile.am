@@ -125,7 +125,9 @@ m_whois_la_SOURCES =	m_whois.c
 m_whowas_la_SOURCES =	m_whowas.c
 m_xline_la_SOURCES =	m_xline.c
 
-modules_LTLIBRARIES = \
+EXTRA_LTLIBRARIES = m_services.la
+
+modules_LTLIBRARIES = @M_SERVICES@ \
 m_accept.la	\
 m_admin.la	\
 m_away.la	\
@@ -161,7 +163,6 @@ m_post.la	\
 m_rehash.la	\
 m_restart.la	\
 m_resv.la	\
-m_services.la	\
 m_set.la	\
 m_stats.la	\
 m_svinfo.la	\
@@ -181,4 +182,5 @@ m_who.la	\
 m_whois.la	\
 m_whowas.la	\
 m_xline.la	
+
 

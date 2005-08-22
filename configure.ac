@@ -815,7 +815,7 @@ M_SERVICES=""
 
 if test "x$ratbox_services" = "xyes"; then
 	AC_DEFINE([ENABLE_SERVICES], 1, [ratbox-services compatibility code])
-	M_SERVICES="m_services.c"
+	M_SERVICES="m_services.la"
 fi
 
 AC_SUBST(M_SERVICES)
