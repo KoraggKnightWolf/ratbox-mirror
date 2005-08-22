@@ -35,6 +35,7 @@
 #include "struct.h"
 #include "send.h"
 #include "client.h"
+#include "channel.h"
 #include "ircd.h"
 #include "numeric.h"
 #include "s_conf.h"
