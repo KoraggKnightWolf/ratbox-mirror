@@ -1,3 +1,11 @@
+androsyn    2005/08/22 10:37:37 UTC	(20050822_3-20636)
+  Log:
+  don't burst a TS5 name in burst_TS6. -via jillies
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2005/08/22 05:02:19 UTC	(20050822_2-20634)
   Log:
   Make m_services.c get conditionally built based on autoconf.  Install doesn't rename the exisitng directories
