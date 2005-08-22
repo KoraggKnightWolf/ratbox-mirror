@@ -5,7 +5,7 @@ if WANT_SERVLINK
 	SERVLINK = servlink
 endif
 
-if !WS2
+if !MINGW
 	ADNS = adns
 endif
 

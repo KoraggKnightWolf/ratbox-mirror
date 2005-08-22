@@ -132,6 +132,8 @@ MAINT = @MAINT@
 MAINTAINER_MODE_FALSE = @MAINTAINER_MODE_FALSE@
 MAINTAINER_MODE_TRUE = @MAINTAINER_MODE_TRUE@
 MAKEINFO = @MAKEINFO@
+MINGW_FALSE = @MINGW_FALSE@
+MINGW_TRUE = @MINGW_TRUE@
 MODULE_DIR = @MODULE_DIR@
 MV = @MV@
 M_SERVICES = @M_SERVICES@
@@ -161,8 +163,6 @@ TOUCH = @TOUCH@
 VERSION = @VERSION@
 WANT_SERVLINK_FALSE = @WANT_SERVLINK_FALSE@
 WANT_SERVLINK_TRUE = @WANT_SERVLINK_TRUE@
-WS2_FALSE = @WS2_FALSE@
-WS2_TRUE = @WS2_TRUE@
 YACC = @YACC@
 ZLIB_LD = @ZLIB_LD@
 ac_ct_AR = @ac_ct_AR@
@@ -642,7 +642,7 @@ uninstall-info: uninstall-info-recursive
 
 @WANT_SERVLINK_TRUE@	SERVLINK = servlink
 
-@WS2_FALSE@	ADNS = adns
+@MINGW_FALSE@	ADNS = adns
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

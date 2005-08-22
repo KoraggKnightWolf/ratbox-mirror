@@ -22,6 +22,7 @@ AM_PROG_LEX
 AC_PROG_CC
 AC_PROG_INSTALL
 
+
 if test "$enable_static" = "yes"; then
 	AM_DISABLE_SHARED
 	AM_ENABLE_STATIC	
@@ -38,6 +39,23 @@ AM_DISABLE_STATIC
 AM_ENABLE_SHARED
 AM_MAINTAINER_MODE
 F77=no
+
+case "$host_os" in
+*cygwin*)
+     AC_DEFINE_UNQUOTED(CYGWIN,1,[This is a Cygwin system])
+     AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
+     ;;
+*mingw*)
+     AC_DEFINE_UNQUOTED(MINGW,1,[This is a MinGW system])
+     AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
+     AC_CHECK_HEADER(winsock2.h, , [AC_MSG_ERROR([** MinGW and no winsock2.h.  I give up.])])
+     AM_CONDITIONAL([MINGW], 0)
+     LIBS = "$LIBS -lws2_32"
+     ;;
+*)
+     AM_CONDITIONAL([MINGW], 1)
+     ;;
+esac
 
 
 AM_CONDITIONAL([STATIC_MODULES], test "$enable_static" = "yes")
@@ -91,14 +109,14 @@ AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
 AC_HEADER_TIME
 
-AC_CHECK_HEADERS([netdb.h crypt.h sys/time.h sys/types.h sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h sys/resource.h sys/param.h errno.h sys/syslog.h stddef.h  sys/epoll.h sys/uio.h winsock2.h])
+AC_CHECK_HEADERS([netdb.h crypt.h sys/time.h sys/types.h sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h sys/resource.h sys/param.h errno.h sys/syslog.h stddef.h  sys/epoll.h sys/uio.h])
 
 
 dnl Networking Functions
 dnl ====================
 
 AC_SEARCH_LIBS(socket, [socket],,)
-AC_CHECK_LIB(ws2_32, main, AM_CONDITIONAL([WS2], [test true])  LIBS="${LIBS} -lws2_32", AM_CONDITIONAL([WS2], [test false]))
+
 
 AC_CHECK_MEMBER([struct sockaddr.sa_len], [AC_DEFINE(SOCKADDR_IN_HAS_LEN, 1, [Define to 1 if sockaddr has a 'sa_len'
 member.])],,[[
