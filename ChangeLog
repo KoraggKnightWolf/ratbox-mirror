@@ -1,3 +1,17 @@
+androsyn    2005/08/22 05:02:19 UTC	(20050822_2-20634)
+  Log:
+  Make m_services.c get conditionally built based on autoconf.  Install doesn't rename the exisitng directories
+  just yet. I'll get around to it.  It appears my autoconf/automake/libtool fu isn't too bad.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+
+
 androsyn    2005/08/22 04:38:05 UTC	(20050822_1-20632)
   Log:
   Make modules actually install again.  This time using the libtool way of doing it.
