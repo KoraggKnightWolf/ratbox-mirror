@@ -1290,7 +1290,7 @@ burst_TS6(struct Client *client_p)
 		if(*chptr->chname != '#')
 			continue;
 
-		cur_len = mlen = ircsprintf(buf, ":%s SJOIN %ld %s %s :", me.name,
+		cur_len = mlen = ircsprintf(buf, ":%s SJOIN %ld %s %s :", me.id,
 				(long) chptr->channelts, chptr->chname,
 				channel_modes(chptr, client_p));
 
