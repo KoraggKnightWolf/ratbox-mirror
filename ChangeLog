@@ -1,3 +1,12 @@
+androsyn    2005/08/22 02:46:58 UTC	(20050822_0-20630)
+  Log:
+  Need to have channel.h included for invalidate_bancache
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+
+
 leeh        2005/08/21 12:18:45 UTC	(20050821_0-20628)
   Log:
   - via jilles, fix nickchanges not invalidating the bancache for
