@@ -1,3 +1,22 @@
+androsyn    2005/08/22 04:38:05 UTC	(20050822_1-20632)
+  Log:
+  Make modules actually install again.  This time using the libtool way of doing it.
+  The stuff about relinking at install is harmless, just a little annoying. 
+  Also merge m_oper/m_challenge.c together
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/ircd.h (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/Makefile.am (File Added) 
+	ircd-ratbox/trunk/modules/core/Makefile.in (File Added) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_challenge.c (File Deleted) 
+	ircd-ratbox/trunk/modules/m_locops.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+
+
 androsyn    2005/08/22 02:46:58 UTC	(20050822_0-20630)
   Log:
   Need to have channel.h included for invalidate_bancache
