@@ -1,3 +1,13 @@
+androsyn    2005/08/22 20:17:56 UTC	(20050822_4-20642)
+  Log:
+  Remove CXX=no
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2005/08/22 10:37:37 UTC	(20050822_3-20636)
   Log:
   don't burst a TS5 name in burst_TS6. -via jillies
