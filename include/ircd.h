@@ -105,7 +105,7 @@ extern void get_current_bandwidth(struct Client *source_p, struct Client *target
 
 extern unsigned long get_maxrss(void);
 extern void set_time(void);
-
+extern int ratbox_main(int argc, char **argv);
 extern int testing_conf;
 
 #endif

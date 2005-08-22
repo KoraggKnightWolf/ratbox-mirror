@@ -36,7 +36,6 @@
 #include "s_serv.h"
 
 static int m_locops(struct Client *, struct Client *, int, const char **);
-static int ms_locops(struct Client *, struct Client *, int, const char **);
 static int me_locops(struct Client *, struct Client *, int, const char **);
 
 struct Message locops_msgtab = {

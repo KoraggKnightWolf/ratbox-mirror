@@ -27,6 +27,7 @@
 #include "stdinc.h"
 #include "struct.h"
 #include "client.h"
+#include "channel.h"
 #include "hash.h"
 #include "irc_string.h"
 #include "ircd.h"
