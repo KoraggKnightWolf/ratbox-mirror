@@ -278,7 +278,6 @@ remove_user_from_channels(struct Client *client_p)
 void
 invalidate_bancache_user(struct Client *client_p)
 {
-	struct Channel *chptr;
 	struct membership *msptr;
 	dlink_node *ptr;
 
