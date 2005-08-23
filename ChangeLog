@@ -1,3 +1,11 @@
+androsyn    2005/08/23 00:32:03 UTC	(20050823_0-20652)
+  Log:
+  forgot to add main.c oops
+
+  Modified:
+	ircd-ratbox/trunk/src/main.c (File Added) 
+
+
 androsyn    2005/08/22 22:54:18 UTC	(20050822_5-20650)
   Log:
   More autoconf fun and games.
