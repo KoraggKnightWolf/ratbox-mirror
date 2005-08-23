@@ -100,8 +100,8 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = &fd_table[fd];
-	s_assert(fd >= 0);
-	s_assert(F->flags.open);
+	lircd_assert(fd >= 0);
+	lircd_assert(F->flags.open);
 
 	/* Update the list, even though we're not using it .. */
 	F->list = list;

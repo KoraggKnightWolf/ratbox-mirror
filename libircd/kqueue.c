@@ -158,8 +158,8 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = &fd_table[fd];
-	s_assert(fd >= 0);
-	s_assert(F->flags.open);
+	lircd_assert(fd >= 0);
+	lircd_assert(F->flags.open);
 
 	if(type & COMM_SELECT_READ)
 	{

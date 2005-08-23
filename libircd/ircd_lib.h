@@ -62,6 +62,10 @@ unsigned int geteuid(void);
 #ifndef UIO_MAXIOV 
 #define UIO_MAXIOV      16
 #endif
+#if defined(HAVE_WRITEV) && defined(HAVE_SENDMSG) && !defined(__CYGWIN__)
+#define USE_WRITEV 1
+#endif 
+
 
 #endif
 

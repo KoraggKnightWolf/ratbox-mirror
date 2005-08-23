@@ -669,9 +669,8 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 	buf_line_t *bufline;
 	int retval;
 
-	if(comm_can_writev(fd))
+#ifdef USE_WRITEV
 	{
-#ifdef HAVE_WRITEV
 		dlink_node *ptr;
 		int x = 0, y;
 		int xret;
@@ -752,8 +751,8 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 		}
 
 		return retval;
-#endif
 	}
+#else
 
 	/* this is the non-writev case */	
 	
@@ -801,6 +800,7 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 
 	/* Return line length */
 	return retval;
+#endif
 }
 
 

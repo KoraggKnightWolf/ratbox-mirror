@@ -4,9 +4,9 @@ AUTOMAKE_OPTIONS = foreign
 
 INCLUDES = -I. -I../include
 
-#if WS2
-#WIN32=win32.c
-#endif 
+if MINGW
+WIN32=win32.c
+endif 
 
 libircd_la_SOURCES = $(WIN32)                    	\
 	balloc.c			\

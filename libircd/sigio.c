@@ -96,7 +96,7 @@ poll_update_pollfds(int fd, short event, PF * handler)
 			{
 				pf->fd = -1;
 				pf->revents = 0;
-				s_assert(used_count > 0);
+				lircd_assert(used_count > 0);
 				if(F->comm_index != used_count - 1)
 				{
 					index_to_fde[used_count - 1]->comm_index = F->comm_index;
@@ -172,9 +172,9 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F;
-	s_assert(fd >= 0);
+	lircd_assert(fd >= 0);
 	F = &fd_table[fd];
-	s_assert(F->flags.open);
+	lircd_assert(F->flags.open);
 
 	if(type & COMM_SELECT_READ)
 	{

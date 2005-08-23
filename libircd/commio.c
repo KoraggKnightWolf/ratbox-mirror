@@ -762,17 +762,6 @@ comm_note(int fd, const char *format, ...)
 		fd_table[fd].desc[0] = '\0';
 }
 
-int
-comm_can_writev(int fd)
-{
-#ifndef HAVE_WRITEV
-	return 0;
-#endif
-/*	fde_t *F = &fd_table[fd];
- */
-	return 1;
-}
-
 ssize_t
 comm_read(int fd, void *buf, int count)
 {
@@ -843,10 +832,10 @@ comm_write(int fd, void *buf, int count)
 
 }
 
+#ifdef USE_WRITEV
 ssize_t
 comm_writev(int fd, struct iovec *vector, int count)
 {
-#ifdef HAVE_WRITEV
 	fde_t *F = &fd_table[fd];
 
 	switch(F->type)
@@ -863,10 +852,8 @@ comm_writev(int fd, struct iovec *vector, int count)
 		default:
 			return writev(fd, vector, count);	
 	}
-#else
-	return 0;
-#endif
 }
+#endif
 
 /* 
  * From: Thomas Helvey <tomh@inxpress.net>

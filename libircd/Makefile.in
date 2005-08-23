@@ -53,8 +53,12 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libircd_la_LIBADD =
-am_libircd_la_OBJECTS = balloc.lo commio.lo event.lo ircd_lib.lo \
-	ircd_memory.lo linebuf.lo snprintf.lo tools.lo \
+am__libircd_la_SOURCES_DIST = win32.c balloc.c commio.c event.c \
+	ircd_lib.c ircd_memory.c linebuf.c snprintf.c tools.c \
+	@SELECT_TYPE@.c
+@MINGW_TRUE@am__objects_1 = win32.lo
+am_libircd_la_OBJECTS = $(am__objects_1) balloc.lo commio.lo event.lo \
+	ircd_lib.lo ircd_memory.lo linebuf.lo snprintf.lo tools.lo \
 	@SELECT_TYPE@.lo
 libircd_la_OBJECTS = $(am_libircd_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
@@ -65,7 +69,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/event.Plo ./$(DEPDIR)/ircd_lib.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ircd_memory.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/linebuf.Plo ./$(DEPDIR)/snprintf.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/tools.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/tools.Plo ./$(DEPDIR)/win32.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -75,7 +79,7 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libircd_la_SOURCES)
-DIST_SOURCES = $(libircd_la_SOURCES)
+DIST_SOURCES = $(am__libircd_la_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -219,10 +223,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 INCLUDES = -I. -I../include
-
-#if WS2
-#WIN32=win32.c
-#endif 
+@MINGW_TRUE@WIN32 = win32.c
 libircd_la_SOURCES = $(WIN32)                    	\
 	balloc.c			\
 	commio.c			\
@@ -316,6 +317,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linebuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snprintf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tools.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/win32.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

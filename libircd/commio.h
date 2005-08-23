@@ -247,9 +247,10 @@ extern int comm_socketpair(int family, int sock_type, int proto, int *nfd, const
 
 extern int comm_accept(int fd, struct sockaddr *pn, socklen_t *addrlen);
 extern ssize_t comm_write(int fd, void *buf, int count);
+#ifdef USE_WRITEV
 extern ssize_t comm_writev(int fd, struct iovec *vector, int count);
+#endif
 extern ssize_t comm_read(int fd, void *buf, int count);
-extern int comm_can_writev(int fd);
 extern int comm_pipe(int *fd, const char *desc);
 
 /* These must be defined in the network IO loop code of your choice */
