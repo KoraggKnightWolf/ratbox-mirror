@@ -1,3 +1,12 @@
+androsyn    2005/08/23 17:26:05 UTC	(20050823_4-20660)
+  Log:
+  Correctly set the length of suffix_len so that autoload modules will actually load now.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2005/08/23 04:56:26 UTC	(20050823_3-20658)
   Log:
   fix COMM_SELECT_ACCEPT and COMM_SELECT_CONNECT flags.  Also remove irc_sleep from poll.
