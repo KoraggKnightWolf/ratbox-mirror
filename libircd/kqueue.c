@@ -25,11 +25,8 @@
  *  $Id$
  */
 
-#include "stdinc.h"
+#include "ircd_lib.h"
 #include <sys/event.h>
-#include "tools.h"
-#include "commio.h"
-#include "ircd_memory.h"
 
 
 
