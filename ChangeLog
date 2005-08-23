@@ -1,3 +1,24 @@
+androsyn    2005/08/23 02:49:48 UTC	(20050823_1-20654)
+  Log:
+  This mostly gets ircd working on cygwin with dynamic module support. 
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/core/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/getopt.c (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2005/08/23 00:32:03 UTC	(20050823_0-20652)
   Log:
   forgot to add main.c oops
