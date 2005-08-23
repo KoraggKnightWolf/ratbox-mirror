@@ -21482,7 +21482,7 @@ else
   MINGW_FALSE=
 fi
 
-     LIBS = "$LIBS -lws2_32"
+     LIBS="$LIBS -lws2_32"
      ;;
 *)
 

@@ -29,6 +29,8 @@
 #include "s_conf.h"
 #include "res.h"
 #include "s_auth.h"
+
+#ifndef MINGW
 /*
  * dummy_handler - don't know if this is really needed but if alarm is still
  * being used we probably will
@@ -166,3 +168,11 @@ setup_signals()
 	sigaction(SIGCHLD, &act, 0);
 
 }
+#else
+void
+setup_signals()
+{
+/* this is a stub for mingw32 */
+}
+#endif
+

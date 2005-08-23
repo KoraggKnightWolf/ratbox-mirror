@@ -132,8 +132,12 @@ get_vm_top(void)
 	 * offset from 0 (NULL), so the result of sbrk is cast to a size_t and 
 	 * returned. We really shouldn't be using it here but...
 	 */
+#ifndef MINGW
 	void *vptr = sbrk(0);
 	return (unsigned long) vptr;
+#else
+	return -1;
+#endif
 }
 
 /*
@@ -196,6 +200,7 @@ init_sys(void)
 static int
 make_daemon(void)
 {
+#ifndef MINGW
 	int pid;
 
 	if((pid = fork()) < 0)
@@ -213,7 +218,7 @@ make_daemon(void)
 	/*  fclose(stdin);
 	   fclose(stdout);
 	   fclose(stderr); */
-
+#endif
 	return 0;
 }
 
