@@ -265,8 +265,9 @@ void find_module_suffix(void)
 		else
 		if((len > 4) && !strcmp(ldirent->d_name+len-4, ".dll"))
 			strcpy(found_suffix, ".dll");
-		
-		if(strlen(found_suffix) > 0)
+
+				
+		if((suffix_len = strlen(found_suffix)) > 0)
 			return;
 	}
 	ilog(L_MAIN, "Cound not determine module suffix at all...");
