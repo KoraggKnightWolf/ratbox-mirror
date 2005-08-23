@@ -46,8 +46,6 @@ typedef struct _pollfd_list pollfd_list_t;
 
 pollfd_list_t pollfd_list;
 static void poll_update_pollfds(int, short, PF *);
-static unsigned long last_count = 0; 
-static unsigned long empty_count = 0;
 
 int 
 comm_setup_fd(int fd)
@@ -175,23 +173,6 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 		F->timeout = CurrentTime + (timeout / 1000);
 }
 
-static void
-irc_sleep(unsigned long useconds)
-{     
-#ifdef HAVE_NANOSLEEP    
-        struct timespec t;
-        t.tv_sec = useconds / (unsigned long) 1000000;
-        t.tv_nsec = (useconds % (unsigned long) 1000000) * 1000;
-        nanosleep(&t, (struct timespec *) NULL);
-#else    
-        struct timeval t;        
-        t.tv_sec = 0;    
-        t.tv_usec = useconds;
-        select(0, NULL, NULL, NULL, &t);
-#endif
-        return;
-}
-
 /* int comm_select_fdlist(unsigned long delay)
  * Input: The maximum time to delay.
  * Output: Returns -1 on error, 0 on success.
@@ -211,26 +192,11 @@ comm_select(unsigned long delay)
 	int num;
 	int fd;
 	int ci;
-	unsigned long ndelay;
 	PF *hdl;
 
-	if(last_count > 0)
-	{
-		empty_count = 0;
-		ndelay = 0;
-	}
-	else {
-		ndelay = ++empty_count * 15000 ;
-		if(ndelay > delay * 1000)
-			ndelay = delay * 1000;	
-	}
-	
 	for (;;)
 	{
-		/* XXX kill that +1 later ! -- adrian */
-		if(ndelay > 0)
-			irc_sleep(ndelay); 
-		last_count = num = poll(pollfd_list.pollfds, pollfd_list.maxindex + 1, 0);
+		num = poll(pollfd_list.pollfds, pollfd_list.maxindex + 1, delay);
 		if(num >= 0)
 			break;
 		if(ignoreErrno(errno))
