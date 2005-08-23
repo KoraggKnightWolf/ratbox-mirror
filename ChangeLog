@@ -1,3 +1,15 @@
+androsyn    2005/08/23 04:56:26 UTC	(20050823_3-20658)
+  Log:
+  fix COMM_SELECT_ACCEPT and COMM_SELECT_CONNECT flags.  Also remove irc_sleep from poll.
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+
+
 androsyn    2005/08/23 03:00:29 UTC	(20050823_2-20656)
   Log:
   fix a minor goofup in configure related to MINGW
