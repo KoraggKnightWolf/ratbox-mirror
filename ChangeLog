@@ -1,3 +1,16 @@
+androsyn    2005/08/23 19:33:28 UTC	(20050823_7-20670)
+  Log:
+  more mingw32 goo
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_signal.c (File Modified) 
+
+
 androsyn    2005/08/23 19:32:22 UTC	(20050823_6-20668)
   Log:
   replace the rest of the s_asserts with lircd_assert
