@@ -1,7 +1,7 @@
 # $Id$
 
 AUTOMAKE_OPTIONS = foreign
-
+AM_YFLAGS = -d
 bin_PROGRAMS = ircd
 
 INCLUDES = $(INCLTDL) -I../libircd/ 
@@ -13,16 +13,6 @@ version.o: version.c
 	$(COMPILE) -c version.c -o version.o
 	$(MV) version.c version.c.last
 
-
-# Note GNU bison uses <file>.tab.c not y.tab.c
-y.tab.c: ircd_parser.y
-	$(YACC) -d ircd_parser.y
-
-lex.yy.o: lex.yy.c ircd_lexer.l 
-	$(COMPILE) -c lex.yy.c 
-
-lex.yy.c: ircd_lexer.l y.tab.c
-	$(LEX) ircd_lexer.l
 
 ircd_SOURCES = main.c
 	
@@ -61,8 +51,8 @@ libratbox_la_SOURCES =                     \
   send.c                        \
   whowas.c			\
   version.c			\
-  ircd_lexer.l			\
-  ircd_parser.y		
+  ircd_parser.y			\
+  ircd_lexer.l			
   
 lib_LTLIBRARIES = libratbox.la
 
@@ -72,7 +62,7 @@ else
 libratbox_la_LIBADD = $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 endif
 
-libratbox_la_LDFLAGS = -avoid-version -noundefined  ../libircd/libircd.la
+libratbox_la_LDFLAGS = -avoid-version -no-undefined  ../libircd/libircd.la
 
 libratbox_la_DEPENDENCIES = $(LIBLTDLC) ../libircd/libircd.la
 

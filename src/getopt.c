@@ -23,7 +23,7 @@
  *
  *  $Id$
  */
-
+#include <stdlib.h>
 #include "stdinc.h"
 
 #include "ircd_getopt.h"

@@ -43,7 +43,7 @@ host_triplet = @host@
 bin_PROGRAMS = ircd$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in ircd_lexer.c \
-	ircd_parser.c
+	ircd_parser.c ircd_parser.h
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
@@ -62,7 +62,7 @@ am_libratbox_la_OBJECTS = dns.lo cache.lo channel.lo class.lo \
 	modules.lo monitor.lo newconf.lo numeric.lo packet.lo parse.lo \
 	patricia.lo reject.lo restart.lo s_auth.lo s_conf.lo \
 	s_newconf.lo s_log.lo s_serv.lo s_user.lo scache.lo send.lo \
-	whowas.lo version.lo ircd_lexer.lo ircd_parser.lo
+	whowas.lo version.lo ircd_parser.lo ircd_lexer.lo
 libratbox_la_OBJECTS = $(am_libratbox_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -250,6 +250,7 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
+AM_YFLAGS = -d
 INCLUDES = $(INCLTDL) -I../libircd/ 
 ircd_SOURCES = main.c
 libratbox_la_SOURCES = \
@@ -287,13 +288,13 @@ libratbox_la_SOURCES = \
   send.c                        \
   whowas.c			\
   version.c			\
-  ircd_lexer.l			\
-  ircd_parser.y		
+  ircd_parser.y			\
+  ircd_lexer.l			
 
 lib_LTLIBRARIES = libratbox.la
 @STATIC_MODULES_FALSE@libratbox_la_LIBADD = $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 @STATIC_MODULES_TRUE@libratbox_la_LIBADD = @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
-libratbox_la_LDFLAGS = -avoid-version -noundefined  ../libircd/libircd.la
+libratbox_la_LDFLAGS = -avoid-version -no-undefined  ../libircd/libircd.la
 libratbox_la_DEPENDENCIES = $(LIBLTDLC) ../libircd/libircd.la
 ircd_LDADD = libratbox.la ../libircd/libircd.la
 all: all-am
@@ -356,6 +357,11 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
+ircd_parser.h: ircd_parser.c
+	@if test ! -f $@; then \
+	  rm -f ircd_parser.c; \
+	  $(MAKE) ircd_parser.c; \
+	else :; fi
 libratbox.la: $(libratbox_la_OBJECTS) $(libratbox_la_DEPENDENCIES) 
 	$(LINK) -rpath $(libdir) $(libratbox_la_LDFLAGS) $(libratbox_la_OBJECTS) $(libratbox_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
@@ -601,8 +607,9 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-rm -f ircd_parser.c
 	-rm -f ircd_lexer.c
+	-rm -f ircd_parser.c
+	-rm -f ircd_parser.h
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -676,16 +683,6 @@ version.c:
 version.o: version.c
 	$(COMPILE) -c version.c -o version.o
 	$(MV) version.c version.c.last
-
-# Note GNU bison uses <file>.tab.c not y.tab.c
-y.tab.c: ircd_parser.y
-	$(YACC) -d ircd_parser.y
-
-lex.yy.o: lex.yy.c ircd_lexer.l 
-	$(COMPILE) -c lex.yy.c 
-
-lex.yy.c: ircd_lexer.l y.tab.c
-	$(LEX) ircd_lexer.l
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

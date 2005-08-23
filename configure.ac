@@ -21,7 +21,7 @@ dnl Checks for programs.
 AM_PROG_LEX
 AC_PROG_CC
 AC_PROG_INSTALL
-
+AC_PROG_EGREP
 
 if test "$enable_static" = "yes"; then
 	AM_DISABLE_SHARED
@@ -31,6 +31,8 @@ else
 	enable_static="no"
 fi
 
+F77=no
+
 AC_LIBLTDL_CONVENIENCE
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
@@ -38,31 +40,6 @@ AC_LIBTOOL_DLOPEN
 AM_DISABLE_STATIC
 AM_ENABLE_SHARED
 AM_MAINTAINER_MODE
-F77=no
-
-case "$host_os" in
-*cygwin*)
-     AC_DEFINE_UNQUOTED(CYGWIN,1,[This is a Cygwin system])
-     AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
-     ;;
-*mingw*)
-     AC_DEFINE_UNQUOTED(MINGW,1,[This is a MinGW system])
-     AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
-     AC_CHECK_HEADER(winsock2.h, , [AC_MSG_ERROR([** MinGW and no winsock2.h.  I give up.])])
-     AM_CONDITIONAL([MINGW], 0)
-     LIBS = "$LIBS -lws2_32"
-     ;;
-*)
-     AM_CONDITIONAL([MINGW], 1)
-     ;;
-esac
-
-
-AM_CONDITIONAL([STATIC_MODULES], test "$enable_static" = "yes")
-AC_PROG_LIBTOOL
-
-AC_CONFIG_SUBDIRS(libltdl)
-
 
 AC_ISC_POSIX
 AC_C_INLINE
@@ -85,6 +62,33 @@ AC_PATH_PROG(TOUCH, touch)
 #AC_PATH_PROG(LEX, flex, [no])
 AC_PROG_YACC
 AC_LANG(C)
+
+AM_CONDITIONAL([STATIC_MODULES], test "$enable_static" = "yes")
+AC_PROG_LIBTOOL
+
+AC_CONFIG_SUBDIRS(libltdl)
+
+
+case "$host_os" in
+*cygwin*)
+     AC_DEFINE_UNQUOTED(CYGWIN,1,[This is a Cygwin system])
+     AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
+     AM_CONDITIONAL([MINGW], false)
+     ;;
+*mingw*)
+     AC_DEFINE_UNQUOTED(MINGW,1,[This is a MinGW system])
+     AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
+     AC_CHECK_HEADER(winsock2.h, , [AC_MSG_ERROR([** MinGW and no winsock2.h.  I give up.])])
+     AM_CONDITIONAL([MINGW], true)
+     LIBS = "$LIBS -lws2_32"
+     ;;
+*)
+     ;;
+esac
+
+
+
+
 
 if test "$LEX" != flex; then
   LEX="$SHELL $missing_dir/missing flex"

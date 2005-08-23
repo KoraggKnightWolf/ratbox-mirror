@@ -304,7 +304,7 @@ load_all_modules(int warn)
 	{
 		len = strlen(ldirent->d_name);
 
-		if((len > suffix_len) && !strcmp(ldirent->d_name+len-3, found_suffix))
+		if((len > suffix_len) && !strcmp(ldirent->d_name+len-suffix_len, found_suffix))
 		{
 			(void) ircsnprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", AUTOMODPATH, ldirent->d_name);
 			(void) load_a_module(module_fq_name, warn, 0);

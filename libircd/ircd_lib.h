@@ -57,6 +57,13 @@ unsigned int geteuid(void);
 #include <netinet/in.h>
 #include "setup.h"
 #include "config.h"
+#ifdef HAVE_SYS_UIO_H
+#include <sys/uio.h>
+#ifndef UIO_MAXIOV 
+#define UIO_MAXIOV      16
+#endif
+
+#endif
 
 #endif
 

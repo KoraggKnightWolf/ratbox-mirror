@@ -24,11 +24,8 @@
  *
  *  $Id$
  */
-#include "stdinc.h"
 #include <sys/poll.h>
-#include "tools.h"
-#include "commio.h"
-#include "ircd_memory.h"
+#include "ircd_lib.h"
 
 
 /* I hate linux -- adrian */
@@ -75,7 +72,7 @@ poll_findslot(void)
 			return i;
 		}
 	}
-	s_assert(1 == 0);
+	lircd_assert(1 == 0);
 	/* NOTREACHED */
 	return -1;
 }
@@ -140,7 +137,7 @@ void
 init_netio(void)
 {
 	int fd;
-	pollfd_list.pollfds = MyMalloc(maxconnections * (sizeof struct pollfd));
+	pollfd_list.pollfds = MyMalloc(maxconnections * (sizeof(struct pollfd)));
 	for (fd = 0; fd < maxconnections; fd++)
 	{
 		pollfd_list.pollfds[fd].fd = -1;
@@ -159,8 +156,8 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = &fd_table[fd];
-	s_assert(fd >= 0);
-	s_assert(F->flags.open);
+	lircd_assert(fd >= 0);
+	lircd_assert(F->flags.open);
 
 	if(type & COMM_SELECT_READ)
 	{
