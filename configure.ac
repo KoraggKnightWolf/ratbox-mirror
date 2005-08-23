@@ -83,6 +83,7 @@ case "$host_os" in
      LIBS = "$LIBS -lws2_32"
      ;;
 *)
+     AM_CONDITIONAL([MINGW], false)
      ;;
 esac
 
