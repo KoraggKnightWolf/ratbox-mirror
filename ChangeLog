@@ -1,3 +1,11 @@
+androsyn    2005/08/23 19:37:48 UTC	(20050823_8-20672)
+  Log:
+  remove an unused variable from invalidate_bancache_user
+
+  Modified:
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+
+
 androsyn    2005/08/23 19:33:28 UTC	(20050823_7-20670)
   Log:
   more mingw32 goo
