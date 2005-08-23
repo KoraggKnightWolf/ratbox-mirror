@@ -1,3 +1,11 @@
+androsyn    2005/08/23 19:13:56 UTC	(20050823_5-20662)
+  Log:
+  fix includes for kqueue.c
+
+  Modified:
+	ircd-ratbox/trunk/libircd/kqueue.c (File Modified) 
+
+
 androsyn    2005/08/23 17:26:05 UTC	(20050823_4-20660)
   Log:
   Correctly set the length of suffix_len so that autoload modules will actually load now.
