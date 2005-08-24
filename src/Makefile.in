@@ -680,8 +680,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am \
 version.c: 
 	$(SHELL) ./version.c.SH 
 
-version.o: version.c
-	$(COMPILE) -c version.c -o version.o
+version.lo: version.c
+	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $<
 	$(MV) version.c version.c.last
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

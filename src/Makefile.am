@@ -9,11 +9,11 @@ INCLUDES = $(INCLTDL) -I../libircd/
 version.c: 
 	$(SHELL) ./version.c.SH 
 
-version.o: version.c
-	$(COMPILE) -c version.c -o version.o
+version.lo: version.c
+	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $<
 	$(MV) version.c version.c.last
-
-
+        
+        
 ircd_SOURCES = main.c
 	
 libratbox_la_SOURCES =                     \
