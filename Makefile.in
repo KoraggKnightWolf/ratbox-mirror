@@ -61,7 +61,6 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -147,10 +146,12 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PICFLAGS = @PICFLAGS@
 RANLIB = @RANLIB@
+RESOLVER = @RESOLVER@
 RM = @RM@
 SED = @SED@
 SEDOBJ = @SEDOBJ@
 SELECT_TYPE = @SELECT_TYPE@
+SERVLINK = @SERVLINK@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SSL_INCLUDES = @SSL_INCLUDES@
@@ -161,8 +162,6 @@ STATIC_MODULES_TRUE = @STATIC_MODULES_TRUE@
 STRIP = @STRIP@
 TOUCH = @TOUCH@
 VERSION = @VERSION@
-WANT_SERVLINK_FALSE = @WANT_SERVLINK_FALSE@
-WANT_SERVLINK_TRUE = @WANT_SERVLINK_TRUE@
 YACC = @YACC@
 ZLIB_LD = @ZLIB_LD@
 ac_ct_AR = @ac_ct_AR@
@@ -214,7 +213,8 @@ target_alias = @target_alias@
 
 # $Id$
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = libircd $(ADNS) libltdl src modules resolver ident $(SERVLINK) tools doc help
+SUBDIRS = libircd libltdl src modules ident @RESOLVER@ @SERVLINK@ tools doc help
+DIST_SUBDIRS = libircd libltdl src modules ident adns resolver servlink tools doc help
 all: all-recursive
 
 .SUFFIXES:
@@ -433,7 +433,7 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	list='$(SUBDIRS)'; for subdir in $$list; do \
+	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
 	  if test "$$subdir" = .; then :; else \
 	    test -d "$(distdir)/$$subdir" \
 	    || mkdir "$(distdir)/$$subdir" \
@@ -639,10 +639,6 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am uninstall-info-am
 
-
-@WANT_SERVLINK_TRUE@	SERVLINK = servlink
-
-@MINGW_FALSE@	ADNS = adns
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

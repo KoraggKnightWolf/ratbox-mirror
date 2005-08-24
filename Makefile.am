@@ -1,12 +1,11 @@
 # $Id$
 AUTOMAKE_OPTIONS = foreign
 
-if WANT_SERVLINK
-	SERVLINK = servlink
-endif
 
-if !MINGW
-	ADNS = adns
-endif
+SUBDIRS = libircd libltdl src modules ident @RESOLVER@ @SERVLINK@ tools doc help
+DIST_SUBDIRS = libircd libltdl src modules ident adns resolver servlink tools doc help
 
-SUBDIRS = libircd $(ADNS) libltdl src modules resolver ident $(SERVLINK) tools doc help
+
+
+
+

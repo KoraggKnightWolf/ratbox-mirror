@@ -68,26 +68,28 @@ AC_PROG_LIBTOOL
 
 AC_CONFIG_SUBDIRS(libltdl)
 
+RESOLVER="adns resolver"
 
 case "$host_os" in
 *cygwin*)
      AC_DEFINE_UNQUOTED(CYGWIN,1,[This is a Cygwin system])
      AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
-     AM_CONDITIONAL([MINGW], false)
      ;;
 *mingw*)
      AC_DEFINE_UNQUOTED(MINGW,1,[This is a MinGW system])
      AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
      AC_CHECK_HEADER(winsock2.h, , [AC_MSG_ERROR([** MinGW and no winsock2.h.  I give up.])])
-     AM_CONDITIONAL([MINGW], true)
+     RESOLVER=""
      LIBS="$LIBS -lws2_32"
      ;;
 *)
-     AM_CONDITIONAL([MINGW], false)
      ;;
 esac
 
+AM_CONDITIONAL([MINGW], [test "$is_mingw" = "yes"])
 
+
+AC_SUBST(RESOLVER)
 
 
 
@@ -452,7 +454,11 @@ AC_CHECK_HEADER(zlib.h, [
 
 fi
 
-AM_CONDITIONAL([WANT_SERVLINK], [test "$zlib" = yes])
+if test "$zlib" = "yes"; then
+	SERVLINK=servlink
+	AC_SUBST(SERVLINK)
+fi
+
 dnl IO Loop Selection
 dnl =================
 
