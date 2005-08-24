@@ -1,3 +1,11 @@
+androsyn    2005/08/24 17:36:13 UTC	(20050824_2-20686)
+  Log:
+  rerun automake
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 androsyn    2005/08/24 17:35:04 UTC	(20050824_1-20684)
   Log:
   Make version.c build correctly
