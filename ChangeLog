@@ -1,3 +1,13 @@
+androsyn    2005/08/24 17:35:04 UTC	(20050824_1-20684)
+  Log:
+  Make version.c build correctly
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+
+
 androsyn    2005/08/24 03:28:05 UTC	(20050824_0-20682)
   Log:
   make adns and the resolver build correctly again
