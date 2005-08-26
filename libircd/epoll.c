@@ -28,7 +28,6 @@
 #define _GNU_SOURCE 1
 
 #include "ircd_lib.h"
-#include <signal.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
 
@@ -36,9 +35,6 @@
 static int ep;			/* epoll file descriptor */
 static struct epoll_event *pfd;
 static int pfd_size;
-static sigset_t our_sigset;
-static void handle_timer(struct siginfo *si);
-
 
 #ifndef HAVE_EPOLL_CTL /* bah..glibc doesn't support epoll yet.. */
 #include <sys/epoll.h>
@@ -50,15 +46,6 @@ _syscall4(int, epoll_wait, int, epfd, struct epoll_event *, pevents,
 		 int, maxevents, int, timeout);
 
 #endif /* HAVE_EPOLL_CTL */
-
-static void
-mask_our_signal(int s)
-{  
-        sigemptyset(&our_sigset);
-        sigaddset(&our_sigset, s);
-        sigaddset(&our_sigset, SIGIO);
-        sigprocmask(SIG_BLOCK, &our_sigset, NULL);
-}
 
 
 /*
@@ -79,28 +66,12 @@ init_netio(void)
 		exit(115);	/* Whee! */
 	}
 	comm_note(ep, "epoll file descriptor");
-	mask_our_signal(SIGRTMIN);
 }
 
 int
 comm_setup_fd(int fd)
 {
-        int flags = 0;
-        flags = fcntl(fd, F_GETFL, 0);
-        if(flags == -1)
-                return 0;
-        flags |= O_ASYNC | O_NONBLOCK;
-        if(fcntl(fd, F_SETFL, flags) == -1)
-                return 0;
-
-        if(fcntl(fd, F_SETSIG, SIGIO) == -1)
-                return 0;
-
-        if(fcntl(fd, F_SETOWN, getpid()) == -1)
-                return 0;
-
-        fd_table[fd].flags.nonblocking = 1;
-        return 1;
+	return 0;
 }  
 
 
@@ -185,148 +156,84 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 int
 comm_select(unsigned long delay)
 {
-	int num, i, flags, old_flags, op, sig;
+	int num, i, flags, old_flags, op;
 	struct epoll_event ep_event;
-	struct siginfo si;
-	struct timespec to;
 	void *data;
-	memset(&to, 0, sizeof(to));
-	for(;;)
+	
+	num = epoll_wait(ep, pfd, pfd_size, delay);
+	set_time();
+
+	if(num < 0 && !ignoreErrno(errno))
 	{
-		
-		if((sig = sigwaitinfo(&our_sigset, &si)) == SIGRTMIN)
-		{
-			set_time();
-			handle_timer(&si);
-			continue;
-		}
-
-		num = epoll_wait(ep, pfd, pfd_size, 0);
-		set_time();
-
-		if(num < 0 && !ignoreErrno(errno))
-		{
-			continue;
-		}
-
-		if(num == 0)
-			return COMM_OK;
-		for (i = 0; i < num; i++)
-		{
-			PF *hdl;
-			fde_t *F = pfd[i].data.ptr;
-			old_flags = F->pflags;
-			if(pfd[i].events & (EPOLLIN | EPOLLHUP | EPOLLERR))
-			{
-				hdl = F->read_handler;
-				data = F->read_data;
-				F->read_handler = NULL;
-				F->read_data = NULL;
-				if(hdl) {
-					hdl(F->fd, data);
-				}
-				else
-					lib_ilog("epoll.c: NULL read handler called");
-	
-			}
-
-			if(F->flags.open == 0)
-				continue;
-			if(pfd[i].events & (EPOLLOUT | EPOLLHUP | EPOLLERR))
-			{
-				hdl = F->write_handler;
-				data = F->write_data;
-				F->write_handler = NULL;
-				F->write_data = NULL;
-
-				if(hdl) {
-					hdl(F->fd, data);
-				}
-				else
-					lib_ilog("epoll.c: NULL write handler called");
-			}
-		
-			if(F->flags.open == 0)
-				continue;		
-		
-			flags = 0;
-		
-			if(F->read_handler != NULL)
-				flags |= EPOLLIN;
-			if(F->write_handler != NULL)
-				flags |= EPOLLOUT;
-		
-			if(old_flags != flags)
-			{
-				if(flags == 0)
-					op = EPOLL_CTL_DEL;			
-				else
-					op = EPOLL_CTL_MOD;
-				F->pflags = ep_event.events = flags;
-				ep_event.data.ptr = F;
-				if(op == EPOLL_CTL_MOD || op == EPOLL_CTL_ADD)
-					ep_event.events |= EPOLLET;
-				
-				if(epoll_ctl(ep, op, F->fd, &ep_event) != 0)
-				{
-					lib_ilog("comm_setselect(): epoll_ctl failed: %s", strerror(errno));
-				}
-			}
-					
-		}
+		return COMM_OK;
 	}
-}
 
-
-static void 
-handle_timer(struct siginfo *si)
-{
-	struct timer_data *tdata;
-	tdata = si->si_ptr;
-	tdata->td_cb(tdata->td_udata);
-	if (!tdata->td_repeat)
-		free(tdata);
-}
-
-comm_event_id
-comm_schedule_event(time_t when, int repeat, comm_event_cb_t cb, void *udata)
-{
-	timer_t	 	 id;
-struct	timer_data	*tdata;
-struct	sigevent	 ev;
-struct	itimerspec	 ts;
+	if(num == 0)
+		return COMM_OK;
+	for (i = 0; i < num; i++)
+	{
+		PF *hdl;
+		fde_t *F = pfd[i].data.ptr;
+		old_flags = F->pflags;
+		if(pfd[i].events & (EPOLLIN | EPOLLHUP | EPOLLERR))
+		{
+			hdl = F->read_handler;
+			data = F->read_data;
+			F->read_handler = NULL;
+			F->read_data = NULL;
+			if(hdl) {
+				hdl(F->fd, data);
+			}
+			else
+				lib_ilog("epoll.c: NULL read handler called");
 	
-	memset(&ev, 0, sizeof(ev));
+		}
 
-	tdata = malloc(sizeof(struct timer_data));
-	tdata->td_cb = cb;
-	tdata->td_udata = udata;
+		if(F->flags.open == 0)
+			continue;
+		if(pfd[i].events & (EPOLLOUT | EPOLLHUP | EPOLLERR))
+		{
+			hdl = F->write_handler;
+			data = F->write_data;
+			F->write_handler = NULL;
+			F->write_data = NULL;
 
-	ev.sigev_notify = SIGEV_SIGNAL;
-	ev.sigev_signo = SIGRTMIN;
-	ev.sigev_value.sival_ptr = tdata;
-	
-	if (timer_create(CLOCK_REALTIME, &ev, &id) < 0)
-		lib_ilog("timer_create: %s\n", strerror(errno));
-
-	tdata->td_timer_id = id;
-
-	memset(&ts, 0, sizeof(ts));
-	ts.it_value.tv_sec = when;
-	ts.it_value.tv_nsec = 0;
-
-	if (repeat)
-		ts.it_interval = ts.it_value;
-	tdata->td_repeat = repeat;
-
-	if (timer_settime(id, 0, &ts, NULL) < 0)
-		lib_ilog("timer_settime: %s\n", strerror(errno));
-	return tdata;
+			if(hdl) {
+				hdl(F->fd, data);
+			}
+			else
+				lib_ilog("epoll.c: NULL write handler called");
+		}
+		
+		if(F->flags.open == 0)
+			continue;		
+		
+		flags = 0;
+		
+		if(F->read_handler != NULL)
+			flags |= EPOLLIN;
+		if(F->write_handler != NULL)
+			flags |= EPOLLOUT;
+		
+		if(old_flags != flags)
+		{
+			if(flags == 0)
+				op = EPOLL_CTL_DEL;			
+			else
+				op = EPOLL_CTL_MOD;
+			F->pflags = ep_event.events = flags;
+			ep_event.data.ptr = F;
+			if(op == EPOLL_CTL_MOD || op == EPOLL_CTL_ADD)
+				ep_event.events |= EPOLLET;
+				
+			if(epoll_ctl(ep, op, F->fd, &ep_event) != 0)
+			{
+				lib_ilog("comm_setselect(): epoll_ctl failed: %s", strerror(errno));
+			}
+		}
+					
+	}
+	return COMM_OK;
 }
 
-void
-comm_unschedule_event(comm_event_id id)
-{
-	timer_delete(id->td_timer_id);
-	free(id);
-}
+
