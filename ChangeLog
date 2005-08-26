@@ -1,3 +1,13 @@
+androsyn    2005/08/26 01:11:51 UTC	(20050826_0-20688)
+  Log:
+  On second though, using posix timers with epoll isn't that great of an idea. Oh well..
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/epoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.h (File Modified) 
+
+
 androsyn    2005/08/24 17:36:13 UTC	(20050824_2-20686)
   Log:
   rerun automake
