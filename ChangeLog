@@ -1,3 +1,14 @@
+androsyn    2005/08/28 20:55:18 UTC	(20050828_2-20698)
+  Log:
+  Remove a unused variable in dns.c.  Fix includes in src/
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 androsyn    2005/08/28 20:36:44 UTC	(20050828_1-20696)
   Log:
   Add checks for vfork()/fork() in autoconf.  Use vfork() for 
