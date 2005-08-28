@@ -169,6 +169,11 @@ extern int errno;
 #include <sys/uio.h>
 #endif
 
+#ifdef  HAVE_VFORK_H
+#include <vfork.h>
+#endif
+
+
 #if defined(__INTEL_COMPILER) || defined(__GNUC__)
 # ifdef __unused
 #  undef __unused

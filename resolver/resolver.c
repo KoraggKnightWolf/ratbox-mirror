@@ -554,16 +554,25 @@ resolve_ip(char **parv)
 
 int main(int argc, char **argv)
 {
-	int i;
+	int i, x, maxfd;
 	char *tifd;
 	char *tofd;
-
+	char *tmaxfd;
+	
 	tifd = getenv("IFD");
 	tofd = getenv("OFD");
-	if(tifd == NULL || tofd == NULL)
+	tmaxfd = getenv("MAXFD");
+	if(tifd == NULL || tofd == NULL || tmaxfd == NULL)
 		exit(1);
 	ifd = atoi(tifd);
 	ofd = atoi(tofd);
+	maxfd = atoi(tmaxfd);
+
+	for(x = 0; x < maxfd; x++)
+	{
+		if(x != ifd && x != ofd)
+			close(x);
+	}
 
 	ircd_lib(NULL, NULL, NULL, 0, 256, 1024, 256); /* XXX fix me */
 

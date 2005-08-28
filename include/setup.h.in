@@ -64,6 +64,9 @@
 /* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
 
+/* Define to 1 if you have the `fork' function. */
+#undef HAVE_FORK
+
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
 
@@ -198,8 +201,20 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to 1 if you have the `vfork' function. */
+#undef HAVE_VFORK
+
+/* Define to 1 if you have the <vfork.h> header file. */
+#undef HAVE_VFORK_H
+
 /* Define to 1 if you have the `vsnprintf' function. */
 #undef HAVE_VSNPRINTF
+
+/* Define to 1 if `fork' works. */
+#undef HAVE_WORKING_FORK
+
+/* Define to 1 if `vfork' works. */
+#undef HAVE_WORKING_VFORK
 
 /* Define to 1 if you have the `writev' function. */
 #undef HAVE_WRITEV
@@ -357,6 +372,9 @@
 #undef inline
 #endif
 
+/* Define to `int' if <sys/types.h> does not define. */
+#undef pid_t
+
 /* If system does not define sa_family_t, define it here. */
 #undef sa_family_t
 
@@ -368,3 +386,6 @@
 
 /* If system does not define u_int32_t, define to unsigned long int here. */
 #undef u_int32_t
+
+/* Define as `fork' if `vfork' does not work. */
+#undef vfork

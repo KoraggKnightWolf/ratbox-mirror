@@ -320,6 +320,7 @@ dnl check for various functions...
 AC_CHECK_FUNCS([socketpair vsnprintf mmap gettimeofday strdup strndup writev sendmsg ])
 
 AC_FUNC_ALLOCA
+AC_FUNC_VFORK
 
 dnl Specialized functions checks
 dnl ============================

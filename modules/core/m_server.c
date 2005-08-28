@@ -795,6 +795,7 @@ fork_server(struct Client *server)
 	int i;
 	int ctrl_fds[2];
 	int data_fds[2];
+	char maxfd[6];
 
 	char fd_str[4][6];
 	char *kid_argv[7];
@@ -811,42 +812,22 @@ fork_server(struct Client *server)
 	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, data_fds, "slink data fds") < 0)
 		goto fork_error;
 
+	ircsnprintf(maxfd, sizeof(maxfd), "%d", HARD_FDLIMIT);
+	setenv("MAXFD", maxfd, 1);
+	ircsnprintf(fd_str[0], sizeof(fd_str[0]), "%d", ctrl_fds[1]);
+	ircsnprintf(fd_str[1], sizeof(fd_str[1]), "%d", data_fds[1]);
+	ircsnprintf(fd_str[2], sizeof(fd_str[2]), "%d", server->localClient->fd);
 
-#ifdef __CYGWIN__
+	setenv("CTRL_FD", fd_str[0], 1);	
+	setenv("DATA_FD", fd_str[1], 1);
+	setenv("NET_FD", fd_str[2], 1);
+
+	kid_argv[0] = slink;
+
 	if((ret = vfork()) < 0)
-#else
-	if((ret = fork()) < 0)
-#endif
 		goto fork_error;
 	else if(ret == 0)
 	{
-		/* set our fds as non blocking and close everything else */
-		for (i = 0; i < HARD_FDLIMIT; i++)
-		{
-				
-
-			if((i == ctrl_fds[1]) || (i == data_fds[1]) || (i == server->localClient->fd)) 
-			{
-				comm_set_nb(i);
-			}
-			else
-			{
-#ifdef __CYGWIN__
-				if(i > 2)	/* don't close std* */
-#endif
-					close(i);
-			}
-		}
-
-		ircsnprintf(fd_str[0], sizeof(fd_str[0]), "%d", ctrl_fds[1]);
-		ircsnprintf(fd_str[1], sizeof(fd_str[1]), "%d", data_fds[1]);
-		ircsnprintf(fd_str[2], sizeof(fd_str[2]), "%d", server->localClient->fd);
-		kid_argv[0] = slink;
-		kid_argv[1] = fd_str[0];
-		kid_argv[2] = fd_str[1];
-		kid_argv[3] = fd_str[2];
-		kid_argv[4] = NULL;
-
 		/* exec servlink program */
 		execv(ConfigFileEntry.servlink_path, kid_argv);
 

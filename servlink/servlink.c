@@ -67,6 +67,7 @@ int
 main(int argc, char *argv[])
 {
 	int max_fd = 0;
+	char *tdata_fd, *tctrl_fd, *tnet_fd, *tmax_fd;
 	int i, x;
 #ifdef SERVLINK_DEBUG
 	int GDBAttached = 0;
@@ -74,18 +75,24 @@ main(int argc, char *argv[])
 	while (!GDBAttached)
 		sleep(1);
 #endif
+	tdata_fd = getenv("CTRL_FD");
+        tctrl_fd = getenv("DATA_FD");
+        tnet_fd = getenv("NET_FD");
+        tmax_fd = getenv("MAXFD");
+	fds[0].fd = atoi(tctrl_fd);
+	fds[1].fd = atoi(tdata_fd);
+	fds[2].fd = atoi(tnet_fd);
+	max_fd = atoi(tmax_fd);
 
 	/* Make sure we are running under ircd.. */
 	
-	if(argc != 4 || strcmp(argv[0], "-slink"))
+	if(argc != 1 || strcmp(argv[0], "-slink"))
 		usage();	/* exits */
 
-
-	for (i = 0; i < 3; i++)
+	for(i = 0; i < max_fd; i++)
 	{
-		fds[i].fd = atoi(argv[i + 1]);
-		if(fds[i].fd < 0)
-			exit(1);
+		if(i != fds[0].fd && i != fds[1].fd && i != fds[2].fd)
+			close(i);
 	}
 
 	for (i = 0; i < 3; i++)

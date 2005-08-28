@@ -109,13 +109,9 @@ assign_id(void)
 static void
 fork_ident(void)
 {
-	int ifd[2];
-	int ofd[2];
-	
-	char fx[6];
-	char fy[6];
+	int ifd[2], ofd[2];
+	char fx[6], fy[6];
 	pid_t pid;
-	int i;
 
 	if(fork_ident_count > 10)
 	{
@@ -143,16 +139,12 @@ fork_ident(void)
 	comm_set_nb(ifd[0]);
 	comm_set_nb(ofd[1]);
 
-	if(!(pid = fork()))
+	setenv("IFD", fy, 1);
+	setenv("OFD", fx, 1);
+	if(!(pid = vfork()))
 	{
-		setenv("IFD", fy, 1);
-		setenv("OFD", fx, 1);
-		for(i = 0; i < HARD_FDLIMIT; i++)
-		{
-			if(i != ifd[1] && i != ofd[0])
-				close(i);
-		}
 		execl(BINPATH "/ident", "-ircd ident daemon", NULL);
+		_exit(1);
 	}
 	else if(pid == -1)
 	{

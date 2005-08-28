@@ -360,15 +360,24 @@ read_auth_request(int fd, void *data)
 
 int main(int argc, char **argv)
 {
-	char *tifd;
-	char *tofd;
+	char *tifd, *tofd, *tmaxfd;
+	int maxfd, x;
+
 	tifd = getenv("IFD");
 	tofd = getenv("OFD");
-	if(tifd == NULL || tofd == NULL)
+	tmaxfd = getenv("MAXFD");
+
+	if(tifd == NULL || tofd == NULL || tmaxfd == NULL)
 		exit(1);
+
+	maxfd = atoi(tmaxfd);
 	irc_ifd = atoi(tifd);
 	irc_ofd = atoi(tofd);
-
+	for(x = 0; x < maxfd; x++)
+	{
+		if(x != irc_ifd && x != irc_ofd)
+			close(x);
+	}
 	ircd_lib(NULL, NULL, NULL, 0, 1024, 1024, 1024); /* XXX fix me */
 	linebuf_newbuf(&sendq);
 	linebuf_newbuf(&recvq);
