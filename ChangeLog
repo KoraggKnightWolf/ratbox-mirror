@@ -1,3 +1,12 @@
+androsyn    2005/08/28 21:58:03 UTC	(20050828_3-20700)
+  Log:
+  lets try this library stuff again..
+
+  Modified:
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+
+
 androsyn    2005/08/28 20:55:18 UTC	(20050828_2-20698)
   Log:
   Remove a unused variable in dns.c.  Fix includes in src/
