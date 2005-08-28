@@ -4,8 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 AM_YFLAGS = -d
 bin_PROGRAMS = ircd
 
-INCLUDES = $(INCLTDL) -I../libircd/ 
-
+INCLUDES = $(DEFAULT_INCLUDES) $(LIBLTDL) -I../libircd -I.
 version.c: 
 	$(SHELL) ./version.c.SH 
 
