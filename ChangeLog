@@ -1,3 +1,26 @@
+androsyn    2005/08/28 20:36:44 UTC	(20050828_1-20696)
+  Log:
+  Add checks for vfork()/fork() in autoconf.  Use vfork() for 
+  calling servlink, ident and resolver.  On most platforms
+  vfork() will just be an alias for fork(), but on some, like
+  linux and cygwin, vfork() actually is really a vfork().  
+  Make the code safe to call vfork() with.  You can't do much of anything
+  after a vfork() other than an exec or an _exit.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/ident/ident.c (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/include/stdinc.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+	ircd-ratbox/trunk/servlink/servlink.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2005/08/28 19:34:23 UTC	(20050828_0-20694)
   Log:
   Fix version.c building again...
