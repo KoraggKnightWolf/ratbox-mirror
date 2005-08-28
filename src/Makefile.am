@@ -55,7 +55,7 @@ libratbox_la_SOURCES =                     \
   
 lib_LTLIBRARIES = libratbox.la
 
-libratbox_la_LDFLAGS = -avoid-version -no-undefined $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
+libratbox_la_LDFLAGS = -avoid-version -no-undefined 
 libratbox_la_DEPENDENCIES = $(LIBLTDLC) ../libircd/libircd.la
-
+libratbox_la_LIBADD = ../libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 ircd_LDADD = libratbox.la ../libircd/libircd.la 

@@ -55,7 +55,7 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libratbox_la_LIBADD =
+am__DEPENDENCIES_1 =
 am_libratbox_la_OBJECTS = dns.lo cache.lo channel.lo class.lo \
 	client.lo getopt.lo hash.lo hook.lo hostmask.lo irc_string.lo \
 	ircd.lo ircd_signal.lo kdparse.lo listener.lo match.lo \
@@ -292,8 +292,9 @@ libratbox_la_SOURCES = \
   ircd_lexer.l			
 
 lib_LTLIBRARIES = libratbox.la
-libratbox_la_LDFLAGS = -avoid-version -no-undefined $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
+libratbox_la_LDFLAGS = -avoid-version -no-undefined 
 libratbox_la_DEPENDENCIES = $(LIBLTDLC) ../libircd/libircd.la
+libratbox_la_LIBADD = ../libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 ircd_LDADD = libratbox.la ../libircd/libircd.la 
 all: all-am
 
