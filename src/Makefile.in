@@ -55,7 +55,7 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-am__DEPENDENCIES_1 =
+libratbox_la_LIBADD =
 am_libratbox_la_OBJECTS = dns.lo cache.lo channel.lo class.lo \
 	client.lo getopt.lo hash.lo hook.lo hostmask.lo irc_string.lo \
 	ircd.lo ircd_signal.lo kdparse.lo listener.lo match.lo \
@@ -251,7 +251,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 AM_YFLAGS = -d
-INCLUDES = $(DEFAULT_INCLUDES) $(LIBLTDL) -I../libircd -I.
+INCLUDES = $(DEFAULT_INCLUDES) -I../libltdl -I../libircd -I.
 ircd_SOURCES = main.c
 libratbox_la_SOURCES = \
   dns.c                        \
@@ -292,11 +292,9 @@ libratbox_la_SOURCES = \
   ircd_lexer.l			
 
 lib_LTLIBRARIES = libratbox.la
-@STATIC_MODULES_FALSE@libratbox_la_LIBADD = $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
-@STATIC_MODULES_TRUE@libratbox_la_LIBADD = @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
-libratbox_la_LDFLAGS = -avoid-version -no-undefined  ../libircd/libircd.la
+libratbox_la_LDFLAGS = -avoid-version -no-undefined $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 libratbox_la_DEPENDENCIES = $(LIBLTDLC) ../libircd/libircd.la
-ircd_LDADD = libratbox.la ../libircd/libircd.la
+ircd_LDADD = libratbox.la ../libircd/libircd.la 
 all: all-am
 
 .SUFFIXES:

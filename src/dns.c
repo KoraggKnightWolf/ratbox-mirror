@@ -187,7 +187,6 @@ static void
 fork_resolver(void)
 {
 	pid_t pid;
-	int i;
 	int ifd[2];
 	int ofd[2];
 	

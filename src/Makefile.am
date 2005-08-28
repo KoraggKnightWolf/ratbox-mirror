@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 AM_YFLAGS = -d
 bin_PROGRAMS = ircd
 
-INCLUDES = $(DEFAULT_INCLUDES) $(LIBLTDL) -I../libircd -I.
+INCLUDES = $(DEFAULT_INCLUDES) -I../libltdl -I../libircd -I.
 version.c: 
 	$(SHELL) ./version.c.SH 
 
@@ -55,14 +55,7 @@ libratbox_la_SOURCES =                     \
   
 lib_LTLIBRARIES = libratbox.la
 
-if STATIC_MODULES
-libratbox_la_LIBADD = @SSL_LIBS@ @CRYPT_LIB@ -L../modules -lmodules
-else
-libratbox_la_LIBADD = $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
-endif
-
-libratbox_la_LDFLAGS = -avoid-version -no-undefined  ../libircd/libircd.la
-
+libratbox_la_LDFLAGS = -avoid-version -no-undefined $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 libratbox_la_DEPENDENCIES = $(LIBLTDLC) ../libircd/libircd.la
 
-ircd_LDADD = libratbox.la ../libircd/libircd.la
+ircd_LDADD = libratbox.la ../libircd/libircd.la 
