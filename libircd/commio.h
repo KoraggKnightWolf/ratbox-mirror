@@ -175,13 +175,20 @@ struct _fde
 	}
 	connect;
 	int pflags;
+#ifdef __MINGW32__
+	dlink_node node;
+#endif
+
 #ifdef SSL_ENABLED
 	SSL *ssl;
 #endif
 };
 
-
+#ifdef __MINGW32__
+dlink_list *fd_table;
+#else
 extern fde_t *fd_table;
+#endif
 
 void fdlist_init(int closeall, int maxfds);
 
@@ -220,13 +227,14 @@ extern void comm_unschedule_event(comm_event_id);
 #define	COMM_SELECT_READ		0x1
 #define	COMM_SELECT_WRITE		0x2
 
-#ifdef __MINGW32__
+/*#ifdef __MINGW32__
 #define COMM_SELECT_ACCEPT		0x4
 #define COMM_SELECT_CONNECT		0x8
 #else
+*/
 #define COMM_SELECT_ACCEPT		COMM_SELECT_READ
 #define COMM_SELECT_CONNECT		COMM_SELECT_WRITE
-#endif
+/*#endif */
 extern int readcalls;
 extern const char *const NONB_ERROR_MSG;
 extern const char *const SETBUF_ERROR_MSG;
@@ -247,7 +255,7 @@ extern int comm_socketpair(int family, int sock_type, int proto, int *nfd, const
 
 extern int comm_accept(int fd, struct sockaddr *pn, socklen_t *addrlen);
 extern ssize_t comm_write(int fd, void *buf, int count);
-#ifdef USE_WRITEV
+#if defined(USE_WRITEV) 
 extern ssize_t comm_writev(int fd, struct iovec *vector, int count);
 #endif
 extern ssize_t comm_read(int fd, void *buf, int count);
@@ -273,6 +281,61 @@ extern void mangle_mapped_sockaddr(struct sockaddr *in);
 #else
 #define mangle_mapped_sockaddr(x) 
 #endif
+
+#ifdef __MINGW32__
+#define hash_fd(x) ((fd >> 2) % maxconnections)
+
+static inline fde_t *
+find_fd(int fd)
+{
+	dlink_list *hlist = &fd_table[hash_fd(fd)];
+	
+	dlink_node *ptr;
+	DLINK_FOREACH(ptr, hlist->head)
+	{
+		fde_t *F = ptr->data;
+		if(F->fd == fd)
+			return F;
+	}	
+	return NULL;
+}
+
+static inline fde_t *
+add_fd(int fd)
+{
+	int hash = hash_fd(fd);
+	fde_t *F;
+	dlink_list *list;
+	/* look up to see if we have it already */
+	if((F = find_fd(fd)) != NULL)
+		return F; 
+	
+	F = MyMalloc(sizeof(fde_t));
+	F->fd = fd;
+	list = &fd_table[hash];
+	dlinkAdd(F, &F->node, list);
+	return(F);
+}
+
+static inline void
+remove_fd(int fd)
+{
+	int hash = hash_fd(fd);
+	fde_t *F;
+	dlink_list *list;
+	list = &fd_table[hash];
+	F = find_fd(fd);
+	dlinkDelete(&F->node, list);
+	MyFree(F);
+}
+
+
+#else
+#define find_fd(x) &fd_table[x]
+#define add_fd(x) &fd_table[x]
+#define remove_fd(x) memset(&fd_table[x], 0, sizeof(fde_t))
+#endif
+
 
 
 #endif /* INCLUDED_commio_h */

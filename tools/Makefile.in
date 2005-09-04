@@ -62,7 +62,7 @@ convertklines_OBJECTS = $(am_convertklines_OBJECTS)
 convertklines_LDADD = $(LDADD)
 am_mkpasswd_OBJECTS = mkpasswd.$(OBJEXT)
 mkpasswd_OBJECTS = $(am_mkpasswd_OBJECTS)
-mkpasswd_DEPENDENCIES =
+mkpasswd_DEPENDENCIES = ../libircd/libircd.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -222,10 +222,11 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+INCLUDES = $(DEFAULT_INCLUDES) -I../libircd -I.
 mkpasswd_SOURCES = mkpasswd.c
 convertilines_SOURCES = convertilines.c
 convertklines_SOURCES = convertklines.c
-mkpasswd_LDADD = @CRYPT_LIB@
+mkpasswd_LDADD = @CRYPT_LIB@ ../libircd/libircd.la
 all: all-am
 
 .SUFFIXES:

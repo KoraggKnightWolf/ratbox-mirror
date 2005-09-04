@@ -24,6 +24,8 @@
  *  $Id$
  */
 
+#include "setup.h"
+#include "config.h"
 #include "stdinc.h"
 #include "struct.h"
 #include "ircd.h"
@@ -225,6 +227,8 @@ make_daemon(void)
 static int printVersion = 0;
 
 struct lgetopt myopts[] = {
+	{"basedir", &ConfigFileEntry.dpath,
+	 STRING, "Base directory to run ircd from"},
 	{"dlinefile", &ConfigFileEntry.dlinefile,
 	 STRING, "File to use for dlines.conf"},
 	{"configfile", &ConfigFileEntry.configfile,
@@ -459,13 +463,15 @@ diecb(const char *buf)
 int
 ratbox_main(int argc, char *argv[])
 {
+	fprintf(stderr, "in ratbox_main");
 	/* Check to see if the user is running us as root, which is a nono */
+#ifndef __MINGW32__
 	if(geteuid() == 0)
 	{
 		fprintf(stderr, "Don't run ircd as root!!!\n");
 		return -1;
 	}
-
+#endif
 	/*
 	 * save server boot time right away, so getrusage works correctly
 	 */
@@ -530,7 +536,7 @@ ratbox_main(int argc, char *argv[])
 
 	setup_signals();
 
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(__MINGW__)
 	server_state_foreground = 1;
 #endif
 
@@ -552,7 +558,7 @@ ratbox_main(int argc, char *argv[])
 
 	/* This must be after we daemonize.. */
 	ircd_lib(ilogcb, restartcb, diecb, 1, MAXCONNECTIONS, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE);
-
+	fprintf(stderr, "Past ircd_lib\n");
 	init_sys();
 	init_main_logfile();
 	init_patricia();

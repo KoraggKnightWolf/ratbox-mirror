@@ -66,7 +66,7 @@ mask_our_signal(int s)
 static void
 poll_update_pollfds(int fd, short event, PF * handler)
 {
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd(fd);
 	struct pollfd *pf;
 	int comm_index;
 
@@ -125,6 +125,7 @@ poll_update_pollfds(int fd, short event, PF * handler)
 int
 comm_setup_fd(int fd)
 {
+	fde_t *F = find_fd(fd);
 	int flags = 0;
 	flags = fcntl(fd, F_GETFL, 0);
 	if(flags == -1)
@@ -139,7 +140,7 @@ comm_setup_fd(int fd)
 	if(fcntl(fd, F_SETOWN, getpid()) == -1)
 		return 0;
 
-	fd_table[fd].flags.nonblocking = 1;
+	F->flags.nonblocking = 1;
 	return 1;
 }
 
@@ -173,7 +174,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 {
 	fde_t *F;
 	lircd_assert(fd >= 0);
-	F = &fd_table[fd];
+	F = find_fd(fd);
 	lircd_assert(F->flags.open);
 
 	if(type & COMM_SELECT_READ)
@@ -248,7 +249,7 @@ comm_select(unsigned long delay)
 				pfds[fd].revents |= si.si_band;
 				revents = pfds[fd].revents;
 				num++;
-				F = &fd_table[fd];
+				F = find_fd(fd);
 				if(!F->flags.open || F->fd < 0)
 					continue;
 
@@ -322,7 +323,7 @@ comm_select(unsigned long delay)
 		if(((revents = pfds[ci].revents) == 0) || (pfds[ci].fd) == -1)
 			continue;
 		fd = pfds[ci].fd;
-		F = &fd_table[fd];
+		F = find_fd(fd);
 		if(revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR))
 		{
 			hdl = F->read_handler;

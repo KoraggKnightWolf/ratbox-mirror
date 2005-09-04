@@ -4,20 +4,12 @@
  */
 
 %{
-#include <sys/types.h>
-#include <sys/stat.h>
 
-#include <netinet/in.h>
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
 #define WE_ARE_MEMORY_C
 #include "stdinc.h"
 #include "setup.h"
-#include "struct.h"
 #include "ircd_lib.h"
+#include "struct.h"
 #include "common.h"
 #include "ircd_defs.h"
 #include "client.h"

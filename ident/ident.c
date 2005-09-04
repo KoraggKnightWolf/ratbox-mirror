@@ -61,7 +61,7 @@ send_sprintf(int fd, const char *format, ...)
 	va_start(args, format);
 	vsprintf(buf, format, args);
 	va_end(args); 
-	return(send(fd, buf, strlen(buf), 0));
+	return(comm_write(fd, buf, strlen(buf)));
 }
 
 
@@ -237,7 +237,7 @@ read_auth(int fd, void *data)
 	char username[USERLEN], *s, *t;
 	int len, count;
 
-	len = recv(fd, buf, sizeof(buf), 0);
+	len = comm_read(fd, buf, sizeof(buf));
 	if(len < 0 && ignoreErrno(errno))
 	{
 		comm_settimeout(fd, 30, read_auth_timeout, auth);

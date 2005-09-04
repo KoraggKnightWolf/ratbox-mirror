@@ -86,7 +86,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	struct epoll_event ep_event;
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd(fd);
 	int old_flags = F->pflags;
 	int op = -1;
 	

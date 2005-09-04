@@ -106,7 +106,7 @@ void
 comm_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd(fd);
 	lircd_assert(fd >= 0);
 	lircd_assert(F->flags.open);
 
@@ -173,8 +173,9 @@ comm_select(unsigned long delay)
 	/* XXX we *could* optimise by falling out after doing num fds ... */
 	for (fd = 0; fd < highest_fd + 1; fd++)
 	{
-		F = &fd_table[fd];
-
+		F = find_fd(fd);
+		if(F == NULL)
+			continue;
 		if(FD_ISSET(fd, &tmpreadfds))
 		{
 			hdl = F->read_handler;

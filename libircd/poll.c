@@ -81,7 +81,7 @@ poll_findslot(void)
 static void
 poll_update_pollfds(int fd, short event, PF * handler)
 {
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd(fd);
 	int comm_index;
 
 	if(F->comm_index < 0)
@@ -153,7 +153,7 @@ void
 comm_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd(fd);
 	lircd_assert(fd >= 0);
 	lircd_assert(F->flags.open);
 
@@ -221,7 +221,7 @@ comm_select(unsigned long delay)
 		   (pollfd_list.pollfds[ci].fd) == -1)
 			continue;
 		fd = pollfd_list.pollfds[ci].fd;
-		F = &fd_table[fd];
+		F = find_fd(fd);
 		if(revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR))
 		{
 			hdl = F->read_handler;

@@ -111,6 +111,7 @@ fork_ident(void)
 {
 	int ifd[2], ofd[2];
 	char fx[6], fy[6];
+	const char *parv[2];
 	pid_t pid;
 
 	if(fork_ident_count > 10)
@@ -141,14 +142,15 @@ fork_ident(void)
 
 	setenv("IFD", fy, 1);
 	setenv("OFD", fx, 1);
-	if(!(pid = vfork()))
+
+	parv[0] = "-ircd ident daemon";
+	parv[1] = NULL;
+
+	pid = spawn_process(BINPATH "/ident", parv);
+
+	if(pid == -1)
 	{
-		execl(BINPATH "/ident", "-ircd ident daemon", NULL);
-		_exit(1);
-	}
-	else if(pid == -1)
-	{
-		ilog(L_MAIN, "fork failed: %s", strerror(errno));
+		ilog(L_MAIN, "spawn_process failed: %s", strerror(errno));
 		comm_close(ifd[0]);
 		comm_close(ifd[1]);
 		comm_close(ofd[0]);

@@ -48,8 +48,9 @@ static buf_head_t dns_sendq;
 static buf_head_t dns_recvq;
 
 static pid_t res_pid;
+#ifndef __MINGW32__
 static int need_restart = 0;
-
+#endif
 struct dnsreq
 {
 	DNSCB *callback;
@@ -186,6 +187,7 @@ restart_spinning_resolver(void *unused)
 static void
 fork_resolver(void)
 {
+	const char *parv[2];
 	pid_t pid;
 	int ifd[2];
 	int ofd[2];
@@ -208,9 +210,6 @@ fork_resolver(void)
 		comm_close(dns_ifd);
 	if(dns_ofd > 0)
 		comm_close(dns_ofd);
-#ifndef SIGKILL
-#define SIGKILL SIGTERM
-#endif
 	if(res_pid > 0)
 		kill(res_pid, SIGKILL);
 
@@ -228,14 +227,13 @@ fork_resolver(void)
 	setenv("IFD", fy, 1);
 	setenv("OFD", fx, 1);
 	setenv("MAXFD", maxfd, 1);
-	if(!(pid = vfork()))
-	{
-		execl(BINPATH "/resolver", "-ircd dns resolver", NULL);
-		_exit(1);
-	} else
+	parv[0] = "-ircd dns resolver";
+	parv[1] = NULL;
+	pid = spawn_process(BINPATH "/resolver", (const char **)parv);	
+
 	if(pid == -1)
 	{
-		ilog(L_MAIN, "fork failed: %s", strerror(errno));
+		ilog(L_MAIN, "spawn_process failed: %s", strerror(errno));
 		comm_close(ifd[0]);
 		comm_close(ifd[1]);
 		comm_close(ofd[0]);
@@ -245,7 +243,6 @@ fork_resolver(void)
 
 	comm_close(ifd[1]);
 	comm_close(ofd[0]);
-
 
 	dns_ifd = ifd[0];
 	dns_ofd = ofd[1];
@@ -347,8 +344,8 @@ restart_resolver(void)
 void
 resolver_sigchld(void)
 {
-	int status;
 #ifndef __MINGW32__
+	int status;
 	if(waitpid(res_pid, &status, WNOHANG) == res_pid)
 	{
 		need_restart = 1;		

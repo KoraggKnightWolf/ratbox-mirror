@@ -17,6 +17,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "ircd_lib.h"
 
 #define FLAG_MD5     0x00000001
 #define FLAG_DES     0x00000002
@@ -27,8 +28,7 @@
 #define FLAG_ROUNDS  0x00000040
 #define FLAG_EXT     0x00000080
 
-extern char *getpass();
-extern char *crypt();
+
 
 static char *make_des_salt(void);
 static char *make_ext_salt(int);
@@ -49,6 +49,46 @@ static char saltChars[] =
        /* 0 .. 63, ascii - 64 */
 
 extern char *optarg;
+extern char *crypt();
+
+
+#ifndef __MINGW32__
+extern char *getpass();
+#else
+#include <conio.h>
+#ifdef PASS_MAX
+#undef PASS_MAX
+#endif
+#define PASS_MAX 256
+static char getpassbuf[PASS_MAX + 1];
+
+static
+char *getpass(const char *prompt)
+{
+    int c;
+    int i = 0;
+    
+    memset(getpassbuf, sizeof(getpassbuf), 0);
+    fputs(prompt, stderr);
+    for (;;)
+    {
+	c = _getch();
+	if (c == '\r')
+	{
+	    getpassbuf[i] = '\0';
+	    break;
+	}
+	else if (i < PASS_MAX)
+	{
+	    getpassbuf[i++] = c;
+	}
+    }
+    fputs("\r\n", stderr);
+
+    return getpassbuf;
+}
+#endif
+
 
 int main(int argc, char *argv[])
 {
@@ -302,10 +342,10 @@ char *make_bf_salt(int rounds, int length)
 char *generate_poor_salt(char *salt, int length)
 {
   int i;
-  srandom(time(NULL));
+  srand(time(NULL));
   for(i = 0; i < length; i++)
   {
-    salt[i] = saltChars[random() % 64];
+    salt[i] = saltChars[rand() % 64];
   }
   return(salt);
 }

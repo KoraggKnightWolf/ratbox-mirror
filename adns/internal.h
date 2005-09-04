@@ -308,8 +308,10 @@ struct adns__state {
    * we are idle (ie, tcpw queue is empty), in which case it is the
    * absolute time when we will close the connection.
    */
+#if 0
   struct sigaction stdsigpipe;
   sigset_t stdsigmask;
+#endif
   struct adns_pollfd pollfds_buf[MAX_POLLFDS];
   struct server {
     struct in_addr addr;

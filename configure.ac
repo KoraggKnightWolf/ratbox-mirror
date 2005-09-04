@@ -81,6 +81,7 @@ case "$host_os" in
      AC_CHECK_HEADER(winsock2.h, , [AC_MSG_ERROR([** MinGW and no winsock2.h.  I give up.])])
      RESOLVER=""
      LIBS="$LIBS -lws2_32"
+     is_mingw=yes
      ;;
 *)
      ;;
@@ -209,6 +210,7 @@ CRYPT_LIB=$ac_cv_search_crypt
 if test "$CRYPT_LIB" = "none required"; then
 	unset CRYPT_LIB
 elif test "$CRYPT_LIB" = no; then
+	AC_DEFINE(NEED_CRYPT, 1, [Define if your system needs crypt.])
 	unset CRYPT_LIB
 fi
 

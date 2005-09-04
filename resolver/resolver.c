@@ -9,27 +9,10 @@
  *
  * $Id$
  */
-#include <stdlib.h>    
-#include <stdio.h>     
-#include <string.h>    
-#include <signal.h>    
-#include <stdarg.h>    
-#include <unistd.h>    
-#include <sys/types.h> 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h> 
-#include <unistd.h>
-#include <fcntl.h>
-#include <ctype.h>
-#include <errno.h>
 
 #define READBUF_SIZE    16384
 
-#include "setup.h"     
 #include "ircd_lib.h"
-#include "adns.h"
 #include "internal.h"
 
 /* data fd from ircd */
@@ -144,10 +127,10 @@ restart_resolver(int sig)
 	adns__rereadconfig(dns_state);
 }
 
-
 static void
 setup_signals(void)
 {
+#ifndef __MINGW32__
 	struct sigaction act;
 	act.sa_flags = 0;
 	act.sa_handler = SIG_IGN;
@@ -155,8 +138,8 @@ setup_signals(void)
 	act.sa_handler = restart_resolver;
 	sigaddset(&act.sa_mask, SIGHUP);
 	sigaction(SIGHUP, &act, 0);
+#endif
 }
-
 
 static void
 write_sendq(int fd, void *unused)
@@ -274,7 +257,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 					case adns_r_addr6:
 					{
 						char tmpres[65];
-						inet_ntop(AF_INET6, &reply->rrs.addr->addr.inet6.sin6_addr, tmpres, sizeof(tmpres)-1);
+						inetntop(AF_INET6, &reply->rrs.addr->addr.inet6.sin6_addr, tmpres, sizeof(tmpres)-1);
 						aftype = 6;
 						if(*tmpres == ':')
 						{
@@ -290,7 +273,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 					{
 						result = 1;
 						aftype = 4;
-						strcpy(response, inet_ntoa(reply->rrs.addr->addr.inet.sin_addr));
+						inetntop(AF_INET, &reply->rrs.addr->addr.inet.sin_addr, response, sizeof(response));
 						break;
 					} 
 					default:

@@ -1,14 +1,16 @@
 /*
  * $Id$
  */
-
 #include "ircd_lib.h"
 
-struct timeval SystemTime;
+
 
 static log_cb *ircd_log;
 static restart_cb *ircd_restart;
 static die_cb *ircd_die;
+
+struct timeval SystemTime;
+
 
 static char errbuf[512];
 
@@ -55,11 +57,8 @@ set_time(void)
 	struct timeval newtime;
 	newtime.tv_sec = 0;
 	newtime.tv_usec = 0;
-#ifdef HAVE_GETTIMEOFDAY
+
 	if(gettimeofday(&newtime, NULL) == -1)
-#else
-	if(time(&newtime.tv_sec) == -1)
-#endif
 	{
 		lib_ilog("Clock Failure (%d)", errno);
 		lib_restart("Clock Failure");
@@ -79,7 +78,6 @@ ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int max
 	ircd_log = ilog;
 	ircd_restart = irestart;
 	ircd_die = idie;
-	
 	fdlist_init(closeall, maxcon);
 	init_netio();
 	eventInit();

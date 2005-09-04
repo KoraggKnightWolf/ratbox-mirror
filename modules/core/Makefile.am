@@ -11,20 +11,23 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 
 INCLUDES = -I../../include -I../../libircd $(INCLTDL)
 
+if MINGW
+EXTRA_FLAGS = -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
+endif
 
 
-m_die_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_error_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_join_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_kick_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_kill_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_message_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_mode_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_nick_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_part_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_quit_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_server_la_LDFLAGS = -module -avoid-version -no-undefined 
-m_squit_la_LDFLAGS = -module -avoid-version -no-undefined 
+m_die_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_error_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_join_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_kick_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_kill_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_message_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_mode_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_nick_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_part_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_quit_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_server_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
+m_squit_la_LDFLAGS = $(EXTRA_FLAGS) -module -avoid-version -no-undefined 
 
 m_die_la_SOURCES =	m_die.c
 m_error_la_SOURCES =	m_error.c

@@ -46,7 +46,7 @@
  */
 
 /* dirs */
-#define DPATH   IRCD_PREFIX
+#define DPATH   "H:/sethmana/w32"
 #define BINPATH IRCD_PREFIX "/bin/"
 #define MODPATH MODULE_DIR
 #define AUTOMODPATH MODULE_DIR "/autoload/"

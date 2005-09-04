@@ -99,7 +99,7 @@ void
 comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd(fd);
 	lircd_assert(fd >= 0);
 	lircd_assert(F->flags.open);
 
@@ -152,7 +152,7 @@ struct	timer_data	*tdata;
 		case PORT_SOURCE_FD:
 			fd = pelst[i].portev_object;
 			PF *hdl = NULL;
-			fde_t *F = &fd_table[fd];
+			fde_t *F = find_fd(fd);
 
 			if ((pelst[i].portev_events & POLLRDNORM) && (hdl = F->read_handler)) {
 				F->read_handler = NULL;

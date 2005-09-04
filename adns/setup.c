@@ -30,35 +30,31 @@
 
 #include <stdlib.h>
 #include <errno.h>
-#include <limits.h>
-#include <unistd.h>
 #include <fcntl.h>
-
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <limits.h>
+#include "ircd_lib.h"
 
 #include "internal.h"
-#include "ircd_lib.h"
 
 static void readconfig(adns_state ads, const char *filename, int warnmissing);
 
 static void addserver(adns_state ads, struct in_addr addr) {
   int i;
   struct server *ss;
-  
+  char buf[512];  
   if(addr.s_addr == 0)
   	addr.s_addr = htonl(INADDR_LOOPBACK);
   for (i=0; i<ads->nservers; i++) {
     if (ads->servers[i].addr.s_addr == addr.s_addr) {
-      adns__debug(ads,-1,0,"duplicate nameserver %s ignored",inet_ntoa(addr));
+      inetntop(AF_INET, &addr, buf, sizeof(buf));
+      adns__debug(ads,-1,0,"duplicate nameserver %s ignored",buf);
       return;
     }
   }
   
   if (ads->nservers>=MAXSERVERS) {
-    adns__diag(ads,-1,0,"too many nameservers, ignoring %s",inet_ntoa(addr));
+    inetntop(AF_INET, &addr, buf, sizeof(buf));
+    adns__diag(ads,-1,0,"too many nameservers, ignoring %s",buf);
     return;
   }
 
@@ -110,12 +106,13 @@ static int nextword(const char **bufp_io, const char **word_r, int *l_r) {
 
 static void ccf_nameserver(adns_state ads, const char *fn, int lno, const char *buf) {
   struct in_addr ia;
-  
-  if (!inet_pton(AF_INET, buf,&ia)) {
+  char nbuf[512];  
+  if (!inetpton(AF_INET, buf,&ia)) {
     configparseerr(ads,fn,lno,"invalid nameserver address `%s'",buf);
     return;
   }
-  adns__debug(ads,-1,0,"using nameserver %s",inet_ntoa(ia));
+  inetntop(AF_INET, &ia, nbuf, sizeof(nbuf));
+  adns__debug(ads,-1,0,"using nameserver %s",nbuf);
   addserver(ads,ia);
 }
 
@@ -173,14 +170,14 @@ static void ccf_sortlist(adns_state ads, const char *fn, int lno, const char *bu
     slash= strchr(tbuf,'/');
     if (slash) *slash++= 0;
     
-    if (!inet_pton(AF_INET, tbuf,&base)) {
+    if (!inetpton(AF_INET, tbuf,&base)) {
       configparseerr(ads,fn,lno,"invalid address `%s' in sortlist",tbuf);
       continue;
     }
 
     if (slash) {
       if (strchr(slash,'.')) {
-	if (!inet_pton(AF_INET, slash,&mask)) {
+	if (!inetpton(AF_INET, slash,&mask)) {
 	  configparseerr(ads,fn,lno,"invalid mask `%s' in sortlist",slash);
 	  continue;
 	}
@@ -456,11 +453,8 @@ static void readconfigenvtext(adns_state ads, const char *envvar) {
 
 
 int adns__setnonblock(adns_state ads, int fd) {
-  int r;
   
-  r= fcntl(fd,F_GETFL,0); if (r<0) return errno;
-  r |= O_NONBLOCK;
-  r= fcntl(fd,F_SETFL,r); if (r<0) return errno;
+  comm_set_nb(fd);
   return 0;
 }
 

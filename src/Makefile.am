@@ -12,6 +12,10 @@ version.lo: version.c
 	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $<
 	$(MV) version.c version.c.last
         
+
+if MINGW
+EXTRA_FLAGS = -Wl,--enable-runtime-pseudo-reloc
+endif
         
 ircd_SOURCES = main.c
 	
@@ -55,7 +59,8 @@ libratbox_la_SOURCES =                     \
   
 lib_LTLIBRARIES = libratbox.la
 
-libratbox_la_LDFLAGS = -avoid-version -no-undefined 
+libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version -no-undefined -export-symbols-regex '*'
 libratbox_la_DEPENDENCIES = $(LIBLTDLC) ../libircd/libircd.la
 libratbox_la_LIBADD = ../libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 ircd_LDADD = libratbox.la ../libircd/libircd.la 
+ircd_LDFLAGS = $(EXTRA_FLAGS)

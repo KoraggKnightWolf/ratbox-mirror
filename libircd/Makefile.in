@@ -53,23 +53,26 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libircd_la_LIBADD =
-am__libircd_la_SOURCES_DIST = win32.c balloc.c commio.c event.c \
-	ircd_lib.c ircd_memory.c linebuf.c snprintf.c tools.c \
+am__libircd_la_SOURCES_DIST = unix.c win32.c balloc.c commio.c crypt.c \
+	event.c ircd_lib.c ircd_memory.c linebuf.c snprintf.c tools.c \
 	@SELECT_TYPE@.c
+@MINGW_FALSE@am__objects_1 = unix.lo
 @MINGW_TRUE@am__objects_1 = win32.lo
-am_libircd_la_OBJECTS = $(am__objects_1) balloc.lo commio.lo event.lo \
-	ircd_lib.lo ircd_memory.lo linebuf.lo snprintf.lo tools.lo \
-	@SELECT_TYPE@.lo
+am_libircd_la_OBJECTS = $(am__objects_1) balloc.lo commio.lo crypt.lo \
+	event.lo ircd_lib.lo ircd_memory.lo linebuf.lo snprintf.lo \
+	tools.lo @SELECT_TYPE@.lo
 libircd_la_OBJECTS = $(am_libircd_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/@SELECT_TYPE@.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/balloc.Plo ./$(DEPDIR)/commio.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/event.Plo ./$(DEPDIR)/ircd_lib.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/crypt.Plo ./$(DEPDIR)/event.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/ircd_lib.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ircd_memory.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/linebuf.Plo ./$(DEPDIR)/snprintf.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/tools.Plo ./$(DEPDIR)/win32.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/tools.Plo ./$(DEPDIR)/unix.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/win32.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -223,10 +226,12 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 INCLUDES = -I. -I../include
-@MINGW_TRUE@WIN32 = win32.c
-libircd_la_SOURCES = $(WIN32)                    	\
+@MINGW_FALSE@OS_FILES = unix.c
+@MINGW_TRUE@OS_FILES = win32.c
+libircd_la_SOURCES = $(OS_FILES)	\
 	balloc.c			\
 	commio.c			\
+	crypt.c				\
 	event.c				\
 	ircd_lib.c			\
 	ircd_memory.c			\
@@ -311,12 +316,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/@SELECT_TYPE@.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/balloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commio.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crypt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircd_lib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircd_memory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linebuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snprintf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tools.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/win32.Plo@am__quote@
 
 .c.o:

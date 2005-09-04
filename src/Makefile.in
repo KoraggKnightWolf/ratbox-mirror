@@ -252,6 +252,7 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 AM_YFLAGS = -d
 INCLUDES = $(DEFAULT_INCLUDES) -I../libltdl -I../libircd -I.
+@MINGW_TRUE@EXTRA_FLAGS = -Wl,--enable-runtime-pseudo-reloc
 ircd_SOURCES = main.c
 libratbox_la_SOURCES = \
   dns.c                        \
@@ -292,10 +293,11 @@ libratbox_la_SOURCES = \
   ircd_lexer.l			
 
 lib_LTLIBRARIES = libratbox.la
-libratbox_la_LDFLAGS = -avoid-version -no-undefined 
+libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version -no-undefined -export-symbols-regex '*'
 libratbox_la_DEPENDENCIES = $(LIBLTDLC) ../libircd/libircd.la
 libratbox_la_LIBADD = ../libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 ircd_LDADD = libratbox.la ../libircd/libircd.la 
+ircd_LDFLAGS = $(EXTRA_FLAGS)
 all: all-am
 
 .SUFFIXES:

@@ -258,6 +258,9 @@
 /* Size of the nick delay heap. */
 #undef ND_HEAP_SIZE
 
+/* Define if your system needs crypt. */
+#undef NEED_CRYPT
+
 /* Nickname length */
 #undef NICKLEN
 

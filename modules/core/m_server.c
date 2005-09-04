@@ -791,8 +791,6 @@ check_server(const char *name, struct Client *client_p)
 static int
 fork_server(struct Client *server)
 {
-	int ret;
-	int i;
 	int ctrl_fds[2];
 	int data_fds[2];
 	char maxfd[6];
@@ -824,17 +822,7 @@ fork_server(struct Client *server)
 
 	kid_argv[0] = slink;
 
-	if((ret = vfork()) < 0)
-		goto fork_error;
-	else if(ret == 0)
-	{
-		/* exec servlink program */
-		execv(ConfigFileEntry.servlink_path, kid_argv);
-
-		/* We're still here, abort. */
-		_exit(1);
-	}
-	else
+	if(spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
 	{
 		comm_close(server->localClient->fd);
 

@@ -30,17 +30,10 @@
  */
 
 #include "stdinc.h"
-
+#include "ircd_lib.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-#include <sys/types.h>
-#include <sys/time.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
 #include "internal.h"
 #include "tvarith.h"

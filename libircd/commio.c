@@ -40,9 +40,12 @@
 
 #ifndef __MINGW32__
 #define get_errno()
+fde_t *fd_table = NULL;
 #else
 #define get_errno()  errno = WSAGetLastError()
+dlink_list *fd_table;
 #endif
+
 
 const char *const NONB_ERROR_MSG = "set_non_blocking failed for %s:%s";
 const char *const SETBUF_ERROR_MSG = "set_sock_buffers failed for server %s:%s";
@@ -53,48 +56,49 @@ static const char *comm_err_str[] = { "Comm OK", "Error during bind()",
 	"Comm Error"
 };
 
-fde_t *fd_table = NULL;
 
-static void fdlist_update_biggest(int fd, int opening);
+
+static void fdlist_update_biggest (int fd, int opening);
 
 /* Highest FD and number of open FDs .. */
 int highest_fd = -1;		/* Its -1 because we haven't started yet -- adrian */
 int number_fd = 0;
 int maxconnections = 0;
 
-static void comm_connect_callback(int fd, int status);
+static void comm_connect_callback (int fd, int status);
 static PF comm_connect_timeout;
 static PF comm_connect_tryconnect;
 
 #ifndef HAVE_SOCKETPAIR
-static int comm_inet_socketpair(int d, int type, int protocol, int sv[2]);
+static int comm_inet_socketpair (int d, int type, int protocol, int sv[2]);
 #endif
 /* 32bit solaris is kinda slow and stdio only supports fds < 256
  * so we got to do this crap below.
  * (BTW Fuck you Sun, I hate your guts and I hope you go bankrupt soon)
  */
-#if defined (__SVR4) && defined (__sun) 
-static void comm_fd_hack(int *fd)
+#if defined (__SVR4) && defined (__sun)
+static void
+comm_fd_hack (int *fd)
 {
 	int newfd;
 	if(*fd > 256 || *fd < 0)
 		return;
-	if((newfd = fcntl(*fd, F_DUPFD, 256)) != -1)
+	if((newfd = fcntl (*fd, F_DUPFD, 256)) != -1)
 	{
-		close(*fd);
+		close (*fd);
 		*fd = newfd;
-	} 
+	}
 	return;
 }
 #else
-#define comm_fd_hack(fd) 
+#define comm_fd_hack(fd)
 #endif
 
 
 /* close_all_connections() can be used *before* the system come up! */
 
 static void
-comm_close_all(void)
+comm_close_all (void)
 {
 	int i;
 #ifndef NDEBUG
@@ -106,18 +110,18 @@ comm_close_all(void)
 
 	for (i = 4; i < maxconnections; ++i)
 	{
-			close(i);
+		close (i);
 	}
 
 	/* XXX should his hack be done in all cases? */
 #ifndef NDEBUG
 	/* fugly hack to reserve fd == 2 */
-	(void) close(2);
-	fd = open("stderr.log", O_WRONLY | O_CREAT | O_APPEND, 0644);
+	(void) close (2);
+	fd = open ("stderr.log", O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if(fd >= 0)
 	{
-		dup2(fd, 2);
-		close(fd);
+		dup2 (fd, 2);
+		close (fd);
 	}
 #endif
 }
@@ -130,14 +134,14 @@ comm_close_all(void)
  * gamble anyway.
  */
 int
-comm_get_sockerr(int fd)
+comm_get_sockerr (int fd)
 {
 	int errtmp = errno;
 #ifdef SO_ERROR
 	int err = 0;
-	socklen_t len = sizeof(err);
+	socklen_t len = sizeof (err);
 
-	if(-1 < fd && !getsockopt(fd, SOL_SOCKET, SO_ERROR, (char *) &err, (socklen_t *) & len))
+	if(-1 < fd && !getsockopt (fd, SOL_SOCKET, SO_ERROR, (char *) &err, (socklen_t *) & len))
 	{
 		if(err)
 			errtmp = err;
@@ -156,11 +160,11 @@ comm_get_sockerr(int fd)
  * side effects -
  */
 int
-comm_set_buffers(int fd, int size)
+comm_set_buffers (int fd, int size)
 {
 	if(setsockopt
-	   (fd, SOL_SOCKET, SO_RCVBUF, (char *) &size, sizeof(size))
-	   || setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char *) &size, sizeof(size)))
+	   (fd, SOL_SOCKET, SO_RCVBUF, (char *) &size, sizeof (size))
+	   || setsockopt (fd, SOL_SOCKET, SO_SNDBUF, (char *) &size, sizeof (size)))
 		return 0;
 	return 1;
 }
@@ -174,26 +178,27 @@ comm_set_buffers(int fd, int size)
  *                be done with it.
  */
 int
-comm_set_nb(int fd)
+comm_set_nb (int fd)
 {
 	int nonb = 0;
 	int res;
+	fde_t *F = find_fd (fd);
 
-	if((res = comm_setup_fd(fd)))
+	if((res = comm_setup_fd (fd)))
 		return res;
 #ifdef O_NONBLOCK
 	nonb |= O_NONBLOCK;
-	res = fcntl(fd, F_GETFL, 0);
-	if(-1 == res || fcntl(fd, F_SETFL, res | nonb) == -1)
+	res = fcntl (fd, F_GETFL, 0);
+	if(-1 == res || fcntl (fd, F_SETFL, res | nonb) == -1)
 		return 0;
-#else	
+#else
 	nonb = 1;
 	res = 0;
-	if(ioctl(fd, FIONBIO, &nonb) == -1)
+	if(ioctl (fd, FIONBIO, &nonb) == -1)
 		return 0;
 #endif
 
-	fd_table[fd].flags.nonblocking = 1;
+	F->flags.nonblocking = 1;
 	return 1;
 }
 
@@ -204,12 +209,12 @@ comm_set_nb(int fd)
  * Set the timeout for the fd
  */
 void
-comm_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
+comm_settimeout (int fd, time_t timeout, PF * callback, void *cbdata)
 {
 	fde_t *F;
-	lircd_assert(fd >= 0);
-	F = &fd_table[fd];
-	lircd_assert(F->flags.open);
+	lircd_assert (fd >= 0);
+	F = find_fd (fd);
+	lircd_assert (F->flags.open);
 
 	F->timeout = CurrentTime + (timeout / 1000);
 	F->timeout_handler = callback;
@@ -228,12 +233,12 @@ comm_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
  * with close functions, we _actually_ don't call comm_close() here ..
  */
 void
-comm_setflush(int fd, time_t timeout, PF * callback, void *cbdata)
+comm_setflush (int fd, time_t timeout, PF * callback, void *cbdata)
 {
 	fde_t *F;
-	lircd_assert(fd >= 0);
-	F = &fd_table[fd];
-	lircd_assert(F->flags.open);
+	lircd_assert (fd >= 0);
+	F = find_fd (fd);
+	lircd_assert (F->flags.open);
 
 	F->flush_timeout = CurrentTime + (timeout / 1000);
 	F->flush_handler = callback;
@@ -249,7 +254,7 @@ comm_setflush(int fd, time_t timeout, PF * callback, void *cbdata)
  * this will happen.
  */
 void
-comm_checktimeouts(void *notused)
+comm_checktimeouts (void *notused)
 {
 	int fd;
 	PF *hdl;
@@ -257,31 +262,31 @@ comm_checktimeouts(void *notused)
 	fde_t *F;
 	for (fd = 0; fd <= highest_fd; fd++)
 	{
-		F = &fd_table[fd];
+		F = find_fd (fd);
+		if(F == NULL)
+			continue;
 		if(!F->flags.open)
 			continue;
 		if(F->flags.closing)
 			continue;
 
 		/* check flush functions */
-		if(F->flush_handler &&
-		   F->flush_timeout > 0 && F->flush_timeout < CurrentTime)
+		if(F->flush_handler && F->flush_timeout > 0 && F->flush_timeout < CurrentTime)
 		{
 			hdl = F->flush_handler;
 			data = F->flush_data;
-			comm_setflush(F->fd, 0, NULL, NULL);
-			hdl(F->fd, data);
+			comm_setflush (F->fd, 0, NULL, NULL);
+			hdl (F->fd, data);
 		}
 
 		/* check timeouts */
-		if(F->timeout_handler &&
-		   F->timeout > 0 && F->timeout < CurrentTime)
+		if(F->timeout_handler && F->timeout > 0 && F->timeout < CurrentTime)
 		{
 			/* Call timeout handler */
 			hdl = F->timeout_handler;
 			data = F->timeout_data;
-			comm_settimeout(F->fd, 0, NULL, NULL);
-			hdl(F->fd, data);
+			comm_settimeout (F->fd, 0, NULL, NULL);
+			hdl (F->fd, data);
 		}
 	}
 }
@@ -302,19 +307,18 @@ comm_checktimeouts(void *notused)
  *               may be called now, or it may be called later.
  */
 void
-comm_connect_tcp(int fd, struct sockaddr *dest,
-		 struct sockaddr *clocal, int socklen, CNCB * callback,
-		 void *data, int timeout)
+comm_connect_tcp (int fd, struct sockaddr *dest,
+		  struct sockaddr *clocal, int socklen, CNCB * callback, void *data, int timeout)
 {
 	fde_t *F;
-	lircd_assert(fd >= 0);
-	F = &fd_table[fd];
+	lircd_assert (fd >= 0);
+	F = find_fd (fd);
 	F->flags.called_connect = 1;
-	lircd_assert(callback);
+	lircd_assert (callback);
 	F->connect.callback = callback;
 	F->connect.data = data;
 
-	memcpy(&F->connect.hostaddr, dest, socklen);
+	memcpy (&F->connect.hostaddr, dest, socklen);
 
 	/* Note that we're using a passed sockaddr here. This is because
 	 * generally you'll be bind()ing to a sockaddr grabbed from
@@ -323,18 +327,18 @@ comm_connect_tcp(int fd, struct sockaddr *dest,
 	 * virtual host IP, for completeness.
 	 *   -- adrian
 	 */
-	if((clocal != NULL) && (bind(F->fd, clocal, socklen) < 0))
+	if((clocal != NULL) && (bind (F->fd, clocal, socklen) < 0))
 	{
 		/* Failure, call the callback with COMM_ERR_BIND */
-		comm_connect_callback(F->fd, COMM_ERR_BIND);
+		comm_connect_callback (F->fd, COMM_ERR_BIND);
 		/* ... and quit */
 		return;
 	}
 
 	/* We have a valid IP, so we just call tryconnect */
 	/* Make sure we actually set the timeout here .. */
-	comm_settimeout(F->fd, timeout * 1000, comm_connect_timeout, NULL);
-	comm_connect_tryconnect(F->fd, NULL);
+	comm_settimeout (F->fd, timeout * 1000, comm_connect_timeout, NULL);
+	comm_connect_tryconnect (F->fd, NULL);
 }
 
 
@@ -342,10 +346,10 @@ comm_connect_tcp(int fd, struct sockaddr *dest,
  * comm_connect_callback() - call the callback, and continue with life
  */
 static void
-comm_connect_callback(int fd, int status)
+comm_connect_callback (int fd, int status)
 {
 	CNCB *hdl;
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd (fd);
 	/* This check is gross..but probably necessary */
 	if(F->connect.callback == NULL)
 		return;
@@ -355,10 +359,10 @@ comm_connect_callback(int fd, int status)
 	F->flags.called_connect = 0;
 
 	/* Clear the timeout handler */
-	comm_settimeout(F->fd, 0, NULL, NULL);
+	comm_settimeout (F->fd, 0, NULL, NULL);
 
 	/* Call the handler */
-	hdl(F->fd, status, F->connect.data);
+	hdl (F->fd, status, F->connect.data);
 }
 
 
@@ -368,10 +372,10 @@ comm_connect_callback(int fd, int status)
  * called ..
  */
 static void
-comm_connect_timeout(int fd, void *notused)
+comm_connect_timeout (int fd, void *notused)
 {
 	/* error! */
-	comm_connect_callback(fd, COMM_ERR_TIMEOUT);
+	comm_connect_callback (fd, COMM_ERR_TIMEOUT);
 }
 
 /* static void comm_connect_tryconnect(int fd, void *notused)
@@ -383,17 +387,17 @@ comm_connect_timeout(int fd, void *notused)
  *               to select for a write event on this FD.
  */
 static void
-comm_connect_tryconnect(int fd, void *notused)
+comm_connect_tryconnect (int fd, void *notused)
 {
 	int retval;
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd (fd);
 
 	if(F->connect.callback == NULL)
 		return;
 	/* Try the connect() */
-	retval = connect(fd,
-			 (struct sockaddr *) &fd_table[fd].connect.hostaddr, 
-						       GET_SS_LEN(fd_table[fd].connect.hostaddr));
+	retval = connect (fd,
+			  (struct sockaddr *) &F->connect.hostaddr,
+			  GET_SS_LEN (F->connect.hostaddr));
 	/* Error? */
 	if(retval < 0)
 	{
@@ -403,25 +407,25 @@ comm_connect_tryconnect(int fd, void *notused)
 		 *   -- adrian
 		 */
 		if(errno == EISCONN)
-			comm_connect_callback(F->fd, COMM_OK);
-		else if(ignoreErrno(errno))
+			comm_connect_callback (F->fd, COMM_OK);
+		else if(ignoreErrno (errno))
 			/* Ignore error? Reschedule */
-			comm_setselect(F->fd, COMM_SELECT_CONNECT,
-				       comm_connect_tryconnect, NULL, 0);
+			comm_setselect (F->fd, COMM_SELECT_CONNECT,
+					comm_connect_tryconnect, NULL, 0);
 		else
 			/* Error? Fail with COMM_ERR_CONNECT */
-			comm_connect_callback(F->fd, COMM_ERR_CONNECT);
+			comm_connect_callback (F->fd, COMM_ERR_CONNECT);
 		return;
 	}
 	/* If we get here, we've suceeded, so call with COMM_OK */
-	comm_connect_callback(F->fd, COMM_OK);
+	comm_connect_callback (F->fd, COMM_OK);
 }
 
 /*
  * comm_error_str() - return an error string for the given error condition
  */
 const char *
-comm_errstr(int error)
+comm_errstr (int error)
 {
 	if(error < 0 || error >= COMM_ERR_MAX)
 		return "Invalid error number!";
@@ -430,7 +434,7 @@ comm_errstr(int error)
 
 
 int
-comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note)
+comm_socketpair (int family, int sock_type, int proto, int *nfd, const char *note)
 {
 	if(number_fd >= maxconnections)
 	{
@@ -439,58 +443,61 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 	}
 
 #ifndef __MINGW32__
-	if(socketpair(family, sock_type, proto, nfd))
+	if(socketpair (family, sock_type, proto, nfd))
 #else
-	if(comm_inet_socketpair(AF_INET, SOCK_STREAM, proto, nfd))
+	if(comm_inet_socketpair (AF_INET, SOCK_STREAM, proto, nfd))
 #endif
 		return -1;
-	
-	comm_fd_hack(&nfd[0]);
+
+	comm_open (nfd[0], FD_SOCKET, note);
+	comm_open (nfd[1], FD_SOCKET, note);
+
+	comm_fd_hack (&nfd[0]);
 	if(nfd[0] < 0)
 	{
-		close(nfd[1]);
+		close (nfd[1]);
 		return -1;
 	}
 	/* Set the socket non-blocking, and other wonderful bits */
-	if(!comm_set_nb(nfd[0]))
+	if(!comm_set_nb (nfd[0]))
 	{
-		lib_ilog("comm_open: Couldn't set FD %d non blocking: %s", nfd[0], strerror(errno));
-		close(nfd[0]);
-		close(nfd[1]);
+		lib_ilog ("comm_open: Couldn't set FD %d non blocking: %s", nfd[0],
+			  strerror (errno));
+		comm_close (nfd[0]);
+		comm_close (nfd[1]);
 		return -1;
 	}
 
-	if(!comm_set_nb(nfd[1]))
+	if(!comm_set_nb (nfd[1]))
 	{
-		lib_ilog("comm_open: Couldn't set FD %d non blocking: %s", nfd[1], strerror(errno));
-		close(nfd[0]);
-		close(nfd[1]);
+		lib_ilog ("comm_open: Couldn't set FD %d non blocking: %s", nfd[1],
+			  strerror (errno));
+		comm_close (nfd[0]);
+		comm_close (nfd[1]);
 		return -1;
 	}
 
-	/* Next, update things in our fd tracking */
-	comm_open(nfd[0], FD_SOCKET, note);
 	return 0;
 }
 
 
-int 
-comm_pipe(int *fd, const char *desc)
+int
+comm_pipe (int *fd, const char *desc)
 {
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(__CYGWIN__)
 	if(number_fd >= maxconnections)
 	{
 		errno = ENFILE;
 		return -1;
 	}
-	if(pipe(fd) == -1)
+	if(pipe (fd) == -1)
 		return -1;
-	comm_open(fd[0], FD_PIPE, desc);
-	comm_open(fd[1], FD_PIPE, desc);
+	comm_open (fd[0], FD_PIPE, desc);
+	comm_open (fd[1], FD_PIPE, desc);
 	return 0;
 #else
 	/* I hate this..but oh well */
-	return comm_socketpair(AF_INET, SOCK_STREAM, 0, fd, "fake pipe");
+	return comm_socketpair (AF_INET, SOCK_STREAM, 0, fd, "fake pipe");
 #endif
 }
 
@@ -502,7 +509,7 @@ comm_pipe(int *fd, const char *desc)
  * to run out of file descriptors.
  */
 int
-comm_socket(int family, int sock_type, int proto, const char *note)
+comm_socket (int family, int sock_type, int proto, const char *note)
 {
 	int fd;
 	/* First, make sure we aren't going to run out of file descriptors */
@@ -517,8 +524,8 @@ comm_socket(int family, int sock_type, int proto, const char *note)
 	 * limit if/when we get an error, but we can deal with that later.
 	 * XXX !!! -- adrian
 	 */
-	fd = socket(family, sock_type, proto);
-	comm_fd_hack(&fd);
+	fd = socket (family, sock_type, proto);
+	comm_fd_hack (&fd);
 	if(fd < 0)
 		return -1;	/* errno will be passed through, yay.. */
 
@@ -530,26 +537,26 @@ comm_socket(int family, int sock_type, int proto, const char *note)
 	if(family == AF_INET6)
 	{
 		int off = 1;
-		if(setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &off, sizeof(off)) == -1)
+		if(setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &off, sizeof (off)) == -1)
 		{
-			lib_ilog("comm_socket: Could not set IPV6_V6ONLY option to 1 on FD %d: %s",
-			     fd, strerror(errno));
-			close(fd);
+			lib_ilog ("comm_socket: Could not set IPV6_V6ONLY option to 1 on FD %d: %s",
+				  fd, strerror (errno));
+			close (fd);
 			return -1;
 		}
 	}
 #endif
 
+	comm_open (fd, FD_SOCKET, note);
+
 	/* Set the socket non-blocking, and other wonderful bits */
-	if(!comm_set_nb(fd))
+	if(!comm_set_nb (fd))
 	{
-		lib_ilog("comm_open: Couldn't set FD %d non blocking: %s", fd, strerror(errno));
-		close(fd);
+		lib_ilog ("comm_open: Couldn't set FD %d non blocking: %s", fd, strerror (errno));
+		comm_close (fd);
 		return -1;
 	}
 
-	/* Next, update things in our fd tracking */
-	comm_open(fd, FD_SOCKET, note);
 	return fd;
 }
 
@@ -561,7 +568,7 @@ comm_socket(int family, int sock_type, int proto, const char *note)
  * comm_open() does.
  */
 int
-comm_accept(int fd, struct sockaddr *pn, socklen_t *addrlen)
+comm_accept (int fd, struct sockaddr *pn, socklen_t * addrlen)
 {
 	int newfd;
 	if(number_fd >= maxconnections)
@@ -575,23 +582,21 @@ comm_accept(int fd, struct sockaddr *pn, socklen_t *addrlen)
 	 * reserved fd limit, but we can deal with that when comm_open()
 	 * also does it. XXX -- adrian
 	 */
-	newfd = accept(fd, (struct sockaddr *) pn, addrlen);
-        comm_fd_hack(&newfd);
-	get_errno();                        
+	newfd = accept (fd, (struct sockaddr *) pn, addrlen);
+	get_errno();
 	if(newfd < 0)
 		return -1;
+	comm_open (newfd, FD_SOCKET, "Incoming connection");
+	comm_fd_hack (&newfd);
 
 	/* Set the socket non-blocking, and other wonderful bits */
-	if(!comm_set_nb(newfd))
+	if(!comm_set_nb (newfd))
 	{
-		get_errno();
-		lib_ilog("comm_accept: Couldn't set FD %d non blocking!", newfd);
-		close(newfd);
+		get_errno ();
+		lib_ilog ("comm_accept: Couldn't set FD %d non blocking!", newfd);
+		comm_close (newfd);
 		return -1;
 	}
-
-	/* Next, tag the FD as an incoming connection */
-	comm_open(newfd, FD_SOCKET, "Incoming connection");
 
 	/* .. and return */
 	return newfd;
@@ -603,41 +608,45 @@ comm_accept(int fd, struct sockaddr *pn, socklen_t *addrlen)
  */
 #ifndef mangle_mapped_sockaddr
 void
-mangle_mapped_sockaddr(struct sockaddr *in)
+mangle_mapped_sockaddr (struct sockaddr *in)
 {
-	struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)in;								
+	struct sockaddr_in6 *in6 = (struct sockaddr_in6 *) in;
 
 	if(in->sa_family == AF_INET)
 		return;
 
-	if(in->sa_family == AF_INET6 && IN6_IS_ADDR_V4MAPPED(&in6->sin6_addr))
+	if(in->sa_family == AF_INET6 && IN6_IS_ADDR_V4MAPPED (&in6->sin6_addr))
 	{
 		struct sockaddr_in in4;
-		memset(&in4, 0, sizeof(struct sockaddr_in));
+		memset (&in4, 0, sizeof (struct sockaddr_in));
 		in4.sin_family = AF_INET;
 		in4.sin_port = in6->sin6_port;
-		in4.sin_addr.s_addr = ((uint32_t *)&in6->sin6_addr)[3];
-		memcpy(in, &in4, sizeof(struct sockaddr_in)); 		
-	}	
+		in4.sin_addr.s_addr = ((uint32_t *) & in6->sin6_addr)[3];
+		memcpy (in, &in4, sizeof (struct sockaddr_in));
+	}
 	return;
 }
 #endif
 
 
 static void
-fdlist_update_biggest(int fd, int opening)
+fdlist_update_biggest (int fd, int opening)
 {
+	fde_t *F = find_fd (fd);
 	if(fd < highest_fd)
 		return;
-	lircd_assert(fd < maxconnections);
-
+#ifndef __MINGW32__
+	lircd_assert (fd < maxconnections);
+#endif
 	if(fd > highest_fd)
 	{
 		/*  
 		 * lircd_assert that we are not closing a FD bigger than
 		 * our known biggest FD
 		 */
-		lircd_assert(opening);
+#ifndef __MINGW32__
+		lircd_assert (opening);
+#endif
 		highest_fd = fd;
 		return;
 	}
@@ -646,40 +655,57 @@ fdlist_update_biggest(int fd, int opening)
 	 * lircd_assert that we are closing the biggest FD; we can't be
 	 * re-opening it
 	 */
-	lircd_assert(!opening);
-	while (highest_fd >= 0 && !fd_table[highest_fd].flags.open)
+#ifndef __MINGW32__
+	lircd_assert (!opening);
+#endif
+	while (highest_fd >= 0 && !F->flags.open)
 		highest_fd--;
 }
 
 
 void
-fdlist_init(int closeall, int maxfds)
+fdlist_init (int closeall, int maxfds)
 {
 	static int initialized = 0;
+#ifdef __MINGW32__
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	int err;
 
+	wVersionRequested = MAKEWORD (2, 0);
+
+	err = WSAStartup (wVersionRequested, &wsaData);
+	if(err != 0)
+	{
+		lib_ilog ("WSAStartup failed");
+		exit (1);
+	}
+
+#endif
 	if(!initialized)
 	{
 		maxconnections = maxfds;
 		if(closeall)
-			comm_close_all();
+			comm_close_all ();
 		/* Since we're doing this once .. */
-		fd_table = MyMalloc((maxfds + 1) * sizeof(fde_t));
+		fd_table = MyMalloc ((maxfds + 1) * sizeof (fde_t));
 		initialized = 1;
 	}
 }
 
+
 /* Called to open a given filedescriptor */
 void
-comm_open(int fd, unsigned int type, const char *desc)
+comm_open (int fd, unsigned int type, const char *desc)
 {
-	fde_t *F = &fd_table[fd];
-	lircd_assert(fd >= 0);
+	fde_t *F = add_fd (fd);
+	lircd_assert (fd >= 0);
 
 	if(F->flags.open)
 	{
-		comm_close(fd);
+		comm_close (fd);
 	}
-	lircd_assert(!F->flags.open);
+	lircd_assert (!F->flags.open);
 	F->fd = fd;
 	F->type = type;
 	F->flags.open = 1;
@@ -688,37 +714,37 @@ comm_open(int fd, unsigned int type, const char *desc)
 	F->defer.n = 0;
 	F->defer.handler = NULL;
 #endif
-	fdlist_update_biggest(fd, 1);
+	fdlist_update_biggest (fd, 1);
 	F->comm_index = -1;
 	if(desc)
-		strlcpy(F->desc, desc, sizeof(F->desc));
+		strlcpy (F->desc, desc, sizeof (F->desc));
 	number_fd++;
 }
 
 
 /* Called to close a given filedescriptor */
 void
-comm_close(int fd)
+comm_close (int fd)
 {
-	fde_t *F = &fd_table[fd];
-	lircd_assert(F->flags.open);
+	fde_t *F = find_fd (fd);
+	lircd_assert (F->flags.open);
 	/* All disk fd's MUST go through file_close() ! */
-	lircd_assert(F->type != FD_FILE);
+	lircd_assert (F->type != FD_FILE);
 	if(F->type == FD_FILE)
 	{
-		lircd_assert(F->read_handler == NULL);
-		lircd_assert(F->write_handler == NULL);
+		lircd_assert (F->read_handler == NULL);
+		lircd_assert (F->write_handler == NULL);
 	}
-	comm_setselect(F->fd, 0, NULL, NULL, 0);
-	comm_setflush(F->fd, 0, NULL, NULL);
-	
+	comm_setselect (F->fd, 0, NULL, NULL, 0);
+	comm_setflush (F->fd, 0, NULL, NULL);
+
 	F->flags.open = 0;
-	fdlist_update_biggest(fd, 0);
+	fdlist_update_biggest (fd, 0);
 	number_fd--;
-	memset(F, '\0', sizeof(fde_t));
-	F->timeout = 0;
+
+	remove_fd (fd);
 	/* Unlike squid, we're actually closing the FD here! -- adrian */
-	close(fd);
+	close (fd);
 }
 
 
@@ -726,18 +752,18 @@ comm_close(int fd)
  * comm_dump() - dump the list of active filedescriptors
  */
 void
-comm_dump(DUMPCB *cb, void *data)
+comm_dump (DUMPCB * cb, void *data)
 {
-	int i;
+	unsigned int i;
 	char buf[128];
 	for (i = 0; i <= highest_fd; i++)
 	{
-		if(!fd_table[i].flags.open)
+		fde_t *F = find_fd (i);
+		if(!F->flags.open)
 			continue;
 
-		ircsnprintf(buf, sizeof(buf), "F :fd %-3d desc '%s'",
-				   i, fd_table[i].desc);
-		cb(buf, data);
+		ircsnprintf (buf, sizeof (buf), "F :fd %-3d desc '%s'", i, F->desc);
+		cb (buf, data);
 	}
 }
 
@@ -748,112 +774,132 @@ comm_dump(DUMPCB *cb, void *data)
  *       calling.
  */
 void
-comm_note(int fd, const char *format, ...)
+comm_note (int fd, const char *format, ...)
 {
 	va_list args;
-
+	fde_t *F = find_fd (fd);
 	if(format)
 	{
-		va_start(args, format);
-		ircvsnprintf(fd_table[fd].desc, FD_DESC_SZ, format, args);
-		va_end(args);
+		va_start (args, format);
+		ircvsnprintf (F->desc, FD_DESC_SZ, format, args);
+		va_end (args);
 	}
 	else
-		fd_table[fd].desc[0] = '\0';
+		F->desc[0] = '\0';
 }
 
 ssize_t
-comm_read(int fd, void *buf, int count)
+comm_read (int fd, void *buf, int count)
 {
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd (fd);
 	if(F == NULL)
 		return 0;
 
-	switch(F->type)
+	switch (F->type)
 	{
-		case FD_SOCKET:
+	case FD_SOCKET:
 		{
-			int ret; 
-			ret = recv(fd, buf, count, 0);
-			get_errno();
+			int ret;
+			ret = recv (fd, buf, count, 0);
+			get_errno ();
 			return ret;
 		}
-		case FD_PIPE:
-		default:
-			return read(fd, buf, count);
+	case FD_PIPE:
+	default:
+		return read (fd, buf, count);
 	}
 }
 
 ssize_t
-comm_write(int fd, void *buf, int count)
+comm_write (int fd, void *buf, int count)
 {
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd (fd);
 	if(F == NULL)
-		return 0;	
-	switch(F->type)
+		return 0;
+	switch (F->type)
 	{
 #if 0
-	/* i'll finish this some day */
-		case FD_SSL:
+		/* i'll finish this some day */
+	case FD_SSL:
 		{
-			r = SSL_write(F->ssl, buf, count);
+			r = SSL_write (F->ssl, buf, count);
 			if(r < 0)
 			{
-				switch ((ssl_r = SSL_get_error(con->ssl, r)))
+				switch ((ssl_r = SSL_get_error (con->ssl, r)))
 				{
-					case SSL_ERROR_WANT_READ:
-					case SSL_ERROR_WANT_WRITE:
-						errno = EAGAIN;
-						return -1;
-					case SSL_ERROR_SYSCALL:
-						return -1;
-					default:
-						lib_ilog("Unknown SSL_write error:%s", 
-							     ERR_error_string(ERR_get_error(), NULL));
-						return -1;					
-				
+				case SSL_ERROR_WANT_READ:
+				case SSL_ERROR_WANT_WRITE:
+					errno = EAGAIN;
+					return -1;
+				case SSL_ERROR_SYSCALL:
+					return -1;
+				default:
+					lib_ilog ("Unknown SSL_write error:%s",
+						  ERR_error_string (ERR_get_error (), NULL));
+					return -1;
+
 				}
-			} 
+			}
 			return 0;
-		}	
+		}
 #endif
-		case FD_SOCKET:
+	case FD_SOCKET:
 		{
-			int ret = send(fd, buf, count, MSG_NOSIGNAL);
-			get_errno();
+			int ret = send (fd, buf, count, MSG_NOSIGNAL);
+			get_errno ();
 			return ret;
 		}
-		case FD_PIPE:
-		default:
-			return write(fd, buf, count);
-	
+	case FD_PIPE:
+	default:
+		return write (fd, buf, count);
+
 	}
 
 
 }
+
+#ifdef __MINGW32__
+int
+writev (int fd, struct iovec *iov, size_t iovcnt)
+{
+	int i;
+	char *base;
+	DWORD BytesWritten, TotalBytesWritten = 0, len;
+	BOOL ret;
+
+	for (i = 0; i < iovcnt; i++)
+	{
+		base = iov[i].iov_base;
+		len = (DWORD) iov[i].iov_len;
+		ret = WriteFile ((HANDLE) fd, (char *) base, len, (LPDWORD) & BytesWritten, NULL);
+		if(ret == FALSE)
+			return -1;
+		TotalBytesWritten += BytesWritten;
+	}
+	return (int) TotalBytesWritten;
+
+}
+#endif
 
 #ifdef USE_WRITEV
 ssize_t
-comm_writev(int fd, struct iovec *vector, int count)
+comm_writev (int fd, struct iovec *vector, int count)
 {
-	fde_t *F = &fd_table[fd];
+	fde_t *F = find_fd (fd);
 
-	switch(F->type)
+	switch (F->type)
 	{
-		case FD_SOCKET:
+	case FD_SOCKET:
 		{
-			struct msghdr hdr;
-			memset(&hdr, 0, sizeof(struct msghdr));
-			hdr.msg_iov = vector;
-			hdr.msg_iovlen = count;
-			return sendmsg(fd, &hdr, MSG_NOSIGNAL);
-		}	
-		case FD_PIPE:
-		default:
-			return writev(fd, vector, count);	
+			return writev (fd, vector, count);
+		}
+	case FD_PIPE:
+	default:
+		return writev (fd, vector, count);
 	}
 }
 #endif
+
 
 /* 
  * From: Thomas Helvey <tomh@inxpress.net>
@@ -899,7 +945,7 @@ static const char *IpQuadTab[] = {
  */
 
 const char *
-inetntoa(const char *in)
+inetntoa (const char *in)
 {
 	static char buf[16];
 	char *bufptr = buf;
@@ -950,9 +996,9 @@ inetntoa(const char *in)
  * sizeof(int) < 4.  sizeof(int) > 4 is fine; all the world's not a VAX.
  */
 
-static const char *inet_ntop4(const u_char * src, char *dst, unsigned int size);
+static const char *inet_ntop4 (const u_char * src, char *dst, unsigned int size);
 #ifdef IPV6
-static const char *inet_ntop6(const u_char * src, char *dst, unsigned int size);
+static const char *inet_ntop6 (const u_char * src, char *dst, unsigned int size);
 #endif
 
 /* const char *
@@ -967,11 +1013,11 @@ static const char *inet_ntop6(const u_char * src, char *dst, unsigned int size);
  *	Paul Vixie, 1996.
  */
 static const char *
-inet_ntop4(const unsigned char *src, char *dst, unsigned int size)
+inet_ntop4 (const unsigned char *src, char *dst, unsigned int size)
 {
 	if(size < 16)
 		return NULL;
-	return strcpy(dst, inetntoa((const char *) src));
+	return strcpy (dst, inetntoa ((const char *) src));
 }
 
 /* const char *
@@ -982,7 +1028,7 @@ inet_ntop4(const unsigned char *src, char *dst, unsigned int size)
  */
 #ifdef IPV6
 static const char *
-inet_ntop6(const unsigned char *src, char *dst, unsigned int size)
+inet_ntop6 (const unsigned char *src, char *dst, unsigned int size)
 {
 	/*
 	 * Note that int32_t and int16_t need only be "at least" large enough
@@ -1005,7 +1051,7 @@ inet_ntop6(const unsigned char *src, char *dst, unsigned int size)
 	 *      Copy the input (bytewise) array into a wordwise array.
 	 *      Find the longest run of 0x00's in src[] for :: shorthanding.
 	 */
-	memset(words, '\0', sizeof words);
+	memset (words, '\0', sizeof words);
 	for (i = 0; i < IN6ADDRSZ; i += 2)
 		words[i / 2] = (src[i] << 8) | src[i + 1];
 	best.base = -1;
@@ -1061,12 +1107,12 @@ inet_ntop6(const unsigned char *src, char *dst, unsigned int size)
 		if(i == 6 && best.base == 0 &&
 		   (best.len == 6 || (best.len == 5 && words[5] == 0xffff)))
 		{
-			if(!inet_ntop4(src + 12, tp, sizeof tmp - (tp - tmp)))
+			if(!inet_ntop4 (src + 12, tp, sizeof tmp - (tp - tmp)))
 				return (NULL);
-			tp += strlen(tp);
+			tp += strlen (tp);
 			break;
 		}
-		tp += SPRINTF((tp, "%x", words[i]));
+		tp += SPRINTF ((tp, "%x", words[i]));
 	}
 	/* Was it a trailing run of 0x00's? */
 	if(best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ))
@@ -1077,30 +1123,30 @@ inet_ntop6(const unsigned char *src, char *dst, unsigned int size)
 	 * Check for overflow, copy, and we're done.
 	 */
 
-	if((unsigned int)(tp - tmp) > size)
+	if((unsigned int) (tp - tmp) > size)
 	{
 		return (NULL);
 	}
-	return strcpy(dst, tmp);
+	return strcpy (dst, tmp);
 }
 #endif
 
 int
-inetpton_sock(const char *src, struct sockaddr *dst)
+inetpton_sock (const char *src, struct sockaddr *dst)
 {
-	if(inetpton(AF_INET, src, &((struct sockaddr_in *)dst)->sin_addr))
+	if(inetpton (AF_INET, src, &((struct sockaddr_in *) dst)->sin_addr))
 	{
-		((struct sockaddr_in *)dst)->sin_port = 0;
-		((struct sockaddr_in *)dst)->sin_family = AF_INET;
-		SET_SS_LEN(*((struct irc_sockaddr_storage *)dst), sizeof(struct sockaddr_in));
-		return 1;		
-	} 
+		((struct sockaddr_in *) dst)->sin_port = 0;
+		((struct sockaddr_in *) dst)->sin_family = AF_INET;
+		SET_SS_LEN (*((struct irc_sockaddr_storage *) dst), sizeof (struct sockaddr_in));
+		return 1;
+	}
 #ifdef IPV6
-	else if(inetpton(AF_INET6, src, &((struct sockaddr_in6 *)dst)->sin6_addr))
+	else if(inetpton (AF_INET6, src, &((struct sockaddr_in6 *) dst)->sin6_addr))
 	{
-		((struct sockaddr_in6 *)dst)->sin6_port = 0;
-		((struct sockaddr_in6 *)dst)->sin6_family = AF_INET6;
-		SET_SS_LEN(*((struct irc_sockaddr_storage *)dst), sizeof(struct sockaddr_in6));
+		((struct sockaddr_in6 *) dst)->sin6_port = 0;
+		((struct sockaddr_in6 *) dst)->sin6_family = AF_INET6;
+		SET_SS_LEN (*((struct irc_sockaddr_storage *) dst), sizeof (struct sockaddr_in6));
 		return 1;
 	}
 #endif
@@ -1108,23 +1154,24 @@ inetpton_sock(const char *src, struct sockaddr *dst)
 }
 
 const char *
-inetntop_sock(struct sockaddr *src, char *dst, unsigned int size)
+inetntop_sock (struct sockaddr *src, char *dst, unsigned int size)
 {
-	switch(src->sa_family)
+	switch (src->sa_family)
 	{
-		case AF_INET:
-			return(inetntop(AF_INET, &((struct sockaddr_in *)src)->sin_addr, dst, size));
-			break;
-#ifdef IPV6	
-		case AF_INET6:
-			return(inetntop(AF_INET6, &((struct sockaddr_in6 *)src)->sin6_addr, dst, size));
-			break;
+	case AF_INET:
+		return (inetntop (AF_INET, &((struct sockaddr_in *) src)->sin_addr, dst, size));
+		break;
+#ifdef IPV6
+	case AF_INET6:
+		return (inetntop (AF_INET6, &((struct sockaddr_in6 *) src)->sin6_addr, dst, size));
+		break;
 #endif
-		default:
-			return NULL;
-			break;
+	default:
+		return NULL;
+		break;
 	}
 }
+
 /* char *
  * inetntop(af, src, dst, size)
  *	convert a network format address to presentation format.
@@ -1134,21 +1181,21 @@ inetntop_sock(struct sockaddr *src, char *dst, unsigned int size)
  *	Paul Vixie, 1996.
  */
 const char *
-inetntop(int af, const void *src, char *dst, unsigned int size)
+inetntop (int af, const void *src, char *dst, unsigned int size)
 {
 	switch (af)
 	{
 	case AF_INET:
-		return (inet_ntop4(src, dst, size));
+		return (inet_ntop4 (src, dst, size));
 #ifdef IPV6
 	case AF_INET6:
-		if(IN6_IS_ADDR_V4MAPPED((const struct in6_addr *) src) ||
-		   IN6_IS_ADDR_V4COMPAT((const struct in6_addr *) src))
+		if(IN6_IS_ADDR_V4MAPPED ((const struct in6_addr *) src) ||
+		   IN6_IS_ADDR_V4COMPAT ((const struct in6_addr *) src))
 			return (inet_ntop4
 				((const unsigned char *)
 				 &((const struct in6_addr *) src)->s6_addr[12], dst, size));
 		else
-			return (inet_ntop6(src, dst, size));
+			return (inet_ntop6 (src, dst, size));
 
 
 #endif
@@ -1186,7 +1233,7 @@ inetntop(int af, const void *src, char *dst, unsigned int size)
  *	Paul Vixie, 1996.
  */
 static int
-inet_pton4(src, dst)
+inet_pton4 (src, dst)
      const char *src;
      u_char *dst;
 {
@@ -1225,7 +1272,7 @@ inet_pton4(src, dst)
 	}
 	if(octets < 4)
 		return (0);
-	memcpy(dst, tmp, INADDRSZ);
+	memcpy (dst, tmp, INADDRSZ);
 	return (1);
 }
 
@@ -1245,7 +1292,7 @@ inet_pton4(src, dst)
  */
 
 static int
-inet_pton6(src, dst)
+inet_pton6 (src, dst)
      const char *src;
      u_char *dst;
 {
@@ -1255,7 +1302,7 @@ inet_pton6(src, dst)
 	int ch, saw_xdigit;
 	u_int val;
 
-	tp = memset(tmp, '\0', IN6ADDRSZ);
+	tp = memset (tmp, '\0', IN6ADDRSZ);
 	endp = tp + IN6ADDRSZ;
 	colonp = NULL;
 	/* Leading :: requires some special handling. */
@@ -1265,11 +1312,11 @@ inet_pton6(src, dst)
 	curtok = src;
 	saw_xdigit = 0;
 	val = 0;
-	while ((ch = tolower(*src++)) != '\0')
+	while ((ch = tolower (*src++)) != '\0')
 	{
 		const char *pch;
 
-		pch = strchr(xdigits, ch);
+		pch = strchr (xdigits, ch);
 		if(pch != NULL)
 		{
 			val <<= 4;
@@ -1303,7 +1350,7 @@ inet_pton6(src, dst)
 		}
 		if(*src != '\0' && ch == '.')
 		{
-			if(((tp + INADDRSZ) <= endp) && inet_pton4(curtok, tp) > 0)
+			if(((tp + INADDRSZ) <= endp) && inet_pton4 (curtok, tp) > 0)
 			{
 				tp += INADDRSZ;
 				saw_xdigit = 0;
@@ -1341,12 +1388,12 @@ inet_pton6(src, dst)
 	}
 	if(tp != endp)
 		return (0);
-	memcpy(dst, tmp, IN6ADDRSZ);
+	memcpy (dst, tmp, IN6ADDRSZ);
 	return (1);
 }
 #endif
 int
-inetpton(af, src, dst)
+inetpton (af, src, dst)
      int af;
      const char *src;
      void *dst;
@@ -1354,18 +1401,18 @@ inetpton(af, src, dst)
 	switch (af)
 	{
 	case AF_INET:
-		return (inet_pton4(src, dst));
+		return (inet_pton4 (src, dst));
 #ifdef IPV6
 	case AF_INET6:
 		/* Somebody might have passed as an IPv4 address this is sick but it works */
-		if(inet_pton4(src, dst))
+		if(inet_pton4 (src, dst))
 		{
 			char tmp[HOSTIPLEN];
-			ircsprintf(tmp, "::ffff:%s", src);
-			return (inet_pton6(tmp, dst));
+			ircsprintf (tmp, "::ffff:%s", src);
+			return (inet_pton6 (tmp, dst));
 		}
 		else
-			return (inet_pton6(src, dst));
+			return (inet_pton6 (src, dst));
 #endif
 	default:
 		return (-1);
@@ -1375,61 +1422,88 @@ inetpton(af, src, dst)
 
 
 #ifndef HAVE_SOCKETPAIR
-static int
-comm_inet_socketpair(int d, int type, int protocol, int sv[2])
+int
+comm_inet_socketpair (int family, int type, int protocol, int fd[2])
 {
-	struct sockaddr_in addr1, addr2, addr3;
-	int addr3_len = sizeof(addr3);
-	int fd, rc;
-	int port_no = 20000;
-	
-	if(d != AF_INET || type != SOCK_STREAM || protocol)
+	int listener = -1;
+	int connector = -1;
+	int acceptor = -1;
+	struct sockaddr_in listen_addr;
+	struct sockaddr_in connect_addr;
+	size_t size;
+
+	if(protocol || family != AF_INET)
 	{
 		errno = EAFNOSUPPORT;
 		return -1;
 	}
-	if(((sv[0] = socket(AF_INET, SOCK_STREAM, 0)) < 0) || ((sv[1] = socket(AF_INET, SOCK_STREAM, 0)) < 0))
-		return -1;
-	
-	addr1.sin_port = htons(port_no);
-	addr1.sin_family = AF_INET;
-	addr1.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	while ((rc = bind (sv[0], (struct sockaddr *) &addr1, sizeof (addr1))) < 0 && errno == EADDRINUSE)
-		addr1.sin_port = htons(++port_no);
-	
-	if(rc < 0)
-		return -1;
-	
-	if(listen(sv[0], 1) < 0)
+	if(!fd)
 	{
-		get_errno();
-		close(sv[0]);
-		close(sv[1]);
+		errno = EINVAL;
 		return -1;
 	}
-	
-	addr2.sin_port = htons(port_no);
-	addr2.sin_family = AF_INET;
-	addr2.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	if(connect (sv[1], (struct sockaddr *) &addr2, sizeof (addr2)) < 0) 
-	{
-		get_errno();
-		close(sv[0]);
-		close(sv[1]);
-		return -1;
-	}
-	
-	if((fd = accept(sv[1], (struct sockaddr *) &addr3, &addr3_len)) < 0)
-	{
-		get_errno();
-		close(sv[0]);
-		close(sv[1]);
-		return -1;
-	}
-	close(sv[0]);
-	sv[0] = fd;
-	
-	return(0);
 
+	listener = socket (AF_INET, type, 0);
+	if(listener == -1)
+		return -1;
+	memset (&listen_addr, 0, sizeof (listen_addr));
+	listen_addr.sin_family = AF_INET;
+	listen_addr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+	listen_addr.sin_port = 0;	/* kernel choses port.  */
+	if(bind (listener, (struct sockaddr *) &listen_addr, sizeof (listen_addr)) == -1)
+		goto tidy_up_and_fail;
+	if(listen (listener, 1) == -1)
+		goto tidy_up_and_fail;
+
+	connector = socket (AF_INET, type, 0);
+	if(connector == -1)
+		goto tidy_up_and_fail;
+	/* We want to find out the port number to connect to.  */
+	size = sizeof (connect_addr);
+	if(getsockname (listener, (struct sockaddr *) &connect_addr, &size) == -1)
+		goto tidy_up_and_fail;
+	if(size != sizeof (connect_addr))
+		goto abort_tidy_up_and_fail;
+	if(connect (connector, (struct sockaddr *) &connect_addr, sizeof (connect_addr)) == -1)
+		goto tidy_up_and_fail;
+
+	size = sizeof (listen_addr);
+	acceptor = accept (listener, (struct sockaddr *) &listen_addr, &size);
+	if(acceptor == -1)
+		goto tidy_up_and_fail;
+	if(size != sizeof (listen_addr))
+		goto abort_tidy_up_and_fail;
+	close (listener);
+	/* Now check we are talking to ourself by matching port and host on the
+	   two sockets.  */
+	if(getsockname (connector, (struct sockaddr *) &connect_addr, &size) == -1)
+		goto tidy_up_and_fail;
+	if(size != sizeof (connect_addr)
+	   || listen_addr.sin_family != connect_addr.sin_family
+	   || listen_addr.sin_addr.s_addr != connect_addr.sin_addr.s_addr
+	   || listen_addr.sin_port != connect_addr.sin_port)
+	{
+		goto abort_tidy_up_and_fail;
+	}
+	fd[0] = connector;
+	fd[1] = acceptor;
+	return 0;
+
+	abort_tidy_up_and_fail:
+      		errno = EINVAL;	/* I hope this is portable and appropriate.  */
+	
+	tidy_up_and_fail:
+	{
+		int save_errno = errno;
+		if(listener != -1)
+			close (listener);
+		if(connector != -1)
+			close (connector);
+		if(acceptor != -1)
+			close (acceptor);
+		errno = save_errno;
+		return -1;
+	}
 }
+
 #endif

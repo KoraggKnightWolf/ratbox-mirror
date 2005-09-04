@@ -115,15 +115,23 @@ ilog(ilogfile dest, const char *format, ...)
 	char buf2[BUFSIZE];
 	va_list args;
 
+#ifndef __MINGW32__
+
 	if(logfile == NULL)
 		return;
-
+#endif
 	va_start(args, format);
 	ircvsnprintf(buf, sizeof(buf), format, args);
 	va_end(args);
 
 	ircsnprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(), buf);
-
+#ifdef __MINGW32__
+	fputs(buf2, stderr);
+	fflush(stderr);
+	
+	if(logfile == NULL)
+		return;
+#endif
 	if(fputs(buf2, logfile) < 0)
 	{
 		fclose(logfile);

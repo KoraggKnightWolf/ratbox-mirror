@@ -71,7 +71,7 @@ server_reboot(void)
 		close(i);
 
 	unlink(pidFileName);
-	execv(SPATH, myargv);
+	execv(SPATH, (void *)myargv);
 
 	exit(-1);
 }

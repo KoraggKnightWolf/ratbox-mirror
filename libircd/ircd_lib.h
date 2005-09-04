@@ -14,6 +14,11 @@
 #include <assert.h>
 #include <fcntl.h>
 #include <time.h>
+#include <signal.h>
+
+#include "setup.h"
+#include "config.h"
+
 
 #ifdef __MINGW32__
 #define FD_SETSIZE 16384 /* this is what cygwin uses..it probably sucks too oh well*/
@@ -24,6 +29,13 @@
 #define socklen_t unsigned int
 #endif
 
+struct iovec
+{
+	void *iov_base;     /* Pointer to data.  */
+	size_t iov_len;     /* Length of data.  */
+};
+#define USE_WRITEV 1
+#define UIO_MAXIOV 16
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 128
 #endif
@@ -37,16 +49,21 @@
 #define EADDRINUSE  WSAEADDRINUSE
 #define EAFNOSUPPORT WSAEAFNOSUPPORT
 
-struct iovec { void *dummy; };
 #define pipe(x)  _pipe(x, 1024, O_BINARY)
 #define ioctl(x,y,z)  ioctlsocket(x,y, (u_long *)z)
 #define HAVE_GETTIMEOFDAY 1
 #define HAVE_VSNPRINTF 1
 
+int setenv(const char *, const char *, int);
 int gettimeofday(struct timeval *tv, void *tz);
 int kill(int pid, int sig);
+#define WNOHANG 1
+pid_t waitpid(pid_t pid, int *status, int options);
 unsigned int geteuid(void);
 
+#ifndef SIGKILL
+#define SIGKILL SIGTERM
+#endif
 
 #else
 /* unixy stuff */
@@ -55,17 +72,25 @@ unsigned int geteuid(void);
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "setup.h"
-#include "config.h"
 #ifdef HAVE_SYS_UIO_H
 #include <sys/uio.h>
 #ifndef UIO_MAXIOV 
 #define UIO_MAXIOV      16
 #endif
+
 #if defined(HAVE_WRITEV) && defined(HAVE_SENDMSG) && !defined(__CYGWIN__)
 #define USE_WRITEV 1
 #endif 
 
+#ifdef __MINGW32__
+struct iovec
+{
+	void *iov_base;     /* Pointer to data.  */
+	size_t iov_len;     /* Length of data.  */
+};
+#endif
+            
+            
 
 #endif
 
@@ -167,10 +192,16 @@ void lib_restart(const char *, ...);
 void lib_die(const char *, ...);
 void set_time(void);
 void ircd_lib(log_cb *xilog, restart_cb *irestart, die_cb *idie, int closeall, int maxfds, size_t lb_hp_size, size_t dh_size);
+
 extern struct timeval SystemTime;  
+pid_t spawn_process(const char *, const char **);
 
 #ifndef CurrentTime
 #define CurrentTime SystemTime.tv_sec
+#endif
+
+#ifdef NEED_CRYPT
+char * crypt(const char *pw, const char *salt);
 #endif
 
 #include "tools.h"
