@@ -1,3 +1,67 @@
+androsyn    2005/09/04 00:11:46 UTC	(20050904_0-20704)
+  Log:
+  Okay this is a rather large commit.
+  First move process forking into libircd.  Fix various 
+  things regarding mingw32 stuff.  (And a bunch of other 
+  things I forget now)
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/aclocal.m4 (File Modified) 
+	ircd-ratbox/trunk/adns/adns.h (File Modified) 
+	ircd-ratbox/trunk/adns/event.c (File Modified) 
+	ircd-ratbox/trunk/adns/general.c (File Modified) 
+	ircd-ratbox/trunk/adns/internal.h (File Modified) 
+	ircd-ratbox/trunk/adns/setup.c (File Modified) 
+	ircd-ratbox/trunk/adns/transmit.c (File Modified) 
+	ircd-ratbox/trunk/adns/types.c (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/ident/ident.c (File Modified) 
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+	ircd-ratbox/trunk/include/ircd.h (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/crypt.c (File Added) 
+	ircd-ratbox/trunk/libircd/devpoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/epoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/kqueue.c (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ports.c (File Modified) 
+	ircd-ratbox/trunk/libircd/select.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/tools.c (File Modified) 
+	ircd-ratbox/trunk/libircd/unix.c (File Added) 
+	ircd-ratbox/trunk/libircd/win32.c (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/core/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.y (File Modified) 
+	ircd-ratbox/trunk/src/main.c (File Modified) 
+	ircd-ratbox/trunk/src/restart.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_log.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/mkpasswd.c (File Modified) 
+
+
 androsyn    2005/08/28 21:58:03 UTC	(20050828_3-20700)
   Log:
   lets try this library stuff again..
