@@ -26,7 +26,6 @@
 
 #include "stdinc.h"
 #include "struct.h"
-#include "m_info.h"
 #include "client.h"
 #include "irc_string.h"
 #include "ircd.h"
@@ -68,521 +67,768 @@ struct InfoStruct
 {
 	const char *name;	/* Displayed variable name */
 	unsigned int output_type;	/* See below #defines */
-	void *option;		/* Pointer reference to the value */
+	union {
+		const void *ptr;
+		int decimal;
+		const int *decimal_ptr;
+		const char *string;
+		const char **pstring;
+	} option;
 	const char *desc;	/* ASCII description of the variable */
 };
 /* Types for output_type in InfoStruct */
 #define OUTPUT_STRING      0x0001	/* Output option as %s w/ dereference */
 #define OUTPUT_STRING_PTR  0x0002	/* Output option as %s w/out deference */
 #define OUTPUT_DECIMAL     0x0004	/* Output option as decimal (%d) */
-#define OUTPUT_BOOLEAN     0x0008	/* Output option as "ON" or "OFF" */
-#define OUTPUT_BOOLEAN_YN  0x0010	/* Output option as "YES" or "NO" */
-#define OUTPUT_BOOLEAN2	   0x0020	/* Output option as "YES/NO/MASKED" */
+#define OUTPUT_DECIMAL_RAW 0x0008	/* Output option as decimal (%d) w/out dereference */
+#define OUTPUT_BOOLEAN     0x0010	/* Output option as "ON" or "OFF" */
+#define OUTPUT_BOOLEAN_YN  0x0020	/* Output option as "YES" or "NO" */
+#define OUTPUT_BOOLEAN_RAW     0x0040	/* Output option as "ON" or "OFF" */
+#define OUTPUT_BOOLEAN_RAW_YN  0x0080	/* Output option as "YES" or "NO" */
+#define OUTPUT_BOOLEAN2	   0x0100	/* Output option as "YES/NO/MASKED" */
+
+
+#ifdef SOMAXCONN
+#undef RATBOX_SOMAXCONN
+#define RATBOX_SOMAXCONN SOMAXCONN
+#endif
+
+static const char *none = "NONE"; /* because we don't need a bunch of NONEs in the executables */
+
+#ifndef CPATH
+#define CPATH none
+#endif
+
+#ifndef DPATH
+#define DPATH none
+#endif
+
+#ifndef DLPATH
+#define DLPATH none
+#endif
+
+#ifndef HPATH 
+#define HPATH none
+#endif
+
+#ifndef UHPATH
+#define UHPATH none
+#endif
+
+#ifndef KPATH
+#define KPATH none
+#endif
+#ifndef LPATH
+#define LPATH none
+#endif
+#ifndef MPATH
+#define MPATH none
+#endif
+#ifndef OPATH
+#define OPATH none
+#endif
+#ifndef SPATH
+#define SPATH none
+#endif
+
 
 /* *INDENT-OFF* */
 static struct InfoStruct info_table[] = {
-	/* --[  START OF TABLE  ]-------------------------------------------- */
+	
+	{
+		"CPATH", 
+		OUTPUT_STRING_PTR,
+		{ CPATH },
+		"Path to Main Configuration File"
+	},
+	{
+		"DPATH",
+		OUTPUT_STRING_PTR,
+		{ DPATH },
+		"Directory Containing Configuration Files"
+	},
+	{
+		"DLPATH", 
+		OUTPUT_STRING_PTR,
+		{ DLPATH },
+		"Path to D-line File"
+	},
+	{	
+		"ENABLE_SERVICES", 
+		OUTPUT_BOOLEAN_RAW,
+#ifdef ENABLE_SERVICES
+		{ (void *)1 },
+#else
+		{ (void *)0 },
+#endif
+		"ratbox-services compatibility code",
+	},
+	{
+		"RESVPATH",
+		OUTPUT_STRING_PTR,
+		{ RESVPATH }, 
+		"Path to resv file"
+	},
+	{
+		"HARD_FDLIMIT_", 
+		OUTPUT_DECIMAL_RAW,
+		{ (void *)HARD_FDLIMIT_ } ,
+		"Maximum Number of File Descriptors Available"
+	},
+	{
+		"HPATH",
+		OUTPUT_STRING_PTR,
+		{ HPATH } ,
+		"Path to Operator Help Files",
+	},
+	{
+		"UHPATH",
+		OUTPUT_STRING_PTR,
+		{ UHPATH },
+		"Path to User Help Files",
+	},
+	{
+		"RATBOX_SOMAXCONN",
+		OUTPUT_DECIMAL_RAW,
+		{ (void *)RATBOX_SOMAXCONN },
+		"Maximum Queue Length of Pending Connections"
+	},
+	{	
+		"IPV6", 
+		OUTPUT_BOOLEAN_RAW,
+#ifdef IPV6
+		{ (void *)1 }, 
+#else
+		{ (void *)0 },
+#endif
+		"IPv6 Support"
+	},
+	{
+		"MAX_CLIENTS",
+		OUTPUT_DECIMAL_RAW,
+		{ (void *)MAX_CLIENTS },
+		"Default maximum Clients"
+	},
+	{
+		"JOIN_LEAVE_COUNT_EXPIRE_TIME", 
+		OUTPUT_DECIMAL_RAW,
+		{ (void *)JOIN_LEAVE_COUNT_EXPIRE_TIME },
+		"Anti SpamBot Parameter"
+	},
+	{
+		"KILLCHASETIMELIMIT", 
+		OUTPUT_DECIMAL_RAW, 
+		{ (void *)KILLCHASETIMELIMIT },
+		"Nick Change Tracker for KILL"
+	},
+	{
+		"KPATH", 
+		OUTPUT_STRING_PTR,
+		{ KPATH },
+		"Path to K-line File"
+	},
+	{
+		"LPATH", 
+		OUTPUT_STRING_PTR,
+		{ LPATH },
+		"Path to Log File"
+	},
+	{
+		"MAX_BUFFER", 
+		OUTPUT_DECIMAL_RAW, 
+		{ (void *)MAX_BUFFER }, 
+		"Maximum Buffer Connections Allowed"
+	},
+	{
+		"MAX_JOIN_LEAVE_COUNT", 
+		OUTPUT_DECIMAL_RAW, 
+		{ (void *)MAX_JOIN_LEAVE_COUNT },
+		"Anti SpamBot Parameter"
+	},
+	{
+		"MIN_JOIN_LEAVE_TIME", 
+		OUTPUT_DECIMAL_RAW, 
+		{ (void *)MIN_JOIN_LEAVE_TIME },
+		"Anti SpamBot Parameter"
+	},
+	{
+		"MPATH", 
+		OUTPUT_STRING_PTR,
+		{ MPATH },
+		"Path to MOTD File"
+	},
+	{
+		"NICKNAMEHISTORYLENGTH", 
+		OUTPUT_DECIMAL_RAW, 
+		{ (void *)NICKNAMEHISTORYLENGTH },
+		"Size of WHOWAS Array"
+	},
+	{
+		"OPATH",
+		OUTPUT_STRING_PTR,
+		{ OPATH }, 
+		"Path to Operator MOTD File"
+	},
+	{
+		"OPER_SPAM_COUNTDOWN", 
+		OUTPUT_DECIMAL_RAW, 
+		{ (void *)OPER_SPAM_COUNTDOWN },
+		"Anti SpamBot Parameter"
+	},
+	{
+		"HAVE_LIBCRYPTO", 
+		OUTPUT_BOOLEAN_RAW,
+#ifdef HAVE_LIBCRYPTO
+		{ (void *)1 },
+#else
+		{ (void *)0 },
+#endif		
+		"OpenSSL CHALLENGE Support"
+	},
+	{
+		"HAVE_LIBZ", 
+		OUTPUT_BOOLEAN_RAW_YN, 
+#ifdef HAVE_LIBZ
+		{ (void *)1 },
+#else
+		{ (void *)0 }, 
+#endif
+		"zlib (ziplinks) support"
+	},
+	{
+		"PPATH", 
+		OUTPUT_STRING_PTR,
+		{ PPATH },
+		"Path to Pid File"
+	},
+	{
+		"SELECT_TYPE", 
+		OUTPUT_STRING_PTR,
+		{ SELECT_TYPE }, 
+		"Method of Multiplexed I/O"
+	},
+	{
+		"SPATH", 
+		OUTPUT_STRING_PTR,
+		{ SPATH }, 
+		"Path to Server Executable"
+	},
+	{
+		"TS_MAX_DELTA_DEFAULT", 
+		OUTPUT_DECIMAL_RAW, 
+		{ (void *)TS_MAX_DELTA_DEFAULT },
+		"Maximum Allowed TS Delta from another Server"
+	},
+	{
+		"USE_IODEBUG_HOOKS", 
+		OUTPUT_BOOLEAN_RAW_YN,
+#ifdef USE_IODEBUG_HOOKS
+		{ (void *)1 },
+#else
+		{ (void *)0 },
+#endif
+		"IO Debugging support"
+	},
 	{
 		"anti_nick_flood",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.anti_nick_flood,
+		{ &ConfigFileEntry.anti_nick_flood }, 
 		"NICK flood protection"
 	},
 	{
 		"anti_spam_exit_message_time",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.anti_spam_exit_message_time,
+		{ &ConfigFileEntry.anti_spam_exit_message_time }, 
 		"Duration a client must be connected for to have an exit message"
 	},
 	{
 		"caller_id_wait",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.caller_id_wait,
+		{ &ConfigFileEntry.caller_id_wait }, 
 		"Minimum delay between notifying UMODE +g users of messages"
 	},
 	{
 		"client_exit",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.client_exit,
+		{ &ConfigFileEntry.client_exit }, 
 		"Prepend 'Client Exit:' to user QUIT messages"
 	},
 	{
 		"client_flood",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.client_flood,
+		{ &ConfigFileEntry.client_flood }, 
 		"Number of lines before a client Excess Flood's",
 	},
 	{
 		"connect_timeout",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.connect_timeout,
+		{ &ConfigFileEntry.connect_timeout }, 
 		"Connect timeout for connections to servers"
 	},
 	{
 		"default_floodcount",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.default_floodcount,
+		{ &ConfigFileEntry.default_floodcount }, 
 		"Startup value of FLOODCOUNT",
 	},
 	{
 		"default_adminstring",
 		OUTPUT_STRING,
-		&ConfigFileEntry.default_adminstring,
+		{ &ConfigFileEntry.default_adminstring }, 
 		"Default adminstring at startup.",
 	},
 	{
 		"default_operstring",
 		OUTPUT_STRING,
-		&ConfigFileEntry.default_operstring,
+		{ &ConfigFileEntry.default_operstring }, 
 		"Default operstring at startup.",
 	},
 	{
 		"default_invisible",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.default_invisible,
+		{ &ConfigFileEntry.default_invisible }, 
 		"Clients are set +i on connect"
 	},
 	{
 		"disable_auth",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.disable_auth,
+		{ &ConfigFileEntry.disable_auth }, 
 		"Controls whether auth checking is disabled or not"
 	},
 	{
 		"disable_fake_channels",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.disable_fake_channels,
+		{ &ConfigFileEntry.disable_fake_channels }, 
 		"Controls whether bold etc are disabled for JOIN"
 	},
 	{
 		"dot_in_ip6_addr",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.dot_in_ip6_addr,
+		{ &ConfigFileEntry.dot_in_ip6_addr }, 
 		"Suffix a . to ip6 addresses",
 	},
 	{
 		"dots_in_ident",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.dots_in_ident,
+		{ &ConfigFileEntry.dots_in_ident }, 
 		"Number of permissable dots in an ident"
 	},
 	{
 		"failed_oper_notice",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.failed_oper_notice,
+		{ &ConfigFileEntry.failed_oper_notice }, 
 		"Inform opers if someone /oper's with the wrong password"
 	},
 	{
 		"fname_userlog",
 		OUTPUT_STRING,
-		&ConfigFileEntry.fname_userlog,
+		{ &ConfigFileEntry.fname_userlog }, 
 		"User log file"
 	},
 	{
 		"fname_fuserlog",
 		OUTPUT_STRING,
-		&ConfigFileEntry.fname_fuserlog,
+		{ &ConfigFileEntry.fname_fuserlog }, 
 		"Failed user log file"
 	},
 
 	{
 		"fname_operlog",
 		OUTPUT_STRING,
-		&ConfigFileEntry.fname_operlog,
+		{ &ConfigFileEntry.fname_operlog }, 
 		"Operator log file"
 	},
 	{
 		"fname_foperlog",
 		OUTPUT_STRING,
-		&ConfigFileEntry.fname_foperlog,
+		{ &ConfigFileEntry.fname_foperlog }, 
 		"Failed operator log file"
 	},
 	{
 		"fname_serverlog",
 		OUTPUT_STRING,
-		&ConfigFileEntry.fname_serverlog,
+		{ &ConfigFileEntry.fname_serverlog }, 
 		"Server connect/disconnect log file"
 	},
 	{
 		"fname_klinelog",
 		OUTPUT_STRING,
-		&ConfigFileEntry.fname_klinelog,
+		{ &ConfigFileEntry.fname_klinelog }, 
 		"KLINE etc log file"
 	},
 	{
 		"fname_glinelog",
 		OUTPUT_STRING,
-		&ConfigFileEntry.fname_glinelog,
+		{ &ConfigFileEntry.fname_glinelog }, 
 		"GLINE log file"
 	},
 	{
 		"fname_operspylog",
 		OUTPUT_STRING,
-		&ConfigFileEntry.fname_operspylog,
+		{ &ConfigFileEntry.fname_operspylog }, 
 		"Oper spy log file"
 	},
 	{
 		"fname_ioerrorlog",
 		OUTPUT_STRING,
-		&ConfigFileEntry.fname_ioerrorlog,
+		{ &ConfigFileEntry.fname_ioerrorlog }, 
 		"IO error log file"
 	},
 	{
 		"glines",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.glines,
+		{ &ConfigFileEntry.glines }, 
 		"G-line (network-wide K-line) support"
 	},
 	{
 		"gline_time",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.gline_time,
+		{ &ConfigFileEntry.gline_time }, 
 		"Expiry time for G-lines"
 	},
 	{
 		"gline_min_cidr",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.gline_min_cidr,
+		{ &ConfigFileEntry.gline_min_cidr }, 
 		"Minimum CIDR bitlen for ipv4 glines"
 	},
 	{
 		"gline_min_cidr6",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.gline_min_cidr6,
+		{ &ConfigFileEntry.gline_min_cidr6 }, 
 		"Minimum CIDR bitlen for ipv6 glines"
 	},
 	{
 		"hide_error_messages",
 		OUTPUT_BOOLEAN2,
-		&ConfigFileEntry.hide_error_messages,
+		{ &ConfigFileEntry.hide_error_messages }, 
 		"Hide ERROR messages coming from servers"
 	},
 	{
 		"hub",
 		OUTPUT_BOOLEAN_YN,
-		&ServerInfo.hub,
+		{ &ServerInfo.hub }, 
 		"Server is a hub"
 	},
 	{
 		"idletime",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.idletime,
+		{ &ConfigFileEntry.idletime }, 
 		"Number of minutes before a client is considered idle"
 	},
 	{
 		"kline_delay",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.kline_delay,
+		{ &ConfigFileEntry.kline_delay }, 
 		"Duration of time to delay kline checking"
 	},
 	{
 		"kline_reason",
 		OUTPUT_STRING,
-		&ConfigFileEntry.kline_reason,
+		{ &ConfigFileEntry.kline_reason }, 
 		"K-lined clients sign off with this reason"
 	},
 	{
 		"dline_with_reason",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.dline_with_reason,
+		{ &ConfigFileEntry.dline_with_reason }, 
 		"Display D-line reason to client on disconnect"
 	},
 	{
 		"kline_with_reason",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.kline_with_reason,
+		{ &ConfigFileEntry.kline_with_reason }, 
 		"Display K-line reason to client on disconnect"
 	},
 	{
 		"max_accept",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.max_accept,
+		{ &ConfigFileEntry.max_accept }, 
 		"Maximum nicknames on accept list",
 	},
 	{
 		"max_nick_changes",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.max_nick_changes,
+		{ &ConfigFileEntry.max_nick_changes }, 
 		"NICK change threshhold setting"
 	},
 	{
 		"max_nick_time",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.max_nick_time,
+		{ &ConfigFileEntry.max_nick_time }, 
 		"NICK flood protection time interval"
 	},
 	{
 		"max_targets",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.max_targets,
+		{ &ConfigFileEntry.max_targets }, 
 		"The maximum number of PRIVMSG/NOTICE targets"
 	},
 	{
 		"min_nonwildcard",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.min_nonwildcard,
+		{ &ConfigFileEntry.min_nonwildcard }, 
 		"Minimum non-wildcard chars in K/G lines",
 	},
 	{
 		"min_nonwildcard_simple",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.min_nonwildcard_simple,
+		{ &ConfigFileEntry.min_nonwildcard_simple }, 
 		"Minimum non-wildcard chars in xlines/resvs",
 	},
 	{
 		"network_name",
 		OUTPUT_STRING,
-		&ServerInfo.network_name,
+		{ &ServerInfo.network_name }, 
 		"Network name"
 	},
 	{
 		"network_desc",
 		OUTPUT_STRING,
-		&ServerInfo.network_desc,
+		{ &ServerInfo.network_desc }, 
 		"Network description"
 	},
 	{
 		"nick_delay",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.nick_delay,
+		{ &ConfigFileEntry.nick_delay }, 
 		"Delay nicks are locked for on split",
 	},
 	{
 		"no_oper_flood",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.no_oper_flood,
+		{ &ConfigFileEntry.no_oper_flood }, 
 		"Disable flood control for operators",
 	},
 	{
 		"non_redundant_klines",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.non_redundant_klines,
+		{ &ConfigFileEntry.non_redundant_klines }, 
 		"Check for and disallow redundant K-lines"
 	},
 	{
 		"operspy_admin_only",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.operspy_admin_only,
+		{ &ConfigFileEntry.operspy_admin_only }, 
 		"Send +Z operspy notices to admins only"
 	},
 	{
 		"pace_wait",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.pace_wait,
+		{ &ConfigFileEntry.pace_wait }, 
 		"Minimum delay between uses of certain commands"
 	},
 	{
 		"pace_wait_simple",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.pace_wait_simple,
+		{ &ConfigFileEntry.pace_wait_simple }, 
 		"Minimum delay between less intensive commands"
 	},
 	{
 		"ping_cookie",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.ping_cookie,
+		{ &ConfigFileEntry.ping_cookie }, 
 		"Require ping cookies to connect",
 	},
 	{
 		"reject_after_count",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.reject_after_count,   
+		{ &ConfigFileEntry.reject_after_count }, 
 		"Client rejection threshold setting",
 	},
 	{
 		"reject_ban_time",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.reject_ban_time,
+		{ &ConfigFileEntry.reject_ban_time }, 
 		"Client rejection time interval",
 	},
 	{
 		"reject_duration",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.reject_duration,
+		{ &ConfigFileEntry.reject_duration }, 
 		"Client rejection cache duration",
 	},
 	{
 		"short_motd",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.short_motd,
+		{ &ConfigFileEntry.short_motd }, 
 		"Do not show MOTD; only tell clients they should read it"
 	},
 	{
 		"stats_e_disabled",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.stats_e_disabled,
+		{ &ConfigFileEntry.stats_e_disabled }, 
 		"STATS e output is disabled",
 	},
 	{
 		"stats_c_oper_only",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.stats_c_oper_only,
+		{ &ConfigFileEntry.stats_c_oper_only }, 
 		"STATS C output is only shown to operators",
 	},
 	{
 		"stats_h_oper_only",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.stats_h_oper_only,
+		{ &ConfigFileEntry.stats_h_oper_only }, 
 		"STATS H output is only shown to operators",
 	},
 	{
 		"stats_i_oper_only",
 		OUTPUT_BOOLEAN2,
-		&ConfigFileEntry.stats_i_oper_only,
+		{ &ConfigFileEntry.stats_i_oper_only }, 
 		"STATS I output is only shown to operators",
 	},
 	{
 		"stats_k_oper_only",
 		OUTPUT_BOOLEAN2,
-		&ConfigFileEntry.stats_k_oper_only,
+		{ &ConfigFileEntry.stats_k_oper_only }, 
 		"STATS K output is only shown to operators",
 	},
 	{
 		"stats_o_oper_only",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.stats_o_oper_only,
+		{ &ConfigFileEntry.stats_o_oper_only }, 
 		"STATS O output is only shown to operators",
 	},
 	{
 		"stats_P_oper_only",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.stats_P_oper_only,
+		{ &ConfigFileEntry.stats_P_oper_only }, 
 		"STATS P is only shown to operators",
 	},
 	{
 		"stats_y_oper_only",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigFileEntry.stats_y_oper_only,
+		{ &ConfigFileEntry.stats_y_oper_only }, 
 		"STATS Y is only shown to operators",
 	},
 	{
 		"tkline_expire_notices",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.tkline_expire_notices,
+		{ &ConfigFileEntry.tkline_expire_notices }, 
 		"Notices given to opers when tklines expire"
 	},
 	{
 		"ts_max_delta",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.ts_max_delta,
+		{ &ConfigFileEntry.ts_max_delta }, 
 		"Maximum permitted TS delta from another server"
 	},
 	{
 		"ts_warn_delta",
 		OUTPUT_DECIMAL,
-		&ConfigFileEntry.ts_warn_delta,
+		{ &ConfigFileEntry.ts_warn_delta }, 
 		"Maximum permitted TS delta before displaying a warning"
 	},
 	{
 		"warn_no_nline",
 		OUTPUT_BOOLEAN,
-		&ConfigFileEntry.warn_no_nline,
+		{ &ConfigFileEntry.warn_no_nline }, 
 		"Display warning if connecting server lacks N-line"
 	},
 	{
 		"default_split_server_count",
 		OUTPUT_DECIMAL,
-		&ConfigChannel.default_split_server_count,
+		{ &ConfigChannel.default_split_server_count }, 
 		"Startup value of SPLITNUM",
 	},
 	{
 		"default_split_user_count",
 		OUTPUT_DECIMAL,
-		&ConfigChannel.default_split_user_count,
+		{ &ConfigChannel.default_split_user_count }, 
 		"Startup value of SPLITUSERS",
 	},
 	{
 		"knock_delay",
 		OUTPUT_DECIMAL,
-		&ConfigChannel.knock_delay,
+		{ &ConfigChannel.knock_delay }, 
 		"Delay between a users KNOCK attempts"
 	},
 	{
 		"knock_delay_channel",
 		OUTPUT_DECIMAL,
-		&ConfigChannel.knock_delay_channel,
+		{ &ConfigChannel.knock_delay_channel }, 
 		"Delay between KNOCK attempts to a channel",
 	},
 	{
 		"invite_ops_only",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigChannel.invite_ops_only,
+		{ &ConfigChannel.invite_ops_only }, 
 		"INVITE is restricted to channelops only"
 	},
 	{
 		"max_bans",
 		OUTPUT_DECIMAL,
-		&ConfigChannel.max_bans,
+		{ &ConfigChannel.max_bans }, 
 		"Total +b/e/I modes allowed in a channel",
 	},
 	{
 		"max_chans_per_user",
 		OUTPUT_DECIMAL,
-		&ConfigChannel.max_chans_per_user,
+		{ &ConfigChannel.max_chans_per_user }, 
 		"Maximum number of channels a user can join",
 	},
 	{
 		"no_create_on_split",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigChannel.no_create_on_split,
+		{ &ConfigChannel.no_create_on_split }, 
 		"Disallow creation of channels when split",
 	},
 	{
 		"no_join_on_split",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigChannel.no_join_on_split,
+		{ &ConfigChannel.no_join_on_split }, 
 		"Disallow joining channels when split",
 	},
 	{
 		"quiet_on_ban",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigChannel.quiet_on_ban,
+		{ &ConfigChannel.quiet_on_ban }, 
 		"Banned users may not send text to a channel"
 	},
 	{
 		"use_except",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigChannel.use_except,
+		{ &ConfigChannel.use_except }, 
 		"Enable chanmode +e (ban exceptions)",
 	},
 	{
 		"use_invex",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigChannel.use_invex,
+		{ &ConfigChannel.use_invex }, 
 		"Enable chanmode +I (invite exceptions)",
 	},
 	{
 		"use_knock",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigChannel.use_knock,
+		{ &ConfigChannel.use_knock }, 
 		"Enable /KNOCK",
 	},
 	{
 		"disable_hidden",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigServerHide.disable_hidden,
+		{ &ConfigServerHide.disable_hidden }, 
 		"Prevent servers from hiding themselves from a flattened /links",
 	},
 	{
 		"flatten_links",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigServerHide.flatten_links,
+		{ &ConfigServerHide.flatten_links }, 
 		"Flatten /links list",
 	},
 	{
 		"hidden",
 		OUTPUT_BOOLEAN_YN,
-		&ConfigServerHide.hidden,
+		{ &ConfigServerHide.hidden }, 
 		"Hide this server from a flattened /links on remote servers",
 	},
 	{
 		"links_delay",
 		OUTPUT_DECIMAL,
-		&ConfigServerHide.links_delay,
+		{ &ConfigServerHide.links_delay }, 
 		"Links rehash delay"
 	},
-	/* --[  END OF TABLE  ]---------------------------------------------- */
-	{ (char *) 0, (unsigned int) 0, (void *) 0, (char *) 0}
+	{ (char *) 0, (unsigned int) 0, { (void *) 0 }, (char *) 0}
 };
 /* *INDENT-ON* */
 
@@ -693,32 +939,7 @@ send_birthdate_online_time(struct Client *source_p)
 static void
 send_conf_options(struct Client *source_p)
 {
-	Info *infoptr;
 	int i = 0;
-
-	/*
-	 * Now send them a list of all our configuration options
-	 * (mostly from config.h)
-	 */
-	for (infoptr = MyInformation; infoptr->name; infoptr++)
-	{
-		if(infoptr->intvalue)
-		{
-			sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5d [%-30s]",
-				   get_id(&me, source_p), RPL_INFO,
-				   get_id(source_p, source_p),
-				   infoptr->name, infoptr->intvalue, 
-				   infoptr->desc);
-		}
-		else
-		{
-			sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
-				   get_id(&me, source_p), RPL_INFO,
-				   get_id(source_p, source_p),
-				   infoptr->name, infoptr->strvalue, 
-				   infoptr->desc);
-		}
-	}
 
 	/*
 	 * Parse the info_table[] and do the magic.
@@ -732,7 +953,7 @@ send_conf_options(struct Client *source_p)
 			 */
 		case OUTPUT_STRING:
 			{
-				char *option = *((char **) info_table[i].option);
+				const char *option = *(info_table[i].option.pstring);
 
 				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
@@ -748,7 +969,7 @@ send_conf_options(struct Client *source_p)
 			 */
 		case OUTPUT_STRING_PTR:
 			{
-				char *option = (char *) info_table[i].option;
+				const char *option = info_table[i].option.string;
 
 				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
@@ -764,7 +985,24 @@ send_conf_options(struct Client *source_p)
 			 */
 		case OUTPUT_DECIMAL:
 			{
-				int option = *((int *) info_table[i].option);
+				int option = *info_table[i].option.decimal_ptr;
+
+				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5d [%-30s]",
+					   get_id(&me, source_p), RPL_INFO,
+					   get_id(source_p, source_p),
+					   info_table[i].name,
+					   option,
+					   info_table[i].desc ? info_table[i].desc : "<none>");
+
+				break;
+			}
+
+			/*
+			 * Output info_table[i].option as a decimal value.
+			 */
+		case OUTPUT_DECIMAL_RAW:
+			{
+				int option = info_table[i].option.decimal;
 
 				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5d [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
@@ -781,7 +1019,7 @@ send_conf_options(struct Client *source_p)
 			 */
 		case OUTPUT_BOOLEAN:
 			{
-				int option = *((int *) info_table[i].option);
+				int option = *(info_table[i].option.decimal_ptr);
 
 				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
@@ -797,7 +1035,38 @@ send_conf_options(struct Client *source_p)
 			 */
 		case OUTPUT_BOOLEAN_YN:
 			{
-				int option = *((int *) info_table[i].option);
+				int option = *(info_table[i].option.decimal_ptr);
+
+				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+					   get_id(&me, source_p), RPL_INFO,
+					   get_id(source_p, source_p),
+					   info_table[i].name,
+					   option ? "YES" : "NO",
+					   info_table[i].desc ? info_table[i].desc : "<none>");
+
+				break;
+			}
+
+
+		case OUTPUT_BOOLEAN_RAW:
+			{
+				int option = info_table[i].option.decimal;
+
+				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+					   get_id(&me, source_p), RPL_INFO,
+					   get_id(source_p, source_p),
+					   info_table[i].name,
+					   option ? "ON" : "OFF",
+					   info_table[i].desc ? info_table[i].desc : "<none>");
+
+				break;
+			}
+			/*
+			 * Output info_table[i].option as "YES" or "NO"
+			 */
+		case OUTPUT_BOOLEAN_RAW_YN:
+			{
+				int option = info_table[i].option.decimal;
 
 				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
@@ -811,7 +1080,7 @@ send_conf_options(struct Client *source_p)
 
 		case OUTPUT_BOOLEAN2:
 		{
-			int option = *((int *) info_table[i].option);
+			int option = *info_table[i].option.decimal_ptr;
 
 			sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
 				   me.name, RPL_INFO, source_p->name,
@@ -846,3 +1115,6 @@ info_spy(struct Client *source_p)
 
 	call_hook(doing_info_hook, &hd);
 }
+
+
+

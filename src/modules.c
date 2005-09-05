@@ -38,6 +38,7 @@
 #include "parse.h"
 #include "irc_string.h"
 
+
 /* Needed to use uintptr_t for some pointer manipulation. */
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
@@ -47,7 +48,6 @@ typedef unsigned long uintptr_t;
 #endif
 #endif
 
-#ifndef STATIC_MODULES
 #include "ltdl.h"
 
 
@@ -107,10 +107,11 @@ struct Message modrestart_msgtab = {
 };
 
 extern struct Message error_msgtab;
-
+extern const lt_dlsymlist lt_preloaded_symbols[];
 void
 modules_init(void)
 {
+	lt_dlpreload_default(lt_preloaded_symbols);
 	if(lt_dlinit())
 	{
 		ilog(L_MAIN, "lt_dlinit failed");
@@ -229,8 +230,13 @@ findmodule_byname(const char *name)
 	return -1;
 }
 
+#ifdef STATIC_MODULES
+static char found_suffix[] = ".la";
+static int suffix_len = 3;
+#else
 static char found_suffix[4];
 static int suffix_len = 0;
+#endif
 
 static
 void find_module_suffix(void)
@@ -294,7 +300,7 @@ load_all_modules(int warn)
 	find_module_suffix();
 	max_mods = MODS_INCREMENT;
 	system_module_dir = opendir(AUTOMODPATH);
-
+	
 	if(system_module_dir == NULL)
 	{
 		ilog(L_MAIN, "Could not load modules from %s: %s", AUTOMODPATH, strerror(errno));
@@ -813,20 +819,4 @@ increase_modlist(void)
 	max_mods += MODS_INCREMENT;
 }
 
-
-#else /* STATIC_MODULES */
- 
-/* load_all_modules()
- *
- * input        -
- * output       -
- * side effects - all the msgtabs are added for static modules
- */
-void
-load_all_modules(int warn)
-{
-	load_static_modules();
-}
-
-#endif /* STATIC_MODULES */
  

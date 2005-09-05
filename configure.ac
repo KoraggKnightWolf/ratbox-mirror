@@ -37,6 +37,7 @@ AC_LIBLTDL_CONVENIENCE
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
+AM_PROG_CC_C_O
 AM_DISABLE_STATIC
 AM_ENABLE_SHARED
 AM_MAINTAINER_MODE
@@ -326,11 +327,6 @@ AC_FUNC_VFORK
 
 dnl Specialized functions checks
 dnl ============================
-
-dnl check for timer_create
-AC_CHECK_FUNC(timer_create,,[AC_CHECK_LIB(rt, timer_create, AC_DEFINE(HAVE_TIMER_CREATE, 1, [Have timer_create]) 
-LIBS="${LIBS} -lrt",,)])
-
 
 
 dnl OpenSSL support
@@ -756,12 +752,14 @@ case  $SELECT_TYPE in
 		;;
 	ports)
 		AC_DEFINE([USE_PORTS], 1, [Define to use ports])
+		AC_CHECK_FUNC(timer_create,,[AC_CHECK_LIB(rt, timer_create, AC_DEFINE(HAVE_TIMER_CREATE, 1, [Have timer_create]) LIBS="${LIBS} -lrt",,)])
 		;;
 	poll)
 		AC_DEFINE([USE_POLL], 1, [Define to use poll])
 		;;
 	sigio)
 		AC_DEFINE([USE_SIGIO],1 , [Define to use sigio])
+		AC_CHECK_FUNC(timer_create,,[AC_CHECK_LIB(rt, timer_create, AC_DEFINE(HAVE_TIMER_CREATE, 1, [Have timer_create]) LIBS="${LIBS} -lrt",,)])
 		;;
 	select)
 		AC_DEFINE([USE_SELECT], 1, [Define to use select])
@@ -837,7 +835,7 @@ if test "x$ratbox_services" = "xyes"; then
 	M_SERVICES="m_services.la"
 fi
 
-AC_SUBST(M_SERVICES)
+AM_CONDITIONAL([ENABLE_SERVICES], [test x"$M_SERVICES" != "x"])
 
 AC_ARG_ENABLE(small-net,
 AC_HELP_STRING([--enable-small-net],[Enable small network support.]),
@@ -966,11 +964,6 @@ AC_CONFIG_FILES(		\
 	adns/Makefile		\
 	servlink/Makefile	\
 	contrib/Makefile	\
-	src/Makefile		\
-	ident/Makefile		\
-	resolver/Makefile	\
-	modules/Makefile	\
-	modules/core/Makefile	\
 	tools/Makefile		\
 	doc/Makefile		\
 	help/Makefile		

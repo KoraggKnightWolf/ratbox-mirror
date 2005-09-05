@@ -69,7 +69,7 @@ mapi_hlist_av1 stats_hlist[] = {
 
 DECLARE_MODULE_AV1(stats, NULL, NULL, stats_clist, stats_hlist, NULL, "$Revision: 19295 $");
 
-const char *Lformat = "%s %u %u %u %u %u :%u %u %s";
+static const char *Lformat = "%s %u %u %u %u %u :%u %u %s";
 
 static void stats_l_list(struct Client *s, const char *, int, int, dlink_list *, char);
 static void stats_l_client(struct Client *source_p, struct Client *target_p,

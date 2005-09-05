@@ -463,7 +463,6 @@ diecb(const char *buf)
 int
 ratbox_main(int argc, char *argv[])
 {
-	fprintf(stderr, "in ratbox_main");
 	/* Check to see if the user is running us as root, which is a nono */
 #ifndef __MINGW32__
 	if(geteuid() == 0)
@@ -558,7 +557,6 @@ ratbox_main(int argc, char *argv[])
 
 	/* This must be after we daemonize.. */
 	ircd_lib(ilogcb, restartcb, diecb, 1, MAXCONNECTIONS, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE);
-	fprintf(stderr, "Past ircd_lib\n");
 	init_sys();
 	init_main_logfile();
 	init_patricia();
@@ -579,9 +577,7 @@ ratbox_main(int argc, char *argv[])
 	init_cache();
 	init_monitor();
 	load_all_modules(1);
-#ifndef STATIC_MODULES
 	load_core_modules(1);
-#endif
 	init_resolver();	/* Needs to be setup before the io loop */
 	init_auth();		/* Initialise the auth code */
 
@@ -589,8 +585,8 @@ ratbox_main(int argc, char *argv[])
 		fprintf(stderr, "\nBeginning config test\n");
 	read_conf_files(YES);	/* cold start init conf files */
 	rehash_bans(0);
-#ifndef STATIC_MODULES
 
+#ifndef STATIC_MODULES
 	mod_add_path(MODULE_DIR); 
 	mod_add_path(MODULE_DIR "/autoload"); 
 #endif
