@@ -1,3 +1,12 @@
+androsyn    2005/09/05 23:01:52 UTC	(20050905_4-20716)
+  Log:
+  move -dlopen self to LDFLAGS from LDADD
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 androsyn    2005/09/05 22:49:12 UTC	(20050905_3-20714)
   Log:
   fix a typo in Makefile.am
