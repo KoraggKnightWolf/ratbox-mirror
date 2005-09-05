@@ -328,7 +328,7 @@ am__DEPENDENCIES_6 = $(shell for x in $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_5) ;do echo $$x \
 	;done)
 @STATIC_MODULES_FALSE@src_ircd_DEPENDENCIES = libircd/libircd.la \
-@STATIC_MODULES_FALSE@	src/libratbox.la self
+@STATIC_MODULES_FALSE@	src/libratbox.la
 @STATIC_MODULES_TRUE@src_ircd_DEPENDENCIES = libircd/libircd.la \
 @STATIC_MODULES_TRUE@	src/libratbox.la $(am__DEPENDENCIES_6)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
@@ -702,9 +702,9 @@ AM_YFLAGS = -d
 INCLUDES = -Ilibircd -Ilibltdl -Iadns
 @MINGW_TRUE@EXTRA_FLAGS = -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
 DLOPEN = $(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_LTLIBRARIES) ;do echo -dlpreopen $$x ;done)
-@STATIC_MODULES_FALSE@src_ircd_LDADD = libircd/libircd.la src/libratbox.la -dlopen self
+@STATIC_MODULES_FALSE@src_ircd_LDADD = libircd/libircd.la src/libratbox.la 
 @STATIC_MODULES_TRUE@src_ircd_LDADD = libircd/libircd.la src/libratbox.la $(DLOPEN) 
-src_ircd_LDFLAGS = $(EXTRA_FLAGS) 
+src_ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 resolver_resolver_LDADD = adns/libadns.a libircd/libircd.la
 ident_ident_LDADD = libircd/libircd.la
 src_ircd_SOURCES = src/main.c

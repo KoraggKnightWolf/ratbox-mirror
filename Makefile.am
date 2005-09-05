@@ -31,12 +31,12 @@ endif
 
 DLOPEN=$(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_LTLIBRARIES) ;do echo -dlpreopen $$x ;done)
 if !STATIC_MODULES
-src_ircd_LDADD = libircd/libircd.la src/libratbox.la -dlopen self
+src_ircd_LDADD = libircd/libircd.la src/libratbox.la 
 else
 src_ircd_LDADD = libircd/libircd.la src/libratbox.la $(DLOPEN) 
 endif
 
-src_ircd_LDFLAGS = $(EXTRA_FLAGS) 
+src_ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
 resolver_resolver_LDADD = adns/libadns.a libircd/libircd.la
 ident_ident_LDADD = libircd/libircd.la
