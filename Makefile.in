@@ -42,7 +42,6 @@ bin_PROGRAMS = src/ircd$(EXEEXT) resolver/resolver$(EXEEXT) \
 	ident/ident$(EXEEXT)
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure \
-	$(top_srcdir)/contrib/Makefile.in \
 	$(top_srcdir)/doc/Makefile.in $(top_srcdir)/help/Makefile.in \
 	$(top_srcdir)/include/setup.h.in ChangeLog INSTALL compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing \
@@ -58,7 +57,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/setup.h
-CONFIG_CLEAN_FILES = contrib/Makefile doc/Makefile help/Makefile
+CONFIG_CLEAN_FILES = doc/Makefile help/Makefile
 am__installdirs = "$(DESTDIR)$(coredir)" "$(DESTDIR)$(modulesdir)" "$(DESTDIR)$(servicesdir)" "$(DESTDIR)$(src_libratboxdir)" "$(DESTDIR)$(bindir)"
 coreLTLIBRARIES_INSTALL = $(INSTALL)
 modulesLTLIBRARIES_INSTALL = $(INSTALL)
@@ -66,7 +65,7 @@ servicesLTLIBRARIES_INSTALL = $(INSTALL)
 src_libratboxLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(core_LTLIBRARIES) $(modules_LTLIBRARIES) \
 	$(services_LTLIBRARIES) $(src_libratbox_LTLIBRARIES)
-@STATIC_MODULES_FALSE@am__DEPENDENCIES_1 = libircd/liblircd.la \
+@STATIC_MODULES_FALSE@am__DEPENDENCIES_1 = libircd/libircd.la \
 @STATIC_MODULES_FALSE@	src/libratbox.la
 modules_core_m_die_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__dirstamp = $(am__leading_dot)dirstamp
@@ -756,7 +755,7 @@ src_libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 
 # now the modules..
 MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version -no-undefined
-@STATIC_MODULES_FALSE@MODULE_LIBS = libircd/liblircd.la src/libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
+@STATIC_MODULES_FALSE@MODULE_LIBS = libircd/libircd.la src/libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
 modules_m_accept_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_admin_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_away_la_LDFLAGS = -module $(MODULE_FLAGS)  
@@ -1083,8 +1082,6 @@ $(top_srcdir)/include/setup.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f include/setup.h include/stamp-h1
-contrib/Makefile: $(top_builddir)/config.status $(top_srcdir)/contrib/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 doc/Makefile: $(top_builddir)/config.status $(top_srcdir)/doc/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 help/Makefile: $(top_builddir)/config.status $(top_srcdir)/help/Makefile.in
@@ -4649,7 +4646,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/contrib $(distdir)/doc $(distdir)/help $(distdir)/include $(distdir)/src
+	$(mkdir_p) $(distdir)/doc $(distdir)/help $(distdir)/include $(distdir)/src
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

@@ -98,7 +98,7 @@ src_libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version -no-undefined
 
 if !STATIC_MODULES
-MODULE_LIBS = libircd/liblircd.la src/libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
+MODULE_LIBS = libircd/libircd.la src/libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
 endif
 
 modules_m_accept_la_LDFLAGS =  -module $(MODULE_FLAGS)  
