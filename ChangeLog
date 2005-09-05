@@ -1,3 +1,11 @@
+androsyn    2005/09/05 21:42:30 UTC	(20050905_1-20710)
+  Log:
+  don't pop queues for remote clients
+
+  Modified:
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2005/09/05 21:27:15 UTC	(20050905_0-20708)
   Log:
   A handful of things in this commit:
