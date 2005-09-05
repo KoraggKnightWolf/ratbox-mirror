@@ -1,3 +1,14 @@
+androsyn    2005/09/05 22:49:12 UTC	(20050905_3-20714)
+  Log:
+  fix a typo in Makefile.am
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+
+
 androsyn    2005/09/05 22:38:42 UTC	(20050905_2-20712)
   Log:
   well the opermyth.txt file isn't quite so accurate anymore for efnet. to the circular file you go
