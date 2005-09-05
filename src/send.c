@@ -111,6 +111,8 @@ _send_linebuf(struct Client *to, buf_head_t *linebuf, int queue)
 void
 send_pop_queue(struct Client *to)
 {
+	if(!MyConnect(to) || IsIOError(to))
+		return;
 	if(linebuf_len(&to->localClient->buf_sendq) > 0)
 		send_queued_write(to->localClient->fd, to);
 }
