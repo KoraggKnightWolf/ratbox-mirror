@@ -7,16 +7,6 @@ package=ircd-ratbox
 
 echo "Extracting $package/src/version.c..."
 
-if test -r version.c.last
-then
-   generation=`sed -n 's/^char \*generation = \"\(.*\)\";/\1/p' < version.c.last`
-   if test ! "$generation" ; then generation=0; fi
-else
-   generation=0
-fi
-
-generation=`expr $generation + 1`
-
 uname=`uname -a`
 
 creation=`date | \
@@ -52,7 +42,6 @@ $spitshell >version.c <<!SUB!THIS!
 #include "../include/patchlevel.h"
 #include "../include/serno.h"
 
-const char *generation = "$generation";
 const char *creation = "$creation";
 const char *platform = "$uname";
 const char *ircd_version = PATCHLEVEL;

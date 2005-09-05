@@ -804,8 +804,6 @@ fork_server(struct Client *server)
 	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, ctrl_fds, "slink control fds") < 0)
 		goto fork_error;
 
-	
-
 	/* data */
 	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, data_fds, "slink data fds") < 0)
 		goto fork_error;
@@ -849,9 +847,6 @@ fork_server(struct Client *server)
 					log_client_name(server, SHOW_IP),
 					errno);
 		}
-
-		comm_open(server->localClient->ctrlfd, FD_SOCKET, NULL);
-		comm_open(server->localClient->fd, FD_SOCKET, NULL);
 
 		read_ctrl_packet(server->localClient->ctrlfd, server);
 		read_packet(server->localClient->fd, server);

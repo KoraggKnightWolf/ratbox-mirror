@@ -93,7 +93,11 @@ struct InfoStruct
 #define RATBOX_SOMAXCONN SOMAXCONN
 #endif
 
+#if !defined(CPATH) || !defined(DPATH) || !defined(DLPATH) || !defined(HPATH) || \ 
+    !defined(UHPATH) || !defined(KPATH) || !defined(LPATH) || !defined(MPATH) || \
+    !defined(OPATH) || !defined(SPATH) 
 static const char *none = "NONE"; /* because we don't need a bunch of NONEs in the executables */
+#endif
 
 #ifndef CPATH
 #define CPATH none
@@ -920,9 +924,9 @@ send_info_text(struct Client *source_p)
 static void
 send_birthdate_online_time(struct Client *source_p)
 {
-	sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :Birth Date: %s, compile # %s",
+	sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :Birth Date: %s",
 		   get_id(&me, source_p), RPL_INFO, 
-		   get_id(source_p, source_p), creation, generation);
+		   get_id(source_p, source_p), creation);
 
 	sendto_one(source_p, POP_QUEUE, ":%s %d %s :On-line since %s",
 		   get_id(&me, source_p), RPL_INFO, 

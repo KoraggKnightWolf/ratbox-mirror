@@ -20,9 +20,8 @@ INCLUDES = -Ilibircd -Ilibltdl -Iadns
 src/version.c: src/version.c.SH
 	$(SHELL) -c "(cd src; $(SHELL) ./version.c.SH)"
 
-src/version.lo: src/version.c
+src/version.lo: src/version.c include/patchlevel.h include/serno.h
 	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-	$(MV) src/version.c src/version.c.last
         
 
 if MINGW
