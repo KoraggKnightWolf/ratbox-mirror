@@ -1,3 +1,11 @@
+androsyn    2005/09/05 22:38:42 UTC	(20050905_2-20712)
+  Log:
+  well the opermyth.txt file isn't quite so accurate anymore for efnet. to the circular file you go
+
+  Modified:
+	ircd-ratbox/trunk/doc/opermyth.txt (File Deleted) 
+
+
 androsyn    2005/09/05 21:42:30 UTC	(20050905_1-20710)
   Log:
   don't pop queues for remote clients
