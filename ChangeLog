@@ -1,3 +1,20 @@
+androsyn    2005/09/05 23:40:05 UTC	(20050905_6-20720)
+  Log:
+  Remove the generation variable from version.c.
+  Only rebuild version.c if include/patchlevel.h
+  or include/serno.h has changed, otherwise 
+  a whole slew of things get rebuilt and that is
+  annoying.
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/src/version.c.SH (File Modified) 
+
+
 androsyn    2005/09/05 23:08:04 UTC	(20050905_5-20718)
   Log:
   remove a debugging fprintf
