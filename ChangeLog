@@ -1,3 +1,11 @@
+androsyn    2005/09/05 23:08:04 UTC	(20050905_5-20718)
+  Log:
+  remove a debugging fprintf
+
+  Modified:
+	ircd-ratbox/trunk/src/main.c (File Modified) 
+
+
 androsyn    2005/09/05 23:01:52 UTC	(20050905_4-20716)
   Log:
   move -dlopen self to LDFLAGS from LDADD
