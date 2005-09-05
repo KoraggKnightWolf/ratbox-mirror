@@ -1,3 +1,45 @@
+androsyn    2005/09/05 21:27:15 UTC	(20050905_0-20708)
+  Log:
+  A handful of things in this commit:
+  1. rewrite info so that it doesn't need m_info.h and uses a single
+     struct for compiled in defaults and run time options.
+  2. rework the make system so that the majority of the work is done 
+     in the root makefile. This means there is no longer makefiles in
+     modules and src.  
+  3. as a result of 2. get the static module build working again, doing 
+     things the libtool/automake way.  This is quite a bit cleaner and
+     portable than they originally were.
+  
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/aclocal.m4 (File Modified) 
+	ircd-ratbox/trunk/adns/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/m_info.h (File Deleted) 
+	ircd-ratbox/trunk/include/modules.h (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Deleted) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Deleted) 
+	ircd-ratbox/trunk/modules/core/Makefile.am (File Deleted) 
+	ircd-ratbox/trunk/modules/core/Makefile.in (File Deleted) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/static_modules.c.SH (File Deleted) 
+	ircd-ratbox/trunk/servlink/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Deleted) 
+	ircd-ratbox/trunk/src/Makefile.in (File Deleted) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+	ircd-ratbox/trunk/src/version.c.SH (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2005/09/04 03:47:59 UTC	(20050904_1-20706)
   Log:
   Oops..remove local change
