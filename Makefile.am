@@ -14,7 +14,7 @@ servicesdir	= @moduledir@
 SUBDIRS = libircd libltdl adns tools doc help @SERVLINK@ 
 
 AM_YFLAGS = -d
-bin_PROGRAMS = src/ircd resolver/resolver ident/ident 
+bin_PROGRAMS = src/ircd src/resolver src/ident 
 
 INCLUDES = -Ilibircd -Ilibltdl -Iadns
 src/version.c: src/version.c.SH
@@ -37,13 +37,13 @@ endif
 
 src_ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
-resolver_resolver_LDADD = adns/libadns.a libircd/libircd.la
-ident_ident_LDADD = libircd/libircd.la
+src_resolver_LDADD = adns/libadns.a libircd/libircd.la
+src_ident_LDADD = libircd/libircd.la
 
         
 src_ircd_SOURCES = src/main.c
-resolver_resolver_SOURCES = resolver/resolver.c
-ident_ident_SOURCES = ident/ident.c
+src_resolver_SOURCES = src/resolver.c
+src_ident_SOURCES = src/ident.c
 
 
 src_libratbox_la_SOURCES =                     \

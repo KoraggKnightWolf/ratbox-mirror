@@ -368,8 +368,12 @@ int main(int argc, char **argv)
 	tmaxfd = getenv("MAXFD");
 
 	if(tifd == NULL || tofd == NULL || tmaxfd == NULL)
+	{
+		fprintf(stderr, "This is ircd-ratbox ident.  You aren't supposed to run be directly.\n");
+		fprintf(stderr, "However I will print my Id tag $Id$\n"); 
+		fprintf(stderr, "Have a nice day\n");
 		exit(1);
-
+	}
 	maxfd = atoi(tmaxfd);
 	irc_ifd = atoi(tifd);
 	irc_ofd = atoi(tofd);

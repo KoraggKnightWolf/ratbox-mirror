@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 
-SOURCES = $(modules_core_m_die_la_SOURCES) $(modules_core_m_error_la_SOURCES) $(modules_core_m_join_la_SOURCES) $(modules_core_m_kick_la_SOURCES) $(modules_core_m_kill_la_SOURCES) $(modules_core_m_message_la_SOURCES) $(modules_core_m_mode_la_SOURCES) $(modules_core_m_nick_la_SOURCES) $(modules_core_m_part_la_SOURCES) $(modules_core_m_quit_la_SOURCES) $(modules_core_m_server_la_SOURCES) $(modules_core_m_squit_la_SOURCES) $(modules_m_accept_la_SOURCES) $(modules_m_admin_la_SOURCES) $(modules_m_away_la_SOURCES) $(modules_m_cap_la_SOURCES) $(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) $(modules_m_cmessage_la_SOURCES) $(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) $(modules_m_encap_la_SOURCES) $(modules_m_etrace_la_SOURCES) $(modules_m_gline_la_SOURCES) $(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) $(modules_m_invite_la_SOURCES) $(modules_m_ison_la_SOURCES) $(modules_m_kline_la_SOURCES) $(modules_m_knock_la_SOURCES) $(modules_m_links_la_SOURCES) $(modules_m_list_la_SOURCES) $(modules_m_locops_la_SOURCES) $(modules_m_lusers_la_SOURCES) $(modules_m_map_la_SOURCES) $(modules_m_monitor_la_SOURCES) $(modules_m_motd_la_SOURCES) $(modules_m_names_la_SOURCES) $(modules_m_oper_la_SOURCES) $(modules_m_operspy_la_SOURCES) $(modules_m_pass_la_SOURCES) $(modules_m_ping_la_SOURCES) $(modules_m_pong_la_SOURCES) $(modules_m_post_la_SOURCES) $(modules_m_rehash_la_SOURCES) $(modules_m_restart_la_SOURCES) $(modules_m_resv_la_SOURCES) $(modules_m_services_la_SOURCES) $(modules_m_set_la_SOURCES) $(modules_m_stats_la_SOURCES) $(modules_m_svinfo_la_SOURCES) $(modules_m_tb_la_SOURCES) $(modules_m_testline_la_SOURCES) $(modules_m_testmask_la_SOURCES) $(modules_m_time_la_SOURCES) $(modules_m_topic_la_SOURCES) $(modules_m_trace_la_SOURCES) $(modules_m_unreject_la_SOURCES) $(modules_m_user_la_SOURCES) $(modules_m_userhost_la_SOURCES) $(modules_m_users_la_SOURCES) $(modules_m_version_la_SOURCES) $(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) $(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) $(modules_m_xline_la_SOURCES) $(src_libratbox_la_SOURCES) $(ident_ident_SOURCES) $(resolver_resolver_SOURCES) $(src_ircd_SOURCES)
+SOURCES = $(modules_core_m_die_la_SOURCES) $(modules_core_m_error_la_SOURCES) $(modules_core_m_join_la_SOURCES) $(modules_core_m_kick_la_SOURCES) $(modules_core_m_kill_la_SOURCES) $(modules_core_m_message_la_SOURCES) $(modules_core_m_mode_la_SOURCES) $(modules_core_m_nick_la_SOURCES) $(modules_core_m_part_la_SOURCES) $(modules_core_m_quit_la_SOURCES) $(modules_core_m_server_la_SOURCES) $(modules_core_m_squit_la_SOURCES) $(modules_m_accept_la_SOURCES) $(modules_m_admin_la_SOURCES) $(modules_m_away_la_SOURCES) $(modules_m_cap_la_SOURCES) $(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) $(modules_m_cmessage_la_SOURCES) $(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) $(modules_m_encap_la_SOURCES) $(modules_m_etrace_la_SOURCES) $(modules_m_gline_la_SOURCES) $(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) $(modules_m_invite_la_SOURCES) $(modules_m_ison_la_SOURCES) $(modules_m_kline_la_SOURCES) $(modules_m_knock_la_SOURCES) $(modules_m_links_la_SOURCES) $(modules_m_list_la_SOURCES) $(modules_m_locops_la_SOURCES) $(modules_m_lusers_la_SOURCES) $(modules_m_map_la_SOURCES) $(modules_m_monitor_la_SOURCES) $(modules_m_motd_la_SOURCES) $(modules_m_names_la_SOURCES) $(modules_m_oper_la_SOURCES) $(modules_m_operspy_la_SOURCES) $(modules_m_pass_la_SOURCES) $(modules_m_ping_la_SOURCES) $(modules_m_pong_la_SOURCES) $(modules_m_post_la_SOURCES) $(modules_m_rehash_la_SOURCES) $(modules_m_restart_la_SOURCES) $(modules_m_resv_la_SOURCES) $(modules_m_services_la_SOURCES) $(modules_m_set_la_SOURCES) $(modules_m_stats_la_SOURCES) $(modules_m_svinfo_la_SOURCES) $(modules_m_tb_la_SOURCES) $(modules_m_testline_la_SOURCES) $(modules_m_testmask_la_SOURCES) $(modules_m_time_la_SOURCES) $(modules_m_topic_la_SOURCES) $(modules_m_trace_la_SOURCES) $(modules_m_unreject_la_SOURCES) $(modules_m_user_la_SOURCES) $(modules_m_userhost_la_SOURCES) $(modules_m_users_la_SOURCES) $(modules_m_version_la_SOURCES) $(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) $(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) $(modules_m_xline_la_SOURCES) $(src_libratbox_la_SOURCES) $(src_ident_SOURCES) $(src_ircd_SOURCES) $(src_resolver_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -38,10 +38,11 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-bin_PROGRAMS = src/ircd$(EXEEXT) resolver/resolver$(EXEEXT) \
-	ident/ident$(EXEEXT)
+bin_PROGRAMS = src/ircd$(EXEEXT) src/resolver$(EXEEXT) \
+	src/ident$(EXEEXT)
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure \
+	$(top_srcdir)/contrib/Makefile.in \
 	$(top_srcdir)/doc/Makefile.in $(top_srcdir)/help/Makefile.in \
 	$(top_srcdir)/include/setup.h.in ChangeLog INSTALL compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing \
@@ -57,7 +58,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/setup.h
-CONFIG_CLEAN_FILES = doc/Makefile help/Makefile
+CONFIG_CLEAN_FILES = contrib/Makefile doc/Makefile help/Makefile
 am__installdirs = "$(DESTDIR)$(coredir)" "$(DESTDIR)$(modulesdir)" "$(DESTDIR)$(servicesdir)" "$(DESTDIR)$(src_libratboxdir)" "$(DESTDIR)$(bindir)"
 coreLTLIBRARIES_INSTALL = $(INSTALL)
 modulesLTLIBRARIES_INSTALL = $(INSTALL)
@@ -291,12 +292,9 @@ am_src_libratbox_la_OBJECTS = src/dns.lo src/cache.lo src/channel.lo \
 src_libratbox_la_OBJECTS = $(am_src_libratbox_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_ident_ident_OBJECTS = ident/ident.$(OBJEXT)
-ident_ident_OBJECTS = $(am_ident_ident_OBJECTS)
-ident_ident_DEPENDENCIES = libircd/libircd.la
-am_resolver_resolver_OBJECTS = resolver/resolver.$(OBJEXT)
-resolver_resolver_OBJECTS = $(am_resolver_resolver_OBJECTS)
-resolver_resolver_DEPENDENCIES = adns/libadns.a libircd/libircd.la
+am_src_ident_OBJECTS = src/ident.$(OBJEXT)
+src_ident_OBJECTS = $(am_src_ident_OBJECTS)
+src_ident_DEPENDENCIES = libircd/libircd.la
 am_src_ircd_OBJECTS = src/main.$(OBJEXT)
 src_ircd_OBJECTS = $(am_src_ircd_OBJECTS)
 am__DEPENDENCIES_3 = modules/m_accept.la modules/m_admin.la \
@@ -332,11 +330,13 @@ am__DEPENDENCIES_6 = $(shell for x in $(am__DEPENDENCIES_3) \
 @STATIC_MODULES_FALSE@	src/libratbox.la
 @STATIC_MODULES_TRUE@src_ircd_DEPENDENCIES = libircd/libircd.la \
 @STATIC_MODULES_TRUE@	src/libratbox.la $(am__DEPENDENCIES_6)
+am_src_resolver_OBJECTS = src/resolver.$(OBJEXT)
+src_resolver_OBJECTS = $(am_src_resolver_OBJECTS)
+src_resolver_DEPENDENCIES = adns/libadns.a libircd/libircd.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ident/$(DEPDIR)/ident.Po \
-@AMDEP_TRUE@	modules/$(DEPDIR)/m_accept.Plo \
+@AMDEP_TRUE@DEP_FILES = modules/$(DEPDIR)/m_accept.Plo \
 @AMDEP_TRUE@	modules/$(DEPDIR)/m_admin.Plo \
 @AMDEP_TRUE@	modules/$(DEPDIR)/m_away.Plo \
 @AMDEP_TRUE@	modules/$(DEPDIR)/m_cap.Plo \
@@ -403,12 +403,11 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	modules/core/$(DEPDIR)/m_quit.Plo \
 @AMDEP_TRUE@	modules/core/$(DEPDIR)/m_server.Plo \
 @AMDEP_TRUE@	modules/core/$(DEPDIR)/m_squit.Plo \
-@AMDEP_TRUE@	resolver/$(DEPDIR)/resolver.Po \
 @AMDEP_TRUE@	src/$(DEPDIR)/cache.Plo src/$(DEPDIR)/channel.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/class.Plo src/$(DEPDIR)/client.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/dns.Plo src/$(DEPDIR)/getopt.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/hash.Plo src/$(DEPDIR)/hook.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/hostmask.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/hostmask.Plo src/$(DEPDIR)/ident.Po \
 @AMDEP_TRUE@	src/$(DEPDIR)/irc_string.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_lexer.Plo \
@@ -421,9 +420,9 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	src/$(DEPDIR)/newconf.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/numeric.Plo src/$(DEPDIR)/packet.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/parse.Plo src/$(DEPDIR)/patricia.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/reject.Plo src/$(DEPDIR)/restart.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/s_auth.Plo src/$(DEPDIR)/s_conf.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/s_log.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/reject.Plo src/$(DEPDIR)/resolver.Po \
+@AMDEP_TRUE@	src/$(DEPDIR)/restart.Plo src/$(DEPDIR)/s_auth.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/s_conf.Plo src/$(DEPDIR)/s_log.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/s_newconf.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/s_serv.Plo src/$(DEPDIR)/s_user.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/scache.Plo src/$(DEPDIR)/send.Plo \
@@ -482,8 +481,8 @@ SOURCES = $(modules_core_m_die_la_SOURCES) \
 	$(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) \
 	$(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) \
 	$(modules_m_xline_la_SOURCES) $(src_libratbox_la_SOURCES) \
-	$(ident_ident_SOURCES) $(resolver_resolver_SOURCES) \
-	$(src_ircd_SOURCES)
+	$(src_ident_SOURCES) $(src_ircd_SOURCES) \
+	$(src_resolver_SOURCES)
 DIST_SOURCES = $(modules_core_m_die_la_SOURCES) \
 	$(modules_core_m_error_la_SOURCES) \
 	$(modules_core_m_join_la_SOURCES) \
@@ -526,8 +525,8 @@ DIST_SOURCES = $(modules_core_m_die_la_SOURCES) \
 	$(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) \
 	$(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) \
 	$(modules_m_xline_la_SOURCES) $(src_libratbox_la_SOURCES) \
-	$(ident_ident_SOURCES) $(resolver_resolver_SOURCES) \
-	$(src_ircd_SOURCES)
+	$(src_ident_SOURCES) $(src_ircd_SOURCES) \
+	$(src_resolver_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -706,11 +705,11 @@ DLOPEN = $(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_
 @STATIC_MODULES_FALSE@src_ircd_LDADD = libircd/libircd.la src/libratbox.la 
 @STATIC_MODULES_TRUE@src_ircd_LDADD = libircd/libircd.la src/libratbox.la $(DLOPEN) 
 src_ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
-resolver_resolver_LDADD = adns/libadns.a libircd/libircd.la
-ident_ident_LDADD = libircd/libircd.la
+src_resolver_LDADD = adns/libadns.a libircd/libircd.la
+src_ident_LDADD = libircd/libircd.la
 src_ircd_SOURCES = src/main.c
-resolver_resolver_SOURCES = resolver/resolver.c
-ident_ident_SOURCES = ident/ident.c
+src_resolver_SOURCES = src/resolver.c
+src_ident_SOURCES = src/ident.c
 src_libratbox_la_SOURCES = \
   src/dns.c                        \
   src/cache.c                       \
@@ -1084,6 +1083,8 @@ $(top_srcdir)/include/setup.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f include/setup.h include/stamp-h1
+contrib/Makefile: $(top_builddir)/config.status $(top_srcdir)/contrib/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 doc/Makefile: $(top_builddir)/config.status $(top_srcdir)/doc/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 help/Makefile: $(top_builddir)/config.status $(top_srcdir)/help/Makefile.in
@@ -1553,36 +1554,22 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-ident/$(am__dirstamp):
-	@$(mkdir_p) ident
-	@: > ident/$(am__dirstamp)
-ident/$(DEPDIR)/$(am__dirstamp):
-	@$(mkdir_p) ident/$(DEPDIR)
-	@: > ident/$(DEPDIR)/$(am__dirstamp)
-ident/ident.$(OBJEXT): ident/$(am__dirstamp) \
-	ident/$(DEPDIR)/$(am__dirstamp)
-ident/ident$(EXEEXT): $(ident_ident_OBJECTS) $(ident_ident_DEPENDENCIES) ident/$(am__dirstamp)
-	@rm -f ident/ident$(EXEEXT)
-	$(LINK) $(ident_ident_LDFLAGS) $(ident_ident_OBJECTS) $(ident_ident_LDADD) $(LIBS)
-resolver/$(am__dirstamp):
-	@$(mkdir_p) resolver
-	@: > resolver/$(am__dirstamp)
-resolver/$(DEPDIR)/$(am__dirstamp):
-	@$(mkdir_p) resolver/$(DEPDIR)
-	@: > resolver/$(DEPDIR)/$(am__dirstamp)
-resolver/resolver.$(OBJEXT): resolver/$(am__dirstamp) \
-	resolver/$(DEPDIR)/$(am__dirstamp)
-resolver/resolver$(EXEEXT): $(resolver_resolver_OBJECTS) $(resolver_resolver_DEPENDENCIES) resolver/$(am__dirstamp)
-	@rm -f resolver/resolver$(EXEEXT)
-	$(LINK) $(resolver_resolver_LDFLAGS) $(resolver_resolver_OBJECTS) $(resolver_resolver_LDADD) $(LIBS)
+src/ident.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/ident$(EXEEXT): $(src_ident_OBJECTS) $(src_ident_DEPENDENCIES) src/$(am__dirstamp)
+	@rm -f src/ident$(EXEEXT)
+	$(LINK) $(src_ident_LDFLAGS) $(src_ident_OBJECTS) $(src_ident_LDADD) $(LIBS)
 src/main.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ircd$(EXEEXT): $(src_ircd_OBJECTS) $(src_ircd_DEPENDENCIES) src/$(am__dirstamp)
 	@rm -f src/ircd$(EXEEXT)
 	$(LINK) $(src_ircd_LDFLAGS) $(src_ircd_OBJECTS) $(src_ircd_LDADD) $(LIBS)
+src/resolver.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/resolver$(EXEEXT): $(src_resolver_OBJECTS) $(src_resolver_DEPENDENCIES) src/$(am__dirstamp)
+	@rm -f src/resolver$(EXEEXT)
+	$(LINK) $(src_resolver_LDFLAGS) $(src_resolver_OBJECTS) $(src_resolver_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ident/ident.$(OBJEXT)
 	-rm -f modules/core/m_die.$(OBJEXT)
 	-rm -f modules/core/m_die.lo
 	-rm -f modules/core/m_error.$(OBJEXT)
@@ -1717,7 +1704,6 @@ mostlyclean-compile:
 	-rm -f modules/m_whowas.lo
 	-rm -f modules/m_xline.$(OBJEXT)
 	-rm -f modules/m_xline.lo
-	-rm -f resolver/resolver.$(OBJEXT)
 	-rm -f src/cache.$(OBJEXT)
 	-rm -f src/cache.lo
 	-rm -f src/channel.$(OBJEXT)
@@ -1736,6 +1722,7 @@ mostlyclean-compile:
 	-rm -f src/hook.lo
 	-rm -f src/hostmask.$(OBJEXT)
 	-rm -f src/hostmask.lo
+	-rm -f src/ident.$(OBJEXT)
 	-rm -f src/irc_string.$(OBJEXT)
 	-rm -f src/irc_string.lo
 	-rm -f src/ircd.$(OBJEXT)
@@ -1769,6 +1756,7 @@ mostlyclean-compile:
 	-rm -f src/patricia.lo
 	-rm -f src/reject.$(OBJEXT)
 	-rm -f src/reject.lo
+	-rm -f src/resolver.$(OBJEXT)
 	-rm -f src/restart.$(OBJEXT)
 	-rm -f src/restart.lo
 	-rm -f src/s_auth.$(OBJEXT)
@@ -1795,7 +1783,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@ident/$(DEPDIR)/ident.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_accept.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_admin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_away.Plo@am__quote@
@@ -1863,7 +1850,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@modules/core/$(DEPDIR)/m_quit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/core/$(DEPDIR)/m_server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/core/$(DEPDIR)/m_squit.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@resolver/$(DEPDIR)/resolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/channel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/class.Plo@am__quote@
@@ -1873,6 +1859,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hook.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hostmask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ident.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/irc_string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd_lexer.Plo@am__quote@
@@ -1890,6 +1877,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/parse.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/patricia.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reject.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/resolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/restart.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/s_auth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/s_conf.Plo@am__quote@
@@ -4390,53 +4378,29 @@ src/ircd_lexer.lo: src/ircd_lexer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/ircd_lexer.lo `test -f 'src/ircd_lexer.c' || echo '$(srcdir)/'`src/ircd_lexer.c
 
-ident/ident.o: ident/ident.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ident/ident.o -MD -MP -MF "ident/$(DEPDIR)/ident.Tpo" -c -o ident/ident.o `test -f 'ident/ident.c' || echo '$(srcdir)/'`ident/ident.c; \
-@am__fastdepCC_TRUE@	then mv -f "ident/$(DEPDIR)/ident.Tpo" "ident/$(DEPDIR)/ident.Po"; else rm -f "ident/$(DEPDIR)/ident.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ident/ident.c' object='ident/ident.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='ident/$(DEPDIR)/ident.Po' tmpdepfile='ident/$(DEPDIR)/ident.TPo' @AMDEPBACKSLASH@
+src/ident.o: src/ident.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/ident.o -MD -MP -MF "src/$(DEPDIR)/ident.Tpo" -c -o src/ident.o `test -f 'src/ident.c' || echo '$(srcdir)/'`src/ident.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/ident.Tpo" "src/$(DEPDIR)/ident.Po"; else rm -f "src/$(DEPDIR)/ident.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/ident.c' object='src/ident.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/ident.Po' tmpdepfile='src/$(DEPDIR)/ident.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ident/ident.o `test -f 'ident/ident.c' || echo '$(srcdir)/'`ident/ident.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/ident.o `test -f 'src/ident.c' || echo '$(srcdir)/'`src/ident.c
 
-ident/ident.obj: ident/ident.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ident/ident.obj -MD -MP -MF "ident/$(DEPDIR)/ident.Tpo" -c -o ident/ident.obj `if test -f 'ident/ident.c'; then $(CYGPATH_W) 'ident/ident.c'; else $(CYGPATH_W) '$(srcdir)/ident/ident.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "ident/$(DEPDIR)/ident.Tpo" "ident/$(DEPDIR)/ident.Po"; else rm -f "ident/$(DEPDIR)/ident.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ident/ident.c' object='ident/ident.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='ident/$(DEPDIR)/ident.Po' tmpdepfile='ident/$(DEPDIR)/ident.TPo' @AMDEPBACKSLASH@
+src/ident.obj: src/ident.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/ident.obj -MD -MP -MF "src/$(DEPDIR)/ident.Tpo" -c -o src/ident.obj `if test -f 'src/ident.c'; then $(CYGPATH_W) 'src/ident.c'; else $(CYGPATH_W) '$(srcdir)/src/ident.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/ident.Tpo" "src/$(DEPDIR)/ident.Po"; else rm -f "src/$(DEPDIR)/ident.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/ident.c' object='src/ident.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/ident.Po' tmpdepfile='src/$(DEPDIR)/ident.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ident/ident.obj `if test -f 'ident/ident.c'; then $(CYGPATH_W) 'ident/ident.c'; else $(CYGPATH_W) '$(srcdir)/ident/ident.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/ident.obj `if test -f 'src/ident.c'; then $(CYGPATH_W) 'src/ident.c'; else $(CYGPATH_W) '$(srcdir)/src/ident.c'; fi`
 
-ident/ident.lo: ident/ident.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ident/ident.lo -MD -MP -MF "ident/$(DEPDIR)/ident.Tpo" -c -o ident/ident.lo `test -f 'ident/ident.c' || echo '$(srcdir)/'`ident/ident.c; \
-@am__fastdepCC_TRUE@	then mv -f "ident/$(DEPDIR)/ident.Tpo" "ident/$(DEPDIR)/ident.Plo"; else rm -f "ident/$(DEPDIR)/ident.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ident/ident.c' object='ident/ident.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='ident/$(DEPDIR)/ident.Plo' tmpdepfile='ident/$(DEPDIR)/ident.TPlo' @AMDEPBACKSLASH@
+src/ident.lo: src/ident.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/ident.lo -MD -MP -MF "src/$(DEPDIR)/ident.Tpo" -c -o src/ident.lo `test -f 'src/ident.c' || echo '$(srcdir)/'`src/ident.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/ident.Tpo" "src/$(DEPDIR)/ident.Plo"; else rm -f "src/$(DEPDIR)/ident.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/ident.c' object='src/ident.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/ident.Plo' tmpdepfile='src/$(DEPDIR)/ident.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ident/ident.lo `test -f 'ident/ident.c' || echo '$(srcdir)/'`ident/ident.c
-
-resolver/resolver.o: resolver/resolver.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT resolver/resolver.o -MD -MP -MF "resolver/$(DEPDIR)/resolver.Tpo" -c -o resolver/resolver.o `test -f 'resolver/resolver.c' || echo '$(srcdir)/'`resolver/resolver.c; \
-@am__fastdepCC_TRUE@	then mv -f "resolver/$(DEPDIR)/resolver.Tpo" "resolver/$(DEPDIR)/resolver.Po"; else rm -f "resolver/$(DEPDIR)/resolver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='resolver/resolver.c' object='resolver/resolver.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='resolver/$(DEPDIR)/resolver.Po' tmpdepfile='resolver/$(DEPDIR)/resolver.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o resolver/resolver.o `test -f 'resolver/resolver.c' || echo '$(srcdir)/'`resolver/resolver.c
-
-resolver/resolver.obj: resolver/resolver.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT resolver/resolver.obj -MD -MP -MF "resolver/$(DEPDIR)/resolver.Tpo" -c -o resolver/resolver.obj `if test -f 'resolver/resolver.c'; then $(CYGPATH_W) 'resolver/resolver.c'; else $(CYGPATH_W) '$(srcdir)/resolver/resolver.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "resolver/$(DEPDIR)/resolver.Tpo" "resolver/$(DEPDIR)/resolver.Po"; else rm -f "resolver/$(DEPDIR)/resolver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='resolver/resolver.c' object='resolver/resolver.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='resolver/$(DEPDIR)/resolver.Po' tmpdepfile='resolver/$(DEPDIR)/resolver.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o resolver/resolver.obj `if test -f 'resolver/resolver.c'; then $(CYGPATH_W) 'resolver/resolver.c'; else $(CYGPATH_W) '$(srcdir)/resolver/resolver.c'; fi`
-
-resolver/resolver.lo: resolver/resolver.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT resolver/resolver.lo -MD -MP -MF "resolver/$(DEPDIR)/resolver.Tpo" -c -o resolver/resolver.lo `test -f 'resolver/resolver.c' || echo '$(srcdir)/'`resolver/resolver.c; \
-@am__fastdepCC_TRUE@	then mv -f "resolver/$(DEPDIR)/resolver.Tpo" "resolver/$(DEPDIR)/resolver.Plo"; else rm -f "resolver/$(DEPDIR)/resolver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='resolver/resolver.c' object='resolver/resolver.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='resolver/$(DEPDIR)/resolver.Plo' tmpdepfile='resolver/$(DEPDIR)/resolver.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o resolver/resolver.lo `test -f 'resolver/resolver.c' || echo '$(srcdir)/'`resolver/resolver.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/ident.lo `test -f 'src/ident.c' || echo '$(srcdir)/'`src/ident.c
 
 src/main.o: src/main.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/main.o -MD -MP -MF "src/$(DEPDIR)/main.Tpo" -c -o src/main.o `test -f 'src/main.c' || echo '$(srcdir)/'`src/main.c; \
@@ -4461,6 +4425,30 @@ src/main.lo: src/main.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/main.Plo' tmpdepfile='src/$(DEPDIR)/main.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/main.lo `test -f 'src/main.c' || echo '$(srcdir)/'`src/main.c
+
+src/resolver.o: src/resolver.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/resolver.o -MD -MP -MF "src/$(DEPDIR)/resolver.Tpo" -c -o src/resolver.o `test -f 'src/resolver.c' || echo '$(srcdir)/'`src/resolver.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/resolver.Tpo" "src/$(DEPDIR)/resolver.Po"; else rm -f "src/$(DEPDIR)/resolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/resolver.c' object='src/resolver.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/resolver.Po' tmpdepfile='src/$(DEPDIR)/resolver.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/resolver.o `test -f 'src/resolver.c' || echo '$(srcdir)/'`src/resolver.c
+
+src/resolver.obj: src/resolver.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/resolver.obj -MD -MP -MF "src/$(DEPDIR)/resolver.Tpo" -c -o src/resolver.obj `if test -f 'src/resolver.c'; then $(CYGPATH_W) 'src/resolver.c'; else $(CYGPATH_W) '$(srcdir)/src/resolver.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/resolver.Tpo" "src/$(DEPDIR)/resolver.Po"; else rm -f "src/$(DEPDIR)/resolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/resolver.c' object='src/resolver.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/resolver.Po' tmpdepfile='src/$(DEPDIR)/resolver.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/resolver.obj `if test -f 'src/resolver.c'; then $(CYGPATH_W) 'src/resolver.c'; else $(CYGPATH_W) '$(srcdir)/src/resolver.c'; fi`
+
+src/resolver.lo: src/resolver.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/resolver.lo -MD -MP -MF "src/$(DEPDIR)/resolver.Tpo" -c -o src/resolver.lo `test -f 'src/resolver.c' || echo '$(srcdir)/'`src/resolver.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/resolver.Tpo" "src/$(DEPDIR)/resolver.Plo"; else rm -f "src/$(DEPDIR)/resolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/resolver.c' object='src/resolver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/resolver.Plo' tmpdepfile='src/$(DEPDIR)/resolver.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/resolver.lo `test -f 'src/resolver.c' || echo '$(srcdir)/'`src/resolver.c
 
 .l.c:
 	$(LEXCOMPILE) $<
@@ -4648,7 +4636,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/doc $(distdir)/help $(distdir)/include $(distdir)/src
+	$(mkdir_p) $(distdir)/contrib $(distdir)/doc $(distdir)/help $(distdir)/include $(distdir)/src
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -4814,13 +4802,9 @@ clean-generic:
 distclean-generic:
 	-rm -f $(CONFIG_CLEAN_FILES)
 	-rm -f modules/core/$(am__dirstamp)
-	-rm -f resolver/$(DEPDIR)/$(am__dirstamp)
 	-rm -f modules/$(am__dirstamp)
-	-rm -f ident/$(DEPDIR)/$(am__dirstamp)
 	-rm -f modules/core/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
-	-rm -f resolver/$(am__dirstamp)
-	-rm -f ident/$(am__dirstamp)
 	-rm -f src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f modules/$(DEPDIR)/$(am__dirstamp)
 
@@ -4839,7 +4823,7 @@ clean-am: clean-binPROGRAMS clean-coreLTLIBRARIES clean-generic \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf ident/$(DEPDIR) modules/$(DEPDIR) modules/core/$(DEPDIR) resolver/$(DEPDIR) src/$(DEPDIR)
+	-rm -rf modules/$(DEPDIR) modules/core/$(DEPDIR) src/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -4868,7 +4852,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf ident/$(DEPDIR) modules/$(DEPDIR) modules/core/$(DEPDIR) resolver/$(DEPDIR) src/$(DEPDIR)
+	-rm -rf modules/$(DEPDIR) modules/core/$(DEPDIR) src/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
