@@ -1,3 +1,15 @@
+androsyn    2005/09/06 01:18:54 UTC	(20050906_1-20724)
+  Log:
+  Clean up servlink code a bit.  Check for uncompressed
+  errors on inflate failure and report them back.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/servlink/io.c (File Modified) 
+	ircd-ratbox/trunk/servlink/servlink.c (File Modified) 
+
+
 androsyn    2005/09/06 00:16:45 UTC	(20050906_0-20722)
   Log:
   fix the highest_fd code for now
