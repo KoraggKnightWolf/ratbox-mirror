@@ -1,3 +1,15 @@
+androsyn    2005/09/06 02:56:43 UTC	(20050906_3-20732)
+  Log:
+  Update some documentation type things
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/BUGS (File Modified) 
+	ircd-ratbox/trunk/Hybrid-team (File Deleted) 
+	ircd-ratbox/trunk/doc/Hybrid-team (File Added) 
+
+
 androsyn    2005/09/06 02:47:46 UTC	(20050906_2-20730)
   Log:
   Only have modules/ depend on libircd and libratbox
