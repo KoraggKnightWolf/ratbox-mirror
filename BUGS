@@ -1,17 +1,7 @@
  Known Bugs worthy of a mention:
 --------------------------------------------------------------------------------
   
-1.  Issues with server hostmasking.
-    - If for example the new servername is blah.blah.blah.nl, the following
-      servernames will be checked, in this order: *.blah.blah.nl, *.blah.nl,
-      *.nl, one of which will match the host-masked server they are
-      connecting behind. This will be accepted by the host-masked server it
-      is connected behind, but when it reaches the server the host-masked
-      server is connected to, the find_server will match, so the host-masked
-      server will be dropped.
-      --> This corrected?
-
-2.  /MODUNLOAD causes cores:
+1.  /MODUNLOAD causes cores:
     - If a module is modified before being unloaded, /MODUNLOAD (and
       therefore /MODRELOAD) may cause a core.
 
