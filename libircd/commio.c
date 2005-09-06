@@ -449,10 +449,12 @@ comm_socketpair (int family, int sock_type, int proto, int *nfd, const char *not
 #endif
 		return -1;
 
+	comm_fd_hack (&nfd[0]);
+	comm_fd_hack (&nfd[1]);
+
 	comm_open (nfd[0], FD_SOCKET, note);
 	comm_open (nfd[1], FD_SOCKET, note);
 
-	comm_fd_hack (&nfd[0]);
 	if(nfd[0] < 0)
 	{
 		close (nfd[1]);
@@ -632,7 +634,6 @@ mangle_mapped_sockaddr (struct sockaddr *in)
 static void
 fdlist_update_biggest (int fd, int opening)
 {
-	fde_t *F = find_fd (fd);
 	if(fd < highest_fd)
 		return;
 #ifndef __MINGW32__
@@ -658,7 +659,7 @@ fdlist_update_biggest (int fd, int opening)
 #ifndef __MINGW32__
 	lircd_assert (!opening);
 #endif
-	while (highest_fd >= 0 && !F->flags.open)
+	while (highest_fd >= 0 && !fd_table[highest_fd].flags.open)
 		highest_fd--;
 }
 
