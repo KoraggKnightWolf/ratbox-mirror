@@ -13,7 +13,6 @@
  */
 #include "ircd_lib.h"
 
-#ifdef NEED_CRYPT
 #define MD5_SIZE 16
 
 typedef unsigned int u_int32_t;
@@ -500,5 +499,4 @@ MD5Transform(state, block)
 	/* Zeroize sensitive information. */
 	memset((void *) x, 0, sizeof(x));
 }
-#endif /* NEED_CRYPT */
 

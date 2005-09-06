@@ -10,7 +10,11 @@ else
 OS_FILES=unix.c
 endif
 
-libircd_la_SOURCES = $(OS_FILES)	\
+if NEED_CRYPT
+CRYPT=crypt.c
+endif
+
+libircd_la_SOURCES = $(OS_FILES) $(CRYPT)	\
 	balloc.c			\
 	commio.c			\
 	crypt.c				\
@@ -22,11 +26,11 @@ libircd_la_SOURCES = $(OS_FILES)	\
 	tools.c				\
 	@SELECT_TYPE@.c		
 
-.c.lo:
-	$(LIBTOOL) --mode=compile $(CC) -prefer-pic -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@
+#.c.lo:
+#	$(LIBTOOL) --mode=compile $(CC) -prefer-pic -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-.c.la:
-	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS)
+#.c.la:
+#	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS)
 
 #noinst_LIBRARIES = libircd.a
 

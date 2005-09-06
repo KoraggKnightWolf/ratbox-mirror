@@ -211,9 +211,13 @@ CRYPT_LIB=$ac_cv_search_crypt
 if test "$CRYPT_LIB" = "none required"; then
 	unset CRYPT_LIB
 elif test "$CRYPT_LIB" = no; then
+	need_crypt=yes;
 	AC_DEFINE(NEED_CRYPT, 1, [Define if your system needs crypt.])
 	unset CRYPT_LIB
 fi
+
+AM_CONDITIONAL([NEED_CRYPT], [test x"$need_crypt" == "xyes"])
+
 
 AC_SUBST(CRYPT_LIB)
 
