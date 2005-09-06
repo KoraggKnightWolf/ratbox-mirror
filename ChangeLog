@@ -1,3 +1,12 @@
+androsyn    2005/09/06 00:16:45 UTC	(20050906_0-20722)
+  Log:
+  fix the highest_fd code for now
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2005/09/05 23:40:05 UTC	(20050905_6-20720)
   Log:
   Remove the generation variable from version.c.
