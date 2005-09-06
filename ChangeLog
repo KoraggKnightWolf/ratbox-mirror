@@ -1,3 +1,13 @@
+androsyn    2005/09/06 03:10:12 UTC	(20050906_5-20736)
+  Log:
+  Give a useful error message when running resolver directly.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+
+
 androsyn    2005/09/06 03:06:45 UTC	(20050906_4-20734)
   Log:
   It seems silly to have resolver.c and ident.c in a directory to themselves.
