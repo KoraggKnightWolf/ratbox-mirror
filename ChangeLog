@@ -1,3 +1,21 @@
+androsyn    2005/09/06 04:24:15 UTC	(20050906_6-20738)
+  Log:
+  Make crypt.c condtionally built using automake
+  rather than having the file wrapped in an #ifdef/#endif
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/adns/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libircd/crypt.c (File Modified) 
+	ircd-ratbox/trunk/servlink/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2005/09/06 03:10:12 UTC	(20050906_5-20736)
   Log:
   Give a useful error message when running resolver directly.
