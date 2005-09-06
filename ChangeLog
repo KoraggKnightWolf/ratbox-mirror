@@ -1,3 +1,18 @@
+androsyn    2005/09/06 03:06:45 UTC	(20050906_4-20734)
+  Log:
+  It seems silly to have resolver.c and ident.c in a directory to themselves.
+  So, they are going into src. Update automake rules to reflect this.
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ident/ (File Deleted) 
+	ircd-ratbox/trunk/resolver/ (File Deleted) 
+	ircd-ratbox/trunk/src/ident.c (File Added) 
+	ircd-ratbox/trunk/src/resolver.c (File Added) 
+
+
 androsyn    2005/09/06 02:56:43 UTC	(20050906_3-20732)
   Log:
   Update some documentation type things
