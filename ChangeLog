@@ -1,3 +1,16 @@
+androsyn    2005/09/06 02:47:46 UTC	(20050906_2-20730)
+  Log:
+  Only have modules/ depend on libircd and libratbox
+  if building on platforms that can't have undefined
+  symbols in shared objects.  This gets rid of the 
+  relinking on install crap.
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 androsyn    2005/09/06 01:18:54 UTC	(20050906_1-20724)
   Log:
   Clean up servlink code a bit.  Check for uncompressed
