@@ -793,7 +793,6 @@ fork_server(struct Client *server)
 {
 	int ctrl_fds[2];
 	int data_fds[2];
-	char maxfd[6];
 
 	char fd_str[4][6];
 	char *kid_argv[7];
@@ -808,25 +807,24 @@ fork_server(struct Client *server)
 	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, data_fds, "slink data fds") < 0)
 		goto fork_error;
 
-	ircsnprintf(maxfd, sizeof(maxfd), "%d", HARD_FDLIMIT);
-	setenv("MAXFD", maxfd, 1);
 	ircsnprintf(fd_str[0], sizeof(fd_str[0]), "%d", ctrl_fds[1]);
 	ircsnprintf(fd_str[1], sizeof(fd_str[1]), "%d", data_fds[1]);
 	ircsnprintf(fd_str[2], sizeof(fd_str[2]), "%d", server->localClient->fd);
 
-	setenv("CTRL_FD", fd_str[0], 1);	
-	setenv("DATA_FD", fd_str[1], 1);
-	setenv("NET_FD", fd_str[2], 1);
+        kid_argv[0] = slink;
+        kid_argv[1] = fd_str[0];
+        kid_argv[2] = fd_str[1];
+        kid_argv[3] = fd_str[2];
+        kid_argv[4] = NULL;
 
-	kid_argv[0] = slink;
-
+		
 	if(spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
 	{
 		comm_close(server->localClient->fd);
 
 		/* close the childs end of the pipes */
-		close(ctrl_fds[1]);
-		close(data_fds[1]);
+		comm_close(ctrl_fds[1]);
+		comm_close(data_fds[1]);
 		
 		s_assert(server->localClient);
 		server->localClient->ctrlfd = ctrl_fds[0];
@@ -850,17 +848,17 @@ fork_server(struct Client *server)
 
 		read_ctrl_packet(server->localClient->ctrlfd, server);
 		read_packet(server->localClient->fd, server);
+		return 0;
 	}
 
-	return 0;
 
       fork_error:
 	/* this is ugly, but nicer than repeating
 	 * about 50 close() statements everywhre... */
-	close(data_fds[0]);
-	close(data_fds[1]);
-	close(ctrl_fds[0]);
-	close(ctrl_fds[1]);
+	comm_close(data_fds[0]);
+	comm_close(data_fds[1]);
+	comm_close(ctrl_fds[0]);
+	comm_close(ctrl_fds[1]);
 	return -1;
 }
 

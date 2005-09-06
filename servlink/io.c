@@ -193,8 +193,12 @@ process_recvq(struct ctrl_command *cmd)
 		while (in_state.zip_state.z_stream.avail_in)
 		{
 			if((ret = inflate(&in_state.zip_state.z_stream, Z_NO_FLUSH)) != Z_OK)
-				send_error("Inflate failed: %s", zError(ret));
-
+			{
+				if(!strncmp("ERROR ", (char *)in_state.zip_state.z_stream.next_in, 6))
+					send_error("Received uncompressed ERROR");
+				else
+					send_error("Inflate failed: %s", zError(ret));
+			}
 			blen = BUFLEN - in_state.zip_state.z_stream.avail_out;
 
 			if(in_state.zip_state.z_stream.avail_in)
@@ -549,8 +553,11 @@ read_net(void)
 			{
 				if((ret2 = inflate(&in_state.zip_state.z_stream,
 						   Z_NO_FLUSH)) != Z_OK)
+				{
+					if(!strncmp("ERROR ", (char *)buf, 6))
+						send_error("Received uncompressed ERROR");
 					send_error("Inflate failed: %s", zError(ret2));
-
+				}
 				blen = BUFLEN - in_state.zip_state.z_stream.avail_out;
 
 				if(in_state.zip_state.z_stream.avail_in)
