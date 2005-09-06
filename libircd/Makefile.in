@@ -60,8 +60,8 @@ am__libircd_la_SOURCES_DIST = unix.c win32.c crypt.c balloc.c commio.c \
 @MINGW_TRUE@am__objects_1 = win32.lo
 @NEED_CRYPT_TRUE@am__objects_2 = crypt.lo
 am_libircd_la_OBJECTS = $(am__objects_1) $(am__objects_2) balloc.lo \
-	commio.lo crypt.lo event.lo ircd_lib.lo ircd_memory.lo \
-	linebuf.lo snprintf.lo tools.lo @SELECT_TYPE@.lo
+	commio.lo event.lo ircd_lib.lo ircd_memory.lo linebuf.lo \
+	snprintf.lo tools.lo @SELECT_TYPE@.lo
 libircd_la_OBJECTS = $(am_libircd_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -236,7 +236,6 @@ INCLUDES = -I. -I../include
 libircd_la_SOURCES = $(OS_FILES) $(CRYPT)	\
 	balloc.c			\
 	commio.c			\
-	crypt.c				\
 	event.c				\
 	ircd_lib.c			\
 	ircd_memory.c			\
@@ -245,14 +244,6 @@ libircd_la_SOURCES = $(OS_FILES) $(CRYPT)	\
 	tools.c				\
 	@SELECT_TYPE@.c		
 
-
-#.c.lo:
-#	$(LIBTOOL) --mode=compile $(CC) -prefer-pic -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@
-
-#.c.la:
-#	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS)
-
-#noinst_LIBRARIES = libircd.a
 libircd_la_LDFLAGS = -avoid-version -no-undefined
 lib_LTLIBRARIES = libircd.la
 all: all-am
