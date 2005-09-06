@@ -25,7 +25,7 @@ src/version.lo: src/version.c include/patchlevel.h include/serno.h
         
 
 if MINGW
-EXTRA_FLAGS = -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
+EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
 endif
 
 DLOPEN=$(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_LTLIBRARIES) ;do echo -dlpreopen $$x ;done)
@@ -86,7 +86,7 @@ src_libratbox_la_SOURCES =                     \
 
 src_libratbox_LTLIBRARIES = src/libratbox.la
   
-src_libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version -no-undefined -export-symbols-regex '*'
+src_libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version  -export-symbols-regex '*'
 src_libratbox_la_DEPENDENCIES = $(LIBLTDLC) libircd/libircd.la
 src_libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 
@@ -94,11 +94,17 @@ src_libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 
 # now the modules..
 
-MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version -no-undefined
+MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version 
 
 if !STATIC_MODULES
+
+if MINGW
 MODULE_LIBS = libircd/libircd.la src/libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
-endif
+else
+MODULE_LIBS = @SSL_LIBS@ @CRYPT_LIB@
+endif # MINGW
+
+endif # !STATIC_MODULES
 
 modules_m_accept_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_admin_la_LDFLAGS =  -module $(MODULE_FLAGS)  
