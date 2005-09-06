@@ -546,7 +546,12 @@ int main(int argc, char **argv)
 	tofd = getenv("OFD");
 	tmaxfd = getenv("MAXFD");
 	if(tifd == NULL || tofd == NULL || tmaxfd == NULL)
+	{
+		fprintf(stderr, "This is ircd-ratbox resolver.  You know you aren't supposed to run me directly?\n");
+		fprintf(stderr, "You get an Id tag for this: $Id$\n");
+		fprintf(stderr, "Have a nice life\n");
 		exit(1);
+	}
 	ifd = atoi(tifd);
 	ofd = atoi(tofd);
 	maxfd = atoi(tmaxfd);
