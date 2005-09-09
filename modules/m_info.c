@@ -93,7 +93,7 @@ struct InfoStruct
 #define RATBOX_SOMAXCONN SOMAXCONN
 #endif
 
-#if !defined(CPATH) || !defined(DPATH) || !defined(DLPATH) || !defined(HPATH) || \ 
+#if !defined(CPATH) || !defined(DPATH) || !defined(DLPATH) || !defined(HPATH) || \
     !defined(UHPATH) || !defined(KPATH) || !defined(LPATH) || !defined(MPATH) || \
     !defined(OPATH) || !defined(SPATH) 
 static const char *none = "NONE"; /* because we don't need a bunch of NONEs in the executables */

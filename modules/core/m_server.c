@@ -830,22 +830,6 @@ fork_server(struct Client *server)
 		server->localClient->ctrlfd = ctrl_fds[0];
 		server->localClient->fd = data_fds[0];
 
-		if(!comm_set_nb(server->localClient->fd))
-		{
-			report_error(NONB_ERROR_MSG,
-					get_server_name(server, SHOW_IP),
-					log_client_name(server, SHOW_IP),
-					errno);
-		}
-
-		if(!comm_set_nb(server->localClient->ctrlfd))
-		{
-			report_error(NONB_ERROR_MSG,
-					get_server_name(server, SHOW_IP),
-					log_client_name(server, SHOW_IP),
-					errno);
-		}
-
 		read_ctrl_packet(server->localClient->ctrlfd, server);
 		read_packet(server->localClient->fd, server);
 		return 0;
@@ -1401,7 +1385,7 @@ server_estab(struct Client *client_p)
 	}
 
 	if(!comm_set_buffers(client_p->localClient->fd, READBUF_SIZE))
-		report_error(SETBUF_ERROR_MSG, 
+		report_error("comm_set_buffers failed for server %s:%s", 
 			     get_server_name(client_p, SHOW_IP), 
 			     log_client_name(client_p, SHOW_IP), errno);
 

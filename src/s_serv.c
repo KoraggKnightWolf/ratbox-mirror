@@ -583,7 +583,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 
 	if(!comm_set_buffers(client_p->localClient->fd, READBUF_SIZE))
 	{
-		report_error(SETBUF_ERROR_MSG,
+		report_error("comm_set_buffers failed for server %s:%s",
 				get_server_name(client_p, SHOW_IP),
 				log_client_name(client_p, SHOW_IP),
 				errno);

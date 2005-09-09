@@ -236,8 +236,6 @@ extern void comm_unschedule_event(comm_event_id);
 #define COMM_SELECT_CONNECT		COMM_SELECT_WRITE
 /*#endif */
 extern int readcalls;
-extern const char *const NONB_ERROR_MSG;
-extern const char *const SETBUF_ERROR_MSG;
 
 extern int comm_set_nb(int);
 extern int comm_set_buffers(int, int);
