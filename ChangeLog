@@ -1,3 +1,16 @@
+androsyn    2005/09/09 17:53:53 UTC	(20050909_0-20750)
+  Log:
+  Remove a few unnecessary strings from libircd and reindent libircd.
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2005/09/06 05:26:02 UTC	(20050906_7-20740)
   Log:
   actually remove crypt.c from the list of sources that get built all the time
