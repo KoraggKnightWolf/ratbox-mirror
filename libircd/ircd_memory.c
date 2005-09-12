@@ -72,6 +72,6 @@ outofmemory()
 
 	was_here = 1;
 
-	lib_ilog("Out of memory: restarting server...");
-	lib_restart("Out of Memory");
+	ircd_lib_log("Out of memory: restarting server...");
+	ircd_lib_restart("Out of Memory");
 }

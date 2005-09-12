@@ -101,7 +101,7 @@ dns_select(void)
 static void
 dns_readable(int fd, void *ptr)
 {
-	adns_processreadable(dns_state, fd, &SystemTime);
+	adns_processreadable(dns_state, fd, ircd_current_time_tv());
 	process_adns_incoming();
 	dns_select();
 }   
@@ -115,7 +115,7 @@ dns_readable(int fd, void *ptr)
 static void
 dns_writeable(int fd, void *ptr)
 {
-	adns_processwriteable(dns_state, fd, &SystemTime);
+	adns_processwriteable(dns_state, fd, ircd_current_time_tv() );
 	process_adns_incoming();
 	dns_select();
 }
@@ -366,7 +366,7 @@ read_io(void)
 	while(1)
 	{
 		dns_select();
-		set_time();
+		ircd_set_time();
 		eventRun();
 		comm_select(250);
 	}

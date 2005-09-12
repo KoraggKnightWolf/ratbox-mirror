@@ -195,7 +195,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(MyClient(source_p) && !IsOper(source_p))
 	{
 		/* Check the user is actually allowed to do /stats, and isnt flooding */
-		if((last_used + ConfigFileEntry.pace_wait) > CurrentTime)
+		if((last_used + ConfigFileEntry.pace_wait) > ircd_currenttime)
 		{
 			/* safe enough to give this on a local connect only */
 			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
@@ -205,7 +205,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 			return 0;
 		}
 		else
-			last_used = CurrentTime;
+			last_used = ircd_currenttime;
 	}
 
 	if(hunt_server (client_p, source_p, ":%s STATS %s :%s", 2, parc, parv) != HUNTED_ISME)
@@ -707,7 +707,7 @@ stats_operedup (struct Client *source_p)
 					   IsAdmin (target_p) ? 'A' : 'O',
 					   get_oper_privs(target_p->operflags),
 					   target_p->name, target_p->username, target_p->host,
-					   (int) (CurrentTime - target_p->localClient->last));
+					   (int) (ircd_currenttime - target_p->localClient->last));
 		}
 		else
 		{
@@ -715,7 +715,7 @@ stats_operedup (struct Client *source_p)
 					   "p :[%c] %s (%s@%s) Idle: %d",
 					   IsAdmin (target_p) ? 'A' : 'O',
 					   target_p->name, target_p->username, target_p->host,
-					   (int) (CurrentTime - target_p->localClient->last));
+					   (int) (ircd_currenttime - target_p->localClient->last));
 		}
 	}
 
@@ -817,7 +817,7 @@ stats_usage (struct Client *source_p)
 	if(0 == secs)
 		secs = 1;
 
-	rup = (CurrentTime - startup_time) * hzz;
+	rup = (ircd_currenttime - startup_time) * hzz;
 	if(0 == rup)
 		rup = 1;
   
@@ -865,7 +865,7 @@ stats_tstats(struct Client *source_p)
 		sp.is_sbr += target_p->localClient->receiveB;
 		sp.is_sks += target_p->localClient->sendK;
 		sp.is_skr += target_p->localClient->receiveK;
-		sp.is_sti += CurrentTime - target_p->localClient->firsttime;
+		sp.is_sti += ircd_currenttime - target_p->localClient->firsttime;
 		sp.is_sv++;
 		if(sp.is_sbs > 1023)
 		{
@@ -887,7 +887,7 @@ stats_tstats(struct Client *source_p)
 		sp.is_cbr += target_p->localClient->receiveB;
 		sp.is_cks += target_p->localClient->sendK;
 		sp.is_ckr += target_p->localClient->receiveK;
-		sp.is_cti += CurrentTime - target_p->localClient->firsttime;
+		sp.is_cti += ircd_currenttime - target_p->localClient->firsttime;
 		sp.is_cl++;
 		if(sp.is_cbs > 1023)
 		{
@@ -947,7 +947,7 @@ stats_uptime (struct Client *source_p)
 {
 	time_t now;
 
-	now = CurrentTime - startup_time;
+	now = ircd_currenttime - startup_time;
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSUPTIME, 
 			   form_str (RPL_STATSUPTIME),
 			   now / 86400, (now / 3600) % 24, 
@@ -1060,7 +1060,7 @@ stats_servers (struct Client *source_p)
 		target_p = ptr->data;
 
 		j++;
-		seconds = CurrentTime - target_p->localClient->firsttime;
+		seconds = ircd_currenttime - target_p->localClient->firsttime;
 
 		days = (int) (seconds / 86400);
 		seconds %= 86400;
@@ -1074,7 +1074,7 @@ stats_servers (struct Client *source_p)
 				   "Connected: %d day%s, %d:%02d:%02d",
 				   target_p->name,
 				   (target_p->serv->by[0] ? target_p->serv->by : "Remote."),
-				   (int) (CurrentTime - target_p->localClient->lasttime),
+				   (int) (ircd_currenttime - target_p->localClient->lasttime),
 				   (int) linebuf_len (&target_p->localClient->buf_sendq),
 				   days, (days == 1) ? "" : "s", hours, minutes, 
 				   (int) seconds);
@@ -1425,9 +1425,9 @@ stats_servlinks (struct Client *source_p)
 			(int) target_p->localClient->sendK,
 			(int) target_p->localClient->receiveM,
 			(int) target_p->localClient->receiveK,
-			CurrentTime - target_p->localClient->firsttime,
-			(CurrentTime > target_p->localClient->lasttime) ? 
-			 (CurrentTime - target_p->localClient->lasttime) : 0,
+			ircd_currenttime - target_p->localClient->firsttime,
+			(ircd_currenttime > target_p->localClient->lasttime) ? 
+			 (ircd_currenttime - target_p->localClient->lasttime) : 0,
 			IsOper (source_p) ? show_capabilities (target_p) : "TS");
 	}
 
@@ -1441,7 +1441,7 @@ stats_servlinks (struct Client *source_p)
 			   "? :Recv total : %7.2f %s",
 			   _GMKv (receiveK), _GMKs (receiveK));
 
-	uptime = (CurrentTime - startup_time);
+	uptime = (ircd_currenttime - startup_time);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :Server send: %7.2f %s (%4.1f K/s)",
@@ -1576,9 +1576,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				(int) target_p->localClient->sendK,
 				(int) target_p->localClient->receiveM,
 				(int) target_p->localClient->receiveK,
-				CurrentTime - target_p->localClient->firsttime,
-				(CurrentTime > target_p->localClient->lasttime) ? 
-				 (CurrentTime - target_p->localClient->lasttime) : 0,
+				ircd_currenttime - target_p->localClient->firsttime,
+				(ircd_currenttime > target_p->localClient->lasttime) ? 
+				 (ircd_currenttime - target_p->localClient->lasttime) : 0,
 				IsOper(source_p) ? show_capabilities(target_p) : "-");
 	}
 
@@ -1597,9 +1597,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				    (int) target_p->localClient->sendK,
 				    (int) target_p->localClient->receiveM,
 				    (int) target_p->localClient->receiveK,
-				    CurrentTime - target_p->localClient->firsttime,
-				    (CurrentTime > target_p->localClient->lasttime) ? 
-				     (CurrentTime - target_p->localClient->lasttime) : 0,
+				    ircd_currenttime - target_p->localClient->firsttime,
+				    (ircd_currenttime > target_p->localClient->lasttime) ? 
+				     (ircd_currenttime - target_p->localClient->lasttime) : 0,
 				    "-");
 	}
 
@@ -1614,9 +1614,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				   (int) target_p->localClient->sendK,
 				   (int) target_p->localClient->receiveM,
 				   (int) target_p->localClient->receiveK,
-				   CurrentTime - target_p->localClient->firsttime,
-				   (CurrentTime > target_p->localClient->lasttime) ? 
-				    (CurrentTime - target_p->localClient->lasttime) : 0,
+				   ircd_currenttime - target_p->localClient->firsttime,
+				   (ircd_currenttime > target_p->localClient->lasttime) ? 
+				    (ircd_currenttime - target_p->localClient->lasttime) : 0,
 				   "-");
 	}
 }

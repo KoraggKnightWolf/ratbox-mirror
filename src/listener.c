@@ -535,12 +535,12 @@ accept_connection(int pfd, void *data)
 			/*
 			 * slow down the whining to opers bit
 			 */
-			if((last_oper_notice + 20) <= CurrentTime)
+			if((last_oper_notice + 20) <= ircd_currenttime)
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 						     "All connections in use. (%s)",
 						     get_listener_name(listener));
-				last_oper_notice = CurrentTime;
+				last_oper_notice = ircd_currenttime;
 			}
 			
 			write(fd, "ERROR :All connections in use\r\n", 32);

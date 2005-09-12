@@ -69,7 +69,7 @@ gettimeofday(struct timeval *tp, void *not_used)
 
 
 pid_t
-spawn_process (const char *path, const char **argv)
+ircd_spawn_process (const char *path, const char **argv)
 {
 	return _spawnv (_P_NOWAIT, path, (const char *const *) argv);
 }

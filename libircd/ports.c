@@ -80,7 +80,7 @@ void
 init_netio(void)
 {
 	if((pe = port_create()) < 0) {
-		lib_ilog("init_netio: Couldn't open port fd!\n");
+		ircd_lib_log("init_netio: Couldn't open port fd!\n");
 		exit(115);	/* Whee! */
 	}
 	pemax = getdtablesize();
@@ -117,7 +117,7 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 		F->write_data = client_data;
 	}
 	if(timeout)
-		F->timeout = CurrentTime + (timeout / 1000);
+		F->timeout = ircd_currenttime + (timeout / 1000);
 
 }
 
@@ -142,7 +142,7 @@ struct	timer_data	*tdata;
 	poll_time.tv_nsec = (delay % 1000) * 1000000;
 
 	i = port_getn(pe, pelst, pemax, &nget, &poll_time);
-	set_time();
+	ircd_set_time();
 
 	if (i == -1)
 		return COMM_OK;
@@ -198,7 +198,7 @@ struct	itimerspec	 ts;
 	not.portnfy_user = tdata;
 
 	if (timer_create(CLOCK_REALTIME, &ev, &id) < 0)
-		lib_ilog("timer_create: %s\n", strerror(errno));
+		ircd_lib_log("timer_create: %s\n", strerror(errno));
 
 	tdata->td_timer_id = id;
 
@@ -211,7 +211,7 @@ struct	itimerspec	 ts;
 	tdata->td_repeat = repeat;
 
 	if (timer_settime(id, 0, &ts, NULL) < 0)
-		lib_ilog("timer_settime: %s\n", strerror(errno));
+		ircd_lib_log("timer_settime: %s\n", strerror(errno));
 	return tdata;
 }
 

@@ -165,7 +165,7 @@ smalldate(void)
 {
 	static char buf[MAX_DATE_STRING];
 	struct tm *lt;
-	time_t ltime = CurrentTime;
+	time_t ltime = ircd_currenttime;
 
 	lt = localtime(&ltime);
 

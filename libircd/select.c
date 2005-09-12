@@ -123,7 +123,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 		select_update_selectfds(fd, COMM_SELECT_WRITE, handler);
 	}
 	if(timeout)
-		F->timeout = CurrentTime + (timeout / 1000);
+		F->timeout = ircd_currenttime + (timeout / 1000);
 }
 
 /*
@@ -160,12 +160,12 @@ comm_select(unsigned long delay)
 			break;
 		if(ignoreErrno(errno))
 			continue;
-		set_time();
+		ircd_set_time();
 		/* error! */
 		return -1;
 		/* NOTREACHED */
 	}
-	set_time();
+	ircd_set_time();
 
 	if(num == 0)
 		return 0;

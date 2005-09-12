@@ -1,7 +1,7 @@
 NAMES [channel]
 
 With no channel argument, NAMES shows the names (nicks) of all clients
-logged in to the server that do not have +i flag.
+logged in to the network that do not have +i flag.
 
 With the #channel argument, it displays the nicks on that channel,
 also respecting the +i flag of each client. If the channel specified

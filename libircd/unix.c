@@ -28,7 +28,7 @@
 #include "ircd_lib.h"
 
 pid_t
-spawn_process(const char *path, const char **argv)
+ircd_spawn_process(const char *path, const char **argv)
 {
 	pid_t pid;
 	if(!(pid = vfork()))

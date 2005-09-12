@@ -79,7 +79,6 @@ extern dlink_list global_client_list;
 extern struct Client *local[];
 extern struct Counter Count;
 
-#define CurrentTime SystemTime.tv_sec
 extern time_t nextconnect;
 extern int default_server_capabs;
 

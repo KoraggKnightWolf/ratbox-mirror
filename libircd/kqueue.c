@@ -108,7 +108,7 @@ kq_update_events(fde_t * F, short filter, PF * handler)
 			/* jdc -- someone needs to do error checking... */
 			if(ret == -1)
 			{
-				lib_ilog("kq_update_events(): kevent(): %s", strerror(errno));
+				ircd_lib_log("kq_update_events(): kevent(): %s", strerror(errno));
 				return;
 			}
 			kqoff = 0;
@@ -138,7 +138,7 @@ init_netio(void)
 	kq = kqueue();
 	if(kq < 0)
 	{
-		lib_ilog("init_netio: Couldn't open kqueue fd!\n");
+		ircd_lib_log("init_netio: Couldn't open kqueue fd!\n");
 		exit(115);	/* Whee! */
 	}
 	kqmax = getdtablesize();
@@ -174,7 +174,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 		F->write_data = client_data;
 	}
 	if(timeout)
-		F->timeout = CurrentTime + (timeout / 1000);
+		F->timeout = ircd_currenttime + (timeout / 1000);
 
 }
 
@@ -221,14 +221,14 @@ comm_select(unsigned long delay)
 		if(ignoreErrno(errno))
 			break;
 
-		set_time();
+		ircd_set_time();
 
 		return COMM_ERROR;
 
 		/* NOTREACHED */
 	}
 
-	set_time();
+	ircd_set_time();
 
 	if(num == 0)
 		return COMM_OK;	/* No error.. */

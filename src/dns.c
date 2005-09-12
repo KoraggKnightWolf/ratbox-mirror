@@ -229,11 +229,11 @@ fork_resolver(void)
 	setenv("MAXFD", maxfd, 1);
 	parv[0] = "-ircd dns resolver";
 	parv[1] = NULL;
-	pid = spawn_process(BINPATH "/resolver", (const char **)parv);	
+	pid = ircd_spawn_process(BINPATH "/resolver", (const char **)parv);	
 
 	if(pid == -1)
 	{
-		ilog(L_MAIN, "spawn_process failed: %s", strerror(errno));
+		ilog(L_MAIN, "ircd_spawn_process failed: %s", strerror(errno));
 		comm_close(ifd[0]);
 		comm_close(ifd[1]);
 		comm_close(ofd[0]);

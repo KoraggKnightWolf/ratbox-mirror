@@ -170,7 +170,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 		poll_update_pollfds(fd, POLLWRNORM, handler);
 	}
 	if(timeout)
-		F->timeout = CurrentTime + (timeout / 1000);
+		F->timeout = ircd_currenttime + (timeout / 1000);
 }
 
 /* int comm_select_fdlist(unsigned long delay)
@@ -202,13 +202,13 @@ comm_select(unsigned long delay)
 		if(ignoreErrno(errno))
 			continue;
 		/* error! */
-		set_time();
+		ircd_set_time();
 		return -1;
 		/* NOTREACHED */
 	}
 
 	/* update current time again, eww.. */
-	set_time();
+	ircd_set_time();
 
 	if(num == 0)
 		return 0;

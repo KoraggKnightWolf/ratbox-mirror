@@ -62,7 +62,7 @@ m_list(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	static time_t last_used = 0L;
 
 	/* pace this due to the sheer traffic involved */
-	if(((last_used + ConfigFileEntry.pace_wait) > CurrentTime))
+	if(((last_used + ConfigFileEntry.pace_wait) > ircd_currenttime))
 	{
 		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
 			   me.name, source_p->name, "LIST");
@@ -70,7 +70,7 @@ m_list(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		return 0;
 	}
 	else
-		last_used = CurrentTime;
+		last_used = ircd_currenttime;
 
 	/* If no arg, do all channels *whee*, else just one channel */
 	if(parc < 2 || EmptyString(parv[1]))

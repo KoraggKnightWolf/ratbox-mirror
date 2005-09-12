@@ -63,7 +63,7 @@ m_help(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	static time_t last_used = 0;
 
 	/* HELP is always local */
-	if((last_used + ConfigFileEntry.pace_wait_simple) > CurrentTime)
+	if((last_used + ConfigFileEntry.pace_wait_simple) > ircd_currenttime)
 	{
 		/* safe enough to give this on a local connect only */
 		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI), 
@@ -75,7 +75,7 @@ m_help(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	}
 	else
 	{
-		last_used = CurrentTime;
+		last_used = ircd_currenttime;
 	}
 
 	dohelp(source_p, HELP_USER, parc > 1 ? parv[1] : NULL);

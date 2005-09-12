@@ -219,7 +219,7 @@ remove_user_from_channel(struct membership *msptr)
 	if(client_p->servptr == &me)
 		dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-	chptr->users_last = CurrentTime;
+	chptr->users_last = ircd_currenttime;
 
 	if(dlink_list_length(&chptr->members) <= 0)
 		destroy_channel(chptr);
@@ -256,7 +256,7 @@ remove_user_from_channels(struct Client *client_p)
 		if(client_p->servptr == &me)
 			dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-		chptr->users_last = CurrentTime;
+		chptr->users_last = ircd_currenttime;
 
 		if(dlink_list_length(&chptr->members) <= 0)
 			destroy_channel(chptr);
@@ -651,7 +651,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
 	else
 	{
 		if((t_delta =
-		    (CurrentTime - source_p->localClient->last_leave_time)) >
+		    (ircd_currenttime - source_p->localClient->last_leave_time)) >
 		   JOIN_LEAVE_COUNT_EXPIRE_TIME)
 		{
 			decrement_count = (t_delta / JOIN_LEAVE_COUNT_EXPIRE_TIME);
@@ -662,7 +662,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
 		}
 		else
 		{
-			if((CurrentTime -
+			if((ircd_currenttime -
 			    (source_p->localClient->last_join_time)) < GlobalSetOptions.spam_time)
 			{
 				/* oh, its a possible spambot */
@@ -670,9 +670,9 @@ check_spambot_warning(struct Client *source_p, const char *name)
 			}
 		}
 		if(name != NULL)
-			source_p->localClient->last_join_time = CurrentTime;
+			source_p->localClient->last_join_time = ircd_currenttime;
 		else
-			source_p->localClient->last_leave_time = CurrentTime;
+			source_p->localClient->last_leave_time = ircd_currenttime;
 	}
 }
 

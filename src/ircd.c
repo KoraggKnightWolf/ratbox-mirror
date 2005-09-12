@@ -474,7 +474,7 @@ ratbox_main(int argc, char *argv[])
 	/*
 	 * save server boot time right away, so getrusage works correctly
 	 */
-	set_time();
+	ircd_set_time();
 	/*
 	 * Setup corefile size immediately after boot -kre
 	 */
@@ -487,7 +487,7 @@ ratbox_main(int argc, char *argv[])
 
 	ServerRunning = 0;
 	/* It ain't random, but it ought to be a little harder to guess */
-	srand(SystemTime.tv_sec ^ (SystemTime.tv_usec | (getpid() << 20)));
+	srand(ircd_systemtime.tv_sec ^ (ircd_systemtime.tv_usec | (getpid() << 20)));
 	memset(&me, 0, sizeof(me));
 	memset(&meLocalUser, 0, sizeof(meLocalUser));
 	me.localClient = &meLocalUser;
@@ -632,7 +632,7 @@ ratbox_main(int argc, char *argv[])
 	SetMe(&me);
 	make_server(&me);
 	me.serv->up = me.name;
-	startup_time = CurrentTime;
+	startup_time = ircd_currenttime;
 	add_to_client_hash(me.name, &me);
 	add_to_id_hash(me.id, &me);
 

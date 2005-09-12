@@ -187,17 +187,21 @@ typedef void log_cb(const char *buffer);
 typedef void restart_cb(const char *buffer);
 typedef void die_cb(const char *buffer);
 
-void lib_ilog(const char *, ...);
-void lib_restart(const char *, ...);
-void lib_die(const char *, ...);
-void set_time(void);
+void ircd_lib_log(const char *, ...);
+void ircd_lib_restart(const char *, ...);
+void ircd_lib_die(const char *, ...);
+void ircd_set_time(void);
 void ircd_lib(log_cb *xilog, restart_cb *irestart, die_cb *idie, int closeall, int maxfds, size_t lb_hp_size, size_t dh_size);
+time_t ircd_current_time(void);
+struct timeval *ircd_current_time_tv(void);
+pid_t ircd_spawn_process(const char *, const char **);
 
-extern struct timeval SystemTime;  
-pid_t spawn_process(const char *, const char **);
+#ifndef ircd_currenttime
+#define ircd_currenttime ircd_current_time()
+#endif
 
-#ifndef CurrentTime
-#define CurrentTime SystemTime.tv_sec
+#ifndef ircd_systemtime
+#define ircd_systemtime (*(ircd_current_time_tv()))
 #endif
 
 #ifdef NEED_CRYPT

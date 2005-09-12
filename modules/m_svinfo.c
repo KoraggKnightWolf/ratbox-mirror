@@ -73,11 +73,11 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 	}
 
 	/*
-	 * since we're here, might as well set CurrentTime while we're at it
+	 * since we're here, might as well set ircd_currenttime while we're at it
 	 */
 	set_time();
 	theirtime = atol(parv[4]);
-	deltat = abs(theirtime - CurrentTime);
+	deltat = abs(theirtime - ircd_currenttime);
 
 	if(deltat > ConfigFileEntry.ts_max_delta)
 	{
@@ -85,11 +85,11 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 				     "Link %s dropped, excessive TS delta"
 				     " (my TS=%ld, their TS=%ld, delta=%d)",
 				     get_server_name(source_p, SHOW_IP),
-				     (long) CurrentTime, (long) theirtime, deltat);
+				     (long) ircd_currenttime, (long) theirtime, deltat);
 		ilog(L_SERVER,
 		     "Link %s dropped, excessive TS delta"
 		     " (my TS=%ld, their TS=%ld, delta=%d)",
-		     log_client_name(source_p, SHOW_IP), (long) CurrentTime, (long) theirtime, deltat);
+		     log_client_name(source_p, SHOW_IP), (long) ircd_currenttime, (long) theirtime, deltat);
 		exit_client(source_p, source_p, source_p, "Excessive TS delta");
 		return 0;
 	}
@@ -99,7 +99,7 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s notable TS delta"
 				     " (my TS=%ld, their TS=%ld, delta=%d)",
-				     source_p->name, (long) CurrentTime, (long) theirtime, deltat);
+				     source_p->name, (long) ircd_currenttime, (long) theirtime, deltat);
 	}
 
 	return 0;

@@ -315,7 +315,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(source_p->flags & FLAGS_CLICAP)
 		return -1;
 
-	client_p->localClient->last = CurrentTime;
+	client_p->localClient->last = ircd_currenttime;
 	/* Straight up the maximum rate of flooding... */
 	source_p->localClient->allow_read = MAX_FLOOD_BURST;
 

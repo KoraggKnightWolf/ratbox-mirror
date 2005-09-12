@@ -53,7 +53,7 @@
 #include "ircd_lib.h"
 
 static const char *last_event_ran = NULL;
-struct ev_entry event_table[MAX_EVENTS];
+static struct ev_entry event_table[MAX_EVENTS];
 static time_t event_time_min = -1;
  
 #ifdef USE_POSIX_TIMERS
@@ -72,7 +72,7 @@ event_run_callback(void *data)
 		ev->arg = NULL;
 		ev->active = 0;
 	} else {
-		ev->when = CurrentTime + ev->frequency;
+		ev->when = ircd_currenttime + ev->frequency;
 	}
 }
 #endif
@@ -98,7 +98,7 @@ eventAdd(const char *name, EVH * func, void *arg, time_t when)
 			event_table[i].func = func;
 			event_table[i].name = name;
 			event_table[i].arg = arg;
-			event_table[i].when = CurrentTime + when;
+			event_table[i].when = ircd_currenttime + when;
 			event_table[i].frequency = when;
 			event_table[i].active = 1;
 
@@ -127,7 +127,7 @@ eventAddOnce(const char *name, EVH *func, void *arg, time_t when)
 			event_table[i].func = func;
 			event_table[i].name = name;
 			event_table[i].arg = arg;
-			event_table[i].when = CurrentTime + when;
+			event_table[i].when = ircd_currenttime + when;
 			event_table[i].frequency = 0;
 			event_table[i].active = 1;
 
@@ -208,7 +208,7 @@ eventRun(void)
 
 	for (i = 0; i < MAX_EVENTS; i++)
 	{
-		if(event_table[i].active && (event_table[i].when <= CurrentTime))
+		if(event_table[i].active && (event_table[i].when <= ircd_currenttime))
 		{
 			last_event_ran = event_table[i].name;
 			event_table[i].func(event_table[i].arg);
@@ -216,7 +216,7 @@ eventRun(void)
 
 			/* event is scheduled more than once */
 			if(event_table[i].frequency)
-				event_table[i].when = CurrentTime + event_table[i].frequency;
+				event_table[i].when = ircd_currenttime + event_table[i].frequency;
 			else
 			{
 				event_table[i].name = NULL;
@@ -290,7 +290,7 @@ dump_events(void (*func)(char *, void *), void *ptr)
 	{
 		if(event_table[i].active) {
 			ircsnprintf(buf, len, "%-28s %-4d seconds", event_table[i].name,
-				    (int)(event_table[i].when - CurrentTime));
+				    (int)(event_table[i].when - ircd_currenttime));
 			func(buf, ptr);
 		}
 	}	
@@ -332,8 +332,8 @@ eventUpdate(const char *name, time_t freq)
                         /* update when its scheduled to run if its higher
                          * than the new frequency
                          */
-                        if((CurrentTime + freq) < event_table[i].when)  
-                                event_table[i].when = CurrentTime + freq;
+                        if((ircd_currenttime + freq) < event_table[i].when)  
+                                event_table[i].when = ircd_currenttime + freq;
 
                         return;
                 }

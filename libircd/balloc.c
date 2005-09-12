@@ -87,7 +87,7 @@ static int zero_fd = -1;
 static void
 _blockheap_fail(const char *reason, const char *file, int line)
 {
-	lib_ilog("Blockheap failure: %s (%s:%d)", reason, file, line);
+	ircd_lib_log("Blockheap failure: %s (%s:%d)", reason, file, line);
 	abort();
 }
                 
@@ -351,7 +351,7 @@ BlockHeapCreate(size_t elemsize, int elemsperblock)
 	bh = (BlockHeap *) calloc(1, sizeof(BlockHeap));
 	if(bh == NULL)
 	{
-		lib_ilog("Attempt to calloc() failed: (%s:%d)", __FILE__, __LINE__);
+		ircd_lib_log("Attempt to calloc() failed: (%s:%d)", __FILE__, __LINE__);
 		outofmemory();	/* die.. out of memory */
 	}
 
@@ -373,7 +373,7 @@ BlockHeapCreate(size_t elemsize, int elemsperblock)
 	{
 		if(bh != NULL)
 			free(bh);
-		lib_ilog("newblock() failed");
+		ircd_lib_log("newblock() failed");
 		outofmemory();	/* die.. out of memory */
 	}
 
@@ -420,7 +420,7 @@ BlockHeapAlloc(BlockHeap * bh)
 			BlockHeapGarbageCollect(bh);
 			if(bh->freeElems == 0)
 			{
-				lib_ilog("newblock() failed and garbage collection didn't help");
+				ircd_lib_log("newblock() failed and garbage collection didn't help");
 				outofmemory();	/* Well that didn't work either...bail */
 			}
 		}
@@ -481,13 +481,13 @@ BlockHeapFree(BlockHeap * bh, void *ptr)
 	if(bh == NULL)
 	{
 
-		lib_ilog("balloc.c:BlockHeapFree() bh == NULL");
+		ircd_lib_log("balloc.c:BlockHeapFree() bh == NULL");
 		return (1);
 	}
 
 	if(ptr == NULL)
 	{
-		lib_ilog("balloc.BlockHeapFree() ptr == NULL");
+		ircd_lib_log("balloc.BlockHeapFree() ptr == NULL");
 		return (1);
 	}
 

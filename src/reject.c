@@ -131,7 +131,7 @@ reject_expires(void *unused)
 		pnode = ptr->data;
 		rdata = pnode->data;		
 
-		if(rdata->time + ConfigFileEntry.reject_duration > CurrentTime)
+		if(rdata->time + ConfigFileEntry.reject_duration > ircd_currenttime)
 			continue;
 
 		dlinkDelete(ptr, &reject_list);
@@ -164,7 +164,7 @@ add_reject(struct Client *client_p)
 	if((pnode = match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
 	{
 		rdata = pnode->data;
-		rdata->time = CurrentTime;
+		rdata->time = ircd_currenttime;
 		rdata->count++;
 	}
 	else
@@ -177,7 +177,7 @@ add_reject(struct Client *client_p)
 		pnode = make_and_lookup_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);
 		pnode->data = rdata = MyMalloc(sizeof(struct reject_data));
 		dlinkAddTail(pnode, &rdata->rnode, &reject_list);
-		rdata->time = CurrentTime;
+		rdata->time = ircd_currenttime;
 		rdata->count = 1;
 	}
 }
@@ -198,7 +198,7 @@ check_reject(struct Client *client_p)
 	{
 		rdata = pnode->data;
 
-		rdata->time = CurrentTime;
+		rdata->time = ircd_currenttime;
 		if(rdata->count > ConfigFileEntry.reject_after_count)
 		{
 			ServerStats.is_rej++;

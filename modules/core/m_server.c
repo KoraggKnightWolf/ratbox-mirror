@@ -818,7 +818,7 @@ fork_server(struct Client *server)
         kid_argv[4] = NULL;
 
 		
-	if(spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
+	if(ircd_spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
 	{
 		comm_close(server->localClient->fd);
 
@@ -1404,7 +1404,7 @@ server_estab(struct Client *client_p)
 		SetServlink(client_p);
 	}
 
-	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, CurrentTime);
+	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, ircd_currenttime);
 
 	client_p->servptr = &me;
 
@@ -1440,7 +1440,7 @@ server_estab(struct Client *client_p)
 
 	/* add it to scache */
 	find_or_add(client_p->name);
-	client_p->localClient->firsttime = CurrentTime;
+	client_p->localClient->firsttime = ircd_currenttime;
 	/* fixing eob timings.. -gnp */
 
 	/* Show the real host/IP to admins */

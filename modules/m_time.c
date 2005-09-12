@@ -90,7 +90,7 @@ date(void)
 	time_t lclock;
 	int minswest;
 
-	lclock = CurrentTime;
+	lclock = ircd_currenttime;
 	gm = gmtime(&lclock);
 	memcpy((void *) &gmbuf, (void *) gm, sizeof(gmbuf));
 	gm = &gmbuf;

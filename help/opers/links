@@ -1,4 +1,4 @@
-LINKS [mask] [remote]
+LINKS [[remote] mask]
 
 LINKS shows a list of all servers linked to the host server.
 
@@ -9,9 +9,9 @@ mask given.
 
 The information provided by the LINKS command can be helpful
 for determining the overall shape of the network in addition to
-it's size.
+its size.
 
 NOTE: the links command employs an intensive process to generate
 it's output, so sparing use is recommended.
 
-See also: connect squit
+See also: connect map squit

@@ -115,7 +115,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 	}
 
 	if(timeout)
-		F->timeout = CurrentTime + (timeout / 1000);
+		F->timeout = ircd_currenttime + (timeout / 1000);
 
 	if(old_flags == 0 && F->pflags == 0)
 		return;
@@ -137,7 +137,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 
 	if(epoll_ctl(ep, op, fd, &ep_event) != 0)
 	{
-		lib_ilog("Xcomm_setselect(): epoll_ctl failed: %s", strerror(errno));
+		ircd_lib_log("Xcomm_setselect(): epoll_ctl failed: %s", strerror(errno));
 		abort();
 	}
 
@@ -161,7 +161,7 @@ comm_select(unsigned long delay)
 	void *data;
 	
 	num = epoll_wait(ep, pfd, pfd_size, delay);
-	set_time();
+	ircd_set_time();
 
 	if(num < 0 && !ignoreErrno(errno))
 	{
@@ -185,7 +185,7 @@ comm_select(unsigned long delay)
 				hdl(F->fd, data);
 			}
 			else
-				lib_ilog("epoll.c: NULL read handler called");
+				ircd_lib_log("epoll.c: NULL read handler called");
 	
 		}
 
@@ -202,7 +202,7 @@ comm_select(unsigned long delay)
 				hdl(F->fd, data);
 			}
 			else
-				lib_ilog("epoll.c: NULL write handler called");
+				ircd_lib_log("epoll.c: NULL write handler called");
 		}
 		
 		if(F->flags.open == 0)
@@ -228,7 +228,7 @@ comm_select(unsigned long delay)
 				
 			if(epoll_ctl(ep, op, F->fd, &ep_event) != 0)
 			{
-				lib_ilog("comm_setselect(): epoll_ctl failed: %s", strerror(errno));
+				ircd_lib_log("comm_setselect(): epoll_ctl failed: %s", strerror(errno));
 			}
 		}
 					

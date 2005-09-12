@@ -107,7 +107,7 @@ slow_list_length(dlink_list *list)
                 count++;
                 if(count > list->length * 2)
                 {
-                        lib_ilog("count > list->length * 2 - I give up");
+                        ircd_lib_log("count > list->length * 2 - I give up");
 			abort();
                 }
         }

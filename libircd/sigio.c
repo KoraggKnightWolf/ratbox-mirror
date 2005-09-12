@@ -190,7 +190,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 		poll_update_pollfds(F->fd, POLLOUT, handler);
 	}
 	if(timeout)
-		F->timeout = CurrentTime + (timeout / 1000);
+		F->timeout = ircd_currenttime + (timeout / 1000);
 }
 
 /* int comm_select(unsigned long delay)
@@ -235,7 +235,7 @@ comm_select(unsigned long delay)
 			{
 				if(sig == SIGIO)
 				{
-					lib_ilog("Kernel RT Signal queue overflowed.  Is /proc/sys/kernel/rtsig-max too small?");
+					ircd_lib_log("Kernel RT Signal queue overflowed.  Is /proc/sys/kernel/rtsig-max too small?");
 					sigio_is_screwed = 1;
 					break;
 				}
@@ -253,7 +253,7 @@ comm_select(unsigned long delay)
 				if(!F->flags.open || F->fd < 0)
 					continue;
 
-				set_time();
+				ircd_set_time();
 				if(F->flags.open
 				   && (revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR)))
 				{
@@ -289,7 +289,7 @@ comm_select(unsigned long delay)
 
 	if(!sigio_is_screwed)	/* We don't need to proceed */
 	{
-		set_time();
+		ircd_set_time();
 		return 0;
 	}
 	for (;;)
@@ -306,13 +306,13 @@ comm_select(unsigned long delay)
 		if(ignoreErrno(errno))
 			continue;
 		/* error! */
-		set_time();
+		ircd_set_time();
 		return -1;
 		/* NOTREACHED */
 	}
 
 	/* update current time again, eww.. */
-	set_time();
+	ircd_set_time();
 
 	if(num == 0)
 		return 0;
@@ -382,7 +382,7 @@ struct	itimerspec	 ts;
 	ev.sigev_value.sival_ptr = tdata;
 	
 	if (timer_create(CLOCK_REALTIME, &ev, &id) < 0)
-		lib_ilog("timer_create: %s\n", strerror(errno));
+		ircd_lib_log("timer_create: %s\n", strerror(errno));
 
 	tdata->td_timer_id = id;
 
@@ -395,7 +395,7 @@ struct	itimerspec	 ts;
 	tdata->td_repeat = repeat;
 
 	if (timer_settime(id, 0, &ts, NULL) < 0)
-		lib_ilog("timer_settime: %s\n", strerror(errno));
+		ircd_lib_log("timer_settime: %s\n", strerror(errno));
 	return tdata;
 }
 

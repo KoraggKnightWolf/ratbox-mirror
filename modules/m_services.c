@@ -186,8 +186,8 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 	newts = atol(parv[3]);
 
 	/* timestamp is older than 15mins, ignore it */
-	if(newts < (CurrentTime - 900))
-		newts = CurrentTime - 900;
+	if(newts < (ircd_currenttime - 900))
+		newts = ircd_currenttime - 900;
 
 	target_p->tsinfo = newts;
 

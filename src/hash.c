@@ -718,7 +718,7 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 
 	dlinkAdd(chptr, &chptr->node, &global_channel_list);
 
-	chptr->channelts = CurrentTime;	/* doesn't hurt to set it here */
+	chptr->channelts = ircd_currenttime;	/* doesn't hurt to set it here */
 
 	dlinkAddAlloc(chptr, &channelTable[hashv]);
 

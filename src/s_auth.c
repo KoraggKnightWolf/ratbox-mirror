@@ -146,11 +146,11 @@ fork_ident(void)
 	parv[0] = "-ircd ident daemon";
 	parv[1] = NULL;
 
-	pid = spawn_process(BINPATH "/ident", parv);
+	pid = ircd_spawn_process(BINPATH "/ident", parv);
 
 	if(pid == -1)
 	{
-		ilog(L_MAIN, "spawn_process failed: %s", strerror(errno));
+		ilog(L_MAIN, "ircd_spawn_process failed: %s", strerror(errno));
 		comm_close(ifd[0]);
 		comm_close(ifd[1]);
 		comm_close(ofd[0]);
@@ -216,7 +216,7 @@ make_auth_request(struct Client *client)
 	request->client = client;
 	request->dns_query = 0;
 	request->reqid = 0;
-	request->timeout = CurrentTime + ConfigFileEntry.connect_timeout;
+	request->timeout = ircd_currenttime + ConfigFileEntry.connect_timeout;
 	return request;
 }
 
@@ -455,7 +455,7 @@ timeout_auth_queries_event(void *notused)
 	{
 		auth = ptr->data;
 
-		if(auth->timeout < CurrentTime)
+		if(auth->timeout < ircd_currenttime)
 		{
 			if(IsAuth(auth))
 			{
@@ -469,7 +469,7 @@ timeout_auth_queries_event(void *notused)
 				sendheader(auth->client, REPORT_FAIL_DNS);
 			}
 
-			auth->client->localClient->lasttime = CurrentTime;
+			auth->client->localClient->lasttime = ircd_currenttime;
 			release_auth_client(auth);
 		}
 	}

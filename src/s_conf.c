@@ -930,17 +930,17 @@ conf_connect_allowed(struct sockaddr *addr, int aftype)
 void
 add_temp_kline(struct ConfItem *aconf)
 {
-	if(aconf->hold >= CurrentTime + (10080 * 60))
+	if(aconf->hold >= ircd_currenttime + (10080 * 60))
 	{
 		dlinkAddAlloc(aconf, &temp_klines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
-	else if(aconf->hold >= CurrentTime + (1440 * 60))
+	else if(aconf->hold >= ircd_currenttime + (1440 * 60))
 	{
 		dlinkAddAlloc(aconf, &temp_klines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
-	else if(aconf->hold >= CurrentTime + (60 * 60))
+	else if(aconf->hold >= ircd_currenttime + (60 * 60))
 	{
 		dlinkAddAlloc(aconf, &temp_klines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
@@ -964,17 +964,17 @@ add_temp_kline(struct ConfItem *aconf)
 void
 add_temp_dline(struct ConfItem *aconf)
 {
-	if(aconf->hold >= CurrentTime + (10080 * 60))
+	if(aconf->hold >= ircd_currenttime + (10080 * 60))
 	{
 		dlinkAddAlloc(aconf, &temp_dlines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
-	else if(aconf->hold >= CurrentTime + (1440 * 60))
+	else if(aconf->hold >= ircd_currenttime + (1440 * 60))
 	{
 		dlinkAddAlloc(aconf, &temp_dlines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
-	else if(aconf->hold >= CurrentTime + (60 * 60))
+	else if(aconf->hold >= ircd_currenttime + (60 * 60))
 	{
 		dlinkAddAlloc(aconf, &temp_dlines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
@@ -1007,7 +1007,7 @@ expire_temp_kd(void *list)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold <= CurrentTime)
+		if(aconf->hold <= ircd_currenttime)
 		{
 			/* Alert opers that a TKline expired - Hwy */
 			if(ConfigFileEntry.tkline_expire_notices)
@@ -1032,7 +1032,7 @@ reorganise_temp_kd(void *list)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold < (CurrentTime + (60 * 60)))
+		if(aconf->hold < (ircd_currenttime + (60 * 60)))
 		{
 			dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
 					&temp_klines[TEMP_MIN] : &temp_dlines[TEMP_MIN]);
@@ -1040,14 +1040,14 @@ reorganise_temp_kd(void *list)
 		}
 		else if(aconf->port > TEMP_HOUR)
 		{
-			if(aconf->hold < (CurrentTime + (1440 * 60)))
+			if(aconf->hold < (ircd_currenttime + (1440 * 60)))
 			{
 				dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
 						&temp_klines[TEMP_HOUR] : &temp_dlines[TEMP_HOUR]);
 				aconf->port = TEMP_HOUR;
 			}
 			else if(aconf->port > TEMP_DAY && 
-				(aconf->hold < (CurrentTime + (10080 * 60))))
+				(aconf->hold < (ircd_currenttime + (10080 * 60))))
 			{
 				dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
 						&temp_klines[TEMP_DAY] : &temp_dlines[TEMP_DAY]);
@@ -1296,18 +1296,18 @@ write_confitem(KlineType type, struct Client *source_p, char *user,
 		ircsnprintf(buffer, sizeof(buffer),
 			   "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld\n",
 			   user, host, reason, oper_reason, current_date,
-			   get_oper_name(source_p), CurrentTime);
+			   get_oper_name(source_p), ircd_currenttime);
 	}
 	else if(type == DLINE_TYPE)
 	{
 		ircsnprintf(buffer, sizeof(buffer),
 			   "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld\n", host,
-			   reason, oper_reason, current_date, get_oper_name(source_p), CurrentTime);
+			   reason, oper_reason, current_date, get_oper_name(source_p), ircd_currenttime);
 	}
 	else if(type == RESV_TYPE)
 	{
 		ircsnprintf(buffer, sizeof(buffer), "\"%s\",\"%s\",\"%s\",%ld\n",
-			   host, reason, get_oper_name(source_p), CurrentTime);
+			   host, reason, get_oper_name(source_p), ircd_currenttime);
 	}
 
 	if(fputs(buffer, out) == -1)

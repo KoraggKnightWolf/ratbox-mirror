@@ -239,7 +239,7 @@ expire_glines(void *unused)
 		aconf = ptr->data;
 
 		/* if gline_time changes, these could end up out of order */
-		if(aconf->hold > CurrentTime)
+		if(aconf->hold > ircd_currenttime)
 			continue;
 
 		delete_one_address_conf(aconf->host, aconf);
@@ -702,7 +702,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold && aconf->hold <= CurrentTime)
+		if(aconf->hold && aconf->hold <= ircd_currenttime)
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -719,7 +719,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold && aconf->hold <= CurrentTime)
+		if(aconf->hold && aconf->hold <= ircd_currenttime)
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -734,7 +734,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold && aconf->hold <= CurrentTime)
+		if(aconf->hold && aconf->hold <= ircd_currenttime)
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -764,7 +764,7 @@ add_nd_entry(const char *name)
 	nd = BlockHeapAlloc(nd_heap);
 	
 	strlcpy(nd->name, name, sizeof(nd->name));
-	nd->expire = CurrentTime + ConfigFileEntry.nick_delay;
+	nd->expire = ircd_currenttime + ConfigFileEntry.nick_delay;
 
 	/* this list is ordered */
 	dlinkAddTail(nd, &nd->lnode, &nd_list);
@@ -793,7 +793,7 @@ expire_nd_entries(void *unused)
 		/* this list is ordered - we can stop when we hit the first
 		 * entry that doesnt expire..
 		 */
-		if(nd->expire > CurrentTime)
+		if(nd->expire > ircd_currenttime)
 			return;
 
 		free_nd_entry(nd);
@@ -816,7 +816,7 @@ add_tgchange(const char *host)
 	target->pnode = pnode;
 
 	DupString(target->ip, host);
-	target->expiry = CurrentTime + (60*60*12);
+	target->expiry = ircd_currenttime + (60*60*12);
 
 	dlinkAdd(target, &target->node, &tgchange_list);
 }

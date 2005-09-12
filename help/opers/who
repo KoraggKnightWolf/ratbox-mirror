@@ -14,13 +14,12 @@ The third field describes the status information about
 the user.  The possible combinations for this field 
 are listed below:
 
-H	-	The user is not away.
-A	-	The user is set away.
-*	-	The user is an IRC operator.
-@	-	The user is a channel op in the channel listed
+H       -       The user is not away.
+G       -       The user is set away.
+*       -       The user is an IRC operator.
+@       -       The user is a channel op in the channel listed
                 in the first field.
-+	-	The user is voiced in the channel listed.
-%	-	The user is a half-op in the channel listed.
++       -       The user is voiced in the channel listed.
 
 The next field contains the username@host of the user.  
 The final field displays the number of server hops and 

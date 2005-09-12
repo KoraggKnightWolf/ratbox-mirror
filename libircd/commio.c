@@ -213,7 +213,7 @@ comm_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 	F = find_fd(fd);
 	lircd_assert(F->flags.open);
 
-	F->timeout = CurrentTime + (timeout / 1000);
+	F->timeout = ircd_currenttime + (timeout / 1000);
 	F->timeout_handler = callback;
 	F->timeout_data = cbdata;
 }
@@ -237,7 +237,7 @@ comm_setflush(int fd, time_t timeout, PF * callback, void *cbdata)
 	F = find_fd(fd);
 	lircd_assert(F->flags.open);
 
-	F->flush_timeout = CurrentTime + (timeout / 1000);
+	F->flush_timeout = ircd_currenttime + (timeout / 1000);
 	F->flush_handler = callback;
 	F->flush_data = cbdata;
 }
@@ -268,7 +268,7 @@ comm_checktimeouts(void *notused)
 			continue;
 
 		/* check flush functions */
-		if(F->flush_handler && F->flush_timeout > 0 && F->flush_timeout < CurrentTime)
+		if(F->flush_handler && F->flush_timeout > 0 && F->flush_timeout < ircd_currenttime)
 		{
 			hdl = F->flush_handler;
 			data = F->flush_data;
@@ -277,7 +277,7 @@ comm_checktimeouts(void *notused)
 		}
 
 		/* check timeouts */
-		if(F->timeout_handler && F->timeout > 0 && F->timeout < CurrentTime)
+		if(F->timeout_handler && F->timeout > 0 && F->timeout < ircd_currenttime)
 		{
 			/* Call timeout handler */
 			hdl = F->timeout_handler;
@@ -459,7 +459,7 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 	/* Set the socket non-blocking, and other wonderful bits */
 	if(!comm_set_nb(nfd[0]))
 	{
-		lib_ilog("comm_open: Couldn't set FD %d non blocking: %s", nfd[0], strerror(errno));
+		ircd_lib_log("comm_open: Couldn't set FD %d non blocking: %s", nfd[0], strerror(errno));
 		comm_close(nfd[0]);
 		comm_close(nfd[1]);
 		return -1;
@@ -467,7 +467,7 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 
 	if(!comm_set_nb(nfd[1]))
 	{
-		lib_ilog("comm_open: Couldn't set FD %d non blocking: %s", nfd[1], strerror(errno));
+		ircd_lib_log("comm_open: Couldn't set FD %d non blocking: %s", nfd[1], strerror(errno));
 		comm_close(nfd[0]);
 		comm_close(nfd[1]);
 		return -1;
@@ -535,7 +535,7 @@ comm_socket(int family, int sock_type, int proto, const char *note)
 		int off = 1;
 		if(setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &off, sizeof(off)) == -1)
 		{
-			lib_ilog("comm_socket: Could not set IPV6_V6ONLY option to 1 on FD %d: %s",
+			ircd_lib_log("comm_socket: Could not set IPV6_V6ONLY option to 1 on FD %d: %s",
 				 fd, strerror(errno));
 			close(fd);
 			return -1;
@@ -548,7 +548,7 @@ comm_socket(int family, int sock_type, int proto, const char *note)
 	/* Set the socket non-blocking, and other wonderful bits */
 	if(!comm_set_nb(fd))
 	{
-		lib_ilog("comm_open: Couldn't set FD %d non blocking: %s", fd, strerror(errno));
+		ircd_lib_log("comm_open: Couldn't set FD %d non blocking: %s", fd, strerror(errno));
 		comm_close(fd);
 		return -1;
 	}
@@ -589,7 +589,7 @@ comm_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 	if(!comm_set_nb(newfd))
 	{
 		get_errno();
-		lib_ilog("comm_accept: Couldn't set FD %d non blocking!", newfd);
+		ircd_lib_log("comm_accept: Couldn't set FD %d non blocking!", newfd);
 		comm_close(newfd);
 		return -1;
 	}
@@ -672,7 +672,7 @@ fdlist_init(int closeall, int maxfds)
 	err = WSAStartup(wVersionRequested, &wsaData);
 	if(err != 0)
 	{
-		lib_ilog("WSAStartup failed");
+		ircd_lib_log("WSAStartup failed");
 		exit(1);
 	}
 
@@ -838,7 +838,7 @@ comm_write(int fd, void *buf, int count)
 				case SSL_ERROR_SYSCALL:
 					return -1;
 				default:
-					lib_ilog("Unknown SSL_write error:%s",
+					ircd_lib_log("Unknown SSL_write error:%s",
 						 ERR_error_string(ERR_get_error(), NULL));
 					return -1;
 

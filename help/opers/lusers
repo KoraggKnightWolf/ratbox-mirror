@@ -1,7 +1,8 @@
-LUSERS [mask] [remoteserver]
+LUSERS [mask [remoteserver]]
 
-LUSERS will display client count statistics
-for the specified mask, or all users if a
-mask was not specified.  If a remote server
-is specified, it will request the information
-from that server.
+LUSERS will display client count statistics.
+If a remote server is specified, it will
+request the information from that server.
+The mask parameter is obsolete but still
+needs to be used when querying a remote
+server.

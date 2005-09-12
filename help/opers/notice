@@ -7,8 +7,7 @@ NOTICE supports the following prefixes for sending
 messages to specific clients in a channel:
 
 @ - channel operators only
-% - channel operators and half-ops
-+ - operators, half-ops, and voiced users
++ - channel operators and voiced users
 
 Two other targets are permitted:
 

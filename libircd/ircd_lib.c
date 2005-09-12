@@ -9,13 +9,25 @@ static log_cb *ircd_log;
 static restart_cb *ircd_restart;
 static die_cb *ircd_die;
 
-struct timeval SystemTime;
+static struct timeval *SystemTime;
 
 
 static char errbuf[512];
 
+time_t
+ircd_current_time(void)
+{
+	return SystemTime->tv_sec;
+}
+
+struct timeval *
+ircd_current_time_tv(void)
+{
+	return SystemTime;	
+}
+
 void
-lib_ilog(const char *format, ...)
+ircd_lib_log(const char *format, ...)
 {
 	va_list args;
 	if(ircd_log == NULL)
@@ -27,7 +39,7 @@ lib_ilog(const char *format, ...)
 }
 
 void
-lib_die(const char *format, ...)
+ircd_lib_die(const char *format, ...)
 {
 	va_list args;
 	if(ircd_die == NULL)
@@ -39,7 +51,7 @@ lib_die(const char *format, ...)
 }
 
 void
-lib_restart(const char *format, ...)
+ircd_lib_restart(const char *format, ...)
 {
 	va_list args;
 	if(ircd_restart == NULL)
@@ -52,23 +64,25 @@ lib_restart(const char *format, ...)
 
 
 void
-set_time(void)
+ircd_set_time(void)
 {
 	struct timeval newtime;
 	newtime.tv_sec = 0;
 	newtime.tv_usec = 0;
-
+	if(SystemTime == NULL)
+	{
+		SystemTime = MyMalloc(sizeof(struct timeval));
+	}
 	if(gettimeofday(&newtime, NULL) == -1)
 	{
-		lib_ilog("Clock Failure (%d)", errno);
-		lib_restart("Clock Failure");
+		ircd_lib_log("Clock Failure (%d)", errno);
+		ircd_lib_restart("Clock Failure");
 	}
 
-	if(newtime.tv_sec < SystemTime.tv_sec)
-		set_back_events(SystemTime.tv_sec - newtime.tv_sec);
+	if(newtime.tv_sec < SystemTime->tv_sec)
+		set_back_events(SystemTime->tv_sec - newtime.tv_sec);
 
-	SystemTime.tv_sec = newtime.tv_sec;
-	SystemTime.tv_usec = newtime.tv_usec;
+	memcpy(SystemTime, &newtime, sizeof(struct timeval));
 }
 
 

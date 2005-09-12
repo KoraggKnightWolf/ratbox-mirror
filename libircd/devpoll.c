@@ -68,7 +68,7 @@ devpoll_write_update(int fd, int events)
 	/* Write the thing to our poll fd */
 	retval = write(dpfd, &pollfds[0], sizeof(struct pollfd));
 	if(retval != sizeof(struct pollfd))
-		lib_ilog("devpoll_write_update: dpfd write failed %d: %s", errno, strerror(errno));
+		ircd_lib_log("devpoll_write_update: dpfd write failed %d: %s", errno, strerror(errno));
 	/* Done! */
 }
 
@@ -188,7 +188,7 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 		F->write_data = client_data;
 	}
 	if(timeout)
-		F->timeout = CurrentTime + (timeout / 1000);
+		F->timeout = ircd_currenttime + (timeout / 1000);
 }
 
 /*
@@ -225,11 +225,11 @@ comm_select(unsigned long delay)
 				break;
 			if(ignoreErrno(errno))
 				break;
-			set_time();
+			ircd_set_time();
 			return COMM_ERROR;
 		}
 
-		set_time();
+		ircd_set_time();
 		if(num == 0)
 			continue;
 

@@ -375,7 +375,7 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACEUNKNOWN,
 				   form_str(RPL_TRACEUNKNOWN),
 				   class_name, name, ip,
-				   CurrentTime - target_p->localClient->firsttime);
+				   ircd_currenttime - target_p->localClient->firsttime);
 		cnt++;
 		break;
 
@@ -395,8 +395,8 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 						   MyOper(source_p) ? ip :
 #endif
 						   (IsIPSpoof(target_p) ? "255.255.255.255" : ip),
-						   CurrentTime - target_p->localClient->lasttime,
-						   CurrentTime - target_p->localClient->last);
+						   ircd_currenttime - target_p->localClient->lasttime,
+						   ircd_currenttime - target_p->localClient->last);
 
 			else
 				sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACEUSER, 
@@ -406,8 +406,8 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 						   MyOper(source_p) ? ip :
 #endif
 						   (IsIPSpoof(target_p) ? "255.255.255.255" : ip),
-						   CurrentTime - target_p->localClient->lasttime,
-						   CurrentTime - target_p->localClient->last);
+						   ircd_currenttime - target_p->localClient->lasttime,
+						   ircd_currenttime - target_p->localClient->last);
 			cnt++;
 		}
 		break;
@@ -416,7 +416,7 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACESERVER, form_str(RPL_TRACESERVER),
 				   class_name, link_s_p, link_u_p, name,
 				   *(target_p->serv->by) ? target_p->serv->by : "*", "*",
-				   me.name, CurrentTime - target_p->localClient->lasttime);
+				   me.name, ircd_currenttime - target_p->localClient->lasttime);
 		cnt++;
 		break;
 

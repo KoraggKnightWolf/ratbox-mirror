@@ -133,7 +133,7 @@ m_cmessage(int p_or_n, const char *command,
 					form_str(ERR_TARGUMODEG), target_p->name);
 
 		if((target_p->localClient->last_caller_id_time +
-		    ConfigFileEntry.caller_id_wait) < CurrentTime)
+		    ConfigFileEntry.caller_id_wait) < ircd_currenttime)
 		{
 			if(p_or_n != NOTICE)
 				sendto_one_numeric(source_p, POP_QUEUE, RPL_TARGNOTIFY,
@@ -144,14 +144,14 @@ m_cmessage(int p_or_n, const char *command,
 				me.name, target_p->name, source_p->name,
 				source_p->username, source_p->host);
 
-			target_p->localClient->last_caller_id_time = CurrentTime;
+			target_p->localClient->last_caller_id_time = ircd_currenttime;
 		}
 
 		return 0;
 	}
 
 	if(p_or_n != NOTICE)
-		source_p->localClient->last = CurrentTime;
+		source_p->localClient->last = ircd_currenttime;
 
 	sendto_anywhere(target_p, source_p, command, ":%s", parv[3]);
 	return 0;

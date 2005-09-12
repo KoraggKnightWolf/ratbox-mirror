@@ -326,7 +326,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 
 	if(temp_time > 0)
 	{
-		aconf->hold = CurrentTime + temp_time;
+		aconf->hold = ircd_currenttime + temp_time;
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s added temporary %d min. X-Line for [%s] [%s]",
@@ -379,7 +379,7 @@ write_xline(struct Client *source_p, struct ConfItem *aconf)
 
 	ircsprintf(buffer, "\"%s\",\"0\",\"%s\",\"%s\",%ld\n",
 		   aconf->name, aconf->passwd,
-		   get_oper_name(source_p), CurrentTime);
+		   get_oper_name(source_p), ircd_currenttime);
 
 	if(fputs(buffer, out) == -1)
 	{

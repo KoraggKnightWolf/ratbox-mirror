@@ -100,7 +100,7 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 			char topic_info[USERHOST_REPLYLEN];
 			ircsprintf(topic_info, "%s!%s@%s",
 					source_p->name, source_p->username, source_p->host);
-			set_channel_topic(chptr, parv[2], topic_info, CurrentTime);
+			set_channel_topic(chptr, parv[2], topic_info, ircd_currenttime);
 
 			sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
 					":%s TOPIC %s :%s",

@@ -442,7 +442,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 		strlcpy(who, source_p->name, sizeof(who));
 
 	actualBan = allocate_ban(realban, who);
-	actualBan->when = CurrentTime;
+	actualBan->when = ircd_currenttime;
 
 	dlinkAdd(actualBan, &actualBan->node, list);
 	chptr->num_mask++;

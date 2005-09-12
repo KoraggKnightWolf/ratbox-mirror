@@ -70,7 +70,7 @@ add_history(struct Client *client_p, int online)
 		del_whowas_from_list(&WHOWASHASH[who->hashv], who);
 	}
 	who->hashv = hash_whowas_name(client_p->name);
-	who->logoff = CurrentTime;
+	who->logoff = ircd_currenttime;
 	/*
 	 * NOTE: strcpy ok here, the sizes in the client struct MUST
 	 * match the sizes in the whowas struct
@@ -114,7 +114,7 @@ get_history(const char *nick, time_t timelimit)
 	struct Whowas *temp;
 	int blah;
 
-	timelimit = CurrentTime - timelimit;
+	timelimit = ircd_currenttime - timelimit;
 	blah = hash_whowas_name(nick);
 	temp = WHOWASHASH[blah];
 	for (; temp; temp = temp->next)

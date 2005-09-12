@@ -10,7 +10,7 @@ LETTER (* = Oper only.)
 X A - Shows the ADNS DNS servers in use
 X b - Shows active nick delays
 X B - Shows hash statistics
-^ c - Shows connect blocks
+^ c - Shows connect blocks (Old C:/N: lines)
 * d - Shows temporary D lines
 * D - Shows D lines
 * e - Shows exemptions to D lines
@@ -18,8 +18,8 @@ X E - Shows Events
 X f - Shows File Descriptors
 * g - Shows pending G lines
 * G - Shows active G lines
-^ h - Shows H/L lines
-^ i - Shows I lines
+^ h - Shows hub_mask/leaf_mask (Old H:/L: lines)
+^ i - Shows auth blocks (Old I: lines)
 ^ K - Shows K lines (or matched klines)
 ^ k - Shows temporary K lines (or matched temp klines)
   L - Shows IP and generic info about [nick]
@@ -34,10 +34,10 @@ X f - Shows File Descriptors
 * t - Shows generic server stats
 * U - Shows shared blocks (Old U: lines)
   u - Shows server uptime
-^ v - Shows connected servers and their idle times
-* x - Shows temporary gecos bans (Old X: lines)
+^ v - Shows connected servers and brief status information
+* x - Shows temporary gecos bans
 * X - Shows gecos bans (Old X: lines)
-^ y - Shows Y lines
+^ y - Shows connection classes (Old Y: lines)
 * z - Shows memory stats
-* Z - Show ziplinks stats
+* Z - Shows ziplinks stats
 ^ ? - Shows connected servers and sendq info about them
