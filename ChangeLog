@@ -1,3 +1,11 @@
+androsyn    2005/09/13 00:13:21 UTC	(20050913_0-20760)
+  Log:
+  forgot to add this in the last commit enough though i committed all of my local changes that i didn't mean to commit. oops.
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/map (File Added) 
+
+
 androsyn    2005/09/12 17:00:43 UTC	(20050912_0-20758)
   Log:
   commit jilles' helpfile updates again :)
