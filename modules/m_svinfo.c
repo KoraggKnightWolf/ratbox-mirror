@@ -75,7 +75,7 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 	/*
 	 * since we're here, might as well set ircd_currenttime while we're at it
 	 */
-	set_time();
+	ircd_set_time();
 	theirtime = atol(parv[4]);
 	deltat = abs(theirtime - ircd_currenttime);
 

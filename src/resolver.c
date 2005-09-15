@@ -552,53 +552,24 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Have a nice life\n");
 		exit(1);
 	}
-	ifd = atoi(tifd);
-	ofd = atoi(tofd);
-	maxfd = atoi(tmaxfd);
+	ifd = (int)strtol(tifd, NULL, 10);
+	ofd = (int)strtol(tofd, NULL, 10);
+	maxfd = (int)strtol(tmaxfd, NULL, 10);
 
+#ifndef __MINGW32__
 	for(x = 0; x < maxfd; x++)
 	{
 		if(x != ifd && x != ofd)
 			close(x);
 	}
-
+#endif
 	ircd_lib(NULL, NULL, NULL, 0, 256, 1024, 256); /* XXX fix me */
 
 	linebuf_newbuf(&sendq);
 	linebuf_newbuf(&recvq);
 
-	if(ifd > 255)
-	{
-		for(i = 3; i < 255; i++)
-		{
-			if(i != ofd) 
-			{
-				if(dup2(ifd, i) < 0)
-					exit(1);
-				close(ifd);
-				ifd = i;
-				break;
-			}
-		}
-	}
-
-	if(ofd > 255)
-	{
-		for(i = 3; i < 255; i++)
-		{
-			if(i != ifd) 
-			{
-				if(dup2(ofd, i) < 0)
-					exit(1);
-				close(ofd);
-				ofd = i;
-				break;
-			}
-		}
-	}
-
-	comm_open(ifd, FD_PIPE, "incoming pipe");
-	comm_open(ofd, FD_PIPE, "outgoing pipe");
+	comm_open(ifd, FD_SOCKET, "incoming pipe");
+	comm_open(ofd, FD_SOCKET, "outgoing pipe");
 	comm_set_nb(ifd);
 	comm_set_nb(ofd);
 	adns_init(&dns_state, adns_if_noautosys, 0);

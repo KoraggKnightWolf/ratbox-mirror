@@ -39,10 +39,8 @@
 #endif
 
 #ifndef __MINGW32__
-#define get_errno()
 fde_t *fd_table = NULL;
 #else
-#define get_errno()  errno = WSAGetLastError()
 dlink_list *fd_table;
 #endif
 
@@ -104,12 +102,12 @@ comm_close_all(void)
 
 	/* XXX someone tell me why we care about 4 fd's ? */
 	/* XXX btw, fd 3 is used for profiler ! */
-
+#ifndef __MINGW32__
 	for (i = 4; i < maxconnections; ++i)
 	{
 		close(i);
 	}
-
+#endif
 	/* XXX should his hack be done in all cases? */
 #ifndef NDEBUG
 	/* fugly hack to reserve fd == 2 */
@@ -480,7 +478,7 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 int
 comm_pipe(int *fd, const char *desc)
 {
-#if !defined(__MINGW32__) && !defined(__CYGWIN__)
+#ifndef __MINGW32__
 	if(number_fd >= maxconnections)
 	{
 		errno = ENFILE;
@@ -492,8 +490,10 @@ comm_pipe(int *fd, const char *desc)
 	comm_open(fd[1], FD_PIPE, desc);
 	return 0;
 #else
-	/* I hate this..but oh well */
-	return comm_socketpair(AF_INET, SOCK_STREAM, 0, fd, "fake pipe");
+	/* Its not a pipe..but its selectable.  I'll take dirty hacks
+	 * for $500 Alex.
+	 */
+	return comm_socketpair(AF_INET, SOCK_STREAM, 0, fd, desc); 
 #endif
 }
 
@@ -652,9 +652,9 @@ fdlist_update_biggest(int fd, int opening)
 	 */
 #ifndef __MINGW32__
 	lircd_assert(!opening);
-#endif
 	while (highest_fd >= 0 && !fd_table[highest_fd].flags.open)
 		highest_fd--;
+#endif
 }
 
 
@@ -663,17 +663,13 @@ fdlist_init(int closeall, int maxfds)
 {
 	static int initialized = 0;
 #ifdef __MINGW32__
-	WORD wVersionRequested;
 	WSADATA wsaData;
 	int err;
 
-	wVersionRequested = MAKEWORD(2, 0);
-
-	err = WSAStartup(wVersionRequested, &wsaData);
+	err = WSAStartup(0x101, &wsaData);
 	if(err != 0)
 	{
-		ircd_lib_log("WSAStartup failed");
-		exit(1);
+		ircd_lib_die("WSAStartup failed");
 	}
 
 #endif
@@ -719,6 +715,7 @@ comm_close(int fd)
 {
 	fde_t *F = find_fd(fd);
 	lircd_assert(F->flags.open);
+	int type;
 	/* All disk fd's MUST go through file_close() ! */
 	lircd_assert(F->type != FD_FILE);
 	if(F->type == FD_FILE)
@@ -726,15 +723,22 @@ comm_close(int fd)
 		lircd_assert(F->read_handler == NULL);
 		lircd_assert(F->write_handler == NULL);
 	}
-	comm_setselect(F->fd, 0, NULL, NULL, 0);
+		comm_setselect(F->fd, 0, NULL, NULL, 0);
 	comm_setflush(F->fd, 0, NULL, NULL);
 
 	F->flags.open = 0;
 	fdlist_update_biggest(fd, 0);
 	number_fd--;
-
+	type = F->type;
 	remove_fd(fd);
-	/* Unlike squid, we're actually closing the FD here! -- adrian */
+
+#ifdef __MINGW32__
+	if(type == FD_SOCKET)
+	{
+		closesocket(fd);
+		return;
+	} else
+#endif
 	close(fd);
 }
 
@@ -788,27 +792,22 @@ comm_read(int fd, void *buf, int count)
 
 	switch (F->type)
 	{
-#ifndef __MINGW32__
-	case FD_SOCKET:
+#ifdef __MINGW32__ /* pipes are sockets for us..deal */
+		case FD_PIPE:
+#endif
+		case FD_SOCKET:
 		{
 			int ret;
 			ret = recv(fd, buf, count, 0);
-			get_errno();
+			if(ret < 0)
+				get_errno();
 			return ret;
 		}
-	case FD_PIPE:
-	default:
-		return read(fd, buf, count);
-#else
-	default:
-		{
-			int ret, rcount;
-			ret = ReadFile(fd, buf, count, &rcount, NULL);
-			if(ret == FALSE)
-				return -1;
-			return rcount;
-		}
+#ifndef __MINGW32__	
+		case FD_PIPE:
 #endif
+		default:
+			return read(fd, buf, count);
 	}
 
 }
@@ -821,7 +820,6 @@ comm_write(int fd, void *buf, int count)
 		return 0;
 	switch (F->type)
 	{
-#ifndef __MINGW32__
 #if 0
 		/* i'll finish this some day */
 	case FD_SSL:
@@ -851,8 +849,12 @@ comm_write(int fd, void *buf, int count)
 
 	case FD_SOCKET:
 		{
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif		
 			int ret = send(fd, buf, count, MSG_NOSIGNAL);
-			get_errno();
+			if(ret < 0)
+				get_errno();
 			return ret;
 		}
 
@@ -860,44 +862,27 @@ comm_write(int fd, void *buf, int count)
 	default:
 		{
 			return write(fd, buf, count);
-
 		}
-#else /* * __MINGW32__ */
-	case FD_SOCKET:
-	case FD_PIPE:
-	default:
-		{
-			int written;
-			int ret = WriteFile(fd, buf, len, &written, NULL);
-			if(ret == FALSE)
-			{
-				get_errno();
-				return -1;
-			}
-			return written;
-		}
-#endif /* __MINGW32__ */
-
 	}
 }
 
 #ifdef __MINGW32__
-int
+static int
 writev(int fd, struct iovec *iov, size_t iovcnt)
 {
 	int i;
 	char *base;
-	DWORD BytesWritten, TotalBytesWritten = 0, len;
-	BOOL ret;
+	int TotalBytesWritten = 0, len;
+	int ret;
 
 	for (i = 0; i < iovcnt; i++)
 	{
 		base = iov[i].iov_base;
-		len = (DWORD) iov[i].iov_len;
-		ret = WriteFile((HANDLE) fd, (char *) base, len, (LPDWORD) & BytesWritten, NULL);
-		if(ret == FALSE)
+		len = iov[i].iov_len;
+		ret = comm_write(fd, base, len);
+		if(ret == 0)
 			return -1;
-		TotalBytesWritten += BytesWritten;
+		TotalBytesWritten += ret;
 	}
 	return (int) TotalBytesWritten;
 

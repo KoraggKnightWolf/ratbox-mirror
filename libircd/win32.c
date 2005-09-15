@@ -29,9 +29,9 @@
 #include <windows.h>
 #include <winsock2.h>
 
-static WSAEVENT Events;
+static HWND hwnd;
 
-
+#define WM_SOCKET WM_USER
 /*
  * having gettimeofday is nice...
  */
@@ -159,53 +159,181 @@ kill(int pid, int sig)
 
 }
 
-static void
-update_events(fde_t *F)
+
+static LRESULT CALLBACK
+comm_process_events(HWND nhwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
-	int events = 0;
-
-	if (F->read_handler != NULL)
-		events |= FD_ACCEPT | FD_CLOSE | FD_READ;
-
-	if (F->write_handler != NULL)
-		events |= FD_CONNECT | FD_WRITE;
-
-	WSAEventSelect(F->fd, Events, WM_SOCKET, events);
+	fde_t *F;
+	PF *hdl;
+	switch(umsg)
+	{
+		case WM_SOCKET:
+		{
+			F = find_fd(wparam);
+			
+			if(F != NULL && F->flags.open)
+			{
+				switch(WSAGETSELECTEVENT(lparam))
+				{
+					case FD_ACCEPT:
+					case FD_CLOSE:
+					case FD_READ:
+					{
+						if((hdl = F->read_handler) != NULL)
+						{
+							F->read_handler = NULL;
+							hdl(F->fd, F->read_data);
+						}
+						break;
+					}	
+					
+					case FD_CONNECT:
+					case FD_WRITE:
+					{
+						if((hdl = F->write_handler) != NULL)
+						{
+							F->write_handler = NULL;
+							hdl(F->fd, F->write_data);
+						}
+					}					
+				}
+			
+			}	
+			return 0;
+		}
+		case WM_DESTROY:
+		{
+			PostQuitMessage(0);
+			return 0;
+		}
+	
+		default:
+			return DefWindowProc(nhwnd, umsg, wparam, lparam);
+	}
+	return 0;
 }
 
 void
 init_netio(void)
 {
-	events = WSACreateEvent();
+	/* this muchly sucks, but i'm too lazy to do overlapped i/o, maybe someday... -androsyn */
+	WNDCLASS wc;
+	static const char *classname = "ircd-ratbox-class";
 
+	wc.style = 0;
+	wc.lpfnWndProc = (WNDPROC) comm_process_events;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hIcon = NULL;
+	wc.hCursor = NULL;
+	wc.hbrBackground = NULL;
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = classname;		
+	wc.hInstance = GetModuleHandle(NULL);
+	
+	if(!RegisterClass(&wc))
+		ircd_lib_die("cannot register window class");
+
+	hwnd = CreateWindow (classname, classname, WS_POPUP, CW_USEDEFAULT, 
+			     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			     (HWND) NULL, (HMENU) NULL, wc.hInstance, NULL);
+	if(!hwnd)
+		ircd_lib_die("could not create window");				
+		
+}
+
+
+int
+comm_setup_fd(int fd)
+{
+	fde_t *F = find_fd(fd);
+	
+	switch(F->type)
+	{
+		case FD_SOCKET:
+		{
+		        u_long nonb = 1;  
+			if(ioctlsocket((SOCKET)fd, FIONBIO, &nonb) == -1)
+			{
+				get_errno();
+				return 0;
+			}
+			return 1;
+		}
+		default:
+			return 1;
+			
+	}
 }
 
 void
-comm_setselect(int fd, unsigned int type, PF *handler, void *client_data, time_t timeout)
+comm_setselect(int fd, unsigned int type, PF * handler,
+	       void *client_data, time_t timeout)
 {
-	int update = 0;
 	fde_t *F = find_fd(fd);
+	int old_flags = F->pflags;
 	
-	if(F == NULL)
-		return;
-
+	lircd_assert(fd >= 0);
+	lircd_assert(F->flags.open);
+	
+	/* Update the list, even though we're not using it .. */
 	if(type & COMM_SELECT_READ)
 	{
-		if(F->read_handler != handler)
-			update = 1;
+		if(handler != NULL)
+			F->pflags |= FD_ACCEPT | FD_CLOSE | FD_READ;
+		else
+			F->pflags &= ~FD_ACCEPT & ~FD_CLOSE & ~FD_READ;
 		F->read_handler = handler;
 		F->read_data = client_data;
 	}
-	
+
 	if(type & COMM_SELECT_WRITE)
 	{
+		if(handler != NULL)
+			F->pflags |= FD_CONNECT | FD_WRITE;
+		else
+			F->pflags &= ~FD_CONNECT & ~FD_WRITE;
 		F->write_handler = handler;
 		F->write_data = client_data;
 	}
-	if(timeout)
-		F->timeout = SystemTime.tv_sec + (timeout / 1000);
 
-	if(update)
-		update_events(F);
+	if(timeout)
+		F->timeout = ircd_currenttime + (timeout / 1000);
+
+	if(old_flags == 0 && F->pflags == 0)
+		return;
+
+	
+	if(F->pflags != old_flags)
+	{
+		WSAAsyncSelect(F->fd, hwnd, WM_SOCKET, F->pflags);
+	} 
+	
+}
+
+
+static int has_set_timer = 0;
+
+int 
+comm_select(unsigned long delay)
+{
+	MSG msg;
+	if(has_set_timer == 0)
+	{
+		/* XXX should probably have this handle all the events
+		 * instead of busy looping 
+		 */
+		SetTimer(hwnd, 0, delay, NULL);
+		has_set_timer = 1;
+	}
+	
+	if(GetMessage(&msg, NULL, 0, 0) == FALSE)
+	{
+		ircd_lib_die("GetMessage failed..byebye");
+	}
+	ircd_set_time();	
+
+	DispatchMessage(&msg);	
+	return COMM_OK;
 }
 

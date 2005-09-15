@@ -14,7 +14,6 @@ servicesdir	= @moduledir@
 SUBDIRS = libircd libltdl adns tools doc help @SERVLINK@ 
 
 AM_YFLAGS = -d
-bin_PROGRAMS = src/ircd src/resolver src/ident 
 
 INCLUDES = -Ilibircd -Ilibltdl -Iadns
 src/version.c: src/version.c.SH
@@ -40,7 +39,6 @@ src_ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 src_resolver_LDADD = adns/libadns.a libircd/libircd.la
 src_ident_LDADD = libircd/libircd.la
 
-        
 src_ircd_SOURCES = src/main.c
 src_resolver_SOURCES = src/resolver.c
 src_ident_SOURCES = src/ident.c
@@ -86,7 +84,7 @@ src_libratbox_la_SOURCES =                     \
 
 src_libratbox_LTLIBRARIES = src/libratbox.la
   
-src_libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version  -export-symbols-regex '*'
+src_libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
 src_libratbox_la_DEPENDENCIES = $(LIBLTDLC) libircd/libircd.la
 src_libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 
@@ -392,15 +390,17 @@ modules_m_services_la_LIBADD = $(MODULE_LIBS)
 services_LTLIBRARIES = modules/m_services.la
 endif
 
+bin_PROGRAMS = src/ircd src/resolver src/ident 
+
 src: $(src_libratbox_LTLIBRARIES) $(services_LTLIBRARIES) src/ircd
 
 modules: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 
 modules_core: $(core_LTLIBRARIES)
 
-resolver: resolver/resolver
+resolver: src/resolver
 
-ident: ident/ident
+ident: src/ident
 
 install-exec-local:
 # move the old module directory out of the way, stale modules cause massive

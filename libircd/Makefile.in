@@ -53,11 +53,10 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libircd_la_LIBADD =
-am__libircd_la_SOURCES_DIST = unix.c win32.c crypt.c balloc.c commio.c \
-	event.c ircd_lib.c ircd_memory.c linebuf.c snprintf.c tools.c \
+am__libircd_la_SOURCES_DIST = unix.c crypt.c balloc.c commio.c event.c \
+	ircd_lib.c ircd_memory.c linebuf.c snprintf.c tools.c \
 	@SELECT_TYPE@.c
 @MINGW_FALSE@am__objects_1 = unix.lo
-@MINGW_TRUE@am__objects_1 = win32.lo
 @NEED_CRYPT_TRUE@am__objects_2 = crypt.lo
 am_libircd_la_OBJECTS = $(am__objects_1) $(am__objects_2) balloc.lo \
 	commio.lo event.lo ircd_lib.lo ircd_memory.lo linebuf.lo \
@@ -72,8 +71,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/ircd_lib.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ircd_memory.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/linebuf.Plo ./$(DEPDIR)/snprintf.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/tools.Plo ./$(DEPDIR)/unix.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/win32.Plo
+@AMDEP_TRUE@	./$(DEPDIR)/tools.Plo ./$(DEPDIR)/unix.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -231,7 +229,6 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
 INCLUDES = -I. -I../include
 @MINGW_FALSE@OS_FILES = unix.c
-@MINGW_TRUE@OS_FILES = win32.c
 @NEED_CRYPT_TRUE@CRYPT = crypt.c
 libircd_la_SOURCES = $(OS_FILES) $(CRYPT)	\
 	balloc.c			\
@@ -326,7 +323,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/snprintf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tools.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unix.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/win32.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

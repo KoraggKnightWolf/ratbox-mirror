@@ -4,9 +4,7 @@ AUTOMAKE_OPTIONS = foreign
 
 INCLUDES = -I. -I../include
 
-if MINGW
-OS_FILES=win32.c
-else 
+if !MINGW
 OS_FILES=unix.c
 endif
 

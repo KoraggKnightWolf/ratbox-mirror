@@ -37,7 +37,7 @@ char *MD5Data(const unsigned char *, unsigned int, char *);
 static unsigned char itoa64[] =	/* 0 ... 63 => ascii - 64 */
 	"./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-void
+static void
 _crypt_to64(s, v, n)
      char *s;
      unsigned long v;
@@ -57,12 +57,12 @@ _crypt_to64(s, v, n)
 char *
 crypt(const char *pw, const char *salt)
 {
-	static char *magic = "$1$";	/*
-					 * This string is magic for
-					 * this algorithm.  Having
-					 * it this way, we can get
-					 * get better later on
-					 */
+	static const char *magic = "$1$";	/*
+					 	 * This string is magic for
+					 	 * this algorithm.  Having
+					 	 * it this way, we can get
+					 	 * get better later on
+					 	 */
 	static char passwd[120], *p;
 	static const char *sp, *ep;
 	unsigned char final[MD5_SIZE];

@@ -509,7 +509,7 @@ int adns_processexceptional(adns_state ads, int fd, const struct timeval *now) {
 
 static void fd_event(adns_state ads, int fd,
 		     int revent, int pollflag,
-		     int maxfd, const fd_set *fds,
+		     int maxfd,  fd_set *fds,
 		     int (*func)(adns_state, int fd, const struct timeval *now),
 		     struct timeval now, int *r_r) {
   int r;
@@ -529,8 +529,8 @@ static void fd_event(adns_state ads, int fd,
 
 void adns__fdevents(adns_state ads,
 		    const struct adns_pollfd *pollfds, int npollfds,
-		    int maxfd, const fd_set *readfds,
-		    const fd_set *writefds, const fd_set *exceptfds,
+		    int maxfd, fd_set *readfds,
+		    fd_set *writefds, fd_set *exceptfds,
 		    struct timeval now, int *r_r) {
   int i, fd, revents;
 
@@ -543,7 +543,7 @@ void adns__fdevents(adns_state ads,
     fd_event(ads,fd, revents,ADNS_POLLPRI, maxfd,exceptfds, adns_processexceptional,now,r_r);
   }
 }
-
+#if 0
 /* Wrappers for select(2). */
 void adns_beforeselect(adns_state ads, int *maxfd_io, fd_set *readfds_io,
 		       fd_set *writefds_io, fd_set *exceptfds_io,
@@ -598,6 +598,7 @@ void adns_afterselect(adns_state ads, int maxfd, const fd_set *readfds,
 xit:
   adns__consistency(ads,0,cc_entex);
 }
+#endif
 
 /* General helpful functions. */
 

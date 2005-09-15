@@ -281,6 +281,7 @@ extern void mangle_mapped_sockaddr(struct sockaddr *in);
 #endif
 
 #ifdef __MINGW32__
+#define get_errno()  errno = WSAGetLastError()
 #define hash_fd(x) ((fd >> 2) % maxconnections)
 
 static inline fde_t *
@@ -329,6 +330,7 @@ remove_fd(int fd)
 
 
 #else
+#define get_errno()
 #define find_fd(x) &fd_table[x]
 #define add_fd(x) &fd_table[x]
 #define remove_fd(x) memset(&fd_table[x], 0, sizeof(fde_t))

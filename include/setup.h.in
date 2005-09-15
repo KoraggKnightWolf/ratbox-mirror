@@ -270,6 +270,9 @@
 /* Define to 1 if your system has no in6addr_any. */
 #undef NO_IN6ADDR_ANY
 
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+#undef NO_MINUS_C_MINUS_O
+
 /* Name of package */
 #undef PACKAGE
 
@@ -346,6 +349,9 @@
 
 /* Define to use sigio */
 #undef USE_SIGIO
+
+/* Define to use win32 io */
+#undef USE_WIN32
 
 /* Version number of package */
 #undef VERSION

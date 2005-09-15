@@ -80,9 +80,8 @@ case "$host_os" in
      AC_DEFINE_UNQUOTED(MINGW,1,[This is a MinGW system])
      AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
      AC_CHECK_HEADER(winsock2.h, , [AC_MSG_ERROR([** MinGW and no winsock2.h.  I give up.])])
-     RESOLVER=""
      LIBS="$LIBS -lws2_32"
-     is_mingw=yes
+     is_mingw="yes"
      ;;
 *)
      ;;
@@ -523,6 +522,7 @@ AC_ARG_ENABLE(rtsigio, AC_HELP_STRING([--enable-rtsigio],[Force rtsigio usage (L
   fi
 ],)
 
+
 dnl **********************************************************************
 dnl Check for --with-confdir
 dnl **********************************************************************
@@ -740,6 +740,10 @@ fi
 
 fi
 
+if test "$is_mingw" = "yes"; then
+	SELECT_TYPE="win32"
+fi
+
 if test -z "$SELECT_TYPE"; then
 	AC_MSG_WARN([Unable to find an i/o interface using select],)
 	SELECT_TYPE="select"
@@ -767,6 +771,9 @@ case  $SELECT_TYPE in
 		;;
 	select)
 		AC_DEFINE([USE_SELECT], 1, [Define to use select])
+		;;
+	win32)
+		AC_DEFINE([USE_WIN32], 1, [Define to use win32 io])
 		;;
 	*)
 		AC_DEFINE([USE_SELECT], 1, [Define to use select])

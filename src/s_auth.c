@@ -112,13 +112,37 @@ fork_ident(void)
 	int ifd[2], ofd[2];
 	char fx[6], fy[6];
 	const char *parv[2];
+	char fullpath[PATH_MAX + 1];
+#ifdef __MINGW32__
+	const char *suffix = ".exe";
+#else
+	const char *suffix = "";
+#endif
 	pid_t pid;
 
+
+#if 0
 	if(fork_ident_count > 10)
 	{
 		ilog(L_MAIN, "Ident daemon is spinning: %d\n", fork_ident_count);
 
 	}
+#endif
+        ircsnprintf(fullpath, sizeof(fullpath), "%s/ident%s", BINPATH, suffix);
+
+        if(access(fullpath, X_OK) == -1)
+        {
+                ilog(L_MAIN, "Unable to execute ident at %s \"%s\", trying alternate path", fullpath, strerror(errno));
+                ircsnprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
+                if(access(fullpath, X_OK) == -1)
+                {
+                        ilog(L_MAIN, "Unable to execute ident at %s \"%s\", I give up", fullpath, strerror(errno));
+                        fork_ident_count++;
+                        return;   
+                }
+                 
+        }        
+
 	fork_ident_count++;
 	if(auth_ifd > 0)
 		comm_close(auth_ifd);
@@ -146,7 +170,7 @@ fork_ident(void)
 	parv[0] = "-ircd ident daemon";
 	parv[1] = NULL;
 
-	pid = ircd_spawn_process(BINPATH "/ident", parv);
+	pid = ircd_spawn_process(fullpath, parv);
 
 	if(pid == -1)
 	{

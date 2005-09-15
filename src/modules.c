@@ -107,11 +107,15 @@ struct Message modrestart_msgtab = {
 };
 
 extern struct Message error_msgtab;
+#ifdef STATIC_MODULES
 extern const lt_dlsymlist lt_preloaded_symbols[];
+#endif
 void
 modules_init(void)
 {
+#ifdef STATIC_MODULES
 	lt_dlpreload_default(lt_preloaded_symbols);
+#endif
 	if(lt_dlinit())
 	{
 		ilog(L_MAIN, "lt_dlinit failed");
@@ -242,6 +246,7 @@ static
 void find_module_suffix(void)
 {
 	struct dirent *ldirent;
+	char module_dir[PATH_MAX + 1];
 	DIR *dir;
 	int len;
 	if(strlen(found_suffix) > 0)
@@ -249,16 +254,23 @@ void find_module_suffix(void)
 
 
 	dir = opendir(AUTOMODPATH);
+	if(dir == NULL)
+	{
+		strlcpy(module_dir, ConfigFileEntry.dpath, sizeof(module_dir));
+		strlcat(module_dir, "/modules/autoload", sizeof(module_dir));
+		dir = opendir(module_dir);
+ 	}
 
 	if(dir == NULL)
 	{
-		ilog(L_MAIN, "Could not determine module suffix from %s: %s", AUTOMODPATH, strerror(errno));
-		abort();
-	} else 
-	if((dir = opendir(MODPATH)) == NULL)   {
-		ilog(L_MAIN, "Could not determine module suffix from %s: %s", MODPATH, strerror(errno));
-		abort();
-	}
+        	if((dir = opendir(MODPATH)) == NULL)   
+        	{
+        		ilog(L_MAIN, "Could not determine module suffix from %s: %s", MODPATH, strerror(errno));
+			abort();
+		}
+	} 
+
+      
 	
 	while ((ldirent = readdir(dir)) != NULL)
 	{
@@ -292,6 +304,7 @@ load_all_modules(int warn)
 	DIR *system_module_dir = NULL;
 	struct dirent *ldirent = NULL;
 	char module_fq_name[PATH_MAX + 1];
+	char module_dir_name[PATH_MAX + 1];
 	int len;
 	modules_init();
 
@@ -299,7 +312,15 @@ load_all_modules(int warn)
 
 	find_module_suffix();
 	max_mods = MODS_INCREMENT;
-	system_module_dir = opendir(AUTOMODPATH);
+	strlcpy(module_dir_name, AUTOMODPATH, sizeof(module_dir_name));
+	system_module_dir = opendir(module_dir_name);
+
+	if(system_module_dir == NULL)
+	{
+		strlcpy(module_dir_name, ConfigFileEntry.dpath, sizeof(module_dir_name));
+		strlcat(module_dir_name, "/modules/autoload", sizeof(module_dir_name));
+		system_module_dir = opendir(module_dir_name);
+	}
 	
 	if(system_module_dir == NULL)
 	{
@@ -313,7 +334,7 @@ load_all_modules(int warn)
 
 		if((len > suffix_len) && !strcmp(ldirent->d_name+len-suffix_len, found_suffix))
 		{
-			(void) ircsnprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", AUTOMODPATH, ldirent->d_name);
+			(void) ircsnprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", module_dir_name, ldirent->d_name);
 			(void) load_a_module(module_fq_name, warn, 0);
 		} 
 	}
@@ -341,10 +362,16 @@ load_core_modules(int warn)
 		
 		if(load_a_module(module_name, warn, 1) == -1)
 		{
-			ilog(L_MAIN,
-			     "Error loading core module %s%s: terminating ircd",
-			     core_module_table[i], found_suffix);
-			exit(0);
+			ircsnprintf(module_name, sizeof(module_name), "%s/modules/%s%s", ConfigFileEntry.dpath, 
+				    core_module_table[i], found_suffix);
+
+			if(load_a_module(module_name, warn, 1) == -1)
+			{
+				ilog(L_MAIN,
+				"Error loading core module %s%s: terminating ircd",
+				     core_module_table[i], found_suffix);
+				exit(0);
+			}
 		}
 	}
 }

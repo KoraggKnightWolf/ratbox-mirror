@@ -673,8 +673,8 @@ void adns__must_gettimeofday(adns_state ads, const struct timeval **now_io,
 int adns__pollfds(adns_state ads, struct adns_pollfd pollfds_buf[MAX_POLLFDS]);
 void adns__fdevents(adns_state ads,
 		    const struct adns_pollfd *pollfds, int npollfds,
-		    int maxfd, const fd_set *readfds,
-		    const fd_set *writefds, const fd_set *exceptfds,
+		    int maxfd, fd_set *readfds,
+		    fd_set *writefds, fd_set *exceptfds,
 		    struct timeval now, int *r_r);
 int adns__internal_check(adns_state ads,
 			 adns_query *query_io,

@@ -17,12 +17,16 @@ static char errbuf[512];
 time_t
 ircd_current_time(void)
 {
+	if(SystemTime == NULL)
+		ircd_set_time();
 	return SystemTime->tv_sec;
 }
 
 struct timeval *
 ircd_current_time_tv(void)
 {
+	if(SystemTime == NULL)
+		ircd_set_time();
 	return SystemTime;	
 }
 

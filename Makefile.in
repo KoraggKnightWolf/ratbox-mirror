@@ -751,7 +751,7 @@ src_libratbox_la_SOURCES = \
   src/ircd_lexer.l			
 
 src_libratbox_LTLIBRARIES = src/libratbox.la
-src_libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version  -export-symbols-regex '*'
+src_libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
 src_libratbox_la_DEPENDENCIES = $(LIBLTDLC) libircd/libircd.la
 src_libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 
@@ -4915,9 +4915,9 @@ modules: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 
 modules_core: $(core_LTLIBRARIES)
 
-resolver: resolver/resolver
+resolver: src/resolver
 
-ident: ident/ident
+ident: src/ident
 
 install-exec-local:
 # move the old module directory out of the way, stale modules cause massive

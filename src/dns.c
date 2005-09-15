@@ -188,6 +188,12 @@ static void
 fork_resolver(void)
 {
 	const char *parv[2];
+	char fullpath [PATH_MAX + 1];
+#ifdef __MINGW32__
+	const char *suffix = ".exe";
+#else
+	const char *suffix = "";
+#endif
 	pid_t pid;
 	int ifd[2];
 	int ofd[2];
@@ -196,15 +202,32 @@ fork_resolver(void)
 	char fy[6];
 	char maxfd[6];
 
+#if 0
 	if(fork_count > 10)
 	{
-		ilog(L_MAIN, "Resolver has forked %d times, waiting 15 seconds to restart it again", fork_count);
+		ilog(L_MAIN, "Resolver has forked %d times, waiting 30 seconds to restart it again", fork_count);
 		ilog(L_MAIN, "DNS resolution will be unavailable during this time");
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Resolver has forked %d times waiting 30 seconds to restart it again", fork_count);
 		sendto_realops_flags(UMODE_ALL, L_ALL, "DNS resolution will be unavailable during this time");
 		eventAddOnce("restart_spinning_resolver", restart_spinning_resolver, NULL, 30);		
 		return;
 	}
+#endif
+	ircsnprintf(fullpath, sizeof(fullpath), "%s/resolver%s", BINPATH, suffix);
+	
+	if(access(fullpath, X_OK) == -1)
+	{
+		ilog(L_MAIN, "Unable to execute resolver at %s \"%s\", trying alternate path", fullpath, strerror(errno));
+		ircsnprintf(fullpath, sizeof(fullpath), "%s/bin/resolver%s", ConfigFileEntry.dpath, suffix);
+		if(access(fullpath, X_OK) == -1)
+		{
+			ilog(L_MAIN, "Unable to execute resolver at %s \"%s\", I give up", fullpath, strerror(errno));
+			fork_count++;
+			return;
+		}
+		
+	} 
+
 	fork_count++;
 	if(dns_ifd > 0)
 		comm_close(dns_ifd);
@@ -229,7 +252,9 @@ fork_resolver(void)
 	setenv("MAXFD", maxfd, 1);
 	parv[0] = "-ircd dns resolver";
 	parv[1] = NULL;
-	pid = ircd_spawn_process(BINPATH "/resolver", (const char **)parv);	
+	
+	
+	pid = ircd_spawn_process(fullpath, (const char **)parv);	
 
 	if(pid == -1)
 	{

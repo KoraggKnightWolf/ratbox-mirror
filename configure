@@ -21566,9 +21566,8 @@ echo "$as_me: error: ** MinGW and no winsock2.h.  I give up." >&2;}
 fi
 
 
-     RESOLVER=""
      LIBS="$LIBS -lws2_32"
-     is_mingw=yes
+     is_mingw="yes"
      ;;
 *)
      ;;
@@ -25857,6 +25856,7 @@ if test "${enable_rtsigio+set}" = set; then
 fi;
 
 
+
 echo "$as_me:$LINENO: checking whether to modify confdir" >&5
 echo $ECHO_N "checking whether to modify confdir... $ECHO_C" >&6
 
@@ -27112,6 +27112,10 @@ fi
 
 fi
 
+if test "$is_mingw" = "yes"; then
+	SELECT_TYPE="win32"
+fi
+
 if test -z "$SELECT_TYPE"; then
 	{ echo "$as_me:$LINENO: WARNING: Unable to find an i/o interface using select" >&5
 echo "$as_me: WARNING: Unable to find an i/o interface using select" >&2;}
@@ -27490,6 +27494,13 @@ fi
 
 cat >>confdefs.h <<\_ACEOF
 #define USE_SELECT 1
+_ACEOF
+
+		;;
+	win32)
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_WIN32 1
 _ACEOF
 
 		;;
