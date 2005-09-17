@@ -1,3 +1,11 @@
+androsyn    2005/09/17 23:27:50 UTC	(20050917_0-20770)
+  Log:
+  finally someone found the randomly breaking servlink bug. thanks jilles
+
+  Modified:
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+
+
 androsyn    2005/09/15 02:25:15 UTC	(20050915_0-20766)
   Log:
   Add some better support for pathnames not being hardcoded.
