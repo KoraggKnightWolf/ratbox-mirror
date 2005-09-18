@@ -1,3 +1,20 @@
+androsyn    2005/09/18 01:57:45 UTC	(20050918_0-20782)
+  Log:
+  A few things in this commit, all from jilles
+  
+    use TS6 form for SQUIT wallops
+    propagate nick changes for remote clients in TS6 form if possible, simplify a bit
+    don't remove oper only umodes for remote clients on deoper 
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_squit.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2005/09/17 23:27:50 UTC	(20050917_0-20770)
   Log:
   finally someone found the randomly breaking servlink bug. thanks jilles
