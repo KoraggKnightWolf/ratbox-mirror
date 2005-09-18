@@ -64,7 +64,7 @@ struct Message uid_msgtab = {
 mapi_clist_av1 nick_clist[] = { &nick_msgtab, &uid_msgtab, NULL };
 DECLARE_MODULE_AV1(nick, NULL, NULL, nick_clist, NULL, NULL, "$Revision: 19256 $");
 
-static int change_remote_nick(struct Client *, struct Client *, int, const char **, time_t, const char *);
+static int change_remote_nick(struct Client *, struct Client *, time_t, const char *);
 
 static int clean_nick(const char *, int loc_client);
 static int clean_username(const char *);
@@ -284,18 +284,18 @@ mc_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* if the nick doesnt exist, allow it and process like normal */
 	if(target_p == NULL)
 	{
-		change_remote_nick(client_p, source_p, parc, parv, newts, parv[1]);
+		change_remote_nick(client_p, source_p, newts, parv[1]);
 	}
 	else if(IsUnknown(target_p))
 	{
 		exit_client(NULL, target_p, &me, "Overridden");
-		change_remote_nick(client_p, source_p, parc, parv, newts, parv[1]);
+		change_remote_nick(client_p, source_p, newts, parv[1]);
 	}
 	else if(target_p == source_p)
 	{
 		/* client changing case of nick */
 		if(strcmp(target_p->name, parv[1]))
-			change_remote_nick(client_p, source_p, parc, parv, newts, parv[1]);
+			change_remote_nick(client_p, source_p, newts, parv[1]);
 	}
 	/* we've got a collision! */
 	else
@@ -701,8 +701,8 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick)
  * change_remote_nick()
  */
 static int
-change_remote_nick(struct Client *client_p, struct Client *source_p, int parc,
-		 const char *parv[], time_t newts, const char *nick)
+change_remote_nick(struct Client *client_p, struct Client *source_p,
+		time_t newts, const char *nick)
 {
 	struct nd_entry *nd;
 	int samenick = irccmp(source_p->name, nick) ? 0 : 1;
@@ -721,8 +721,10 @@ change_remote_nick(struct Client *client_p, struct Client *source_p, int parc,
 	if(source_p->user)
 	{
 		add_history(source_p, 1);
-		sendto_server(client_p, NULL, NOCAPS, NOCAPS, ":%s NICK %s :%ld",
-			      parv[0], nick, (long) source_p->tsinfo);
+		sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
+				use_id(source_p), nick, (long) source_p->tsinfo);
+		sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%ld",
+				source_p->name, nick, (long) source_p->tsinfo);
 	}
 
 	del_from_client_hash(source_p->name, source_p);
@@ -922,7 +924,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 		}
 	}
 
-	change_remote_nick(client_p, source_p, parc, parv, newts, nick);
+	change_remote_nick(client_p, source_p, newts, nick);
 
 	return 0;
 }

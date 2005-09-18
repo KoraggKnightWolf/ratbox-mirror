@@ -134,7 +134,11 @@ ms_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 				     "Remote SQUIT %s from %s (%s)",
 				     target_p->name, source_p->name, comment);
 
-		sendto_server(NULL, NULL, NOCAPS, NOCAPS,
+		sendto_server(NULL, NULL, CAP_TS6, NOCAPS,
+			      ":%s WALLOPS :Remote SQUIT %s from %s (%s)",
+			      me.id, target_p->name, source_p->name, comment);
+
+		sendto_server(NULL, NULL, NOCAPS, CAP_TS6,
 			      ":%s WALLOPS :Remote SQUIT %s from %s (%s)",
 			      me.name, target_p->name, source_p->name, comment);
 
