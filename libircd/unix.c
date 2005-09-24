@@ -1,11 +1,10 @@
 /*
  *  ircd-ratbox: A slightly useful ircd.
- *  win32.c: select() compatible network routines.
+ *  unix.c: various unix type functions
  *
  *  Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
- *  Copyright (C) 1996-2002 Hybrid Development Team
- *  Copyright (C) 2001 Adrian Chadd <adrian@creative.net.au>
- *  Copyright (C) 2002-2005 ircd-ratbox development team
+ *  Copyright (C) 2005 ircd-ratbox development team
+ *  Copyright (C) 2005 Aaron Sethman <androsyn@ratbox.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -38,4 +37,20 @@ ircd_spawn_process(const char *path, const char **argv)
 	}
 	return(pid);
 }
+
+#ifndef HAVE_GETTIMEOFDAY
+int
+gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+	if(tv == NULL)
+	{
+		errno = EFAULT;
+		return -1;
+	}
+	tv->tv_usec = 0;
+	if(time(&tv->tv_sec) == -1)
+		return -1;
+	return 0;
+}
+#endif
 
