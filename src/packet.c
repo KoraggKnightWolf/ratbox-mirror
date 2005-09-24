@@ -180,7 +180,7 @@ flood_recalc(int fd, void *data)
 		return;
 
 	/* and finally, reset the flood check */
-	comm_setflush(fd, 1000, flood_recalc, client_p);
+	ircd_setflush(fd, 1000, flood_recalc, client_p);
 }
 
 /*
@@ -214,7 +214,7 @@ read_ctrl_packet(int fd, void *data)
 		reply->readdata = 0;
 		reply->data = NULL;
 
-		length = comm_read(fd, tmp, 1);
+		length = ircd_read(fd, tmp, 1);
 
 		if(length <= 0)
 		{
@@ -240,7 +240,7 @@ read_ctrl_packet(int fd, void *data)
 	if((replydef->flags & SLINKRPL_FLAG_DATA) && (reply->gotdatalen < 2))
 	{
 		/* we need a datalen u16 which we don't have yet... */
-		length = comm_read(fd, len, (2 - reply->gotdatalen));
+		length = ircd_read(fd, len, (2 - reply->gotdatalen));
 		if(length <= 0)
 		{
 			if((length == -1) && ignoreErrno(errno))
@@ -261,7 +261,7 @@ read_ctrl_packet(int fd, void *data)
 			reply->datalen |= *len;
 			reply->gotdatalen++;
 			if(reply->datalen > 0)
-				reply->data = MyMalloc(reply->datalen);
+				reply->data = ircd_malloc(reply->datalen);
 		}
 
 		if(reply->gotdatalen < 2)
@@ -270,7 +270,7 @@ read_ctrl_packet(int fd, void *data)
 
 	if(reply->readdata < reply->datalen)	/* try to get any remaining data */
 	{
-		length = comm_read(fd, (reply->data + reply->readdata),
+		length = ircd_read(fd, (reply->data + reply->readdata),
 			      (reply->datalen - reply->readdata));
 		if(length <= 0)
 		{
@@ -298,15 +298,15 @@ read_ctrl_packet(int fd, void *data)
 
 	/* reset SlinkRpl */
 	if(reply->datalen > 0)
-		MyFree(reply->data);
+		ircd_free(reply->data);
 	reply->command = 0;
 
 	if(IsAnyDead(server))
 		return;
 
       nodata:
-	/* If we get here, we need to register for another COMM_SELECT_READ */
-	comm_setselect(fd, COMM_SELECT_READ, read_ctrl_packet, server, 0);
+	/* If we get here, we need to register for another IRCD_SELECT_READ */
+	ircd_setselect(fd, IRCD_SELECT_READ, read_ctrl_packet, server, 0);
 }
 
 /*
@@ -336,14 +336,14 @@ read_packet(int fd, void *data)
 		 * I personally think it makes the code too hairy to make sane.
 		 *     -- adrian
 		 */
-		length = comm_read(client_p->localClient->fd, readBuf, READBUF_SIZE);
+		length = ircd_read(client_p->localClient->fd, readBuf, READBUF_SIZE);
 
 		if(length < 0)
 		{
 			if(ignoreErrno(errno))
 			{
-				comm_setselect(client_p->localClient->fd, 
-						COMM_SELECT_READ, read_packet, client_p, 0);
+				ircd_setselect(client_p->localClient->fd, 
+						IRCD_SELECT_READ, read_packet, client_p, 0);
 			} else
 				error_exit_client(client_p, length);
 			return;
@@ -402,8 +402,8 @@ read_packet(int fd, void *data)
 
 		if(length < READBUF_SIZE) 
 		{
-			comm_setselect(client_p->localClient->fd,
-					COMM_SELECT_READ, read_packet, client_p, 0);
+			ircd_setselect(client_p->localClient->fd,
+					IRCD_SELECT_READ, read_packet, client_p, 0);
 			return;
 		}
 	}

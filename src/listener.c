@@ -56,7 +56,7 @@ static struct Listener *ListenerPollList = NULL;
 static struct Listener *
 make_listener(struct irc_sockaddr_storage *addr)
 {
-	struct Listener *listener = (struct Listener *) MyMalloc(sizeof(struct Listener));
+	struct Listener *listener = (struct Listener *) ircd_malloc(sizeof(struct Listener));
 	s_assert(0 != listener);
 
 	listener->name = me.name;
@@ -91,7 +91,7 @@ free_listener(struct Listener *listener)
 	}
 
 	/* free */
-	MyFree(listener);
+	ircd_free(listener);
 }
 
 #define PORTNAMELEN 6		/* ":31337" */
@@ -171,7 +171,7 @@ inetport(struct Listener *listener)
 	 * At first, open a new socket
 	 */
 	
-	fd = comm_socket(listener->addr.ss_family, SOCK_STREAM, 0, "Listener socket");
+	fd = ircd_socket(listener->addr.ss_family, SOCK_STREAM, 0, "Listener socket");
 
 #ifdef IPV6
 	if(listener->addr.ss_family == AF_INET6)
@@ -206,7 +206,7 @@ inetport(struct Listener *listener)
 		report_error("no more connections left for listener %s:%s",
 			     get_listener_name(listener), 
 			     get_listener_name(listener), errno);
-		comm_close(fd);
+		ircd_close(fd);
 		return 0;
 	}
 	/*
@@ -218,7 +218,7 @@ inetport(struct Listener *listener)
 		report_error("setting SO_REUSEADDR for listener %s:%s",
 			     get_listener_name(listener), 
 			     get_listener_name(listener), errno);
-		comm_close(fd);
+		ircd_close(fd);
 		return 0;
 	}
 
@@ -232,7 +232,7 @@ inetport(struct Listener *listener)
 		report_error("binding listener socket %s:%s",
 			     get_listener_name(listener), 
 			     get_listener_name(listener), errno);
-		comm_close(fd);
+		ircd_close(fd);
 		return 0;
 	}
 
@@ -241,7 +241,7 @@ inetport(struct Listener *listener)
 		report_error("listen failed for %s:%s", 
 			     get_listener_name(listener), 
 			     get_listener_name(listener), errno);
-		comm_close(fd);
+		ircd_close(fd);
 		return 0;
 	}
 
@@ -402,7 +402,7 @@ close_listener(struct Listener *listener)
 		return;
 	if(listener->fd >= 0)
 	{
-		comm_close(listener->fd);
+		ircd_close(listener->fd);
 		listener->fd = -1;
 	}
 
@@ -513,7 +513,7 @@ accept_connection(int pfd, void *data)
 	 while(listener != NULL) /* loop until we again EAGAIN or listener goes null */
 	 {
 
-		fd = comm_accept(listener->fd, (struct sockaddr *)&sai, &addrlen);
+		fd = ircd_accept(listener->fd, (struct sockaddr *)&sai, &addrlen);
 
 		/* This needs to be done here, otherwise we break dlines */
 		mangle_mapped_sockaddr((struct sockaddr *)&sai);
@@ -521,8 +521,8 @@ accept_connection(int pfd, void *data)
 		if(fd < 0)
 		{
 			/* Re-register a new IO request for the next accept .. */
-			comm_setselect(listener->fd,
-				      COMM_SELECT_ACCEPT, accept_connection, listener, 0);
+			ircd_setselect(listener->fd,
+				      IRCD_SELECT_ACCEPT, accept_connection, listener, 0);
 			return;
 		}
 		
@@ -544,7 +544,7 @@ accept_connection(int pfd, void *data)
 			}
 			
 			write(fd, "ERROR :All connections in use\r\n", 32);
-			comm_close(fd);
+			ircd_close(fd);
 			/* Re-register a new IO request for the next accept .. */
 			continue;
 		}
@@ -568,7 +568,7 @@ accept_connection(int pfd, void *data)
 			   ircsprintf(buf, "ERROR :You have been D-lined.\r\n");
 	
 			write(fd, buf, strlen(buf));
-			comm_close(fd);
+			ircd_close(fd);
 			continue;
 			
 		}

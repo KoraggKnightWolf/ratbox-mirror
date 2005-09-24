@@ -44,7 +44,7 @@ static port_event_t *pelst;	/* port buffer */
 static int pemax;		/* max structs to buffer */
 
 int 
-comm_setup_fd(int fd)
+ircd_setup_fd(int fd)
 {
         return 0;
 }
@@ -84,19 +84,19 @@ init_netio(void)
 		exit(115);	/* Whee! */
 	}
 	pemax = getdtablesize();
-	pelst = MyMalloc(sizeof(port_event_t) * pemax);
+	pelst = ircd_malloc(sizeof(port_event_t) * pemax);
 	zero_timespec.tv_sec = 0;
 	zero_timespec.tv_nsec = 0;
 }
 
 /*
- * comm_setselect
+ * ircd_setselect
  *
  * This is a needed exported function which will be called to register
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
+ircd_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = find_fd(fd);
@@ -106,12 +106,12 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 	/* Update the list, even though we're not using it .. */
 	F->list = list;
 
-	if(type & COMM_SELECT_READ) {
+	if(type & IRCD_SELECT_READ) {
 		pe_update_events(F, POLLRDNORM, handler);
 		F->read_handler = handler;
 		F->read_data = client_data;
 	}
-	if(type & COMM_SELECT_WRITE) {
+	if(type & IRCD_SELECT_WRITE) {
 		pe_update_events(F, POLLWRNORM, handler);
 		F->write_handler = handler;
 		F->write_data = client_data;
@@ -122,16 +122,16 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 }
 
 /*
- * comm_select
+ * ircd_select
  *
  * Called to do the new-style IO, courtesy of squid (like most of this
  * new IO code). This routine handles the stuff we've hidden in
- * comm_setselect and fd_table[] and calls callbacks for IO ready
+ * ircd_setselect and fd_table[] and calls callbacks for IO ready
  * events.
  */
 
 int
-comm_select(unsigned long delay)
+ircd_select(unsigned long delay)
 {
 	int	 	 i, fd;
 	uint	 	 nget = 1;
@@ -145,7 +145,7 @@ struct	timer_data	*tdata;
 	ircd_set_time();
 
 	if (i == -1)
-		return COMM_OK;
+		return IRCD_OK;
 
 	for (i = 0; i < nget; i++) {
 		switch(pelst[i].portev_source) {
@@ -174,11 +174,11 @@ struct	timer_data	*tdata;
 			break;
 		}
 	}
-	return COMM_OK;
+	return IRCD_OK;
 }
 
-comm_event_id
-comm_schedule_event(time_t when, int repeat, comm_event_cb_t cb, void *udata)
+ircd_event_id
+ircd_schedule_event(time_t when, int repeat, ircd_event_cb_t cb, void *udata)
 {
 	timer_t	 	 id;
 struct	timer_data	*tdata;
@@ -216,7 +216,7 @@ struct	itimerspec	 ts;
 }
 
 void
-comm_unschedule_event(comm_event_id id)
+ircd_unschedule_event(ircd_event_id id)
 {
 	timer_delete(id->td_timer_id);
 	free(id);

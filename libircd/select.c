@@ -37,7 +37,7 @@ fd_set select_readfds;
 fd_set select_writefds;
 
 /*
- * You know, I'd rather have these local to comm_select but for some
+ * You know, I'd rather have these local to ircd_select but for some
  * reason my gcc decides that I can't modify them at all..
  *   -- adrian
  */
@@ -56,14 +56,14 @@ static void
 select_update_selectfds(int fd, short event, PF * handler)
 {
 	/* Update the read / write set */
-	if(event & COMM_SELECT_READ)
+	if(event & IRCD_SELECT_READ)
 	{
 		if(handler)
 			FD_SET(fd, &select_readfds);
 		else
 			FD_CLR(fd, &select_readfds);
 	}
-	if(event & COMM_SELECT_WRITE)
+	if(event & IRCD_SELECT_WRITE)
 	{
 		if(handler)
 			FD_SET(fd, &select_writefds);
@@ -77,7 +77,7 @@ select_update_selectfds(int fd, short event, PF * handler)
 /* Public functions */
 
 int
-comm_setup_fd(int fd)
+ircd_setup_fd(int fd)
 {
 	return 0;	
 }
@@ -97,30 +97,30 @@ init_netio(void)
 }
 
 /*
- * comm_setselect
+ * ircd_setselect
  *
  * This is a needed exported function which will be called to register
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, unsigned int type, PF * handler,
+ircd_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = find_fd(fd);
 	lircd_assert(fd >= 0);
 	lircd_assert(F->flags.open);
 
-	if(type & COMM_SELECT_READ)
+	if(type & IRCD_SELECT_READ)
 	{
 		F->read_handler = handler;
 		F->read_data = client_data;
-		select_update_selectfds(fd, COMM_SELECT_READ, handler);
+		select_update_selectfds(fd, IRCD_SELECT_READ, handler);
 	}
-	if(type & COMM_SELECT_WRITE)
+	if(type & IRCD_SELECT_WRITE)
 	{
 		F->write_handler = handler;
 		F->write_data = client_data;
-		select_update_selectfds(fd, COMM_SELECT_WRITE, handler);
+		select_update_selectfds(fd, IRCD_SELECT_WRITE, handler);
 	}
 	if(timeout)
 		F->timeout = ircd_currenttime + (timeout / 1000);
@@ -133,13 +133,13 @@ comm_setselect(int fd, unsigned int type, PF * handler,
  */
 
 /*
- * comm_select
+ * ircd_select
  *
  * Do IO events
  */
 
 int
-comm_select(unsigned long delay)
+ircd_select(unsigned long delay)
 {
 	int num;
 	int fd;
@@ -196,9 +196,9 @@ comm_select(unsigned long delay)
 		}
 
 		if(F->read_handler == NULL)
-			select_update_selectfds(fd, COMM_SELECT_READ, NULL);
+			select_update_selectfds(fd, IRCD_SELECT_READ, NULL);
 		if(F->write_handler == NULL)
-			select_update_selectfds(fd, COMM_SELECT_WRITE, NULL);
+			select_update_selectfds(fd, IRCD_SELECT_WRITE, NULL);
 	}
 	return 0;
 }

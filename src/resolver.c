@@ -85,9 +85,9 @@ dns_select(void)
 	{
 		fd = pollfds[i].fd;
 		if(pollfds[i].events & ADNS_POLLIN)
-			comm_setselect(fd, COMM_SELECT_READ, dns_readable, NULL, 0);
+			ircd_setselect(fd, IRCD_SELECT_READ, dns_readable, NULL, 0);
 		if(pollfds[i].events & ADNS_POLLOUT)
-			comm_setselect(fd, COMM_SELECT_WRITE,
+			ircd_setselect(fd, IRCD_SELECT_WRITE,
 				       dns_writeable, NULL, 0);
 	}
 }
@@ -154,7 +154,7 @@ write_sendq(int fd, void *unused)
 		}
 	}
 	if(linebuf_len(&sendq) > 0)
-		comm_setselect(fd, COMM_SELECT_WRITE, write_sendq, NULL, 0);
+		ircd_setselect(fd, IRCD_SELECT_WRITE, write_sendq, NULL, 0);
 }
 
 /*
@@ -212,7 +212,7 @@ read_request(int fd, void *unusued)
 {
 	int length;
 
-	while((length = comm_read(fd, readBuf, sizeof(readBuf))) > 0)
+	while((length = ircd_read(fd, readBuf, sizeof(readBuf))) > 0)
 	{
 		linebuf_parse(&recvq, readBuf, length, 0);
 		parse_request();
@@ -223,7 +223,7 @@ read_request(int fd, void *unusued)
 
 	if(length == -1 && !ignoreErrno(errno))
 		exit(1);
-	comm_setselect(fd, COMM_SELECT_READ, read_request, NULL, 0);
+	ircd_setselect(fd, IRCD_SELECT_READ, read_request, NULL, 0);
 }
 
 
@@ -304,13 +304,13 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 				    adns_r_ptr_ip6_old,
 				    adns_qf_owner | adns_qf_cname_loose |
 				    adns_qf_quoteok_anshost, req, &req->query);
-			MyFree(reply);
+			ircd_free(reply);
 			if(result != 0)
 			{
 				linebuf_put(&sendq, "%s 0 FAILED", req->reqid);
 				write_sendq(ofd, NULL);
-				MyFree(reply);
-				MyFree(req);
+				ircd_free(reply);
+				ircd_free(req);
 
 			}							
 			return;
@@ -321,8 +321,8 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 	}
 	linebuf_put(&sendq, "%s %d %d %s\n", req->reqid, result, aftype, response);
 	write_sendq(ofd, NULL);
-	MyFree(reply);
-	MyFree(req);
+	ircd_free(reply);
+	ircd_free(req);
 }
 
 
@@ -368,7 +368,7 @@ read_io(void)
 		dns_select();
 		ircd_set_time();
 		eventRun();
-		comm_select(250);
+		ircd_select(250);
 	}
 }
 
@@ -444,7 +444,7 @@ resolve_host(char **parv)
 	char *rec = parv[3];
 	int result;
 	int flags;
-	req = MyMalloc(sizeof(struct dns_request));
+	req = ircd_malloc(sizeof(struct dns_request));
 	strcpy(req->reqid, requestid);
 
 	req->revfwd = REQFWD;
@@ -487,7 +487,7 @@ resolve_ip(char **parv)
 	{
 		exit(3);
 	}
-	req = MyMalloc(sizeof(struct dns_request));
+	req = ircd_malloc(sizeof(struct dns_request));
 	req->revfwd = REQREV;
 	strcpy(req->reqid, requestid);
 	switch(*iptype)
@@ -568,10 +568,10 @@ int main(int argc, char **argv)
 	linebuf_newbuf(&sendq);
 	linebuf_newbuf(&recvq);
 
-	comm_open(ifd, FD_SOCKET, "incoming pipe");
-	comm_open(ofd, FD_SOCKET, "outgoing pipe");
-	comm_set_nb(ifd);
-	comm_set_nb(ofd);
+	ircd_open(ifd, FD_SOCKET, "incoming pipe");
+	ircd_open(ofd, FD_SOCKET, "outgoing pipe");
+	ircd_set_nb(ifd);
+	ircd_set_nb(ofd);
 	adns_init(&dns_state, adns_if_noautosys, 0);
 	setup_signals();
 	read_io();	

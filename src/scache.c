@@ -103,7 +103,7 @@ find_or_add(const char *name)
 			return (ptr->name);
 	}
 
-	ptr = (SCACHE *) MyMalloc(sizeof(SCACHE));
+	ptr = (SCACHE *) ircd_malloc(sizeof(SCACHE));
 	s_assert(0 != ptr);
 
 	strlcpy(ptr->name, name, sizeof(ptr->name));

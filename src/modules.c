@@ -166,7 +166,7 @@ mod_add_path(const char *path)
 	if(mod_find_path(path))
 		return;
 
-	pathst = MyMalloc(sizeof(struct module_path));
+	pathst = ircd_malloc(sizeof(struct module_path));
 
 	strcpy(pathst->path, path);
 	dlinkAddAlloc(pathst, &mod_paths);
@@ -185,7 +185,7 @@ mod_clear_paths(void)
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, mod_paths.head)
 	{
-		MyFree(ptr->data);
+		ircd_free(ptr->data);
 		free_dlink_node(ptr);
 	}
 
@@ -202,7 +202,7 @@ mod_clear_paths(void)
 char *
 irc_basename(const char *path)
 {
-	char *mod_basename = MyMalloc(strlen(path) + 1);
+	char *mod_basename = ircd_malloc(strlen(path) + 1);
 	const char *s;
 
 	if(!(s = strrchr(path, '/')))
@@ -308,7 +308,7 @@ load_all_modules(int warn)
 	int len;
 	modules_init();
 
-	modlist = (struct module **) MyMalloc(sizeof(struct module) * (MODS_INCREMENT));
+	modlist = (struct module **) ircd_malloc(sizeof(struct module) * (MODS_INCREMENT));
 
 	find_module_suffix();
 	max_mods = MODS_INCREMENT;
@@ -439,13 +439,13 @@ mo_modload(struct Client *client_p, struct Client *source_p, int parc, const cha
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is already loaded",
 			   me.name, source_p->name, m_bn);
-		MyFree(m_bn);
+		ircd_free(m_bn);
 		return 0;
 	}
 
 	load_one_module(parv[1], 0);
 
-	MyFree(m_bn);
+	ircd_free(m_bn);
 
 	return 0;
 }
@@ -471,7 +471,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 	{
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
-		MyFree(m_bn);
+		ircd_free(m_bn);
 		return 0;
 	}
 
@@ -480,7 +480,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is a core module and may not be unloaded",
 			   me.name, source_p->name, m_bn);
-		MyFree(m_bn);
+		ircd_free(m_bn);
 		return 0;
 	}
 
@@ -489,7 +489,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
 	}
-	MyFree(m_bn);
+	ircd_free(m_bn);
 	return 0;
 }
 
@@ -514,7 +514,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 	{
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
-		MyFree(m_bn);
+		ircd_free(m_bn);
 		return 0;
 	}
 
@@ -524,7 +524,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 	{
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
-		MyFree(m_bn);
+		ircd_free(m_bn);
 		return 0;
 	}
 
@@ -536,7 +536,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 		exit(0);
 	}
 
-	MyFree(m_bn);
+	ircd_free(m_bn);
 	return 0;
 }
 
@@ -673,7 +673,7 @@ unload_one_module(const char *name, int warn)
 
 	lt_dlclose(modlist[modindex]->address);
 
-	MyFree(modlist[modindex]->name);
+	ircd_free(modlist[modindex]->name);
 	memcpy(&modlist[modindex], &modlist[modindex + 1],
 	       sizeof(struct module) * ((num_mods - 1) - modindex));
 
@@ -718,7 +718,7 @@ load_a_module(const char *path, int warn, int core)
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Error loading module %s: %s", mod_basename, err);
 		ilog(L_MAIN, "Error loading module %s: %s", mod_basename, err);
-		MyFree(mod_basename);
+		ircd_free(mod_basename);
 		return -1;
 	}
 
@@ -739,7 +739,7 @@ load_a_module(const char *path, int warn, int core)
 				     mod_basename);
 		ilog(L_MAIN, "Data format error: module %s has no MAPI header.", mod_basename);
 		lt_dlclose(tmpptr);
-		MyFree(mod_basename);
+		ircd_free(mod_basename);
 		return -1;
 	}
 
@@ -756,7 +756,7 @@ load_a_module(const char *path, int warn, int core)
 						     "Module %s indicated failure during load.",
 						     mod_basename);
 				lt_dlclose(tmpptr);
-				MyFree(mod_basename);
+				ircd_free(mod_basename);
 				return -1;
 			}
 			if(mheader->mapi_command_list)
@@ -791,7 +791,7 @@ load_a_module(const char *path, int warn, int core)
 				     "Module %s has unknown/unsupported MAPI version %d.",
 				     mod_basename, *mapi_version);
 		lt_dlclose(tmpptr); 
-		MyFree(mod_basename);
+		ircd_free(mod_basename);
 		return -1;
 	}
 
@@ -800,7 +800,7 @@ load_a_module(const char *path, int warn, int core)
 
 	increase_modlist();
 
-	modlist[num_mods] = MyMalloc(sizeof(struct module));
+	modlist[num_mods] = ircd_malloc(sizeof(struct module));
 	modlist[num_mods]->address = tmpptr;
 	modlist[num_mods]->version = ver;
 	modlist[num_mods]->core = core;
@@ -818,7 +818,7 @@ load_a_module(const char *path, int warn, int core)
 		ilog(L_MAIN, "Module %s [version: %s; MAPI version: %d] loaded at 0x%lx",
 		     mod_basename, ver, MAPI_VERSION(*mapi_version), (unsigned long) tmpptr);
 	}
-	MyFree(mod_basename);
+	ircd_free(mod_basename);
 	return 0;
 }
 
@@ -837,11 +837,11 @@ increase_modlist(void)
 	if((num_mods + 1) < max_mods)
 		return;
 
-	new_modlist = (struct module **) MyMalloc(sizeof(struct module) *
+	new_modlist = (struct module **) ircd_malloc(sizeof(struct module) *
 						  (max_mods + MODS_INCREMENT));
 	memcpy((void *) new_modlist, (void *) modlist, sizeof(struct module) * num_mods);
 
-	MyFree(modlist);
+	ircd_free(modlist);
 	modlist = new_modlist;
 	max_mods += MODS_INCREMENT;
 }

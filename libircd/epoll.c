@@ -59,30 +59,30 @@ init_netio(void)
 {
 	pfd_size = getdtablesize();
 	ep = epoll_create(pfd_size);
-	pfd = MyMalloc(sizeof(struct epoll_event) * pfd_size);
+	pfd = ircd_malloc(sizeof(struct epoll_event) * pfd_size);
 	if(ep < 0)
 	{
 		fprintf(stderr, "init_netio: Couldn't open epoll fd!\n");
 		exit(115);	/* Whee! */
 	}
-	comm_note(ep, "epoll file descriptor");
+	ircd_note(ep, "epoll file descriptor");
 }
 
 int
-comm_setup_fd(int fd)
+ircd_setup_fd(int fd)
 {
 	return 0;
 }  
 
 
 /*
- * comm_setselect
+ * ircd_setselect
  *
  * This is a needed exported function which will be called to register
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, unsigned int type, PF * handler,
+ircd_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	struct epoll_event ep_event;
@@ -94,7 +94,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 	lircd_assert(F->flags.open);
 	
 	/* Update the list, even though we're not using it .. */
-	if(type & COMM_SELECT_READ)
+	if(type & IRCD_SELECT_READ)
 	{
 		if(handler != NULL)
 			F->pflags |= EPOLLIN;
@@ -104,7 +104,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 		F->read_data = client_data;
 	}
 
-	if(type & COMM_SELECT_WRITE)
+	if(type & IRCD_SELECT_WRITE)
 	{
 		if(handler != NULL)
 			F->pflags |= EPOLLOUT;
@@ -137,7 +137,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 
 	if(epoll_ctl(ep, op, fd, &ep_event) != 0)
 	{
-		ircd_lib_log("Xcomm_setselect(): epoll_ctl failed: %s", strerror(errno));
+		ircd_lib_log("Xircd_setselect(): epoll_ctl failed: %s", strerror(errno));
 		abort();
 	}
 
@@ -145,16 +145,16 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 }
 
 /*
- * comm_select
+ * ircd_select
  *
  * Called to do the new-style IO, courtesy of squid (like most of this
  * new IO code). This routine handles the stuff we've hidden in
- * comm_setselect and fd_table[] and calls callbacks for IO ready
+ * ircd_setselect and fd_table[] and calls callbacks for IO ready
  * events.
  */
 
 int
-comm_select(unsigned long delay)
+ircd_select(unsigned long delay)
 {
 	int num, i, flags, old_flags, op;
 	struct epoll_event ep_event;
@@ -165,11 +165,11 @@ comm_select(unsigned long delay)
 
 	if(num < 0 && !ignoreErrno(errno))
 	{
-		return COMM_OK;
+		return IRCD_OK;
 	}
 
 	if(num == 0)
-		return COMM_OK;
+		return IRCD_OK;
 	for (i = 0; i < num; i++)
 	{
 		PF *hdl;
@@ -228,12 +228,12 @@ comm_select(unsigned long delay)
 				
 			if(epoll_ctl(ep, op, F->fd, &ep_event) != 0)
 			{
-				ircd_lib_log("comm_setselect(): epoll_ctl failed: %s", strerror(errno));
+				ircd_lib_log("ircd_setselect(): epoll_ctl failed: %s", strerror(errno));
 			}
 		}
 					
 	}
-	return COMM_OK;
+	return IRCD_OK;
 }
 
 

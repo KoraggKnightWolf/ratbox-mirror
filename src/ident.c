@@ -61,7 +61,7 @@ send_sprintf(int fd, const char *format, ...)
 	va_start(args, format);
 	vsprintf(buf, format, args);
 	va_end(args); 
-	return(comm_write(fd, buf, strlen(buf)));
+	return(ircd_write(fd, buf, strlen(buf)));
 }
 
 
@@ -156,7 +156,7 @@ write_sendq(int fd, void *unused)
 	 
 	if(linebuf_len(&sendq) > 0)
 	{
-		comm_setselect(irc_ofd, COMM_SELECT_WRITE,
+		ircd_setselect(irc_ofd, IRCD_SELECT_WRITE,
 			       write_sendq, NULL, 0);
 	}
 }
@@ -170,7 +170,7 @@ read_auth_timeout(int fd, void *data)
 	linebuf_put(&sendq, "%s 0", auth->reqid);
 	write_sendq(irc_ofd, NULL);
 	BlockHeapFree(authheap, auth);
-	comm_close(fd);
+	ircd_close(fd);
 }
 
 
@@ -237,12 +237,12 @@ read_auth(int fd, void *data)
 	char username[USERLEN], *s, *t;
 	int len, count;
 
-	len = comm_read(fd, buf, sizeof(buf));
+	len = ircd_read(fd, buf, sizeof(buf));
 	fprintf(stderr, "Read %s from %d %d\n", buf, fd, len);
 	if(len < 0 && ignoreErrno(errno))
 	{
-		comm_settimeout(fd, 30, read_auth_timeout, auth);
-		comm_setselect(fd, COMM_SELECT_READ, read_auth, auth, 30);
+		ircd_settimeout(fd, 30, read_auth_timeout, auth);
+		ircd_setselect(fd, IRCD_SELECT_READ, read_auth, auth, 30);
 		return;
 	} else {
 		buf[len] = '\0';
@@ -266,7 +266,7 @@ read_auth(int fd, void *data)
 		} else
 			linebuf_put(&sendq, "%s 0", auth->reqid);
 		write_sendq(irc_ofd, NULL);
-		comm_close(fd);
+		ircd_close(fd);
 		BlockHeapFree(authheap, auth);
 	}
 }
@@ -276,7 +276,7 @@ connect_callback(int fd, int status, void *data)
 {
 	struct auth_request *auth = data;
 	fprintf(stderr, "Got a connect callback..weee!\n");
-	if(status == COMM_OK)
+	if(status == IRCD_OK)
 	{
 		/* one shot at the send, socket buffers should be able to handle it
 		 * if not, oh well, you lose
@@ -285,7 +285,7 @@ connect_callback(int fd, int status, void *data)
 		{
 			linebuf_put(&sendq, "%s 0", auth->reqid);
 			write_sendq(irc_ofd, NULL);
-			comm_close(fd);
+			ircd_close(fd);
 			BlockHeapFree(authheap, auth);
 			return;
 		}
@@ -293,7 +293,7 @@ connect_callback(int fd, int status, void *data)
 	} else {
 		linebuf_put(&sendq, "%s 0", auth->reqid);
 		write_sendq(irc_ofd, NULL);
-		comm_close(fd);
+		ircd_close(fd);
 		BlockHeapFree(authheap, auth);
 	}
 }
@@ -318,10 +318,10 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	auth->dstport = atoi(dstport);
 	strcpy(auth->reqid, id);
 	fprintf(stderr, "Going to try to connect\n");
-	auth->authfd = comm_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
-	comm_connect_tcp(auth->authfd, (struct sockaddr *)&auth->destaddr, 
+	auth->authfd = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
+	ircd_connect_tcp(auth->authfd, (struct sockaddr *)&auth->destaddr, 
 		(struct sockaddr *)&auth->bindaddr, GET_SS_LEN(auth->destaddr), connect_callback, auth, 30);
-	fprintf(stderr, "Fired off the comm_connect_tcp\n");				  
+	fprintf(stderr, "Fired off the ircd_connect_tcp\n");				  
 }
 
 static void
@@ -345,7 +345,7 @@ read_auth_request(int fd, void *data)
 {
 	int length;
 
-	while((length = comm_read(irc_ifd, readBuf, sizeof(readBuf))) > 0)
+	while((length = ircd_read(irc_ifd, readBuf, sizeof(readBuf))) > 0)
 	{
 		linebuf_parse(&recvq, readBuf, length, 0);
 		parse_auth_request();
@@ -357,7 +357,7 @@ read_auth_request(int fd, void *data)
 	if(length == -1 && !ignoreErrno(errno))
 		exit(1);
 
-	comm_setselect(irc_ifd, COMM_SELECT_READ, read_auth_request, NULL, 0);
+	ircd_setselect(irc_ifd, IRCD_SELECT_READ, read_auth_request, NULL, 0);
 }
 
 static void
@@ -411,17 +411,17 @@ int main(int argc, char **argv)
 	linebuf_newbuf(&recvq);
 	authheap = BlockHeapCreate(sizeof(struct auth_request), 2048);
 
-	comm_open(irc_ifd, FD_PIPE, "ircd ifd");
-	comm_open(irc_ofd, FD_PIPE, "ircd ofd");
+	ircd_open(irc_ifd, FD_PIPE, "ircd ifd");
+	ircd_open(irc_ofd, FD_PIPE, "ircd ofd");
 
-	comm_set_nb(irc_ifd);
-	comm_set_nb(irc_ofd);
+	ircd_set_nb(irc_ifd);
+	ircd_set_nb(irc_ofd);
 	
 	read_auth_request(irc_ifd, NULL);
 
 	while(1) {
-		comm_select(1000);
-		comm_checktimeouts(NULL);
+		ircd_select(1000);
+		ircd_checktimeouts(NULL);
 		eventRun();
 	}
 	return 0;

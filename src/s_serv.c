@@ -197,7 +197,7 @@ collect_zipstats(void *unused)
 			/* only bother if we haven't already got something queued... */
 			if(!target_p->localClient->slinkq)
 			{
-				target_p->localClient->slinkq = MyMalloc(1);	/* sigh.. */
+				target_p->localClient->slinkq = ircd_malloc(1);	/* sigh.. */
 				target_p->localClient->slinkq[0] = SLINKCMD_ZIPSTATS;
 				target_p->localClient->slinkq_ofs = 0;
 				target_p->localClient->slinkq_len = 1;
@@ -400,7 +400,7 @@ try_connections(void *unused)
 
 	/*
 	 * We used to only print this if serv_connect() actually
-	 * suceeded, but since comm_tcp_connect() can call the callback
+	 * suceeded, but since ircd_tcp_connect() can call the callback
 	 * immediately if there is an error, we were getting error messages
 	 * in the wrong order. SO, we just print out the activated line,
 	 * and let serv_connect() / serv_connect_callback() print an
@@ -511,7 +511,7 @@ show_capabilities(struct Client *target_p)
  * This code initiates a connection to a server. It first checks to make
  * sure the given server exists. If this is the case, it creates a socket,
  * creates a client, saves the socket information in the client, and
- * initiates a connection to the server through comm_connect_tcp(). The
+ * initiates a connection to the server through ircd_connect_tcp(). The
  * completion of this goes through serv_completed_connection().
  *
  * We return 1 if the connection is attempted, since we don't know whether
@@ -547,7 +547,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	}
 
 	/* create a socket for the server connection */
-	if((fd = comm_socket(server_p->ipnum.ss_family, SOCK_STREAM, 0, NULL)) < 0)
+	if((fd = ircd_socket(server_p->ipnum.ss_family, SOCK_STREAM, 0, NULL)) < 0)
 	{
 		/* Eek, failure to create the socket */
 		report_error("opening stream socket to %s: %s", 
@@ -556,7 +556,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	}
 
 	/* servernames are always guaranteed under HOSTLEN chars */
-	comm_note(fd, "Server: %s", server_p->name);
+	ircd_note(fd, "Server: %s", server_p->name);
 
 	/* Create a local client */
 	client_p = make_client(NULL);
@@ -581,9 +581,9 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	 *   -- adrian
 	 */
 
-	if(!comm_set_buffers(client_p->localClient->fd, READBUF_SIZE))
+	if(!ircd_set_buffers(client_p->localClient->fd, READBUF_SIZE))
 	{
-		report_error("comm_set_buffers failed for server %s:%s",
+		report_error("ircd_set_buffers failed for server %s:%s",
 				get_server_name(client_p, SHOW_IP),
 				log_client_name(client_p, SHOW_IP),
 				errno);
@@ -649,13 +649,13 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 #endif
 	else
 	{
-		comm_connect_tcp(client_p->localClient->fd, (struct sockaddr *)&server_p->ipnum,
+		ircd_connect_tcp(client_p->localClient->fd, (struct sockaddr *)&server_p->ipnum,
 				 NULL, 0, serv_connect_callback, 
 				 client_p, ConfigFileEntry.connect_timeout);
 		 return 1;
 	}
 
-	comm_connect_tcp(client_p->localClient->fd, (struct sockaddr *)&server_p->ipnum,
+	ircd_connect_tcp(client_p->localClient->fd, (struct sockaddr *)&server_p->ipnum,
 			 (struct sockaddr *) &myipnum,
 			 GET_SS_LEN(myipnum), serv_connect_callback, client_p,
 			 ConfigFileEntry.connect_timeout);
@@ -717,12 +717,12 @@ serv_connect_callback(int fd, int status, void *data)
 #endif	
 	
 	/* Check the status */
-	if(status != COMM_OK)
+	if(status != IRCD_OK)
 	{
-		/* COMM_ERR_TIMEOUT wont have an errno associated with it,
+		/* IRCD_ERR_TIMEOUT wont have an errno associated with it,
 		 * the others will.. --fl
 		 */
-		if(status == COMM_ERR_TIMEOUT)
+		if(status == IRCD_ERR_TIMEOUT)
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"Error connecting to %s[%s]: %s",
 					client_p->name, 
@@ -731,7 +731,7 @@ serv_connect_callback(int fd, int status, void *data)
 #else
 					client_p->host,
 #endif
-					comm_errstr(status));
+					ircd_errstr(status));
 		else
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"Error connecting to %s[%s]: %s (%s)",
@@ -741,13 +741,13 @@ serv_connect_callback(int fd, int status, void *data)
 #else
 					client_p->host,
 #endif
-					comm_errstr(status), strerror(errno));
+					ircd_errstr(status), strerror(errno));
 
-		exit_client(client_p, client_p, &me, comm_errstr(status));
+		exit_client(client_p, client_p, &me, ircd_errstr(status));
 		return;
 	}
 
-	/* COMM_OK, so continue the connection procedure */
+	/* IRCD_OK, so continue the connection procedure */
 	/* Get the C/N lines */
 	if((server_p = client_p->localClient->att_sconf) == NULL)
 	{

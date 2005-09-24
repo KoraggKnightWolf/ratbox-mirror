@@ -51,7 +51,6 @@ struct iovec
 
 #define pipe(x)  _pipe(x, 1024, O_BINARY)
 #define ioctl(x,y,z)  ioctlsocket(x,y, (u_long *)z)
-#define HAVE_GETTIMEOFDAY 1
 #define HAVE_VSNPRINTF 1
 
 int setenv(const char *, const char *, int);
@@ -195,6 +194,9 @@ void ircd_lib(log_cb *xilog, restart_cb *irestart, die_cb *idie, int closeall, i
 time_t ircd_current_time(void);
 struct timeval *ircd_current_time_tv(void);
 pid_t ircd_spawn_process(const char *, const char **);
+#ifndef HAVE_GETTIMEOFDAY
+int gettimeofday(struct timeval *, struct timezone *);
+#endif
 
 #ifndef ircd_currenttime
 #define ircd_currenttime ircd_current_time()

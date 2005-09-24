@@ -518,8 +518,8 @@ expire_tgchange(void *unused)
 		{
 			dlinkDelete(ptr, &tgchange_list);
 			patricia_remove(tgchange_tree, target->pnode);
-			MyFree(target->ip);
-			MyFree(target);
+			ircd_free(target->ip);
+			ircd_free(target);
 		}
 	}
 }

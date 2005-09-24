@@ -178,19 +178,19 @@ free_local_client(struct Client *client_p)
 	}
 
 	if(client_p->localClient->fd >= 0)
-		comm_close(client_p->localClient->fd);
+		ircd_close(client_p->localClient->fd);
 
 	if(client_p->localClient->passwd)
 	{
 		memset(client_p->localClient->passwd, 0,
 			strlen(client_p->localClient->passwd));
-		MyFree(client_p->localClient->passwd);
+		ircd_free(client_p->localClient->passwd);
 	}
 
-	MyFree(client_p->localClient->fullcaps);
-	MyFree(client_p->localClient->auth_oper);
-	MyFree(client_p->localClient->response);
-	MyFree(client_p->localClient->opername);
+	ircd_free(client_p->localClient->fullcaps);
+	ircd_free(client_p->localClient->auth_oper);
+	ircd_free(client_p->localClient->response);
+	ircd_free(client_p->localClient->opername);
 
 	BlockHeapFree(lclient_heap, client_p->localClient);
 	client_p->localClient = NULL;
@@ -634,8 +634,8 @@ release_client_state(struct Client *client_p)
 		if(client_p->serv->user != NULL)
 			free_user(client_p->serv->user, client_p);
 		if(client_p->serv->fullcaps)
-			MyFree(client_p->serv->fullcaps);
-		MyFree(client_p->serv);
+			ircd_free(client_p->serv->fullcaps);
+		ircd_free(client_p->serv);
 	}
 }
 
@@ -1120,7 +1120,7 @@ exit_aborted_clients(void *unused)
 		 */
 		abt->client->flags &= ~FLAGS_CLOSING;
 		exit_client(abt->client, abt->client, &me, abt->notice);
-		MyFree(abt);
+		ircd_free(abt);
 	}
 }
 
@@ -1138,7 +1138,7 @@ dead_link(struct Client *client_p)
 	if(IsDead(client_p) || IsClosing(client_p) || IsMe(client_p))
 		return;
 
-	abt = (struct abort_client *) MyMalloc(sizeof(struct abort_client));
+	abt = (struct abort_client *) ircd_malloc(sizeof(struct abort_client));
 
 	if(client_p->flags & FLAGS_SENDQEX)
 		strlcpy(abt->notice, "Max SendQ exceeded", sizeof(abt->notice));
@@ -1345,7 +1345,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	
 	if(source_p->localClient->ctrlfd >= 0)
 	{
-		comm_close(source_p->localClient->ctrlfd);
+		ircd_close(source_p->localClient->ctrlfd);
 		source_p->localClient->ctrlfd = -1;
 	}
 
@@ -1759,7 +1759,7 @@ make_server(struct Client *client_p)
 
 	if(!serv)
 	{
-		serv = (struct Server *) MyMalloc(sizeof(struct Server));
+		serv = (struct Server *) ircd_malloc(sizeof(struct Server));
 		client_p->serv = serv;
 	}
 	return client_p->serv;
@@ -1780,7 +1780,7 @@ free_user(struct User *user, struct Client *client_p)
 	if(--user->refcnt <= 0)
 	{
 		if(user->away)
-			MyFree((char *) user->away);
+			ircd_free((char *) user->away);
 		/*
 		 * sanity check
 		 */
@@ -1941,7 +1941,7 @@ close_connection(struct Client *client_p)
 		if(!IsIOError(client_p))
 			send_queued_write(client_p->localClient->fd, client_p);
 
-		comm_close(client_p->localClient->fd);
+		ircd_close(client_p->localClient->fd);
 		client_p->localClient->fd = -1;
 	}
 
@@ -1949,7 +1949,7 @@ close_connection(struct Client *client_p)
 	{
 		if(client_p->localClient->fd > -1)
 		{
-			comm_close(client_p->localClient->ctrlfd);
+			ircd_close(client_p->localClient->ctrlfd);
 			client_p->localClient->ctrlfd = -1;
 		}
 	}
@@ -1981,7 +1981,7 @@ error_exit_client(struct Client *client_p, int error)
 	 * for reading even though it ends up being an EOF. -avalon
 	 */
 	char errmsg[255];
-	int current_error = comm_get_sockerr(client_p->localClient->fd);
+	int current_error = ircd_get_sockerr(client_p->localClient->fd);
 
 	SetIOError(client_p);
 

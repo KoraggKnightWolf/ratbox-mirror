@@ -45,7 +45,7 @@ dlink_list *fd_table;
 #endif
 
 
-static const char *comm_err_str[] = { "Comm OK", "Error during bind()",
+static const char *ircd_err_str[] = { "Comm OK", "Error during bind()",
 	"Error during DNS lookup", "connect timeout",
 	"Error during connect()",
 	"Comm Error"
@@ -60,12 +60,12 @@ int highest_fd = -1;		/* Its -1 because we haven't started yet -- adrian */
 int number_fd = 0;
 int maxconnections = 0;
 
-static void comm_connect_callback(int fd, int status);
-static PF comm_connect_timeout;
-static PF comm_connect_tryconnect;
+static void ircd_connect_callback(int fd, int status);
+static PF ircd_connect_timeout;
+static PF ircd_connect_tryconnect;
 
 #ifndef HAVE_SOCKETPAIR
-static int comm_inet_socketpair(int d, int type, int protocol, int sv[2]);
+static int ircd_inet_socketpair(int d, int type, int protocol, int sv[2]);
 #endif
 /* 32bit solaris is kinda slow and stdio only supports fds < 256
  * so we got to do this crap below.
@@ -73,7 +73,7 @@ static int comm_inet_socketpair(int d, int type, int protocol, int sv[2]);
  */
 #if defined (__SVR4) && defined (__sun)
 static void
-comm_fd_hack(int *fd)
+ircd_fd_hack(int *fd)
 {
 	int newfd;
 	if(*fd > 256 || *fd < 0)
@@ -86,14 +86,14 @@ comm_fd_hack(int *fd)
 	return;
 }
 #else
-#define comm_fd_hack(fd)
+#define ircd_fd_hack(fd)
 #endif
 
 
 /* close_all_connections() can be used *before* the system come up! */
 
 static void
-comm_close_all(void)
+ircd_close_all(void)
 {
 	int i;
 #ifndef NDEBUG
@@ -129,7 +129,7 @@ comm_close_all(void)
  * gamble anyway.
  */
 int
-comm_get_sockerr(int fd)
+ircd_get_sockerr(int fd)
 {
 	int errtmp = errno;
 #ifdef SO_ERROR
@@ -155,7 +155,7 @@ comm_get_sockerr(int fd)
  * side effects -
  */
 int
-comm_set_buffers(int fd, int size)
+ircd_set_buffers(int fd, int size)
 {
 	if(setsockopt
 	   (fd, SOL_SOCKET, SO_RCVBUF, (char *) &size, sizeof(size))
@@ -173,13 +173,13 @@ comm_set_buffers(int fd, int size)
  *                be done with it.
  */
 int
-comm_set_nb(int fd)
+ircd_set_nb(int fd)
 {
 	int nonb = 0;
 	int res;
 	fde_t *F = find_fd(fd);
 
-	if((res = comm_setup_fd(fd)))
+	if((res = ircd_setup_fd(fd)))
 		return res;
 #ifdef O_NONBLOCK
 	nonb |= O_NONBLOCK;
@@ -199,12 +199,12 @@ comm_set_nb(int fd)
 
 
 /*
- * comm_settimeout() - set the socket timeout
+ * ircd_settimeout() - set the socket timeout
  *
  * Set the timeout for the fd
  */
 void
-comm_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
+ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 {
 	fde_t *F;
 	lircd_assert(fd >= 0);
@@ -218,17 +218,17 @@ comm_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 
 
 /*
- * comm_setflush() - set a flush function
+ * ircd_setflush() - set a flush function
  *
  * A flush function is simply a function called if found during
- * comm_timeouts(). Its basically a second timeout, except in this case
+ * ircd_timeouts(). Its basically a second timeout, except in this case
  * I'm too lazy to implement multiple timeout functions! :-)
  * its kinda nice to have it seperate, since this is designed for
- * flush functions, and when comm_close() is implemented correctly
- * with close functions, we _actually_ don't call comm_close() here ..
+ * flush functions, and when ircd_close() is implemented correctly
+ * with close functions, we _actually_ don't call ircd_close() here ..
  */
 void
-comm_setflush(int fd, time_t timeout, PF * callback, void *cbdata)
+ircd_setflush(int fd, time_t timeout, PF * callback, void *cbdata)
 {
 	fde_t *F;
 	lircd_assert(fd >= 0);
@@ -242,14 +242,14 @@ comm_setflush(int fd, time_t timeout, PF * callback, void *cbdata)
 
 
 /*
- * comm_checktimeouts() - check the socket timeouts
+ * ircd_checktimeouts() - check the socket timeouts
  *
  * All this routine does is call the given callback/cbdata, without closing
  * down the file descriptor. When close handlers have been implemented,
  * this will happen.
  */
 void
-comm_checktimeouts(void *notused)
+ircd_checktimeouts(void *notused)
 {
 	int fd;
 	PF *hdl;
@@ -270,7 +270,7 @@ comm_checktimeouts(void *notused)
 		{
 			hdl = F->flush_handler;
 			data = F->flush_data;
-			comm_setflush(F->fd, 0, NULL, NULL);
+			ircd_setflush(F->fd, 0, NULL, NULL);
 			hdl(F->fd, data);
 		}
 
@@ -280,7 +280,7 @@ comm_checktimeouts(void *notused)
 			/* Call timeout handler */
 			hdl = F->timeout_handler;
 			data = F->timeout_data;
-			comm_settimeout(F->fd, 0, NULL, NULL);
+			ircd_settimeout(F->fd, 0, NULL, NULL);
 			hdl(F->fd, data);
 		}
 	}
@@ -289,7 +289,7 @@ comm_checktimeouts(void *notused)
 
 
 /*
- * void comm_connect_tcp(int fd, struct sockaddr *dest,
+ * void ircd_connect_tcp(int fd, struct sockaddr *dest,
  *                       struct sockaddr *clocal, int socklen,
  *                       CNCB *callback, void *data, int timeout)
  * Input: An fd to connect with, a host and port to connect to,
@@ -302,7 +302,7 @@ comm_checktimeouts(void *notused)
  *               may be called now, or it may be called later.
  */
 void
-comm_connect_tcp(int fd, struct sockaddr *dest,
+ircd_connect_tcp(int fd, struct sockaddr *dest,
 		 struct sockaddr *clocal, int socklen, CNCB * callback, void *data, int timeout)
 {
 	fde_t *F;
@@ -324,24 +324,24 @@ comm_connect_tcp(int fd, struct sockaddr *dest,
 	 */
 	if((clocal != NULL) && (bind(F->fd, clocal, socklen) < 0))
 	{
-		/* Failure, call the callback with COMM_ERR_BIND */
-		comm_connect_callback(F->fd, COMM_ERR_BIND);
+		/* Failure, call the callback with IRCD_ERR_BIND */
+		ircd_connect_callback(F->fd, IRCD_ERR_BIND);
 		/* ... and quit */
 		return;
 	}
 
 	/* We have a valid IP, so we just call tryconnect */
 	/* Make sure we actually set the timeout here .. */
-	comm_settimeout(F->fd, timeout * 1000, comm_connect_timeout, NULL);
-	comm_connect_tryconnect(F->fd, NULL);
+	ircd_settimeout(F->fd, timeout * 1000, ircd_connect_timeout, NULL);
+	ircd_connect_tryconnect(F->fd, NULL);
 }
 
 
 /*
- * comm_connect_callback() - call the callback, and continue with life
+ * ircd_connect_callback() - call the callback, and continue with life
  */
 static void
-comm_connect_callback(int fd, int status)
+ircd_connect_callback(int fd, int status)
 {
 	CNCB *hdl;
 	fde_t *F = find_fd(fd);
@@ -354,7 +354,7 @@ comm_connect_callback(int fd, int status)
 	F->flags.called_connect = 0;
 
 	/* Clear the timeout handler */
-	comm_settimeout(F->fd, 0, NULL, NULL);
+	ircd_settimeout(F->fd, 0, NULL, NULL);
 
 	/* Call the handler */
 	hdl(F->fd, status, F->connect.data);
@@ -362,18 +362,18 @@ comm_connect_callback(int fd, int status)
 
 
 /*
- * comm_connect_timeout() - this gets called when the socket connection
+ * ircd_connect_timeout() - this gets called when the socket connection
  * times out. This *only* can be called once connect() is initially
  * called ..
  */
 static void
-comm_connect_timeout(int fd, void *notused)
+ircd_connect_timeout(int fd, void *notused)
 {
 	/* error! */
-	comm_connect_callback(fd, COMM_ERR_TIMEOUT);
+	ircd_connect_callback(fd, IRCD_ERR_TIMEOUT);
 }
 
-/* static void comm_connect_tryconnect(int fd, void *notused)
+/* static void ircd_connect_tryconnect(int fd, void *notused)
  * Input: The fd, the handler data(unused).
  * Output: None.
  * Side-effects: Try and connect with pending connect data for the FD. If
@@ -382,7 +382,7 @@ comm_connect_timeout(int fd, void *notused)
  *               to select for a write event on this FD.
  */
 static void
-comm_connect_tryconnect(int fd, void *notused)
+ircd_connect_tryconnect(int fd, void *notused)
 {
 	int retval;
 	fde_t *F = find_fd(fd);
@@ -401,34 +401,34 @@ comm_connect_tryconnect(int fd, void *notused)
 		 *   -- adrian
 		 */
 		if(errno == EISCONN)
-			comm_connect_callback(F->fd, COMM_OK);
+			ircd_connect_callback(F->fd, IRCD_OK);
 		else if(ignoreErrno(errno))
 			/* Ignore error? Reschedule */
-			comm_setselect(F->fd, COMM_SELECT_CONNECT,
-				       comm_connect_tryconnect, NULL, 0);
+			ircd_setselect(F->fd, IRCD_SELECT_CONNECT,
+				       ircd_connect_tryconnect, NULL, 0);
 		else
-			/* Error? Fail with COMM_ERR_CONNECT */
-			comm_connect_callback(F->fd, COMM_ERR_CONNECT);
+			/* Error? Fail with IRCD_ERR_CONNECT */
+			ircd_connect_callback(F->fd, IRCD_ERR_CONNECT);
 		return;
 	}
-	/* If we get here, we've suceeded, so call with COMM_OK */
-	comm_connect_callback(F->fd, COMM_OK);
+	/* If we get here, we've suceeded, so call with IRCD_OK */
+	ircd_connect_callback(F->fd, IRCD_OK);
 }
 
 /*
- * comm_error_str() - return an error string for the given error condition
+ * ircd_error_str() - return an error string for the given error condition
  */
 const char *
-comm_errstr(int error)
+ircd_errstr(int error)
 {
-	if(error < 0 || error >= COMM_ERR_MAX)
+	if(error < 0 || error >= IRCD_ERR_MAX)
 		return "Invalid error number!";
-	return comm_err_str[error];
+	return ircd_err_str[error];
 }
 
 
 int
-comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note)
+ircd_socketpair(int family, int sock_type, int proto, int *nfd, const char *note)
 {
 	if(number_fd >= maxconnections)
 	{
@@ -439,15 +439,15 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 #ifndef __MINGW32__
 	if(socketpair(family, sock_type, proto, nfd))
 #else
-	if(comm_inet_socketpair(AF_INET, SOCK_STREAM, proto, nfd))
+	if(ircd_inet_socketpair(AF_INET, SOCK_STREAM, proto, nfd))
 #endif
 		return -1;
 
-	comm_fd_hack(&nfd[0]);
-	comm_fd_hack(&nfd[1]);
+	ircd_fd_hack(&nfd[0]);
+	ircd_fd_hack(&nfd[1]);
 
-	comm_open(nfd[0], FD_SOCKET, note);
-	comm_open(nfd[1], FD_SOCKET, note);
+	ircd_open(nfd[0], FD_SOCKET, note);
+	ircd_open(nfd[1], FD_SOCKET, note);
 
 	if(nfd[0] < 0)
 	{
@@ -455,19 +455,19 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 		return -1;
 	}
 	/* Set the socket non-blocking, and other wonderful bits */
-	if(!comm_set_nb(nfd[0]))
+	if(!ircd_set_nb(nfd[0]))
 	{
-		ircd_lib_log("comm_open: Couldn't set FD %d non blocking: %s", nfd[0], strerror(errno));
-		comm_close(nfd[0]);
-		comm_close(nfd[1]);
+		ircd_lib_log("ircd_open: Couldn't set FD %d non blocking: %s", nfd[0], strerror(errno));
+		ircd_close(nfd[0]);
+		ircd_close(nfd[1]);
 		return -1;
 	}
 
-	if(!comm_set_nb(nfd[1]))
+	if(!ircd_set_nb(nfd[1]))
 	{
-		ircd_lib_log("comm_open: Couldn't set FD %d non blocking: %s", nfd[1], strerror(errno));
-		comm_close(nfd[0]);
-		comm_close(nfd[1]);
+		ircd_lib_log("ircd_open: Couldn't set FD %d non blocking: %s", nfd[1], strerror(errno));
+		ircd_close(nfd[0]);
+		ircd_close(nfd[1]);
 		return -1;
 	}
 
@@ -476,7 +476,7 @@ comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 
 
 int
-comm_pipe(int *fd, const char *desc)
+ircd_pipe(int *fd, const char *desc)
 {
 #ifndef __MINGW32__
 	if(number_fd >= maxconnections)
@@ -486,26 +486,26 @@ comm_pipe(int *fd, const char *desc)
 	}
 	if(pipe(fd) == -1)
 		return -1;
-	comm_open(fd[0], FD_PIPE, desc);
-	comm_open(fd[1], FD_PIPE, desc);
+	ircd_open(fd[0], FD_PIPE, desc);
+	ircd_open(fd[1], FD_PIPE, desc);
 	return 0;
 #else
 	/* Its not a pipe..but its selectable.  I'll take dirty hacks
 	 * for $500 Alex.
 	 */
-	return comm_socketpair(AF_INET, SOCK_STREAM, 0, fd, desc); 
+	return ircd_socketpair(AF_INET, SOCK_STREAM, 0, fd, desc); 
 #endif
 }
 
 /*
- * comm_socket() - open a socket
+ * ircd_socket() - open a socket
  *
- * This is a highly highly cut down version of squid's comm_open() which
+ * This is a highly highly cut down version of squid's ircd_open() which
  * for the most part emulates socket(), *EXCEPT* it fails if we're about
  * to run out of file descriptors.
  */
 int
-comm_socket(int family, int sock_type, int proto, const char *note)
+ircd_socket(int family, int sock_type, int proto, const char *note)
 {
 	int fd;
 	/* First, make sure we aren't going to run out of file descriptors */
@@ -521,7 +521,7 @@ comm_socket(int family, int sock_type, int proto, const char *note)
 	 * XXX !!! -- adrian
 	 */
 	fd = socket(family, sock_type, proto);
-	comm_fd_hack(&fd);
+	ircd_fd_hack(&fd);
 	if(fd < 0)
 		return -1;	/* errno will be passed through, yay.. */
 
@@ -535,7 +535,7 @@ comm_socket(int family, int sock_type, int proto, const char *note)
 		int off = 1;
 		if(setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &off, sizeof(off)) == -1)
 		{
-			ircd_lib_log("comm_socket: Could not set IPV6_V6ONLY option to 1 on FD %d: %s",
+			ircd_lib_log("ircd_socket: Could not set IPV6_V6ONLY option to 1 on FD %d: %s",
 				 fd, strerror(errno));
 			close(fd);
 			return -1;
@@ -543,13 +543,13 @@ comm_socket(int family, int sock_type, int proto, const char *note)
 	}
 #endif
 
-	comm_open(fd, FD_SOCKET, note);
+	ircd_open(fd, FD_SOCKET, note);
 
 	/* Set the socket non-blocking, and other wonderful bits */
-	if(!comm_set_nb(fd))
+	if(!ircd_set_nb(fd))
 	{
-		ircd_lib_log("comm_open: Couldn't set FD %d non blocking: %s", fd, strerror(errno));
-		comm_close(fd);
+		ircd_lib_log("ircd_open: Couldn't set FD %d non blocking: %s", fd, strerror(errno));
+		ircd_close(fd);
 		return -1;
 	}
 
@@ -558,13 +558,13 @@ comm_socket(int family, int sock_type, int proto, const char *note)
 
 
 /*
- * comm_accept() - accept an incoming connection
+ * ircd_accept() - accept an incoming connection
  *
  * This is a simple wrapper for accept() which enforces FD limits like
- * comm_open() does.
+ * ircd_open() does.
  */
 int
-comm_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
+ircd_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 {
 	int newfd;
 	if(number_fd >= maxconnections)
@@ -575,22 +575,22 @@ comm_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 
 	/*
 	 * Next, do the accept(). if we get an error, we should drop the
-	 * reserved fd limit, but we can deal with that when comm_open()
+	 * reserved fd limit, but we can deal with that when ircd_open()
 	 * also does it. XXX -- adrian
 	 */
 	newfd = accept(fd, (struct sockaddr *) pn, addrlen);
 	get_errno();
 	if(newfd < 0)
 		return -1;
-	comm_open(newfd, FD_SOCKET, "Incoming connection");
-	comm_fd_hack(&newfd);
+	ircd_open(newfd, FD_SOCKET, "Incoming connection");
+	ircd_fd_hack(&newfd);
 
 	/* Set the socket non-blocking, and other wonderful bits */
-	if(!comm_set_nb(newfd))
+	if(!ircd_set_nb(newfd))
 	{
 		get_errno();
-		ircd_lib_log("comm_accept: Couldn't set FD %d non blocking!", newfd);
-		comm_close(newfd);
+		ircd_lib_log("ircd_accept: Couldn't set FD %d non blocking!", newfd);
+		ircd_close(newfd);
 		return -1;
 	}
 
@@ -677,9 +677,9 @@ fdlist_init(int closeall, int maxfds)
 	{
 		maxconnections = maxfds;
 		if(closeall)
-			comm_close_all();
+			ircd_close_all();
 		/* Since we're doing this once .. */
-		fd_table = MyMalloc((maxfds + 1) * sizeof(fde_t));
+		fd_table = ircd_malloc((maxfds + 1) * sizeof(fde_t));
 		initialized = 1;
 	}
 }
@@ -687,14 +687,14 @@ fdlist_init(int closeall, int maxfds)
 
 /* Called to open a given filedescriptor */
 void
-comm_open(int fd, unsigned int type, const char *desc)
+ircd_open(int fd, unsigned int type, const char *desc)
 {
 	fde_t *F = add_fd(fd);
 	lircd_assert(fd >= 0);
 
 	if(F->flags.open)
 	{
-		comm_close(fd);
+		ircd_close(fd);
 	}
 	lircd_assert(!F->flags.open);
 	F->fd = fd;
@@ -702,7 +702,7 @@ comm_open(int fd, unsigned int type, const char *desc)
 	F->flags.open = 1;
 
 	fdlist_update_biggest(fd, 1);
-	F->comm_index = -1;
+	F->ircd_index = -1;
 	if(desc)
 		strlcpy(F->desc, desc, sizeof(F->desc));
 	number_fd++;
@@ -711,7 +711,7 @@ comm_open(int fd, unsigned int type, const char *desc)
 
 /* Called to close a given filedescriptor */
 void
-comm_close(int fd)
+ircd_close(int fd)
 {
 	fde_t *F = find_fd(fd);
 	lircd_assert(F->flags.open);
@@ -723,8 +723,8 @@ comm_close(int fd)
 		lircd_assert(F->read_handler == NULL);
 		lircd_assert(F->write_handler == NULL);
 	}
-		comm_setselect(F->fd, 0, NULL, NULL, 0);
-	comm_setflush(F->fd, 0, NULL, NULL);
+		ircd_setselect(F->fd, 0, NULL, NULL, 0);
+	ircd_setflush(F->fd, 0, NULL, NULL);
 
 	F->flags.open = 0;
 	fdlist_update_biggest(fd, 0);
@@ -744,10 +744,10 @@ comm_close(int fd)
 
 
 /*
- * comm_dump() - dump the list of active filedescriptors
+ * ircd_dump() - dump the list of active filedescriptors
  */
 void
-comm_dump(DUMPCB * cb, void *data)
+ircd_dump(DUMPCB * cb, void *data)
 {
 	unsigned int i;
 	char buf[128];
@@ -763,13 +763,13 @@ comm_dump(DUMPCB * cb, void *data)
 }
 
 /*
- * comm_note() - set the fd note
+ * ircd_note() - set the fd note
  *
  * Note: must be careful not to overflow fd_table[fd].desc when
  *       calling.
  */
 void
-comm_note(int fd, const char *format, ...)
+ircd_note(int fd, const char *format, ...)
 {
 	va_list args;
 	fde_t *F = find_fd(fd);
@@ -784,7 +784,7 @@ comm_note(int fd, const char *format, ...)
 }
 
 ssize_t
-comm_read(int fd, void *buf, int count)
+ircd_read(int fd, void *buf, int count)
 {
 	fde_t *F = find_fd(fd);
 	if(F == NULL)
@@ -799,8 +799,9 @@ comm_read(int fd, void *buf, int count)
 		{
 			int ret;
 			ret = recv(fd, buf, count, 0);
-			if(ret < 0)
+			if(ret < 0) {
 				get_errno();
+			}
 			return ret;
 		}
 #ifndef __MINGW32__	
@@ -813,7 +814,7 @@ comm_read(int fd, void *buf, int count)
 }
 
 ssize_t
-comm_write(int fd, void *buf, int count)
+ircd_write(int fd, void *buf, int count)
 {
 	fde_t *F = find_fd(fd);
 	if(F == NULL)
@@ -853,8 +854,9 @@ comm_write(int fd, void *buf, int count)
 #define MSG_NOSIGNAL 0
 #endif		
 			int ret = send(fd, buf, count, MSG_NOSIGNAL);
-			if(ret < 0)
+			if(ret < 0) {
 				get_errno();
+			}
 			return ret;
 		}
 
@@ -879,7 +881,7 @@ writev(int fd, struct iovec *iov, size_t iovcnt)
 	{
 		base = iov[i].iov_base;
 		len = iov[i].iov_len;
-		ret = comm_write(fd, base, len);
+		ret = ircd_write(fd, base, len);
 		if(ret == 0)
 			return -1;
 		TotalBytesWritten += ret;
@@ -891,7 +893,7 @@ writev(int fd, struct iovec *iov, size_t iovcnt)
 
 #ifdef USE_WRITEV
 ssize_t
-comm_writev(int xfd, struct iovec *vector, int count)
+ircd_writev(int xfd, struct iovec *vector, int count)
 {
 	fde_t *F = find_fd(xfd);
 
@@ -1431,7 +1433,7 @@ inetpton(af, src, dst)
 
 #ifndef HAVE_SOCKETPAIR
 int
-comm_inet_socketpair(int family, int type, int protocol, int fd[2])
+ircd_inet_socketpair(int family, int type, int protocol, int fd[2])
 {
 	int listener = -1;
 	int connector = -1;

@@ -160,7 +160,7 @@ clear_s_newconf_bans(void)
 struct remote_conf *
 make_remote_conf(void)
 {
-	struct remote_conf *remote_p = MyMalloc(sizeof(struct remote_conf));
+	struct remote_conf *remote_p = ircd_malloc(sizeof(struct remote_conf));
 	return remote_p;
 }
 
@@ -171,10 +171,10 @@ free_remote_conf(struct remote_conf *remote_p)
 	if(remote_p == NULL)
 		return;
 
-	MyFree(remote_p->username);
-	MyFree(remote_p->host);
-	MyFree(remote_p->server);
-	MyFree(remote_p);
+	ircd_free(remote_p->username);
+	ircd_free(remote_p->host);
+	ircd_free(remote_p->server);
+	ircd_free(remote_p);
 }
 
 int
@@ -250,7 +250,7 @@ expire_glines(void *unused)
 struct oper_conf *
 make_oper_conf(void)
 {
-	struct oper_conf *oper_p = MyMalloc(sizeof(struct oper_conf));
+	struct oper_conf *oper_p = ircd_malloc(sizeof(struct oper_conf));
 	return oper_p;
 }
 
@@ -261,24 +261,24 @@ free_oper_conf(struct oper_conf *oper_p)
 	if(oper_p == NULL)
 		return;
 
-	MyFree(oper_p->username);
-	MyFree(oper_p->host);
-	MyFree(oper_p->name);
+	ircd_free(oper_p->username);
+	ircd_free(oper_p->host);
+	ircd_free(oper_p->name);
 
 	if(oper_p->passwd)
 	{
 		memset(oper_p->passwd, 0, strlen(oper_p->passwd));
-		MyFree(oper_p->passwd);
+		ircd_free(oper_p->passwd);
 	}
 
 #ifdef HAVE_LIBCRYPTO
-	MyFree(oper_p->rsa_pubkey_file);
+	ircd_free(oper_p->rsa_pubkey_file);
 
 	if(oper_p->rsa_pubkey)
 		RSA_free(oper_p->rsa_pubkey);
 #endif
 
-	MyFree(oper_p);
+	ircd_free(oper_p);
 }
 
 struct oper_conf *
@@ -371,7 +371,7 @@ get_oper_privs(int flags)
 struct server_conf *
 make_server_conf(void)
 {
-	struct server_conf *server_p = MyMalloc(sizeof(struct server_conf));
+	struct server_conf *server_p = ircd_malloc(sizeof(struct server_conf));
 	server_p->ipnum.ss_family = AF_INET;
 	return server_p;
 }
@@ -386,21 +386,21 @@ free_server_conf(struct server_conf *server_p)
 	if(!EmptyString(server_p->passwd))
 	{
 		memset(server_p->passwd, 0, strlen(server_p->passwd));
-		MyFree(server_p->passwd);
+		ircd_free(server_p->passwd);
 	}
 
 	if(!EmptyString(server_p->spasswd))
 	{
 		memset(server_p->spasswd, 0, strlen(server_p->spasswd));
-		MyFree(server_p->spasswd);
+		ircd_free(server_p->spasswd);
 	}
 
 	cancel_lookup(server_p->dns_query);
 
-	MyFree(server_p->name);
-	MyFree(server_p->host);
-	MyFree(server_p->class_name);
-	MyFree(server_p);
+	ircd_free(server_p->name);
+	ircd_free(server_p->host);
+	ircd_free(server_p->class_name);
+	ircd_free(server_p);
 }
 
 /*
@@ -459,7 +459,7 @@ add_server_conf(struct server_conf *server_p)
 		conf_report_error("Warning connect::class invalid for %s",
 				server_p->name);
 
-		MyFree(server_p->class_name);
+		ircd_free(server_p->class_name);
 		DupString(server_p->class_name, "default");
 	}
 
@@ -809,7 +809,7 @@ add_tgchange(const char *host)
 	if(find_tgchange(host))
 		return;
 
-	target = MyMalloc(sizeof(tgchange));
+	target = ircd_malloc(sizeof(tgchange));
 	pnode = make_and_lookup(tgchange_tree, host);
 
 	pnode->data = target;

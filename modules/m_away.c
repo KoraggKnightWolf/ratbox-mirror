@@ -89,7 +89,7 @@ m_away(struct Client *client_p, struct Client *source_p, int parc, const char *p
 				      ":%s AWAY", use_id(source_p));
 			sendto_server(client_p, NULL, NOCAPS, CAP_TS6, 
 				      ":%s AWAY", source_p->name);
-			MyFree(away);
+			ircd_free(away);
 			source_p->user->away = NULL;
 		}
 		if(MyConnect(source_p))
@@ -126,7 +126,7 @@ m_away(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			      ":%s AWAY :%s", source_p->name, awy2);
 	}
 	else
-		MyFree(away);
+		ircd_free(away);
 
 	DupString(away, awy2);
 

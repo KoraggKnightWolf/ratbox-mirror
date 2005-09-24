@@ -31,10 +31,10 @@
 
 
 /*
- * MyMalloc - allocate memory, call outofmemory on failure
+ * ircd_malloc - allocate memory, call outofmemory on failure
  */
 void *
-MyMalloc(size_t size)
+ircd_malloc(size_t size)
 {
 	void *ret = calloc(1, size);
 	if(ret == NULL)
@@ -43,10 +43,10 @@ MyMalloc(size_t size)
 }
 
 /*
- * MyRealloc - reallocate memory, call outofmemory on failure
+ * ircd_realloc - reallocate memory, call outofmemory on failure
  */
 void *
-MyRealloc(void *x, size_t y)
+ircd_realloc(void *x, size_t y)
 {
 	void *ret = realloc(x, y);
 

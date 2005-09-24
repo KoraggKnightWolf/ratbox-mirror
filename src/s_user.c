@@ -422,7 +422,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(source_p->localClient->passwd)
 	{
 		memset(source_p->localClient->passwd, 0, strlen(source_p->localClient->passwd));
-		MyFree(source_p->localClient->passwd);
+		ircd_free(source_p->localClient->passwd);
 		source_p->localClient->passwd = NULL;
 	}
 
@@ -895,7 +895,7 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 						source_p->umodes &= ~ConfigFileEntry.oper_only_umodes;
 						source_p->operflags &= ~OPER_FLAGS;
 
-						MyFree(source_p->localClient->opername);
+						ircd_free(source_p->localClient->opername);
 						source_p->localClient->opername = NULL;
 
 						dlinkFindDestroy(source_p, &oper_list);

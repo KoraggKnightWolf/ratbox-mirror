@@ -317,15 +317,15 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		     source_p->localClient->auth_oper, source_p->name, 
 		     source_p->username, source_p->host);
 
-		MyFree(source_p->localClient->response);
-		MyFree(source_p->localClient->auth_oper);
+		ircd_free(source_p->localClient->response);
+		ircd_free(source_p->localClient->auth_oper);
 		source_p->localClient->response = NULL;
 		source_p->localClient->auth_oper = NULL;
 		return 0;
 	}
 
-	MyFree(source_p->localClient->response);
-	MyFree(source_p->localClient->auth_oper);
+	ircd_free(source_p->localClient->response);
+	ircd_free(source_p->localClient->auth_oper);
 	source_p->localClient->response = NULL;
 	source_p->localClient->auth_oper = NULL;
 
@@ -360,7 +360,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 	}
 
 	DupString(source_p->localClient->auth_oper, oper_p->name);
-	MyFree(challenge);
+	ircd_free(challenge);
 	return 0;
 }
 
@@ -413,17 +413,17 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 		return -1;
 	if(get_randomness(secret, 32))
 	{
-		*r_response = MyMalloc(65);
+		*r_response = ircd_malloc(65);
 		binary_to_hex(secret, *r_response, 32);
 
 		length = RSA_size(rsa);
-		tmp = MyMalloc(length);
+		tmp = ircd_malloc(length);
 		ret = RSA_public_encrypt(32, secret, tmp, rsa, RSA_PKCS1_PADDING);
 	
-		*r_challenge = MyMalloc((length << 1) + 1);
+		*r_challenge = ircd_malloc((length << 1) + 1);
 		binary_to_hex(tmp, *r_challenge, length);
 		(*r_challenge)[length << 1] = 0;
-		MyFree(tmp);
+		ircd_free(tmp);
 		if(ret >= 0)
 			return 0;
 	}

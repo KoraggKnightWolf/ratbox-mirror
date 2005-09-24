@@ -230,22 +230,22 @@ fork_resolver(void)
 
 	fork_count++;
 	if(dns_ifd > 0)
-		comm_close(dns_ifd);
+		ircd_close(dns_ifd);
 	if(dns_ofd > 0)
-		comm_close(dns_ofd);
+		ircd_close(dns_ofd);
 	if(res_pid > 0)
 		kill(res_pid, SIGKILL);
 
-	comm_pipe(ifd, "resolver daemon - read");
-	comm_pipe(ofd, "resolver daemon - write");
+	ircd_pipe(ifd, "resolver daemon - read");
+	ircd_pipe(ofd, "resolver daemon - write");
 
 	ircsnprintf(fx, sizeof(fx), "%d", ifd[1]); /*dns write*/
 	ircsnprintf(fy, sizeof(fy), "%d", ofd[0]); /*dns read*/ 
 	ircsnprintf(maxfd, sizeof(maxfd), "%d", HARD_FDLIMIT);
-	comm_set_nb(ifd[0]);
-	comm_set_nb(ifd[1]);
-	comm_set_nb(ifd[0]);
-	comm_set_nb(ofd[1]);
+	ircd_set_nb(ifd[0]);
+	ircd_set_nb(ifd[1]);
+	ircd_set_nb(ifd[0]);
+	ircd_set_nb(ofd[1]);
 
 	setenv("IFD", fy, 1);
 	setenv("OFD", fx, 1);
@@ -259,15 +259,15 @@ fork_resolver(void)
 	if(pid == -1)
 	{
 		ilog(L_MAIN, "ircd_spawn_process failed: %s", strerror(errno));
-		comm_close(ifd[0]);
-		comm_close(ifd[1]);
-		comm_close(ofd[0]);
-		comm_close(ofd[1]);
+		ircd_close(ifd[0]);
+		ircd_close(ifd[1]);
+		ircd_close(ofd[0]);
+		ircd_close(ofd[1]);
 		return;
 	}
 
-	comm_close(ifd[1]);
-	comm_close(ofd[0]);
+	ircd_close(ifd[1]);
+	ircd_close(ofd[0]);
 
 	dns_ifd = ifd[0];
 	dns_ofd = ofd[1];
@@ -302,7 +302,7 @@ read_dns(int fd, void *data)
 {
 	int length;
 
-	while((length = comm_read(dns_ifd, dnsBuf, sizeof(dnsBuf))) > 0)
+	while((length = ircd_read(dns_ifd, dnsBuf, sizeof(dnsBuf))) > 0)
 	{
 		linebuf_parse(&dns_recvq, dnsBuf, length, 0);
 		parse_dns_reply();
@@ -314,7 +314,7 @@ read_dns(int fd, void *data)
 	if(length == -1 && !ignoreErrno(errno))
 		fork_resolver(); 
 
-	comm_setselect(dns_ifd, COMM_SELECT_READ, read_dns, NULL, 0);
+	ircd_setselect(dns_ifd, IRCD_SELECT_READ, read_dns, NULL, 0);
 }
 
 static void
@@ -332,7 +332,7 @@ dns_write_sendq(int fd, void *unused)
 	 
 	if(linebuf_len(&dns_sendq) > 0)
 	{
-		comm_setselect(dns_ofd, COMM_SELECT_WRITE,
+		ircd_setselect(dns_ofd, IRCD_SELECT_WRITE,
 			       dns_write_sendq, NULL, 0);
 	}
 }

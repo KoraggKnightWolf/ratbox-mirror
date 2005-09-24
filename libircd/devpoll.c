@@ -42,7 +42,7 @@ static void devpoll_write_update(int, int);
 
 
 int 
-comm_setup_fd(int fd)
+ircd_setup_fd(int fd)
 {
         return 0;
 }
@@ -82,7 +82,7 @@ devpoll_update_events(int fd, short filter, PF * handler)
 	fdmask[fd] = 0;
 	switch (filter)
 	{
-	case COMM_SELECT_READ:
+	case IRCD_SELECT_READ:
 		cur_handler = F->read_handler;
 		if(handler)
 			fdmask[fd] |= POLLRDNORM;
@@ -91,7 +91,7 @@ devpoll_update_events(int fd, short filter, PF * handler)
 		if(F->write_handler)
 			fdmask[fd] |= POLLWRNORM;
 		break;
-	case COMM_SELECT_WRITE:
+	case IRCD_SELECT_WRITE:
 		cur_handler = F->write_handler;
 		if(handler)
 			fdmask[fd] |= POLLWRNORM;
@@ -154,18 +154,18 @@ init_netio(void)
 		exit(115);	/* Whee! */
 	}
 	maxfd = getdtablesize() - 2; /* This makes more sense than HARD_FDLIMIT */
-	fdmask = MyMalloc(sizeof(fdmask) * maxfd + 1);
-	comm_note(dpfd, "poll file descriptor");
+	fdmask = ircd_malloc(sizeof(fdmask) * maxfd + 1);
+	ircd_note(dpfd, "poll file descriptor");
 }
 
 /*
- * comm_setselect
+ * ircd_setselect
  *
  * This is a needed exported function which will be called to register
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
+ircd_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = find_fd(fd);
@@ -175,15 +175,15 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 	/* Update the list, even though we're not using it .. */
 	F->list = list;
 
-	if(type & COMM_SELECT_READ)
+	if(type & IRCD_SELECT_READ)
 	{
-		devpoll_update_events(fd, COMM_SELECT_READ, handler);
+		devpoll_update_events(fd, IRCD_SELECT_READ, handler);
 		F->read_handler = handler;
 		F->read_data = client_data;
 	}
-	if(type & COMM_SELECT_WRITE)
+	if(type & IRCD_SELECT_WRITE)
 	{
-		devpoll_update_events(fd, COMM_SELECT_WRITE, handler);
+		devpoll_update_events(fd, IRCD_SELECT_WRITE, handler);
 		F->write_handler = handler;
 		F->write_data = client_data;
 	}
@@ -198,16 +198,16 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
  */
 
 /*
- * comm_select
+ * ircd_select
  *
  * Called to do the new-style IO, courtesy of squid (like most of this
  * new IO code). This routine handles the stuff we've hidden in
- * comm_setselect and fd_table[] and calls callbacks for IO ready
+ * ircd_setselect and fd_table[] and calls callbacks for IO ready
  * events.
  */
 
 int
-comm_select(unsigned long delay)
+ircd_select(unsigned long delay)
 {
 	int num, i;
 	struct pollfd pollfds[maxfd];
@@ -226,7 +226,7 @@ comm_select(unsigned long delay)
 			if(ignoreErrno(errno))
 				break;
 			ircd_set_time();
-			return COMM_ERROR;
+			return IRCD_ERROR;
 		}
 
 		ircd_set_time();
@@ -254,7 +254,7 @@ comm_select(unsigned long delay)
 					 * NULL or vice versa.)
 					 */
 					devpoll_update_events(fd,
-							      COMM_SELECT_READ, F->read_handler);
+							      IRCD_SELECT_READ, F->read_handler);
 				}
 			}
 
@@ -271,12 +271,12 @@ comm_select(unsigned long delay)
 					hdl(fd, F->write_data);
 					/* See above similar code in the read case */
 					devpoll_update_events(fd,
-							      COMM_SELECT_WRITE, F->write_handler);
+							      IRCD_SELECT_WRITE, F->write_handler);
 				}
 
 			}
 		}
-		return COMM_OK;
+		return IRCD_OK;
 	}
 	while (0);
 	/* XXX Get here, we broke! */

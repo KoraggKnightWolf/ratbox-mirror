@@ -145,24 +145,24 @@ fork_ident(void)
 
 	fork_ident_count++;
 	if(auth_ifd > 0)
-		comm_close(auth_ifd);
+		ircd_close(auth_ifd);
 	if(auth_ofd > 0)
-		comm_close(auth_ofd);
+		ircd_close(auth_ofd);
 	if(auth_pid > 0)
 	{
 		kill(auth_pid, SIGKILL);
 	}
-//	comm_socketpair(AF_UNIX, SOCK_STREAM, 0, fdx, "ident daemon");
-	comm_pipe(ifd, "ident daemon - read");
-	comm_pipe(ofd, "ident daemon - write");
+//	ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, fdx, "ident daemon");
+	ircd_pipe(ifd, "ident daemon - read");
+	ircd_pipe(ofd, "ident daemon - write");
 
 	ircsnprintf(fx, sizeof(fx), "%d", ifd[1]); /*ident write*/
 	ircsnprintf(fy, sizeof(fy), "%d", ofd[0]); /*ident read*/
 
-	comm_set_nb(ifd[0]);
-	comm_set_nb(ifd[1]);
-	comm_set_nb(ifd[0]);
-	comm_set_nb(ofd[1]);
+	ircd_set_nb(ifd[0]);
+	ircd_set_nb(ifd[1]);
+	ircd_set_nb(ifd[0]);
+	ircd_set_nb(ofd[1]);
 
 	setenv("IFD", fy, 1);
 	setenv("OFD", fx, 1);
@@ -175,14 +175,14 @@ fork_ident(void)
 	if(pid == -1)
 	{
 		ilog(L_MAIN, "ircd_spawn_process failed: %s", strerror(errno));
-		comm_close(ifd[0]);
-		comm_close(ifd[1]);
-		comm_close(ofd[0]);
-		comm_close(ofd[1]);
+		ircd_close(ifd[0]);
+		ircd_close(ifd[1]);
+		ircd_close(ofd[0]);
+		ircd_close(ofd[1]);
 		return;
 	}
-	comm_close(ifd[1]);
-	comm_close(ofd[0]);
+	ircd_close(ifd[1]);
+	ircd_close(ofd[0]);
 
 	auth_ifd = ifd[0];
 	auth_ofd = ofd[1];
@@ -281,7 +281,7 @@ release_auth_client(struct AuthRequest *auth)
 	 *     -- adrian
 	 */
 	client->localClient->allow_read = MAX_FLOOD;
-	comm_setflush(client->localClient->fd, 1000, flood_recalc, client);
+	ircd_setflush(client->localClient->fd, 1000, flood_recalc, client);
 	dlinkAddTail(client, &client->node, &global_client_list);
 	read_packet(client->localClient->fd, client);
 }
@@ -346,7 +346,7 @@ auth_write_sendq(int fd, void *unused)
 	
 	if(linebuf_len(&auth_sendq) > 0)
 	{
-		comm_setselect(auth_ofd, COMM_SELECT_WRITE, 
+		ircd_setselect(auth_ofd, IRCD_SELECT_WRITE, 
 			       auth_write_sendq, NULL, 0);
 	}
 }
@@ -579,7 +579,7 @@ read_auth_reply(int fd, void *data)
 {
 	int length;
 
-	while((length = comm_read(auth_ifd, authBuf, sizeof(authBuf))) > 0)
+	while((length = ircd_read(auth_ifd, authBuf, sizeof(authBuf))) > 0)
 	{
 		linebuf_parse(&auth_recvq, authBuf, length, 0);
 		parse_auth_reply();
@@ -591,6 +591,6 @@ read_auth_reply(int fd, void *data)
 	if(length == -1 && !ignoreErrno(errno))
 		fork_ident();
 	
-	comm_setselect(auth_ifd, COMM_SELECT_READ, read_auth_reply, NULL, 0);	
+	ircd_setselect(auth_ifd, IRCD_SELECT_READ, read_auth_reply, NULL, 0);	
 }
 

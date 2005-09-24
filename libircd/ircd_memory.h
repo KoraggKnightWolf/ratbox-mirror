@@ -34,8 +34,8 @@
 
 extern void outofmemory(void);
 
-extern void *MyMalloc(size_t size);
-extern void *MyRealloc(void *x, size_t y);
+extern void *ircd_malloc(size_t size);
+extern void *ircd_realloc(void *x, size_t y);
 
 /* forte (and maybe others) dont like double declarations, 
  * so we dont declare the inlines unless GNUC
@@ -45,7 +45,7 @@ extern void *MyRealloc(void *x, size_t y);
 
 #ifdef __GNUC__
 extern inline void *
-MyMalloc(size_t size)
+ircd_malloc(size_t size)
 {
 	void *ret = calloc(1, size);
 	if(ret == NULL)
@@ -54,7 +54,7 @@ MyMalloc(size_t size)
 }
 
 extern inline void *
-MyRealloc(void *x, size_t y)
+ircd_realloc(void *x, size_t y)
 {
 	void *ret = realloc(x, y);
 
@@ -66,6 +66,6 @@ MyRealloc(void *x, size_t y)
 #endif /* __GNUC__ */
 #endif /* __APPLE__ */
 
-#define MyFree(x) do { if(x) free(x); } while (0)
+#define ircd_free(x) do { if(x) free(x); } while (0)
 
 #endif /* _I_MEMORY_H */

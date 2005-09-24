@@ -71,7 +71,7 @@ linebuf_allocate(void)
 	t = BlockHeapAlloc(linebuf_heap);
 	t->refcount = 0;
 #else
-	t = MyMalloc(sizeof(buf_line_t));
+	t = ircd_malloc(sizeof(buf_line_t));
 	t->refcount = 0;
 #endif
 	return (t);
@@ -84,7 +84,7 @@ linebuf_free(buf_line_t * p)
 #ifndef NO_BLOCKHEAP
 	BlockHeapFree(linebuf_heap, p);
 #else
-	MyFree(p);
+	ircd_free(p);
 #endif
 }
 
@@ -720,7 +720,7 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 			return -1;
 		}
 
-		xret = retval = comm_writev(fd, vec, x);
+		xret = retval = ircd_writev(fd, vec, x);
 		if(retval <= 0)
 			return retval;
 
@@ -782,7 +782,7 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 	}
 
 	/* Now, try writing data */
-	retval = comm_write(fd, bufline->buf + bufhead->writeofs, bufline->len - bufhead->writeofs);
+	retval = ircd_write(fd, bufline->buf + bufhead->writeofs, bufline->len - bufhead->writeofs);
 
 	if(retval <= 0)
 		return retval;

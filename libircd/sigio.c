@@ -68,17 +68,17 @@ poll_update_pollfds(int fd, short event, PF * handler)
 {
 	fde_t *F = find_fd(fd);
 	struct pollfd *pf;
-	int comm_index;
+	int ircd_index;
 
-	if(F->comm_index < 0)
+	if(F->ircd_index < 0)
 	{
 		used_count++;
-		F->comm_index = used_count - 1;
-		index_to_fde[F->comm_index] = F;
+		F->ircd_index = used_count - 1;
+		index_to_fde[F->ircd_index] = F;
 	}
-	comm_index = F->comm_index;
+	ircd_index = F->ircd_index;
 
-	pf = &pfds[comm_index];
+	pf = &pfds[ircd_index];
 
 
 	/* Update the events */
@@ -89,7 +89,7 @@ poll_update_pollfds(int fd, short event, PF * handler)
 	}
 	else
 	{
-		if(comm_index >= 0 && used_count > 0)
+		if(ircd_index >= 0 && used_count > 0)
 		{
 			pf->events &= ~event;
 			if(pf->events == 0)
@@ -97,13 +97,13 @@ poll_update_pollfds(int fd, short event, PF * handler)
 				pf->fd = -1;
 				pf->revents = 0;
 				lircd_assert(used_count > 0);
-				if(F->comm_index != used_count - 1)
+				if(F->ircd_index != used_count - 1)
 				{
-					index_to_fde[used_count - 1]->comm_index = F->comm_index;
-					pfds[F->comm_index] = pfds[used_count - 1];
+					index_to_fde[used_count - 1]->ircd_index = F->ircd_index;
+					pfds[F->ircd_index] = pfds[used_count - 1];
 				}
 				pfds[used_count - 1].fd = -1;
-				F->comm_index = -1;
+				F->ircd_index = -1;
 				used_count--;
 			}
 		}
@@ -123,7 +123,7 @@ poll_update_pollfds(int fd, short event, PF * handler)
  * Side Effect: Sets the FD up for SIGIO
  */
 int
-comm_setup_fd(int fd)
+ircd_setup_fd(int fd)
 {
 	fde_t *F = find_fd(fd);
 	int flags = 0;
@@ -156,20 +156,20 @@ void
 init_netio(void)
 {
 	sigio_signal = SIGRTMIN;
-	pfds = MyMalloc(maxconnections * sizeof(struct pollfd));
-	index_to_fde = MyMalloc(maxconnections * sizeof(fde_t *));
+	pfds = ircd_malloc(maxconnections * sizeof(struct pollfd));
+	index_to_fde = ircd_malloc(maxconnections * sizeof(fde_t *));
 	sigio_is_screwed = 1; /* Start off with poll first.. */
 	mask_our_signal(sigio_signal);
 }
 
 /*
- * comm_setselect
+ * ircd_setselect
  *
  * This is a needed exported function which will be called to register
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, unsigned int type, PF * handler,
+ircd_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F;
@@ -177,13 +177,13 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 	F = find_fd(fd);
 	lircd_assert(F->flags.open);
 
-	if(type & COMM_SELECT_READ)
+	if(type & IRCD_SELECT_READ)
 	{
 		F->read_handler = handler;
 		F->read_data = client_data;
 		poll_update_pollfds(F->fd, POLLIN, handler);
 	}
-	if(type & COMM_SELECT_WRITE)
+	if(type & IRCD_SELECT_WRITE)
 	{
 		F->write_handler = handler;
 		F->write_data = client_data;
@@ -193,7 +193,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 		F->timeout = ircd_currenttime + (timeout / 1000);
 }
 
-/* int comm_select(unsigned long delay)
+/* int ircd_select(unsigned long delay)
  * Input: The maximum time to delay.
  * Output: Returns -1 on error, 0 on success.
  * Side-effects: Deregisters future interest in IO and calls the handlers
@@ -203,11 +203,11 @@ comm_setselect(int fd, unsigned int type, PF * handler,
  * and whether we can write it out.
  * Called to do the new-style IO, courtesy of squid (like most of this
  * new IO code). This routine handles the stuff we've hidden in
- * comm_setselect and fd_table[] and calls callbacks for IO ready
+ * ircd_setselect and fd_table[] and calls callbacks for IO ready
  * events.
  */
 int
-comm_select(unsigned long delay)
+ircd_select(unsigned long delay)
 {
 	int num = 0;
 	int revents = 0;
@@ -363,8 +363,8 @@ handle_timer(struct siginfo *si)
 		free(tdata);
 }
 
-comm_event_id
-comm_schedule_event(time_t when, int repeat, comm_event_cb_t cb, void *udata)
+ircd_event_id
+ircd_schedule_event(time_t when, int repeat, ircd_event_cb_t cb, void *udata)
 {
 	timer_t	 	 id;
 struct	timer_data	*tdata;
@@ -400,7 +400,7 @@ struct	itimerspec	 ts;
 }
 
 void
-comm_unschedule_event(comm_event_id id)
+ircd_unschedule_event(ircd_event_id id)
 {
 	timer_delete(id->td_timer_id);
 	free(id);

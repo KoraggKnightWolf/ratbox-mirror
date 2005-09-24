@@ -75,7 +75,7 @@ ircd_set_time(void)
 	newtime.tv_usec = 0;
 	if(SystemTime == NULL)
 	{
-		SystemTime = MyMalloc(sizeof(struct timeval));
+		SystemTime = ircd_malloc(sizeof(struct timeval));
 	}
 	if(gettimeofday(&newtime, NULL) == -1)
 	{

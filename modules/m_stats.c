@@ -1622,7 +1622,7 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 }
 
 static void
-comm_dump_callback(const char *str, void *data)
+ircd_dump_callback(const char *str, void *data)
 {
 	struct Client *source_p = data;
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG, str);
@@ -1631,7 +1631,7 @@ comm_dump_callback(const char *str, void *data)
 static void
 stats_comm(struct Client *source_p)
 {
-	comm_dump(comm_dump_callback, source_p);
+	ircd_dump(ircd_dump_callback, source_p);
 }
 /*
  * stats_spy

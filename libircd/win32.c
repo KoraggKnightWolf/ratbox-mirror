@@ -124,10 +124,10 @@ setenv(const char *name, const char *value, int overwrite)
 	if(name == NULL || value == NULL)
 		return -1;
 	len = strlen(name) + strlen(value) + 5;
-	buf = MyMalloc(len);
+	buf = ircd_malloc(len);
 	ircsnprintf(buf, len, "%s=%s", name, value);
 	len = putenv(buf);
-	MyFree(buf);
+	ircd_free(buf);
 	return(len);
 }
 
@@ -161,7 +161,7 @@ kill(int pid, int sig)
 
 
 static LRESULT CALLBACK
-comm_process_events(HWND nhwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+ircd_process_events(HWND nhwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	fde_t *F;
 	PF *hdl;
@@ -221,7 +221,7 @@ init_netio(void)
 	static const char *classname = "ircd-ratbox-class";
 
 	wc.style = 0;
-	wc.lpfnWndProc = (WNDPROC) comm_process_events;
+	wc.lpfnWndProc = (WNDPROC) ircd_process_events;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hIcon = NULL;
@@ -244,7 +244,7 @@ init_netio(void)
 
 
 int
-comm_setup_fd(int fd)
+ircd_setup_fd(int fd)
 {
 	fde_t *F = find_fd(fd);
 	
@@ -267,7 +267,7 @@ comm_setup_fd(int fd)
 }
 
 void
-comm_setselect(int fd, unsigned int type, PF * handler,
+ircd_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = find_fd(fd);
@@ -277,7 +277,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 	lircd_assert(F->flags.open);
 	
 	/* Update the list, even though we're not using it .. */
-	if(type & COMM_SELECT_READ)
+	if(type & IRCD_SELECT_READ)
 	{
 		if(handler != NULL)
 			F->pflags |= FD_ACCEPT | FD_CLOSE | FD_READ;
@@ -287,7 +287,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 		F->read_data = client_data;
 	}
 
-	if(type & COMM_SELECT_WRITE)
+	if(type & IRCD_SELECT_WRITE)
 	{
 		if(handler != NULL)
 			F->pflags |= FD_CONNECT | FD_WRITE;
@@ -315,7 +315,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 static int has_set_timer = 0;
 
 int 
-comm_select(unsigned long delay)
+ircd_select(unsigned long delay)
 {
 	MSG msg;
 	if(has_set_timer == 0)
@@ -334,6 +334,6 @@ comm_select(unsigned long delay)
 	ircd_set_time();	
 
 	DispatchMessage(&msg);	
-	return COMM_OK;
+	return IRCD_OK;
 }
 

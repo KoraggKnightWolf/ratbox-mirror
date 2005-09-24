@@ -474,7 +474,7 @@ add_conf_by_address(const char *address, int type, const char *username, struct 
 
 	if(address == NULL)
 		address = "/NOMATCH!/";
-	arec = MyMalloc(sizeof(struct AddressRec));
+	arec = ircd_malloc(sizeof(struct AddressRec));
 	masktype = parse_netmask(address, (struct sockaddr *)&arec->Mask.ipa.addr, &bits);
 	arec->Mask.ipa.bits = bits;
 	arec->masktype = masktype;
@@ -555,7 +555,7 @@ delete_one_address_conf(const char *address, struct ConfItem *aconf)
 			aconf->status |= CONF_ILLEGAL;
 			if(!aconf->clients)
 				free_conf(aconf);
-			MyFree(arec);
+			ircd_free(arec);
 			return;
 		}
 		arecl = arec;
@@ -596,7 +596,7 @@ clear_out_address_conf(void)
 				arec->aconf->status |= CONF_ILLEGAL;
 				if(!arec->aconf->clients)
 					free_conf(arec->aconf);
-				MyFree(arec);
+				ircd_free(arec);
 			}
 		}
 		*store_next = NULL;
@@ -630,7 +630,7 @@ clear_out_address_conf_bans(void)
 				arec->aconf->status |= CONF_ILLEGAL;
 				if(!arec->aconf->clients)
 					free_conf(arec->aconf);
-				MyFree(arec);
+				ircd_free(arec);
 			}
 		}
 		*store_next = NULL;

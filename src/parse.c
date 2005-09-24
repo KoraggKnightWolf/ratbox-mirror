@@ -430,7 +430,7 @@ mod_add_cmd(struct Message *msg)
 		last_ptr = ptr;
 	}
 
-	new_ptr = (struct MessageHash *) MyMalloc(sizeof(struct MessageHash));
+	new_ptr = (struct MessageHash *) ircd_malloc(sizeof(struct MessageHash));
 
 	new_ptr->next = NULL;
 	DupString(new_ptr->cmd, msg->cmd);
@@ -469,12 +469,12 @@ mod_del_cmd(struct Message *msg)
 	{
 		if(strcasecmp(msg->cmd, ptr->cmd) == 0)
 		{
-			MyFree(ptr->cmd);
+			ircd_free(ptr->cmd);
 			if(last_ptr != NULL)
 				last_ptr->next = ptr->next;
 			else
 				msg_hash_table[msgindex] = ptr->next;
-			MyFree(ptr);
+			ircd_free(ptr);
 			return;
 		}
 		last_ptr = ptr;

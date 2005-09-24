@@ -144,9 +144,9 @@ rehash_pglines(struct Client *source_p)
 	{
 		glp_ptr = ptr->data;
 
-		MyFree(glp_ptr->reason1);
-		MyFree(glp_ptr->reason2);
-		MyFree(glp_ptr);
+		ircd_free(glp_ptr->reason1);
+		ircd_free(glp_ptr->reason2);
+		ircd_free(glp_ptr);
 		dlinkDestroy(ptr, &pending_glines);
 	}
 }

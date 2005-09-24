@@ -222,7 +222,7 @@ send_queued_write(int fd, void *data)
 	}
 
 	if(linebuf_len(&to->localClient->buf_sendq))
-	comm_setselect(fd, COMM_SELECT_WRITE,
+	ircd_setselect(fd, IRCD_SELECT_WRITE,
 			       send_queued_write, to, 0);
 }
 
@@ -277,7 +277,7 @@ send_queued_slink_write(int fd, void *data)
 			else
 			{
 				to->localClient->slinkq_ofs = 0;
-				MyFree(to->localClient->slinkq);
+				ircd_free(to->localClient->slinkq);
 				to->localClient->slinkq = NULL;
 			}
 		}
@@ -285,8 +285,8 @@ send_queued_slink_write(int fd, void *data)
 
 	/* if we have any more data, reschedule a write */
 	if(to->localClient->slinkq_len)
-		comm_setselect(to->localClient->ctrlfd,
-			       COMM_SELECT_WRITE, send_queued_slink_write, to, 0);
+		ircd_setselect(to->localClient->ctrlfd,
+			       IRCD_SELECT_WRITE, send_queued_slink_write, to, 0);
 }
 
 /* sendto_one()

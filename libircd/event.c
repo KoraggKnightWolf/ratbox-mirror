@@ -106,7 +106,7 @@ eventAdd(const char *name, EVH * func, void *arg, time_t when)
 				event_time_min = event_table[i].when;
 
 #ifdef USE_POSIX_TIMERS
-			event_table[i].comm_id = comm_schedule_event(when, 1, event_run_callback, &event_table[i]);
+			event_table[i].ircd_id = ircd_schedule_event(when, 1, event_run_callback, &event_table[i]);
 #endif
 
 			return;
@@ -135,7 +135,7 @@ eventAddOnce(const char *name, EVH *func, void *arg, time_t when)
 				event_time_min = event_table[i].when;
 
 #ifdef USE_POSIX_TIMERS
-			event_table[i].comm_id = comm_schedule_event(when, 0, event_run_callback, &event_table[i]);
+			event_table[i].ircd_id = ircd_schedule_event(when, 0, event_run_callback, &event_table[i]);
 #endif
 			return;
 		}
@@ -165,7 +165,7 @@ eventDelete(EVH * func, void *arg)
 	event_table[i].active = 0;
 
 #ifdef USE_POSIX_TIMERS
-	comm_unschedule_event(event_table[i].comm_id);
+	ircd_unschedule_event(event_table[i].ircd_id);
 #endif
 }
 

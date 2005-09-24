@@ -755,7 +755,7 @@ majority_gline(struct Client *source_p, const char *user,
 
 	/* no pending gline, create a new one */
 	pending = (struct gline_pending *) 
-			    MyMalloc(sizeof(struct gline_pending));
+			    ircd_malloc(sizeof(struct gline_pending));
 
 	strlcpy(pending->oper_nick1, source_p->name,
 		sizeof(pending->oper_nick1));
@@ -848,9 +848,9 @@ expire_pending_glines(void *unused)
 		    ircd_currenttime) || find_is_glined(glp_ptr->host, glp_ptr->user))
 
 		{
-			MyFree(glp_ptr->reason1);
-			MyFree(glp_ptr->reason2);
-			MyFree(glp_ptr);
+			ircd_free(glp_ptr->reason1);
+			ircd_free(glp_ptr->reason2);
+			ircd_free(glp_ptr);
 			dlinkDestroy(pending_node, &pending_glines);
 		}
 	}

@@ -85,7 +85,7 @@ moddeinit(void)
 	dlink_node *ptr, *next_ptr;
         DLINK_FOREACH_SAFE(ptr, next_ptr, links_cache_list.head)
         {
-		MyFree(ptr->data);
+		ircd_free(ptr->data);
 		free_dlink_node(ptr);
         }
         eventDelete(cache_links, NULL);
@@ -188,7 +188,7 @@ cache_links(void *unused)
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, links_cache_list.head)
 	{
-		MyFree(ptr->data);
+		ircd_free(ptr->data);
 		free_dlink_node(ptr);
 	}
 
@@ -205,7 +205,7 @@ cache_links(void *unused)
 			continue;
 
 		/* if the below is ever modified, change LINKSLINELEN */
-		links_line = MyMalloc(LINKSLINELEN);
+		links_line = ircd_malloc(LINKSLINELEN);
 		ircsnprintf(links_line, LINKSLINELEN, "%s %s :1 %s",
 			   target_p->name, me.name, 
 			   target_p->info[0] ? target_p->info : 

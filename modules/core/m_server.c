@@ -800,11 +800,11 @@ fork_server(struct Client *server)
 
 
 	/* ctrl */
-	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, ctrl_fds, "slink control fds") < 0)
+	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, ctrl_fds, "slink control fds") < 0)
 		goto fork_error;
 
 	/* data */
-	if(comm_socketpair(AF_UNIX, SOCK_STREAM, 0, data_fds, "slink data fds") < 0)
+	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, data_fds, "slink data fds") < 0)
 		goto fork_error;
 
 	ircsnprintf(fd_str[0], sizeof(fd_str[0]), "%d", ctrl_fds[1]);
@@ -820,11 +820,11 @@ fork_server(struct Client *server)
 		
 	if(ircd_spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
 	{
-		comm_close(server->localClient->fd);
+		ircd_close(server->localClient->fd);
 
 		/* close the childs end of the pipes */
-		comm_close(ctrl_fds[1]);
-		comm_close(data_fds[1]);
+		ircd_close(ctrl_fds[1]);
+		ircd_close(data_fds[1]);
 		
 		s_assert(server->localClient);
 		server->localClient->ctrlfd = ctrl_fds[0];
@@ -839,10 +839,10 @@ fork_server(struct Client *server)
       fork_error:
 	/* this is ugly, but nicer than repeating
 	 * about 50 close() statements everywhre... */
-	comm_close(data_fds[0]);
-	comm_close(data_fds[1]);
-	comm_close(ctrl_fds[0]);
-	comm_close(ctrl_fds[1]);
+	ircd_close(data_fds[0]);
+	ircd_close(data_fds[1]);
+	ircd_close(ctrl_fds[0]);
+	ircd_close(ctrl_fds[1]);
 	return -1;
 }
 
@@ -854,7 +854,7 @@ start_io(struct Client *server)
 	int linecount = 0;
 	int linelen;
 
-	iobuf = MyMalloc(256);
+	iobuf = ircd_malloc(256);
 
 	if(IsCapable(server, CAP_ZIP))
 	{
@@ -871,7 +871,7 @@ start_io(struct Client *server)
 	{
 		linecount++;
 
-		iobuf = MyRealloc(iobuf, (c + READBUF_SIZE + 64));
+		iobuf = ircd_realloc(iobuf, (c + READBUF_SIZE + 64));
 
 		/* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
 		linelen = linebuf_get(&server->localClient->buf_recvq, (char *) (iobuf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL, LINEBUF_RAW);	/* include partial lines */
@@ -891,7 +891,7 @@ start_io(struct Client *server)
 	{
 		linecount++;
 
-		iobuf = MyRealloc(iobuf, (c + BUF_DATA_SIZE + 64));
+		iobuf = ircd_realloc(iobuf, (c + BUF_DATA_SIZE + 64));
 
 		/* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
 		linelen = linebuf_get(&server->localClient->buf_sendq, 
@@ -1334,7 +1334,7 @@ server_estab(struct Client *client_p)
 	if(client_p->localClient->passwd)
 	{
 		memset(client_p->localClient->passwd, 0, strlen(client_p->localClient->passwd));
-		MyFree(client_p->localClient->passwd);
+		ircd_free(client_p->localClient->passwd);
 		client_p->localClient->passwd = NULL;
 	}
 
@@ -1384,8 +1384,8 @@ server_estab(struct Client *client_p)
 			   (me.info[0]) ? (me.info) : "IRCers United");
 	}
 
-	if(!comm_set_buffers(client_p->localClient->fd, READBUF_SIZE))
-		report_error("comm_set_buffers failed for server %s:%s", 
+	if(!ircd_set_buffers(client_p->localClient->fd, READBUF_SIZE))
+		report_error("ircd_set_buffers failed for server %s:%s", 
 			     get_server_name(client_p, SHOW_IP), 
 			     log_client_name(client_p, SHOW_IP), errno);
 
@@ -1434,7 +1434,7 @@ server_estab(struct Client *client_p)
 	if(client_p->localClient->fullcaps)
 	{
 		DupString(client_p->serv->fullcaps, client_p->localClient->fullcaps);
-		MyFree(client_p->localClient->fullcaps);
+		ircd_free(client_p->localClient->fullcaps);
 		client_p->localClient->fullcaps = NULL;
 	}
 
@@ -1461,11 +1461,11 @@ server_estab(struct Client *client_p)
 		/* we won't overflow FD_DESC_SZ here, as it can hold
 		 * client_p->name + 64
 		 */
-		comm_note(client_p->localClient->fd, "slink data: %s", client_p->name);
-		comm_note(client_p->localClient->ctrlfd, "slink ctrl: %s", client_p->name);
+		ircd_note(client_p->localClient->fd, "slink data: %s", client_p->name);
+		ircd_note(client_p->localClient->ctrlfd, "slink ctrl: %s", client_p->name);
 	}
 	else
-		comm_note(client_p->localClient->fd, "Server: %s", client_p->name);
+		ircd_note(client_p->localClient->fd, "Server: %s", client_p->name);
 
 	/*
 	 ** Old sendto_serv_but_one() call removed because we now

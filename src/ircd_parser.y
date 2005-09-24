@@ -99,7 +99,7 @@ static void	free_cur_list(conf_parm_t* list)
 	{
 		case CF_STRING:
 		case CF_QSTRING:
-			MyFree(list->v.string);
+			ircd_free(list->v.string);
 			break;
 		case CF_LIST:
 			free_cur_list(list->v.list);
@@ -118,7 +118,7 @@ static void	add_cur_list_cpt(conf_parm_t *new)
 {
 	if (cur_list == NULL)
 	{
-		cur_list = MyMalloc(sizeof(conf_parm_t));
+		cur_list = ircd_malloc(sizeof(conf_parm_t));
 		cur_list->type |= CF_FLIST;
 		cur_list->v.list = new;
 	}
@@ -133,7 +133,7 @@ static void	add_cur_list(int type, char *str, int number)
 {
 	conf_parm_t *new;
 
-	new = MyMalloc(sizeof(conf_parm_t));
+	new = ircd_malloc(sizeof(conf_parm_t));
 	new->next = NULL;
 	new->type = type;
 
@@ -247,19 +247,19 @@ single: oneitem
 
 oneitem: qstring
             {
-		$$ = MyMalloc(sizeof(conf_parm_t));
+		$$ = ircd_malloc(sizeof(conf_parm_t));
 		$$->type = CF_QSTRING;
 		DupString($$->v.string, $1);
 	    }
           | timespec
             {
-		$$ = MyMalloc(sizeof(conf_parm_t));
+		$$ = ircd_malloc(sizeof(conf_parm_t));
 		$$->type = CF_TIME;
 		$$->v.number = $1;
 	    }
           | number
             {
-		$$ = MyMalloc(sizeof(conf_parm_t));
+		$$ = ircd_malloc(sizeof(conf_parm_t));
 		$$->type = CF_INT;
 		$$->v.number = $1;
 	    }
@@ -269,7 +269,7 @@ oneitem: qstring
 		   so pass it as that, if so */
 		int val = conf_get_yesno_value($1);
 
-		$$ = MyMalloc(sizeof(conf_parm_t));
+		$$ = ircd_malloc(sizeof(conf_parm_t));
 
 		if (val != -1)
 		{

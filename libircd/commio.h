@@ -113,13 +113,13 @@ enum
 
 enum
 {
-	COMM_OK,
-	COMM_ERR_BIND,
-	COMM_ERR_DNS,
-	COMM_ERR_TIMEOUT,
-	COMM_ERR_CONNECT,
-	COMM_ERROR,
-	COMM_ERR_MAX
+	IRCD_OK,
+	IRCD_ERR_BIND,
+	IRCD_ERR_DNS,
+	IRCD_ERR_TIMEOUT,
+	IRCD_ERR_CONNECT,
+	IRCD_ERROR,
+	IRCD_ERR_MAX
 };
 
 typedef struct _fde fde_t;
@@ -139,7 +139,7 @@ struct _fde
 	 */
 	int fd;			/* So we can use the fde_t as a callback ptr */
 	int type;
-	int comm_index;		/* where in the poll list we live */
+	int ircd_index;		/* where in the poll list we live */
 	char desc[FD_DESC_SZ];
 	PF *read_handler;
 	void *read_data;
@@ -192,28 +192,28 @@ extern fde_t *fd_table;
 
 void fdlist_init(int closeall, int maxfds);
 
-extern void comm_open(int, unsigned int, const char *);
-extern void comm_close(int);
-extern void comm_dump(DUMPCB *, void *xdata);
+extern void ircd_open(int, unsigned int, const char *);
+extern void ircd_close(int);
+extern void ircd_dump(DUMPCB *, void *xdata);
 #ifndef __GNUC__
-extern void comm_note(int fd, const char *format, ...);
+extern void ircd_note(int fd, const char *format, ...);
 #else
-extern void comm_note(int fd, const char *format, ...) __attribute__ ((format(printf, 2, 3)));
+extern void ircd_note(int fd, const char *format, ...) __attribute__ ((format(printf, 2, 3)));
 #endif
 
 
 #if defined(HAVE_PORTS) || defined(HAVE_SIGIO)
-typedef void (*comm_event_cb_t)(void *);
+typedef void (*ircd_event_cb_t)(void *);
 
 typedef struct timer_data {
 	timer_t		 td_timer_id;
-	comm_event_cb_t	 td_cb;
+	ircd_event_cb_t	 td_cb;
 	void		*td_udata;
 	int		 td_repeat;
-} *comm_event_id;
+} *ircd_event_id;
 
-extern comm_event_id comm_schedule_event(time_t, int, comm_event_cb_t, void *);
-extern void comm_unschedule_event(comm_event_id);
+extern ircd_event_id ircd_schedule_event(time_t, int, ircd_event_cb_t, void *);
+extern void ircd_unschedule_event(ircd_event_id);
 #endif
 
 #define FB_EOF  0x01
@@ -224,49 +224,49 @@ extern void comm_unschedule_event(comm_event_id);
 #define READBUF_SIZE    16384	/* used by src/packet.c and src/s_serv.c */
 
 /* Type of IO */
-#define	COMM_SELECT_READ		0x1
-#define	COMM_SELECT_WRITE		0x2
+#define	IRCD_SELECT_READ		0x1
+#define	IRCD_SELECT_WRITE		0x2
 
 /*#ifdef __MINGW32__
-#define COMM_SELECT_ACCEPT		0x4
-#define COMM_SELECT_CONNECT		0x8
+#define IRCD_SELECT_ACCEPT		0x4
+#define IRCD_SELECT_CONNECT		0x8
 #else
 */
-#define COMM_SELECT_ACCEPT		COMM_SELECT_READ
-#define COMM_SELECT_CONNECT		COMM_SELECT_WRITE
+#define IRCD_SELECT_ACCEPT		IRCD_SELECT_READ
+#define IRCD_SELECT_CONNECT		IRCD_SELECT_WRITE
 /*#endif */
 extern int readcalls;
 
-extern int comm_set_nb(int);
-extern int comm_set_buffers(int, int);
+extern int ircd_set_nb(int);
+extern int ircd_set_buffers(int, int);
 
-extern int comm_get_sockerr(int);
+extern int ircd_get_sockerr(int);
 
-extern void comm_settimeout(int fd, time_t, PF *, void *);
-extern void comm_setflush(int fd, time_t, PF *, void *);
-extern void comm_checktimeouts(void *);
-extern void comm_connect_tcp(int fd, struct sockaddr *,
+extern void ircd_settimeout(int fd, time_t, PF *, void *);
+extern void ircd_setflush(int fd, time_t, PF *, void *);
+extern void ircd_checktimeouts(void *);
+extern void ircd_connect_tcp(int fd, struct sockaddr *,
 			     struct sockaddr *, int, CNCB *, void *, int);
-extern const char *comm_errstr(int status);
-extern int comm_socket(int family, int sock_type, int proto, const char *note);
-extern int comm_socketpair(int family, int sock_type, int proto, int *nfd, const char *note);
+extern const char *ircd_errstr(int status);
+extern int ircd_socket(int family, int sock_type, int proto, const char *note);
+extern int ircd_socketpair(int family, int sock_type, int proto, int *nfd, const char *note);
 
-extern int comm_accept(int fd, struct sockaddr *pn, socklen_t *addrlen);
-extern ssize_t comm_write(int fd, void *buf, int count);
+extern int ircd_accept(int fd, struct sockaddr *pn, socklen_t *addrlen);
+extern ssize_t ircd_write(int fd, void *buf, int count);
 #if defined(USE_WRITEV) 
-extern ssize_t comm_writev(int fd, struct iovec *vector, int count);
+extern ssize_t ircd_writev(int fd, struct iovec *vector, int count);
 #endif
-extern ssize_t comm_read(int fd, void *buf, int count);
-extern int comm_pipe(int *fd, const char *desc);
+extern ssize_t ircd_read(int fd, void *buf, int count);
+extern int ircd_pipe(int *fd, const char *desc);
 
 /* These must be defined in the network IO loop code of your choice */
-extern void comm_setselect(int fd, unsigned int type,
+extern void ircd_setselect(int fd, unsigned int type,
 			   PF * handler, void *client_data, time_t timeout);
 extern void init_netio(void);
 extern int read_message(time_t, unsigned char);
-extern int comm_select(unsigned long);
+extern int ircd_select(unsigned long);
 extern int disable_sock_options(int);
-extern int comm_setup_fd(int fd);
+extern int ircd_setup_fd(int fd);
 
 const char *inetntoa(const char *in_addr);
 const char *inetntop(int af, const void *src, char *dst, unsigned int size);
@@ -309,7 +309,7 @@ add_fd(int fd)
 	if((F = find_fd(fd)) != NULL)
 		return F; 
 	
-	F = MyMalloc(sizeof(fde_t));
+	F = ircd_malloc(sizeof(fde_t));
 	F->fd = fd;
 	list = &fd_table[hash];
 	dlinkAdd(F, &F->node, list);
@@ -325,7 +325,7 @@ remove_fd(int fd)
 	list = &fd_table[hash];
 	F = find_fd(fd);
 	dlinkDelete(&F->node, list);
-	MyFree(F);
+	ircd_free(F);
 }
 
 

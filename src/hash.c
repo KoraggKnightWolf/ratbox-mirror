@@ -89,13 +89,13 @@ dlink_list *ndTable;
 void
 init_hash(void)
 {
-	clientTable = MyMalloc(sizeof(dlink_list) * U_MAX);
-	idTable = MyMalloc(sizeof(dlink_list) * U_MAX);
-	ndTable = MyMalloc(sizeof(dlink_list) * U_MAX);
-	channelTable = MyMalloc(sizeof(dlink_list) * CH_MAX);
-	hostTable = MyMalloc(sizeof(dlink_list) * HOST_MAX);
-	resvTable = MyMalloc(sizeof(dlink_list) * R_MAX);
-	helpTable = MyMalloc(sizeof(dlink_list) * HELP_MAX);
+	clientTable = ircd_malloc(sizeof(dlink_list) * U_MAX);
+	idTable = ircd_malloc(sizeof(dlink_list) * U_MAX);
+	ndTable = ircd_malloc(sizeof(dlink_list) * U_MAX);
+	channelTable = ircd_malloc(sizeof(dlink_list) * CH_MAX);
+	hostTable = ircd_malloc(sizeof(dlink_list) * HOST_MAX);
+	resvTable = ircd_malloc(sizeof(dlink_list) * R_MAX);
+	helpTable = ircd_malloc(sizeof(dlink_list) * HELP_MAX);
 }
 
 

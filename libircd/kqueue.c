@@ -55,7 +55,7 @@ static int kqoff;		/* offset into the buffer */
 
 
 int 
-comm_setup_fd(int fd)
+ircd_setup_fd(int fd)
 {
 	return 0;
 }
@@ -142,32 +142,32 @@ init_netio(void)
 		exit(115);	/* Whee! */
 	}
 	kqmax = getdtablesize();
-	kqlst = MyMalloc(sizeof(struct kevent) * kqmax);
+	kqlst = ircd_malloc(sizeof(struct kevent) * kqmax);
 	zero_timespec.tv_sec = 0;
 	zero_timespec.tv_nsec = 0;
 }
 
 /*
- * comm_setselect
+ * ircd_setselect
  *
  * This is a needed exported function which will be called to register
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, unsigned int type, PF * handler,
+ircd_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = find_fd(fd);
 	lircd_assert(fd >= 0);
 	lircd_assert(F->flags.open);
 
-	if(type & COMM_SELECT_READ)
+	if(type & IRCD_SELECT_READ)
 	{
 		kq_update_events(F, EVFILT_READ, handler);
 		F->read_handler = handler;
 		F->read_data = client_data;
 	}
-	if(type & COMM_SELECT_WRITE)
+	if(type & IRCD_SELECT_WRITE)
 	{
 		kq_update_events(F, EVFILT_WRITE, handler);
 		F->write_handler = handler;
@@ -185,16 +185,16 @@ comm_setselect(int fd, unsigned int type, PF * handler,
  */
 
 /*
- * comm_select
+ * ircd_select
  *
  * Called to do the new-style IO, courtesy of squid (like most of this
  * new IO code). This routine handles the stuff we've hidden in
- * comm_setselect and fd_table[] and calls callbacks for IO ready
+ * ircd_setselect and fd_table[] and calls callbacks for IO ready
  * events.
  */
 
 int
-comm_select(unsigned long delay)
+ircd_select(unsigned long delay)
 {
 	int num, i;
 	static struct kevent ke[KE_LENGTH];
@@ -223,7 +223,7 @@ comm_select(unsigned long delay)
 
 		ircd_set_time();
 
-		return COMM_ERROR;
+		return IRCD_ERROR;
 
 		/* NOTREACHED */
 	}
@@ -231,7 +231,7 @@ comm_select(unsigned long delay)
 	ircd_set_time();
 
 	if(num == 0)
-		return COMM_OK;	/* No error.. */
+		return IRCD_OK;	/* No error.. */
 
 	for (i = 0; i < num; i++)
 	{
@@ -273,6 +273,6 @@ comm_select(unsigned long delay)
 			break;
 		}
 	}
-	return COMM_OK;
+	return IRCD_OK;
 }
 

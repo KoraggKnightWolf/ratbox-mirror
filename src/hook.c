@@ -62,7 +62,7 @@ int h_server_introduced;
 void
 init_hook(void)
 {
-	hooks = MyMalloc(sizeof(hook) * HOOK_INCREMENT);
+	hooks = ircd_malloc(sizeof(hook) * HOOK_INCREMENT);
 
 #ifdef USE_IODEBUG_HOOKS
 	h_iosend_id = register_hook("iosend");
@@ -84,10 +84,10 @@ grow_hooktable(void)
 {
 	hook *newhooks;
 
-	newhooks = MyMalloc(sizeof(hook) * (max_hooks + HOOK_INCREMENT));
+	newhooks = ircd_malloc(sizeof(hook) * (max_hooks + HOOK_INCREMENT));
 	memcpy(newhooks, hooks, sizeof(hook) * num_hooks);
 
-	MyFree(hooks);
+	ircd_free(hooks);
 	hooks = newhooks;
 	max_hooks += HOOK_INCREMENT;
 }

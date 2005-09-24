@@ -75,7 +75,7 @@ add_top_conf(const char *name, int (*sfunc) (struct TopConf *),
 {
 	struct TopConf *tc;
 
-	tc = MyMalloc(sizeof(struct TopConf));
+	tc = ircd_malloc(sizeof(struct TopConf));
 
 	DupString(tc->tc_name, name);
 	tc->tc_sfunc = sfunc;
@@ -146,8 +146,8 @@ remove_top_conf(char *name)
 		return -1;
 
 	dlinkDestroy(ptr, &conf_items);
-	MyFree(tc->tc_name);
-	MyFree(tc);
+	ircd_free(tc->tc_name);
+	ircd_free(tc);
 
 	return 0;
 }
@@ -220,7 +220,7 @@ conf_set_serverinfo_network_name(void *data)
 	if((p = strchr((char *) data, ' ')))
 		*p = '\0';
 
-	MyFree(ServerInfo.network_name);
+	ircd_free(ServerInfo.network_name);
 	DupString(ServerInfo.network_name, (char *) data);
 }
 
@@ -266,7 +266,7 @@ conf_set_modules_module(void *data)
 
 	load_one_module((char *) data, 0);
 
-	MyFree(m_bn);
+	ircd_free(m_bn);
 #else
 	conf_report_error("Ignoring modules::module -- loadable module support not present.");
 #endif
@@ -606,7 +606,7 @@ conf_set_oper_password(void *data)
 	if(yy_oper->passwd)
 	{
 		memset(yy_oper->passwd, 0, strlen(yy_oper->passwd));
-		MyFree(yy_oper->passwd);
+		ircd_free(yy_oper->passwd);
 	}
 
 	DupString(yy_oper->passwd, (char *) data);
@@ -616,7 +616,7 @@ static void
 conf_set_oper_rsa_public_key_file(void *data)
 {
 #ifdef HAVE_LIBCRYPTO
-	MyFree(yy_oper->rsa_pubkey_file);
+	ircd_free(yy_oper->rsa_pubkey_file);
 	DupString(yy_oper->rsa_pubkey_file, (char *) data);
 #else
 	conf_report_error("Warning -- ignoring rsa_public_key_file (OpenSSL support not available");
@@ -726,7 +726,7 @@ static char *listener_address;
 static int
 conf_begin_listen(struct TopConf *tc)
 {
-	MyFree(listener_address);
+	ircd_free(listener_address);
 	listener_address = NULL;
 	return 0;
 }
@@ -734,7 +734,7 @@ conf_begin_listen(struct TopConf *tc)
 static int
 conf_end_listen(struct TopConf *tc)
 {
-	MyFree(listener_address);
+	ircd_free(listener_address);
 	listener_address = NULL;
 	return 0;
 }
@@ -778,7 +778,7 @@ conf_set_listen_port(void *data)
 static void
 conf_set_listen_address(void *data)
 {
-	MyFree(listener_address);
+	ircd_free(listener_address);
 	DupString(listener_address, data);
 }
 
@@ -892,7 +892,7 @@ conf_set_auth_passwd(void *data)
 {
 	if(yy_aconf->passwd)
 		memset(yy_aconf->passwd, 0, strlen(yy_aconf->passwd));
-	MyFree(yy_aconf->passwd);
+	ircd_free(yy_aconf->passwd);
 	DupString(yy_aconf->passwd, data);
 }
 
@@ -952,7 +952,7 @@ conf_set_auth_spoof(void *data)
 		return;
 	}
 
-	MyFree(yy_aconf->name);
+	ircd_free(yy_aconf->name);
 	DupString(yy_aconf->name, data);
 	yy_aconf->flags |= CONF_FLAGS_SPOOF_IP;
 }
@@ -969,7 +969,7 @@ static void
 conf_set_auth_redir_serv(void *data)
 {
 	yy_aconf->flags |= CONF_FLAGS_REDIR;
-	MyFree(yy_aconf->name);
+	ircd_free(yy_aconf->name);
 	DupString(yy_aconf->name, data);
 }
 
@@ -985,7 +985,7 @@ conf_set_auth_redir_port(void *data)
 static void
 conf_set_auth_class(void *data)
 {
-	MyFree(yy_aconf->className);
+	ircd_free(yy_aconf->className);
 	DupString(yy_aconf->className, data);
 }
 
@@ -1148,7 +1148,7 @@ conf_end_connect(struct TopConf *tc)
 static void
 conf_set_connect_host(void *data)
 {
-	MyFree(yy_server->host);
+	ircd_free(yy_server->host);
 	DupString(yy_server->host, data);
 }
 
@@ -1171,7 +1171,7 @@ conf_set_connect_send_password(void *data)
 	if(yy_server->spasswd)
 	{
 		memset(yy_server->spasswd, 0, strlen(yy_server->spasswd));
-		MyFree(yy_server->spasswd);
+		ircd_free(yy_server->spasswd);
 	}
 
 	DupString(yy_server->spasswd, data);
@@ -1183,7 +1183,7 @@ conf_set_connect_accept_password(void *data)
 	if(yy_server->passwd)
 	{
 		memset(yy_server->passwd, 0, strlen(yy_server->passwd));
-		MyFree(yy_server->passwd);
+		ircd_free(yy_server->passwd);
 	}
 	DupString(yy_server->passwd, data);
 }
@@ -1260,7 +1260,7 @@ conf_set_connect_leaf_mask(void *data)
 static void
 conf_set_connect_class(void *data)
 {
-	MyFree(yy_server->class_name);
+	ircd_free(yy_server->class_name);
 	DupString(yy_server->class_name, data);
 }
 
@@ -1551,7 +1551,7 @@ conf_end_block(struct TopConf *tc)
 	if(tc->tc_efunc)
 		return tc->tc_efunc(tc);
 
-	MyFree(conf_cur_block_name);
+	ircd_free(conf_cur_block_name);
 	return 0;
 }
 
@@ -1570,7 +1570,7 @@ conf_set_generic_string(void *data, int len, void *location)
 	if(len && strlen(input) > len)
 		input[len] = '\0';
 
-	MyFree(*loc);
+	ircd_free(*loc);
 	DupString(*loc, input);
 }
 
@@ -1683,7 +1683,7 @@ add_conf_item(const char *topconf, const char *name, int type, void (*func) (voi
 	if((cf = find_conf_item(tc, name)) != NULL)
 		return -1;
 
-	cf = MyMalloc(sizeof(struct ConfEntry));
+	cf = ircd_malloc(sizeof(struct ConfEntry));
 
 	DupString(cf->cf_name, name);
 	cf->cf_type = type;
@@ -1713,8 +1713,8 @@ remove_conf_item(const char *topconf, const char *name)
 		return -1;
 
 	dlinkDestroy(ptr, &tc->tc_items);
-	MyFree(cf->cf_name);
-	MyFree(cf);
+	ircd_free(cf->cf_name);
+	ircd_free(cf);
 
 	return 0;
 }

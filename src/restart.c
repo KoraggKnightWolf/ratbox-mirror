@@ -60,7 +60,7 @@ server_reboot(void)
 	/*
 	 * XXX we used to call flush_connections() here. But since this routine
 	 * doesn't exist anymore, we won't be flushing. This is ok, since 
-	 * when close handlers come into existance, comm_close() will be called
+	 * when close handlers come into existance, ircd_close() will be called
 	 * below, and the data flushing will be implicit.
 	 *    -- adrian
 	 *

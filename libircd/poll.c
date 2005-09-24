@@ -48,7 +48,7 @@ pollfd_list_t pollfd_list;
 static void poll_update_pollfds(int, short, PF *);
 
 int 
-comm_setup_fd(int fd)
+ircd_setup_fd(int fd)
 {
         return 0;
 }
@@ -82,36 +82,36 @@ static void
 poll_update_pollfds(int fd, short event, PF * handler)
 {
 	fde_t *F = find_fd(fd);
-	int comm_index;
+	int ircd_index;
 
-	if(F->comm_index < 0)
+	if(F->ircd_index < 0)
 	{
-		F->comm_index = poll_findslot();
+		F->ircd_index = poll_findslot();
 	}
-	comm_index = F->comm_index;
+	ircd_index = F->ircd_index;
 
 	/* Update the events */
 	if(handler)
 	{
-		pollfd_list.pollfds[comm_index].events |= event;
-		pollfd_list.pollfds[comm_index].fd = fd;
+		pollfd_list.pollfds[ircd_index].events |= event;
+		pollfd_list.pollfds[ircd_index].fd = fd;
 		/* update maxindex here */
-		if(comm_index > pollfd_list.maxindex)
-			pollfd_list.maxindex = comm_index;
+		if(ircd_index > pollfd_list.maxindex)
+			pollfd_list.maxindex = ircd_index;
 	}
 	else
 	{
-		if(comm_index >= 0)
+		if(ircd_index >= 0)
 		{
-			pollfd_list.pollfds[comm_index].events &= ~event;
-			if(pollfd_list.pollfds[comm_index].events == 0)
+			pollfd_list.pollfds[ircd_index].events &= ~event;
+			if(pollfd_list.pollfds[ircd_index].events == 0)
 			{
-				pollfd_list.pollfds[comm_index].fd = -1;
-				pollfd_list.pollfds[comm_index].revents = 0;
-				F->comm_index = -1;
+				pollfd_list.pollfds[ircd_index].fd = -1;
+				pollfd_list.pollfds[ircd_index].revents = 0;
+				F->ircd_index = -1;
 
 				/* update pollfd_list.maxindex here */
-				if(comm_index == pollfd_list.maxindex)
+				if(ircd_index == pollfd_list.maxindex)
 					while (pollfd_list.maxindex >= 0 &&
 					       pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
 						pollfd_list.maxindex--;
@@ -135,7 +135,7 @@ void
 init_netio(void)
 {
 	int fd;
-	pollfd_list.pollfds = MyMalloc(maxconnections * (sizeof(struct pollfd)));
+	pollfd_list.pollfds = ircd_malloc(maxconnections * (sizeof(struct pollfd)));
 	for (fd = 0; fd < maxconnections; fd++)
 	{
 		pollfd_list.pollfds[fd].fd = -1;
@@ -144,26 +144,26 @@ init_netio(void)
 }
 
 /*
- * comm_setselect
+ * ircd_setselect
  *
  * This is a needed exported function which will be called to register
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-comm_setselect(int fd, unsigned int type, PF * handler,
+ircd_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data, time_t timeout)
 {
 	fde_t *F = find_fd(fd);
 	lircd_assert(fd >= 0);
 	lircd_assert(F->flags.open);
 
-	if(type & COMM_SELECT_READ)
+	if(type & IRCD_SELECT_READ)
 	{
 		F->read_handler = handler;
 		F->read_data = client_data;
 		poll_update_pollfds(fd, POLLRDNORM, handler);
 	}
-	if(type & COMM_SELECT_WRITE)
+	if(type & IRCD_SELECT_WRITE)
 	{
 		F->write_handler = handler;
 		F->write_data = client_data;
@@ -173,7 +173,7 @@ comm_setselect(int fd, unsigned int type, PF * handler,
 		F->timeout = ircd_currenttime + (timeout / 1000);
 }
 
-/* int comm_select_fdlist(unsigned long delay)
+/* int ircd_select_fdlist(unsigned long delay)
  * Input: The maximum time to delay.
  * Output: Returns -1 on error, 0 on success.
  * Side-effects: Deregisters future interest in IO and calls the handlers
@@ -183,11 +183,11 @@ comm_setselect(int fd, unsigned int type, PF * handler,
  * and whether we can write it out.
  * Called to do the new-style IO, courtesy of squid (like most of this
  * new IO code). This routine handles the stuff we've hidden in
- * comm_setselect and fd_table[] and calls callbacks for IO ready
+ * ircd_setselect and fd_table[] and calls callbacks for IO ready
  * events.
  */
 int
-comm_select(unsigned long delay)
+ircd_select(unsigned long delay)
 {
 	int num;
 	int fd;

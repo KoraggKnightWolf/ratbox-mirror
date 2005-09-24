@@ -48,7 +48,7 @@ make_class(void)
 {
 	struct Class *tmp;
 
-	tmp = (struct Class *) MyMalloc(sizeof(struct Class));
+	tmp = (struct Class *) ircd_malloc(sizeof(struct Class));
 
 	ConFreq(tmp) = DEFAULT_CONNECTFREQUENCY;
 	PingFreq(tmp) = DEFAULT_PINGFREQUENCY;
@@ -65,8 +65,8 @@ free_class(struct Class *tmp)
 	if(tmp->ip_limits)
 		Destroy_Patricia(tmp->ip_limits, NULL);
 
-	MyFree(tmp->class_name);
-	MyFree(tmp);
+	ircd_free(tmp->class_name);
+	ircd_free(tmp);
 
 }
 

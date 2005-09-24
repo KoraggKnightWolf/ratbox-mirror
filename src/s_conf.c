@@ -142,12 +142,12 @@ free_conf(struct ConfItem *aconf)
 	if(aconf->spasswd)
 		memset(aconf->spasswd, 0, strlen(aconf->spasswd));
 
-	MyFree(aconf->passwd);
-	MyFree(aconf->spasswd);
-	MyFree(aconf->name);
-	MyFree(aconf->className);
-	MyFree(aconf->user);
-	MyFree(aconf->host);
+	ircd_free(aconf->passwd);
+	ircd_free(aconf->spasswd);
+	ircd_free(aconf->name);
+	ircd_free(aconf->className);
+	ircd_free(aconf->user);
+	ircd_free(aconf->host);
 
 	BlockHeapFree(confitem_heap, aconf);
 }
@@ -1217,19 +1217,19 @@ clear_out_old_conf(void)
 #endif
 
 	/* clean out ServerInfo */
-	MyFree(ServerInfo.description);
+	ircd_free(ServerInfo.description);
 	ServerInfo.description = NULL;
-	MyFree(ServerInfo.network_name);
+	ircd_free(ServerInfo.network_name);
 	ServerInfo.network_name = NULL;
-	MyFree(ServerInfo.network_desc);
+	ircd_free(ServerInfo.network_desc);
 	ServerInfo.network_desc = NULL;
 
 	/* clean out AdminInfo */
-	MyFree(AdminInfo.name);
+	ircd_free(AdminInfo.name);
 	AdminInfo.name = NULL;
-	MyFree(AdminInfo.email);
+	ircd_free(AdminInfo.email);
 	AdminInfo.email = NULL;
-	MyFree(AdminInfo.description);
+	ircd_free(AdminInfo.description);
 	AdminInfo.description = NULL;
 
 	/* operator{} and class{} blocks are freed above */
@@ -1241,13 +1241,13 @@ clear_out_old_conf(void)
 	 */
 
 	/* clean out general */
-	MyFree(ConfigFileEntry.servlink_path);
+	ircd_free(ConfigFileEntry.servlink_path);
 	ConfigFileEntry.servlink_path = NULL;
 
 #ifdef ENABLE_SERVICES
 	DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
 	{
-		MyFree(ptr->data);
+		ircd_free(ptr->data);
 		dlinkDestroy(ptr, &service_list);
 	}
 #endif
@@ -1436,7 +1436,7 @@ conf_add_class_to_conf(struct ConfItem *aconf)
 					     aconf->className, aconf->user, aconf->host);
 		}
 
-		MyFree(aconf->className);
+		ircd_free(aconf->className);
 		DupString(aconf->className, "default");
 		return;
 	}
@@ -1444,7 +1444,7 @@ conf_add_class_to_conf(struct ConfItem *aconf)
 	if(ConfMaxUsers(aconf) < 0)
 	{
 		ClassPtr(aconf) = default_class;
-		MyFree(aconf->className);
+		ircd_free(aconf->className);
 		DupString(aconf->className, "default");
 		return;
 	}

@@ -135,7 +135,7 @@ reject_expires(void *unused)
 			continue;
 
 		dlinkDelete(ptr, &reject_list);
-		MyFree(rdata);
+		ircd_free(rdata);
 		patricia_remove(reject_tree, pnode);
 	}
 }
@@ -175,7 +175,7 @@ add_reject(struct Client *client_p)
 			bitlen = 128;
 #endif
 		pnode = make_and_lookup_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);
-		pnode->data = rdata = MyMalloc(sizeof(struct reject_data));
+		pnode->data = rdata = ircd_malloc(sizeof(struct reject_data));
 		dlinkAddTail(pnode, &rdata->rnode, &reject_list);
 		rdata->time = ircd_currenttime;
 		rdata->count = 1;
@@ -203,7 +203,7 @@ check_reject(struct Client *client_p)
 		{
 			ServerStats.is_rej++;
 			SetReject(client_p);
-			comm_setselect(client_p->localClient->fd, COMM_SELECT_WRITE | COMM_SELECT_READ, NULL, NULL, 0);
+			ircd_setselect(client_p->localClient->fd, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL, 0);
 			SetClosing(client_p);
 			dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &delay_exit);
 			return 1;
@@ -225,7 +225,7 @@ flush_reject(void)
 		pnode = ptr->data;
 		rdata = pnode->data;
 		dlinkDelete(ptr, &reject_list);
-		MyFree(rdata);
+		ircd_free(rdata);
 		patricia_remove(reject_tree, pnode);
 	}
 }
@@ -244,7 +244,7 @@ remove_reject(const char *ip)
 	{
 		struct reject_data *rdata = pnode->data;
 		dlinkDelete(&rdata->rnode, &reject_list);
-		MyFree(rdata);
+		ircd_free(rdata);
 		patricia_remove(reject_tree, pnode);
 		return 1;
 	}

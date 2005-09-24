@@ -90,7 +90,7 @@ allocate_channel(const char *chname)
 void
 free_channel(struct Channel *chptr)
 {
-	MyFree(chptr->chname);
+	ircd_free(chptr->chname);
 	BlockHeapFree(channel_heap, chptr);
 }
 
@@ -108,8 +108,8 @@ allocate_ban(const char *banstr, const char *who)
 void
 free_ban(struct Ban *bptr)
 {
-	MyFree(bptr->banstr);
-	MyFree(bptr->who);
+	ircd_free(bptr->banstr);
+	ircd_free(bptr->who);
 	BlockHeapFree(ban_heap, bptr);
 }
 

@@ -266,7 +266,7 @@ io_loop(void)
 
 		eventRun();
 
-		comm_select(250);
+		ircd_select(250);
 
 		/*
 		 * Check to see whether we have to rehash the configuration ..
@@ -656,7 +656,7 @@ ratbox_main(int argc, char *argv[])
 	eventAddIsh("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
 
 	/* Setup the timeout check. I'll shift it later :)  -- adrian */
-	eventAddIsh("comm_checktimeouts", comm_checktimeouts, NULL, 5);
+	eventAddIsh("ircd_checktimeouts", ircd_checktimeouts, NULL, 5);
 
 
 	if(splitmode)

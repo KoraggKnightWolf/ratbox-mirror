@@ -55,7 +55,7 @@ struct ev_entry
 	time_t when;
 	int active;
 #ifdef USE_POSIX_TIMERS
-	struct timer_data * comm_id;
+	struct timer_data * ircd_id;
 #endif
 };
 
