@@ -1,3 +1,11 @@
+androsyn    2005/09/24 21:38:34 UTC	(20050924_0-20788)
+  Log:
+  provide a gettimeofday function for unix platforms that don't have it
+
+  Modified:
+	ircd-ratbox/trunk/libircd/unix.c (File Modified) 
+
+
 androsyn    2005/09/18 01:57:45 UTC	(20050918_0-20782)
   Log:
   A few things in this commit, all from jilles
