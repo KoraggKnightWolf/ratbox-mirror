@@ -1,3 +1,13 @@
+androsyn    2005/09/25 21:46:48 UTC	(20050925_1-20802)
+  Log:
+  use the crypt() implementation from uclibc so we can support
+  both md5 and unix crypt on platforms that don't have crypt()
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/crypt.c (File Modified) 
+
+
 androsyn    2005/09/25 21:11:30 UTC	(20050925_0-20796)
   Log:
   fix a silly bug in gcap where client_p should be source_p -via jilles
