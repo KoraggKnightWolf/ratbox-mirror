@@ -1,3 +1,13 @@
+androsyn    2005/09/25 22:01:21 UTC	(20050925_3-20810)
+  Log:
+  Make gcc 4.x shut up about unused vars in the in6addr_any check
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2005/09/25 21:52:17 UTC	(20050925_2-20808)
   Log:
   make gcc shut up about uninitialized variables via darix
