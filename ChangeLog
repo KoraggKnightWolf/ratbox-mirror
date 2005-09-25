@@ -1,3 +1,11 @@
+androsyn    2005/09/25 21:11:30 UTC	(20050925_0-20796)
+  Log:
+  fix a silly bug in gcap where client_p should be source_p -via jilles
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_capab.c (File Modified) 
+
+
 androsyn    2005/09/24 21:39:39 UTC	(20050924_1-20790)
   Log:
   More libircd namespace changes.
