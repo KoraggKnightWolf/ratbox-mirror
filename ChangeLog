@@ -1,3 +1,11 @@
+androsyn    2005/09/25 21:52:17 UTC	(20050925_2-20808)
+  Log:
+  make gcc shut up about uninitialized variables via darix
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2005/09/25 21:46:48 UTC	(20050925_1-20802)
   Log:
   use the crypt() implementation from uclibc so we can support
