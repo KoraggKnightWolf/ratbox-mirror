@@ -119,7 +119,7 @@ me_gcap(struct Client *client_p, struct Client *source_p,
 		{
 			if(!irccmp(cap->name, s))
 			{
-				client_p->serv->caps |= cap->cap;
+				source_p->serv->caps |= cap->cap;
 				break;
 			}
 		}
