@@ -1065,7 +1065,9 @@ inet_ntop6(const unsigned char *src, char *dst, unsigned int size)
 	for (i = 0; i < IN6ADDRSZ; i += 2)
 		words[i / 2] = (src[i] << 8) | src[i + 1];
 	best.base = -1;
+	best.len = 0;
 	cur.base = -1;
+	cur.len = 0;
 	for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
 	{
 		if(words[i] == 0)
