@@ -749,7 +749,7 @@ ircd_close(int fd)
 void
 ircd_dump(DUMPCB * cb, void *data)
 {
-	unsigned int i;
+	int i;
 	char buf[128];
 	for (i = 0; i <= highest_fd; i++)
 	{
