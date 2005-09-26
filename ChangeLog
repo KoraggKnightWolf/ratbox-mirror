@@ -1,3 +1,27 @@
+androsyn    2005/09/26 04:22:12 UTC	(20050926_4-20832)
+  Log:
+  Change some times from signed to unsigned and vice-versa and 
+  some casting as well.  Remove -Wno-sign-compare from the --enable-warnings
+  flags
+  
+
+  Modified:
+	ircd-ratbox/trunk/adns/query.c (File Modified) 
+	ircd-ratbox/trunk/adns/reply.c (File Modified) 
+	ircd-ratbox/trunk/adns/setup.c (File Modified) 
+	ircd-ratbox/trunk/adns/types.c (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_cap.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_list.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2005/09/26 04:03:59 UTC	(20050926_3-20830)
   Log:
   fix a signed comparison issue
