@@ -29,7 +29,7 @@ static log_cb *ircd_log;
 static restart_cb *ircd_restart;
 static die_cb *ircd_die;
 
-static struct timeval *ircd_systemtime;
+static struct timeval *ircd_time;
 
 
 static char errbuf[512];
@@ -37,17 +37,17 @@ static char errbuf[512];
 time_t
 ircd_current_time(void)
 {
-	if(ircd_systemtime == NULL)
+	if(ircd_time == NULL)
 		ircd_set_time();
-	return ircd_systemtime->tv_sec;
+	return ircd_time->tv_sec;
 }
 
 struct timeval *
 ircd_current_time_tv(void)
 {
-	if(ircd_systemtime == NULL)
+	if(ircd_time == NULL)
 		ircd_set_time();
-	return ircd_systemtime;	
+	return ircd_time;	
 }
 
 void
@@ -93,9 +93,9 @@ ircd_set_time(void)
 	struct timeval newtime;
 	newtime.tv_sec = 0;
 	newtime.tv_usec = 0;
-	if(ircd_systemtime == NULL)
+	if(ircd_time == NULL)
 	{
-		ircd_systemtime = ircd_malloc(sizeof(struct timeval));
+		ircd_time = ircd_malloc(sizeof(struct timeval));
 	}
 	if(gettimeofday(&newtime, NULL) == -1)
 	{
@@ -103,10 +103,10 @@ ircd_set_time(void)
 		ircd_lib_restart("Clock Failure");
 	}
 
-	if(newtime.tv_sec < ircd_systemtime->tv_sec)
-		set_back_events(ircd_systemtime->tv_sec - newtime.tv_sec);
+	if(newtime.tv_sec < ircd_time->tv_sec)
+		set_back_events(ircd_time->tv_sec - newtime.tv_sec);
 
-	memcpy(ircd_systemtime, &newtime, sizeof(struct timeval));
+	memcpy(ircd_time, &newtime, sizeof(struct timeval));
 }
 
 
