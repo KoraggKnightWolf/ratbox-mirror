@@ -1567,7 +1567,7 @@ conf_set_generic_string(void *data, int len, void *location)
 	char **loc = location;
 	char *input = data;
 
-	if(len && strlen(input) > len)
+	if(len && (int)strlen(input) > len)
 		input[len] = '\0';
 
 	ircd_free(*loc);

@@ -81,7 +81,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 		if(EmptyString(name) || strlen(name) > NICKLEN-1)
 			continue;
 
-		if(dlink_list_length(&client_p->localClient->monitor_list) >=
+		if((int)dlink_list_length(&client_p->localClient->monitor_list) >=
 			ConfigFileEntry.max_monitor)
 		{
 			char buf[100];

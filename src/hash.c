@@ -865,7 +865,7 @@ static void
 count_hash(struct Client *source_p, dlink_list *table, int length, const char *name)
 {
 	int counts[11];
-	int deepest = 0;
+	unsigned long deepest = 0;
 	int i;
 
 	memset(counts, 0, sizeof(counts));

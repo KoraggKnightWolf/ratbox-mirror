@@ -527,8 +527,7 @@ expire_tgchange(void *unused)
 static int
 add_target(struct Client *source_p, struct Client *target_p)
 {
-	int i, j;
-
+	unsigned int i, j;
 	/* messaging themselves, doesnt incur any penalties */
 	if(source_p == target_p)
 		return 1;

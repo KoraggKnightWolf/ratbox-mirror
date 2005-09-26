@@ -173,7 +173,7 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 	char *p;
 	int buflen = 0;
 	int curlen, mlen;
-	int i;
+	unsigned int i;
 
 	mlen = ircsprintf(buf, ":%s CAP %s %s",
 			me.name, 

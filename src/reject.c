@@ -199,7 +199,7 @@ check_reject(struct Client *client_p)
 		rdata = pnode->data;
 
 		rdata->time = ircd_currenttime;
-		if(rdata->count > ConfigFileEntry.reject_after_count)
+		if(rdata->count > (unsigned long)ConfigFileEntry.reject_after_count)
 		{
 			ServerStats.is_rej++;
 			SetReject(client_p);

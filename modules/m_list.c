@@ -158,7 +158,7 @@ list_limit_channels(struct Client *source_p, const char *param)
 	char *args;
 	char *p;
 	dlink_node *ptr;
-	unsigned int sendq_limit;
+	int sendq_limit;
 	int max = INT_MAX;
 	int min = 0;
 	int i;
@@ -209,8 +209,8 @@ list_limit_channels(struct Client *source_p, const char *param)
 			break;
 		}
 
-		if(dlink_list_length(&chptr->members) >= max ||
-		   dlink_list_length(&chptr->members) <= min)
+		if((int)dlink_list_length(&chptr->members) >= max ||
+		   (int)dlink_list_length(&chptr->members) <= min)
 			continue;
 
 		if(SecretChannel(chptr) && !IsMember(source_p, chptr))

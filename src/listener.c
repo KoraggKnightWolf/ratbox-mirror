@@ -557,7 +557,7 @@ accept_connection(int pfd, void *data)
 			
 			if(ConfigFileEntry.dline_with_reason)
 			{
-			    if (ircsnprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd) >= (sizeof(buf)-1))
+			    if (ircsnprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd) >= (int)(sizeof(buf)-1))
 			    {
 				buf[sizeof(buf) - 3] = '\r';
 				buf[sizeof(buf) - 2] = '\n';

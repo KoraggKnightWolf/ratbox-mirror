@@ -161,7 +161,7 @@ static void ccf_sortlist(adns_state ads, const char *fn, int lno, const char *bu
       return;
     }
 
-    if (l >= sizeof(tbuf)) {
+    if (l >= (int)sizeof(tbuf)) {
       configparseerr(ads,fn,lno,"sortlist entry `%.*s' too long",l,word);
       continue;
     }
@@ -380,7 +380,7 @@ static void readconfiggeneric(adns_state ads, const char *filename,
     while (*q && !ctype_whitespace(*q)) q++;
     dirl= q-p;
     for (ccip=configcommandinfos;
-	 ccip->name && !(strlen(ccip->name)==dirl && !memcmp(ccip->name,p,q-p));
+	 ccip->name && !((int)strlen(ccip->name)==dirl && !memcmp(ccip->name,p,q-p));
 	 ccip++);
     if (!ccip->name) {
       adns__diag(ads,-1,0,"%s:%d: unknown configuration directive `%.*s'",
