@@ -1,15 +1,35 @@
 /*
- * $Id$
+ *  ircd-ratbox: A slightly useful ircd.
+ *  ircd_lib.c: libircd initialization functions at the like
+ *
+ *  Copyright (C) 2005 ircd-ratbox development team
+ *  Copyright (C) 2005 Aaron Sethman <androsyn@ratbox.org>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ *  USA
+ *
+ *  $Id$
  */
+
 #include "ircd_lib.h"
-
-
 
 static log_cb *ircd_log;
 static restart_cb *ircd_restart;
 static die_cb *ircd_die;
 
-static struct timeval *SystemTime;
+static struct timeval *ircd_systemtime;
 
 
 static char errbuf[512];
@@ -17,17 +37,17 @@ static char errbuf[512];
 time_t
 ircd_current_time(void)
 {
-	if(SystemTime == NULL)
+	if(ircd_systemtime == NULL)
 		ircd_set_time();
-	return SystemTime->tv_sec;
+	return ircd_systemtime->tv_sec;
 }
 
 struct timeval *
 ircd_current_time_tv(void)
 {
-	if(SystemTime == NULL)
+	if(ircd_systemtime == NULL)
 		ircd_set_time();
-	return SystemTime;	
+	return ircd_systemtime;	
 }
 
 void
@@ -73,20 +93,20 @@ ircd_set_time(void)
 	struct timeval newtime;
 	newtime.tv_sec = 0;
 	newtime.tv_usec = 0;
-	if(SystemTime == NULL)
+	if(ircd_systemtime == NULL)
 	{
-		SystemTime = ircd_malloc(sizeof(struct timeval));
+		ircd_systemtime = ircd_malloc(sizeof(struct timeval));
 	}
 	if(gettimeofday(&newtime, NULL) == -1)
 	{
-		ircd_lib_log("Clock Failure (%d)", errno);
+		ircd_lib_log("Clock Failure (%s)", strerror(errno));
 		ircd_lib_restart("Clock Failure");
 	}
 
-	if(newtime.tv_sec < SystemTime->tv_sec)
-		set_back_events(SystemTime->tv_sec - newtime.tv_sec);
+	if(newtime.tv_sec < ircd_systemtime->tv_sec)
+		set_back_events(ircd_systemtime->tv_sec - newtime.tv_sec);
 
-	memcpy(SystemTime, &newtime, sizeof(struct timeval));
+	memcpy(ircd_systemtime, &newtime, sizeof(struct timeval));
 }
 
 
@@ -103,4 +123,5 @@ ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int max
 	init_dlink_nodes(dh_size);
 	linebuf_init(lb_heap_size);
 }
+
 
