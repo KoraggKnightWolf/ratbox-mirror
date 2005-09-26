@@ -202,7 +202,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 	{
 		if(kline_queued == 0)
 		{
-			eventAddOnce("check_klines", check_klines_event, NULL,
+			ircd_event_addonce("check_klines", check_klines_event, NULL,
 				     ConfigFileEntry.kline_delay);
 			kline_queued = 1;
 		}
@@ -284,7 +284,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		if(kline_queued == 0)
 		{
-			eventAddOnce("check_klines", check_klines_event, NULL,
+			ircd_event_addonce("check_klines", check_klines_event, NULL,
 				     ConfigFileEntry.kline_delay);
 			kline_queued = 1;
 		}

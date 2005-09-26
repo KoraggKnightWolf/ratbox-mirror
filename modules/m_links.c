@@ -72,7 +72,7 @@ modinit(void)
 	if(ConfigServerHide.links_delay > 0)
 	{
 		cache_links(NULL);
-		eventAdd("cache_links", cache_links, NULL,
+		ircd_event_add("cache_links", cache_links, NULL,
 			    ConfigServerHide.links_delay);
 		status = 1;
         }
@@ -88,7 +88,7 @@ moddeinit(void)
 		ircd_free(ptr->data);
 		free_dlink_node(ptr);
         }
-        eventDelete(cache_links, NULL);
+        ircd_event_delete(cache_links, NULL);
         return;
 }
 
@@ -99,7 +99,7 @@ check_delay(void)
 	if(status == 0 && ConfigServerHide.links_disabled == 0)
 	{
 		cache_links(NULL);
-		eventAdd("cache_links", cache_links, NULL, ConfigServerHide.links_delay);
+		ircd_event_add("cache_links", cache_links, NULL, ConfigServerHide.links_delay);
 		status = 1; 
 	}
 }

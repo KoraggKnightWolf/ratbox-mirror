@@ -75,7 +75,7 @@ static void expire_pending_glines(void *unused);
 static int
 modinit(void)
 {
-	eventAddIsh("expire_pending_glines", expire_pending_glines, NULL, 
+	ircd_event_addish("expire_pending_glines", expire_pending_glines, NULL, 
 			CLEANUP_GLINES_TIME);
 	return 0;
 }
@@ -83,7 +83,7 @@ modinit(void)
 static void
 moddeinit(void)
 {
-	eventDelete(expire_pending_glines, NULL);
+	ircd_event_delete(expire_pending_glines, NULL);
 }
 
 /* mo_gline()

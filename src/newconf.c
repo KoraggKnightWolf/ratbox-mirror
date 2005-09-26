@@ -1447,7 +1447,7 @@ conf_set_serverhide_links_delay(void *data)
 		ConfigServerHide.links_disabled = 0;
 	}
 	else if(val != ConfigServerHide.links_delay)
-		eventUpdate("cache_links", val);
+		ircd_event_update("cache_links", val);
 
 	ConfigServerHide.links_delay = val;
 }

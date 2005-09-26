@@ -49,7 +49,7 @@ void
 init_monitor(void)
 {
 	monitor_heap = BlockHeapCreate(sizeof(struct monitor), MONITOR_HEAP_SIZE);
-	eventAddIsh("cleanup_monitor", cleanup_monitor, NULL, 3600);
+	ircd_event_addish("cleanup_monitor", cleanup_monitor, NULL, 3600);
 }
 
 static inline unsigned int

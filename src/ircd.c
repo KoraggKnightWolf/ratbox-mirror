@@ -264,7 +264,7 @@ io_loop(void)
 		 * event
 		 */
 
-		eventRun();
+		ircd_event_run();
 
 		ircd_select(250);
 
@@ -650,17 +650,17 @@ ratbox_main(int argc, char *argv[])
 	/* um.  by waiting even longer, that just means we have even *more*
 	 * nick collisions.  what a stupid idea. set an event for the IO loop --fl
 	 */
-	eventAddIsh("try_connections", try_connections, NULL, STARTUP_CONNECTIONS_TIME);
-	eventAddOnce("try_connections_startup", try_connections, NULL, 2);
+	ircd_event_addish("try_connections", try_connections, NULL, STARTUP_CONNECTIONS_TIME);
+	ircd_event_addonce("try_connections_startup", try_connections, NULL, 2);
 
-	eventAddIsh("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
+	ircd_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
 
 	/* Setup the timeout check. I'll shift it later :)  -- adrian */
-	eventAddIsh("ircd_checktimeouts", ircd_checktimeouts, NULL, 5);
+	ircd_event_addish("ircd_checktimeouts", ircd_checktimeouts, NULL, 5);
 
 
 	if(splitmode)
-		eventAdd("check_splitmode", check_splitmode, NULL, 5);
+		ircd_event_add("check_splitmode", check_splitmode, NULL, 5);
 
 	ServerRunning = 1;
 

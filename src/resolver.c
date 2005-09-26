@@ -367,7 +367,7 @@ read_io(void)
 	{
 		dns_select();
 		ircd_set_time();
-		eventRun();
+		ircd_event_run();
 		ircd_select(250);
 	}
 }

@@ -48,7 +48,7 @@ static void expire_tgchange(void *unused);
 static int
 modinit(void)
 {
-	eventAddIsh("expire_tgchange", expire_tgchange, NULL, 300);
+	ircd_event_addish("expire_tgchange", expire_tgchange, NULL, 300);
 	expire_tgchange(NULL);
 	return 0;
 }
@@ -56,7 +56,7 @@ modinit(void)
 static void
 moddeinit(void)
 {
-	eventDelete(expire_tgchange, NULL);
+	ircd_event_delete(expire_tgchange, NULL);
 }
 
 struct Message privmsg_msgtab = {

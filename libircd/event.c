@@ -46,7 +46,7 @@
  * How its used:
  *
  * Should be pretty self-explanatory. Events are added to the static
- * array event_table with a frequency time telling eventRun how often
+ * array event_table with a frequency time telling ircd_event_run how often
  * to execute it.
  */
 
@@ -78,7 +78,7 @@ event_run_callback(void *data)
 #endif
 
 /*
- * void eventAdd(const char *name, EVH *func, void *arg, time_t when)
+ * void ircd_event_add(const char *name, EVH *func, void *arg, time_t when)
  *
  * Input: Name of event, function to call, arguments to pass, and frequency
  *	  of the event.
@@ -86,7 +86,7 @@ event_run_callback(void *data)
  * Side Effects: Adds the event to the event list.
  */
 void
-eventAdd(const char *name, EVH * func, void *arg, time_t when)
+ircd_event_add(const char *name, EVH * func, void *arg, time_t when)
 {
 	int i;
 
@@ -115,7 +115,7 @@ eventAdd(const char *name, EVH * func, void *arg, time_t when)
 }
 
 void
-eventAddOnce(const char *name, EVH *func, void *arg, time_t when)
+ircd_event_addonce(const char *name, EVH *func, void *arg, time_t when)
 {
 	int i;
 
@@ -143,18 +143,18 @@ eventAddOnce(const char *name, EVH *func, void *arg, time_t when)
 }
 
 /*
- * void eventDelete(EVH *func, void *arg)
+ * void ircd_event_delete(EVH *func, void *arg)
  *
  * Input: Function handler, argument that was passed.
  * Output: None
  * Side Effects: Removes the event from the event list
  */
 void
-eventDelete(EVH * func, void *arg)
+ircd_event_delete(EVH * func, void *arg)
 {
 	int i;
 
-	i = eventFind(func, arg);
+	i = ircd_event_find(func, arg);
 
 	if(i == -1)
 		return;
@@ -170,7 +170,7 @@ eventDelete(EVH * func, void *arg)
 }
 
 /* 
- * void eventAddIsh(const char *name, EVH *func, void *arg, time_t delta_isa)
+ * void ircd_event_addish(const char *name, EVH *func, void *arg, time_t delta_isa)
  *
  * Input: Name of event, function to call, arguments to pass, and frequency
  *	  of the event.
@@ -179,7 +179,7 @@ eventDelete(EVH * func, void *arg)
  *	         specified frequency.
  */
 void
-eventAddIsh(const char *name, EVH * func, void *arg, time_t delta_ish)
+ircd_event_addish(const char *name, EVH * func, void *arg, time_t delta_ish)
 {
 	if(delta_ish >= 3.0)
 	{
@@ -190,11 +190,11 @@ eventAddIsh(const char *name, EVH * func, void *arg, time_t delta_ish)
 		 * Grr. -- adrian
 		 */
 	}
-	eventAdd(name, func, arg, delta_ish);
+	ircd_event_add(name, func, arg, delta_ish);
 }
 
 /*
- * void eventRun(void)
+ * void ircd_event_run(void)
  *
  * Input: None
  * Output: None
@@ -202,7 +202,7 @@ eventAddIsh(const char *name, EVH * func, void *arg, time_t delta_ish)
  */
 #ifndef USE_POSIX_TIMERS
 void
-eventRun(void)
+ircd_event_run(void)
 {
 	int i;
 
@@ -230,7 +230,7 @@ eventRun(void)
 
 #else
 void
-eventRun(void)
+ircd_event_run(void)
 {
 	return;
 }
@@ -238,28 +238,28 @@ eventRun(void)
 #endif
 
 /*
- * void eventInit(void)
+ * void ircd_event_init(void)
  *
  * Input: None
  * Output: None
  * Side Effects: Initializes the event system. 
  */
 void
-eventInit(void)
+ircd_event_init(void)
 {
 	last_event_ran = NULL;
 	memset((void *) event_table, 0, sizeof(event_table));
 }
 
 /*
- * int eventFind(EVH *func, void *arg)
+ * int ircd_event_find(EVH *func, void *arg)
  *
  * Input: Event function and the argument passed to it
  * Output: Index to the slow in the event_table
  * Side Effects: None
  */
 int
-eventFind(EVH * func, void *arg)
+ircd_event_find(EVH * func, void *arg)
 {
 	int i;
 
@@ -318,7 +318,7 @@ set_back_events(time_t by)
 }
 
 void
-eventUpdate(const char *name, time_t freq)
+ircd_event_update(const char *name, time_t freq)
 {
         int i;
   

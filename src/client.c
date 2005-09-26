@@ -104,9 +104,9 @@ init_client(void)
 	 */
 	client_heap = BlockHeapCreate(sizeof(struct Client), CLIENT_HEAP_SIZE);
 	lclient_heap = BlockHeapCreate(sizeof(struct LocalUser), LCLIENT_HEAP_SIZE);
-	eventAddIsh("check_pings", check_pings, NULL, 30);
-	eventAddIsh("free_exited_clients", &free_exited_clients, NULL, 5);
-	eventAddIsh("exit_aborted_clients", exit_aborted_clients, NULL, 5);
+	ircd_event_addish("check_pings", check_pings, NULL, 30);
+	ircd_event_addish("free_exited_clients", &free_exited_clients, NULL, 5);
+	ircd_event_addish("exit_aborted_clients", exit_aborted_clients, NULL, 5);
 }
 
 

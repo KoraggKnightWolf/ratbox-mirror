@@ -146,8 +146,8 @@ init_reject(void)
 	reject_tree = New_Patricia(PATRICIA_BITS);
 	dline_tree = New_Patricia(PATRICIA_BITS);
 	eline_tree = New_Patricia(PATRICIA_BITS);
-	eventAdd("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
-	eventAdd("reject_expires", reject_expires, NULL, 60);
+	ircd_event_add("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
+	ircd_event_add("reject_expires", reject_expires, NULL, 60);
 }
 
 

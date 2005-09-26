@@ -88,20 +88,20 @@ init_s_conf(void)
 {
 	confitem_heap = BlockHeapCreate(sizeof(struct ConfItem), CONFITEM_HEAP_SIZE);
 
-	eventAddIsh("expire_temp_klines", expire_temp_kd, &temp_klines[TEMP_MIN], 60);
-	eventAddIsh("expire_temp_dlines", expire_temp_kd, &temp_dlines[TEMP_MIN], 60);
+	ircd_event_addish("expire_temp_klines", expire_temp_kd, &temp_klines[TEMP_MIN], 60);
+	ircd_event_addish("expire_temp_dlines", expire_temp_kd, &temp_dlines[TEMP_MIN], 60);
 
-	eventAddIsh("expire_temp_klines_hour", reorganise_temp_kd,
+	ircd_event_addish("expire_temp_klines_hour", reorganise_temp_kd,
 			&temp_klines[TEMP_HOUR], 3600);
-	eventAddIsh("expire_temp_dlines_hour", reorganise_temp_kd,
+	ircd_event_addish("expire_temp_dlines_hour", reorganise_temp_kd,
 			&temp_dlines[TEMP_HOUR], 3600);
-	eventAddIsh("expire_temp_klines_day", reorganise_temp_kd,
+	ircd_event_addish("expire_temp_klines_day", reorganise_temp_kd,
 			&temp_klines[TEMP_DAY], 86400);
-	eventAddIsh("expire_temp_dlines_day", reorganise_temp_kd,
+	ircd_event_addish("expire_temp_dlines_day", reorganise_temp_kd,
 			&temp_dlines[TEMP_DAY], 86400);
-	eventAddIsh("expire_temp_klines_week", reorganise_temp_kd,
+	ircd_event_addish("expire_temp_klines_week", reorganise_temp_kd,
 			&temp_klines[TEMP_WEEK], 604800);
-	eventAddIsh("expire_temp_dlines_week", reorganise_temp_kd,
+	ircd_event_addish("expire_temp_dlines_week", reorganise_temp_kd,
 			&temp_dlines[TEMP_WEEK], 604800);
 }
 
@@ -885,7 +885,7 @@ validate_conf(void)
 	if(!split_users || !split_servers ||
 	   (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
 	{
-		eventDelete(check_splitmode, NULL);
+		ircd_event_delete(check_splitmode, NULL);
 		splitmode = 0;
 		splitchecking = 0;
 	}

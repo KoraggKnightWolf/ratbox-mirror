@@ -422,7 +422,7 @@ int main(int argc, char **argv)
 	while(1) {
 		ircd_select(1000);
 		ircd_checktimeouts(NULL);
-		eventRun();
+		ircd_event_run();
 	}
 	return 0;
 }

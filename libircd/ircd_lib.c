@@ -98,7 +98,7 @@ ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int max
 	ircd_die = idie;
 	fdlist_init(closeall, maxcon);
 	init_netio();
-	eventInit();
+	ircd_event_init();
 	initBlockHeap();
 	init_dlink_nodes(dh_size);
 	linebuf_init(lb_heap_size);

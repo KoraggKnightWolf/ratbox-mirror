@@ -59,14 +59,14 @@ struct ev_entry
 #endif
 };
 
-extern void eventAdd(const char *name, EVH * func, void *arg, time_t when);
-extern void eventAddOnce(const char *name, EVH * func, void *arg, time_t when);
-extern void eventAddIsh(const char *name, EVH * func, void *arg, time_t delta_ish);
-extern void eventRun(void);
-extern void eventInit(void);
-extern void eventDelete(EVH * func, void *);
-void eventUpdate(const char *name, time_t freq);
-extern int eventFind(EVH * func, void *);
+extern void ircd_event_add(const char *name, EVH * func, void *arg, time_t when);
+extern void ircd_event_addonce(const char *name, EVH * func, void *arg, time_t when);
+extern void ircd_event_addish(const char *name, EVH * func, void *arg, time_t delta_ish);
+extern void ircd_event_run(void);
+extern void ircd_event_init(void);
+extern void ircd_event_delete(EVH * func, void *);
+void ircd_event_update(const char *name, time_t freq);
+extern int ircd_event_find(EVH * func, void *);
 extern void set_back_events(time_t);
 int dump_events(void (*func)(char *, void *), void *ptr);
 

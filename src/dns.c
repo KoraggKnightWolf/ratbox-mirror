@@ -209,7 +209,7 @@ fork_resolver(void)
 		ilog(L_MAIN, "DNS resolution will be unavailable during this time");
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Resolver has forked %d times waiting 30 seconds to restart it again", fork_count);
 		sendto_realops_flags(UMODE_ALL, L_ALL, "DNS resolution will be unavailable during this time");
-		eventAddOnce("restart_spinning_resolver", restart_spinning_resolver, NULL, 30);		
+		ircd_event_addonce("restart_spinning_resolver", restart_spinning_resolver, NULL, 30);		
 		return;
 	}
 #endif
