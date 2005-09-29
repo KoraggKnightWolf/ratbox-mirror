@@ -1,3 +1,11 @@
+androsyn    2005/09/29 18:23:33 UTC	(20050929_0-20836)
+  Log:
+  when doing an ircd_open() on the passed fds, mark them as FD_PIPE not FD_SOCKET
+
+  Modified:
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+
+
 androsyn    2005/09/26 04:22:12 UTC	(20050926_4-20832)
   Log:
   Change some times from signed to unsigned and vice-versa and 
