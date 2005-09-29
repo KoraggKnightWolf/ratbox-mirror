@@ -568,8 +568,8 @@ int main(int argc, char **argv)
 	linebuf_newbuf(&sendq);
 	linebuf_newbuf(&recvq);
 
-	ircd_open(ifd, FD_SOCKET, "incoming pipe");
-	ircd_open(ofd, FD_SOCKET, "outgoing pipe");
+	ircd_open(ifd, FD_PIPE, "incoming pipe");
+	ircd_open(ofd, FD_PIPE, "outgoing pipe");
 	ircd_set_nb(ifd);
 	ircd_set_nb(ofd);
 	adns_init(&dns_state, adns_if_noautosys, 0);
