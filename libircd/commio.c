@@ -455,7 +455,7 @@ ircd_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 		return -1;
 	}
 	/* Set the socket non-blocking, and other wonderful bits */
-	if(!ircd_set_nb(nfd[0]))
+	if(unlikely(!ircd_set_nb(nfd[0])))
 	{
 		ircd_lib_log("ircd_open: Couldn't set FD %d non blocking: %s", nfd[0], strerror(errno));
 		ircd_close(nfd[0]);
@@ -463,7 +463,7 @@ ircd_socketpair(int family, int sock_type, int proto, int *nfd, const char *note
 		return -1;
 	}
 
-	if(!ircd_set_nb(nfd[1]))
+	if(unlikely(!ircd_set_nb(nfd[1])))
 	{
 		ircd_lib_log("ircd_open: Couldn't set FD %d non blocking: %s", nfd[1], strerror(errno));
 		ircd_close(nfd[0]);
@@ -509,7 +509,7 @@ ircd_socket(int family, int sock_type, int proto, const char *note)
 {
 	int fd;
 	/* First, make sure we aren't going to run out of file descriptors */
-	if(number_fd >= maxconnections)
+	if(unlikely(number_fd >= maxconnections))
 	{
 		errno = ENFILE;
 		return -1;
@@ -522,7 +522,7 @@ ircd_socket(int family, int sock_type, int proto, const char *note)
 	 */
 	fd = socket(family, sock_type, proto);
 	ircd_fd_hack(&fd);
-	if(fd < 0)
+	if(unlikely(fd < 0))
 		return -1;	/* errno will be passed through, yay.. */
 
 #if defined(IPV6) && defined(IPV6_V6ONLY)
@@ -546,7 +546,7 @@ ircd_socket(int family, int sock_type, int proto, const char *note)
 	ircd_open(fd, FD_SOCKET, note);
 
 	/* Set the socket non-blocking, and other wonderful bits */
-	if(!ircd_set_nb(fd))
+	if(unlikely(!ircd_set_nb(fd)))
 	{
 		ircd_lib_log("ircd_open: Couldn't set FD %d non blocking: %s", fd, strerror(errno));
 		ircd_close(fd);
@@ -580,13 +580,13 @@ ircd_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 	 */
 	newfd = accept(fd, (struct sockaddr *) pn, addrlen);
 	get_errno();
-	if(newfd < 0)
+	if(unlikely(newfd < 0))
 		return -1;
 	ircd_open(newfd, FD_SOCKET, "Incoming connection");
 	ircd_fd_hack(&newfd);
 
 	/* Set the socket non-blocking, and other wonderful bits */
-	if(!ircd_set_nb(newfd))
+	if(unlikely(!ircd_set_nb(newfd)))
 	{
 		get_errno();
 		ircd_lib_log("ircd_accept: Couldn't set FD %d non blocking!", newfd);
@@ -633,7 +633,7 @@ fdlist_update_biggest(int fd, int opening)
 #ifndef __MINGW32__
 	lircd_assert(fd < maxconnections);
 #endif
-	if(fd > highest_fd)
+	if(unlikely(fd > highest_fd))
 	{
 		/*  
 		 * lircd_assert that we are not closing a FD bigger than
@@ -692,7 +692,7 @@ ircd_open(int fd, unsigned int type, const char *desc)
 	fde_t *F = add_fd(fd);
 	lircd_assert(fd >= 0);
 
-	if(F->flags.open)
+	if(unlikely(F->flags.open))
 	{
 		ircd_close(fd);
 	}
@@ -718,7 +718,7 @@ ircd_close(int fd)
 	int type;
 	/* All disk fd's MUST go through file_close() ! */
 	lircd_assert(F->type != FD_FILE);
-	if(F->type == FD_FILE)
+	if(unlikely(F->type == FD_FILE))
 	{
 		lircd_assert(F->read_handler == NULL);
 		lircd_assert(F->write_handler == NULL);

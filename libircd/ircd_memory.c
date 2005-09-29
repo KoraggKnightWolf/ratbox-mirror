@@ -37,7 +37,7 @@ void *
 ircd_malloc(size_t size)
 {
 	void *ret = calloc(1, size);
-	if(ret == NULL)
+	if(unlikely(ret == NULL))
 		outofmemory();
 	return ret;
 }
@@ -50,7 +50,7 @@ ircd_realloc(void *x, size_t y)
 {
 	void *ret = realloc(x, y);
 
-	if(ret == NULL)
+	if(unlikely(ret == NULL))
 		outofmemory();
 	return ret;
 }

@@ -19,6 +19,28 @@
 #include "setup.h"
 #include "config.h"
 
+#ifdef __GNUC__
+#ifdef likely
+#undef likely
+#endif
+#ifdef unlikely
+#undef unlikely
+#endif
+
+#define likely(x)       __builtin_expect(!!(x), 1)
+#define unlikely(x)     __builtin_expect(!!(x), 0)
+#else
+#ifdef likely
+#undef likely
+#endif
+#ifdef unlikely
+#undef unlikely
+#endif
+#define likely(x)
+#define unlikely(x)
+#endif
+
+
 
 #ifdef __MINGW32__
 #define FD_SETSIZE 16384 /* this is what cygwin uses..it probably sucks too oh well*/
@@ -104,7 +126,7 @@ struct iovec
 #ifdef SOFT_ASSERT
 #ifdef __GNUC__
 #define lircd_assert(expr)	do								\
-			if(!(expr)) {							\
+			if(unlikely(!(expr))) {							\
 				lib_ilog(L_MAIN, 						\
 				"file: %s line: %d (%s): Assertion failed: (%s)",	\
 				__FILE__, __LINE__, __PRETTY_FUNCTION__, #expr); 	\
@@ -115,7 +137,7 @@ struct iovec
 			while(0)
 #else
 #define lircd_assert(expr)	do								\
-			if(!(expr)) {							\
+			if(unlikely(!(expr))) {							\
 				lib_ilog(L_MAIN, 						\
 				"file: %s line: %d: Assertion failed: (%s)",		\
 				__FILE__, __LINE__, #expr); 				\
@@ -209,6 +231,7 @@ int gettimeofday(struct timeval *, struct timezone *);
 #ifdef NEED_CRYPT
 char * crypt(const char *pw, const char *salt);
 #endif
+
 
 #include "tools.h"
 #include "ircd_memory.h"

@@ -280,7 +280,7 @@ newblock(BlockHeap * bh)
 
 	/* Setup the initial data structure. */
 	b = (Block *) calloc(1, sizeof(Block));
-	if(b == NULL)
+	if(unlikely(b == NULL))
 	{
 		return (1);
 	}
@@ -291,7 +291,7 @@ newblock(BlockHeap * bh)
 	b->alloc_size = (bh->elemsPerBlock + 1) * (bh->elemSize + sizeof(MemBlock));
 
 	b->elems = get_block(b->alloc_size);
-	if(b->elems == NULL)
+	if(unlikely(b->elems == NULL))
 	{
 		return (1);
 	}
@@ -404,7 +404,7 @@ BlockHeapAlloc(BlockHeap * bh)
 	dlink_node *new_node;
 
 	lircd_assert(bh != NULL);
-	if(bh == NULL)
+	if(unlikely(bh == NULL))
 	{
 		blockheap_fail("Cannot allocate if bh == NULL");
 	}
@@ -478,14 +478,14 @@ BlockHeapFree(BlockHeap * bh, void *ptr)
 	lircd_assert(bh != NULL);
 	lircd_assert(ptr != NULL);
 
-	if(bh == NULL)
+	if(unlikely(bh == NULL))
 	{
 
 		ircd_lib_log("balloc.c:BlockHeapFree() bh == NULL");
 		return (1);
 	}
 
-	if(ptr == NULL)
+	if(unlikely(ptr == NULL))
 	{
 		ircd_lib_log("balloc.BlockHeapFree() ptr == NULL");
 		return (1);
@@ -505,7 +505,7 @@ BlockHeapFree(BlockHeap * bh, void *ptr)
 	}
 #endif
 	lircd_assert(memblock->block != NULL);
-	if(memblock->block == NULL)
+	if(unlikely(memblock->block == NULL))
 	{
 		blockheap_fail("memblock->block == NULL, not a valid block?");
 		outofmemory();
