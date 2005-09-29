@@ -1,3 +1,15 @@
+androsyn    2005/09/29 18:24:55 UTC	(20050929_1-20838)
+  Log:
+  give gcc's branch prediction code some hints in some more heavily used code paths
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_memory.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_memory.h (File Modified) 
+
+
 androsyn    2005/09/29 18:23:33 UTC	(20050929_0-20836)
   Log:
   when doing an ircd_open() on the passed fds, mark them as FD_PIPE not FD_SOCKET
