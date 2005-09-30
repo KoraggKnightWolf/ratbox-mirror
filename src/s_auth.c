@@ -164,9 +164,13 @@ fork_ident(void)
 	ircd_set_nb(ifd[0]);
 	ircd_set_nb(ofd[1]);
 
+#ifdef __MINGW32__	
+	SetHandleInformation((HANDLE)ifd[1], HANDLE_FLAG_INHERIT, 1);
+	SetHandleInformation((HANDLE)ofd[0], HANDLE_FLAG_INHERIT, 1);
+#endif
 	setenv("IFD", fy, 1);
 	setenv("OFD", fx, 1);
-
+	
 	parv[0] = "-ircd ident daemon";
 	parv[1] = NULL;
 

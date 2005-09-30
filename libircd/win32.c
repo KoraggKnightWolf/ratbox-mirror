@@ -71,7 +71,16 @@ gettimeofday(struct timeval *tp, void *not_used)
 pid_t
 ircd_spawn_process (const char *path, const char **argv)
 {
-	return _spawnv (_P_NOWAIT, path, (const char *const *) argv);
+	PROCESS_INFORMATION pi;
+	STARTUPINFO si;
+	char cmd[MAX_PATH];
+	memset(&pi, 0, sizeof(pi));
+	memset(&si, 0, sizeof(si));
+	strlcpy(cmd, path, sizeof(cmd));
+	if(CreateProcess(cmd, cmd, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi) == FALSE)
+		return -1;
+
+	return(pi.dwProcessId);
 }
 
 pid_t
@@ -247,7 +256,8 @@ int
 ircd_setup_fd(int fd)
 {
 	fde_t *F = find_fd(fd);
-	
+
+	SetHandleInformation((HANDLE)fd, HANDLE_FLAG_INHERIT, 0); 
 	switch(F->type)
 	{
 		case FD_SOCKET:
@@ -275,14 +285,14 @@ ircd_setselect(int fd, unsigned int type, PF * handler,
 	
 	lircd_assert(fd >= 0);
 	lircd_assert(F->flags.open);
-	
+
 	/* Update the list, even though we're not using it .. */
 	if(type & IRCD_SELECT_READ)
 	{
 		if(handler != NULL)
-			F->pflags |= FD_ACCEPT | FD_CLOSE | FD_READ;
+			F->pflags |= FD_CLOSE | FD_READ | FD_ACCEPT;
 		else
-			F->pflags &= ~FD_ACCEPT & ~FD_CLOSE & ~FD_READ;
+			F->pflags &= ~(FD_CLOSE|FD_READ|FD_ACCEPT);
 		F->read_handler = handler;
 		F->read_data = client_data;
 	}
@@ -290,13 +300,13 @@ ircd_setselect(int fd, unsigned int type, PF * handler,
 	if(type & IRCD_SELECT_WRITE)
 	{
 		if(handler != NULL)
-			F->pflags |= FD_CONNECT | FD_WRITE;
+			F->pflags |= FD_WRITE | FD_CONNECT;
 		else
-			F->pflags &= ~FD_CONNECT & ~FD_WRITE;
+			F->pflags &= ~(FD_WRITE|FD_CONNECT);
 		F->write_handler = handler;
 		F->write_data = client_data;
 	}
-
+	
 	if(timeout)
 		F->timeout = ircd_currenttime + (timeout / 1000);
 

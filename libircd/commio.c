@@ -799,7 +799,9 @@ ircd_read(int fd, void *buf, int count)
 		{
 			int ret;
 			ret = recv(fd, buf, count, 0);
-			if(ret < 0) {
+
+			if(ret < 0)
+			{
 				get_errno();
 			}
 			return ret;
@@ -819,6 +821,7 @@ ircd_write(int fd, void *buf, int count)
 	fde_t *F = find_fd(fd);
 	if(F == NULL)
 		return 0;
+
 	switch (F->type)
 	{
 #if 0
@@ -847,7 +850,9 @@ ircd_write(int fd, void *buf, int count)
 		}
 #endif
 
-
+#ifdef __MINGW32__
+	case FD_PIPE:
+#endif
 	case FD_SOCKET:
 		{
 #ifndef MSG_NOSIGNAL
@@ -859,8 +864,9 @@ ircd_write(int fd, void *buf, int count)
 			}
 			return ret;
 		}
-
+#ifndef __MINGW32__
 	case FD_PIPE:
+#endif
 	default:
 		{
 			return write(fd, buf, count);

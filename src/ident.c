@@ -238,7 +238,7 @@ read_auth(int fd, void *data)
 	int len, count;
 
 	len = ircd_read(fd, buf, sizeof(buf));
-	fprintf(stderr, "Read %s from %d %d\n", buf, fd, len);
+
 	if(len < 0 && ignoreErrno(errno))
 	{
 		ircd_settimeout(fd, 30, read_auth_timeout, auth);
@@ -275,7 +275,7 @@ static void
 connect_callback(int fd, int status, void *data)
 {
 	struct auth_request *auth = data;
-	fprintf(stderr, "Got a connect callback..weee!\n");
+
 	if(status == IRCD_OK)
 	{
 		/* one shot at the send, socket buffers should be able to handle it
@@ -317,15 +317,14 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	auth->srcport = atoi(srcport);
 	auth->dstport = atoi(dstport);
 	strcpy(auth->reqid, id);
-	fprintf(stderr, "Going to try to connect\n");
+
 	auth->authfd = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
 	ircd_connect_tcp(auth->authfd, (struct sockaddr *)&auth->destaddr, 
 		(struct sockaddr *)&auth->bindaddr, GET_SS_LEN(auth->destaddr), connect_callback, auth, 30);
-	fprintf(stderr, "Fired off the ircd_connect_tcp\n");				  
 }
 
 static void
-parse_auth_request(void)
+parse_request(void)
 {
 	int len;
 	static char *parv[MAXPARA + 1];
@@ -340,24 +339,24 @@ parse_auth_request(void)
 	}
 }
 
+
 static void
-read_auth_request(int fd, void *data)
+read_request(int fd, void *unusued)
 {
-	int length;
+        int length;
+        while((length = ircd_read(fd, readBuf, sizeof(readBuf))) > 0)
+        {
+                linebuf_parse(&recvq, readBuf, length, 0);
+                parse_request();
+        }
+         
+        if(length == 0)
+                exit(1);
 
-	while((length = ircd_read(irc_ifd, readBuf, sizeof(readBuf))) > 0)
-	{
-		linebuf_parse(&recvq, readBuf, length, 0);
-		parse_auth_request();
-	}
+        if(length == -1 && !ignoreErrno(errno))
+                exit(1);
 
-	if(length == 0)
-		exit(1);
-
-	if(length == -1 && !ignoreErrno(errno))
-		exit(1);
-
-	ircd_setselect(irc_ifd, IRCD_SELECT_READ, read_auth_request, NULL, 0);
+	ircd_setselect(irc_ifd, IRCD_SELECT_READ, read_request, NULL, 0);
 }
 
 static void
@@ -392,7 +391,6 @@ int main(int argc, char **argv)
 		fprintf(stderr, "This is ircd-ratbox ident.  You aren't supposed to run be directly.\n");
 		fprintf(stderr, "However I will print my Id tag $Id$\n"); 
 		fprintf(stderr, "Have a nice day\n");
-		fflush(stderr);
 		exit(1);
 	}
 	maxfd = atoi(tmaxfd);
@@ -414,10 +412,10 @@ int main(int argc, char **argv)
 	ircd_open(irc_ifd, FD_PIPE, "ircd ifd");
 	ircd_open(irc_ofd, FD_PIPE, "ircd ofd");
 
+	read_request(irc_ifd, NULL);
 	ircd_set_nb(irc_ifd);
 	ircd_set_nb(irc_ofd);
 	
-	read_auth_request(irc_ifd, NULL);
 
 	while(1) {
 		ircd_select(1000);

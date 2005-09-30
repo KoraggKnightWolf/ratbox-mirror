@@ -253,7 +253,11 @@ fork_resolver(void)
 	parv[0] = "-ircd dns resolver";
 	parv[1] = NULL;
 	
-	
+#ifdef __MINGW32__      
+        SetHandleInformation((HANDLE)ifd[1], HANDLE_FLAG_INHERIT, 1);
+        SetHandleInformation((HANDLE)ofd[0], HANDLE_FLAG_INHERIT, 1);
+#endif
+                	
 	pid = ircd_spawn_process(fullpath, (const char **)parv);	
 
 	if(pid == -1)

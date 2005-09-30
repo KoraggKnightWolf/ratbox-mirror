@@ -227,14 +227,9 @@ extern void ircd_unschedule_event(ircd_event_id);
 #define	IRCD_SELECT_READ		0x1
 #define	IRCD_SELECT_WRITE		0x2
 
-/*#ifdef __MINGW32__
-#define IRCD_SELECT_ACCEPT		0x4
-#define IRCD_SELECT_CONNECT		0x8
-#else
-*/
 #define IRCD_SELECT_ACCEPT		IRCD_SELECT_READ
 #define IRCD_SELECT_CONNECT		IRCD_SELECT_WRITE
-/*#endif */
+
 extern int readcalls;
 
 extern int ircd_set_nb(int);
