@@ -145,15 +145,15 @@ static void
 write_sendq(int fd, void *unused)
 {
 	int retlen;
-	if(linebuf_len(&sendq) > 0)
+	if(ircd_linebuf_len(&sendq) > 0)
 	{
-		while((retlen = linebuf_flush(fd, &sendq)) > 0);
+		while((retlen = ircd_linebuf_flush(fd, &sendq)) > 0);
 		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
 		{
 			exit(1);
 		}
 	}
-	if(linebuf_len(&sendq) > 0)
+	if(ircd_linebuf_len(&sendq) > 0)
 		ircd_setselect(fd, IRCD_SELECT_WRITE, write_sendq, NULL, 0);
 }
 
@@ -185,7 +185,7 @@ parse_request(void)
 	int len;  
 	static char *parv[MAXPARA + 1];
 	int parc;  
-	while((len = linebuf_get(&recvq, readBuf, sizeof(readBuf),
+	while((len = ircd_linebuf_get(&recvq, readBuf, sizeof(readBuf),
 				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 	{
 		parc = io_to_array(readBuf, parv);
@@ -214,7 +214,7 @@ read_request(int fd, void *unusued)
 
 	while((length = ircd_read(fd, readBuf, sizeof(readBuf))) > 0)
 	{
-		linebuf_parse(&recvq, readBuf, length, 0);
+		ircd_linebuf_parse(&recvq, readBuf, length, 0);
 		parse_request();
 	}
 	 
@@ -307,7 +307,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 			ircd_free(reply);
 			if(result != 0)
 			{
-				linebuf_put(&sendq, "%s 0 FAILED", req->reqid);
+				ircd_linebuf_put(&sendq, "%s 0 FAILED", req->reqid);
 				write_sendq(ofd, NULL);
 				ircd_free(reply);
 				ircd_free(req);
@@ -319,7 +319,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 		strcpy(response, "FAILED");
 		result = 0;
 	}
-	linebuf_put(&sendq, "%s %d %d %s\n", req->reqid, result, aftype, response);
+	ircd_linebuf_put(&sendq, "%s %d %d %s\n", req->reqid, result, aftype, response);
 	write_sendq(ofd, NULL);
 	ircd_free(reply);
 	ircd_free(req);
@@ -565,8 +565,8 @@ int main(int argc, char **argv)
 #endif
 	ircd_lib(NULL, NULL, NULL, 0, 256, 1024, 256); /* XXX fix me */
 
-	linebuf_newbuf(&sendq);
-	linebuf_newbuf(&recvq);
+	ircd_linebuf_newbuf(&sendq);
+	ircd_linebuf_newbuf(&recvq);
 
 	ircd_open(ifd, FD_PIPE, "incoming pipe");
 	ircd_open(ofd, FD_PIPE, "outgoing pipe");

@@ -874,7 +874,7 @@ start_io(struct Client *server)
 		iobuf = ircd_realloc(iobuf, (c + READBUF_SIZE + 64));
 
 		/* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
-		linelen = linebuf_get(&server->localClient->buf_recvq, (char *) (iobuf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL, LINEBUF_RAW);	/* include partial lines */
+		linelen = ircd_linebuf_get(&server->localClient->buf_recvq, (char *) (iobuf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL, LINEBUF_RAW);	/* include partial lines */
 
 		if(linelen)
 		{
@@ -894,7 +894,7 @@ start_io(struct Client *server)
 		iobuf = ircd_realloc(iobuf, (c + BUF_DATA_SIZE + 64));
 
 		/* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
-		linelen = linebuf_get(&server->localClient->buf_sendq, 
+		linelen = ircd_linebuf_get(&server->localClient->buf_sendq, 
 				      (char *) (iobuf + c + 3), READBUF_SIZE, 
 				      LINEBUF_PARTIAL, LINEBUF_PARSED);	/* include partial lines */
 

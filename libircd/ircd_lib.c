@@ -121,7 +121,7 @@ ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int max
 	ircd_event_init();
 	initBlockHeap();
 	init_dlink_nodes(dh_size);
-	linebuf_init(lb_heap_size);
+	ircd_linebuf_init(lb_heap_size);
 }
 
 

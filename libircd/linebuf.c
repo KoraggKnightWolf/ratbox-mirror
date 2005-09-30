@@ -40,7 +40,7 @@
 #endif
 
 #ifndef NO_BLOCKHEAP
-static BlockHeap *linebuf_heap;
+static BlockHeap *ircd_linebuf_heap;
 #endif
 
 static int bufline_count = 0;
@@ -50,25 +50,25 @@ static int bufline_count = 0;
 #endif
 
 /*
- * linebuf_init
+ * ircd_linebuf_init
  *
  * Initialise the linebuf mechanism
  */
 
 void
-linebuf_init(size_t heap_size)
+ircd_linebuf_init(size_t heap_size)
 {
 #ifndef NO_BLOCKHEAP
-	linebuf_heap = BlockHeapCreate(sizeof(buf_line_t), heap_size);
+	ircd_linebuf_heap = BlockHeapCreate(sizeof(buf_line_t), heap_size);
 #endif
 }
 
 static buf_line_t *
-linebuf_allocate(void)
+ircd_linebuf_allocate(void)
 {
 	buf_line_t *t;
 #ifndef NO_BLOCKHEAP
-	t = BlockHeapAlloc(linebuf_heap);
+	t = BlockHeapAlloc(ircd_linebuf_heap);
 	t->refcount = 0;
 #else
 	t = ircd_malloc(sizeof(buf_line_t));
@@ -79,28 +79,28 @@ linebuf_allocate(void)
 }
 
 static void
-linebuf_free(buf_line_t * p)
+ircd_linebuf_free(buf_line_t * p)
 {
 #ifndef NO_BLOCKHEAP
-	BlockHeapFree(linebuf_heap, p);
+	BlockHeapFree(ircd_linebuf_heap, p);
 #else
 	ircd_free(p);
 #endif
 }
 
 /*
- * linebuf_new_line
+ * ircd_linebuf_new_line
  *
  * Create a new line, and link it to the given linebuf.
  * It will be initially empty.
  */
 static buf_line_t *
-linebuf_new_line(buf_head_t * bufhead)
+ircd_linebuf_new_line(buf_head_t * bufhead)
 {
 	buf_line_t *bufline;
 	dlink_node *node;
 
-	bufline = linebuf_allocate();
+	bufline = ircd_linebuf_allocate();
 	if(bufline == NULL)
 		return NULL;
 	++bufline_count;
@@ -126,12 +126,12 @@ linebuf_new_line(buf_head_t * bufhead)
 
 
 /*
- * linebuf_done_line
+ * ircd_linebuf_done_line
  *
  * We've finished with the given line, so deallocate it
  */
 static void
-linebuf_done_line(buf_head_t * bufhead, buf_line_t * bufline, dlink_node * node)
+ircd_linebuf_done_line(buf_head_t * bufhead, buf_line_t * bufline, dlink_node * node)
 {
 	/* Remove it from the linked list */
 	dlinkDestroy(node, &bufhead->list);
@@ -150,7 +150,7 @@ linebuf_done_line(buf_head_t * bufhead, buf_line_t * bufline, dlink_node * node)
 		/* and finally, deallocate the buf */
 		--bufline_count;
 		lircd_assert(bufline_count >= 0);
-		linebuf_free(bufline);
+		ircd_linebuf_free(bufline);
 	}
 }
 
@@ -159,7 +159,7 @@ linebuf_done_line(buf_head_t * bufhead, buf_line_t * bufline, dlink_node * node)
  * skip to end of line or the crlfs, return the number of bytes ..
  */
 static inline int
-linebuf_skip_crlf(char *ch, int len)
+ircd_linebuf_skip_crlf(char *ch, int len)
 {
 	int orig_len = len;
 
@@ -185,33 +185,33 @@ linebuf_skip_crlf(char *ch, int len)
 
 
 /*
- * linebuf_newbuf
+ * ircd_linebuf_newbuf
  *
  * Initialise the new buffer
  */
 void
-linebuf_newbuf(buf_head_t * bufhead)
+ircd_linebuf_newbuf(buf_head_t * bufhead)
 {
 	/* not much to do right now :) */
 	memset(bufhead, 0, sizeof(buf_head_t));
 }
 
 /*
- * linebuf_donebuf
+ * ircd_linebuf_donebuf
  *
  * Flush all the lines associated with this buffer
  */
 void
-linebuf_donebuf(buf_head_t * bufhead)
+ircd_linebuf_donebuf(buf_head_t * bufhead)
 {
 	while(bufhead->list.head != NULL)
 	{
-		linebuf_done_line(bufhead, (buf_line_t *) bufhead->list.head->data, bufhead->list.head);
+		ircd_linebuf_done_line(bufhead, (buf_line_t *) bufhead->list.head->data, bufhead->list.head);
 	}
 }
 
 /*
- * linebuf_copy_line
+ * ircd_linebuf_copy_line
  *
  * Okay..this functions comments made absolutely no sense.
  * 
@@ -231,7 +231,7 @@ linebuf_donebuf(buf_head_t * bufhead)
  * -Aaron
  */
 static int
-linebuf_copy_line(buf_head_t * bufhead, buf_line_t * bufline, char *data, int len)
+ircd_linebuf_copy_line(buf_head_t * bufhead, buf_line_t * bufline, char *data, int len)
 {
 	int cpylen = 0;		/* how many bytes we've copied */
 	char *ch = data;	/* Pointer to where we are in the read data */
@@ -246,7 +246,7 @@ linebuf_copy_line(buf_head_t * bufhead, buf_line_t * bufline, char *data, int le
 	if(bufline->terminated == 1)
 		return 0;
 
-	clen = cpylen = linebuf_skip_crlf(ch, len);
+	clen = cpylen = ircd_linebuf_skip_crlf(ch, len);
 	if(clen == -1)
 		return -1;
 
@@ -297,14 +297,14 @@ linebuf_copy_line(buf_head_t * bufhead, buf_line_t * bufline, char *data, int le
 }
 
 /*
- * linebuf_copy_raw
+ * ircd_linebuf_copy_raw
  *
  * Copy as much data as possible directly into a linebuf,
  * splitting at \r\n, but without altering any data.
  *
  */
 static int
-linebuf_copy_raw(buf_head_t * bufhead, buf_line_t * bufline, char *data, int len)
+ircd_linebuf_copy_raw(buf_head_t * bufhead, buf_line_t * bufline, char *data, int len)
 {
 	int cpylen = 0;		/* how many bytes we've copied */
 	char *ch = data;	/* Pointer to where we are in the read data */
@@ -319,7 +319,7 @@ linebuf_copy_raw(buf_head_t * bufhead, buf_line_t * bufline, char *data, int len
 	if(bufline->terminated == 1)
 		return 0;
 
-	clen = cpylen = linebuf_skip_crlf(ch, len);
+	clen = cpylen = ircd_linebuf_skip_crlf(ch, len);
 	if(clen == -1)
 		return -1;
 
@@ -358,7 +358,7 @@ linebuf_copy_raw(buf_head_t * bufhead, buf_line_t * bufline, char *data, int len
 
 
 /*
- * linebuf_parse
+ * ircd_linebuf_parse
  *
  * Take a given buffer and break out as many buffers as we can.
  * If we find a CRLF, we terminate that buffer and create a new one.
@@ -375,7 +375,7 @@ linebuf_copy_raw(buf_head_t * bufhead, buf_line_t * bufline, char *data, int len
  *   to dodge copious copies.
  */
 int
-linebuf_parse(buf_head_t * bufhead, char *data, int len, int raw)
+ircd_linebuf_parse(buf_head_t * bufhead, char *data, int len, int raw)
 {
 	buf_line_t *bufline;
 	int cpylen;
@@ -389,9 +389,9 @@ linebuf_parse(buf_head_t * bufhead, char *data, int len, int raw)
 		lircd_assert(!bufline->flushing);
 		/* just try, the worst it could do is *reject* us .. */
 		if(!raw)
-			cpylen = linebuf_copy_line(bufhead, bufline, data, len);
+			cpylen = ircd_linebuf_copy_line(bufhead, bufline, data, len);
 		else
-			cpylen = linebuf_copy_raw(bufhead, bufline, data, len);
+			cpylen = ircd_linebuf_copy_raw(bufhead, bufline, data, len);
 
 		if(cpylen == -1)
 			return -1;
@@ -411,13 +411,13 @@ linebuf_parse(buf_head_t * bufhead, char *data, int len, int raw)
 	while(len > 0)
 	{
 		/* We obviously need a new buffer, so .. */
-		bufline = linebuf_new_line(bufhead);
+		bufline = ircd_linebuf_new_line(bufhead);
 
 		/* And parse */
 		if(!raw)
-			cpylen = linebuf_copy_line(bufhead, bufline, data, len);
+			cpylen = ircd_linebuf_copy_line(bufhead, bufline, data, len);
 		else
-			cpylen = linebuf_copy_raw(bufhead, bufline, data, len);
+			cpylen = ircd_linebuf_copy_raw(bufhead, bufline, data, len);
 
 		if(cpylen == -1)
 			return -1;
@@ -432,13 +432,13 @@ linebuf_parse(buf_head_t * bufhead, char *data, int len, int raw)
 
 
 /*
- * linebuf_get
+ * ircd_linebuf_get
  *
  * get the next buffer from our line. For the time being it will copy
  * data into the given buffer and free the underlying linebuf.
  */
 int
-linebuf_get(buf_head_t * bufhead, char *buf, int buflen, int partial, int raw)
+ircd_linebuf_get(buf_head_t * bufhead, char *buf, int buflen, int partial, int raw)
 {
 	buf_line_t *bufline;
 	int cpylen;
@@ -489,20 +489,20 @@ linebuf_get(buf_head_t * bufhead, char *buf, int buflen, int partial, int raw)
 	lircd_assert(cpylen >= 0);
 
 	/* Deallocate the line */
-	linebuf_done_line(bufhead, bufline, bufhead->list.head);
+	ircd_linebuf_done_line(bufhead, bufline, bufhead->list.head);
 
 	/* return how much we copied */
 	return cpylen;
 }
 
 /*
- * linebuf_attach
+ * ircd_linebuf_attach
  *
  * attach the lines in a buf_head_t to another buf_head_t
  * without copying the data (using refcounts).
  */
 void
-linebuf_attach(buf_head_t * bufhead, buf_head_t * new)
+ircd_linebuf_attach(buf_head_t * bufhead, buf_head_t * new)
 {
 	dlink_node *ptr;
 	buf_line_t *line;
@@ -524,15 +524,15 @@ linebuf_attach(buf_head_t * bufhead, buf_head_t * new)
 
 
 /*
- * linebuf_putmsg
+ * ircd_linebuf_putmsg
  *
- * Similar to linebuf_put, but designed for use by send.c.
+ * Similar to ircd_linebuf_put, but designed for use by send.c.
  *
  * prefixfmt is used as a format for the varargs, and is inserted first.
  * Then format/va_args is appended to the buffer.
  */
 void
-linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list * va_args, const char *prefixfmt, ...)
+ircd_linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list * va_args, const char *prefixfmt, ...)
 {
 	buf_line_t *bufline;
 	int len = 0;
@@ -547,7 +547,7 @@ linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list * va_args, cons
 	}
 #endif
 	/* Create a new line */
-	bufline = linebuf_new_line(bufhead);
+	bufline = ircd_linebuf_new_line(bufhead);
 
 	if(prefixfmt != NULL)
 	{
@@ -594,7 +594,7 @@ linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list * va_args, cons
 }
 
 void
-linebuf_put(buf_head_t * bufhead, const char *format, ...)
+ircd_linebuf_put(buf_head_t * bufhead, const char *format, ...)
 {
 	buf_line_t *bufline;
 	int len = 0;
@@ -609,7 +609,7 @@ linebuf_put(buf_head_t * bufhead, const char *format, ...)
 	}
 #endif
 	/* Create a new line */
-	bufline = linebuf_new_line(bufhead);
+	bufline = ircd_linebuf_new_line(bufhead);
 
 	if(format != NULL)
 	{
@@ -653,7 +653,7 @@ linebuf_put(buf_head_t * bufhead, const char *format, ...)
 
 
 /*
- * linebuf_flush
+ * ircd_linebuf_flush
  *
  * Flush data to the buffer. It tries to write as much data as possible
  * to the given socket. Any return values are passed straight through.
@@ -665,7 +665,7 @@ linebuf_put(buf_head_t * bufhead, const char *format, ...)
  *        we have a CRLF.
  */
 int
-linebuf_flush(int fd, buf_head_t * bufhead)
+ircd_linebuf_flush(int fd, buf_head_t * bufhead)
 {
 	buf_line_t *bufline;
 	int retval;
@@ -741,7 +741,7 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 
 				ptr = ptr->next;
 				lircd_assert(bufhead->len >= 0);
-				linebuf_done_line(bufhead, bufline, bufhead->list.head);
+				ircd_linebuf_done_line(bufhead, bufline, bufhead->list.head);
 			}
 			else
 			{
@@ -796,7 +796,7 @@ linebuf_flush(int fd, buf_head_t * bufhead)
 	{
 		bufhead->writeofs = 0;
 		lircd_assert(bufhead->len >= 0);
-		linebuf_done_line(bufhead, bufline, bufhead->list.head);
+		ircd_linebuf_done_line(bufhead, bufline, bufhead->list.head);
 	}
 
 	/* Return line length */
@@ -811,12 +811,12 @@ linebuf_flush(int fd, buf_head_t * bufhead)
  */
 
 void
-count_linebuf_memory(size_t * count, size_t * linebuf_memory_used)
+ircd_count_ircd_linebuf_memory(size_t * count, size_t * ircd_linebuf_memory_used)
 {
 #ifndef NO_BLOCKHEAP
-	BlockHeapUsage(linebuf_heap, count, NULL, linebuf_memory_used);
+	BlockHeapUsage(ircd_linebuf_heap, count, NULL, ircd_linebuf_memory_used);
 #else
 	*count = 0;
-	*linebuf_memory_used = 0;
+	*ircd_linebuf_memory_used = 0;
 #endif
 }

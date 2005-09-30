@@ -126,7 +126,7 @@ list_all_channels(struct Client *source_p)
 		chptr = ptr->data;
 
 		/* if theyre overflowing their sendq, stop. --fl */
-		if(linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
+		if(ircd_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYMATCHES),
 				   me.name, source_p->name, "LIST");
@@ -202,7 +202,7 @@ list_limit_channels(struct Client *source_p, const char *param)
 		chptr = ptr->data;
 
 		/* if theyre overflowing their sendq, stop. --fl */
-		if(linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
+		if(ircd_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYMATCHES),
 				   me.name, source_p->name, "LIST");

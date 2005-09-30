@@ -145,16 +145,16 @@ static void
 write_sendq(int fd, void *unused)
 {
 	int retlen;
-	if(linebuf_len(&sendq) > 0)
+	if(ircd_linebuf_len(&sendq) > 0)
 	{
-		while((retlen = linebuf_flush(irc_ofd, &sendq)) > 0);
+		while((retlen = ircd_linebuf_flush(irc_ofd, &sendq)) > 0);
 		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
 		{
 			exit(1);
 		}
 	}
 	 
-	if(linebuf_len(&sendq) > 0)
+	if(ircd_linebuf_len(&sendq) > 0)
 	{
 		ircd_setselect(irc_ofd, IRCD_SELECT_WRITE,
 			       write_sendq, NULL, 0);
@@ -167,7 +167,7 @@ static void
 read_auth_timeout(int fd, void *data)
 {
 	struct auth_request *auth = data;
-	linebuf_put(&sendq, "%s 0", auth->reqid);
+	ircd_linebuf_put(&sendq, "%s 0", auth->reqid);
 	write_sendq(irc_ofd, NULL);
 	BlockHeapFree(authheap, auth);
 	ircd_close(fd);
@@ -262,9 +262,9 @@ read_auth(int fd, void *data)
 				}
 			}
 			*t = '\0';
-			linebuf_put(&sendq, "%s %s", auth->reqid, username);
+			ircd_linebuf_put(&sendq, "%s %s", auth->reqid, username);
 		} else
-			linebuf_put(&sendq, "%s 0", auth->reqid);
+			ircd_linebuf_put(&sendq, "%s 0", auth->reqid);
 		write_sendq(irc_ofd, NULL);
 		ircd_close(fd);
 		BlockHeapFree(authheap, auth);
@@ -283,7 +283,7 @@ connect_callback(int fd, int status, void *data)
 		 */
 		if(send_sprintf(fd, "%u , %u\r\n", auth->srcport, auth->dstport) <= 0)
 		{
-			linebuf_put(&sendq, "%s 0", auth->reqid);
+			ircd_linebuf_put(&sendq, "%s 0", auth->reqid);
 			write_sendq(irc_ofd, NULL);
 			ircd_close(fd);
 			BlockHeapFree(authheap, auth);
@@ -291,7 +291,7 @@ connect_callback(int fd, int status, void *data)
 		}
 		read_auth(fd, auth);
 	} else {
-		linebuf_put(&sendq, "%s 0", auth->reqid);
+		ircd_linebuf_put(&sendq, "%s 0", auth->reqid);
 		write_sendq(irc_ofd, NULL);
 		ircd_close(fd);
 		BlockHeapFree(authheap, auth);
@@ -329,7 +329,7 @@ parse_request(void)
 	int len;
 	static char *parv[MAXPARA + 1];
 	int parc;
-	while((len = linebuf_get(&recvq, readBuf, sizeof(readBuf),
+	while((len = ircd_linebuf_get(&recvq, readBuf, sizeof(readBuf),
 				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 	{
 		parc = io_to_array(readBuf, parv);
@@ -346,7 +346,7 @@ read_request(int fd, void *unusued)
         int length;
         while((length = ircd_read(fd, readBuf, sizeof(readBuf))) > 0)
         {
-                linebuf_parse(&recvq, readBuf, length, 0);
+                ircd_linebuf_parse(&recvq, readBuf, length, 0);
                 parse_request();
         }
          
@@ -405,8 +405,8 @@ int main(int argc, char **argv)
 	}
 #endif
 	ircd_lib(ilogcb, restartcb, diecb, 0, 1024, 1024, 1024); /* XXX fix me */
-	linebuf_newbuf(&sendq);
-	linebuf_newbuf(&recvq);
+	ircd_linebuf_newbuf(&sendq);
+	ircd_linebuf_newbuf(&recvq);
 	authheap = BlockHeapCreate(sizeof(struct auth_request), 2048);
 
 	ircd_open(irc_ifd, FD_PIPE, "ircd ifd");

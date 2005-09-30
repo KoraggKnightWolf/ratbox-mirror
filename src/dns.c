@@ -286,7 +286,7 @@ parse_dns_reply(void)
 {
 	int len, parc;
 	char *parv[MAXPARA+1];
-	while((len = linebuf_get(&dns_recvq, dnsBuf, sizeof(dnsBuf), 
+	while((len = ircd_linebuf_get(&dns_recvq, dnsBuf, sizeof(dnsBuf), 
 				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 	{
 		parc = string_to_array(dnsBuf, parv); /* we shouldn't be using this here, but oh well */
@@ -308,7 +308,7 @@ read_dns(int fd, void *data)
 
 	while((length = ircd_read(dns_ifd, dnsBuf, sizeof(dnsBuf))) > 0)
 	{
-		linebuf_parse(&dns_recvq, dnsBuf, length, 0);
+		ircd_linebuf_parse(&dns_recvq, dnsBuf, length, 0);
 		parse_dns_reply();
 	}
    
@@ -325,16 +325,16 @@ static void
 dns_write_sendq(int fd, void *unused)
 {
 	int retlen;
-	if(linebuf_len(&dns_sendq) > 0)
+	if(ircd_linebuf_len(&dns_sendq) > 0)
 	{
-		while((retlen = linebuf_flush(dns_ofd, &dns_sendq)) > 0);
+		while((retlen = ircd_linebuf_flush(dns_ofd, &dns_sendq)) > 0);
 		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
 		{
 			fork_resolver();
 		}
 	}
 	 
-	if(linebuf_len(&dns_sendq) > 0)
+	if(ircd_linebuf_len(&dns_sendq) > 0)
 	{
 		ircd_setselect(dns_ofd, IRCD_SELECT_WRITE,
 			       dns_write_sendq, NULL, 0);
@@ -345,7 +345,7 @@ dns_write_sendq(int fd, void *unused)
 void 
 submit_dns(char type, int nid, int aftype, const char *addr)
 {
-	linebuf_put(&dns_sendq, "%c %x %d %s", type, nid, aftype, addr);
+	ircd_linebuf_put(&dns_sendq, "%c %x %d %s", type, nid, aftype, addr);
 	dns_write_sendq(dns_ofd, NULL);
 	read_dns(dns_ifd, NULL);
 }
@@ -354,8 +354,8 @@ void
 init_resolver(void)
 {
 	fork_resolver();
-	linebuf_newbuf(&dns_sendq);
-	linebuf_newbuf(&dns_recvq);
+	ircd_linebuf_newbuf(&dns_sendq);
+	ircd_linebuf_newbuf(&dns_recvq);
 	
 	if(res_pid < 0)
 	{

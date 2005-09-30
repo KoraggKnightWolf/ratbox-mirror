@@ -221,8 +221,8 @@ init_auth(void)
 {
 	/* This hook takes a struct Client for its argument */
 	fork_ident();
-	linebuf_newbuf(&auth_sendq);
-	linebuf_newbuf(&auth_recvq);
+	ircd_linebuf_newbuf(&auth_sendq);
+	ircd_linebuf_newbuf(&auth_recvq);
 	if(auth_pid < 0)
 	{
 		ilog(L_MAIN, "Unable to fork ident daemon");
@@ -339,16 +339,16 @@ static void
 auth_write_sendq(int fd, void *unused)
 {
 	int retlen;
-	if(linebuf_len(&auth_sendq) > 0)
+	if(ircd_linebuf_len(&auth_sendq) > 0)
 	{
-		while((retlen = linebuf_flush(auth_ofd, &auth_sendq)) > 0);
+		while((retlen = ircd_linebuf_flush(auth_ofd, &auth_sendq)) > 0);
 		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
 		{
 			fork_ident();
 		}
 	}
 	
-	if(linebuf_len(&auth_sendq) > 0)
+	if(ircd_linebuf_len(&auth_sendq) > 0)
 	{
 		ircd_setselect(auth_ofd, IRCD_SELECT_WRITE, 
 			       auth_write_sendq, NULL, 0);
@@ -416,7 +416,7 @@ start_auth_query(struct AuthRequest *auth)
 	auth->reqid = assign_id();
 	authtable[auth->reqid] = auth;
 
-	linebuf_put(&auth_sendq, "%x %s %s %u %u", auth->reqid, myip, 
+	ircd_linebuf_put(&auth_sendq, "%x %s %s %u %u", auth->reqid, myip, 
 		    auth->client->sockhost, (unsigned int)rport, (unsigned int)lport); 
 
 
@@ -537,7 +537,7 @@ parse_auth_reply(void)
 	int len;
 	struct AuthRequest *auth;	
 	char *q, *p;
-	while((len = linebuf_get(&auth_recvq, authBuf, sizeof(authBuf), 
+	while((len = ircd_linebuf_get(&auth_recvq, authBuf, sizeof(authBuf), 
 				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)	
 	{
 		
@@ -585,7 +585,7 @@ read_auth_reply(int fd, void *data)
 
 	while((length = ircd_read(auth_ifd, authBuf, sizeof(authBuf))) > 0)
 	{
-		linebuf_parse(&auth_recvq, authBuf, length, 0);
+		ircd_linebuf_parse(&auth_recvq, authBuf, length, 0);
 		parse_auth_reply();
 	}
 

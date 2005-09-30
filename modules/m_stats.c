@@ -1075,7 +1075,7 @@ stats_servers (struct Client *source_p)
 				   target_p->name,
 				   (target_p->serv->by[0] ? target_p->serv->by : "Remote."),
 				   (int) (ircd_currenttime - target_p->localClient->lasttime),
-				   (int) linebuf_len (&target_p->localClient->buf_sendq),
+				   (int) ircd_linebuf_len (&target_p->localClient->buf_sendq),
 				   days, (days == 1) ? "" : "s", hours, minutes, 
 				   (int) seconds);
 	}
@@ -1166,8 +1166,8 @@ stats_memory (struct Client *source_p)
 	size_t conf_memory = 0;	/* memory used by conf lines */
 	size_t mem_servers_cached;	/* memory used by scache */
 
-	size_t linebuf_count = 0;
-	size_t linebuf_memory_used = 0;
+	size_t ircd_linebuf_count = 0;
+	size_t ircd_linebuf_memory_used = 0;
 
 	size_t total_channel_memory = 0;
 	size_t totww = 0;
@@ -1242,7 +1242,7 @@ stats_memory (struct Client *source_p)
 
 	class_count = dlink_list_length(&class_list) + 1;
 
-	count_linebuf_memory(&linebuf_count, &linebuf_memory_used);
+	ircd_count_ircd_linebuf_memory(&ircd_linebuf_count, &ircd_linebuf_memory_used);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :Users %u(%lu) Invites %u(%lu)",
@@ -1314,7 +1314,7 @@ stats_memory (struct Client *source_p)
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :linebuf %ld(%ld)",
-			   (long)linebuf_count, (long)linebuf_memory_used);
+			   (long)ircd_linebuf_count, (long)ircd_linebuf_memory_used);
 
 	count_scache(&number_servers_cached, &mem_servers_cached);
 
@@ -1420,7 +1420,7 @@ stats_servlinks (struct Client *source_p)
 		sendto_one(source_p, POP_QUEUE, Sformat,
 			get_id(&me, source_p), RPL_STATSLINKINFO, get_id(source_p, source_p),
 			get_server_name(target_p, SHOW_IP),
-			(int) linebuf_len (&target_p->localClient->buf_sendq),
+			(int) ircd_linebuf_len (&target_p->localClient->buf_sendq),
 			(int) target_p->localClient->sendM,
 			(int) target_p->localClient->sendK,
 			(int) target_p->localClient->receiveM,
@@ -1571,7 +1571,7 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSLINKINFO, Lformat,
 				get_server_name(target_p, SHOW_IP),
-				(int) linebuf_len(&target_p->localClient->buf_sendq),
+				(int) ircd_linebuf_len(&target_p->localClient->buf_sendq),
 				(int) target_p->localClient->sendM,
 				(int) target_p->localClient->sendK,
 				(int) target_p->localClient->receiveM,
@@ -1592,7 +1592,7 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				     get_client_name(target_p, HIDE_IP)) :
 #endif
 				    get_client_name(target_p, MASK_IP),
-				    (int) linebuf_len(&target_p->localClient->buf_sendq),
+				    (int) ircd_linebuf_len(&target_p->localClient->buf_sendq),
 				    (int) target_p->localClient->sendM,
 				    (int) target_p->localClient->sendK,
 				    (int) target_p->localClient->receiveM,
@@ -1609,7 +1609,7 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				   IsUpper(statchar) ?
 				   get_client_name(target_p, SHOW_IP) :
 				   get_client_name(target_p, HIDE_IP),
-				   (int) linebuf_len(&target_p->localClient->buf_sendq),
+				   (int) ircd_linebuf_len(&target_p->localClient->buf_sendq),
 				   (int) target_p->localClient->sendM,
 				   (int) target_p->localClient->sendK,
 				   (int) target_p->localClient->receiveM,

@@ -61,7 +61,7 @@ parse_client_queued(struct Client *client_p)
 			if(i >= MAX_FLOOD)
 				break;
 
-			dolen = linebuf_get(&client_p->localClient->
+			dolen = ircd_linebuf_get(&client_p->localClient->
 					    buf_recvq, readBuf, READBUF_SIZE,
 					    LINEBUF_COMPLETE, LINEBUF_PARSED);
 
@@ -85,7 +85,7 @@ parse_client_queued(struct Client *client_p)
 
 	if(IsAnyServer(client_p) || IsExemptFlood(client_p))
 	{
-		while (!IsAnyDead(client_p) && (dolen = linebuf_get(&client_p->localClient->buf_recvq,
+		while (!IsAnyDead(client_p) && (dolen = ircd_linebuf_get(&client_p->localClient->buf_recvq,
 					   readBuf, READBUF_SIZE, LINEBUF_COMPLETE,
 					   LINEBUF_PARSED)) > 0)
 		{
@@ -129,7 +129,7 @@ parse_client_queued(struct Client *client_p)
 			else if(client_p->localClient->sent_parsed >= (4 * client_p->localClient->allow_read))
 				break;
 
-			dolen = linebuf_get(&client_p->localClient->
+			dolen = ircd_linebuf_get(&client_p->localClient->
 					    buf_recvq, readBuf, READBUF_SIZE,
 					    LINEBUF_COMPLETE, LINEBUF_PARSED);
 
@@ -373,7 +373,7 @@ read_packet(int fd, void *data)
 		if(IsHandshake(client_p) || IsUnknown(client_p))
 			binary = 1;
 
-		lbuf_len = linebuf_parse(&client_p->localClient->buf_recvq, readBuf, length, binary);
+		lbuf_len = ircd_linebuf_parse(&client_p->localClient->buf_recvq, readBuf, length, binary);
 
 		lclient_p->actually_read += lbuf_len;
 
@@ -388,7 +388,7 @@ read_packet(int fd, void *data)
 		
 		/* Check to make sure we're not flooding */
 		if(!IsAnyServer(client_p) &&
-		   (linebuf_alloclen(&client_p->localClient->buf_recvq) > ConfigFileEntry.client_flood))
+		   (ircd_linebuf_alloclen(&client_p->localClient->buf_recvq) > ConfigFileEntry.client_flood))
 		{
 			if(!(ConfigFileEntry.no_oper_flood && IsOper(client_p)))
 			{

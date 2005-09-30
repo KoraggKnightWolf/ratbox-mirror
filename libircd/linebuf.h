@@ -67,24 +67,24 @@ typedef struct _buf_head
 
 
 /* they should be functions, but .. */
-#define linebuf_len(x)		((x)->len)
-#define linebuf_alloclen(x)	((x)->alloclen)
-#define linebuf_numlines(x)	((x)->numlines)
+#define ircd_linebuf_len(x)		((x)->len)
+#define ircd_linebuf_alloclen(x)	((x)->alloclen)
+#define ircd_linebuf_numlines(x)	((x)->numlines)
 
-extern void linebuf_init(size_t heap_size);
+extern void ircd_linebuf_init(size_t heap_size);
 /* declared as static */
-/* extern buf_line_t *linebuf_new_line(buf_head_t *); */
-/* extern void linebuf_done_line(buf_head_t *, buf_line_t *, dlink_node *); */
-/* extern int linebuf_skip_crlf(char *, int); */
-/* extern void linebuf_terminate_crlf(buf_head_t *, buf_line_t *); */
-extern void linebuf_newbuf(buf_head_t *);
+/* extern buf_line_t *ircd_linebuf_new_line(buf_head_t *); */
+/* extern void ircd_linebuf_done_line(buf_head_t *, buf_line_t *, dlink_node *); */
+/* extern int ircd_linebuf_skip_crlf(char *, int); */
+/* extern void ircd_linebuf_terminate_crlf(buf_head_t *, buf_line_t *); */
+extern void ircd_linebuf_newbuf(buf_head_t *);
 extern void client_flush_input(struct Client *);
-extern void linebuf_donebuf(buf_head_t *);
-extern int linebuf_parse(buf_head_t *, char *, int, int);
-extern int linebuf_get(buf_head_t *, char *, int, int, int);
-extern void linebuf_putmsg(buf_head_t *, const char *, va_list *, const char *, ...);
-extern void linebuf_put(buf_head_t *, const char *, ...);
-extern int linebuf_flush(int, buf_head_t *);
-extern void linebuf_attach(buf_head_t *, buf_head_t *);
-extern void count_linebuf_memory(size_t *, size_t *);
+extern void ircd_linebuf_donebuf(buf_head_t *);
+extern int ircd_linebuf_parse(buf_head_t *, char *, int, int);
+extern int ircd_linebuf_get(buf_head_t *, char *, int, int, int);
+extern void ircd_linebuf_putmsg(buf_head_t *, const char *, va_list *, const char *, ...);
+extern void ircd_linebuf_put(buf_head_t *, const char *, ...);
+extern int ircd_linebuf_flush(int, buf_head_t *);
+extern void ircd_linebuf_attach(buf_head_t *, buf_head_t *);
+extern void ircd_count_ircd_linebuf_memory(size_t *, size_t *);
 #endif

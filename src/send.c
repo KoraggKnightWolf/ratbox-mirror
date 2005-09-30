@@ -44,7 +44,7 @@
 
 /* send the message to the link the target is attached to */
 #define send_linebuf(a,b) _send_linebuf((a->from ? a->from : a) ,b, 0)
-#define send_linebuf_queue(a, b) _send_linebuf((a->from ? a->from : a) ,b, 1)
+#define send_ircd_linebuf_queue(a, b) _send_linebuf((a->from ? a->from : a) ,b, 1)
 unsigned long current_serial = 0L;
 
 /* send_linebuf()
@@ -65,19 +65,19 @@ _send_linebuf(struct Client *to, buf_head_t *linebuf, int queue)
 	if(!MyConnect(to) || IsIOError(to))
 		return 0;
 
-	if(linebuf_len(&to->localClient->buf_sendq) > get_sendq(to))
+	if(ircd_linebuf_len(&to->localClient->buf_sendq) > get_sendq(to))
 	{
 		if(IsServer(to))
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Max SendQ limit exceeded for %s: %u > %lu",
 					     get_server_name(to, HIDE_IP),
-					     linebuf_len(&to->localClient->buf_sendq), 
+					     ircd_linebuf_len(&to->localClient->buf_sendq), 
 					     get_sendq(to));
 
 			ilog(L_SERVER, "Max SendQ limit exceeded for %s: %u > %lu",
 			     log_client_name(to, SHOW_IP),
-			     linebuf_len(&to->localClient->buf_sendq), 
+			     ircd_linebuf_len(&to->localClient->buf_sendq), 
 			     get_sendq(to));
 		}
 
@@ -92,7 +92,7 @@ _send_linebuf(struct Client *to, buf_head_t *linebuf, int queue)
 		/* just attach the linebuf to the sendq instead of
 		 * generating a new one
 		 */
-		linebuf_attach(&to->localClient->buf_sendq, linebuf);
+		ircd_linebuf_attach(&to->localClient->buf_sendq, linebuf);
 	}
 
 	/*
@@ -103,7 +103,7 @@ _send_linebuf(struct Client *to, buf_head_t *linebuf, int queue)
 	to->localClient->sendM += 1;
 	me.localClient->sendM += 1;
 
-	if(linebuf_len(&to->localClient->buf_sendq) > 0 && queue == 0)
+	if(ircd_linebuf_len(&to->localClient->buf_sendq) > 0 && queue == 0)
 		send_queued_write(to->localClient->fd, to);
 	return 0;
 }
@@ -113,18 +113,18 @@ send_pop_queue(struct Client *to)
 {
 	if(!MyConnect(to) || IsIOError(to))
 		return;
-	if(linebuf_len(&to->localClient->buf_sendq) > 0)
+	if(ircd_linebuf_len(&to->localClient->buf_sendq) > 0)
 		send_queued_write(to->localClient->fd, to);
 }
 
-/* send_linebuf_remote()
+/* send_ircd_linebuf_remote()
  *
  * inputs	- client to attach to, sender, linebuf
  * outputs	-
  * side effects - client has linebuf attached
  */
 static void
-send_linebuf_remote(struct Client *to, struct Client *from, buf_head_t *linebuf)
+send_ircd_linebuf_remote(struct Client *to, struct Client *from, buf_head_t *linebuf)
 {
 	if(to->from)
 		to = to->from;
@@ -183,10 +183,10 @@ send_queued_write(int fd, void *data)
 			     to->localClient->buf_sendq.writeofs;
 #endif
 
-	if(linebuf_len(&to->localClient->buf_sendq))
+	if(ircd_linebuf_len(&to->localClient->buf_sendq))
 	{
 		while ((retlen =
-			linebuf_flush(to->localClient->fd, &to->localClient->buf_sendq)) > 0)
+			ircd_linebuf_flush(to->localClient->fd, &to->localClient->buf_sendq)) > 0)
 		{
 			/* We have some data written .. update counters */
 #ifdef USE_IODEBUG_HOOKS
@@ -221,7 +221,7 @@ send_queued_write(int fd, void *data)
 		}
 	}
 
-	if(linebuf_len(&to->localClient->buf_sendq))
+	if(ircd_linebuf_len(&to->localClient->buf_sendq))
 	ircd_setselect(fd, IRCD_SELECT_WRITE,
 			       send_queued_write, to, 0);
 }
@@ -308,15 +308,15 @@ sendto_one(struct Client *target_p, int queue, const char *pattern, ...)
 	if(IsIOError(target_p))
 		return;
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 
 	va_start(args, pattern);
-	linebuf_putmsg(&linebuf, pattern, &args, NULL);
+	ircd_linebuf_putmsg(&linebuf, pattern, &args, NULL);
 	va_end(args);
 
 	_send_linebuf(target_p, &linebuf, queue);
 
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 
 }
 
@@ -350,16 +350,16 @@ sendto_one_prefix(struct Client *target_p, struct Client *source_p,
 		return;
 	}
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 	va_start(args, pattern);
-	linebuf_putmsg(&linebuf, pattern, &args,
+	ircd_linebuf_putmsg(&linebuf, pattern, &args,
 		       ":%s %s %s ",
 		       get_id(source_p, target_p),
 		       command, get_id(target_p, target_p));
 	va_end(args);
 
 	_send_linebuf(dest_p, &linebuf, 0);
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 /* sendto_one_notice()
@@ -390,15 +390,15 @@ sendto_one_notice(struct Client *target_p, int queue, const char *pattern, ...)
 		return;
 	}
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 	va_start(args, pattern);
-	linebuf_putmsg(&linebuf, pattern, &args,
+	ircd_linebuf_putmsg(&linebuf, pattern, &args,
 		       ":%s NOTICE %s ",
 		       get_id(&me, target_p), get_id(target_p, target_p));
 	va_end(args);
 
 	_send_linebuf(dest_p, &linebuf, queue);
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 
@@ -430,16 +430,16 @@ sendto_one_numeric(struct Client *target_p, int queue, int numeric, const char *
 		return;
 	}
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 	va_start(args, pattern);
-	linebuf_putmsg(&linebuf, pattern, &args,
+	ircd_linebuf_putmsg(&linebuf, pattern, &args,
 		       ":%s %03d %s ",
 		       get_id(&me, target_p),
 		       numeric, get_id(target_p, target_p));
 	va_end(args);
 
 	_send_linebuf(dest_p, &linebuf, queue);
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 /*
@@ -476,9 +476,9 @@ sendto_server(struct Client *one, struct Channel *chptr, unsigned long caps,
 	if(chptr != NULL && *chptr->chname != '#')
 			return;
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 	va_start(args, format);
-	linebuf_putmsg(&linebuf, format, &args, NULL);
+	ircd_linebuf_putmsg(&linebuf, format, &args, NULL);
 	va_end(args);
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, serv_list.head)
@@ -500,7 +500,7 @@ sendto_server(struct Client *one, struct Channel *chptr, unsigned long caps,
 		_send_linebuf(target_p, &linebuf, 0);
 	}
 
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 
 }
 
@@ -516,17 +516,17 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 {
 	static char buf[BUFSIZE];
 	va_list args;
-	buf_head_t linebuf_local;
-	buf_head_t linebuf_name;
-	buf_head_t linebuf_id;
+	buf_head_t ircd_linebuf_local;
+	buf_head_t ircd_linebuf_name;
+	buf_head_t ircd_linebuf_id;
 	struct Client *target_p;
 	struct membership *msptr;
 	dlink_node *ptr;
 	dlink_node *next_ptr;
 
-	linebuf_newbuf(&linebuf_local);
-	linebuf_newbuf(&linebuf_name);
-	linebuf_newbuf(&linebuf_id);
+	ircd_linebuf_newbuf(&ircd_linebuf_local);
+	ircd_linebuf_newbuf(&ircd_linebuf_name);
+	ircd_linebuf_newbuf(&ircd_linebuf_id);
 
 	current_serial++;
 
@@ -535,16 +535,16 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 	va_end(args);
 
 	if(IsServer(source_p))
-		linebuf_putmsg(&linebuf_local, NULL, NULL,
+		ircd_linebuf_putmsg(&ircd_linebuf_local, NULL, NULL,
 			       ":%s %s", source_p->name, buf);
 	else
-		linebuf_putmsg(&linebuf_local, NULL, NULL,
+		ircd_linebuf_putmsg(&ircd_linebuf_local, NULL, NULL,
 			       ":%s!%s@%s %s",
 			       source_p->name, source_p->username, 
 			       source_p->host, buf);
 
-	linebuf_putmsg(&linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
-	linebuf_putmsg(&linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
+	ircd_linebuf_putmsg(&ircd_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
+	ircd_linebuf_putmsg(&ircd_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->members.head)
 	{
@@ -571,20 +571,20 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 			if(target_p->from->serial != current_serial)
 			{
 				if(has_id(target_p->from))
-					send_linebuf_remote(target_p, source_p, &linebuf_id);
+					send_ircd_linebuf_remote(target_p, source_p, &ircd_linebuf_id);
 				else
-					send_linebuf_remote(target_p, source_p, &linebuf_name);
+					send_ircd_linebuf_remote(target_p, source_p, &ircd_linebuf_name);
 
 				target_p->from->serial = current_serial;
 			}
 		}
 		else
-			_send_linebuf(target_p, &linebuf_local, 0);
+			_send_linebuf(target_p, &ircd_linebuf_local, 0);
 	}
 
-	linebuf_donebuf(&linebuf_local);
-	linebuf_donebuf(&linebuf_name);
-	linebuf_donebuf(&linebuf_id);
+	ircd_linebuf_donebuf(&ircd_linebuf_local);
+	ircd_linebuf_donebuf(&ircd_linebuf_name);
+	ircd_linebuf_donebuf(&ircd_linebuf_id);
 }
 
 
@@ -604,10 +604,10 @@ sendto_channel_local(int type, struct Channel *chptr, const char *pattern, ...)
 	dlink_node *ptr;
 	dlink_node *next_ptr;
 	
-	linebuf_newbuf(&linebuf); 
+	ircd_linebuf_newbuf(&linebuf); 
 	
 	va_start(args, pattern);
-	linebuf_putmsg(&linebuf, pattern, &args, NULL);
+	ircd_linebuf_putmsg(&linebuf, pattern, &args, NULL);
 	va_end(args);
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->locmembers.head)
@@ -624,7 +624,7 @@ sendto_channel_local(int type, struct Channel *chptr, const char *pattern, ...)
 		_send_linebuf(target_p, &linebuf, 0);
 	}
 
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 /*
@@ -651,9 +651,9 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 	struct membership *mscptr;
 	buf_head_t linebuf;
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 	va_start(args, pattern);
-	linebuf_putmsg(&linebuf, pattern, &args, NULL);
+	ircd_linebuf_putmsg(&linebuf, pattern, &args, NULL);
 	va_end(args);
 
 	++current_serial;
@@ -683,7 +683,7 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 	if(MyConnect(user) && (user->serial != current_serial))
 		send_linebuf(user, &linebuf);
 
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 /* sendto_match_butone()
@@ -701,29 +701,29 @@ sendto_match_butone(struct Client *one, struct Client *source_p,
 	struct Client *target_p;
 	dlink_node *ptr;
 	dlink_node *next_ptr;
-	buf_head_t linebuf_local;
-	buf_head_t linebuf_name;
-	buf_head_t linebuf_id;
+	buf_head_t ircd_linebuf_local;
+	buf_head_t ircd_linebuf_name;
+	buf_head_t ircd_linebuf_id;
 
-	linebuf_newbuf(&linebuf_local);
-	linebuf_newbuf(&linebuf_name);
-	linebuf_newbuf(&linebuf_id);
+	ircd_linebuf_newbuf(&ircd_linebuf_local);
+	ircd_linebuf_newbuf(&ircd_linebuf_name);
+	ircd_linebuf_newbuf(&ircd_linebuf_id);
 
 	va_start(args, pattern);
 	ircvsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
 	if(IsServer(source_p))
-		linebuf_putmsg(&linebuf_local, NULL, NULL,
+		ircd_linebuf_putmsg(&ircd_linebuf_local, NULL, NULL,
 			       ":%s %s", source_p->name, buf);
 	else
-		linebuf_putmsg(&linebuf_local, NULL, NULL,
+		ircd_linebuf_putmsg(&ircd_linebuf_local, NULL, NULL,
 			       ":%s!%s@%s %s",
 			       source_p->name, source_p->username, 
 			       source_p->host, buf);
 
-	linebuf_putmsg(&linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
-	linebuf_putmsg(&linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
+	ircd_linebuf_putmsg(&ircd_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
+	ircd_linebuf_putmsg(&ircd_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
 
 	if(what == MATCH_HOST)
 	{
@@ -732,7 +732,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p,
 			target_p = ptr->data;
 
 			if(match(mask, target_p->host))
-				_send_linebuf(target_p, &linebuf_local, 0);
+				_send_linebuf(target_p, &ircd_linebuf_local, 0);
 		}
 	}
 	/* what = MATCH_SERVER, if it doesnt match us, just send remote */
@@ -741,7 +741,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p,
 		DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 		{
 			target_p = ptr->data;
-			_send_linebuf(target_p, &linebuf_local, 0);
+			_send_linebuf(target_p, &ircd_linebuf_local, 0);
 		}
 	}
 
@@ -753,14 +753,14 @@ sendto_match_butone(struct Client *one, struct Client *source_p,
 			continue;
 
 		if(has_id(target_p))
-			send_linebuf_remote(target_p, source_p, &linebuf_id);
+			send_ircd_linebuf_remote(target_p, source_p, &ircd_linebuf_id);
 		else
-			send_linebuf_remote(target_p, source_p, &linebuf_name);
+			send_ircd_linebuf_remote(target_p, source_p, &ircd_linebuf_name);
 	}
 
-	linebuf_donebuf(&linebuf_local);
-	linebuf_donebuf(&linebuf_id);
-	linebuf_donebuf(&linebuf_name);
+	ircd_linebuf_donebuf(&ircd_linebuf_local);
+	ircd_linebuf_donebuf(&ircd_linebuf_id);
+	ircd_linebuf_donebuf(&ircd_linebuf_name);
 }
 
 /* sendto_match_servs()
@@ -777,22 +777,22 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap,
 	va_list args;
 	dlink_node *ptr;
 	struct Client *target_p;
-	buf_head_t linebuf_id;
-	buf_head_t linebuf_name;
+	buf_head_t ircd_linebuf_id;
+	buf_head_t ircd_linebuf_name;
 
 	if(EmptyString(mask))
 		return;
 
-	linebuf_newbuf(&linebuf_id);
-	linebuf_newbuf(&linebuf_name);
+	ircd_linebuf_newbuf(&ircd_linebuf_id);
+	ircd_linebuf_newbuf(&ircd_linebuf_name);
 
 	va_start(args, pattern);
 	ircvsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
-	linebuf_putmsg(&linebuf_id, NULL, NULL, 
+	ircd_linebuf_putmsg(&ircd_linebuf_id, NULL, NULL, 
 			":%s %s", use_id(source_p), buf);
-	linebuf_putmsg(&linebuf_name, NULL, NULL, 
+	ircd_linebuf_putmsg(&ircd_linebuf_name, NULL, NULL, 
 			":%s %s", source_p->name, buf);
 
 	current_serial++;
@@ -822,14 +822,14 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap,
 				continue;
 
 			if(has_id(target_p->from))
-				_send_linebuf(target_p->from, &linebuf_id, 0);
+				_send_linebuf(target_p->from, &ircd_linebuf_id, 0);
 			else
-				_send_linebuf(target_p->from, &linebuf_name, 0);
+				_send_linebuf(target_p->from, &ircd_linebuf_name, 0);
 		}
 	}
 
-	linebuf_donebuf(&linebuf_id);
-	linebuf_donebuf(&linebuf_name);
+	ircd_linebuf_donebuf(&ircd_linebuf_id);
+	ircd_linebuf_donebuf(&ircd_linebuf_name);
 }
 
 /* sendto_anywhere()
@@ -845,25 +845,25 @@ sendto_anywhere(struct Client *target_p, struct Client *source_p,
 	va_list args;
 	buf_head_t linebuf;
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 
 	va_start(args, pattern);
 
 	if(MyClient(target_p))
 	{
 		if(IsServer(source_p))
-			linebuf_putmsg(&linebuf, pattern, &args, ":%s %s %s ",
+			ircd_linebuf_putmsg(&linebuf, pattern, &args, ":%s %s %s ",
 				       source_p->name, command, 
 				       target_p->name);
 		else
-			linebuf_putmsg(&linebuf, pattern, &args, 
+			ircd_linebuf_putmsg(&linebuf, pattern, &args, 
 				       ":%s!%s@%s %s %s ", 
 				       source_p->name, source_p->username,
 				       source_p->host, command,
 				       target_p->name);
 	}
 	else
-		linebuf_putmsg(&linebuf, pattern, &args, ":%s %s %s ",
+		ircd_linebuf_putmsg(&linebuf, pattern, &args, ":%s %s %s ",
 			       get_id(source_p, target_p), command,
 			       get_id(target_p, target_p));
 	va_end(args);
@@ -871,9 +871,9 @@ sendto_anywhere(struct Client *target_p, struct Client *source_p,
 	if(MyClient(target_p))
 		_send_linebuf(target_p, &linebuf, 0);
 	else
-		send_linebuf_remote(target_p, source_p, &linebuf);
+		send_ircd_linebuf_remote(target_p, source_p, &linebuf);
 
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 /* sendto_realops_flags()
@@ -891,10 +891,10 @@ sendto_realops_flags(int flags, int level, const char *pattern, ...)
 	va_list args;
 	buf_head_t linebuf;
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 
 	va_start(args, pattern);
-	linebuf_putmsg(&linebuf, pattern, &args, 
+	ircd_linebuf_putmsg(&linebuf, pattern, &args, 
 		       ":%s NOTICE * :*** Notice -- ", me.name);
 	va_end(args);
 
@@ -913,7 +913,7 @@ sendto_realops_flags(int flags, int level, const char *pattern, ...)
 			_send_linebuf(client_p, &linebuf, 0);
 	}
 
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 /*
@@ -934,16 +934,16 @@ sendto_wallops_flags(int flags, struct Client *source_p, const char *pattern, ..
 	va_list args;
 	buf_head_t linebuf;
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 
 	va_start(args, pattern);
 
 	if(IsPerson(source_p))
-		linebuf_putmsg(&linebuf, pattern, &args,
+		ircd_linebuf_putmsg(&linebuf, pattern, &args,
 			       ":%s!%s@%s WALLOPS :", source_p->name,
 			       source_p->username, source_p->host);
 	else
-		linebuf_putmsg(&linebuf, pattern, &args, ":%s WALLOPS :", source_p->name);
+		ircd_linebuf_putmsg(&linebuf, pattern, &args, ":%s WALLOPS :", source_p->name);
 
 	va_end(args);
 
@@ -959,7 +959,7 @@ sendto_wallops_flags(int flags, struct Client *source_p, const char *pattern, ..
 			_send_linebuf(client_p, &linebuf, 0);
 	}
 
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 /* kill_client()
@@ -974,15 +974,15 @@ kill_client(struct Client *target_p, struct Client *diedie, const char *pattern,
 	va_list args;
 	buf_head_t linebuf;
 
-	linebuf_newbuf(&linebuf);
+	ircd_linebuf_newbuf(&linebuf);
 
 	va_start(args, pattern);
-	linebuf_putmsg(&linebuf, pattern, &args, ":%s KILL %s :",
+	ircd_linebuf_putmsg(&linebuf, pattern, &args, ":%s KILL %s :",
 		      get_id(&me, target_p), get_id(diedie, target_p));
 	va_end(args);
 
 	send_linebuf(target_p, &linebuf);
-	linebuf_donebuf(&linebuf);
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 
@@ -1005,19 +1005,19 @@ kill_client_serv_butone(struct Client *one, struct Client *target_p, const char 
 	struct Client *client_p;
 	dlink_node *ptr;
 	dlink_node *next_ptr;
-	buf_head_t linebuf_id;
-	buf_head_t linebuf_name;
+	buf_head_t ircd_linebuf_id;
+	buf_head_t ircd_linebuf_name;
 
-	linebuf_newbuf(&linebuf_name);
-	linebuf_newbuf(&linebuf_id);
+	ircd_linebuf_newbuf(&ircd_linebuf_name);
+	ircd_linebuf_newbuf(&ircd_linebuf_id);
 	
 	va_start(args, pattern);
 	ircvsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
-	linebuf_putmsg(&linebuf_name, NULL, NULL, ":%s KILL %s :%s",
+	ircd_linebuf_putmsg(&ircd_linebuf_name, NULL, NULL, ":%s KILL %s :%s",
 		       me.name, target_p->name, buf);
-	linebuf_putmsg(&linebuf_id, NULL, NULL, ":%s KILL %s :%s",
+	ircd_linebuf_putmsg(&ircd_linebuf_id, NULL, NULL, ":%s KILL %s :%s",
 		       use_id(&me), use_id(target_p), buf);
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, serv_list.head)
@@ -1032,11 +1032,11 @@ kill_client_serv_butone(struct Client *one, struct Client *target_p, const char 
 			continue;
 
 		if(has_id(client_p))
-			_send_linebuf(client_p, &linebuf_id, 0);
+			_send_linebuf(client_p, &ircd_linebuf_id, 0);
 		else
-			_send_linebuf(client_p, &linebuf_name, 0);
+			_send_linebuf(client_p, &ircd_linebuf_name, 0);
 	}
 
-	linebuf_donebuf(&linebuf_id);
-	linebuf_donebuf(&linebuf_name);
+	ircd_linebuf_donebuf(&ircd_linebuf_id);
+	ircd_linebuf_donebuf(&ircd_linebuf_name);
 }

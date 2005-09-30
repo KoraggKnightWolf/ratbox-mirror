@@ -1232,7 +1232,7 @@ exit_unknown_client(struct Client *client_p, struct Client *source_p, struct Cli
 		  const char *comment)
 {
 	delete_auth_queries(source_p);
-	linebuf_donebuf(&client_p->localClient->buf_recvq);
+	ircd_linebuf_donebuf(&client_p->localClient->buf_recvq);
 	dlinkDelete(&source_p->localClient->tnode, &unknown_list);
 
 	if(!IsIOError(source_p))
@@ -1401,7 +1401,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	clear_monitor(source_p);
 
 	s_assert(IsPerson(source_p));
-	linebuf_donebuf(&client_p->localClient->buf_recvq);
+	ircd_linebuf_donebuf(&client_p->localClient->buf_recvq);
 	dlinkDelete(&source_p->localClient->tnode, &lclient_list);
 	dlinkDelete(&source_p->lnode, &me.serv->users);
 
@@ -1954,8 +1954,8 @@ close_connection(struct Client *client_p)
 		}
 	}
 
-	linebuf_donebuf(&client_p->localClient->buf_sendq);
-	linebuf_donebuf(&client_p->localClient->buf_recvq);
+	ircd_linebuf_donebuf(&client_p->localClient->buf_sendq);
+	ircd_linebuf_donebuf(&client_p->localClient->buf_recvq);
 	detach_conf(client_p);
 
 	/* XXX shouldnt really be done here. */
