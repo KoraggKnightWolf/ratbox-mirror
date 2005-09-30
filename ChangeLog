@@ -1,3 +1,17 @@
+androsyn    2005/09/30 18:06:19 UTC	(20050930_0-20840)
+  Log:
+  Update some things related to win32 process creation mostly.
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/win32.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2005/09/29 18:24:55 UTC	(20050929_1-20838)
   Log:
   give gcc's branch prediction code some hints in some more heavily used code paths
