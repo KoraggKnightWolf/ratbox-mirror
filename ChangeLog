@@ -1,3 +1,25 @@
+androsyn    2005/09/30 18:47:21 UTC	(20050930_1-20842)
+  Log:
+  More of the libircd namestuff stuff.
+  Change linebuf_ to ircd_linebuf_
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+	ircd-ratbox/trunk/libircd/linebuf.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_list.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2005/09/30 18:06:19 UTC	(20050930_0-20840)
   Log:
   Update some things related to win32 process creation mostly.
