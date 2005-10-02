@@ -1,3 +1,23 @@
+leeh        2005/10/02 15:05:07 UTC	(20051002_2-20848)
+  Log:
+  - start work on the transaction log, make all ban additions get written to
+    the transaction log
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/include/banconf.h (File Added) 
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+	ircd-ratbox/trunk/include/config.h.dist (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/banconf.c (File Added) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2005/10/02 02:38:47 UTC	(20051002_1-20846)
   Log:
   more variable cleanups
