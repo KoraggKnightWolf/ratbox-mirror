@@ -38,6 +38,7 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
+#include "banconf.h"
 
 static int mo_dline(struct Client *, struct Client *, int, const char **);
 static int mo_undline(struct Client *, struct Client *, int, const char **);
@@ -234,6 +235,8 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		add_dline(aconf);
 		write_confitem(DLINE_TYPE, source_p, NULL, aconf->host, reason,
 			       oper_reason, current_date, 0);
+		banconf_add_write(TRANS_DLINE, source_p, aconf->host, NULL,
+				reason, oper_reason);
 	}
 
 	check_dlines();

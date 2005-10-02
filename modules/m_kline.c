@@ -38,6 +38,7 @@
 #include "s_serv.h"
 #include "parse.h"
 #include "modules.h"
+#include "banconf.h"
 
 static int mo_kline(struct Client *, struct Client *, int, const char **);
 static int me_kline(struct Client *, struct Client *, int, const char **);
@@ -434,6 +435,8 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
 	write_confitem(KLINE_TYPE, source_p, aconf->user, aconf->host,
 		       reason, oper_reason, current_date, 0);
+	banconf_add_write(TRANS_KLINE, source_p, aconf->user, aconf->host,
+			reason, oper_reason);
 }
 
 /* apply_tkline()

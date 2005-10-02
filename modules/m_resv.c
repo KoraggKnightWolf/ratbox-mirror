@@ -38,6 +38,7 @@
 #include "hash.h"
 #include "s_log.h"
 #include "irc_string.h"
+#include "banconf.h"
 
 static int mo_resv(struct Client *, struct Client *, int, const char **);
 static int me_resv(struct Client *, struct Client *, int, const char **);
@@ -210,8 +211,12 @@ parse_resv(struct Client *source_p, const char *name,
 					temp_time / 60, name);
 		}
 		else
+		{
 			write_confitem(RESV_TYPE, source_p, NULL, aconf->name, 
 					aconf->passwd, NULL, NULL, 0);
+			banconf_add_write(TRANS_RESV, source_p, aconf->name, NULL,
+					aconf->passwd, NULL);
+		}
 	}
 	else if(clean_resv_nick(name))
 	{

@@ -1275,49 +1275,8 @@ write_confitem(KlineType type, struct Client *source_p, char *user,
 	       char *host, const char *reason, const char *oper_reason,
 	       const char *current_date, int xtype)
 {
-	char buffer[1024];
-	FILE *out;
-	const char *filename;	/* filename to use for kline */
-
-	filename = get_conf_name(type);
-
-
-	if((out = fopen(filename, "a")) == NULL)
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "*** Problem opening %s ", filename);
-		return;
-	}
-
 	if(oper_reason == NULL)
 		oper_reason = "";
-
-	if(type == KLINE_TYPE)
-	{
-		ircd_snprintf(buffer, sizeof(buffer),
-			   "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld\n",
-			   user, host, reason, oper_reason, current_date,
-			   get_oper_name(source_p), ircd_currenttime);
-	}
-	else if(type == DLINE_TYPE)
-	{
-		ircd_snprintf(buffer, sizeof(buffer),
-			   "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld\n", host,
-			   reason, oper_reason, current_date, get_oper_name(source_p), ircd_currenttime);
-	}
-	else if(type == RESV_TYPE)
-	{
-		ircd_snprintf(buffer, sizeof(buffer), "\"%s\",\"%s\",\"%s\",%ld\n",
-			   host, reason, get_oper_name(source_p), ircd_currenttime);
-	}
-
-	if(fputs(buffer, out) == -1)
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "*** Problem writing to %s", filename);
-		fclose(out);
-		return;
-	}
-
-	fclose(out);
 
 	if(type == KLINE_TYPE)
 	{
@@ -1367,7 +1326,7 @@ write_confitem(KlineType type, struct Client *source_p, char *user,
 
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Added D-Line [%s] to %s", me.name,
-			   source_p->name, host, filename);
+			   source_p->name, host, ConfigFileEntry.dlinefile);
 
 	}
 	else if(type == RESV_TYPE)

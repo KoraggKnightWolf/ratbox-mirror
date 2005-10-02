@@ -46,6 +46,7 @@ src_ident_SOURCES = src/ident.c
 
 src_libratbox_la_SOURCES =                     \
   src/dns.c                        \
+  src/banconf.c			\
   src/cache.c                       \
   src/channel.c                     \
   src/class.c                       \

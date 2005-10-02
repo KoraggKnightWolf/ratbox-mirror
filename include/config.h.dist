@@ -70,6 +70,7 @@
 #define LPATH    LOGPATH "/ircd.log"	/* ircd logfile */
 #define PPATH    ETCPATH "/ircd.pid"	/* pid file */
 #define OPATH    ETCPATH "/opers.motd"	/* oper MOTD file */
+#define TRANSPATH ETCPATH "/transaction.log" /* transaction log */
 
 /* IGNORE_BOGUS_TS
  * Ignore bogus timestamps from other servers. Yes this will desync

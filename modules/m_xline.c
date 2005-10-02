@@ -45,6 +45,7 @@
 #include "modules.h"
 #include "s_conf.h"
 #include "s_newconf.h"
+#include "banconf.h"
 
 static int mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
@@ -66,7 +67,6 @@ DECLARE_MODULE_AV1(xline, NULL, NULL, xline_clist, NULL, NULL, "$Revision: 19295
 static int valid_xline(struct Client *, const char *, const char *);
 static void apply_xline(struct Client *client_p, const char *name, 
 			const char *reason, int temp_time);
-static void write_xline(struct Client *source_p, struct ConfItem *aconf);
 
 static int remove_temp_xline(struct Client *source_p, const char *name);
 static void remove_xline(struct Client *source_p, const char *gecos);
@@ -340,7 +340,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	}
 	else
 	{
-		write_xline(source_p, aconf);
+		banconf_add_write(TRANS_XLINE, source_p, aconf->name, "0", reason, NULL);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
 				get_oper_name(source_p), 
@@ -353,43 +353,6 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 
 	dlinkAddAlloc(aconf, &xline_conf_list);
 	check_xlines();
-}
-
-/* write_xline()
- *
- * inputs	- gecos, reason, xline type
- * outputs	- writes an xline to the config
- * side effects - 
- */
-static void
-write_xline(struct Client *source_p, struct ConfItem *aconf)
-{
-	char buffer[BUFSIZE * 2];
-	FILE *out;
-	const char *filename;
-
-	filename = ConfigFileEntry.xlinefile;
-
-	if((out = fopen(filename, "a")) == NULL)
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "*** Problem opening %s ", filename);
-		free_conf(aconf);
-		return;
-	}
-
-	ircd_sprintf(buffer, "\"%s\",\"0\",\"%s\",\"%s\",%ld\n",
-		   aconf->name, aconf->passwd,
-		   get_oper_name(source_p), ircd_currenttime);
-
-	if(fputs(buffer, out) == -1)
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "*** Problem writing to %s", filename);
-		free_conf(aconf);
-		fclose(out);
-		return;
-	}
-
-	fclose(out);
 }
 
 /* mo_unxline()
