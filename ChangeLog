@@ -1,3 +1,14 @@
+androsyn    2005/10/02 02:38:47 UTC	(20051002_1-20846)
+  Log:
+  more variable cleanups
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2005/10/02 02:35:31 UTC	(20051002_0-20844)
   Log:
   Change ircsprintf and the like to ircd_sprintf
