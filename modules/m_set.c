@@ -255,7 +255,7 @@ quote_max(struct Client *source_p, int newval)
 			sendto_one(source_p, POP_QUEUE,
 				   ":%s NOTICE %s :You cannot set MAXCLIENTS to < 32 (%d:%d)",
 				   me.name, source_p->name, GlobalSetOptions.maxclients,
-				   highest_fd);
+				   ircd_highest_fd);
 			return;
 		}
 
