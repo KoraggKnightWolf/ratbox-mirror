@@ -1511,7 +1511,7 @@ conf_report_error(const char *fmt, ...)
 	char msg[IRCD_BUFSIZE + 1] = { 0 };
 
 	va_start(ap, fmt);
-	ircvsnprintf(msg, IRCD_BUFSIZE, fmt, ap);
+	ircd_vsnprintf(msg, IRCD_BUFSIZE, fmt, ap);
 	va_end(ap);
 
 	if (testing_conf)

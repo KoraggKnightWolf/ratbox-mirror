@@ -213,12 +213,12 @@ fork_resolver(void)
 		return;
 	}
 #endif
-	ircsnprintf(fullpath, sizeof(fullpath), "%s/resolver%s", BINPATH, suffix);
+	ircd_snprintf(fullpath, sizeof(fullpath), "%s/resolver%s", BINPATH, suffix);
 	
 	if(access(fullpath, X_OK) == -1)
 	{
 		ilog(L_MAIN, "Unable to execute resolver at %s \"%s\", trying alternate path", fullpath, strerror(errno));
-		ircsnprintf(fullpath, sizeof(fullpath), "%s/bin/resolver%s", ConfigFileEntry.dpath, suffix);
+		ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/resolver%s", ConfigFileEntry.dpath, suffix);
 		if(access(fullpath, X_OK) == -1)
 		{
 			ilog(L_MAIN, "Unable to execute resolver at %s \"%s\", I give up", fullpath, strerror(errno));
@@ -239,9 +239,9 @@ fork_resolver(void)
 	ircd_pipe(ifd, "resolver daemon - read");
 	ircd_pipe(ofd, "resolver daemon - write");
 
-	ircsnprintf(fx, sizeof(fx), "%d", ifd[1]); /*dns write*/
-	ircsnprintf(fy, sizeof(fy), "%d", ofd[0]); /*dns read*/ 
-	ircsnprintf(maxfd, sizeof(maxfd), "%d", HARD_FDLIMIT);
+	ircd_snprintf(fx, sizeof(fx), "%d", ifd[1]); /*dns write*/
+	ircd_snprintf(fy, sizeof(fy), "%d", ofd[0]); /*dns read*/ 
+	ircd_snprintf(maxfd, sizeof(maxfd), "%d", HARD_FDLIMIT);
 	ircd_set_nb(ifd[0]);
 	ircd_set_nb(ifd[1]);
 	ircd_set_nb(ifd[0]);

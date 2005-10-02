@@ -61,7 +61,7 @@ m_userhost(struct Client *client_p, struct Client *source_p, int parc, const cha
 	int cur_len;
 	int rl;
 
-	cur_len = ircsprintf(buf, form_str(RPL_USERHOST), me.name, parv[0], "");
+	cur_len = ircd_sprintf(buf, form_str(RPL_USERHOST), me.name, parv[0], "");
 	t = buf + cur_len;
 
 	for (i = 1; i <= 5; i++)
@@ -79,7 +79,7 @@ m_userhost(struct Client *client_p, struct Client *source_p, int parc, const cha
 			 */
 			if(MyClient(target_p) && (target_p == source_p))
 			{
-				rl = ircsprintf(response, "%s%s=%c%s@%s ",
+				rl = ircd_sprintf(response, "%s%s=%c%s@%s ",
 						target_p->name,
 						IsOper(target_p) ? "*" : "",
 						(target_p->user->away) ? '-' : '+',
@@ -88,7 +88,7 @@ m_userhost(struct Client *client_p, struct Client *source_p, int parc, const cha
 			}
 			else
 			{
-				rl = ircsprintf(response, "%s%s=%c%s@%s ",
+				rl = ircd_sprintf(response, "%s%s=%c%s@%s ",
 						target_p->name,
 						IsOper(target_p) ? "*" : "",
 						(target_p->user->away) ? '-' : '+',
@@ -97,7 +97,7 @@ m_userhost(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 			if((rl + cur_len) < (BUFSIZE - 10))
 			{
-				ircsprintf(t, "%s", response);
+				ircd_sprintf(t, "%s", response);
 				t += rl;
 				cur_len += rl;
 			}

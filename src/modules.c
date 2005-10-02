@@ -334,7 +334,7 @@ load_all_modules(int warn)
 
 		if((len > suffix_len) && !strcmp(ldirent->d_name+len-suffix_len, found_suffix))
 		{
-			(void) ircsnprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", module_dir_name, ldirent->d_name);
+			(void) ircd_snprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", module_dir_name, ldirent->d_name);
 			(void) load_a_module(module_fq_name, warn, 0);
 		} 
 	}
@@ -356,13 +356,13 @@ load_core_modules(int warn)
 	for (i = 0; core_module_table[i]; i++)
 	{
 
-		ircsnprintf(module_name, sizeof(module_name), "%s/%s%s", MODPATH,
+		ircd_snprintf(module_name, sizeof(module_name), "%s/%s%s", MODPATH,
 			    core_module_table[i], found_suffix);
 
 		
 		if(load_a_module(module_name, warn, 1) == -1)
 		{
-			ircsnprintf(module_name, sizeof(module_name), "%s/modules/%s%s", ConfigFileEntry.dpath, 
+			ircd_snprintf(module_name, sizeof(module_name), "%s/modules/%s%s", ConfigFileEntry.dpath, 
 				    core_module_table[i], found_suffix);
 
 			if(load_a_module(module_name, warn, 1) == -1)
@@ -395,7 +395,7 @@ load_one_module(const char *path, int coremodule)
 	{
 		mpath = pathst->data;
 
-		ircsnprintf(modpath, sizeof(modpath), "%s/%s", mpath->path, path);
+		ircd_snprintf(modpath, sizeof(modpath), "%s/%s", mpath->path, path);
 		if((strstr(modpath, "../") == NULL) && (strstr(modpath, "/..") == NULL))
 		{
 			if(stat(modpath, &statbuf) == 0)

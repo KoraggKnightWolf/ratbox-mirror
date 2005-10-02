@@ -316,7 +316,7 @@ check_pings_list(dlink_list * list)
 					     "No response from %s, closing link",
 					     log_client_name(client_p, HIDE_IP));
 				}
-				(void) ircsnprintf(scratch, sizeof(scratch),
+				(void) ircd_snprintf(scratch, sizeof(scratch),
 						  "Ping timeout: %d seconds",
 						  (int) (ircd_currenttime - client_p->localClient->lasttime));
 
@@ -775,16 +775,16 @@ get_client_name(struct Client *client, int showip)
 		switch (showip)
 		{
 		case SHOW_IP:
-			ircsnprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", 
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", 
 				   client->name, client->username, 
 				   client->sockhost);
 			break;
 		case MASK_IP:
-			ircsnprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
 				   client->name, client->username);
 			break;
 		default:
-			ircsnprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
 				   client->name, client->username, client->host);
 		}
 		return nbuf;
@@ -810,7 +810,7 @@ get_server_name(struct Client *target_p, int showip)
 #ifdef HIDE_SERVERS_IPS
 	if(EmptyString(target_p->name))
 	{
-		ircsnprintf(nbuf, sizeof(nbuf), "[%s@255.255.255.255]",
+		ircd_snprintf(nbuf, sizeof(nbuf), "[%s@255.255.255.255]",
 				target_p->username);
 		return nbuf;
 	}
@@ -821,17 +821,17 @@ get_server_name(struct Client *target_p, int showip)
 	switch (showip)
 	{
 		case SHOW_IP:
-			ircsnprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
 				target_p->name, target_p->username, 
 				target_p->sockhost);
 			break;
 
 		case MASK_IP:
-			ircsnprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
 				target_p->name, target_p->username);
 
 		default:
-			ircsnprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
 				target_p->name, target_p->username,
 				target_p->host);
 	}
@@ -860,16 +860,16 @@ log_client_name(struct Client *target_p, int showip)
 		switch (showip)
 		{
 		case SHOW_IP:
-			ircsnprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", target_p->name,
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", target_p->name,
 				   target_p->username, target_p->sockhost);
 			break;
 
 		case MASK_IP:
-			ircsnprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
 				   target_p->name, target_p->username);
 
 		default:
-			ircsnprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", target_p->name,
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", target_p->name,
 				   target_p->username, target_p->host);
 		}
 
@@ -1143,7 +1143,7 @@ dead_link(struct Client *client_p)
 	if(client_p->flags & FLAGS_SENDQEX)
 		strlcpy(abt->notice, "Max SendQ exceeded", sizeof(abt->notice));
 	else
-		ircsnprintf(abt->notice, sizeof(abt->notice), "Write error: %s", strerror(errno));
+		ircd_snprintf(abt->notice, sizeof(abt->notice), "Write error: %s", strerror(errno));
 
 	abt->client = client_p;
 	SetIOError(client_p);
@@ -2017,7 +2017,7 @@ error_exit_client(struct Client *client_p, int error)
 	if(error == 0)
 		strlcpy(errmsg, "Remote host closed the connection", sizeof(errmsg));
 	else
-		ircsnprintf(errmsg, sizeof(errmsg), "Read error: %s", strerror(current_error));
+		ircd_snprintf(errmsg, sizeof(errmsg), "Read error: %s", strerror(current_error));
 
 	exit_client(client_p, client_p, &me, errmsg);
 }

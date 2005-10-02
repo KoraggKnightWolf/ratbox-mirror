@@ -552,13 +552,13 @@ ircd_linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list * va_args,
 	if(prefixfmt != NULL)
 	{
 		va_start(prefix_args, prefixfmt);
-		len = ircvsnprintf(bufline->buf, BUF_DATA_SIZE, prefixfmt, prefix_args);
+		len = ircd_vsnprintf(bufline->buf, BUF_DATA_SIZE, prefixfmt, prefix_args);
 		va_end(prefix_args);
 	}
 
 	if(va_args != NULL)
 	{
-		len += ircvsnprintf((bufline->buf + len), (BUF_DATA_SIZE - len), format, *va_args);
+		len += ircd_vsnprintf((bufline->buf + len), (BUF_DATA_SIZE - len), format, *va_args);
 	}
 
 	bufline->terminated = 1;
@@ -614,7 +614,7 @@ ircd_linebuf_put(buf_head_t * bufhead, const char *format, ...)
 	if(format != NULL)
 	{
 		va_start(args, format);
-		len = ircvsnprintf(bufline->buf, BUF_DATA_SIZE, format, args);
+		len = ircd_vsnprintf(bufline->buf, BUF_DATA_SIZE, format, args);
 		va_end(args);
 	}
 

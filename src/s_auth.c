@@ -128,12 +128,12 @@ fork_ident(void)
 
 	}
 #endif
-        ircsnprintf(fullpath, sizeof(fullpath), "%s/ident%s", BINPATH, suffix);
+        ircd_snprintf(fullpath, sizeof(fullpath), "%s/ident%s", BINPATH, suffix);
 
         if(access(fullpath, X_OK) == -1)
         {
                 ilog(L_MAIN, "Unable to execute ident at %s \"%s\", trying alternate path", fullpath, strerror(errno));
-                ircsnprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
+                ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
                 if(access(fullpath, X_OK) == -1)
                 {
                         ilog(L_MAIN, "Unable to execute ident at %s \"%s\", I give up", fullpath, strerror(errno));
@@ -156,8 +156,8 @@ fork_ident(void)
 	ircd_pipe(ifd, "ident daemon - read");
 	ircd_pipe(ofd, "ident daemon - write");
 
-	ircsnprintf(fx, sizeof(fx), "%d", ifd[1]); /*ident write*/
-	ircsnprintf(fy, sizeof(fy), "%d", ofd[0]); /*ident read*/
+	ircd_snprintf(fx, sizeof(fx), "%d", ifd[1]); /*ident write*/
+	ircd_snprintf(fy, sizeof(fy), "%d", ofd[0]); /*ident read*/
 
 	ircd_set_nb(ifd[0]);
 	ircd_set_nb(ifd[1]);

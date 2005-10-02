@@ -329,7 +329,7 @@ mo_rehash(struct Client *client_p, struct Client *source_p, int parc, const char
 		for (x = 0; rehash_commands[x].cmd != NULL && rehash_commands[x].handler != NULL;
 		     x++)
 		{
-			ircsnprintf_append(cmdbuf, sizeof(cmdbuf), " %s", rehash_commands[x].cmd);
+			ircd_snprintf_append(cmdbuf, sizeof(cmdbuf), " %s", rehash_commands[x].cmd);
 		}
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :rehash one of:%s", me.name, source_p->name,
 			   cmdbuf);

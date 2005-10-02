@@ -136,7 +136,7 @@ names_global(struct Client *source_p)
 		chptr = ptr->data;
 		channel_member_names(chptr, source_p, 0);
 	}
-	cur_len = mlen = ircsprintf(buf, form_str(RPL_NAMREPLY), 
+	cur_len = mlen = ircd_sprintf(buf, form_str(RPL_NAMREPLY), 
 				    me.name, source_p->name, "*", "*");
 	t = buf + mlen;
 
@@ -179,7 +179,7 @@ names_global(struct Client *source_p)
 			t = buf + mlen;
 		}
 
-		tlen = ircsprintf(t, "%s ", target_p->name);
+		tlen = ircd_sprintf(t, "%s ", target_p->name);
 		cur_len += tlen;
 		t += tlen;
 	}

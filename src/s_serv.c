@@ -443,7 +443,7 @@ send_capabilities(struct Client *client_p, int cap_can_send)
 	{
 		if(cap->cap & cap_can_send)
 		{
-			tl = ircsprintf(t, "%s ", cap->name);
+			tl = ircd_sprintf(t, "%s ", cap->name);
 			t += tl;
 		}
 	}
@@ -470,7 +470,7 @@ show_capabilities(struct Client *target_p)
 	int tl;
 
 	t = msgbuf;
-	tl = ircsprintf(msgbuf, "TS ");
+	tl = ircd_sprintf(msgbuf, "TS ");
 	t += tl;
 
 	if(!IsServer(target_p) || !target_p->serv->caps)	/* short circuit if no caps */
@@ -483,7 +483,7 @@ show_capabilities(struct Client *target_p)
 	{
 		if(cap->cap & target_p->serv->caps)
 		{
-			tl = ircsprintf(t, "%s ", cap->name);
+			tl = ircd_sprintf(t, "%s ", cap->name);
 			t += tl;
 		}
 	}

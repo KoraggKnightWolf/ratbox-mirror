@@ -807,9 +807,9 @@ fork_server(struct Client *server)
 	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, data_fds, "slink data fds") < 0)
 		goto fork_error;
 
-	ircsnprintf(fd_str[0], sizeof(fd_str[0]), "%d", ctrl_fds[1]);
-	ircsnprintf(fd_str[1], sizeof(fd_str[1]), "%d", data_fds[1]);
-	ircsnprintf(fd_str[2], sizeof(fd_str[2]), "%d", server->localClient->fd);
+	ircd_snprintf(fd_str[0], sizeof(fd_str[0]), "%d", ctrl_fds[1]);
+	ircd_snprintf(fd_str[1], sizeof(fd_str[1]), "%d", data_fds[1]);
+	ircd_snprintf(fd_str[2], sizeof(fd_str[2]), "%d", server->localClient->fd);
 
         kid_argv[0] = slink;
         kid_argv[1] = fd_str[0];
@@ -941,7 +941,7 @@ burst_modes_TS5(struct Client *client_p, char *chname, dlink_list *list, char fl
 	char *pp;
 	int count = 0;
 
-	mlen = ircsprintf(buf, ":%s MODE %s +", me.name, chname);
+	mlen = ircd_sprintf(buf, ":%s MODE %s +", me.name, chname);
 	cur_len = mlen;
 
 	mp = mbuf;
@@ -968,7 +968,7 @@ burst_modes_TS5(struct Client *client_p, char *chname, dlink_list *list, char fl
 
 		*mp++ = flag;
 		*mp = '\0';
-		pp += ircsprintf(pp, "%s ", banptr->banstr);
+		pp += ircd_sprintf(pp, "%s ", banptr->banstr);
 		cur_len += tlen;
 		count++;
 	}
@@ -995,7 +995,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr,
 	int mlen;
 	int cur_len;
 
-	cur_len = mlen = ircsprintf(buf, ":%s BMASK %ld %s %c :",
+	cur_len = mlen = ircd_sprintf(buf, ":%s BMASK %ld %s %c :",
 				    me.id, (long) chptr->channelts, chptr->chname, flag);
 	t = buf + mlen;
 
@@ -1022,7 +1022,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr,
 			t = buf + mlen;
 		}
 
-		ircsprintf(t, "%s ", banptr->banstr);
+		ircd_sprintf(t, "%s ", banptr->banstr);
 		t += tlen;
 		cur_len += tlen;
 	}
@@ -1099,7 +1099,7 @@ burst_TS5(struct Client *client_p)
 		if(*chptr->chname != '#')
 			continue;
 
-		cur_len = mlen = ircsprintf(buf, ":%s SJOIN %ld %s %s :", me.name,
+		cur_len = mlen = ircd_sprintf(buf, ":%s SJOIN %ld %s %s :", me.name,
 				(long) chptr->channelts, chptr->chname, 
 				channel_modes(chptr, client_p));
 
@@ -1124,7 +1124,7 @@ burst_TS5(struct Client *client_p)
 				t = buf + mlen;
 			}
 
-			ircsprintf(t, "%s%s ", find_channel_status(msptr, 1), 
+			ircd_sprintf(t, "%s%s ", find_channel_status(msptr, 1), 
 				   msptr->client_p->name);
 
 			cur_len += tlen;
@@ -1236,7 +1236,7 @@ burst_TS6(struct Client *client_p)
 		if(*chptr->chname != '#')
 			continue;
 
-		cur_len = mlen = ircsprintf(buf, ":%s SJOIN %ld %s %s :", me.id,
+		cur_len = mlen = ircd_sprintf(buf, ":%s SJOIN %ld %s %s :", me.id,
 				(long) chptr->channelts, chptr->chname,
 				channel_modes(chptr, client_p));
 
@@ -1260,7 +1260,7 @@ burst_TS6(struct Client *client_p)
 				t = buf + mlen;
 			}
 
-			ircsprintf(t, "%s%s ", find_channel_status(msptr, 1), 
+			ircd_sprintf(t, "%s%s ", find_channel_status(msptr, 1), 
 				   use_id(msptr->client_p));
 
 			cur_len += tlen;

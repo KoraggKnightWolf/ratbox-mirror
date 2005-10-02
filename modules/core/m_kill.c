@@ -150,7 +150,7 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 		target_p->flags |= FLAGS_KILLED;
 	}
 
-	ircsprintf(buf, "Killed (%s (%s))", source_p->name, reason);
+	ircd_sprintf(buf, "Killed (%s (%s))", source_p->name, reason);
 
 	exit_client(client_p, target_p, source_p, buf);
 
@@ -272,7 +272,7 @@ ms_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* FLAGS_KILLED prevents a quit being sent out */
 	target_p->flags |= FLAGS_KILLED;
 
-	ircsprintf(buf, "Killed (%s %s)", source_p->name, reason);
+	ircd_sprintf(buf, "Killed (%s %s)", source_p->name, reason);
 
 	exit_client(client_p, target_p, source_p, buf);
 
@@ -288,12 +288,12 @@ relay_kill(struct Client *one, struct Client *source_p,
 	char buffer[BUFSIZE];
 
 	if(MyClient(source_p))
-		ircsnprintf(buffer, sizeof(buffer),
+		ircd_snprintf(buffer, sizeof(buffer),
 			    "%s!%s!%s!%s (%s)",
 			    me.name, source_p->host, source_p->username,
 			    source_p->name, reason);
 	else
-		ircsnprintf(buffer, sizeof(buffer),
+		ircd_snprintf(buffer, sizeof(buffer),
 			    "%s %s", inpath, reason);
 
 	DLINK_FOREACH(ptr, serv_list.head)

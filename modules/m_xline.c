@@ -377,7 +377,7 @@ write_xline(struct Client *source_p, struct ConfItem *aconf)
 		return;
 	}
 
-	ircsprintf(buffer, "\"%s\",\"0\",\"%s\",\"%s\",%ld\n",
+	ircd_sprintf(buffer, "\"%s\",\"0\",\"%s\",\"%s\",%ld\n",
 		   aconf->name, aconf->passwd,
 		   get_oper_name(source_p), ircd_currenttime);
 
@@ -511,7 +511,7 @@ remove_xline(struct Client *source_p, const char *huntgecos)
 	int found_xline = 0;
 
 	filename = ConfigFileEntry.xlinefile;
-	ircsnprintf(temppath, sizeof(temppath),
+	ircd_snprintf(temppath, sizeof(temppath),
 		 "%s.tmp", ConfigFileEntry.xlinefile);
 
 	if((in = fopen(filename, "r")) == NULL)

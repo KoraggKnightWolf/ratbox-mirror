@@ -212,7 +212,7 @@ cluster_generic(struct Client *source_p, const char *command,
 	dlink_node *ptr;
 
 	va_start(args, format);
-	ircvsnprintf(buffer, sizeof(buffer), format, args);
+	ircd_vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
 	DLINK_FOREACH(ptr, cluster_conf_list.head)

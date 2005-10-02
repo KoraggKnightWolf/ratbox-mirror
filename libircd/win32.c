@@ -134,7 +134,7 @@ setenv(const char *name, const char *value, int overwrite)
 		return -1;
 	len = strlen(name) + strlen(value) + 5;
 	buf = ircd_malloc(len);
-	ircsnprintf(buf, len, "%s=%s", name, value);
+	ircd_snprintf(buf, len, "%s=%s", name, value);
 	len = putenv(buf);
 	ircd_free(buf);
 	return(len);

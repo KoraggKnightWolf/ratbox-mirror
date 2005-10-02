@@ -57,7 +57,7 @@ ircd_lib_log(const char *format, ...)
 	if(ircd_log == NULL)
 		return;
 	va_start(args, format);
-	ircvsnprintf(errbuf, sizeof(errbuf), format,  args);
+	ircd_vsnprintf(errbuf, sizeof(errbuf), format,  args);
 	va_end(args);
 	ircd_log(errbuf);
 }
@@ -69,7 +69,7 @@ ircd_lib_die(const char *format, ...)
 	if(ircd_die == NULL)
 		return;
 	va_start(args, format);
-	ircvsnprintf(errbuf, sizeof(errbuf), format,  args);
+	ircd_vsnprintf(errbuf, sizeof(errbuf), format,  args);
 	va_end(args);
 	ircd_die(errbuf);
 }
@@ -81,7 +81,7 @@ ircd_lib_restart(const char *format, ...)
 	if(ircd_restart == NULL)
 		return;
 	va_start(args, format);
-	ircvsnprintf(errbuf, sizeof(errbuf), format,  args);
+	ircd_vsnprintf(errbuf, sizeof(errbuf), format,  args);
 	va_end(args);
 	ircd_restart(errbuf);
 }
@@ -104,7 +104,7 @@ ircd_set_time(void)
 	}
 
 	if(newtime.tv_sec < ircd_time->tv_sec)
-		set_back_events(ircd_time->tv_sec - newtime.tv_sec);
+		ircd_set_back_events(ircd_time->tv_sec - newtime.tv_sec);
 
 	memcpy(ircd_time, &newtime, sizeof(struct timeval));
 }
@@ -116,7 +116,7 @@ ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int max
 	ircd_log = ilog;
 	ircd_restart = irestart;
 	ircd_die = idie;
-	fdlist_init(closeall, maxcon);
+	ircd_fdlist_init(closeall, maxcon);
 	init_netio();
 	ircd_event_init();
 	initBlockHeap();

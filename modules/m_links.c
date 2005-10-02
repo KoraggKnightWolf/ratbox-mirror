@@ -206,7 +206,7 @@ cache_links(void *unused)
 
 		/* if the below is ever modified, change LINKSLINELEN */
 		links_line = ircd_malloc(LINKSLINELEN);
-		ircsnprintf(links_line, LINKSLINELEN, "%s %s :1 %s",
+		ircd_snprintf(links_line, LINKSLINELEN, "%s %s :1 %s",
 			   target_p->name, me.name, 
 			   target_p->info[0] ? target_p->info : 
 			    "(Unknown Location)");

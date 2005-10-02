@@ -155,7 +155,7 @@ ircd_select(unsigned long delay)
 	{
 		to.tv_sec = 0;
 		to.tv_usec = delay * 1000;
-		num = select(highest_fd + 1, &tmpreadfds, &tmpwritefds, NULL, &to);
+		num = select(ircd_highest_fd + 1, &tmpreadfds, &tmpwritefds, NULL, &to);
 		if(num >= 0)
 			break;
 		if(ignoreErrno(errno))
@@ -171,7 +171,7 @@ ircd_select(unsigned long delay)
 		return 0;
 
 	/* XXX we *could* optimise by falling out after doing num fds ... */
-	for (fd = 0; fd < highest_fd + 1; fd++)
+	for (fd = 0; fd < ircd_highest_fd + 1; fd++)
 	{
 		F = find_fd(fd);
 		if(F == NULL)

@@ -274,13 +274,13 @@ ircd_event_find(EVH * func, void *arg)
 }
 
 int
-dump_events(void (*func)(char *, void *), void *ptr)
+ircd_dump_events(void (*func)(char *, void *), void *ptr)
 {
 	int len, i;
 	char buf[512];
 	len = sizeof(buf);
 	if(last_event_ran) {
-		ircsnprintf(buf, len, "Last event to run: %s", last_event_ran);
+		ircd_snprintf(buf, len, "Last event to run: %s", last_event_ran);
 		func(buf, ptr);
 	}
 	strlcpy(buf, "Operation                    Next Execution", len);
@@ -289,7 +289,7 @@ dump_events(void (*func)(char *, void *), void *ptr)
 	for(i = 0; i < MAX_EVENTS;i++)
 	{
 		if(event_table[i].active) {
-			ircsnprintf(buf, len, "%-28s %-4d seconds", event_table[i].name,
+			ircd_snprintf(buf, len, "%-28s %-4d seconds", event_table[i].name,
 				    (int)(event_table[i].when - ircd_currenttime));
 			func(buf, ptr);
 		}
@@ -298,13 +298,13 @@ dump_events(void (*func)(char *, void *), void *ptr)
 }
 
 /* 
- * void set_back_events(time_t by)
+ * void ircd_set_back_events(time_t by)
  * Input: Time to set back events by.
  * Output: None.
  * Side-effects: Sets back all events by "by" seconds.
  */
 void
-set_back_events(time_t by)
+ircd_set_back_events(time_t by)
 {
 	int i;
 

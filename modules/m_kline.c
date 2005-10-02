@@ -185,7 +185,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 
 	if(tkline_time > 0)
 	{
-		ircsnprintf(buffer, sizeof(buffer),
+		ircd_snprintf(buffer, sizeof(buffer),
 			   "Temporary K-line %d min. - %s (%s)",
 			   (int) (tkline_time / 60), reason, current_date);
 		DupString(aconf->passwd, buffer);
@@ -193,7 +193,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 	}
 	else
 	{
-		ircsnprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
+		ircd_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
 		DupString(aconf->passwd, buffer);
 		apply_kline(source_p, aconf, reason, oper_reason, current_date);
 	}
@@ -266,7 +266,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(tkline_time > 0)
 	{
-		ircsnprintf(buffer, sizeof(buffer),
+		ircd_snprintf(buffer, sizeof(buffer),
 				"Temporary K-line %d min. - %s (%s)",
 				(int) (tkline_time / 60), reason, current_date);
 		DupString(aconf->passwd, buffer);
@@ -275,7 +275,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 	else
 	{
-		ircsnprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
+		ircd_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
 		DupString(aconf->passwd, buffer);
 		apply_kline(source_p, aconf, reason, oper_reason, current_date);
 	}
@@ -668,7 +668,7 @@ remove_permkline_match(struct Client *source_p, const char *host, const char *us
 	mode_t oldumask;
 	int matchlen;
 
-	ircsnprintf(temppath, sizeof(temppath),
+	ircd_snprintf(temppath, sizeof(temppath),
 		 "%s.tmp", ConfigFileEntry.klinefile);
 
 	filename = get_conf_name(KLINE_TYPE);

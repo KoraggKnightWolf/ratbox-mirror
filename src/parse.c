@@ -665,10 +665,10 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 		int tl;		/* current length of presently being built string in t */
 		for (i = 2; i < (parc - 1); i++)
 		{
-			tl = ircsprintf(t, " %s", parv[i]);
+			tl = ircd_sprintf(t, " %s", parv[i]);
 			t += tl;
 		}
-		ircsprintf(t, " :%s", parv[parc - 1]);
+		ircd_sprintf(t, " :%s", parv[parc - 1]);
 	}
 
 	if((target_p = find_client(parv[1])) != NULL)

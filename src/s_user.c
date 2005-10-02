@@ -241,10 +241,10 @@ show_isupport(struct Client *source_p)
 {
 	char isupportbuffer[512];
 
-	ircsprintf(isupportbuffer, FEATURES, FEATURESVALUES);
+	ircd_sprintf(isupportbuffer, FEATURES, FEATURESVALUES);
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
 
-	ircsprintf(isupportbuffer, FEATURES2, FEATURES2VALUES);
+	ircd_sprintf(isupportbuffer, FEATURES2, FEATURES2VALUES);
 	sendto_one_numeric(source_p, POP_QUEUE,  RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
 
 	return;
@@ -459,7 +459,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 				     "Invalid username: %s (%s@%s)",
 				     source_p->name, source_p->username, source_p->host);
 		ServerStats.is_ref++;
-		ircsprintf(tmpstr2, "Invalid username [%s]", source_p->username);
+		ircd_sprintf(tmpstr2, "Invalid username [%s]", source_p->username);
 		exit_client(client_p, source_p, &me, tmpstr2);
 		return (CLIENT_EXITED);
 	}

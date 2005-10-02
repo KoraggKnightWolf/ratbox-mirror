@@ -67,8 +67,8 @@ extern void ircd_event_init(void);
 extern void ircd_event_delete(EVH * func, void *);
 void ircd_event_update(const char *name, time_t freq);
 extern int ircd_event_find(EVH * func, void *);
-extern void set_back_events(time_t);
-int dump_events(void (*func)(char *, void *), void *ptr);
+extern void ircd_set_back_events(time_t);
+int ircd_dump_events(void (*func)(char *, void *), void *ptr);
 
 
 #endif /* INCLUDED_event_h */

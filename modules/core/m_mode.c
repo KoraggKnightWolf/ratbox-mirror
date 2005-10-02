@@ -301,7 +301,7 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 	parabuf[0] = '\0';
 	s = LOCAL_COPY(parv[4]);
 
-	mlen = ircsprintf(modebuf, ":%s MODE %s +",
+	mlen = ircd_sprintf(modebuf, ":%s MODE %s +",
 			  source_p->name, chptr->chname);
 	mbuf = modebuf + mlen;
 	pbuf = parabuf;
@@ -351,7 +351,7 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 			}
 
 			*mbuf++ = parv[3][0];
-			arglen = ircsprintf(pbuf, "%s ", s);
+			arglen = ircd_sprintf(pbuf, "%s ", s);
 			pbuf += arglen;
 			plen += arglen;
 			modecount++;
@@ -436,7 +436,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 
 
 	if(IsPerson(source_p))
-		ircsprintf(who, "%s!%s@%s",
+		ircd_sprintf(who, "%s!%s@%s",
 			   source_p->name, source_p->username, source_p->host);
 	else
 		strlcpy(who, source_p->name, sizeof(who));
@@ -614,7 +614,7 @@ pretty_mask(const char *idmask)
 		host[HOSTLEN] = '\0';
 	}
 
-	mask_pos += ircsprintf(mask_buf + mask_pos, "%s!%s@%s", nick, user, host) + 1;
+	mask_pos += ircd_sprintf(mask_buf + mask_pos, "%s!%s@%s", nick, user, host) + 1;
 
 	/* restore mask, since we may need to use it again later */
 	if(at)
@@ -1105,7 +1105,7 @@ chm_limit(struct Client *source_p, struct Channel *chptr,
 		if(EmptyString(lstr) || (limit = atoi(lstr)) <= 0)
 			return;
 
-		ircsprintf(limitstr, "%d", limit);
+		ircd_sprintf(limitstr, "%d", limit);
 
 		mode_changes[mode_count].letter = c;
 		mode_changes[mode_count].dir = MODE_ADD;
@@ -1396,10 +1396,10 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 		return;
 
 	if(IsServer(source_p))
-		mlen = ircsprintf(modebuf, ":%s MODE %s ", 
+		mlen = ircd_sprintf(modebuf, ":%s MODE %s ", 
 				  source_p->name, chptr->chname);
 	else
-		mlen = ircsprintf(modebuf, ":%s!%s@%s MODE %s ",
+		mlen = ircd_sprintf(modebuf, ":%s!%s@%s MODE %s ",
 				  source_p->name, source_p->username, 
 				  source_p->host, chptr->chname);
 
@@ -1463,7 +1463,7 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 			if(mode_changes[i].arg != NULL)
 			{
 				paracount++;
-				len = ircsprintf(pbuf, "%s ", mode_changes[i].arg);
+				len = ircd_sprintf(pbuf, "%s ", mode_changes[i].arg);
 				pbuf += len;
 				paralen += len;
 			}

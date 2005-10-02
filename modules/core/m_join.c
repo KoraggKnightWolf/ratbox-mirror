@@ -672,7 +672,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		modes = empty_modes;
 
-	mlen = ircsprintf(buf_nick, ":%s SJOIN %ld %s %s :",
+	mlen = ircd_sprintf(buf_nick, ":%s SJOIN %ld %s %s :",
 			  source_p->name, (long) chptr->channelts,
 			  parv[2], modes);
 	ptr_nick = buf_nick + mlen;
@@ -680,7 +680,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* working on the presumption eventually itll be more efficient to
 	 * build a TS6 buffer without checking its needed..
 	 */
-	mlen = ircsprintf(buf_uid, ":%s SJOIN %ld %s %s :",
+	mlen = ircd_sprintf(buf_uid, ":%s SJOIN %ld %s %s :",
 			  use_id(source_p), (long) chptr->channelts,
 			  parv[2], modes);
 	ptr_uid = buf_uid + mlen;
@@ -764,10 +764,10 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		}
 
 		/* copy the nick to the two buffers */
-		len = ircsprintf(ptr_nick, "%s ", target_p->name);
+		len = ircd_sprintf(ptr_nick, "%s ", target_p->name);
 		ptr_nick += len;
 		len_nick += len;
-		len = ircsprintf(ptr_uid, "%s ", use_id(target_p));
+		len = ircd_sprintf(ptr_uid, "%s ", use_id(target_p));
 		ptr_uid += len;
 		len_uid += len;
 
@@ -990,9 +990,9 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 
 	s_assert(source_p->localClient != NULL);
 
-	ircsprintf(src_host, "%s!%s@%s", 
+	ircd_sprintf(src_host, "%s!%s@%s", 
 		   source_p->name, source_p->username, source_p->host);
-	ircsprintf(src_iphost, "%s!%s@%s",
+	ircd_sprintf(src_iphost, "%s!%s@%s",
 		   source_p->name, source_p->username, source_p->sockhost);
 
 	if((is_banned(chptr, source_p, NULL, src_host, src_iphost)) == CHFL_BAN)
@@ -1112,7 +1112,7 @@ set_final_mode(struct Client *source_p, struct Channel *chptr,
 			dir = MODE_DEL;
 		}
 		*mbuf++ = 'k';
-		pbuf += ircsprintf(pbuf, "%s ", oldmode->key);
+		pbuf += ircd_sprintf(pbuf, "%s ", oldmode->key);
 	}
 	if(mode->limit && oldmode->limit != mode->limit)
 	{
@@ -1122,7 +1122,7 @@ set_final_mode(struct Client *source_p, struct Channel *chptr,
 			dir = MODE_ADD;
 		}
 		*mbuf++ = 'l';
-		pbuf += ircsprintf(pbuf, "%d ", mode->limit);
+		pbuf += ircd_sprintf(pbuf, "%d ", mode->limit);
 	}
 	if(mode->key[0] && strcmp(oldmode->key, mode->key))
 	{
@@ -1132,7 +1132,7 @@ set_final_mode(struct Client *source_p, struct Channel *chptr,
 			dir = MODE_ADD;
 		}
 		*mbuf++ = 'k';
-		pbuf += ircsprintf(pbuf, "%s ", mode->key);
+		pbuf += ircd_sprintf(pbuf, "%s ", mode->key);
 	}
 
 	*mbuf = '\0';
@@ -1274,7 +1274,7 @@ remove_ban_list(struct Channel *chptr, struct Client *source_p,
 
 	pbuf = lparabuf;
 
-	cur_len = mlen = ircsprintf(lmodebuf, ":%s MODE %s -", 
+	cur_len = mlen = ircd_sprintf(lmodebuf, ":%s MODE %s -", 
 				    source_p->name, chptr->chname);
 	mbuf = lmodebuf + mlen;
 
@@ -1302,7 +1302,7 @@ remove_ban_list(struct Channel *chptr, struct Client *source_p,
 
 		*mbuf++ = c;
 		cur_len += plen;
-		pbuf += ircsprintf(pbuf, "%s ", banptr->banstr);
+		pbuf += ircd_sprintf(pbuf, "%s ", banptr->banstr);
 		count++;
 
 		free_ban(banptr);

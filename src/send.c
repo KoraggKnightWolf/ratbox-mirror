@@ -531,7 +531,7 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 	current_serial++;
 
 	va_start(args, pattern);
-	ircvsnprintf(buf, sizeof(buf), pattern, args);
+	ircd_vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
 	if(IsServer(source_p))
@@ -710,7 +710,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p,
 	ircd_linebuf_newbuf(&ircd_linebuf_id);
 
 	va_start(args, pattern);
-	ircvsnprintf(buf, sizeof(buf), pattern, args);
+	ircd_vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
 	if(IsServer(source_p))
@@ -787,7 +787,7 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap,
 	ircd_linebuf_newbuf(&ircd_linebuf_name);
 
 	va_start(args, pattern);
-	ircvsnprintf(buf, sizeof(buf), pattern, args);
+	ircd_vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
 	ircd_linebuf_putmsg(&ircd_linebuf_id, NULL, NULL, 
@@ -1012,7 +1012,7 @@ kill_client_serv_butone(struct Client *one, struct Client *target_p, const char 
 	ircd_linebuf_newbuf(&ircd_linebuf_id);
 	
 	va_start(args, pattern);
-	ircvsnprintf(buf, sizeof(buf), pattern, args);
+	ircd_vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
 	ircd_linebuf_putmsg(&ircd_linebuf_name, NULL, NULL, ":%s KILL %s :%s",

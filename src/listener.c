@@ -117,7 +117,7 @@ get_listener_name(const struct Listener *listener)
 #endif
 		port = ntohs(((const struct sockaddr_in *)&listener->addr)->sin_port);	
 
-	ircsnprintf(buf, sizeof(buf), "%s[%s/%u]", me.name, listener->name, port);
+	ircd_snprintf(buf, sizeof(buf), "%s[%s/%u]", me.name, listener->name, port);
 	return buf;
 }
 
@@ -557,7 +557,7 @@ accept_connection(int pfd, void *data)
 			
 			if(ConfigFileEntry.dline_with_reason)
 			{
-			    if (ircsnprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd) >= (int)(sizeof(buf)-1))
+			    if (ircd_snprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd) >= (int)(sizeof(buf)-1))
 			    {
 				buf[sizeof(buf) - 3] = '\r';
 				buf[sizeof(buf) - 2] = '\n';
@@ -565,7 +565,7 @@ accept_connection(int pfd, void *data)
 			    }
 			}
 			else
-			   ircsprintf(buf, "ERROR :You have been D-lined.\r\n");
+			   ircd_sprintf(buf, "ERROR :You have been D-lined.\r\n");
 	
 			write(fd, buf, strlen(buf));
 			ircd_close(fd);

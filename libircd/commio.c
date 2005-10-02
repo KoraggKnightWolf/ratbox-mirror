@@ -53,10 +53,10 @@ static const char *ircd_err_str[] = { "Comm OK", "Error during bind()",
 
 
 
-static void fdlist_update_biggest(int fd, int opening);
+static void ircd_fdlist_update_biggest(int fd, int opening);
 
 /* Highest FD and number of open FDs .. */
-int highest_fd = -1;		/* Its -1 because we haven't started yet -- adrian */
+int ircd_highest_fd = -1;		/* Its -1 because we haven't started yet -- adrian */
 int number_fd = 0;
 int maxconnections = 0;
 
@@ -255,7 +255,7 @@ ircd_checktimeouts(void *notused)
 	PF *hdl;
 	void *data;
 	fde_t *F;
-	for (fd = 0; fd <= highest_fd; fd++)
+	for (fd = 0; fd <= ircd_highest_fd; fd++)
 	{
 		F = find_fd(fd);
 		if(F == NULL)
@@ -626,14 +626,14 @@ mangle_mapped_sockaddr(struct sockaddr *in)
 
 
 static void
-fdlist_update_biggest(int fd, int opening)
+ircd_fdlist_update_biggest(int fd, int opening)
 {
-	if(fd < highest_fd)
+	if(fd < ircd_highest_fd)
 		return;
 #ifndef __MINGW32__
 	lircd_assert(fd < maxconnections);
 #endif
-	if(unlikely(fd > highest_fd))
+	if(unlikely(fd > ircd_highest_fd))
 	{
 		/*  
 		 * lircd_assert that we are not closing a FD bigger than
@@ -642,7 +642,7 @@ fdlist_update_biggest(int fd, int opening)
 #ifndef __MINGW32__
 		lircd_assert(opening);
 #endif
-		highest_fd = fd;
+		ircd_highest_fd = fd;
 		return;
 	}
 	/* if we are here, then fd == Biggest_FD */
@@ -652,14 +652,14 @@ fdlist_update_biggest(int fd, int opening)
 	 */
 #ifndef __MINGW32__
 	lircd_assert(!opening);
-	while (highest_fd >= 0 && !fd_table[highest_fd].flags.open)
-		highest_fd--;
+	while (ircd_highest_fd >= 0 && !fd_table[ircd_highest_fd].flags.open)
+		ircd_highest_fd--;
 #endif
 }
 
 
 void
-fdlist_init(int closeall, int maxfds)
+ircd_fdlist_init(int closeall, int maxfds)
 {
 	static int initialized = 0;
 #ifdef __MINGW32__
@@ -701,7 +701,7 @@ ircd_open(int fd, unsigned int type, const char *desc)
 	F->type = type;
 	F->flags.open = 1;
 
-	fdlist_update_biggest(fd, 1);
+	ircd_fdlist_update_biggest(fd, 1);
 	F->ircd_index = -1;
 	if(desc)
 		strlcpy(F->desc, desc, sizeof(F->desc));
@@ -727,7 +727,7 @@ ircd_close(int fd)
 	ircd_setflush(F->fd, 0, NULL, NULL);
 
 	F->flags.open = 0;
-	fdlist_update_biggest(fd, 0);
+	ircd_fdlist_update_biggest(fd, 0);
 	number_fd--;
 	type = F->type;
 	remove_fd(fd);
@@ -751,13 +751,13 @@ ircd_dump(DUMPCB * cb, void *data)
 {
 	int i;
 	char buf[128];
-	for (i = 0; i <= highest_fd; i++)
+	for (i = 0; i <= ircd_highest_fd; i++)
 	{
 		fde_t *F = find_fd(i);
 		if(!F->flags.open)
 			continue;
 
-		ircsnprintf(buf, sizeof(buf), "F :fd %-3d desc '%s'", i, F->desc);
+		ircd_snprintf(buf, sizeof(buf), "F :fd %-3d desc '%s'", i, F->desc);
 		cb(buf, data);
 	}
 }
@@ -776,7 +776,7 @@ ircd_note(int fd, const char *format, ...)
 	if(format)
 	{
 		va_start(args, format);
-		ircvsnprintf(F->desc, FD_DESC_SZ, format, args);
+		ircd_vsnprintf(F->desc, FD_DESC_SZ, format, args);
 		va_end(args);
 	}
 	else
@@ -1005,7 +1005,7 @@ inetntoa(const char *in)
  * SOFTWARE.
  */
 
-#define SPRINTF(x) ((size_t)ircsprintf x)
+#define SPRINTF(x) ((size_t)ircd_sprintf x)
 
 /*
  * WARNING: Don't even consider trying to compile this on a system where
@@ -1426,7 +1426,7 @@ inetpton(af, src, dst)
 		if(inet_pton4(src, dst))
 		{
 			char tmp[HOSTIPLEN];
-			ircsprintf(tmp, "::ffff:%s", src);
+			ircd_sprintf(tmp, "::ffff:%s", src);
 			return (inet_pton6(tmp, dst));
 		}
 		else

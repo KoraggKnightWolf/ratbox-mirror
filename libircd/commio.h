@@ -125,7 +125,7 @@ enum
 typedef struct _fde fde_t;
 
 
-extern int highest_fd;
+extern int ircd_highest_fd;
 extern int number_fd;
 
 struct Client;
@@ -190,7 +190,7 @@ dlink_list *fd_table;
 extern fde_t *fd_table;
 #endif
 
-void fdlist_init(int closeall, int maxfds);
+void ircd_fdlist_init(int closeall, int maxfds);
 
 extern void ircd_open(int, unsigned int, const char *);
 extern void ircd_close(int);

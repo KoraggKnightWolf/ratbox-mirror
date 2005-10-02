@@ -273,7 +273,7 @@ NOTE: This function handles the following flags only:
 */
 
 int
-ircvsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
+ircd_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 {
 	char ch;
 	int written = 0;	/* bytes written so far */
@@ -602,7 +602,7 @@ ircvsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 }				/* vSnprintf() */
 
 /*
-ircvsprintf()
+ircd_vsprintf()
  Backend to Sprintf() - performs the construction of 'dest'
 using the string 'format' and the given arguments.
 
@@ -620,7 +620,7 @@ NOTE: This function handles the following flags only:
 */
 
 int
-ircvsprintf(char *dest, const char *format, va_list args)
+ircd_vsprintf(char *dest, const char *format, va_list args)
 {
 	char ch;
 	int written = 0;	/* bytes written so far */
@@ -920,7 +920,7 @@ ircvsprintf(char *dest, const char *format, va_list args)
 }				/* vSprintf() */
 
 /*
-ircsnprintf()
+ircd_snprintf()
  Optimized version of snprintf().
 
 Inputs: dest   - destination string
@@ -933,14 +933,14 @@ Return: number of characters copied, NOT including the terminating
 */
 
 int
-ircsnprintf(char *dest, const size_t bytes, const char *format, ...)
+ircd_snprintf(char *dest, const size_t bytes, const char *format, ...)
 {
 	va_list args;
 	int count;
 
 	va_start(args, format);
 
-	count = ircvsnprintf(dest, bytes, format, args);
+	count = ircd_vsnprintf(dest, bytes, format, args);
 
 	va_end(args);
 
@@ -948,7 +948,7 @@ ircsnprintf(char *dest, const size_t bytes, const char *format, ...)
 }				/* Snprintf() */
 
 /*
-ircsprintf()
+ircd_sprintf()
  Optimized version of sprintf()
 
 Inputs: dest   - destination string
@@ -960,14 +960,14 @@ Return: number of characters copied, NOT including the terminating
 */
 
 int
-ircsprintf(char *dest, const char *format, ...)
+ircd_sprintf(char *dest, const char *format, ...)
 {
 	va_list args;
 	int count;
 
 	va_start(args, format);
 
-	count = ircvsprintf(dest, format, args);
+	count = ircd_vsprintf(dest, format, args);
 
 	va_end(args);
 
@@ -975,58 +975,58 @@ ircsprintf(char *dest, const char *format, ...)
 }				/* Sprintf() */
 
 /*
- * ircvsnprintf_append()
+ * ircd_vsnprintf_append()
  * appends sprintf formatted string to the end of the buffer but not
  * exceeding len
  */
 
 inline int
-ircvsnprintf_append(char *str, size_t len, const char *format, va_list ap)
+ircd_vsnprintf_append(char *str, size_t len, const char *format, va_list ap)
 {
         size_t x = strlen(str);
-        return(ircvsnprintf(str+x, len - x, format, ap) + x);
+        return(ircd_vsnprintf(str+x, len - x, format, ap) + x);
 }
 
 /*
- * ircvsprintf_append()
+ * ircd_vsprintf_append()
  * appends sprintf formatted string to the end of the buffer
  */
  
 inline int
-ircvsprintf_append(char *str, const char *format, va_list ap)
+ircd_vsprintf_append(char *str, const char *format, va_list ap)
 {
         size_t x = strlen(str);
-        return(ircvsprintf(str+x, format, ap) + x);
+        return(ircd_vsprintf(str+x, format, ap) + x);
 }
 
 /*
- * ircsprintf_append()
+ * ircd_sprintf_append()
  * appends sprintf formatted string to the end of the buffer
  */
 int
-ircsprintf_append(char *str, const char *format, ...)
+ircd_sprintf_append(char *str, const char *format, ...)
 {
         int x;
         va_list ap;
         va_start(ap, format);
-        x = ircvsprintf_append(str, format, ap);
+        x = ircd_vsprintf_append(str, format, ap);
         va_end(ap);
         return(x);
 }
 
 /*
- * ircsnprintf_append()
+ * ircd_snprintf_append()
  * appends snprintf formatted string to the end of the buffer but not
  * exceeding len
  */
 
 int
-ircsnprintf_append(char *str, size_t len, const char *format, ...)
+ircd_snprintf_append(char *str, size_t len, const char *format, ...)
 {
         int x;
         va_list ap;
         va_start(ap, format);
-        x = ircvsnprintf_append(str, len, format, ap);
+        x = ircd_vsnprintf_append(str, len, format, ap);
         va_end(ap);
         return(x); 
 }
