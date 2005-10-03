@@ -233,8 +233,30 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		ircd_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
 		DupString(aconf->passwd, dlbuffer);
 		add_dline(aconf);
-		write_confitem(DLINE_TYPE, source_p, NULL, aconf->host, reason,
-			       oper_reason, current_date, 0);
+
+		if(EmptyString(oper_reason))
+		{
+			sendto_realops_flags(UMODE_ALL, L_ALL,
+					"%s added D-Line for [%s] [%s]",
+					get_oper_name(source_p), aconf->host, reason);
+			ilog(L_KLINE, "D %s 0 %s %s",
+				get_oper_name(source_p), aconf->host, reason);
+		}
+		else
+		{
+			sendto_realops_flags(UMODE_ALL, L_ALL,
+					"%s added D-Line for [%s] [%s|%s]",
+					get_oper_name(source_p), aconf->host, 
+					reason, oper_reason);
+			ilog(L_KLINE, "D %s 0 %s %s|%s",
+				get_oper_name(source_p), aconf->host, 
+				reason, oper_reason);
+		}
+
+		sendto_one(source_p, POP_QUEUE,
+			   ":%s NOTICE %s :Added D-Line [%s] to %s", me.name,
+			   source_p->name, aconf->host, ConfigFileEntry.dlinefile);
+
 		banconf_add_write(TRANS_DLINE, source_p, aconf->host, NULL,
 				reason, oper_reason);
 	}

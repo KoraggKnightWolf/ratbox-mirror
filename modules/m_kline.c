@@ -432,9 +432,29 @@ static void
 apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	    const char *reason, const char *oper_reason, const char *current_date)
 {
+	if(EmptyString(oper_reason))
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				"%s added K-Line for [%s@%s] [%s]",
+				get_oper_name(source_p), aconf->user, aconf->host, reason);
+		ilog(L_KLINE, "K %s 0 %s %s %s",
+			get_oper_name(source_p), aconf->user, aconf->host, reason);
+	}
+	else
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				"%s added K-Line for [%s@%s] [%s|%s]",
+				get_oper_name(source_p), aconf->user, aconf->host, 
+				reason, oper_reason);
+		ilog(L_KLINE, "K %s 0 %s %s %s|%s",
+			get_oper_name(source_p), aconf->user, aconf->host,
+			reason, oper_reason);
+	}
+
+	sendto_one_notice(source_p, POP_QUEUE, ":Added K-Line [%s@%s]",
+			  aconf->user, aconf->host);
+
 	add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
-	write_confitem(KLINE_TYPE, source_p, aconf->user, aconf->host,
-		       reason, oper_reason, current_date, 0);
 	banconf_add_write(TRANS_KLINE, source_p, aconf->user, aconf->host,
 			reason, oper_reason);
 }

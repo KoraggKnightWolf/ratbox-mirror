@@ -328,8 +328,6 @@ typedef enum
 }
 KlineType;
 
-extern void write_confitem(KlineType, struct Client *, char *, char *,
-			   const char *, const char *, const char *, int);
 extern void add_temp_kline(struct ConfItem *);
 extern void add_temp_dline(struct ConfItem *);
 extern void report_temp_klines(struct Client *);

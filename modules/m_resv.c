@@ -145,6 +145,34 @@ me_resv(struct Client *client_p, struct Client *source_p,
 	return 0;
 }
 
+static void
+notify_resv(struct Client *source_p, const char *name, const char *reason, int temp_time)
+{
+	if(temp_time)
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+			     "%s added temporary %d min. RESV for [%s] [%s]",
+			     get_oper_name(source_p), temp_time / 60,
+			     name, reason);
+		ilog(L_KLINE, "R %s %d %s %s",
+			get_oper_name(source_p), temp_time / 60,
+			name, reason);
+		sendto_one_notice(source_p, POP_QUEUE, ":Added temporary %d min. RESV [%s]",
+				temp_time / 60, name);
+	}
+	else
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				"%s added RESV for [%s] [%s]",
+				get_oper_name(source_p), name, reason);
+		ilog(L_KLINE, "R %s 0 %s %s",
+			get_oper_name(source_p), name, reason);
+		sendto_one_notice(source_p, POP_QUEUE, ":Added RESV for [%s] [%s]",
+				  name, reason);
+	}
+}
+
+
 /* parse_resv()
  *
  * inputs       - source_p if error messages wanted
@@ -196,27 +224,13 @@ parse_resv(struct Client *source_p, const char *name,
 		DupString(aconf->passwd, reason);
 		add_to_resv_hash(aconf->name, aconf);
 
-		if(temp_time > 0)
-		{
-			aconf->hold = ircd_currenttime + temp_time;
+		notify_resv(source_p, aconf->name, aconf->passwd, temp_time);
 
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added temporary %d min. RESV for [%s] [%s]",
-				     get_oper_name(source_p), temp_time / 60,
-				     name, reason);
-			ilog(L_KLINE, "R %s %d %s %s",
-				get_oper_name(source_p), temp_time / 60,
-				name, reason);
-			sendto_one_notice(source_p, POP_QUEUE, ":Added temporary %d min. RESV [%s]",
-					temp_time / 60, name);
-		}
+		if(temp_time > 0)
+			aconf->hold = ircd_currenttime + temp_time;
 		else
-		{
-			write_confitem(RESV_TYPE, source_p, NULL, aconf->name, 
-					aconf->passwd, NULL, NULL, 0);
 			banconf_add_write(TRANS_RESV, source_p, aconf->name, NULL,
 					aconf->passwd, NULL);
-		}
 	}
 	else if(clean_resv_nick(name))
 	{
@@ -258,23 +272,14 @@ parse_resv(struct Client *source_p, const char *name,
 		DupString(aconf->passwd, reason);
 		dlinkAddAlloc(aconf, &resv_conf_list);
 
-		if(temp_time > 0)
-		{
-			aconf->hold = ircd_currenttime + (temp_time * 60);
+		notify_resv(source_p, aconf->name, aconf->passwd, temp_time);
 
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added temporary %d min. RESV for [%s] [%s]",
-				     get_oper_name(source_p), temp_time / 60,
-				     name, reason);
-			ilog(L_KLINE, "R %s %d %s %s",
-				get_oper_name(source_p), temp_time / 60,
-				name, reason);
-			sendto_one_notice(source_p, POP_QUEUE, ":Added temporary %d min. RESV [%s]",
-					temp_time / 60, name);
-		}
+		if(temp_time > 0)
+			aconf->hold = ircd_currenttime + (temp_time * 60);
 		else
-			write_confitem(RESV_TYPE, source_p, NULL, aconf->name, 
-					aconf->passwd, NULL, NULL, 0);
+			banconf_add_write(TRANS_RESV, source_p, aconf->name, NULL,
+					aconf->passwd, NULL);
+			
 	}
 	else
 		sendto_one_notice(source_p, POP_QUEUE,
