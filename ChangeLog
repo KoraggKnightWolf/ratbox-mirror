@@ -1,3 +1,12 @@
+leeh        2005/10/03 21:34:32 UTC	(20051003_7-20864)
+  Log:
+  - add in a license
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+
+
 leeh        2005/10/03 21:33:15 UTC	(20051003_6-20862)
   Log:
   - rewrote the ban parser
