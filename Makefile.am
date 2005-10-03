@@ -55,7 +55,6 @@ src_libratbox_la_SOURCES =                     \
   src/hash.c                        \
   src/hook.c                        \
   src/hostmask.c                    \
-  src/irc_string.c                  \
   src/ircd.c                        \
   src/ircd_signal.c                 \
   src/kdparse.c                     \

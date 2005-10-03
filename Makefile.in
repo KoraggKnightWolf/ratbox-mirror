@@ -281,14 +281,14 @@ modules_m_xline_la_OBJECTS = $(am_modules_m_xline_la_OBJECTS)
 am__DEPENDENCIES_2 =
 am_src_libratbox_la_OBJECTS = src/dns.lo src/banconf.lo src/cache.lo \
 	src/channel.lo src/class.lo src/client.lo src/getopt.lo \
-	src/hash.lo src/hook.lo src/hostmask.lo src/irc_string.lo \
-	src/ircd.lo src/ircd_signal.lo src/kdparse.lo src/listener.lo \
-	src/match.lo src/modules.lo src/monitor.lo src/newconf.lo \
-	src/numeric.lo src/packet.lo src/parse.lo src/patricia.lo \
-	src/reject.lo src/restart.lo src/s_auth.lo src/s_conf.lo \
-	src/s_newconf.lo src/s_log.lo src/s_serv.lo src/s_user.lo \
-	src/scache.lo src/send.lo src/whowas.lo src/version.lo \
-	src/ircd_parser.lo src/ircd_lexer.lo
+	src/hash.lo src/hook.lo src/hostmask.lo src/ircd.lo \
+	src/ircd_signal.lo src/kdparse.lo src/listener.lo src/match.lo \
+	src/modules.lo src/monitor.lo src/newconf.lo src/numeric.lo \
+	src/packet.lo src/parse.lo src/patricia.lo src/reject.lo \
+	src/restart.lo src/s_auth.lo src/s_conf.lo src/s_newconf.lo \
+	src/s_log.lo src/s_serv.lo src/s_user.lo src/scache.lo \
+	src/send.lo src/whowas.lo src/version.lo src/ircd_parser.lo \
+	src/ircd_lexer.lo
 src_libratbox_la_OBJECTS = $(am_src_libratbox_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -408,9 +408,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	src/$(DEPDIR)/client.Plo src/$(DEPDIR)/dns.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/getopt.Plo src/$(DEPDIR)/hash.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/hook.Plo src/$(DEPDIR)/hostmask.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/ident.Po \
-@AMDEP_TRUE@	src/$(DEPDIR)/irc_string.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/ircd.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/ident.Po src/$(DEPDIR)/ircd.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_lexer.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_parser.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_signal.Plo \
@@ -724,7 +722,6 @@ src_libratbox_la_SOURCES = \
   src/hash.c                        \
   src/hook.c                        \
   src/hostmask.c                    \
-  src/irc_string.c                  \
   src/ircd.c                        \
   src/ircd_signal.c                 \
   src/kdparse.c                     \
@@ -1497,7 +1494,6 @@ src/getopt.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/hash.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/hook.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/hostmask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/irc_string.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ircd.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ircd_signal.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/kdparse.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -1730,8 +1726,6 @@ mostlyclean-compile:
 	-rm -f src/hostmask.$(OBJEXT)
 	-rm -f src/hostmask.lo
 	-rm -f src/ident.$(OBJEXT)
-	-rm -f src/irc_string.$(OBJEXT)
-	-rm -f src/irc_string.lo
 	-rm -f src/ircd.$(OBJEXT)
 	-rm -f src/ircd.lo
 	-rm -f src/ircd_lexer.$(OBJEXT)
@@ -1868,7 +1862,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hook.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hostmask.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ident.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/irc_string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd_lexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd_parser.Plo@am__quote@
@@ -3769,30 +3762,6 @@ src/hostmask.lo: src/hostmask.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/hostmask.Plo' tmpdepfile='src/$(DEPDIR)/hostmask.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/hostmask.lo `test -f 'src/hostmask.c' || echo '$(srcdir)/'`src/hostmask.c
-
-src/irc_string.o: src/irc_string.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/irc_string.o -MD -MP -MF "src/$(DEPDIR)/irc_string.Tpo" -c -o src/irc_string.o `test -f 'src/irc_string.c' || echo '$(srcdir)/'`src/irc_string.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/irc_string.Tpo" "src/$(DEPDIR)/irc_string.Po"; else rm -f "src/$(DEPDIR)/irc_string.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/irc_string.c' object='src/irc_string.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/irc_string.Po' tmpdepfile='src/$(DEPDIR)/irc_string.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/irc_string.o `test -f 'src/irc_string.c' || echo '$(srcdir)/'`src/irc_string.c
-
-src/irc_string.obj: src/irc_string.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/irc_string.obj -MD -MP -MF "src/$(DEPDIR)/irc_string.Tpo" -c -o src/irc_string.obj `if test -f 'src/irc_string.c'; then $(CYGPATH_W) 'src/irc_string.c'; else $(CYGPATH_W) '$(srcdir)/src/irc_string.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/irc_string.Tpo" "src/$(DEPDIR)/irc_string.Po"; else rm -f "src/$(DEPDIR)/irc_string.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/irc_string.c' object='src/irc_string.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/irc_string.Po' tmpdepfile='src/$(DEPDIR)/irc_string.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/irc_string.obj `if test -f 'src/irc_string.c'; then $(CYGPATH_W) 'src/irc_string.c'; else $(CYGPATH_W) '$(srcdir)/src/irc_string.c'; fi`
-
-src/irc_string.lo: src/irc_string.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/irc_string.lo -MD -MP -MF "src/$(DEPDIR)/irc_string.Tpo" -c -o src/irc_string.lo `test -f 'src/irc_string.c' || echo '$(srcdir)/'`src/irc_string.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/irc_string.Tpo" "src/$(DEPDIR)/irc_string.Plo"; else rm -f "src/$(DEPDIR)/irc_string.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/irc_string.c' object='src/irc_string.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/irc_string.Plo' tmpdepfile='src/$(DEPDIR)/irc_string.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/irc_string.lo `test -f 'src/irc_string.c' || echo '$(srcdir)/'`src/irc_string.c
 
 src/ircd.o: src/ircd.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/ircd.o -MD -MP -MF "src/$(DEPDIR)/ircd.Tpo" -c -o src/ircd.o `test -f 'src/ircd.c' || echo '$(srcdir)/'`src/ircd.c; \
