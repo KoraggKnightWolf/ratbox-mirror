@@ -1,3 +1,13 @@
+androsyn    2005/10/03 19:43:23 UTC	(20051003_2-20854)
+  Log:
+  strip_tabs was only being used by s_conf.c so move if there and make it static
+
+  Modified:
+	ircd-ratbox/trunk/include/irc_string.h (File Modified) 
+	ircd-ratbox/trunk/src/irc_string.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2005/10/03 19:21:37 UTC	(20051003_1-20852)
   Log:
   Change myctime() to ircd_ctime() and move into libircd.
