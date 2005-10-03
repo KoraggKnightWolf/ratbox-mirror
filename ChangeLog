@@ -1,3 +1,12 @@
+androsyn    2005/10/03 19:55:03 UTC	(20051003_3-20856)
+  Log:
+  move mangle_mapped_sockaddr calls into ircd_accept()
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2005/10/03 19:43:23 UTC	(20051003_2-20854)
   Log:
   strip_tabs was only being used by s_conf.c so move if there and make it static
