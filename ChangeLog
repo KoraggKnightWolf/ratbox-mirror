@@ -1,3 +1,29 @@
+androsyn    2005/10/03 21:10:55 UTC	(20051003_4-20858)
+  Log:
+  Replace strtoken() calls with strtok_r(). Supply a strtok_r() implementation
+  for platforms that don't happen to have one.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/irc_string.h (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_kick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_part.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_accept.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_capab.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_ison.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/irc_string.c (File Modified) 
+
+
 androsyn    2005/10/03 19:55:03 UTC	(20051003_3-20856)
   Log:
   move mangle_mapped_sockaddr calls into ircd_accept()
