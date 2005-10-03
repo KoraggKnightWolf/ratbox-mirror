@@ -1,3 +1,23 @@
+androsyn    2005/10/03 19:21:37 UTC	(20051003_1-20852)
+  Log:
+  Change myctime() to ircd_ctime() and move into libircd.
+  Have ircd_ctime() use ctime_r() if available, if not use
+  ctime()
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/irc_string.h (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_whowas.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/irc_string.c (File Modified) 
+
+
 leeh        2005/10/03 18:25:18 UTC	(20051003_0-20850)
   Log:
   - merge the remainder of write_confitem() into the respective modules
