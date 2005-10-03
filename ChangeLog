@@ -1,3 +1,15 @@
+leeh        2005/10/03 21:33:15 UTC	(20051003_6-20862)
+  Log:
+  - rewrote the ban parser
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/banconf.h (File Modified) 
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+	ircd-ratbox/trunk/src/kdparse.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2005/10/03 21:26:03 UTC	(20051003_5-20860)
   Log:
   Move clean_string() into m_links.c as that is the only place its used.  remove irc_string.c as its now empty
