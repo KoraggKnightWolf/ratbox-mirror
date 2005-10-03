@@ -73,6 +73,7 @@ static void set_default_conf(void);
 static void validate_conf(void);
 static void read_conf(FILE *);
 static void clear_out_old_conf(void);
+static char *strip_tabs(char *dest, const unsigned char *src, size_t len);
 
 static void expire_temp_kd(void *list);
 static void reorganise_temp_kd(void *list);
@@ -1384,4 +1385,39 @@ int
 conf_yy_fatal_error(const char *msg)
 {
 	return (0);
+}
+
+/*
+ * strip_tabs(dst, src, length)
+ *
+ *   Copies src to dst, while converting all \t (tabs) into spaces.
+ *
+ * NOTE: jdc: I have a gut feeling there's a faster way to do this.
+ */
+static char *
+strip_tabs(char *dest, const unsigned char *src, size_t len)
+{
+	char *d = dest;
+	/* Sanity check; we don't want anything nasty... */
+	s_assert(0 != dest);
+	s_assert(0 != src);
+
+	if(dest == NULL || src == NULL)
+		return NULL;
+
+	while (*src && (len > 0))
+	{
+		if(*src == '\t')
+		{
+			*d++ = ' ';	/* Translate the tab into a space */
+		}
+		else
+		{
+			*d++ = *src;	/* Copy src to dst */
+		}
+		++src;
+		--len;
+	}
+	*d = '\0';		/* Null terminate, thanks and goodbye */
+	return dest;
 }

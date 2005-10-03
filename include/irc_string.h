@@ -88,11 +88,6 @@ extern char *canonize(char *);
  * -Dianora
  */
 char *clean_string(char *dest, const unsigned char *src, size_t len);
-/*
- * strip_tabs - convert tabs to spaces
- * - jdc
- */
-char *strip_tabs(char *dest, const unsigned char *src, size_t len);
 
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
