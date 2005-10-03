@@ -145,3 +145,35 @@ ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int max
 }
 
 
+#ifndef HAVE_STRTOK_R
+char *
+strtok_r (char *s, const char *delim, char **save)
+{
+	char *token;
+
+	if (s == NULL)
+		s = *save;
+
+	/* Scan leading delimiters.  */
+	s += strspn(s, delim);
+
+	if (*s == '\0')
+	{
+		*save = s;
+		return NULL;
+	}
+
+	token = s;
+	s = strpbrk(token, delim);
+	
+	if (s == NULL)  
+		*save = (token + strlen(token, '\0'));
+	else
+	{
+		*s = '\0'; 
+		*save = s + 1;
+	}
+	return token;
+}
+#endif
+

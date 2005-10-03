@@ -269,11 +269,6 @@ int inetpton(int af, const char *src, void *dst);
 const char *inetntop_sock(struct sockaddr *src, char *dst, unsigned int size);
 int inetpton_sock(const char *src, struct sockaddr *dst);
 extern int maxconnections;
-#ifdef IPV6
-extern void mangle_mapped_sockaddr(struct sockaddr *in);
-#else
-#define mangle_mapped_sockaddr(x) 
-#endif
 
 #ifdef __MINGW32__
 #define get_errno()  errno = WSAGetLastError()

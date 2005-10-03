@@ -92,8 +92,6 @@ char *clean_string(char *dest, const unsigned char *src, size_t len);
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
 
-char *strtoken(char **save, char *str, const char *fs);
-
 /*
  * character macros
  */

@@ -556,6 +556,31 @@ ircd_socket(int family, int sock_type, int proto, const char *note)
 	return fd;
 }
 
+/*
+ * If a sockaddr_storage is AF_INET6 but is a mapped IPv4
+ * socket manged the sockaddr.
+ */
+#ifdef IPV6
+static void
+mangle_mapped_sockaddr(struct sockaddr *in)
+{
+	struct sockaddr_in6 *in6 = (struct sockaddr_in6 *) in;
+
+	if(in->sa_family == AF_INET)
+		return;
+
+	if(in->sa_family == AF_INET6 && IN6_IS_ADDR_V4MAPPED(&in6->sin6_addr))
+	{
+		struct sockaddr_in in4;
+		memset(&in4, 0, sizeof(struct sockaddr_in));
+		in4.sin_family = AF_INET;
+		in4.sin_port = in6->sin6_port;
+		in4.sin_addr.s_addr = ((uint32_t *) & in6->sin6_addr)[3];
+		memcpy(in, &in4, sizeof(struct sockaddr_in));
+	}
+	return;
+}
+#endif
 
 /*
  * ircd_accept() - accept an incoming connection
@@ -584,7 +609,7 @@ ircd_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 		return -1;
 	ircd_open(newfd, FD_SOCKET, "Incoming connection");
 	ircd_fd_hack(&newfd);
-
+	
 	/* Set the socket non-blocking, and other wonderful bits */
 	if(unlikely(!ircd_set_nb(newfd)))
 	{
@@ -594,35 +619,13 @@ ircd_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 		return -1;
 	}
 
+#ifdef IPV6
+	mangle_mapped_sockaddr((struct sockaddr *)pn);
+#endif
 	/* .. and return */
 	return newfd;
 }
 
-/*
- * If a sockaddr_storage is AF_INET6 but is a mapped IPv4
- * socket manged the sockaddr.
- */
-#ifndef mangle_mapped_sockaddr
-void
-mangle_mapped_sockaddr(struct sockaddr *in)
-{
-	struct sockaddr_in6 *in6 = (struct sockaddr_in6 *) in;
-
-	if(in->sa_family == AF_INET)
-		return;
-
-	if(in->sa_family == AF_INET6 && IN6_IS_ADDR_V4MAPPED(&in6->sin6_addr))
-	{
-		struct sockaddr_in in4;
-		memset(&in4, 0, sizeof(struct sockaddr_in));
-		in4.sin_family = AF_INET;
-		in4.sin_port = in6->sin6_port;
-		in4.sin_addr.s_addr = ((uint32_t *) & in6->sin6_addr)[3];
-		memcpy(in, &in4, sizeof(struct sockaddr_in));
-	}
-	return;
-}
-#endif
 
 
 static void

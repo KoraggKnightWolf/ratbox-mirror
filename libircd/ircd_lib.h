@@ -217,6 +217,11 @@ void ircd_lib(log_cb *xilog, restart_cb *irestart, die_cb *idie, int closeall, i
 time_t ircd_current_time(void);
 struct timeval *ircd_current_time_tv(void);
 pid_t ircd_spawn_process(const char *, const char **);
+
+#ifndef HAVE_STRTOK_R
+char *strtok_r(char *, const char *, char **);
+#endif
+
 #ifndef HAVE_GETTIMEOFDAY
 int gettimeofday(struct timeval *, struct timezone *);
 #endif

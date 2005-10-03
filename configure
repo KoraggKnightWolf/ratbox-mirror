@@ -24176,7 +24176,8 @@ fi
 
 
 
-for ac_func in socketpair vsnprintf mmap gettimeofday strdup strndup writev sendmsg ctime_r
+
+for ac_func in socketpair vsnprintf mmap gettimeofday strdup strndup writev sendmsg ctime_r strtok_r
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ac_func" >&5
