@@ -49,6 +49,7 @@
 #include "reject.h"
 #include "cache.h"
 #include "res.h"
+#include "banconf.h"
 
 struct config_server_hide ConfigServerHide;
 
@@ -639,23 +640,6 @@ rehash(int sig)
 	return (0);
 }
 
-static struct banconf_entry
-{
-	const char **filename;
-	void (*func) (FILE *);
-	int perm;
-} banconfs[] = {
-	{ &ConfigFileEntry.klinefile,	parse_k_file,	0 },
-	{ &ConfigFileEntry.klinefile,	parse_k_file,	1 },
-	{ &ConfigFileEntry.dlinefile,	parse_d_file,	0 },
-	{ &ConfigFileEntry.dlinefile,	parse_d_file,	1 },
-	{ &ConfigFileEntry.xlinefile,	parse_x_file,	0 },
-	{ &ConfigFileEntry.xlinefile,	parse_x_file,	1 },
-	{ &ConfigFileEntry.resvfile,	parse_resv_file,0 },
-	{ &ConfigFileEntry.resvfile,	parse_resv_file,1 },
-	{ NULL,				NULL,		0 }
-};
-
 void
 rehash_bans(int sig)
 {
@@ -669,32 +653,7 @@ rehash_bans(int sig)
 
 	clear_out_address_conf_bans();
 	clear_s_newconf_bans();
-
-	for(i = 0; banconfs[i].filename; i++)
-	{
-		if(banconfs[i].perm)
-			snprintf(buf, sizeof(buf), "%s.perm", *banconfs[i].filename);
-		else
-			snprintf(buf, sizeof(buf), "%s", *banconfs[i].filename);
-
-		if((file = fopen(buf, "r")) == NULL)
-		{
-			if(banconfs[i].perm)
-				continue;
-
-			ilog(L_MAIN, "Failed reading ban file %s",
-				*banconfs[i].filename);
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"Can't open %s file bans could be missing!",
-					*banconfs[i].filename);
-		}
-		else
-		{
-			(banconfs[i].func)(file);
-			fclose(file);
-		}
-	}
-
+	banconf_parse();
 	check_banned_lines();
 }
 

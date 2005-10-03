@@ -13,4 +13,6 @@ void banconf_add_write(banconf_type type, struct Client *source_p, const char *m
 			const char *mask2, const char *reason, const char *oper_reason);
 void banconf_del_write(banconf_type type, const char *mask, const char *mask2);
 
+void banconf_parse(void);
+
 #endif
