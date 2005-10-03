@@ -1396,7 +1396,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 		  const char *comment)
 {
 	unsigned long on_for;
-
+	char tbuf[26];
 	exit_generic_client(client_p, source_p, from, comment);
 	clear_monitor(source_p);
 
@@ -1428,7 +1428,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	on_for = ircd_currenttime - source_p->localClient->firsttime;
 
 	ilog(L_USER, "%s (%3lu:%02lu:%02lu): %s!%s@%s %d/%d",
-		myctime(ircd_currenttime), on_for / 3600,
+		ircd_ctime(ircd_currenttime, tbuf), on_for / 3600,
 		(on_for % 3600) / 60, on_for % 60,
 		source_p->name, source_p->username, source_p->host,
 		source_p->localClient->sendK, source_p->localClient->receiveK);

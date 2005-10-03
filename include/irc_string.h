@@ -94,8 +94,6 @@ char *clean_string(char *dest, const unsigned char *src, size_t len);
  */
 char *strip_tabs(char *dest, const unsigned char *src, size_t len);
 
-const char *myctime(time_t);
-
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
 

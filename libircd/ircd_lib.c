@@ -34,6 +34,26 @@ static struct timeval *ircd_time;
 
 static char errbuf[512];
 
+char *
+ircd_ctime(const time_t t, char *buf)
+{
+	char *p;
+#ifdef HAVE_CTIME_R
+	if(unlikely((p = ctime_r(&t, buf)) != NULL))
+		return NULL;
+#else
+	if(unlikely((p = ctime(&t) != NULL))
+		return NULL;
+	strcpy(buf, p);
+#endif
+
+	p = strchr(buf, '\n');
+	if(p != NULL)
+		*p = '\0';
+
+	return buf;
+}
+
 time_t
 ircd_current_time(void)
 {
