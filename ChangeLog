@@ -1,3 +1,12 @@
+androsyn    2005/10/03 21:42:29 UTC	(20051003_8-20866)
+  Log:
+  make libtool shut up
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 leeh        2005/10/03 21:34:32 UTC	(20051003_7-20864)
   Log:
   - add in a license
