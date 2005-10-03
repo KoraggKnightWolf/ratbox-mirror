@@ -396,7 +396,6 @@ start_auth_query(struct AuthRequest *auth)
 		return;
 	}
 
-	mangle_mapped_sockaddr((struct sockaddr *) &localaddr);
 	inetntop_sock((struct sockaddr *) &localaddr, myip, sizeof(myip));
 
 #ifdef IPV6

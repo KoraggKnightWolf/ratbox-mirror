@@ -515,9 +515,6 @@ accept_connection(int pfd, void *data)
 
 		fd = ircd_accept(listener->fd, (struct sockaddr *)&sai, &addrlen);
 
-		/* This needs to be done here, otherwise we break dlines */
-		mangle_mapped_sockaddr((struct sockaddr *)&sai);
-
 		if(fd < 0)
 		{
 			/* Re-register a new IO request for the next accept .. */
