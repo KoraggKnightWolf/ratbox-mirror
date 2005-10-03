@@ -21390,6 +21390,8 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 
 
 
+LIBTOOL="$LIBTOOL --silent"
+
 
 
 subdirs="$subdirs libltdl"

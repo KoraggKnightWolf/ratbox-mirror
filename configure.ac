@@ -67,6 +67,8 @@ AC_LANG(C)
 AM_CONDITIONAL([STATIC_MODULES], test "$enable_static" = "yes")
 AC_PROG_LIBTOOL
 
+LIBTOOL="$LIBTOOL --silent"
+
 AC_CONFIG_SUBDIRS(libltdl)
 
 RESOLVER="adns resolver"
