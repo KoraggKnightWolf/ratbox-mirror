@@ -213,7 +213,7 @@ cache_links(void *unused)
 			   target_p->info[0] ? target_p->info : 
 			    "(Unknown Location)");
 
-		dlinkAddTailAlloc(links_line, &links_cache_list);
+		ircd_dlinkAddTailAlloc(links_line, &links_cache_list);
 	}
 }
 

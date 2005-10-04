@@ -82,7 +82,7 @@ add_top_conf(const char *name, int (*sfunc) (struct TopConf *),
 	tc->tc_efunc = efunc;
 	tc->tc_entries = items;
 
-	dlinkAddAlloc(tc, &conf_items);
+	ircd_dlinkAddAlloc(tc, &conf_items);
 	return 0;
 }
 
@@ -142,10 +142,10 @@ remove_top_conf(char *name)
 	if((tc = find_top_conf(name)) == NULL)
 		return -1;
 
-	if((ptr = dlinkFind(tc, &conf_items)) == NULL)
+	if((ptr = ircd_dlinkFind(tc, &conf_items)) == NULL)
 		return -1;
 
-	dlinkDestroy(ptr, &conf_items);
+	ircd_dlinkDestroy(ptr, &conf_items);
 	ircd_free(tc->tc_name);
 	ircd_free(tc);
 
@@ -462,7 +462,7 @@ conf_begin_oper(struct TopConf *tc)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_oper_list.head)
 	{
 		free_oper_conf(ptr->data);
-		dlinkDestroy(ptr, &yy_oper_list);
+		ircd_dlinkDestroy(ptr, &yy_oper_list);
 	}
 
 	yy_oper = make_oper_conf();
@@ -550,7 +550,7 @@ conf_end_oper(struct TopConf *tc)
 #endif
 
 		/* all is ok, put it on oper_conf_list */
-		dlinkMoveNode(ptr, &yy_oper_list, &oper_conf_list);
+		ircd_dlinkMoveNode(ptr, &yy_oper_list, &oper_conf_list);
 	}
 
 	free_oper_conf(yy_oper);
@@ -597,7 +597,7 @@ conf_set_oper_user(void *data)
 		return;
 	}
 
-	dlinkAddAlloc(yy_tmpoper, &yy_oper_list);
+	ircd_dlinkAddAlloc(yy_tmpoper, &yy_oper_list);
 }
 
 static void
@@ -794,7 +794,7 @@ conf_begin_auth(struct TopConf *tc)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_aconf_list.head)
 	{
 		free_conf(ptr->data);
-		dlinkDestroy(ptr, &yy_aconf_list);
+		ircd_dlinkDestroy(ptr, &yy_aconf_list);
 	}
 
 	yy_aconf = make_conf();
@@ -848,7 +848,7 @@ conf_end_auth(struct TopConf *tc)
 		conf_add_class_to_conf(yy_tmp);
 
 		add_conf_by_address(yy_tmp->host, CONF_CLIENT, yy_tmp->user, yy_tmp);
-		dlinkDestroy(ptr, &yy_aconf_list);
+		ircd_dlinkDestroy(ptr, &yy_aconf_list);
 	}
 
 	yy_aconf = NULL;
@@ -884,7 +884,7 @@ conf_set_auth_user(void *data)
 	}
 
 	if(yy_aconf != yy_tmp)
-		dlinkAddAlloc(yy_tmp, &yy_aconf_list);
+		ircd_dlinkAddAlloc(yy_tmp, &yy_aconf_list);
 }
 
 static void
@@ -1001,7 +1001,7 @@ conf_cleanup_shared(struct TopConf *tc)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_shared_list.head)
 	{
 		free_remote_conf(ptr->data);
-		dlinkDestroy(ptr, &yy_shared_list);
+		ircd_dlinkDestroy(ptr, &yy_shared_list);
 	}
 
 	if(yy_shared != NULL)
@@ -1064,7 +1064,7 @@ conf_set_shared_oper(void *data)
 	else
 		DupString(yy_shared->username, username);
 
-	dlinkAddAlloc(yy_shared, &yy_shared_list);
+	ircd_dlinkAddAlloc(yy_shared, &yy_shared_list);
 	yy_shared = NULL;
 }
 
@@ -1085,8 +1085,8 @@ conf_set_shared_flags(void *data)
 		yy_shared = ptr->data;
 
 		yy_shared->flags = flags;
-		dlinkDestroy(ptr, &yy_shared_list);
-		dlinkAddTail(yy_shared, &yy_shared->node, &shared_conf_list);
+		ircd_dlinkDestroy(ptr, &yy_shared_list);
+		ircd_dlinkAddTail(yy_shared, &yy_shared->node, &shared_conf_list);
 	}
 
 	yy_shared = NULL;
@@ -1139,7 +1139,7 @@ conf_end_connect(struct TopConf *tc)
 #endif
 
 	add_server_conf(yy_server);
-	dlinkAdd(yy_server, &yy_server->node, &server_conf_list);
+	ircd_dlinkAdd(yy_server, &yy_server->node, &server_conf_list);
 
 	yy_server = NULL;
 	return 0;
@@ -1238,7 +1238,7 @@ conf_set_connect_hub_mask(void *data)
 
 	DupString(yy_hub->host, data);
 	DupString(yy_hub->server, yy_server->name);
-	dlinkAdd(yy_hub, &yy_hub->node, &hubleaf_conf_list);
+	ircd_dlinkAdd(yy_hub, &yy_hub->node, &hubleaf_conf_list);
 }
 
 static void
@@ -1254,7 +1254,7 @@ conf_set_connect_leaf_mask(void *data)
 
 	DupString(yy_leaf->host, data);
 	DupString(yy_leaf->server, yy_server->name);
-	dlinkAdd(yy_leaf, &yy_leaf->node, &hubleaf_conf_list);
+	ircd_dlinkAdd(yy_leaf, &yy_leaf->node, &hubleaf_conf_list);
 }
 
 static void
@@ -1290,7 +1290,7 @@ conf_cleanup_cluster(struct TopConf *tc)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_cluster_list.head)
 	{
 		free_remote_conf(ptr->data);
-		dlinkDestroy(ptr, &yy_cluster_list);
+		ircd_dlinkDestroy(ptr, &yy_cluster_list);
 	}
 
 	if(yy_shared != NULL)
@@ -1310,7 +1310,7 @@ conf_set_cluster_name(void *data)
 
 	yy_shared = make_remote_conf();
 	DupString(yy_shared->server, data);
-	dlinkAddAlloc(yy_shared, &yy_cluster_list);
+	ircd_dlinkAddAlloc(yy_shared, &yy_cluster_list);
 
 	yy_shared = NULL;
 }
@@ -1331,8 +1331,8 @@ conf_set_cluster_flags(void *data)
 	{
 		yy_shared = ptr->data;
 		yy_shared->flags = flags;
-		dlinkAddTail(yy_shared, &yy_shared->node, &cluster_conf_list);
-		dlinkDestroy(ptr, &yy_cluster_list);
+		ircd_dlinkAddTail(yy_shared, &yy_shared->node, &cluster_conf_list);
+		ircd_dlinkDestroy(ptr, &yy_cluster_list);
 	}
 
 	yy_shared = NULL;
@@ -1494,7 +1494,7 @@ conf_set_service_name(void *data)
 	 }
 
 	 DupString(tmp, data);
-	 dlinkAddAlloc(tmp, &service_list);
+	 ircd_dlinkAddAlloc(tmp, &service_list);
 
 	if((target_p = find_server(NULL, tmp)))
 		target_p->flags |= FLAGS_SERVICE;
@@ -1690,7 +1690,7 @@ add_conf_item(const char *topconf, const char *name, int type, void (*func) (voi
 	cf->cf_func = func;
 	cf->cf_arg = NULL;
 
-	dlinkAddAlloc(cf, &tc->tc_items);
+	ircd_dlinkAddAlloc(cf, &tc->tc_items);
 
 	return 0;
 }
@@ -1709,10 +1709,10 @@ remove_conf_item(const char *topconf, const char *name)
 	if((cf = find_conf_item(tc, name)) == NULL)
 		return -1;
 
-	if((ptr = dlinkFind(cf, &tc->tc_items)) == NULL)
+	if((ptr = ircd_dlinkFind(cf, &tc->tc_items)) == NULL)
 		return -1;
 
-	dlinkDestroy(ptr, &tc->tc_items);
+	ircd_dlinkDestroy(ptr, &tc->tc_items);
 	ircd_free(cf->cf_name);
 	ircd_free(cf);
 

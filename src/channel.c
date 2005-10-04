@@ -188,11 +188,11 @@ add_user_to_channel(struct Channel *chptr, struct Client *client_p, int flags)
 	msptr->client_p = client_p;
 	msptr->flags = flags;
 
-	dlinkAdd(msptr, &msptr->usernode, &client_p->user->channel);
-	dlinkAdd(msptr, &msptr->channode, &chptr->members);
+	ircd_dlinkAdd(msptr, &msptr->usernode, &client_p->user->channel);
+	ircd_dlinkAdd(msptr, &msptr->channode, &chptr->members);
 
 	if(MyClient(client_p))
-		dlinkAdd(msptr, &msptr->locchannode, &chptr->locmembers);
+		ircd_dlinkAdd(msptr, &msptr->locchannode, &chptr->locmembers);
 }
 
 /* remove_user_from_channel()
@@ -213,11 +213,11 @@ remove_user_from_channel(struct membership *msptr)
 	client_p = msptr->client_p;
 	chptr = msptr->chptr;
 
-	dlinkDelete(&msptr->usernode, &client_p->user->channel);
-	dlinkDelete(&msptr->channode, &chptr->members);
+	ircd_dlinkDelete(&msptr->usernode, &client_p->user->channel);
+	ircd_dlinkDelete(&msptr->channode, &chptr->members);
 
 	if(client_p->servptr == &me)
-		dlinkDelete(&msptr->locchannode, &chptr->locmembers);
+		ircd_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
 	chptr->users_last = ircd_currenttime;
 
@@ -251,10 +251,10 @@ remove_user_from_channels(struct Client *client_p)
 		msptr = ptr->data;
 		chptr = msptr->chptr;
 
-		dlinkDelete(&msptr->channode, &chptr->members);
+		ircd_dlinkDelete(&msptr->channode, &chptr->members);
 
 		if(client_p->servptr == &me)
-			dlinkDelete(&msptr->locchannode, &chptr->locmembers);
+			ircd_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
 		chptr->users_last = ircd_currenttime;
 
@@ -361,7 +361,7 @@ destroy_channel(struct Channel *chptr)
 	/* Free the topic */
 	free_topic(chptr);
 
-	dlinkDelete(&chptr->node, &global_channel_list);
+	ircd_dlinkDelete(&chptr->node, &global_channel_list);
 	del_from_channel_hash(chptr->chname, chptr);
 	free_channel(chptr);
 }
@@ -467,8 +467,8 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 void
 del_invite(struct Channel *chptr, struct Client *who)
 {
-	dlinkFindDestroy(who, &chptr->invites);
-	dlinkFindDestroy(chptr, &who->user->invited);
+	ircd_dlinkFindDestroy(who, &chptr->invites);
+	ircd_dlinkFindDestroy(chptr, &who->user->invited);
 }
 
 /* is_banned()

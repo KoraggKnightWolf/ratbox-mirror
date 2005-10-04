@@ -444,7 +444,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 	actualBan = allocate_ban(realban, who);
 	actualBan->when = ircd_currenttime;
 
-	dlinkAdd(actualBan, &actualBan->node, list);
+	ircd_dlinkAdd(actualBan, &actualBan->node, list);
 	chptr->num_mask++;
 
 	/* invalidate the can_send() cache */
@@ -476,7 +476,7 @@ del_id(struct Channel *chptr, const char *banid, dlink_list *list,
 
 		if(irccmp(banid, banptr->banstr) == 0)
 		{
-			dlinkDelete(&banptr->node, list);
+			ircd_dlinkDelete(&banptr->node, list);
 			free_ban(banptr);
 
 			/* num_mask should never be < 0 */

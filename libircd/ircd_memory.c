@@ -31,19 +31,19 @@
 
 
 /*
- * ircd_malloc - allocate memory, call outofmemory on failure
+ * ircd_malloc - allocate memory, call ircd_outofmemory on failure
  */
 void *
 ircd_malloc(size_t size)
 {
 	void *ret = calloc(1, size);
 	if(unlikely(ret == NULL))
-		outofmemory();
+		ircd_outofmemory();
 	return ret;
 }
 
 /*
- * ircd_realloc - reallocate memory, call outofmemory on failure
+ * ircd_realloc - reallocate memory, call ircd_outofmemory on failure
  */
 void *
 ircd_realloc(void *x, size_t y)
@@ -51,19 +51,19 @@ ircd_realloc(void *x, size_t y)
 	void *ret = realloc(x, y);
 
 	if(unlikely(ret == NULL))
-		outofmemory();
+		ircd_outofmemory();
 	return ret;
 }
 
 /*
- * outofmemory()
+ * ircd_outofmemory()
  *
  * input        - NONE
  * output       - NONE
  * side effects - simply try to report there is a problem. Abort if it was called more than once
  */
 void
-outofmemory()
+ircd_outofmemory()
 {
 	static int was_here = 0;
 

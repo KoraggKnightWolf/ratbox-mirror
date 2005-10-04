@@ -687,8 +687,8 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	{
 		target_p = ptr->data;
 
-		dlinkFindDestroy(source_p, &target_p->localClient->allow_list);
-		dlinkDestroy(ptr, &source_p->on_allow_list);
+		ircd_dlinkFindDestroy(source_p, &target_p->localClient->allow_list);
+		ircd_dlinkDestroy(ptr, &source_p->on_allow_list);
 	}
 
 	/* fd_desc is long enough */
@@ -941,7 +941,7 @@ register_client(struct Client *client_p, struct Client *server,
 
 	source_p = make_client(client_p);
 	user = make_user(source_p);
-	dlinkAddTail(source_p, &source_p->node, &global_client_list);
+	ircd_dlinkAddTail(source_p, &source_p->node, &global_client_list);
 
 	source_p->hopcount = atoi(parv[2]);
 	source_p->tsinfo = newts;
@@ -1033,7 +1033,7 @@ register_client(struct Client *client_p, struct Client *server,
 	else
 		source_p->servptr = server;
 
-	dlinkAdd(source_p, &source_p->lnode, &source_p->servptr->serv->users);
+	ircd_dlinkAdd(source_p, &source_p->lnode, &source_p->servptr->serv->users);
 
 	/* fake direction */
 	if(source_p->servptr->from != source_p->from)

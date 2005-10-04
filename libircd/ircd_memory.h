@@ -32,7 +32,7 @@
 #define _I_MEMORY_H
 
 
-extern void outofmemory(void);
+extern void ircd_outofmemory(void);
 
 extern void *ircd_malloc(size_t size);
 extern void *ircd_realloc(void *x, size_t y);
@@ -49,7 +49,7 @@ ircd_malloc(size_t size)
 {
 	void *ret = calloc(1, size);
 	if(unlikely(ret == NULL))
-		outofmemory();
+		ircd_outofmemory();
 	return (ret);
 }
 
@@ -59,7 +59,7 @@ ircd_realloc(void *x, size_t y)
 	void *ret = realloc(x, y);
 
 	if(unlikely(ret == NULL))
-		outofmemory();
+		ircd_outofmemory();
 	return (ret);
 }
 

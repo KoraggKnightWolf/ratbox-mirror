@@ -114,7 +114,7 @@ ircd_linebuf_new_line(buf_head_t * bufhead)
 	bufline->raw = 0;
 
 	/* Stick it at the end of the buf list */
-	dlinkAddTail(bufline, node, &bufhead->list);
+	ircd_dlinkAddTail(bufline, node, &bufhead->list);
 	bufline->refcount++;
 
 	/* And finally, update the allocated size */
@@ -134,7 +134,7 @@ static void
 ircd_linebuf_done_line(buf_head_t * bufhead, buf_line_t * bufline, dlink_node * node)
 {
 	/* Remove it from the linked list */
-	dlinkDestroy(node, &bufhead->list);
+	ircd_dlinkDestroy(node, &bufhead->list);
 
 	/* Update the allocated size */
 	bufhead->alloclen--;
@@ -510,7 +510,7 @@ ircd_linebuf_attach(buf_head_t * bufhead, buf_head_t * new)
 	DLINK_FOREACH(ptr, new->list.head)
 	{
 		line = ptr->data;
-		dlinkAddTailAlloc(line, &bufhead->list);
+		ircd_dlinkAddTailAlloc(line, &bufhead->list);
 
 		/* Update the allocated size */
 		bufhead->alloclen++;

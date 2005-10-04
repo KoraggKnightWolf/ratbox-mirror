@@ -125,10 +125,10 @@ cache_file(const char *filename, const char *shortname, int flags)
 		{
 			lineptr = BlockHeapAlloc(cacheline_heap);
 			strlcpy(lineptr->data, line, sizeof(lineptr->data));
-			dlinkAddTail(lineptr, &lineptr->linenode, &cacheptr->contents);
+			ircd_dlinkAddTail(lineptr, &lineptr->linenode, &cacheptr->contents);
 		}
 		else
-			dlinkAddTailAlloc(emptyline, &cacheptr->contents);
+			ircd_dlinkAddTailAlloc(emptyline, &cacheptr->contents);
 	}
 
 	fclose(in);

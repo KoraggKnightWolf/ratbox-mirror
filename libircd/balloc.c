@@ -307,7 +307,7 @@ newblock(BlockHeap * bh)
 #endif
 		data = (void *) ((size_t) offset + sizeof(MemBlock));
 		newblk->block = b;
-		dlinkAdd(data, &newblk->self, &b->free_list);
+		ircd_dlinkAdd(data, &newblk->self, &b->free_list);
 		offset = (unsigned char *) ((unsigned char *) offset +
 					    bh->elemSize + sizeof(MemBlock));
 	}
@@ -352,7 +352,7 @@ BlockHeapCreate(size_t elemsize, int elemsperblock)
 	if(bh == NULL)
 	{
 		ircd_lib_log("Attempt to calloc() failed: (%s:%d)", __FILE__, __LINE__);
-		outofmemory();	/* die.. out of memory */
+		ircd_outofmemory();	/* die.. out of memory */
 	}
 
 	if((elemsize % sizeof(void *)) != 0)
@@ -374,14 +374,14 @@ BlockHeapCreate(size_t elemsize, int elemsperblock)
 		if(bh != NULL)
 			free(bh);
 		ircd_lib_log("newblock() failed");
-		outofmemory();	/* die.. out of memory */
+		ircd_outofmemory();	/* die.. out of memory */
 	}
 
 	if(bh == NULL)
 	{
 		blockheap_fail("bh == NULL when it shouldn't be");
 	}
-	dlinkAdd(bh, &bh->hlist, &heap_lists);
+	ircd_dlinkAdd(bh, &bh->hlist, &heap_lists);
 	return (bh);
 }
 
@@ -421,7 +421,7 @@ BlockHeapAlloc(BlockHeap * bh)
 			if(bh->freeElems == 0)
 			{
 				ircd_lib_log("newblock() failed and garbage collection didn't help");
-				outofmemory();	/* Well that didn't work either...bail */
+				ircd_outofmemory();	/* Well that didn't work either...bail */
 			}
 		}
 	}
@@ -435,7 +435,7 @@ BlockHeapAlloc(BlockHeap * bh)
 #endif
 			bh->freeElems--;
 			new_node = walker->free_list.head;
-			dlinkMoveNode(new_node, &walker->free_list, &walker->used_list);
+			ircd_dlinkMoveNode(new_node, &walker->free_list, &walker->used_list);
 			lircd_assert(new_node->data != NULL);
 			if(new_node->data == NULL)
 				blockheap_fail("new_node->data is NULL and that shouldn't happen!!!");
@@ -496,19 +496,19 @@ BlockHeapFree(BlockHeap * bh, void *ptr)
 	if(memblock->magic == BALLOC_FREE_MAGIC)
 	{
 		blockheap_fail("double free of a block");
-		outofmemory();
+		ircd_outofmemory();
 	} else 
 	if(memblock->magic != BALLOC_MAGIC)
 	{
 		blockheap_fail("memblock->magic != BALLOC_MAGIC");
-		outofmemory();
+		ircd_outofmemory();
 	}
 #endif
 	lircd_assert(memblock->block != NULL);
 	if(unlikely(memblock->block == NULL))
 	{
 		blockheap_fail("memblock->block == NULL, not a valid block?");
-		outofmemory();
+		ircd_outofmemory();
 	}
 
 	block = memblock->block;
@@ -517,7 +517,7 @@ BlockHeapFree(BlockHeap * bh, void *ptr)
 #endif
 	bh->freeElems++;
 	mem_frob(ptr, bh->elemSize);
-	dlinkMoveNode(&memblock->self, &block->used_list, &block->free_list);
+	ircd_dlinkMoveNode(&memblock->self, &block->used_list, &block->free_list);
 #ifdef DEBUG_BALLOC
 	bh_sanity_check_block(bh, block);
 #endif
@@ -612,7 +612,7 @@ BlockHeapDestroy(BlockHeap * bh)
 		if(walker != NULL)
 			free(walker);
 	}
-	dlinkDelete(&bh->hlist, &heap_lists);
+	ircd_dlinkDelete(&bh->hlist, &heap_lists);
 	free(bh);
 	return (0);
 }

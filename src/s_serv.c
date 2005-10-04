@@ -395,8 +395,8 @@ try_connections(void *unused)
 		return;
 
 	/* move this connect entry to end.. */
-	dlinkDelete(&server_p->node, &server_conf_list);
-	dlinkAddTail(server_p, &server_p->node, &server_conf_list);
+	ircd_dlinkDelete(&server_p->node, &server_conf_list);
+	ircd_dlinkAddTail(server_p, &server_p->node, &server_conf_list);
 
 	/*
 	 * We used to only print this if serv_connect() actually
@@ -621,7 +621,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	client_p->serv->up = me.name;
 	client_p->serv->upid = me.id;
 	SetConnecting(client_p);
-	dlinkAddTail(client_p, &client_p->node, &global_client_list);
+	ircd_dlinkAddTail(client_p, &client_p->node, &global_client_list);
 
 	if(ServerConfVhosted(server_p))
 	{

@@ -169,7 +169,7 @@ mod_add_path(const char *path)
 	pathst = ircd_malloc(sizeof(struct module_path));
 
 	strcpy(pathst->path, path);
-	dlinkAddAlloc(pathst, &mod_paths);
+	ircd_dlinkAddAlloc(pathst, &mod_paths);
 }
 
 /* mod_clear_paths()

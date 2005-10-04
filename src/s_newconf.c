@@ -89,26 +89,26 @@ clear_s_newconf(void)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, shared_conf_list.head)
 	{
 		/* ptr here is ptr->data->node */
-		dlinkDelete(ptr, &shared_conf_list);
+		ircd_dlinkDelete(ptr, &shared_conf_list);
 		free_remote_conf(ptr->data);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, cluster_conf_list.head)
 	{
-		dlinkDelete(ptr, &cluster_conf_list);
+		ircd_dlinkDelete(ptr, &cluster_conf_list);
 		free_remote_conf(ptr->data);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, hubleaf_conf_list.head)
 	{
-		dlinkDelete(ptr, &hubleaf_conf_list);
+		ircd_dlinkDelete(ptr, &hubleaf_conf_list);
 		free_remote_conf(ptr->data);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, oper_conf_list.head)
 	{
 		free_oper_conf(ptr->data);
-		dlinkDestroy(ptr, &oper_conf_list);
+		ircd_dlinkDestroy(ptr, &oper_conf_list);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, server_conf_list.head)
@@ -117,7 +117,7 @@ clear_s_newconf(void)
 
 		if(!server_p->servers)
 		{
-			dlinkDelete(ptr, &server_conf_list);
+			ircd_dlinkDelete(ptr, &server_conf_list);
 			free_server_conf(ptr->data);
 		}
 		else
@@ -139,7 +139,7 @@ clear_s_newconf_bans(void)
 			continue;
 
 		free_conf(aconf);
-		dlinkDestroy(ptr, &xline_conf_list);
+		ircd_dlinkDestroy(ptr, &xline_conf_list);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
@@ -151,7 +151,7 @@ clear_s_newconf_bans(void)
 			continue;
 
 		free_conf(aconf);
-		dlinkDestroy(ptr, &resv_conf_list);
+		ircd_dlinkDestroy(ptr, &resv_conf_list);
 	}
 
 	clear_resv_hash();
@@ -243,7 +243,7 @@ expire_glines(void *unused)
 			continue;
 
 		delete_one_address_conf(aconf->host, aconf);
-		dlinkDestroy(ptr, &glines);
+		ircd_dlinkDestroy(ptr, &glines);
 	}
 }
 
@@ -529,7 +529,7 @@ detach_server_conf(struct Client *client_p)
 		if(MaxUsers(server_p->class) < 0 && CurrUsers(server_p->class) <= 0)
 			free_class(server_p->class);
 
-		dlinkDelete(&server_p->node, &server_conf_list);
+		ircd_dlinkDelete(&server_p->node, &server_conf_list);
 		free_server_conf(server_p);
 	}
 }
@@ -710,7 +710,7 @@ expire_temp_rxlines(void *unused)
 						aconf->name);
 
 			free_conf(aconf);
-			dlinkDestroy(ptr, &resvTable[i]);
+			ircd_dlinkDestroy(ptr, &resvTable[i]);
 		}
 	}
 	HASH_WALK_END
@@ -726,7 +726,7 @@ expire_temp_rxlines(void *unused)
 						"Temporary RESV for [%s] expired",
 						aconf->name);
 			free_conf(aconf);
-			dlinkDestroy(ptr, &resv_conf_list);
+			ircd_dlinkDestroy(ptr, &resv_conf_list);
 		}
 	}
 
@@ -741,7 +741,7 @@ expire_temp_rxlines(void *unused)
 						"Temporary X-line for [%s] expired",
 						aconf->name);
 			free_conf(aconf);
-			dlinkDestroy(ptr, &xline_conf_list);
+			ircd_dlinkDestroy(ptr, &xline_conf_list);
 		}
 	}
 }
@@ -767,15 +767,15 @@ add_nd_entry(const char *name)
 	nd->expire = ircd_currenttime + ConfigFileEntry.nick_delay;
 
 	/* this list is ordered */
-	dlinkAddTail(nd, &nd->lnode, &nd_list);
+	ircd_dlinkAddTail(nd, &nd->lnode, &nd_list);
 	add_to_nd_hash(name, nd);
 }
 
 void
 free_nd_entry(struct nd_entry *nd)
 {
-	dlinkDelete(&nd->lnode, &nd_list);
-	dlinkDelete(&nd->hnode, &ndTable[nd->hashv]);
+	ircd_dlinkDelete(&nd->lnode, &nd_list);
+	ircd_dlinkDelete(&nd->hnode, &ndTable[nd->hashv]);
 	BlockHeapFree(nd_heap, nd);
 }
 
@@ -818,7 +818,7 @@ add_tgchange(const char *host)
 	DupString(target->ip, host);
 	target->expiry = ircd_currenttime + (60*60*12);
 
-	dlinkAdd(target, &target->node, &tgchange_list);
+	ircd_dlinkAdd(target, &target->node, &tgchange_list);
 }
 
 tgchange *

@@ -476,7 +476,7 @@ remove_temp_dline(const char *host)
 
 			if(comp_with_mask_sock((struct sockaddr *)&addr, (struct sockaddr *)&caddr, bits) && bits == cbits)
 			{
-				dlinkDestroy(ptr, &temp_dlines[i]);
+				ircd_dlinkDestroy(ptr, &temp_dlines[i]);
 				delete_one_address_conf(aconf->host, aconf);
 				return YES;
 			}

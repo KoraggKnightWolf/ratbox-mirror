@@ -72,14 +72,14 @@ transaction_append(const char *data)
 	if(transaction_queue.head || (translog = fopen(TRANSPATH, "a")) == NULL)
 	{
 		DupString(store, data);
-		dlinkAddAlloc(store, &transaction_queue);
+		ircd_dlinkAddAlloc(store, &transaction_queue);
 		return;
 	}
 
 	if(fputs(data, translog) < 0)
 	{
 		DupString(store, data);
-		dlinkAddAlloc(store, &transaction_queue);
+		ircd_dlinkAddAlloc(store, &transaction_queue);
 		return;
 	}
 
@@ -270,7 +270,7 @@ banconf_parse_xline(char *line)
 
 	if(banconf_parse_line(line, &aconf->name, NULL, 
 				&aconf->passwd, NULL))
-		dlinkAddAlloc(aconf, &xline_conf_list);
+		ircd_dlinkAddAlloc(aconf, &xline_conf_list);
 	else
 		free_conf(aconf);
 }
@@ -299,7 +299,7 @@ banconf_parse_resv(char *line)
 				return;
 
 			aconf->status = CONF_RESV_NICK;
-			dlinkAddAlloc(aconf, &resv_conf_list);
+			ircd_dlinkAddAlloc(aconf, &resv_conf_list);
 		}
 		else
 			free_conf(aconf);

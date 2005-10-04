@@ -270,7 +270,7 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf->port = 0;
 		DupString(aconf->name, name);
 		DupString(aconf->passwd, reason);
-		dlinkAddAlloc(aconf, &resv_conf_list);
+		ircd_dlinkAddAlloc(aconf, &resv_conf_list);
 
 		notify_resv(source_p, aconf->name, aconf->passwd, temp_time);
 
@@ -383,7 +383,7 @@ remove_temp_resv(struct Client *source_p, const char *name)
 			return 0;
 
 		/* already have ptr from the loop above.. */
-		dlinkDestroy(ptr, &resv_conf_list);
+		ircd_dlinkDestroy(ptr, &resv_conf_list);
 		free_conf(aconf);
 	}
 

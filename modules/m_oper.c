@@ -217,7 +217,7 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 	source_p->operflags |= oper_p->flags;
 	DupString(source_p->localClient->opername, oper_p->name);
 
-	dlinkAddAlloc(source_p, &oper_list);
+	ircd_dlinkAddAlloc(source_p, &oper_list);
 
 	if(IsOperAdmin(source_p) && !IsOperHiddenAdmin(source_p))
 		source_p->umodes |= UMODE_ADMIN;

@@ -657,7 +657,7 @@ set_local_gline(struct Client *source_p, const char *user,
 	DupString(aconf->host, host);
 	aconf->hold = ircd_currenttime + ConfigFileEntry.gline_time;
 
-	dlinkAddTailAlloc(aconf, &glines);
+	ircd_dlinkAddTailAlloc(aconf, &glines);
 	add_conf_by_address(aconf->host, CONF_GLINE, aconf->user, aconf);
 
 	sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -774,7 +774,7 @@ majority_gline(struct Client *source_p, const char *user,
 	pending->last_gline_time = ircd_currenttime;
 	pending->time_request1 = ircd_currenttime;
 
-	dlinkAddAlloc(pending, &pending_glines);
+	ircd_dlinkAddAlloc(pending, &pending_glines);
 
 	return NO;
 }
@@ -815,7 +815,7 @@ remove_temp_gline(const char *user, const char *host)
 						(struct sockaddr *)&caddr, bits))
 			continue;
 
-		dlinkDestroy(ptr, &glines);
+		ircd_dlinkDestroy(ptr, &glines);
 		delete_one_address_conf(aconf->host, aconf);
 		return YES;
 	}
@@ -851,7 +851,7 @@ expire_pending_glines(void *unused)
 			ircd_free(glp_ptr->reason1);
 			ircd_free(glp_ptr->reason2);
 			ircd_free(glp_ptr);
-			dlinkDestroy(pending_node, &pending_glines);
+			ircd_dlinkDestroy(pending_node, &pending_glines);
 		}
 	}
 }

@@ -351,7 +351,7 @@ extern void notify_banned_client(struct Client *client_p, struct ConfItem *aconf
 extern int accept_message(struct Client *source, struct Client *target);
 extern void del_from_accept(struct Client *source, struct Client *target);
 
-#define accept_message(s, t) ((s) == (t) || (dlinkFind((s), &((t)->localClient->allow_list))))
+#define accept_message(s, t) ((s) == (t) || (ircd_dlinkFind((s), &((t)->localClient->allow_list))))
 extern void del_all_accepts(struct Client *client_p);
 
 extern void dead_link(struct Client *client_p);

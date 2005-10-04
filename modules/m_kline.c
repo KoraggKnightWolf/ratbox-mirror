@@ -857,7 +857,7 @@ remove_temp_kline(const char *user, const char *host)
 						(struct sockaddr *)&caddr, bits))
 				continue;
 
-			dlinkDestroy(ptr, &temp_klines[i]);
+			ircd_dlinkDestroy(ptr, &temp_klines[i]);
 			delete_one_address_conf(aconf->host, aconf);
 			return YES;
 		}

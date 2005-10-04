@@ -105,11 +105,11 @@ add_monitor(struct Client *client_p, const char *nicks)
 		monptr = find_monitor(name, 1);
 
 		/* already monitoring this nick */
-		if(dlinkFind(client_p, &monptr->users))
+		if(ircd_dlinkFind(client_p, &monptr->users))
 			continue;
 
-		dlinkAddAlloc(client_p, &monptr->users);
-		dlinkAddAlloc(monptr, &client_p->localClient->monitor_list);
+		ircd_dlinkAddAlloc(client_p, &monptr->users);
+		ircd_dlinkAddAlloc(monptr, &client_p->localClient->monitor_list);
 
 		if((target_p = find_person(name)) != NULL)
 		{
@@ -176,8 +176,8 @@ del_monitor(struct Client *client_p, const char *nicks)
 		if((monptr = find_monitor(name, 0)) == NULL)
 			continue;
 
-		dlinkFindDestroy(client_p, &monptr->users);
-		dlinkFindDestroy(monptr, &client_p->localClient->monitor_list);
+		ircd_dlinkFindDestroy(client_p, &monptr->users);
+		ircd_dlinkFindDestroy(monptr, &client_p->localClient->monitor_list);
 	}
 }
 

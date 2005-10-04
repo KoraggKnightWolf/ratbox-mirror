@@ -516,7 +516,7 @@ expire_tgchange(void *unused)
 
 		if(target->expiry < ircd_currenttime)
 		{
-			dlinkDelete(ptr, &tgchange_list);
+			ircd_dlinkDelete(ptr, &tgchange_list);
 			patricia_remove(tgchange_tree, target->pnode);
 			ircd_free(target->ip);
 			ircd_free(target);

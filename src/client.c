@@ -142,7 +142,7 @@ make_client(struct Client *from)
 		client_p->localClient->ctrlfd = -1;
 
 		/* as good a place as any... */
-		dlinkAdd(client_p, &client_p->localClient->tnode, &unknown_list);
+		ircd_dlinkAdd(client_p, &client_p->localClient->tnode, &unknown_list);
 	}
 	else
 	{			/* from is not NULL */
@@ -663,7 +663,7 @@ remove_client_from_list(struct Client *client_p)
 	if(client_p->node.prev == NULL && client_p->node.next == NULL)
 		return;
 
-	dlinkDelete(&client_p->node, &global_client_list);
+	ircd_dlinkDelete(&client_p->node, &global_client_list);
 
 	update_client_exit_stats(client_p);
 }
@@ -913,7 +913,7 @@ free_exited_clients(void *unused)
 
 			if(found)
 			{
-				dlinkDestroy(ptr, &dead_list);
+				ircd_dlinkDestroy(ptr, &dead_list);
 				continue;
 			}
 		}
@@ -923,12 +923,12 @@ free_exited_clients(void *unused)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Warning: null client on dead_list!");
-			dlinkDestroy(ptr, &dead_list);
+			ircd_dlinkDestroy(ptr, &dead_list);
 			continue;
 		}
 		release_client_state(target_p);
 		free_client(target_p);
-		dlinkDestroy(ptr, &dead_list);
+		ircd_dlinkDestroy(ptr, &dead_list);
 	}
 
 #ifdef DEBUG_EXITED_CLIENTS
@@ -940,12 +940,12 @@ free_exited_clients(void *unused)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Warning: null client on dead_list!");
-			dlinkDestroy(ptr, &dead_list);
+			ircd_dlinkDestroy(ptr, &dead_list);
 			continue;
 		}
 		release_client_state(target_p);
 		free_client(target_p);
-		dlinkDestroy(ptr, &dead_remote_list);
+		ircd_dlinkDestroy(ptr, &dead_remote_list);
 	}
 #endif
 	
@@ -1093,7 +1093,7 @@ exit_aborted_clients(void *unused)
 
 #ifdef DEBUG_EXITED_CLIENTS
 		{
-			if(dlinkFind(abt->client, &dead_list))
+			if(ircd_dlinkFind(abt->client, &dead_list))
 			{
 				s_assert(0);
 				sendto_realops_flags(UMODE_ALL, L_ALL, 
@@ -1108,7 +1108,7 @@ exit_aborted_clients(void *unused)
 #endif
 
 		s_assert(*((unsigned long*)abt->client) != 0xdeadbeef); /* This is lame but its a debug thing */
-		dlinkDelete(ptr, &abort_list);
+		ircd_dlinkDelete(ptr, &abort_list);
 
 		if(IsAnyServer(abt->client))
 			sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -1149,7 +1149,7 @@ dead_link(struct Client *client_p)
 	SetIOError(client_p);
 	SetDead(client_p);
 	SetClosing(client_p);
-	dlinkAdd(abt, &abt->node, &abort_list);
+	ircd_dlinkAdd(abt, &abt->node, &abort_list);
 }
 
 
@@ -1203,7 +1203,7 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
 	
 	if(source_p->servptr && source_p->servptr->serv)
 	{
-		dlinkDelete(&source_p->lnode, &source_p->servptr->serv->users);
+		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->users);
 	}
 
 	if((source_p->flags & FLAGS_KILLED) == 0)
@@ -1216,9 +1216,9 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
 
 	SetDead(source_p);
 #ifdef DEBUG_EXITED_CLIENTS
-	dlinkAddAlloc(source_p, &dead_remote_list);
+	ircd_dlinkAddAlloc(source_p, &dead_remote_list);
 #else
-	dlinkAddAlloc(source_p, &dead_list);
+	ircd_dlinkAddAlloc(source_p, &dead_list);
 #endif
 	return(CLIENT_EXITED);
 }
@@ -1233,7 +1233,7 @@ exit_unknown_client(struct Client *client_p, struct Client *source_p, struct Cli
 {
 	delete_auth_queries(source_p);
 	ircd_linebuf_donebuf(&client_p->localClient->buf_recvq);
-	dlinkDelete(&source_p->localClient->tnode, &unknown_list);
+	ircd_dlinkDelete(&source_p->localClient->tnode, &unknown_list);
 
 	if(!IsIOError(source_p))
 		sendto_one(source_p, POP_QUEUE, "ERROR :Closing Link: 127.0.0.1 (%s)", comment);
@@ -1244,7 +1244,7 @@ exit_unknown_client(struct Client *client_p, struct Client *source_p, struct Cli
 	del_from_client_hash(source_p->name, source_p);
 	remove_client_from_list(source_p);
 	SetDead(source_p);
-	dlinkAddAlloc(source_p, &dead_list);
+	ircd_dlinkAddAlloc(source_p, &dead_list);
 
 	/* Note that we don't need to add unknowns to the dead_list */
 	return(CLIENT_EXITED);
@@ -1268,11 +1268,11 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 		remove_dependents(client_p, source_p, from, comment, comment1);
 
 	if(source_p->servptr && source_p->servptr->serv)
-		dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
+		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
 	else
 		s_assert(0);
 
-	dlinkFindDestroy(source_p, &global_serv_list);
+	ircd_dlinkFindDestroy(source_p, &global_serv_list);
 	target_p = source_p->from;
 	
 	if(target_p != NULL && IsServer(target_p) && target_p != client_p &&
@@ -1291,9 +1291,9 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 	
 	SetDead(source_p);
 #ifdef DEBUG_EXITED_CLIENTS
-	dlinkAddAlloc(source_p, &dead_remote_list);
+	ircd_dlinkAddAlloc(source_p, &dead_remote_list);
 #else
-	dlinkAddAlloc(source_p, &dead_list);
+	ircd_dlinkAddAlloc(source_p, &dead_list);
 #endif
 	return 0;
 }
@@ -1305,11 +1305,11 @@ qs_server(struct Client *client_p, struct Client *source_p, struct Client *from,
 	struct Client *target_p;
 
 	if(source_p->servptr && source_p->servptr->serv)
-		dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
+		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
 	else
 		s_assert(0);
 
-	dlinkFindDestroy(source_p, &global_serv_list);
+	ircd_dlinkFindDestroy(source_p, &global_serv_list);
 	target_p = source_p->from;
 	
 	if(has_id(source_p))
@@ -1319,7 +1319,7 @@ qs_server(struct Client *client_p, struct Client *source_p, struct Client *from,
 	remove_client_from_list(source_p);  
 	
 	SetDead(source_p);
-	dlinkAddAlloc(source_p, &dead_list);	
+	ircd_dlinkAddAlloc(source_p, &dead_list);	
 	return 0;
 }
 
@@ -1330,8 +1330,8 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	static char comment1[(HOSTLEN*2)+2];
 	unsigned int sendk, recvk;
 	
-	dlinkDelete(&source_p->localClient->tnode, &serv_list);
-	dlinkFindDestroy(source_p, &global_serv_list);
+	ircd_dlinkDelete(&source_p->localClient->tnode, &serv_list);
+	ircd_dlinkFindDestroy(source_p, &global_serv_list);
 	
 	unset_chcap_usage_counts(source_p);
 	sendk = source_p->localClient->sendK;
@@ -1350,7 +1350,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	}
 
 	if(source_p->servptr && source_p->servptr->serv)
-		dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
+		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
 	else
 		s_assert(0);
 
@@ -1382,7 +1382,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	remove_client_from_list(source_p);
 	
 	SetDead(source_p);
-	dlinkAddAlloc(source_p, &dead_list);
+	ircd_dlinkAddAlloc(source_p, &dead_list);
 	return 0;
 }
 
@@ -1402,11 +1402,11 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 
 	s_assert(IsPerson(source_p));
 	ircd_linebuf_donebuf(&client_p->localClient->buf_recvq);
-	dlinkDelete(&source_p->localClient->tnode, &lclient_list);
-	dlinkDelete(&source_p->lnode, &me.serv->users);
+	ircd_dlinkDelete(&source_p->localClient->tnode, &lclient_list);
+	ircd_dlinkDelete(&source_p->lnode, &me.serv->users);
 
 	if(IsOper(source_p))
-		dlinkFindDestroy(source_p, &oper_list);
+		ircd_dlinkFindDestroy(source_p, &oper_list);
 
 	sendto_realops_flags(UMODE_CCONN, L_ALL,
 			     "Client exiting: %s (%s@%s) [%s] [%s]",
@@ -1445,7 +1445,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	}
 
 	SetDead(source_p);
-	dlinkAddAlloc(source_p, &dead_list);
+	ircd_dlinkAddAlloc(source_p, &dead_list);
 	return(CLIENT_EXITED);
 }
 
@@ -1585,8 +1585,8 @@ del_all_accepts(struct Client *client_p)
 		DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->allow_list.head)
 		{
 			target_p = ptr->data;
-			dlinkFindDestroy(client_p, &target_p->on_allow_list);
-			dlinkDestroy(ptr, &client_p->localClient->allow_list);
+			ircd_dlinkFindDestroy(client_p, &target_p->on_allow_list);
+			ircd_dlinkDestroy(ptr, &client_p->localClient->allow_list);
 		}
 	}
 
@@ -1594,8 +1594,8 @@ del_all_accepts(struct Client *client_p)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->on_allow_list.head)
 	{
 		target_p = ptr->data;
-		dlinkFindDestroy(client_p, &target_p->localClient->allow_list);
-		dlinkDestroy(ptr, &client_p->on_allow_list);
+		ircd_dlinkFindDestroy(client_p, &target_p->localClient->allow_list);
+		ircd_dlinkDestroy(ptr, &client_p->on_allow_list);
 	}
 }
 
@@ -1718,7 +1718,7 @@ initUser(void)
 {
 	user_heap = BlockHeapCreate(sizeof(struct User), USER_HEAP_SIZE);
 	if(!user_heap)
-		outofmemory();
+		ircd_outofmemory();
 }
 
 /*

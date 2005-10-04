@@ -351,7 +351,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 			get_oper_name(source_p), name, reason);
 	}
 
-	dlinkAddAlloc(aconf, &xline_conf_list);
+	ircd_dlinkAddAlloc(aconf, &xline_conf_list);
 	check_xlines();
 }
 
@@ -445,7 +445,7 @@ remove_temp_xline(struct Client *source_p, const char *name)
 				get_oper_name(source_p), name);
 			
 			free_conf(aconf);
-			dlinkDestroy(ptr, &xline_conf_list);
+			ircd_dlinkDestroy(ptr, &xline_conf_list);
 			return 1;
 		}
 	}

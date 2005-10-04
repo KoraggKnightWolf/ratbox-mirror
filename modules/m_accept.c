@@ -93,8 +93,8 @@ m_accept(struct Client *client_p, struct Client *source_p, int parc, const char 
 			continue;
 		}
 
-		dlinkFindDestroy(target_p, &source_p->localClient->allow_list);
-		dlinkFindDestroy(source_p, &target_p->on_allow_list);
+		ircd_dlinkFindDestroy(target_p, &source_p->localClient->allow_list);
+		ircd_dlinkFindDestroy(source_p, &target_p->on_allow_list);
 
 	}
 
@@ -207,8 +207,8 @@ build_nicklist(struct Client *source_p, char *addbuf, char *delbuf, const char *
 static void
 add_accept(struct Client *source_p, struct Client *target_p)
 {
-	dlinkAddAlloc(target_p, &source_p->localClient->allow_list);
-	dlinkAddAlloc(source_p, &target_p->on_allow_list);
+	ircd_dlinkAddAlloc(target_p, &source_p->localClient->allow_list);
+	ircd_dlinkAddAlloc(source_p, &target_p->on_allow_list);
 }
 
 

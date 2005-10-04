@@ -186,7 +186,7 @@ add_class(struct Class *classptr)
 
 	if(tmpptr == default_class)
 	{
-		dlinkAddAlloc(classptr, &class_list);
+		ircd_dlinkAddAlloc(classptr, &class_list);
 		CurrUsers(classptr) = 0;
 	}
 	else
@@ -253,7 +253,7 @@ check_class()
 
 		if(MaxUsers(cltmp) < 0)
 		{
-			dlinkDestroy(ptr, &class_list);
+			ircd_dlinkDestroy(ptr, &class_list);
 			if(CurrUsers(cltmp) <= 0)
 				free_class(cltmp);
 		}

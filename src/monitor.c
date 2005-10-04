@@ -155,7 +155,7 @@ clear_monitor(struct Client *client_p)
 		/* we leave the actual entry around with no users, itll be
 		 * cleaned up periodically by cleanup_monitor() --anfl
 		 */
-		dlinkFindDestroy(client_p, &monptr->users);
+		ircd_dlinkFindDestroy(client_p, &monptr->users);
 		free_dlink_node(ptr);
 	}
 

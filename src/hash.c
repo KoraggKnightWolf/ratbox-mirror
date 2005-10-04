@@ -232,7 +232,7 @@ add_to_id_hash(const char *name, struct Client *client_p)
 		return;
 
 	hashv = hash_id(name);
-	dlinkAddAlloc(client_p, &idTable[hashv]);
+	ircd_dlinkAddAlloc(client_p, &idTable[hashv]);
 }
 
 /* add_to_client_hash()
@@ -250,7 +250,7 @@ add_to_client_hash(const char *name, struct Client *client_p)
 		return;
 
 	hashv = hash_nick(name);
-	dlinkAddAlloc(client_p, &clientTable[hashv]);
+	ircd_dlinkAddAlloc(client_p, &clientTable[hashv]);
 }
 
 /* add_to_hostname_hash()
@@ -268,7 +268,7 @@ add_to_hostname_hash(const char *hostname, struct Client *client_p)
 		return;
 
 	hashv = hash_hostname(hostname);
-	dlinkAddAlloc(client_p, &hostTable[hashv]);
+	ircd_dlinkAddAlloc(client_p, &hostTable[hashv]);
 }
 
 /* add_to_resv_hash()
@@ -286,7 +286,7 @@ add_to_resv_hash(const char *name, struct ConfItem *aconf)
 		return;
 
 	hashv = hash_resv(name);
-	dlinkAddAlloc(aconf, &resvTable[hashv]);
+	ircd_dlinkAddAlloc(aconf, &resvTable[hashv]);
 }
 
 void
@@ -298,14 +298,14 @@ add_to_help_hash(const char *name, struct cachefile *hptr)
 		return;
 
 	hashv = hash_help(name);
-	dlinkAddAlloc(hptr, &helpTable[hashv]);
+	ircd_dlinkAddAlloc(hptr, &helpTable[hashv]);
 }
 
 void
 add_to_nd_hash(const char *name, struct nd_entry *nd)
 {
 	nd->hashv = hash_nick(name);
-	dlinkAdd(nd, &nd->hnode, &ndTable[nd->hashv]);
+	ircd_dlinkAdd(nd, &nd->hnode, &ndTable[nd->hashv]);
 }
 
 /* del_from_id_hash()
@@ -323,7 +323,7 @@ del_from_id_hash(const char *id, struct Client *client_p)
 		return;
 
 	hashv = hash_id(id);
-	dlinkFindDestroy(client_p, &idTable[hashv]);
+	ircd_dlinkFindDestroy(client_p, &idTable[hashv]);
 }
 
 /* del_from_client_hash()
@@ -342,7 +342,7 @@ del_from_client_hash(const char *name, struct Client *client_p)
 		return;
 
 	hashv = hash_nick(name);
-	dlinkFindDestroy(client_p, &clientTable[hashv]);
+	ircd_dlinkFindDestroy(client_p, &clientTable[hashv]);
 }
 
 /* del_from_channel_hash()
@@ -361,7 +361,7 @@ del_from_channel_hash(const char *name, struct Channel *chptr)
 		return;
 
 	hashv = hash_channel(name);
-	dlinkFindDestroy(chptr, &channelTable[hashv]);
+	ircd_dlinkFindDestroy(chptr, &channelTable[hashv]);
 }
 
 /* del_from_hostname_hash()
@@ -378,7 +378,7 @@ del_from_hostname_hash(const char *hostname, struct Client *client_p)
 
 	hashv = hash_hostname(hostname);
 
-	dlinkFindDestroy(client_p, &hostTable[hashv]);
+	ircd_dlinkFindDestroy(client_p, &hostTable[hashv]);
 }
 
 /* del_from_resv_hash()
@@ -397,7 +397,7 @@ del_from_resv_hash(const char *name, struct ConfItem *aconf)
 
 	hashv = hash_resv(name);
 
-	dlinkFindDestroy(aconf, &resvTable[hashv]);
+	ircd_dlinkFindDestroy(aconf, &resvTable[hashv]);
 }
 
 void
@@ -410,7 +410,7 @@ clear_help_hash(void)
 	HASH_WALK_SAFE(i, HELP_MAX, ptr, next_ptr, helpTable)
 	{
 		free_cachefile(ptr->data);
-		dlinkDestroy(ptr, &helpTable[i]);
+		ircd_dlinkDestroy(ptr, &helpTable[i]);
 	}
 	HASH_WALK_END
 }
@@ -716,11 +716,11 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 
 	chptr = allocate_channel(s);
 
-	dlinkAdd(chptr, &chptr->node, &global_channel_list);
+	ircd_dlinkAdd(chptr, &chptr->node, &global_channel_list);
 
 	chptr->channelts = ircd_currenttime;	/* doesn't hurt to set it here */
 
-	dlinkAddAlloc(chptr, &channelTable[hashv]);
+	ircd_dlinkAddAlloc(chptr, &channelTable[hashv]);
 
 	return chptr;
 }
@@ -797,7 +797,7 @@ clear_resv_hash(void)
 			continue;
 
 		free_conf(ptr->data);
-		dlinkDestroy(ptr, &resvTable[i]);
+		ircd_dlinkDestroy(ptr, &resvTable[i]);
 	}
 	HASH_WALK_END
 }

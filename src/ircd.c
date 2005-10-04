@@ -457,7 +457,7 @@ diecb(const char *buf)
 {
 	if(buf != NULL)
 		ilog(L_MAIN, "%s", buf);
-	outofmemory();	
+	abort();
 }
 
 int
@@ -499,7 +499,7 @@ ratbox_main(int argc, char *argv[])
 	memset(&global_serv_list, 0, sizeof(global_serv_list));
 	memset(&oper_list, 0, sizeof(oper_list));
 
-	dlinkAddTail(&me, &me.node, &global_client_list);
+	ircd_dlinkAddTail(&me, &me.node, &global_client_list);
 
 	memset((void *) &Count, 0, sizeof(Count));
 	memset((void *) &ServerInfo, 0, sizeof(ServerInfo));
@@ -636,7 +636,7 @@ ratbox_main(int argc, char *argv[])
 	add_to_client_hash(me.name, &me);
 	add_to_id_hash(me.id, &me);
 
-	dlinkAddAlloc(&me, &global_serv_list);
+	ircd_dlinkAddAlloc(&me, &global_serv_list);
 
 	check_class();
 	write_pidfile(pidFileName);

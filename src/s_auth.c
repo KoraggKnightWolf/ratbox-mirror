@@ -274,7 +274,7 @@ release_auth_client(struct AuthRequest *auth)
 		authtable[auth->reqid] = NULL;
 
 	client->localClient->auth_request = NULL;
-	dlinkDelete(&auth->node, &auth_poll_list);
+	ircd_dlinkDelete(&auth->node, &auth_poll_list);
 	free_auth_request(auth);
 	if(client->localClient->fd > ircd_highest_fd)
 		ircd_highest_fd = client->localClient->fd;
@@ -286,7 +286,7 @@ release_auth_client(struct AuthRequest *auth)
 	 */
 	client->localClient->allow_read = MAX_FLOOD;
 	ircd_setflush(client->localClient->fd, 1000, flood_recalc, client);
-	dlinkAddTail(client, &client->node, &global_client_list);
+	ircd_dlinkAddTail(client, &client->node, &global_client_list);
 	read_packet(client->localClient->fd, client);
 }
 
@@ -447,7 +447,7 @@ start_auth(struct Client *client)
 
 	sendheader(client, REPORT_DO_DNS);
 
-	dlinkAdd(auth, &auth->node, &auth_poll_list);
+	ircd_dlinkAdd(auth, &auth->node, &auth_poll_list);
 
 	/* Note that the order of things here are done for a good reason
 	 * if you try to do start_auth_query before lookup_ip there is a 
@@ -522,7 +522,7 @@ delete_auth_queries(struct Client *target_p)
 	if(auth->reqid > 0)
 		authtable[auth->reqid] = NULL;
 
-	dlinkDelete(&auth->node, &auth_poll_list);
+	ircd_dlinkDelete(&auth->node, &auth_poll_list);
 	free_auth_request(auth);
 }
 

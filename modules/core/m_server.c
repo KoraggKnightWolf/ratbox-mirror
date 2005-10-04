@@ -400,10 +400,10 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	SetServer(target_p);
 
-	dlinkAddTail(target_p, &target_p->node, &global_client_list);
-	dlinkAddTailAlloc(target_p, &global_serv_list);
+	ircd_dlinkAddTail(target_p, &target_p->node, &global_client_list);
+	ircd_dlinkAddTailAlloc(target_p, &global_serv_list);
 	add_to_client_hash(target_p->name, target_p);
-	dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
+	ircd_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
 
 	sendto_server(client_p, NULL, NOCAPS, NOCAPS,
 		      ":%s SERVER %s %d :%s%s",
@@ -536,11 +536,11 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	target_p->servptr = source_p;
 	SetServer(target_p);
 
-	dlinkAddTail(target_p, &target_p->node, &global_client_list);
-	dlinkAddTailAlloc(target_p, &global_serv_list);
+	ircd_dlinkAddTail(target_p, &target_p->node, &global_client_list);
+	ircd_dlinkAddTailAlloc(target_p, &global_serv_list);
 	add_to_client_hash(target_p->name, target_p);
 	add_to_id_hash(target_p->id, target_p);
-	dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
+	ircd_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
 
 	sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
 		      ":%s SID %s %d %s :%s%s",
@@ -1416,9 +1416,9 @@ server_estab(struct Client *client_p)
 	/* Update the capability combination usage counts */
 	set_chcap_usage_counts(client_p);
 
-	dlinkAdd(client_p, &client_p->lnode, &me.serv->servers);
-	dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &serv_list);
-	dlinkAddTailAlloc(client_p, &global_serv_list);
+	ircd_dlinkAdd(client_p, &client_p->lnode, &me.serv->servers);
+	ircd_dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &serv_list);
+	ircd_dlinkAddTailAlloc(client_p, &global_serv_list);
 
 	if(has_id(client_p))
 		add_to_id_hash(client_p->id, client_p);

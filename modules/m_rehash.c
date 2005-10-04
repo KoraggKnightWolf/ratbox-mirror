@@ -126,7 +126,7 @@ rehash_glines(struct Client *source_p)
 		aconf = ptr->data;
 
 		delete_one_address_conf(aconf->host, aconf);
-		dlinkDestroy(ptr, &glines);
+		ircd_dlinkDestroy(ptr, &glines);
 	}
 }
 
@@ -147,7 +147,7 @@ rehash_pglines(struct Client *source_p)
 		ircd_free(glp_ptr->reason1);
 		ircd_free(glp_ptr->reason2);
 		ircd_free(glp_ptr);
-		dlinkDestroy(ptr, &pending_glines);
+		ircd_dlinkDestroy(ptr, &pending_glines);
 	}
 }
 
@@ -168,7 +168,7 @@ rehash_tklines(struct Client *source_p)
 			aconf = ptr->data;
 
 			delete_one_address_conf(aconf->host, aconf);
-			dlinkDestroy(ptr, &temp_klines[i]);
+			ircd_dlinkDestroy(ptr, &temp_klines[i]);
 		}
 	}
 }
@@ -190,7 +190,7 @@ rehash_tdlines(struct Client *source_p)
 			aconf = ptr->data;
 
 			delete_one_address_conf(aconf->host, aconf);
-			dlinkDestroy(ptr, &temp_dlines[i]);
+			ircd_dlinkDestroy(ptr, &temp_dlines[i]);
 		}
 	}
 }
@@ -213,7 +213,7 @@ rehash_txlines(struct Client *source_p)
 			continue;
 
 		free_conf(aconf);
-		dlinkDestroy(ptr, &xline_conf_list);
+		ircd_dlinkDestroy(ptr, &xline_conf_list);
 	}
 }
 
@@ -236,7 +236,7 @@ rehash_tresvs(struct Client *source_p)
 			continue;
 
 		free_conf(aconf);
-		dlinkDestroy(ptr, &resvTable[i]);
+		ircd_dlinkDestroy(ptr, &resvTable[i]);
 	}
 	HASH_WALK_END
 
@@ -248,7 +248,7 @@ rehash_tresvs(struct Client *source_p)
 			continue;
 
 		free_conf(aconf);
-		dlinkDestroy(ptr, &resv_conf_list);
+		ircd_dlinkDestroy(ptr, &resv_conf_list);
 	}
 }
 

@@ -100,9 +100,9 @@ void mem_frob(void *ndata, int len);
 #define dlink_list_length(list) (list)->length
 #define dlink_move_list(oldlist, newlist, node)
 
-#define dlinkAddAlloc(data, list) dlinkAdd(data, make_dlink_node(), list)
-#define dlinkAddTailAlloc(data, list) dlinkAddTail(data, make_dlink_node(), list)
-#define dlinkDestroy(node, list) do { dlinkDelete(node, list); free_dlink_node(node); } while(0)
+#define ircd_dlinkAddAlloc(data, list) ircd_dlinkAdd(data, make_dlink_node(), list)
+#define ircd_dlinkAddTailAlloc(data, list) ircd_dlinkAddTail(data, make_dlink_node(), list)
+#define ircd_dlinkDestroy(node, list) do { ircd_dlinkDelete(node, list); free_dlink_node(node); } while(0)
 
 
 unsigned long slow_list_length(dlink_list *);
@@ -119,7 +119,7 @@ unsigned long slow_list_length(dlink_list *);
  */
 
 /* 
- * dlink_ routines are stolen from squid, except for dlinkAddBefore,
+ * dlink_ routines are stolen from squid, except for ircd_dlinkAddBefore,
  * which is mine.
  *   -- adrian
  */
@@ -138,21 +138,21 @@ unsigned long slow_list_length(dlink_list *);
 #define INLINE_FUNC
 #endif 
     
-void dlinkMoveNode(dlink_node * m, dlink_list * oldlist, dlink_list * newlist);
-void dlinkAdd(void *ndata, dlink_node * m, dlink_list * list);
-void dlinkAddBefore(dlink_node * b, void *ndata, dlink_node * m, dlink_list * list);
-void dlinkMoveTail(dlink_node *m, dlink_list *list);
-void dlinkAddTail(void *ndata, dlink_node * m, dlink_list * list);
-void dlinkDelete(dlink_node * m, dlink_list * list);
-dlink_node *dlinkFindDelete(void *ndata, dlink_list *list);
-int dlinkFindDestroy(void *ndata, dlink_list *list);
-dlink_node *dlinkFind(void *ndata, dlink_list *list);
-void dlinkMoveList(dlink_list * from, dlink_list * to);
+void ircd_dlinkMoveNode(dlink_node * m, dlink_list * oldlist, dlink_list * newlist);
+void ircd_dlinkAdd(void *ndata, dlink_node * m, dlink_list * list);
+void ircd_dlinkAddBefore(dlink_node * b, void *ndata, dlink_node * m, dlink_list * list);
+void ircd_dlinkMoveTail(dlink_node *m, dlink_list *list);
+void ircd_dlinkAddTail(void *ndata, dlink_node * m, dlink_list * list);
+void ircd_dlinkDelete(dlink_node * m, dlink_list * list);
+dlink_node *ircd_dlinkFindDelete(void *ndata, dlink_list *list);
+int ircd_dlinkFindDestroy(void *ndata, dlink_list *list);
+dlink_node *ircd_dlinkFind(void *ndata, dlink_list *list);
+void ircd_dlinkMoveList(dlink_list * from, dlink_list * to);
 
 
 #if defined(NEED_INLINES) || defined(TOOLS_C)
 INLINE_FUNC void
-dlinkMoveNode(dlink_node * m, dlink_list * oldlist, dlink_list * newlist)
+ircd_dlinkMoveNode(dlink_node * m, dlink_list * oldlist, dlink_list * newlist)
 {
 	/* Assumption: If m->next == NULL, then list->tail == m
 	 *      and:   If m->prev == NULL, then list->head == m
@@ -184,7 +184,7 @@ dlinkMoveNode(dlink_node * m, dlink_list * oldlist, dlink_list * newlist)
 }
 
 INLINE_FUNC void
-dlinkAdd(void *data, dlink_node * m, dlink_list * list)
+ircd_dlinkAdd(void *data, dlink_node * m, dlink_list * list)
 {
 	assert(data != NULL);
 	assert(m != NULL);
@@ -205,17 +205,17 @@ dlinkAdd(void *data, dlink_node * m, dlink_list * list)
 }
 
 INLINE_FUNC void
-dlinkAddBefore(dlink_node * b, void *data, dlink_node * m, dlink_list * list)
+ircd_dlinkAddBefore(dlink_node * b, void *data, dlink_node * m, dlink_list * list)
 {
 	assert(b != NULL);
 	assert(data != NULL);
 	assert(m != NULL);
 	assert(list != NULL);
 
-	/* Shortcut - if its the first one, call dlinkAdd only */
+	/* Shortcut - if its the first one, call ircd_dlinkAdd only */
 	if(b == list->head)
 	{
-		dlinkAdd(data, m, list);
+		ircd_dlinkAdd(data, m, list);
 	}
 	else
 	{
@@ -229,7 +229,7 @@ dlinkAddBefore(dlink_node * b, void *data, dlink_node * m, dlink_list * list)
 }
 
 INLINE_FUNC void
-dlinkMoveTail(dlink_node *m, dlink_list *list)
+ircd_dlinkMoveTail(dlink_node *m, dlink_list *list)
 {
 	if(list->tail == m)
 		return;
@@ -252,7 +252,7 @@ dlinkMoveTail(dlink_node *m, dlink_list *list)
 }
 
 INLINE_FUNC void
-dlinkAddTail(void *data, dlink_node * m, dlink_list * list)
+ircd_dlinkAddTail(void *data, dlink_node * m, dlink_list * list)
 {
 	assert(m != NULL);
 	assert(list != NULL);
@@ -276,7 +276,7 @@ dlinkAddTail(void *data, dlink_node * m, dlink_list * list)
  * often of all non-spontaneous functions. So it had better be
  * efficient. */
 INLINE_FUNC void
-dlinkDelete(dlink_node * m, dlink_list * list)
+ircd_dlinkDelete(dlink_node * m, dlink_list * list)
 {
 	assert(m != NULL);
 	assert(list != NULL);
@@ -298,7 +298,7 @@ dlinkDelete(dlink_node * m, dlink_list * list)
 }
 
 INLINE_FUNC dlink_node *
-dlinkFindDelete(void *data, dlink_list *list)
+ircd_dlinkFindDelete(void *data, dlink_list *list)
 {
 	dlink_node *m;
 	assert(list != NULL);
@@ -326,13 +326,13 @@ dlinkFindDelete(void *data, dlink_list *list)
 }
 
 INLINE_FUNC int
-dlinkFindDestroy(void *data, dlink_list *list)
+ircd_dlinkFindDestroy(void *data, dlink_list *list)
 {
 	void *ptr;
 
 	assert(list != NULL);
 	assert(data != NULL);
-	ptr = dlinkFindDelete(data, list);
+	ptr = ircd_dlinkFindDelete(data, list);
 
 	if(ptr != NULL)
 	{
@@ -343,14 +343,14 @@ dlinkFindDestroy(void *data, dlink_list *list)
 }
 
 /*
- * dlinkFind
+ * ircd_dlinkFind
  * inputs	- list to search 
  *		- data
  * output	- pointer to link or NULL if not found
  * side effects	- Look for ptr in the linked listed pointed to by link.
  */
 INLINE_FUNC dlink_node *
-dlinkFind(void *data, dlink_list *list)
+ircd_dlinkFind(void *data, dlink_list *list)
 {
 	dlink_node *ptr;
 	assert(list != NULL);
@@ -365,7 +365,7 @@ dlinkFind(void *data, dlink_list *list)
 }
 
 INLINE_FUNC void
-dlinkMoveList(dlink_list * from, dlink_list * to)
+ircd_dlinkMoveList(dlink_list * from, dlink_list * to)
 {
 	assert(from != NULL);
 	assert(to != NULL);

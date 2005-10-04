@@ -66,7 +66,7 @@ init_dlink_nodes(size_t dh_size)
 
 	dnode_heap = BlockHeapCreate(sizeof(dlink_node), dh_size);
 	if(dnode_heap == NULL)
-		outofmemory();
+		ircd_outofmemory();
 }
 
 /*

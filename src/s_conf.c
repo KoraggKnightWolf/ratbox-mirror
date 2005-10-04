@@ -892,22 +892,22 @@ add_temp_kline(struct ConfItem *aconf)
 {
 	if(aconf->hold >= ircd_currenttime + (10080 * 60))
 	{
-		dlinkAddAlloc(aconf, &temp_klines[TEMP_WEEK]);
+		ircd_dlinkAddAlloc(aconf, &temp_klines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
 	else if(aconf->hold >= ircd_currenttime + (1440 * 60))
 	{
-		dlinkAddAlloc(aconf, &temp_klines[TEMP_DAY]);
+		ircd_dlinkAddAlloc(aconf, &temp_klines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
 	else if(aconf->hold >= ircd_currenttime + (60 * 60))
 	{
-		dlinkAddAlloc(aconf, &temp_klines[TEMP_HOUR]);
+		ircd_dlinkAddAlloc(aconf, &temp_klines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
 	}
 	else
 	{
-		dlinkAddAlloc(aconf, &temp_klines[TEMP_MIN]);
+		ircd_dlinkAddAlloc(aconf, &temp_klines[TEMP_MIN]);
 		aconf->port = TEMP_MIN;
 	}
 
@@ -926,22 +926,22 @@ add_temp_dline(struct ConfItem *aconf)
 {
 	if(aconf->hold >= ircd_currenttime + (10080 * 60))
 	{
-		dlinkAddAlloc(aconf, &temp_dlines[TEMP_WEEK]);
+		ircd_dlinkAddAlloc(aconf, &temp_dlines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
 	else if(aconf->hold >= ircd_currenttime + (1440 * 60))
 	{
-		dlinkAddAlloc(aconf, &temp_dlines[TEMP_DAY]);
+		ircd_dlinkAddAlloc(aconf, &temp_dlines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
 	else if(aconf->hold >= ircd_currenttime + (60 * 60))
 	{
-		dlinkAddAlloc(aconf, &temp_dlines[TEMP_HOUR]);
+		ircd_dlinkAddAlloc(aconf, &temp_dlines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
 	}
 	else
 	{
-		dlinkAddAlloc(aconf, &temp_dlines[TEMP_MIN]);
+		ircd_dlinkAddAlloc(aconf, &temp_dlines[TEMP_MIN]);
 		aconf->port = TEMP_MIN;
 	}
 
@@ -977,7 +977,7 @@ expire_temp_kd(void *list)
 						     user : "*", (aconf->host) ? aconf->host : "*");
 
 			delete_one_address_conf(aconf->host, aconf);
-			dlinkDestroy(ptr, list);
+			ircd_dlinkDestroy(ptr, list);
 		}
 	}
 }
@@ -994,7 +994,7 @@ reorganise_temp_kd(void *list)
 
 		if(aconf->hold < (ircd_currenttime + (60 * 60)))
 		{
-			dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
+			ircd_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
 					&temp_klines[TEMP_MIN] : &temp_dlines[TEMP_MIN]);
 			aconf->port = TEMP_MIN;
 		}
@@ -1002,14 +1002,14 @@ reorganise_temp_kd(void *list)
 		{
 			if(aconf->hold < (ircd_currenttime + (1440 * 60)))
 			{
-				dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
+				ircd_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
 						&temp_klines[TEMP_HOUR] : &temp_dlines[TEMP_HOUR]);
 				aconf->port = TEMP_HOUR;
 			}
 			else if(aconf->port > TEMP_DAY && 
 				(aconf->hold < (ircd_currenttime + (10080 * 60))))
 			{
-				dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
+				ircd_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
 						&temp_klines[TEMP_DAY] : &temp_dlines[TEMP_DAY]);
 				aconf->port = TEMP_DAY;
 			}
@@ -1208,7 +1208,7 @@ clear_out_old_conf(void)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
 	{
 		ircd_free(ptr->data);
-		dlinkDestroy(ptr, &service_list);
+		ircd_dlinkDestroy(ptr, &service_list);
 	}
 #endif
 

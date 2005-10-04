@@ -72,15 +72,15 @@ extern char *canonize(char *);
 
 
 #ifdef HAVE_STRDUP
-#define DupString(x,y) do { x = strdup(y); if(x == NULL) outofmemory(); } while(0)
+#define DupString(x,y) do { x = strdup(y); if(x == NULL) ircd_outofmemory(); } while(0)
 #else
-#define DupString(x,y) do { x = malloc(strlen(y) + 1); if(x == NULL) outofmemory(); strcpy(x, y); } while(0)
+#define DupString(x,y) do { x = malloc(strlen(y) + 1); if(x == NULL) ircd_outofmemory(); strcpy(x, y); } while(0)
 #endif
 
 #ifdef HAVE_STRNDUP
-#define DupNString(x, y, len) do { x = strndup(y, len); if(x == NULL) outofmemory(); } while (0)
+#define DupNString(x, y, len) do { x = strndup(y, len); if(x == NULL) ircd_outofmemory(); } while (0)
 #else
-#define DupNString(x, y, len) do { x = malloc(len+1); if(x == NULL) outofmemory(); strlcpy(x, y, len+1); } while(0)
+#define DupNString(x, y, len) do { x = malloc(len+1); if(x == NULL) ircd_outofmemory(); strlcpy(x, y, len+1); } while(0)
 #endif
 
 

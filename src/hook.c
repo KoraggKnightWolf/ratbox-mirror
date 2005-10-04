@@ -164,7 +164,7 @@ add_hook(const char *name, hookfn fn)
 
 	i = register_hook(name);
 
-	dlinkAddAlloc(fn, &hooks[i].hooks);
+	ircd_dlinkAddAlloc(fn, &hooks[i].hooks);
 }
 
 /* remove_hook()
@@ -178,7 +178,7 @@ remove_hook(const char *name, hookfn fn)
 	if((i = find_hook(name)) < 0)
 		return;
 
-	dlinkFindDestroy(fn, &hooks[i].hooks);
+	ircd_dlinkFindDestroy(fn, &hooks[i].hooks);
 }
 
 /* call_hook()

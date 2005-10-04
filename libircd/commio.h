@@ -302,7 +302,7 @@ add_fd(int fd)
 	F = ircd_malloc(sizeof(fde_t));
 	F->fd = fd;
 	list = &fd_table[hash];
-	dlinkAdd(F, &F->node, list);
+	ircd_dlinkAdd(F, &F->node, list);
 	return(F);
 }
 
@@ -314,7 +314,7 @@ remove_fd(int fd)
 	dlink_list *list;
 	list = &fd_table[hash];
 	F = find_fd(fd);
-	dlinkDelete(&F->node, list);
+	ircd_dlinkDelete(&F->node, list);
 	ircd_free(F);
 }
 
