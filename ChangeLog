@@ -1,3 +1,12 @@
+leeh        2005/10/04 18:09:29 UTC	(20051004_6-20880)
+  Log:
+  - add some comments
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+
+
 androsyn    2005/10/04 16:55:16 UTC	(20051004_5-20878)
   Log:
   make inetntoa static 
