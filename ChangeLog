@@ -1,3 +1,13 @@
+androsyn    2005/10/04 16:55:16 UTC	(20051004_5-20878)
+  Log:
+  make inetntoa static 
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+
+
 androsyn    2005/10/04 05:52:22 UTC	(20051004_4-20876)
   Log:
   add a likely statement in irc_free
