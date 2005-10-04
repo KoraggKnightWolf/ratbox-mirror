@@ -63,6 +63,12 @@ static char translog_del_letter[] =
 	'r'	/* TRANS_RESV */
 };
 
+/* transaction_append()
+ *
+ * inputs	- string to add to transaction log
+ * outputs	-
+ * side effects	- string is added to transaction log
+ */
 static void
 transaction_append(const char *data)
 {
@@ -86,6 +92,13 @@ transaction_append(const char *data)
 	fclose(translog);
 }
 
+/* banconf_add_write()
+ *
+ * inputs	- type of ban, source, masks to add, reasons
+ * outputs	-
+ * side effects	- ban is converted into ircd format and appended to
+ * 		  transaction log
+ */
 void
 banconf_add_write(banconf_type type, struct Client *source_p, const char *mask, 
 		const char *mask2, const char *reason, const char *oper_reason)
@@ -108,8 +121,16 @@ banconf_add_write(banconf_type type, struct Client *source_p, const char *mask,
 				translog_add_letter[type], mask, reason, 
 				oper_reason, smalldate(),
 				get_oper_name(source_p), ircd_currenttime);
+
+	transaction_append(buf);
 }
 
+/* banconf_del_write()
+ *
+ * inputs	- type of ban, masks to remove
+ * outputs	-
+ * side effects	- ban is scheduled for removal via transaction log
+ */
 void
 banconf_del_write(banconf_type type, const char *mask, const char *mask2)
 {
@@ -125,6 +146,12 @@ banconf_del_write(banconf_type type, const char *mask, const char *mask2)
 	transaction_append(buf);
 }
 
+/* banconf_parse_field()
+ *
+ * inputs	- new line pointer, NULL to parse existing line
+ * outputs	- next field from line
+ * side effects	- parses the given line, splitting it into fields
+ */
 static char *
 banconf_parse_field(char *nline)
 {
@@ -136,7 +163,6 @@ banconf_parse_field(char *nline)
 
 	if(EmptyString(line))
 		return NULL;
-
 
 	/* skip beginning " */
 	if(*line == '"')
@@ -179,6 +205,12 @@ banconf_parse_field(char *nline)
 	return NULL;
 }
 
+/* banconf_set_field()
+ *
+ * inputs	- line to take fields from, location to store field
+ * outputs	- 1 on success, otherwise 0
+ * side effects	- parses a field into the given location
+ */
 static int
 banconf_set_field(char *line, char **field)
 {
@@ -198,6 +230,12 @@ banconf_set_field(char *line, char **field)
 	return 1;
 }
 
+/* banconf_parse_line()
+ *
+ * inputs	- line to take fields from, locations for storage
+ * outputs	- 1 on success, otherwise 0
+ * side effects	- parses given line generically according to passed fields
+ */
 static int
 banconf_parse_line(char *line, char **mask, char **mask2, char **reason,
 			char **oper_reason)
@@ -223,6 +261,12 @@ banconf_parse_line(char *line, char **mask, char **mask2, char **reason,
 	return 1;
 }
 
+/* banconf_parse_kline()
+ *
+ * inputs	- line to parse
+ * outputs	-
+ * side effects	- parses the given kline line
+ */
 static void
 banconf_parse_kline(char *line)
 {
@@ -239,6 +283,12 @@ banconf_parse_kline(char *line)
 		free_conf(aconf);
 }
 
+/* banconf_parse_dline()
+ *
+ * inputs	- line to parse
+ * outputs	-
+ * side effects	- parses the given dline line
+ */
 static void
 banconf_parse_dline(char *line)
 {
@@ -260,6 +310,12 @@ banconf_parse_dline(char *line)
 		free_conf(aconf);
 }
 
+/* banconf_parse_xline()
+ *
+ * inputs	- line to parse
+ * outputs	-
+ * side effects - parses the given xline line
+ */
 static void
 banconf_parse_xline(char *line)
 {
@@ -275,6 +331,12 @@ banconf_parse_xline(char *line)
 		free_conf(aconf);
 }
 
+/* banconf_parse_resv()
+ *
+ * inputs	- line to parse
+ * outputs	-
+ * side effects - parses the given resv line
+ */
 static void
 banconf_parse_resv(char *line)
 {
@@ -320,6 +382,12 @@ static struct banconf_file
 	{ NULL, NULL }
 };
 
+/* banconf_parse()
+ *
+ * inputs	-
+ * outputs	-
+ * side effects	- parses all given ban files
+ */
 void
 banconf_parse(void)
 {
@@ -332,6 +400,10 @@ banconf_parse(void)
 
 	while(banconf_files[i].filename)
 	{
+		/* iterate twice, once for normal files, once for
+		 * "permanent" bans that cant be removed via ircd, with the
+		 * suffix ".perm"
+		 */
 		while(perm < 2)
 		{
 			snprintf(buf, sizeof(buf), *banconf_files[i].filename);
@@ -341,6 +413,7 @@ banconf_parse(void)
 
 			if((banfile = fopen(buf, "r")) == NULL)
 			{
+				/* its natural for permanent files to not exist */
 				if(!perm)
 				{
 					ilog(L_MAIN, "Failed reading ban file %s",
