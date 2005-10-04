@@ -263,7 +263,6 @@ extern int ircd_select(unsigned long);
 extern int disable_sock_options(int);
 extern int ircd_setup_fd(int fd);
 
-const char *inetntoa(const char *in_addr);
 const char *inetntop(int af, const void *src, char *dst, unsigned int size);
 int inetpton(int af, const char *src, void *dst);
 const char *inetntop_sock(struct sockaddr *src, char *dst, unsigned int size);

@@ -963,7 +963,7 @@ static const char *IpQuadTab[] = {
  *  inet_ntoa --  its broken on some Ultrix/Dynix too. -avalon
  */
 
-const char *
+static const char *
 inetntoa(const char *in)
 {
 	static char buf[16];
