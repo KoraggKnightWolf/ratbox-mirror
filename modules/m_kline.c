@@ -702,12 +702,7 @@ remove_temp_kline(struct Client *source_p, const char *user, const char *host)
 {
 	struct ConfItem *aconf;
 	dlink_node *ptr;
-	struct irc_sockaddr_storage addr, caddr;
-	int bits, cbits;
-	int mtype, ktype;
 	int i;
-
-	mtype = parse_netmask(host, (struct sockaddr *)&addr, &bits);
 
 	for (i = 0; i < LAST_TEMP_TYPE; i++)
 	{
@@ -715,19 +710,10 @@ remove_temp_kline(struct Client *source_p, const char *user, const char *host)
 		{
 			aconf = ptr->data;
 
-			ktype = parse_netmask(aconf->host, (struct sockaddr *)&caddr, &cbits);
-
-			if(ktype != mtype || (user && irccmp(user, aconf->user)))
+			if(aconf->user && irccmp(user, aconf->user))
 				continue;
 
-			if(ktype == HM_HOST)
-			{
-				if(irccmp(aconf->host, host))
-					continue;
-			}
-			else if(bits != cbits || 
-				!comp_with_mask_sock((struct sockaddr *)&addr,
-						(struct sockaddr *)&caddr, bits))
+			if(irccmp(aconf->host, host))
 				continue;
 
 			ircd_dlinkDestroy(ptr, &temp_klines[i]);
