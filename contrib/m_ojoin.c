@@ -138,7 +138,7 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 			   source_p->name, chptr->chname, chptr->topic_info, chptr->topic_time);
 	}
 
-	source_p->localClient->last_join_time = CurrentTime;
+	source_p->localClient->last_join_time = ircd_currenttime;
 	channel_member_names(chptr, source_p, 1);
 
 	return 0;

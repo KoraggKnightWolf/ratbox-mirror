@@ -56,7 +56,7 @@ m_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const cha
 	static time_t last_used = 0;
 	int is_md5 = 0;
 
-	if((last_used + ConfigFileEntry.pace_wait) > CurrentTime)
+	if((last_used + ConfigFileEntry.pace_wait) > ircd_currenttime)
 	{
 		/* safe enough to give this on a local connect only */
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_LOAD2HI), me.name, parv[0]);
@@ -64,7 +64,7 @@ m_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const cha
 	}
 	else
 	{
-		last_used = CurrentTime;
+		last_used = ircd_currenttime;
 	}
 
 	if(parc == 3)

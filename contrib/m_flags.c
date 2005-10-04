@@ -164,7 +164,7 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 	for(i = 1; i < parc; i++)
 	{
 		char *s = LOCAL_COPY(parv[i]);
-		for(flag = strtoken(&p, s, " "); flag; flag = strtoken(&p, NULL, " "))
+		for(flag = strtok_r(s, " ", &p); flag; flag = strtok_r(NULL, " ", &p))
 		{
 			/* We default to being in ADD mode */
 			isadd = 1;
@@ -265,7 +265,7 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 	for(i = 1; i < parc; i++)
 	{
 		char *s = LOCAL_COPY(parv[i]);
-		for(flag = strtoken(&p, s, " "); flag; flag = strtoken(&p, NULL, " "))
+		for(flag = strtok_r(s, " ", &p); flag; flag = strtok_r(NULL, " ", &p))
 		{
 			/* We default to being in ADD mode */
 			isadd = 1;
@@ -355,7 +355,7 @@ set_flags_to_string(struct Client *client_p)
 	static char setflags[BUFSIZE + 1];
 	int i;
 
-	/* Clear it to begin with, we'll be doing a lot of ircsprintf's */
+	/* Clear it to begin with, we'll be doing a lot of ircd_sprintf's */
 	setflags[0] = '\0';
 
 	/* Unlike unset_flags_to_string(), we don't have to care about oper
@@ -366,7 +366,7 @@ set_flags_to_string(struct Client *client_p)
 	{
 		if(client_p->umodes & flag_table[i].mode)
 		{
-			ircsprintf(setflags, "%s %s", setflags, flag_table[i].name);
+			ircd_sprintf(setflags, "%s %s", setflags, flag_table[i].name);
 		}
 	}
 
@@ -379,7 +379,7 @@ set_flags_to_string(struct Client *client_p)
 		 */
 		if(client_p->umodes & UMODE_NCHANGE)
 		{
-			ircsprintf(setflags, "%s %s", setflags, "NICKCHANGES");
+			ircd_sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
 		}
 #if 0
 	}
@@ -396,7 +396,7 @@ unset_flags_to_string(struct Client *client_p)
 	static char setflags[BUFSIZE + 1];
 	int i, isoper;
 
-	/* Clear it to begin with, we'll be doing a lot of ircsprintf's */
+	/* Clear it to begin with, we'll be doing a lot of ircd_sprintf's */
 	setflags[0] = '\0';
 
 	if(IsOper(client_p))
@@ -410,7 +410,7 @@ unset_flags_to_string(struct Client *client_p)
 		{
 			if(!isoper && flag_table[i].oper)
 				continue;
-			ircsprintf(setflags, "%s %s", setflags, flag_table[i].name);
+			ircd_sprintf(setflags, "%s %s", setflags, flag_table[i].name);
 		}
 	}
 
@@ -418,7 +418,7 @@ unset_flags_to_string(struct Client *client_p)
 	{
 		if(!(client_p->umodes & UMODE_NCHANGE))
 		{
-			ircsprintf(setflags, "%s %s", setflags, "NICKCHANGES");
+			ircd_sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
 		}
 	}
 
