@@ -62,7 +62,6 @@ static void parse_resv(struct Client *source_p, const char *name,
 
 static void handle_remote_unresv(struct Client *source_p, const char *name);
 static void remove_resv(struct Client *source_p, const char *name);
-static int remove_temp_resv(struct Client *source_p, const char *name);
 
 /*
  * mo_resv()
@@ -315,9 +314,6 @@ mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 		cluster_generic(source_p, "UNRESV", SHARED_UNRESV, 
 				"%s", parv[1]);
 
-	if(remove_temp_resv(source_p, parv[1]))
-		return 0;
-
 	remove_resv(source_p, parv[1]);
 	return 0;
 }
@@ -337,26 +333,27 @@ me_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 				source_p->user->server, SHARED_UNRESV))
 		return 0;
 
-	if(remove_temp_resv(source_p, name))
-		return 0;
-
 	remove_resv(source_p, name);
 	return 0;
 }
 
-static int
-remove_temp_resv(struct Client *source_p, const char *name)
+static void
+remove_resv(struct Client *source_p, const char *name)
 {
 	struct ConfItem *aconf = NULL;
 
 	if(IsChannelName(name))
 	{
 		if((aconf = hash_find_resv(name)) == NULL)
-			return 0;
+		{
+			sendto_one_notice(source_p, POP_QUEUE,
+					":No RESV for %s", name);
+			return;
+		}
 
-		/* its permanent, let remove_resv do it properly */
-		if(!aconf->hold)
-			return 0;
+		/* schedule it to transaction log */
+		if(aconf->hold)
+			banconf_del_write(TRANS_RESV, name, NULL);
 
 		del_from_resv_hash(name, aconf);
 		free_conf(aconf);
@@ -376,11 +373,15 @@ remove_temp_resv(struct Client *source_p, const char *name)
 		}
 
 		if(aconf == NULL)
-			return 0;
+		{
+			sendto_one_notice(source_p, POP_QUEUE,
+					":No RESV for %s", name);
+			return;
+		}
 
-		/* permanent, remove_resv() needs to do it properly */
-		if(!aconf->hold)
-			return 0;
+		/* schedule it to transaction log */
+		if(aconf->hold)
+			banconf_del_write(TRANS_RESV, name, NULL);
 
 		/* already have ptr from the loop above.. */
 		ircd_dlinkDestroy(ptr, &resv_conf_list);
@@ -392,113 +393,5 @@ remove_temp_resv(struct Client *source_p, const char *name)
 			"%s has removed the RESV for: [%s]", 
 			get_oper_name(source_p), name);
 	ilog(L_KLINE, "UR %s %s", get_oper_name(source_p), name);
-
-	return 1;
 }
 
-/* remove_resv()
- *
- * inputs	- client removing the resv
- * 		- resv to remove
- * outputs	-
- * side effects - resv if found, is removed
- */
-static void
-remove_resv(struct Client *source_p, const char *name)
-{
-	FILE *in, *out;
-	char buf[BUFSIZE];
-	char buff[BUFSIZE];
-	char temppath[BUFSIZE];
-	const char *filename;
-	mode_t oldumask;
-	char *p;
-	int error_on_write = 0;
-	int found_resv = 0;
-
-	ircd_sprintf(temppath, "%s.tmp", ConfigFileEntry.resvfile);
-	filename = get_conf_name(RESV_TYPE);
-
-	if((in = fopen(filename, "r")) == NULL)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Cannot open %s", filename);
-		return;
-	}
-
-	oldumask = umask(0);
-
-	if((out = fopen(temppath, "w")) == NULL)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Cannot open %s", temppath);
-		fclose(in);
-		umask(oldumask);
-		return;
-	}
-
-	umask(oldumask);
-
-	while (fgets(buf, sizeof(buf), in))
-	{
-		const char *resv_name;
-
-		if(error_on_write)
-		{
-			if(temppath != NULL)
-				(void) unlink(temppath);
-
-			break;
-		}
-
-		strlcpy(buff, buf, sizeof(buff));
-
-		if((p = strchr(buff, '\n')) != NULL)
-			*p = '\0';
-
-		if((*buff == '\0') || (*buff == '#'))
-		{
-			error_on_write = (fputs(buf, out) < 0) ? YES : NO;
-			continue;
-		}
-
-		if((resv_name = getfield(buff)) == NULL)
-		{
-			error_on_write = (fputs(buf, out) < 0) ? YES : NO;
-			continue;
-		}
-
-		if(irccmp(resv_name, name) == 0)
-		{
-			found_resv++;
-		}
-		else
-		{
-			error_on_write = (fputs(buf, out) < 0) ? YES : NO;
-		}
-	}
-
-	fclose(in);
-	fclose(out);
-
-	if(error_on_write)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Couldn't write temp resv file, aborted");
-		return;
-	}
-	else if(!found_resv)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":No RESV for %s", name);
-
-		if(temppath != NULL)
-			(void) unlink(temppath);
-
-		return;
-	}
-
-	(void) rename(temppath, filename);
-	rehash_bans(0);
-
-	sendto_one_notice(source_p, POP_QUEUE, ":RESV for [%s] is removed", name);
-	sendto_realops_flags(UMODE_ALL, L_ALL,
-			     "%s has removed the RESV for: [%s]", get_oper_name(source_p), name);
-	ilog(L_KLINE, "UR %s %s", get_oper_name(source_p), name);
-}

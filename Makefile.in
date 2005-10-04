@@ -282,12 +282,12 @@ am__DEPENDENCIES_2 =
 am_src_libratbox_la_OBJECTS = src/dns.lo src/banconf.lo src/cache.lo \
 	src/channel.lo src/class.lo src/client.lo src/getopt.lo \
 	src/hash.lo src/hook.lo src/hostmask.lo src/ircd.lo \
-	src/ircd_signal.lo src/kdparse.lo src/listener.lo src/match.lo \
-	src/modules.lo src/monitor.lo src/newconf.lo src/numeric.lo \
-	src/packet.lo src/parse.lo src/patricia.lo src/reject.lo \
-	src/restart.lo src/s_auth.lo src/s_conf.lo src/s_newconf.lo \
-	src/s_log.lo src/s_serv.lo src/s_user.lo src/scache.lo \
-	src/send.lo src/whowas.lo src/version.lo src/ircd_parser.lo \
+	src/ircd_signal.lo src/listener.lo src/match.lo src/modules.lo \
+	src/monitor.lo src/newconf.lo src/numeric.lo src/packet.lo \
+	src/parse.lo src/patricia.lo src/reject.lo src/restart.lo \
+	src/s_auth.lo src/s_conf.lo src/s_newconf.lo src/s_log.lo \
+	src/s_serv.lo src/s_user.lo src/scache.lo src/send.lo \
+	src/whowas.lo src/version.lo src/ircd_parser.lo \
 	src/ircd_lexer.lo
 src_libratbox_la_OBJECTS = $(am_src_libratbox_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -412,7 +412,6 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_lexer.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_parser.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_signal.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/kdparse.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/listener.Plo src/$(DEPDIR)/main.Po \
 @AMDEP_TRUE@	src/$(DEPDIR)/match.Plo src/$(DEPDIR)/modules.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/monitor.Plo \
@@ -724,7 +723,6 @@ src_libratbox_la_SOURCES = \
   src/hostmask.c                    \
   src/ircd.c                        \
   src/ircd_signal.c                 \
-  src/kdparse.c                     \
   src/listener.c                    \
   src/match.c                       \
   src/modules.c                     \
@@ -1496,7 +1494,6 @@ src/hook.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/hostmask.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ircd.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ircd_signal.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/kdparse.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/listener.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/match.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/modules.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -1734,8 +1731,6 @@ mostlyclean-compile:
 	-rm -f src/ircd_parser.lo
 	-rm -f src/ircd_signal.$(OBJEXT)
 	-rm -f src/ircd_signal.lo
-	-rm -f src/kdparse.$(OBJEXT)
-	-rm -f src/kdparse.lo
 	-rm -f src/listener.$(OBJEXT)
 	-rm -f src/listener.lo
 	-rm -f src/main.$(OBJEXT)
@@ -1866,7 +1861,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd_lexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd_parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd_signal.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/kdparse.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/listener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/match.Plo@am__quote@
@@ -3810,30 +3804,6 @@ src/ircd_signal.lo: src/ircd_signal.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/ircd_signal.Plo' tmpdepfile='src/$(DEPDIR)/ircd_signal.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/ircd_signal.lo `test -f 'src/ircd_signal.c' || echo '$(srcdir)/'`src/ircd_signal.c
-
-src/kdparse.o: src/kdparse.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/kdparse.o -MD -MP -MF "src/$(DEPDIR)/kdparse.Tpo" -c -o src/kdparse.o `test -f 'src/kdparse.c' || echo '$(srcdir)/'`src/kdparse.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/kdparse.Tpo" "src/$(DEPDIR)/kdparse.Po"; else rm -f "src/$(DEPDIR)/kdparse.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/kdparse.c' object='src/kdparse.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/kdparse.Po' tmpdepfile='src/$(DEPDIR)/kdparse.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/kdparse.o `test -f 'src/kdparse.c' || echo '$(srcdir)/'`src/kdparse.c
-
-src/kdparse.obj: src/kdparse.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/kdparse.obj -MD -MP -MF "src/$(DEPDIR)/kdparse.Tpo" -c -o src/kdparse.obj `if test -f 'src/kdparse.c'; then $(CYGPATH_W) 'src/kdparse.c'; else $(CYGPATH_W) '$(srcdir)/src/kdparse.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/kdparse.Tpo" "src/$(DEPDIR)/kdparse.Po"; else rm -f "src/$(DEPDIR)/kdparse.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/kdparse.c' object='src/kdparse.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/kdparse.Po' tmpdepfile='src/$(DEPDIR)/kdparse.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/kdparse.obj `if test -f 'src/kdparse.c'; then $(CYGPATH_W) 'src/kdparse.c'; else $(CYGPATH_W) '$(srcdir)/src/kdparse.c'; fi`
-
-src/kdparse.lo: src/kdparse.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/kdparse.lo -MD -MP -MF "src/$(DEPDIR)/kdparse.Tpo" -c -o src/kdparse.lo `test -f 'src/kdparse.c' || echo '$(srcdir)/'`src/kdparse.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/kdparse.Tpo" "src/$(DEPDIR)/kdparse.Plo"; else rm -f "src/$(DEPDIR)/kdparse.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/kdparse.c' object='src/kdparse.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/kdparse.Plo' tmpdepfile='src/$(DEPDIR)/kdparse.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/kdparse.lo `test -f 'src/kdparse.c' || echo '$(srcdir)/'`src/kdparse.c
 
 src/listener.o: src/listener.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/listener.o -MD -MP -MF "src/$(DEPDIR)/listener.Tpo" -c -o src/listener.o `test -f 'src/listener.c' || echo '$(srcdir)/'`src/listener.c; \

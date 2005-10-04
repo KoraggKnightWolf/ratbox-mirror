@@ -68,7 +68,6 @@ static int valid_xline(struct Client *, const char *, const char *);
 static void apply_xline(struct Client *client_p, const char *name, 
 			const char *reason, int temp_time);
 
-static int remove_temp_xline(struct Client *source_p, const char *name);
 static void remove_xline(struct Client *source_p, const char *gecos);
 
 
@@ -389,11 +388,7 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		cluster_generic(source_p, "UNXLINE", SHARED_UNXLINE, 
 				"%s", parv[1]);
 
-	if(remove_temp_xline(source_p, parv[1]))
-		return 0;
-
 	remove_xline(source_p, parv[1]);
-
 	return 0;
 }
 
@@ -412,15 +407,12 @@ me_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 				source_p->user->server, SHARED_UNXLINE))
 		return 0;
 
-	if(remove_temp_xline(source_p, name))
-		return 0;
-
 	remove_xline(source_p, name);
 	return 0;
 }
 
-static int
-remove_temp_xline(struct Client *source_p, const char *name)
+static void
+remove_xline(struct Client *source_p, const char *name)
 {
 	struct ConfItem *aconf;
 	dlink_node *ptr;
@@ -429,130 +421,24 @@ remove_temp_xline(struct Client *source_p, const char *name)
 	{
 		aconf = ptr->data;
 
-		/* only want to check temp ones! */
-		if(!aconf->hold)
+		if(irccmp(aconf->name, name))
 			continue;
 
-		if(!irccmp(aconf->name, name))
-		{
-			sendto_one_notice(source_p, POP_QUEUE, 
-					":X-Line for [%s] is removed",
-					name);
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					 "%s has removed the temporary X-Line for: [%s]",
-					 get_oper_name(source_p), name);
-			ilog(L_KLINE, "UX %s %s", 
-				get_oper_name(source_p), name);
-			
-			free_conf(aconf);
-			ircd_dlinkDestroy(ptr, &xline_conf_list);
-			return 1;
-		}
-	}
+		sendto_one_notice(source_p, POP_QUEUE, 
+				":X-Line for [%s] is removed", name);
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "%s has removed the X-Line for: [%s]",
+				     get_oper_name(source_p), name);
+		ilog(L_KLINE, "UX %s %s", 
+			get_oper_name(source_p), name);
 
-	return 0;
+
+		if(aconf->hold)
+			banconf_del_write(TRANS_XLINE, name, NULL);
+
+		free_conf(aconf);
+		ircd_dlinkDestroy(ptr, &xline_conf_list);
+		return;
+	}
 }
 
-/* remove_xline()
- *
- * inputs	- gecos to remove
- * outputs	- 
- * side effects - removes xline from conf, if exists
- */
-static void
-remove_xline(struct Client *source_p, const char *huntgecos)
-{
-	FILE *in, *out;
-	char buf[BUFSIZE];
-	char buff[BUFSIZE];
-	char temppath[BUFSIZE];
-	const char *filename;
-	const char *gecos;
-	mode_t oldumask;
-	char *p;
-	int error_on_write = 0;
-	int found_xline = 0;
-
-	filename = ConfigFileEntry.xlinefile;
-	ircd_snprintf(temppath, sizeof(temppath),
-		 "%s.tmp", ConfigFileEntry.xlinefile);
-
-	if((in = fopen(filename, "r")) == NULL)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Cannot open %s", filename);
-		return;
-	}
-
-	oldumask = umask(0);
-
-	if((out = fopen(temppath, "w")) == NULL)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Cannot open %s", temppath);
-		fclose(in);
-		umask(oldumask);
-		return;
-	}
-
-	umask(oldumask);
-
-	while (fgets(buf, sizeof(buf), in))
-	{
-		if(error_on_write)
-		{
-			if(temppath != NULL)
-				(void) unlink(temppath);
-
-			break;
-		}
-
-		strlcpy(buff, buf, sizeof(buff));
-
-		if((p = strchr(buff, '\n')) != NULL)
-			*p = '\0';
-
-		if((*buff == '\0') || (*buff == '#'))
-		{
-			error_on_write = (fputs(buf, out) < 0) ? YES : NO;
-			continue;
-		}
-
-		if((gecos = getfield(buff)) == NULL)
-		{
-			error_on_write = (fputs(buf, out) < 0) ? YES : NO;
-			continue;
-		}
-
-		/* matching.. */
-		if(irccmp(gecos, huntgecos) == 0)
-			found_xline++;
-		else
-			error_on_write = (fputs(buf, out) < 0) ? YES : NO;
-	}
-
-	fclose(in);
-	fclose(out);
-
-	if(error_on_write)
-	{
-		sendto_one_notice(source_p, POP_QUEUE,
-				  ":Couldn't write temp xline file, aborted");
-		return;
-	}
-	else if(found_xline == 0)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":No X-Line for %s", huntgecos);
-
-		if(temppath != NULL)
-			(void) unlink(temppath);
-		return;
-	}
-
-	(void) rename(temppath, filename);
-	rehash_bans(0);
-
-	sendto_one_notice(source_p, POP_QUEUE, ":X-Line for [%s] is removed", huntgecos);
-	sendto_realops_flags(UMODE_ALL, L_ALL,
-			     "%s has removed the X-Line for: [%s]",
-			     get_oper_name(source_p), huntgecos);
-	ilog(L_KLINE, "UX %s %s", get_oper_name(source_p), huntgecos);
-}

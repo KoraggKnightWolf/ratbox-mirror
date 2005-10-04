@@ -57,7 +57,6 @@ src_libratbox_la_SOURCES =                     \
   src/hostmask.c                    \
   src/ircd.c                        \
   src/ircd_signal.c                 \
-  src/kdparse.c                     \
   src/listener.c                    \
   src/match.c                       \
   src/modules.c                     \
