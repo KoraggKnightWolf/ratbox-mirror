@@ -1,3 +1,14 @@
+leeh        2005/10/04 19:03:35 UTC	(20051004_8-20884)
+  Log:
+  - add \n onto end of lines for banconf_del_write()
+  - make unkline use the transaction log
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+
+
 leeh        2005/10/04 18:34:44 UTC	(20051004_7-20882)
   Log:
   - fix an infinite loop in banconf_parse()
