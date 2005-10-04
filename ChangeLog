@@ -1,3 +1,15 @@
+leeh        2005/10/04 18:34:44 UTC	(20051004_7-20882)
+  Log:
+  - fix an infinite loop in banconf_parse()
+  - add some macros for walking the hostname hash
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/hostmask.h (File Modified) 
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+
+
 leeh        2005/10/04 18:09:29 UTC	(20051004_6-20880)
   Log:
   - add some comments
