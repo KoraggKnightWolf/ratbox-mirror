@@ -1,3 +1,13 @@
+androsyn    2005/10/04 04:33:36 UTC	(20051004_1-20870)
+  Log:
+  Add a rule to allow for doing make m_foo.so or so
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 androsyn    2005/10/04 01:07:49 UTC	(20051004_0-20868)
   Log:
   change dlink.* to ircd_dlink. Also change outofmemory() to ircd_outofmemory()
