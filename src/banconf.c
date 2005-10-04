@@ -423,6 +423,7 @@ banconf_parse(void)
 							*banconf_files[i].filename);
 				}
 
+				perm++;
 				continue;
 			}
 

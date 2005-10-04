@@ -683,26 +683,29 @@ report_auth(struct Client *client_p)
 	struct ConfItem *aconf;
 	int i, port;
 
-	for (i = 0; i < ATABLE_SIZE; i++)
-		for (arec = atable[i]; arec; arec = arec->next)
-			if((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT)
-			{
-				aconf = arec->aconf;
+	HOSTHASH_WALK(i, arec)
+	{
+		if((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT)
+		{
+			aconf = arec->aconf;
 
-				if(!MyOper(client_p) && IsConfDoSpoofIp(aconf))
-					continue;
+			if(!MyOper(client_p) && IsConfDoSpoofIp(aconf))
+				continue;
 
-				get_printable_conf(aconf, &name, &host, &pass, &user, &port,
-						   &classname);
+			get_printable_conf(aconf, &name, &host, &pass, &user, &port,
+					   &classname);
 
-				sendto_one_numeric(client_p, HOLD_QUEUE, RPL_STATSILINE, 
-						   form_str(RPL_STATSILINE),
-						   name, show_iline_prefix(client_p, aconf, user),
+			sendto_one_numeric(client_p, HOLD_QUEUE, RPL_STATSILINE, 
+					   form_str(RPL_STATSILINE),
+					   name, show_iline_prefix(client_p, aconf, user),
 #ifdef HIDE_SPOOF_IPS
-						   IsConfDoSpoofIp(aconf) ? "255.255.255.255" :
+					   IsConfDoSpoofIp(aconf) ? "255.255.255.255" :
 #endif
-						   host, port, classname);
-			}
+					   host, port, classname);
+		}
+	}
+	HOSTHASH_WALK_END
+
 	send_pop_queue(client_p);
 }
 
@@ -720,25 +723,23 @@ report_Klines(struct Client *source_p)
 	struct ConfItem *aconf = NULL;
 	int i;
 
-	for (i = 0; i < ATABLE_SIZE; i++)
+	HOSTHASH_WALK(i, arec)
 	{
-		for (arec = atable[i]; arec; arec = arec->next)
+		if((arec->type & ~CONF_SKIPUSER) == CONF_KILL)
 		{
-			if((arec->type & ~CONF_SKIPUSER) == CONF_KILL)
-			{
-				aconf = arec->aconf;
+			aconf = arec->aconf;
 
-				/* its a tempkline, theyre reported elsewhere */
-				if(aconf->flags & CONF_FLAGS_TEMPORARY)
-					continue;
+			/* its a tempkline, theyre reported elsewhere */
+			if(aconf->flags & CONF_FLAGS_TEMPORARY)
+				continue;
 
-				get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
-				sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSKLINE,
-						   form_str(RPL_STATSKLINE),
-						   'K', host, user, pass,
-						   oper_reason ? "|" : "",
-						   oper_reason ? oper_reason : "");
-			}
+			get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
+			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSKLINE,
+					   form_str(RPL_STATSKLINE),
+					   'K', host, user, pass,
+					   oper_reason ? "|" : "",
+					   oper_reason ? oper_reason : "");
 		}
 	}
+	HOSTHASH_WALK_END
 }

@@ -68,6 +68,13 @@ int match_ipv4(struct sockaddr *, struct sockaddr *, int);
 
 extern struct AddressRec *atable[ATABLE_SIZE];
 
+#define HOSTHASH_WALK(i, arec) for (i = 0; i < ATABLE_SIZE; i++) { for(arec = atable[i]; arec; arec = arec->next)
+#define HOSTHASH_WALK_SAFE(i, arec, arecn) \
+	for(i = 0; i < ATABLE_SIZE; i++) { \
+		for(arec = atable[i], arecn = arec ? arec->next : NULL; arec; \
+			arec = arecn, arecn = arecn ? arecn->next : NULL)
+#define HOSTHASH_WALK_END }
+
 struct AddressRec
 {
 	/* masktype: HM_HOST, HM_IPV4, HM_IPV6 -A1kmm */
