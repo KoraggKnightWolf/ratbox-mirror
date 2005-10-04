@@ -66,6 +66,6 @@ ircd_realloc(void *x, size_t y)
 #endif /* __GNUC__ */
 #endif /* __APPLE__ */
 
-#define ircd_free(x) do { if(x) free(x); } while (0)
+#define ircd_free(x) do { if(likely(x != NULL)) free(x); } while (0)
 
 #endif /* _I_MEMORY_H */
