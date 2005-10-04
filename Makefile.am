@@ -402,6 +402,9 @@ resolver: src/resolver
 
 ident: src/ident
 
+.o.so: 
+	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(MODULE_FLAGS) $(MODULE_LIBS) -avoid-version -shared $< -o $@
+
 install-exec-local:
 # move the old module directory out of the way, stale modules cause massive
 # amounts of problems.

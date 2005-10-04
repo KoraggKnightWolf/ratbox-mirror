@@ -1033,7 +1033,7 @@ modules_core_m_squit_la_LIBADD = $(MODULE_LIBS)
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .l .lo .o .obj .y
+.SUFFIXES: .c .l .lo .o .obj .so .y
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -4917,6 +4917,9 @@ modules_core: $(core_LTLIBRARIES)
 resolver: src/resolver
 
 ident: src/ident
+
+.o.so: 
+	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(MODULE_FLAGS) $(MODULE_LIBS) -avoid-version -shared $< -o $@
 
 install-exec-local:
 # move the old module directory out of the way, stale modules cause massive
