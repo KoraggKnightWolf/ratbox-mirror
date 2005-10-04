@@ -1,3 +1,15 @@
+androsyn    2005/10/04 04:37:15 UTC	(20051004_2-20872)
+  Log:
+  Fix busticated contrib modules
+  
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_flags.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_force.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_mkpasswd.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_ojoin.c (File Modified) 
+
+
 androsyn    2005/10/04 04:33:36 UTC	(20051004_1-20870)
   Log:
   Add a rule to allow for doing make m_foo.so or so
