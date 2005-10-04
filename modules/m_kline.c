@@ -72,9 +72,8 @@ static int already_placed_kline(struct Client *, const char *, const char *, int
 
 static void handle_remote_unkline(struct Client *source_p, 
 			const char *user, const char *host);
-static void remove_permkline_match(struct Client *, const char *, const char *);
-static int flush_write(struct Client *, FILE *, const char *, const char *);
-static int remove_temp_kline(const char *, const char *);
+static int remove_temp_kline(struct Client *, const char *, const char *);
+static void remove_perm_kline(struct Client *, const char *, const char *);
 
 /* mo_kline()
  *
@@ -368,21 +367,10 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		cluster_generic(source_p, "UNKLINE", SHARED_UNKLINE, 
 				"%s %s", user, host);
 
-	if(remove_temp_kline(user, host))
-	{
-		sendto_one(source_p, POP_QUEUE, 
-			   ":%s NOTICE %s :Un-klined [%s@%s] from temporary k-lines",
-			   me.name, parv[0], user, host);
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s has removed the temporary K-Line for: [%s@%s]",
-				     get_oper_name(source_p), user, host);
-		ilog(L_KLINE, "UK %s %s %s",
-			get_oper_name(source_p), user, host);
+	if(remove_temp_kline(source_p, user, host))
 		return 0;
-	}
 
-	remove_permkline_match(source_p, host, user);
-
+	remove_perm_kline(source_p, user, host);
 	return 0;
 }
 
@@ -402,22 +390,10 @@ me_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 				source_p->user->server, SHARED_UNKLINE))
 		return 0;
 
-	if(remove_temp_kline(user, host))
-	{
-		sendto_one_notice(source_p, POP_QUEUE,
-				":Un-klined [%s@%s] from temporary k-lines",
-				user, host);
-
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				"%s has removed the temporary K-Line for: [%s@%s]",
-				get_oper_name(source_p), user, host);
-
-		ilog(L_KLINE, "UK %s %s %s",
-			get_oper_name(source_p), user, host);
+	if(remove_temp_kline(source_p, user, host))
 		return 0;
-	}
 
-	remove_permkline_match(source_p, host, user);
+	remove_perm_kline(source_p, user, host);
 	return 0;
 }
 
@@ -674,148 +650,45 @@ already_placed_kline(struct Client *source_p, const char *luser, const char *lho
 	return 0;
 }
 
-/* remove_permkline_match()
- *
- * hunts for a permanent kline, and removes it.
- */
 static void
-remove_permkline_match(struct Client *source_p, const char *host, const char *user)
+remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 {
-	FILE *in, *out;
-	int pairme = 0;
-	int error_on_write = NO;
-	char buf[BUFSIZE];
-	char matchbuf[BUFSIZE];
-	char temppath[BUFSIZE];
-	const char *filename;
-	mode_t oldumask;
-	int matchlen;
+	struct AddressRec *arec, *arecp;
+	struct ConfItem *aconf;
+	int i;
 
-	ircd_snprintf(temppath, sizeof(temppath),
-		 "%s.tmp", ConfigFileEntry.klinefile);
-
-	filename = get_conf_name(KLINE_TYPE);
-
-	if((in = fopen(filename, "r")) == 0)
+	/* dont need to be safe, as we're quitting once we've done anything */
+	HOSTHASH_WALK(i, arec)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Cannot open %s", filename);
-		return;
-	}
-
-	oldumask = umask(0);
-	if((out = fopen(temppath, "w")) == 0)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Cannot open %s", temppath);
-		fclose(in);
-		umask(oldumask);
-		return;
-	}
-
-	umask(oldumask);
-
-	snprintf(matchbuf, sizeof(matchbuf), "\"%s\",\"%s\"", user, host);
-	matchlen = strlen(matchbuf);
-
-	while (fgets(buf, sizeof(buf), in))
-	{
-		if(error_on_write)
-			break;
-
-		if(!strncasecmp(buf, matchbuf, matchlen))
+		if((arec->type & ~CONF_SKIPUSER) == CONF_KILL)
 		{
-			pairme++;
-			break;
+			aconf = arec->aconf;
+
+			if(aconf->flags & CONF_FLAGS_TEMPORARY)
+				continue;
+
+			if((aconf->user && irccmp(user, aconf->user)) ||
+			   irccmp(host, aconf->host))
+				continue;
+
+			delete_one_address_conf(host, aconf);
+			banconf_del_write(TRANS_KLINE, user, host);
+
+			sendto_one_notice(source_p, POP_QUEUE, ":K-Line for [%s@%s] is removed",
+					  user, host);
+			sendto_realops_flags(UMODE_ALL, L_ALL,
+					     "%s has removed the K-Line for: [%s@%s]",
+					     get_oper_name(source_p), user, host);
+			ilog(L_KLINE, "UK %s %s %s",
+				get_oper_name(source_p), user, host);
+			return;
 		}
-		else
-			error_on_write = flush_write(source_p, out, buf, temppath);
+
 	}
+	HOSTHASH_WALK_END
 
-	/* we dropped out of the loop early because we found a match,
-	 * to drop into this somewhat faster loop as we presume we'll never
-	 * have two matching klines --anfl
-	 */
-	if(pairme && !error_on_write)
-	{
-		while(fgets(buf, sizeof(buf), in))
-		{
-			if(error_on_write)
-				break;
-
-			error_on_write = flush_write(source_p, out, buf, temppath);
-		}
-	}
-
-	fclose(in);
-	fclose(out);
-
-	/* The result of the rename should be checked too... oh well */
-	/* If there was an error on a write above, then its been reported
-	 * and I am not going to trash the original kline /conf file
-	 */
-	if(error_on_write)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Couldn't write temp kline file, aborted");
-		return;
-	}
-	else if(!pairme)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":No K-Line for %s@%s",
-				  user, host);
-
-		if(temppath != NULL)
-			(void) unlink(temppath);
-
-		return;
-	}
-		
-	(void) rename(temppath, filename);
-	rehash_bans(0);
-
-	sendto_one_notice(source_p, POP_QUEUE, ":K-Line for [%s@%s] is removed",
+	sendto_one_notice(source_p, POP_QUEUE, ":No K-Line for %s@%s",
 			  user, host);
-
-	sendto_realops_flags(UMODE_ALL, L_ALL,
-			     "%s has removed the K-Line for: [%s@%s]",
-			     get_oper_name(source_p), user, host);
-
-	ilog(L_KLINE, "UK %s %s %s",
-		get_oper_name(source_p), user, host);
-	return;
-}
-
-/*
- * flush_write()
- *
- * inputs       - pointer to client structure of oper requesting unkline
- *              - out is the file descriptor
- *              - buf is the buffer to write
- *              - ntowrite is the expected number of character to be written
- *              - temppath is the temporary file name to be written
- * output       - YES for error on write
- *              - NO for success
- * side effects - if successful, the buf is written to output file
- *                if a write failure happesn, and the file pointed to
- *                by temppath, if its non NULL, is removed.
- *
- * The idea here is, to be as robust as possible when writing to the 
- * kline file.
- *
- * -Dianora
- */
-
-static int
-flush_write(struct Client *source_p, FILE * out, const char *buf, const char *temppath)
-{
-	int error_on_write = (fputs(buf, out) < 0) ? YES : NO;
-
-	if(error_on_write)
-	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Unable to write to %s",
-				  temppath);
-		if(temppath != NULL)
-			(void) unlink(temppath);
-	}
-	return (error_on_write);
 }
 
 /* remove_temp_kline()
@@ -825,7 +698,7 @@ flush_write(struct Client *source_p, FILE * out, const char *buf, const char *te
  * side effects - tries to unkline anything that matches
  */
 static int
-remove_temp_kline(const char *user, const char *host)
+remove_temp_kline(struct Client *source_p, const char *user, const char *host)
 {
 	struct ConfItem *aconf;
 	dlink_node *ptr;
@@ -859,6 +732,16 @@ remove_temp_kline(const char *user, const char *host)
 
 			ircd_dlinkDestroy(ptr, &temp_klines[i]);
 			delete_one_address_conf(aconf->host, aconf);
+
+			sendto_one(source_p, POP_QUEUE, 
+				   ":%s NOTICE %s :Un-klined [%s@%s] from temporary k-lines",
+				   me.name, source_p->name, user, host);
+			sendto_realops_flags(UMODE_ALL, L_ALL,
+					     "%s has removed the temporary K-Line for: [%s@%s]",
+					     get_oper_name(source_p), user, host);
+			ilog(L_KLINE, "UK %s %s %s",
+				get_oper_name(source_p), user, host);
+
 			return YES;
 		}
 	}

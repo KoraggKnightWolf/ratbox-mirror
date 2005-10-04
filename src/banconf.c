@@ -137,10 +137,10 @@ banconf_del_write(banconf_type type, const char *mask, const char *mask2)
 	char buf[BUFSIZE*2];
 
 	if(mask2)
-		snprintf(buf, sizeof(buf), "%c %s %s",
+		snprintf(buf, sizeof(buf), "%c %s %s\n",
 			translog_del_letter[type], mask, mask2);
 	else
-		snprintf(buf, sizeof(buf), "%c %s",
+		snprintf(buf, sizeof(buf), "%c %s\n",
 			translog_del_letter[type], mask);
 
 	transaction_append(buf);
