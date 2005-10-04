@@ -22,7 +22,7 @@
 #include "stdinc.h"
 #include "ircd_lib.h"
 #include "ircd.h"
-#include "irc_string.h"
+#include "match.h"
 
 /* match()
  * 

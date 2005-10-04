@@ -29,7 +29,7 @@
 #include "ircd_defs.h"
 #include "parse.h"
 #include "res.h"
-#include "irc_string.h"
+#include "match.h"
 #include "s_log.h"
 #include "s_conf.h"
 #include "client.h"

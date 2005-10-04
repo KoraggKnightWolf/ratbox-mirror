@@ -43,7 +43,7 @@
 #include "parse.h"
 #include "hook.h"
 #include "modules.h"
-#include "irc_string.h"
+#include "match.h"
 #include "whowas.h"
 #include "monitor.h"
 #include "s_serv.h"

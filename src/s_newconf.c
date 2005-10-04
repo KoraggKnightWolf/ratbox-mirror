@@ -44,7 +44,7 @@
 #include "newconf.h"
 #include "hash.h"
 #include "ircd_lib.h"
-#include "irc_string.h"
+#include "match.h"
 #include "patricia.h"
 #include "ircd.h"
 #include "class.h"

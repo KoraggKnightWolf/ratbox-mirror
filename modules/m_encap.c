@@ -37,7 +37,7 @@
 #include "hash.h"
 #include "parse.h"
 #include "modules.h"
-#include "irc_string.h"
+#include "match.h"
 
 static int ms_encap(struct Client *client_p, struct Client *source_p,
 		     int parc, const char *parv[]);

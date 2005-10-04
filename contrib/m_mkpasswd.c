@@ -16,7 +16,7 @@
 #include "client.h"
 #include "common.h"		
 #include "ircd.h"
-#include "irc_string.h"
+#include "match.h"
 #include "numeric.h"
 #include "s_newconf.h"
 #include "s_conf.h"

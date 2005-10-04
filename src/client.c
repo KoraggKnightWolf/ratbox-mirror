@@ -29,7 +29,7 @@
 #include "channel.h"
 #include "class.h"
 #include "hash.h"
-#include "irc_string.h"
+#include "match.h"
 #include "ircd.h"
 #include "s_gline.h"
 #include "numeric.h"

@@ -27,7 +27,7 @@
 #include "stdinc.h"
 #include "struct.h"
 #include "client.h"
-#include "irc_string.h"
+#include "match.h"
 #include "ircd.h"
 #include "hostmask.h"
 #include "numeric.h"

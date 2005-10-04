@@ -34,7 +34,7 @@
 #include "s_conf.h"
 #include "s_serv.h"
 #include "send.h"
-#include "irc_string.h"
+#include "match.h"
 #include "s_conf.h"
 #include "s_log.h"
 #include "parse.h"

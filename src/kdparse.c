@@ -30,7 +30,7 @@
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "hostmask.h"
-#include "irc_string.h"
+#include "match.h"
 #include "hash.h"
 #include "channel.h"
 

@@ -34,7 +34,7 @@
 #include "class.h"
 #include "client.h"
 #include "hash.h"
-#include "irc_string.h"
+#include "match.h"
 #include "ircd_lib.h"
 #include "ircd.h"
 #include "listener.h"

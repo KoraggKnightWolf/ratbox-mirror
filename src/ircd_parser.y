@@ -13,7 +13,7 @@
 #include "common.h"
 #include "ircd_defs.h"
 #include "client.h"
-#include "irc_string.h"
+#include "match.h"
 #include "modules.h"
 #include "newconf.h"
 

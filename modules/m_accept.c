@@ -33,7 +33,7 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
-#include "irc_string.h"
+#include "match.h"
 
 static int m_accept(struct Client *, struct Client *, int, const char **);
 static void build_nicklist(struct Client *, char *, char *, const char *);

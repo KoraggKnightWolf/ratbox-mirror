@@ -32,7 +32,7 @@
 #include "hostmask.h"
 #include "numeric.h"
 #include "send.h"
-#include "irc_string.h"
+#include "match.h"
 
 #ifdef IPV6
 static unsigned long hash_ipv6(struct sockaddr *, int);

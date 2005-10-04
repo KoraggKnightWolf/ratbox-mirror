@@ -33,7 +33,7 @@
 #include "stdinc.h"
 #include "struct.h"
 #include "tools.h"
-#include "irc_string.h"
+#include "match.h"
 #include "client.h"
 #include "channel.h"
 #include "s_conf.h"

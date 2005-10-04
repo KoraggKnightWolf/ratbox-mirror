@@ -29,7 +29,7 @@
 #include "class.h"		/* report_classes */
 #include "client.h"		/* Client */
 #include "channel.h"
-#include "irc_string.h"
+#include "match.h"
 #include "ircd.h"		/* me */
 #include "listener.h"		/* show_ports */
 #include "s_gline.h"

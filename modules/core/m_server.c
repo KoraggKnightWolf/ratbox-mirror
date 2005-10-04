@@ -29,7 +29,7 @@
 #include "client.h"		/* client struct */
 #include "channel.h"
 #include "hash.h"		/* add_to_client_hash */
-#include "irc_string.h"
+#include "match.h"
 #include "ircd.h"		/* me */
 #include "s_conf.h"		/* struct ConfItem */
 #include "s_newconf.h"

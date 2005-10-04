@@ -33,7 +33,7 @@
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "send.h"
-#include "irc_string.h"
+#include "match.h"
 #include "patricia.h"
 
 #define BAD_CONF_CLASS          -1

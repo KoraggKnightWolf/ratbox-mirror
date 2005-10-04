@@ -31,7 +31,7 @@
 #include "send.h"
 #include "s_conf.h"
 #include "ircd.h"
-#include "irc_string.h"
+#include "match.h"
 
 #define USER_COL       50	/* display | Users: %d at col 50 */
 

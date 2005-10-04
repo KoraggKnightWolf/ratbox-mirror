@@ -27,7 +27,7 @@
 #include "stdinc.h"
 #include "struct.h"
 #include "client.h"		/* client struct */
-#include "irc_string.h"
+#include "match.h"
 #include "send.h"		/* sendto_one */
 #include "ircd.h"		/* me */
 #include "parse.h"

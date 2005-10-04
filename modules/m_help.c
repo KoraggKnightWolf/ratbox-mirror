@@ -34,7 +34,7 @@
 #include "modules.h"
 #include "hash.h"
 #include "cache.h"
-#include "irc_string.h"
+#include "match.h"
 
 static int m_help(struct Client *, struct Client *, int, const char **);
 static int mo_help(struct Client *, struct Client *, int, const char **);

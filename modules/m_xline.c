@@ -39,7 +39,7 @@
 #include "numeric.h"
 #include "s_log.h"
 #include "s_serv.h"
-#include "irc_string.h"
+#include "match.h"
 #include "ircd_lib.h"
 #include "parse.h"
 #include "modules.h"

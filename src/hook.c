@@ -39,7 +39,7 @@
 #include "stdinc.h"
 #include "ircd_lib.h"
 #include "hook.h"
-#include "irc_string.h"
+#include "match.h"
 
 hook *hooks;
 

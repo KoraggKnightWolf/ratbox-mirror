@@ -25,7 +25,7 @@
 #include "hash.h"
 #include "cache.h"
 #include "ircd.h"
-#include "irc_string.h"
+#include "match.h"
 #include "class.h"
 #include "reject.h"
 

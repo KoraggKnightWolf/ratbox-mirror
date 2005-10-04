@@ -22,7 +22,7 @@
 #include "stdinc.h"
 #include "ircd_lib.h"
 #include "patricia.h"
-#include "irc_string.h"
+#include "match.h"
 
 static BlockHeap *prefix_heap;
 static BlockHeap *node_heap;

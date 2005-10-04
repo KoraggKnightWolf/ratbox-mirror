@@ -39,7 +39,7 @@
 #include "numeric.h"
 #include "s_conf.h"
 #include "ircd.h"
-#include "irc_string.h"
+#include "match.h"
 #include "send.h"
 
 static int m_monitor(struct Client *, struct Client *, int, const char **);

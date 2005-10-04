@@ -38,7 +38,7 @@
 #include "send.h"
 #include "client.h"
 #include "s_serv.h"
-#include "irc_string.h"
+#include "match.h"
 #include "ircd.h"
 
 static FILE *log_main;

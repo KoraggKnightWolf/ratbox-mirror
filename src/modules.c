@@ -36,7 +36,7 @@
 #include "s_newconf.h"
 #include "numeric.h"
 #include "parse.h"
-#include "irc_string.h"
+#include "match.h"
 
 
 /* Needed to use uintptr_t for some pointer manipulation. */

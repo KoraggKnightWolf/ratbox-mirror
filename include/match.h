@@ -24,8 +24,8 @@
  *  $Id$
  */
 
-#ifndef INCLUDED_irc_string_h
-#define INCLUDED_irc_string_h
+#ifndef INCLUDED_match_h
+#define INCLUDED_match_h
 
 /*
  * match - compare name with mask, mask may contain * and ? as wildcards
@@ -146,4 +146,4 @@ extern const unsigned int CharAttrs[];
 #define IsNonEOS(c) (CharAttrs[(unsigned char)(c)] & NONEOS_C)
 #define IsEol(c) (CharAttrs[(unsigned char)(c)] & EOL_C)
 
-#endif /* INCLUDED_irc_string_h */
+#endif /* INCLUDED_match_h */

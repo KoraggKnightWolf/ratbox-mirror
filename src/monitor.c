@@ -37,7 +37,7 @@
 #include "hash.h"
 #include "numeric.h"
 #include "ircd.h"
-#include "irc_string.h"
+#include "match.h"
 #include "send.h"
 
 static struct monitor *monitorTable[MONITOR_HASH_SIZE];

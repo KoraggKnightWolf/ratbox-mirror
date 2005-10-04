@@ -37,7 +37,7 @@
 #include "s_newconf.h"
 #include "hash.h"
 #include "s_log.h"
-#include "irc_string.h"
+#include "match.h"
 #include "banconf.h"
 
 static int mo_resv(struct Client *, struct Client *, int, const char **);

@@ -33,7 +33,7 @@
 #include "parse.h"
 #include "modules.h"
 #include "channel.h"
-#include "irc_string.h"
+#include "match.h"
 #include "hash.h"
 #include "send.h"
 #include "patricia.h"
