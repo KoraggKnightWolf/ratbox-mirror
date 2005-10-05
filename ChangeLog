@@ -1,3 +1,11 @@
+androsyn    2005/10/05 03:59:28 UTC	(20051005_0-20890)
+  Log:
+  move non-blocking setting to before reading the fd
+
+  Modified:
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+
+
 leeh        2005/10/04 21:01:21 UTC	(20051004_10-20888)
   Log:
   - make undline/unxline/unresv use the transaction log
