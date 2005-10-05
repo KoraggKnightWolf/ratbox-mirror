@@ -1,3 +1,11 @@
+androsyn    2005/10/05 04:00:26 UTC	(20051005_1-20892)
+  Log:
+  add an unlikely to the new block allocation code
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+
+
 androsyn    2005/10/05 03:59:28 UTC	(20051005_0-20890)
   Log:
   move non-blocking setting to before reading the fd
