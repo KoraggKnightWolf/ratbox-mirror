@@ -412,9 +412,9 @@ int main(int argc, char **argv)
 	ircd_open(irc_ifd, FD_PIPE, "ircd ifd");
 	ircd_open(irc_ofd, FD_PIPE, "ircd ofd");
 
-	read_request(irc_ifd, NULL);
 	ircd_set_nb(irc_ifd);
 	ircd_set_nb(irc_ofd);
+	read_request(irc_ifd, NULL);
 	
 
 	while(1) {
