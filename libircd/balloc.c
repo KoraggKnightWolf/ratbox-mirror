@@ -414,7 +414,7 @@ BlockHeapAlloc(BlockHeap * bh)
 		/* Allocate new block and assign */
 		/* newblock returns 1 if unsuccessful, 0 if not */
 
-		if(newblock(bh))
+		if(unlikely(newblock(bh)))
 		{
 			/* That didn't work..try to garbage collect */
 			BlockHeapGarbageCollect(bh);
