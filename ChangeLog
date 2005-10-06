@@ -1,3 +1,14 @@
+leeh        2005/10/06 18:05:18 UTC	(20051006_2-20900)
+  Log:
+  - max operhash_table statically allocated
+  - make hash_nick() etc macros for the fnv functions
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 leeh        2005/10/06 17:52:17 UTC	(20051006_1-20898)
   Log:
   - split transaction log stuff out into translog.c
