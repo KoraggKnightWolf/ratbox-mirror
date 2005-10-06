@@ -600,7 +600,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	/* This had to be copied here to avoid problems.. */
 	source_p->tsinfo = ircd_currenttime;
 	if(source_p->name[0])
-		del_from_client_hash(source_p->name, source_p);
+		del_from_hash(HASH_CLIENT, source_p->name, source_p);
 
 	strcpy(source_p->name, nick);
 	add_to_hash(HASH_CLIENT, nick, source_p);
@@ -672,7 +672,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	}
 
 	/* Finally, add to hash */
-	del_from_client_hash(source_p->name, source_p);
+	del_from_hash(HASH_CLIENT, source_p->name, source_p);
 	strcpy(source_p->name, nick);
 	add_to_hash(HASH_CLIENT, nick, source_p);
 
@@ -727,7 +727,7 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 				source_p->name, nick, (long) source_p->tsinfo);
 	}
 
-	del_from_client_hash(source_p->name, source_p);
+	del_from_hash(HASH_CLIENT, source_p->name, source_p);
 
 	/* invalidate nick delay when a remote client uses the nick.. */
 	if((nd = hash_find_nd(nick)))

@@ -355,7 +355,7 @@ remove_resv(struct Client *source_p, const char *name)
 		if(aconf->hold)
 			translog_del_ban(TRANS_RESV, name, NULL);
 
-		del_from_resv_hash(name, aconf);
+		del_from_hash(HASH_RESV, name, aconf);
 		free_conf(aconf);
 	}
 	else

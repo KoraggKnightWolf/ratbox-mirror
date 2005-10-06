@@ -183,7 +183,7 @@ static struct _hash_function
 } hash_function[] = {
 	{ fnv_hash_upper,	&clientTable,	U_MAX_BITS,	0	},
 	{ fnv_hash,		&idTable,	U_MAX_BITS,	0	},
-	{ NULL,			NULL,		0,		0	},	/* not for channels */
+	{ fnv_hash_upper_len,	&channelTable,	CH_MAX_BITS,	30	},
 	{ fnv_hash_upper_len,	&hostTable,	HOST_MAX_BITS,	30	},
 	{ fnv_hash_upper_len,	&resvTable,	R_MAX_BITS,	30	}
 };
@@ -205,6 +205,21 @@ add_to_hash(hash_type type, const char *hashindex, void *pointer)
 }
 
 void
+del_from_hash(hash_type type, const char *hashindex, void *pointer)
+{
+	dlink_list *table = *hash_function[type].table;
+	unsigned int hashv;
+
+	if(EmptyString(hashindex) || (pointer == NULL))
+		return;
+
+	hashv = (hash_function[type].func)((const unsigned char *) hashindex,
+					hash_function[type].hashbits,
+					hash_function[type].hashlen);
+	ircd_dlinkFindDestroy(pointer, &table[hashv]);
+}
+
+void
 add_to_help_hash(const char *name, struct cachefile *hptr)
 {
 	unsigned int hashv;
@@ -221,98 +236,6 @@ add_to_nd_hash(const char *name, struct nd_entry *nd)
 {
 	nd->hashv = hash_nick(name);
 	ircd_dlinkAdd(nd, &nd->hnode, &ndTable[nd->hashv]);
-}
-
-/* del_from_id_hash()
- *
- * removes an id from the id hash table
- */
-void
-del_from_id_hash(const char *id, struct Client *client_p)
-{
-	unsigned int hashv;
-
-	s_assert(id != NULL);
-	s_assert(client_p != NULL);
-	if(EmptyString(id) || client_p == NULL)
-		return;
-
-	hashv = hash_id(id);
-	ircd_dlinkFindDestroy(client_p, &idTable[hashv]);
-}
-
-/* del_from_client_hash()
- *
- * removes a client/server from the client hash table
- */
-void
-del_from_client_hash(const char *name, struct Client *client_p)
-{
-	unsigned int hashv;
-
-	/* no s_asserts, this can happen when removing a client that
-	 * is unregistered.
-	 */
-	if(EmptyString(name) || client_p == NULL)
-		return;
-
-	hashv = hash_nick(name);
-	ircd_dlinkFindDestroy(client_p, &clientTable[hashv]);
-}
-
-/* del_from_channel_hash()
- * 
- * removes a channel from the channel hash table
- */
-void
-del_from_channel_hash(const char *name, struct Channel *chptr)
-{
-	unsigned int hashv;
-
-	s_assert(name != NULL);
-	s_assert(chptr != NULL);
-
-	if(EmptyString(name) || chptr == NULL)
-		return;
-
-	hashv = hash_channel(name);
-	ircd_dlinkFindDestroy(chptr, &channelTable[hashv]);
-}
-
-/* del_from_hostname_hash()
- *
- * removes a client entry from the hostname hash table
- */
-void
-del_from_hostname_hash(const char *hostname, struct Client *client_p)
-{
-	unsigned int hashv;
-
-	if(hostname == NULL || client_p == NULL)
-		return;
-
-	hashv = hash_hostname(hostname);
-
-	ircd_dlinkFindDestroy(client_p, &hostTable[hashv]);
-}
-
-/* del_from_resv_hash()
- *
- * removes a resv entry from the resv hash table
- */
-void
-del_from_resv_hash(const char *name, struct ConfItem *aconf)
-{
-	unsigned int hashv;
-
-	s_assert(name != NULL);
-	s_assert(aconf != NULL);
-	if(EmptyString(name) || aconf == NULL)
-		return;
-
-	hashv = hash_resv(name);
-
-	ircd_dlinkFindDestroy(aconf, &resvTable[hashv]);
 }
 
 void

@@ -362,7 +362,7 @@ destroy_channel(struct Channel *chptr)
 	free_topic(chptr);
 
 	ircd_dlinkDelete(&chptr->node, &global_channel_list);
-	del_from_channel_hash(chptr->chname, chptr);
+	del_from_hash(HASH_CHANNEL, chptr->chname, chptr);
 	free_channel(chptr);
 }
 

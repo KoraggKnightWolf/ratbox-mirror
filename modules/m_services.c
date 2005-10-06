@@ -210,7 +210,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 	sendto_server(NULL, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%ld",
 			target_p->name, parv[2], (long) target_p->tsinfo);
 
-	del_from_client_hash(target_p->name, target_p);
+	del_from_hash(HASH_CLIENT, target_p->name, target_p);
 	strcpy(target_p->name, parv[2]);
 	add_to_hash(HASH_CLIENT, target_p->name, target_p);
 

@@ -77,24 +77,21 @@ extern u_int32_t fnv_hash_upper_len(const unsigned char *s, unsigned int bits, u
 extern void init_hash(void);
 
 extern void add_to_hash(hash_type, const char *, void *);
+extern void del_from_hash(hash_type, const char *, void *);
 
-extern void del_from_client_hash(const char *name, struct Client *client);
 extern struct Client *find_any_client(const char *name);
 extern struct Client *find_client(const char *name);
 extern struct Client *find_named_client(const char *name);
 extern struct Client *find_server(struct Client *source_p, const char *name);
 
-extern void del_from_id_hash(const char *name, struct Client *client);
 extern struct Client *find_id(const char *name);
 
 extern struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
 extern void del_from_channel_hash(const char *name, struct Channel *chan);
 extern struct Channel *find_channel(const char *name);
 
-extern void del_from_hostname_hash(const char *, struct Client *);
 extern dlink_node *find_hostname(const char *);
 
-extern void del_from_resv_hash(const char *name, struct ConfItem *aconf);
 extern struct ConfItem *hash_find_resv(const char *name);
 extern void clear_resv_hash(void);
 
