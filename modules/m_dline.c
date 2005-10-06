@@ -38,7 +38,7 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
-#include "banconf.h"
+#include "translog.h"
 
 static int mo_dline(struct Client *, struct Client *, int, const char **);
 static int mo_undline(struct Client *, struct Client *, int, const char **);
@@ -257,7 +257,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 			   ":%s NOTICE %s :Added D-Line [%s] to %s", me.name,
 			   source_p->name, aconf->host, ConfigFileEntry.dlinefile);
 
-		banconf_add_write(TRANS_DLINE, source_p, aconf->host, NULL,
+		translog_add_ban(TRANS_DLINE, source_p, aconf->host, NULL,
 				reason, oper_reason);
 	}
 
@@ -376,7 +376,7 @@ remove_perm_dline(struct Client *source_p, const char *host)
 				continue;
 
 			delete_one_address_conf(host, aconf);
-			banconf_del_write(TRANS_DLINE, host, NULL);
+			translog_del_ban(TRANS_DLINE, host, NULL);
 
 
 			sendto_one(source_p, POP_QUEUE, 

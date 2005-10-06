@@ -38,7 +38,7 @@
 #include "s_serv.h"
 #include "parse.h"
 #include "modules.h"
-#include "banconf.h"
+#include "translog.h"
 
 static int mo_kline(struct Client *, struct Client *, int, const char **);
 static int me_kline(struct Client *, struct Client *, int, const char **);
@@ -431,7 +431,7 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 			  aconf->user, aconf->host);
 
 	add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
-	banconf_add_write(TRANS_KLINE, source_p, aconf->user, aconf->host,
+	translog_add_ban(TRANS_KLINE, source_p, aconf->user, aconf->host,
 			reason, oper_reason);
 }
 
@@ -672,7 +672,7 @@ remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 				continue;
 
 			delete_one_address_conf(host, aconf);
-			banconf_del_write(TRANS_KLINE, user, host);
+			translog_del_ban(TRANS_KLINE, user, host);
 
 			sendto_one_notice(source_p, POP_QUEUE, ":K-Line for [%s@%s] is removed",
 					  user, host);

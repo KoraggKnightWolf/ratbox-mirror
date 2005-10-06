@@ -77,6 +77,7 @@ src_libratbox_la_SOURCES =                     \
   src/s_user.c                      \
   src/scache.c                      \
   src/send.c                        \
+  src/translog.c		\
   src/whowas.c			    \
   src/version.c			\
   src/ircd_parser.y			\

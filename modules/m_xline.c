@@ -45,7 +45,7 @@
 #include "modules.h"
 #include "s_conf.h"
 #include "s_newconf.h"
-#include "banconf.h"
+#include "translog.h"
 
 static int mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
@@ -339,7 +339,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	}
 	else
 	{
-		banconf_add_write(TRANS_XLINE, source_p, aconf->name, "0", reason, NULL);
+		translog_add_ban(TRANS_XLINE, source_p, aconf->name, "0", reason, NULL);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
 				get_oper_name(source_p), 
@@ -434,7 +434,7 @@ remove_xline(struct Client *source_p, const char *name)
 
 
 		if(aconf->hold)
-			banconf_del_write(TRANS_XLINE, name, NULL);
+			translog_del_ban(TRANS_XLINE, name, NULL);
 
 		free_conf(aconf);
 		ircd_dlinkDestroy(ptr, &xline_conf_list);

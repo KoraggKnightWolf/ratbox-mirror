@@ -38,7 +38,7 @@
 #include "hash.h"
 #include "s_log.h"
 #include "match.h"
-#include "banconf.h"
+#include "translog.h"
 
 static int mo_resv(struct Client *, struct Client *, int, const char **);
 static int me_resv(struct Client *, struct Client *, int, const char **);
@@ -228,7 +228,7 @@ parse_resv(struct Client *source_p, const char *name,
 		if(temp_time > 0)
 			aconf->hold = ircd_currenttime + temp_time;
 		else
-			banconf_add_write(TRANS_RESV, source_p, aconf->name, NULL,
+			translog_add_ban(TRANS_RESV, source_p, aconf->name, NULL,
 					aconf->passwd, NULL);
 	}
 	else if(clean_resv_nick(name))
@@ -276,7 +276,7 @@ parse_resv(struct Client *source_p, const char *name,
 		if(temp_time > 0)
 			aconf->hold = ircd_currenttime + (temp_time * 60);
 		else
-			banconf_add_write(TRANS_RESV, source_p, aconf->name, NULL,
+			translog_add_ban(TRANS_RESV, source_p, aconf->name, NULL,
 					aconf->passwd, NULL);
 			
 	}
@@ -353,7 +353,7 @@ remove_resv(struct Client *source_p, const char *name)
 
 		/* schedule it to transaction log */
 		if(aconf->hold)
-			banconf_del_write(TRANS_RESV, name, NULL);
+			translog_del_ban(TRANS_RESV, name, NULL);
 
 		del_from_resv_hash(name, aconf);
 		free_conf(aconf);
@@ -381,7 +381,7 @@ remove_resv(struct Client *source_p, const char *name)
 
 		/* schedule it to transaction log */
 		if(aconf->hold)
-			banconf_del_write(TRANS_RESV, name, NULL);
+			translog_del_ban(TRANS_RESV, name, NULL);
 
 		/* already have ptr from the loop above.. */
 		ircd_dlinkDestroy(ptr, &resv_conf_list);
