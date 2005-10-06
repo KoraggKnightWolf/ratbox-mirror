@@ -221,7 +221,7 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf->port = 0;
 		DupString(aconf->name, name);
 		DupString(aconf->passwd, reason);
-		add_to_resv_hash(aconf->name, aconf);
+		add_to_hash(HASH_RESV, aconf->name, aconf);
 
 		notify_resv(source_p, aconf->name, aconf->passwd, temp_time);
 

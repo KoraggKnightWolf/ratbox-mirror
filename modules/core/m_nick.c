@@ -603,7 +603,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 		del_from_client_hash(source_p->name, source_p);
 
 	strcpy(source_p->name, nick);
-	add_to_client_hash(nick, source_p);
+	add_to_hash(HASH_CLIENT, nick, source_p);
 
 	/* fd_desc is long enough */
 	ircd_note(client_p->localClient->fd, "Nick: %s", nick);
@@ -674,7 +674,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	/* Finally, add to hash */
 	del_from_client_hash(source_p->name, source_p);
 	strcpy(source_p->name, nick);
-	add_to_client_hash(nick, source_p);
+	add_to_hash(HASH_CLIENT, nick, source_p);
 
 	if(!samenick)
 		monitor_signon(source_p);
@@ -734,7 +734,7 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 		free_nd_entry(nd);
 
 	strcpy(source_p->name, nick);
-	add_to_client_hash(nick, source_p);
+	add_to_hash(HASH_CLIENT, nick, source_p);
 
 	if(!samenick)
 		monitor_signon(source_p);
@@ -956,7 +956,7 @@ register_client(struct Client *client_p, struct Client *server,
 		strlcpy(source_p->info, parv[9], sizeof(source_p->info));
 		strlcpy(source_p->sockhost, parv[7], sizeof(source_p->sockhost));
 		strlcpy(source_p->id, parv[8], sizeof(source_p->id));
-		add_to_id_hash(source_p->id, source_p);
+		add_to_hash(HASH_ID, source_p->id, source_p);
 	}
 	else
 	{
@@ -968,8 +968,8 @@ register_client(struct Client *client_p, struct Client *server,
 	if((nd = hash_find_nd(nick)))
 		free_nd_entry(nd);
 
-	add_to_client_hash(nick, source_p);
-	add_to_hostname_hash(source_p->host, source_p);
+	add_to_hash(HASH_CLIENT, nick, source_p);
+	add_to_hash(HASH_HOSTNAME, source_p->host, source_p);
 	monitor_signon(source_p);
 
 	m = &parv[4][1];

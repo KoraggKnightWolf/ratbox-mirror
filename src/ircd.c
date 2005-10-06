@@ -633,8 +633,8 @@ ratbox_main(int argc, char *argv[])
 	make_server(&me);
 	me.serv->up = me.name;
 	startup_time = ircd_currenttime;
-	add_to_client_hash(me.name, &me);
-	add_to_id_hash(me.id, &me);
+	add_to_hash(HASH_CLIENT, me.name, &me);
+	add_to_hash(HASH_ID, me.id, &me);
 
 	ircd_dlinkAddAlloc(&me, &global_serv_list);
 

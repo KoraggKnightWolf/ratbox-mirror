@@ -252,7 +252,7 @@ banconf_parse_resv(char *line)
 				return;
 
 			aconf->status = CONF_RESV_CHANNEL;
-			add_to_resv_hash(aconf->name, aconf);
+			add_to_hash(HASH_RESV, aconf->name, aconf);
 		}
 		else if(clean_resv_nick(aconf->name))
 		{

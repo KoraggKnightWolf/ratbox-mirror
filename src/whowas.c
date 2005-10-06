@@ -50,7 +50,7 @@ static int whowas_next = 0;
 unsigned int
 hash_whowas_name(const char *name)
 {
-	return fnv_hash_upper((const unsigned char *)name, WW_MAX_BITS);
+	return fnv_hash_upper((const unsigned char *)name, WW_MAX_BITS, 0);
 }
 
 void

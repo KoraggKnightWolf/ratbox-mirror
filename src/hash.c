@@ -37,8 +37,8 @@
 #include "cache.h"
 #include "s_newconf.h"
 
-#define hash_nick(x) (fnv_hash_upper((const unsigned char *)(x), U_MAX_BITS))
-#define hash_id(x) (fnv_hash((const unsigned char *)(x), U_MAX_BITS))
+#define hash_nick(x) (fnv_hash_upper((const unsigned char *)(x), U_MAX_BITS, 0))
+#define hash_id(x) (fnv_hash((const unsigned char *)(x), U_MAX_BITS, 0))
 #define hash_channel(x) (fnv_hash_upper_len((const unsigned char *)(x), CH_MAX_BITS, 30))
 #define hash_hostname(x) (fnv_hash_upper_len((const unsigned char *)(x), HOST_MAX_BITS, 30))
 #define hash_resv(x) (fnv_hash_upper_len((const unsigned char *)(x), R_MAX_BITS, 30))
@@ -106,7 +106,7 @@ init_hash(void)
 
 
 u_int32_t
-fnv_hash_upper(const unsigned char *s, unsigned int bits)
+fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused)
 {
 	u_int32_t h = FNV1_32_INIT;
 
@@ -120,7 +120,7 @@ fnv_hash_upper(const unsigned char *s, unsigned int bits)
 }
 
 u_int32_t
-fnv_hash(const unsigned char *s, unsigned int bits)
+fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused)
 {
 	u_int32_t h = FNV1_32_INIT;
 
@@ -174,74 +174,34 @@ hash_help(const char *name)
 	return (h % HELP_MAX);
 }
 
-/* add_to_id_hash()
- *
- * adds an entry to the id hash table
- */
-void
-add_to_id_hash(const char *name, struct Client *client_p)
+static struct _hash_function
 {
+	u_int32_t (*func) (unsigned const char *, unsigned int, unsigned int);
+	dlink_list **table;
+	unsigned int hashbits;
+	unsigned int hashlen;
+} hash_function[] = {
+	{ fnv_hash_upper,	&clientTable,	U_MAX_BITS,	0	},
+	{ fnv_hash,		&idTable,	U_MAX_BITS,	0	},
+	{ NULL,			NULL,		0,		0	},	/* not for channels */
+	{ fnv_hash_upper_len,	&hostTable,	HOST_MAX_BITS,	30	},
+	{ fnv_hash_upper_len,	&resvTable,	R_MAX_BITS,	30	}
+};
+
+void
+add_to_hash(hash_type type, const char *hashindex, void *pointer)
+{
+	dlink_list *table = *hash_function[type].table;
 	unsigned int hashv;
 
-	if(EmptyString(name) || (client_p == NULL))
+	if(EmptyString(hashindex) || (pointer == NULL))
 		return;
 
-	hashv = hash_id(name);
-	ircd_dlinkAddAlloc(client_p, &idTable[hashv]);
-}
-
-/* add_to_client_hash()
- *
- * adds an entry (client/server) to the client hash table
- */
-void
-add_to_client_hash(const char *name, struct Client *client_p)
-{
-	unsigned int hashv;
-
-	s_assert(name != NULL);
-	s_assert(client_p != NULL);
-	if(EmptyString(name) || (client_p == NULL))
-		return;
-
-	hashv = hash_nick(name);
-	ircd_dlinkAddAlloc(client_p, &clientTable[hashv]);
-}
-
-/* add_to_hostname_hash()
- *
- * adds a client entry to the hostname hash table
- */
-void
-add_to_hostname_hash(const char *hostname, struct Client *client_p)
-{
-	unsigned int hashv;
-
-	s_assert(hostname != NULL);
-	s_assert(client_p != NULL);
-	if(EmptyString(hostname) || (client_p == NULL))
-		return;
-
-	hashv = hash_hostname(hostname);
-	ircd_dlinkAddAlloc(client_p, &hostTable[hashv]);
-}
-
-/* add_to_resv_hash()
- *
- * adds a resv channel entry to the resv hash table
- */
-void
-add_to_resv_hash(const char *name, struct ConfItem *aconf)
-{
-	unsigned int hashv;
-
-	s_assert(!EmptyString(name));
-	s_assert(aconf != NULL);
-	if(EmptyString(name) || aconf == NULL)
-		return;
-
-	hashv = hash_resv(name);
-	ircd_dlinkAddAlloc(aconf, &resvTable[hashv]);
+	hashv = (hash_function[type].func)((const unsigned char *) hashindex, 
+					hash_function[type].hashbits, 
+					hash_function[type].hashlen);
+//	ircd_dlinkAddAlloc(pointer, &hash_function[type].table[hashv]);
+	ircd_dlinkAddAlloc(pointer, &table[hashv]);
 }
 
 void
