@@ -37,6 +37,12 @@
 #include "cache.h"
 #include "s_newconf.h"
 
+#define hash_nick(x) (fnv_hash_upper((const unsigned char *)(x), U_MAX_BITS))
+#define hash_id(x) (fnv_hash((const unsigned char *)(x), U_MAX_BITS))
+#define hash_channel(x) (fnv_hash_upper_len((const unsigned char *)(x), CH_MAX_BITS, 30))
+#define hash_hostname(x) (fnv_hash_upper_len((const unsigned char *)(x), HOST_MAX_BITS, 30))
+#define hash_resv(x) (fnv_hash_upper_len((const unsigned char *)(x), R_MAX_BITS, 30))
+
 static dlink_list *clientTable;
 static dlink_list *channelTable;
 static dlink_list *idTable;
@@ -153,57 +159,6 @@ fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len)
 	}
 	h = (h >> bits) ^ (h & ((2^bits)-1));
 	return h;
-}
-
-/* hash_nick()
- *
- * hashes a nickname, first converting to lowercase
- */
-static u_int32_t
-hash_nick(const char *name)
-{
-	return fnv_hash_upper((const unsigned char *)name, U_MAX_BITS);
-}
-
-/* hash_id()
- *
- * hashes an id, case is kept
- */
-static u_int32_t
-hash_id(const char *name)
-{
-	return fnv_hash((const unsigned char *)name, U_MAX_BITS);
-}
-
-/* hash_channel()
- *
- * hashes a channel name, based on first 30 chars only for efficiency
- */
-static u_int32_t
-hash_channel(const char *name)
-{
-	return fnv_hash_upper_len((const unsigned char *)name, CH_MAX_BITS, 30);
-}
-
-/* hash_hostname()
- *
- * hashes a hostname, based on first 30 chars only, as thats likely to
- * be more dynamic than rest.
- */
-static u_int32_t
-hash_hostname(const char *name)
-{
-	return fnv_hash_upper_len((const unsigned char *)name, HOST_MAX_BITS, 30);
-}
-
-/* hash_resv()
- *
- * hashes a resv channel name, based on first 30 chars only
- */
-static u_int32_t
-hash_resv(const char *name)
-{
-	return fnv_hash_upper_len((const unsigned char *)name, R_MAX_BITS, 30);
 }
 
 static unsigned int

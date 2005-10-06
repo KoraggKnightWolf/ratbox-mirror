@@ -42,13 +42,7 @@
 
 #define hash_opername(x) fnv_hash_upper_len((const unsigned char *)(x), OPERHASH_MAX_BITS, 30)
 
-static dlink_list *operhash_table;
-
-void
-init_operhash(void)
-{
-	operhash_table = ircd_malloc(sizeof(dlink_list) * OPERHASH_MAX);
-}
+static dlink_list operhash_table[OPERHASH_MAX];
 
 const char *
 operhash_add(const char *name)
