@@ -63,6 +63,7 @@ src_libratbox_la_SOURCES =                     \
   src/monitor.c                     \
   src/newconf.c                     \
   src/numeric.c                     \
+  src/operhash.c		\
   src/packet.c                      \
   src/parse.c                       \
   src/patricia.c                    \

@@ -283,11 +283,11 @@ am_src_libratbox_la_OBJECTS = src/dns.lo src/banconf.lo src/cache.lo \
 	src/channel.lo src/class.lo src/client.lo src/getopt.lo \
 	src/hash.lo src/hook.lo src/hostmask.lo src/ircd.lo \
 	src/ircd_signal.lo src/listener.lo src/match.lo src/modules.lo \
-	src/monitor.lo src/newconf.lo src/numeric.lo src/packet.lo \
-	src/parse.lo src/patricia.lo src/reject.lo src/restart.lo \
-	src/s_auth.lo src/s_conf.lo src/s_newconf.lo src/s_log.lo \
-	src/s_serv.lo src/s_user.lo src/scache.lo src/send.lo \
-	src/whowas.lo src/version.lo src/ircd_parser.lo \
+	src/monitor.lo src/newconf.lo src/numeric.lo src/operhash.lo \
+	src/packet.lo src/parse.lo src/patricia.lo src/reject.lo \
+	src/restart.lo src/s_auth.lo src/s_conf.lo src/s_newconf.lo \
+	src/s_log.lo src/s_serv.lo src/s_user.lo src/scache.lo \
+	src/send.lo src/whowas.lo src/version.lo src/ircd_parser.lo \
 	src/ircd_lexer.lo
 src_libratbox_la_OBJECTS = $(am_src_libratbox_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -416,8 +416,10 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	src/$(DEPDIR)/match.Plo src/$(DEPDIR)/modules.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/monitor.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/newconf.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/numeric.Plo src/$(DEPDIR)/packet.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/parse.Plo src/$(DEPDIR)/patricia.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/numeric.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/operhash.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/packet.Plo src/$(DEPDIR)/parse.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/patricia.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/reject.Plo src/$(DEPDIR)/resolver.Po \
 @AMDEP_TRUE@	src/$(DEPDIR)/restart.Plo src/$(DEPDIR)/s_auth.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/s_conf.Plo src/$(DEPDIR)/s_log.Plo \
@@ -729,6 +731,7 @@ src_libratbox_la_SOURCES = \
   src/monitor.c                     \
   src/newconf.c                     \
   src/numeric.c                     \
+  src/operhash.c		\
   src/packet.c                      \
   src/parse.c                       \
   src/patricia.c                    \
@@ -1500,6 +1503,7 @@ src/modules.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/monitor.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/newconf.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/numeric.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/operhash.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/packet.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/parse.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/patricia.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -1744,6 +1748,8 @@ mostlyclean-compile:
 	-rm -f src/newconf.lo
 	-rm -f src/numeric.$(OBJEXT)
 	-rm -f src/numeric.lo
+	-rm -f src/operhash.$(OBJEXT)
+	-rm -f src/operhash.lo
 	-rm -f src/packet.$(OBJEXT)
 	-rm -f src/packet.lo
 	-rm -f src/parse.$(OBJEXT)
@@ -1868,6 +1874,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/monitor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/newconf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/numeric.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/operhash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/parse.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/patricia.Plo@am__quote@
@@ -3948,6 +3955,30 @@ src/numeric.lo: src/numeric.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/numeric.Plo' tmpdepfile='src/$(DEPDIR)/numeric.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/numeric.lo `test -f 'src/numeric.c' || echo '$(srcdir)/'`src/numeric.c
+
+src/operhash.o: src/operhash.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/operhash.o -MD -MP -MF "src/$(DEPDIR)/operhash.Tpo" -c -o src/operhash.o `test -f 'src/operhash.c' || echo '$(srcdir)/'`src/operhash.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/operhash.Tpo" "src/$(DEPDIR)/operhash.Po"; else rm -f "src/$(DEPDIR)/operhash.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/operhash.c' object='src/operhash.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/operhash.Po' tmpdepfile='src/$(DEPDIR)/operhash.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/operhash.o `test -f 'src/operhash.c' || echo '$(srcdir)/'`src/operhash.c
+
+src/operhash.obj: src/operhash.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/operhash.obj -MD -MP -MF "src/$(DEPDIR)/operhash.Tpo" -c -o src/operhash.obj `if test -f 'src/operhash.c'; then $(CYGPATH_W) 'src/operhash.c'; else $(CYGPATH_W) '$(srcdir)/src/operhash.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/operhash.Tpo" "src/$(DEPDIR)/operhash.Po"; else rm -f "src/$(DEPDIR)/operhash.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/operhash.c' object='src/operhash.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/operhash.Po' tmpdepfile='src/$(DEPDIR)/operhash.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/operhash.obj `if test -f 'src/operhash.c'; then $(CYGPATH_W) 'src/operhash.c'; else $(CYGPATH_W) '$(srcdir)/src/operhash.c'; fi`
+
+src/operhash.lo: src/operhash.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/operhash.lo -MD -MP -MF "src/$(DEPDIR)/operhash.Tpo" -c -o src/operhash.lo `test -f 'src/operhash.c' || echo '$(srcdir)/'`src/operhash.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/operhash.Tpo" "src/$(DEPDIR)/operhash.Plo"; else rm -f "src/$(DEPDIR)/operhash.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/operhash.c' object='src/operhash.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/operhash.Plo' tmpdepfile='src/$(DEPDIR)/operhash.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/operhash.lo `test -f 'src/operhash.c' || echo '$(srcdir)/'`src/operhash.c
 
 src/packet.o: src/packet.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/packet.o -MD -MP -MF "src/$(DEPDIR)/packet.Tpo" -c -o src/packet.o `test -f 'src/packet.c' || echo '$(srcdir)/'`src/packet.c; \
