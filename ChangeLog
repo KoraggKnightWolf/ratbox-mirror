@@ -1,3 +1,11 @@
+androsyn    2005/10/07 14:38:20 UTC	(20051007_1-20908)
+  Log:
+  fix a sign comparision warning
+
+  Modified:
+	ircd-ratbox/trunk/adns/general.c (File Modified) 
+
+
 androsyn    2005/10/07 14:37:15 UTC	(20051007_0-20906)
   Log:
   fix a few minor win32 compile warnings
