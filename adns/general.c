@@ -218,7 +218,7 @@ adns_status adns_rr_info(adns_rrtype type,
   st= typei->convstring(&vb,datap);
   if (st) goto x_freevb;
   if (!adns__vbuf_append(&vb,"",1)) { st= adns_s_nomemory; goto x_freevb; }
-  assert(strlen(vb.buf) == vb.used-1);
+  assert(strlen(vb.buf) == (size_t)vb.used-1);
   *data_r= realloc(vb.buf,vb.used);
   if (!*data_r) *data_r= (char *)vb.buf;
   return adns_s_ok;
