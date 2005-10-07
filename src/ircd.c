@@ -59,6 +59,7 @@
 #include "cache.h"
 #include "monitor.h"
 #include "res.h"
+#include "translog.h"
 
 /*
  * Try and find the correct name to use with getrlimit() for setting the max.
@@ -585,6 +586,7 @@ ratbox_main(int argc, char *argv[])
 		fprintf(stderr, "\nBeginning config test\n");
 	read_conf_files(YES);	/* cold start init conf files */
 	rehash_bans(0);
+	translog_parse();
 
 #ifndef STATIC_MODULES
 	mod_add_path(MODULE_DIR); 

@@ -174,7 +174,7 @@ banconf_parse_kline(char *line)
 	aconf = make_conf();
 	aconf->status = CONF_KILL;
 
-	if(banconf_parse_line(line, &aconf->host, &aconf->user,
+	if(banconf_parse_line(line, &aconf->user, &aconf->host,
 				&aconf->passwd, &aconf->spasswd))
 		add_conf_by_address(aconf->host, aconf->status,
 					aconf->user, aconf);

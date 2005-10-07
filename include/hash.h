@@ -87,7 +87,6 @@ extern struct Client *find_server(struct Client *source_p, const char *name);
 extern struct Client *find_id(const char *name);
 
 extern struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
-extern void del_from_channel_hash(const char *name, struct Channel *chan);
 extern struct Channel *find_channel(const char *name);
 
 extern dlink_node *find_hostname(const char *);

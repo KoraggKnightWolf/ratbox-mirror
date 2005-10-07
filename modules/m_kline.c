@@ -653,7 +653,7 @@ already_placed_kline(struct Client *source_p, const char *luser, const char *lho
 static void
 remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 {
-	struct AddressRec *arec, *arecp;
+	struct AddressRec *arec;
 	struct ConfItem *aconf;
 	int i;
 

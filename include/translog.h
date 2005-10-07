@@ -13,4 +13,6 @@ void translog_add_ban(translog_type type, struct Client *source_p, const char *m
 			const char *mask2, const char *reason, const char *oper_reason);
 void translog_del_ban(translog_type type, const char *mask, const char *mask2);
 
+void translog_parse(void);
+
 #endif

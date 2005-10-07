@@ -35,10 +35,14 @@
 #include "tools.h"
 #include "match.h"
 #include "client.h"
+#include "channel.h"
 #include "banconf.h"
 #include "translog.h"
 #include "s_log.h"
 #include "s_conf.h"
+#include "s_newconf.h"
+#include "hash.h"
+#include "hostmask.h"
 
 static dlink_list transaction_queue;
 
@@ -141,4 +145,177 @@ translog_del_ban(translog_type type, const char *mask, const char *mask2)
 	transaction_append(buf);
 }
 
+static void
+translog_unkline(char *line)
+{
+	struct AddressRec *arec;
+	struct ConfItem *aconf;
+	int i;
+	char *user, *host;
+
+	if((host = strchr(line, ' ')) == NULL)
+		return;
+
+	user = line;
+	*host++ = '\0';
+
+	HOSTHASH_WALK(i, arec)
+	{
+		aconf = arec->aconf;
+
+		if((arec->type & ~CONF_SKIPUSER) != CONF_KILL)
+			continue;
+
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
+			continue;
+
+		if((aconf->user && irccmp(user, aconf->user)) ||
+		   irccmp(host, aconf->host))
+			continue;
+
+		delete_one_address_conf(aconf->host, aconf);
+	}
+	HOSTHASH_WALK_END
+}
+
+static void
+translog_undline(char *line)
+{
+	struct AddressRec *arec;
+	struct ConfItem *aconf;
+	int i;
+
+	HOSTHASH_WALK(i, arec)
+	{
+		aconf = arec->aconf;
+
+		if((arec->type & ~CONF_SKIPUSER) != CONF_DLINE)
+			continue;
+
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
+			continue;
+
+		if(irccmp(aconf->host, line))
+			continue;
+
+		delete_one_address_conf(aconf->host, aconf);
+	}
+	HOSTHASH_WALK_END
+}
+
+static void
+translog_unresv(char *line)
+{
+	struct ConfItem *aconf;
+
+	if(IsChannelName(line))
+	{
+		if((aconf = hash_find_resv(line)) == NULL)
+			return;
+
+		if(aconf->hold)
+			return;
+
+		del_from_hash(HASH_RESV, line, aconf);
+		free_conf(aconf);
+	}
+	else
+	{
+		dlink_node *ptr;
+
+		DLINK_FOREACH(ptr, resv_conf_list.head)
+		{
+			aconf = ptr->data;
+
+			if(aconf->hold)
+				continue;
+
+			if(irccmp(aconf->name, line))
+				continue;
+
+			ircd_dlinkDestroy(ptr, &resv_conf_list);
+			free_conf(aconf);
+			return;
+		}
+	}
+}
+
+static void
+translog_unxline(char *line)
+{
+	struct ConfItem *aconf;
+	dlink_node *ptr;
+
+	DLINK_FOREACH(ptr, xline_conf_list.head)
+	{
+		aconf = ptr->data;
+
+		if(aconf->hold)
+			continue;
+
+		if(irccmp(aconf->name, line))
+			continue;
+
+		free_conf(aconf);
+		ircd_dlinkDestroy(ptr, &xline_conf_list);
+		return;
+	}
+}
+
+void
+translog_parse(void)
+{
+	FILE *tlog;
+	char line[BUFSIZE*2];
+	char *p;
+
+	if((tlog = fopen(TRANSPATH, "r")) == NULL)
+		return;
+
+	while(fgets(line, sizeof(line), tlog))
+	{
+		if((p = strchr(line, '\n')))
+			*p = '\0';
+
+		switch(line[0])
+		{
+		case 'K':
+			banconf_parse_kline(&line[2]);
+			break;
+
+		case 'D':
+			banconf_parse_dline(&line[2]);
+			break;
+
+		case 'R':
+			banconf_parse_resv(&line[2]);
+			break;
+
+		case 'X':
+			banconf_parse_xline(&line[2]);
+			break;
+
+		case 'k':
+			translog_unkline(&line[2]);
+			break;
+
+		case 'd':
+			translog_undline(&line[2]);
+			break;
+
+		case 'r':
+			translog_unresv(&line[2]);
+			break;
+
+		case 'x':
+			translog_unxline(&line[2]);
+			break;
+		}
+	}
+
+	fclose(tlog);
+
+	/* its been parsed.. nuke it */
+	unlink(TRANSPATH);
+}
 
