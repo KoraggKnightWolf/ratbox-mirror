@@ -1,3 +1,14 @@
+androsyn    2005/10/07 16:59:14 UTC	(20051007_2-20910)
+  Log:
+  Do a propset Id on these files
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/banconf.c  (Property Modified)
+	ircd-ratbox/trunk/src/operhash.c  (Property Modified)
+	ircd-ratbox/trunk/src/translog.c  (Property Modified)
+
+
 androsyn    2005/10/07 14:38:20 UTC	(20051007_1-20908)
   Log:
   fix a sign comparision warning
