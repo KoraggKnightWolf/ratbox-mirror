@@ -76,7 +76,6 @@ struct iovec
 #define HAVE_VSNPRINTF 1
 
 int setenv(const char *, const char *, int);
-int gettimeofday(struct timeval *tv, void *tz);
 int kill(int pid, int sig);
 #define WNOHANG 1
 pid_t waitpid(pid_t pid, int *status, int options);
@@ -223,7 +222,7 @@ char *strtok_r(char *, const char *, char **);
 #endif
 
 #ifndef HAVE_GETTIMEOFDAY
-int gettimeofday(struct timeval *, struct timezone *);
+int gettimeofday(struct timeval *, void *);
 #endif
 
 #ifndef ircd_currenttime

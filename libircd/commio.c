@@ -881,7 +881,7 @@ ircd_write(int fd, void *buf, int count)
 static int
 writev(int fd, struct iovec *iov, size_t iovcnt)
 {
-	int i;
+	size_t i;
 	char *base;
 	int TotalBytesWritten = 0, len;
 	int ret;

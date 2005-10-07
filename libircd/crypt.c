@@ -391,7 +391,7 @@ setup_salt(long salt)
 	u_int32_t	obit, saltbit;
 	int	i;
 
-	if (salt == old_salt)
+	if (salt == (long)old_salt)
 		return;
 	old_salt = salt;
 
@@ -881,7 +881,7 @@ static void   __md5_Init (struct MD5Context *);
 static void   __md5_Update (struct MD5Context *, const char *, unsigned int);
 static void   __md5_Pad (struct MD5Context *);
 static void   __md5_Final (char [16], struct MD5Context *);
-static void __md5_Transform __P((u_int32_t [4], const unsigned char [64]));
+static void __md5_Transform (u_int32_t [4], const unsigned char [64]);
 
 
 static const char __md5__magic[] = "$1$";	/* This string is magic for this algorithm.  Having 

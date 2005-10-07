@@ -42,7 +42,7 @@ ircd_ctime(const time_t t, char *buf)
 	if(unlikely((p = ctime_r(&t, buf)) != NULL))
 		return NULL;
 #else
-	if(unlikely((p = ctime(&t) != NULL))
+	if(unlikely((p = ctime(&t)) != NULL))
 		return NULL;
 	strcpy(buf, p);
 #endif
@@ -167,7 +167,7 @@ strtok_r (char *s, const char *delim, char **save)
 	s = strpbrk(token, delim);
 	
 	if (s == NULL)  
-		*save = (token + strlen(token, '\0'));
+		*save = (token + strlen(token));
 	else
 	{
 		*s = '\0'; 
