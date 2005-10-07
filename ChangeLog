@@ -1,3 +1,16 @@
+androsyn    2005/10/07 14:37:15 UTC	(20051007_0-20906)
+  Log:
+  fix a few minor win32 compile warnings
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/crypt.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/unix.c (File Modified) 
+
+
 leeh        2005/10/06 19:12:26 UTC	(20051006_4-20904)
   Log:
   - create a generic del_from_hash() function
