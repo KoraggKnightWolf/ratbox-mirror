@@ -1,3 +1,12 @@
+leeh        2005/10/08 18:14:32 UTC	(20051008_0-20914)
+  Log:
+  - seemingly ->next is unused in struct ConfItem
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+
+
 leeh        2005/10/07 20:41:44 UTC	(20051007_3-20912)
   Log:
   - add code for parsing the transaction log on startup
