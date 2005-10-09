@@ -291,30 +291,31 @@ banconf_parse_resv(char *line, int perm)
 	if(perm)
 		aconf->flags |= CONF_FLAGS_PERMANENT;
 
-	if(banconf_parse_line(line, &aconf->name, NULL,
+	if(banconf_parse_line(line, &aconf->host, NULL,
 				&aconf->passwd, NULL))
 	{
-		if(IsChannelName(aconf->name))
+		if(IsChannelName(aconf->host))
 		{
-			if(hash_find_resv(aconf->name))
+			if(!hash_find_resv(aconf->host))
+			{
+				aconf->status = CONF_RESV_CHANNEL;
+				add_to_hash(HASH_RESV, aconf->host, aconf);
 				return;
-
-			aconf->status = CONF_RESV_CHANNEL;
-			add_to_hash(HASH_RESV, aconf->name, aconf);
+			}
 		}
-		else if(clean_resv_nick(aconf->name))
+		else if(clean_resv_nick(aconf->host))
 		{
-			if(find_nick_resv(aconf->name))
+			if(!find_nick_resv(aconf->host))
+			{
+				aconf->status = CONF_RESV_NICK;
+				ircd_dlinkAddAlloc(aconf, &resv_conf_list);
 				return;
-
-			aconf->status = CONF_RESV_NICK;
-			ircd_dlinkAddAlloc(aconf, &resv_conf_list);
+			}
 		}
-		else
-			free_conf(aconf);
 	}
-	else
-		free_conf(aconf);
+
+	/* invalid */
+	free_conf(aconf);
 }
 
 static struct banconf_file

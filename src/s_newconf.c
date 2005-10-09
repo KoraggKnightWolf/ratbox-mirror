@@ -586,7 +586,7 @@ find_nick_resv(const char *name)
 	{
 		aconf = ptr->data;
 
-		if(match_esc(aconf->name, name))
+		if(match_esc(aconf->host, name))
 		{
 			aconf->port++;
 			return aconf;
@@ -707,7 +707,7 @@ expire_temp_rxlines(void *unused)
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 						"Temporary RESV for [%s] expired",
-						aconf->name);
+						aconf->host);
 
 			free_conf(aconf);
 			ircd_dlinkDestroy(ptr, &resvTable[i]);
@@ -724,7 +724,7 @@ expire_temp_rxlines(void *unused)
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 						"Temporary RESV for [%s] expired",
-						aconf->name);
+						aconf->host);
 			free_conf(aconf);
 			ircd_dlinkDestroy(ptr, &resv_conf_list);
 		}
@@ -739,7 +739,7 @@ expire_temp_rxlines(void *unused)
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 						"Temporary X-line for [%s] expired",
-						aconf->name);
+						aconf->host);
 			free_conf(aconf);
 			ircd_dlinkDestroy(ptr, &xline_conf_list);
 		}

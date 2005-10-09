@@ -219,11 +219,11 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf = make_conf();
 		aconf->status = CONF_RESV_CHANNEL;
 		aconf->port = 0;
-		DupString(aconf->name, name);
+		DupString(aconf->host, name);
 		DupString(aconf->passwd, reason);
-		add_to_hash(HASH_RESV, aconf->name, aconf);
+		add_to_hash(HASH_RESV, aconf->host, aconf);
 
-		notify_resv(source_p, aconf->name, aconf->passwd, temp_time);
+		notify_resv(source_p, aconf->host, aconf->passwd, temp_time);
 
 		if(temp_time > 0)
 		{
@@ -231,7 +231,7 @@ parse_resv(struct Client *source_p, const char *name,
 			aconf->hold = ircd_currenttime + temp_time;
 		}
 		else
-			translog_add_ban(TRANS_RESV, source_p, aconf->name, NULL,
+			translog_add_ban(TRANS_RESV, source_p, aconf->host, NULL,
 					aconf->passwd, NULL);
 	}
 	else if(clean_resv_nick(name))
@@ -270,11 +270,11 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf = make_conf();
 		aconf->status = CONF_RESV_NICK;
 		aconf->port = 0;
-		DupString(aconf->name, name);
+		DupString(aconf->host, name);
 		DupString(aconf->passwd, reason);
 		ircd_dlinkAddAlloc(aconf, &resv_conf_list);
 
-		notify_resv(source_p, aconf->name, aconf->passwd, temp_time);
+		notify_resv(source_p, aconf->host, aconf->passwd, temp_time);
 
 		if(temp_time > 0)
 		{
@@ -282,7 +282,7 @@ parse_resv(struct Client *source_p, const char *name,
 			aconf->hold = ircd_currenttime + (temp_time * 60);
 		}
 		else
-			translog_add_ban(TRANS_RESV, source_p, aconf->name, NULL,
+			translog_add_ban(TRANS_RESV, source_p, aconf->host, NULL,
 					aconf->passwd, NULL);
 			
 	}

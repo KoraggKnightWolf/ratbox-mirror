@@ -230,7 +230,7 @@ translog_unresv(char *line)
 			if(aconf->flags & CONF_FLAGS_TEMPORARY)
 				continue;
 
-			if(irccmp(aconf->name, line))
+			if(irccmp(aconf->host, line))
 				continue;
 
 			ircd_dlinkDestroy(ptr, &resv_conf_list);

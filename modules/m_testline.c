@@ -160,7 +160,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 				me.name, source_p->name,
 				(resv_p->flags & CONF_FLAGS_TEMPORARY) ? 'q' : 'Q',
 				(resv_p->flags & CONF_FLAGS_TEMPORARY) ? (long) ((resv_p->hold - ircd_currenttime) / 60) : 0L,
-				resv_p->name, resv_p->passwd);
+				resv_p->host, resv_p->passwd);
 
 		/* this is a false positive, so make sure it isn't counted in stats q
 		 * --nenolod

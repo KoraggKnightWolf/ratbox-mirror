@@ -748,7 +748,7 @@ stats_tresv(struct Client *source_p)
 		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSQLINE, 
 					form_str(RPL_STATSQLINE),
-					'q', aconf->port, aconf->name, aconf->passwd);
+					'q', aconf->port, aconf->host, aconf->passwd);
 	}
 
 	HASH_WALK(i, R_MAX, ptr, resvTable)
@@ -757,7 +757,7 @@ stats_tresv(struct Client *source_p)
 		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSQLINE, 
 					form_str(RPL_STATSQLINE),
-					'q', aconf->port, aconf->name, aconf->passwd);
+					'q', aconf->port, aconf->host, aconf->passwd);
 	}
 	HASH_WALK_END
 }
@@ -776,7 +776,7 @@ stats_resv(struct Client *source_p)
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSQLINE, 
 					form_str(RPL_STATSQLINE),
-					'Q', aconf->port, aconf->name, aconf->passwd);
+					'Q', aconf->port, aconf->host, aconf->passwd);
 	}
 
 	HASH_WALK(i, R_MAX, ptr, resvTable)
@@ -785,7 +785,7 @@ stats_resv(struct Client *source_p)
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSQLINE, 
 					form_str(RPL_STATSQLINE),
-					'Q', aconf->port, aconf->name, aconf->passwd);
+					'Q', aconf->port, aconf->host, aconf->passwd);
 	}
 	HASH_WALK_END
 }
