@@ -1,3 +1,18 @@
+leeh        2005/10/09 16:01:59 UTC	(20051009_4-20930)
+  Log:
+  - store the target of a resv in aconf->host, rather than aconf->name
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/translog.c (File Modified) 
+
+
 leeh        2005/10/09 11:15:44 UTC	(20051009_3-20928)
   Log:
   - make this 3.0, rather than 2.2
