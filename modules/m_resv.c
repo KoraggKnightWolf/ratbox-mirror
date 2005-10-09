@@ -350,7 +350,8 @@ remove_resv(struct Client *source_p, const char *name)
 
 	if(IsChannelName(name))
 	{
-		if((aconf = hash_find_resv(name)) == NULL)
+		if(((aconf = hash_find_resv(name)) == NULL) ||
+		   IsConfPermanent(aconf))
 		{
 			sendto_one_notice(source_p, POP_QUEUE,
 					":No RESV for %s", name);
@@ -378,7 +379,7 @@ remove_resv(struct Client *source_p, const char *name)
 				break;
 		}
 
-		if(aconf == NULL)
+		if(aconf == NULL || IsConfPermanent(aconf))
 		{
 			sendto_one_notice(source_p, POP_QUEUE,
 					":No RESV for %s", name);

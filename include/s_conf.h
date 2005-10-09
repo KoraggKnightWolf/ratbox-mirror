@@ -100,6 +100,7 @@ struct ConfItem
 #define CONF_FLAGS_COMPRESSED           0x00200000
 #define CONF_FLAGS_TEMPORARY            0x00400000
 #define CONF_FLAGS_TB			0x00800000
+#define CONF_FLAGS_PERMANENT		0x01000000
 
 /* Macros for struct ConfItem */
 #define IsNoTilde(x)            ((x)->flags & CONF_FLAGS_NO_TILDE)
@@ -117,6 +118,7 @@ struct ConfItem
 #define IsConfEncrypted(x)      ((x)->flags & CONF_FLAGS_ENCRYPTED)
 #define IsConfCompressed(x)     ((x)->flags & CONF_FLAGS_COMPRESSED)
 #define IsConfTburst(x)		((x)->flags & CONF_FLAGS_TB)
+#define IsConfPermanent(x)	((x)->flags & CONF_FLAGS_PERMANENT)
 
 /* flag definitions for opers now in client.h */
 

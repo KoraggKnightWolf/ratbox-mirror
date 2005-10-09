@@ -203,12 +203,15 @@ banconf_parse_line(char *line, char **mask, char **mask2, char **reason,
  * side effects	- parses the given kline line
  */
 void
-banconf_parse_kline(char *line)
+banconf_parse_kline(char *line, int perm)
 {
 	struct ConfItem *aconf;
 
 	aconf = make_conf();
 	aconf->status = CONF_KILL;
+
+	if(perm)
+		aconf->flags |= CONF_FLAGS_PERMANENT;
 
 	if(banconf_parse_line(line, &aconf->user, &aconf->host,
 				&aconf->passwd, &aconf->spasswd))
@@ -225,12 +228,15 @@ banconf_parse_kline(char *line)
  * side effects	- parses the given dline line
  */
 void
-banconf_parse_dline(char *line)
+banconf_parse_dline(char *line, int perm)
 {
 	struct ConfItem *aconf;
 
 	aconf = make_conf();
 	aconf->status = CONF_DLINE;
+
+	if(perm)
+		aconf->flags |= CONF_FLAGS_PERMANENT;
 
 	if(banconf_parse_line(line, &aconf->host, NULL,
 				&aconf->passwd, &aconf->spasswd))
@@ -252,12 +258,15 @@ banconf_parse_dline(char *line)
  * side effects - parses the given xline line
  */
 void
-banconf_parse_xline(char *line)
+banconf_parse_xline(char *line, int perm)
 {
 	struct ConfItem *aconf;
 
 	aconf = make_conf();
 	aconf->status = CONF_XLINE;
+
+	if(perm)
+		aconf->flags |= CONF_FLAGS_PERMANENT;
 
 	if(banconf_parse_line(line, &aconf->name, NULL, 
 				&aconf->passwd, NULL))
@@ -273,11 +282,14 @@ banconf_parse_xline(char *line)
  * side effects - parses the given resv line
  */
 void
-banconf_parse_resv(char *line)
+banconf_parse_resv(char *line, int perm)
 {
 	struct ConfItem *aconf;
 
 	aconf = make_conf();
+
+	if(perm)
+		aconf->flags |= CONF_FLAGS_PERMANENT;
 
 	if(banconf_parse_line(line, &aconf->name, NULL,
 				&aconf->passwd, NULL))
@@ -308,7 +320,7 @@ banconf_parse_resv(char *line)
 static struct banconf_file
 {
 	const char **filename;
-	void (*func) (char *);
+	void (*func) (char *, int);
 } banconf_files[] = {
 	{ &ConfigFileEntry.klinefile,	banconf_parse_kline	},
 	{ &ConfigFileEntry.dlinefile,	banconf_parse_dline	},
@@ -371,7 +383,7 @@ banconf_parse(void)
 				if(EmptyString(line) || (*line == '#'))
 					continue;
 
-				(banconf_files[i].func)(line);
+				(banconf_files[i].func)(line, perm);
 			}
 
 			fclose(banfile);

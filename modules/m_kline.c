@@ -667,6 +667,9 @@ remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 			if(aconf->flags & CONF_FLAGS_TEMPORARY)
 				continue;
 
+			if(IsConfPermanent(aconf))
+				continue;
+
 			if((aconf->user && irccmp(user, aconf->user)) ||
 			   irccmp(host, aconf->host))
 				continue;

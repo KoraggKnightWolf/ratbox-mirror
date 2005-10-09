@@ -3,9 +3,9 @@
 
 void banconf_parse(void);
 
-void banconf_parse_kline(char *line);
-void banconf_parse_dline(char *line);
-void banconf_parse_xline(char *line);
-void banconf_parse_resv(char *line);
+void banconf_parse_kline(char *line, int perm);
+void banconf_parse_dline(char *line, int perm);
+void banconf_parse_xline(char *line, int perm);
+void banconf_parse_resv(char *line, int perm);
 
 #endif

@@ -422,6 +422,9 @@ remove_xline(struct Client *source_p, const char *name)
 	{
 		aconf = ptr->data;
 
+		if(IsConfPermanent(aconf))
+			continue;
+
 		if(irccmp(aconf->name, name))
 			continue;
 

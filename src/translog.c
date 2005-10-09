@@ -280,19 +280,19 @@ translog_parse(void)
 		switch(line[0])
 		{
 		case 'K':
-			banconf_parse_kline(&line[2]);
+			banconf_parse_kline(&line[2], 0);
 			break;
 
 		case 'D':
-			banconf_parse_dline(&line[2]);
+			banconf_parse_dline(&line[2], 0);
 			break;
 
 		case 'R':
-			banconf_parse_resv(&line[2]);
+			banconf_parse_resv(&line[2], 0);
 			break;
 
 		case 'X':
-			banconf_parse_xline(&line[2]);
+			banconf_parse_xline(&line[2], 0);
 			break;
 
 		case 'k':

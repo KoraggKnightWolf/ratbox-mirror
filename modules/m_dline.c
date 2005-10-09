@@ -372,6 +372,9 @@ remove_perm_dline(struct Client *source_p, const char *host)
 			if(aconf->flags & CONF_FLAGS_TEMPORARY)
 				continue;
 
+			if(IsConfPermanent(aconf))
+				continue;
+
 			if(irccmp(aconf->host, host))
 				continue;
 
