@@ -52,7 +52,7 @@
  * side effects	- parses the given line, splitting it into fields
  */
 static char *
-banconf_parse_field(char *nline)
+banconf_parse_field(char *nline, int quoted)
 {
 	static char *line = NULL;
 	char *begin, *end;
@@ -66,7 +66,8 @@ banconf_parse_field(char *nline)
 	/* skip beginning " */
 	if(*line == '"')
 		line++;
-	else
+	/* field must be quoted */
+	else if(quoted)
 		return NULL;
 
 	begin = line;
@@ -85,6 +86,9 @@ banconf_parse_field(char *nline)
 				*end = '\0';
 				return begin;
 			}
+			/* not supposed to be quoted, so ok */
+			else if(!quoted)
+				return begin;
 			
 			return NULL;
 		}
@@ -92,6 +96,12 @@ banconf_parse_field(char *nline)
 		{
 			line = end + 1;
 			*(end - 1) = '\0';
+			return begin;
+		}
+		else if(!quoted)
+		{
+			line = end + 1;
+			*end = '\0';
 			return begin;
 		}
 
@@ -116,7 +126,33 @@ banconf_set_field(char *line, char **field)
 	static const char *empty = "";
 	char *tmp;
 
-	tmp = banconf_parse_field(line);
+	tmp = banconf_parse_field(line, 1);
+
+	if(tmp == NULL)
+		return 0;
+
+	if(*tmp == '\0')
+		*field = NULL;
+	else
+		DupString(*field, tmp);
+
+	return 1;
+}
+
+/* banconf_set_field_unquoted()
+ *
+ * inputs	- line to take fields from, location to store field
+ * outputs	- 1 on success, otherwise 0
+ * side effects - parses a field into the given location, without expecting
+ *		  it to be quoted
+ */
+static int
+banconf_set_field_unquoted(char *line, char **field)
+{
+	static const char *empty = "";
+	char *tmp;
+
+	tmp = banconf_parse_field(line, 0);
 
 	if(tmp == NULL)
 		return 0;
