@@ -1,3 +1,17 @@
+leeh        2005/10/09 20:19:26 UTC	(20051009_6-20934)
+  Log:
+  - store the actual xline in aconf->host rather than aconf->name
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/translog.c (File Modified) 
+
+
 leeh        2005/10/09 16:04:43 UTC	(20051009_5-20932)
   Log:
   - remove pointless get_conf_name()
