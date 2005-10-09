@@ -1,3 +1,12 @@
+leeh        2005/10/09 11:15:44 UTC	(20051009_3-20928)
+  Log:
+  - make this 3.0, rather than 2.2
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 leeh        2005/10/09 11:11:20 UTC	(20051009_2-20926)
   Log:
   - mark permanent bans with CONF_FLAGS_PERMANENT, and disallow them being
