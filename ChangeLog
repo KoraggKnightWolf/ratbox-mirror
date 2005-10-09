@@ -1,3 +1,14 @@
+leeh        2005/10/09 11:00:04 UTC	(20051009_1-20924)
+  Log:
+  - remove the commented out ->next in struct ConfItem
+  - modify ban parser to support parsing unquoted fields
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+
+
 leeh        2005/10/09 10:49:01 UTC	(20051009_0-20922)
   Log:
   - apply CONF_FLAGS_TEMPORARY to temp xlines/resvs, and test this instead of
