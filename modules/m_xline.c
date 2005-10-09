@@ -325,6 +325,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 
 	if(temp_time > 0)
 	{
+		aconf->flags |= CONF_FLAGS_TEMPORARY;
 		aconf->hold = ircd_currenttime + temp_time;
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -433,7 +434,7 @@ remove_xline(struct Client *source_p, const char *name)
 			get_oper_name(source_p), name);
 
 
-		if(aconf->hold)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			translog_del_ban(TRANS_XLINE, name, NULL);
 
 		free_conf(aconf);

@@ -158,8 +158,8 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	{
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_TESTLINE),
 				me.name, source_p->name,
-				resv_p->hold ? 'q' : 'Q',
-				resv_p->hold ? (long) ((resv_p->hold - ircd_currenttime) / 60) : 0L,
+				(resv_p->flags & CONF_FLAGS_TEMPORARY) ? 'q' : 'Q',
+				(resv_p->flags & CONF_FLAGS_TEMPORARY) ? (long) ((resv_p->hold - ircd_currenttime) / 60) : 0L,
 				resv_p->name, resv_p->passwd);
 
 		/* this is a false positive, so make sure it isn't counted in stats q
@@ -198,8 +198,8 @@ mo_testgecos(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	sendto_one(source_p, POP_QUEUE, form_str(RPL_TESTLINE),
 			me.name, source_p->name,
-			aconf->hold ? 'x' : 'X',
-			aconf->hold ? (long) ((aconf->hold - ircd_currenttime) / 60) : 0L,
+			(aconf->flags & CONF_FLAGS_TEMPORARY) ? 'x' : 'X',
+			(aconf->flags & CONF_FLAGS_TEMPORARY) ? (long) ((aconf->hold - ircd_currenttime) / 60) : 0L,
 			aconf->name, aconf->passwd);
 	return 0;
 }

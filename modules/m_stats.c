@@ -745,7 +745,7 @@ stats_tresv(struct Client *source_p)
 	DLINK_FOREACH(ptr, resv_conf_list.head)
 	{
 		aconf = ptr->data;
-		if(aconf->hold)
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSQLINE, 
 					form_str(RPL_STATSQLINE),
 					'q', aconf->port, aconf->name, aconf->passwd);
@@ -754,7 +754,7 @@ stats_tresv(struct Client *source_p)
 	HASH_WALK(i, R_MAX, ptr, resvTable)
 	{
 		aconf = ptr->data;
-		if(aconf->hold)
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSQLINE, 
 					form_str(RPL_STATSQLINE),
 					'q', aconf->port, aconf->name, aconf->passwd);
@@ -773,7 +773,7 @@ stats_resv(struct Client *source_p)
 	DLINK_FOREACH(ptr, resv_conf_list.head)
 	{
 		aconf = ptr->data;
-		if(!aconf->hold)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSQLINE, 
 					form_str(RPL_STATSQLINE),
 					'Q', aconf->port, aconf->name, aconf->passwd);
@@ -782,7 +782,7 @@ stats_resv(struct Client *source_p)
 	HASH_WALK(i, R_MAX, ptr, resvTable)
 	{
 		aconf = ptr->data;
-		if(!aconf->hold)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSQLINE, 
 					form_str(RPL_STATSQLINE),
 					'Q', aconf->port, aconf->name, aconf->passwd);
@@ -1094,7 +1094,7 @@ stats_tgecos(struct Client *source_p)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold)
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSXLINE,
 					form_str(RPL_STATSXLINE),
 					'x', aconf->port, aconf->name,
@@ -1112,7 +1112,7 @@ stats_gecos(struct Client *source_p)
 	{
 		aconf = ptr->data;
 
-		if(!aconf->hold)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSXLINE,
 					form_str(RPL_STATSXLINE),
 					'X', aconf->port, aconf->name, 

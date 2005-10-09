@@ -209,7 +209,7 @@ rehash_txlines(struct Client *source_p)
 	{
 		aconf = ptr->data;
 
-		if(!aconf->hold)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			continue;
 
 		free_conf(aconf);
@@ -232,7 +232,7 @@ rehash_tresvs(struct Client *source_p)
 	{
 		aconf = ptr->data;
 
-		if(!aconf->hold)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			continue;
 
 		free_conf(aconf);
@@ -244,7 +244,7 @@ rehash_tresvs(struct Client *source_p)
 	{
 		aconf = ptr->data;
 
-		if(!aconf->hold)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			continue;
 
 		free_conf(aconf);

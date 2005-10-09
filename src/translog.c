@@ -213,7 +213,7 @@ translog_unresv(char *line)
 		if((aconf = hash_find_resv(line)) == NULL)
 			return;
 
-		if(aconf->hold)
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			return;
 
 		del_from_hash(HASH_RESV, line, aconf);
@@ -227,7 +227,7 @@ translog_unresv(char *line)
 		{
 			aconf = ptr->data;
 
-			if(aconf->hold)
+			if(aconf->flags & CONF_FLAGS_TEMPORARY)
 				continue;
 
 			if(irccmp(aconf->name, line))
@@ -250,7 +250,7 @@ translog_unxline(char *line)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold)
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			continue;
 
 		if(irccmp(aconf->name, line))

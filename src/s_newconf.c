@@ -135,7 +135,7 @@ clear_s_newconf_bans(void)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold)
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			continue;
 
 		free_conf(aconf);
@@ -147,7 +147,7 @@ clear_s_newconf_bans(void)
 		aconf = ptr->data;
 
 		/* temporary resv */
-		if(aconf->hold)
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			continue;
 
 		free_conf(aconf);
@@ -702,7 +702,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold && aconf->hold <= ircd_currenttime)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_currenttime)
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -719,7 +719,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold && aconf->hold <= ircd_currenttime)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_currenttime)
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -734,7 +734,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold && aconf->hold <= ircd_currenttime)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_currenttime)
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,

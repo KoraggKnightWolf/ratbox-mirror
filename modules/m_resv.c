@@ -226,7 +226,10 @@ parse_resv(struct Client *source_p, const char *name,
 		notify_resv(source_p, aconf->name, aconf->passwd, temp_time);
 
 		if(temp_time > 0)
+		{
+			aconf->flags |= CONF_FLAGS_TEMPORARY;
 			aconf->hold = ircd_currenttime + temp_time;
+		}
 		else
 			translog_add_ban(TRANS_RESV, source_p, aconf->name, NULL,
 					aconf->passwd, NULL);
@@ -274,7 +277,10 @@ parse_resv(struct Client *source_p, const char *name,
 		notify_resv(source_p, aconf->name, aconf->passwd, temp_time);
 
 		if(temp_time > 0)
+		{
+			aconf->flags |= CONF_FLAGS_TEMPORARY;
 			aconf->hold = ircd_currenttime + (temp_time * 60);
+		}
 		else
 			translog_add_ban(TRANS_RESV, source_p, aconf->name, NULL,
 					aconf->passwd, NULL);
@@ -352,7 +358,7 @@ remove_resv(struct Client *source_p, const char *name)
 		}
 
 		/* schedule it to transaction log */
-		if(aconf->hold)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			translog_del_ban(TRANS_RESV, name, NULL);
 
 		del_from_hash(HASH_RESV, name, aconf);
@@ -380,7 +386,7 @@ remove_resv(struct Client *source_p, const char *name)
 		}
 
 		/* schedule it to transaction log */
-		if(aconf->hold)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			translog_del_ban(TRANS_RESV, name, NULL);
 
 		/* already have ptr from the loop above.. */

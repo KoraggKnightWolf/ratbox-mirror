@@ -631,7 +631,7 @@ clear_resv_hash(void)
 		aconf = ptr->data;
 
 		/* skip temp resvs */
-		if(aconf->hold)
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			continue;
 
 		free_conf(ptr->data);
