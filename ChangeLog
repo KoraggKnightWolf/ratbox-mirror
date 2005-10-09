@@ -1,3 +1,13 @@
+leeh        2005/10/09 16:04:43 UTC	(20051009_5-20932)
+  Log:
+  - remove pointless get_conf_name()
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 leeh        2005/10/09 16:01:59 UTC	(20051009_4-20930)
   Log:
   - store the target of a resv in aconf->host, rather than aconf->name
