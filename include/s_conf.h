@@ -320,21 +320,11 @@ extern void yyerror(const char *);
 extern int conf_yy_fatal_error(const char *);
 extern int conf_fgets(char *, int, FILE *);
 
-typedef enum
-{
-	CONF_TYPE,
-	KLINE_TYPE,
-	DLINE_TYPE,
-	RESV_TYPE
-}
-KlineType;
-
 extern void add_temp_kline(struct ConfItem *);
 extern void add_temp_dline(struct ConfItem *);
 extern void report_temp_klines(struct Client *);
 extern void show_temp_klines(struct Client *, dlink_list *);
 
-extern const char *get_conf_name(KlineType);
 extern int rehash(int);
 extern void rehash_bans(int);
 

@@ -1106,7 +1106,7 @@ read_conf_files(int cold)
 
 	conf_fbfile_in = NULL;
 
-	filename = get_conf_name(CONF_TYPE);
+	filename = ConfigFileEntry.configfile;
 
 	/* We need to know the initial filename for the yyerror() to report
 	   FIXME: The full path is in conffilenamebuf first time since we
@@ -1213,32 +1213,6 @@ clear_out_old_conf(void)
 #endif
 
 	/* OK, that should be everything... */
-}
-
-
-/* get_conf_name
- *
- * inputs       - type of conf file to return name of file for
- * output       - pointer to filename for type of conf
- * side effects - none
- */
-const char *
-get_conf_name(KlineType type)
-{
-	if(type == CONF_TYPE)
-	{
-		return (ConfigFileEntry.configfile);
-	}
-	else if(type == DLINE_TYPE)
-	{
-		return (ConfigFileEntry.dlinefile);
-	}
-	else if(type == RESV_TYPE)
-	{
-		return (ConfigFileEntry.resvfile);
-	}
-
-	return ConfigFileEntry.klinefile;
 }
 
 /*
