@@ -565,7 +565,7 @@ find_xline(const char *gecos, int counter)
 	{
 		aconf = ptr->data;
 
-		if(match_esc(aconf->name, gecos))
+		if(match_esc(aconf->host, gecos))
 		{
 			if(counter)
 				aconf->port++;

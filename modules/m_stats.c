@@ -1097,7 +1097,7 @@ stats_tgecos(struct Client *source_p)
 		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSXLINE,
 					form_str(RPL_STATSXLINE),
-					'x', aconf->port, aconf->name,
+					'x', aconf->port, aconf->host,
 					aconf->passwd);
 	}
 }
@@ -1115,7 +1115,7 @@ stats_gecos(struct Client *source_p)
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSXLINE,
 					form_str(RPL_STATSXLINE),
-					'X', aconf->port, aconf->name, 
+					'X', aconf->port, aconf->host, 
 					aconf->passwd);
 	}
 }

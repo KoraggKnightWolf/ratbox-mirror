@@ -268,7 +268,7 @@ banconf_parse_xline(char *line, int perm)
 	if(perm)
 		aconf->flags |= CONF_FLAGS_PERMANENT;
 
-	if(banconf_parse_line(line, &aconf->name, NULL, 
+	if(banconf_parse_line(line, &aconf->host, NULL, 
 				&aconf->passwd, NULL))
 		ircd_dlinkAddAlloc(aconf, &xline_conf_list);
 	else

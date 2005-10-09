@@ -144,7 +144,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if((aconf = find_xline(name, 0)) != NULL)
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :[%s] already X-Lined by [%s] - %s",
-			   me.name, source_p->name, parv[1], aconf->name, aconf->passwd);
+			   me.name, source_p->name, parv[1], aconf->host, aconf->passwd);
 		return 0;
 	}
 
@@ -184,7 +184,7 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :[%s] already X-Lined by [%s] - %s",
 				me.name, source_p->name, name, 
-				aconf->name, aconf->passwd);
+				aconf->host, aconf->passwd);
 		return 0;
 	}
 
@@ -315,13 +315,13 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 		}
 
 		*new = '\0';
-		DupString(aconf->name, tmp);
+		DupString(aconf->host, tmp);
 	}
 	else
-		DupString(aconf->name, name);
+		DupString(aconf->host, name);
 
 	DupString(aconf->passwd, reason);
-	collapse(aconf->name);
+	collapse(aconf->host);
 
 	if(temp_time > 0)
 	{
@@ -331,22 +331,22 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s added temporary %d min. X-Line for [%s] [%s]",
 			     get_oper_name(source_p), temp_time / 60,
-			     aconf->name, reason);
+			     aconf->host, reason);
 		ilog(L_KLINE, "X %s %d %s %s",
 			get_oper_name(source_p), temp_time / 60,
 			name, reason);
 		sendto_one_notice(source_p, POP_QUEUE, ":Added temporary %d min. X-Line [%s]",
-				temp_time / 60, aconf->name);
+				temp_time / 60, aconf->host);
 	}
 	else
 	{
-		translog_add_ban(TRANS_XLINE, source_p, aconf->name, "0", reason, NULL);
+		translog_add_ban(TRANS_XLINE, source_p, aconf->host, "0", reason, NULL);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
 				get_oper_name(source_p), 
-				aconf->name, aconf->passwd);
+				aconf->host, aconf->passwd);
 		sendto_one_notice(source_p, POP_QUEUE, ":Added X-Line for [%s] [%s]",
-					aconf->name, aconf->passwd);
+					aconf->host, aconf->passwd);
 		ilog(L_KLINE, "X %s 0 %s %s",
 			get_oper_name(source_p), name, reason);
 	}
@@ -425,7 +425,7 @@ remove_xline(struct Client *source_p, const char *name)
 		if(IsConfPermanent(aconf))
 			continue;
 
-		if(irccmp(aconf->name, name))
+		if(irccmp(aconf->host, name))
 			continue;
 
 		sendto_one_notice(source_p, POP_QUEUE, 

@@ -200,6 +200,6 @@ mo_testgecos(struct Client *client_p, struct Client *source_p, int parc, const c
 			me.name, source_p->name,
 			(aconf->flags & CONF_FLAGS_TEMPORARY) ? 'x' : 'X',
 			(aconf->flags & CONF_FLAGS_TEMPORARY) ? (long) ((aconf->hold - ircd_currenttime) / 60) : 0L,
-			aconf->name, aconf->passwd);
+			aconf->host, aconf->passwd);
 	return 0;
 }
