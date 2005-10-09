@@ -1,3 +1,20 @@
+leeh        2005/10/09 10:49:01 UTC	(20051009_0-20922)
+  Log:
+  - apply CONF_FLAGS_TEMPORARY to temp xlines/resvs, and test this instead of
+    aconf->hold
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/translog.c (File Modified) 
+
+
 leeh        2005/10/08 18:14:32 UTC	(20051008_0-20914)
   Log:
   - seemingly ->next is unused in struct ConfItem
