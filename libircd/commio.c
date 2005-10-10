@@ -1153,9 +1153,9 @@ inet_ntop6(const unsigned char *src, char *dst, unsigned int size)
 #endif
 
 int
-inetpton_sock(const char *src, struct sockaddr *dst)
+ircd_inet_pton_sock(const char *src, struct sockaddr *dst)
 {
-	if(inetpton(AF_INET, src, &((struct sockaddr_in *) dst)->sin_addr))
+	if(ircd_inet_pton(AF_INET, src, &((struct sockaddr_in *) dst)->sin_addr))
 	{
 		((struct sockaddr_in *) dst)->sin_port = 0;
 		((struct sockaddr_in *) dst)->sin_family = AF_INET;
@@ -1163,7 +1163,7 @@ inetpton_sock(const char *src, struct sockaddr *dst)
 		return 1;
 	}
 #ifdef IPV6
-	else if(inetpton(AF_INET6, src, &((struct sockaddr_in6 *) dst)->sin6_addr))
+	else if(ircd_inet_pton(AF_INET6, src, &((struct sockaddr_in6 *) dst)->sin6_addr))
 	{
 		((struct sockaddr_in6 *) dst)->sin6_port = 0;
 		((struct sockaddr_in6 *) dst)->sin6_family = AF_INET6;
@@ -1175,16 +1175,16 @@ inetpton_sock(const char *src, struct sockaddr *dst)
 }
 
 const char *
-inetntop_sock(struct sockaddr *src, char *dst, unsigned int size)
+ircd_inet_ntop_sock(struct sockaddr *src, char *dst, unsigned int size)
 {
 	switch (src->sa_family)
 	{
 	case AF_INET:
-		return (inetntop(AF_INET, &((struct sockaddr_in *) src)->sin_addr, dst, size));
+		return (ircd_inet_ntop(AF_INET, &((struct sockaddr_in *) src)->sin_addr, dst, size));
 		break;
 #ifdef IPV6
 	case AF_INET6:
-		return (inetntop(AF_INET6, &((struct sockaddr_in6 *) src)->sin6_addr, dst, size));
+		return (ircd_inet_ntop(AF_INET6, &((struct sockaddr_in6 *) src)->sin6_addr, dst, size));
 		break;
 #endif
 	default:
@@ -1194,7 +1194,7 @@ inetntop_sock(struct sockaddr *src, char *dst, unsigned int size)
 }
 
 /* char *
- * inetntop(af, src, dst, size)
+ * ircd_inet_ntop(af, src, dst, size)
  *	convert a network format address to presentation format.
  * return:
  *	pointer to presentation format address (`dst'), or NULL (see errno).
@@ -1202,7 +1202,7 @@ inetntop_sock(struct sockaddr *src, char *dst, unsigned int size)
  *	Paul Vixie, 1996.
  */
 const char *
-inetntop(int af, const void *src, char *dst, unsigned int size)
+ircd_inet_ntop(int af, const void *src, char *dst, unsigned int size)
 {
 	switch (af)
 	{
@@ -1232,7 +1232,7 @@ inetntop(int af, const void *src, char *dst, unsigned int size)
  */
 
 /* int
- * inetpton(af, src, dst)
+ * ircd_inet_pton(af, src, dst)
  *	convert from presentation format (which usually means ASCII printable)
  *	to network format (which is usually some kind of binary format).
  * return:
@@ -1414,7 +1414,7 @@ inet_pton6(src, dst)
 }
 #endif
 int
-inetpton(af, src, dst)
+ircd_inet_pton(af, src, dst)
      int af;
      const char *src;
      void *dst;

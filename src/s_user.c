@@ -479,7 +479,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(IsAnyDead(client_p))
 		return CLIENT_EXITED;
 
-	inetntop_sock((struct sockaddr *)&source_p->localClient->ip, ipaddr, sizeof(ipaddr));
+	ircd_inet_ntop_sock((struct sockaddr *)&source_p->localClient->ip, ipaddr, sizeof(ipaddr));
 
 	sendto_realops_flags(UMODE_CCONN, L_ALL,
 			     "Client connecting: %s (%s@%s) [%s] {%s} [%s]",

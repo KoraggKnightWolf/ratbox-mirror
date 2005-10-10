@@ -396,7 +396,7 @@ start_auth_query(struct AuthRequest *auth)
 		return;
 	}
 
-	inetntop_sock((struct sockaddr *) &localaddr, myip, sizeof(myip));
+	ircd_inet_ntop_sock((struct sockaddr *) &localaddr, myip, sizeof(myip));
 
 #ifdef IPV6
 	if(localaddr.ss_family == AF_INET6)

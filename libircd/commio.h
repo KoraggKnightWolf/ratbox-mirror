@@ -263,10 +263,10 @@ extern int ircd_select(unsigned long);
 extern int disable_sock_options(int);
 extern int ircd_setup_fd(int fd);
 
-const char *inetntop(int af, const void *src, char *dst, unsigned int size);
-int inetpton(int af, const char *src, void *dst);
-const char *inetntop_sock(struct sockaddr *src, char *dst, unsigned int size);
-int inetpton_sock(const char *src, struct sockaddr *dst);
+const char *ircd_inet_ntop(int af, const void *src, char *dst, unsigned int size);
+int ircd_inet_pton(int af, const char *src, void *dst);
+const char *ircd_inet_ntop_sock(struct sockaddr *src, char *dst, unsigned int size);
+int ircd_inet_pton_sock(const char *src, struct sockaddr *dst);
 extern int maxconnections;
 
 #ifdef __MINGW32__

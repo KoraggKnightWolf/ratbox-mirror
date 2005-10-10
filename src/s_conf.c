@@ -257,7 +257,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 			/* why ipaddr, and not just source_p->sockhost? --fl */
 #if 0
 			static char ipaddr[HOSTIPLEN];
-			inetntop_sock(&source_p->localClient->ip, ipaddr, sizeof(ipaddr));
+			ircd_inet_ntop_sock(&source_p->localClient->ip, ipaddr, sizeof(ipaddr));
 #endif
 			sendto_realops_flags(UMODE_UNAUTH, L_ALL,
 					"Unauthorised client connection from "

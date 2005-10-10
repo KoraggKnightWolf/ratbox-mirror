@@ -420,7 +420,7 @@ conf_dns_callback(const char *result, int status, int aftype, void *data)
 
 	if(status == 1)
 	{
-		inetpton(aftype, result, &server_p->ipnum);
+		ircd_inet_pton(aftype, result, &server_p->ipnum);
 #ifdef IPV6
 		if(aftype == AF_INET6)
 		{
@@ -466,7 +466,7 @@ add_server_conf(struct server_conf *server_p)
 	if(strchr(server_p->host, '*') || strchr(server_p->host, '?'))
 		return;
 
-	if(inetpton_sock(server_p->host, (struct sockaddr *)&server_p->ipnum) > 0)
+	if(ircd_inet_pton_sock(server_p->host, (struct sockaddr *)&server_p->ipnum) > 0)
 		return;
 
 	server_p->dns_query = lookup_hostname(server_p->host, server_p->ipnum.ss_family, conf_dns_callback, server_p);

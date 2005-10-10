@@ -292,7 +292,7 @@ static adns_status cs_inaddr(vbuf *vb, const void *datap) {
   const struct in_addr *rr= datap;
   char ia[20];
   
-  inetntop(AF_INET, rr, ia, sizeof(ia));
+  ircd_inet_ntop(AF_INET, rr, ia, sizeof(ia));
   CSP_ADDSTR(ia);
   return adns_s_ok;
 }
@@ -345,7 +345,7 @@ static adns_status csp_addr(vbuf *vb, const adns_rr_addr *rrp) {
   switch (rrp->addr.sa.sa_family) {
   case AF_INET:
     CSP_ADDSTR("INET ");
-    inetntop(AF_INET, &rrp->addr.inet.sin_addr.s_addr, ia, sizeof(ia));
+    ircd_inet_ntop(AF_INET, &rrp->addr.inet.sin_addr.s_addr, ia, sizeof(ia));
     CSP_ADDSTR(ia);
     break;
 #ifdef IPV6
@@ -353,7 +353,7 @@ static adns_status csp_addr(vbuf *vb, const adns_rr_addr *rrp) {
     {
        char ip[IP6STRLEN];
        CSP_ADDSTR("INET6 ");
-       inetntop(AF_INET6, rrp->addr.inet6.sin6_addr.s6_addr, ip, IP6STRLEN);
+       ircd_inet_ntop(AF_INET6, rrp->addr.inet6.sin6_addr.s6_addr, ip, IP6STRLEN);
        CSP_ADDSTR(ip);
        break;
     }
@@ -812,7 +812,7 @@ static adns_status pa_ptr6_all(const parseinfo *pai, int dmstart, int max, void 
     ap->len= sizeof(struct sockaddr_in6);
     memset(&ap->addr,0,sizeof(ap->addr.inet6));
     ap->addr.inet6.sin6_family=AF_INET6;
-    inetpton(AF_INET6, ip6, ap->addr.inet6.sin6_addr.s6_addr);
+    ircd_inet_pton(AF_INET6, ip6, ap->addr.inet6.sin6_addr.s6_addr);
   }
 
   st= adns__mkquery_frdgram(pai->ads, &pai->qu->vb, &id,

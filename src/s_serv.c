@@ -529,7 +529,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 		return 0;
 
 	/* log */
-	inetntop_sock((struct sockaddr *)&server_p->ipnum, buf, sizeof(buf));
+	ircd_inet_ntop_sock((struct sockaddr *)&server_p->ipnum, buf, sizeof(buf));
 	ilog(L_SERVER, "Connect to *[%s] @%s", server_p->name, buf);
 
 	/*

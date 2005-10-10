@@ -179,7 +179,7 @@ inetport(struct Listener *listener)
 		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)&listener->addr;
 		if(!IN6_ARE_ADDR_EQUAL(&in6->sin6_addr, &in6addr_any))
 		{
-			inetntop(AF_INET6, &in6->sin6_addr, listener->vhost, sizeof(listener->vhost));
+			ircd_inet_ntop(AF_INET6, &in6->sin6_addr, listener->vhost, sizeof(listener->vhost));
 			listener->name = listener->vhost;
 		}
 	} else
@@ -188,7 +188,7 @@ inetport(struct Listener *listener)
 		struct sockaddr_in *in = (struct sockaddr_in *)&listener->addr;
 		if(in->sin_addr.s_addr != INADDR_ANY)
 		{
-			inetntop(AF_INET, &in->sin_addr, listener->vhost, sizeof(listener->vhost));
+			ircd_inet_ntop(AF_INET, &in->sin_addr, listener->vhost, sizeof(listener->vhost));
 			listener->name = listener->vhost;
 		}	
 	}
@@ -329,13 +329,13 @@ add_listener(int port, const char *vhost_ip, int family)
 	{
 		if(family == AF_INET)
 		{
-			if(inetpton(family, vhost_ip, &((struct sockaddr_in *)&vaddr)->sin_addr) <= 0)
+			if(ircd_inet_pton(family, vhost_ip, &((struct sockaddr_in *)&vaddr)->sin_addr) <= 0)
 				return;
 		} 
 #ifdef IPV6
 		else
 		{
-			if(inetpton(family, vhost_ip, &((struct sockaddr_in6 *)&vaddr)->sin6_addr) <= 0)
+			if(ircd_inet_pton(family, vhost_ip, &((struct sockaddr_in6 *)&vaddr)->sin6_addr) <= 0)
 				return;
 		
 		}
@@ -458,7 +458,7 @@ add_connection(struct Listener *listener, int fd, struct sockaddr *sai)
 	 * copy address to 'sockhost' as a string, copy it to host too
 	 * so we have something valid to put into error messages...
 	 */
-	inetntop_sock((struct sockaddr *)&new_client->localClient->ip, new_client->sockhost, 
+	ircd_inet_ntop_sock((struct sockaddr *)&new_client->localClient->ip, new_client->sockhost, 
 		sizeof(new_client->sockhost));
 
 

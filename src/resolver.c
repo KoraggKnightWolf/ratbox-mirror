@@ -257,7 +257,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 					case adns_r_addr6:
 					{
 						char tmpres[65];
-						inetntop(AF_INET6, &reply->rrs.addr->addr.inet6.sin6_addr, tmpres, sizeof(tmpres)-1);
+						ircd_inet_ntop(AF_INET6, &reply->rrs.addr->addr.inet6.sin6_addr, tmpres, sizeof(tmpres)-1);
 						aftype = 6;
 						if(*tmpres == ':')
 						{
@@ -273,7 +273,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 					{
 						result = 1;
 						aftype = 4;
-						inetntop(AF_INET, &reply->rrs.addr->addr.inet.sin_addr, response, sizeof(response));
+						ircd_inet_ntop(AF_INET, &reply->rrs.addr->addr.inet.sin_addr, response, sizeof(response));
 						break;
 					} 
 					default:
@@ -495,7 +495,7 @@ resolve_ip(char **parv)
 		case '4':
 			flags = adns_r_ptr;
 			req->reqtype = REVIPV4;
-			if(!inetpton(AF_INET, rec, &req->sins.in.sin_addr))
+			if(!ircd_inet_pton(AF_INET, rec, &req->sins.in.sin_addr))
 				exit(6);
 			req->sins.in.sin_family = AF_INET;
 
@@ -504,7 +504,7 @@ resolve_ip(char **parv)
 		case '5': /* This is the case of having to fall back to "ip6.int" */
 			req->reqtype = REVIPV6FALLBACK;
 			flags = adns_r_ptr_ip6;
-			if(!inetpton(AF_INET6, rec, &req->sins.in6.sin6_addr))
+			if(!ircd_inet_pton(AF_INET6, rec, &req->sins.in6.sin6_addr))
 				exit(6);
 			req->sins.in6.sin6_family = AF_INET6;
 			req->fallback = 0;
@@ -512,7 +512,7 @@ resolve_ip(char **parv)
 		case '6':
 			req->reqtype = REVIPV6;
 			flags = adns_r_ptr_ip6;
-			if(!inetpton(AF_INET6, rec, &req->sins.in6.sin6_addr))
+			if(!ircd_inet_pton(AF_INET6, rec, &req->sins.in6.sin6_addr))
 				exit(6);
 			req->sins.in6.sin6_family = AF_INET6;
 			break;

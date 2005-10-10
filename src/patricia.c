@@ -221,14 +221,14 @@ ascii2prefix(int family, const char *string)
 
 	if(family == AF_INET)
 	{
-		if((result = inetpton(AF_INET, string, &sinaddr)) <= 0)
+		if((result = ircd_inet_pton(AF_INET, string, &sinaddr)) <= 0)
 			return (NULL);
 		return (New_Prefix(AF_INET, &sinaddr, bitlen));
 	}
 #ifdef IPV6
 	else if(family == AF_INET6)
 	{
-		if((result = inetpton(AF_INET6, string, &sinaddr6)) <= 0)
+		if((result = ircd_inet_pton(AF_INET6, string, &sinaddr6)) <= 0)
 			return (NULL);
 		return (New_Prefix(AF_INET6, &sinaddr6, bitlen));
 	}
