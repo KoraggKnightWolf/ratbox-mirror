@@ -1,3 +1,12 @@
+androsyn    2005/10/12 22:55:18 UTC	(20051012_0-20938)
+  Log:
+  Replace snprintf with ircd_snprintf
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/translog.c (File Modified) 
+
+
 androsyn    2005/10/10 15:15:18 UTC	(20051010_0-20936)
   Log:
   Rename inetntop/inetpton to ircd_inet_ntop/ircd_inet_pton
