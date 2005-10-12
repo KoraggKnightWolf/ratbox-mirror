@@ -111,12 +111,12 @@ translog_add_ban(translog_type type, struct Client *source_p, const char *mask,
 		oper_reason = "";
 
 	if(mask2)
-		snprintf(buf, sizeof(buf), "%c \"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%ld\"\n",
+		ircd_snprintf(buf, sizeof(buf), "%c \"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%ld\"\n",
 				translog_add_letter[type], mask, mask2, reason, 
 				oper_reason, smalldate(),
 				get_oper_name(source_p), ircd_currenttime);
 	else
-		snprintf(buf, sizeof(buf), "%c \"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%ld\"\n",
+		ircd_snprintf(buf, sizeof(buf), "%c \"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%ld\"\n",
 				translog_add_letter[type], mask, reason, 
 				oper_reason, smalldate(),
 				get_oper_name(source_p), ircd_currenttime);
@@ -136,10 +136,10 @@ translog_del_ban(translog_type type, const char *mask, const char *mask2)
 	char buf[BUFSIZE*2];
 
 	if(mask2)
-		snprintf(buf, sizeof(buf), "%c %s %s\n",
+		ircd_snprintf(buf, sizeof(buf), "%c %s %s\n",
 			translog_del_letter[type], mask, mask2);
 	else
-		snprintf(buf, sizeof(buf), "%c %s\n",
+		ircd_snprintf(buf, sizeof(buf), "%c %s\n",
 			translog_del_letter[type], mask);
 
 	transaction_append(buf);
