@@ -199,7 +199,7 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 		{
 			char buffer[BUFSIZE];
 
-			snprintf(buffer, sizeof(buffer), "%s!%s@%s %s",
+			ircd_snprintf(buffer, sizeof(buffer), "%s!%s@%s %s",
 				target_p->name, target_p->username,
 				target_p->host, target_p->user->server);
 			report_operspy(source_p, "WHOIS", buffer);

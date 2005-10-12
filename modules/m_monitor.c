@@ -92,9 +92,9 @@ add_monitor(struct Client *client_p, const char *nicks)
 				sendto_one(client_p, POP_QUEUE, "%s", offbuf);
 
 			if(p)
-				snprintf(buf, sizeof(buf), "%s,%s", name, p);
+				ircd_snprintf(buf, sizeof(buf), "%s,%s", name, p);
 			else
-				snprintf(buf, sizeof(buf), "%s", name);
+				ircd_snprintf(buf, sizeof(buf), "%s", name);
 
 			sendto_one(client_p, POP_QUEUE, form_str(ERR_MONLISTFULL),
 					me.name, client_p->name,

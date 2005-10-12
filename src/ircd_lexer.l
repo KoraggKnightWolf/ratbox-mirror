@@ -206,7 +206,7 @@ void cinclude(void)
       /* if its not found in PREFIX, look in ETCPATH */
       char fnamebuf[IRCD_BUFSIZE];
 
-      snprintf(fnamebuf, sizeof(fnamebuf), "%s/%s", ETCPATH, c);
+      ircd_snprintf(fnamebuf, sizeof(fnamebuf), "%s/%s", ETCPATH, c);
       tmp_fbfile_in = fopen(fnamebuf, "r");
 
       /* wasnt found there either.. error. */

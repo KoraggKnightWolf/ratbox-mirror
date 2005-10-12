@@ -354,7 +354,7 @@ banconf_parse(void)
 		 */
 		while(perm < 2)
 		{
-			snprintf(buf, sizeof(buf), *banconf_files[i].filename);
+			ircd_snprintf(buf, sizeof(buf), *banconf_files[i].filename);
 
 			if(perm)
 				strlcat(buf, ".perm", sizeof(buf));
