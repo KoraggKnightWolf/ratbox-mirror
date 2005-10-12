@@ -1,3 +1,16 @@
+androsyn    2005/10/12 22:58:03 UTC	(20051012_1-20940)
+  Log:
+  Replace some more snprintf calls with ircd_snprintf
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_lexer.l (File Modified) 
+
+
 androsyn    2005/10/12 22:55:18 UTC	(20051012_0-20938)
   Log:
   Replace snprintf with ircd_snprintf
