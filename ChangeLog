@@ -1,3 +1,11 @@
+androsyn    2005/10/13 02:52:49 UTC	(20051013_4-20950)
+  Log:
+  cast &req to adns_check to (void *) instead of (void **)
+
+  Modified:
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+
+
 androsyn    2005/10/13 02:46:00 UTC	(20051013_3-20948)
   Log:
   Move strlcpy/strlcat so they can be inlined.  Also change
