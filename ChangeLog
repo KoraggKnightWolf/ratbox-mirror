@@ -1,3 +1,11 @@
+androsyn    2005/10/13 03:21:51 UTC	(20051013_7-20956)
+  Log:
+  apply trace fix
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+
+
 androsyn    2005/10/13 03:13:25 UTC	(20051013_6-20954)
   Log:
   Fix a logic inversion problem in ircd_ctime().  
