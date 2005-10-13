@@ -285,16 +285,10 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 	 * Add these lines to summarize the above which can get rather long
 	 * and messy when done remotely - Avalon
 	 */
-	if(!SendWallops(source_p) || !cnt)
+	if(!cnt)
 	{
-		/* redundant given we dont allow trace from non-opers anyway.. but its
-		 * left here in case that should ever change --fl
-		 */
-		if(!cnt)
-			sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACESERVER, 
-					   form_str(RPL_TRACESERVER),
-					   0, link_s[me.localClient->fd],
-					   link_u[me.localClient->fd], me.name, "*", "*", me.name);
+		sendto_one_numeric(source_p, HOLD_QUEUE, ERR_NOSUCHSERVER, 
+		                   form_str(ERR_NOSUCHSERVER), tname);
 
 		/* let the user have some idea that its at the end of the
 		 * trace
