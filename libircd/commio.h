@@ -247,9 +247,9 @@ extern int ircd_socket(int family, int sock_type, int proto, const char *note);
 extern int ircd_socketpair(int family, int sock_type, int proto, int *nfd, const char *note);
 
 extern int ircd_accept(int fd, struct sockaddr *pn, socklen_t *addrlen);
-extern ssize_t ircd_write(int fd, void *buf, int count);
+extern ssize_t ircd_write(int fd, const void *buf, int count);
 #if defined(USE_WRITEV) 
-extern ssize_t ircd_writev(int fd, struct iovec *vector, int count);
+extern ssize_t ircd_writev(int fd, const struct iovec *vector, int count);
 #endif
 extern ssize_t ircd_read(int fd, void *buf, int count);
 extern int ircd_pipe(int *fd, const char *desc);

@@ -819,7 +819,7 @@ ircd_read(int fd, void *buf, int count)
 }
 
 ssize_t
-ircd_write(int fd, void *buf, int count)
+ircd_write(int fd, const void *buf, int count)
 {
 	fde_t *F = find_fd(fd);
 	if(F == NULL)
@@ -902,7 +902,7 @@ writev(int fd, struct iovec *iov, size_t iovcnt)
 
 #ifdef USE_WRITEV
 ssize_t
-ircd_writev(int xfd, struct iovec *vector, int count)
+ircd_writev(int xfd, const struct iovec *vector, int count)
 {
 	fde_t *F = find_fd(xfd);
 

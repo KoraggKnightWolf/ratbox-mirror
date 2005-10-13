@@ -27,8 +27,10 @@
  *  Useful stuff, ripped from places ..
  *  adrian chadd <adrian@creative.net.au>
  *
- * When you update these functions make sure you update the ones in tools.h
- * as well!!!
+ *  The TOOLS_C define builds versions of the functions in tools.h
+ *  so that they end up in the resulting object files.  If its not
+ *  defined, tools.h will build inlined versions of the functions
+ *  on supported compilers
  */
 
 #define TOOLS_C
@@ -115,35 +117,4 @@ slow_list_length(dlink_list *list)
 }
 
 
-
-#ifndef HAVE_STRLCAT
-size_t strlcat(char *dest, const char *src, size_t count)
-{
-        size_t dsize = strlen(dest);  
-        size_t len = strlen(src);
-        size_t res = dsize + len;
-
-        dest += dsize; 
-        count -= dsize;
-        if (len >= count)
-                len = count-1;
-        memcpy(dest, src, len);
-        dest[len] = 0;
-        return res;
-}
-#endif
-
-#ifndef HAVE_STRLCPY
-size_t strlcpy(char *dest, const char *src, size_t size)
-{
-        size_t ret = strlen(src);
-
-        if (size) {
-                size_t len = (ret >= size) ? size-1 : ret;
-                memcpy(dest, src, len);
-                dest[len] = '\0';
-        }
-        return ret;
-}
-#endif
 
