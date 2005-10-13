@@ -335,7 +335,7 @@ static void process_adns_incoming(void)
 	adns_forallqueries_begin(dns_state);
 	while(   (q = adns_forallqueries_next(dns_state, (void *)&r)) != NULL)
 	{
-		switch(adns_check(dns_state, &q, &answer, (void **)&req))
+		switch(adns_check(dns_state, &q, &answer, (void *)&req))
 		{
 			case EAGAIN:
 				continue;
