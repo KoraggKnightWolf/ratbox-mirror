@@ -43,17 +43,13 @@
 #define hash_hostname(x) (fnv_hash_upper_len((const unsigned char *)(x), HOST_MAX_BITS, 30))
 #define hash_resv(x) (fnv_hash_upper_len((const unsigned char *)(x), R_MAX_BITS, 30))
 
-static dlink_list *clientTable;
-static dlink_list *channelTable;
-static dlink_list *idTable;
-dlink_list *resvTable;
-static dlink_list *hostTable;
-static dlink_list *helpTable;
-dlink_list *ndTable;
-
-/*
- * look in whowas.c for the missing ...[WW_MAX]; entry
- */
+static dlink_list clientTable[U_MAX];
+static dlink_list channelTable[CH_MAX];
+static dlink_list idTable[U_MAX];
+dlink_list resvTable[R_MAX];
+static dlink_list hostTable[HOST_MAX];
+static dlink_list helpTable[HELP_MAX];
+dlink_list ndTable[U_MAX];
 
 /*
  * Hashing.
@@ -95,13 +91,7 @@ dlink_list *ndTable;
 void
 init_hash(void)
 {
-	clientTable = ircd_malloc(sizeof(dlink_list) * U_MAX);
-	idTable = ircd_malloc(sizeof(dlink_list) * U_MAX);
-	ndTable = ircd_malloc(sizeof(dlink_list) * U_MAX);
-	channelTable = ircd_malloc(sizeof(dlink_list) * CH_MAX);
-	hostTable = ircd_malloc(sizeof(dlink_list) * HOST_MAX);
-	resvTable = ircd_malloc(sizeof(dlink_list) * R_MAX);
-	helpTable = ircd_malloc(sizeof(dlink_list) * HELP_MAX);
+	/* nothing to do here */
 }
 
 
@@ -177,21 +167,21 @@ hash_help(const char *name)
 static struct _hash_function
 {
 	u_int32_t (*func) (unsigned const char *, unsigned int, unsigned int);
-	dlink_list **table;
+	dlink_list *table;
 	unsigned int hashbits;
 	unsigned int hashlen;
 } hash_function[] = {
-	{ fnv_hash_upper,	&clientTable,	U_MAX_BITS,	0	},
-	{ fnv_hash,		&idTable,	U_MAX_BITS,	0	},
-	{ fnv_hash_upper_len,	&channelTable,	CH_MAX_BITS,	30	},
-	{ fnv_hash_upper_len,	&hostTable,	HOST_MAX_BITS,	30	},
-	{ fnv_hash_upper_len,	&resvTable,	R_MAX_BITS,	30	}
+	{ fnv_hash_upper,	clientTable,	U_MAX_BITS,	0	},
+	{ fnv_hash,		idTable,	U_MAX_BITS,	0	},
+	{ fnv_hash_upper_len,	channelTable,	CH_MAX_BITS,	30	},
+	{ fnv_hash_upper_len,	hostTable,	HOST_MAX_BITS,	30	},
+	{ fnv_hash_upper_len,	resvTable,	R_MAX_BITS,	30	}
 };
 
 void
 add_to_hash(hash_type type, const char *hashindex, void *pointer)
 {
-	dlink_list *table = *hash_function[type].table;
+	dlink_list *table = hash_function[type].table;
 	unsigned int hashv;
 
 	if(EmptyString(hashindex) || (pointer == NULL))
@@ -207,7 +197,7 @@ add_to_hash(hash_type type, const char *hashindex, void *pointer)
 void
 del_from_hash(hash_type type, const char *hashindex, void *pointer)
 {
-	dlink_list *table = *hash_function[type].table;
+	dlink_list *table = hash_function[type].table;
 	unsigned int hashv;
 
 	if(EmptyString(hashindex) || (pointer == NULL))

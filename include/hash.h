@@ -27,8 +27,8 @@
 #ifndef INCLUDED_hash_h
 #define INCLUDED_hash_h
 
-extern dlink_list *resvTable;
-extern dlink_list *ndTable;
+extern dlink_list resvTable[];
+extern dlink_list ndTable[];
 
 /* Magic value for FNV hash functions */
 #define FNV1_32_INIT 0x811c9dc5UL
