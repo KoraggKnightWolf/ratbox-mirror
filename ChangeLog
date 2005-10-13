@@ -1,3 +1,14 @@
+androsyn    2005/10/13 00:53:15 UTC	(20051013_0-20942)
+  Log:
+  lee asked why the hash tables were being malloc()ed, well
+  I couldn't think of a good reason. so lets undo that
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2005/10/12 22:58:03 UTC	(20051012_1-20940)
   Log:
   Replace some more snprintf calls with ircd_snprintf
