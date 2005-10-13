@@ -1,3 +1,16 @@
+androsyn    2005/10/13 02:46:00 UTC	(20051013_3-20948)
+  Log:
+  Move strlcpy/strlcat so they can be inlined.  Also change
+  the declaration on ircd_write so that buf is const void *
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/tools.c (File Modified) 
+	ircd-ratbox/trunk/libircd/tools.h (File Modified) 
+
+
 androsyn    2005/10/13 02:20:13 UTC	(20051013_2-20946)
   Log:
   change a few remaining write() calls to ircd_write()
