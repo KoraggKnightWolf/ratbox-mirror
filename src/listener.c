@@ -540,7 +540,7 @@ accept_connection(int pfd, void *data)
 				last_oper_notice = ircd_currenttime;
 			}
 			
-			write(fd, "ERROR :All connections in use\r\n", 32);
+			ircd_write(fd, "ERROR :All connections in use\r\n", 32);
 			ircd_close(fd);
 			/* Re-register a new IO request for the next accept .. */
 			continue;
@@ -564,7 +564,7 @@ accept_connection(int pfd, void *data)
 			else
 			   ircd_sprintf(buf, "ERROR :You have been D-lined.\r\n");
 	
-			write(fd, buf, strlen(buf));
+			ircd_write(fd, buf, strlen(buf));
 			ircd_close(fd);
 			continue;
 			
