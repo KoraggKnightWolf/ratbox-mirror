@@ -1,3 +1,12 @@
+androsyn    2005/10/13 03:13:25 UTC	(20051013_6-20954)
+  Log:
+  Fix a logic inversion problem in ircd_ctime().  
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+
+
 androsyn    2005/10/13 02:55:12 UTC	(20051013_5-20952)
   Log:
   flags could possibly be used uninitialized
