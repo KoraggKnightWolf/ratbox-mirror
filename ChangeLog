@@ -1,3 +1,23 @@
+leeh        2005/10/14 16:19:18 UTC	(20051014_0-20958)
+  Log:
+  - split aconf->name into a union of name/oper, former used in I:, latter we
+    store the oper setting the ban for k/d/x/resvs
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2005/10/13 03:21:51 UTC	(20051013_7-20956)
   Log:
   apply trace fix
