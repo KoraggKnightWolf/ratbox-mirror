@@ -46,6 +46,7 @@
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "translog.h"
+#include "operhash.h"
 
 static int mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
@@ -281,6 +282,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 		int temp_time)
 {
 	struct ConfItem *aconf;
+	char *oper = get_oper_name(source_p);
 
 	aconf = make_conf();
 	aconf->status = CONF_XLINE;
@@ -323,6 +325,8 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	DupString(aconf->passwd, reason);
 	collapse(aconf->host);
 
+	aconf->info.oper = operhash_add(oper);
+
 	if(temp_time > 0)
 	{
 		aconf->flags |= CONF_FLAGS_TEMPORARY;
@@ -330,25 +334,25 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s added temporary %d min. X-Line for [%s] [%s]",
-			     get_oper_name(source_p), temp_time / 60,
+			     aconf->info.oper, temp_time / 60,
 			     aconf->host, reason);
 		ilog(L_KLINE, "X %s %d %s %s",
-			get_oper_name(source_p), temp_time / 60,
+			aconf->info.oper, temp_time / 60,
 			name, reason);
 		sendto_one_notice(source_p, POP_QUEUE, ":Added temporary %d min. X-Line [%s]",
 				temp_time / 60, aconf->host);
 	}
 	else
 	{
+		aconf->hold = ircd_currenttime;
 		translog_add_ban(TRANS_XLINE, source_p, aconf->host, "0", reason, NULL);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
-				get_oper_name(source_p), 
-				aconf->host, aconf->passwd);
+				aconf->info.oper, aconf->host, aconf->passwd);
 		sendto_one_notice(source_p, POP_QUEUE, ":Added X-Line for [%s] [%s]",
 					aconf->host, aconf->passwd);
 		ilog(L_KLINE, "X %s 0 %s %s",
-			get_oper_name(source_p), name, reason);
+			aconf->info.oper, name, reason);
 	}
 
 	ircd_dlinkAddAlloc(aconf, &xline_conf_list);

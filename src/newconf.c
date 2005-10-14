@@ -810,8 +810,8 @@ conf_end_auth(struct TopConf *tc)
 	dlink_node *ptr;
 	dlink_node *next_ptr;
 
-	if(EmptyString(yy_aconf->name))
-		DupString(yy_aconf->name, "NOMATCH");
+	if(EmptyString(yy_aconf->info.name))
+		DupString(yy_aconf->info.name, "NOMATCH");
 
 	/* didnt even get one ->host? */
 	if(EmptyString(yy_aconf->host))
@@ -834,7 +834,7 @@ conf_end_auth(struct TopConf *tc)
 			DupString(yy_tmp->passwd, yy_aconf->passwd);
 
 		/* this will always exist.. */
-		DupString(yy_tmp->name, yy_aconf->name);
+		DupString(yy_tmp->info.name, yy_aconf->info.name);
 
 		if(yy_aconf->className)
 			DupString(yy_tmp->className, yy_aconf->className);
@@ -952,8 +952,8 @@ conf_set_auth_spoof(void *data)
 		return;
 	}
 
-	ircd_free(yy_aconf->name);
-	DupString(yy_aconf->name, data);
+	ircd_free(yy_aconf->info.name);
+	DupString(yy_aconf->info.name, data);
 	yy_aconf->flags |= CONF_FLAGS_SPOOF_IP;
 }
 
@@ -969,8 +969,8 @@ static void
 conf_set_auth_redir_serv(void *data)
 {
 	yy_aconf->flags |= CONF_FLAGS_REDIR;
-	ircd_free(yy_aconf->name);
-	DupString(yy_aconf->name, data);
+	ircd_free(yy_aconf->info.name);
+	DupString(yy_aconf->info.name, data);
 }
 
 static void

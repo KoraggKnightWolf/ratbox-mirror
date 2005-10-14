@@ -39,6 +39,7 @@
 #include "parse.h"
 #include "modules.h"
 #include "translog.h"
+#include "operhash.h"
 
 static int mo_dline(struct Client *, struct Client *, int, const char **);
 static int mo_undline(struct Client *, struct Client *, int, const char **);
@@ -79,6 +80,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	int bits;
 	char dlbuffer[IRCD_BUFSIZE];
 	const char *current_date;
+	const char *oper;
 	int tdline_time = 0;
 	int loc = 1;
 
@@ -185,6 +187,9 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	aconf->status = CONF_DLINE;
 	DupString(aconf->host, dlhost);
 
+	oper = get_oper_name(source_p);
+	aconf->info.oper = operhash_add(oper);
+
 	/* Look for an oper reason */
 	if((oper_reason = strchr(reason, '|')) != NULL)
 	{
@@ -207,21 +212,21 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		if(EmptyString(oper_reason))
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "%s added temporary %d min. D-Line for [%s] [%s]",
-					     get_oper_name(source_p), tdline_time / 60,
-					     aconf->host, reason);
+					"%s added temporary %d min. D-Line for [%s] [%s]",
+					aconf->info.oper, tdline_time / 60,
+					aconf->host, reason);
 			ilog(L_KLINE, "D %s %d %s %s",
-				get_oper_name(source_p), tdline_time / 60,
+				aconf->info.oper, tdline_time / 60,
 				aconf->host, reason);
 		}
 		else
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "%s added temporary %d min. D-Line for [%s] [%s|%s]",
-					     get_oper_name(source_p), tdline_time / 60,
-					     aconf->host, reason, oper_reason);
+					"%s added temporary %d min. D-Line for [%s] [%s|%s]",
+					aconf->info.oper, tdline_time / 60,
+					aconf->host, reason, oper_reason);
 			ilog(L_KLINE, "D %s %d %s %s|%s",
-				get_oper_name(source_p), tdline_time / 60,
+				aconf->info.oper, tdline_time / 60,
 				aconf->host, reason, oper_reason);
 		}
 
@@ -232,24 +237,25 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	{
 		ircd_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
 		DupString(aconf->passwd, dlbuffer);
+		aconf->hold = ircd_currenttime;
 		add_dline(aconf);
 
 		if(EmptyString(oper_reason))
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"%s added D-Line for [%s] [%s]",
-					get_oper_name(source_p), aconf->host, reason);
+					aconf->info.oper, aconf->host, reason);
 			ilog(L_KLINE, "D %s 0 %s %s",
-				get_oper_name(source_p), aconf->host, reason);
+				aconf->info.oper, aconf->host, reason);
 		}
 		else
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"%s added D-Line for [%s] [%s|%s]",
-					get_oper_name(source_p), aconf->host, 
+					aconf->info.oper, aconf->host, 
 					reason, oper_reason);
 			ilog(L_KLINE, "D %s 0 %s %s|%s",
-				get_oper_name(source_p), aconf->host, 
+				aconf->info.oper, aconf->host, 
 				reason, oper_reason);
 		}
 

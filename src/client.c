@@ -502,7 +502,7 @@ check_banned_lines(void)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 						"XLINE over-ruled for %s, client is kline_exempt [%s]",
 						get_client_name(client_p, HIDE_IP),
-						aconf->name);
+						aconf->info.oper);
 				continue;
 			}
 

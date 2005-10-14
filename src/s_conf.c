@@ -50,6 +50,7 @@
 #include "cache.h"
 #include "res.h"
 #include "banconf.h"
+#include "operhash.h"
 
 struct config_server_hide ConfigServerHide;
 
@@ -146,10 +147,14 @@ free_conf(struct ConfItem *aconf)
 
 	ircd_free(aconf->passwd);
 	ircd_free(aconf->spasswd);
-	ircd_free(aconf->name);
 	ircd_free(aconf->className);
 	ircd_free(aconf->user);
 	ircd_free(aconf->host);
+
+	if(IsConfBan(aconf))
+		operhash_delete(aconf->info.oper);
+	else
+		ircd_free(aconf->info.name);
 
 	BlockHeapFree(confitem_heap, aconf);
 }
@@ -330,7 +335,7 @@ verify_access(struct Client *client_p, const char *username)
 		{
 			sendto_one(client_p, POP_QUEUE, form_str(RPL_REDIR),
 					me.name, client_p->name,
-					aconf->name ? aconf->name : "", aconf->port);
+					aconf->info.name ? aconf->info.name : "", aconf->port);
 			return (NOT_AUTHORISED);
 		}
 
@@ -345,27 +350,27 @@ verify_access(struct Client *client_p, const char *username)
 						"%s spoofing: %s as %s",
 						client_p->name,
 #ifdef HIDE_SPOOF_IPS
-						aconf->name,
+						aconf->info.name,
 #else
 						client_p->host,
 #endif
-						aconf->name);
+						aconf->info.name);
 			}
 
 			/* user@host spoof */
-			if((p = strchr(aconf->name, '@')) != NULL)
+			if((p = strchr(aconf->info.name, '@')) != NULL)
 			{
 				char *host = p+1;
 				*p = '\0';
 
-				strlcpy(client_p->username, aconf->name,
+				strlcpy(client_p->username, aconf->info.name,
 					sizeof(client_p->username));
 				strlcpy(client_p->host, host,
 					sizeof(client_p->host));
 				*p = '@';
 			}
 			else
-				strlcpy(client_p->host, aconf->name, sizeof(client_p->host));
+				strlcpy(client_p->host, aconf->info.name, sizeof(client_p->host));
 
 			SetIPSpoof(client_p);
 		}
@@ -1067,7 +1072,7 @@ get_printable_conf(struct ConfItem *aconf, char **name, char **host,
 	static char null[] = "<NULL>";
 	static char zero[] = "default";
 
-	*name = EmptyString(aconf->name) ? null : aconf->name;
+	*name = EmptyString(aconf->info.name) ? null : aconf->info.name;
 	*host = EmptyString(aconf->host) ? null : aconf->host;
 	*pass = EmptyString(aconf->passwd) ? null : aconf->passwd;
 	*user = EmptyString(aconf->user) ? null : aconf->user;

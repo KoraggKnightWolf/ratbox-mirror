@@ -428,7 +428,7 @@ find_address_conf(const char *host, const char *sockhost, const char *user,
 	/* if theres a spoof, check it against klines.. */
 	if(IsConfDoSpoofIp(iconf))
 	{
-		char *p = strchr(iconf->name, '@');
+		char *p = strchr(iconf->info.name, '@');
 
 		/* note, we dont need to pass sockhost here, as its
 		 * guaranteed to not match by whats above.. --anfl
@@ -436,11 +436,11 @@ find_address_conf(const char *host, const char *sockhost, const char *user,
 		if(p)
 		{
 			*p = '\0';
-			kconf = find_conf_by_address(p+1, NULL, ip, CONF_KILL, aftype, iconf->name);
+			kconf = find_conf_by_address(p+1, NULL, ip, CONF_KILL, aftype, iconf->info.name);
 			*p = '@';
 		}
 		else
-			kconf = find_conf_by_address(iconf->name, NULL, ip, CONF_KILL, aftype, user);
+			kconf = find_conf_by_address(iconf->info.name, NULL, ip, CONF_KILL, aftype, user);
 
 		if(kconf)
 			return kconf;

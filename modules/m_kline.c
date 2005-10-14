@@ -39,6 +39,7 @@
 #include "parse.h"
 #include "modules.h"
 #include "translog.h"
+#include "operhash.h"
 
 static int mo_kline(struct Client *, struct Client *, int, const char **);
 static int me_kline(struct Client *, struct Client *, int, const char **);
@@ -408,22 +409,27 @@ static void
 apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	    const char *reason, const char *oper_reason, const char *current_date)
 {
+	const char *oper = get_oper_name(source_p);
+
+	aconf->info.oper = operhash_add(oper);
+	aconf->hold = ircd_currenttime;
+
 	if(EmptyString(oper_reason))
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				"%s added K-Line for [%s@%s] [%s]",
-				get_oper_name(source_p), aconf->user, aconf->host, reason);
+				aconf->info.oper, aconf->user, aconf->host, reason);
 		ilog(L_KLINE, "K %s 0 %s %s %s",
-			get_oper_name(source_p), aconf->user, aconf->host, reason);
+			aconf->info.oper, aconf->user, aconf->host, reason);
 	}
 	else
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				"%s added K-Line for [%s@%s] [%s|%s]",
-				get_oper_name(source_p), aconf->user, aconf->host, 
+				aconf->info.oper, aconf->user, aconf->host, 
 				reason, oper_reason);
 		ilog(L_KLINE, "K %s 0 %s %s %s|%s",
-			get_oper_name(source_p), aconf->user, aconf->host,
+			aconf->info.oper, aconf->user, aconf->host,
 			reason, oper_reason);
 	}
 
@@ -445,6 +451,9 @@ static void
 apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 	     const char *reason, const char *oper_reason, const char *current_date, int tkline_time)
 {
+	const char *oper = get_oper_name(source_p);
+
+	aconf->info.oper = operhash_add(oper);
 	aconf->hold = ircd_currenttime + tkline_time;
 	add_temp_kline(aconf);
 
@@ -452,21 +461,21 @@ apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 	if(EmptyString(oper_reason))
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added temporary %d min. K-Line for [%s@%s] [%s]",
-				     get_oper_name(source_p), tkline_time / 60,
-				     aconf->user, aconf->host, reason);
+				"%s added temporary %d min. K-Line for [%s@%s] [%s]",
+				aconf->info.oper, tkline_time / 60,
+				aconf->user, aconf->host, reason);
 		ilog(L_KLINE, "K %s %d %s %s %s",
-			get_oper_name(source_p), tkline_time / 60,
+			aconf->info.oper, tkline_time / 60,
 			aconf->user, aconf->host, reason);
 	}
 	else
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added temporary %d min. K-Line for [%s@%s] [%s|%s]",
-				     get_oper_name(source_p), tkline_time / 60,
-				     aconf->user, aconf->host, reason, oper_reason);
+				"%s added temporary %d min. K-Line for [%s@%s] [%s|%s]",
+				aconf->info.oper, tkline_time / 60,
+				aconf->user, aconf->host, reason, oper_reason);
 		ilog(L_KLINE, "K %s %d %s %s %s|%s",
-			get_oper_name(source_p), tkline_time / 60,
+			aconf->info.oper, tkline_time / 60,
 			aconf->user, aconf->host, reason, oper_reason);
 	}
 

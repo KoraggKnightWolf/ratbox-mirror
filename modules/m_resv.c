@@ -39,6 +39,7 @@
 #include "s_log.h"
 #include "match.h"
 #include "translog.h"
+#include "operhash.h"
 
 static int mo_resv(struct Client *, struct Client *, int, const char **);
 static int me_resv(struct Client *, struct Client *, int, const char **);
@@ -185,6 +186,7 @@ parse_resv(struct Client *source_p, const char *name,
 	   const char *reason, int temp_time)
 {
 	struct ConfItem *aconf;
+	const char *oper = get_oper_name(source_p);
 
 	if(!MyClient(source_p) && 
 	   !find_shared_conf(source_p->username, source_p->host,
@@ -221,6 +223,7 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf->port = 0;
 		DupString(aconf->host, name);
 		DupString(aconf->passwd, reason);
+		aconf->info.oper = operhash_add(oper);
 		add_to_hash(HASH_RESV, aconf->host, aconf);
 
 		notify_resv(source_p, aconf->host, aconf->passwd, temp_time);
@@ -231,8 +234,11 @@ parse_resv(struct Client *source_p, const char *name,
 			aconf->hold = ircd_currenttime + temp_time;
 		}
 		else
+		{
 			translog_add_ban(TRANS_RESV, source_p, aconf->host, NULL,
 					aconf->passwd, NULL);
+			aconf->hold = ircd_currenttime;
+		}
 	}
 	else if(clean_resv_nick(name))
 	{
@@ -272,6 +278,7 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf->port = 0;
 		DupString(aconf->host, name);
 		DupString(aconf->passwd, reason);
+		aconf->info.oper = operhash_add(oper);
 		ircd_dlinkAddAlloc(aconf, &resv_conf_list);
 
 		notify_resv(source_p, aconf->host, aconf->passwd, temp_time);
@@ -282,8 +289,11 @@ parse_resv(struct Client *source_p, const char *name,
 			aconf->hold = ircd_currenttime + (temp_time * 60);
 		}
 		else
+		{
 			translog_add_ban(TRANS_RESV, source_p, aconf->host, NULL,
 					aconf->passwd, NULL);
+			aconf->hold = ircd_currenttime;
+		}
 			
 	}
 	else
@@ -373,7 +383,7 @@ remove_resv(struct Client *source_p, const char *name)
 		{
 			aconf = ptr->data;
 
-			if(irccmp(aconf->name, name))
+			if(irccmp(aconf->host, name))
 				aconf = NULL;
 			else
 				break;
