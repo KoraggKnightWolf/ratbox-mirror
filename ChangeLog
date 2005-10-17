@@ -1,3 +1,16 @@
+androsyn    2005/10/17 00:33:32 UTC	(20051017_0-20976)
+  Log:
+  Have the executable programs be built in the main directory and not src.
+  libtool is a bit silly on some platforms otherwise. Also fix a minor writev
+  issue.
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 leeh        2005/10/14 16:19:18 UTC	(20051014_0-20958)
   Log:
   - split aconf->name into a union of name/oper, former used in I:, latter we
