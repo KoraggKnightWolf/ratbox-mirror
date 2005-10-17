@@ -879,7 +879,7 @@ ircd_write(int fd, const void *buf, int count)
 
 #ifdef __MINGW32__
 static int
-writev(int fd, struct iovec *iov, size_t iovcnt)
+writev(int fd, const struct iovec *iov, size_t iovcnt)
 {
 	size_t i;
 	char *base;

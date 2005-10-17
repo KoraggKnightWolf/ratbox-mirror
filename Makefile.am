@@ -3,12 +3,13 @@
 # okay so i've flattened out the build stuff here.
 # this is really for the best since so many things depend
 # on each other now..
+
 AUTOMAKE_OPTIONS = foreign subdir-objects 
 
 prefix		= @prefix@
+libratboxdir 	= @libdir@
 modulesdir	= @moduledir@/autoload
 coredir		= @moduledir@
-src_libratboxdir 	= @libdir@
 servicesdir	= @moduledir@
 
 SUBDIRS = libircd libltdl adns tools doc help @SERVLINK@ 
@@ -29,22 +30,22 @@ endif
 
 DLOPEN=$(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_LTLIBRARIES) ;do echo -dlpreopen $$x ;done)
 if !STATIC_MODULES
-src_ircd_LDADD = libircd/libircd.la src/libratbox.la 
+ircd_LDADD = libircd/libircd.la libratbox.la 
 else
-src_ircd_LDADD = libircd/libircd.la src/libratbox.la $(DLOPEN) 
+ircd_LDADD = libircd/libircd.la libratbox.la $(DLOPEN) 
 endif
 
-src_ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
+ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
-src_resolver_LDADD = adns/libadns.a libircd/libircd.la
-src_ident_LDADD = libircd/libircd.la
+resolver_LDADD = adns/libadns.a libircd/libircd.la
+ident_LDADD = libircd/libircd.la
 
-src_ircd_SOURCES = src/main.c
-src_resolver_SOURCES = src/resolver.c
-src_ident_SOURCES = src/ident.c
+ircd_SOURCES = src/main.c
+resolver_SOURCES = src/resolver.c
+ident_SOURCES = src/ident.c
 
 
-src_libratbox_la_SOURCES =                     \
+libratbox_la_SOURCES =                     \
   src/dns.c                        \
   src/banconf.c			\
   src/cache.c                       \
@@ -83,12 +84,11 @@ src_libratbox_la_SOURCES =                     \
   src/ircd_parser.y			\
   src/ircd_lexer.l			
 
-src_libratbox_LTLIBRARIES = src/libratbox.la
+libratbox_LTLIBRARIES = libratbox.la
   
-src_libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
-src_libratbox_la_DEPENDENCIES = $(LIBLTDLC) libircd/libircd.la
-src_libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
-
+libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
+libratbox_la_DEPENDENCIES = $(LIBLTDLC) libircd/libircd.la
+libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 
 
 # now the modules..
@@ -98,7 +98,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 if !STATIC_MODULES
 
 if MINGW
-MODULE_LIBS = libircd/libircd.la src/libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
+MODULE_LIBS = libircd/libircd.la libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
 else
 MODULE_LIBS = @SSL_LIBS@ @CRYPT_LIB@
 endif # MINGW
@@ -391,22 +391,22 @@ modules_m_services_la_LIBADD = $(MODULE_LIBS)
 services_LTLIBRARIES = modules/m_services.la
 endif
 
-bin_PROGRAMS = src/ircd src/resolver src/ident 
 
-src: $(src_libratbox_LTLIBRARIES) $(services_LTLIBRARIES) src/ircd
+
+bin_PROGRAMS = ircd resolver ident
+
+src: $(libratbox_LTLIBRARIES) ircd
 
 modules: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 
 modules_core: $(core_LTLIBRARIES)
 
-resolver: src/resolver
-
-ident: src/ident
-
 .o.so: 
 	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(MODULE_FLAGS) $(MODULE_LIBS) -avoid-version -shared $< -o $@
 
-install-exec-local:
+install-exec-hook: install-libratboxLTLIBRARIES move-old-modules
+
+move-old-modules:
 # move the old module directory out of the way, stale modules cause massive
 # amounts of problems.
 	-@if test -d $(DESTDIR)$(moduledir)-old; then \
