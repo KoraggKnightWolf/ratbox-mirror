@@ -116,7 +116,9 @@ banconf_parse_field(char *nline, int quoted)
 
 /* banconf_parse_line()
  *
- * inputs	- line to take fields from, locations for storage
+ * inputs	- line to take fields from, locations for storage, whether
+ * 		  field is quoted (must be accurate -- even if field is to
+ * 		  be ignored), number of parameters
  * outputs	- 1 on success, otherwise 0
  * side effects	- parses given line generically according to passed fields
  */
@@ -129,16 +131,15 @@ banconf_parse_line(char *line, char ***params, int *quoted, int parcount)
 
 	for(i = 0; i < parcount; i++)
 	{
-		/* skip field */
-		if(params[i] == NULL)
-			continue;
-
 		tmp = banconf_parse_field(i ? NULL : line, quoted[i]);
 
 		if(tmp == NULL)
 			return 0;
 
-		if(*tmp == '\0')
+		/* skip field */
+		if(params[i] == NULL)
+			continue;
+		else if(*tmp == '\0')
 			*params[i] = NULL;
 		else
 			DupString(*params[i], tmp);
