@@ -1,3 +1,13 @@
+leeh        2005/10/18 18:51:19 UTC	(20051018_0-20978)
+  Log:
+  - make the banconf parser work on arrays of storage rather than seperate
+    parameters
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+
+
 androsyn    2005/10/17 00:33:32 UTC	(20051017_0-20976)
   Log:
   Have the executable programs be built in the main directory and not src.
