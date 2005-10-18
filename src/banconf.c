@@ -114,57 +114,6 @@ banconf_parse_field(char *nline, int quoted)
 	return NULL;
 }
 
-/* banconf_set_field()
- *
- * inputs	- line to take fields from, location to store field
- * outputs	- 1 on success, otherwise 0
- * side effects	- parses a field into the given location
- */
-static int
-banconf_set_field(char *line, char **field)
-{
-	static const char *empty = "";
-	char *tmp;
-
-	tmp = banconf_parse_field(line, 1);
-
-	if(tmp == NULL)
-		return 0;
-
-	if(*tmp == '\0')
-		*field = NULL;
-	else
-		DupString(*field, tmp);
-
-	return 1;
-}
-
-/* banconf_set_field_unquoted()
- *
- * inputs	- line to take fields from, location to store field
- * outputs	- 1 on success, otherwise 0
- * side effects - parses a field into the given location, without expecting
- *		  it to be quoted
- */
-static int
-banconf_set_field_unquoted(char *line, char **field)
-{
-	static const char *empty = "";
-	char *tmp;
-
-	tmp = banconf_parse_field(line, 0);
-
-	if(tmp == NULL)
-		return 0;
-
-	if(*tmp == '\0')
-		*field = NULL;
-	else
-		DupString(*field, tmp);
-
-	return 1;
-}
-
 /* banconf_parse_line()
  *
  * inputs	- line to take fields from, locations for storage
@@ -172,25 +121,27 @@ banconf_set_field_unquoted(char *line, char **field)
  * side effects	- parses given line generically according to passed fields
  */
 static int
-banconf_parse_line(char *line, char **mask, char **mask2, char **reason,
-			char **oper_reason)
+banconf_parse_line(char *line, char ***params, int *quoted, int parcount)
 {
-	if(!banconf_set_field(line, mask))
-		return 0;
+	static const char *empty = "";
+	char *tmp;
+	int i;
 
-	if(mask2)
+	for(i = 0; i < parcount; i++)
 	{
-		if(!banconf_set_field(NULL, mask2))
-			return 0;
-	}
+		/* skip field */
+		if(params[i] == NULL)
+			continue;
 
-	if(!banconf_set_field(NULL, reason))
-		return 0;
+		tmp = banconf_parse_field(i ? NULL : line, quoted[i]);
 
-	if(oper_reason)
-	{
-		if(!banconf_set_field(NULL, oper_reason))
+		if(tmp == NULL)
 			return 0;
+
+		if(*tmp == '\0')
+			*params[i] = NULL;
+		else
+			DupString(*params[i], tmp);
 	}
 
 	return 1;
@@ -206,6 +157,10 @@ void
 banconf_parse_kline(char *line, int perm)
 {
 	struct ConfItem *aconf;
+	char **params[7];
+	int quoted[7] = { 1, 1, 1, 1, 1, 1, 0 };
+
+	/* user,host,reason,operreason,humandate,oper,timestamp */
 
 	aconf = make_conf();
 	aconf->status = CONF_KILL;
@@ -213,8 +168,12 @@ banconf_parse_kline(char *line, int perm)
 	if(perm)
 		aconf->flags |= CONF_FLAGS_PERMANENT;
 
-	if(banconf_parse_line(line, &aconf->user, &aconf->host,
-				&aconf->passwd, &aconf->spasswd))
+	params[0] = &aconf->user;
+	params[1] = &aconf->host;
+	params[2] = &aconf->passwd;
+	params[3] = &aconf->spasswd;
+
+	if(banconf_parse_line(line, params, quoted, 4))
 		add_conf_by_address(aconf->host, aconf->status,
 					aconf->user, aconf);
 	else
@@ -231,6 +190,10 @@ void
 banconf_parse_dline(char *line, int perm)
 {
 	struct ConfItem *aconf;
+	char **params[6];
+	int quoted[6] = { 1, 1, 1, 1, 1, 0 };
+
+	/* host,reason,operreason,humandate,oper,timestamp */
 
 	aconf = make_conf();
 	aconf->status = CONF_DLINE;
@@ -238,8 +201,11 @@ banconf_parse_dline(char *line, int perm)
 	if(perm)
 		aconf->flags |= CONF_FLAGS_PERMANENT;
 
-	if(banconf_parse_line(line, &aconf->host, NULL,
-				&aconf->passwd, &aconf->spasswd))
+	params[0] = &aconf->host;
+	params[1] = &aconf->passwd;
+	params[2] = &aconf->spasswd;
+
+	if(banconf_parse_line(line, params, quoted, 3))
 	{
 		if(!add_dline(aconf))
 		{
@@ -261,6 +227,10 @@ void
 banconf_parse_xline(char *line, int perm)
 {
 	struct ConfItem *aconf;
+	char **params[5];
+	int quoted[5] = { 1, 1, 1, 1, 0 };
+
+	/* gecos,type,reason,oper,timestamp */
 
 	aconf = make_conf();
 	aconf->status = CONF_XLINE;
@@ -268,8 +238,11 @@ banconf_parse_xline(char *line, int perm)
 	if(perm)
 		aconf->flags |= CONF_FLAGS_PERMANENT;
 
-	if(banconf_parse_line(line, &aconf->host, NULL, 
-				&aconf->passwd, NULL))
+	params[0] = &aconf->host;
+	params[1] = NULL;		/* skip unused type */
+	params[2] = &aconf->passwd;
+
+	if(banconf_parse_line(line, params, quoted, 3))
 		ircd_dlinkAddAlloc(aconf, &xline_conf_list);
 	else
 		free_conf(aconf);
@@ -285,14 +258,20 @@ void
 banconf_parse_resv(char *line, int perm)
 {
 	struct ConfItem *aconf;
+	char **params[4];
+	int quoted[4] = { 1, 1, 1, 0 };
+
+	/* resv,reason,oper,timestamp */
 
 	aconf = make_conf();
 
 	if(perm)
 		aconf->flags |= CONF_FLAGS_PERMANENT;
 
-	if(banconf_parse_line(line, &aconf->host, NULL,
-				&aconf->passwd, NULL))
+	params[0] = &aconf->host;
+	params[1] =  &aconf->passwd;
+
+	if(banconf_parse_line(line, params, quoted, 2))
 	{
 		if(IsChannelName(aconf->host))
 		{
@@ -344,7 +323,7 @@ banconf_parse(void)
 	FILE *banfile;
 	char *p;
 	int i = 0;
-	int perm = 0;
+	int perm;
 
 	while(banconf_files[i].filename)
 	{
@@ -352,7 +331,7 @@ banconf_parse(void)
 		 * "permanent" bans that cant be removed via ircd, with the
 		 * suffix ".perm"
 		 */
-		while(perm < 2)
+		for(perm = 0; perm < 2; perm++)
 		{
 			ircd_snprintf(buf, sizeof(buf), *banconf_files[i].filename);
 
@@ -371,7 +350,6 @@ banconf_parse(void)
 							*banconf_files[i].filename);
 				}
 
-				perm++;
 				continue;
 			}
 
@@ -388,7 +366,6 @@ banconf_parse(void)
 			}
 
 			fclose(banfile);
-			perm++;
 		}
 
 		i++;
