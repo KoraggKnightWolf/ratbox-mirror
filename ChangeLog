@@ -1,3 +1,12 @@
+leeh        2005/10/19 20:20:02 UTC	(20051019_0-20982)
+  Log:
+  - parse in the oper/time from kline.conf etc.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+
+
 leeh        2005/10/18 19:30:00 UTC	(20051018_1-20980)
   Log:
   - err, skipping fields needs to be done after we've extracted them from the
