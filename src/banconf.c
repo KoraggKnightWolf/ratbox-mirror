@@ -44,6 +44,7 @@
 #include "reject.h"
 #include "s_newconf.h"
 #include "hash.h"
+#include "operhash.h"
 
 /* banconf_parse_field()
  *
@@ -160,6 +161,7 @@ banconf_parse_kline(char *line, int perm)
 	struct ConfItem *aconf;
 	char **params[7];
 	int quoted[7] = { 1, 1, 1, 1, 1, 1, 0 };
+	char *banoper = NULL, *bantime = NULL;
 
 	/* user,host,reason,operreason,humandate,oper,timestamp */
 
@@ -173,12 +175,23 @@ banconf_parse_kline(char *line, int perm)
 	params[1] = &aconf->host;
 	params[2] = &aconf->passwd;
 	params[3] = &aconf->spasswd;
+	params[4] = NULL;
+	params[5] = &banoper;
+	params[6] = &bantime;
 
-	if(banconf_parse_line(line, params, quoted, 4))
+	if(banconf_parse_line(line, params, quoted, 7))
+	{
+		aconf->info.oper = operhash_add(banoper);
+		aconf->hold = atol(bantime);
+
 		add_conf_by_address(aconf->host, aconf->status,
 					aconf->user, aconf);
+	}
 	else
 		free_conf(aconf);
+
+	ircd_free(banoper);
+	ircd_free(bantime);
 }
 
 /* banconf_parse_dline()
@@ -193,6 +206,7 @@ banconf_parse_dline(char *line, int perm)
 	struct ConfItem *aconf;
 	char **params[6];
 	int quoted[6] = { 1, 1, 1, 1, 1, 0 };
+	char *banoper = NULL, *bantime = NULL;
 
 	/* host,reason,operreason,humandate,oper,timestamp */
 
@@ -205,9 +219,15 @@ banconf_parse_dline(char *line, int perm)
 	params[0] = &aconf->host;
 	params[1] = &aconf->passwd;
 	params[2] = &aconf->spasswd;
+	params[3] = NULL;
+	params[4] = &banoper;
+	params[5] = &bantime;
 
-	if(banconf_parse_line(line, params, quoted, 3))
+	if(banconf_parse_line(line, params, quoted, 6))
 	{
+		aconf->info.oper = operhash_add(banoper);
+		aconf->hold = atol(bantime);
+
 		if(!add_dline(aconf))
 		{
 			ilog(L_MAIN, "Invalid Dline %s ignored", aconf->host);
@@ -216,6 +236,9 @@ banconf_parse_dline(char *line, int perm)
 	}
 	else
 		free_conf(aconf);
+
+	ircd_free(banoper);
+	ircd_free(bantime);
 }
 
 /* banconf_parse_xline()
@@ -230,6 +253,7 @@ banconf_parse_xline(char *line, int perm)
 	struct ConfItem *aconf;
 	char **params[5];
 	int quoted[5] = { 1, 1, 1, 1, 0 };
+	char *banoper = NULL, *bantime = NULL;
 
 	/* gecos,type,reason,oper,timestamp */
 
@@ -242,11 +266,21 @@ banconf_parse_xline(char *line, int perm)
 	params[0] = &aconf->host;
 	params[1] = NULL;		/* skip unused type */
 	params[2] = &aconf->passwd;
+	params[3] = &banoper;
+	params[4] = &bantime;
 
-	if(banconf_parse_line(line, params, quoted, 3))
+	if(banconf_parse_line(line, params, quoted, 5))
+	{
+		aconf->info.oper = operhash_add(banoper);
+		aconf->hold = atol(bantime);
+
 		ircd_dlinkAddAlloc(aconf, &xline_conf_list);
+	}
 	else
 		free_conf(aconf);
+
+	ircd_free(banoper);
+	ircd_free(bantime);
 }
 
 /* banconf_parse_resv()
@@ -261,6 +295,7 @@ banconf_parse_resv(char *line, int perm)
 	struct ConfItem *aconf;
 	char **params[4];
 	int quoted[4] = { 1, 1, 1, 0 };
+	char *banoper = NULL, *bantime = NULL;
 
 	/* resv,reason,oper,timestamp */
 
@@ -270,16 +305,24 @@ banconf_parse_resv(char *line, int perm)
 		aconf->flags |= CONF_FLAGS_PERMANENT;
 
 	params[0] = &aconf->host;
-	params[1] =  &aconf->passwd;
+	params[1] = &aconf->passwd;
+	params[2] = &banoper;
+	params[3] = &bantime;
 
-	if(banconf_parse_line(line, params, quoted, 2))
+	if(banconf_parse_line(line, params, quoted, 4))
 	{
 		if(IsChannelName(aconf->host))
 		{
 			if(!hash_find_resv(aconf->host))
 			{
+				aconf->info.oper = operhash_add(banoper);
+				aconf->hold = atol(bantime);
+
 				aconf->status = CONF_RESV_CHANNEL;
 				add_to_hash(HASH_RESV, aconf->host, aconf);
+
+				ircd_free(banoper);
+				ircd_free(bantime);
 				return;
 			}
 		}
@@ -287,15 +330,22 @@ banconf_parse_resv(char *line, int perm)
 		{
 			if(!find_nick_resv(aconf->host))
 			{
+				aconf->info.oper = operhash_add(banoper);
+				aconf->hold = atol(bantime);
+
 				aconf->status = CONF_RESV_NICK;
 				ircd_dlinkAddAlloc(aconf, &resv_conf_list);
+
+				ircd_free(banoper);
+				ircd_free(bantime);
 				return;
 			}
 		}
 	}
-
-	/* invalid */
+	
 	free_conf(aconf);
+	ircd_free(banoper);
+	ircd_free(bantime);
 }
 
 static struct banconf_file
