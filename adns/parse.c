@@ -170,11 +170,11 @@ adns_status adns__findrr_anychk(adns_query qu, int serv,
   int tmp, rdlen, mismatch;
   unsigned long ttl;
   int lablen, labstart, ch;
-  int eo_lablen, eo_labstart, eo_ch;
+  int eo_lablen = 0, eo_labstart = 0, eo_ch = 0;
   adns_status st;
 
   cbyte= *cbyte_io;
-
+  memset(&eo_fls, 0, sizeof(eo_fls));
   adns__findlabel_start(&flstate,qu->ads, serv,qu, dgram,dglen,dglen,cbyte,&cbyte);
   if (eo_dgram) {
     adns__findlabel_start(&eo_fls,qu->ads, -1,0, eo_dgram,eo_dglen,eo_dglen,eo_cbyte,0);
