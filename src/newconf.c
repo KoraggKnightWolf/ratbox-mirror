@@ -1850,7 +1850,6 @@ static struct ConfEntry conf_general_table[] =
 	{ "gline_min_cidr",	CF_INT,   NULL, 0, &ConfigFileEntry.gline_min_cidr	},
 	{ "gline_min_cidr6",	CF_INT,   NULL, 0, &ConfigFileEntry.gline_min_cidr6	},
 	{ "gline_time",		CF_TIME,  NULL, 0, &ConfigFileEntry.gline_time		},
-	{ "idletime",		CF_TIME,  NULL, 0, &ConfigFileEntry.idletime		},
 	{ "dline_with_reason",	CF_YESNO, NULL, 0, &ConfigFileEntry.dline_with_reason	},
 	{ "kline_with_reason",	CF_YESNO, NULL, 0, &ConfigFileEntry.kline_with_reason	},
 	{ "map_oper_only",	CF_YESNO, NULL, 0, &ConfigFileEntry.map_oper_only	},

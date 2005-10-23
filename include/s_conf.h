@@ -196,7 +196,6 @@ struct config_file_entry
 	int gline_time;
 	int gline_min_cidr;
 	int gline_min_cidr6;
-	int idletime;
 	int hide_server;
 	int hide_error_messages;
 	int client_exit;

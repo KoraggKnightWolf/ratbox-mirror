@@ -752,7 +752,6 @@ set_default_conf(void)
 	ConfigFileEntry.gline_min_cidr = 16;
 	ConfigFileEntry.gline_min_cidr6 = 48;
 	ConfigFileEntry.hide_error_messages = 1;
-	ConfigFileEntry.idletime = 0;
 	ConfigFileEntry.dots_in_ident = 0;
 	ConfigFileEntry.max_targets = MAX_TARGETS_DEFAULT;
 	DupString(ConfigFileEntry.servlink_path, SLPATH);
@@ -844,8 +843,6 @@ validate_conf(void)
 	if((ConfigFileEntry.client_flood < CLIENT_FLOOD_MIN) ||
 	   (ConfigFileEntry.client_flood > CLIENT_FLOOD_MAX))
 		ConfigFileEntry.client_flood = CLIENT_FLOOD_MAX;
-
-	GlobalSetOptions.idletime = (ConfigFileEntry.idletime * 60);
 
 	if(!split_users || !split_servers ||
 	   (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))

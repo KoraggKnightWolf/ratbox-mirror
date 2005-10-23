@@ -67,7 +67,6 @@ static void quote_autoconn(struct Client *, char *, int);
 static void quote_autoconnall(struct Client *, int);
 static void quote_floodcount(struct Client *, int);
 static void quote_identtimeout(struct Client *, int);
-static void quote_idletime(struct Client *, int);
 static void quote_max(struct Client *, int);
 static void quote_operstring(struct Client *, const char *);
 static void quote_spamnum(struct Client *, int);
@@ -94,7 +93,6 @@ static struct SetStruct set_cmd_table[] = {
 	{"AUTOCONNALL", quote_autoconnall, 	0,	1	},
 	{"FLOODCOUNT", 	quote_floodcount, 	0,	1	},
 	{"IDENTTIMEOUT", quote_identtimeout,	0,	1	},
-	{"IDLETIME", 	quote_idletime, 	0,	1	},
 	{"MAX", 	quote_max, 		0,	1	},
 	{"MAXCLIENTS",	quote_max,		0,	1	},
 	{"OPERSTRING",	quote_operstring,	1,	0	},
@@ -207,33 +205,6 @@ quote_identtimeout(struct Client *source_p, int newval)
 	else
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :IDENTTIMEOUT is currently %d",
 			   me.name, source_p->name, GlobalSetOptions.ident_timeout);
-}
-
-/* SET IDLETIME */
-static void
-quote_idletime(struct Client *source_p, int newval)
-{
-	if(newval >= 0)
-	{
-		if(newval == 0)
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "%s has disabled idletime checking", source_p->name);
-			GlobalSetOptions.idletime = 0;
-		}
-		else
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "%s has changed IDLETIME to %i",
-					     source_p->name, newval);
-			GlobalSetOptions.idletime = (newval * 60);
-		}
-	}
-	else
-	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :IDLETIME is currently %i",
-			   me.name, source_p->name, GlobalSetOptions.idletime / 60);
-	}
 }
 
 /* SET MAX */
