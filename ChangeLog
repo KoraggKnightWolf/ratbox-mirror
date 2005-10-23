@@ -1,3 +1,14 @@
+androsyn    2005/10/23 01:01:20 UTC	(20051023_0-20988)
+  Log:
+  Add prebuilt version of the lexer/parser to the tree.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd_lexer.c (File Added) 
+	ircd-ratbox/trunk/src/ircd_parser.c (File Added) 
+	ircd-ratbox/trunk/src/ircd_parser.h (File Added) 
+
+
 androsyn    2005/10/20 15:07:17 UTC	(20051020_0-20984)
   Log:
   more hate for gcc
