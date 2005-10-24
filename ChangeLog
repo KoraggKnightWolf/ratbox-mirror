@@ -1,3 +1,17 @@
+androsyn    2005/10/24 15:11:45 UTC	(20051024_0-20992)
+  Log:
+  Have flood_recalc() loops over lclient_list.  Remove ircd_setflush() code as it is now unused
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/packet.h (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2005/10/23 23:37:16 UTC	(20051023_1-20990)
   Log:
   Remove idletime limits.  I don't think anyone really uses
