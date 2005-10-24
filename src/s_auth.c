@@ -285,7 +285,6 @@ release_auth_client(struct AuthRequest *auth)
 	 *     -- adrian
 	 */
 	client->localClient->allow_read = MAX_FLOOD;
-	ircd_setflush(client->localClient->fd, 1000, flood_recalc, client);
 	ircd_dlinkAddTail(client, &client->node, &global_client_list);
 	read_packet(client->localClient->fd, client);
 }

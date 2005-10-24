@@ -107,6 +107,7 @@ init_client(void)
 	ircd_event_addish("check_pings", check_pings, NULL, 30);
 	ircd_event_addish("free_exited_clients", &free_exited_clients, NULL, 5);
 	ircd_event_addish("exit_aborted_clients", exit_aborted_clients, NULL, 5);
+	ircd_event_add("flood_recalc", flood_recalc, NULL, 1);
 }
 
 

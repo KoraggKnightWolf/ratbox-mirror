@@ -49,6 +49,6 @@
 
 extern PF read_ctrl_packet;
 extern PF read_packet;
-extern PF flood_recalc;
+extern EVH flood_recalc;
 
 #endif /* INCLUDED_packet_h */

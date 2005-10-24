@@ -151,37 +151,43 @@ parse_client_queued(struct Client *client_p)
  * once a second on any given client. We then attempt to flush some data.
  */
 void
-flood_recalc(int fd, void *data)
+flood_recalc(void *unused)
 {
-	struct Client *client_p = data;
-	struct LocalUser *lclient_p = client_p->localClient;
+	dlink_node *ptr, *next;
+	struct Client *client_p;
+	struct LocalUser *lclient_p;
 
-	/* This can happen in the event that the client detached. */
-	if(!lclient_p)
-		return;
+	DLINK_FOREACH_SAFE(ptr, next, lclient_list.head)
+	{
+		client_p = ptr->data;
 
-	/* allow a bursting client their allocation per second, allow
-	 * a client whos flooding an extra 2 per second
-	 */
-	if(IsFloodDone(client_p))
-		lclient_p->sent_parsed -= 2;
-	else
-		lclient_p->sent_parsed = 0;
+		if(unlikely(IsMe(client_p)))
+			continue;
+			
+		if(unlikely(client_p->localClient == NULL))
+			continue;
+		
+		if(IsFloodDone(client_p))
+			client_p->localClient->sent_parsed -= 2;
+		else
+			client_p->localClient->sent_parsed = 0;
+			
+		if(client_p->localClient->sent_parsed < 0)
+			client_p->localClient->sent_parsed = 0;
 
-	if(lclient_p->sent_parsed < 0)
-		lclient_p->sent_parsed = 0;
+		if(--client_p->localClient->actually_read < 0)
+			client_p->localClient->actually_read = 0;
 
-	if(--lclient_p->actually_read < 0)
-		lclient_p->actually_read = 0;
+		parse_client_queued(client_p);
+		
+		if(unlikely(IsAnyDead(client_p)))
+			continue;
 
-	parse_client_queued(client_p);
-
-	if(IsAnyDead(client_p))
-		return;
-
-	/* and finally, reset the flood check */
-	ircd_setflush(fd, 1000, flood_recalc, client_p);
+	}
 }
+
+
+
 
 /*
  * read_ctrl_packet - Read a 'packet' of data from a servlink control

@@ -216,31 +216,6 @@ ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 	F->timeout_data = cbdata;
 }
 
-
-/*
- * ircd_setflush() - set a flush function
- *
- * A flush function is simply a function called if found during
- * ircd_timeouts(). Its basically a second timeout, except in this case
- * I'm too lazy to implement multiple timeout functions! :-)
- * its kinda nice to have it seperate, since this is designed for
- * flush functions, and when ircd_close() is implemented correctly
- * with close functions, we _actually_ don't call ircd_close() here ..
- */
-void
-ircd_setflush(int fd, time_t timeout, PF * callback, void *cbdata)
-{
-	fde_t *F;
-	lircd_assert(fd >= 0);
-	F = find_fd(fd);
-	lircd_assert(F->flags.open);
-
-	F->flush_timeout = ircd_currenttime + (timeout / 1000);
-	F->flush_handler = callback;
-	F->flush_data = cbdata;
-}
-
-
 /*
  * ircd_checktimeouts() - check the socket timeouts
  *
@@ -264,15 +239,6 @@ ircd_checktimeouts(void *notused)
 			continue;
 		if(F->flags.closing)
 			continue;
-
-		/* check flush functions */
-		if(F->flush_handler && F->flush_timeout > 0 && F->flush_timeout < ircd_currenttime)
-		{
-			hdl = F->flush_handler;
-			data = F->flush_data;
-			ircd_setflush(F->fd, 0, NULL, NULL);
-			hdl(F->fd, data);
-		}
 
 		/* check timeouts */
 		if(F->timeout_handler && F->timeout > 0 && F->timeout < ircd_currenttime)
@@ -727,7 +693,6 @@ ircd_close(int fd)
 		lircd_assert(F->write_handler == NULL);
 	}
 		ircd_setselect(F->fd, 0, NULL, NULL, 0);
-	ircd_setflush(F->fd, 0, NULL, NULL);
 
 	F->flags.open = 0;
 	ircd_fdlist_update_biggest(fd, 0);

@@ -148,9 +148,6 @@ struct _fde
 	PF *timeout_handler;
 	void *timeout_data;
 	time_t timeout;
-	PF *flush_handler;
-	void *flush_data;
-	time_t flush_timeout;
 	struct
 	{
 		unsigned int open:1;
@@ -238,7 +235,6 @@ extern int ircd_set_buffers(int, int);
 extern int ircd_get_sockerr(int);
 
 extern void ircd_settimeout(int fd, time_t, PF *, void *);
-extern void ircd_setflush(int fd, time_t, PF *, void *);
 extern void ircd_checktimeouts(void *);
 extern void ircd_connect_tcp(int fd, struct sockaddr *,
 			     struct sockaddr *, int, CNCB *, void *, int);
