@@ -1,3 +1,16 @@
+androsyn    2005/10/26 23:11:31 UTC	(20051026_7-21020)
+  Log:
+  Replace a few bits that were doing strchr() looking for * or ? 
+  with a single call to strpbrk()
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2005/10/26 19:02:54 UTC	(20051026_6-21014)
   Log:
   change a vsprintf to ircd_vsprintf
