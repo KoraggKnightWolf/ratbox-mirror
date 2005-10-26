@@ -1,3 +1,14 @@
+androsyn    2005/10/26 18:53:09 UTC	(20051026_3-21008)
+  Log:
+  Move cleanup_monitor and clear_monitor into m_monitor.c. 
+  Fix monitor overflow.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2005/10/26 17:58:02 UTC	(20051026_2-21004)
   Log:
   reset last_ptr when looping over the monitor_hash table
