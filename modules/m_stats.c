@@ -1476,7 +1476,7 @@ stats_ltrace(struct Client *source_p, int parc, const char *parv[])
 		else
 		{
 			name = parv[2];
-			wilds = strchr(name, '*') || strchr(name, '?');
+			wilds = (strpbrk(name, "*?") != NULL);
 		}
 
 		/* must be directed at a specific person thats not us */

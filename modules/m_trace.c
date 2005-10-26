@@ -155,7 +155,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 		tname = me.name;
 	}
 
-	wilds = strchr(tname, '*') || strchr(tname, '?');
+	wilds = (strpbrk(tname, "*?") != NULL);
 	dow = wilds || doall;
 
 	/* specific trace */

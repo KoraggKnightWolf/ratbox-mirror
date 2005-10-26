@@ -265,8 +265,8 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 			target_p = NULL;
 
 	collapse(new);
-	wilds = (strchr(new, '?') || strchr(new, '*'));
 
+	wilds = (strpbrk(new, "?*") != NULL);
 	/*
 	 * Again, if there are no wild cards involved in the server
 	 * name, use the hash lookup

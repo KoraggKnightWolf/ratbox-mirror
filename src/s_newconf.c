@@ -463,7 +463,7 @@ add_server_conf(struct server_conf *server_p)
 		DupString(server_p->class_name, "default");
 	}
 
-	if(strchr(server_p->host, '*') || strchr(server_p->host, '?'))
+	if(strpbrk(server_p->host, "?*") != NULL)
 		return;
 
 	if(ircd_inet_pton_sock(server_p->host, (struct sockaddr *)&server_p->ipnum) > 0)
