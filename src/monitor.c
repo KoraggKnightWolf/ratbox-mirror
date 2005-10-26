@@ -104,17 +104,15 @@ monitor_signon(struct Client *client_p)
 	if(monptr == NULL)
 		return;
 
+	ircd_snprintf(buf, sizeof(buf), "%s!%s@%s", client_p->name, client_p->username, client_p->host);
+
 	DLINK_FOREACH(ptr, monptr->users.head)
 	{
 		target_p = ptr->data;
 
-		snprintf(buf, sizeof(buf), "%s!%s@%s",
-			client_p->name, client_p->username, client_p->host);
-
-		sendto_one(target_p, HOLD_QUEUE, form_str(RPL_MONONLINE),
+		sendto_one(target_p, POP_QUEUE, form_str(RPL_MONONLINE),
 				me.name, target_p->name, buf);
 	}
-	send_pop_queue(client_p);
 }
 
 /* monitor_signoff()
@@ -136,10 +134,10 @@ monitor_signoff(struct Client *client_p)
 
 	DLINK_FOREACH(ptr, monptr->users.head)
 	{
-		sendto_one(ptr->data, HOLD_QUEUE, form_str(RPL_MONOFFLINE),
-				me.name, ((struct Client *) ptr->data)->name, client_p->name);
+		target_p = ptr->data;
+		sendto_one(target_p, POP_QUEUE, form_str(RPL_MONOFFLINE),
+				me.name, target_p->name, client_p->name);
 	}
-	send_pop_queue(client_p);
 }
 
 void
