@@ -1,3 +1,11 @@
+androsyn    2005/10/26 19:02:54 UTC	(20051026_6-21014)
+  Log:
+  change a vsprintf to ircd_vsprintf
+
+  Modified:
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+
+
 androsyn    2005/10/26 19:01:09 UTC	(20051026_5-21012)
   Log:
   next time i will compile before i commit. move clear_monitor back to monitor.c as client.c needs it. fix a minor typo in m_monitor.c
