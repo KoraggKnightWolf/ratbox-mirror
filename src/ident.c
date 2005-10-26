@@ -59,7 +59,7 @@ send_sprintf(int fd, const char *format, ...)
 {
 	va_list args; 
 	va_start(args, format);
-	vsprintf(buf, format, args);
+	ircd_vsprintf(buf, format, args);
 	va_end(args); 
 	return(ircd_write(fd, buf, strlen(buf)));
 }
