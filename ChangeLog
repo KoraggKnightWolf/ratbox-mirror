@@ -1,3 +1,12 @@
+androsyn    2005/10/26 01:08:55 UTC	(20051026_0-20996)
+  Log:
+  Fix UID leakage in invite.  
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_invite.c (File Modified) 
+
+
 androsyn    2005/10/24 15:11:45 UTC	(20051024_0-20992)
   Log:
   Have flood_recalc() loops over lclient_list.  Remove ircd_setflush() code as it is now unused
