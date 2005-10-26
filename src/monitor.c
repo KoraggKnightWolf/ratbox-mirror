@@ -141,3 +141,24 @@ monitor_signoff(struct Client *client_p)
 }
 
 
+void 
+clear_monitor(struct Client *client_p)
+{
+	struct monitor *monptr;
+	dlink_node *ptr, *next_ptr;
+
+	DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->monitor_list.head)
+	{
+		monptr = ptr->data;
+
+		/* we leave the actual entry around with no users, itll be
+		 * cleaned up periodically by cleanup_monitor() --anfl
+		 */
+		ircd_dlinkFindDestroy(client_p, &monptr->users);
+		free_dlink_node(ptr);
+	}
+
+	client_p->localClient->monitor_list.head = client_p->localClient->monitor_list.tail = NULL;
+	client_p->localClient->monitor_list.length = 0;
+}
+

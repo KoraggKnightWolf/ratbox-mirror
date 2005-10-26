@@ -20,6 +20,7 @@ struct monitor
 };
 
 extern struct BlockHeap *monitor_heap;
+extern struct monitor *monitorTable[];
 
 #define MONITOR_HASH_SIZE 65536
 #define MONITOR_HASH_BITS 16

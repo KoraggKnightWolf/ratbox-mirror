@@ -165,7 +165,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 			if(cur_offlen != mlen) 
 			{
 				*offptr++ = ',';
-				offlen++;
+				cur_offlen++;
 			}
 			arglen = ircd_sprintf(offptr, "%s", name);
 			offptr += arglen;
@@ -322,26 +322,6 @@ show_monitor_status(struct Client *client_p)
 		sendto_one(client_p, POP_QUEUE, "%s", offbuf);
 }
 
-
-static void clear_monitor(struct Client *client_p)
-{
-	struct monitor *monptr;
-	dlink_node *ptr, *next_ptr;
-
-	DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->monitor_list.head)
-	{
-		monptr = ptr->data;
-
-		/* we leave the actual entry around with no users, itll be
-		 * cleaned up periodically by cleanup_monitor() --anfl
-		 */
-		ircd_dlinkFindDestroy(client_p, &monptr->users);
-		free_dlink_node(ptr);
-	}
-
-	client_p->localClient->monitor_list.head = client_p->localClient->monitor_list.tail = NULL;
-	client_p->localClient->monitor_list.length = 0;
-}
 
 static void cleanup_monitor(void *unused)
 {
