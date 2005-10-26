@@ -1,3 +1,11 @@
+androsyn    2005/10/26 18:56:24 UTC	(20051026_4-21010)
+  Log:
+  fix a minor compile issue
+
+  Modified:
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2005/10/26 18:53:09 UTC	(20051026_3-21008)
   Log:
   Move cleanup_monitor and clear_monitor into m_monitor.c. 
