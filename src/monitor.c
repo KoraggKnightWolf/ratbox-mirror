@@ -170,6 +170,7 @@ cleanup_monitor(void *unused)
 
 	for(i = 0; i < MONITOR_HASH_SIZE; i++)
 	{
+		last_ptr = NULL;
 		for(ptr = monitorTable[i]; ptr; ptr = next_ptr)
 		{
 			next_ptr = ptr->hnext;
