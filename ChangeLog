@@ -1,3 +1,13 @@
+androsyn    2005/10/26 19:01:09 UTC	(20051026_5-21012)
+  Log:
+  next time i will compile before i commit. move clear_monitor back to monitor.c as client.c needs it. fix a minor typo in m_monitor.c
+
+  Modified:
+	ircd-ratbox/trunk/include/monitor.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2005/10/26 18:56:24 UTC	(20051026_4-21010)
   Log:
   fix a minor compile issue
