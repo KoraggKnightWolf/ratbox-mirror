@@ -1,3 +1,12 @@
+androsyn    2005/10/27 20:08:39 UTC	(20051027_4-21030)
+  Log:
+  rename fd_table to ircd_fd_table
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+
+
 androsyn    2005/10/27 20:05:28 UTC	(20051027_3-21028)
   Log:
   only compile slow_list_length() if LIST_SANITY_CHECK is defined
