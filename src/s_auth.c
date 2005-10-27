@@ -111,6 +111,7 @@ fork_ident(void)
 {
 	int ifd[2], ofd[2];
 	char fx[6], fy[6];
+	char timeout[6];
 	const char *parv[2];
 	char fullpath[PATH_MAX + 1];
 #ifdef __MINGW32__
@@ -158,7 +159,6 @@ fork_ident(void)
 
 	ircd_snprintf(fx, sizeof(fx), "%d", ifd[1]); /*ident write*/
 	ircd_snprintf(fy, sizeof(fy), "%d", ofd[0]); /*ident read*/
-
 	ircd_set_nb(ifd[0]);
 	ircd_set_nb(ifd[1]);
 	ircd_set_nb(ifd[0]);
@@ -170,7 +170,10 @@ fork_ident(void)
 #endif
 	setenv("IFD", fy, 1);
 	setenv("OFD", fx, 1);
-	
+
+	ircd_snprintf(timeout, sizeof(timeout), "%d", GlobalSetOptions.ident_timeout);
+	setenv("IDENT_TIMEOUT", timeout, 1);
+		
 	parv[0] = "-ircd ident daemon";
 	parv[1] = NULL;
 
@@ -595,4 +598,12 @@ read_auth_reply(int fd, void *data)
 	
 	ircd_setselect(auth_ifd, IRCD_SELECT_READ, read_auth_reply, NULL, 0);	
 }
+
+void
+change_ident_timeout(int timeout)
+{
+	ircd_linebuf_put(&auth_sendq, "T %d", timeout); 
+	auth_write_sendq(auth_ofd, NULL);
+}
+
 

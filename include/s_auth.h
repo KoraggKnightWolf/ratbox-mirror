@@ -73,4 +73,5 @@ extern void init_auth(void);
 extern void delete_auth_queries(struct Client *);
 extern void ident_sigchld(void);
 extern void restart_ident(void);
+extern void change_ident_timeout(int timeout);
 #endif /* INCLUDED_s_auth_h */

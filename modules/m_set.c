@@ -36,6 +36,7 @@
 #include "channel.h"
 #include "s_conf.h"
 #include "s_newconf.h"
+#include "s_auth.h"
 #include "parse.h"
 #include "modules.h"
 
@@ -201,6 +202,7 @@ quote_identtimeout(struct Client *source_p, int newval)
 				     "%s has changed IDENTTIMEOUT to %d",
 				     get_oper_name(source_p), newval);
 		GlobalSetOptions.ident_timeout = newval;
+		change_ident_timeout(GlobalSetOptions.ident_timeout);
 	}
 	else
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :IDENTTIMEOUT is currently %d",

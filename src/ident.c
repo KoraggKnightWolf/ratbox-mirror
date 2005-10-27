@@ -22,6 +22,8 @@ int irc_ifd;
 /* control fd from ircd */
 int irc_ofd; 
 
+int ident_timeout;
+
 #define MAXPARA 10
 #define REQIDLEN 10
 
@@ -320,7 +322,7 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 
 	auth->authfd = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
 	ircd_connect_tcp(auth->authfd, (struct sockaddr *)&auth->destaddr, 
-		(struct sockaddr *)&auth->bindaddr, GET_SS_LEN(auth->destaddr), connect_callback, auth, 30);
+		(struct sockaddr *)&auth->bindaddr, GET_SS_LEN(auth->destaddr), connect_callback, auth, ident_timeout);
 }
 
 static void
@@ -333,9 +335,20 @@ parse_request(void)
 				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 	{
 		parc = io_to_array(readBuf, parv);
-		if(parc != 5)
-			exit(1);
-		check_identd(parv[0], parv[1], parv[2], parv[3], parv[4]);
+		switch(parc)
+		{
+			case 5:
+				check_identd(parv[0], parv[1], parv[2], parv[3], parv[4]);
+				break;
+			case 2:
+				if(*parv[0] == 'T')
+				{
+					ident_timeout = atoi(parv[1]);
+					break;
+				}
+			default:
+				exit(0);
+		}
 	}
 }
 
@@ -380,13 +393,14 @@ diecb(const char *str)
 
 int main(int argc, char **argv)
 {
-	char *tifd, *tofd, *tmaxfd;
+	char *tifd, *tofd, *tmaxfd, *tident_timeout;
 	int maxfd, x;
 
 	tifd = getenv("IFD");
 	tofd = getenv("OFD");
 	tmaxfd = getenv("MAXFD");
-	if(tifd == NULL || tofd == NULL || tmaxfd == NULL)
+	tident_timeout = getenv("IDENT_TIMEOUT");
+	if(tifd == NULL || tofd == NULL || tmaxfd == NULL || tident_timeout == NULL)
 	{
 		fprintf(stderr, "This is ircd-ratbox ident.  You aren't supposed to run be directly.\n");
 		fprintf(stderr, "However I will print my Id tag $Id$\n"); 
@@ -396,7 +410,8 @@ int main(int argc, char **argv)
 	maxfd = atoi(tmaxfd);
 	irc_ifd = atoi(tifd);
 	irc_ofd = atoi(tofd);
-
+	ident_timeout = atoi(tident_timeout);
+	
 #ifndef __MINGW32__
 	for(x = 0; x < maxfd; x++)
 	{
