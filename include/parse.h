@@ -84,8 +84,6 @@ struct MessageHash
 	struct MessageHash *next;
 };
 
-#define MAX_MSG_HASH  387
-
 extern void parse(struct Client *, char *, char *);
 int string_to_array(char *string, char *parv[]);
 extern void handle_encap(struct Client *, struct Client *, 

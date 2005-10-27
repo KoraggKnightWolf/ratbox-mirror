@@ -57,6 +57,7 @@ static int handle_command(struct Message *, struct Client *, struct Client *, in
 static int cmd_hash(const char *p);
 static struct Message *hash_parse(const char *);
 
+#define MAX_MSG_HASH 512 /* don't change this unless you know what you are doing */
 struct MessageHash *msg_hash_table[MAX_MSG_HASH];
 
 static char buffer[1024];
@@ -492,7 +493,7 @@ hash_parse(const char *cmd)
 {
 	struct MessageHash *ptr;
 	int msgindex;
-
+	
 	msgindex = cmd_hash(cmd);
 
 	for (ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
@@ -511,20 +512,20 @@ hash_parse(const char *cmd)
  * output	- hash index
  * side effects - NONE
  *
- * BUGS		- This a HORRIBLE hash function
+ * BUGS		- This was a horrible hash function, now its an okay one...
  */
 static int
 cmd_hash(const char *p)
 {
-	int hash_val = 0;
+	int hash_val = 0, q = 1, n;
 
 	while (*p)
 	{
-		hash_val += ((int) (*p) & 0xDF);
-		p++;
+		n = ToUpper(*p++);
+		hash_val += ((n) + (q++ << 1)) ^ ((n) << 2);
 	}
-
-	return (hash_val % MAX_MSG_HASH);
+	/* note that 9 comes from 2^9 = MAX_MSG_HASH */
+	return (hash_val >> 9) ^ (hash_val & (MAX_MSG_HASH-1));
 }
 
 /*
