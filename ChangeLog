@@ -1,3 +1,11 @@
+androsyn    2005/10/27 20:05:28 UTC	(20051027_3-21028)
+  Log:
+  only compile slow_list_length() if LIST_SANITY_CHECK is defined
+
+  Modified:
+	ircd-ratbox/trunk/libircd/tools.c (File Modified) 
+
+
 androsyn    2005/10/27 15:56:35 UTC	(20051027_2-21026)
   Log:
   make SET IDENTTIMEOUT actually change the ident timeout
