@@ -182,9 +182,9 @@ struct _fde
 };
 
 #ifdef __MINGW32__
-dlink_list *fd_table;
+dlink_list *ircd_fd_table;
 #else
-extern fde_t *fd_table;
+extern fde_t *ircd_fd_table;
 #endif
 
 void ircd_fdlist_init(int closeall, int maxfds);
@@ -272,7 +272,7 @@ extern int maxconnections;
 static inline fde_t *
 find_fd(int fd)
 {
-	dlink_list *hlist = &fd_table[hash_fd(fd)];
+	dlink_list *hlist = &ircd_fd_table[hash_fd(fd)];
 	
 	dlink_node *ptr;
 	DLINK_FOREACH(ptr, hlist->head)
@@ -296,7 +296,7 @@ add_fd(int fd)
 	
 	F = ircd_malloc(sizeof(fde_t));
 	F->fd = fd;
-	list = &fd_table[hash];
+	list = &ircd_fd_table[hash];
 	ircd_dlinkAdd(F, &F->node, list);
 	return(F);
 }
@@ -307,7 +307,7 @@ remove_fd(int fd)
 	int hash = hash_fd(fd);
 	fde_t *F;
 	dlink_list *list;
-	list = &fd_table[hash];
+	list = &ircd_fd_table[hash];
 	F = find_fd(fd);
 	ircd_dlinkDelete(&F->node, list);
 	ircd_free(F);
@@ -316,9 +316,9 @@ remove_fd(int fd)
 
 #else
 #define get_errno()
-#define find_fd(x) &fd_table[x]
-#define add_fd(x) &fd_table[x]
-#define remove_fd(x) memset(&fd_table[x], 0, sizeof(fde_t))
+#define find_fd(x) &ircd_fd_table[x]
+#define add_fd(x) &ircd_fd_table[x]
+#define remove_fd(x) memset(&ircd_fd_table[x], 0, sizeof(fde_t))
 #endif
 
 

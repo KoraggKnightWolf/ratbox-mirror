@@ -39,9 +39,9 @@
 #endif
 
 #ifndef __MINGW32__
-fde_t *fd_table = NULL;
+fde_t *ircd_fd_table = NULL;
 #else
-dlink_list *fd_table;
+dlink_list *ircd_fd_table;
 #endif
 
 
@@ -621,7 +621,7 @@ ircd_fdlist_update_biggest(int fd, int opening)
 	 */
 #ifndef __MINGW32__
 	lircd_assert(!opening);
-	while (ircd_highest_fd >= 0 && !fd_table[ircd_highest_fd].flags.open)
+	while (ircd_highest_fd >= 0 && !ircd_fd_table[ircd_highest_fd].flags.open)
 		ircd_highest_fd--;
 #endif
 }
@@ -648,7 +648,7 @@ ircd_fdlist_init(int closeall, int maxfds)
 		if(closeall)
 			ircd_close_all();
 		/* Since we're doing this once .. */
-		fd_table = ircd_malloc((maxfds + 1) * sizeof(fde_t));
+		ircd_fd_table = ircd_malloc((maxfds + 1) * sizeof(fde_t));
 		initialized = 1;
 	}
 }
@@ -733,7 +733,7 @@ ircd_dump(DUMPCB * cb, void *data)
 /*
  * ircd_note() - set the fd note
  *
- * Note: must be careful not to overflow fd_table[fd].desc when
+ * Note: must be careful not to overflow ircd_fd_table[fd].desc when
  *       calling.
  */
 void
