@@ -98,6 +98,7 @@ free_dlink_node(dlink_node * ptr)
 	BlockHeapFree(dnode_heap, ptr);
 }
 
+#ifdef LIST_SANITY_CHECK
 unsigned long
 slow_list_length(dlink_list *list)
 {
@@ -115,6 +116,6 @@ slow_list_length(dlink_list *list)
         }
         return count;
 }
-
+#endif
 
 
