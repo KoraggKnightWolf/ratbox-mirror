@@ -1,3 +1,11 @@
+androsyn    2005/10/27 20:12:09 UTC	(20051027_5-21032)
+  Log:
+  cut and paste some of the basic docs of monitor.txt into monitor for help
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/monitor (File Added) 
+
+
 androsyn    2005/10/27 20:08:39 UTC	(20051027_4-21030)
   Log:
   rename fd_table to ircd_fd_table
