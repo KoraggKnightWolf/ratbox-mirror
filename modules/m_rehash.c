@@ -76,7 +76,6 @@ rehash_ident(struct Client *source_p)
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is restarting ident daemon", 
 			     get_oper_name(source_p));
 
-	/* reread /etc/resolv.conf and reopen res socket */
 	restart_ident();
 
 }
