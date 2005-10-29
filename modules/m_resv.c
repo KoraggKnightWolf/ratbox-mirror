@@ -236,7 +236,7 @@ parse_resv(struct Client *source_p, const char *name,
 		else
 		{
 			translog_add_ban(TRANS_RESV, source_p, aconf->host, NULL,
-					aconf->passwd, NULL);
+					aconf->passwd, NULL, 0);
 			aconf->hold = ircd_currenttime;
 		}
 	}
@@ -291,7 +291,7 @@ parse_resv(struct Client *source_p, const char *name,
 		else
 		{
 			translog_add_ban(TRANS_RESV, source_p, aconf->host, NULL,
-					aconf->passwd, NULL);
+					aconf->passwd, NULL, 0);
 			aconf->hold = ircd_currenttime;
 		}
 			

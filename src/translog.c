@@ -100,25 +100,29 @@ transaction_append(const char *data)
  */
 void
 translog_add_ban(translog_type type, struct Client *source_p, const char *mask, 
-		const char *mask2, const char *reason, const char *oper_reason)
+		const char *mask2, const char *reason, const char *oper_reason, int humandate)
 {
 	char buf[BUFSIZE*2];
 	FILE *translog;
 
 	if(reason == NULL)
 		reason = "";
-	if(oper_reason == NULL)
-		oper_reason = "";
+
+	snprintf(buf, sizeof(buf), "%c \"%s\"",
+			translog_add_letter[type], mask);
 
 	if(mask2)
-		ircd_snprintf(buf, sizeof(buf), "%c \"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%ld\"\n",
-				translog_add_letter[type], mask, mask2, reason, 
-				oper_reason, smalldate(),
-				get_oper_name(source_p), ircd_currenttime);
-	else
-		ircd_snprintf(buf, sizeof(buf), "%c \"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%ld\"\n",
-				translog_add_letter[type], mask, reason, 
-				oper_reason, smalldate(),
+		ircd_snprintf_append(buf, sizeof(buf), ",\"%s\"", mask2);
+
+	ircd_snprintf_append(buf, sizeof(buf), ",\"%s\"", reason);
+
+	if(oper_reason)
+		ircd_snprintf_append(buf, sizeof(buf), ",\"%s\"", oper_reason);
+
+	if(humandate)
+		ircd_snprintf_append(buf, sizeof(buf), ",\"%s\"", smalldate());
+
+	ircd_snprintf_append(buf, sizeof(buf), ",\"%s\",%ld\n",
 				get_oper_name(source_p), ircd_currenttime);
 
 	transaction_append(buf);

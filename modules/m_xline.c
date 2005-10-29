@@ -345,7 +345,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	else
 	{
 		aconf->hold = ircd_currenttime;
-		translog_add_ban(TRANS_XLINE, source_p, aconf->host, "0", reason, NULL);
+		translog_add_ban(TRANS_XLINE, source_p, aconf->host, "0", reason, NULL, 0);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
 				aconf->info.oper, aconf->host, aconf->passwd);

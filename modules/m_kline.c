@@ -438,7 +438,7 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 
 	add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
 	translog_add_ban(TRANS_KLINE, source_p, aconf->user, aconf->host,
-			reason, oper_reason);
+			reason, EmptyString(oper_reason) ? "" : oper_reason, 1);
 }
 
 /* apply_tkline()

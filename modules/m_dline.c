@@ -264,7 +264,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 			   source_p->name, aconf->host, ConfigFileEntry.dlinefile);
 
 		translog_add_ban(TRANS_DLINE, source_p, aconf->host, NULL,
-				reason, oper_reason);
+				reason, EmptyString(oper_reason) ? "" : oper_reason, 1);
 	}
 
 	check_dlines();
