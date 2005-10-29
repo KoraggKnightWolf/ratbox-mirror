@@ -1,3 +1,12 @@
+leeh        2005/10/29 09:56:10 UTC	(20051029_0-21036)
+  Log:
+  - add jilles to the CREDITS
+  
+
+  Modified:
+	ircd-ratbox/trunk/CREDITS (File Modified) 
+
+
 androsyn    2005/10/27 20:12:09 UTC	(20051027_5-21032)
   Log:
   cut and paste some of the basic docs of monitor.txt into monitor for help
