@@ -1,3 +1,11 @@
+androsyn    2005/10/29 22:48:23 UTC	(20051029_3-21044)
+  Log:
+  missed an fd_table to ircd_fd_table name change(though it shouldn't be using ircd_fd_table directly anyways, i'll fix it later
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 leeh        2005/10/29 22:04:42 UTC	(20051029_2-21042)
   Log:
   - fix the transaction log so it outputs bans in the correct format
