@@ -1,3 +1,17 @@
+leeh        2005/10/29 22:04:42 UTC	(20051029_2-21042)
+  Log:
+  - fix the transaction log so it outputs bans in the correct format
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/translog.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/translog.c (File Modified) 
+
+
 leeh        2005/10/29 09:57:11 UTC	(20051029_1-21038)
   Log:
   - we're actually missing the word 'team' here..
