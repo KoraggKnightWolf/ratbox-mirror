@@ -1,3 +1,13 @@
+leeh        2005/10/30 10:17:08 UTC	(20051030_0-21046)
+  Log:
+  - add transaction_write_queue() to output the current queued list to the
+    transaction log
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/translog.c (File Modified) 
+
+
 androsyn    2005/10/29 22:48:23 UTC	(20051029_3-21044)
   Log:
   missed an fd_table to ircd_fd_table name change(though it shouldn't be using ircd_fd_table directly anyways, i'll fix it later
