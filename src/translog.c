@@ -62,6 +62,36 @@ static char translog_del_letter[] =
 	'r'	/* TRANS_RESV */
 };
 
+/* transaction_write_queue()
+ *
+ * inputs	-
+ * outputs	-
+ * side effects - writes the current queue of entries to the transaction log
+ */
+static void
+transaction_write_queue(void)
+{
+	FILE *translog;
+	dlink_node *ptr, *next_ptr;
+
+	if((translog = fopen(TRANSPATH, "a")) == NULL)
+		return;
+
+	DLINK_FOREACH_SAFE(ptr, next_ptr, transaction_queue.head)
+	{
+		if(fputs((const char *) ptr->data, translog) < 0)
+		{
+			fclose(translog);
+			return;
+		}
+
+		ircd_free(ptr->data);
+		ircd_dlinkDestroy(ptr, &transaction_queue);
+	}
+
+	fclose(translog);
+}
+
 /* transaction_append()
  *
  * inputs	- string to add to transaction log
@@ -74,6 +104,9 @@ transaction_append(const char *data)
 	FILE *translog;
 	char *store;
 
+	if(transaction_queue.head)
+		transaction_write_queue();
+
 	if(transaction_queue.head || (translog = fopen(TRANSPATH, "a")) == NULL)
 	{
 		DupString(store, data);
@@ -83,6 +116,7 @@ transaction_append(const char *data)
 
 	if(fputs(data, translog) < 0)
 	{
+		fclose(translog);
 		DupString(store, data);
 		ircd_dlinkAddAlloc(store, &transaction_queue);
 		return;
