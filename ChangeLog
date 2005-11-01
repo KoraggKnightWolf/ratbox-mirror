@@ -1,3 +1,11 @@
+androsyn    2005/11/01 15:19:33 UTC	(20051101_0-21048)
+  Log:
+  use the results of find_fd() instead of using ircd_fd_table directly
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 leeh        2005/10/30 10:17:08 UTC	(20051030_0-21046)
   Log:
   - add transaction_write_queue() to output the current queued list to the
