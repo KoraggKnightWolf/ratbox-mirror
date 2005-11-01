@@ -697,13 +697,13 @@ serv_connect_callback(int fd, int status, void *data)
 
 	/* Next, for backward purposes, record the ip of the server */
 #ifdef IPV6
-	if(ircd_fd_table[fd].connect.hostaddr.ss_family == AF_INET6)
+	if(F->connect.hostaddr.ss_family == AF_INET6)
 	{
 		struct sockaddr_in6 *lip = (struct sockaddr_in6 *)&client_p->localClient->ip;
 		struct sockaddr_in6 *hip = (struct sockaddr_in6 *)&F->connect.hostaddr;	
 		memcpy(&lip->sin6_addr, &hip->sin6_addr, sizeof(struct in6_addr));
 		SET_SS_LEN(client_p->localClient->ip, sizeof(struct sockaddr_in6));
-		SET_SS_LEN(fd_table[fd].connect.hostaddr, sizeof(struct sockaddr_in6));
+		SET_SS_LEN(F->connect.hostaddr, sizeof(struct sockaddr_in6));
 
 	} else
 #else
@@ -711,8 +711,8 @@ serv_connect_callback(int fd, int status, void *data)
 		struct sockaddr_in *lip = (struct sockaddr_in *)&client_p->localClient->ip;
 		struct sockaddr_in *hip = (struct sockaddr_in *)&F->connect.hostaddr;	
 		lip->sin_addr.s_addr = hip->sin_addr.s_addr;
-		SET_SS_LEN(client_p->localClient->ip, sizeof(struct sockaddr_in));
-		SET_SS_LEN(fd_table[fd].connect.hostaddr, sizeof(struct sockaddr_in));
+		SET_SS_LEN(F->localClient->ip, sizeof(struct sockaddr_in));
+		SET_SS_LEN(F->connect.hostaddr, sizeof(struct sockaddr_in));
 	}	
 #endif	
 	
