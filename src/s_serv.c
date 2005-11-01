@@ -677,7 +677,6 @@ serv_connect_callback(int fd, int status, void *data)
 {
 	struct Client *client_p = data;
 	struct server_conf *server_p;
-	fde_t *F;
 	/* First, make sure its a real client! */
 	s_assert(client_p != NULL);
 	s_assert(client_p->localClient->fd == fd);
@@ -693,28 +692,8 @@ serv_connect_callback(int fd, int status, void *data)
 		exit_client(client_p, client_p, &me, "Server Exists");
 		return;
 	}
-	F = find_fd(fd);
 
-	/* Next, for backward purposes, record the ip of the server */
-#ifdef IPV6
-	if(F->connect.hostaddr.ss_family == AF_INET6)
-	{
-		struct sockaddr_in6 *lip = (struct sockaddr_in6 *)&client_p->localClient->ip;
-		struct sockaddr_in6 *hip = (struct sockaddr_in6 *)&F->connect.hostaddr;	
-		memcpy(&lip->sin6_addr, &hip->sin6_addr, sizeof(struct in6_addr));
-		SET_SS_LEN(client_p->localClient->ip, sizeof(struct sockaddr_in6));
-		SET_SS_LEN(F->connect.hostaddr, sizeof(struct sockaddr_in6));
-
-	} else
-#else
-	{
-		struct sockaddr_in *lip = (struct sockaddr_in *)&client_p->localClient->ip;
-		struct sockaddr_in *hip = (struct sockaddr_in *)&F->connect.hostaddr;	
-		lip->sin_addr.s_addr = hip->sin_addr.s_addr;
-		SET_SS_LEN(F->localClient->ip, sizeof(struct sockaddr_in));
-		SET_SS_LEN(F->connect.hostaddr, sizeof(struct sockaddr_in));
-	}	
-#endif	
+	ircd_connect_sockaddr(fd, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
 	
 	/* Check the status */
 	if(status != IRCD_OK)

@@ -238,6 +238,8 @@ extern void ircd_settimeout(int fd, time_t, PF *, void *);
 extern void ircd_checktimeouts(void *);
 extern void ircd_connect_tcp(int fd, struct sockaddr *,
 			     struct sockaddr *, int, CNCB *, void *, int);
+extern int ircd_connect_sockaddr(int fd, struct sockaddr *addr, socklen_t len);
+
 extern const char *ircd_errstr(int status);
 extern int ircd_socket(int family, int sock_type, int proto, const char *note);
 extern int ircd_socketpair(int family, int sock_type, int proto, int *nfd, const char *note);

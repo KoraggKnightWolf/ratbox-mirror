@@ -381,6 +381,19 @@ ircd_connect_tryconnect(int fd, void *notused)
 	ircd_connect_callback(F->fd, IRCD_OK);
 }
 
+
+int
+ircd_connect_sockaddr(int fd, struct sockaddr *addr, socklen_t len)
+{
+	fde_t *F = find_fd(fd);
+	
+	if(F == NULL)
+		return 0;
+
+	memcpy(addr, &F->connect.hostaddr, len);
+	return 1;
+}
+
 /*
  * ircd_error_str() - return an error string for the given error condition
  */
