@@ -1,3 +1,16 @@
+androsyn    2005/11/01 15:29:27 UTC	(20051101_1-21050)
+  Log:
+  Add ircd_connect_sockaddr which will copy the F->connect.hostaddr to the 
+  passed struct sockaddr.  Use this in serv_connect_callback()
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2005/11/01 15:19:33 UTC	(20051101_0-21048)
   Log:
   use the results of find_fd() instead of using ircd_fd_table directly
