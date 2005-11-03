@@ -1,3 +1,13 @@
+androsyn    2005/11/03 18:18:21 UTC	(20051103_2-21056)
+  Log:
+  Have the server not release the sendq for a burst until its finished building the burst.
+  This could very easily reduce the number of system calls needed for a burst by 70%.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2005/11/03 17:38:26 UTC	(20051103_1-21054)
   Log:
   memset the iovec before we use it again in the writev code.
