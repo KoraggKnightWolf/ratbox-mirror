@@ -1,3 +1,11 @@
+androsyn    2005/11/03 01:43:36 UTC	(20051103_0-21052)
+  Log:
+  copy sizeof hostaddr instead of sizeof socklen for the dest addr
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2005/11/01 15:29:27 UTC	(20051101_1-21050)
   Log:
   Add ircd_connect_sockaddr which will copy the F->connect.hostaddr to the 
