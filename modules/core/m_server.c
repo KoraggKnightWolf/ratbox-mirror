@@ -958,7 +958,7 @@ burst_modes_TS5(struct Client *client_p, char *chname, dlink_list *list, char fl
 
 		if((count >= MAXMODEPARAMS) || ((cur_len + tlen + 2) > (BUFSIZE - 3)))
 		{
-			sendto_one(client_p, POP_QUEUE, "%s%s %s", buf, mbuf, pbuf);
+			sendto_one(client_p, HOLD_QUEUE, "%s%s %s", buf, mbuf, pbuf);
 
 			mp = mbuf;
 			pp = pbuf;
@@ -974,7 +974,7 @@ burst_modes_TS5(struct Client *client_p, char *chname, dlink_list *list, char fl
 	}
 
 	if(count != 0)
-		sendto_one(client_p, POP_QUEUE, "%s%s %s", buf, mbuf, pbuf);
+		sendto_one(client_p, HOLD_QUEUE, "%s%s %s", buf, mbuf, pbuf);
 }
 
 /* burst_modes_TS6()
@@ -1017,7 +1017,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr,
 
 			/* chop off trailing space and send.. */
 			*(t-1) = '\0';
-			sendto_one(client_p, POP_QUEUE, "%s", buf);
+			sendto_one(client_p, HOLD_QUEUE, "%s", buf);
 			cur_len = mlen;
 			t = buf + mlen;
 		}
@@ -1031,7 +1031,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr,
 	 * chop off trailing space and send.
 	 */
 	*(t-1) = '\0';
-	sendto_one(client_p, POP_QUEUE, "%s", buf);
+	sendto_one(client_p, HOLD_QUEUE, "%s", buf);
 }
 
 /*
@@ -1074,14 +1074,14 @@ burst_TS5(struct Client *client_p)
 			ubuf[1] = '\0';
 		}
 
-		sendto_one(client_p, POP_QUEUE, "NICK %s %d %ld %s %s %s %s :%s",
+		sendto_one(client_p, HOLD_QUEUE, "NICK %s %d %ld %s %s %s %s :%s",
 			   target_p->name, target_p->hopcount + 1,
 			   (long) target_p->tsinfo, ubuf,
 			   target_p->username, target_p->host,
 			   target_p->user->server, target_p->info);
 
 		if(ConfigFileEntry.burst_away && !EmptyString(target_p->user->away))
-			sendto_one(client_p, POP_QUEUE, ":%s AWAY :%s",
+			sendto_one(client_p, HOLD_QUEUE, ":%s AWAY :%s",
 				   target_p->name, target_p->user->away);
 
 		hclientinfo.target = target_p;
@@ -1119,7 +1119,7 @@ burst_TS5(struct Client *client_p)
 			{
 				t--;
 				*t = '\0';
-				sendto_one(client_p, POP_QUEUE, "%s", buf);
+				sendto_one(client_p, HOLD_QUEUE, "%s", buf);
 				cur_len = mlen;
 				t = buf + mlen;
 			}
@@ -1134,7 +1134,7 @@ burst_TS5(struct Client *client_p)
 		/* remove trailing space */
 		t--;
 		*t = '\0';
-		sendto_one(client_p, POP_QUEUE, "%s", buf);
+		sendto_one(client_p, HOLD_QUEUE, "%s", buf);
 
 		burst_modes_TS5(client_p, chptr->chname, &chptr->banlist, 'b');
 
@@ -1145,7 +1145,7 @@ burst_TS5(struct Client *client_p)
 			burst_modes_TS5(client_p, chptr->chname, &chptr->invexlist, 'I');
 
 		if(IsCapable(client_p, CAP_TB) && chptr->topic != NULL)
-			sendto_one(client_p, POP_QUEUE, ":%s TB %s %ld %s%s:%s",
+			sendto_one(client_p, HOLD_QUEUE, ":%s TB %s %ld %s%s:%s",
 				   me.name, chptr->chname, (long) chptr->topic_time,
 				   ConfigChannel.burst_topicwho ? chptr->topic_info : "",
 				   ConfigChannel.burst_topicwho ? " " : "",
@@ -1200,7 +1200,7 @@ burst_TS6(struct Client *client_p)
 		}
 
 		if(has_id(target_p))
-			sendto_one(client_p, POP_QUEUE, ":%s UID %s %d %ld %s %s %s %s %s :%s",
+			sendto_one(client_p, HOLD_QUEUE, ":%s UID %s %d %ld %s %s %s %s %s :%s",
 				   target_p->servptr->id, target_p->name,
 				   target_p->hopcount + 1, 
 				   (long) target_p->tsinfo, ubuf,
@@ -1208,7 +1208,7 @@ burst_TS6(struct Client *client_p)
 				   IsIPSpoof(target_p) ? "0" : target_p->sockhost,
 				   target_p->id, target_p->info);
 		else
-			sendto_one(client_p, POP_QUEUE, "NICK %s %d %ld %s %s %s %s :%s",
+			sendto_one(client_p, HOLD_QUEUE, "NICK %s %d %ld %s %s %s %s :%s",
 					target_p->name,
 					target_p->hopcount + 1,
 					(long) target_p->tsinfo,
@@ -1217,7 +1217,7 @@ burst_TS6(struct Client *client_p)
 					target_p->user->server, target_p->info);
 
 		if(ConfigFileEntry.burst_away && !EmptyString(target_p->user->away))
-			sendto_one(client_p, POP_QUEUE, ":%s AWAY :%s",
+			sendto_one(client_p, HOLD_QUEUE, ":%s AWAY :%s",
 				   use_id(target_p),
 				   target_p->user->away);
 
@@ -1255,7 +1255,7 @@ burst_TS6(struct Client *client_p)
 			if(cur_len + tlen >= BUFSIZE - 3)
 			{
 				*(t-1) = '\0';
-				sendto_one(client_p, POP_QUEUE, "%s", buf);
+				sendto_one(client_p, HOLD_QUEUE, "%s", buf);
 				cur_len = mlen;
 				t = buf + mlen;
 			}
@@ -1269,7 +1269,7 @@ burst_TS6(struct Client *client_p)
 
 		/* remove trailing space */
 		*(t-1) = '\0';
-		sendto_one(client_p, POP_QUEUE, "%s", buf);
+		sendto_one(client_p, HOLD_QUEUE, "%s", buf);
 
 		if(dlink_list_length(&chptr->banlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->banlist, 'b');
@@ -1283,7 +1283,7 @@ burst_TS6(struct Client *client_p)
 			burst_modes_TS6(client_p, chptr, &chptr->invexlist, 'I');
 
 		if(IsCapable(client_p, CAP_TB) && chptr->topic != NULL)
-			sendto_one(client_p, POP_QUEUE, ":%s TB %s %ld %s%s:%s",
+			sendto_one(client_p, HOLD_QUEUE, ":%s TB %s %ld %s%s:%s",
 				   me.id, chptr->chname, (long) chptr->topic_time,
 				   ConfigChannel.burst_topicwho ? chptr->topic_info : "",
 				   ConfigChannel.burst_topicwho ? " " : "",
