@@ -1,3 +1,12 @@
+leeh        2005/11/03 19:37:44 UTC	(20051103_3-21060)
+  Log:
+  - add in a numeric patchlevel
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2005/11/03 18:18:21 UTC	(20051103_2-21056)
   Log:
   Have the server not release the sendq for a burst until its finished building the burst.
