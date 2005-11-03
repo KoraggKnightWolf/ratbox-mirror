@@ -677,6 +677,7 @@ ircd_linebuf_flush(int fd, buf_head_t * bufhead)
 		int xret;
 		static struct iovec vec[UIO_MAXIOV];
 
+		memset(vec, 0, sizeof(vec));
 		/* Check we actually have a first buffer */
 		if(bufhead->list.head == NULL)
 		{
@@ -692,6 +693,14 @@ ircd_linebuf_flush(int fd, buf_head_t * bufhead)
 		{
 			errno = EWOULDBLOCK;
 			return -1;
+
+		}
+
+		if(bufline->flushing)
+		{
+			vec[x].iov_base = bufline->buf + bufhead->writeofs;
+			vec[x++].iov_len = bufline->len - bufhead->writeofs;
+			ptr = ptr->next;
 		}
 
 		do
@@ -700,18 +709,13 @@ ircd_linebuf_flush(int fd, buf_head_t * bufhead)
 				break;
 
 			bufline = ptr->data;
-
 			if(!bufline->terminated)
 				break;
 		
-			if(!bufline->flushing)
-			{
-				bufhead->writeofs = 0;
-			}
-
-			vec[x].iov_base = bufline->buf + bufhead->writeofs;
-			vec[x].iov_len = bufline->len - bufhead->writeofs;
+			vec[x].iov_base = bufline->buf;
+			vec[x].iov_len = bufline->len;
 			ptr = ptr->next;
+
 		} while(++x < UIO_MAXIOV);
 
 		if(x == 0)
@@ -730,25 +734,29 @@ ircd_linebuf_flush(int fd, buf_head_t * bufhead)
 		{
 			bufline = ptr->data;
 
-			if((bufline->flushing == 0 && xret >= bufline->len)
-			   || (bufline->flushing == 1 && xret >= bufline->len - bufhead->writeofs))
+			if(bufline->flushing)
 			{
-				bufhead->writeofs = 0;
-				if(bufline->flushing == 0)
-					xret -= bufline->len;
-				else
-					xret -= bufhead->writeofs;
-
+				if(xret >= bufline->len - bufhead->writeofs)
+				{
+					xret = xret - (bufline->len - bufhead->writeofs);
+					ptr = ptr->next;
+					ircd_linebuf_done_line(bufhead, bufline, bufhead->list.head);
+					continue;
+				}	
+			}
+			if(xret >= bufline->len) 
+			{
+				xret = xret - bufline->len;
 				ptr = ptr->next;
-				lircd_assert(bufhead->len >= 0);
 				ircd_linebuf_done_line(bufhead, bufline, bufhead->list.head);
 			}
-			else
+			else 
 			{
 				bufline->flushing = 1;
-				bufhead->writeofs += xret;
+				bufhead->writeofs = xret;
 				break;
 			}
+			
 		}
 
 		return retval;
