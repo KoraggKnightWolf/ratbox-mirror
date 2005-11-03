@@ -1,3 +1,13 @@
+androsyn    2005/11/03 17:38:26 UTC	(20051103_1-21054)
+  Log:
+  memset the iovec before we use it again in the writev code.
+  properly deal with buffers that are partially written out.
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+
+
 androsyn    2005/11/03 01:43:36 UTC	(20051103_0-21052)
   Log:
   copy sizeof hostaddr instead of sizeof socklen for the dest addr
