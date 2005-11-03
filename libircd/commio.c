@@ -279,7 +279,7 @@ ircd_connect_tcp(int fd, struct sockaddr *dest,
 	F->connect.callback = callback;
 	F->connect.data = data;
 
-	memcpy(&F->connect.hostaddr, dest, socklen);
+	memcpy(&F->connect.hostaddr, dest, sizeof(F->connect.hostaddr));
 
 	/* Note that we're using a passed sockaddr here. This is because
 	 * generally you'll be bind()ing to a sockaddr grabbed from
