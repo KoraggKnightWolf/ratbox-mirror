@@ -1,3 +1,11 @@
+androsyn    2005/11/04 21:32:42 UTC	(20051104_8-21078)
+  Log:
+  for the non-gcc case of likely/unlikely we want to still have the actual conditional statement left behind..oops
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+
+
 androsyn    2005/11/04 21:01:25 UTC	(20051104_7-21076)
   Log:
   have the accept loop just do a while(1) instead of while(listener != NULL) as listener will never go NULL
