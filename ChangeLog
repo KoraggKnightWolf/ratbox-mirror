@@ -1,3 +1,12 @@
+androsyn    2005/11/04 03:41:17 UTC	(20051104_0-21062)
+  Log:
+  move string.h/strings.h includes to ircd_lib.h from linebuf.c
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+
+
 leeh        2005/11/03 19:37:44 UTC	(20051103_3-21060)
   Log:
   - add in a numeric patchlevel
