@@ -793,7 +793,7 @@ fork_server(struct Client *server)
 {
 	int ctrl_fds[2];
 	int data_fds[2];
-
+	char maxfd[6];
 	char fd_str[4][6];
 	char *kid_argv[7];
 	char slink[] = "-slink";
@@ -810,6 +810,8 @@ fork_server(struct Client *server)
 	ircd_snprintf(fd_str[0], sizeof(fd_str[0]), "%d", ctrl_fds[1]);
 	ircd_snprintf(fd_str[1], sizeof(fd_str[1]), "%d", data_fds[1]);
 	ircd_snprintf(fd_str[2], sizeof(fd_str[2]), "%d", server->localClient->fd);
+	ircd_snprintf(maxfd, sizeof(maxfd), "%d", HARD_FDLIMIT);
+	setenv("MAXFD", maxfd, 1);	  
 
         kid_argv[0] = slink;
         kid_argv[1] = fd_str[0];

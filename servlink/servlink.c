@@ -68,24 +68,34 @@ main(int argc, char *argv[])
 {
 	int max_fd = 0;
 	int i, x;
+	int maxconnects;
+	char *tmaxconnects;
 #ifdef SERVLINK_DEBUG
 	int GDBAttached = 0;
 
 	while (!GDBAttached)
 		sleep(1);
 #endif
+	tmaxconnects = getenv("MAXFD");
 
 	/* Make sure we are running under ircd.. */
 	
-	if(argc != 4 || strcmp(argv[0], "-slink"))
+	if(argc != 4 || strcmp(argv[0], "-slink") || tmaxconnects == NULL)
 		usage();	/* exits */
 
-
+	maxconnects = atoi(tmaxconnects);
+	
 	for (i = 0; i < 3; i++)
 	{
 		fds[i].fd = atoi(argv[i + 1]);
 		if(fds[i].fd < 0)
 			exit(1);
+	}
+
+	for(i = 0; i < maxconnects; i++)
+	{
+		if(i != fds[0].fd && i != fds[1].fd && i != fds[2].fd)
+			close(i);
 	}
 
 	for (i = 0; i < 3; i++)
