@@ -1,3 +1,11 @@
+androsyn    2005/11/04 21:01:25 UTC	(20051104_7-21076)
+  Log:
+  have the accept loop just do a while(1) instead of while(listener != NULL) as listener will never go NULL
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2005/11/04 20:40:09 UTC	(20051104_6-21074)
   Log:
   pass MAXFD variable to servlink and then close all fds up to that number
