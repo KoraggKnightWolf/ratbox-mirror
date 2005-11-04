@@ -53,8 +53,8 @@
 #ifdef unlikely
 #undef unlikely
 #endif
-#define likely(x)
-#define unlikely(x)
+#define likely(x)	(x)
+#define unlikely(x)	(x)
 #endif
 
 
