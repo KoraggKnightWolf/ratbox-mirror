@@ -51,7 +51,7 @@ static const struct in6_addr in6addr_any =
 
 static PF accept_connection;
 
-static struct Listener *ListenerPollList = NULL;
+static dlink_list listener_list;
 
 static struct Listener *
 make_listener(struct irc_sockaddr_storage *addr)
@@ -62,7 +62,6 @@ make_listener(struct irc_sockaddr_storage *addr)
 	listener->name = me.name;
 	listener->fd = -1;
 	memcpy(&listener->addr, addr, sizeof(struct irc_sockaddr_storage));
-	listener->next = NULL;
 	return listener;
 }
 
@@ -72,25 +71,8 @@ free_listener(struct Listener *listener)
 	s_assert(NULL != listener);
 	if(listener == NULL)
 		return;
-	/*
-	 * remove from listener list
-	 */
-	if(listener == ListenerPollList)
-		ListenerPollList = listener->next;
-	else
-	{
-		struct Listener *prev = ListenerPollList;
-		for (; prev; prev = prev->next)
-		{
-			if(listener == prev->next)
-			{
-				prev->next = listener->next;
-				break;
-			}
-		}
-	}
-
-	/* free */
+	
+	ircd_dlinkDelete(&listener->node, &listener_list);
 	ircd_free(listener);
 }
 
@@ -130,10 +112,12 @@ get_listener_name(const struct Listener *listener)
 void
 show_ports(struct Client *source_p)
 {
-	struct Listener *listener = 0;
-
-	for (listener = ListenerPollList; listener; listener = listener->next)
+	struct Listener *listener;
+	dlink_node *ptr;
+	
+	DLINK_FOREACH(ptr, listener_list.head)
 	{
+		listener = ptr->data;
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSPLINE, 
 				   form_str(RPL_STATSPLINE), 'P',
 #ifdef IPV6
@@ -258,9 +242,11 @@ find_listener(struct irc_sockaddr_storage *addr)
 {
 	struct Listener *listener = NULL;
 	struct Listener *last_closed = NULL;
+	dlink_node *ptr;
 
-	for (listener = ListenerPollList; listener; listener = listener->next)
+	DLINK_FOREACH(ptr, listener_list.head)
 	{
+		listener = ptr->data;
 		if(addr->ss_family != listener->addr.ss_family)
 			continue;
 		
@@ -379,8 +365,7 @@ add_listener(int port, const char *vhost_ip, int family)
 	else
 	{
 		listener = make_listener(&vaddr);
-		listener->next = ListenerPollList;
-		ListenerPollList = listener;
+		ircd_dlinkAdd(listener, &listener->node, &listener_list);
 	}
 
 	listener->fd = -1;
@@ -421,13 +406,11 @@ void
 close_listeners()
 {
 	struct Listener *listener;
-	struct Listener *listener_next = 0;
-	/*
-	 * close all 'extra' listening ports we have
-	 */
-	for (listener = ListenerPollList; listener; listener = listener_next)
+	dlink_node *ptr, *next;
+
+	DLINK_FOREACH_SAFE(ptr, next, listener_list.head)
 	{
-		listener_next = listener->next;
+		listener = ptr->data;
 		close_listener(listener);
 	}
 }

@@ -31,7 +31,7 @@ struct Client;
 
 struct Listener
 {
-	struct Listener *next;	/* list node pointer */
+	dlink_node node;
 	const char *name;	/* listener name */
 	int fd;			/* file descriptor */
 	int ref_count;		/* number of connection references */
@@ -39,7 +39,6 @@ struct Listener
 	int index;		/* index into poll array */
 	pid_t ssl_pid;		/* ssl listener */
 	struct irc_sockaddr_storage addr;
-	struct DNSQuery *dns_query;
 	char vhost[HOSTLEN + 1];	/* virtual name of listener */
 };
 
