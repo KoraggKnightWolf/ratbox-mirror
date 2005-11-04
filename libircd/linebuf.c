@@ -26,19 +26,6 @@
 
 #include "ircd_lib.h"
 
-#ifdef STRING_WITH_STRINGS
-# include <string.h>
-# include <strings.h>
-#else
-# ifdef HAVE_STRING_H
-#  include <string.h>
-# else
-#  ifdef HAVE_STRINGS_H
-#   include <strings.h>
-#  endif
-# endif
-#endif
-
 #ifndef NO_BLOCKHEAP
 static BlockHeap *ircd_linebuf_heap;
 #endif

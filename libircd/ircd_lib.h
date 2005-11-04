@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <string.h>
 #include <errno.h>
 #include <ctype.h>
 #include <assert.h>
@@ -18,6 +17,20 @@
 
 #include "setup.h"
 #include "config.h"
+
+#ifdef STRING_WITH_STRINGS
+# include <string.h>
+# include <strings.h> 
+#else  
+# ifdef HAVE_STRING_H
+#  include <string.h>
+# else  
+#  ifdef HAVE_STRINGS_H
+#   include <strings.h>
+#  endif  
+# endif  
+#endif  
+
 
 #ifdef __GNUC__
 #ifdef likely
