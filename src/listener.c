@@ -493,9 +493,8 @@ accept_connection(int pfd, void *data)
 	 */
 
 
-	 while(listener != NULL) /* loop until we again EAGAIN or listener goes null */
+	 while(1)
 	 {
-
 		fd = ircd_accept(listener->fd, (struct sockaddr *)&sai, &addrlen);
 
 		if(fd < 0)
