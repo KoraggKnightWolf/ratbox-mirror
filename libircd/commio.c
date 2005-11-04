@@ -695,9 +695,10 @@ ircd_open(int fd, unsigned int type, const char *desc)
 void
 ircd_close(int fd)
 {
-	fde_t *F = find_fd(fd);
-	lircd_assert(F->flags.open);
 	int type;
+	fde_t *F = find_fd(fd);
+
+	lircd_assert(F->flags.open);
 	/* All disk fd's MUST go through file_close() ! */
 	lircd_assert(F->type != FD_FILE);
 	if(unlikely(F->type == FD_FILE))
