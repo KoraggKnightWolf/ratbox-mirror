@@ -32,7 +32,7 @@ ircd_spawn_process(const char *path, const char **argv)
 	pid_t pid;
 	if(!(pid = vfork()))
 	{
-		execv(path, (void *)argv); /* make gcc shut up */
+		execv(path, (const void *)argv); /* make gcc shut up */
 		_exit(1); /* if we're still here, we're screwed */
 	}
 	return(pid);
