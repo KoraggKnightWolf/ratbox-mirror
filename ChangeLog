@@ -1,3 +1,12 @@
+androsyn    2005/11/05 03:12:40 UTC	(20051105_4-21088)
+  Log:
+  remove -Wno-unused from the flags for --enable-warnings
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2005/11/05 03:11:25 UTC	(20051105_3-21086)
   Log:
   Add a UNUSED macro for gcc to tell it that some arguments are unused on purpose.
