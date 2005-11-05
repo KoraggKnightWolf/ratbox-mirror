@@ -1,3 +1,13 @@
+androsyn    2005/11/05 01:25:32 UTC	(20051105_1-21082)
+  Log:
+  Build ircd_lexer.c with flex 2.5.4a as the output from
+  flex 2.5.31 doesn't play so nice with gcc 2.95
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd_lexer.c (File Modified) 
+
+
 androsyn    2005/11/05 00:41:44 UTC	(20051105_0-21080)
   Log:
   pass servlink fds via the environment.  make the command line passed to servlink a bit more pretty
