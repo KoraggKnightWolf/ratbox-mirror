@@ -462,7 +462,7 @@ quote_splitusers(struct Client *source_p, int newval)
  * set options while running
  */
 static int
-mo_set(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_set(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	int newval;
 	int i, n;

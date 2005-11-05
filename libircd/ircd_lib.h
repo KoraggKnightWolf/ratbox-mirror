@@ -31,8 +31,14 @@
 # endif  
 #endif  
 
-
 #ifdef __GNUC__
+
+#ifdef UNUSED
+#undef UNUSED
+#endif
+
+#define UNUSED(x) x __attribute__((unused))
+
 #ifdef likely
 #undef likely
 #endif
@@ -46,7 +52,11 @@
 
 #define likely(x)       __builtin_expect(!!(x), 1)
 #define unlikely(x)     __builtin_expect(!!(x), 0)
-#else
+
+#else /* !__GNUC__ */
+
+#define UNUSED(x) x
+
 #ifdef likely
 #undef likely
 #endif

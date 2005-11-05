@@ -58,7 +58,7 @@ DECLARE_MODULE_AV1(help, NULL, NULL, help_clist, NULL, NULL, "$Revision: 19256 $
  *      parv[0] = sender prefix
  */
 static int
-m_help(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_help(struct Client *UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	static time_t last_used = 0;
 
@@ -88,7 +88,7 @@ m_help(struct Client *client_p, struct Client *source_p, int parc, const char *p
  *      parv[0] = sender prefix
  */
 static int
-mo_help(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_help(struct Client *UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	dohelp(source_p, HELP_OPER, parc > 1 ? parv[1] : NULL);
 	return 0;
@@ -100,7 +100,7 @@ mo_help(struct Client *client_p, struct Client *source_p, int parc, const char *
  *      parv[0] = sender prefix
  */
 static int
-mo_uhelp(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_uhelp(struct Client *UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	dohelp(source_p, HELP_USER, parc > 1 ? parv[1] : NULL);
 	return 0;

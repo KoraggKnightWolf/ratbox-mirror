@@ -61,7 +61,7 @@ static int can_join(struct Client *source_p, struct Channel *chptr, char *key);
 
 static void set_final_mode(struct Client *, struct Channel *, 
 			struct Mode *, struct Mode *);
-static void remove_our_modes(struct Channel *chptr, struct Client *source_p);
+static void remove_our_modes(struct Channel *chptr);
 static void remove_ban_list(struct Channel *chptr, struct Client *source_p,
 			    dlink_list *list, char c, int cap, int mems);
 
@@ -454,7 +454,7 @@ ms_join(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* Lost the TS, other side wins, so remove modes on this side */
 	if(!keep_our_modes)
 	{
-		remove_our_modes(chptr, source_p);
+		remove_our_modes(chptr);
 		sendto_channel_local(ALL_MEMBERS, chptr,
 				     ":%s NOTICE %s :*** Notice -- TS for %s changed from %ld to %ld",
 				     me.name, chptr->chname, chptr->chname, (long) oldts, (long) newts);
@@ -655,7 +655,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* Lost the TS, other side wins, so remove modes on this side */
 	if(!keep_our_modes)
 	{
-		remove_our_modes(chptr, source_p);
+		remove_our_modes(chptr);
 		sendto_channel_local(ALL_MEMBERS, chptr,
 				     ":%s NOTICE %s :*** Notice -- TS for %s changed from %ld to %ld",
 				     me.name, chptr->chname, chptr->chname,
@@ -1161,7 +1161,7 @@ set_final_mode(struct Client *source_p, struct Channel *chptr,
  * side effects	- 
  */
 static void
-remove_our_modes(struct Channel *chptr, struct Client *source_p)
+remove_our_modes(struct Channel *chptr)
 {
 	struct membership *msptr;
 	dlink_node *ptr;

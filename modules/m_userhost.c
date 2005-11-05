@@ -52,7 +52,7 @@ DECLARE_MODULE_AV1(userhost, NULL, NULL, userhost_clist, NULL, NULL, "$Revision:
  * information only (no spurious AWAY labels or channels).
  */
 static int
-m_userhost(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_userhost(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 	char response[NICKLEN * 2 + USERLEN + HOSTLEN + 30];

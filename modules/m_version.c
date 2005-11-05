@@ -36,7 +36,7 @@
 #include "parse.h"
 #include "modules.h"
 
-static char *confopts(struct Client *source_p);
+static char *confopts(void);
 
 static int m_version(struct Client *, struct Client *, int, const char **);
 static int mo_version(struct Client *, struct Client *, int, const char **);
@@ -77,7 +77,7 @@ m_version(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_VERSION, form_str(RPL_VERSION),
 			   ircd_version, serno,
-			   me.name, confopts(source_p), TS_CURRENT,
+			   me.name, confopts(), TS_CURRENT,
 			   ServerInfo.sid);
 
 	show_isupport(source_p);
@@ -97,7 +97,7 @@ mo_version(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_VERSION, form_str(RPL_VERSION),
 				   ircd_version, serno, 
-				   me.name, confopts(source_p), TS_CURRENT,
+				   me.name, confopts(), TS_CURRENT,
 				   ServerInfo.sid);
 		show_isupport(source_p);
 	}
@@ -106,12 +106,12 @@ mo_version(struct Client *client_p, struct Client *source_p, int parc, const cha
 }
 
 /* confopts()
- * input  - client pointer
+ * input  - 
  * output - ircd.conf option string
  * side effects - none
  */
 static char *
-confopts(struct Client *source_p)
+confopts(void)
 {
 	static char result[15];
 	char *p;

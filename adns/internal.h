@@ -327,7 +327,7 @@ struct adns__state {
 int adns__setnonblock(adns_state ads, int fd); /* => errno value */
 
 /* From general.c: */
-
+#if 0
 void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
 		 int serv, adns_query qu, const char *fmt, va_list al);
 
@@ -337,7 +337,11 @@ void adns__warn(adns_state ads, int serv, adns_query qu,
 		const char *fmt, ...);
 void adns__diag(adns_state ads, int serv, adns_query qu,
 		const char *fmt, ...);
-
+#endif
+#define adns__vdiag(...) do {} while(0)
+#define adns__debug(...) do {} while(0)
+#define adns__warn(...)  do {} while(0)
+#define adns__diag(...)  do {} while(0)
 int adns__vbuf_ensure(vbuf *vb, int want);
 int adns__vbuf_appendstr(vbuf *vb, const char *xdata); /* does not include nul */
 int adns__vbuf_append(vbuf *vb, const char *xdata, int len);
@@ -370,6 +374,9 @@ void adns__isort(void *array, int nobjs, int sz, void *tempbuf,
 
 void adns__sigpipe_protect(adns_state);
 void adns__sigpipe_unprotect(adns_state);
+#define adns__sigpipe_protect(x)
+#define adns__sigpipe_unprotect(x)
+
 /* If SIGPIPE protection is not disabled, will block all signals except
  * SIGPIPE, and set SIGPIPE's disposition to SIG_IGN.  (And then restore.)
  * Each call to _protect must be followed by a call to _unprotect before

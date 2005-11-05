@@ -43,8 +43,6 @@
 struct monitor *monitorTable[MONITOR_HASH_SIZE];
 BlockHeap *monitor_heap;
 
-static void cleanup_monitor(void *unused);
-
 void
 init_monitor(void)
 {

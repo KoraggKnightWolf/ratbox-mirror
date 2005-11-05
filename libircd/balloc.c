@@ -250,7 +250,7 @@ get_block(size_t size)
 
 
 static void
-block_heap_gc(void *unused)
+block_heap_gc(void * UNUSED(unused))
 {
 	dlink_node *ptr;
 	DLINK_FOREACH(ptr, heap_lists.head)

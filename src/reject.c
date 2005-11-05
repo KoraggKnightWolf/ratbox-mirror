@@ -92,7 +92,7 @@ add_eline(struct ConfItem *aconf)
 
 
 static void
-reject_exit(void *unused)
+reject_exit(void * UNUSED(unused))
 {
 	struct Client *client_p;
 	dlink_node *ptr, *ptr_next;
@@ -120,7 +120,7 @@ reject_exit(void *unused)
 }
 
 static void
-reject_expires(void *unused)
+reject_expires(void * UNUSED(unused))
 {
 	dlink_node *ptr, *next;
 	patricia_node_t *pnode;
@@ -251,7 +251,7 @@ remove_reject(const char *ip)
 	return 0;
 }
 
-
+#if 0
 static int
 add_ipline(struct ConfItem *aconf, patricia_tree_t *t, struct sockaddr *addr, int cidr)
 {
@@ -273,7 +273,7 @@ delete_ipline(struct ConfItem *aconf, patricia_tree_t *t)
 		free_conf(aconf);
 	}
 }
-
+#endif
 
 static struct ConfItem *
 find_ipline(patricia_tree_t *t, struct sockaddr *addr)

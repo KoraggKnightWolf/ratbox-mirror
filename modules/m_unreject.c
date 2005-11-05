@@ -48,7 +48,7 @@ DECLARE_MODULE_AV1(unreject, NULL, NULL, unreject_clist, NULL, NULL, "$Revision:
  *
  */
 static int
-mo_unreject(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_unreject(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_ban_time == 0 ||
 	   ConfigFileEntry.reject_duration == 0)

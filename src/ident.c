@@ -144,7 +144,7 @@ ID success/failure username
 */
 
 static void
-write_sendq(int fd, void *unused)
+write_sendq(int UNUSED(fd), void *UNUSED(unused))
 {
 	int retlen;
 	if(ircd_linebuf_len(&sendq) > 0)
@@ -354,7 +354,7 @@ parse_request(void)
 
 
 static void
-read_request(int fd, void *unusued)
+read_request(int fd, void * UNUSED(unusued))
 {
         int length;
         while((length = ircd_read(fd, readBuf, sizeof(readBuf))) > 0)
@@ -373,25 +373,25 @@ read_request(int fd, void *unusued)
 }
 
 static void
-ilogcb(const char *str)
+ilogcb(const char *UNUSED(str))
 {
 	return;
 }
  
 static void
-restartcb(const char *str)
+restartcb(const char *UNUSED(str))
 {
         exit(0);
 }
  
 static void
-diecb(const char *str)
+diecb(const char *UNUSED(str))
 {
         exit(0);  
 }
 
 
-int main(int argc, char **argv)
+int main(int UNUSED(argc), char **UNUSED(argv))
 {
 	char *tifd, *tofd, *tmaxfd, *tident_timeout;
 	int maxfd, x;

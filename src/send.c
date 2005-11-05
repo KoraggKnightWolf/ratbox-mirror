@@ -162,7 +162,7 @@ send_ircd_linebuf_remote(struct Client *to, struct Client *from, buf_head_t *lin
  *
  * inputs	- fd to have queue sent, client we're sending to
  * outputs	- contents of queue
- * side effects - write is rescheduled if queue isnt emptied
+ * side effects - write is dns.heduled if queue isnt emptied
  */
 void
 send_queued_write(int fd, void *data)
@@ -230,10 +230,10 @@ send_queued_write(int fd, void *data)
  *
  * inputs	- fd to have queue sent, client we're sending to
  * outputs	- contents of queue
- * side effects - write is rescheduled if queue isnt emptied
+ * side effects - write is dns.heduled if queue isnt emptied
  */
 void
-send_queued_slink_write(int fd, void *data)
+send_queued_slink_write(int UNUSED(fd), void *data)
 {
 	struct Client *to = data;
 	int retlen;
@@ -283,7 +283,7 @@ send_queued_slink_write(int fd, void *data)
 		}
 	}
 
-	/* if we have any more data, reschedule a write */
+	/* if we have any more data, dns.hedule a write */
 	if(to->localClient->slinkq_len)
 		ircd_setselect(to->localClient->ctrlfd,
 			       IRCD_SELECT_WRITE, send_queued_slink_write, to, 0);

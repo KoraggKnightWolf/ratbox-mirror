@@ -48,7 +48,7 @@
 #include "patricia.h"
 #include "reject.h"
 #include "cache.h"
-#include "res.h"
+#include "dns.h"
 #include "banconf.h"
 #include "operhash.h"
 
@@ -73,7 +73,7 @@ dlink_list service_list;
 /* internally defined functions */
 static void set_default_conf(void);
 static void validate_conf(void);
-static void read_conf(FILE *);
+static void read_conf(void);
 static void clear_out_old_conf(void);
 static char *strip_tabs(char *dest, const unsigned char *src, size_t len);
 
@@ -648,10 +648,6 @@ rehash(int sig)
 void
 rehash_bans(int sig)
 {
-	FILE *file;
-	char buf[MAXPATHLEN];
-	int i;
-
 	if(sig != 0)
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				"Got signal SIGUSR2, reloading ban confs");
@@ -811,7 +807,7 @@ set_default_conf(void)
  * side effects	- Read configuration file.
  */
 static void
-read_conf(FILE * file)
+read_conf(void)
 {
 	lineno = 0;
 
@@ -868,7 +864,7 @@ validate_conf(void)
  * side effects	- none
  */
 struct ConfItem *
-conf_connect_allowed(struct sockaddr *addr, int aftype)
+conf_connect_allowed(struct sockaddr *addr, int UNUSED(aftype))
 {
 	struct ConfItem *aconf = find_dline(addr);
 
@@ -1138,7 +1134,7 @@ read_conf_files(int cold)
 		clear_out_old_conf();
 	}
 
-	read_conf(conf_fbfile_in);
+	read_conf();
 	fclose(conf_fbfile_in);
 }
 
@@ -1317,7 +1313,7 @@ conf_fgets(char *lbuf, int max_size, FILE * fb)
 }
 
 int
-conf_yy_fatal_error(const char *msg)
+conf_yy_fatal_error(const char * UNUSED(msg))
 {
 	return (0);
 }

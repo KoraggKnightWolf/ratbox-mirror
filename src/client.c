@@ -233,7 +233,7 @@ free_client(struct Client *client_p)
  */
 
 static void
-check_pings(void *notused)
+check_pings(void * UNUSED(notused))
 {
 	check_pings_list(&lclient_list);
 	check_pings_list(&serv_list);
@@ -510,7 +510,7 @@ check_banned_lines(void)
  * side effects - check_klines() is called, kline_queued unset
  */
 void
-check_klines_event(void *unused)
+check_klines_event(void * UNUSED(unused))
 {
 	kline_queued = 0;
 	check_klines();
@@ -853,7 +853,7 @@ log_client_name(struct Client *target_p, int showip)
 }
 
 static void
-free_exited_clients(void *unused)
+free_exited_clients(void * UNUSED(unused))
 {
 	dlink_node *ptr, *next;
 	struct Client *target_p;
@@ -1027,7 +1027,7 @@ recurse_remove_clients(struct Client *source_p, const char *comment)
 static void
 remove_dependents(struct Client *client_p,
 		  struct Client *source_p,
-		  struct Client *from, const char *comment, const char *comment1)
+		  const char *comment1)
 {
 	struct Client *to;
 	static char myname[HOSTLEN + 1];
@@ -1056,7 +1056,7 @@ remove_dependents(struct Client *client_p,
 }
 
 void
-exit_aborted_clients(void *unused)
+exit_aborted_clients(void * UNUSED(unused))
 {
 	struct abort_client *abt;
 	dlink_node *ptr, *next;
@@ -1128,7 +1128,7 @@ dead_link(struct Client *client_p)
 
 /* This does the remove of the user from channels..local or remote */
 static inline void
-exit_generic_client(struct Client *client_p, struct Client *source_p, struct Client *from,
+exit_generic_client(struct Client * UNUSED(client_p), struct Client *source_p, struct Client * UNUSED(from),
 		   const char *comment)
 {
 	dlink_node *ptr, *next_ptr;
@@ -1201,7 +1201,7 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
  */
 
 static int
-exit_unknown_client(struct Client *client_p, struct Client *source_p, struct Client *from,
+exit_unknown_client(struct Client *client_p, struct Client *source_p, struct Client * UNUSED(from),
 		  const char *comment)
 {
 	delete_auth_queries(source_p);
@@ -1238,7 +1238,7 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 	strcat(comment1, " ");
 	strcat(comment1, source_p->name);							        		                		                                                                      		
 	if(source_p->serv != NULL)
-		remove_dependents(client_p, source_p, from, comment, comment1);
+		remove_dependents(client_p, source_p, comment1);
 
 	if(source_p->servptr && source_p->servptr->serv)
 		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
@@ -1272,8 +1272,8 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 }
 
 static int
-qs_server(struct Client *client_p, struct Client *source_p, struct Client *from, 
-		  const char *comment)
+qs_server(struct Client * UNUSED(client_p), struct Client *source_p, struct Client * UNUSED(from), 
+		  const char * UNUSED(comment))
 {
 	struct Client *target_p;
 
@@ -1297,7 +1297,7 @@ qs_server(struct Client *client_p, struct Client *source_p, struct Client *from,
 }
 
 static int
-exit_local_server(struct Client *client_p, struct Client *source_p, struct Client *from, 
+exit_local_server(struct Client *client_p, struct Client *source_p, struct Client * UNUSED(from), 
 		  const char *comment)
 {
 	static char comment1[(HOSTLEN*2)+2];
@@ -1339,7 +1339,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	strcat(comment1, source_p->name);
 
 	if(source_p->serv != NULL)
-		remove_dependents(client_p, source_p, from, comment, comment1);
+		remove_dependents(client_p, source_p, comment1);
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s was connected"
 			     " for %ld seconds.  %d/%d sendK/recvK.",

@@ -84,7 +84,7 @@ static int build_target_list(int p_or_n, const char *command,
 
 static int flood_attack_client(int p_or_n, struct Client *source_p, struct Client *target_p);
 static int flood_attack_channel(int p_or_n, struct Client *source_p,
-				struct Channel *chptr, char *chname);
+				struct Channel *chptr);
 static struct Client *find_userhost(const char *, const char *, int *);
 
 #define ENTITY_NONE    0
@@ -109,7 +109,7 @@ static void msg_channel_flags(int p_or_n, const char *command,
 static void msg_client(int p_or_n, const char *command,
 		       struct Client *source_p, struct Client *target_p, const char *text);
 
-static void handle_special(int p_or_n, const char *command,
+static void handle_special(const char *command,
 			 struct Client *client_p, struct Client *source_p, const char *nick, const char *text);
 
 /*
@@ -370,7 +370,7 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 
 		if(strchr(nick, '@') || (IsOper(source_p) && (*nick == '$')))
 		{
-			handle_special(p_or_n, command, client_p, source_p, nick, text);
+			handle_special(command, client_p, source_p, nick, text);
 			continue;
 		}
 
@@ -442,7 +442,7 @@ msg_channel(int p_or_n, const char *command,
 	if((result = can_send(chptr, source_p, NULL)))
 	{
 		if(result == CAN_SEND_OPV ||
-		   !flood_attack_channel(p_or_n, source_p, chptr, chptr->chname))
+		   !flood_attack_channel(p_or_n, source_p, chptr))
 		{
 			sendto_channel_flags(client_p, ALL_MEMBERS, source_p, chptr, 
 					      "%s %s :%s",
@@ -505,7 +505,7 @@ msg_channel_flags(int p_or_n, const char *command, struct Client *client_p,
 #define NEXT_TARGET(i) ((i == 9) ? i = 0 : ++i)
 
 static void
-expire_tgchange(void *unused)
+expire_tgchange(void * UNUSED(unused))
 {
 	tgchange *target;
 	dlink_node *ptr, *next_ptr;
@@ -760,7 +760,7 @@ flood_attack_client(int p_or_n, struct Client *source_p, struct Client *target_p
  * side effects	- check for flood attack on target chptr
  */
 static int
-flood_attack_channel(int p_or_n, struct Client *source_p, struct Channel *chptr, char *chname)
+flood_attack_channel(int p_or_n, struct Client *source_p, struct Channel *chptr)
 {
 	int delta;
 
@@ -824,7 +824,7 @@ flood_attack_channel(int p_or_n, struct Client *source_p, struct Channel *chptr,
  *		  This disambiguates the syntax.
  */
 static void
-handle_special(int p_or_n, const char *command, struct Client *client_p,
+handle_special(const char *command, struct Client *client_p,
 	     struct Client *source_p, const char *nick, const char *text)
 {
 	struct Client *target_p;

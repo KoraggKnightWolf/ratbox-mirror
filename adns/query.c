@@ -87,9 +87,9 @@ static adns_query query_alloc(adns_state ads, const typeinfo *typei,
   return qu;
 }
 
-static void query_submit(adns_state ads, adns_query qu,
-			 const typeinfo *typei, vbuf *qumsg_vb, int id,
-			 adns_queryflags flags, struct timeval now) {
+static void query_submit(adns_state UNUSED(ads), adns_query qu,
+			 const typeinfo * UNUSED(typei), vbuf *qumsg_vb, int id,
+			 adns_queryflags UNUSED(flags), struct timeval now) {
   /* Fills in the query message in for a previously-allocated query,
    * and submits it.  Cannot fail.  Takes over the memory for qumsg_vb.
    */

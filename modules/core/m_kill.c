@@ -61,7 +61,7 @@ DECLARE_MODULE_AV1(kill, NULL, NULL, kill_clist, NULL, NULL, "$Revision: 19295 $
 **      parv[2] = kill path
 */
 static int
-mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_kill(struct Client *client_p, struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	struct Client *target_p;
 	const char *inpath = client_p->name;
@@ -164,7 +164,7 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
  *      parv[2] = kill path and reason
  */
 static int
-ms_kill(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+ms_kill(struct Client *client_p, struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	struct Client *target_p;
 	const char *user;

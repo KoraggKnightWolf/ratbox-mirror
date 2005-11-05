@@ -28,7 +28,7 @@
 #include "struct.h"
 #include "ircd_defs.h"
 #include "parse.h"
-#include "res.h"
+#include "dns.h"
 #include "match.h"
 #include "s_log.h"
 #include "s_conf.h"
@@ -165,10 +165,12 @@ results_callback(const char *callid, const char *status, const char *aftype, con
 	req->data = NULL;
 }
 
+
 static int fork_count = 0;
+#if 0
 static int spin_restart = 0;
 static void
-restart_spinning_resolver(void *unused)
+restart_spinning_resolver(void * UNUSED(unused))
 {
 	if(spin_restart > 10)
 	{
@@ -183,6 +185,7 @@ restart_spinning_resolver(void *unused)
 	spin_restart++;
 	fork_resolver();
 }
+#endif
 
 static void
 fork_resolver(void)
@@ -302,7 +305,7 @@ parse_dns_reply(void)
 }
 
 static void
-read_dns(int fd, void *data)
+read_dns(int UNUSED(fd), void * UNUSED(data))
 {
 	int length;
 
@@ -322,7 +325,7 @@ read_dns(int fd, void *data)
 }
 
 static void
-dns_write_sendq(int fd, void *unused)
+dns_write_sendq(int UNUSED(fd), void * UNUSED(unused))
 {
 	int retlen;
 	if(ircd_linebuf_len(&dns_sendq) > 0)

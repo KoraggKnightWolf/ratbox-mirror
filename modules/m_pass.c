@@ -56,7 +56,7 @@ DECLARE_MODULE_AV1(pass, NULL, NULL, pass_clist, NULL, NULL, "$Revision: 19295 $
  *      parv[3] = optional TS version field -- needed for TS6
  */
 static int
-mr_pass(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mr_pass(struct Client *client_p, struct Client * UNUSED(source_p), int parc, const char *parv[])
 {
 	if(client_p->localClient->passwd)
 	{

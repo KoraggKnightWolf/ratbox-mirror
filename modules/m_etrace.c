@@ -66,7 +66,7 @@ static void do_single_etrace(struct Client *source_p, struct Client *target_p);
  *	parv[2] = [target]
  */
 static int
-mo_etrace(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_etrace(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	if(parc > 1 && !EmptyString(parv[1]))
 	{
@@ -104,7 +104,7 @@ mo_etrace(struct Client *client_p, struct Client *source_p, int parc, const char
 }
 
 static int
-me_etrace(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+me_etrace(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 

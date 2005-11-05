@@ -86,8 +86,8 @@ mapi_hfn_list_av1 services_hfnlist[] = {
 DECLARE_MODULE_AV1(services, NULL, NULL, services_clist, NULL, services_hfnlist, "$Revision: 18720 $");
 
 static int
-me_su(struct Client *client_p, struct Client *source_p,
-	int parc, const char *parv[])
+me_su(struct Client *UNUSED(client_p), struct Client *source_p,
+	int UNUSED(parc), const char *parv[])
 {
 	struct Client *target_p;
 
@@ -131,8 +131,8 @@ clean_nick(const char *nick)
 }
 
 static int
-me_rsfnc(struct Client *client_p, struct Client *source_p,
-	int parc, const char *parv[])
+me_rsfnc(struct Client *UNUSED(client_p), struct Client *source_p,
+	int UNUSED(parc), const char *parv[])
 {
 	struct Client *target_p;
 	struct Client *exist_p;
@@ -223,8 +223,8 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 }
 
 static int
-me_login(struct Client *client_p, struct Client *source_p,
-	int parc, const char *parv[])
+me_login(struct Client *UNUSED(client_p), struct Client *source_p,
+	int UNUSED(parc), const char *parv[])
 {
 	if(!IsPerson(source_p) || !ServerInfo.hub)
 		return 0;

@@ -47,7 +47,7 @@ static char *sender;
 /* parv[0] == source, and parv[LAST] == NULL */
 static char *para[MAXPARA + 2];
 
-static void cancel_clients(struct Client *, struct Client *, char *);
+static void cancel_clients(struct Client *, struct Client *);
 static void remove_unknown(struct Client *, char *, char *);
 
 static void do_numeric(char[], struct Client *, struct Client *, int, char **);
@@ -171,7 +171,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 			if(from->from != client_p)
 			{
 				ServerStats.is_wrdi++;
-				cancel_clients(client_p, from, pbuffer);
+				cancel_clients(client_p, from);
 				return;
 			}
 		}
@@ -565,7 +565,7 @@ report_messages(struct Client *source_p)
  * side effects -
  */
 static void
-cancel_clients(struct Client *client_p, struct Client *source_p, char *cmd)
+cancel_clients(struct Client *client_p, struct Client *source_p)
 {
 	/* ok, fake prefix happens naturally during a burst on a nick
 	 * collision with TS5, we cant kill them because one client has to
@@ -731,14 +731,14 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 
 
 int
-m_not_oper(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_not_oper(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *UNUSED(parv[]))
 {
 	sendto_one_numeric(source_p, POP_QUEUE, ERR_NOPRIVILEGES, form_str(ERR_NOPRIVILEGES));
 	return 0;
 }
 
 int
-m_unregistered(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_unregistered(struct Client *client_p, struct Client * UNUSED(source_p), int UNUSED(parc), const char * UNUSED(parv[]))
 {
 	/* bit of a hack.
 	 * I don't =really= want to waste a bit in a flag
@@ -755,14 +755,14 @@ m_unregistered(struct Client *client_p, struct Client *source_p, int parc, const
 }
 
 int
-m_registered(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_registered(struct Client *client_p, struct Client * UNUSED(source_p), int UNUSED(parc), const char * UNUSED(parv[]))
 {
 	sendto_one(client_p, POP_QUEUE, form_str(ERR_ALREADYREGISTRED), me.name, source_p->name);
 	return 0;
 }
 
 int
-m_ignore(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_ignore(struct Client * UNUSED(client_p), struct Client * UNUSED(source_p), int UNUSED(parc), const char * UNUSED(parv[]))
 {
 	return 0;
 }

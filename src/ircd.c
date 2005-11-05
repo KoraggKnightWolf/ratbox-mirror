@@ -58,7 +58,7 @@
 #include "s_newconf.h"
 #include "cache.h"
 #include "monitor.h"
-#include "res.h"
+#include "dns.h"
 #include "translog.h"
 
 /*

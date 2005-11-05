@@ -156,7 +156,7 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
  * Let servers always set a topic
  */
 static int
-ms_topic(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+ms_topic(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	struct Channel *chptr = NULL;
 

@@ -53,7 +53,7 @@ DECLARE_MODULE_AV1(locops, NULL, NULL, locops_clist, NULL, NULL, "$Revision: 187
  *      parv[1] = message text
  */
 static int
-m_locops(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_locops(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	sendto_wallops_flags(UMODE_LOCOPS, source_p, "LOCOPS - %s", parv[1]);
 	
@@ -65,8 +65,8 @@ m_locops(struct Client *client_p, struct Client *source_p, int parc, const char 
 }
 
 static int
-me_locops(struct Client *client_p, struct Client *source_p,
-		int parc, const char *parv[])
+me_locops(struct Client *UNUSED(client_p), struct Client *source_p,
+		int UNUSED(parc), const char *parv[])
 {
 	if(!IsPerson(source_p))
 		return 0;

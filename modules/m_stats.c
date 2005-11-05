@@ -45,7 +45,7 @@
 #include "modules.h"
 #include "s_newconf.h"
 #include "hash.h"
-#include "res.h"
+#include "dns.h"
 #include "reject.h"
 #include "whowas.h"
 #include "scache.h"
@@ -249,6 +249,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 static void
 stats_adns_servers (struct Client *source_p)
 {
+	(void)source_p;
 /*	report_adns_servers (source_p); */
 }
 

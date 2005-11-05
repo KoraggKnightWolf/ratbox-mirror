@@ -684,7 +684,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
  *                values and adjusts splitmode accordingly
  */
 void
-check_splitmode(void *unused)
+check_splitmode(void * UNUSED(unused))
 {
 	if(splitchecking && (ConfigChannel.no_join_on_split || ConfigChannel.no_create_on_split))
 	{

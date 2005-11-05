@@ -37,10 +37,9 @@
 #define LOG_BUFSIZE 512
 
 /* Core diagnostic functions */
-
+#if 0
 void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
 		 int serv, adns_query qu, const char *fmt, va_list al) {
-#if 0  
   const char *bef, *aft;
   vbuf vb;
   if (!ads->diagfile ||
@@ -77,12 +76,12 @@ void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
   }
 
   fputs(aft,ads->diagfile);
-#endif
 }
+#endif
 
+#if 0
 void adns__debug(adns_state ads, int serv, adns_query qu, const char *fmt, ...) 
 {
-#if 0
   char    buf[LOG_BUFSIZE];
   va_list al;
 
@@ -91,12 +90,12 @@ void adns__debug(adns_state ads, int serv, adns_query qu, const char *fmt, ...)
   adns__vdiag(ads," debug",0,serv,qu,fmt,al);
   va_end(al);
 /*  putlog(LOG_DEBUG, "*", "%s", buf); */
-#endif
 }
+#endif
 
+#if 0
 void adns__warn(adns_state ads, int serv, adns_query qu, const char *fmt, ...) 
 {
-#if 0
   char    buf[LOG_BUFSIZE];
   va_list al;
 
@@ -105,11 +104,11 @@ void adns__warn(adns_state ads, int serv, adns_query qu, const char *fmt, ...)
   adns__vdiag(ads," warning",adns_if_noerrprint|adns_if_noserverwarn,serv,qu,fmt,al);
   va_end(al);
 /*  putlog(LOG_DEBUG, "*", "%s", buf); */
-#endif
 }
+#endif
 
-void adns__diag(adns_state ads, int serv, adns_query qu, const char *fmt, ...) {
 #if 0
+void adns__diag(adns_state ads, int serv, adns_query qu, const char *fmt, ...) {
   char    buf[LOG_BUFSIZE];
   va_list al;
 
@@ -118,8 +117,8 @@ void adns__diag(adns_state ads, int serv, adns_query qu, const char *fmt, ...) {
   adns__vdiag(ads,"",adns_if_noerrprint,serv,qu,fmt,al);
   va_end(al);
 /*  putlog(LOG_DEBUG, "*", "%s", buf); */
-#endif
 }
+#endif
 
 /* vbuf functions */
 
@@ -350,8 +349,8 @@ void adns__isort(void *array, int nobjs, int sz, void *tempbuf,
 
 /* SIGPIPE protection. */
 
-void adns__sigpipe_protect(adns_state ads) {
 #if 0 /* not needed */
+void adns__sigpipe_protect(adns_state ads) {
   sigset_t toblock;
   struct sigaction sa;
   int r;
@@ -367,17 +366,17 @@ void adns__sigpipe_protect(adns_state ads) {
   
   r= sigprocmask(SIG_SETMASK,&toblock,&ads->stdsigmask); assert(!r);
   r= sigaction(SIGPIPE,&sa,&ads->stdsigpipe); assert(!r);
-#endif
 }
+#endif
 
-void adns__sigpipe_unprotect(adns_state ads) {
 #if 0 /* not needed */
+void adns__sigpipe_unprotect(adns_state ads) {
   int r;
 
   if (ads->iflags & adns_if_nosigpipe) return;
 
   r= sigaction(SIGPIPE,&ads->stdsigpipe,0); assert(!r);
   r= sigprocmask(SIG_SETMASK,&ads->stdsigmask,0); assert(!r);
-#endif 
 }
+#endif 
 

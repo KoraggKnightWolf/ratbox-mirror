@@ -421,7 +421,7 @@ load_one_module(const char *path, int coremodule)
 
 /* load a module .. */
 static int
-mo_modload(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
+mo_modload(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char **parv)
 {
 	char *m_bn;
 
@@ -453,7 +453,7 @@ mo_modload(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 /* unload a module .. */
 static int
-mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
+mo_modunload(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char **parv)
 {
 	char *m_bn;
 	int modindex;
@@ -495,7 +495,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 /* unload and load in one! */
 static int
-mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
+mo_modreload(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char **parv)
 {
 	char *m_bn;
 	int modindex;
@@ -542,7 +542,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 /* list modules .. */
 static int
-mo_modlist(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
+mo_modlist(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char **parv)
 {
 	int i;
 
@@ -581,7 +581,7 @@ mo_modlist(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 /* unload and reload all modules */
 static int
-mo_modrestart(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
+mo_modrestart(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char **parv)
 {
 	int modnum;
 

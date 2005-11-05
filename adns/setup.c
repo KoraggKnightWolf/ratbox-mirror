@@ -116,7 +116,7 @@ static void ccf_nameserver(adns_state ads, const char *fn, int lno, const char *
   addserver(ads,ia);
 }
 
-static void ccf_search(adns_state ads, const char *fn, int lno, const char *buf) {
+static void ccf_search(adns_state ads, const char * UNUSED(fn), int UNUSED(lno), const char *buf) {
   const char *bufp, *word;
   char *newchars, **newptrs, **pp;
   int count, tl, l;
@@ -257,7 +257,7 @@ static void ccf_options(adns_state ads, const char *fn, int lno, const char *buf
   }
 }
 
-static void ccf_clearnss(adns_state ads, const char *fn, int lno, const char *buf) {
+static void ccf_clearnss(adns_state ads, const char *UNUSED(fn), int UNUSED(lno), const char * UNUSED(buf)) {
   ads->nservers= 0;
 }
 
@@ -288,8 +288,8 @@ typedef union {
   const char *text;
 } getline_ctx;
 
-static int gl_file(adns_state ads, getline_ctx *src_io, const char *filename,
-		   int lno, char *buf, int buflen) {
+static int gl_file(adns_state ads, getline_ctx *src_io, const char * UNUSED(filename),
+		   int UNUSED(lno), char *buf, int buflen) {
   FILE *file= src_io->file;
   int c, i;
   char *p;
@@ -332,8 +332,8 @@ static int gl_file(adns_state ads, getline_ctx *src_io, const char *filename,
   return -2;
 }
 
-static int gl_text(adns_state ads, getline_ctx *src_io, const char *filename,
-		   int lno, char *buf, int buflen) {
+static int gl_text(adns_state ads, getline_ctx *src_io, const char * UNUSED(filename),
+ 		   int UNUSED(lno), char *buf, int buflen) {
   const char *cp= src_io->text;
   int l;
 
@@ -392,7 +392,7 @@ static void readconfiggeneric(adns_state ads, const char *filename,
   }
 }
 
-static const char *instrum_getenv(adns_state ads, const char *envvar) {
+static const char *instrum_getenv(adns_state UNUSED(ads), const char *envvar) {
   const char *value;
 
   value= getenv(envvar);
@@ -452,7 +452,7 @@ static void readconfigenvtext(adns_state ads, const char *envvar) {
 }
 
 
-int adns__setnonblock(adns_state ads, int fd) {
+int adns__setnonblock(adns_state UNUSED(ads), int fd) {
   
   ircd_set_nb(fd);
   return 0;

@@ -19,6 +19,7 @@
  */
 
 #include "setup.h"
+#include "ircd_lib.h"
 
 #include <sys/types.h>
 
@@ -63,7 +64,7 @@ cmd_set_zip_out_level(struct ctrl_command *cmd)
 }
 
 void
-cmd_start_zip_out(struct ctrl_command *cmd)
+cmd_start_zip_out(struct ctrl_command * UNUSED(cmd))
 {
 #ifdef HAVE_LIBZ
 	int ret;
@@ -90,7 +91,7 @@ cmd_start_zip_out(struct ctrl_command *cmd)
 }
 
 void
-cmd_start_zip_in(struct ctrl_command *cmd)
+cmd_start_zip_in(struct ctrl_command * UNUSED(cmd))
 {
 #ifdef HAVE_LIBZ
 	int ret;
@@ -113,7 +114,7 @@ cmd_start_zip_in(struct ctrl_command *cmd)
 
 
 void
-cmd_init(struct ctrl_command *cmd)
+cmd_init(struct ctrl_command * UNUSED(cmd))
 {
 	if(in_state.active || out_state.active)
 		send_error("CMD_INIT sent twice!");

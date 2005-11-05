@@ -448,7 +448,7 @@ set_modes_from_table(int *modes, const char *whatis, struct mode_table *tab, con
 }
 
 static int
-conf_begin_oper(struct TopConf *tc)
+conf_begin_oper(struct TopConf * UNUSED(tc))
 {
 	dlink_node *ptr;
 	dlink_node *next_ptr;
@@ -472,7 +472,7 @@ conf_begin_oper(struct TopConf *tc)
 }
 
 static int
-conf_end_oper(struct TopConf *tc)
+conf_end_oper(struct TopConf * UNUSED(tc))
 {
 	struct oper_conf *yy_tmpoper;
 	dlink_node *ptr;
@@ -613,7 +613,7 @@ conf_set_oper_password(void *data)
 }
 
 static void
-conf_set_oper_rsa_public_key_file(void *data)
+conf_set_oper_rsa_public_key_file(void * UNUSED(data))
 {
 #ifdef HAVE_LIBCRYPTO
 	ircd_free(yy_oper->rsa_pubkey_file);
@@ -630,7 +630,7 @@ conf_set_oper_umodes(void *data)
 }
 
 static int
-conf_begin_class(struct TopConf *tc)
+conf_begin_class(struct TopConf * UNUSED(tc))
 {
 	if(yy_class)
 		free_class(yy_class);
@@ -640,7 +640,7 @@ conf_begin_class(struct TopConf *tc)
 }
 
 static int
-conf_end_class(struct TopConf *tc)
+conf_end_class(struct TopConf * UNUSED(tc))
 {
 	if(conf_cur_block_name != NULL)
 		DupString(yy_class->class_name, conf_cur_block_name);
@@ -724,7 +724,7 @@ conf_set_class_sendq(void *data)
 static char *listener_address;
 
 static int
-conf_begin_listen(struct TopConf *tc)
+conf_begin_listen(struct TopConf * UNUSED(tc))
 {
 	ircd_free(listener_address);
 	listener_address = NULL;
@@ -732,7 +732,7 @@ conf_begin_listen(struct TopConf *tc)
 }
 
 static int
-conf_end_listen(struct TopConf *tc)
+conf_end_listen(struct TopConf * UNUSED(tc))
 {
 	ircd_free(listener_address);
 	listener_address = NULL;
@@ -783,7 +783,7 @@ conf_set_listen_address(void *data)
 }
 
 static int
-conf_begin_auth(struct TopConf *tc)
+conf_begin_auth(struct TopConf * UNUSED(tc))
 {
 	dlink_node *ptr;
 	dlink_node *next_ptr;
@@ -804,7 +804,7 @@ conf_begin_auth(struct TopConf *tc)
 }
 
 static int
-conf_end_auth(struct TopConf *tc)
+conf_end_auth(struct TopConf * UNUSED(tc))
 {
 	struct ConfItem *yy_tmp;
 	dlink_node *ptr;
@@ -994,7 +994,7 @@ conf_set_auth_class(void *data)
  * clean up anything thats been left over.
  */
 static int
-conf_cleanup_shared(struct TopConf *tc)
+conf_cleanup_shared(struct TopConf * UNUSED(tc))
 {
 	dlink_node *ptr, *next_ptr;
 
@@ -1093,7 +1093,7 @@ conf_set_shared_flags(void *data)
 }
 
 static int
-conf_begin_connect(struct TopConf *tc)
+conf_begin_connect(struct TopConf * UNUSED(tc))
 {
 	if(yy_server)
 		free_server_conf(yy_server);
@@ -1108,7 +1108,7 @@ conf_begin_connect(struct TopConf *tc)
 }
 
 static int
-conf_end_connect(struct TopConf *tc)
+conf_end_connect(struct TopConf * UNUSED(tc))
 {
 	if(EmptyString(yy_server->name))
 	{
@@ -1283,7 +1283,7 @@ conf_set_exempt_ip(void *data)
 }
 
 static int
-conf_cleanup_cluster(struct TopConf *tc)
+conf_cleanup_cluster(struct TopConf * UNUSED(tc))
 {
 	dlink_node *ptr, *next_ptr;
 
@@ -1454,7 +1454,7 @@ conf_set_serverhide_links_delay(void *data)
 
 #ifdef ENABLE_SERVICES
 static int
-conf_begin_service(struct TopConf *tc)
+conf_begin_service(struct TopConf * UNUSED(tc))
 {
 	struct Client *target_p;
 	dlink_node *ptr;
@@ -1575,7 +1575,7 @@ conf_set_generic_string(void *data, int len, void *location)
 }
 
 int
-conf_call_set(struct TopConf *tc, char *item, conf_parm_t * value, int type)
+conf_call_set(struct TopConf *tc, char *item, conf_parm_t * value, int UNUSED(type))
 {
 	struct ConfEntry *cf;
 	conf_parm_t *cp;

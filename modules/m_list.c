@@ -57,7 +57,7 @@ static void list_named_channel(struct Client *source_p, const char *name);
  *      parv[1] = channel
  */
 static int
-m_list(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_list(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	static time_t last_used = 0L;
 
@@ -88,7 +88,7 @@ m_list(struct Client *client_p, struct Client *source_p, int parc, const char *p
  *      parv[1] = channel
  */
 static int
-mo_list(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_list(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	/* If no arg, do all channels *whee*, else just one channel */
 	if(parc < 2 || EmptyString(parv[1]))

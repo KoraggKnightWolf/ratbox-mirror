@@ -27,7 +27,7 @@
 #include "restart.h"		/* server_reboot */
 #include "s_log.h"
 #include "s_conf.h"
-#include "res.h"
+#include "dns.h"
 #include "s_auth.h"
 
 #ifndef MINGW
@@ -36,14 +36,14 @@
  * being used we probably will
  */
 static void
-dummy_handler(int sig)
+dummy_handler(int UNUSED(sig))
 {
 	/* Empty */
 }
 
 
 static void
-sigchld_handler(int sig)
+sigchld_handler(int UNUSED(sig))
 {
 	int status;
 	resolver_sigchld(); /* let the resolver check its children first */
@@ -55,7 +55,7 @@ sigchld_handler(int sig)
  * sigterm_handler - exit the server
  */
 static void
-sigterm_handler(int sig)
+sigterm_handler(int UNUSED(sig))
 {
 	/* XXX we had a flush_connections() here - we should close all the
 	 * connections and flush data. read server_reboot() for my explanation.
@@ -69,7 +69,7 @@ sigterm_handler(int sig)
  * sighup_handler - reread the server configuration
  */
 static void
-sighup_handler(int sig)
+sighup_handler(int UNUSED(sig))
 {
 	dorehash = 1;
 }
@@ -78,13 +78,13 @@ sighup_handler(int sig)
  * sigusr1_handler - reread the motd file
  */
 static void
-sigusr1_handler(int sig)
+sigusr1_handler(int UNUSED(sig))
 {
 	doremotd = 1;
 }
 
 static void
-sigusr2_handler(int sig)
+sigusr2_handler(int UNUSED(sig))
 {
 	dorehashbans = 1;
 }
@@ -93,7 +93,7 @@ sigusr2_handler(int sig)
  * sigint_handler - restart the server
  */
 static void
-sigint_handler(int sig)
+sigint_handler(int UNUSED(sig))
 {
 	static int restarting = 0;
 

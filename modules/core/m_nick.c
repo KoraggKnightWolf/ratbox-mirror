@@ -832,8 +832,8 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 
 static int
 perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
-			    struct Client *target_p, int parc, 
-			    const char *parv[], time_t newts, const char *nick)
+			    struct Client *target_p, int UNUSED(parc), 
+			    const char * UNUSED(parv[]), time_t newts, const char *nick)
 {
 	int sameuser;
 

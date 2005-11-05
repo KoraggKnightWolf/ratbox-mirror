@@ -126,7 +126,6 @@ banconf_parse_field(char *nline, int quoted)
 static int
 banconf_parse_line(char *line, char ***params, int *quoted, int parcount)
 {
-	static const char *empty = "";
 	char *tmp;
 	int i;
 

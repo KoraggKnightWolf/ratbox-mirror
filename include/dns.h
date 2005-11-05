@@ -24,8 +24,8 @@
  *  $Id$
  */
 
-#ifndef _RES_H_INCLUDED
-#define _RES_H_INCLUDED 1
+#ifndef _DNS_H_INCLUDED
+#define _DNS_H_INCLUDED 1
 
 struct Client;
 
@@ -38,7 +38,7 @@ void resolver_sigchld(void);
 u_int16_t lookup_hostname(const char *hostname, int aftype, DNSCB *callback, void *data);
 u_int16_t lookup_ip(const char *hostname, int aftype, DNSCB *callback, void *data);
 void cancel_lookup(u_int16_t xid);
-
+void report_dns_servers(struct Client *);
 
 
 #endif

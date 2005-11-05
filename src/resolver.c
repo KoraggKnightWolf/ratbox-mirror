@@ -99,7 +99,7 @@ dns_select(void)
  * Note: Called by the fd system.
  */
 static void
-dns_readable(int fd, void *ptr)
+dns_readable(int fd, void * UNUSED(ptr))
 {
 	adns_processreadable(dns_state, fd, ircd_current_time_tv());
 	process_adns_incoming();
@@ -113,7 +113,7 @@ dns_readable(int fd, void *ptr)
  * Note: Called by the fd system.
  */
 static void
-dns_writeable(int fd, void *ptr)
+dns_writeable(int fd, void *UNUSED(ptr))
 {
 	adns_processwriteable(dns_state, fd, ircd_current_time_tv() );
 	process_adns_incoming();
@@ -121,7 +121,7 @@ dns_writeable(int fd, void *ptr)
 }
 
 static void
-restart_resolver(int sig)
+restart_resolver(int UNUSED(sig))
 {
 	/* Rehash dns configuration */
 	adns__rereadconfig(dns_state);
@@ -142,7 +142,7 @@ setup_signals(void)
 }
 
 static void
-write_sendq(int fd, void *unused)
+write_sendq(int fd, void *UNUSED(unused))
 {
 	int retlen;
 	if(ircd_linebuf_len(&sendq) > 0)
@@ -208,7 +208,7 @@ parse_request(void)
 }
 
 static void                       
-read_request(int fd, void *unusued)
+read_request(int fd, void *UNUSED(unusued))
 {
 	int length;
 
@@ -534,9 +534,9 @@ resolve_ip(char **parv)
 }
 
 
-int main(int argc, char **argv)
+int main(int UNUSED(argc), char ** UNUSED(argv))
 {
-	int i, x, maxfd;
+	int x, maxfd;
 	char *tifd;
 	char *tofd;
 	char *tmaxfd;

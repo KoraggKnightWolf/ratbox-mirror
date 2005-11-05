@@ -56,7 +56,7 @@ DECLARE_MODULE_AV1(kick, NULL, NULL, kick_clist, NULL, NULL, "$Revision: 19256 $
 **      parv[3] = kick comment
 */
 static int
-m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_kick(struct Client *client_p, struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	struct membership *msptr;
 	struct Client *who;

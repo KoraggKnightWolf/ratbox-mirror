@@ -54,7 +54,7 @@ DECLARE_MODULE_AV1(capab, NULL, NULL, capab_clist, NULL, NULL, "$Revision: 19295
  *
  */
 static int
-mr_capab(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mr_capab(struct Client *client_p, struct Client * UNUSED(source_p), int parc, const char *parv[])
 {
 	struct Capability *cap;
 	int i;
@@ -96,8 +96,8 @@ mr_capab(struct Client *client_p, struct Client *source_p, int parc, const char 
 }
 
 static int
-me_gcap(struct Client *client_p, struct Client *source_p,
-		int parc, const char *parv[])
+me_gcap(struct Client * UNUSED(client_p), struct Client *source_p,
+		int UNUSED(parc), const char *parv[])
 {
 	struct Capability *cap;
 	char *t = LOCAL_COPY(parv[1]);

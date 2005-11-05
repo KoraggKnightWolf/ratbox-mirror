@@ -137,7 +137,6 @@ translog_add_ban(translog_type type, struct Client *source_p, const char *mask,
 		const char *mask2, const char *reason, const char *oper_reason, int humandate)
 {
 	char buf[BUFSIZE*2];
-	FILE *translog;
 
 	if(reason == NULL)
 		reason = "";

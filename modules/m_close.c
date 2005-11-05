@@ -48,7 +48,7 @@ DECLARE_MODULE_AV1(close, NULL, NULL, close_clist, NULL, NULL, "$Revision: 19256
  *  - added by Darren Reed Jul 13 1992.
  */
 static int
-mo_close(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_close(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char * UNUSED(parv[]))
 {
 	struct Client *target_p;
 	dlink_node *ptr;

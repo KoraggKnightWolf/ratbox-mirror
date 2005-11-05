@@ -181,7 +181,7 @@ mo_links(struct Client *client_p, struct Client *source_p, int parc, const char 
 }
 
 void
-cache_links(void *unused)
+cache_links(void * UNUSED(unused))
 {
 	struct Client *target_p;
 	dlink_node *ptr;

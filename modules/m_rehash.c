@@ -35,7 +35,7 @@
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "s_log.h"
-#include "res.h"
+#include "dns.h"
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
@@ -295,7 +295,7 @@ static struct hash_commands rehash_commands[] =
  *
  */
 static int
-mo_rehash(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_rehash(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	if(!IsOperRehash(source_p))
 	{

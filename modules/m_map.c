@@ -54,7 +54,7 @@ static char buf[BUFSIZE];
 **	parv[0] = sender prefix
 */
 static int
-m_map(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_map(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	if((!IsExemptShide(source_p) && ConfigServerHide.flatten_links) ||
 	   ConfigFileEntry.map_oper_only)
@@ -63,8 +63,8 @@ m_map(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 		return 0;
 	}
 
-	dump_map(client_p, &me, buf);
-	sendto_one(client_p, POP_QUEUE, form_str(RPL_MAPEND), me.name, client_p->name);
+	dump_map(source_p, &me, buf);
+	sendto_one(source_p, POP_QUEUE, form_str(RPL_MAPEND), me.name, source_p->name);
 	return 0;
 }
 
@@ -73,10 +73,10 @@ m_map(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 **      parv[0] = sender prefix
 */
 static int
-mo_map(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_map(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *UNUSED(parv[]))
 {
-	dump_map(client_p, &me, buf);
-	sendto_one(client_p, POP_QUEUE, form_str(RPL_MAPEND), me.name, client_p->name);
+	dump_map(source_p, &me, buf);
+	sendto_one(source_p, POP_QUEUE, form_str(RPL_MAPEND), me.name, source_p->name);
 
 	return 0;
 }

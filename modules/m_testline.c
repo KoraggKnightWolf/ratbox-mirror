@@ -58,7 +58,7 @@ mapi_clist_av1 testline_clist[] = { &testline_msgtab, &testgecos_msgtab, NULL };
 DECLARE_MODULE_AV1(testline, NULL, NULL, testline_clist, NULL, NULL, "$Revision: 19295 $");
 
 static int
-mo_testline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_testline(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	struct ConfItem *aconf;
 	struct ConfItem *resv_p;
@@ -185,7 +185,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 }
 
 static int
-mo_testgecos(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_testgecos(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	struct ConfItem *aconf;
 

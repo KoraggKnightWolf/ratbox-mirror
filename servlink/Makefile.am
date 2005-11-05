@@ -3,7 +3,7 @@
 #
 bin_PROGRAMS = servlink
 
-INCLUDES = -I../include
+INCLUDES = -I../include -I../libircd
 
 
 servlink_SOURCES = servlink.c control.c io.c

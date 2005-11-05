@@ -242,7 +242,7 @@ ms_tmode(struct Client *client_p, struct Client *source_p, int parc, const char 
 }
 
 static int
-ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+ms_bmask(struct Client *client_p, struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	static char modebuf[BUFSIZE];
 	static char parabuf[BUFSIZE];
@@ -682,9 +682,9 @@ fix_key_remote(char *arg)
  * The handlers for each specific mode.
  */
 static void
-chm_nosuch(struct Client *source_p, struct Channel *chptr, 
-	   int alevel, int parc, int *parn,
-	   const char **parv, int *errors, int dir, char c, long mode_type)
+chm_nosuch(struct Client *source_p, struct Channel *UNUSED(chptr), 
+	   int UNUSED(alevel), int UNUSED(parc), int * UNUSED(parn),
+	   const char ** UNUSED(parv), int *errors, int UNUSED(dir), char c, long UNUSED(mode_type))
 {
 	if(*errors & SM_ERR_UNKNOWN)
 		return;
@@ -694,8 +694,8 @@ chm_nosuch(struct Client *source_p, struct Channel *chptr,
 
 static void
 chm_simple(struct Client *source_p, struct Channel *chptr, 
-	   int alevel, int parc, int *parn,
-	   const char **parv, int *errors, int dir, char c, long mode_type)
+	   int alevel, int UNUSED(parc), int * UNUSED(parn),
+	   const char ** UNUSED(parv), int *errors, int dir, char c, long mode_type)
 {
 	if(alevel != CHFL_CHANOP)
 	{
@@ -907,7 +907,7 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 static void
 chm_op(struct Client *source_p, struct Channel *chptr, 
        int alevel, int parc, int *parn,
-       const char **parv, int *errors, int dir, char c, long mode_type)
+       const char **parv, int *errors, int dir, char c, long UNUSED(mode_type))
 {
 	struct membership *mstptr;
 	const char *opnick;
@@ -1000,7 +1000,7 @@ chm_op(struct Client *source_p, struct Channel *chptr,
 static void
 chm_voice(struct Client *source_p, struct Channel *chptr,
 	  int alevel, int parc, int *parn,
-	  const char **parv, int *errors, int dir, char c, long mode_type)
+	  const char **parv, int *errors, int dir, char c, long UNUSED(mode_type))
 {
 	struct membership *mstptr;
 	const char *opnick;
@@ -1079,7 +1079,7 @@ chm_voice(struct Client *source_p, struct Channel *chptr,
 static void
 chm_limit(struct Client *source_p, struct Channel *chptr,
 	  int alevel, int parc, int *parn,
-	  const char **parv, int *errors, int dir, char c, long mode_type)
+	  const char **parv, int *errors, int dir, char c, long UNUSED(mode_type))
 {
 	const char *lstr;
 	static char limitstr[30];
@@ -1137,7 +1137,7 @@ chm_limit(struct Client *source_p, struct Channel *chptr,
 static void
 chm_key(struct Client *source_p, struct Channel *chptr,
 	int alevel, int parc, int *parn,
-	const char **parv, int *errors, int dir, char c, long mode_type)
+	const char **parv, int *errors, int dir, char c, long UNUSED(mode_type))
 {
 	char *key;
 
@@ -1213,8 +1213,8 @@ chm_key(struct Client *source_p, struct Channel *chptr,
 #ifdef ENABLE_SERVICES
 static void
 chm_regonly(struct Client *source_p, struct Channel *chptr,
-		int alevel, int parc, int *parn,
-		const char **parv, int *errors, int dir, char c, long mode_type)
+		int alevel, int UNUSED(parc), int * UNUSED(parn),
+		const char ** UNUSED(parv), int *errors, int dir, char c, long UNUSED(mode_type))
 {
 	if(alevel != CHFL_CHANOP)
 	{

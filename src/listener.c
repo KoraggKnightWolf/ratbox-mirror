@@ -466,7 +466,7 @@ add_connection(struct Listener *listener, int fd, struct sockaddr *sai)
 
 
 static void
-accept_connection(int pfd, void *data)
+accept_connection(int UNUSED(pfd), void *data)
 {
 	static time_t last_oper_notice = 0;
 

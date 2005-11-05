@@ -60,7 +60,7 @@ static char buf2[BUFSIZE];
  * ISON :nicklist
  */
 static int
-m_ison(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_ison(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 	char *nick;

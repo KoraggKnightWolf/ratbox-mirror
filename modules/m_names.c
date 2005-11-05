@@ -59,7 +59,7 @@ static void names_global(struct Client *source_p);
  *      parv[1] = channel
  */
 static int
-m_names(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_names(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	static time_t last_used = 0;
 	struct Channel *chptr = NULL;

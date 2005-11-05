@@ -224,7 +224,7 @@ ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
  * this will happen.
  */
 void
-ircd_checktimeouts(void *notused)
+ircd_checktimeouts(void * UNUSED(notused))
 {
 	int fd;
 	PF *hdl;
@@ -333,7 +333,7 @@ ircd_connect_callback(int fd, int status)
  * called ..
  */
 static void
-ircd_connect_timeout(int fd, void *notused)
+ircd_connect_timeout(int fd, void * UNUSED(notused))
 {
 	/* error! */
 	ircd_connect_callback(fd, IRCD_ERR_TIMEOUT);
@@ -348,7 +348,7 @@ ircd_connect_timeout(int fd, void *notused)
  *               to select for a write event on this FD.
  */
 static void
-ircd_connect_tryconnect(int fd, void *notused)
+ircd_connect_tryconnect(int fd, void * UNUSED(notused))
 {
 	int retval;
 	fde_t *F = find_fd(fd);

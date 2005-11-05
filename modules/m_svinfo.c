@@ -53,7 +53,7 @@ DECLARE_MODULE_AV1(svinfo, NULL, NULL, svinfo_clist, NULL, NULL, "$Revision: 187
  *      parv[4] = server's idea of UTC time
  */
 static int
-ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+ms_svinfo(struct Client *client_p, struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	signed int deltat;
 	time_t theirtime;

@@ -44,8 +44,8 @@
 #include "parse.h"
 #include "modules.h"
 
-static int mo_testmask(struct Client *client_p, struct Client *source_p,
-			int parc, const char *parv[]);
+static int mo_testmask(struct Client *UNUSED(client_p), struct Client *source_p,
+			int UNUSED(parc), const char *parv[]);
 
 struct Message testmask_msgtab = {
 	"TESTMASK", 0, 0, 0, MFLG_SLOW,
@@ -56,8 +56,8 @@ mapi_clist_av1 testmask_clist[] = { &testmask_msgtab, NULL };
 DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision: 19256 $");
 
 static int
-mo_testmask(struct Client *client_p, struct Client *source_p,
-			int parc, const char *parv[])
+mo_testmask(struct Client *UNUSED(client_p), struct Client *source_p,
+			int UNUSED(parc), const char *parv[])
 {
 	struct Client *target_p;
 	int lcount = 0;

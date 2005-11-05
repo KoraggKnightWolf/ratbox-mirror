@@ -65,7 +65,7 @@ DECLARE_MODULE_AV1(admin, NULL, NULL, admin_clist, admin_hlist, NULL, "$Revision
  *      parv[1] = servername   
  */
 static int
-mr_admin(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mr_admin(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char * UNUSED(parv[]))
 {
 	static time_t last_used = 0L;
 

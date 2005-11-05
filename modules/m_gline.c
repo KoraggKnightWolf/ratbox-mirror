@@ -67,7 +67,7 @@ static int majority_gline(struct Client *source_p, const char *user,
 			  const char *host, const char *reason);
 
 static int check_wild_gline(const char *, const char *);
-static int invalid_gline(struct Client *, const char *, const char *, char *);
+static int invalid_gline(struct Client *, const char *, char *);
 
 static int remove_temp_gline(const char *, const char *);
 static void expire_pending_glines(void *unused);
@@ -93,7 +93,7 @@ moddeinit(void)
  * side effects - place a gline if 3 opers agree
  */
 static int
-mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_gline(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	const char *user = NULL;
 	char *host = NULL;	/* user and host of GLINE "victim" */
@@ -145,7 +145,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	reason = LOCAL_COPY(parv[2]);
 
-	if(invalid_gline(source_p, user, host, reason))
+	if(invalid_gline(source_p, user, reason))
 		return 0;
 
 	/* Not enough non-wild characters were found, assume they are trying to gline *@*. */
@@ -220,7 +220,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 /* mc_gline()
  */
 static int
-mc_gline(struct Client *client_p, struct Client *source_p,
+mc_gline(struct Client * UNUSED(client_p), struct Client *source_p,
 	 int parc, const char *parv[])
 {
 	struct Client *acptr;
@@ -239,7 +239,7 @@ mc_gline(struct Client *client_p, struct Client *source_p,
 	host = parv[2];
 	reason = LOCAL_COPY(parv[3]);
 
-	if(invalid_gline(acptr, user, host, reason))
+	if(invalid_gline(acptr, user, reason))
 		return 0;
 
 	sendto_server(client_p, NULL, CAP_GLN|CAP_TS6, NOCAPS,
@@ -351,7 +351,7 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	host = parv[6];
 	reason = LOCAL_COPY(parv[7]);
 
-	if(invalid_gline(acptr, user, host, reason))
+	if(invalid_gline(acptr, user, reason))
 		return 0;
 
 	sendto_server(client_p, NULL, CAP_GLN|CAP_TS6, NOCAPS,
@@ -403,7 +403,7 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
  *      parv[1] = gline to remove
  */
 static int
-mo_ungline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_ungline(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	const char *user;
 	char *h = LOCAL_COPY(parv[1]);
@@ -524,8 +524,7 @@ check_wild_gline(const char *user, const char *host)
  * side effects -
  */
 static int
-invalid_gline(struct Client *source_p, const char *luser,
-	      const char *lhost, char *lreason)
+invalid_gline(struct Client *source_p, const char *luser, char *lreason)
 {
 	if(strchr(luser, '!'))
 	{
@@ -834,7 +833,7 @@ remove_temp_gline(const char *user, const char *host)
  * enough "votes" in the time period allowed
  */
 static void
-expire_pending_glines(void *unused)
+expire_pending_glines(void * UNUSED(unused))
 {
 	dlink_node *pending_node;
 	dlink_node *next_node;

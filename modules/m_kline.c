@@ -60,7 +60,7 @@ mapi_clist_av1 kline_clist[] = { &kline_msgtab, &unkline_msgtab, NULL };
 DECLARE_MODULE_AV1(kline, NULL, NULL, kline_clist, NULL, NULL, "$Revision: 19295 $");
 
 /* Local function prototypes */
-static int find_user_host(struct Client *source_p, const char *userhost, char *user, char *host);
+static int find_user_host(const char *userhost, char *user, char *host);
 static int valid_comment(struct Client *source_p, char *comment);
 static int valid_user_host(struct Client *source_p, const char *user, const char *host);
 static int valid_wild_card(struct Client *source_p, const char *user, const char *host);
@@ -71,8 +71,6 @@ static void apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 			 const char *, const char *, const char *, int);
 static int already_placed_kline(struct Client *, const char *, const char *, int);
 
-static void handle_remote_unkline(struct Client *source_p, 
-			const char *user, const char *host);
 static int remove_temp_kline(struct Client *, const char *, const char *);
 static void remove_perm_kline(struct Client *, const char *, const char *);
 
@@ -85,7 +83,7 @@ static void remove_perm_kline(struct Client *, const char *, const char *);
  *   parv[5] - reason
  */
 static int
-mo_kline(struct Client *client_p, struct Client *source_p,
+mo_kline(struct Client *UNUSED(client_p), struct Client *source_p,
 	 int parc, const char **parv)
 {
 	char def[] = "No Reason";
@@ -113,7 +111,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 	else
 		tkline_time = 0;
 
-	if(find_user_host(source_p, parv[loc], user, host) == 0)
+	if(find_user_host(parv[loc], user, host) == 0)
 		return 0;
 
 	loc++;
@@ -215,7 +213,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 }
 
 static int
-me_kline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+me_kline(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	char buffer[BUFSIZE];
 	struct ConfItem *aconf = NULL;
@@ -303,7 +301,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
  *   parv[3] - optional target server
  */
 static int
-mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+mo_unkline(struct Client *UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
 {
 	const char *user;
 	char *host;
@@ -376,7 +374,7 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 }
 
 static int
-me_unkline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+me_unkline(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	const char *user, *host;
 
@@ -407,7 +405,7 @@ me_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
  */
 static void
 apply_kline(struct Client *source_p, struct ConfItem *aconf,
-	    const char *reason, const char *oper_reason, const char *current_date)
+	    const char *reason, const char *oper_reason, const char * UNUSED(current_date))
 {
 	const char *oper = get_oper_name(source_p);
 
@@ -449,7 +447,7 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
  */
 static void
 apply_tkline(struct Client *source_p, struct ConfItem *aconf,
-	     const char *reason, const char *oper_reason, const char *current_date, int tkline_time)
+	     const char *reason, const char *oper_reason, const char * UNUSED(current_date), int tkline_time)
 {
 	const char *oper = get_oper_name(source_p);
 
@@ -490,7 +488,7 @@ apply_tkline(struct Client *source_p, struct ConfItem *aconf,
  * side effects -
  */
 static int
-find_user_host(struct Client *source_p, const char *userhost, char *luser, char *lhost)
+find_user_host(const char *userhost, char *luser, char *lhost)
 {
 	char *hostp;
 

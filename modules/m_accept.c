@@ -57,7 +57,7 @@ DECLARE_MODULE_AV1(accept, NULL, NULL, accept_clist, NULL, NULL, "$Revision: 192
  *      parv[1] = servername
  */
 static int
-m_accept(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_accept(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	char *nick;
 	char *p = NULL;

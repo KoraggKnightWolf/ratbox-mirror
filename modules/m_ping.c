@@ -55,12 +55,12 @@ DECLARE_MODULE_AV1(ping, NULL, NULL, ping_clist, NULL, NULL, "$Revision: 19256 $
 **      parv[2] = destination
 */
 static int
-m_ping(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+m_ping(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	struct Client *target_p;
 	const char *destination;
 
-	destination = parv[2];	/* Will get NULL or pointer (parc >= 2!!) */
+	destination = parv[2];	/* Will get NULL or pointer (UNUSED(parc) >= 2!!) */
 
 	if(!EmptyString(destination) && !match(destination, me.name))
 	{
@@ -86,7 +86,7 @@ m_ping(struct Client *client_p, struct Client *source_p, int parc, const char *p
 }
 
 static int
-ms_ping(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+ms_ping(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
 {
 	struct Client *target_p;
 	const char *destination;
