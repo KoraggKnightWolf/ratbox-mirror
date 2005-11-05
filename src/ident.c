@@ -310,7 +310,7 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	ircd_inet_pton_sock(destaddr, (struct sockaddr *)&auth->destaddr);
 
 #ifdef IPV6
-	if(((struct sockaddr *)&destaddr)->sa_family == AF_INET6)
+	if(((struct sockaddr *)&auth->destaddr)->sa_family == AF_INET6)
 		((struct sockaddr_in6 *)&auth->destaddr)->sin6_port = htons(113);
 	else
 #endif
