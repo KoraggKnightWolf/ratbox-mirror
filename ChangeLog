@@ -1,3 +1,12 @@
+androsyn    2005/11/05 00:41:44 UTC	(20051105_0-21080)
+  Log:
+  pass servlink fds via the environment.  make the command line passed to servlink a bit more pretty
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/servlink/servlink.c (File Modified) 
+
+
 androsyn    2005/11/04 21:32:42 UTC	(20051104_8-21078)
   Log:
   for the non-gcc case of likely/unlikely we want to still have the actual conditional statement left behind..oops
