@@ -1,3 +1,12 @@
+androsyn    2005/11/05 01:29:42 UTC	(20051105_2-21084)
+  Log:
+  destaddr and auth->destaddr aren't quite the same things ;)
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+
+
 androsyn    2005/11/05 01:25:32 UTC	(20051105_1-21082)
   Log:
   Build ircd_lexer.c with flex 2.5.4a as the output from
