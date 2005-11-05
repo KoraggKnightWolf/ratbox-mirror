@@ -795,9 +795,9 @@ fork_server(struct Client *server)
 	int data_fds[2];
 	char maxfd[6];
 	char fd_str[4][6];
-	char *kid_argv[7];
-	char slink[] = "-slink";
-
+	char *kid_argv[3];
+	char slink[] = "-ircd servlink";
+	char servname[HOSTLEN+1];
 
 	/* ctrl */
 	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, ctrl_fds, "slink control fds") < 0)
@@ -811,14 +811,16 @@ fork_server(struct Client *server)
 	ircd_snprintf(fd_str[1], sizeof(fd_str[1]), "%d", data_fds[1]);
 	ircd_snprintf(fd_str[2], sizeof(fd_str[2]), "%d", server->localClient->fd);
 	ircd_snprintf(maxfd, sizeof(maxfd), "%d", HARD_FDLIMIT);
+	ircd_snprintf(servname, sizeof(servname), "(%s)", server->name);
+
 	setenv("MAXFD", maxfd, 1);	  
-
+	setenv("CTRLFD", fd_str[0], 1);
+	setenv("DATAFD", fd_str[1], 1);
+	setenv("NETFD", fd_str[2], 1);
+	
         kid_argv[0] = slink;
-        kid_argv[1] = fd_str[0];
-        kid_argv[2] = fd_str[1];
-        kid_argv[3] = fd_str[2];
-        kid_argv[4] = NULL;
-
+        kid_argv[1] = servname; 
+        kid_argv[2] = NULL;
 		
 	if(ircd_spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
 	{

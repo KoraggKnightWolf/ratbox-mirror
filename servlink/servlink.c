@@ -55,8 +55,8 @@ struct fd_table fds[3] = {
 static void
 usage(void)
 {
-	fprintf(stderr, "ircd-ratbox server link v1.2\n");
-	fprintf(stderr, "2004-03-02\n");
+	fprintf(stderr, "ircd-ratbox server link v1.3\n");
+	fprintf(stderr, "2005-11-04\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "This program is called by the ircd-ratbox ircd.\n");
 	fprintf(stderr, "It cannot be used on its own.\n");
@@ -69,7 +69,7 @@ main(int argc, char *argv[])
 	int max_fd = 0;
 	int i, x;
 	int maxconnects;
-	char *tmaxconnects;
+	char *tmaxconnects, *ctrlfd, *datafd, *netfd;
 #ifdef SERVLINK_DEBUG
 	int GDBAttached = 0;
 
@@ -77,21 +77,21 @@ main(int argc, char *argv[])
 		sleep(1);
 #endif
 	tmaxconnects = getenv("MAXFD");
+	ctrlfd = getenv("CTRLFD");
+	datafd = getenv("DATAFD");
+	netfd = getenv("NETFD");
 
 	/* Make sure we are running under ircd.. */
 	
-	if(argc != 4 || strcmp(argv[0], "-slink") || tmaxconnects == NULL)
+	if(argc != 2 || strcmp(argv[0], "-ircd servlink") || 
+		tmaxconnects == NULL || ctrlfd == NULL || datafd == NULL || netfd == NULL)
 		usage();	/* exits */
 
 	maxconnects = atoi(tmaxconnects);
+	fds[0].fd = atoi(ctrlfd);
+	fds[1].fd = atoi(datafd);
+	fds[2].fd = atoi(netfd);
 	
-	for (i = 0; i < 3; i++)
-	{
-		fds[i].fd = atoi(argv[i + 1]);
-		if(fds[i].fd < 0)
-			exit(1);
-	}
-
 	for(i = 0; i < maxconnects; i++)
 	{
 		if(i != fds[0].fd && i != fds[1].fd && i != fds[2].fd)
