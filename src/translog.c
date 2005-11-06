@@ -153,7 +153,7 @@ translog_add_ban(translog_type type, struct Client *source_p, const char *mask,
 		ircd_snprintf_append(buf, sizeof(buf), ",\"%s\"", oper_reason);
 
 	if(humandate)
-		ircd_snprintf_append(buf, sizeof(buf), ",\"%s\"", smalldate());
+		ircd_snprintf_append(buf, sizeof(buf), ",\"%s\"", smalldate(ircd_currenttime));
 
 	ircd_snprintf_append(buf, sizeof(buf), ",\"%s\",%ld\n",
 				get_oper_name(source_p), ircd_currenttime);

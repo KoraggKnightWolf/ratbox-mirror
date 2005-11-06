@@ -124,7 +124,7 @@ ilog(ilogfile dest, const char *format, ...)
 	ircd_vsnprintf(buf, sizeof(buf), format, args);
 	va_end(args);
 
-	ircd_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(), buf);
+	ircd_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(ircd_currenttime), buf);
 #ifdef __MINGW32__
 	fputs(buf2, stderr);
 	fflush(stderr);
@@ -161,11 +161,10 @@ report_operspy(struct Client *source_p, const char *token, const char *arg)
 }
 
 const char *
-smalldate(void)
+smalldate(time_t ltime)
 {
 	static char buf[MAX_DATE_STRING];
 	struct tm *lt;
-	time_t ltime = ircd_currenttime;
 
 	lt = localtime(&ltime);
 

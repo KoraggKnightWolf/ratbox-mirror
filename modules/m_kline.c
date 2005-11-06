@@ -165,7 +165,7 @@ mo_kline(struct Client *UNUSED(client_p), struct Client *source_p,
 		return 0;
 
 	ircd_set_time();
-	current_date = smalldate();
+	current_date = smalldate(ircd_currenttime);
 	aconf = make_conf();
 	aconf->status = CONF_KILL;
 	DupString(aconf->host, host);
@@ -261,7 +261,7 @@ me_kline(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(pa
 			DupString(aconf->spasswd, oper_reason);
 	}
 
-	current_date = smalldate();
+	current_date = smalldate(ircd_currenttime);
 
 	if(tkline_time > 0)
 	{

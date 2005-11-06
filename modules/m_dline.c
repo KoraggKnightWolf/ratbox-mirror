@@ -181,7 +181,7 @@ mo_dline(struct Client * UNUSED(client_p), struct Client *source_p,
 	}
 
 	ircd_set_time();
-	current_date = smalldate();
+	current_date = smalldate(ircd_currenttime);
 
 	aconf = make_conf();
 	aconf->status = CONF_DLINE;

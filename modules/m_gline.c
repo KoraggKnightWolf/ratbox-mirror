@@ -629,7 +629,7 @@ set_local_gline(struct Client *source_p, const char *user,
 	char *my_reason;
 	char *oper_reason;
 
-	current_date = smalldate();
+	current_date = smalldate(ircd_currenttime);
 
 	my_reason = LOCAL_COPY(reason);
 
