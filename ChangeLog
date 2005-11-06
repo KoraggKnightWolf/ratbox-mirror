@@ -1,3 +1,17 @@
+leeh        2005/11/06 21:25:29 UTC	(20051106_1-21092)
+  Log:
+  - make smalldate() take a time argument
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_log.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_gline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/src/s_log.c (File Modified) 
+	ircd-ratbox/trunk/src/translog.c (File Modified) 
+
+
 androsyn    2005/11/06 02:02:54 UTC	(20051106_0-21090)
   Log:
   Add a autoconf macro for detecting/generating a stdint.h file for
