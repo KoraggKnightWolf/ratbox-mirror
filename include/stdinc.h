@@ -233,5 +233,6 @@ extern int errno;
 #endif
 #endif
 
+#include "_stdint.h"
 #include "ircd_defs.h"
 #include "common.h"

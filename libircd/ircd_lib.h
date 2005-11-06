@@ -17,6 +17,7 @@
 
 #include "setup.h"
 #include "config.h"
+#include "_stdint.h"
 
 #ifdef STRING_WITH_STRINGS
 # include <string.h>

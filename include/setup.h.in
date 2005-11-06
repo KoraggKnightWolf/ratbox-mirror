@@ -300,6 +300,21 @@
 /* This is the type of IO loop we are using */
 #undef SELECT_TYPE
 
+/* The size of a `char', as computed by sizeof. */
+#undef SIZEOF_CHAR
+
+/* The size of a `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of a `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of a `short', as computed by sizeof. */
+#undef SIZEOF_SHORT
+
+/* The size of a `void*', as computed by sizeof. */
+#undef SIZEOF_VOIDP
+
 /* Define to 1 if sockaddr has a 'sa_len' member. */
 #undef SOCKADDR_IN_HAS_LEN
 
@@ -395,12 +410,6 @@
 
 /* If we don't have a real socklen_t, unsigned int is good enough. */
 #undef socklen_t
-
-/* If system does not define u_int16_t, define a usable substitute. */
-#undef u_int16_t
-
-/* If system does not define u_int32_t, define to unsigned long int here. */
-#undef u_int32_t
 
 /* Define as `fork' if `vfork' does not work. */
 #undef vfork
