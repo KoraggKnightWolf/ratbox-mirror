@@ -838,13 +838,14 @@ dnl	AC_DEFINE([HASHSIZE], 4096, [Max number of buckets in hash tables.])
 	AC_DEFINE([CLIENT_HEAP_SIZE], 256, [Size of the client heap.])
 	AC_DEFINE([LCLIENT_HEAP_SIZE], 128, [Size of the local client heap.])
 	AC_DEFINE([USER_HEAP_SIZE], 128, [Size of the user heap.])
-	AC_DEFINE([DNODE_HEAP_SIZE], 256, [Size of the dlink_node heap.])
+	AC_DEFINE([DNODE_HEAP_SIZE], 512, [Size of the dlink_node heap.])
 	AC_DEFINE([TOPIC_HEAP_SIZE], 256, [Size of the topic heap.])
 	AC_DEFINE([LINEBUF_HEAP_SIZE], 128, [Size of the linebuf heap.])
 	AC_DEFINE([MEMBER_HEAP_SIZE], 256, [Sizeof member heap.])
 	AC_DEFINE([ND_HEAP_SIZE], 128, [Size of the nick delay heap.])
 	AC_DEFINE([CONFITEM_HEAP_SIZE], 128, [Size of the confitem heap.])
 	AC_DEFINE([MONITOR_HEAP_SIZE], 128, [Size of the monitor heap.])
+	AC_DEFINE([AUTH_HEAP_SIZE], 128, [Size of the auth heap.])
 else
 dnl These settings are for a large network like efnet..they will use lots of memory
 dnl so enable small net unless you really need this much support
@@ -859,8 +860,9 @@ dnl so enable small net unless you really need this much support
         AC_DEFINE([LINEBUF_HEAP_SIZE], 2048, [Size of the linebuf heap.])
         AC_DEFINE([MEMBER_HEAP_SIZE], 32768, [Sizeof member heap.])
         AC_DEFINE([ND_HEAP_SIZE], 512, [Size of the nick delay heap.])
-        AC_DEFINE([CONFITEM_HEAP_SIZE], 256, [Size of the confitem heap.])
+        AC_DEFINE([CONFITEM_HEAP_SIZE], 1024, [Size of the confitem heap.])
 	AC_DEFINE([MONITOR_HEAP_SIZE], 1024, [Size of the monitor heap.])
+	AC_DEFINE([AUTH_HEAP_SIZE], 256, [Size of the auth heap.])
 fi
 
 AC_ARG_WITH(nicklen,

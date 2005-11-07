@@ -232,7 +232,7 @@ init_auth(void)
 	}
 	memset(&auth_poll_list, 0, sizeof(auth_poll_list));
 	ircd_event_addish("timeout_auth_queries_event", timeout_auth_queries_event, NULL, 3);
-	auth_heap = BlockHeapCreate(sizeof(struct AuthRequest), LCLIENT_HEAP_SIZE);
+	auth_heap = BlockHeapCreate(sizeof(struct AuthRequest), AUTH_HEAP_SIZE);
 
 }
 

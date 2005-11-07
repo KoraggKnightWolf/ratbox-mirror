@@ -30219,7 +30219,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<\_ACEOF
-#define DNODE_HEAP_SIZE 256
+#define DNODE_HEAP_SIZE 512
 _ACEOF
 
 
@@ -30250,6 +30250,11 @@ _ACEOF
 
 cat >>confdefs.h <<\_ACEOF
 #define MONITOR_HEAP_SIZE 128
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define AUTH_HEAP_SIZE 128
 _ACEOF
 
 else
@@ -30310,12 +30315,17 @@ _ACEOF
 
 
 cat >>confdefs.h <<\_ACEOF
-#define CONFITEM_HEAP_SIZE 256
+#define CONFITEM_HEAP_SIZE 1024
 _ACEOF
 
 
 cat >>confdefs.h <<\_ACEOF
 #define MONITOR_HEAP_SIZE 1024
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define AUTH_HEAP_SIZE 256
 _ACEOF
 
 fi
