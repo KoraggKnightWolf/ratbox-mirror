@@ -1,3 +1,11 @@
+androsyn    2005/11/07 04:06:54 UTC	(20051107_0-21100)
+  Log:
+  using a block heap for patricia tree is mostly pointless
+
+  Modified:
+	ircd-ratbox/trunk/src/patricia.c (File Modified) 
+
+
 leeh        2005/11/06 21:25:29 UTC	(20051106_1-21092)
   Log:
   - make smalldate() take a time argument
