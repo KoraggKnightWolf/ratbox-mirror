@@ -1,3 +1,20 @@
+androsyn    2005/11/07 04:24:25 UTC	(20051107_1-21102)
+  Log:
+  From 2.1: 
+    - dont use a blockheap for the file cache.. its not really needed.
+    - alter a few of the blockheap allocations
+    - make auth heap its own value
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2005/11/07 04:06:54 UTC	(20051107_0-21100)
   Log:
   using a block heap for patricia tree is mostly pointless
