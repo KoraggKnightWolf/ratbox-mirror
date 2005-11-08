@@ -67,14 +67,14 @@ struct SlinkRpl
 
 struct ZipStats
 {
-	unsigned long in;
-	unsigned long in_wire;
-	unsigned long out;
-	unsigned long out_wire;
-	unsigned long inK;
-	unsigned long inK_wire;
-	unsigned long outK;
-	unsigned long outK_wire;
+	u_int32_t in;
+	u_int32_t in_wire;
+	u_int32_t out;
+	u_int32_t out_wire;
+	u_int32_t inK;
+	u_int32_t inK_wire;
+	u_int32_t outK;
+	u_int32_t outK_wire;
 	double in_ratio;
 	double out_ratio;
 };
@@ -158,22 +158,13 @@ struct LocalUser
 	/* Send and receive linebuf queues .. */
 	buf_head_t buf_sendq;
 	buf_head_t buf_recvq;
-	/*
-	 * we want to use unsigned int here so the sizes have a better chance of
-	 * staying the same on 64 bit machines. The current trend is to use
-	 * I32LP64, (32 bit ints, 64 bit longs and pointers) and since ircd
-	 * will NEVER run on an operating system where ints are less than 32 bits, 
-	 * it's a relatively safe bet to use ints. Since right shift operations are
-	 * performed on these, it's not safe to allow them to become negative, 
-	 * which is possible for long running server connections. Unsigned values 
-	 * generally overflow gracefully. --Bleep
-	 */
-	unsigned int sendM;	/* Statistics: protocol messages send */
-	unsigned int sendK;	/* Statistics: total k-bytes send */
-	unsigned int receiveM;	/* Statistics: protocol messages received */
-	unsigned int receiveK;	/* Statistics: total k-bytes received */
-	unsigned short sendB;	/* counters to count upto 1-k lots of bytes */
-	unsigned short receiveB;	/* sent and received. */
+
+	u_int32_t sendM;	/* Statistics: protocol messages send */
+	u_int32_t sendK;	/* Statistics: total k-bytes send */
+	u_int32_t receiveM;	/* Statistics: protocol messages received */
+	u_int32_t receiveK;	/* Statistics: total k-bytes received */
+	u_int16_t sendB;	/* counters to count upto 1-k lots of bytes */
+	u_int16_t receiveB;	/* sent and received. */
 	struct Listener *listener;	/* listener accepted from */
 	struct ConfItem *att_conf;	/* attached conf */
 	struct server_conf *att_sconf;
