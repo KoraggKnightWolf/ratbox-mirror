@@ -35,9 +35,9 @@
 #include "match.h"
 
 #ifdef IPV6
-static unsigned long hash_ipv6(struct sockaddr *, int);
+static u_int32_t hash_ipv6(struct sockaddr *, int);
 #endif
-static unsigned long hash_ipv4(struct sockaddr *, int);
+static u_int32_t hash_ipv4(struct sockaddr *, int);
 
 
 /* int parse_netmask(const char *, struct irc_sockaddr_storage *, int *);
@@ -110,36 +110,36 @@ init_host_hash(void)
 	memset(&atable, 0, sizeof(atable));
 }
 
-/* unsigned long hash_ipv4(struct irc_sockaddr_storage*)
+/* u_int32_t hash_ipv4(struct irc_sockaddr_storage*)
  * Input: An IP address.
  * Output: A hash value of the IP address.
  * Side effects: None
  */
-static unsigned long
+static u_int32_t
 hash_ipv4(struct sockaddr *saddr, int bits)
 {
 	struct sockaddr_in *addr = (struct sockaddr_in *) saddr;
 	
 	if(bits != 0)
 	{
-		unsigned long av = ntohl(addr->sin_addr.s_addr) & ~((1 << (32 - bits)) - 1);
+		u_int32_t av = ntohl(addr->sin_addr.s_addr) & ~((1 << (32 - bits)) - 1);
 		return (av ^ (av >> 12) ^ (av >> 24)) & (ATABLE_SIZE - 1);
 	}
 
 	return 0;
 }
 
-/* unsigned long hash_ipv6(struct irc_sockaddr_storage*)
+/* u_int32_t hash_ipv6(struct irc_sockaddr_storage*)
  * Input: An IP address.
  * Output: A hash value of the IP address.
  * Side effects: None
  */
 #ifdef IPV6
-static unsigned long
+static u_int32_t
 hash_ipv6(struct sockaddr *saddr, int bits)
 {
 	struct sockaddr_in6 *addr = (struct sockaddr_in6 *) saddr;
-	unsigned long v = 0, n;
+	u_int32_t v = 0, n;
 	for (n = 0; n < 16; n++)
 	{
 		if(bits >= 8)
@@ -164,11 +164,11 @@ hash_ipv6(struct sockaddr *saddr, int bits)
  * Output: The hash of the string between 1 and (TH_MAX-1)
  * Side-effects: None.
  */
-static int
+static u_int32_t
 hash_text(const char *start)
 {
 	const char *p = start;
-	unsigned long h = 0;
+	u_int32_t h = 0;
 
 	while(*p)
 	{
@@ -178,13 +178,13 @@ hash_text(const char *start)
 	return (h & (ATABLE_SIZE - 1));
 }
 
-/* unsigned long get_hash_mask(const char *)
+/* u_int32_t get_hash_mask(const char *)
  * Input: The text to hash.
  * Output: The hash of the string right of the first '.' past the last
  *         wildcard in the string.
  * Side-effects: None.
  */
-static unsigned long
+static u_int32_t
 get_mask_hash(const char *text)
 {
 	const char *hp = "", *p;
@@ -208,7 +208,7 @@ struct ConfItem *
 find_auth(const char *name, const char *sockhost, 
 		struct sockaddr *addr, int fam, const char *username)
 {
-	unsigned long hprecv = 0;
+	u_int32_t hprecv = 0;
 	struct ConfItem *hprec = NULL;
 	struct AddressRec *arec;
 	int b;
@@ -467,9 +467,9 @@ find_address_conf(const char *host, const char *sockhost, const char *user,
 void
 add_conf_by_address(const char *address, int type, const char *username, struct ConfItem *aconf)
 {
-	static unsigned long prec_value = 0xFFFFFFFF;
+	static u_int32_t prec_value = 0xFFFFFFFF;
 	int masktype, bits;
-	unsigned long hv;
+	u_int32_t hv;
 	struct AddressRec *arec;
 
 	if(address == NULL)
@@ -523,7 +523,7 @@ void
 delete_one_address_conf(const char *address, struct ConfItem *aconf)
 {
 	int masktype, bits;
-	unsigned long hv;
+	u_int32_t hv;
 	struct AddressRec *arec, *arecl = NULL;
 	struct irc_sockaddr_storage addr;
 	masktype = parse_netmask(address, (struct sockaddr *)&addr, &bits);
