@@ -1,3 +1,12 @@
+androsyn    2005/11/08 20:12:05 UTC	(20051108_4-21124)
+  Log:
+  change hash_whowas_name to return u_int32_t
+
+  Modified:
+	ircd-ratbox/trunk/include/whowas.h (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2005/11/08 16:59:39 UTC	(20051108_3-21110)
   Log:
   Change the byte counters from using unsigned int to u_int32_t as
