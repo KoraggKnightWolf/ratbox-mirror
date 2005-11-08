@@ -1381,8 +1381,9 @@ stats_ziplinks (struct Client *source_p)
 					    "(%lu kB data/%lu kB wire)] recv[%.2f%% compression "
 					    "(%lu kB data/%lu kB wire)]",
 					    target_p->name,
-					    zipstats.out_ratio, zipstats.outK, zipstats.outK_wire,
-					    zipstats.in_ratio, zipstats.inK, zipstats.inK_wire);
+					    zipstats.out_ratio, (unsigned long)zipstats.outK, 
+					    (unsigned long)zipstats.outK_wire, zipstats.in_ratio, 
+					    (unsigned long)zipstats.inK, (unsigned long)zipstats.inK_wire);
 			sent_data++;
 		}
 	}
