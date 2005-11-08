@@ -1,3 +1,14 @@
+androsyn    2005/11/08 16:50:36 UTC	(20051108_2-21108)
+  Log:
+  Use u_int32_t in the hostmask hash code, as I suspect that using 
+  unsigned long on 64bit platforms won't quite behave as we'd like 
+  it to.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+
+
 androsyn    2005/11/08 16:41:21 UTC	(20051108_1-21106)
   Log:
   change res.h in header to dns.h
