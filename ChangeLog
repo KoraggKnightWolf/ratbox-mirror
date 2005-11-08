@@ -1,3 +1,11 @@
+androsyn    2005/11/08 20:12:52 UTC	(20051108_5-21126)
+  Log:
+  cast zipstats u_int32_t members to unsigned long for sprintf
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2005/11/08 20:12:05 UTC	(20051108_4-21124)
   Log:
   change hash_whowas_name to return u_int32_t
