@@ -47,7 +47,7 @@ struct Whowas *WHOWASHASH[WW_MAX];
 
 static int whowas_next = 0;
 
-unsigned int
+u_int32_t
 hash_whowas_name(const char *name)
 {
 	return fnv_hash_upper((const unsigned char *)name, WW_MAX_BITS, 0);
@@ -112,11 +112,11 @@ struct Client *
 get_history(const char *nick, time_t timelimit)
 {
 	struct Whowas *temp;
-	int blah;
+	u_int32_t nhash;
 
 	timelimit = ircd_currenttime - timelimit;
-	blah = hash_whowas_name(nick);
-	temp = WHOWASHASH[blah];
+	nhash = hash_whowas_name(nick);
+	temp = WHOWASHASH[nhash];
 	for (; temp; temp = temp->next)
 	{
 		if(irccmp(nick, temp->name))
