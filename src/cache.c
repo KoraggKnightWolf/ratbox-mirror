@@ -104,7 +104,7 @@ cache_file(const char *filename, const char *shortname, int flags)
 				 local_tm->tm_min);
 	}
 
-	cacheptr = ircd_malloc(sizeof(struct cachefile));
+	cacheptr = ircd_malloc(sizeof(struct cacheline));
 
 	strlcpy(cacheptr->name, shortname, sizeof(cacheptr->name));
 	cacheptr->flags = flags;
