@@ -1,3 +1,11 @@
+androsyn    2005/11/08 16:07:34 UTC	(20051108_0-21104)
+  Log:
+  malloc for the sizeof(struct cacheline) not struct cachefile
+
+  Modified:
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+
+
 androsyn    2005/11/07 04:24:25 UTC	(20051107_1-21102)
   Log:
   From 2.1: 
