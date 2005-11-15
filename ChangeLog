@@ -1,3 +1,12 @@
+androsyn    2005/11/15 21:11:50 UTC	(20051115_6-21221)
+  Log:
+  add the event for checking fd timeouts into libircd
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2005/11/15 20:58:48 UTC	(20051115_5-21219)
   Log:
   Clean up the i/o timeout code.  
