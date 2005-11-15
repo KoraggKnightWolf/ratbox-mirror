@@ -659,10 +659,6 @@ ratbox_main(int argc, char *argv[])
 
 	ircd_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
 
-	/* Setup the timeout check. I'll shift it later :)  -- adrian */
-	ircd_event_addish("ircd_checktimeouts", ircd_checktimeouts, NULL, 5);
-
-
 	if(splitmode)
 		ircd_event_add("check_splitmode", check_splitmode, NULL, 5);
 

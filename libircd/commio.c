@@ -680,6 +680,8 @@ ircd_fdlist_init(int closeall, int maxfds)
 		ircd_fd_table = ircd_malloc((maxfds + 1) * sizeof(fde_t));
 		initialized = 1;
 	}
+	ircd_event_addish("ircd_checktimeouts", ircd_checktimeouts, NULL, 5);
+
 }
 
 
