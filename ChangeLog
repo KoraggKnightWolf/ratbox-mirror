@@ -1,3 +1,37 @@
+androsyn    2005/11/15 20:58:48 UTC	(20051115_5-21219)
+  Log:
+  Clean up the i/o timeout code.  
+  - There is no need to pass a timeout value to ircd_setselect()
+    as this is really the job of ircd_settimeout().  
+  - Put timeout data into its own struct and then add that struct to a linked
+    list that has all of the info regarding all fds requiring timeouts to be handled.
+    This keeps us from having to spin the entire fd_table for a few cases that need 
+    timeout handling.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/devpoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/epoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/kqueue.c (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ports.c (File Modified) 
+	ircd-ratbox/trunk/libircd/select.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/win32.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/scache.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2005/11/15 17:04:08 UTC	(20051115_4-21217)
   Log:
   change ->name to const char *
