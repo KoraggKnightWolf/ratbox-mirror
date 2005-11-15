@@ -92,8 +92,7 @@ m_ison(struct Client * UNUSED(client_p), struct Client *source_p, int parc, cons
 				len = strlen(target_p->name);
 				if((current_insert_point + (len + 5)) < (buf + sizeof(buf)))
 				{
-					memcpy((void *) current_insert_point,
-					       (void *) target_p->name, len);
+					memcpy(current_insert_point, target_p->name, len);
 					current_insert_point += len;
 					*current_insert_point++ = ' ';
 				}

@@ -1315,7 +1315,7 @@ server_estab(struct Client *client_p)
 	struct Client *target_p;
 	struct server_conf *server_p;
 	hook_data_client hdata;
-	char *host;
+	const char *host;
 	dlink_node *ptr;
 
 	s_assert(NULL != client_p);

@@ -137,7 +137,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 	for (ch = pbuffer; *ch == ' '; ch++)	/* skip spaces */
 		/* null statement */ ;
 
-	para[0] = from->name;
+	para[0] = LOCAL_COPY(from->name);
 
 	if(*ch == ':')
 	{
@@ -165,7 +165,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 				return;
 			}
 
-			para[0] = from->name;
+			para[0] = LOCAL_COPY(from->name);
 
 			/* fake direction, hmm. */
 			if(from->from != client_p)

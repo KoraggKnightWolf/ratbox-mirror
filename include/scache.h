@@ -28,7 +28,7 @@
 #define INCLUDED_scache_h
 
 extern void clear_scache_hash_table(void);
-extern char *find_or_add(const char *name);
+extern const char *find_or_add(const char *name);
 extern void count_scache(size_t *, size_t *);
 
 #endif

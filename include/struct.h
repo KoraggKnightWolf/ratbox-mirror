@@ -101,7 +101,7 @@ struct Client
 	unsigned long serial;	/* used to enforce 1 send per nick */
 
 	/* client->name is the unique name for a client nick or host */
-	char *name;
+	const char *name;
 
 	/* 
 	 * client->username is the username from ident or the USER message, 

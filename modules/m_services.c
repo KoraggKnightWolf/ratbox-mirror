@@ -211,7 +211,7 @@ me_rsfnc(struct Client *UNUSED(client_p), struct Client *source_p,
 			target_p->name, parv[2], (long) target_p->tsinfo);
 
 	del_from_hash(HASH_CLIENT, target_p->name, target_p);
-	strcpy(target_p->name, parv[2]);
+	strcpy(target_p->user->name, parv[2]);
 	add_to_hash(HASH_CLIENT, target_p->name, target_p);
 
 	monitor_signon(target_p);

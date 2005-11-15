@@ -90,7 +90,7 @@ sc_hash(const char *string)
  * existing, servername.  use the hash in list.c for those.  -orabidoo
  */
 
-char *
+const char *
 find_or_add(const char *name)
 {
 	int hash_index;
