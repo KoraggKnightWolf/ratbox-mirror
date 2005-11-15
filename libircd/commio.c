@@ -224,8 +224,8 @@ ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 	}
 
 	if(F->timeout == NULL)
-		F->timeout = ircd_malloc(sizeof(struct timeout_data));	
-	
+		td = F->timeout = ircd_malloc(sizeof(struct timeout_data));	
+		
 	td->F = F;
 	td->timeout = ircd_currenttime + (timeout / 1000);
 	td->timeout_handler = callback;
