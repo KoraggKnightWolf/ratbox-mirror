@@ -1,3 +1,16 @@
+androsyn    2005/11/15 16:09:13 UTC	(20051115_1-21211)
+  Log:
+  Port of a few fixes from jilles
+  
+  - show real errno if we fail to connect to a server
+  - don't disclose server ip on irc
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2005/11/15 15:39:15 UTC	(20051115_0-21207)
   Log:
   Change ->name in struct Client to a pointer to either
