@@ -44,6 +44,7 @@ fde_t *ircd_fd_table = NULL;
 dlink_list *ircd_fd_table;
 #endif
 
+static dlink_list timeout_list;
 
 static const char *ircd_err_str[] = { "Comm OK", "Error during bind()",
 	"Error during DNS lookup", "connect timeout",
@@ -197,7 +198,6 @@ ircd_set_nb(int fd)
 	return 1;
 }
 
-
 /*
  * ircd_settimeout() - set the socket timeout
  *
@@ -207,13 +207,30 @@ void
 ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 {
 	fde_t *F;
+	struct timeout_data *td;
 	lircd_assert(fd >= 0);
 	F = find_fd(fd);
 	lircd_assert(F->flags.open);
+	td = F->timeout;
 
-	F->timeout = ircd_currenttime + (timeout / 1000);
-	F->timeout_handler = callback;
-	F->timeout_data = cbdata;
+	if(callback == NULL) /* user wants to remove */
+	{
+		if(td == NULL)
+			return;
+		ircd_dlinkDelete(&td->node, &timeout_list);
+		ircd_free(td);
+		F->timeout = NULL;
+		return;
+	}
+
+	if(F->timeout == NULL)
+		F->timeout = ircd_malloc(sizeof(struct timeout_data));	
+	
+	td->F = F;
+	td->timeout = ircd_currenttime + (timeout / 1000);
+	td->timeout_handler = callback;
+	td->timeout_data = cbdata;
+	ircd_dlinkAdd(td, &td->node, &timeout_list);
 }
 
 /*
@@ -226,29 +243,28 @@ ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 void
 ircd_checktimeouts(void * UNUSED(notused))
 {
-	int fd;
+	dlink_node *ptr, *next;
+	struct timeout_data *td;
+	fde_t *F;
 	PF *hdl;
 	void *data;
-	fde_t *F;
-	for (fd = 0; fd <= ircd_highest_fd; fd++)
+	
+	DLINK_FOREACH_SAFE(ptr, next, timeout_list.head)
 	{
-		F = find_fd(fd);
-		if(F == NULL)
-			continue;
-		if(!F->flags.open)
-			continue;
-		if(F->flags.closing)
+		td = ptr->data;
+		F = td->F;
+		if(F == NULL || F->flags.closing || !F->flags.open)
 			continue;
 
-		/* check timeouts */
-		if(F->timeout_handler && F->timeout > 0 && F->timeout < ircd_currenttime)
+		if(td->timeout < ircd_currenttime)
 		{
-			/* Call timeout handler */
-			hdl = F->timeout_handler;
-			data = F->timeout_data;
-			ircd_settimeout(F->fd, 0, NULL, NULL);
+			hdl = td->timeout_handler;
+			data = td->timeout_data;
+			ircd_dlinkDelete(&td->node, &timeout_list);
+			F->timeout = NULL;
+			ircd_free(td);
 			hdl(F->fd, data);
-		}
+		}		
 	}
 }
 
@@ -371,7 +387,7 @@ ircd_connect_tryconnect(int fd, void * UNUSED(notused))
 		else if(ignoreErrno(errno))
 			/* Ignore error? Reschedule */
 			ircd_setselect(F->fd, IRCD_SELECT_CONNECT,
-				       ircd_connect_tryconnect, NULL, 0);
+				       ircd_connect_tryconnect, NULL);
 		else
 			/* Error? Fail with IRCD_ERR_CONNECT */
 			ircd_connect_callback(F->fd, IRCD_ERR_CONNECT);
@@ -706,7 +722,8 @@ ircd_close(int fd)
 		lircd_assert(F->read_handler == NULL);
 		lircd_assert(F->write_handler == NULL);
 	}
-		ircd_setselect(F->fd, 0, NULL, NULL, 0);
+	ircd_setselect(F->fd, 0, NULL, NULL);
+	ircd_settimeout(F->fd, 0, NULL, NULL);
 
 	F->flags.open = 0;
 	ircd_fdlist_update_biggest(fd, 0);

@@ -278,7 +278,7 @@ ircd_setup_fd(int fd)
 
 void
 ircd_setselect(int fd, unsigned int type, PF * handler,
-	       void *client_data, time_t timeout)
+	       void *client_data)
 {
 	fde_t *F = find_fd(fd);
 	int old_flags = F->pflags;
@@ -307,12 +307,8 @@ ircd_setselect(int fd, unsigned int type, PF * handler,
 		F->write_data = client_data;
 	}
 	
-	if(timeout)
-		F->timeout = ircd_currenttime + (timeout / 1000);
-
 	if(old_flags == 0 && F->pflags == 0)
 		return;
-
 	
 	if(F->pflags != old_flags)
 	{

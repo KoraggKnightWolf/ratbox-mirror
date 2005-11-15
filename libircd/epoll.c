@@ -83,7 +83,7 @@ ircd_setup_fd(int UNUSED(fd))
  */
 void
 ircd_setselect(int fd, unsigned int type, PF * handler,
-	       void *client_data, time_t timeout)
+	       void *client_data)
 {
 	struct epoll_event ep_event;
 	fde_t *F = find_fd(fd);
@@ -113,9 +113,6 @@ ircd_setselect(int fd, unsigned int type, PF * handler,
 		F->write_handler = handler;
 		F->write_data = client_data;
 	}
-
-	if(timeout)
-		F->timeout = ircd_currenttime + (timeout / 1000);
 
 	if(old_flags == 0 && F->pflags == 0)
 		return;

@@ -501,7 +501,7 @@ accept_connection(int UNUSED(pfd), void *data)
 		{
 			/* Re-register a new IO request for the next accept .. */
 			ircd_setselect(listener->fd,
-				      IRCD_SELECT_ACCEPT, accept_connection, listener, 0);
+				      IRCD_SELECT_ACCEPT, accept_connection, listener);
 			return;
 		}
 		

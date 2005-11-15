@@ -130,6 +130,15 @@ extern int number_fd;
 
 struct Client;
 
+struct timeout_data
+{
+	fde_t *F;
+	dlink_node node;
+	time_t timeout;
+	PF *timeout_handler;
+	void *timeout_data;
+};
+
 struct _fde
 {
 	/* New-school stuff, again pretty much ripped from squid */
@@ -145,9 +154,7 @@ struct _fde
 	void *read_data;
 	PF *write_handler;
 	void *write_data;
-	PF *timeout_handler;
-	void *timeout_data;
-	time_t timeout;
+	struct timeout_data *timeout;
 	struct
 	{
 		unsigned int open:1;
@@ -254,7 +261,7 @@ extern int ircd_pipe(int *fd, const char *desc);
 
 /* These must be defined in the network IO loop code of your choice */
 extern void ircd_setselect(int fd, unsigned int type,
-			   PF * handler, void *client_data, time_t timeout);
+			   PF * handler, void *client_data);
 extern void init_netio(void);
 extern int read_message(time_t, unsigned char);
 extern int ircd_select(unsigned long);

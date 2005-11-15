@@ -55,7 +55,7 @@
 
 typedef struct scache_entry
 {
-	char name[HOSTLEN + 1];
+	char *name;
 	struct scache_entry *next;
 }
 SCACHE;
@@ -103,9 +103,9 @@ find_or_add(const char *name)
 			return (ptr->name);
 	}
 
-	ptr = (SCACHE *) ircd_malloc(sizeof(SCACHE));
-	s_assert(0 != ptr);
+	ptr = ircd_malloc(sizeof(SCACHE));
 
+	DupNString(ptr->name, name, HOSTLEN+1);
 	strlcpy(ptr->name, name, sizeof(ptr->name));
 
 	ptr->next = scache_hash[hash_index];

@@ -222,8 +222,8 @@ send_queued_write(int fd, void *data)
 	}
 
 	if(ircd_linebuf_len(&to->localClient->buf_sendq))
-	ircd_setselect(fd, IRCD_SELECT_WRITE,
-			       send_queued_write, to, 0);
+		ircd_setselect(fd, IRCD_SELECT_WRITE,
+			       send_queued_write, to);
 }
 
 /* send_queued_slink_write()
@@ -286,7 +286,7 @@ send_queued_slink_write(int UNUSED(fd), void *data)
 	/* if we have any more data, dns.hedule a write */
 	if(to->localClient->slinkq_len)
 		ircd_setselect(to->localClient->ctrlfd,
-			       IRCD_SELECT_WRITE, send_queued_slink_write, to, 0);
+			       IRCD_SELECT_WRITE, send_queued_slink_write, to);
 }
 
 /* sendto_one()

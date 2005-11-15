@@ -151,7 +151,7 @@ init_netio(void)
  */
 void
 ircd_setselect(int fd, unsigned int type, PF * handler,
-	       void *client_data, time_t timeout)
+	       void *client_data)
 {
 	fde_t *F = find_fd(fd);
 	lircd_assert(fd >= 0);
@@ -169,8 +169,6 @@ ircd_setselect(int fd, unsigned int type, PF * handler,
 		F->write_data = client_data;
 		poll_update_pollfds(fd, POLLWRNORM, handler);
 	}
-	if(timeout)
-		F->timeout = ircd_currenttime + (timeout / 1000);
 }
 
 /* int ircd_select_fdlist(unsigned long delay)

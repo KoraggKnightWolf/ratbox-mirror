@@ -353,7 +353,7 @@ auth_write_sendq(int UNUSED(fd), void * UNUSED(unused))
 	if(ircd_linebuf_len(&auth_sendq) > 0)
 	{
 		ircd_setselect(auth_ofd, IRCD_SELECT_WRITE, 
-			       auth_write_sendq, NULL, 0);
+			       auth_write_sendq, NULL);
 	}
 }
 
@@ -596,7 +596,7 @@ read_auth_reply(int UNUSED(fd), void * UNUSED(data))
 	if(length == -1 && !ignoreErrno(errno))
 		fork_ident();
 	
-	ircd_setselect(auth_ifd, IRCD_SELECT_READ, read_auth_reply, NULL, 0);	
+	ircd_setselect(auth_ifd, IRCD_SELECT_READ, read_auth_reply, NULL);	
 }
 
 void

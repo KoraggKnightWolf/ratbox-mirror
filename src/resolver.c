@@ -85,10 +85,10 @@ dns_select(void)
 	{
 		fd = pollfds[i].fd;
 		if(pollfds[i].events & ADNS_POLLIN)
-			ircd_setselect(fd, IRCD_SELECT_READ, dns_readable, NULL, 0);
+			ircd_setselect(fd, IRCD_SELECT_READ, dns_readable, NULL);
 		if(pollfds[i].events & ADNS_POLLOUT)
 			ircd_setselect(fd, IRCD_SELECT_WRITE,
-				       dns_writeable, NULL, 0);
+				       dns_writeable, NULL);
 	}
 }
 
@@ -154,7 +154,7 @@ write_sendq(int fd, void *UNUSED(unused))
 		}
 	}
 	if(ircd_linebuf_len(&sendq) > 0)
-		ircd_setselect(fd, IRCD_SELECT_WRITE, write_sendq, NULL, 0);
+		ircd_setselect(fd, IRCD_SELECT_WRITE, write_sendq, NULL);
 }
 
 /*
@@ -223,7 +223,7 @@ read_request(int fd, void *UNUSED(unusued))
 
 	if(length == -1 && !ignoreErrno(errno))
 		exit(1);
-	ircd_setselect(fd, IRCD_SELECT_READ, read_request, NULL, 0);
+	ircd_setselect(fd, IRCD_SELECT_READ, read_request, NULL);
 }
 
 

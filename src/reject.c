@@ -203,7 +203,7 @@ check_reject(struct Client *client_p)
 		{
 			ServerStats.is_rej++;
 			SetReject(client_p);
-			ircd_setselect(client_p->localClient->fd, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL, 0);
+			ircd_setselect(client_p->localClient->fd, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
 			SetClosing(client_p);
 			ircd_dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &delay_exit);
 			return 1;

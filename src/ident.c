@@ -159,7 +159,7 @@ write_sendq(int UNUSED(fd), void *UNUSED(unused))
 	if(ircd_linebuf_len(&sendq) > 0)
 	{
 		ircd_setselect(irc_ofd, IRCD_SELECT_WRITE,
-			       write_sendq, NULL, 0);
+			       write_sendq, NULL);
 	}
 }
  
@@ -244,7 +244,7 @@ read_auth(int fd, void *data)
 	if(len < 0 && ignoreErrno(errno))
 	{
 		ircd_settimeout(fd, 30, read_auth_timeout, auth);
-		ircd_setselect(fd, IRCD_SELECT_READ, read_auth, auth, 30);
+		ircd_setselect(fd, IRCD_SELECT_READ, read_auth, auth);
 		return;
 	} else {
 		buf[len] = '\0';
@@ -369,7 +369,7 @@ read_request(int fd, void * UNUSED(unusued))
         if(length == -1 && !ignoreErrno(errno))
                 exit(1);
 
-	ircd_setselect(irc_ifd, IRCD_SELECT_READ, read_request, NULL, 0);
+	ircd_setselect(irc_ifd, IRCD_SELECT_READ, read_request, NULL);
 }
 
 static void

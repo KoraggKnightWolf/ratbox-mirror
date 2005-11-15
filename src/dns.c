@@ -321,7 +321,7 @@ read_dns(int UNUSED(fd), void * UNUSED(data))
 	if(length == -1 && !ignoreErrno(errno))
 		fork_resolver(); 
 
-	ircd_setselect(dns_ifd, IRCD_SELECT_READ, read_dns, NULL, 0);
+	ircd_setselect(dns_ifd, IRCD_SELECT_READ, read_dns, NULL);
 }
 
 static void
@@ -340,7 +340,7 @@ dns_write_sendq(int UNUSED(fd), void * UNUSED(unused))
 	if(ircd_linebuf_len(&dns_sendq) > 0)
 	{
 		ircd_setselect(dns_ofd, IRCD_SELECT_WRITE,
-			       dns_write_sendq, NULL, 0);
+			       dns_write_sendq, NULL);
 	}
 }
  

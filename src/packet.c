@@ -311,7 +311,7 @@ read_ctrl_packet(int fd, void *data)
 
       nodata:
 	/* If we get here, we need to register for another IRCD_SELECT_READ */
-	ircd_setselect(fd, IRCD_SELECT_READ, read_ctrl_packet, server, 0);
+	ircd_setselect(fd, IRCD_SELECT_READ, read_ctrl_packet, server);
 }
 
 /*
@@ -348,7 +348,7 @@ read_packet(int UNUSED(fd), void *data)
 			if(ignoreErrno(errno))
 			{
 				ircd_setselect(client_p->localClient->fd, 
-						IRCD_SELECT_READ, read_packet, client_p, 0);
+						IRCD_SELECT_READ, read_packet, client_p);
 			} else
 				error_exit_client(client_p, length);
 			return;
@@ -408,7 +408,7 @@ read_packet(int UNUSED(fd), void *data)
 		if(length < READBUF_SIZE) 
 		{
 			ircd_setselect(client_p->localClient->fd,
-					IRCD_SELECT_READ, read_packet, client_p, 0);
+					IRCD_SELECT_READ, read_packet, client_p);
 			return;
 		}
 	}
