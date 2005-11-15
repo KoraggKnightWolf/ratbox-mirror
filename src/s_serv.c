@@ -720,7 +720,7 @@ serv_connect_callback(int fd, int status, void *data)
 #else
 					client_p->host,
 #endif
-					ircd_errstr(status), strerror(errno));
+					ircd_errstr(status), strerror(ircd_get_sockerr(fd)));
 
 		exit_client(client_p, client_p, &me, ircd_errstr(status));
 		return;
@@ -767,10 +767,7 @@ serv_connect_callback(int fd, int status, void *data)
 	 */
 	if(IsAnyDead(client_p))
 	{
-		sendto_realops_flags(UMODE_ALL, L_ADMIN,
-				     "%s[%s] went dead during handshake",
-				     client_p->name, client_p->host);
-		sendto_realops_flags(UMODE_ALL, L_OPER,
+		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s went dead during handshake", client_p->name);
 		exit_client(client_p, client_p, &me, "Went dead during handshake");
 		return;
