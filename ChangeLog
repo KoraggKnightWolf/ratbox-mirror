@@ -1,3 +1,11 @@
+androsyn    2005/11/15 16:22:47 UTC	(20051115_2-21213)
+  Log:
+  can't strlcpy() into client_p->name anymore..oops
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2005/11/15 16:09:13 UTC	(20051115_1-21211)
   Log:
   Port of a few fixes from jilles
