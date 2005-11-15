@@ -464,6 +464,7 @@ diecb(const char *buf)
 int
 ratbox_main(int argc, char *argv[])
 {
+	char emptyname[] = "";
 	/* Check to see if the user is running us as root, which is a nono */
 #ifndef __MINGW32__
 	if(geteuid() == 0)
@@ -490,6 +491,7 @@ ratbox_main(int argc, char *argv[])
 	/* It ain't random, but it ought to be a little harder to guess */
 	srand(ircd_systemtime.tv_sec ^ (ircd_systemtime.tv_usec | (getpid() << 20)));
 	memset(&me, 0, sizeof(me));
+	me.name = emptyname;
 	memset(&meLocalUser, 0, sizeof(meLocalUser));
 	me.localClient = &meLocalUser;
 
@@ -602,7 +604,7 @@ ratbox_main(int argc, char *argv[])
 		ilog(L_MAIN, "No server name specified in serverinfo block.");
 		exit(EXIT_FAILURE);
 	}
-	strlcpy(me.name, ServerInfo.name, sizeof(me.name));
+	me.name = ServerInfo.name;
 
 	if(ServerInfo.sid[0] == '\0')
 	{

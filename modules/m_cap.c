@@ -318,7 +318,7 @@ cap_end(struct Client *source_p, const char * UNUSED(arg))
 
 	source_p->flags &= ~FLAGS_CLICAP;
 
-	if(source_p->name[0] && source_p->user)
+	if(source_p->name && source_p->user)
 	{
 		char buf[USERLEN+1];
 		strlcpy(buf, source_p->username, sizeof(buf));

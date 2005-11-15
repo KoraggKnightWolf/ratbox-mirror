@@ -1166,7 +1166,7 @@ remove_our_modes(struct Channel *chptr)
 	struct membership *msptr;
 	dlink_node *ptr;
 	char lmodebuf[MODEBUFLEN];
-	char *lpara[MAXMODEPARAMS];
+	const char *lpara[MAXMODEPARAMS];
 	char *mbuf;
 	int count = 0;
 	int i;

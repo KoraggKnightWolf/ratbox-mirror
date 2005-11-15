@@ -37,7 +37,7 @@ struct User
 	char *away;		/* pointer to away message */
 	int refcnt;		/* Number of times this block is referenced */
 	const char *server;	/* pointer to scached server name */
-
+	char name[NICKLEN];
 #ifdef ENABLE_SERVICES
 	char suser[NICKLEN+1];
 #endif
@@ -49,6 +49,7 @@ struct Server
 	struct User *user;	/* who activated this connection */
 	const char *up;		/* Pointer to scache name */
 	const char *upid;
+	const char *name;
 	char by[NICKLEN];
 	dlink_list servers;
 	dlink_list users;
@@ -100,7 +101,7 @@ struct Client
 	unsigned long serial;	/* used to enforce 1 send per nick */
 
 	/* client->name is the unique name for a client nick or host */
-	char name[HOSTLEN + 1];
+	char *name;
 
 	/* 
 	 * client->username is the username from ident or the USER message, 

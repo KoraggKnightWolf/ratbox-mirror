@@ -599,16 +599,20 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 
 	/* This had to be copied here to avoid problems.. */
 	source_p->tsinfo = ircd_currenttime;
-	if(source_p->name[0])
+	if(source_p->name)
 		del_from_hash(HASH_CLIENT, source_p->name, source_p);
 
+	make_user(source_p);		
 	strcpy(source_p->name, nick);
 	add_to_hash(HASH_CLIENT, nick, source_p);
 
 	/* fd_desc is long enough */
 	ircd_note(client_p->localClient->fd, "Nick: %s", nick);
 
-	if(source_p->user)
+	/* note that fullcaps is the main part of checking to see if we got a USER command..
+	 * source_p->username would be set if we had got ident..its a hack but oh well
+	 */
+	if(source_p->user != NULL && !EmptyString(source_p->username) && source_p->localClient->fullcaps != NULL)
 	{
 		strlcpy(buf, source_p->username, sizeof(buf));
 

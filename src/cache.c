@@ -104,7 +104,7 @@ cache_file(const char *filename, const char *shortname, int flags)
 				 local_tm->tm_min);
 	}
 
-	cacheptr = ircd_malloc(sizeof(struct cacheline));
+	cacheptr = ircd_malloc(sizeof(struct cachefile));
 
 	strlcpy(cacheptr->name, shortname, sizeof(cacheptr->name));
 	cacheptr->flags = flags;
@@ -117,7 +117,7 @@ cache_file(const char *filename, const char *shortname, int flags)
 
 		if(!EmptyString(line))
 		{
-			lineptr = ircd_malloc(sizeof(struct cachefile));
+			lineptr = ircd_malloc(sizeof(struct cacheline));
 			strlcpy(lineptr->data, line, sizeof(lineptr->data));
 			ircd_dlinkAddTail(lineptr, &lineptr->linenode, &cacheptr->contents);
 		}
