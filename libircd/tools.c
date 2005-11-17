@@ -63,7 +63,7 @@ mem_frob(void *data, int len)
  */
 static BlockHeap *dnode_heap;
 void
-init_dlink_nodes(size_t dh_size)
+init_dlink_nodes(size_t UNUSED(dh_size))
 {
 
 	dnode_heap = BlockHeapCreate(sizeof(dlink_node), dh_size);
