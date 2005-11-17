@@ -1,3 +1,11 @@
+androsyn    2005/11/17 17:36:16 UTC	(20051117_0-21227)
+  Log:
+  the cachefile/cacheline heap sizes don't need to be here anymore
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.h (File Modified) 
+
+
 androsyn    2005/11/15 21:26:11 UTC	(20051115_7-21225)
   Log:
   helps if you actually assign the value returned from malloc to the variable you are going to use
