@@ -28,12 +28,8 @@
 # error "Do not use balloc.h directly"
 #endif
 
-#ifndef INCLUDED_blalloc_h
-#define INCLUDED_blalloc_h
-
-#define CACHEFILE_HEAP_SIZE	32
-#define CACHELINE_HEAP_SIZE	64
-
+#ifndef INCLUDED_balloc_h
+#define INCLUDED_balloc_h
 
 #ifdef NOBALLOC 
 	 
@@ -102,6 +98,4 @@ extern void BlockHeapUsage(BlockHeap * bh, size_t * bused, size_t * bfree, size_
 
 #endif /* NOBALLOC */
 
-
-
-#endif /* INCLUDED_blalloc_h */
+#endif /* INCLUDED_balloc_h */
