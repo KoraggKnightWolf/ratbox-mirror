@@ -1,3 +1,12 @@
+androsyn    2005/11/17 17:39:00 UTC	(20051117_1-21229)
+  Log:
+  add a few UNUSEDs that are needed if NOBALLOC is enabled
+
+  Modified:
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+	ircd-ratbox/trunk/libircd/tools.c (File Modified) 
+
+
 androsyn    2005/11/17 17:36:16 UTC	(20051117_0-21227)
   Log:
   the cachefile/cacheline heap sizes don't need to be here anymore
