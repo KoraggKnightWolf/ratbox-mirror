@@ -1,3 +1,23 @@
+androsyn    2005/11/18 15:58:10 UTC	(20051118_1-21243)
+  Log:
+  Casting the return value of malloc and the like really annoys me and isn't necessary with somewhat modern compiler.
+  Same goes for values passed into memset, memcpy...
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/crypt.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_time.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/src/class.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2005/11/18 15:36:25 UTC	(20051118_0-21241)
   Log:
   Have the timeout code run every 2 seconds instead of every 5 or so..
