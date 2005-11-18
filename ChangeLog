@@ -1,3 +1,14 @@
+androsyn    2005/11/18 21:59:24 UTC	(20051118_4-21249)
+  Log:
+  Save the last slot index in last_index, and check
+  to see if its unused the next time we allocate a slot.
+  Could possibly save a bit of looping from time to time..
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+
+
 androsyn    2005/11/18 21:52:02 UTC	(20051118_3-21247)
   Log:
   No point in zeroing values in the new bufline, seeing that the allocated
