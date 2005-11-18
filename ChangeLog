@@ -1,3 +1,13 @@
+androsyn    2005/11/18 21:52:02 UTC	(20051118_3-21247)
+  Log:
+  No point in zeroing values in the new bufline, seeing that the allocated
+  variable is already memset() for us..
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+
+
 androsyn    2005/11/18 21:46:52 UTC	(20051118_2-21245)
   Log:
   Add sendto_one_buffer() as well as ircd_linebuf_putbuf()
