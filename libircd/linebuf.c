@@ -56,10 +56,8 @@ ircd_linebuf_allocate(void)
 	buf_line_t *t;
 #ifndef NO_BLOCKHEAP
 	t = BlockHeapAlloc(ircd_linebuf_heap);
-	t->refcount = 0;
 #else
 	t = ircd_malloc(sizeof(buf_line_t));
-	t->refcount = 0;
 #endif
 	return (t);
 
@@ -94,11 +92,6 @@ ircd_linebuf_new_line(buf_head_t * bufhead)
 
 
 	node = make_dlink_node();
-
-	bufline->len = 0;
-	bufline->terminated = 0;
-	bufline->flushing = 0;
-	bufline->raw = 0;
 
 	/* Stick it at the end of the buf list */
 	ircd_dlinkAddTail(bufline, node, &bufhead->list);
