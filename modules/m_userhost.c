@@ -106,7 +106,7 @@ m_userhost(struct Client * UNUSED(client_p), struct Client *source_p, int parc, 
 		}
 	}
 
-	sendto_one(source_p, POP_QUEUE, "%s", buf);
+	sendto_one_buffer(source_p, POP_QUEUE, buf);
 
 	return 0;
 }

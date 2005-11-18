@@ -551,13 +551,13 @@ ircd_linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list * va_args,
 	bufline->terminated = 1;
 
 	/* Truncate the data if required */
-	if(len > 510)
+	if(unlikely(len > 510))
 	{
 		len = 510;
 		bufline->buf[len++] = '\r';
 		bufline->buf[len++] = '\n';
 	}
-	else if(len == 0)
+	else if(unlikely(len == 0))
 	{
 		bufline->buf[len++] = '\r';
 		bufline->buf[len++] = '\n';
@@ -581,6 +581,60 @@ ircd_linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list * va_args,
 }
 
 void
+ircd_linebuf_putbuf(buf_head_t *bufhead, const char *buffer)
+{
+	buf_line_t *bufline;
+	int len = 0;
+
+	/* make sure the previous line is terminated */
+#ifndef NDEBUG
+	if(bufhead->list.tail)
+	{
+		bufline = bufhead->list.tail->data;
+		lircd_assert(bufline->terminated);
+	}
+#endif
+	/* Create a new line */
+	bufline = ircd_linebuf_new_line(bufhead);
+
+	if(unlikely(buffer != NULL))
+		len = strlcpy(bufline->buf, buffer, BUF_DATA_SIZE);
+
+	bufline->terminated = 1;
+
+	/* Truncate the data if required */
+	if(unlikely(len > 510))
+	{
+		len = 510;
+		bufline->buf[len++] = '\r';
+		bufline->buf[len++] = '\n';
+	}
+	else if(unlikely(len == 0))
+	{
+		bufline->buf[len++] = '\r';
+		bufline->buf[len++] = '\n';
+		bufline->buf[len] = '\0';
+	}
+	else
+	{
+		/* Chop trailing CRLF's .. */
+		while((bufline->buf[len] == '\r') || (bufline->buf[len] == '\n') || (bufline->buf[len] == '\0'))
+		{
+			len--;
+		}
+
+		bufline->buf[++len] = '\r';
+		bufline->buf[++len] = '\n';
+		bufline->buf[++len] = '\0';
+	}
+
+	bufline->len = len;
+	bufhead->len += len;
+
+	
+}
+
+void
 ircd_linebuf_put(buf_head_t * bufhead, const char *format, ...)
 {
 	buf_line_t *bufline;
@@ -598,7 +652,7 @@ ircd_linebuf_put(buf_head_t * bufhead, const char *format, ...)
 	/* Create a new line */
 	bufline = ircd_linebuf_new_line(bufhead);
 
-	if(format != NULL)
+	if(unlikely(format != NULL))
 	{
 		va_start(args, format);
 		len = ircd_vsnprintf(bufline->buf, BUF_DATA_SIZE, format, args);
@@ -608,13 +662,13 @@ ircd_linebuf_put(buf_head_t * bufhead, const char *format, ...)
 	bufline->terminated = 1;
 
 	/* Truncate the data if required */
-	if(len > 510)
+	if(unlikely(len > 510))
 	{
 		len = 510;
 		bufline->buf[len++] = '\r';
 		bufline->buf[len++] = '\n';
 	}
-	else if(len == 0)
+	else if(unlikely(len == 0))
 	{
 		bufline->buf[len++] = '\r';
 		bufline->buf[len++] = '\n';

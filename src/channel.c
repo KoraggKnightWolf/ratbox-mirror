@@ -425,7 +425,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 			if(cur_len + strlen(target_p->name) + 3 >= BUFSIZE-3)
 			{
 				*(t - 1) = '\0';
-				sendto_one(client_p, HOLD_QUEUE, "%s", lbuf);
+				sendto_one_buffer(client_p, HOLD_QUEUE, lbuf);
 				cur_len = mlen;
 				t = lbuf + mlen;
 			}
@@ -447,7 +447,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 		if(cur_len != mlen)
 		{
 			*(t - 1) = '\0';
-			sendto_one(client_p, HOLD_QUEUE, "%s", lbuf);
+			sendto_one_buffer(client_p, HOLD_QUEUE, lbuf);
 		}
 	}
 

@@ -108,9 +108,9 @@ add_monitor(struct Client *client_p, const char *nicks)
 			char buf[100];
 
 			if(cur_onlen != mlen)
-				sendto_one(client_p, POP_QUEUE, "%s", onbuf);
+				sendto_one_buffer(client_p, POP_QUEUE, onbuf);
 			if(cur_offlen != mlen)
-				sendto_one(client_p, POP_QUEUE, "%s", offbuf);
+				sendto_one_buffer(client_p, POP_QUEUE, offbuf);
 
 			if(p)
 				ircd_snprintf(buf, sizeof(buf), "%s,%s", name, p);
@@ -137,7 +137,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 			if(cur_onlen + strlen(target_p->name) + 
 			   strlen(target_p->username) + strlen(target_p->host) + 3 >= BUFSIZE-3)
 			{
-				sendto_one(client_p, POP_QUEUE, "%s", onbuf);
+				sendto_one_buffer(client_p, POP_QUEUE, onbuf);
 				cur_onlen = mlen;
 				onptr = onbuf + mlen;
 			}
@@ -157,7 +157,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 		{
 			if(cur_offlen + strlen(name) + 1 >= BUFSIZE-3)
 			{
-				sendto_one(client_p, POP_QUEUE, "%s", offbuf);
+				sendto_one_buffer(client_p, POP_QUEUE, offbuf);
 				cur_offlen = mlen;
 				offptr = offbuf + mlen;
 			}
@@ -174,9 +174,9 @@ add_monitor(struct Client *client_p, const char *nicks)
 	}
 
 	if(cur_onlen != mlen)
-		sendto_one(client_p, POP_QUEUE, "%s", onbuf);
+		sendto_one_buffer(client_p, POP_QUEUE, onbuf);
 	if(cur_offlen != mlen)
-		sendto_one(client_p, POP_QUEUE, "%s", offbuf);
+		sendto_one_buffer(client_p, POP_QUEUE, offbuf);
 }
 
 static void
@@ -232,7 +232,7 @@ list_monitor(struct Client *client_p)
 
 		if(cur_len + strlen(monptr->name) + 1 >= BUFSIZE-3)
 		{
-			sendto_one(client_p, HOLD_QUEUE, "%s", buf);
+			sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 			nbuf = buf + mlen;
 			cur_len = mlen;
 		}
@@ -246,7 +246,7 @@ list_monitor(struct Client *client_p)
 		nbuf += arglen;
 	}
 
-	sendto_one(client_p, POP_QUEUE, "%s", buf);
+	sendto_one_buffer(client_p, POP_QUEUE, buf);
 	sendto_one(client_p, POP_QUEUE, form_str(RPL_ENDOFMONLIST), 
 			me.name, client_p->name);
 }
@@ -279,7 +279,7 @@ show_monitor_status(struct Client *client_p)
 			if(cur_onlen + strlen(target_p->name) + 
 			   strlen(target_p->username) + strlen(target_p->host) + 3 >= BUFSIZE-3)
 			{
-				sendto_one(client_p, HOLD_QUEUE, "%s", onbuf);
+				sendto_one_buffer(client_p, HOLD_QUEUE, onbuf);
 				cur_onlen = mlen;
 				onptr = onbuf + mlen;
 			}
@@ -299,7 +299,7 @@ show_monitor_status(struct Client *client_p)
 		{
 			if(cur_offlen + strlen(monptr->name) + 1 >= BUFSIZE-3)
 			{
-				sendto_one(client_p, POP_QUEUE, "%s", offbuf);
+				sendto_one_buffer(client_p, POP_QUEUE, offbuf);
 				cur_offlen = mlen;
 				offptr = offbuf + mlen;
 			}
@@ -317,9 +317,9 @@ show_monitor_status(struct Client *client_p)
 	}
 
 	if(cur_onlen != mlen)
-		sendto_one(client_p, POP_QUEUE, "%s", onbuf);
+		sendto_one_buffer(client_p, POP_QUEUE, onbuf);
 	if(cur_offlen != mlen)
-		sendto_one(client_p, POP_QUEUE, "%s", offbuf);
+		sendto_one_buffer(client_p, POP_QUEUE, offbuf);
 }
 
 

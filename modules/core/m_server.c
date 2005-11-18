@@ -1021,7 +1021,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr,
 
 			/* chop off trailing space and send.. */
 			*(t-1) = '\0';
-			sendto_one(client_p, HOLD_QUEUE, "%s", buf);
+			sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 			cur_len = mlen;
 			t = buf + mlen;
 		}
@@ -1035,7 +1035,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr,
 	 * chop off trailing space and send.
 	 */
 	*(t-1) = '\0';
-	sendto_one(client_p, HOLD_QUEUE, "%s", buf);
+	sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 }
 
 /*
@@ -1123,7 +1123,7 @@ burst_TS5(struct Client *client_p)
 			{
 				t--;
 				*t = '\0';
-				sendto_one(client_p, HOLD_QUEUE, "%s", buf);
+				sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 				cur_len = mlen;
 				t = buf + mlen;
 			}
@@ -1138,7 +1138,7 @@ burst_TS5(struct Client *client_p)
 		/* remove trailing space */
 		t--;
 		*t = '\0';
-		sendto_one(client_p, HOLD_QUEUE, "%s", buf);
+		sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 
 		burst_modes_TS5(client_p, chptr->chname, &chptr->banlist, 'b');
 
@@ -1259,7 +1259,7 @@ burst_TS6(struct Client *client_p)
 			if(cur_len + tlen >= BUFSIZE - 3)
 			{
 				*(t-1) = '\0';
-				sendto_one(client_p, HOLD_QUEUE, "%s", buf);
+				sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 				cur_len = mlen;
 				t = buf + mlen;
 			}
@@ -1273,7 +1273,7 @@ burst_TS6(struct Client *client_p)
 
 		/* remove trailing space */
 		*(t-1) = '\0';
-		sendto_one(client_p, HOLD_QUEUE, "%s", buf);
+		sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 
 		if(dlink_list_length(&chptr->banlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->banlist, 'b');

@@ -289,6 +289,28 @@ send_queued_slink_write(int UNUSED(fd), void *data)
 			       IRCD_SELECT_WRITE, send_queued_slink_write, to);
 }
 
+/* sendto_one_buffer()
+ *
+ * inputs	- client to send to, buffer
+ * outputs	- client has message put into its queue
+ */
+void
+sendto_one_buffer(struct Client *target_p, int queue, const char *buffer)
+{
+	buf_head_t linebuf;
+	
+	if(target_p->from != NULL)
+		target_p = target_p->from;
+	
+	if(IsIOError(target_p))
+		return;
+
+	ircd_linebuf_newbuf(&linebuf);
+	ircd_linebuf_put(&linebuf, buffer);
+	_send_linebuf(target_p, &linebuf, queue);
+	ircd_linebuf_donebuf(&linebuf);	
+}
+
 /* sendto_one()
  *
  * inputs	- client to send to, va_args

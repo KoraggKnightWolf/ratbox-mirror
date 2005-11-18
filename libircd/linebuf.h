@@ -84,6 +84,7 @@ extern int ircd_linebuf_parse(buf_head_t *, char *, int, int);
 extern int ircd_linebuf_get(buf_head_t *, char *, int, int, int);
 extern void ircd_linebuf_putmsg(buf_head_t *, const char *, va_list *, const char *, ...);
 extern void ircd_linebuf_put(buf_head_t *, const char *, ...);
+extern void ircd_linebuf_putbuf(buf_head_t *bufhead, const char *buffer);
 extern int ircd_linebuf_flush(int, buf_head_t *);
 extern void ircd_linebuf_attach(buf_head_t *, buf_head_t *);
 extern void ircd_count_ircd_linebuf_memory(size_t *, size_t *);

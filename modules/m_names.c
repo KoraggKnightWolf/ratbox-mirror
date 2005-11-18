@@ -174,7 +174,7 @@ names_global(struct Client *source_p)
 
 		if((cur_len + NICKLEN + 2) > (BUFSIZE - 3))
 		{
-			sendto_one(source_p, POP_QUEUE, "%s", buf);
+			sendto_one_buffer(source_p, POP_QUEUE, buf);
 			cur_len = mlen;
 			t = buf + mlen;
 		}
@@ -185,5 +185,5 @@ names_global(struct Client *source_p)
 	}
 
 	if(cur_len > mlen)
-		sendto_one(source_p, POP_QUEUE, "%s", buf);
+		sendto_one_buffer(source_p, POP_QUEUE, buf);
 }

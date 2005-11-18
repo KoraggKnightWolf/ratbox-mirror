@@ -41,6 +41,7 @@ extern void send_queued_slink_write(int fd, void *data);
 #define HOLD_QUEUE 1
 extern void send_pop_queue(struct Client *);
 extern void sendto_one(struct Client *target_p, int queue, const char *, ...) AFP(3, 4);
+extern void sendto_one_buffer(struct Client *target_p, int queue, const char *buffer);
 extern void sendto_one_notice(struct Client *target_p, int queue, const char *, ...) AFP(3, 4);
 extern void sendto_one_prefix(struct Client *target_p, struct Client *source_p,
 			      const char *command, const char *, ...) AFP(4, 5);

@@ -277,7 +277,7 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 		{
 			if((cur_len + strlen(chptr->chname) + 3) > (BUFSIZE - 5))
 			{
-				sendto_one(source_p, HOLD_QUEUE, "%s", buf);
+				sendto_one_buffer(source_p, HOLD_QUEUE, buf);
 				cur_len = mlen;
 				t = buf + mlen;
 			}
@@ -292,7 +292,7 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 	}
 
 	if(cur_len > mlen)
-		sendto_one(source_p, HOLD_QUEUE, "%s", buf);
+		sendto_one_buffer(source_p, HOLD_QUEUE, buf);
 
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_WHOISSERVER, form_str(RPL_WHOISSERVER),
 			   target_p->name, target_p->user->server,
