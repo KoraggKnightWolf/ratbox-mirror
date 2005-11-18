@@ -184,8 +184,8 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	trace_spy(source_p, NULL);
 
-	memset((void *) link_s, 0, sizeof(link_s));
-	memset((void *) link_u, 0, sizeof(link_u));
+	memset(link_s, 0, sizeof(link_s));
+	memset(link_u, 0, sizeof(link_u));
 
 	/* count up the servers behind the server links only if were going
 	 * to be using them --fl

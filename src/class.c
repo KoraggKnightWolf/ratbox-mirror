@@ -48,7 +48,7 @@ make_class(void)
 {
 	struct Class *tmp;
 
-	tmp = (struct Class *) ircd_malloc(sizeof(struct Class));
+	tmp = ircd_malloc(sizeof(struct Class));
 
 	ConFreq(tmp) = DEFAULT_CONNECTFREQUENCY;
 	PingFreq(tmp) = DEFAULT_PINGFREQUENCY;

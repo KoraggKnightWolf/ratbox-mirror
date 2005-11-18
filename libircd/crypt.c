@@ -1000,7 +1000,7 @@ static void __md5_Update ( struct MD5Context *context, const char *xinput, unsig
 
 	/* Transform as many times as possible. */
 	if (inputLen >= partLen) {
-		memcpy((void *)&context->buffer[lindex], (const void *)input,
+		memcpy(&context->buffer[lindex], input,
 		    partLen);
 		__md5_Transform (context->state, context->buffer);
 
@@ -1013,7 +1013,7 @@ static void __md5_Update ( struct MD5Context *context, const char *xinput, unsig
 		i = 0;
 
 	/* Buffer remaining input */
-	memcpy ((void *)&context->buffer[lindex], (const void *)&input[i],
+	memcpy (&context->buffer[lindex], &input[i],
 	    inputLen-i);
 }
 
@@ -1057,7 +1057,7 @@ static void __md5_Final ( char xdigest[16], struct MD5Context *context)
 	__md5_Encode (digest, context->state, 16);
 
 	/* Zeroize sensitive information. */
-	memset ((void *)context, 0, sizeof (*context));
+	memset (context, 0, sizeof (*context));
 }
 
 /* MD5 basic transformation. Transforms state based on block. */
@@ -1304,7 +1304,7 @@ __md5_Transform (state, block)
 	state[3] += d;
 
 	/* Zeroize sensitive information. */
-	memset ((void *)x, 0, sizeof (x));
+	memset (x, 0, sizeof (x));
 }
 
 

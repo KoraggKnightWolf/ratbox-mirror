@@ -504,9 +504,9 @@ ratbox_main(int argc, char *argv[])
 
 	ircd_dlinkAddTail(&me, &me.node, &global_client_list);
 
-	memset((void *) &Count, 0, sizeof(Count));
-	memset((void *) &ServerInfo, 0, sizeof(ServerInfo));
-	memset((void *) &AdminInfo, 0, sizeof(AdminInfo));
+	memset(&Count, 0, sizeof(Count));
+	memset(&ServerInfo, 0, sizeof(ServerInfo));
+	memset(&AdminInfo, 0, sizeof(AdminInfo));
 	memset(&ServerStats, 0, sizeof(struct ServerStatistics));
 
 	/* Initialise the channel capability usage counts... */

@@ -157,7 +157,7 @@ initwhowas()
 
 	for (i = 0; i < NICKNAMEHISTORYLENGTH; i++)
 	{
-		memset((void *) &WHOWAS[i], 0, sizeof(struct Whowas));
+		memset(&WHOWAS[i], 0, sizeof(struct Whowas));
 		WHOWAS[i].hashv = -1;
 	}
 	for (i = 0; i < WW_MAX; i++)

@@ -308,7 +308,7 @@ load_all_modules(int warn)
 	int len;
 	modules_init();
 
-	modlist = (struct module **) ircd_malloc(sizeof(struct module) * (MODS_INCREMENT));
+	modlist = ircd_malloc(sizeof(struct module) * (MODS_INCREMENT));
 
 	find_module_suffix();
 	max_mods = MODS_INCREMENT;
@@ -837,9 +837,9 @@ increase_modlist(void)
 	if((num_mods + 1) < max_mods)
 		return;
 
-	new_modlist = (struct module **) ircd_malloc(sizeof(struct module) *
+	new_modlist = ircd_malloc(sizeof(struct module) *
 						  (max_mods + MODS_INCREMENT));
-	memcpy((void *) new_modlist, (void *) modlist, sizeof(struct module) * num_mods);
+	memcpy(new_modlist, modlist, sizeof(struct module) * num_mods);
 
 	ircd_free(modlist);
 	modlist = new_modlist;

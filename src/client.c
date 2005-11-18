@@ -133,7 +133,7 @@ make_client(struct Client *from)
 	{
 		client_p->from = client_p;	/* 'from' of local client is self! */
 
-		localClient = (struct LocalUser *) BlockHeapAlloc(lclient_heap);
+		localClient = BlockHeapAlloc(lclient_heap);
 		SetMyConnect(client_p);
 		client_p->localClient = localClient;
 
@@ -1111,7 +1111,7 @@ dead_link(struct Client *client_p)
 	if(IsDead(client_p) || IsClosing(client_p) || IsMe(client_p))
 		return;
 
-	abt = (struct abort_client *) ircd_malloc(sizeof(struct abort_client));
+	abt = ircd_malloc(sizeof(struct abort_client));
 
 	if(client_p->flags & FLAGS_SENDQEX)
 		strlcpy(abt->notice, "Max SendQ exceeded", sizeof(abt->notice));
@@ -1710,7 +1710,7 @@ make_user(struct Client *client_p)
 	user = client_p->user;
 	if(!user)
 	{
-		user = (struct User *) BlockHeapAlloc(user_heap);
+		user = BlockHeapAlloc(user_heap);
 		user->refcnt = 1;
 		client_p->user = user;
 		client_p->name = user->name;
@@ -1733,7 +1733,7 @@ make_server(struct Client *client_p)
 
 	if(!serv)
 	{
-		serv = (struct Server *) ircd_malloc(sizeof(struct Server));
+		serv = ircd_malloc(sizeof(struct Server));
 		client_p->serv = serv;
 	}
 	return client_p->serv;

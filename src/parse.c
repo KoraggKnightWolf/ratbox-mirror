@@ -137,8 +137,11 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 	for (ch = pbuffer; *ch == ' '; ch++)	/* skip spaces */
 		/* null statement */ ;
 
-	para[0] = LOCAL_COPY(from->name);
-
+	if(from->name != NULL)
+		para[0] = LOCAL_COPY(from->name);
+	else
+		para[0] = NULL;
+	
 	if(*ch == ':')
 	{
 		ch++;
@@ -431,7 +434,7 @@ mod_add_cmd(struct Message *msg)
 		last_ptr = ptr;
 	}
 
-	new_ptr = (struct MessageHash *) ircd_malloc(sizeof(struct MessageHash));
+	new_ptr = ircd_malloc(sizeof(struct MessageHash));
 
 	new_ptr->next = NULL;
 	DupString(new_ptr->cmd, msg->cmd);

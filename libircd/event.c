@@ -248,7 +248,7 @@ void
 ircd_event_init(void)
 {
 	last_event_ran = NULL;
-	memset((void *) event_table, 0, sizeof(event_table));
+	memset(event_table, 0, sizeof(event_table));
 }
 
 /*

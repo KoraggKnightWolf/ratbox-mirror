@@ -56,7 +56,7 @@ static dlink_list listener_list;
 static struct Listener *
 make_listener(struct irc_sockaddr_storage *addr)
 {
-	struct Listener *listener = (struct Listener *) ircd_malloc(sizeof(struct Listener));
+	struct Listener *listener = ircd_malloc(sizeof(struct Listener));
 	s_assert(0 != listener);
 
 	listener->name = me.name;

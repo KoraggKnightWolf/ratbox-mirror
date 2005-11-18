@@ -92,7 +92,7 @@ date(void)
 
 	lclock = ircd_currenttime;
 	gm = gmtime(&lclock);
-	memcpy((void *) &gmbuf, (void *) gm, sizeof(gmbuf));
+	memcpy(&gmbuf, gm, sizeof(gmbuf));
 	gm = &gmbuf;
 	lt = localtime(&lclock);
 
