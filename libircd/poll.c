@@ -46,6 +46,7 @@ typedef struct _pollfd_list pollfd_list_t;
 
 pollfd_list_t pollfd_list;
 static void poll_update_pollfds(int, short, PF *);
+static int last_index = 0;
 
 int 
 ircd_setup_fd(int fd)
@@ -62,6 +63,11 @@ static inline int
 poll_findslot(void)
 {
 	int i;
+
+	/* try using the last slot deallocated first, could save a bit of looping here */
+	if(pollfd_list.pollfds[last_index].fd == -1)
+		return last_index;
+	
 	for (i = 0; i < maxconnections; i++)
 	{
 		if(pollfd_list.pollfds[i].fd == -1)
@@ -108,6 +114,7 @@ poll_update_pollfds(int fd, short event, PF * handler)
 			{
 				pollfd_list.pollfds[ircd_index].fd = -1;
 				pollfd_list.pollfds[ircd_index].revents = 0;
+				last_index = ircd_index; 
 				F->ircd_index = -1;
 
 				/* update pollfd_list.maxindex here */
