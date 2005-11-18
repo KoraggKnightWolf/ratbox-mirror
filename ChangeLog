@@ -1,3 +1,12 @@
+androsyn    2005/11/18 15:36:25 UTC	(20051118_0-21241)
+  Log:
+  Have the timeout code run every 2 seconds instead of every 5 or so..
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2005/11/17 17:39:00 UTC	(20051117_1-21229)
   Log:
   add a few UNUSEDs that are needed if NOBALLOC is enabled
