@@ -1,3 +1,11 @@
+androsyn    2005/11/20 06:01:08 UTC	(20051120_0-21251)
+  Log:
+  when copying from a linebuf we ignore buflen completely, which is bad
+
+  Modified:
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+
+
 androsyn    2005/11/18 21:59:24 UTC	(20051118_4-21249)
   Log:
   Save the last slot index in last_index, and check
