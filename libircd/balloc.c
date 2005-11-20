@@ -279,11 +279,8 @@ newblock(BlockHeap * bh)
 	void *offset;
 
 	/* Setup the initial data structure. */
-	b = (Block *) calloc(1, sizeof(Block));
-	if(unlikely(b == NULL))
-	{
-		return (1);
-	}
+	b = ircd_malloc(sizeof(Block));
+
 	b->free_list.head = b->free_list.tail = NULL;
 	b->used_list.head = b->used_list.tail = NULL;
 	b->next = bh->base;
@@ -348,12 +345,7 @@ BlockHeapCreate(size_t elemsize, int elemsperblock)
 	}
 
 	/* Allocate our new BlockHeap */
-	bh = (BlockHeap *) calloc(1, sizeof(BlockHeap));
-	if(bh == NULL)
-	{
-		ircd_lib_log("Attempt to calloc() failed: (%s:%d)", __FILE__, __LINE__);
-		ircd_outofmemory();	/* die.. out of memory */
-	}
+	bh = ircd_malloc(sizeof(BlockHeap));
 
 	if((elemsize % sizeof(void *)) != 0)
 	{
