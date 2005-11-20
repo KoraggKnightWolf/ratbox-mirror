@@ -1,3 +1,12 @@
+androsyn    2005/11/20 06:18:13 UTC	(20051120_2-21255)
+  Log:
+  the few calls to calloc can be replaced with ircd_malloc(). Also remove the rather pointless WE_ARE_MEMORY_C define
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_memory.c (File Modified) 
+
+
 androsyn    2005/11/20 06:03:00 UTC	(20051120_1-21253)
   Log:
   opening in ircd_fdlist_update_biggest is unused if asserts are disabled
