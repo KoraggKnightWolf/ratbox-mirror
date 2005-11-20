@@ -1,3 +1,11 @@
+androsyn    2005/11/20 06:03:00 UTC	(20051120_1-21253)
+  Log:
+  opening in ircd_fdlist_update_biggest is unused if asserts are disabled
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2005/11/20 06:01:08 UTC	(20051120_0-21251)
   Log:
   when copying from a linebuf we ignore buflen completely, which is bad
