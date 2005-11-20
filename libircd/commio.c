@@ -624,7 +624,7 @@ ircd_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 
 
 static void
-ircd_fdlist_update_biggest(int fd, int opening)
+ircd_fdlist_update_biggest(int fd, int UNUSED(opening))
 {
 	if(fd < ircd_highest_fd)
 		return;
