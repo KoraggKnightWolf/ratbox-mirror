@@ -1,3 +1,12 @@
+androsyn    2005/11/20 06:26:55 UTC	(20051120_3-21257)
+  Log:
+  add Id keywords properties to unix.c and win32.c
+
+  Modified:
+	ircd-ratbox/trunk/libircd/unix.c  (Property Modified)
+	ircd-ratbox/trunk/libircd/win32.c  (Property Modified)
+
+
 androsyn    2005/11/20 06:18:13 UTC	(20051120_2-21255)
   Log:
   the few calls to calloc can be replaced with ircd_malloc(). Also remove the rather pointless WE_ARE_MEMORY_C define
