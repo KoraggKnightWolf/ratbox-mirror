@@ -435,7 +435,7 @@ ircd_linebuf_get(buf_head_t * bufhead, char *buf, int buflen, int partial, int r
 		return 0;	/* Wait for more data! */
 
 	/* make sure we've got the space, including the NULL */
-	cpylen = bufline->len;
+	cpylen = buflen;
 	lircd_assert(cpylen + 1 <= buflen);
 
 	/* Copy it */
