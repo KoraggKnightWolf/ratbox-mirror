@@ -1,3 +1,14 @@
+androsyn    2005/11/21 20:17:44 UTC	(20051121_4-21279)
+  Log:
+  - strcpy() is fine for who->name copying client_p->name. If it wasn't
+    we have bigger issues anyways...
+  - fix a minor style issue
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2005/11/21 17:12:39 UTC	(20051121_3-21267)
   Log:
   add some UNUSED's for some variables that only get used in the ipv6 build
