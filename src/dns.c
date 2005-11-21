@@ -81,7 +81,7 @@ cancel_lookup(u_int16_t xid)
 }
 
 u_int16_t
-lookup_hostname(const char *hostname, int aftype, DNSCB *callback, void *data)
+lookup_hostname(const char *hostname, int UNUSED(aftype), DNSCB *callback, void *data)
 {
 	struct dnsreq *req;
 	int aft;
@@ -105,7 +105,7 @@ lookup_hostname(const char *hostname, int aftype, DNSCB *callback, void *data)
 }
 
 u_int16_t
-lookup_ip(const char *addr, int aftype, DNSCB *callback, void *data)
+lookup_ip(const char *addr, int UNUSED(aftype), DNSCB *callback, void *data)
 {
 	struct dnsreq *req;
 	int aft;

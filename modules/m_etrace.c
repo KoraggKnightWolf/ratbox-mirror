@@ -122,7 +122,7 @@ me_etrace(struct Client * UNUSED(client_p), struct Client *source_p, int parc, c
 }
 
 static void
-do_etrace(struct Client *source_p, int ipv4, int ipv6)
+do_etrace(struct Client *source_p, int UNUSED(ipv4), int UNUSED(ipv6))
 {
 	struct Client *target_p;
 	dlink_node *ptr;

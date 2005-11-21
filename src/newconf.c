@@ -237,7 +237,7 @@ conf_set_serverinfo_vhost(void *data)
 }
 
 static void
-conf_set_serverinfo_vhost6(void *data)
+conf_set_serverinfo_vhost6(void *UNUSED(data))
 {
 #ifdef IPV6
 	if(ircd_inet_pton(AF_INET6, (char *) data, &ServerInfo.ip6.sin6_addr) <= 0)
