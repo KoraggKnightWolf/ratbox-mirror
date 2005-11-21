@@ -71,11 +71,8 @@ add_history(struct Client *client_p, int online)
 	}
 	who->hashv = hash_whowas_name(client_p->name);
 	who->logoff = ircd_currenttime;
-	/*
-	 * NOTE: strcpy ok here, the sizes in the client struct MUST
-	 * match the sizes in the whowas struct
-	 */
-	strlcpy(who->name, client_p->name, sizeof(who->name));
+
+	strcpy(who->name, client_p->name);
 	strcpy(who->username, client_p->username);
 	strcpy(who->hostname, client_p->host);
 	strcpy(who->realname, client_p->info);
@@ -140,11 +137,13 @@ count_whowas_memory(size_t * wwu, size_t * wwum)
 	/* count up the memory used of whowas structs in um */
 
 	for (i = 0, tmp = &WHOWAS[0]; i < NICKNAMEHISTORYLENGTH; i++, tmp++)
+	{
 		if(tmp->hashv != -1)
 		{
 			u++;
 			um += sizeof(struct Whowas);
 		}
+	}
 	*wwu = u;
 	*wwum = um;
 	return;
