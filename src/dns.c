@@ -1,4 +1,4 @@
-/*
+ /*
  *  dns.c: An interface to the resolver daemon
  *  Copyright (C) 2005 Aaron Sethman <androsyn@ratbox.org>
  *  Copyright (C) 2005 ircd-ratbox development team
@@ -76,10 +76,8 @@ assign_id(void)
 void
 cancel_lookup(u_int16_t xid)
 {
-	struct dnsreq *req;
-	req = &querytable[xid];
-	req->callback = NULL;
-	req->data = NULL;
+	querytable[xid].callback = NULL;
+	querytable[xid].data = NULL;
 }
 
 u_int16_t
