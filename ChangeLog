@@ -1,3 +1,13 @@
+androsyn    2005/11/21 17:12:39 UTC	(20051121_3-21267)
+  Log:
+  add some UNUSED's for some variables that only get used in the ipv6 build
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_etrace.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2005/11/21 16:03:36 UTC	(20051121_2-21265)
   Log:
   no need to store a pointer to the querytable entry when doing cancel_lookup
