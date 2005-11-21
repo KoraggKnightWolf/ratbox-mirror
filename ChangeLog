@@ -1,3 +1,12 @@
+androsyn    2005/11/21 15:38:04 UTC	(20051121_0-21261)
+  Log:
+  Update boilerplate on main.c
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/main.c (File Modified) (Property Modified)
+
+
 androsyn    2005/11/20 06:26:55 UTC	(20051120_3-21257)
   Log:
   add Id keywords properties to unix.c and win32.c
