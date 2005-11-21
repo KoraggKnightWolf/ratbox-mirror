@@ -1,3 +1,11 @@
+androsyn    2005/11/21 16:03:36 UTC	(20051121_2-21265)
+  Log:
+  no need to store a pointer to the querytable entry when doing cancel_lookup
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 androsyn    2005/11/21 15:50:20 UTC	(20051121_1-21263)
   Log:
   make assign_id inline
