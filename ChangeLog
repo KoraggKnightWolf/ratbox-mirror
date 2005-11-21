@@ -1,3 +1,11 @@
+androsyn    2005/11/21 15:50:20 UTC	(20051121_1-21263)
+  Log:
+  make assign_id inline
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 androsyn    2005/11/21 15:38:04 UTC	(20051121_0-21261)
   Log:
   Update boilerplate on main.c
