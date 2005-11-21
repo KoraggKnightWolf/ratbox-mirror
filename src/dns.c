@@ -62,7 +62,7 @@ static u_int16_t id = 1;
 static int dns_ifd = -1;
 static int dns_ofd = -1;
 
-static u_int16_t 
+static inline u_int16_t 
 assign_id(void)
 {
 	if(id < IDTABLE-1)
