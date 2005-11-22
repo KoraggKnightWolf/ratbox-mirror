@@ -1770,7 +1770,7 @@ free_user(struct User *user, struct Client *client_p)
 					     (unsigned long) user,
 					     (unsigned long) user->invited.head,
 					     (unsigned long) user->channel.head, 
-					     dlink_list_length(&user->channel),
+					     ircd_dlink_list_length(&user->channel),
 					     user->refcnt);
 			s_assert(!user->refcnt);
 			s_assert(!user->invited.head);

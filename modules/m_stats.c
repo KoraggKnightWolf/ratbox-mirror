@@ -429,7 +429,7 @@ stats_pending_glines (struct Client *source_p)
 			}
 		}
 
-		if(dlink_list_length (&pending_glines) > 0)
+		if(ircd_dlink_list_length (&pending_glines) > 0)
 			sendto_one_notice(source_p, POP_QUEUE, ":End of Pending G-lines");
 	}
 	else
@@ -908,7 +908,7 @@ stats_tstats(struct Client *source_p)
 				sp.is_ac, sp.is_ref);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 				"T :rejected %u delaying %lu", 
-				sp.is_rej, dlink_list_length(&delay_exit));
+				sp.is_rej, ircd_dlink_list_length(&delay_exit));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 				"T :nicks being delayed %lu", get_nd_count());
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
@@ -1194,8 +1194,8 @@ stats_memory (struct Client *source_p)
 		if(target_p->user)
 		{
 			users_counted++;
-			users_invited_count += dlink_list_length(&target_p->user->invited);
-			user_channels += dlink_list_length(&target_p->user->channel);
+			users_invited_count += ircd_dlink_list_length(&target_p->user->invited);
+			user_channels += ircd_dlink_list_length(&target_p->user->channel);
 			if(target_p->user->away)
 			{
 				aways_counted++;
@@ -1211,8 +1211,8 @@ stats_memory (struct Client *source_p)
 		channel_count++;
 		channel_memory += (strlen(chptr->chname) + sizeof(struct Channel));
 
-		channel_users += dlink_list_length(&chptr->members);
-		channel_invites += dlink_list_length(&chptr->invites);
+		channel_users += ircd_dlink_list_length(&chptr->members);
+		channel_invites += ircd_dlink_list_length(&chptr->invites);
 
 		DLINK_FOREACH(dlink, chptr->banlist.head)
 		{
@@ -1241,7 +1241,7 @@ stats_memory (struct Client *source_p)
 
 	/* count up all classes */
 
-	class_count = dlink_list_length(&class_list) + 1;
+	class_count = ircd_dlink_list_length(&class_list) + 1;
 
 	ircd_count_ircd_linebuf_memory(&ircd_linebuf_count, &ircd_linebuf_memory_used);
 

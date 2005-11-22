@@ -182,7 +182,7 @@ add_invite(struct Channel *chptr, struct Client *who)
 	}
 
 	/* ok, if their invite list is too long, remove the tail */
-	if((int)dlink_list_length(&who->user->invited) >= 
+	if((int)ircd_dlink_list_length(&who->user->invited) >= 
 	   ConfigChannel.max_chans_per_user)
 	{
 		ptr = who->user->invited.tail;

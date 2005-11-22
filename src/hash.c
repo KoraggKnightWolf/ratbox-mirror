@@ -700,13 +700,13 @@ count_hash(struct Client *source_p, dlink_list *table, int length, const char *n
 	
 	for(i = 0; i < length; i++)
 	{
-		if(dlink_list_length(&table[i]) >= 10)
+		if(ircd_dlink_list_length(&table[i]) >= 10)
 			counts[10]++;
 		else
-			counts[dlink_list_length(&table[i])]++;
+			counts[ircd_dlink_list_length(&table[i])]++;
 
-		if(dlink_list_length(&table[i]) > deepest)
-			deepest = dlink_list_length(&table[i]);
+		if(ircd_dlink_list_length(&table[i]) > deepest)
+			deepest = ircd_dlink_list_length(&table[i]);
 	}
 
 	output_hash(source_p, name, length, counts, deepest);

@@ -22,7 +22,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: select.c 20593 2005-07-24 02:57:33Z androsyn $
+ *  $Id$
  */
 
 #include "ircd_lib.h"

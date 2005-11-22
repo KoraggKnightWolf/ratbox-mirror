@@ -99,7 +99,7 @@ m_accept(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(p
 	}
 
 	/* get the number of accepts they have */
-	accept_num = dlink_list_length(&source_p->localClient->allow_list);
+	accept_num = ircd_dlink_list_length(&source_p->localClient->allow_list);
 
 	/* parse the add list */
 	for (nick = strtok_r(addbuf, ",", &p); nick; nick = strtok_r(NULL, ",", &p), accept_num++)

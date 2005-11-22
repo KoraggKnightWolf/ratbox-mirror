@@ -150,7 +150,7 @@ mo_kline(struct Client *UNUSED(client_p), struct Client *source_p,
 			return 0;
 	}
 	/* if we have cluster servers, send it to them.. */
-	else if(dlink_list_length(&cluster_conf_list) > 0)
+	else if(ircd_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "KLINE", 
 				(tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE,
 				"%lu %s %s :%s",
@@ -362,7 +362,7 @@ mo_unkline(struct Client *UNUSED(client_p), struct Client *source_p, int parc, c
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
-	else if(dlink_list_length(&cluster_conf_list) > 0)
+	else if(ircd_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "UNKLINE", SHARED_UNKLINE, 
 				"%s %s", user, host);
 

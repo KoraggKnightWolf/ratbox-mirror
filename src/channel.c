@@ -221,7 +221,7 @@ remove_user_from_channel(struct membership *msptr)
 
 	chptr->users_last = ircd_currenttime;
 
-	if(dlink_list_length(&chptr->members) <= 0)
+	if(ircd_dlink_list_length(&chptr->members) <= 0)
 		destroy_channel(chptr);
 
 	BlockHeapFree(member_heap, msptr);
@@ -258,7 +258,7 @@ remove_user_from_channels(struct Client *client_p)
 
 		chptr->users_last = ircd_currenttime;
 
-		if(dlink_list_length(&chptr->members) <= 0)
+		if(ircd_dlink_list_length(&chptr->members) <= 0)
 			destroy_channel(chptr);
 
 		BlockHeapFree(member_heap, msptr);

@@ -104,7 +104,7 @@ m_knock(struct Client *client_p, struct Client *source_p, int UNUSED(parc), cons
 
 	if(!((chptr->mode.mode & MODE_INVITEONLY) || (*chptr->mode.key) || 
 	     (chptr->mode.limit && 
-	      dlink_list_length(&chptr->members) >= (unsigned long)chptr->mode.limit)))
+	      ircd_dlink_list_length(&chptr->members) >= (unsigned long)chptr->mode.limit)))
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, ERR_CHANOPEN,
 				   form_str(ERR_CHANOPEN), name);

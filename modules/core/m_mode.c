@@ -1478,7 +1478,7 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 	}
 
 	/* only propagate modes originating locally, or if we're hubbing */
-	if(MyClient(source_p) || dlink_list_length(&serv_list) > 1)
+	if(MyClient(source_p) || ircd_dlink_list_length(&serv_list) > 1)
 		send_cap_mode_changes(client_p, source_p, chptr, mode_changes, mode_count);
 }
 

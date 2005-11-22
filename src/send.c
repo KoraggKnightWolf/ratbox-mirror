@@ -492,7 +492,7 @@ sendto_server(struct Client *one, struct Channel *chptr, unsigned long caps,
 	buf_head_t linebuf;
 
 	/* noone to send to.. */
-	if(dlink_list_length(&serv_list) == 0)
+	if(ircd_dlink_list_length(&serv_list) == 0)
 		return;
 
 	if(chptr != NULL && *chptr->chname != '#')

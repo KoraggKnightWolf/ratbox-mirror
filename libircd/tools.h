@@ -97,7 +97,7 @@ void mem_frob(void *ndata, int len);
 
 
 /* Returns the list length */
-#define dlink_list_length(list) (list)->length
+#define ircd_dlink_list_length(list) (list)->length
 #define dlink_move_list(oldlist, newlist, node)
 
 #define ircd_dlinkAddAlloc(data, list) ircd_dlinkAdd(data, make_dlink_node(), list)
@@ -108,7 +108,7 @@ void mem_frob(void *ndata, int len);
 unsigned long slow_list_length(dlink_list *);
 
 #ifdef LIST_SANITY
-#define list_sanity_check(list) if(slow_list_length(list) != dlink_list_length(list)) abort();
+#define list_sanity_check(list) if(slow_list_length(list) != ircd_dlink_list_length(list)) abort();
 #else
 #define list_sanity_check(list)
 #endif

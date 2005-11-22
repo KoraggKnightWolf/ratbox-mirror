@@ -196,7 +196,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 		{
 			target_p = ptr->data;
 
-			link_u[target_p->from->localClient->fd] += dlink_list_length(&target_p->serv->users);
+			link_u[target_p->from->localClient->fd] += ircd_dlink_list_length(&target_p->serv->users);
 			link_s[target_p->from->localClient->fd]++;
 		}
 	}

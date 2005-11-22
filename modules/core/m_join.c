@@ -179,7 +179,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			if(IsMember(source_p, chptr))
 				continue;
 		
-			if(dlink_list_length(&chptr->members) == 0)
+			if(ircd_dlink_list_length(&chptr->members) == 0)
 				flags = CHFL_CHANOP;
 			else
 				flags = 0;
@@ -197,10 +197,10 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			flags = CHFL_CHANOP;
 		}
 
-		if((dlink_list_length(&source_p->user->channel) >= 
+		if((ircd_dlink_list_length(&source_p->user->channel) >= 
 					(unsigned long)ConfigChannel.max_chans_per_user) &&
 		   (!IsOper(source_p) || 
-		    (dlink_list_length(&source_p->user->channel) >=
+		    (ircd_dlink_list_length(&source_p->user->channel) >=
 				 (unsigned long)ConfigChannel.max_chans_per_user * 3)))
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYCHANNELS),
@@ -889,15 +889,15 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	 */
 	if(!keep_our_modes && source_p->id[0] != '\0')
 	{
-		if(dlink_list_length(&chptr->banlist) > 0)
+		if(ircd_dlink_list_length(&chptr->banlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->banlist,
 					'b', NOCAPS, ALL_MEMBERS);
 
-		if(dlink_list_length(&chptr->exceptlist) > 0)
+		if(ircd_dlink_list_length(&chptr->exceptlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->exceptlist,
 					'e', CAP_EX, ONLY_CHANOPS);
 
-		if(dlink_list_length(&chptr->invexlist) > 0)
+		if(ircd_dlink_list_length(&chptr->invexlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->invexlist,
 					'I', CAP_IE, ONLY_CHANOPS);
 	}
@@ -1026,7 +1026,7 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 		return (ERR_BADCHANNELKEY);
 
 	if(chptr->mode.limit && 
-	   dlink_list_length(&chptr->members) >= (unsigned long)chptr->mode.limit)
+	   ircd_dlink_list_length(&chptr->members) >= (unsigned long)chptr->mode.limit)
 		return (ERR_CHANNELISFULL);
 
 #ifdef ENABLE_SERVICES

@@ -235,7 +235,7 @@ send_user_motd(struct Client *source_p)
 	const char *myname = get_id(&me, source_p);
 	const char *nick = get_id(source_p, source_p);
 
-	if(user_motd == NULL || dlink_list_length(&user_motd->contents) == 0)
+	if(user_motd == NULL || ircd_dlink_list_length(&user_motd->contents) == 0)
 	{
 		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOMOTD), myname, nick);
 		return;
@@ -264,7 +264,7 @@ send_oper_motd(struct Client *source_p)
 	struct cacheline *lineptr;
 	dlink_node *ptr;
 
-	if(oper_motd == NULL || dlink_list_length(&oper_motd->contents) == 0)
+	if(oper_motd == NULL || ircd_dlink_list_length(&oper_motd->contents) == 0)
 		return;
 
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_OMOTDSTART), 

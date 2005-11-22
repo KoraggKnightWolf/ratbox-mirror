@@ -136,7 +136,7 @@ mo_xline(struct Client *UNUSED(client_p), struct Client *source_p, int parc, con
 		if(!match(target_server, me.name))
 			return 0;
 	}
-	else if(dlink_list_length(&cluster_conf_list) > 0)
+	else if(ircd_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "XLINE",
 				(temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE,
 				"%d %s 2 :%s",
@@ -389,7 +389,7 @@ mo_unxline(struct Client * UNUSED(client_p), struct Client *source_p, int parc, 
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
-	else if(dlink_list_length(&cluster_conf_list))
+	else if(ircd_dlink_list_length(&cluster_conf_list))
 		cluster_generic(source_p, "UNXLINE", SHARED_UNXLINE, 
 				"%s", parv[1]);
 

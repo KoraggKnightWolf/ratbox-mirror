@@ -134,12 +134,12 @@ bh_sanity_check_block(BlockHeap *bh, Block *block)
 	unsigned long s_used, s_free;
 	s_used = slow_list_length(&block->used_list);
 	s_free = slow_list_length(&block->free_list);
-	if(s_used != dlink_list_length(&block->used_list))
+	if(s_used != ircd_dlink_list_length(&block->used_list))
 		blockheap_fail("used link count doesn't match head count");
-	if(s_free != dlink_list_length(&block->free_list))
+	if(s_free != ircd_dlink_list_length(&block->free_list))
 		blockheap_fail("free link count doesn't match head count");
 	
-	if(dlink_list_length(&block->used_list) + dlink_list_length(&block->free_list) != bh->elemsPerBlock)
+	if(ircd_dlink_list_length(&block->used_list) + ircd_dlink_list_length(&block->free_list) != bh->elemsPerBlock)
 		blockheap_fail("used_list + free_list != elemsPerBlock");
 }
 
@@ -164,16 +164,16 @@ bh_sanity_check(BlockHeap *bh)
 		s_used = slow_list_length(&walker->used_list);
 		s_free = slow_list_length(&walker->free_list);
 		
-		if(s_used != dlink_list_length(&walker->used_list))
+		if(s_used != ircd_dlink_list_length(&walker->used_list))
 			blockheap_fail("used link count doesn't match head count");
-		if(s_free != dlink_list_length(&walker->free_list))
+		if(s_free != ircd_dlink_list_length(&walker->free_list))
 			blockheap_fail("free link count doesn't match head count");
 		
-		if(dlink_list_length(&walker->used_list) + dlink_list_length(&walker->free_list) != bh->elemsPerBlock)
+		if(ircd_dlink_list_length(&walker->used_list) + ircd_dlink_list_length(&walker->free_list) != bh->elemsPerBlock)
 			blockheap_fail("used_list + free_list != elemsPerBlock");
 
-		real_alloc += dlink_list_length(&walker->used_list);
-		real_alloc += dlink_list_length(&walker->free_list);
+		real_alloc += ircd_dlink_list_length(&walker->used_list);
+		real_alloc += ircd_dlink_list_length(&walker->free_list);
 	}
 
 	if(allocated != real_alloc)
@@ -420,7 +420,7 @@ BlockHeapAlloc(BlockHeap * bh)
 
 	for (walker = bh->base; walker != NULL; walker = walker->next)
 	{
-		if(dlink_list_length(&walker->free_list) > 0)
+		if(ircd_dlink_list_length(&walker->free_list) > 0)
 		{
 #ifdef DEBUG_BALLOC
 			bh_sanity_check_block(bh, walker);
@@ -548,7 +548,7 @@ BlockHeapGarbageCollect(BlockHeap * bh)
 
 	while (walker != NULL)
 	{
-		if((dlink_list_length(&walker->free_list) == bh->elemsPerBlock) != 0)
+		if((ircd_dlink_list_length(&walker->free_list) == bh->elemsPerBlock) != 0)
 		{
 			free_block(walker->elems, walker->alloc_size);
 			if(last != NULL)
