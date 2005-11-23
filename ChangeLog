@@ -1,3 +1,15 @@
+leeh        2005/11/23 19:38:10 UTC	(20051123_4-21311)
+  Log:
+  - add in my code for outputting all klines etc
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/banconf.h (File Modified) 
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/src/banconf.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 leeh        2005/11/23 19:37:11 UTC	(20051123_3-21309)
   Log:
   - add back -Wno-unused
