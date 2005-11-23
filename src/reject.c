@@ -37,7 +37,7 @@
 #include "hostmask.h"
 
 static patricia_tree_t *reject_tree;
-static patricia_tree_t *dline_tree;
+patricia_tree_t *dline_tree;
 static patricia_tree_t *eline_tree;
 dlink_list delay_exit;
 static dlink_list reject_list;

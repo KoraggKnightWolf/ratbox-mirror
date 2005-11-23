@@ -29,6 +29,7 @@
 /* amount of time to delay a rejected clients exit */
 #define DELAYED_EXIT_TIME	10
 
+struct _patricia_tree_t *dline_tree;
 extern dlink_list delay_exit;
 
 void init_reject(void);

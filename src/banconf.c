@@ -45,6 +45,13 @@
 #include "s_newconf.h"
 #include "hash.h"
 #include "operhash.h"
+#include "patricia.h"
+#include "reject.h"
+
+static int banconf_write_klines(FILE *);
+static int banconf_write_dlines(FILE *);
+static int banconf_write_xlines(FILE *);
+static int banconf_write_resvs(FILE *);
 
 /* banconf_parse_field()
  *
@@ -351,12 +358,13 @@ static struct banconf_file
 {
 	const char **filename;
 	void (*func) (char *, int);
+	int (*writefunc) (FILE *);
 } banconf_files[] = {
-	{ &ConfigFileEntry.klinefile,	banconf_parse_kline	},
-	{ &ConfigFileEntry.dlinefile,	banconf_parse_dline	},
-	{ &ConfigFileEntry.xlinefile,	banconf_parse_xline	},
-	{ &ConfigFileEntry.resvfile,	banconf_parse_resv	},
-	{ NULL, NULL }
+	{ &ConfigFileEntry.klinefile,	banconf_parse_kline,	banconf_write_klines	},
+	{ &ConfigFileEntry.dlinefile,	banconf_parse_dline,	banconf_write_dlines	},
+	{ &ConfigFileEntry.xlinefile,	banconf_parse_xline,	banconf_write_xlines	},
+	{ &ConfigFileEntry.resvfile,	banconf_parse_resv,	banconf_write_resvs	},
+	{ NULL, NULL, NULL }
 };
 
 /* banconf_parse()
@@ -419,6 +427,109 @@ banconf_parse(void)
 		}
 
 		i++;
+	}
+}
+
+static int
+banconf_write_klines(FILE *banfile)
+{
+	char buf[BUFSIZE*2];
+	struct AddressRec *arec;
+	struct ConfItem *aconf;
+	int i;
+
+	HOSTHASH_WALK(i, arec)
+	{
+		aconf = arec->aconf;
+
+		if((arec->type & ~CONF_SKIPUSER) != CONF_KILL)
+			continue;
+
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
+			continue;
+
+		ircd_snprintf(buf, sizeof(buf), "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%lu\n",
+				SAFE_PRINT(aconf->user), SAFE_PRINT(aconf->host),
+				SAFE_PRINT(aconf->passwd), SAFE_PRINT(aconf->spasswd),
+				smalldate(aconf->hold), SAFE_PRINT(aconf->info.oper),
+				(unsigned long) aconf->hold);
+
+		if(fputs(buf, banfile) < 0)
+		{
+			fclose(banfile);
+			return 0;
+		}
+
+	}
+	HOSTHASH_WALK_END
+
+	fclose(banfile);
+	return 1;
+}
+
+static int
+banconf_write_dlines(FILE *banfile)
+{
+	char buf[BUFSIZE*2];
+	struct ConfItem *aconf;
+	patricia_node_t *pnode;
+
+	PATRICIA_WALK(dline_tree->head, pnode)
+	{
+		aconf = pnode->data;
+
+		if(aconf->flags & CONF_FLAGS_TEMPORARY)
+			PATRICIA_WALK_BREAK;
+
+		ircd_snprintf(buf, sizeof(buf), "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%lu\n",
+				SAFE_PRINT(aconf->host), SAFE_PRINT(aconf->passwd),
+				SAFE_PRINT(aconf->spasswd), smalldate(aconf->hold),
+				SAFE_PRINT(aconf->info.oper), (unsigned long) aconf->hold);
+
+		if(fputs(buf, banfile) < 0)
+		{
+			fclose(banfile);
+			return 0;
+		}
+	}
+	PATRICIA_WALK_END;
+
+	fclose(banfile);
+	return 1;
+}
+
+static int
+banconf_write_xlines(FILE *banfile)
+{
+	return 1;
+}
+
+static int
+banconf_write_resvs(FILE *banfile)
+{
+	return 1;
+}
+
+void
+banconf_write(void)
+{
+	FILE *banfile;
+	char banpath[MAXPATHLEN];
+	int i;
+
+	for(i = 0; banconf_files[i].filename; i++)
+	{
+		snprintf(banpath, sizeof(banpath), "%s.tmp", *banconf_files[i].filename);
+
+		if((banfile = fopen(banpath, "w")) == NULL)
+		{
+			return;
+		}
+
+		if(!((banconf_files[i].writefunc)(banfile)))
+		{
+			return;
+		}
 	}
 }
 
