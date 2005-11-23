@@ -864,7 +864,7 @@ validate_conf(void)
  * side effects	- none
  */
 struct ConfItem *
-conf_connect_allowed(struct sockaddr *addr, int UNUSED(aftype))
+conf_connect_allowed(struct sockaddr *addr, int aftype)
 {
 	struct ConfItem *aconf = find_dline(addr);
 
@@ -1313,7 +1313,7 @@ conf_fgets(char *lbuf, int max_size, FILE * fb)
 }
 
 int
-conf_yy_fatal_error(const char * UNUSED(msg))
+conf_yy_fatal_error(const char *msg)
 {
 	return (0);
 }

@@ -151,7 +151,7 @@ parse_client_queued(struct Client *client_p)
  * once a second on any given client. We then attempt to flush some data.
  */
 void
-flood_recalc(void * UNUSED(unused))
+flood_recalc(void *unused)
 {
 	dlink_node *ptr, *next;
 	struct Client *client_p;
@@ -318,7 +318,7 @@ read_ctrl_packet(int fd, void *data)
  * read_packet - Read a 'packet' of data from a connection and process it.
  */
 void
-read_packet(int UNUSED(fd), void *data)
+read_packet(int fd, void *data)
 {
 	struct Client *client_p = data;
 	struct LocalUser *lclient_p = client_p->localClient;

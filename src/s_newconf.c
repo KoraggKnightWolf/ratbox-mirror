@@ -229,7 +229,7 @@ cluster_generic(struct Client *source_p, const char *command,
 }
 
 static void
-expire_glines(void * UNUSED(unused))
+expire_glines(void *unused)
 {
 	struct ConfItem *aconf;
 	dlink_node *ptr, *next_ptr;
@@ -691,7 +691,7 @@ valid_temp_time(const char *p)
 }
 
 static void
-expire_temp_rxlines(void * UNUSED(unused))
+expire_temp_rxlines(void *unused)
 {
 	struct ConfItem *aconf;
 	dlink_node *ptr;
@@ -780,7 +780,7 @@ free_nd_entry(struct nd_entry *nd)
 }
 
 void
-expire_nd_entries(void * UNUSED(unused))
+expire_nd_entries(void *unused)
 {
 	struct nd_entry *nd;
 	dlink_node *ptr;

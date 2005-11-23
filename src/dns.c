@@ -81,7 +81,7 @@ cancel_lookup(u_int16_t xid)
 }
 
 u_int16_t
-lookup_hostname(const char *hostname, int UNUSED(aftype), DNSCB *callback, void *data)
+lookup_hostname(const char *hostname, int aftype, DNSCB *callback, void *data)
 {
 	struct dnsreq *req;
 	int aft;
@@ -105,7 +105,7 @@ lookup_hostname(const char *hostname, int UNUSED(aftype), DNSCB *callback, void 
 }
 
 u_int16_t
-lookup_ip(const char *addr, int UNUSED(aftype), DNSCB *callback, void *data)
+lookup_ip(const char *addr, int aftype, DNSCB *callback, void *data)
 {
 	struct dnsreq *req;
 	int aft;
@@ -168,7 +168,7 @@ static int fork_count = 0;
 #if 0
 static int spin_restart = 0;
 static void
-restart_spinning_resolver(void * UNUSED(unused))
+restart_spinning_resolver(void *unused)
 {
 	if(spin_restart > 10)
 	{
@@ -303,7 +303,7 @@ parse_dns_reply(void)
 }
 
 static void
-read_dns(int UNUSED(fd), void * UNUSED(data))
+read_dns(int fd, void *data)
 {
 	int length;
 
@@ -323,7 +323,7 @@ read_dns(int UNUSED(fd), void * UNUSED(data))
 }
 
 static void
-dns_write_sendq(int UNUSED(fd), void * UNUSED(unused))
+dns_write_sendq(int fd, void *unused)
 {
 	int retlen;
 	if(ircd_linebuf_len(&dns_sendq) > 0)

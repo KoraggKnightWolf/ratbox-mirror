@@ -61,9 +61,9 @@ static void exit_aborted_clients(void *unused);
 static int exit_remote_client(struct Client *, struct Client *, struct Client *,const char *);
 static int exit_remote_server(struct Client *, struct Client *, struct Client *,const char *);
 static int exit_local_client(struct Client *, struct Client *, struct Client *,const char *);
-static int exit_unknown_client(struct Client *, struct Client *, struct Client *,const char *);
-static int exit_local_server(struct Client *, struct Client *, struct Client *,const char *);
-static int qs_server(struct Client *, struct Client *, struct Client *, const char *comment);
+static int exit_unknown_client(struct Client *, struct Client *, const char *);
+static int exit_local_server(struct Client *, struct Client *,const char *);
+static int qs_server(struct Client *);
 
 static EVH check_pings;
 
@@ -233,7 +233,7 @@ free_client(struct Client *client_p)
  */
 
 static void
-check_pings(void * UNUSED(notused))
+check_pings(void *notused)
 {
 	check_pings_list(&lclient_list);
 	check_pings_list(&serv_list);
@@ -510,7 +510,7 @@ check_banned_lines(void)
  * side effects - check_klines() is called, kline_queued unset
  */
 void
-check_klines_event(void * UNUSED(unused))
+check_klines_event(void *unused)
 {
 	kline_queued = 0;
 	check_klines();
@@ -853,7 +853,7 @@ log_client_name(struct Client *target_p, int showip)
 }
 
 static void
-free_exited_clients(void * UNUSED(unused))
+free_exited_clients(void *unused)
 {
 	dlink_node *ptr, *next;
 	struct Client *target_p;
@@ -1015,7 +1015,7 @@ recurse_remove_clients(struct Client *source_p, const char *comment)
 	{
 		target_p = ptr->data;
 		recurse_remove_clients(target_p, comment);
-		qs_server(NULL, target_p, &me, comment);
+		qs_server(target_p);
 	}
 }
 
@@ -1056,7 +1056,7 @@ remove_dependents(struct Client *client_p,
 }
 
 void
-exit_aborted_clients(void * UNUSED(unused))
+exit_aborted_clients(void *unused)
 {
 	struct abort_client *abt;
 	dlink_node *ptr, *next;
@@ -1128,8 +1128,7 @@ dead_link(struct Client *client_p)
 
 /* This does the remove of the user from channels..local or remote */
 static inline void
-exit_generic_client(struct Client * UNUSED(client_p), struct Client *source_p, struct Client * UNUSED(from),
-		   const char *comment)
+exit_generic_client(struct Client *source_p, const char *comment)
 {
 	dlink_node *ptr, *next_ptr;
 
@@ -1172,7 +1171,7 @@ static int
 exit_remote_client(struct Client *client_p, struct Client *source_p, struct Client *from,
 		   const char *comment)
 {
-	exit_generic_client(client_p, source_p, from, comment);
+	exit_generic_client(source_p, comment);
 	
 	if(source_p->servptr && source_p->servptr->serv)
 	{
@@ -1201,8 +1200,7 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
  */
 
 static int
-exit_unknown_client(struct Client *client_p, struct Client *source_p, struct Client * UNUSED(from),
-		  const char *comment)
+exit_unknown_client(struct Client *client_p, struct Client *source_p, const char *comment)
 {
 	delete_auth_queries(source_p);
 	ircd_linebuf_donebuf(&client_p->localClient->buf_recvq);
@@ -1272,8 +1270,7 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 }
 
 static int
-qs_server(struct Client * UNUSED(client_p), struct Client *source_p, struct Client * UNUSED(from), 
-		  const char * UNUSED(comment))
+qs_server(struct Client *source_p)
 {
 	struct Client *target_p;
 
@@ -1297,8 +1294,7 @@ qs_server(struct Client * UNUSED(client_p), struct Client *source_p, struct Clie
 }
 
 static int
-exit_local_server(struct Client *client_p, struct Client *source_p, struct Client * UNUSED(from), 
-		  const char *comment)
+exit_local_server(struct Client *client_p, struct Client *source_p, const char *comment)
 {
 	static char comment1[(HOSTLEN*2)+2];
 	unsigned int sendk, recvk;
@@ -1370,7 +1366,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 {
 	unsigned long on_for;
 	char tbuf[26];
-	exit_generic_client(client_p, source_p, from, comment);
+	exit_generic_client(source_p, comment);
 	clear_monitor(source_p);
 
 	s_assert(IsPerson(source_p));
@@ -1471,10 +1467,10 @@ exit_client(struct Client *client_p,	/* The local client originating the
 		if(IsPerson(source_p))
 			return exit_local_client(client_p, source_p, from, comment);
 		else if(IsServer(source_p))
-			return exit_local_server(client_p, source_p, from, comment);
+			return exit_local_server(client_p, source_p, comment);
 		/* IsUnknown || IsConnecting || IsHandShake */
 		else if(!IsReject(source_p))
-			return exit_unknown_client(client_p, source_p, from, comment);
+			return exit_unknown_client(client_p, source_p, comment);
 	} 
 	else 
 	{

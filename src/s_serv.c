@@ -98,7 +98,7 @@ struct SlinkRplDef slinkrpltab[] = {
 static CNCB serv_connect_callback;
 
 void
-slink_error(unsigned int UNUSED(rpl), unsigned int len, unsigned char *data, struct Client *server_p)
+slink_error(unsigned int rpl, unsigned int len, unsigned char *data, struct Client *server_p)
 {
 	s_assert(rpl == SLINKRPL_ERROR);
 
@@ -110,7 +110,7 @@ slink_error(unsigned int UNUSED(rpl), unsigned int len, unsigned char *data, str
 }
 
 void
-slink_zipstats(unsigned int UNUSED(rpl), unsigned int UNUSED(len), unsigned char *data, struct Client *server_p)
+slink_zipstats(unsigned int rpl, unsigned int len, unsigned char *data, struct Client *server_p)
 {
 	struct ZipStats zipstats;
 	u_int32_t in = 0, in_wire = 0, out = 0, out_wire = 0;
@@ -184,7 +184,7 @@ slink_zipstats(unsigned int UNUSED(rpl), unsigned int UNUSED(len), unsigned char
 }
 
 void
-collect_zipstats(void * UNUSED(unused))
+collect_zipstats(void *unused)
 {
 	dlink_node *ptr;
 	struct Client *target_p;
@@ -227,7 +227,7 @@ collect_zipstats(void * UNUSED(unused))
  *      returns: (see #defines)
  */
 int
-hunt_server(struct Client * UNUSED(client_p), struct Client *source_p,
+hunt_server(struct Client *client_p, struct Client *source_p,
 	    const char *command, int server, int parc, const char *parv[])
 {
 	struct Client *target_p;
@@ -331,7 +331,7 @@ hunt_server(struct Client * UNUSED(client_p), struct Client *source_p,
  * is called earlier or later...)
  */
 void
-try_connections(void * UNUSED(unused))
+try_connections(void *unused)
 {
 	struct Client *client_p;
 	struct server_conf *server_p = NULL;

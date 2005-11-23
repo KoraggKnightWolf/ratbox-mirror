@@ -233,7 +233,7 @@ send_queued_write(int fd, void *data)
  * side effects - write is dns.heduled if queue isnt emptied
  */
 void
-send_queued_slink_write(int UNUSED(fd), void *data)
+send_queued_slink_write(int fd, void *data)
 {
 	struct Client *to = data;
 	int retlen;

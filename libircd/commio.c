@@ -241,7 +241,7 @@ ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
  * this will happen.
  */
 void
-ircd_checktimeouts(void * UNUSED(notused))
+ircd_checktimeouts(void *notused)
 {
 	dlink_node *ptr, *next;
 	struct timeout_data *td;
@@ -349,7 +349,7 @@ ircd_connect_callback(int fd, int status)
  * called ..
  */
 static void
-ircd_connect_timeout(int fd, void * UNUSED(notused))
+ircd_connect_timeout(int fd, void *notused)
 {
 	/* error! */
 	ircd_connect_callback(fd, IRCD_ERR_TIMEOUT);
@@ -364,7 +364,7 @@ ircd_connect_timeout(int fd, void * UNUSED(notused))
  *               to select for a write event on this FD.
  */
 static void
-ircd_connect_tryconnect(int fd, void * UNUSED(notused))
+ircd_connect_tryconnect(int fd, void *notused)
 {
 	int retval;
 	fde_t *F = find_fd(fd);
@@ -624,7 +624,7 @@ ircd_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 
 
 static void
-ircd_fdlist_update_biggest(int fd, int UNUSED(opening))
+ircd_fdlist_update_biggest(int fd, int opening)
 {
 	if(fd < ircd_highest_fd)
 		return;

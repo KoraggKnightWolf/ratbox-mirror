@@ -36,14 +36,14 @@
  * being used we probably will
  */
 static void
-dummy_handler(int UNUSED(sig))
+dummy_handler(int sig)
 {
 	/* Empty */
 }
 
 
 static void
-sigchld_handler(int UNUSED(sig))
+sigchld_handler(int sig)
 {
 	int status;
 	resolver_sigchld(); /* let the resolver check its children first */
@@ -55,7 +55,7 @@ sigchld_handler(int UNUSED(sig))
  * sigterm_handler - exit the server
  */
 static void
-sigterm_handler(int UNUSED(sig))
+sigterm_handler(int sig)
 {
 	/* XXX we had a flush_connections() here - we should close all the
 	 * connections and flush data. read server_reboot() for my explanation.
@@ -69,7 +69,7 @@ sigterm_handler(int UNUSED(sig))
  * sighup_handler - reread the server configuration
  */
 static void
-sighup_handler(int UNUSED(sig))
+sighup_handler(int sig)
 {
 	dorehash = 1;
 }
@@ -78,13 +78,13 @@ sighup_handler(int UNUSED(sig))
  * sigusr1_handler - reread the motd file
  */
 static void
-sigusr1_handler(int UNUSED(sig))
+sigusr1_handler(int sig)
 {
 	doremotd = 1;
 }
 
 static void
-sigusr2_handler(int UNUSED(sig))
+sigusr2_handler(int sig)
 {
 	dorehashbans = 1;
 }
@@ -93,7 +93,7 @@ sigusr2_handler(int UNUSED(sig))
  * sigint_handler - restart the server
  */
 static void
-sigint_handler(int UNUSED(sig))
+sigint_handler(int sig)
 {
 	static int restarting = 0;
 

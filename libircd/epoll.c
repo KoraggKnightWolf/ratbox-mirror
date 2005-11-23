@@ -69,7 +69,7 @@ init_netio(void)
 }
 
 int
-ircd_setup_fd(int UNUSED(fd))
+ircd_setup_fd(int fd)
 {
 	return 0;
 }  

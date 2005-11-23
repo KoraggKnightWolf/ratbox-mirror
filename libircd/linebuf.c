@@ -43,7 +43,7 @@ static int bufline_count = 0;
  */
 
 void
-ircd_linebuf_init(size_t UNUSED(heap_size))
+ircd_linebuf_init(size_t heap_size)
 {
 #ifndef NO_BLOCKHEAP
 	ircd_linebuf_heap = BlockHeapCreate(sizeof(buf_line_t), heap_size);

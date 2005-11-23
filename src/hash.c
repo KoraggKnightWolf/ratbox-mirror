@@ -96,7 +96,7 @@ init_hash(void)
 
 
 u_int32_t
-fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int UNUSED(unused))
+fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused)
 {
 	u_int32_t h = FNV1_32_INIT;
 
@@ -110,7 +110,7 @@ fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int UNUSED(un
 }
 
 u_int32_t
-fnv_hash(const unsigned char *s, unsigned int bits, unsigned int UNUSED(unused))
+fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused)
 {
 	u_int32_t h = FNV1_32_INIT;
 

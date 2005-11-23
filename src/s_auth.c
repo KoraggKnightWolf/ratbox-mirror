@@ -300,7 +300,7 @@ release_auth_client(struct AuthRequest *auth)
  * of success of failure
  */
 static void
-auth_dns_callback(const char *res, int status, int UNUSED(aftype), void *data)
+auth_dns_callback(const char *res, int status, int aftype, void *data)
 {
 	struct AuthRequest *auth = data;
 	ClearDNS(auth);
@@ -338,7 +338,7 @@ auth_error(struct AuthRequest *auth)
 }
 
 static void
-auth_write_sendq(int UNUSED(fd), void * UNUSED(unused))
+auth_write_sendq(int fd, void *unused)
 {
 	int retlen;
 	if(ircd_linebuf_len(&auth_sendq) > 0)
@@ -474,7 +474,7 @@ start_auth(struct Client *client)
  * allow clients through if requests failed
  */
 static void
-timeout_auth_queries_event(void * UNUSED(notused))
+timeout_auth_queries_event(void *notused)
 {
 	dlink_node *ptr;
 	dlink_node *next_ptr;
@@ -580,7 +580,7 @@ parse_auth_reply(void)
 }
 
 static void
-read_auth_reply(int UNUSED(fd), void * UNUSED(data))
+read_auth_reply(int fd, void *data)
 {
 	int length;
 

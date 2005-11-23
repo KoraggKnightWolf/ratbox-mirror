@@ -734,14 +734,14 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 
 
 int
-m_not_oper(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *UNUSED(parv[]))
+m_not_oper(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	sendto_one_numeric(source_p, POP_QUEUE, ERR_NOPRIVILEGES, form_str(ERR_NOPRIVILEGES));
 	return 0;
 }
 
 int
-m_unregistered(struct Client *client_p, struct Client * UNUSED(source_p), int UNUSED(parc), const char * UNUSED(parv[]))
+m_unregistered(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	/* bit of a hack.
 	 * I don't =really= want to waste a bit in a flag
@@ -758,14 +758,14 @@ m_unregistered(struct Client *client_p, struct Client * UNUSED(source_p), int UN
 }
 
 int
-m_registered(struct Client *client_p, struct Client * UNUSED(source_p), int UNUSED(parc), const char * UNUSED(parv[]))
+m_registered(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	sendto_one(client_p, POP_QUEUE, form_str(ERR_ALREADYREGISTRED), me.name, source_p->name);
 	return 0;
 }
 
 int
-m_ignore(struct Client * UNUSED(client_p), struct Client * UNUSED(source_p), int UNUSED(parc), const char * UNUSED(parv[]))
+m_ignore(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	return 0;
 }

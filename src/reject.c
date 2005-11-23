@@ -92,7 +92,7 @@ add_eline(struct ConfItem *aconf)
 
 
 static void
-reject_exit(void * UNUSED(unused))
+reject_exit(void *unused)
 {
 	struct Client *client_p;
 	dlink_node *ptr, *ptr_next;
@@ -120,7 +120,7 @@ reject_exit(void * UNUSED(unused))
 }
 
 static void
-reject_expires(void * UNUSED(unused))
+reject_expires(void *unused)
 {
 	dlink_node *ptr, *next;
 	patricia_node_t *pnode;
