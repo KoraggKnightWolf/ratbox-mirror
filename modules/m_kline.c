@@ -481,6 +481,75 @@ apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 			  tkline_time / 60, aconf->user, aconf->host);
 }
 
+
+static inline
+int is_ip_number(const char *number)
+{
+	if(strlen(number) > 3)
+		return 0;
+	while(*number)
+	{
+		if(!IsDigit(*number++))
+			return 0;
+	}
+	return 1;
+}
+
+static const char *
+mangle_wildcard_to_cidr(const char *text)
+{
+	static char buf[20];
+	static const char *splat = "*", *dot = ".";
+	char *p, *q, *n1, *n2, *n3, *n4;
+
+	q = LOCAL_COPY(text);
+	
+	n1 = strtok_r(q, dot, &p);
+	n2 = strtok_r(NULL, dot, &p);
+	n3 = strtok_r(NULL, dot, &p);
+	n4 = strtok_r(NULL, dot, &p);
+	
+	if(n1 == NULL)
+		return NULL;
+	
+	/* ain't gonna touch this with a ten foot pole.. */
+	if(!strcmp(n1, splat) || !is_ip_number(n1))
+		return NULL;	
+
+	if(!strcmp(n2, splat))
+	{
+		if(n3 == NULL || (!strcmp(n3, splat) && !strcmp(n4, splat)))
+		{
+			ircd_sprintf(buf, "%s.0.0.0/8", n1);
+			return buf;
+		}
+	}
+	
+	if(!is_ip_number(n2))
+		return NULL;
+	
+	if(!strcmp(n3, splat))
+	{
+		if(n4 == NULL || !strcmp(n4, splat))
+		{
+			ircd_sprintf(buf, "%s.%s.0.0/16", n1, n2);
+			return buf;
+		}
+	}
+	
+	if(!is_ip_number(n3))
+		return NULL;
+
+	if(n4 == NULL || !strcmp(n4, splat))
+	{
+		ircd_sprintf(buf, "%s.%s.%s.0/24", n1, n2, n3);
+		return buf;
+	}
+	
+	return NULL;	
+}
+
+
 /* find_user_host()
  * 
  * inputs	- client placing kline, user@host, user buffer, host buffer
@@ -491,6 +560,7 @@ static int
 find_user_host(const char *userhost, char *luser, char *lhost)
 {
 	char *hostp;
+	const char *ptr;
 
 	hostp = strchr(userhost, '@');
 	
@@ -501,8 +571,12 @@ find_user_host(const char *userhost, char *luser, char *lhost)
 			strlcpy(luser, userhost, USERLEN + 1);	/* here is my user */
 		else
 			strcpy(luser, "*");
-		if(*hostp)
-			strlcpy(lhost, hostp, HOSTLEN + 1);	/* here is my host */
+		if(*hostp) {
+			ptr = mangle_wildcard_to_cidr(hostp);
+			if(ptr == NULL)
+				ptr = hostp;
+			strlcpy(lhost, ptr, HOSTLEN + 1);	/* here is my host */
+		}
 		else
 			strcpy(lhost, "*");
 		}
@@ -516,7 +590,12 @@ find_user_host(const char *userhost, char *luser, char *lhost)
 
 		luser[0] = '*';	/* no @ found, assume its *@somehost */
 		luser[1] = '\0';
-		strlcpy(lhost, userhost, HOSTLEN + 1);
+		ptr = mangle_wildcard_to_cidr(userhost);
+		
+		if(ptr == NULL)
+			ptr = userhost;
+
+		strlcpy(lhost, ptr, HOSTLEN + 1);
 	}
 
 	return 1;
