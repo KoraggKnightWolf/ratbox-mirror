@@ -70,7 +70,7 @@ static void remove_resv(struct Client *source_p, const char *name);
  *      parv[2] = reason
  */
 static int
-mo_resv(struct Client *UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
+mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *name;
 	const char *reason;
@@ -133,8 +133,8 @@ mo_resv(struct Client *UNUSED(client_p), struct Client *source_p, int parc, cons
 }
 
 static int
-me_resv(struct Client *UNUSED(client_p), struct Client *source_p,
-	int UNUSED(parc), const char *parv[])
+me_resv(struct Client *client_p, struct Client *source_p,
+	int parc, const char *parv[])
 {
 	/* time name 0 :reason */
 	if(!IsPerson(source_p))
@@ -307,7 +307,7 @@ parse_resv(struct Client *source_p, const char *name,
  *     parv[1] = channel/nick to unforbid
  */
 static int
-mo_unresv(struct Client *UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
+mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	if((parc == 4) && (irccmp(parv[2], "ON") == 0))
 	{
@@ -334,7 +334,7 @@ mo_unresv(struct Client *UNUSED(client_p), struct Client *source_p, int parc, co
 }
 
 static int
-me_unresv(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+me_unresv(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *name;
 

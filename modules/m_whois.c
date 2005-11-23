@@ -171,7 +171,7 @@ ms_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
  * side effects -
  */
 static void
-do_whois(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+do_whois(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 	char *nick;

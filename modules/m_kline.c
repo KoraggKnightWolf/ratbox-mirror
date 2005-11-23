@@ -83,7 +83,7 @@ static void remove_perm_kline(struct Client *, const char *, const char *);
  *   parv[5] - reason
  */
 static int
-mo_kline(struct Client *UNUSED(client_p), struct Client *source_p,
+mo_kline(struct Client *client_p, struct Client *source_p,
 	 int parc, const char **parv)
 {
 	char def[] = "No Reason";
@@ -213,7 +213,7 @@ mo_kline(struct Client *UNUSED(client_p), struct Client *source_p,
 }
 
 static int
-me_kline(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+me_kline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	char buffer[BUFSIZE];
 	struct ConfItem *aconf = NULL;
@@ -301,7 +301,7 @@ me_kline(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(pa
  *   parv[3] - optional target server
  */
 static int
-mo_unkline(struct Client *UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
+mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *user;
 	char *host;
@@ -374,7 +374,7 @@ mo_unkline(struct Client *UNUSED(client_p), struct Client *source_p, int parc, c
 }
 
 static int
-me_unkline(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+me_unkline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *user, *host;
 
@@ -405,7 +405,7 @@ me_unkline(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(
  */
 static void
 apply_kline(struct Client *source_p, struct ConfItem *aconf,
-	    const char *reason, const char *oper_reason, const char * UNUSED(current_date))
+	    const char *reason, const char *oper_reason, const char *current_date)
 {
 	const char *oper = get_oper_name(source_p);
 
@@ -447,7 +447,7 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
  */
 static void
 apply_tkline(struct Client *source_p, struct ConfItem *aconf,
-	     const char *reason, const char *oper_reason, const char * UNUSED(current_date), int tkline_time)
+	     const char *reason, const char *oper_reason, const char *current_date, int tkline_time)
 {
 	const char *oper = get_oper_name(source_p);
 

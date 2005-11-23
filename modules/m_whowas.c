@@ -52,7 +52,7 @@ DECLARE_MODULE_AV1(whowas, NULL, NULL, whowas_clist, NULL, NULL, "$Revision: 192
 **      parv[1] = nickname queried
 */
 static int
-m_whowas(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
+m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {	
 	struct Whowas *temp;
 	int cur = 0;

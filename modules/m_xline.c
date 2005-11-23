@@ -79,7 +79,7 @@ static void remove_xline(struct Client *source_p, const char *gecos);
  * parv[3] - reason
  */
 static int
-mo_xline(struct Client *UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
+mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct ConfItem *aconf;
 	const char *name;
@@ -158,7 +158,7 @@ mo_xline(struct Client *UNUSED(client_p), struct Client *source_p, int parc, con
 }
 
 static int
-me_xline(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct ConfItem *aconf;
 	const char *name, *reason;
@@ -364,7 +364,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
  * parv[1] - thing to unxline
  */
 static int
-mo_unxline(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
+mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	if(!IsOperXline(source_p))
 	{
@@ -398,7 +398,7 @@ mo_unxline(struct Client * UNUSED(client_p), struct Client *source_p, int parc, 
 }
 
 static int
-me_unxline(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+me_unxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *name;
 

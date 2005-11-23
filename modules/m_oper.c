@@ -83,7 +83,7 @@ DECLARE_MODULE_AV1(oper, NULL, NULL, oper_clist, NULL, NULL, "$Revision: 19256 $
  *      parv[2] = oper password
  */
 static int
-m_oper(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct oper_conf *oper_p;
 	const char *name;
@@ -239,7 +239,7 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 
 #ifndef HAVE_LIBCRYPTO
 static int
-m_challenge(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *UNUSED(parv[]))
+m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Challenge not implemented ",
 		   me.name, source_p->name);
@@ -257,7 +257,7 @@ static int generate_challenge(char **r_challenge, char **r_response, RSA * rsa);
  *
  */
 static int
-m_challenge(struct Client *UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct oper_conf *oper_p;
 	char *challenge;

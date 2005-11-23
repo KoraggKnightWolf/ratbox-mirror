@@ -75,7 +75,7 @@ static int server_estab(struct Client *client_p);
  *      parv[3] = serverinfo
  */
 static int
-mr_server(struct Client *client_p, struct Client * UNUSED(source_p), int UNUSED(parc), const char *parv[])
+mr_server(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	char info[REALLEN + 1];
 	const char *name;
@@ -424,7 +424,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 }
 
 static int
-ms_sid(struct Client *client_p, struct Client *source_p, int UNUSED(parc), const char *parv[])
+ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 	struct remote_conf *hub_p;

@@ -66,7 +66,7 @@ static void do_who(struct Client *source_p,
 **      parv[2] = additional selection flag, only 'o' for now.
 */
 static int
-m_who(struct Client *UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
+m_who(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	static time_t last_used = 0;
 	struct Client *target_p;

@@ -80,8 +80,7 @@ static int perform_nick_collides(struct Client *, struct Client *,
 				 struct Client *, int, const char **, 
 				 time_t, const char *, const char *);
 static int perform_nickchange_collides(struct Client *, struct Client *,
-				       struct Client *, int, const char **, 
-				       time_t, const char *);
+				       struct Client *, time_t, const char *);
 
 /* mr_nick()
  *       parv[0] = sender prefix
@@ -300,7 +299,7 @@ mc_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* we've got a collision! */
 	else
 		perform_nickchange_collides(source_p, client_p, target_p, 
-					    parc, parv, newts, parv[1]);
+					    newts, parv[1]);
 
 	return 0;
 }
@@ -837,8 +836,7 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 
 static int
 perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
-			    struct Client *target_p, int UNUSED(parc), 
-			    const char * UNUSED(parv[]), time_t newts, const char *nick)
+			    struct Client *target_p, time_t newts, const char *nick)
 {
 	int sameuser;
 

@@ -67,7 +67,7 @@ static void check_dlines(void);
  *   parv[2] - reason
  */
 static int
-mo_dline(struct Client * UNUSED(client_p), struct Client *source_p,
+mo_dline(struct Client *client_p, struct Client *source_p,
 	 int parc, const char *parv[])
 {
 	char def[] = "No Reason";
@@ -276,7 +276,7 @@ mo_dline(struct Client * UNUSED(client_p), struct Client *source_p,
  *      parv[1] = dline to remove
  */
 static int
-mo_undline(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+mo_undline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *cidr;
 

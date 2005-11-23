@@ -62,7 +62,7 @@ DECLARE_MODULE_AV1(knock, NULL, NULL, knock_clist, NULL, NULL, "$Revision: 19256
  *  <anonymous>
  */
 static int
-m_knock(struct Client *client_p, struct Client *source_p, int UNUSED(parc), const char *parv[])
+m_knock(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Channel *chptr;
 	char *p, *name;

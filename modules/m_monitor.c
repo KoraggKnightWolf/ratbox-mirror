@@ -323,7 +323,7 @@ show_monitor_status(struct Client *client_p)
 }
 
 
-static void cleanup_monitor(void * UNUSED(unused))
+static void cleanup_monitor(void *unused)
 {
 	struct monitor *last_ptr = NULL;
 	struct monitor *next_ptr, *ptr;

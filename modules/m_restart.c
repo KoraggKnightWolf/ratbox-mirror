@@ -52,7 +52,7 @@ DECLARE_MODULE_AV1(restart, NULL, NULL, restart_clist, NULL, NULL, "$Revision: 1
  *
  */
 static int
-mo_restart(struct Client * UNUSED(client_p), struct Client *source_p, int parc, const char *parv[])
+mo_restart(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	char buf[BUFSIZE];
 	dlink_node *ptr;

@@ -505,7 +505,7 @@ msg_channel_flags(int p_or_n, const char *command, struct Client *client_p,
 #define NEXT_TARGET(i) ((i == 9) ? i = 0 : ++i)
 
 static void
-expire_tgchange(void * UNUSED(unused))
+expire_tgchange(void *unused)
 {
 	tgchange *target;
 	dlink_node *ptr, *next_ptr;

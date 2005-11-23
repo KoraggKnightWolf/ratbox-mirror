@@ -54,7 +54,7 @@ DECLARE_MODULE_AV1(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision: 1
  * parv[2] - optional params
  */
 static int
-ms_operspy(struct Client * UNUSED(client_p), struct Client *source_p,
+ms_operspy(struct Client *client_p, struct Client *source_p,
 	   int parc, const char *parv[])
 {
 	static char buffer[BUFSIZE];

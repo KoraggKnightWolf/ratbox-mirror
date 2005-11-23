@@ -60,7 +60,7 @@ DECLARE_MODULE_AV1(post, NULL, NULL, post_clist, NULL, NULL, "$Revision: 18720 $
 **      parv[1] = comment
 */
 static int
-mr_dumb_proxy(struct Client *client_p, struct Client *source_p, int UNUSED(parc), const char * UNUSED(parv[]))
+mr_dumb_proxy(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	sendto_realops_flags(UMODE_REJ, L_ALL,
 			     "HTTP Proxy disconnected: [%s@%s]",

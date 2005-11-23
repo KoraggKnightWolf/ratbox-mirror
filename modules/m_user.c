@@ -55,7 +55,7 @@ static int do_local_user(struct Client *client_p, struct Client *source_p,
  *      parv[4] = users gecos
  */
 static int
-mr_user(struct Client *client_p, struct Client *source_p, int UNUSED(parc), const char *parv[])
+mr_user(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	static char buf[BUFSIZE];
 	char *p;

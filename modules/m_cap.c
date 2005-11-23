@@ -297,7 +297,7 @@ cap_ack(struct Client *source_p, const char *arg)
 }
 
 static void
-cap_clear(struct Client *source_p, const char * UNUSED(arg))
+cap_clear(struct Client *source_p, const char *arg)
 {
 	clicap_generate(source_p, "ACK", 
 			source_p->localClient->caps ? source_p->localClient->caps : -1, 1);
@@ -311,7 +311,7 @@ cap_clear(struct Client *source_p, const char * UNUSED(arg))
 }
 
 static void
-cap_end(struct Client *source_p, const char * UNUSED(arg))
+cap_end(struct Client *source_p, const char *arg)
 {
 	if(IsRegistered(source_p))
 		return;
@@ -327,7 +327,7 @@ cap_end(struct Client *source_p, const char * UNUSED(arg))
 }
 
 static void
-cap_list(struct Client *source_p, const char * UNUSED(arg))
+cap_list(struct Client *source_p, const char *arg)
 {
 	/* list of what theyre currently using */
 	clicap_generate(source_p, "LIST",
@@ -335,7 +335,7 @@ cap_list(struct Client *source_p, const char * UNUSED(arg))
 }
 
 static void
-cap_ls(struct Client *source_p, const char * UNUSED(arg))
+cap_ls(struct Client *source_p, const char *arg)
 {
 	if(!IsRegistered(source_p))
 		source_p->flags |= FLAGS_CLICAP;
@@ -456,7 +456,7 @@ clicap_cmd_search(const char *command, struct clicap_cmd *entry)
 }
 
 static int
-m_cap(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+m_cap(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct clicap_cmd *cmd;
 

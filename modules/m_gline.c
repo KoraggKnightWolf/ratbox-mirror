@@ -93,7 +93,7 @@ moddeinit(void)
  * side effects - place a gline if 3 opers agree
  */
 static int
-mo_gline(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *user = NULL;
 	char *host = NULL;	/* user and host of GLINE "victim" */
@@ -220,7 +220,7 @@ mo_gline(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(p
 /* mc_gline()
  */
 static int
-mc_gline(struct Client * UNUSED(client_p), struct Client *source_p,
+mc_gline(struct Client *client_p, struct Client *source_p,
 	 int parc, const char *parv[])
 {
 	struct Client *acptr;
@@ -403,7 +403,7 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
  *      parv[1] = gline to remove
  */
 static int
-mo_ungline(struct Client * UNUSED(client_p), struct Client *source_p, int UNUSED(parc), const char *parv[])
+mo_ungline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *user;
 	char *h = LOCAL_COPY(parv[1]);
@@ -833,7 +833,7 @@ remove_temp_gline(const char *user, const char *host)
  * enough "votes" in the time period allowed
  */
 static void
-expire_pending_glines(void * UNUSED(unused))
+expire_pending_glines(void *unused)
 {
 	dlink_node *pending_node;
 	dlink_node *next_node;
