@@ -1713,7 +1713,6 @@ make_user(struct Client *client_p)
 		user = BlockHeapAlloc(user_heap);
 		user->refcnt = 1;
 		client_p->user = user;
-		client_p->name = user->name;
 	}
 	return user;
 }

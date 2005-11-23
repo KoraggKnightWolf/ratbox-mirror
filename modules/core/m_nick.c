@@ -604,6 +604,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 
 	make_user(source_p);		
 	strcpy(source_p->user->name, nick);
+	source_p->name = source_p->user->name;
 	add_to_hash(HASH_CLIENT, nick, source_p);
 
 	/* fd_desc is long enough */
