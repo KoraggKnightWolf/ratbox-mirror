@@ -434,9 +434,10 @@ ircd_linebuf_get(buf_head_t * bufhead, char *buf, int buflen, int partial, int r
 	if(!(partial || bufline->terminated))
 		return 0;	/* Wait for more data! */
 
-	/* make sure we've got the space, including the NULL */
-	cpylen = buflen;
-	lircd_assert(cpylen + 1 <= buflen);
+	if(buflen < bufline->len)
+		cpylen = buflen - 1;
+	else
+		cpylen = bufline->len;
 
 	/* Copy it */
 	start = bufline->buf;
