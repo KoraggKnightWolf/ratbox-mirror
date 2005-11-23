@@ -1,3 +1,11 @@
+androsyn    2005/11/23 17:12:57 UTC	(20051123_1-21303)
+  Log:
+  fix a buglet regarding lengths in linebuf_get
+
+  Modified:
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+
+
 androsyn    2005/11/23 17:11:41 UTC	(20051123_0-21301)
   Log:
   fix some nickname related stuff
