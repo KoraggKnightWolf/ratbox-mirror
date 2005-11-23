@@ -1,3 +1,12 @@
+androsyn    2005/11/23 17:11:41 UTC	(20051123_0-21301)
+  Log:
+  fix some nickname related stuff
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2005/11/22 19:16:30 UTC	(20051122_0-21291)
   Log:
   rename dlink_list_length to ircd_dlink_list_length.  seems i missed this when doing the renames before
