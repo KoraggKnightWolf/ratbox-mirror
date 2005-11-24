@@ -826,21 +826,21 @@ channel_modes(struct Channel *chptr, struct Client *client_p)
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))
 			ircd_sprintf(mbuf, "lk %d %s", chptr->mode.limit, chptr->mode.key);
 		else
-			ircd_sprintf(mbuf, "lk");
+			strcpy(mbuf, "lk");
 	}
 	else if(chptr->mode.limit)
 	{
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))
 			ircd_sprintf(mbuf, "l %d", chptr->mode.limit);
 		else
-			ircd_sprintf(mbuf, "l");
+			strcpy(mbuf, "l");
 	}
 	else if(*chptr->mode.key)
 	{
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))
 			ircd_sprintf(mbuf, "k %s", chptr->mode.key);
 		else
-			ircd_sprintf(mbuf, "k");
+			strcpy(mbuf, "k");
 	}
 	else
 		*mbuf = '\0';

@@ -265,6 +265,10 @@ int gettimeofday(struct timeval *, void *);
 char * crypt(const char *pw, const char *salt);
 #endif
 
+unsigned char * ircd_base64_encode(const unsigned char *str, int length);
+unsigned char * ircd_base64_decode(const unsigned char *str, int length);
+
+
 
 #include "tools.h"
 #include "ircd_memory.h"
@@ -276,26 +280,4 @@ char * crypt(const char *pw, const char *salt);
 
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -30,7 +30,7 @@
 #include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/rsa.h>
-#include <openssl/md5.h>
+#include <openssl/sha.h>
 #include <openssl/bn.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -364,19 +364,6 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 	return 0;
 }
 
-static void
-binary_to_hex(unsigned char *bin, char *hex, int length)
-{
-	static const char trans[] = "0123456789ABCDEF";
-	int i;
-
-	for (i = 0; i < length; i++)
-	{
-		hex[i << 1] = trans[bin[i] >> 4];
-		hex[(i << 1) + 1] = trans[bin[i] & 0xf];
-	}
-	hex[i << 1] = '\0';
-}
 
 static int
 get_randomness(unsigned char *buf, int length)
@@ -403,6 +390,8 @@ get_randomness(unsigned char *buf, int length)
 static int
 generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 {
+	SHA256_CTX ctx;
+	u_int8_t results[SHA256_DIGEST_LENGTH];
 	unsigned char secret[32], *tmp;
 	unsigned long length;
 	unsigned long e = 0;
@@ -413,16 +402,17 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 		return -1;
 	if(get_randomness(secret, 32))
 	{
-		*r_response = ircd_malloc(65);
-		binary_to_hex(secret, *r_response, 32);
+		SHA256_Init(&ctx);
+		SHA256_Update(&ctx, (u_int8_t *)secret, 32);
+		SHA256_Final(results, &ctx);
+		
+		*r_response = (char *)ircd_base64_encode(results, 32);
 
 		length = RSA_size(rsa);
 		tmp = ircd_malloc(length);
 		ret = RSA_public_encrypt(32, secret, tmp, rsa, RSA_PKCS1_PADDING);
-	
-		*r_challenge = ircd_malloc((length << 1) + 1);
-		binary_to_hex(tmp, *r_challenge, length);
-		(*r_challenge)[length << 1] = 0;
+
+		*r_challenge = (char *)ircd_base64_encode(tmp, ret);
 		ircd_free(tmp);
 		if(ret >= 0)
 			return 0;
