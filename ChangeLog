@@ -1,3 +1,20 @@
+androsyn    2005/11/24 01:18:51 UTC	(20051124_0-21315)
+  Log:
+  - get autoconf detecting openssl again
+  - modify challenge to use a sha256 hash of the plaintext as the response
+  - also get challenge working correctly with rsa keys > 1024
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/tools/rsa_respond/respond.c (File Modified) 
+
+
 leeh        2005/11/23 19:53:09 UTC	(20051123_5-21313)
   Log:
   - remove some more UNUSED()
