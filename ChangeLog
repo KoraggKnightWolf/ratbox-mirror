@@ -1,3 +1,21 @@
+leeh        2005/11/27 18:42:49 UTC	(20051127_0-21317)
+  Log:
+  - remove more UNUSED() stuff..
+  
+
+  Modified:
+	ircd-ratbox/trunk/adns/check.c (File Modified) 
+	ircd-ratbox/trunk/adns/event.c (File Modified) 
+	ircd-ratbox/trunk/adns/parse.c (File Modified) 
+	ircd-ratbox/trunk/adns/query.c (File Modified) 
+	ircd-ratbox/trunk/adns/setup.c (File Modified) 
+	ircd-ratbox/trunk/adns/transmit.c (File Modified) 
+	ircd-ratbox/trunk/adns/types.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/servlink/control.c (File Modified) 
+	ircd-ratbox/trunk/servlink/io.c (File Modified) 
+
+
 androsyn    2005/11/24 01:18:51 UTC	(20051124_0-21315)
   Log:
   - get autoconf detecting openssl again
