@@ -34,12 +34,6 @@
 
 #ifdef __GNUC__
 
-#ifdef UNUSED
-#undef UNUSED
-#endif
-
-#define UNUSED(x) x __attribute__((unused))
-
 #ifdef likely
 #undef likely
 #endif

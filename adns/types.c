@@ -276,7 +276,7 @@ static int di_inaddr(adns_state ads, const void *datap_a, const void *datap_b) {
 
 
 #ifdef IPV6
-static adns_status cs_in6addr(vbuf *vb, const void * UNUSED(datap)) {
+static adns_status cs_in6addr(vbuf *vb, const void *datap) {
 #ifndef NDEBUG
   const struct in6_addr *rrp= datap;
   struct in6_addr rr= *rrp;
@@ -656,7 +656,7 @@ static adns_status pa_mx_raw(const parseinfo *pai, int cbyte, int max, void *dat
   return adns_s_ok;
 }
 
-static int di_mx_raw(adns_state UNUSED(ads), const void *datap_a, const void *datap_b) {
+static int di_mx_raw(adns_state ads, const void *datap_a, const void *datap_b) {
   const adns_rr_intstr *ap= datap_a, *bp= datap_b;
 
   if (ap->i < bp->i) return 0;
@@ -1115,7 +1115,7 @@ static adns_status cs_soa(vbuf *vb, const void *datap) {
  * _flat   (mf)
  */
 
-static void mf_flat(adns_query UNUSED(qu), void *UNUSED(xdata)) { }
+static void mf_flat(adns_query qu, void *xdata) { }
 
 /*
  * Now the table.

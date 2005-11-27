@@ -55,14 +55,14 @@ void adns_checkconsistency(adns_state ads, adns_query qu) {
     }										\
   } while(0)
 
-static void checkc_query_alloc(adns_state UNUSED(ads), adns_query qu) {
+static void checkc_query_alloc(adns_state ads, adns_query qu) {
   allocnode *an;
 
   DLIST_CHECK(qu->allocations, an, , {
   });
 }
 
-static void checkc_query(adns_state UNUSED(ads), adns_query qu) {
+static void checkc_query(adns_state ads, adns_query qu) {
   adns_query child;
 
   assert(qu->udpnextserver < ads->nservers);
@@ -71,7 +71,7 @@ static void checkc_query(adns_state UNUSED(ads), adns_query qu) {
   if (qu->parent) DLIST_ASSERTON(qu, child, qu->parent->children, siblings.);
 }
 
-static void checkc_notcpbuf(adns_state UNUSED(ads)) {
+static void checkc_notcpbuf(adns_state ads) {
   assert(!ads->tcpsend.used);
   assert(!ads->tcprecv.used);
   assert(!ads->tcprecv_skip);

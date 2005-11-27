@@ -219,7 +219,7 @@ process_recvq(struct ctrl_command *cmd)
 }
 
 void
-send_zipstats(struct ctrl_command * UNUSED(unused))
+send_zipstats(struct ctrl_command *unused)
 {
 #ifdef HAVE_LIBZ
 	int i = 0;

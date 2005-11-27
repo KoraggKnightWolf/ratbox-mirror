@@ -134,7 +134,7 @@ adns_status adns__mkquery(adns_state ads, vbuf *vb, int *id_r,
 
 adns_status adns__mkquery_frdgram(adns_state ads, vbuf *vb, int *id_r,
 				  const byte *qd_dgram, int qd_dglen, int qd_begin,
-				  adns_rrtype type, adns_queryflags UNUSED(flags)) {
+				  adns_rrtype type, adns_queryflags flags) {
   byte *rqp;
   findlabel_state flstate;
   int lablen, labstart;
@@ -162,7 +162,7 @@ adns_status adns__mkquery_frdgram(adns_state ads, vbuf *vb, int *id_r,
   return adns_s_ok;
 }
 
-void adns__querysend_tcp(adns_query qu, struct timeval UNUSED(now)) {
+void adns__querysend_tcp(adns_query qu, struct timeval now) {
   byte length[2];
   struct iovec iov[2];
   int wr, r;

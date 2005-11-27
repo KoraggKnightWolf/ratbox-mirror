@@ -122,8 +122,8 @@ adns_status adns__parse_domain(adns_state ads, int serv, adns_query qu,
   return adns__parse_domain_more(&flstate,ads,qu, vb,flags,dgram);
 }
 
-adns_status adns__parse_domain_more(findlabel_state *flstate, adns_state UNUSED(ads),
-				    adns_query UNUSED(qu), vbuf *vb, parsedomain_flags flags,
+adns_status adns__parse_domain_more(findlabel_state *flstate, adns_state ads,
+				    adns_query qu, vbuf *vb, parsedomain_flags flags,
 				    const byte *dgram) {
   int lablen, labstart, i, ch, first;
   adns_status st;

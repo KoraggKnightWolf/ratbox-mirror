@@ -49,7 +49,7 @@ static void tcp_close(adns_state ads) {
   ads->tcprecv.used= ads->tcprecv_skip= ads->tcpsend.used= 0;
 }
 
-void adns__tcp_broken(adns_state ads, const char *what, const char * UNUSED(why)) {
+void adns__tcp_broken(adns_state ads, const char *what, const char *why) {
   int serv;
   adns_query qu;
   
@@ -195,7 +195,7 @@ static void inter_maxtoabs(struct timeval **tv_io, struct timeval *tvbuf,
   inter_maxto(tv_io,tvbuf,maxtime);
 }
 
-static void timeouts_queue(adns_state UNUSED(ads), int act,
+static void timeouts_queue(adns_state ads, int act,
 			   struct timeval **tv_io, struct timeval *tvbuf,
 			   struct timeval now, struct query_queue *queue) {
   adns_query qu, nqu;
@@ -489,7 +489,7 @@ xit:
   return r;
 }
   
-int adns_processexceptional(adns_state ads, int fd, const struct timeval * UNUSED(now)) {
+int adns_processexceptional(adns_state ads, int fd, const struct timeval *now) {
   adns__consistency(ads,0,cc_entex);
   switch (ads->tcpstate) {
   case server_disconnected:
@@ -648,7 +648,7 @@ int adns_processany(adns_state ads) {
   return 0;
 }
 
-void adns__autosys(adns_state ads, struct timeval UNUSED(now)) {
+void adns__autosys(adns_state ads, struct timeval now) {
   if (ads->iflags & adns_if_noautosys) return;
   adns_processany(ads);
 }
