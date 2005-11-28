@@ -256,12 +256,14 @@ static int generate_challenge(char **r_challenge, char **r_response, RSA * rsa);
  * parv[1] = operator to challenge for, or +response
  *
  */
+#define CHAL_WIDTH 51
 static int
 m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct oper_conf *oper_p;
 	char *challenge;
-
+	char chal_line[CHAL_WIDTH]; 
+	size_t cnt;
 	/* if theyre an oper, reprint oper motd and ignore */
 	if(IsOper(source_p))
 	{
@@ -355,8 +357,19 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(!generate_challenge(&challenge, &(source_p->localClient->response), oper_p->rsa_pubkey))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_RSACHALLENGE), 
-			   me.name, source_p->name, challenge);
+		char *chal = challenge;
+		for(;;)
+		{
+			cnt = strlcpy(chal_line, chal, CHAL_WIDTH);
+			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_RSACHALLENGE2), me.name, source_p->name, chal_line);
+			if(cnt > CHAL_WIDTH)
+				chal += CHAL_WIDTH - 1;
+			else
+				break;
+			
+		}
+		sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFRSACHALLENGE2), 
+			   me.name, source_p->name);
 	}
 
 	DupString(source_p->localClient->auth_oper, oper_p->name);
