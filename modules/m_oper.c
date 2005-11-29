@@ -257,14 +257,16 @@ static int generate_challenge(char **r_challenge, char **r_response, RSA * rsa);
  *
  */
 #define CHAL_WIDTH 51
+
 static int
 m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct oper_conf *oper_p;
 	char *challenge;
 	char chal_line[CHAL_WIDTH]; 
+	u_int8_t *b_response;
 	size_t cnt;
-	/* if theyre an oper, reprint oper motd and ignore */
+
 	if(IsOper(source_p))
 	{
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_YOUREOPER), me.name, source_p->name);
@@ -274,13 +276,16 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(*parv[1] == '+')
 	{
-		/* Ignore it if we aren't expecting this... -A1kmm */
-		if(!source_p->localClient->response)
+		if(source_p->localClient->response == NULL)
 			return 0;
 
-		if(irccmp(source_p->localClient->response, ++parv[1]))
+
+		b_response = ircd_base64_decode((const unsigned char *)++parv[1], strlen(parv[1]));
+
+		if(memcmp(source_p->localClient->response, b_response, SHA256_DIGEST_LENGTH))
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
+			ircd_free(b_response);
 			ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 			     source_p->localClient->auth_oper, source_p->name,
 			     source_p->username, source_p->host);
@@ -292,6 +297,8 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 						     source_p->host);
 			return 0;
 		}
+
+		ircd_free(b_response);
 
 		oper_p = find_oper_conf(source_p->username, source_p->host, 
 					source_p->sockhost, 
@@ -404,7 +411,6 @@ static int
 generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 {
 	SHA256_CTX ctx;
-	u_int8_t results[SHA256_DIGEST_LENGTH];
 	unsigned char secret[32], *tmp;
 	unsigned long length;
 	unsigned long e = 0;
@@ -417,9 +423,8 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 	{
 		SHA256_Init(&ctx);
 		SHA256_Update(&ctx, (u_int8_t *)secret, 32);
-		SHA256_Final(results, &ctx);
-		
-		*r_response = (char *)ircd_base64_encode(results, 32);
+		*r_response = malloc(SHA256_DIGEST_LENGTH);
+		SHA256_Final((u_int8_t *)*r_response, &ctx);
 
 		length = RSA_size(rsa);
 		tmp = ircd_malloc(length);
