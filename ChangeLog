@@ -1,3 +1,12 @@
+androsyn    2005/11/29 17:31:24 UTC	(20051129_0-21323)
+  Log:
+  fix respond to deal with getting passwords from somewhere else than a tty. if stdin isn't a tty, read the first line from stdin and use that as the password rather than using getpass(). this also lets us get rid of that horrible patch that accepted the password on the command line(wtf?)
+
+  Modified:
+	ircd-ratbox/trunk/tools/rsa_respond/respond.c (File Modified) 
+	ircd-ratbox/trunk/tools/rsa_respond/rsa_respond-insecure.diff (File Deleted) 
+
+
 androsyn    2005/11/28 20:25:53 UTC	(20051128_0-21321)
   Log:
   allow for challenge using more than one line in the challenge text. this will allow for keys > 2048. need to rewrite response at some point now
