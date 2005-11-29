@@ -461,6 +461,24 @@ diecb(const char *buf)
 	abort();
 }
 
+static void
+seed_random(void)
+{
+	int fd;
+	unsigned int seed;
+	fd = open("/dev/random", O_RDONLY);
+	if(fd >= 0)
+	{
+		if(read(fd, &seed, sizeof(seed)) == sizeof(seed))
+		{
+			close(fd);
+			srand(seed);
+		}
+	}
+	ircd_set_time();
+	srand(ircd_systemtime.tv_sec ^ (ircd_systemtime.tv_usec | (getpid() << 20)));
+}
+
 int
 ratbox_main(int argc, char *argv[])
 {
@@ -488,8 +506,9 @@ ratbox_main(int argc, char *argv[])
 	initialVMTop = get_vm_top();
 
 	ServerRunning = 0;
-	/* It ain't random, but it ought to be a little harder to guess */
-	srand(ircd_systemtime.tv_sec ^ (ircd_systemtime.tv_usec | (getpid() << 20)));
+
+	seed_random();
+
 	memset(&me, 0, sizeof(me));
 	me.name = emptyname;
 	memset(&meLocalUser, 0, sizeof(meLocalUser));
