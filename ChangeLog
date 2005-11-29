@@ -1,3 +1,13 @@
+androsyn    2005/11/29 18:35:03 UTC	(20051129_2-21327)
+  Log:
+  Seed srand() with data from /dev/random if it exists,
+  otherwise fallback to the old method.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2005/11/29 18:07:06 UTC	(20051129_1-21325)
   Log:
   Have challenge do the base64 decode and then compare the resulting
