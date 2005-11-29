@@ -1,3 +1,14 @@
+androsyn    2005/11/29 18:07:06 UTC	(20051129_1-21325)
+  Log:
+  Have challenge do the base64 decode and then compare the resulting
+  decoded data, rather than trying to compare the base64 data, as sometimes
+  this gets padded differently depending on the base64 implementation.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+
+
 androsyn    2005/11/29 17:31:24 UTC	(20051129_0-21323)
   Log:
   fix respond to deal with getting passwords from somewhere else than a tty. if stdin isn't a tty, read the first line from stdin and use that as the password rather than using getpass(). this also lets us get rid of that horrible patch that accepted the password on the command line(wtf?)
