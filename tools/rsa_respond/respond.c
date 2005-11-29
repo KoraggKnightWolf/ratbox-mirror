@@ -1,9 +1,12 @@
 /*
- * tools/rsa_respond/respond.c
- * A simple RSA authentification challenge response generator for the
- * ircd-hybrid CHALLENGE command.
- *  This code is Copyright(C)2001 by the past and present ircd-hybrid
- *  developers.
+ *  respond.c: A challenge response generator for ircd-ratbox
+ *
+ *  Note: This is not compatible with previous versions of the CHALLENGE
+ *  command, as the prior version was seriously flawed in many ways.
+ * 
+ *  Copyright (C) 2001 by the past and present ircd-hybrid developers.
+ *  Copyright (C) 2005 Aaron Sethman <androsyn@ratbox.org> 
+ *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -18,7 +21,9 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *  $Id$
+ *
  */
+
 #include <stdio.h>
 #include <string.h>
 #include <openssl/err.h>
@@ -31,6 +36,14 @@ static int pass_cb(char *buf, int size, int rwflag, void *u)
 {
 	int len;
         char *tmp;
+        if(!isatty(fileno(stdin))) {
+        	if(fgets(buf, size, stdin) == NULL)
+        		return 0;
+		tmp = strpbrk(buf, "\r\n");
+		if(tmp != NULL)
+			*tmp = '\0';
+		return strlen(buf);
+        }
 	tmp = getpass("Enter passphrase for challenge: ");
         len = strlen(tmp);
         if (len <= 0) 
