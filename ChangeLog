@@ -1,3 +1,14 @@
+androsyn    2005/11/30 17:27:15 UTC	(20051130_1-21331)
+  Log:
+  Change the length of each challenge line to
+  BUFSIZE - (NICKLEN + HOSTLEN + 6).  This will
+  keep most challenges for rsa keys <= to one line.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+
+
 androsyn    2005/11/30 16:53:57 UTC	(20051130_0-21329)
   Log:
   - Change respond to be a bit smarter about challenge texts.
