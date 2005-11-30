@@ -32,6 +32,7 @@
 #include <openssl/sha.h>
 #include <unistd.h>
 
+static int called_passcb = 0;
 static int pass_cb(char *buf, int size, int rwflag, void *u)
 {
 	int len;
@@ -44,13 +45,14 @@ static int pass_cb(char *buf, int size, int rwflag, void *u)
 			*tmp = '\0';
 		return strlen(buf);
         }
-	tmp = getpass("Enter passphrase for challenge: ");
+	tmp = getpass("Enter passphrase for private key: ");
         len = strlen(tmp);
         if (len <= 0) 
 		return 0;
         if (len > size)
         	len = size;
         memcpy(buf, tmp, len);
+        called_passcb++;
         return len;
 }
 
@@ -178,6 +180,26 @@ base64_decode(const unsigned char *str, int length, int *ret)
 	return result;
 }
 
+unsigned char *
+read_challenge(FILE *f)
+{
+	static unsigned char buf[16384];	
+
+	if(isatty(fileno(f)))
+	{
+		fprintf(stderr, "Please paste challenge text now\n");
+	} else {
+		if(!called_passcb)
+		{
+			/* throw away the unneeded password line */
+			fgets((char *)buf, sizeof(buf), f);
+		}
+	}
+
+	fread(buf, sizeof(buf), 1, f);
+	return buf;
+}
+
 
 int
 main(int argc, char **argv)
@@ -185,12 +207,13 @@ main(int argc, char **argv)
 	FILE *kfile;
 	RSA *rsa = NULL;
 	SHA256_CTX ctx;
+	unsigned char *ptr;
 	unsigned char *ndata, ddata[512];
 	int len;
 	/* respond privatefile challenge */
-	if (argc < 3)
+	if (argc < 2)
 	{
-		puts("Usage: respond privatefile challenge");
+		puts("Usage: respond privatefile");
 		return 0;
 	}
 
@@ -210,7 +233,9 @@ main(int argc, char **argv)
 	}
 
 	fclose(kfile);
-	ndata = base64_decode((unsigned char *)argv[2], strlen(argv[2]), &len);
+
+	ptr = read_challenge(stdin);
+	ndata = base64_decode(ptr, strlen((char *)ptr), &len);
 	if (ndata == NULL)
 	{
 		puts("Bad challenge.");
@@ -227,6 +252,10 @@ main(int argc, char **argv)
 	SHA256_Update(&ctx, (unsigned char *)ddata, 32);
 	SHA256_Final((unsigned char *)ddata, &ctx);
 	ndata = base64_encode((unsigned char *)ddata, 32);
+	if(isatty(fileno(stdin)))
+	{
+		fprintf(stderr, "Response: /quote CHALLENGE +");
+	}
 	puts((char *)ndata);
 	return 0;
 }

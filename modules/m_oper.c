@@ -285,7 +285,6 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		if(memcmp(source_p->localClient->response, b_response, SHA256_DIGEST_LENGTH))
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
-			ircd_free(b_response);
 			ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 			     source_p->localClient->auth_oper, source_p->name,
 			     source_p->username, source_p->host);
@@ -295,6 +294,12 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 						     "Failed OPER attempt by %s (%s@%s)",
 						     source_p->name, source_p->username,
 						     source_p->host);
+
+			ircd_free(b_response);
+			ircd_free(source_p->localClient->auth_oper);
+			ircd_free(source_p->localClient->response);
+			source_p->localClient->auth_oper = NULL;
+			source_p->localClient->response = NULL;
 			return 0;
 		}
 

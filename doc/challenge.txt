@@ -2,16 +2,24 @@
 
    $Id$
 
-   Copyright (c) 2001 by ircd-hybrid team
+   Copyright (C) 2001 by ircd-hybrid team
+   Copyright (C) 2005 Aaaron Sethman <androsyn@ratbox.org>
 
      ----------------------------------------------------------------------
 
-   ircd-hybrid
+   ircd-ratbox
 
    In an effort to reduce the damage caused to a network by a hacked O-line,
-   Hybrid supports an OpenSSL based challenge-response system. This new
+   ircd-ratbox supports a public-key based challenge-response system. This new
    system allows the admin to remove all oper block passwords from the conf
    file. Authentication is done through a public/private key.
+
+   BIG FAT WARNING:
+   
+   This document only covers the CHALLENGE system in ircd-ratbox 3.0beta. 
+   For the previous version of this system, please see the challenge.txt 
+   in older releases of ircd-ratbox.  The challenge system described here
+   and the respond tools are NOT compatible with the prior versions.
 
      ----------------------------------------------------------------------
 
@@ -26,8 +34,6 @@
    use both challenge and normal passwords, but this would defeat the purpose
    of the challenge system.
 
-   m_challenge.so must be loaded.
-
    The oper has their private key file and an implementation of the RSA
    Respond tool available to be run.
 
@@ -36,8 +42,7 @@
                                     Process
 
    Each oper should have a private key file and a public key file. The keys
-   can be generated with the mkkeypair utility provided in tools/. The keys
-   are compatible with cryptlink keys.
+   can be generated with the mkkeypair utility provided in tools/. 
 
    The oper keeps their private key file in a safe place, and gives their
    public key file to their admin(s).
@@ -60,17 +65,20 @@
 
    The keys can be generated with the openssl command as follows:
 
-       openssl genrsa -des3(1) -out rsa.key 1024(2)
+       openssl genrsa -aes256(1) -out rsa.key 1024(2)
        openssl rsa -in rsa.key -pubout -out rsa.pub
    
 
    (1)
-           The -des3 must be included in order to create a key with a
+           The -aes256 must be included in order to create a key with a
            passphrase. Omitting this option will create a non protected key.
+           If your version of openssl does not have AES support, use -des3
+	   instead.
+
    (2)
-           The key size must be 1024 or below. The challenge sent for a
-           longer keysize will be too long to fit into the ircd's 512 byte
-           line constraint.
+	   With the previous implementation of challenge, 1024 was a hard
+	   limit for key sizes, this is no longer the case and will accept
+	   any valid RSA key size.
 
    It is highly recommended that you set a password on your private key.
 
@@ -82,7 +90,7 @@
                           Using CHALLENGE and respond
 
      Note: All examples assume the use of the stock respond client included
-     with the Hybrid 7 source, run on a UNIX(c) platform.
+     with the ircd-ratbox sources.
 
    The administrator of the server you oper on should remove the password in
    your oper {} block and replace it with an entry for your public key, so
@@ -92,58 +100,62 @@
 
    The oper will issue /challenge oper_nick, and see something like below:
 
- *** 56F1FDAE4C590C524CF758917E62C2A2A1376CB9C4C2E7D411BB0AD9C4A
- 605A2D05A94E7254197E9D71438B5FB565B6FD35465E462305F35F4A2D45311
- F983B3E062F635912FA155B4B1E18EAA782CC107F4C9DA83092658D16A2E88A
- 6BCF9820F5A044A29CDD4C062F05BF509CA3B561375CBC4179BD1CF6026BDE9
- 60E52C6B
+*** hgAyfCsMiA1hRxN8LmErwgL6VpqBc9IRAO/t6NTwCHqjqBqilQ
+*** gO3tUByEe8GtpLizX/BnswJ10rnmwsbPjS9l0dbPvJqk9+SqsG
+*** 7AbB0cjltEvwo0kCXSJiU6ki2D3UM5JRtERDvzd1XfuM0gNo5W
+*** BJk5nW/RPSv2qxtnw1t0ajPm9y/NQxiaFf5gM0t0gYDYs3oGFW
+*** DQ7CQ7BmcZHHeHRSFO8YweeDoLSJSsZQPUGwHMrn6VdfovClXk
+*** m9oRnBlELEDyHtLuGbn5Dfk3PU+YgubepccTyraP5pqarVb/e8
+*** D3ekwOVrNp1Yhk09sjGG3U1kV2sTYBK2w40yvv2OwA==
+*** End of CHALLENGE
 
-     Note: The challenge is all on one line.
+
 
      Note: With some clients, the oper will have to issue /quote CHALLENGE
      instead of /challenge.
 
    The oper will then have to feed that challenge to the respond program.
+   When running from an interactive session respond expects to receive
+   the challenge text from standard input. Note that when entering text 
+   from standard input, you must tell response that you are finished by
+   hitting ctrl-d when complete.
 
-   +------------------------------------------------------------------+
-   | The respond utility's syntax is:                                 |
-   |                                                                  |
-   |$ ./respond private_key_file challenge_from_server                |
-   |                                                                  |
-   |                                                                  |
-   | Example:                                                         |
-   |                                                                  |
-   |wcampbel@botbay (rsa_respond): ./respond hwy.key \                |
-   |56F1FDAE4C590C524CF758917E62C2A2A1376CB9C4C2E7D411BB0AD9C4A605A2D0|
-   |5A94E7254197E9D71438B5FB565B6FD35465E462305F35F4A2D45311F983B3E062|
-   |F635912FA155B4B1E18EAA782CC107F4C9DA83092658D16A2E88A6BCF9820F5A04|
-   |4A29CDD4C062F05BF509CA3B561375CBC4179BD1CF6026BDE960E52C6B        |
-   |Keyphrase:                                                        |
-   |6B882932DD00F86123869E401F7334B9B0D0018A60F1DE244E90E47246AA87C7  |
-   |                                                                  |
-   |   Note: The challenge parameter must be on one line.             |
-   +------------------------------------------------------------------+
+   The following example assumes that private.key is encrypted:
 
-   The keyphrase must be entered properly to get the response. The bottom
-   line is the response that must be sent back to the server.
+$ ./respond private.key
+Enter passphrase for private key:
+Please paste challenge text now
+hgAyfCsMiA1hRxN8LmErwgL6VpqBc9IRAO/t6NTwCHqjqBqilQ
+gO3tUByEe8GtpLizX/BnswJ10rnmwsbPjS9l0dbPvJqk9+SqsG
+7AbB0cjltEvwo0kCXSJiU6ki2D3UM5JRtERDvzd1XfuM0gNo5W
+BJk5nW/RPSv2qxtnw1t0ajPm9y/NQxiaFf5gM0t0gYDYs3oGFW
+DQ7CQ7BmcZHHeHRSFO8YweeDoLSJSsZQPUGwHMrn6VdfovClXk
+m9oRnBlELEDyHtLuGbn5Dfk3PU+YgubepccTyraP5pqarVb/e8
+D3ekwOVrNp1Yhk09sjGG3U1kV2sTYBK2w40yvv2OwA==
 
-   The oper will issue the following command in order to obtain operator
-   status:
+Response: /quote CHALLENGE +YRv9l8HEiV4YwEiYY2UWYlWag0S5BTzS70ZvDfAh2EA=
 
-   /challenge
-   +6B882932DD00F86123869E401F7334B9B0D0018A60F1DE244E90E47246AA87C7
 
-     Note: The '+' is needed
+For the purposes scripting respond can also function non-interactively.
+When operating in this mode, respond expects that the first line it receives
+is a passphrase for the private.key.  Note that this line *must* be there
+regardless of whether or not the private.key has a password on it or not. 
+Simply sending an empty line should be sufficient for this.  Afterwards
+the challenge text should be included.  Below is an example of calling
+respond in this fashion:
 
-   If successful, the oper will obtain operator status on the server.
 
-   +------------------------------------------------------------------------+
-   |                                Warning                                 |
-   |------------------------------------------------------------------------|
-   | If the CHALLENGE fails, and you use ircII, EPIC, or BX, you may get    |
-   | disconnected with the client asking for the server password. This is a |
-   | client bug, not an ircd bug.                                           |
-   +------------------------------------------------------------------------+
+echo 'thisisnotapassword
+hgAyfCsMiA1hRxN8LmErwgL6VpqBc9IRAO/t6NTwCHqjqBqilQ
+gO3tUByEe8GtpLizX/BnswJ10rnmwsbPjS9l0dbPvJqk9+SqsG
+7AbB0cjltEvwo0kCXSJiU6ki2D3UM5JRtERDvzd1XfuM0gNo5W
+BJk5nW/RPSv2qxtnw1t0ajPm9y/NQxiaFf5gM0t0gYDYs3oGFW
+DQ7CQ7BmcZHHeHRSFO8YweeDoLSJSsZQPUGwHMrn6VdfovClXk
+m9oRnBlELEDyHtLuGbn5Dfk3PU+YgubepccTyraP5pqarVb/e8
+D3ekwOVrNp1Yhk09sjGG3U1kV2sTYBK2w40yvv2OwA==' | ./respond private.key
+YRv9l8HEiV4YwEiYY2UWYlWag0S5BTzS70ZvDfAh2EA=
+
+
 
      ----------------------------------------------------------------------
 
@@ -191,10 +203,13 @@
 
      ----------------------------------------------------------------------
 
-                                  A. Numerics
+                                    Numerics
 
  :server 381 user :You have entered... the Twilight Zone!.
- :server 386 user :challenge-text
+ :server 740 user :challenge-text
+ :server 740 user :challenge-text1
+ :server 740 user :challenge-text2
+ :server 741 user :End of CHALLENGE
  :server 464 user :Password Incorrect
  :server 491 user :Only few of mere mortals may try to enter the twilight zone
    
@@ -203,123 +218,34 @@
 
      ----------------------------------------------------------------------
 
-                                  B. Scripting
+                                 Method of Operation
 
-   The following script is for EPIC 4 only. It was written by Greg Prosser,
-   xyst <gregp@blackened.net>.
+   The challenge protocol described here works as follows:
 
-   Please note that passphrase protected keys cannot be used in conjunction
-   with this script.
 
-   BEGIN challenge.irc
+   1.  The server enerates 32 bytes of pseudo-random data using RAND_bytes()
+       or RAND_pseudo_bytes().
 
-      
+   2.  The server encrypts this data with the operators public key and then
+       base64 encodes the data.  This is the CHALLENGE string that the
+       operator receives.
 
-      
- # challenge.irc -- authenticate to a hybrid-7 server with challenge response
- #                  oper authentication.  --gnp (xyst)
- # note: this is almost gauranteed to not work if your key needs a passphrase
- #
- # credit goes to hop for pipe from the default script archive, which doesn't
- # work, but gave me a framework for execing stuff and getting the response.
+   3.  The operator receives the CHALLENGE data, decrypts the data with his
+       private key.
 
- # For Hybrid's cvs...
- # $Id$
+   4.  The respond client generates a response to the CHALLENGE by doing an
+       SHA256 hash on the decrypted data and base64 encodes it.  This is
+       the response the operator sends back to the server.
 
- xecho ... Loading challenge.irc by xyst, feer.
+   5.  The server checks to see if the SHA256 hash sent back from the
+       operator matches the hash of the data the server sent, if it matches
+       the server gives the operator status.  If it does not match, the
+       server returns password mismatch and resets the CHALLENGE state for
+       the operator
+ 
 
- # you might want to change these..
 
- @challenge.path=[~/.irc/respond]
- @challenge.key=[~/.irc/challenge.identity]
- @challenge.num=0
- @challenge.response=[]
- @challenge.savepath=[~/.irc/challenge.config]
-
- alias rsaconfig {
-     if ([$0])
-     {
-         switch ($tolower($0))
-         {
-             (resppath)
-             {
-                 if ([$1])
-                 {
-                     @challenge.resp=[$1]
-                     xecho $G Challenge -- resppath is now: $1
-                 } {
-                     xecho $G Challenge -- resppath: $challenge.path
-                 }
-             }
-             (keypath)
-             {
-                 if ([$1])
-                 {
-                     @challenge.key=[$1]
-                     xecho $G Challenge -- keypath is now: $1
-                 } {
-                     xecho $G Challenge -- keypath: $challenge.key
-                 }
-             }
-             (save)
-             {
-                 @unlink($challenge.savepath)
-                 @fd=open($challenge.savepath W)
-                 @write($fd @challenge.path=[$challenge.path])
-                 @write($fd @challenge.key=[$challenge.key])
-                 @close($fd)
-                 xecho $G Challenge -- saved settings.
-             }
-             (*)
-             {
-                 xecho $G Usage: /rsaconfig <resppath|keypath> [value]
-             }
-         }
-     } {
-         xecho $G Current settings for challenge.irc:
-         rsaconfig resppath
-         rsaconfig keypath
-         xecho $G Type /rsaconfig <resppath|keypath> <value> to change these, /rsaconfig save saves them.
-     }
- }
-
- alias challenge {
-     if ([$0])
-     {
-         ^quote challenge $0
-     } {
-         xecho $G Usage: /challenge <username>
-     }
- }
-
- on ^386 * {
-     xecho $G Got oper-challenge from server, sending response..
-     @challenge.num++
-     ^on ^exec "chall$challenge.num *" {
-         @challenge.response=[$1]
-     }
-     ^exec -name chall$challenge.num $challenge.path $challenge.key $1
-     ^wait %chall$challenge.num
-     ^on exec -"chall$challenge.num *"
-     ^stack push on raw_irc
-     ^stack push on 381
-     ^on ^raw_irc "$S 464 *" { xecho $G Challenge incorrect.  Check your key.;^stack pop on raw_irc;^stack pop on 381 }
-     ^on -381 * { ^stack pop on 381;^stack pop on raw_irc }
-     ^quote challenge +$challenge.response
- }
-
- if ([$fexist($challenge.savepath)] > 0)
- {
-     xecho $G Loading settings from $challenge.savepath ..
-     ^load $challenge.savepath
- } {
-     xecho $G Config file not found, try /rsaconfig save\; using defaults.
- }
-
- rsaconfig
-
-      
-   
+     ----------------------------------------------------------------------
 
   Notes
 
