@@ -1,3 +1,18 @@
+androsyn    2005/11/30 18:24:43 UTC	(20051130_2-21333)
+  Log:
+  - Change RSA padding to use RSA_PKCS1_OAEP_PADDING
+  - Change CHALLENGE secret length to 128 bytes as the padding
+    ends up padding it up to at least 128 anyways.
+  - Make challenges only valid for 180 seconds.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/tools/rsa_respond/respond.c (File Modified) 
+
+
 androsyn    2005/11/30 17:27:15 UTC	(20051130_1-21331)
   Log:
   Change the length of each challenge line to
