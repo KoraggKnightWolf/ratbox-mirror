@@ -256,7 +256,7 @@ static int generate_challenge(char **r_challenge, char **r_response, RSA * rsa);
  * parv[1] = operator to challenge for, or +response
  *
  */
-#define CHAL_WIDTH 51
+#define CHAL_WIDTH BUFSIZE - (NICKLEN + HOSTLEN + 6)
 
 static int
 m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
