@@ -202,7 +202,8 @@ struct LocalUser
 	/* challenge stuff */
 	char *response;
 	char *auth_oper;
-
+	time_t chal_time;
+	
 	/* clients allowed to talk through +g */
 	dlink_list allow_list;
 

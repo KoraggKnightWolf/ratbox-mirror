@@ -242,16 +242,17 @@ main(int argc, char **argv)
 		return -1;
 	}
 	
-	if (RSA_private_decrypt(len, (unsigned char*)ndata,
-		(unsigned char*)ddata, rsa, RSA_PKCS1_PADDING) == -1)
+	if ((len = RSA_private_decrypt(len, (unsigned char*)ndata,
+		(unsigned char*)ddata, rsa, RSA_PKCS1_OAEP_PADDING)) == -1)
 	{
 		puts("Decryption error.");
 		return -1;
 	}
+
 	SHA256_Init(&ctx);
-	SHA256_Update(&ctx, (unsigned char *)ddata, 32);
+	SHA256_Update(&ctx, (unsigned char *)ddata, len);
 	SHA256_Final((unsigned char *)ddata, &ctx);
-	ndata = base64_encode((unsigned char *)ddata, 32);
+	ndata = base64_encode((unsigned char *)ddata, SHA256_DIGEST_LENGTH);
 	if(isatty(fileno(stdin)))
 	{
 		fprintf(stderr, "Response: /quote CHALLENGE +");
