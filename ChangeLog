@@ -1,3 +1,18 @@
+androsyn    2005/11/30 16:53:57 UTC	(20051130_0-21329)
+  Log:
+  - Change respond to be a bit smarter about challenge texts.
+  - Update challenge documentation
+  - Clear out the CHALLENGE state if the oper fails to get the 
+    correct response.  The oper must now need to do a 
+    CHALLENGE opernick after a response failure.  
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/challenge.txt (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/tools/rsa_respond/respond.c (File Modified) 
+
+
 androsyn    2005/11/29 18:35:03 UTC	(20051129_2-21327)
   Log:
   Seed srand() with data from /dev/random if it exists,
