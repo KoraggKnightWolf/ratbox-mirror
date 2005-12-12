@@ -143,6 +143,7 @@ init_netio(void)
 	}
 	kqmax = getdtablesize();
 	kqlst = ircd_malloc(sizeof(struct kevent) * kqmax);
+	ircd_open(kq, FD_UNKNOWN, "kqueue fd");
 	zero_timespec.tv_sec = 0;
 	zero_timespec.tv_nsec = 0;
 }

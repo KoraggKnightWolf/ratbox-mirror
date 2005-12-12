@@ -59,13 +59,13 @@ init_netio(void)
 {
 	pfd_size = getdtablesize();
 	ep = epoll_create(pfd_size);
+	ircd_open(ep, FD_SOCKET, "epoll file descriptor");
 	pfd = ircd_malloc(sizeof(struct epoll_event) * pfd_size);
 	if(ep < 0)
 	{
 		fprintf(stderr, "init_netio: Couldn't open epoll fd!\n");
 		exit(115);	/* Whee! */
 	}
-	ircd_note(ep, "epoll file descriptor");
 }
 
 int

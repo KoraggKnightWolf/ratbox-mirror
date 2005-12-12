@@ -155,7 +155,7 @@ init_netio(void)
 	}
 	maxfd = getdtablesize() - 2; /* This makes more sense than HARD_FDLIMIT */
 	fdmask = ircd_malloc(sizeof(fdmask) * maxfd + 1);
-	ircd_note(dpfd, "poll file descriptor");
+	ircd_open(dpfd, FD_UNKNOWN, "/dev/poll file descriptor");
 }
 
 /*
