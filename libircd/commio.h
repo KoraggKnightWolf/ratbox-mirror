@@ -179,20 +179,14 @@ struct _fde
 	}
 	connect;
 	int pflags;
-#ifdef __MINGW32__
 	dlink_node node;
-#endif
 
 #ifdef SSL_ENABLED
 	SSL *ssl;
 #endif
 };
 
-#ifdef __MINGW32__
-dlink_list *ircd_fd_table;
-#else
-extern fde_t *ircd_fd_table;
-#endif
+extern dlink_list ircd_fd_table[];
 
 void ircd_fdlist_init(int closeall, int maxfds);
 
