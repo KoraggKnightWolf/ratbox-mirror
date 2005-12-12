@@ -1,3 +1,14 @@
+androsyn    2005/12/12 19:30:47 UTC	(20051212_1-21361)
+  Log:
+  rename maxconnections to ircd_maxconnections
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+
+
 androsyn    2005/12/12 18:56:58 UTC	(20051212_0-21353)
   Log:
   update challenge documentation some more
