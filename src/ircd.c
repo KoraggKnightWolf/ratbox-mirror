@@ -181,7 +181,7 @@ init_sys(void)
 
 	if(!getrlimit(RLIMIT_NOFILE, &limit))
 	{
-		maxconnections = limit.rlim_cur;
+		maxconnections = limit.rlim_cur - 10;
 		if(maxconnections > MAXCONNECTIONS)
 		{
 			maxconnections = MAXCONNECTIONS;
