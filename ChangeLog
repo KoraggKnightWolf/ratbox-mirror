@@ -1,3 +1,11 @@
+androsyn    2005/12/12 19:54:22 UTC	(20051212_3-21365)
+  Log:
+  make that the return valued from getrlimit() - 10
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2005/12/12 19:53:38 UTC	(20051212_2-21363)
   Log:
   - Change most cases of MAXCONNECTIONS to use maxconnections instead
