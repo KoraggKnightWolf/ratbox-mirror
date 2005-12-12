@@ -80,6 +80,7 @@ struct Counter Count;
 struct ServerStatistics ServerStats;
 
 int ServerRunning;		/* GLOBAL - server execution state */
+int maxconnections;
 struct Client me;		/* That's me */
 struct LocalUser meLocalUser;	/* That's also part of me */
 
@@ -175,29 +176,19 @@ print_startup(int pid)
 static void
 init_sys(void)
 {
-#if defined(RLIMIT_FD_MAX) && defined(HAVE_SYS_RLIMIT_H)
+#if defined(RLIMIT_NOFILE) && defined(HAVE_SYS_RESOURCE_H)
 	struct rlimit limit;
 
-	if(!getrlimit(RLIMIT_FD_MAX, &limit))
+	if(!getrlimit(RLIMIT_NOFILE, &limit))
 	{
-
-		if(limit.rlim_max < MAXCONNECTIONS)
+		maxconnections = limit.rlim_cur;
+		if(maxconnections > MAXCONNECTIONS)
 		{
-			fprintf(stderr, "ircd fd table too big\n");
-			fprintf(stderr, "Hard Limit: %ld IRC max: %d\n",
-				(long) limit.rlim_max, MAXCONNECTIONS);
-			fprintf(stderr, "Fix MAXCONNECTIONS\n");
-			exit(-1);
-		}
-
-		limit.rlim_cur = limit.rlim_max;	/* make soft limit the max */
-		if(setrlimit(RLIMIT_FD_MAX, &limit) == -1)
-		{
-			fprintf(stderr, "error setting max fd's to %ld\n", (long) limit.rlim_cur);
-			exit(EXIT_FAILURE);
+			maxconnections = MAXCONNECTIONS;
 		}
 	}
 #endif /* RLIMIT_FD_MAX */
+	maxconnections = MAXCONNECTIONS;
 }
 
 static int
@@ -578,7 +569,7 @@ ratbox_main(int argc, char *argv[])
 	}
 
 	/* This must be after we daemonize.. */
-	ircd_lib(ilogcb, restartcb, diecb, 1, MAXCONNECTIONS, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE);
+	ircd_lib(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE);
 	init_sys();
 	init_main_logfile();
 	init_patricia();

@@ -67,7 +67,7 @@ server_reboot(void)
 	 * bah, for now, the program ain't coming back to here, so forcibly
 	 * close everything the "wrong" way for now, and just LEAVE...
 	 */
-	for (i = 0; i < MAXCONNECTIONS; ++i)
+	for (i = 0; i < maxconnections; ++i)
 		close(i);
 
 	unlink(pidFileName);

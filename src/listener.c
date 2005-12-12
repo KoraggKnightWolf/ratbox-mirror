@@ -508,7 +508,7 @@ accept_connection(int pfd, void *data)
 		/*
 		 * check for connection limit
 		 */
-		if((MAXCONNECTIONS - 10) < fd)
+		if((maxconnections - 10) < fd)
 		{
 			++ServerStats.is_ref;
 			/*
