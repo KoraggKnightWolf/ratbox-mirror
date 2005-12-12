@@ -1,3 +1,13 @@
+androsyn    2005/12/12 21:26:33 UTC	(20051212_7-21373)
+  Log:
+  add ircd_open calls for /dev/poll, epoll and kqueue descriptors
+
+  Modified:
+	ircd-ratbox/trunk/libircd/devpoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/epoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/kqueue.c (File Modified) 
+
+
 androsyn    2005/12/12 20:35:51 UTC	(20051212_6-21371)
   Log:
   make the stupid thing actually compile
