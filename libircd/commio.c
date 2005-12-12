@@ -38,11 +38,7 @@
 #define MSG_NOSIGNAL 0
 #endif
 
-#ifndef __MINGW32__
-fde_t *ircd_fd_table = NULL;
-#else
-dlink_list *ircd_fd_table;
-#endif
+dlink_list ircd_fd_table[FD_HASH_SIZE];
 
 static dlink_list timeout_list;
 
@@ -628,31 +624,16 @@ ircd_fdlist_update_biggest(int fd, int opening)
 {
 	if(fd < ircd_highest_fd)
 		return;
-#ifndef __MINGW32__
-	lircd_assert(fd < ircd_maxconnections);
-#endif
+
 	if(unlikely(fd > ircd_highest_fd))
 	{
 		/*  
 		 * lircd_assert that we are not closing a FD bigger than
 		 * our known biggest FD
 		 */
-#ifndef __MINGW32__
-		lircd_assert(opening);
-#endif
 		ircd_highest_fd = fd;
 		return;
 	}
-	/* if we are here, then fd == Biggest_FD */
-	/*
-	 * lircd_assert that we are closing the biggest FD; we can't be
-	 * re-opening it
-	 */
-#ifndef __MINGW32__
-	lircd_assert(!opening);
-	while (ircd_highest_fd >= 0 && !ircd_fd_table[ircd_highest_fd].flags.open)
-		ircd_highest_fd--;
-#endif
 }
 
 
@@ -677,7 +658,6 @@ ircd_fdlist_init(int closeall, int maxfds)
 		if(closeall)
 			ircd_close_all();
 		/* Since we're doing this once .. */
-		ircd_fd_table = ircd_malloc((maxfds + 1) * sizeof(fde_t));
 		initialized = 1;
 	}
 	ircd_event_add("ircd_checktimeouts", ircd_checktimeouts, NULL, 2);
