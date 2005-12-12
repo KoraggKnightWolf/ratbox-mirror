@@ -59,7 +59,7 @@ static void ircd_fdlist_update_biggest(int fd, int opening);
 /* Highest FD and number of open FDs .. */
 int ircd_highest_fd = -1;		/* Its -1 because we haven't started yet -- adrian */
 int number_fd = 0;
-int maxconnections = 0;
+int ircd_maxconnections = 0;
 
 static void ircd_connect_callback(int fd, int status);
 static PF ircd_connect_timeout;
@@ -104,7 +104,7 @@ ircd_close_all(void)
 	/* XXX someone tell me why we care about 4 fd's ? */
 	/* XXX btw, fd 3 is used for profiler ! */
 #ifndef __MINGW32__
-	for (i = 4; i < maxconnections; ++i)
+	for (i = 4; i < ircd_maxconnections; ++i)
 	{
 		close(i);
 	}
@@ -425,7 +425,7 @@ ircd_errstr(int error)
 int
 ircd_socketpair(int family, int sock_type, int proto, int *nfd, const char *note)
 {
-	if(number_fd >= maxconnections)
+	if(number_fd >= ircd_maxconnections)
 	{
 		errno = ENFILE;
 		return -1;
@@ -474,7 +474,7 @@ int
 ircd_pipe(int *fd, const char *desc)
 {
 #ifndef __MINGW32__
-	if(number_fd >= maxconnections)
+	if(number_fd >= ircd_maxconnections)
 	{
 		errno = ENFILE;
 		return -1;
@@ -504,7 +504,7 @@ ircd_socket(int family, int sock_type, int proto, const char *note)
 {
 	int fd;
 	/* First, make sure we aren't going to run out of file descriptors */
-	if(unlikely(number_fd >= maxconnections))
+	if(unlikely(number_fd >= ircd_maxconnections))
 	{
 		errno = ENFILE;
 		return -1;
@@ -587,7 +587,7 @@ int
 ircd_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 {
 	int newfd;
-	if(number_fd >= maxconnections)
+	if(number_fd >= ircd_maxconnections)
 	{
 		errno = ENFILE;
 		return -1;
@@ -629,7 +629,7 @@ ircd_fdlist_update_biggest(int fd, int opening)
 	if(fd < ircd_highest_fd)
 		return;
 #ifndef __MINGW32__
-	lircd_assert(fd < maxconnections);
+	lircd_assert(fd < ircd_maxconnections);
 #endif
 	if(unlikely(fd > ircd_highest_fd))
 	{
@@ -673,7 +673,7 @@ ircd_fdlist_init(int closeall, int maxfds)
 #endif
 	if(!initialized)
 	{
-		maxconnections = maxfds;
+		ircd_maxconnections = maxfds;
 		if(closeall)
 			ircd_close_all();
 		/* Since we're doing this once .. */

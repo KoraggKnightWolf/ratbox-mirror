@@ -68,7 +68,7 @@ poll_findslot(void)
 	if(pollfd_list.pollfds[last_index].fd == -1)
 		return last_index;
 	
-	for (i = 0; i < maxconnections; i++)
+	for (i = 0; i < ircd_maxconnections; i++)
 	{
 		if(pollfd_list.pollfds[i].fd == -1)
 		{
@@ -142,8 +142,8 @@ void
 init_netio(void)
 {
 	int fd;
-	pollfd_list.pollfds = ircd_malloc(maxconnections * (sizeof(struct pollfd)));
-	for (fd = 0; fd < maxconnections; fd++)
+	pollfd_list.pollfds = ircd_malloc(ircd_maxconnections * (sizeof(struct pollfd)));
+	for (fd = 0; fd < ircd_maxconnections; fd++)
 	{
 		pollfd_list.pollfds[fd].fd = -1;
 	}

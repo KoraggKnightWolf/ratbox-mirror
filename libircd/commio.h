@@ -272,11 +272,11 @@ const char *ircd_inet_ntop(int af, const void *src, char *dst, unsigned int size
 int ircd_inet_pton(int af, const char *src, void *dst);
 const char *ircd_inet_ntop_sock(struct sockaddr *src, char *dst, unsigned int size);
 int ircd_inet_pton_sock(const char *src, struct sockaddr *dst);
-extern int maxconnections;
+extern int ircd_maxconnections;
 
 #ifdef __MINGW32__
 #define get_errno()  errno = WSAGetLastError()
-#define hash_fd(x) ((fd >> 2) % maxconnections)
+#define hash_fd(x) ((fd >> 2) % ircd_maxconnections)
 
 static inline fde_t *
 find_fd(int fd)

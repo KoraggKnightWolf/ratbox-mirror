@@ -156,8 +156,8 @@ void
 init_netio(void)
 {
 	sigio_signal = SIGRTMIN;
-	pfds = ircd_malloc(maxconnections * sizeof(struct pollfd));
-	index_to_fde = ircd_malloc(maxconnections * sizeof(fde_t *));
+	pfds = ircd_malloc(ircd_maxconnections * sizeof(struct pollfd));
+	index_to_fde = ircd_malloc(ircd_maxconnections * sizeof(fde_t *));
 	sigio_is_screwed = 1; /* Start off with poll first.. */
 	mask_our_signal(sigio_signal);
 }
