@@ -568,9 +568,9 @@ ratbox_main(int argc, char *argv[])
 			print_startup(getpid());
 	}
 
+	init_sys();
 	/* This must be after we daemonize.. */
 	ircd_lib(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE);
-	init_sys();
 	init_main_logfile();
 	init_patricia();
 	newconf_init();
