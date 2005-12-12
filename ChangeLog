@@ -1,3 +1,12 @@
+androsyn    2005/12/12 20:35:51 UTC	(20051212_6-21371)
+  Log:
+  make the stupid thing actually compile
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+
+
 androsyn    2005/12/12 20:33:16 UTC	(20051212_5-21369)
   Log:
   - make the fd table a hash for all platforms
