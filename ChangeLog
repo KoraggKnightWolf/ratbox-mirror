@@ -1,3 +1,11 @@
+androsyn    2005/12/12 18:56:58 UTC	(20051212_0-21353)
+  Log:
+  update challenge documentation some more
+
+  Modified:
+	ircd-ratbox/trunk/doc/challenge.txt (File Modified) 
+
+
 androsyn    2005/11/30 18:24:43 UTC	(20051130_2-21333)
   Log:
   - Change RSA padding to use RSA_PKCS1_OAEP_PADDING
