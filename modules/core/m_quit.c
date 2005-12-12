@@ -34,15 +34,24 @@
 #include "s_conf.h"
 
 static int m_quit(struct Client *, struct Client *, int, const char **);
+static int mr_quit(struct Client *, struct Client *, int, const char **);
 static int ms_quit(struct Client *, struct Client *, int, const char **);
 
 struct Message quit_msgtab = {
 	"QUIT", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{m_quit, 0}, {m_quit, 0}, {ms_quit, 0}, {ms_quit, 0}, mg_ignore, {m_quit, 0}}
+	{{mr_quit, 0}, {m_quit, 0}, {ms_quit, 0}, {ms_quit, 0}, mg_ignore, {m_quit, 0}}
 };
 
 mapi_clist_av1 quit_clist[] = { &quit_msgtab, NULL };
 DECLARE_MODULE_AV1(quit, NULL, NULL, quit_clist, NULL, NULL, "$Revision: 19295 $");
+
+
+static int
+mr_quit(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+{
+	exit_client(client_p, source_p, source_p, "Client Quit");
+	return 0;
+}
 
 /*
 ** m_quit
@@ -52,7 +61,7 @@ DECLARE_MODULE_AV1(quit, NULL, NULL, quit_clist, NULL, NULL, "$Revision: 19295 $
 static int
 m_quit(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	char *comment = LOCAL_COPY((parc > 1 && parv[1]) ? parv[1] : ((client_p->name) ? client_p->name : ""));
+	char *comment = LOCAL_COPY((parc > 1 && parv[1]) ? parv[1] : client_p->name);
 	char reason[REASONLEN + 1];
 
 	source_p->flags |= FLAGS_NORMALEX;
