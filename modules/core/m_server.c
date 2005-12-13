@@ -821,10 +821,10 @@ fork_server(struct Client *server)
 		ircd_close(data_fds[1]);
 		
 		s_assert(server->localClient);
-		server->localClient->ctrlfd = ctrl_fds[0];
+		server->localClient->slink->ctrlfd = ctrl_fds[0];
 		server->localClient->fd = data_fds[0];
 
-		read_ctrl_packet(server->localClient->ctrlfd, server);
+		read_ctrl_packet(server->localClient->slink->ctrlfd, server);
 		read_packet(server->localClient->fd, server);
 		return 0;
 	}
@@ -911,7 +911,7 @@ start_io(struct Client *server)
 	server->localClient->slink->slinkq_len = c;
 
 	/* schedule a write */
-	send_queued_slink_write(server->localClient->ctrlfd, server);
+	send_queued_slink_write(server->localClient->slink->ctrlfd, server);
 }
 
 /* burst_modes_TS5()
@@ -1456,7 +1456,7 @@ server_estab(struct Client *client_p)
 		 * client_p->name + 64
 		 */
 		ircd_note(client_p->localClient->fd, "slink data: %s", client_p->name);
-		ircd_note(client_p->localClient->ctrlfd, "slink ctrl: %s", client_p->name);
+		ircd_note(client_p->localClient->slink->ctrlfd, "slink ctrl: %s", client_p->name);
 	}
 	else
 		ircd_note(client_p->localClient->fd, "Server: %s", client_p->name);

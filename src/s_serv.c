@@ -201,7 +201,7 @@ collect_zipstats(void *unused)
 				target_p->localClient->slink->slinkq[0] = SLINKCMD_ZIPSTATS;
 				target_p->localClient->slink->slinkq_ofs = 0;
 				target_p->localClient->slink->slinkq_len = 1;
-				send_queued_slink_write(target_p->localClient->ctrlfd, target_p);
+				send_queued_slink_write(target_p->localClient->slink->ctrlfd, target_p);
 			}
 		}
 	}

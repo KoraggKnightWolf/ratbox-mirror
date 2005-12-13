@@ -242,13 +242,13 @@ send_queued_slink_write(int fd, void *data)
 	 ** Once socket is marked dead, we cannot start writing to it,
 	 ** even if the error is removed...
 	 */
-	if(IsIOError(to))
+	if(IsIOError(to) || to->localClient->slink == NULL)
 		return;
 
 	/* Next, lets try to write some data */
 	if(to->localClient->slink->slinkq)
 	{
-		retlen = ircd_write(to->localClient->ctrlfd,
+		retlen = ircd_write(to->localClient->slink->ctrlfd,
 			      to->localClient->slink->slinkq + to->localClient->slink->slinkq_ofs,
 			      to->localClient->slink->slinkq_len);
 
@@ -285,7 +285,7 @@ send_queued_slink_write(int fd, void *data)
 
 	/* if we have any more data, dns.hedule a write */
 	if(to->localClient->slink->slinkq_len)
-		ircd_setselect(to->localClient->ctrlfd,
+		ircd_setselect(to->localClient->slink->ctrlfd,
 			       IRCD_SELECT_WRITE, send_queued_slink_write, to);
 }
 
