@@ -1,3 +1,11 @@
+androsyn    2005/12/13 19:29:18 UTC	(20051213_1-21387)
+  Log:
+  i don't think anyone actually gives a damn if getsockname or getpeername fails as its likely to just be a connection that died
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2005/12/13 17:22:31 UTC	(20051213_0-21383)
   Log:
   Make FD_HASH_SIZE configurable with --enable-small-net
