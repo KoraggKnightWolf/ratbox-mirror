@@ -143,10 +143,8 @@ do_etrace(struct Client *source_p, int ipv4, int ipv6)
 			   IsOper(target_p) ? "Oper" : "User", 
 			   get_client_class(target_p),
 			   target_p->name, target_p->username, target_p->host,
-#ifdef HIDE_SPOOF_IPS
-			   IsIPSpoof(target_p) ? "255.255.255.255" :
-#endif
-			    target_p->sockhost, target_p->info);
+			   show_ip(source_p, target_p) ? target_p->sockhost : "255.255.255.255",
+			   target_p->sockhost, target_p->info);
 	}
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), me.name);
@@ -175,11 +173,10 @@ do_etrace_full(struct Client *source_p)
 static void
 do_single_etrace(struct Client *source_p, struct Client *target_p)
 {
-#ifdef HIDE_SPOOF_IPS
 	/* note, we hide fullcaps for spoofed users, as mirc can often
 	 * advertise its internal ip address in the field --fl
 	 */
-	if(IsIPSpoof(target_p))
+	 if(!show_ip(source_p, target_p))
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_ETRACEFULL),
 				me.name, source_p->name, 
 				IsOper(target_p) ? "Oper" : "User",
@@ -187,7 +184,6 @@ do_single_etrace(struct Client *source_p, struct Client *target_p)
 				target_p->name, target_p->username, target_p->host, 
 				"255.255.255.255", "<hidden> <hidden>", target_p->info);
 	else
-#endif
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_ETRACEFULL),
 				me.name, source_p->name, 
 				IsOper(target_p) ? "Oper" : "User",
