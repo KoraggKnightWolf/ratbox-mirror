@@ -1,3 +1,13 @@
+androsyn    2005/12/13 19:40:25 UTC	(20051213_3-21391)
+  Log:
+  - deny ", in permanent xlines, as this breaks the parser.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 androsyn    2005/12/13 19:31:06 UTC	(20051213_2-21389)
   Log:
   rename assign_id in s_auth to assign_auth_id and to assign_dns_id in dns.c
