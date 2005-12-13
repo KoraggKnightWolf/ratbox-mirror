@@ -1,3 +1,12 @@
+androsyn    2005/12/13 22:39:29 UTC	(20051213_31-21450)
+  Log:
+  - make etrace and stats use show_ip() rather than #ifdef HIDE_SPOOF_IPS
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_etrace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2005/12/13 22:32:55 UTC	(20051213_30-21448)
   Log:
   merge initUser into init_client()
