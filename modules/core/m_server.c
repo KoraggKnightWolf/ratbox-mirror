@@ -1072,7 +1072,7 @@ burst_TS5(struct Client *client_p)
 			   target_p->name, target_p->hopcount + 1,
 			   (long) target_p->tsinfo, ubuf,
 			   target_p->username, target_p->host,
-			   target_p->user->server, target_p->info);
+			   target_p->servptr->name, target_p->info);
 
 		if(ConfigFileEntry.burst_away && !EmptyString(target_p->user->away))
 			sendto_one(client_p, HOLD_QUEUE, ":%s AWAY :%s",
@@ -1208,7 +1208,7 @@ burst_TS6(struct Client *client_p)
 					(long) target_p->tsinfo,
 					ubuf,
 					target_p->username, target_p->host,
-					target_p->user->server, target_p->info);
+					target_p->servptr->name, target_p->info);
 
 		if(ConfigFileEntry.burst_away && !EmptyString(target_p->user->away))
 			sendto_one(client_p, HOLD_QUEUE, ":%s AWAY :%s",

@@ -518,8 +518,8 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	ircd_dlinkMoveNode(&source_p->localClient->tnode, &unknown_list, &lclient_list);
 	SetClient(source_p);
 
-	/* XXX source_p->servptr is &me, since local client */
-	source_p->servptr = find_server(NULL, user->server);
+	source_p->servptr = &me;
+
 	ircd_dlinkAdd(source_p, &source_p->lnode, &source_p->servptr->serv->users);
 	/* Increment our total user count here */
 	if(++Count.total > Count.max_tot)
@@ -591,7 +591,7 @@ introduce_client(struct Client *client_p, struct Client *source_p, struct User *
 			      nick, source_p->hopcount + 1,
 			      (long) source_p->tsinfo,
 			      ubuf, source_p->username, source_p->host,
-			      user->server, source_p->info);
+			      source_p->servptr->name, source_p->info);
 	}
 	else
 		sendto_server(client_p, NULL, NOCAPS, NOCAPS,
@@ -599,7 +599,7 @@ introduce_client(struct Client *client_p, struct Client *source_p, struct User *
 			      nick, source_p->hopcount + 1,
 			      (long) source_p->tsinfo,
 			      ubuf, source_p->username, source_p->host,
-			      user->server, source_p->info);
+			      source_p->servptr->name, source_p->info);
 
 
 	return 0;

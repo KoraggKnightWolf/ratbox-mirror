@@ -189,7 +189,7 @@ parse_resv(struct Client *source_p, const char *name,
 
 	if(!MyClient(source_p) && 
 	   !find_shared_conf(source_p->username, source_p->host,
-			source_p->user->server, 
+			source_p->servptr->name, 
 			(temp_time > 0) ? SHARED_TRESV : SHARED_PRESV))
 		return;
 
@@ -358,7 +358,7 @@ me_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 	name = parv[1];
 
 	if(!find_shared_conf(source_p->username, source_p->host,
-				source_p->user->server, SHARED_UNRESV))
+				source_p->servptr->name, SHARED_UNRESV))
 		return 0;
 
 	remove_resv(source_p, name);

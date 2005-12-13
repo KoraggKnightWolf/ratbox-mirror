@@ -81,7 +81,6 @@ do_local_user(struct Client *client_p, struct Client *source_p,
 	s_assert(source_p->username != username);
 
 	user = make_user(source_p);
-	user->server = me.name;
 
 	strlcpy(source_p->info, realname, sizeof(source_p->info));
 

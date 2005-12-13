@@ -233,7 +233,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	reason = LOCAL_COPY(parv[4]);
 
 	if(!find_shared_conf(source_p->username, source_p->host,
-				source_p->user->server, 
+				source_p->servptr->name, 
 				(tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE))
 		return 0;
 
@@ -386,7 +386,7 @@ me_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	host = parv[2];
 
 	if(!find_shared_conf(source_p->username, source_p->host,
-				source_p->user->server, SHARED_UNKLINE))
+				source_p->servptr->name, SHARED_UNKLINE))
 		return 0;
 
 	if(remove_temp_kline(source_p, user, host))

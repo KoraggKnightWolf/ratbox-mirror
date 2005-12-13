@@ -195,7 +195,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 			source_p->host, me.name, user, host, reason);
 	ilog(L_GLINE, "R %s %s %s %s %s %s %s",
 	     source_p->name, source_p->username, source_p->host, 
-	     source_p->user->server, user, host, reason);
+	     source_p->servptr->name, user, host, reason);
 
 	/* If at least 3 opers agree this user should be G lined then do it */
 	majority_gline(source_p, user, host, reason);
@@ -212,7 +212,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	sendto_server(NULL, NULL, NOCAPS, CAP_GLN,
 			":%s GLINE %s %s %s %s %s %s :%s",
 			me.name, source_p->name, source_p->username,
-			source_p->host, source_p->user->server, 
+			source_p->host, source_p->servptr->name, 
 			user, host, reason);
 	return 0;
 }
@@ -250,9 +250,9 @@ mc_gline(struct Client *client_p, struct Client *source_p,
 		      acptr->name, user, host, reason);
 	sendto_server(client_p, NULL, NOCAPS, CAP_GLN,
 		      ":%s GLINE %s %s %s %s %s %s :%s",
-		      acptr->user->server, acptr->name, 
+		      acptr->servptr->name, acptr->name, 
 		      acptr->username, acptr->host,
-		      acptr->user->server, user, host, reason);
+		      acptr->servptr->name, user, host, reason);
 
 	if(!ConfigFileEntry.glines)
 		return 0;
@@ -264,7 +264,7 @@ mc_gline(struct Client *client_p, struct Client *source_p,
 				"%s!%s@%s on %s is requesting a gline without "
 				"%d non-wildcard characters for [%s@%s] [%s]",
 				acptr->name, acptr->username, 
-				acptr->host, acptr->user->server,
+				acptr->host, acptr->servptr->name,
 				ConfigFileEntry.min_nonwildcard,
 				user, host, reason);
 		return 0;
@@ -283,7 +283,7 @@ mc_gline(struct Client *client_p, struct Client *source_p,
 				sendto_realops_flags(UMODE_ALL, L_ALL, "%s!%s@%s on %s is requesting a "
 						     "gline with a cidr mask < %d for [%s@%s] [%s]",
 						     acptr->name, acptr->username, acptr->host,
-						     acptr->user->server,
+						     acptr->servptr->name,
 						     ConfigFileEntry.gline_min_cidr, 
 						     user, host, reason);
 				return 0;
@@ -295,7 +295,7 @@ mc_gline(struct Client *client_p, struct Client *source_p,
 			sendto_realops_flags(UMODE_ALL, L_ALL, "%s!%s@%s on %s is requesting a "
 					     "gline with a cidr mask < %d for [%s@%s] [%s]",
 					     acptr->name, acptr->username, acptr->host,
-					     acptr->user->server,
+					     acptr->servptr->name,
 					     ConfigFileEntry.gline_min_cidr6,
 					     user, host, reason);
 			return 0;
@@ -306,11 +306,11 @@ mc_gline(struct Client *client_p, struct Client *source_p,
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			"%s!%s@%s on %s is requesting gline for [%s@%s] [%s]",
 			acptr->name, acptr->username, acptr->host,
-			acptr->user->server, user, host, reason);
+			acptr->servptr->name, user, host, reason);
 
 	ilog(L_GLINE, "R %s %s %s %s %s %s %s",
 	     source_p->name, source_p->username, source_p->host, 
-	     source_p->user->server, user, host, reason);
+	     source_p->servptr->name, user, host, reason);
 
 	/* If at least 3 opers agree this user should be G lined then do it */
 	majority_gline(acptr, user, host, reason);
@@ -362,9 +362,9 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		      acptr->name, user, host, reason);
 	sendto_server(client_p, NULL, NOCAPS, CAP_GLN,
 		      ":%s GLINE %s %s %s %s %s %s :%s",
-		      acptr->user->server, acptr->name, 
+		      acptr->servptr->name, acptr->name, 
 		      acptr->username, acptr->host,
-		      acptr->user->server, user, host, reason);
+		      acptr->servptr->name, user, host, reason);
 
 	if(!ConfigFileEntry.glines)
 		return 0;
@@ -376,7 +376,7 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 				"%s!%s@%s on %s is requesting a gline without "
 				"%d non-wildcard characters for [%s@%s] [%s]",
 				acptr->name, acptr->username, 
-				acptr->host, acptr->user->server,
+				acptr->host, acptr->servptr->name,
 				ConfigFileEntry.min_nonwildcard,
 				user, host, reason);
 		return 0;
@@ -385,11 +385,11 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			"%s!%s@%s on %s is requesting gline for [%s@%s] [%s]",
 			acptr->name, acptr->username, acptr->host,
-			acptr->user->server, user, host, reason);
+			acptr->servptr->name, user, host, reason);
 
 	ilog(L_GLINE, "R %s %s %s %s %s %s %s",
 	     acptr->name, acptr->username, acptr->host, 
-	     acptr->user->server, user, host, reason);
+	     acptr->servptr->name, user, host, reason);
 
 	/* If at least 3 opers agree this user should be G lined then do it */
 	majority_gline(acptr, user, host, reason);
@@ -461,7 +461,7 @@ mo_ungline(struct Client *client_p, struct Client *source_p, int parc, const cha
 				     get_oper_name(source_p), user, host);
 		ilog(L_GLINE, "U %s %s %s %s %s %s",
 		     source_p->name, source_p->username, source_p->host, 
-		     source_p->user->server, user, host);
+		     source_p->servptr->name, user, host);
 	}
 	else
 	{
@@ -662,11 +662,11 @@ set_local_gline(struct Client *source_p, const char *user,
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s!%s@%s on %s has triggered gline for [%s@%s] [%s]",
 			     source_p->name, source_p->username,
-			     source_p->host, source_p->user->server,
+			     source_p->host, source_p->servptr->name,
 			     user, host, reason);
 	ilog(L_GLINE, "T %s %s %s %s %s %s %s",
 	     source_p->name, source_p->username, source_p->host, 
-	     source_p->user->server, user, host, reason);
+	     source_p->servptr->name, user, host, reason);
 
 	check_glines();
 }
@@ -705,7 +705,7 @@ majority_gline(struct Client *source_p, const char *user,
 				sendto_realops_flags(UMODE_ALL, L_ALL, "oper has already voted");
 				return NO;
 			}
-			else if(irccmp(pending->oper_server1, source_p->user->server) == 0)
+			else if(irccmp(pending->oper_server1, source_p->servptr->name) == 0)
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL, "server has already voted");
 				return NO;
@@ -721,7 +721,7 @@ majority_gline(struct Client *source_p, const char *user,
 							     "oper has already voted");
 					return NO;
 				}
-				else if(irccmp(pending->oper_server2, source_p->user->server) == 0)
+				else if(irccmp(pending->oper_server2, source_p->servptr->name) == 0)
 				{
 					sendto_realops_flags(UMODE_ALL, L_ALL,
 							     "server has already voted");
@@ -744,7 +744,7 @@ majority_gline(struct Client *source_p, const char *user,
 				strlcpy(pending->oper_host2, source_p->host,
 					sizeof(pending->oper_host2));
 				DupString(pending->reason2, reason);
-				pending->oper_server2 = find_or_add(source_p->user->server);
+				pending->oper_server2 = find_or_add(source_p->servptr->name);
 				pending->last_gline_time = ircd_currenttime;
 				pending->time_request2 = ircd_currenttime;
 				return NO;
@@ -763,7 +763,7 @@ majority_gline(struct Client *source_p, const char *user,
 	strlcpy(pending->oper_host1, source_p->host,
 		sizeof(pending->oper_host1));
 
-	pending->oper_server1 = find_or_add(source_p->user->server);
+	pending->oper_server1 = find_or_add(source_p->servptr->name);
 
 	strlcpy(pending->user, user, sizeof(pending->user));
 	strlcpy(pending->host, host, sizeof(pending->host));

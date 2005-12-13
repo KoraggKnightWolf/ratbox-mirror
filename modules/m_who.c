@@ -235,7 +235,7 @@ who_common_channel(struct Client *source_p, struct Channel *chptr,
 
 		if((mask == NULL) ||
 		   match(mask, target_p->name) || match(mask, target_p->username) ||
-		   match(mask, target_p->host) || match(mask, target_p->user->server) ||
+		   match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
 		   match(mask, target_p->info))
 		{
 
@@ -300,7 +300,7 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 
 		if(!mask ||
 		   match(mask, target_p->name) || match(mask, target_p->username) ||
-		   match(mask, target_p->host) || match(mask, target_p->user->server) ||
+		   match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
 		   match(mask, target_p->info))
 		{
 
@@ -373,7 +373,7 @@ do_who(struct Client *source_p, struct Client *target_p, const char *chname, con
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_WHOREPLY), me.name, source_p->name,
 		   (chname) ? (chname) : "*",
 		   target_p->username,
-		   target_p->host, target_p->user->server, target_p->name,
+		   target_p->host, target_p->servptr->name, target_p->name,
 		   status, 
 		   ConfigServerHide.flatten_links ? 0 : target_p->hopcount, 
 		   target_p->info);

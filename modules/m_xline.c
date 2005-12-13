@@ -173,7 +173,7 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	reason = parv[4];
 
 	if(!find_shared_conf(source_p->username, source_p->host,
-				source_p->user->server,
+				source_p->servptr->name,
 				(temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE))
 		return 0;
 
@@ -422,7 +422,7 @@ me_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	name = parv[1];
 
 	if(!find_shared_conf(source_p->username, source_p->host,
-				source_p->user->server, SHARED_UNXLINE))
+				source_p->servptr->name, SHARED_UNXLINE))
 		return 0;
 
 	remove_xline(source_p, name);

@@ -262,7 +262,7 @@ mc_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 		ServerStats.is_kill++;
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
 				     "Bad Nick: %s From: %s(via %s)",
-				     parv[1], source_p->user->server,
+				     parv[1], source_p->servptr->name,
 				     client_p->name);
 		sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Bad Nickname)",
 			   me.name, parv[1], me.name);
@@ -955,7 +955,6 @@ register_client(struct Client *client_p, struct Client *server,
 	
 	if(parc == 10)
 	{
-		user->server = find_or_add(server->name);
 		strlcpy(source_p->info, parv[9], sizeof(source_p->info));
 		strlcpy(source_p->sockhost, parv[7], sizeof(source_p->sockhost));
 		strlcpy(source_p->id, parv[8], sizeof(source_p->id));
@@ -963,9 +962,27 @@ register_client(struct Client *client_p, struct Client *server,
 	}
 	else
 	{
-		user->server = find_or_add(parv[7]);
 		strlcpy(source_p->info, parv[8], sizeof(source_p->info));
-	}
+
+		if((server = find_server(NULL, parv[7])) == NULL)
+		{
+			sendto_realops_flags(UMODE_ALL, L_ALL,
+					     "Ghost killed: %s on invalid server %s",
+					     source_p->name, parv[7]);
+			kill_client(client_p, source_p, "%s (Server doesn't exist)", me.name);
+			free_user(source_p->user, source_p);
+			free_client(source_p);
+			return 0;
+		}
+
+ 	}
+ 
+	ircd_dlinkAddTail(source_p, &source_p->node, &global_client_list);
+
+	/* server is guaranteed to exist at this point */
+	source_p->servptr = server;
+	ircd_dlinkAdd(source_p, &source_p->lnode, &source_p->servptr->serv->users);
+
 
 	/* remove any nd entries for this nick */
 	if((nd = hash_find_nd(nick)))
@@ -988,7 +1005,7 @@ register_client(struct Client *client_p, struct Client *server,
 
 			DLINK_FOREACH(ptr, service_list.head)
 			{
-				if(!irccmp((const char *) ptr->data, user->server))
+				if(!irccmp((const char *) ptr->data, source_p->servptr->name))
 				{
 					hit++;
 					break;
@@ -1021,23 +1038,6 @@ register_client(struct Client *client_p, struct Client *server,
 	if(++Count.total > Count.max_tot)
 		Count.max_tot = Count.total;
 	
-	if(server == NULL)
-	{
-		if((source_p->servptr = find_server(NULL, user->server)) == NULL)
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "Ghost killed: %s on invalid server %s",
-					     source_p->name, user->server);
-			kill_client(client_p, source_p, "%s (Server doesn't exist)", me.name);
-			source_p->flags |= FLAGS_KILLED;
-			return exit_client(NULL, source_p, &me, "Ghosted Client");
-		}
-	}
-	else
-		source_p->servptr = server;
-
-	ircd_dlinkAdd(source_p, &source_p->lnode, &source_p->servptr->serv->users);
-
 	/* fake direction */
 	if(source_p->servptr->from != source_p->from)
 	{
@@ -1047,11 +1047,11 @@ register_client(struct Client *client_p, struct Client *server,
 				     "Bad User [%s] :%s USER %s@%s %s, != %s[%s]",
 				     client_p->name, source_p->name,
 				     source_p->username, source_p->host,
-				     user->server, target_p->name,
+				     source_p->servptr->name, target_p->name,
 				     target_p->from->name);
 		kill_client(client_p, source_p,
 			    "%s (NICK from wrong direction (%s != %s))",
-			    me.name, user->server, target_p->from->name);
+			    me.name, source_p->servptr->name, target_p->from->name);
 		source_p->flags |= FLAGS_KILLED;
 		return exit_client(source_p, source_p, &me, "USER server wrong direction");
 	}

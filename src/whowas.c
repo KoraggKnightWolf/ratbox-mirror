@@ -77,7 +77,7 @@ add_history(struct Client *client_p, int online)
 	strcpy(who->hostname, client_p->host);
 	strcpy(who->realname, client_p->info);
 
-	who->servername = client_p->user->server;
+	who->servername = client_p->servptr->name;
 
 	if(online)
 	{

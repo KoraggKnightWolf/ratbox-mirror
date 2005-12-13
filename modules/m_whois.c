@@ -201,7 +201,7 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 			ircd_snprintf(buffer, sizeof(buffer), "%s!%s@%s %s",
 				target_p->name, target_p->username,
-				target_p->host, target_p->user->server);
+				target_p->host, target_p->servptr->name);
 			report_operspy(source_p, "WHOIS", buffer);
 		}
 
@@ -295,7 +295,7 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 		sendto_one_buffer(source_p, HOLD_QUEUE, buf);
 
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_WHOISSERVER, form_str(RPL_WHOISSERVER),
-			   target_p->name, target_p->user->server,
+			   target_p->name, target_p->servptr->name,
 			   a2client_p ? a2client_p->info : "*Not On This Net*");
 
 	if(target_p->user->away)

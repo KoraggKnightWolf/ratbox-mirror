@@ -478,7 +478,7 @@ ms_join(struct Client *client_p, struct Client *source_p, int parc, const char *
 		      modes);
 	sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
 		      ":%s SJOIN %ld %s %s :%s",
-		      source_p->user->server, (long) chptr->channelts,
+		      source_p->servptr->name, (long) chptr->channelts,
 		      chptr->chname, modes, source_p->name);
 	return 0;
 }

@@ -131,7 +131,7 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 	ilog(L_KILL, "%c %s %s!%s@%s %s %s",
 		MyConnect(target_p) ? 'L' : 'G', get_oper_name(source_p),
 		target_p->name, target_p->username, target_p->host,
-		target_p->user->server, reason);
+		target_p->servptr->name, reason);
 
 	/*
 	 ** And pass on the message to other servers. Note, that if KILL
@@ -248,13 +248,13 @@ ms_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Received KILL message for %s. From %s Path: %s!%s!%s!%s %s",
-				     target_p->name, parv[0], source_p->user->server,
+				     target_p->name, parv[0], source_p->servptr->name,
 				     source_p->host, source_p->username, source_p->name, reason);
 
 		ilog(L_KILL, "%c %s %s!%s@%s %s %s",
 			MyConnect(target_p) ? 'O' : 'R', get_oper_name(source_p),
 			target_p->name, target_p->username, target_p->host,
-			target_p->user->server, reason);
+			target_p->servptr->name, reason);
 	}
 	else
 	{
@@ -264,7 +264,7 @@ ms_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		ilog(L_KILL, "S %s %s!%s@%s %s %s",
 			source_p->name, target_p->name, target_p->username,
-			target_p->host, target_p->user->server, reason);
+			target_p->host, target_p->servptr->name, reason);
 	}
 
 	relay_kill(client_p, source_p, target_p, path, reason);
