@@ -1,3 +1,12 @@
+androsyn    2005/12/13 19:31:06 UTC	(20051213_2-21389)
+  Log:
+  rename assign_id in s_auth to assign_auth_id and to assign_dns_id in dns.c
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2005/12/13 19:29:18 UTC	(20051213_1-21387)
   Log:
   i don't think anyone actually gives a damn if getsockname or getpeername fails as its likely to just be a connection that died
