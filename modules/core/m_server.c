@@ -906,9 +906,9 @@ start_io(struct Client *server)
 	/* start io */
 	iobuf[c++] = SLINKCMD_INIT;
 
-	server->localClient->slinkq = iobuf;
-	server->localClient->slinkq_ofs = 0;
-	server->localClient->slinkq_len = c;
+	server->localClient->slink->slinkq = iobuf;
+	server->localClient->slink->slinkq_ofs = 0;
+	server->localClient->slink->slinkq_len = c;
 
 	/* schedule a write */
 	send_queued_slink_write(server->localClient->ctrlfd, server);
@@ -1386,6 +1386,8 @@ server_estab(struct Client *client_p)
 	/* Hand the server off to servlink now */
 	if(IsCapable(client_p, CAP_ZIP))
 	{
+		client_p->localClient->slink = ircd_malloc(sizeof(struct servlink_data));
+		
 		if(fork_server(client_p) < 0)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,

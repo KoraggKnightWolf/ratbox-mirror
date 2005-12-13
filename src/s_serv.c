@@ -128,7 +128,7 @@ slink_zipstats(unsigned int rpl, unsigned int len, unsigned char *data, struct C
 	 * regression for most of our installed SPARC base.
 	 * -jmallett, 04/27/2002
 	 */
-	memcpy(&zipstats, &server_p->localClient->zipstats, sizeof(struct ZipStats));
+	memcpy(&zipstats, &server_p->localClient->slink->zipstats, sizeof(struct ZipStats));
 
 	in |= (data[i++] << 24);
 	in |= (data[i++] << 16);
@@ -180,7 +180,7 @@ slink_zipstats(unsigned int rpl, unsigned int len, unsigned char *data, struct C
 	else
 		zipstats.out_ratio = 0;
 
-	memcpy(&server_p->localClient->zipstats, &zipstats, sizeof(struct ZipStats));
+	memcpy(&server_p->localClient->slink->zipstats, &zipstats, sizeof(struct ZipStats));
 }
 
 void
@@ -195,12 +195,12 @@ collect_zipstats(void *unused)
 		if(IsCapable(target_p, CAP_ZIP))
 		{
 			/* only bother if we haven't already got something queued... */
-			if(!target_p->localClient->slinkq)
+			if(!target_p->localClient->slink->slinkq)
 			{
-				target_p->localClient->slinkq = ircd_malloc(1);	/* sigh.. */
-				target_p->localClient->slinkq[0] = SLINKCMD_ZIPSTATS;
-				target_p->localClient->slinkq_ofs = 0;
-				target_p->localClient->slinkq_len = 1;
+				target_p->localClient->slink->slinkq = ircd_malloc(1);	/* sigh.. */
+				target_p->localClient->slink->slinkq[0] = SLINKCMD_ZIPSTATS;
+				target_p->localClient->slink->slinkq_ofs = 0;
+				target_p->localClient->slink->slinkq_len = 1;
 				send_queued_slink_write(target_p->localClient->ctrlfd, target_p);
 			}
 		}

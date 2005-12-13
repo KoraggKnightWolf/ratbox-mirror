@@ -52,15 +52,6 @@ struct Server
 	char *fullcaps;
 };
 
-struct SlinkRpl
-{
-	int command;
-	int datalen;
-	int gotdatalen;
-	int readdata;
-	unsigned char *data;
-};
-
 struct ZipStats
 {
 	uint32_t in;
@@ -74,6 +65,21 @@ struct ZipStats
 	double in_ratio;
 	double out_ratio;
 };
+
+struct servlink_data
+{
+	int command;
+	int datalen;
+	int gotdatalen;
+	int readdata;
+	unsigned char *data;
+	unsigned char *slinkq;	/* sendq for control data */
+	int slinkq_ofs;		/* ofset into slinkq */
+	int slinkq_len;		/* length remaining after slinkq_ofs */
+
+	struct ZipStats zipstats;
+};
+
 
 struct Client
 {
@@ -185,12 +191,7 @@ struct LocalUser
 				   control fd used for sending commands
 				   to servlink */
 
-	struct SlinkRpl slinkrpl;	/* slink reply being parsed */
-	unsigned char *slinkq;	/* sendq for control data */
-	int slinkq_ofs;		/* ofset into slinkq */
-	int slinkq_len;		/* length remaining after slinkq_ofs */
-
-	struct ZipStats zipstats;
+	struct servlink_data *slink;	/* slink reply being parsed */
 
 	time_t last;
 
