@@ -1,3 +1,15 @@
+androsyn    2005/12/13 21:52:22 UTC	(20051213_23-21434)
+  Log:
+  move ctrlfd into servlink_data
+
+  Modified:
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2005/12/13 21:45:09 UTC	(20051213_22-21432)
   Log:
   that would be hostname not host
