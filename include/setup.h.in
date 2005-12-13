@@ -35,6 +35,9 @@
 /* Prefix where config files are installed. */
 #undef ETC_DIR
 
+/* Size of fd hash. */
+#undef FD_HASH_SIZE
+
 /* Define to 1 if you have `alloca', as a function or macro. */
 #undef HAVE_ALLOCA
 

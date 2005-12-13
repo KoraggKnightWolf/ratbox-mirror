@@ -30254,6 +30254,11 @@ cat >>confdefs.h <<\_ACEOF
 #define AUTH_HEAP_SIZE 128
 _ACEOF
 
+
+cat >>confdefs.h <<\_ACEOF
+#define FD_HASH_SIZE 1000
+_ACEOF
+
 else
 
 cat >>confdefs.h <<\_ACEOF
@@ -30324,6 +30329,12 @@ _ACEOF
 cat >>confdefs.h <<\_ACEOF
 #define AUTH_HEAP_SIZE 256
 _ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define FD_HASH_SIZE 12000
+_ACEOF
+
 
 fi
 

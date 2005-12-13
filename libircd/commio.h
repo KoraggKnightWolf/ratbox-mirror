@@ -268,7 +268,9 @@ const char *ircd_inet_ntop_sock(struct sockaddr *src, char *dst, unsigned int si
 int ircd_inet_pton_sock(const char *src, struct sockaddr *dst);
 extern int ircd_maxconnections;
 
-#define FD_HASH_SIZE 0x3000
+#ifndef FD_HASH_SIZE
+#define FD_HASH_SIZE 3000
+#endif
 
 #ifdef __MINGW32__
 #define get_errno()  errno = WSAGetLastError()
