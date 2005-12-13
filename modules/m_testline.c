@@ -41,6 +41,7 @@
 #include "match.h"
 #include "ircd.h"
 #include "reject.h"
+#include "class.h"
 
 static int mo_testline(struct Client *, struct Client *, int, const char **);
 static int mo_testgecos(struct Client *, struct Client *, int, const char **);
@@ -174,7 +175,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSILINE, form_str(RPL_STATSILINE),
 				aconf->info.name, show_iline_prefix(source_p, aconf, aconf->user),
-				aconf->host, aconf->port, aconf->className);
+				aconf->host, aconf->port, ConfClassName(aconf));
 		return 0;
 	}
 

@@ -147,7 +147,6 @@ free_conf(struct ConfItem *aconf)
 
 	ircd_free(aconf->passwd);
 	ircd_free(aconf->spasswd);
-	ircd_free(aconf->className);
 	ircd_free(aconf->user);
 	ircd_free(aconf->host);
 
@@ -1069,7 +1068,7 @@ get_printable_conf(struct ConfItem *aconf, char **name, char **host,
 	*host = EmptyString(aconf->host) ? null : aconf->host;
 	*pass = EmptyString(aconf->passwd) ? null : aconf->passwd;
 	*user = EmptyString(aconf->user) ? null : aconf->user;
-	*classname = EmptyString(aconf->className) ? zero : aconf->className;
+	*classname = EmptyString(ConfClassName(aconf)) ? zero : ConfClassName(aconf);
 	*port = (int) aconf->port;
 }
 
@@ -1221,16 +1220,15 @@ clear_out_old_conf(void)
  */
 
 void
-conf_add_class_to_conf(struct ConfItem *aconf)
+conf_add_class_to_conf(struct ConfItem *aconf, const char *classname)
 {
-	if(aconf->className == NULL)
+	if(EmptyString(classname))
 	{
-		DupString(aconf->className, "default");
 		ClassPtr(aconf) = default_class;
 		return;
 	}
 
-	ClassPtr(aconf) = find_class(aconf->className);
+	ClassPtr(aconf) = find_class(classname);
 
 	if(ClassPtr(aconf) == default_class)
 	{
@@ -1238,19 +1236,15 @@ conf_add_class_to_conf(struct ConfItem *aconf)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Warning -- Using default class for missing class \"%s\" in auth{} for %s@%s",
-					     aconf->className, aconf->user, aconf->host);
+					     classname, aconf->user, aconf->host);
 		}
 
-		ircd_free(aconf->className);
-		DupString(aconf->className, "default");
 		return;
 	}
 
 	if(ConfMaxUsers(aconf) < 0)
 	{
 		ClassPtr(aconf) = default_class;
-		ircd_free(aconf->className);
-		DupString(aconf->className, "default");
 		return;
 	}
 }

@@ -37,7 +37,7 @@ static char *conf_cur_block_name;
 static dlink_list conf_items;
 
 static struct ConfItem *yy_aconf = NULL;
-
+static char *yy_aconf_class;
 static struct Class *yy_class = NULL;
 
 static struct remote_conf *yy_shared = NULL;
@@ -791,6 +791,9 @@ conf_begin_auth(struct TopConf *tc)
 	if(yy_aconf)
 		free_conf(yy_aconf);
 
+	ircd_free(yy_aconf_class);
+	yy_aconf_class = NULL;
+
 	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_aconf_list.head)
 	{
 		free_conf(ptr->data);
@@ -823,7 +826,7 @@ conf_end_auth(struct TopConf *tc)
 	/* so the stacking works in order.. */
 	collapse(yy_aconf->user);
 	collapse(yy_aconf->host);
-	conf_add_class_to_conf(yy_aconf);
+	conf_add_class_to_conf(yy_aconf, yy_aconf_class);
 	add_conf_by_address(yy_aconf->host, CONF_CLIENT, yy_aconf->user, yy_aconf);
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_aconf_list.head)
@@ -836,16 +839,13 @@ conf_end_auth(struct TopConf *tc)
 		/* this will always exist.. */
 		DupString(yy_tmp->info.name, yy_aconf->info.name);
 
-		if(yy_aconf->className)
-			DupString(yy_tmp->className, yy_aconf->className);
-
 		yy_tmp->flags = yy_aconf->flags;
 		yy_tmp->port = yy_aconf->port;
 
 		collapse(yy_tmp->user);
 		collapse(yy_tmp->host);
 
-		conf_add_class_to_conf(yy_tmp);
+		conf_add_class_to_conf(yy_tmp, yy_aconf_class);
 
 		add_conf_by_address(yy_tmp->host, CONF_CLIENT, yy_tmp->user, yy_tmp);
 		ircd_dlinkDestroy(ptr, &yy_aconf_list);
@@ -985,8 +985,8 @@ conf_set_auth_redir_port(void *data)
 static void
 conf_set_auth_class(void *data)
 {
-	ircd_free(yy_aconf->className);
-	DupString(yy_aconf->className, data);
+	ircd_free(yy_aconf_class);
+	DupString(yy_aconf_class, data);
 }
 
 /* ok, shared_oper handles the stacking, shared_flags handles adding
