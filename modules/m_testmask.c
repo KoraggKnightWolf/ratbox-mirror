@@ -89,6 +89,13 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	else
 		*username++ = '\0';
 
+	if(EmptyString(username) || EmptyString(host))
+	{
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid parameters",
+				me.name, source_p->name);
+		return 0;
+	}
+
 	DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		target_p = ptr->data;
