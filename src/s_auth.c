@@ -391,8 +391,6 @@ start_auth_query(struct AuthRequest *auth)
 	if(getsockname(auth->client->localClient->fd, (struct sockaddr *) &localaddr, &locallen) ||
 	   getpeername(auth->client->localClient->fd, (struct sockaddr *) &remoteaddr, &remotelen))
 	{
-		ilog(L_IOERROR, "auth get{sock,peer}name error for %s:%m", 
-					log_client_name(auth->client, SHOW_IP));
 		auth_error(auth);
 		release_auth_client(auth);
 		return;
