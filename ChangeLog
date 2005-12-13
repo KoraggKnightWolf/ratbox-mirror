@@ -1,3 +1,13 @@
+androsyn    2005/12/13 22:07:57 UTC	(20051213_25-21438)
+  Log:
+  remove FLAGS_SENDQEX and just pass that info to dead_link()
+
+  Modified:
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2005/12/13 21:58:59 UTC	(20051213_24-21436)
   Log:
   remove auth_oper and use opername instead
