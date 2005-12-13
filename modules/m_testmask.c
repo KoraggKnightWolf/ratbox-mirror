@@ -89,7 +89,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	else
 		*username++ = '\0';
 
-	if(EmptyString(username) || EmptyString(host))
+	if(EmptyString(username) || EmptyString(hostname))
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid parameters",
 				me.name, source_p->name);
