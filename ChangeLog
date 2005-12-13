@@ -1,3 +1,13 @@
+androsyn    2005/12/13 21:58:59 UTC	(20051213_24-21436)
+  Log:
+  remove auth_oper and use opername instead
+
+  Modified:
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2005/12/13 21:52:22 UTC	(20051213_23-21434)
   Log:
   move ctrlfd into servlink_data
