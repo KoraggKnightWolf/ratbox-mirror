@@ -1,3 +1,13 @@
+androsyn    2005/12/13 19:42:17 UTC	(20051213_4-21393)
+  Log:
+  - check resvs against channels are valid channel names
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+
+
 androsyn    2005/12/13 19:40:25 UTC	(20051213_3-21391)
   Log:
   - deny ", in permanent xlines, as this breaks the parser.
