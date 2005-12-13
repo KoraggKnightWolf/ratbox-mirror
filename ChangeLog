@@ -1,3 +1,11 @@
+androsyn    2005/12/13 21:45:09 UTC	(20051213_22-21432)
+  Log:
+  that would be hostname not host
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+
+
 androsyn    2005/12/13 21:44:15 UTC	(20051213_21-21430)
   Log:
   require user/host be non-empty
