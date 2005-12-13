@@ -33,7 +33,6 @@
 struct User
 {
 	dlink_list channel;	/* chain of channel pointer blocks */
-	dlink_list invited;	/* chain of invite pointer blocks */
 	char *away;		/* pointer to away message */
 	char name[NICKLEN];
 #ifdef ENABLE_SERVICES
@@ -203,6 +202,8 @@ struct LocalUser
 
 	/* nicknames theyre monitoring */
 	dlink_list monitor_list;
+
+	dlink_list invited;	/* chain of invite pointer blocks */
 
 	/*
 	 * Anti-flood stuff. We track how many messages were parsed and how

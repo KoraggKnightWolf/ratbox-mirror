@@ -1194,7 +1194,7 @@ stats_memory (struct Client *source_p)
 		if(target_p->user)
 		{
 			users_counted++;
-			users_invited_count += ircd_dlink_list_length(&target_p->user->invited);
+			users_invited_count += ircd_dlink_list_length(&target_p->localClient->invited);
 			user_channels += ircd_dlink_list_length(&target_p->user->channel);
 			if(target_p->user->away)
 			{

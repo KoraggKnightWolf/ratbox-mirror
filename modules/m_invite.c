@@ -175,17 +175,17 @@ add_invite(struct Channel *chptr, struct Client *who)
 	dlink_node *ptr;
 
 	/* already invited? */
-	DLINK_FOREACH(ptr, who->user->invited.head)
+	DLINK_FOREACH(ptr, who->localClient->invited.head)
 	{
 		if(ptr->data == chptr)
 			return;
 	}
 
 	/* ok, if their invite list is too long, remove the tail */
-	if((int)ircd_dlink_list_length(&who->user->invited) >= 
+	if((int)ircd_dlink_list_length(&who->localClient->invited) >= 
 	   ConfigChannel.max_chans_per_user)
 	{
-		ptr = who->user->invited.tail;
+		ptr = who->localClient->invited.tail;
 		del_invite(ptr->data, who);
 	}
 
@@ -193,7 +193,7 @@ add_invite(struct Channel *chptr, struct Client *who)
 	ircd_dlinkAddAlloc(who, &chptr->invites);
 
 	/* add channel to user invite list */
-	ircd_dlinkAddAlloc(chptr, &who->user->invited);
+	ircd_dlinkAddAlloc(chptr, &who->localClient->invited);
 }
 
 

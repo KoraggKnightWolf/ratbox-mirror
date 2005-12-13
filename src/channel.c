@@ -464,7 +464,7 @@ void
 del_invite(struct Channel *chptr, struct Client *who)
 {
 	ircd_dlinkFindDestroy(who, &chptr->invites);
-	ircd_dlinkFindDestroy(chptr, &who->user->invited);
+	ircd_dlinkFindDestroy(chptr, &who->localClient->invited);
 }
 
 /* is_banned()
