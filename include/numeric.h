@@ -322,6 +322,7 @@ extern const char *form_str(int);
 #define RPL_TESTMASK		724
 #define RPL_TESTLINE		725
 #define RPL_NOTESTLINE		726
+#define RPL_TESTMASKGECOS       727
 
 #define RPL_MONONLINE		730
 #define RPL_MONOFFLINE		731

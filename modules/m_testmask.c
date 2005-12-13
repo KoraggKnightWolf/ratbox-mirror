@@ -47,12 +47,20 @@
 static int mo_testmask(struct Client *client_p, struct Client *source_p,
 			int parc, const char *parv[]);
 
+static int mo_testmaskgecos(struct Client *client_p, struct Client *source_p,
+				int parc, const char *parv[]);
+ 
+struct Message testmaskgecos_msgtab = {
+	"TESTMASKGECOS", 0, 0, 0, MFLG_SLOW,
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_testmaskgecos, 2}}
+};
+
 struct Message testmask_msgtab = {
 	"TESTMASK", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_testmask, 2}}
 };
 
-mapi_clist_av1 testmask_clist[] = { &testmask_msgtab, NULL };
+mapi_clist_av1 testmask_clist[] = { &testmask_msgtab, &testmaskgecos_msgtab, NULL };
 DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision: 19256 $");
 
 static int
@@ -118,7 +126,39 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 
 	sendto_one(source_p, POP_QUEUE, form_str(RPL_TESTMASK),
                                me.name, source_p->name,
-                               name ? name : "",
+                               name ? name : "*",
                                username, hostname, lcount, gcount);
+	return 0;
+}
+
+static int
+mo_testmaskgecos(struct Client *client_p, struct Client *source_p,
+			int parc, const char *parv[])
+{
+	struct Client *target_p;
+	int lcount = 0;
+	int gcount = 0;
+	dlink_node *ptr;
+
+	DLINK_FOREACH(ptr, global_client_list.head)
+	{
+		target_p = ptr->data;
+
+		if(!IsPerson(target_p))
+			continue;
+
+		if(match_esc(parv[1], target_p->info))
+		{
+			if(MyClient(target_p))
+				lcount++;
+			else
+				gcount++;
+		}
+	}
+
+	sendto_one(source_p, POP_QUEUE, form_str(RPL_TESTMASKGECOS),
+			me.name, source_p->name, 
+			lcount, gcount, parv[1]);
+
 	return 0;
 }

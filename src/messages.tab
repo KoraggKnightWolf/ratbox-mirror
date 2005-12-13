@@ -749,7 +749,7 @@ static  const char *  replies[] = {
 /* 724 RPL_TESTMASK */		":%s 724 %s %s@%s %d %d :Local/remote clients match",
 /* 725 RPL_TESTLINE */		":%s 725 %s %c %ld %s :%s",
 /* 726 RPL_NOTESTLINE */	":%s 726 %s %s :No matches",
-/* 727 */	NULL,
+/* 727 RPL_TESTMASKGECOS */     ":%s 727 %s %d %d %s :Local/remote clients match",
 /* 728 */	NULL,
 /* 729 */	NULL,
 /* 730 RPL_MONONLINE */		":%s 730 %s :%s",
