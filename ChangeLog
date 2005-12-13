@@ -1,3 +1,11 @@
+androsyn    2005/12/13 21:15:22 UTC	(20051213_14-21416)
+  Log:
+  remove an unused pnode from struct ConfItem
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+
+
 androsyn    2005/12/13 21:14:42 UTC	(20051213_13-21414)
   Log:
   - remove "className" from struct ConfItem, every auth should always have
