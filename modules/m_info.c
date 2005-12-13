@@ -346,6 +346,12 @@ static struct InfoStruct info_table[] = {
 		"Duration a client must be connected for to have an exit message"
 	},
 	{
+		"burst_away",
+		OUTPUT_BOOLEAN,
+		{ &ConfigFileEntry.burst_away },
+		"Burst away messages on server joins"
+	},
+	{
 		"caller_id_wait",
 		OUTPUT_DECIMAL,
 		{ &ConfigFileEntry.caller_id_wait }, 
@@ -538,12 +544,24 @@ static struct InfoStruct info_table[] = {
 		{ &ConfigFileEntry.kline_with_reason }, 
 		"Display K-line reason to client on disconnect"
 	},
+ 	{
+		"map_oper_only",
+		OUTPUT_BOOLEAN_YN,
+		{ &ConfigFileEntry.map_oper_only },
+		"MAP is oper only"
+	},	
 	{
 		"max_accept",
 		OUTPUT_DECIMAL,
 		{ &ConfigFileEntry.max_accept }, 
 		"Maximum nicknames on accept list",
 	},
+ 	{
+		"max_monitor",
+		OUTPUT_DECIMAL,
+		{ &ConfigFileEntry.max_monitor },
+		"Maximum nicknames on monitor list"
+	},	
 	{
 		"max_nick_changes",
 		OUTPUT_DECIMAL,
@@ -701,6 +719,12 @@ static struct InfoStruct info_table[] = {
 		"STATS Y is only shown to operators",
 	},
 	{
+		"target_change",
+		OUTPUT_BOOLEAN,
+		{ &ConfigFileEntry.target_change },
+		"Target change anti-spam system"
+	},
+	{
 		"tkline_expire_notices",
 		OUTPUT_BOOLEAN,
 		{ &ConfigFileEntry.tkline_expire_notices }, 
@@ -717,6 +741,12 @@ static struct InfoStruct info_table[] = {
 		OUTPUT_DECIMAL,
 		{ &ConfigFileEntry.ts_warn_delta }, 
 		"Maximum permitted TS delta before displaying a warning"
+	},
+	{
+		"use_whois_actually",
+		OUTPUT_BOOLEAN_YN,
+		{ &ConfigFileEntry.use_whois_actually },
+		"RPL_WHOISACTUALLY sent in reply to whois requests"
 	},
 	{
 		"warn_no_nline",
