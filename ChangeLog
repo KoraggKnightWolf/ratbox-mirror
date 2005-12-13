@@ -1,3 +1,13 @@
+androsyn    2005/12/13 22:20:28 UTC	(20051213_27-21442)
+  Log:
+  add testmaskgecos
+
+  Modified:
+	ircd-ratbox/trunk/include/numeric.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 androsyn    2005/12/13 22:14:54 UTC	(20051213_26-21440)
   Log:
   sync up m_info
