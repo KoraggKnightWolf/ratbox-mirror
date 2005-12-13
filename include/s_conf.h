@@ -67,7 +67,6 @@ struct ConfItem
 	int port;
 	time_t hold;		/* Hold action until this time (calendar time) */
 	struct Class *c_class;	/* Class of connection */
-	struct _patricia_node_t *pnode;	/* Our patricia node */
 };
 
 #define CONF_ILLEGAL            0x80000000
