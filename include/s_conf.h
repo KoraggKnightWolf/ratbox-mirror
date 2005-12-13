@@ -86,25 +86,25 @@ struct ConfItem
 
 /* Generic flags... */
 /* access flags... */
-#define CONF_FLAGS_NO_TILDE             0x00000004
-#define CONF_FLAGS_NEED_IDENTD          0x00000008
-#define CONF_FLAGS_EXEMPTKLINE          0x00000040
-#define CONF_FLAGS_NOLIMIT              0x00000080
-#define CONF_FLAGS_SPOOF_IP             0x00000200
-#define CONF_FLAGS_SPOOF_NOTICE		0x00000400
-#define CONF_FLAGS_REDIR                0x00000800
-#define CONF_FLAGS_EXEMPTGLINE          0x00001000
-#define CONF_FLAGS_EXEMPTRESV		0x00002000	/* exempt from resvs */
-#define CONF_FLAGS_EXEMPTFLOOD          0x00004000
-#define CONF_FLAGS_EXEMPTSPAMBOT	0x00008000
-#define CONF_FLAGS_EXEMPTSHIDE		0x00010000
-#define CONF_FLAGS_EXEMPTJUPE		0x00020000	/* exempt from resv generating warnings */
+#define CONF_FLAGS_NO_TILDE             0x00000001
+#define CONF_FLAGS_NEED_IDENTD          0x00000002
+#define CONF_FLAGS_EXEMPTKLINE          0x00000004
+#define CONF_FLAGS_NOLIMIT              0x00000008
+#define CONF_FLAGS_SPOOF_IP             0x00000010
+#define CONF_FLAGS_SPOOF_NOTICE		0x00000020
+#define CONF_FLAGS_REDIR                0x00000040
+#define CONF_FLAGS_EXEMPTGLINE          0x00000080
+#define CONF_FLAGS_EXEMPTRESV		0x00000100	/* exempt from resvs */
+#define CONF_FLAGS_EXEMPTFLOOD          0x00000200
+#define CONF_FLAGS_EXEMPTSPAMBOT	0x00000400
+#define CONF_FLAGS_EXEMPTSHIDE		0x00000800
+#define CONF_FLAGS_EXEMPTJUPE		0x00001000	/* exempt from resv generating warnings */
 /* server flags */
-#define CONF_FLAGS_ENCRYPTED            0x00100000
-#define CONF_FLAGS_COMPRESSED           0x00200000
-#define CONF_FLAGS_TEMPORARY            0x00400000
-#define CONF_FLAGS_TB			0x00800000
-#define CONF_FLAGS_PERMANENT		0x01000000
+#define CONF_FLAGS_ENCRYPTED            0x00002000
+#define CONF_FLAGS_COMPRESSED           0x00004000
+#define CONF_FLAGS_TEMPORARY            0x00008000
+#define CONF_FLAGS_TB			0x00010000
+#define CONF_FLAGS_PERMANENT		0x00020000
 
 /* Macros for struct ConfItem */
 #define IsConfBan(x)		((x)->status & (CONF_KILL|CONF_XLINE|CONF_DLINE|\
