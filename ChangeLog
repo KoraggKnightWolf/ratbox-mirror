@@ -1,3 +1,20 @@
+androsyn    2005/12/13 17:22:31 UTC	(20051213_0-21383)
+  Log:
+  Make FD_HASH_SIZE configurable with --enable-small-net
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/adns/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/servlink/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2005/12/12 21:54:13 UTC	(20051212_9-21377)
   Log:
   Make quit work like 2.2 does and not attempt to use client_p->name for a quit reason
