@@ -63,14 +63,14 @@ struct SlinkRpl
 
 struct ZipStats
 {
-	u_int32_t in;
-	u_int32_t in_wire;
-	u_int32_t out;
-	u_int32_t out_wire;
-	u_int32_t inK;
-	u_int32_t inK_wire;
-	u_int32_t outK;
-	u_int32_t outK_wire;
+	uint32_t in;
+	uint32_t in_wire;
+	uint32_t out;
+	uint32_t out_wire;
+	uint32_t inK;
+	uint32_t inK_wire;
+	uint32_t outK;
+	uint32_t outK_wire;
 	double in_ratio;
 	double out_ratio;
 };
@@ -87,8 +87,8 @@ struct Client
 	struct Whowas *whowas;	/* Pointers to whowas structs */
 	time_t tsinfo;		/* TS on the nick, SVINFO on server */
 	unsigned int umodes;	/* opers, normal users subset */
-	u_int32_t flags;	/* client flags */
-	u_int32_t operflags;	/* ugh. overflow */
+	uint32_t flags;	/* client flags */
+	uint32_t operflags;	/* ugh. overflow */
 
 	int hopcount;		/* number of servers to this 0 = local */
 	unsigned short status;	/* Client type */
@@ -155,12 +155,12 @@ struct LocalUser
 	buf_head_t buf_sendq;
 	buf_head_t buf_recvq;
 
-	u_int32_t sendM;	/* Statistics: protocol messages send */
-	u_int32_t sendK;	/* Statistics: total k-bytes send */
-	u_int32_t receiveM;	/* Statistics: protocol messages received */
-	u_int32_t receiveK;	/* Statistics: total k-bytes received */
-	u_int16_t sendB;	/* counters to count upto 1-k lots of bytes */
-	u_int16_t receiveB;	/* sent and received. */
+	uint32_t sendM;	/* Statistics: protocol messages send */
+	uint32_t sendK;	/* Statistics: total k-bytes send */
+	uint32_t receiveM;	/* Statistics: protocol messages received */
+	uint32_t receiveK;	/* Statistics: total k-bytes received */
+	uint16_t sendB;	/* counters to count upto 1-k lots of bytes */
+	uint16_t receiveB;	/* sent and received. */
 	struct Listener *listener;	/* listener accepted from */
 	struct ConfItem *att_conf;	/* attached conf */
 	struct server_conf *att_sconf;
@@ -214,7 +214,7 @@ struct LocalUser
 	int actually_read;	/* how many we've actually read in this second */
 	int sent_parsed;	/* how many messages we've parsed in this second */
 	time_t last_knock;	/* time of last knock */
-	u_int32_t random_ping;
+	uint32_t random_ping;
 	struct AuthRequest	*auth_request;
 
 	/* target change stuff */

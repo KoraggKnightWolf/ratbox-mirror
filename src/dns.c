@@ -58,11 +58,11 @@ struct dnsreq
 };
 
 static struct dnsreq querytable[IDTABLE];
-static u_int16_t id = 1;
+static uint16_t id = 1;
 static int dns_ifd = -1;
 static int dns_ofd = -1;
 
-static inline u_int16_t 
+static inline uint16_t 
 assign_dns_id(void)
 {
 	if(id < IDTABLE-1)
@@ -74,18 +74,18 @@ assign_dns_id(void)
 
 
 void
-cancel_lookup(u_int16_t xid)
+cancel_lookup(uint16_t xid)
 {
 	querytable[xid].callback = NULL;
 	querytable[xid].data = NULL;
 }
 
-u_int16_t
+uint16_t
 lookup_hostname(const char *hostname, int aftype, DNSCB *callback, void *data)
 {
 	struct dnsreq *req;
 	int aft;
-	u_int16_t nid;
+	uint16_t nid;
 	
 	nid = assign_dns_id();
 	req = &querytable[nid];
@@ -104,12 +104,12 @@ lookup_hostname(const char *hostname, int aftype, DNSCB *callback, void *data)
 	return(id);
 }
 
-u_int16_t
+uint16_t
 lookup_ip(const char *addr, int aftype, DNSCB *callback, void *data)
 {
 	struct dnsreq *req;
 	int aft;
-	u_int16_t nid;
+	uint16_t nid;
 	
 	nid = assign_dns_id();
 	req = &querytable[nid];
@@ -138,7 +138,7 @@ static void
 results_callback(const char *callid, const char *status, const char *aftype, const char *results)
 {
 	struct dnsreq *req;
-	u_int16_t nid;
+	uint16_t nid;
 	int st;
 	int aft;
 	nid = strtol(callid, NULL, 16);

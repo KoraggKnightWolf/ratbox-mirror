@@ -102,7 +102,7 @@ mr_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		if(ConfigFileEntry.ping_cookie && source_p->user && source_p->name)
 		{
-			u_int32_t incoming_ping = strtoul(parv[1], NULL, 16);
+			uint32_t incoming_ping = strtoul(parv[1], NULL, 16);
 			if(incoming_ping)
 			{
 				if(source_p->localClient->random_ping == incoming_ping)

@@ -91,12 +91,12 @@ static int fork_ident_count = 0;
 static int auth_ofd = -1;
 static int auth_ifd = -1;
 static pid_t auth_pid = -1;
-static u_int16_t id;
+static uint16_t id;
 #define IDTABLE 0x1000
 
 static struct AuthRequest *authtable[IDTABLE];
 
-static u_int16_t
+static uint16_t
 assign_auth_id(void)
 {
 	if(id < IDTABLE - 1)

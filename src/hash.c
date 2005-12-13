@@ -95,10 +95,10 @@ init_hash(void)
 }
 
 
-u_int32_t
+uint32_t
 fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused)
 {
-	u_int32_t h = FNV1_32_INIT;
+	uint32_t h = FNV1_32_INIT;
 
 	while (*s)
 	{
@@ -109,10 +109,10 @@ fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused)
 	return h;
 }
 
-u_int32_t
+uint32_t
 fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused)
 {
-	u_int32_t h = FNV1_32_INIT;
+	uint32_t h = FNV1_32_INIT;
 
 	while (*s)
 	{
@@ -123,10 +123,10 @@ fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused)
 	return h;
 }
 
-u_int32_t
+uint32_t
 fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len)
 {
-	u_int32_t h = FNV1_32_INIT;
+	uint32_t h = FNV1_32_INIT;
 	const unsigned char *x = s + len;
 	while (*s && s < x)
 	{
@@ -137,10 +137,10 @@ fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len)
 	return h;
 }
 
-u_int32_t
+uint32_t
 fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len)
 {
-	u_int32_t h = FNV1_32_INIT;
+	uint32_t h = FNV1_32_INIT;
 	const unsigned char *x = s + len;
 	while (*s && s < x)
 	{
@@ -166,7 +166,7 @@ hash_help(const char *name)
 
 static struct _hash_function
 {
-	u_int32_t (*func) (unsigned const char *, unsigned int, unsigned int);
+	uint32_t (*func) (unsigned const char *, unsigned int, unsigned int);
 	dlink_list *table;
 	unsigned int hashbits;
 	unsigned int hashlen;

@@ -113,7 +113,7 @@ void
 slink_zipstats(unsigned int rpl, unsigned int len, unsigned char *data, struct Client *server_p)
 {
 	struct ZipStats zipstats;
-	u_int32_t in = 0, in_wire = 0, out = 0, out_wire = 0;
+	uint32_t in = 0, in_wire = 0, out = 0, out_wire = 0;
 	int i = 0;
 
 	s_assert(rpl == SLINKRPL_ZIPSTATS);

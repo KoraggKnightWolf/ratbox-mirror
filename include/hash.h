@@ -69,10 +69,10 @@ struct ConfItem;
 struct cachefile;
 struct nd_entry;
 
-extern u_int32_t fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused);
-extern u_int32_t fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused);
-extern u_int32_t fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len);
-extern u_int32_t fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len);
+extern uint32_t fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused);
+extern uint32_t fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused);
+extern uint32_t fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len);
+extern uint32_t fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len);
 
 extern void init_hash(void);
 

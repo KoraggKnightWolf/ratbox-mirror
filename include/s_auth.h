@@ -41,8 +41,8 @@ struct AuthRequest
 {
 	dlink_node node;
 	struct Client *client;	/* pointer to client struct for request */
-	u_int16_t dns_query; /* DNS Query */
-	u_int16_t reqid;
+	uint16_t dns_query; /* DNS Query */
+	uint16_t reqid;
 	unsigned int flags;	/* current state of request */
 	time_t timeout;		/* time when query expires */
 #ifdef IPV6
