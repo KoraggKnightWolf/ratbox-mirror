@@ -604,22 +604,10 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	 */
 	make_server(client_p);
 	if(by && IsPerson(by))
-	{
 		strcpy(client_p->serv->by, by->name);
-		if(client_p->serv->user)
-			free_user(client_p->serv->user, NULL);
-		client_p->serv->user = by->user;
-		by->user->refcnt++;
-	}
 	else
-	{
 		strcpy(client_p->serv->by, "AutoConn.");
-		if(client_p->serv->user)
-			free_user(client_p->serv->user, NULL);
-		client_p->serv->user = NULL;
-	}
-	client_p->serv->up = me.name;
-	client_p->serv->upid = me.id;
+
 	SetConnecting(client_p);
 	ircd_dlinkAddTail(client_p, &client_p->node, &global_client_list);
 

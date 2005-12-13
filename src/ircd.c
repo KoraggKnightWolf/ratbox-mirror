@@ -645,7 +645,6 @@ ratbox_main(int argc, char *argv[])
 	me.servptr = &me;
 	SetMe(&me);
 	make_server(&me);
-	me.serv->up = me.name;
 	startup_time = ircd_currenttime;
 	add_to_hash(HASH_CLIENT, me.name, &me);
 	add_to_hash(HASH_ID, me.id, &me);

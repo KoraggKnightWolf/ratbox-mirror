@@ -169,7 +169,7 @@ mo_links(struct Client *client_p, struct Client *source_p, int parc, const char 
 		 * or theyre an oper..  
 		 */
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LINKS, form_str(RPL_LINKS),
-				   target_p->name, target_p->serv->up,
+				   target_p->name, target_p->servptr->name,
 				   target_p->hopcount,
 				   target_p->info[0] ? target_p->info : "(Unknown Location)");
 	}

@@ -35,7 +35,6 @@ struct User
 	dlink_list channel;	/* chain of channel pointer blocks */
 	dlink_list invited;	/* chain of invite pointer blocks */
 	char *away;		/* pointer to away message */
-	int refcnt;		/* Number of times this block is referenced */
 	const char *server;	/* pointer to scached server name */
 	char name[NICKLEN];
 #ifdef ENABLE_SERVICES
@@ -46,9 +45,6 @@ struct User
 
 struct Server
 {
-	struct User *user;	/* who activated this connection */
-	const char *up;		/* Pointer to scache name */
-	const char *upid;
 	const char *name;
 	char by[NICKLEN];
 	dlink_list servers;

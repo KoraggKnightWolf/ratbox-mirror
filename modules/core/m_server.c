@@ -390,11 +390,6 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	set_server_gecos(target_p, info);
 
-	target_p->serv->up = target_p->name;
-
-	if(has_id(source_p))
-		target_p->serv->upid = source_p->id;
-
 	target_p->servptr = source_p;
 
 	SetServer(target_p);
@@ -527,11 +522,6 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	target_p->hopcount = atoi(parv[2]);
 	strcpy(target_p->id, parv[3]);
 	set_server_gecos(target_p, parv[4]);
-
-	target_p->serv->up = find_or_add(source_p->name);
-
-	if(has_id(source_p))
-		target_p->serv->upid = source_p->id;
 
 	target_p->servptr = source_p;
 	SetServer(target_p);
@@ -1430,8 +1420,6 @@ server_estab(struct Client *client_p)
 	add_to_hash(HASH_CLIENT, client_p->name, client_p);
 	/* doesnt duplicate client_p->serv if allocated this struct already */
 	make_server(client_p);
-	client_p->serv->up = me.name;
-	client_p->serv->upid = me.id;
 
 	client_p->serv->caps = client_p->localClient->caps;
 
@@ -1536,12 +1524,12 @@ server_estab(struct Client *client_p)
 		/* presumption, if target has an id, so does its uplink */
 		if(has_id(client_p) && has_id(target_p))
 			sendto_one(client_p, POP_QUEUE, ":%s SID %s %d %s :%s%s",
-				   target_p->serv->upid, target_p->name,
+				   target_p->servptr->id, target_p->name,
 				   target_p->hopcount + 1, target_p->id,
 				   IsHidden(target_p) ? "(H) " : "", target_p->info);
 		else
 			sendto_one(client_p, POP_QUEUE, ":%s SERVER %s %d :%s%s",
-				   target_p->serv->up,
+				   target_p->servptr->name,
 				   target_p->name, target_p->hopcount + 1,
 				   IsHidden(target_p) ? "(H) " : "", target_p->info);
 
