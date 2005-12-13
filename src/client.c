@@ -104,6 +104,7 @@ init_client(void)
 	 */
 	client_heap = BlockHeapCreate(sizeof(struct Client), CLIENT_HEAP_SIZE);
 	lclient_heap = BlockHeapCreate(sizeof(struct LocalUser), LCLIENT_HEAP_SIZE);
+	user_heap = BlockHeapCreate(sizeof(struct User), USER_HEAP_SIZE);
 	ircd_event_addish("check_pings", check_pings, NULL, 30);
 	ircd_event_addish("free_exited_clients", &free_exited_clients, NULL, 5);
 	ircd_event_addish("exit_aborted_clients", exit_aborted_clients, NULL, 5);
@@ -1668,23 +1669,6 @@ show_ip(struct Client *source_p, struct Client *target_p)
 	return 0;
 }
 
-/*
- * initUser
- *
- * inputs	- none
- * outputs	- none
- *
- * side effects - Creates a block heap for struct Users
- *
- */
-static BlockHeap *user_heap;
-void
-initUser(void)
-{
-	user_heap = BlockHeapCreate(sizeof(struct User), USER_HEAP_SIZE);
-	if(!user_heap)
-		ircd_outofmemory();
-}
 
 /*
  * make_user
