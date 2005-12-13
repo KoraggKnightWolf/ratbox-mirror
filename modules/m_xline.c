@@ -65,7 +65,7 @@ struct Message unxline_msgtab = {
 mapi_clist_av1 xline_clist[] =  { &xline_msgtab, &unxline_msgtab, NULL };
 DECLARE_MODULE_AV1(xline, NULL, NULL, xline_clist, NULL, NULL, "$Revision: 19295 $");
 
-static int valid_xline(struct Client *, const char *, const char *);
+static int valid_xline(struct Client *, const char *, const char *, int temp);
 static void apply_xline(struct Client *client_p, const char *name, 
 			const char *reason, int temp_time);
 
@@ -149,7 +149,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 	}
 
-	if(!valid_xline(source_p, name, reason))
+	if(!valid_xline(source_p, name, reason, temp_time))
 		return 0;
 
 	apply_xline(source_p, name, reason, temp_time);
@@ -177,7 +177,7 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 				(temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE))
 		return 0;
 
-	if(!valid_xline(source_p, name, reason))
+	if(!valid_xline(source_p, name, reason, temp_time))
 		return 0;
 
 	/* already xlined */
@@ -201,7 +201,7 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
  */
 static int
 valid_xline(struct Client *source_p, const char *gecos,
-	    const char *reason)
+	    const char *reason,  int temp_time)
 {
 	if(EmptyString(reason))
 	{
@@ -231,6 +231,19 @@ valid_xline(struct Client *source_p, const char *gecos,
 				  ":Please include at least %d non-wildcard "
 				  "characters with the xline",
 				  ConfigFileEntry.min_nonwildcard_simple);
+		return 0;
+	}
+
+	/* The following test checks for an xline which would break the
+	 * parser (which doesnt understand quoting).
+	 *
+	 * We dont lose much here, permanent versions of these would break
+	 * the parser on a reload anyway. --anfl
+	 */
+	if(!temp_time && strstr(gecos, "\","))
+	{
+		sendto_one_notice(source_p, POP_QUEUE,
+				":Xlines containing \", must be temporary.");
 		return 0;
 	}
 
