@@ -38,11 +38,10 @@
 #include "modules.h"
 
 static int m_topic(struct Client *, struct Client *, int, const char **);
-static int ms_topic(struct Client *, struct Client *, int, const char **);
 
 struct Message topic_msgtab = {
 	"TOPIC", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_topic, 2}, {m_topic, 2}, {ms_topic, 5}, mg_ignore, {m_topic, 2}}
+	{mg_unreg, {m_topic, 2}, {m_topic, 2}, mg_ignore, mg_ignore, {m_topic, 2}}
 };
 
 mapi_clist_av1 topic_clist[] = { &topic_msgtab, NULL };
@@ -145,32 +144,3 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 	return 0;
 }
 
-/*
- * ms_topic
- *      parv[0] = sender prefix
- *      parv[1] = channel name
- *	parv[2] = topic_info
- *	parv[3] = topic_info time
- *	parv[4] = new channel topic
- *
- * Let servers always set a topic
- */
-static int
-ms_topic(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
-{
-	struct Channel *chptr = NULL;
-
-	if(IsChannelName(parv[1]))
-	{
-		if((chptr = find_channel(parv[1])) == NULL)
-			return 0;
-
-		set_channel_topic(chptr, parv[4], parv[2], atoi(parv[3]));
-
-		sendto_channel_local(ALL_MEMBERS, chptr, ":%s TOPIC %s :%s",
-				     source_p->name, parv[1], 
-				     chptr->topic == NULL ? "" : chptr->topic);
-	}
-
-	return 0;
-}
