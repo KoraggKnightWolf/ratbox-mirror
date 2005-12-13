@@ -62,14 +62,16 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	struct Client *target_p;
 	int lcount = 0;
 	int gcount = 0;
+	char *name;
 	char *username;
 	char *hostname;
 	dlink_node *ptr;
 
-	username = LOCAL_COPY(parv[1]);
-	collapse(username);
+	name = LOCAL_COPY(parv[1]);
+	collapse(name);
 
-	if((hostname = strchr(username, '@')) == NULL)
+	/* username is required */
+	if((hostname = strchr(name, '@')) == NULL)
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid parameters",
 				me.name, source_p->name);
@@ -77,6 +79,15 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	}
 
 	*hostname++ = '\0';
+
+	/* nickname is optional */
+	if((username = strchr(name, '!')) == NULL)
+	{
+		username = name;
+		name = NULL;
+	}
+	else
+		*username++ = '\0';
 
 	DLINK_FOREACH(ptr, global_client_list.head)
 	{
@@ -88,6 +99,9 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 		if(match(username, target_p->username) &&
 		   match(hostname, target_p->host))
 		{
+			if(name && !match(name, target_p->name))
+				continue;
+
 			if(MyClient(target_p))
 				lcount++;
 			else
@@ -96,7 +110,8 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	}
 
 	sendto_one(source_p, POP_QUEUE, form_str(RPL_TESTMASK),
-			me.name, source_p->name, username, hostname,
-			lcount, gcount);
+                               me.name, source_p->name,
+                               name ? name : "",
+                               username, hostname, lcount, gcount);
 	return 0;
 }
