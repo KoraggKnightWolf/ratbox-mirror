@@ -93,7 +93,6 @@ struct Client
 	int hopcount;		/* number of servers to this 0 = local */
 	unsigned short status;	/* Client type */
 	unsigned char handler;	/* Handler index */
-	unsigned long serial;	/* used to enforce 1 send per nick */
 
 	/* client->name is the unique name for a client nick or host */
 	const char *name;
@@ -150,6 +149,8 @@ struct LocalUser
 
 	time_t lasttime;	/* last time we parsed something */
 	time_t firsttime;	/* time client was created */
+
+	unsigned long serial;	/* used to enforce 1 send per nick */
 
 	/* Send and receive linebuf queues .. */
 	buf_head_t buf_sendq;

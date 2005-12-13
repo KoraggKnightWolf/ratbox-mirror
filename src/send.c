@@ -590,14 +590,14 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 			if(type && NotCapable(target_p->from, CAP_CHW))
 				continue;
 
-			if(target_p->from->serial != current_serial)
+			if(target_p->from->localClient->serial != current_serial)
 			{
 				if(has_id(target_p->from))
 					send_ircd_linebuf_remote(target_p, source_p, &ircd_linebuf_id);
 				else
 					send_ircd_linebuf_remote(target_p, source_p, &ircd_linebuf_name);
 
-				target_p->from->serial = current_serial;
+				target_p->from->localClient->serial = current_serial;
 			}
 		}
 		else
@@ -691,10 +691,10 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 			target_p = msptr->client_p;
 
 			if(IsIOError(target_p) ||
-			   target_p->serial == current_serial)
+			   target_p->localClient->serial == current_serial)
 				continue;
 
-			target_p->serial = current_serial;
+			target_p->localClient->serial = current_serial;
 			send_linebuf(target_p, &linebuf);
 		}
 	}
@@ -702,7 +702,7 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 	/* this can happen when the user isnt in any channels, but we still
 	 * need to send them the data, ie a nick change
 	 */
-	if(MyConnect(user) && (user->serial != current_serial))
+	if(MyConnect(user) && (user->localClient->serial != current_serial))
 		send_linebuf(user, &linebuf);
 
 	ircd_linebuf_donebuf(&linebuf);
@@ -827,7 +827,7 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap,
 		if(IsMe(target_p) || target_p->from == source_p->from)
 			continue;
 
-		if(target_p->from->serial == current_serial)
+		if(target_p->from->localClient->serial == current_serial)
 			continue;
 
 		if(match(mask, target_p->name))
@@ -835,7 +835,7 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap,
 			/* if we set the serial here, then we'll never do
 			 * a match() again if !IsCapable()
 			 */
-			target_p->from->serial = current_serial;
+			target_p->from->localClient->serial = current_serial;
 
 			if(cap && !IsCapable(target_p->from, cap))
 				continue;
