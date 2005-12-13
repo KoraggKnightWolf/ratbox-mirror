@@ -375,6 +375,6 @@ do_who(struct Client *source_p, struct Client *target_p, const char *chname, con
 		   target_p->username,
 		   target_p->host, target_p->servptr->name, target_p->name,
 		   status, 
-		   ConfigServerHide.flatten_links ? 0 : target_p->servptr->serv->hopcount, 
+		   ConfigServerHide.flatten_links ? 0 : target_p->hopcount, 
 		   target_p->info);
 }

@@ -208,6 +208,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	client_p->name = find_or_add(name);
 	set_server_gecos(client_p, info);
+	client_p->hopcount = hop;
 	server_estab(client_p);
 
 	return 0;
@@ -384,7 +385,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	target_p = make_client(client_p);
 	make_server(target_p);
-	target_p->serv->hopcount = hop;
+	target_p->hopcount = hop;
 	target_p->name = find_or_add(name);
 
 	set_server_gecos(target_p, info);
@@ -399,8 +400,8 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	ircd_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
 
 	sendto_server(client_p, NULL, NOCAPS, NOCAPS,
-		      ":%s SERVER %s %u :%s%s",
-		      source_p->name, target_p->serv->name, target_p->serv->hopcount + 1,
+		      ":%s SERVER %s %d :%s%s",
+		      source_p->name, target_p->name, target_p->hopcount + 1,
 		      IsHidden(target_p) ? "(H) " : "", target_p->info);
 
 	sendto_realops_flags(UMODE_EXTERNAL, L_ALL,
@@ -518,7 +519,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	target_p->name = find_or_add(parv[1]);
 
-	target_p->serv->hopcount = (uint8_t)atoi(parv[2]);
+	target_p->hopcount = atoi(parv[2]);
 	strcpy(target_p->id, parv[3]);
 	set_server_gecos(target_p, parv[4]);
 
@@ -532,13 +533,13 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	ircd_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
 
 	sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
-		      ":%s SID %s %u %s :%s%s",
-		      source_p->id, target_p->name, target_p->serv->hopcount + 1,
+		      ":%s SID %s %d %s :%s%s",
+		      source_p->id, target_p->name, target_p->hopcount + 1,
 		      target_p->id,
 		      IsHidden(target_p) ? "(H) " : "", target_p->info);
 	sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
-		      ":%s SERVER %s %u :%s%s",
-		      source_p->name, target_p->name, target_p->serv->hopcount + 1,
+		      ":%s SERVER %s %d :%s%s",
+		      source_p->name, target_p->name, target_p->hopcount + 1,
 		      IsHidden(target_p) ? "(H) " : "", target_p->info);
 
 	sendto_realops_flags(UMODE_EXTERNAL, L_ALL,
@@ -1067,8 +1068,8 @@ burst_TS5(struct Client *client_p)
 			ubuf[1] = '\0';
 		}
 
-		sendto_one(client_p, HOLD_QUEUE, "NICK %s %u %ld %s %s %s %s :%s",
-			   target_p->name, target_p->serv->hopcount + 1,
+		sendto_one(client_p, HOLD_QUEUE, "NICK %s %d %ld %s %s %s %s :%s",
+			   target_p->name, target_p->hopcount + 1,
 			   (long) target_p->tsinfo, ubuf,
 			   target_p->username, target_p->host,
 			   target_p->servptr->name, target_p->info);
@@ -1193,17 +1194,17 @@ burst_TS6(struct Client *client_p)
 		}
 
 		if(has_id(target_p))
-			sendto_one(client_p, HOLD_QUEUE, ":%s UID %s %u %ld %s %s %s %s %s :%s",
+			sendto_one(client_p, HOLD_QUEUE, ":%s UID %s %d %ld %s %s %s %s %s :%s",
 				   target_p->servptr->id, target_p->name,
-				   target_p->serv->hopcount + 1, 
+				   target_p->hopcount + 1, 
 				   (long) target_p->tsinfo, ubuf,
 				   target_p->username, target_p->host,
 				   IsIPSpoof(target_p) ? "0" : target_p->sockhost,
 				   target_p->id, target_p->info);
 		else
-			sendto_one(client_p, HOLD_QUEUE, "NICK %s %u %ld %s %s %s %s :%s",
+			sendto_one(client_p, HOLD_QUEUE, "NICK %s %d %ld %s %s %s %s :%s",
 					target_p->name,
-					target_p->serv->hopcount + 1,
+					target_p->hopcount + 1,
 					(long) target_p->tsinfo,
 					ubuf,
 					target_p->username, target_p->host,
@@ -1522,14 +1523,14 @@ server_estab(struct Client *client_p)
 
 		/* presumption, if target has an id, so does its uplink */
 		if(has_id(client_p) && has_id(target_p))
-			sendto_one(client_p, POP_QUEUE, ":%s SID %s %u %s :%s%s",
+			sendto_one(client_p, POP_QUEUE, ":%s SID %s %d %s :%s%s",
 				   target_p->servptr->id, target_p->name,
-				   target_p->serv->hopcount + 1, target_p->id,
+				   target_p->hopcount + 1, target_p->id,
 				   IsHidden(target_p) ? "(H) " : "", target_p->info);
 		else
-			sendto_one(client_p, POP_QUEUE, ":%s SERVER %s %u :%s%s",
+			sendto_one(client_p, POP_QUEUE, ":%s SERVER %s %d :%s%s",
 				   target_p->servptr->name,
-				   target_p->name, target_p->serv->hopcount + 1,
+				   target_p->name, target_p->hopcount + 1,
 				   IsHidden(target_p) ? "(H) " : "", target_p->info);
 
 		if(IsCapable(client_p, CAP_ENCAP) && 
