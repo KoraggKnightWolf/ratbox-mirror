@@ -1,3 +1,12 @@
+androsyn    2005/12/13 22:23:51 UTC	(20051213_28-21444)
+  Log:
+  add testmaskgecos help
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/testmaskgecos (File Added) 
+
+
 androsyn    2005/12/13 22:20:28 UTC	(20051213_27-21442)
   Log:
   add testmaskgecos
