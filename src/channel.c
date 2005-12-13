@@ -219,8 +219,6 @@ remove_user_from_channel(struct membership *msptr)
 	if(client_p->servptr == &me)
 		ircd_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-	chptr->users_last = ircd_currenttime;
-
 	if(ircd_dlink_list_length(&chptr->members) <= 0)
 		destroy_channel(chptr);
 
@@ -255,8 +253,6 @@ remove_user_from_channels(struct Client *client_p)
 
 		if(client_p->servptr == &me)
 			ircd_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
-
-		chptr->users_last = ircd_currenttime;
 
 		if(ircd_dlink_list_length(&chptr->members) <= 0)
 			destroy_channel(chptr);
