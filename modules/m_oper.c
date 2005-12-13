@@ -262,9 +262,9 @@ cleanup_challenge(struct Client *target_p)
 		return;
 	
 	ircd_free(target_p->localClient->passwd);
-	ircd_free(target_p->localClient->auth_oper);
+	ircd_free(target_p->localClient->opername);
 	target_p->localClient->passwd = NULL;
-	target_p->localClient->auth_oper = NULL;
+	target_p->localClient->opername = NULL;
 	target_p->localClient->chal_time = 0;
 }
 
@@ -300,7 +300,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "EXPIRED CHALLENGE (%s) by (%s!%s@%s)",
-			     source_p->localClient->auth_oper, source_p->name,
+			     source_p->localClient->opername, source_p->name,
 			     source_p->username, source_p->host);
 
 			if(ConfigFileEntry.failed_oper_notice)
@@ -318,7 +318,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
-			     source_p->localClient->auth_oper, source_p->name,
+			     source_p->localClient->opername, source_p->name,
 			     source_p->username, source_p->host);
 
 			if(ConfigFileEntry.failed_oper_notice)
@@ -336,14 +336,14 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		oper_p = find_oper_conf(source_p->username, source_p->host, 
 					source_p->sockhost, 
-					source_p->localClient->auth_oper);
+					source_p->localClient->opername);
 
 		if(oper_p == NULL)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_NOOPERHOST), 
 				   me.name, source_p->name);
 			ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
-			     source_p->localClient->auth_oper, source_p->name,
+			     source_p->localClient->opername, source_p->name,
 			     source_p->username, source_p->host);
 
 			if(ConfigFileEntry.failed_oper_notice)
@@ -357,7 +357,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		oper_up(source_p, oper_p);
 
 		ilog(L_OPERED, "OPER %s by %s!%s@%s",
-		     source_p->localClient->auth_oper, source_p->name, 
+		     source_p->localClient->opername, source_p->name, 
 		     source_p->username, source_p->host);
 
 		cleanup_challenge(source_p);
@@ -408,7 +408,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 			   me.name, source_p->name);
 	}
 
-	DupString(source_p->localClient->auth_oper, oper_p->name);
+	DupString(source_p->localClient->opername, oper_p->name);
 	ircd_free(challenge);
 	return 0;
 }
