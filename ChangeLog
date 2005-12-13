@@ -1,3 +1,13 @@
+androsyn    2005/12/13 20:25:31 UTC	(20051213_8-21401)
+  Log:
+  Pacing away seems stupid..
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_away.c (File Modified) 
+
+
 androsyn    2005/12/13 20:23:40 UTC	(20051213_7-21399)
   Log:
   - remove "server" from struct User, we can reference servptr->name where its needed
