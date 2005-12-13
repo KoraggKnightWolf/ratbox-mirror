@@ -138,7 +138,6 @@ struct exit_client_hook
 #define FLAGS_GOTID        	0x00000010	/* successful ident lookup achieved */
 #define FLAGS_NEEDID       	0x00000020	/* I-lines say must use ident return */
 #define FLAGS_NORMALEX     	0x00000040	/* Client exited normally */
-#define FLAGS_SENDQEX      	0x00000080	/* Sendq exceeded */
 #define FLAGS_SERVLINK     	0x00000100	/* servlink has servlink process */
 #define FLAGS_MARK	   	0x00000200	/* marked client */
 #define FLAGS_HIDDEN       	0x00000400	/* hidden server */
@@ -354,7 +353,7 @@ extern void del_from_accept(struct Client *source, struct Client *target);
 #define accept_message(s, t) ((s) == (t) || (ircd_dlinkFind((s), &((t)->localClient->allow_list))))
 extern void del_all_accepts(struct Client *client_p);
 
-extern void dead_link(struct Client *client_p);
+extern void dead_link(struct Client *client_p, int);
 extern int show_ip(struct Client *source_p, struct Client *target_p);
 
 extern void initUser(void);

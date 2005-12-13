@@ -81,10 +81,7 @@ _send_linebuf(struct Client *to, buf_head_t *linebuf, int queue)
 			     get_sendq(to));
 		}
 
-		if(IsClient(to))
-			to->flags |= FLAGS_SENDQEX;
-
-		dead_link(to);
+		dead_link(to, 1);
 		return -1;
 	}
 	else
@@ -216,7 +213,7 @@ send_queued_write(int fd, void *data)
 
 		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
 		{
-			dead_link(to);
+			dead_link(to, 0);
 			return;
 		}
 	}
@@ -257,14 +254,14 @@ send_queued_slink_write(int fd, void *data)
 			/* If we have a fatal error */
 			if(!ignoreErrno(errno))
 			{
-				dead_link(to);
+				dead_link(to, 0);
 				return;
 			}
 		}
 		/* 0 bytes is an EOF .. */
 		else if(retlen == 0)
 		{
-			dead_link(to);
+			dead_link(to, 0);
 			return;
 		}
 		else
