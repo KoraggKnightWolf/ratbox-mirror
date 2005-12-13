@@ -610,11 +610,18 @@ find_user_host(const char *userhost, char *luser, char *lhost)
 static int
 valid_user_host(struct Client *source_p, const char *luser, const char *lhost)
 {
-	/* # is invalid, as is '!' (n!u@h kline) */
-	if(strchr(lhost, '#') || strchr(luser, '#') || strchr(luser, '!'))
+	const char *p;
+
+	for(p = luser; *p; p++)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Invalid K-Line");
-		return 0;
+		if(!IsUserChar(*p) && !IsKWildChar(*p))
+			return 0;
+	}
+
+	for(p = lhost; *p; p++)
+	{
+		if(!IsHostChar(*p) && !IsKWildChar(*p))
+			return 0;
 	}
 
 	return 1;
