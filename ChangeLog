@@ -1,3 +1,11 @@
+androsyn    2005/12/13 22:14:54 UTC	(20051213_26-21440)
+  Log:
+  sync up m_info
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+
+
 androsyn    2005/12/13 22:07:57 UTC	(20051213_25-21438)
   Log:
   remove FLAGS_SENDQEX and just pass that info to dead_link()
