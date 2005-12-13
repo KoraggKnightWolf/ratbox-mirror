@@ -97,7 +97,7 @@ static u_int16_t id;
 static struct AuthRequest *authtable[IDTABLE];
 
 static u_int16_t
-assign_id(void)
+assign_auth_id(void)
 {
 	if(id < IDTABLE - 1)
 		id++;
@@ -412,7 +412,7 @@ start_auth_query(struct AuthRequest *auth)
 #endif
 		rport = ntohs(((struct sockaddr_in *) &remoteaddr)->sin_port);
 
-	auth->reqid = assign_id();
+	auth->reqid = assign_auth_id();
 	authtable[auth->reqid] = auth;
 
 	ircd_linebuf_put(&auth_sendq, "%x %s %s %u %u", auth->reqid, myip, 

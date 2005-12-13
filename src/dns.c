@@ -63,7 +63,7 @@ static int dns_ifd = -1;
 static int dns_ofd = -1;
 
 static inline u_int16_t 
-assign_id(void)
+assign_dns_id(void)
 {
 	if(id < IDTABLE-1)
 		id++;
@@ -87,7 +87,7 @@ lookup_hostname(const char *hostname, int aftype, DNSCB *callback, void *data)
 	int aft;
 	u_int16_t nid;
 	
-	nid = assign_id();
+	nid = assign_dns_id();
 	req = &querytable[nid];
 
 	req->callback = callback;
@@ -111,7 +111,7 @@ lookup_ip(const char *addr, int aftype, DNSCB *callback, void *data)
 	int aft;
 	u_int16_t nid;
 	
-	nid = assign_id();
+	nid = assign_dns_id();
 	req = &querytable[nid];
 
 	req->callback = callback;
