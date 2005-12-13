@@ -1,3 +1,25 @@
+androsyn    2005/12/13 20:33:40 UTC	(20051213_10-21405)
+  Log:
+  use uintXX_t instead of u_intXX_t
+
+  Modified:
+	ircd-ratbox/trunk/include/dns.h (File Modified) 
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/include/s_auth.h (File Modified) 
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/include/whowas.h (File Modified) 
+	ircd-ratbox/trunk/libircd/crypt.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_pong.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2005/12/13 20:27:17 UTC	(20051213_9-21403)
   Log:
   make targinfo[2] u_int8_t
