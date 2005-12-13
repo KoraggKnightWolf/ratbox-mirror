@@ -196,7 +196,6 @@ struct LocalUser
 	time_t last;
 
 	/* challenge stuff */
-	char *response;
 	char *auth_oper;
 	time_t chal_time;
 	

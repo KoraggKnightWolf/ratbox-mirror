@@ -258,12 +258,12 @@ static int generate_challenge(char **r_challenge, char **r_response, RSA * rsa);
 static void
 cleanup_challenge(struct Client *target_p)
 {
-	if(target_p->localClient == NULL || target_p->localClient->response == NULL)
+	if(target_p->localClient == NULL)
 		return;
 	
-	ircd_free(target_p->localClient->response);
+	ircd_free(target_p->localClient->passwd);
 	ircd_free(target_p->localClient->auth_oper);
-	target_p->localClient->response = NULL;
+	target_p->localClient->passwd = NULL;
 	target_p->localClient->auth_oper = NULL;
 	target_p->localClient->chal_time = 0;
 }
@@ -293,7 +293,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(*parv[1] == '+')
 	{
-		if(source_p->localClient->response == NULL)
+		if(source_p->localClient->passwd == NULL)
 			return 0;
 
 		if((ircd_currenttime - source_p->localClient->chal_time) > CHALLENGE_EXPIRES)
@@ -314,7 +314,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		b_response = ircd_base64_decode((const unsigned char *)++parv[1], strlen(parv[1]));
 
-		if(memcmp(source_p->localClient->response, b_response, SHA256_DIGEST_LENGTH))
+		if(memcmp(source_p->localClient->passwd, b_response, SHA256_DIGEST_LENGTH))
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
@@ -390,7 +390,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		return 0;
 	}
 
-	if(!generate_challenge(&challenge, &(source_p->localClient->response), oper_p->rsa_pubkey))
+	if(!generate_challenge(&challenge, &(source_p->localClient->passwd), oper_p->rsa_pubkey))
 	{
 		char *chal = challenge;
 		source_p->localClient->chal_time = ircd_currenttime;
