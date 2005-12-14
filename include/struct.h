@@ -220,7 +220,7 @@ struct LocalUser
 
 	/* target change stuff */
 	void *targets[10];		/* targets were aware of */
-	u_int8_t targinfo[2];	/* cyclic array, no in use */
+	uint8_t targinfo[2];	/* cyclic array, no in use */
 	time_t target_last;		/* last time we cleared a slot */
 };
 
