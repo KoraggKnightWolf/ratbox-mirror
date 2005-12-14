@@ -1,3 +1,15 @@
+androsyn    2005/12/14 15:56:38 UTC	(20051214_1-21456)
+  Log:
+  remove IGNORE_BOGUS_TS
+
+  Modified:
+	ircd-ratbox/trunk/doc/server-version-info (File Modified) 
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+	ircd-ratbox/trunk/include/config.h.dist (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_version.c (File Modified) 
+
+
 androsyn    2005/12/14 15:54:18 UTC	(20051214_0-21454)
   Log:
   - add show_ip_conf(), decides whether we can show the potentially spoofed ip 
