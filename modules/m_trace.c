@@ -381,27 +381,15 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 		    (MyClient(source_p) || !(dow && IsInvisible(target_p))))
 		   || !dow || IsOper(target_p) || (source_p == target_p))
 		{
+			int tnumeric = RPL_TRACEUSER;
 			if(IsOper(target_p))
-				sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACEOPERATOR,
-						   form_str(RPL_TRACEOPERATOR),
-						   class_name, name,
-#ifndef HIDE_SPOOF_IPS
-						   MyOper(source_p) ? ip :
-#endif
-						   (IsIPSpoof(target_p) ? "255.255.255.255" : ip),
-						   ircd_currenttime - target_p->localClient->lasttime,
-						   ircd_currenttime - target_p->localClient->last);
-
-			else
-				sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACEUSER, 
-						   form_str(RPL_TRACEUSER),
-						   class_name, name,
-#ifndef HIDE_SPOOF_IPS
-						   MyOper(source_p) ? ip :
-#endif
-						   (IsIPSpoof(target_p) ? "255.255.255.255" : ip),
-						   ircd_currenttime - target_p->localClient->lasttime,
-						   ircd_currenttime - target_p->localClient->last);
+				tnumeric = RPL_TRACEOPERATOR;
+			
+			sendto_one_numeric(source_p, tnumeric, form_str(tnumeric),
+					class_name, name,
+					show_ip(source_p, target_p) ? ip : "255.255.255.255",
+					CurrentTime - target_p->localClient->lasttime,
+					CurrentTime - target_p->localClient->last);
 			cnt++;
 		}
 		break;
