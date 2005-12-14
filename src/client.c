@@ -1335,18 +1335,12 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 			     "Client exiting: %s (%s@%s) [%s] [%s]",
 			     source_p->name,
 			     source_p->username, source_p->host, comment,
-#ifdef HIDE_SPOOF_IPS
-			     IsIPSpoof(source_p) ? "255.255.255.255" :
-#endif
-			     source_p->sockhost);
+			     show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255");
 
 	sendto_realops_flags(UMODE_CCONNEXT, L_ALL,
 			"CLIEXIT %s %s %s %s 0 %s",
 			source_p->name, source_p->username, source_p->host,
-#ifdef HIDE_SPOOF_IPS
-			IsIPSpoof(source_p) ? "255.255.255.255" :
-#endif
-			source_p->sockhost, comment);
+			show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255", comment);
 
 	on_for = ircd_currenttime - source_p->localClient->firsttime;
 

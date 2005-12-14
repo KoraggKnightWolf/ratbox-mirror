@@ -484,19 +484,16 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	sendto_realops_flags(UMODE_CCONN, L_ALL,
 			     "Client connecting: %s (%s@%s) [%s] {%s} [%s]",
 			     source_p->name, source_p->username, source_p->host,
-#ifdef HIDE_SPOOF_IPS
-			     IsIPSpoof(source_p) ? "255.255.255.255" :
-#endif
-			     ipaddr, get_client_class(source_p), source_p->info);
+			     show_ip(NULL, source_p) ? ipaddr : "255.255.255.255",
+			     get_client_class(source_p), source_p->info);
 
 	sendto_realops_flags(UMODE_CCONNEXT, L_ALL,
 			"CLICONN %s %s %s %s %s %s 0 %s",
 			source_p->name, source_p->username, source_p->host,
-#ifdef HIDE_SPOOF_IPS
-			IsIPSpoof(source_p) ? "255.255.255.255" :
-#endif
-			ipaddr, get_client_class(source_p),
-			source_p->localClient->fullcaps,
+			show_ip(NULL, source_p) ? ipaddr : "255.255.255.255",
+			get_client_class(source_p),
+			/* mirc sometimes puts IPs in here */
+			show_ip(NULL, source_p) ? source_p->localClient->fullcaps : "<hidden> <hidden>",
 			source_p->info);
 
 	/* If they have died in send_* don't do anything. */
