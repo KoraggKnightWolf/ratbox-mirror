@@ -1,3 +1,14 @@
+androsyn    2005/12/14 17:15:33 UTC	(20051214_11-21480)
+  Log:
+  add CHANTRACE, rebuild help index
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/chantrace (File Added) 
+	ircd-ratbox/trunk/help/opers/index (File Modified) 
+	ircd-ratbox/trunk/help/users/index (File Modified) 
+	ircd-ratbox/trunk/modules/m_etrace.c (File Modified) 
+
+
 androsyn    2005/12/14 17:09:02 UTC	(20051214_10-21478)
   Log:
   remove unused struct ip_value
