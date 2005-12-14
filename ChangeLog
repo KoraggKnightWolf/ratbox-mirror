@@ -1,3 +1,11 @@
+androsyn    2005/12/14 17:18:25 UTC	(20051214_13-21484)
+  Log:
+  make sockhost 255.255.255.255 for spoofed users
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_etrace.c (File Modified) 
+
+
 androsyn    2005/12/14 17:17:20 UTC	(20051214_12-21482)
   Log:
   handle \! correctly in CHANTRACE
