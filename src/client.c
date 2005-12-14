@@ -69,6 +69,7 @@ static EVH check_pings;
 
 static BlockHeap *client_heap = NULL;
 static BlockHeap *lclient_heap = NULL;
+static BlockHeap *user_heap = NULL;
 
 static char current_uid[IDLEN];
 
