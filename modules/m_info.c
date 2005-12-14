@@ -174,12 +174,6 @@ static struct InfoStruct info_table[] = {
 		"Path to resv file"
 	},
 	{
-		"HARD_FDLIMIT_", 
-		OUTPUT_DECIMAL_RAW,
-		{ (void *)HARD_FDLIMIT_ } ,
-		"Maximum Number of File Descriptors Available"
-	},
-	{
 		"HPATH",
 		OUTPUT_STRING_PTR,
 		{ HPATH } ,
@@ -208,10 +202,10 @@ static struct InfoStruct info_table[] = {
 		"IPv6 Support"
 	},
 	{
-		"MAX_CLIENTS",
-		OUTPUT_DECIMAL_RAW,
-		{ (void *)MAX_CLIENTS },
-		"Default maximum Clients"
+		"MAX_CONNECTIONS",
+		OUTPUT_DECIMAL,
+		{ &maxconnections },
+		"Max number connections"
 	},
 	{
 		"JOIN_LEAVE_COUNT_EXPIRE_TIME", 

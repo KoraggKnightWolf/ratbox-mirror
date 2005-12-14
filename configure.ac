@@ -888,24 +888,8 @@ AC_HELP_STRING([--with-topiclen=NUMBER],[Set the max topic length to NUMBER (def
  fi
 ], [TOPICLEN=160])
 
-AC_ARG_WITH(maxclients,
-AC_HELP_STRING([--with-maxclients=NUMBER],[Maximum number of connections the ircd can handle]),
-        MAX_CLIENTS="$withval", MAX_CLIENTS=3000)
-
-
-if test "$MAX_CLIENTS" = yes; then
-	MAX_CLIENTS=3000
-fi
-
-if test $MAX_CLIENTS -gt 65536; then
-	MAX_CLIENTS=65536
-	AC_MSG_WARN([Max connections cannot be larger than 65536!])
-fi
-
 AC_DEFINE_UNQUOTED(TOPICLEN, ${TOPICLEN}, [Maximum topic length (<=390)])
 AC_DEFINE_UNQUOTED(NICKLEN, (${NICKLEN}+1), [Nickname length])
-AC_DEFINE_UNQUOTED(MAX_CLIENTS, ${MAX_CLIENTS}, [Maximum number of network connections])
-
 
 
 #case $PLATFORM in
@@ -992,5 +976,4 @@ echo
 echo "Configured limits:"
 echo "NICKLEN ................. $NICKLEN"
 echo "TOPICLEN ................ $TOPICLEN"
-echo "MAX_CLIENTS ............. $MAX_CLIENTS"
 echo

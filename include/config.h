@@ -116,11 +116,6 @@
  */
 #define MAX_BUFFER      60
 
-/* HARD_FDLIMIT_
- * The maximum amount of FDs to use.  MAX_CLIENTS is set in ./configure.
- */
-#define HARD_FDLIMIT_    MAX_CLIENTS + MAX_BUFFER + 20
-
 #define CONFIG_RATBOX_LEVEL_2
 
 #include "defaults.h"

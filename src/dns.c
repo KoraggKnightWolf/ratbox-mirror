@@ -201,7 +201,6 @@ fork_resolver(void)
 	
 	char fx[6];   
 	char fy[6];
-	char maxfd[6];
 
 #if 0
 	if(fork_count > 10)
@@ -228,7 +227,7 @@ fork_resolver(void)
 		}
 		
 	} 
-
+ 
 	fork_count++;
 	if(dns_ifd > 0)
 		ircd_close(dns_ifd);
@@ -242,7 +241,6 @@ fork_resolver(void)
 
 	ircd_snprintf(fx, sizeof(fx), "%d", ifd[1]); /*dns write*/
 	ircd_snprintf(fy, sizeof(fy), "%d", ofd[0]); /*dns read*/ 
-	ircd_snprintf(maxfd, sizeof(maxfd), "%d", HARD_FDLIMIT);
 	ircd_set_nb(ifd[0]);
 	ircd_set_nb(ifd[1]);
 	ircd_set_nb(ifd[0]);
@@ -250,7 +248,7 @@ fork_resolver(void)
 
 	setenv("IFD", fy, 1);
 	setenv("OFD", fx, 1);
-	setenv("MAXFD", maxfd, 1);
+	setenv("MAXFD", "128", 1);
 	parv[0] = "-ircd dns resolver";
 	parv[1] = NULL;
 	

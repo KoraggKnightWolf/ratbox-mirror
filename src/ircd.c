@@ -182,10 +182,7 @@ init_sys(void)
 	if(!getrlimit(RLIMIT_NOFILE, &limit))
 	{
 		maxconnections = limit.rlim_cur - 10;
-		if(maxconnections > MAXCONNECTIONS)
-		{
-			maxconnections = MAXCONNECTIONS;
-		}
+		return;
 	}
 #endif /* RLIMIT_FD_MAX */
 	maxconnections = MAXCONNECTIONS;
@@ -297,7 +294,7 @@ initialize_global_set_options(void)
 	memset(&GlobalSetOptions, 0, sizeof(GlobalSetOptions));
 	/* memset( &ConfigFileEntry, 0, sizeof(ConfigFileEntry)); */
 
-	GlobalSetOptions.maxclients = MAX_CLIENTS;
+	GlobalSetOptions.maxclients = maxconnections;
 	GlobalSetOptions.autoconn = 1;
 
 	GlobalSetOptions.spam_time = MIN_JOIN_LEAVE_TIME;

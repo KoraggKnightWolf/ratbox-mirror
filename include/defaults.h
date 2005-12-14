@@ -31,15 +31,8 @@
  * values for things which are now configurable at runtime.
  */
 
-/*
- * First, set other fd limits based on values from user
- */
-#ifndef HARD_FDLIMIT_
-error HARD_FDLIMIT_ undefined
-#endif
-#define HARD_FDLIMIT    (HARD_FDLIMIT_ - 10)
-#define MAXCONNECTIONS  HARD_FDLIMIT
-#define MASTER_MAX      (HARD_FDLIMIT - MAX_BUFFER)
+
+#define MAXCONNECTIONS 3000 /* default max connections if getrlimit doesn't work */
 /* class {} default values */
 #define DEFAULT_SENDQ 20000000	/* default max SendQ */
 #define PORTNUM 6667		/* default outgoing portnum */

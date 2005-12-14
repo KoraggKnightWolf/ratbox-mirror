@@ -215,11 +215,11 @@ quote_max(struct Client *source_p, int newval)
 {
 	if(newval > 0)
 	{
-		if(newval > MASTER_MAX)
+		if(newval > maxconnections)
 		{
 			sendto_one(source_p, POP_QUEUE,
-				   ":%s NOTICE %s :You cannot set MAXCLIENTS to > MASTER_MAX (%d)",
-				   me.name, source_p->name, MASTER_MAX);
+				   ":%s NOTICE %s :You cannot set MAXCLIENTS to > %d",
+				   me.name, source_p->name, maxconnections);
 			return;
 		}
 

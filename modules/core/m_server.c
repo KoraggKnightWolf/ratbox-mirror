@@ -800,7 +800,7 @@ fork_server(struct Client *server)
 	ircd_snprintf(fd_str[0], sizeof(fd_str[0]), "%d", ctrl_fds[1]);
 	ircd_snprintf(fd_str[1], sizeof(fd_str[1]), "%d", data_fds[1]);
 	ircd_snprintf(fd_str[2], sizeof(fd_str[2]), "%d", server->localClient->fd);
-	ircd_snprintf(maxfd, sizeof(maxfd), "%d", HARD_FDLIMIT);
+	ircd_snprintf(maxfd, sizeof(maxfd), "%d", maxconnections);
 	ircd_snprintf(servname, sizeof(servname), "(%s)", server->name);
 
 	setenv("MAXFD", maxfd, 1);	  
