@@ -1669,6 +1669,22 @@ show_ip(struct Client *source_p, struct Client *target_p)
 	return 0;
 }
 
+int
+show_ip_conf(struct ConfItem *aconf, struct Client *source_p)
+{
+	if(IsConfDoSpoofIp(aconf))
+	{
+#ifndef HIDE_SPOOF_IPS
+		if(MyOper(source_p))
+			return 1;
+#endif
+
+		return 0;
+	}
+	else
+		return 1;
+}
+
 
 /*
  * make_user

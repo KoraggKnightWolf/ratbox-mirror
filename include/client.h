@@ -355,6 +355,7 @@ extern void del_all_accepts(struct Client *client_p);
 
 extern void dead_link(struct Client *client_p, int);
 extern int show_ip(struct Client *source_p, struct Client *target_p);
+extern int show_ip_conf(struct ConfItem *aconf, struct Client *target_p);
 
 extern void free_user(struct User *, struct Client *);
 extern struct User *make_user(struct Client *);
