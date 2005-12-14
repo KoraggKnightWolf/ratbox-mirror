@@ -205,7 +205,8 @@ do_single_etrace(struct Client *source_p, struct Client *target_p)
 static int
 mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	static const char dummy_sockhost[] = "255.255.255.255";
+	static const char empty_sockhost[] = "255.255.255.255";
+	static const char spoofed_sockhost[] = "0";
 	struct Client *target_p;
 	struct Channel *chptr;
 	struct membership *msptr;
@@ -251,16 +252,18 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 		msptr = ptr->data;
 		target_p = msptr->client_p;
 
-		if(EmptyString(target_p->sockhost) || !show_ip(source_p, target_p))
-			sockhost = dummy_sockhost;
+		if(EmptyString(target_p->sockhost) 
+			sockhost = empty_sockhost;
+		else if(!show_ip(source_p, target_p))
+			sockhost = spoofed_sockhost;
 		else
 			sockhost = target_p->sockhost;
 
 		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_ETRACE),
 				me.name, source_p->name, 
 				IsOper(target_p) ? "Oper" : "User",
-				/* class field -- pretend its channel.. */
-				chptr->chname,
+				/* class field -- pretend its server.. */
+				target_p->servptr->name,,
 				target_p->name, target_p->username, target_p->host,
 				sockhost, target_p->info);
 	}
