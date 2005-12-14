@@ -40,13 +40,6 @@ struct hostent;
 /* used by new parser */
 /* yacc/lex love globals!!! */
 
-struct ip_value
-{
-	struct irc_sockaddr_storage ip;
-	int ip_mask;
-	int type;
-};
-
 extern FILE *conf_fbfile_in;
 extern char conf_line_in[256];
 
