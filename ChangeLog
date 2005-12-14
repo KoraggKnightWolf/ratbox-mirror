@@ -1,3 +1,11 @@
+androsyn    2005/12/14 16:41:12 UTC	(20051214_6-21470)
+  Log:
+  rework TRACEOPERATOR/TRACEUSER and deal with hiding/showing the IP in a sane fashion
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+
+
 androsyn    2005/12/14 16:37:45 UTC	(20051214_5-21468)
   Log:
   replace some HIDE_SPOOF_IPS with show_ip. also put in masking of fullcaps if spoofed
