@@ -1,3 +1,24 @@
+androsyn    2005/12/14 17:59:58 UTC	(20051214_17-21492)
+  Log:
+  - Rename ircd_dump() ircd_dump_fd()
+  - Fix a core in ircd_dump_fd() - deal with find_fd() returning NULL if the fd isn't tracked
+  - Make ircd_dump_fd() just return the fd and description to its callback and not a formatted string
+  - Handle kqueue(),epoll_create(),/dev/poll opening failures slightly more usefully\
+  - Add ircd_fd_hack() calls for pipes
+  - Fix a core dump when using ircd_fd_hack() on incoming connections - ircd_fd_hack() should be called
+    before doing ircd_open()
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/devpoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/epoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/kqueue.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2005/12/14 17:27:42 UTC	(20051214_16-21490)
   Log:
   Lets make m_etrace.c compile now
