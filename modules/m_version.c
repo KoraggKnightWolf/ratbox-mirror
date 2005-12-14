@@ -139,10 +139,6 @@ confopts(void)
 	*p++ = 'M';
 	*p++ = 'p';
 
-#ifdef IGNORE_BOGUS_TS
-	*p++ = 'T';
-#endif
-
 #ifdef HAVE_LIBZ
 	*p++ = 'Z';
 #endif
