@@ -86,7 +86,7 @@ typedef void PF(int fd, void *);
 /* int fd, int status, void * */
 typedef void CNCB(int fd, int, void *);
 /* callback for fd table dumps */
-typedef void DUMPCB(const char *string, void *);
+typedef void DUMPCB(int fd, const char *desc, void *);
 /*
  * priority values used in fdlist code
  */
@@ -192,7 +192,7 @@ void ircd_fdlist_init(int closeall, int maxfds);
 
 extern void ircd_open(int, unsigned int, const char *);
 extern void ircd_close(int);
-extern void ircd_dump(DUMPCB *, void *xdata);
+extern void ircd_dump_fd(DUMPCB *, void *xdata);
 #ifndef __GNUC__
 extern void ircd_note(int fd, const char *format, ...);
 #else

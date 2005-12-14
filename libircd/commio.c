@@ -68,6 +68,7 @@ static int ircd_inet_socketpair(int d, int type, int protocol, int sv[2]);
  * so we got to do this crap below.
  * (BTW Fuck you Sun, I hate your guts and I hope you go bankrupt soon)
  */
+
 #if defined (__SVR4) && defined (__sun)
 static void
 ircd_fd_hack(int *fd)
@@ -477,6 +478,8 @@ ircd_pipe(int *fd, const char *desc)
 	}
 	if(pipe(fd) == -1)
 		return -1;
+	ircd_fd_hack(&fd[0]);
+	ircd_fd_hack(&fd[1]);
 	ircd_open(fd[0], FD_PIPE, desc);
 	ircd_open(fd[1], FD_PIPE, desc);
 	return 0;
@@ -598,8 +601,8 @@ ircd_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 	get_errno();
 	if(unlikely(newfd < 0))
 		return -1;
-	ircd_open(newfd, FD_SOCKET, "Incoming connection");
 	ircd_fd_hack(&newfd);
+	ircd_open(newfd, FD_SOCKET, "Incoming connection");
 	
 	/* Set the socket non-blocking, and other wonderful bits */
 	if(unlikely(!ircd_set_nb(newfd)))
@@ -725,21 +728,19 @@ ircd_close(int fd)
 
 
 /*
- * ircd_dump() - dump the list of active filedescriptors
+ * ircd_dump_fd() - dump the list of active filedescriptors
  */
 void
-ircd_dump(DUMPCB * cb, void *data)
+ircd_dump_fd(DUMPCB * cb, void *data)
 {
 	int i;
-	char buf[128];
 	for (i = 0; i <= ircd_highest_fd; i++)
 	{
 		fde_t *F = find_fd(i);
-		if(!F->flags.open)
+		if(F == NULL || !F->flags.open)
 			continue;
 
-		ircd_snprintf(buf, sizeof(buf), "F :fd %-3d desc '%s'", i, F->desc);
-		cb(buf, data);
+		cb(i, F->desc, data);
 	}
 }
 

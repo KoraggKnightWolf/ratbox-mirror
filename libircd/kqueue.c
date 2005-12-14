@@ -138,8 +138,8 @@ init_netio(void)
 	kq = kqueue();
 	if(kq < 0)
 	{
-		ircd_lib_log("init_netio: Couldn't open kqueue fd!\n");
-		exit(115);	/* Whee! */
+		ircd_lib_log("init_netio: Couldn't open kqueue fd - %d: %s", errno, strerror(errno));
+		abort();
 	}
 	kqmax = getdtablesize();
 	kqlst = ircd_malloc(sizeof(struct kevent) * kqmax);

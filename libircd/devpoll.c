@@ -148,10 +148,8 @@ init_netio(void)
 	dpfd = open("/dev/poll", O_RDWR);
 	if(dpfd < 0)
 	{
-		fprintf(stderr,
-		     "init_netio: Couldn't open /dev/poll - %d: %s\n",
-		     errno, strerror(errno));
-		exit(115);	/* Whee! */
+		ircd_lib_log("init_netio: Couldn't open /dev/poll - %d: %s", errno, strerror(errno));
+		abort();
 	}
 	maxfd = getdtablesize() - 2; /* This makes more sense than HARD_FDLIMIT */
 	fdmask = ircd_malloc(sizeof(fdmask) * maxfd + 1);

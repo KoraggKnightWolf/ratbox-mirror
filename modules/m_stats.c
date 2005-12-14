@@ -1613,16 +1613,17 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 }
 
 static void
-ircd_dump_callback(const char *str, void *data)
+ircd_dump_fd_callback(int fd, const char *desc, void *data)
 {
 	struct Client *source_p = data;
-	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG, str);
+	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG, "F :fd %-3d desc '%s'", fd, desc);
 }
 
 static void
 stats_comm(struct Client *source_p)
 {
-	ircd_dump(ircd_dump_callback, source_p);
+	ircd_dump_fd(ircd_dump_fd_callback, source_p);
+	send_pop_queue(source_p);
 }
 /*
  * stats_spy
