@@ -223,7 +223,7 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 		operspy = 1;
 		if(EmptyString(name))
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, form_str(ERR_NEEDMOREPARAMS), me.name, 
+			sendto_one_numeric(source_p, POP_QUEUE, ERR_NEEDMOREPARAMS, form_str(ERR_NEEDMOREPARAMS), me.name, 
 					   source_p->name, "CHANTRACE");
 			return 0;
 		}
@@ -252,7 +252,7 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 		msptr = ptr->data;
 		target_p = msptr->client_p;
 
-		if(EmptyString(target_p->sockhost) 
+		if(EmptyString(target_p->sockhost))
 			sockhost = empty_sockhost;
 		else if(!show_ip(source_p, target_p))
 			sockhost = spoofed_sockhost;
@@ -263,7 +263,7 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 				me.name, source_p->name, 
 				IsOper(target_p) ? "Oper" : "User",
 				/* class field -- pretend its server.. */
-				target_p->servptr->name,,
+				target_p->servptr->name,
 				target_p->name, target_p->username, target_p->host,
 				sockhost, target_p->info);
 	}
