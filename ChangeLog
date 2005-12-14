@@ -1,3 +1,14 @@
+androsyn    2005/12/14 17:21:33 UTC	(20051214_14-21486)
+  Log:
+  - make CHANTRACE output servername instead of channel
+  - use "0" for spoofs, and "255.255.255.255" for ips we dont have
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_etrace.c (File Modified) 
+
+
 androsyn    2005/12/14 17:18:25 UTC	(20051214_13-21484)
   Log:
   make sockhost 255.255.255.255 for spoofed users
