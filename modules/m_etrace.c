@@ -205,7 +205,7 @@ do_single_etrace(struct Client *source_p, struct Client *target_p)
 static int
 mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	static const char empty_sockhost[] = "0";
+	static const char dummy_sockhost[] = "255.255.255.255";
 	struct Client *target_p;
 	struct Channel *chptr;
 	struct membership *msptr;
@@ -252,7 +252,7 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 		target_p = msptr->client_p;
 
 		if(EmptyString(target_p->sockhost) || !show_ip(source_p, target_p))
-			sockhost = empty_sockhost;
+			sockhost = dummy_sockhost;
 		else
 			sockhost = target_p->sockhost;
 
