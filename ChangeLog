@@ -1,3 +1,18 @@
+androsyn    2005/12/14 16:17:55 UTC	(20051214_3-21464)
+  Log:
+  - hardcode HIDE_SERVERS_IPS
+  - cleanup show_ip()
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_connect.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2005/12/14 15:57:33 UTC	(20051214_2-21458)
   Log:
   remove pointless USE_LOGFILE
