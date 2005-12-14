@@ -43,16 +43,25 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
+#include "channel.h"
+#include "s_newconf.h"
+#include "s_log.h"
 
 static int mo_etrace(struct Client *, struct Client *, int, const char **);
 static int me_etrace(struct Client *, struct Client *, int, const char **);
+static int mo_chantrace(struct Client *, struct Client *, int, const char **);
 
+struct Message chantrace_msgtab = {
+	"CHANTRACE", 0, 0, 0, MFLG_SLOW,
+	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_chantrace, 2}}
+};
+                    
 struct Message etrace_msgtab = {
 	"ETRACE", 0, 0, 0, MFLG_SLOW,
 	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_etrace, 0}, {mo_etrace, 0}}
 };
 
-mapi_clist_av1 etrace_clist[] = { &etrace_msgtab, NULL };
+mapi_clist_av1 etrace_clist[] = { &etrace_msgtab, &chantrace_msgtab, NULL };
 DECLARE_MODULE_AV1(etrace, NULL, NULL, etrace_clist, NULL, NULL, "$Revision: 19256 $");
 
 static void do_etrace(struct Client *source_p, int ipv4, int ipv6);
@@ -191,5 +200,66 @@ do_single_etrace(struct Client *source_p, struct Client *target_p)
 				target_p->name, target_p->username, 
 				target_p->host, target_p->sockhost,
 				target_p->localClient->fullcaps, target_p->info);
+}
+
+static int
+mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+{
+	static const char empty_sockhost[] = "0";
+	struct Client *target_p;
+	struct Channel *chptr;
+	struct membership *msptr;
+	const char *sockhost;
+	const char *name;
+	dlink_node *ptr;
+	int operspy = 0;
+
+	name = parv[1];
+
+	if(IsOperSpy(source_p) && parv[1][0] == '!')
+	{
+		name++;
+		operspy = 1;
+	}
+
+	if((chptr = find_channel(name)) == NULL)
+	{
+		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL, form_str(ERR_NOSUCHCHANNEL),
+				name);
+		return 0;
+	}
+
+	/* dont report operspys for nonexistant channels. */
+	if(operspy)
+		report_operspy(source_p, "CHANTRACE", chptr->chname);
+
+	if(!operspy && !IsMember(client_p, chptr))
+	{
+		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOTONCHANNEL, form_str(ERR_NOTONCHANNEL),
+				chptr->chname);
+		return 0;
+	}
+
+	DLINK_FOREACH(ptr, chptr->members.head)
+	{
+		msptr = ptr->data;
+		target_p = msptr->client_p;
+
+		if(EmptyString(target_p->sockhost) || !show_ip(source_p, target_p))
+			sockhost = empty_sockhost;
+		else
+			sockhost = target_p->sockhost;
+
+		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_ETRACE),
+				me.name, source_p->name, 
+				IsOper(target_p) ? "Oper" : "User",
+				/* class field -- pretend its channel.. */
+				chptr->chname,
+				target_p->name, target_p->username, target_p->host,
+				sockhost, target_p->info);
+	}
+
+	sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), me.name); 
+	return 0;
 }
 
