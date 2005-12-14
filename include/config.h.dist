@@ -80,12 +80,6 @@
  */
 #undef TS6_ONLY
 
-/* CLIENT_FLOOD - client excess flood threshold(in messages)
- * The number of messages that we can receive before we disconnect the
- * remote client...
- */
-#define CLIENT_FLOOD 20
-
 /* NICKNAMEHISTORYLENGTH - size of WHOWAS array
  * this defines the length of the nickname history.  each time a user changes
  * nickname or signs off, their old nickname is added to the top of the list.

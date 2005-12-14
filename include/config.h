@@ -78,12 +78,6 @@
  */
 #undef TS6_ONLY
 
-/* CLIENT_FLOOD - client excess flood threshold(in messages)
- * The number of messages that we can receive before we disconnect the
- * remote client...
- */
-#define CLIENT_FLOOD 20
-
 /* HANGONGOODLINK and HANGONGOODLINK
  * Often net breaks for a short time and it's useful to try to
  * establishing the same connection again faster than CONNECTFREQUENCY
