@@ -342,13 +342,13 @@ verify_access(struct Client *client_p, const char *username)
 		if(IsConfDoSpoofIp(aconf))
 		{
 			char *p;
-			SetSpoofIP(client_p); /*show_ip depends on this */
+			SetIPSpoof(client_p); /*show_ip depends on this */
 			if(IsConfSpoofNotice(aconf))
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 						"%s spoofing: %s as %s",
 						client_p->name,
-						show_ip(NULL, client_p) ? client_p->host : aconf->name,
+						show_ip(NULL, client_p) ? client_p->host : aconf->info.name,
 						aconf->info.name);
 			}
 
@@ -747,6 +747,7 @@ set_default_conf(void)
 	ConfigFileEntry.egdpool_path = NULL;
 	ConfigFileEntry.use_whois_actually = YES;
 	ConfigFileEntry.burst_away = NO;
+	ConfigFileEntry.hide_spoof_ips = YES;
 
 #ifdef HAVE_LIBZ
 	ConfigFileEntry.compression_level = 4;

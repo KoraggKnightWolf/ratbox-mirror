@@ -1846,6 +1846,7 @@ static struct ConfEntry conf_general_table[] =
 	{ "dot_in_ip6_addr",	CF_YESNO, NULL, 0, &ConfigFileEntry.dot_in_ip6_addr	},
 	{ "dots_in_ident",	CF_INT,   NULL, 0, &ConfigFileEntry.dots_in_ident	},
 	{ "failed_oper_notice",	CF_YESNO, NULL, 0, &ConfigFileEntry.failed_oper_notice	},
+	{ "hide_spoof_ips",     CF_YESNO, NULL, 0, &ConfigFileEntry.hide_spoof_ips      },
 	{ "glines",		CF_YESNO, NULL, 0, &ConfigFileEntry.glines		},
 	{ "gline_min_cidr",	CF_INT,   NULL, 0, &ConfigFileEntry.gline_min_cidr	},
 	{ "gline_min_cidr6",	CF_INT,   NULL, 0, &ConfigFileEntry.gline_min_cidr6	},

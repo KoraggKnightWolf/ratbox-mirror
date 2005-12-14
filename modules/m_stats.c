@@ -1,4 +1,4 @@
-[A/*
+/*
  *  ircd-ratbox: an advanced Internet Relay Chat Daemon(ircd).
  *  m_stats.c: Sends the user statistics or config information.
  *

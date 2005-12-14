@@ -341,7 +341,7 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 	class_name = get_client_class(target_p);
 
 	if(IsAnyServer(target_p))
-		name = client_p->name;
+		name = target_p->name;
 	else
 		name = get_client_name(target_p, HIDE_IP);
 
@@ -385,11 +385,11 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 			if(IsOper(target_p))
 				tnumeric = RPL_TRACEOPERATOR;
 			
-			sendto_one_numeric(source_p, tnumeric, form_str(tnumeric),
+			sendto_one_numeric(source_p, POP_QUEUE, tnumeric, form_str(tnumeric),
 					class_name, name,
 					show_ip(source_p, target_p) ? ip : "255.255.255.255",
-					CurrentTime - target_p->localClient->lasttime,
-					CurrentTime - target_p->localClient->last);
+					ircd_currenttime - target_p->localClient->lasttime,
+					ircd_currenttime - target_p->localClient->last);
 			cnt++;
 		}
 		break;

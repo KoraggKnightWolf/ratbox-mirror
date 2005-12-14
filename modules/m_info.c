@@ -515,6 +515,12 @@ static struct InfoStruct info_table[] = {
 		"Hide ERROR messages coming from servers"
 	},
 	{
+		"hide_spoof_ips",
+		OUTPUT_BOOLEAN_YN,
+		{ &ConfigFileEntry.hide_spoof_ips }, 
+		"Hide IPs of spoofed users"
+	},
+	{
 		"hub",
 		OUTPUT_BOOLEAN_YN,
 		{ &ServerInfo.hub }, 

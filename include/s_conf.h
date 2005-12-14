@@ -219,6 +219,7 @@ struct config_file_entry
 	int reject_after_count;
 	int reject_duration;
 	int target_change;
+	int hide_spoof_ips;
 #ifdef IPV6
 	int fallback_to_ip6_int;
 #endif

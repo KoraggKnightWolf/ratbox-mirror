@@ -698,8 +698,8 @@ report_auth(struct Client *client_p)
 			sendto_one_numeric(client_p, HOLD_QUEUE, RPL_STATSILINE, 
 					   form_str(RPL_STATSILINE),
 					   name, show_iline_prefix(client_p, aconf, user),
-					   show_ip_conf(aconf, client_p) ? host : "255.255.255.255"
-					   host, port, classname);
+					   show_ip_conf(aconf, client_p) ? host : "255.255.255.255",
+					   port, classname);
 		}
 	}
 	HOSTHASH_WALK_END
