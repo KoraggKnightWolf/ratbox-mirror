@@ -303,6 +303,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* configure arguments */
+#undef RATBOX_CONFIGURE_OPTS
+
 /* This is the type of IO loop we are using */
 #undef SELECT_TYPE
 

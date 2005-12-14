@@ -30390,6 +30390,10 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+cat >>confdefs.h <<_ACEOF
+#define RATBOX_CONFIGURE_OPTS "$ac_configure_args"
+_ACEOF
+
 
 #case $PLATFORM in
 #	*hpux* )

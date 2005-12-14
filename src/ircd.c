@@ -534,6 +534,8 @@ ratbox_main(int argc, char *argv[])
 	if(printVersion)
 	{
 		printf("ircd: version %s\n", ircd_version);
+		printf("ircd: configure options\n");
+		puts(RATBOX_CONFIGURE_OPTS);
 		exit(EXIT_SUCCESS);
 	}
 
