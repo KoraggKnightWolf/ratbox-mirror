@@ -1,3 +1,20 @@
+androsyn    2005/12/14 16:29:13 UTC	(20051214_4-21466)
+  Log:
+  get rid of get_server_name() and just use client_p->name
+
+  Modified:
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_error.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_svinfo.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2005/12/14 16:17:55 UTC	(20051214_3-21464)
   Log:
   - hardcode HIDE_SERVERS_IPS
