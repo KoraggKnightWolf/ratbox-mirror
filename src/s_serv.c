@@ -533,10 +533,10 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Server %s already present from %s",
-				     server_p->name, get_server_name(client_p, SHOW_IP));
+				     server_p->name, client_p->name);
 		if(by && IsPerson(by) && !MyClient(by))
 			sendto_one_notice(by, POP_QUEUE, ":Server %s already present from %s",
-					  server_p->name, get_server_name(client_p, SHOW_IP));
+					  server_p->name, client_p->name);
 		return 0;
 	}
 
@@ -578,7 +578,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	if(!ircd_set_buffers(client_p->localClient->fd, READBUF_SIZE))
 	{
 		report_error("ircd_set_buffers failed for server %s:%s",
-				get_server_name(client_p, SHOW_IP),
+				client_p->name,
 				log_client_name(client_p, SHOW_IP),
 				errno);
 	}
@@ -704,7 +704,7 @@ serv_connect_callback(int fd, int status, void *data)
 	if((server_p = client_p->localClient->att_sconf) == NULL)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Lost connect{} block for %s",
-				get_server_name(client_p, HIDE_IP));
+				client_p->name);
 		exit_client(client_p, client_p, &me, "Lost connect{} block");
 		return;
 	}

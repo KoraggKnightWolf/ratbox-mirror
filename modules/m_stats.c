@@ -1,4 +1,4 @@
-/*
+[A/*
  *  ircd-ratbox: an advanced Internet Relay Chat Daemon(ircd).
  *  m_stats.c: Sends the user statistics or config information.
  *
@@ -1416,7 +1416,7 @@ stats_servlinks (struct Client *source_p)
 
 		sendto_one(source_p, POP_QUEUE, Sformat,
 			get_id(&me, source_p), RPL_STATSLINKINFO, get_id(source_p, source_p),
-			get_server_name(target_p, SHOW_IP),
+			target_p->name,
 			(int) ircd_linebuf_len (&target_p->localClient->buf_sendq),
 			(int) target_p->localClient->sendM,
 			(int) target_p->localClient->sendK,
@@ -1567,7 +1567,7 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 	if(IsAnyServer(target_p))
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSLINKINFO, Lformat,
-				get_server_name(target_p, SHOW_IP),
+				target_p->name,
 				(int) ircd_linebuf_len(&target_p->localClient->buf_sendq),
 				(int) target_p->localClient->sendM,
 				(int) target_p->localClient->sendK,

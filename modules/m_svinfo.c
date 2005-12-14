@@ -67,7 +67,7 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 		/* TS version is too low on one of the sides, drop the link */
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s dropped, wrong TS protocol version (%s,%s)",
-				     get_server_name(source_p, SHOW_IP), parv[1], parv[2]);
+				     source_p->name, parv[1], parv[2]);
 		exit_client(source_p, source_p, source_p, "Incompatible TS version");
 		return 0;
 	}
@@ -84,7 +84,7 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s dropped, excessive TS delta"
 				     " (my TS=%ld, their TS=%ld, delta=%d)",
-				     get_server_name(source_p, SHOW_IP),
+				     source_p->name,
 				     (long) ircd_currenttime, (long) theirtime, deltat);
 		ilog(L_SERVER,
 		     "Link %s dropped, excessive TS delta"

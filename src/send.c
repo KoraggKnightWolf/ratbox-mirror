@@ -71,7 +71,7 @@ _send_linebuf(struct Client *to, buf_head_t *linebuf, int queue)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Max SendQ limit exceeded for %s: %u > %lu",
-					     get_server_name(to, HIDE_IP),
+					     to->name),
 					     ircd_linebuf_len(&to->localClient->buf_sendq), 
 					     get_sendq(to));
 

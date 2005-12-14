@@ -92,7 +92,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	if(!DoesTS(client_p))
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Link %s dropped, non-TS server",
-				     get_server_name(client_p, HIDE_IP));
+				     client_p->name);
 		exit_client(client_p, client_p, client_p, "Non-TS server");
 		return 0;
 	}
@@ -113,7 +113,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"Unauthorised server connection attempt from %s: "
 					"No entry for servername %s",
-					get_server_name(client_p, HIDE_IP),
+					client_p->name,
 					name);
 
 			ilog(L_SERVER, "Access denied, No N line for server %s",
@@ -129,7 +129,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				"Unauthorised server connection attempt from %s: "
 				"Bad password for server %s", 
-				get_server_name(client_p, HIDE_IP), name);
+				client_p->name, name);
 
 		ilog(L_SERVER, "Access denied, invalid password for server %s",
 		     log_client_name(client_p, SHOW_IP));
@@ -143,7 +143,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Unauthorised server connection attempt from %s: "
 				     "Invalid host for server %s", 
-				     get_server_name(client_p, HIDE_IP), name);
+				     client_p->name, name);
 
 		ilog(L_SERVER, "Access denied, invalid host for server %s",
 		     log_client_name(client_p, SHOW_IP));
@@ -157,7 +157,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	case -4:
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Invalid servername %s from %s",
-				     name, get_server_name(client_p, HIDE_IP));
+				     name, client_p->name);
 		ilog(L_SERVER, "Access denied, invalid servername from %s",
 		     log_client_name(client_p, SHOW_IP));
 
@@ -182,7 +182,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		 */
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Attempt to re-introduce server %s from %s",
-				     name, get_server_name(client_p, HIDE_IP));
+				     name, client_p->name);
 
 		sendto_one(client_p, POP_QUEUE, "ERROR :Server already exists.");
 		exit_client(client_p, client_p, client_p, "Server Exists");
@@ -194,7 +194,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Attempt to re-introduce SID %s from %s%s",
 				     client_p->id, name,
-				     get_server_name(client_p, HIDE_IP));
+				     client_p->name);
 
 		sendto_one(client_p, POP_QUEUE, "ERROR :SID already exists.");
 		exit_client(client_p, client_p, client_p, "SID Exists");
@@ -269,7 +269,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, server %s already exists",
-				     get_server_name(client_p, SHOW_IP), name);
+				     client_p->name, name);
 
 		exit_client(client_p, client_p, &me, "Server Exists");
 		return 0;
@@ -289,7 +289,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_one(client_p, POP_QUEUE, "ERROR :Nickname %s already exists!", name);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled: Server/nick collision on %s",
-				     get_server_name(client_p, HIDE_IP), name);
+				     client_p->name, name);
 		exit_client(client_p, client_p, client_p, "Nick as Server");
 		return 0;
 	}
@@ -353,7 +353,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	{
 		/* OOOPs nope can't HUB */
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Non-Hub link %s introduced %s.",
-				     get_server_name(client_p, HIDE_IP), name);
+				     client_p->name, name);
 
 		exit_client(NULL, client_p, &me, "No matching hub_mask.");
 		return 0;
@@ -365,7 +365,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		/* OOOPs nope can't HUB this leaf */
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s introduced leafed server %s.",
-				     get_server_name(client_p, HIDE_IP), name);
+				     client_p->name, name);
 
 		exit_client(NULL, client_p, &me, "Leafed Server.");
 		return 0;
@@ -377,7 +377,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s introduced server with invalid servername %s",
-				     get_server_name(client_p, HIDE_IP), name);
+				     client_p->name, name);
 
 		exit_client(NULL, client_p, &me, "Invalid servername introduced.");
 		return 0;
@@ -436,7 +436,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_one(client_p, POP_QUEUE, "ERROR :Server %s already exists", parv[1]);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, server %s already exists",
-				     get_server_name(client_p, SHOW_IP), parv[1]);
+				     client_p->name, parv[1]);
 		exit_client(NULL, client_p, &me, "Server Exists");
 		return 0;
 	}
@@ -447,7 +447,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_one(client_p, POP_QUEUE, "ERROR :SID %s already exists", parv[3]);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, SID %s already exists",
-				     get_server_name(client_p, SHOW_IP), parv[3]);
+				     client_p->name, parv[3]);
 		exit_client(NULL, client_p, &me, "Server Exists");
 		return 0;
 	}
@@ -457,7 +457,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_one(client_p, POP_QUEUE, "ERROR :Invalid servername");
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, servername %s invalid",
-				     get_server_name(client_p, SHOW_IP), parv[1]);
+				     client_p->name, parv[1]);
 		exit_client(NULL, client_p, &me, "Bogus server name");
 		return 0;
 	}
@@ -468,7 +468,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_one(client_p, POP_QUEUE, "ERROR :Invalid SID");
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, SID %s invalid",
-				     get_server_name(client_p, SHOW_IP), parv[3]);
+				     client_p->name, parv[3]);
 		exit_client(NULL, client_p, &me, "Bogus SID");
 		return 0;
 	}
@@ -497,7 +497,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_one(client_p, POP_QUEUE, "ERROR :No matching hub_mask");
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Non-Hub link %s introduced %s.",
-				     get_server_name(client_p, SHOW_IP), parv[1]);
+				     client_p->name, parv[1]);
 		exit_client(NULL, client_p, &me, "No matching hub_mask.");
 		return 0;
 	}
@@ -508,7 +508,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_one(client_p, POP_QUEUE, "ERROR :Matching leaf_mask");
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s introduced leafed server %s.",
-				     get_server_name(client_p, SHOW_IP), parv[1]);
+				     client_p->name, parv[1]);
 		exit_client(NULL, client_p, &me, "Leafed Server.");
 		return 0;
 	}
@@ -1380,7 +1380,7 @@ server_estab(struct Client *client_p)
 
 	if(!ircd_set_buffers(client_p->localClient->fd, READBUF_SIZE))
 		report_error("ircd_set_buffers failed for server %s:%s", 
-			     get_server_name(client_p, SHOW_IP), 
+			     client_p->name, 
 			     log_client_name(client_p, SHOW_IP), errno);
 
 	/* Hand the server off to servlink now */
@@ -1392,7 +1392,7 @@ server_estab(struct Client *client_p)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Warning: fork failed for server %s -- check servlink_path (%s)",
-					     get_server_name(client_p, HIDE_IP),
+					     client_p->name,
 					     ConfigFileEntry.servlink_path);
 			return exit_client(client_p, client_p, client_p, "Fork failed");
 		}
@@ -1440,7 +1440,7 @@ server_estab(struct Client *client_p)
 	/* Show the real host/IP to admins */
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			"Link with %s established: (%s) link",
-			get_server_name(client_p, SHOW_IP),
+			client_p->name,
 			show_capabilities(client_p));
 
 	ilog(L_SERVER, "Link with %s established: (%s) link",

@@ -341,7 +341,7 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 	class_name = get_client_class(target_p);
 
 	if(IsAnyServer(target_p))
-		name = get_server_name(target_p, HIDE_IP);
+		name = client_p->name;
 	else
 		name = get_client_name(target_p, HIDE_IP);
 

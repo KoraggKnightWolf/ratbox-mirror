@@ -70,12 +70,12 @@ m_error(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		sendto_realops_flags(UMODE_ALL, L_ADMIN,
 				"ERROR :from %s -- %s",
-				get_server_name(client_p, HIDE_IP), para);
+				client_p->name, para);
 
 		if(!ConfigFileEntry.hide_error_messages)
 			sendto_realops_flags(UMODE_ALL, L_OPER,
 					"ERROR :from %s -- %s",
-					get_server_name(client_p, HIDE_IP), para);
+					client_p->name, para);
 	}
 
 	exit_client(client_p, source_p, source_p, "ERROR");
@@ -99,24 +99,24 @@ ms_error(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if(client_p == source_p)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ADMIN, "ERROR :from %s -- %s",
-				get_server_name(client_p, HIDE_IP), para);
+				client_p->name, para);
 
 		if(!ConfigFileEntry.hide_error_messages)
 			sendto_realops_flags(UMODE_ALL, L_OPER, 
 					"ERROR :from %s -- %s",
-					get_server_name(client_p, HIDE_IP), para);
+					client_p->name, para);
 	}
 	else
 	{
 		sendto_realops_flags(UMODE_ALL, L_ADMIN, "ERROR :from %s via %s -- %s",
 				source_p->name, 
-				get_server_name(client_p, HIDE_IP), para);
+				client_p->name, para);
 
 		if(!ConfigFileEntry.hide_error_messages)
 			sendto_realops_flags(UMODE_ALL, L_OPER,
 					"ERROR :from %s via %s -- %s",
 					source_p->name,
-					get_server_name(client_p, HIDE_IP), para);
+					client_p->name, para);
 	}
 
 	return 0;
