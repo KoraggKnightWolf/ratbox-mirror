@@ -1,3 +1,15 @@
+androsyn    2005/12/14 19:18:18 UTC	(20051214_18-21494)
+  Log:
+  move add_fd/remove_fd into commio.c have fde_t allocations use the blockheap
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+
+
 androsyn    2005/12/14 17:59:58 UTC	(20051214_17-21492)
   Log:
   - Rename ircd_dump() ircd_dump_fd()
