@@ -92,12 +92,6 @@
  */
 #undef TS6_ONLY
 
-/* USE_LOGFILE - log errors and such to LPATH
- * If you wish to have the server send 'vital' messages about server
- * to a logfile, define USE_LOGFILE.
- */
-#define USE_LOGFILE
-
 /* CLIENT_FLOOD - client excess flood threshold(in messages)
  * The number of messages that we can receive before we disconnect the
  * remote client...
