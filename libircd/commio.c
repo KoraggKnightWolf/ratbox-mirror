@@ -39,6 +39,7 @@
 #endif
 
 dlink_list ircd_fd_table[FD_HASH_SIZE];
+static BlockHeap *fd_heap;
 
 static dlink_list timeout_list;
 
@@ -64,6 +65,38 @@ static PF ircd_connect_tryconnect;
 #ifndef HAVE_SOCKETPAIR
 static int ircd_inet_socketpair(int d, int type, int protocol, int sv[2]);
 #endif
+
+
+static inline fde_t *
+add_fd(int fd)
+{
+	int hash = hash_fd(fd);
+	fde_t *F;
+	dlink_list *list;
+	/* look up to see if we have it already */
+	if((F = find_fd(fd)) != NULL)
+		return F; 
+	
+	F = BlockHeapAlloc(fd_heap);
+	F->fd = fd;
+	list = &ircd_fd_table[hash];
+	ircd_dlinkAdd(F, &F->node, list);
+	return(F);
+}
+
+static inline void
+remove_fd(int fd)
+{
+	int hash = hash_fd(fd);
+	fde_t *F;
+	dlink_list *list;
+	list = &ircd_fd_table[hash];
+	F = find_fd(fd);
+	ircd_dlinkDelete(&F->node, list);
+	BlockHeapFree(fd_heap, F);
+}
+
+
 /* 32bit solaris is kinda slow and stdio only supports fds < 256
  * so we got to do this crap below.
  * (BTW Fuck you Sun, I hate your guts and I hope you go bankrupt soon)
@@ -663,6 +696,7 @@ ircd_fdlist_init(int closeall, int maxfds)
 		/* Since we're doing this once .. */
 		initialized = 1;
 	}
+	fd_heap = BlockHeapCreate(sizeof(fde_t), FD_HEAP_SIZE);
 	ircd_event_add("ircd_checktimeouts", ircd_checktimeouts, NULL, 2);
 
 }

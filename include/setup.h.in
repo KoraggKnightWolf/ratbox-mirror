@@ -38,6 +38,9 @@
 /* Size of fd hash. */
 #undef FD_HASH_SIZE
 
+/* Size of fd heap. */
+#undef FD_HEAP_SIZE
+
 /* Define to 1 if you have `alloca', as a function or macro. */
 #undef HAVE_ALLOCA
 

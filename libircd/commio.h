@@ -295,34 +295,5 @@ find_fd(int fd)
 	return NULL;
 }
 
-static inline fde_t *
-add_fd(int fd)
-{
-	int hash = hash_fd(fd);
-	fde_t *F;
-	dlink_list *list;
-	/* look up to see if we have it already */
-	if((F = find_fd(fd)) != NULL)
-		return F; 
-	
-	F = ircd_malloc(sizeof(fde_t));
-	F->fd = fd;
-	list = &ircd_fd_table[hash];
-	ircd_dlinkAdd(F, &F->node, list);
-	return(F);
-}
-
-static inline void
-remove_fd(int fd)
-{
-	int hash = hash_fd(fd);
-	fde_t *F;
-	dlink_list *list;
-	list = &ircd_fd_table[hash];
-	F = find_fd(fd);
-	ircd_dlinkDelete(&F->node, list);
-	ircd_free(F);
-}
-
 
 #endif /* INCLUDED_commio_h */
