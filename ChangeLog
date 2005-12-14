@@ -1,3 +1,13 @@
+androsyn    2005/12/14 16:37:45 UTC	(20051214_5-21468)
+  Log:
+  replace some HIDE_SPOOF_IPS with show_ip. also put in masking of fullcaps if spoofed
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2005/12/14 16:29:13 UTC	(20051214_4-21466)
   Log:
   get rid of get_server_name() and just use client_p->name
