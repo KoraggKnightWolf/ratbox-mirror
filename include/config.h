@@ -70,13 +70,6 @@
 #define OPATH    ETCPATH "/opers.motd"	/* oper MOTD file */
 #define TRANSPATH ETCPATH "/transaction.log" /* transaction log */
 
-/* HIDE_SERVERS_IPS
- *
- * If this is undefined, anyone can see a servers ip.  If it is defined,
- * noone can.
- */
-#define  HIDE_SERVERS_IPS
-
 /* HIDE_SPOOF_IPS
  *
  * If this is undefined, opers will be allowed to see the real IP of spoofed

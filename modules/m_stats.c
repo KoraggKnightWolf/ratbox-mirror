@@ -319,12 +319,7 @@ stats_connect(struct Client *source_p)
 
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSCLINE, 
 				form_str(RPL_STATSCLINE),
-#ifndef HIDE_SERVERS_IPS
-				server_p->host,
-#else
-				"*@127.0.0.1", 
-#endif
-				buf, server_p->name,
+				"*@127.0.0.1", buf, server_p->name,
 				server_p->port, server_p->class_name);
 	}
 }

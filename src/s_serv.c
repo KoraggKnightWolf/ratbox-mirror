@@ -407,15 +407,9 @@ try_connections(void *unused)
 	 * error afterwards if it fails.
 	 *   -- adrian
 	 */
-#ifndef HIDE_SERVERS_IPS
-	sendto_realops_flags(UMODE_ALL, L_ALL,
-			"Connection to %s[%s] activated.",
-			server_p->name, server_p->host);
-#else
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			"Connection to %s activated",
 			server_p->name);
-#endif
 
 	serv_connect(server_p, 0);
 }
@@ -693,21 +687,12 @@ serv_connect_callback(int fd, int status, void *data)
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"Error connecting to %s[%s]: %s",
 					client_p->name, 
-#ifdef HIDE_SERVERS_IPS
 					"255.255.255.255",
-#else
-					client_p->host,
-#endif
 					ircd_errstr(status));
 		else
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"Error connecting to %s[%s]: %s (%s)",
+					"Error connecting to %s: %s (%s)",
 					client_p->name,
-#ifdef HIDE_SERVERS_IPS
-					"255.255.255.255",
-#else
-					client_p->host,
-#endif
 					ircd_errstr(status), strerror(ircd_get_sockerr(fd)));
 
 		exit_client(client_p, client_p, &me, ircd_errstr(status));
