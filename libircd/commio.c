@@ -871,9 +871,6 @@ ircd_write(int fd, const void *buf, int count)
 #endif
 	case FD_SOCKET:
 		{
-#ifndef MSG_NOSIGNAL
-#define MSG_NOSIGNAL 0
-#endif		
 			int ret = send(fd, buf, count, MSG_NOSIGNAL);
 			if(ret < 0) {
 				get_errno();
