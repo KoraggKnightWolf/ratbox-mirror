@@ -1,3 +1,11 @@
+androsyn    2005/12/15 04:41:39 UTC	(20051215_0-21504)
+  Log:
+  remove a redundant MSG_NOSIGNAL define
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2005/12/14 21:59:37 UTC	(20051214_21-21502)
   Log:
   add configure args to -version output
