@@ -1,3 +1,11 @@
+androsyn    2005/12/22 17:59:21 UTC	(20051222_1-21514)
+  Log:
+  update the changelog for a missing details regarding commio.c changes in the last commit
+
+  Modified:
+	ircd-ratbox/trunk/ChangeLog (File Modified) 
+
+
 androsyn    2005/12/22 17:56:23 UTC	(20051222_0-21512)
   Log:
   - fix mr_pong to handle a client that doesn't have a nick yet
