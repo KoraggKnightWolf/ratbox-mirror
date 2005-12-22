@@ -1,6 +1,7 @@
 androsyn    2005/12/22 17:56:23 UTC	(20051222_0-21512)
   Log:
-  fix mr_pong to handle a client that doesn't have a nick yet
+  - fix mr_pong to handle a client that doesn't have a nick yet
+  - add a needed get_errno() in commio.c 
 
   Modified:
 	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
