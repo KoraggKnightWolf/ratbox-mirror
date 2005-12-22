@@ -124,7 +124,7 @@ mr_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	}
 	else
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOORIGIN), me.name, parv[0]);
+		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOORIGIN), me.name, EmptyString(source_p->name) ? "*" : source_p->name);
 
 	source_p->flags &= ~FLAGS_PINGSENT;
 

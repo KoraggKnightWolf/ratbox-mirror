@@ -412,6 +412,7 @@ ircd_connect_tryconnect(int fd, void *notused)
 		 * which is a good thing.
 		 *   -- adrian
 		 */
+		get_errno();
 		if(errno == EISCONN)
 			ircd_connect_callback(F->fd, IRCD_OK);
 		else if(ignoreErrno(errno))
