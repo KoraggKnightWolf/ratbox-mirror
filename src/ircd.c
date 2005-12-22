@@ -106,7 +106,7 @@ int kline_queued = 0;
 int server_state_foreground = 0;
 
 int testing_conf = 0;
-
+int conf_parse_failure = 0;
 time_t startup_time;
 
 /* Set to zero because it should be initialized later using
@@ -592,8 +592,7 @@ ratbox_main(int argc, char *argv[])
 	init_resolver();	/* Needs to be setup before the io loop */
 	init_auth();		/* Initialise the auth code */
 
-	if (testing_conf)
-		fprintf(stderr, "\nBeginning config test\n");
+		
 	read_conf_files(YES);	/* cold start init conf files */
 	rehash_bans(0);
 	translog_parse();
@@ -634,9 +633,7 @@ ratbox_main(int argc, char *argv[])
 
 	if (testing_conf)
 	{
-		fprintf(stderr, "\nConfig testing complete.\n");
-		fflush(stderr);
-		exit(EXIT_SUCCESS);
+		exit(conf_parse_failure ? 1 : 0);
 	}
 
 	me.from = &me;

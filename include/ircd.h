@@ -101,6 +101,7 @@ extern unsigned long get_maxrss(void);
 extern void set_time(void);
 extern int ratbox_main(int argc, char **argv);
 extern int testing_conf;
-
+extern int conf_parse_failure;
 extern int maxconnections;
+
 #endif
