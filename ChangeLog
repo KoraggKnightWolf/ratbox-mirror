@@ -1,3 +1,12 @@
+androsyn    2005/12/22 17:56:23 UTC	(20051222_0-21512)
+  Log:
+  fix mr_pong to handle a client that doesn't have a nick yet
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_pong.c (File Modified) 
+
+
 androsyn    2005/12/15 04:41:39 UTC	(20051215_0-21504)
   Log:
   remove a redundant MSG_NOSIGNAL define
