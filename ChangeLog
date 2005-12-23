@@ -1,3 +1,13 @@
+jilles      2005/12/23 15:26:33 UTC	(20051223_0-21518)
+  Log:
+  Forward port r20834 from RATBOX_2_1:
+  fix monitor UID leak
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+
+
 androsyn    2005/12/22 18:12:29 UTC	(20051222_2-21516)
   Log:
   - make -conftest output on stderr only the errors it finds, or nothing at
