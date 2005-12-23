@@ -1,3 +1,14 @@
+jilles      2005/12/23 18:04:24 UTC	(20051223_3-21524)
+  Log:
+  Only clear invites on exit for local clients, would
+  cause a crash otherwise. This is a part of r21205
+  of RATBOX_2_2.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 jilles      2005/12/23 15:40:35 UTC	(20051223_2-21522)
   Log:
   Set Client.name for remote introduced users.
