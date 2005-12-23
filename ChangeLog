@@ -1,3 +1,12 @@
+jilles      2005/12/23 15:40:35 UTC	(20051223_2-21522)
+  Log:
+  Set Client.name for remote introduced users.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+
+
 androsyn    2005/12/23 15:37:50 UTC	(20051223_1-21520)
   Log:
   remove a redundant strlcpy
