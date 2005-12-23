@@ -132,7 +132,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 		ircd_dlinkAddAlloc(client_p, &monptr->users);
 		ircd_dlinkAddAlloc(monptr, &client_p->localClient->monitor_list);
 
-		if((target_p = find_person(name)) != NULL)
+		if((target_p = find_named_person(name)) != NULL)
 		{
 			if(cur_onlen + strlen(target_p->name) + 
 			   strlen(target_p->username) + strlen(target_p->host) + 3 >= BUFSIZE-3)
@@ -274,7 +274,7 @@ show_monitor_status(struct Client *client_p)
 	{
 		monptr = ptr->data;
 
-		if((target_p = find_person(monptr->name)) != NULL)
+		if((target_p = find_named_person(monptr->name)) != NULL)
 		{
 			if(cur_onlen + strlen(target_p->name) + 
 			   strlen(target_p->username) + strlen(target_p->host) + 3 >= BUFSIZE-3)
