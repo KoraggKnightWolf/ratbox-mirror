@@ -950,6 +950,7 @@ register_client(struct Client *client_p, struct Client *server,
 	source_p->tsinfo = newts;
 
 	strcpy(source_p->user->name, nick);
+	source_p->name = source_p->user->name;
 	strlcpy(source_p->username, parv[5], sizeof(source_p->username));
 	strlcpy(source_p->host, parv[6], sizeof(source_p->host));
 	
