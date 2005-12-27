@@ -1,3 +1,12 @@
+androsyn    2005/12/27 17:25:50 UTC	(20051227_0-21530)
+  Log:
+  eliminate a few inet_ntoa calls
+
+  Modified:
+	ircd-ratbox/trunk/adns/event.c (File Modified) 
+	ircd-ratbox/trunk/adns/general.c (File Modified) 
+
+
 jilles      2005/12/23 18:04:24 UTC	(20051223_3-21524)
   Log:
   Only clear invites on exit for local clients, would
