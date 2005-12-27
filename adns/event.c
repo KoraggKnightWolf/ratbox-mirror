@@ -415,8 +415,9 @@ int adns_processreadable(adns_state ads, int fd, const struct timeval *now) {
 	     ads->servers[serv].addr.s_addr != udpaddr.sin_addr.s_addr;
 	   serv++);
       if (serv >= ads->nservers) {
-	adns__warn(ads,-1,0,"datagram received from unknown nameserver %s",
-		   inet_ntoa(udpaddr.sin_addr));
+        char buf[16];
+        ircd_inet_ntop(AF_INET, &udpaddr.sin_addr, buf, sizeof(buf));
+	adns__warn(ads,-1,0,"datagram received from unknown nameserver %s", buf);
 	continue;
       }
       adns__procdgram(ads,udpbuf,r,serv,0,*now);

@@ -71,7 +71,9 @@ void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
   }
   
   if (serv>=0) {
-    fprintf(ads->diagfile,"%sNS=%s",bef,inet_ntoa(ads->servers[serv].addr));
+    char buf[16];
+    ircd_inet_ntop(AF_INET, &ads->servers[serv].addr, buf, sizeof(buf)
+    fprintf(ads->diagfile,"%sNS=%s",bef,buf);
     bef=", "; aft=")\n";
   }
 
