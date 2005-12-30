@@ -1,3 +1,12 @@
+androsyn    2005/12/30 15:13:42 UTC	(20051230_0-21540)
+  Log:
+  tweak epoll detection a bit when epoll is force enabled
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2005/12/28 15:26:18 UTC	(20051228_0-21538)
   Log:
   fix openssl version detection
