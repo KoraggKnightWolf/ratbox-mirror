@@ -486,6 +486,7 @@ AC_ARG_ENABLE(devpoll,AC_HELP_STRING([--enable-devpoll],[Force usage of /dev/pol
 AC_ARG_ENABLE(epoll, AC_HELP_STRING([--enable-epoll],[Force sys_epoll usage (Linux only).]),
 [ if test $enableval = yes; then 
 	SELECT_TYPE_EXPLICIT="epoll"
+	AC_CHECK_FUNCS(epoll_ctl, [haveepoll=yes], [haveepoll=no])
   else
   	use_epoll=no
   fi
