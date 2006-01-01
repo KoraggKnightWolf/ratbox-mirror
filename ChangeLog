@@ -1,3 +1,11 @@
+androsyn    2006/01/01 17:40:36 UTC	(20060101_0-21542)
+  Log:
+  - remove unused extern cidr_to_bitmask
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+
+
 androsyn    2005/12/30 15:13:42 UTC	(20051230_0-21540)
   Log:
   tweak epoll detection a bit when epoll is force enabled
