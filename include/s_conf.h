@@ -342,8 +342,6 @@ extern char *get_oper_name(struct Client *client_p);
 
 extern int yylex(void);
 
-extern unsigned long cidr_to_bitmask[];
-
 extern char conffilebuf[IRCD_BUFSIZE + 1];
 extern int lineno;
 
