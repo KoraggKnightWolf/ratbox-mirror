@@ -1,3 +1,12 @@
+leeh        2006/01/03 21:34:51 UTC	(20060103_2-21553)
+  Log:
+  - remove rsa_respond, its now its own tree
+  
+
+  Modified:
+	ircd-ratbox/trunk/tools/rsa_respond/ (File Deleted) 
+
+
 leeh        2006/01/03 21:22:34 UTC	(20060103_1-21548)
   Log:
   - make CHALLENGE_LEN more accurate
