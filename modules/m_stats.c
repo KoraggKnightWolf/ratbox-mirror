@@ -371,7 +371,7 @@ stats_exempt(struct Client *source_p)
 static void
 stats_events_cb(char *str, void *ptr)
 {
-	sendto_one_numeric(ptr, HOLD_QUEUE, RPL_STATSDEBUG, "E: %s", str);
+	sendto_one_numeric(ptr, HOLD_QUEUE, RPL_STATSDEBUG, "E :%s", str);
 }
 
 static void
