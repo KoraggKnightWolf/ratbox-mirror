@@ -1,3 +1,14 @@
+jilles      2006/01/03 21:51:39 UTC	(20060103_3-21557)
+  Log:
+  Fix bug where temporary nick resvs had a 60x longer expiration time
+  than they should have.
+  (Same as r21544 on RATBOX_2_2)
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+
+
 leeh        2006/01/03 21:34:51 UTC	(20060103_2-21553)
   Log:
   - remove rsa_respond, its now its own tree
