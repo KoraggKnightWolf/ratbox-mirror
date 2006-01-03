@@ -1,3 +1,13 @@
+androsyn    2006/01/03 18:29:30 UTC	(20060103_0-21546)
+  Log:
+  for some reason using user_modes_from_c_to_bitmask[] directly bothered me.  Wrap those in a macro
+
+  Modified:
+	ircd-ratbox/trunk/include/s_user.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2006/01/01 17:40:36 UTC	(20060101_0-21542)
   Log:
   - remove unused extern cidr_to_bitmask
