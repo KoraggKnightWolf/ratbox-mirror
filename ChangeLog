@@ -1,3 +1,12 @@
+leeh        2006/01/03 21:22:34 UTC	(20060103_1-21548)
+  Log:
+  - make CHALLENGE_LEN more accurate
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+
+
 androsyn    2006/01/03 18:29:30 UTC	(20060103_0-21546)
   Log:
   for some reason using user_modes_from_c_to_bitmask[] directly bothered me.  Wrap those in a macro
