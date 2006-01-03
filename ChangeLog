@@ -1,3 +1,12 @@
+jilles      2006/01/03 21:55:24 UTC	(20060103_4-21559)
+  Log:
+  Fix /stats E formatting (bug is not in 2.x).
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 jilles      2006/01/03 21:51:39 UTC	(20060103_3-21557)
   Log:
   Fix bug where temporary nick resvs had a 60x longer expiration time
