@@ -298,7 +298,7 @@ parse_resv(struct Client *source_p, const char *name,
 		if(temp_time > 0)
 		{
 			aconf->flags |= CONF_FLAGS_TEMPORARY;
-			aconf->hold = ircd_currenttime + (temp_time * 60);
+			aconf->hold = ircd_currenttime + temp_time;
 		}
 		else
 		{
