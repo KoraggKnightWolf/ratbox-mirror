@@ -51,7 +51,7 @@
 #include "cache.h"
 
 
-#define CHALLENGE_WIDTH BUFSIZE - (NICKLEN + HOSTLEN + 6)
+#define CHALLENGE_WIDTH BUFSIZE - (NICKLEN + HOSTLEN + 12)
 #define CHALLENGE_EXPIRES	180	/* 180 seconds should be more than long enough */
 #define CHALLENGE_SECRET_LENGTH	128	/* how long our challenge secret should be */
 
