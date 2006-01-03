@@ -996,7 +996,7 @@ register_client(struct Client *client_p, struct Client *server,
 	m = &parv[4][1];
 	while(*m)
 	{
-		flag = user_modes_from_c_to_bitmask[(unsigned char) *m];
+		flag = UserModeBitmask(*m);
 
 #ifdef ENABLE_SERVICES
 		if(flag & UMODE_SERVICE)

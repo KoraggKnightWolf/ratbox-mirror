@@ -47,4 +47,6 @@ extern int introduce_client(struct Client *client_p, struct Client *source_p,
 extern int user_modes_from_c_to_bitmask[];
 extern void show_isupport(struct Client *);
 
+#define UserModeBitmask(c) user_modes_from_c_to_bitmask[(unsigned char)c]
+
 #endif

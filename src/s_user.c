@@ -915,7 +915,7 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 				break;
 
 			default:
-				if((flag = user_modes_from_c_to_bitmask[(unsigned char) *pm]))
+				if((flag = UserModeBitmask(*pm)))
 				{
 					if(MyConnect(source_p)
 					   && !IsOper(source_p)
