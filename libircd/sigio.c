@@ -30,21 +30,34 @@
 #define _GNU_SOURCE 1		/* Needed for F_SETSIG */
 #endif
 
+#include "ircd_lib.h"
+
 #include <signal.h>
 #include <sys/poll.h>
-#include "tools.h"
-#include "commio.h"
-#include "ircd_memory.h"
 
+/* I hate linux -- adrian */
+#ifndef POLLRDNORM
+#define POLLRDNORM POLLIN
+#endif
+#ifndef POLLWRNORM
+#define POLLWRNORM POLLOUT
+#endif
 
-static struct pollfd *pfds;
-static int used_count = 0;
-static fde_t **index_to_fde;
+struct _pollfd_list
+{
+	struct pollfd *pollfds;
+	int maxindex;		/* highest FD number */
+};
+
+typedef struct _pollfd_list pollfd_list_t;
+
+pollfd_list_t pollfd_list;
+static void poll_update_pollfds(int, short, PF *);
+static void handle_timer(struct siginfo *si);
 
 static int sigio_signal;
 static int sigio_is_screwed = 0;	/* We overflowed our sigio queue */
 static sigset_t our_sigset;
-static void handle_timer(struct siginfo *si);
 static void poll_update_pollfds(int, short, PF *);
 
 /* 
@@ -63,51 +76,104 @@ mask_our_signal(int s)
 	sigprocmask(SIG_BLOCK, &our_sigset, NULL);
 }
 
+/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+/* Private functions */
+
+/*
+ * find a spare slot in the fd list. We can optimise this out later!
+ *   -- adrian
+ */
+static inline int
+poll_findslot(void)
+{
+	int i;
+	for (i = 0; i < MAXCONNECTIONS; i++)
+	{
+		if(pollfd_list.pollfds[i].fd == -1)
+		{
+			/* MATCH!!#$*&$ */
+			return i;
+		}
+	}
+	lircd_assert(1 == 0);
+	/* NOTREACHED */
+	return -1;
+}
+
+/*
+ * set and clear entries in the pollfds[] array.
+ */
 static void
 poll_update_pollfds(int fd, short event, PF * handler)
 {
 	fde_t *F = find_fd(fd);
-	struct pollfd *pf;
 	int ircd_index;
 
+	if(F == NULL)
+		return;
+	
 	if(F->ircd_index < 0)
 	{
-		used_count++;
-		F->ircd_index = used_count - 1;
-		index_to_fde[F->ircd_index] = F;
+		F->ircd_index = poll_findslot();
 	}
 	ircd_index = F->ircd_index;
 
-	pf = &pfds[ircd_index];
-
-
 	/* Update the events */
-	if(handler != NULL)
+	if(handler)
 	{
-		pf->events |= event;
-		pf->fd = fd;
+		pollfd_list.pollfds[ircd_index].events |= event;
+		pollfd_list.pollfds[ircd_index].fd = fd;
+		/* update maxindex here */
+		if(ircd_index > pollfd_list.maxindex)
+			pollfd_list.maxindex = ircd_index;
 	}
 	else
 	{
-		if(ircd_index >= 0 && used_count > 0)
+		if(ircd_index >= 0)
 		{
-			pf->events &= ~event;
-			if(pf->events == 0)
+			pollfd_list.pollfds[ircd_index].events &= ~event;
+			if(pollfd_list.pollfds[ircd_index].events == 0)
 			{
-				pf->fd = -1;
-				pf->revents = 0;
-				lircd_assert(used_count > 0);
-				if(F->ircd_index != used_count - 1)
-				{
-					index_to_fde[used_count - 1]->ircd_index = F->ircd_index;
-					pfds[F->ircd_index] = pfds[used_count - 1];
-				}
-				pfds[used_count - 1].fd = -1;
+				pollfd_list.pollfds[ircd_index].fd = -1;
+				pollfd_list.pollfds[ircd_index].revents = 0;
 				F->ircd_index = -1;
-				used_count--;
+
+				/* update pollfd_list.maxindex here */
+				if(ircd_index == pollfd_list.maxindex)
+					while (pollfd_list.maxindex >= 0 &&
+					       pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
+						pollfd_list.maxindex--;
 			}
 		}
 	}
+}
+
+
+/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+/* Public functions */
+
+
+/*
+ * init_netio
+ *
+ * This is a needed exported function which will be called to initialise
+ * the network loop code.
+ */
+void
+init_netio(void)
+{
+	int fd;
+        pollfd_list.pollfds = ircd_malloc(ircd_maxconnections * (sizeof(struct pollfd)));
+        for (fd = 0; fd < ircd_maxconnections; fd++)
+        {
+        	pollfd_list.pollfds[fd].fd = -1;
+	}
+
+	pollfd_list.maxindex = 0;
+                                                                
+        sigio_signal = SIGRTMIN;
+	sigio_is_screwed = 1; /* Start off with poll first.. */
+	mask_our_signal(sigio_signal);
 }
 
 
@@ -145,24 +211,6 @@ ircd_setup_fd(int fd)
 }
 
 /*
- * void init_netio(void)
- *
- * Input: None
- * Output: None
- * Side Effects: This is a needed exported function which will 
- *		 be called to initialise the network loop code.
- */
-void
-init_netio(void)
-{
-	sigio_signal = SIGRTMIN;
-	pfds = ircd_malloc(ircd_maxconnections * sizeof(struct pollfd));
-	index_to_fde = ircd_malloc(ircd_maxconnections * sizeof(fde_t *));
-	sigio_is_screwed = 1; /* Start off with poll first.. */
-	mask_our_signal(sigio_signal);
-}
-
-/*
  * ircd_setselect
  *
  * This is a needed exported function which will be called to register
@@ -172,22 +220,21 @@ void
 ircd_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data)
 {
-	fde_t *F;
-	lircd_assert(fd >= 0);
-	F = find_fd(fd);
-	lircd_assert(F->flags.open);
+	fde_t *F = find_fd(fd);
+	if(F == NULL)
+		return;
 
 	if(type & IRCD_SELECT_READ)
 	{
 		F->read_handler = handler;
 		F->read_data = client_data;
-		poll_update_pollfds(F->fd, POLLIN, handler);
+		poll_update_pollfds(fd, POLLIN, handler);
 	}
 	if(type & IRCD_SELECT_WRITE)
 	{
 		F->write_handler = handler;
 		F->write_data = client_data;
-		poll_update_pollfds(F->fd, POLLOUT, handler);
+		poll_update_pollfds(fd, POLLOUT, handler);
 	}
 }
 
@@ -212,70 +259,70 @@ ircd_select(unsigned long delay)
 	int sig;
 	int fd;
 	int ci;
-	int rused;
 	PF *hdl;
 	fde_t *F;
+	void *data;
 	struct siginfo si;
+
 #if 0
 	struct timespec timeout;
-
 	timeout.tv_sec = (delay / 1000);
 	timeout.tv_nsec = (delay % 1000) * 1000000;
 #endif
+
 	for (;;)
 	{
 		if(!sigio_is_screwed)
 		{
 #if 0
 			if((sig = sigtimedwait(&our_sigset, &si, &timeout)) > 0)
-#endif
+#else
 			if((sig = sigwaitinfo(&our_sigset, &si)) > 0)
+#endif
 			{
+
 				if(sig == SIGIO)
 				{
 					ircd_lib_log("Kernel RT Signal queue overflowed.  Is /proc/sys/kernel/rtsig-max too small?");
 					sigio_is_screwed = 1;
 					break;
 				}
+
 				if(si.si_code == SI_TIMER)
 				{
 					handle_timer(&si);
 					continue;					
 				}
-				
+
 				fd = si.si_fd;
-				pfds[fd].revents |= si.si_band;
-				revents = pfds[fd].revents;
+				pollfd_list.pollfds[fd].revents |= si.si_band;
+				revents = pollfd_list.pollfds[fd].revents;
 				num++;
 				F = find_fd(fd);
-				if(!F->flags.open || F->fd < 0)
+				if(F == NULL)
 					continue;
 
-				ircd_set_time();
-				if(F->flags.open
-				   && (revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR)))
+				if(revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR))
 				{
 					hdl = F->read_handler;
+					data = F->read_data;
 					F->read_handler = NULL;
+					F->read_data = NULL;
+					poll_update_pollfds(fd, POLLIN, NULL);
 					if(hdl)
-						hdl(F->fd, F->read_data);
+						hdl(F->fd, data);
 				}
 
-				if(F->flags.open
-				   && (revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR)))
+				if(revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR))
 				{
 					hdl = F->write_handler;
+					data = F->write_data;
 					F->write_handler = NULL;
-					if(hdl)
-						hdl(F->fd, F->write_data);
-				}
-
-				if(F->read_handler == NULL)
-					poll_update_pollfds(fd, POLLIN, NULL);
-				if(F->write_handler == NULL)
+					F->write_data = NULL;
 					poll_update_pollfds(fd, POLLOUT, NULL);
-
-				F = NULL;
+					if(hdl)
+						hdl(F->fd, data);
+				}
 			}
 			else
 				break;
@@ -290,15 +337,15 @@ ircd_select(unsigned long delay)
 		ircd_set_time();
 		return 0;
 	}
+
+	signal(sigio_signal, SIG_IGN);
+	signal(sigio_signal, SIG_DFL);
+	sigio_is_screwed = 0;
+
 	for (;;)
 	{
-		if(sigio_is_screwed)
-		{
-			signal(sigio_signal, SIG_IGN);
-			signal(sigio_signal, SIG_DFL);
-			sigio_is_screwed = 0;
-		}
-		num = poll(pfds, used_count, 0);
+		/* XXX kill that +1 later ! -- adrian */
+		num = poll(pollfd_list.pollfds, pollfd_list.maxindex + 1, delay);
 		if(num >= 0)
 			break;
 		if(ignoreErrno(errno))
@@ -314,42 +361,37 @@ ircd_select(unsigned long delay)
 
 	if(num == 0)
 		return 0;
-	rused = used_count;
 	/* XXX we *could* optimise by falling out after doing num fds ... */
-	for (ci = 0; ci < rused; ci++)
+	for (ci = 0; ci < pollfd_list.maxindex + 1; ci++)
 	{
-		if(((revents = pfds[ci].revents) == 0) || (pfds[ci].fd) == -1)
+		fde_t *F;
+		int revents;
+		if(((revents = pollfd_list.pollfds[ci].revents) == 0) ||
+		   (pollfd_list.pollfds[ci].fd) == -1)
 			continue;
-		fd = pfds[ci].fd;
+		fd = pollfd_list.pollfds[ci].fd;
 		F = find_fd(fd);
+		if(F == NULL)
+			continue;
 		if(revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR))
 		{
 			hdl = F->read_handler;
 			F->read_handler = NULL;
+			poll_update_pollfds(fd, POLLIN, NULL);
 			if(hdl)
-				hdl(F->fd, F->read_data);
+				hdl(fd, F->read_data);
 		}
-
-		if(F->flags.open == 0)
-			continue;	/* Read handler closed us..go on */
-		if(F->flags.open && (revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR)))
+		if(revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR))
 		{
 			hdl = F->write_handler;
 			F->write_handler = NULL;
-			if(hdl)
-				hdl(F->fd, F->write_data);
-		}
-
-		if(F->read_handler == NULL)
-			poll_update_pollfds(fd, POLLIN, NULL);
-		if(F->write_handler == NULL)
 			poll_update_pollfds(fd, POLLOUT, NULL);
-
+			if(hdl)
+				hdl(fd, F->write_data);
+		}
 	}
-	mask_our_signal(sigio_signal);
 	return 0;
 }
-
 
 static void 
 handle_timer(struct siginfo *si)
@@ -358,7 +400,7 @@ handle_timer(struct siginfo *si)
 	tdata = si->si_ptr;
 	tdata->td_cb(tdata->td_udata);
 	if (!tdata->td_repeat)
-		free(tdata);
+		ircd_free(tdata);
 }
 
 ircd_event_id
@@ -371,7 +413,7 @@ struct	itimerspec	 ts;
 	
 	memset(&ev, 0, sizeof(ev));
 
-	tdata = malloc(sizeof(struct timer_data));
+	tdata = ircd_malloc(sizeof(struct timer_data));
 	tdata->td_cb = cb;
 	tdata->td_udata = udata;
 
@@ -401,5 +443,5 @@ void
 ircd_unschedule_event(ircd_event_id id)
 {
 	timer_delete(id->td_timer_id);
-	free(id);
+	ircd_free(id);
 }

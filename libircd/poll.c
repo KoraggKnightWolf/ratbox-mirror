@@ -90,6 +90,9 @@ poll_update_pollfds(int fd, short event, PF * handler)
 	fde_t *F = find_fd(fd);
 	int ircd_index;
 
+	if(F == NULL)
+		return;
+
 	if(F->ircd_index < 0)
 	{
 		F->ircd_index = poll_findslot();
