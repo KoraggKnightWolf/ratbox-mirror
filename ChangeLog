@@ -1,3 +1,15 @@
+androsyn    2006/01/04 21:55:17 UTC	(20060104_0-21568)
+  Log:
+  - Various sigio related fixes
+  - Init the event system before the fd system
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+
+
 jilles      2006/01/03 21:55:24 UTC	(20060103_4-21559)
   Log:
   Fix /stats E formatting (bug is not in 2.x).
