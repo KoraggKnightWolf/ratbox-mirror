@@ -1,3 +1,14 @@
+leeh        2006/01/04 22:05:59 UTC	(20060104_1-21570)
+  Log:
+  - remove mkkeypair, needs to be in respond tree
+  - remove mkkeypair and rsa_respond from README
+  
+
+  Modified:
+	ircd-ratbox/trunk/tools/README (File Modified) 
+	ircd-ratbox/trunk/tools/mkkeypair (File Deleted) 
+
+
 androsyn    2006/01/04 21:55:17 UTC	(20060104_0-21568)
   Log:
   - Various sigio related fixes
