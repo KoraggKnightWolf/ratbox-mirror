@@ -76,81 +76,51 @@ mask_our_signal(int s)
 	sigprocmask(SIG_BLOCK, &our_sigset, NULL);
 }
 
-/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
-/* Private functions */
 
 /*
- * find a spare slot in the fd list. We can optimise this out later!
- *   -- adrian
- */
-static inline int
-poll_findslot(void)
-{
-	int i;
-	for (i = 0; i < MAXCONNECTIONS; i++)
-	{
-		if(pollfd_list.pollfds[i].fd == -1)
-		{
-			/* MATCH!!#$*&$ */
-			return i;
-		}
-	}
-	lircd_assert(1 == 0);
-	/* NOTREACHED */
-	return -1;
-}
-
-/*
- * set and clear entries in the pollfds[] array.
+ * set and clear entries in the pollfd_list array
  */
 static void
 poll_update_pollfds(int fd, short event, PF * handler)
 {
-	fde_t *F = find_fd(fd);
-	int ircd_index;
+        fde_t *F;
 
-	if(F == NULL)
-		return;
-	
-	if(F->ircd_index < 0)
-	{
-		F->ircd_index = poll_findslot();
-	}
-	ircd_index = F->ircd_index;
+        if(fd < 0) 
+                return;
 
-	/* Update the events */
-	if(handler)
-	{
-		pollfd_list.pollfds[ircd_index].events |= event;
-		pollfd_list.pollfds[ircd_index].fd = fd;
-		/* update maxindex here */
-		if(ircd_index > pollfd_list.maxindex)
-			pollfd_list.maxindex = ircd_index;
-	}
-	else
-	{
-		if(ircd_index >= 0)
-		{
-			pollfd_list.pollfds[ircd_index].events &= ~event;
-			if(pollfd_list.pollfds[ircd_index].events == 0)
-			{
-				pollfd_list.pollfds[ircd_index].fd = -1;
-				pollfd_list.pollfds[ircd_index].revents = 0;
-				F->ircd_index = -1;
-
-				/* update pollfd_list.maxindex here */
-				if(ircd_index == pollfd_list.maxindex)
-					while (pollfd_list.maxindex >= 0 &&
-					       pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
-						pollfd_list.maxindex--;
-			}
-		}
-	}
+        F = find_fd(fd);
+  
+        if(F == NULL)
+                return;
+  
+        /* Update the events */
+        if(handler)
+        {
+                pollfd_list.pollfds[fd].events |= event;
+                pollfd_list.pollfds[fd].fd = fd;
+                /* update maxindex here */
+                if(fd > pollfd_list.maxindex)
+                        pollfd_list.maxindex = fd;
+        }
+        else
+        {
+                pollfd_list.pollfds[fd].events &= ~event;
+                if(pollfd_list.pollfds[fd].events == 0)
+                {
+                        pollfd_list.pollfds[fd].fd = -1;
+                        pollfd_list.pollfds[fd].revents = 0;
+ 
+                        /* update pollfd_list.maxindex here */
+                        if(fd == pollfd_list.maxindex)
+                        {
+                                while (pollfd_list.maxindex >= 0 && pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
+                                        pollfd_list.maxindex--;
+                        }
+                }
+        }
 }
 
 
-/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
-/* Public functions */
 
 
 /*
@@ -175,10 +145,6 @@ init_netio(void)
 	sigio_is_screwed = 1; /* Start off with poll first.. */
 	mask_our_signal(sigio_signal);
 }
-
-
-/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
-/* Public functions */
 
 
 /*

@@ -148,7 +148,6 @@ struct _fde
 	 */
 	int fd;			/* So we can use the fde_t as a callback ptr */
 	int type;
-	int ircd_index;		/* where in the poll list we live */
 	char desc[FD_DESC_SZ];
 	PF *read_handler;
 	void *read_data;

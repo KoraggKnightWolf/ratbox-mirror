@@ -54,32 +54,6 @@ ircd_setup_fd(int fd)
         return 0;
 }
         
-        
-/*
- * find a spare slot in the fd list. We can optimise this out later!
- *   -- adrian
- */
-static inline int
-poll_findslot(void)
-{
-	int i;
-
-	/* try using the last slot deallocated first, could save a bit of looping here */
-	if(pollfd_list.pollfds[last_index].fd == -1)
-		return last_index;
-	
-	for (i = 0; i < ircd_maxconnections; i++)
-	{
-		if(pollfd_list.pollfds[i].fd == -1)
-		{
-			/* MATCH!!#$*&$ */
-			return i;
-		}
-	}
-	lircd_assert(1 == 0);
-	/* NOTREACHED */
-	return -1;
-}
 
 /*
  * set and clear entries in the pollfds[] array.
@@ -87,44 +61,38 @@ poll_findslot(void)
 static void
 poll_update_pollfds(int fd, short event, PF * handler)
 {
-	fde_t *F = find_fd(fd);
-	int ircd_index;
+	fde_t *F;
+	
+	if(fd < 0)
+		return;
+
+	F = find_fd(fd);
 
 	if(F == NULL)
 		return;
 
-	if(F->ircd_index < 0)
-	{
-		F->ircd_index = poll_findslot();
-	}
-	ircd_index = F->ircd_index;
-
 	/* Update the events */
 	if(handler)
 	{
-		pollfd_list.pollfds[ircd_index].events |= event;
-		pollfd_list.pollfds[ircd_index].fd = fd;
+		pollfd_list.pollfds[fd].events |= event;
+		pollfd_list.pollfds[fd].fd = fd;
 		/* update maxindex here */
-		if(ircd_index > pollfd_list.maxindex)
-			pollfd_list.maxindex = ircd_index;
+		if(fd > pollfd_list.maxindex)
+			pollfd_list.maxindex = fd;
 	}
 	else
 	{
-		if(ircd_index >= 0)
+		pollfd_list.pollfds[fd].events &= ~event;
+		if(pollfd_list.pollfds[fd].events == 0)
 		{
-			pollfd_list.pollfds[ircd_index].events &= ~event;
-			if(pollfd_list.pollfds[ircd_index].events == 0)
-			{
-				pollfd_list.pollfds[ircd_index].fd = -1;
-				pollfd_list.pollfds[ircd_index].revents = 0;
-				last_index = ircd_index; 
-				F->ircd_index = -1;
+			pollfd_list.pollfds[fd].fd = -1;
+			pollfd_list.pollfds[fd].revents = 0;
 
-				/* update pollfd_list.maxindex here */
-				if(ircd_index == pollfd_list.maxindex)
-					while (pollfd_list.maxindex >= 0 &&
-					       pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
-						pollfd_list.maxindex--;
+			/* update pollfd_list.maxindex here */
+			if(fd == pollfd_list.maxindex) 
+			{
+				while (pollfd_list.maxindex >= 0 && pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
+					pollfd_list.maxindex--;
 			}
 		}
 	}

@@ -720,7 +720,6 @@ ircd_open(int fd, unsigned int type, const char *desc)
 	F->flags.open = 1;
 
 	ircd_fdlist_update_biggest(fd, 1);
-	F->ircd_index = -1;
 	if(desc)
 		strlcpy(F->desc, desc, sizeof(F->desc));
 	number_fd++;
