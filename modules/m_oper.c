@@ -314,7 +314,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		b_response = ircd_base64_decode((const unsigned char *)++parv[1], strlen(parv[1]));
 
-		if(memcmp(source_p->localClient->passwd, b_response, SHA256_DIGEST_LENGTH))
+		if(memcmp(source_p->localClient->passwd, b_response, SHA_DIGEST_LENGTH))
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
@@ -439,7 +439,7 @@ get_randomness(unsigned char *buf, int length)
 static int
 generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 {
-	SHA256_CTX ctx;
+	SHA_CTX ctx;
 	unsigned char secret[CHALLENGE_SECRET_LENGTH], *tmp;
 	unsigned long length;
 	unsigned long e = 0;
@@ -450,10 +450,10 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 		return -1;
 	if(get_randomness(secret, CHALLENGE_SECRET_LENGTH))
 	{
-		SHA256_Init(&ctx);
-		SHA256_Update(&ctx, (u_int8_t *)secret, CHALLENGE_SECRET_LENGTH);
-		*r_response = malloc(SHA256_DIGEST_LENGTH);
-		SHA256_Final((u_int8_t *)*r_response, &ctx);
+		SHA1_Init(&ctx);
+		SHA1_Update(&ctx, (u_int8_t *)secret, CHALLENGE_SECRET_LENGTH);
+		*r_response = malloc(SHA_DIGEST_LENGTH);
+		SHA1_Final((u_int8_t *)*r_response, &ctx);
 
 		length = RSA_size(rsa);
 		tmp = ircd_malloc(length);
