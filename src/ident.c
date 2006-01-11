@@ -304,8 +304,18 @@ static void
 check_identd(const char *id, const char *bindaddr, const char *destaddr, const char *srcport, const char *dstport)
 {
 	struct auth_request *auth;
+	int authfd;
+	
+	authfd = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
+	if(authfd < 0)
+	{
+		ircd_linebuf_put(&sendq, "%s 0", id);
+		write_sendq(irc_ofd, NULL);
+		return;	
+	}
+	
 	auth = BlockHeapAlloc(authheap);
-
+	auth->authfd = authfd;
 	ircd_inet_pton_sock(bindaddr, (struct sockaddr *)&auth->bindaddr);
 	ircd_inet_pton_sock(destaddr, (struct sockaddr *)&auth->destaddr);
 
@@ -320,7 +330,6 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	auth->dstport = atoi(dstport);
 	strcpy(auth->reqid, id);
 
-	auth->authfd = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
 	ircd_connect_tcp(auth->authfd, (struct sockaddr *)&auth->destaddr, 
 		(struct sockaddr *)&auth->bindaddr, GET_SS_LEN(auth->destaddr), connect_callback, auth, ident_timeout);
 }
