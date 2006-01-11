@@ -1,3 +1,11 @@
+androsyn    2006/01/11 21:15:30 UTC	(20060111_10-21631)
+  Log:
+  the extra ircd_set_time() calls in the check timeout code seemed a bit excessive after thinking about it
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2006/01/11 20:23:49 UTC	(20060111_9-21628)
   Log:
   add a macro version of ircd_free in case some module or something pulls in the library without using the correct headers
