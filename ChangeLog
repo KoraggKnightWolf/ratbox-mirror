@@ -1,3 +1,15 @@
+androsyn    2006/01/11 16:48:35 UTC	(20060111_5-21620)
+  Log:
+  - initialize auth code after global set options have been done
+  - cleanup timeout code a bit
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2006/01/11 15:34:41 UTC	(20060111_4-21618)
   Log:
   - Tweak the poll and sigio code a bit
