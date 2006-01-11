@@ -109,7 +109,7 @@ transaction_append(const char *data)
 
 	if(transaction_queue.head || (translog = fopen(TRANSPATH, "a")) == NULL)
 	{
-		DupString(store, data);
+		store = ircd_strdup(data);
 		ircd_dlinkAddAlloc(store, &transaction_queue);
 		return;
 	}
@@ -117,7 +117,7 @@ transaction_append(const char *data)
 	if(fputs(data, translog) < 0)
 	{
 		fclose(translog);
-		DupString(store, data);
+		store = ircd_strdup(data);
 		ircd_dlinkAddAlloc(store, &transaction_queue);
 		return;
 	}

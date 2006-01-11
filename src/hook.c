@@ -146,7 +146,7 @@ register_hook(const char *name)
 	if((i = find_hook(name)) < 0)
 	{
 		i = find_freehookslot();
-		DupString(hooks[i].name, name);
+		hooks[i].name = ircd_strdup(name);
 		num_hooks++;
 	}
 

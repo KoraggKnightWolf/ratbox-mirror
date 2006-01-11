@@ -646,14 +646,14 @@ set_local_gline(struct Client *source_p, const char *user,
 		oper_reason++;
 
 		if(!EmptyString(oper_reason))
-			DupString(aconf->spasswd, oper_reason);
+			aconf->spasswd = ircd_strdup(oper_reason);
 	}
 
 	ircd_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
 
-	DupString(aconf->passwd, buffer);
-	DupString(aconf->user, user);
-	DupString(aconf->host, host);
+	aconf->passwd = ircd_strdup(buffer);
+	aconf->user = ircd_strdup(user);
+	aconf->host = ircd_strdup(host);
 	aconf->hold = ircd_currenttime + ConfigFileEntry.gline_time;
 
 	ircd_dlinkAddTailAlloc(aconf, &glines);
@@ -743,7 +743,7 @@ majority_gline(struct Client *source_p, const char *user,
 					sizeof(pending->oper_user2));
 				strlcpy(pending->oper_host2, source_p->host,
 					sizeof(pending->oper_host2));
-				DupString(pending->reason2, reason);
+				pending->reason2 = ircd_strdup(reason);
 				pending->oper_server2 = find_or_add(source_p->servptr->name);
 				pending->last_gline_time = ircd_currenttime;
 				pending->time_request2 = ircd_currenttime;
@@ -767,7 +767,7 @@ majority_gline(struct Client *source_p, const char *user,
 
 	strlcpy(pending->user, user, sizeof(pending->user));
 	strlcpy(pending->host, host, sizeof(pending->host));
-	DupString(pending->reason1, reason);
+	pending->reason1 = ircd_strdup(reason);
 	pending->reason2 = NULL;
 
 	pending->last_gline_time = ircd_currenttime;

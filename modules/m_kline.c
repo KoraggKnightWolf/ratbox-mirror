@@ -168,8 +168,8 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 	current_date = smalldate(ircd_currenttime);
 	aconf = make_conf();
 	aconf->status = CONF_KILL;
-	DupString(aconf->host, host);
-	DupString(aconf->user, user);
+	aconf->host = ircd_strdup(host);
+	aconf->user = ircd_strdup(user);
 	aconf->port = 0;
 
 	/* Look for an oper reason */
@@ -179,7 +179,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 		oper_reason++;
 
 		if(!EmptyString(oper_reason))
-			DupString(aconf->spasswd, oper_reason);
+			aconf->spasswd = ircd_strdup(oper_reason);
 	}
 
 	if(tkline_time > 0)
@@ -187,13 +187,13 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 		ircd_snprintf(buffer, sizeof(buffer),
 			   "Temporary K-line %d min. - %s (%s)",
 			   (int) (tkline_time / 60), reason, current_date);
-		DupString(aconf->passwd, buffer);
+		aconf->passwd = ircd_strdup(buffer);
 		apply_tkline(source_p, aconf, reason, oper_reason, current_date, tkline_time);
 	}
 	else
 	{
 		ircd_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
-		DupString(aconf->passwd, buffer);
+		aconf->passwd = ircd_strdup(buffer);
 		apply_kline(source_p, aconf, reason, oper_reason, current_date);
 	}
 
@@ -248,8 +248,8 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	aconf = make_conf();
 
 	aconf->status = CONF_KILL;
-	DupString(aconf->user, user);
-	DupString(aconf->host, host);
+	aconf->user = ircd_strdup(user);
+	aconf->host = ircd_strdup(host);
 
 	/* Look for an oper reason */
 	if((oper_reason = strchr(reason, '|')) != NULL)
@@ -258,7 +258,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		oper_reason++;
 
 		if(!EmptyString(oper_reason))
-			DupString(aconf->spasswd, oper_reason);
+			aconf->spasswd = ircd_strdup(oper_reason);
 	}
 
 	current_date = smalldate(ircd_currenttime);
@@ -268,14 +268,14 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		ircd_snprintf(buffer, sizeof(buffer),
 				"Temporary K-line %d min. - %s (%s)",
 				(int) (tkline_time / 60), reason, current_date);
-		DupString(aconf->passwd, buffer);
+		aconf->passwd = ircd_strdup(buffer);
 		apply_tkline(source_p, aconf, reason, oper_reason,
 				current_date, tkline_time);
 	}
 	else
 	{
 		ircd_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
-		DupString(aconf->passwd, buffer);
+		aconf->passwd = ircd_strdup(buffer);
 		apply_kline(source_p, aconf, reason, oper_reason, current_date);
 	}
 

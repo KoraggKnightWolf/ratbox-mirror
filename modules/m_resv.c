@@ -233,8 +233,8 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf = make_conf();
 		aconf->status = CONF_RESV_CHANNEL;
 		aconf->port = 0;
-		DupString(aconf->host, name);
-		DupString(aconf->passwd, reason);
+		aconf->host = ircd_strdup(name);
+		aconf->passwd = ircd_strdup(reason);
 		aconf->info.oper = operhash_add(oper);
 		add_to_hash(HASH_RESV, aconf->host, aconf);
 
@@ -288,8 +288,8 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf = make_conf();
 		aconf->status = CONF_RESV_NICK;
 		aconf->port = 0;
-		DupString(aconf->host, name);
-		DupString(aconf->passwd, reason);
+		aconf->host = ircd_strdup(name);
+		aconf->passwd = ircd_strdup(reason);
 		aconf->info.oper = operhash_add(oper);
 		ircd_dlinkAddAlloc(aconf, &resv_conf_list);
 

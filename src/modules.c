@@ -804,7 +804,7 @@ load_a_module(const char *path, int warn, int core)
 	modlist[num_mods]->address = tmpptr;
 	modlist[num_mods]->version = ver;
 	modlist[num_mods]->core = core;
-	DupString(modlist[num_mods]->name, mod_basename);
+	modlist[num_mods]->name = ircd_strdup(mod_basename);
 	modlist[num_mods]->mapi_header = mapi_version;
 	modlist[num_mods]->mapi_version = MAPI_VERSION(*mapi_version);
 	num_mods++;

@@ -447,7 +447,7 @@ add_server_conf(struct server_conf *server_p)
 {
 	if(EmptyString(server_p->class_name))
 	{
-		DupString(server_p->class_name, "default");
+		server_p->class_name = ircd_strdup("default");
 		server_p->class = default_class;
 		return;
 	}
@@ -460,7 +460,7 @@ add_server_conf(struct server_conf *server_p)
 				server_p->name);
 
 		ircd_free(server_p->class_name);
-		DupString(server_p->class_name, "default");
+		server_p->class_name = ircd_strdup("default");
 	}
 
 	if(strpbrk(server_p->host, "?*") != NULL)
@@ -815,7 +815,7 @@ add_tgchange(const char *host)
 	pnode->data = target;
 	target->pnode = pnode;
 
-	DupString(target->ip, host);
+	target->ip = ircd_strdup(host);
 	target->expiry = ircd_currenttime + (60*60*12);
 
 	ircd_dlinkAdd(target, &target->node, &tgchange_list);

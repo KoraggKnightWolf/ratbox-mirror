@@ -330,12 +330,12 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 		}
 
 		*new = '\0';
-		DupString(aconf->host, tmp);
+		aconf->host = ircd_strdup(tmp);
 	}
 	else
-		DupString(aconf->host, name);
+		aconf->host = ircd_strdup(name);
 
-	DupString(aconf->passwd, reason);
+	aconf->passwd = ircd_strdup(reason);
 	collapse(aconf->host);
 
 	aconf->info.oper = operhash_add(oper);

@@ -149,7 +149,7 @@ banconf_parse_line(char *line, char ***params, int *quoted, int parcount)
 		else if(*tmp == '\0')
 			*params[i] = NULL;
 		else
-			DupString(*params[i], tmp);
+			*params[i] = ircd_strdup(tmp);
 	}
 
 	return 1;

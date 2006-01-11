@@ -83,7 +83,7 @@ allocate_channel(const char *chname)
 {
 	struct Channel *chptr;
 	chptr = BlockHeapAlloc(channel_heap);
-	DupNString(chptr->chname, chname, CHANNELLEN);
+	chptr->chname = ircd_strndup(chname, CHANNELLEN);
 	return(chptr);
 }
 
@@ -99,8 +99,8 @@ allocate_ban(const char *banstr, const char *who)
 {
 	struct Ban *bptr;
 	bptr = BlockHeapAlloc(ban_heap);
-	DupNString(bptr->banstr, banstr, BANLEN);
-	DupNString(bptr->who, who, BANLEN);
+	bptr->banstr = ircd_strndup(banstr, BANLEN);
+	bptr->who = ircd_strndup(who, BANLEN);
 	
 	return(bptr);
 }

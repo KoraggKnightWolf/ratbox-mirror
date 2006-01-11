@@ -220,7 +220,7 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 	SetExemptKline(source_p);
 
 	source_p->operflags |= oper_p->flags;
-	DupString(source_p->localClient->opername, oper_p->name);
+	source_p->localClient->opername = ircd_strdup(oper_p->name);
 
 	ircd_dlinkAddAlloc(source_p, &oper_list);
 
@@ -408,7 +408,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 			   me.name, source_p->name);
 	}
 
-	DupString(source_p->localClient->opername, oper_p->name);
+	source_p->localClient->opername = ircd_strdup(oper_p->name);
 	ircd_free(challenge);
 	return 0;
 }

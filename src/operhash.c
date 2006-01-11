@@ -69,7 +69,7 @@ operhash_add(const char *name)
 
 	ohash = ircd_malloc(sizeof(struct operhash_entry));
 	ohash->refcount = 1;
-	DupString(ohash->name, name);
+	ohash->name = ircd_strdup(name);
 
 	ircd_dlinkAddAlloc(ohash, &operhash_table[hashv]);
 

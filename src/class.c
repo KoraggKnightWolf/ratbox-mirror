@@ -271,7 +271,7 @@ void
 initclass()
 {
 	default_class = make_class();
-	DupString(ClassName(default_class), "default");
+	ClassName(default_class) = ircd_strdup("default");
 }
 
 /*

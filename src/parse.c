@@ -437,7 +437,7 @@ mod_add_cmd(struct Message *msg)
 	new_ptr = ircd_malloc(sizeof(struct MessageHash));
 
 	new_ptr->next = NULL;
-	DupString(new_ptr->cmd, msg->cmd);
+	new_ptr->cmd = ircd_strdup(msg->cmd);
 	new_ptr->msg = msg;
 
 	msg->count = 0;

@@ -70,20 +70,6 @@ extern int ircncmp(const char *s1, const char *s2, int n);
 extern char *canonize(char *);
 #endif
 
-
-#ifdef HAVE_STRDUP
-#define DupString(x,y) do { x = strdup(y); if(x == NULL) ircd_outofmemory(); } while(0)
-#else
-#define DupString(x,y) do { x = malloc(strlen(y) + 1); if(x == NULL) ircd_outofmemory(); strcpy(x, y); } while(0)
-#endif
-
-#ifdef HAVE_STRNDUP
-#define DupNString(x, y, len) do { x = strndup(y, len); if(x == NULL) ircd_outofmemory(); } while (0)
-#else
-#define DupNString(x, y, len) do { x = malloc(len+1); if(x == NULL) ircd_outofmemory(); strlcpy(x, y, len+1); } while(0)
-#endif
-
-
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
 

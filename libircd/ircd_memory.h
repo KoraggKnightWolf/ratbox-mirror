@@ -37,6 +37,7 @@ extern void ircd_outofmemory(void);
 extern void *ircd_malloc(size_t size);
 extern void *ircd_realloc(void *x, size_t y);
 
+
 /* forte (and maybe others) dont like double declarations, 
  * so we dont declare the inlines unless GNUC
  */
@@ -67,5 +68,7 @@ ircd_realloc(void *x, size_t y)
 #endif /* __APPLE__ */
 
 #define ircd_free(x) do { if(likely(x != NULL)) free(x); } while (0)
+#define ircd_strdup(x) strcpy(ircd_malloc(strlen(x) + 1) , x)
+#define ircd_strndup(x, len) strlcpy(ircd_malloc(strlen(x) + 1), x, len + 1)
 
 #endif /* _I_MEMORY_H */

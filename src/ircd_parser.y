@@ -146,7 +146,7 @@ static void	add_cur_list(int type, char *str, int number)
 		break;
 	case CF_STRING:
 	case CF_QSTRING:
-		DupString(new->v.string, str);
+		new->v.string = ircd_strdup(str);
 		break;
 	}
 
@@ -249,7 +249,7 @@ oneitem: qstring
             {
 		$$ = ircd_malloc(sizeof(conf_parm_t));
 		$$->type = CF_QSTRING;
-		DupString($$->v.string, $1);
+		$$->v.string = ircd_strdup($1);
 	    }
           | timespec
             {
@@ -279,7 +279,7 @@ oneitem: qstring
 		else
 		{
 			$$->type = CF_STRING;
-			DupString($$->v.string, $1);
+			$$->v.string = ircd_strdup($1);
 		}
             }
           ;

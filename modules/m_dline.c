@@ -185,7 +185,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 
 	aconf = make_conf();
 	aconf->status = CONF_DLINE;
-	DupString(aconf->host, dlhost);
+	aconf->host = ircd_strdup(dlhost);
 
 	oper = get_oper_name(source_p);
 	aconf->info.oper = operhash_add(oper);
@@ -197,7 +197,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		oper_reason++;
 
 		if(!EmptyString(oper_reason))
-			DupString(aconf->spasswd, oper_reason);
+			aconf->spasswd = ircd_strdup(oper_reason);
 	}
 
 	if(tdline_time > 0)
@@ -205,7 +205,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		ircd_snprintf(dlbuffer, sizeof(dlbuffer), 
 			 "Temporary D-line %d min. - %s (%s)",
 			 (int) (tdline_time / 60), reason, current_date);
-		DupString(aconf->passwd, dlbuffer);
+		aconf->passwd = ircd_strdup(dlbuffer);
 		aconf->hold = ircd_currenttime + tdline_time;
 		add_temp_dline(aconf);
 
@@ -236,7 +236,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	else
 	{
 		ircd_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
-		DupString(aconf->passwd, dlbuffer);
+		aconf->passwd = ircd_strdup(dlbuffer);
 		aconf->hold = ircd_currenttime;
 		add_dline(aconf);
 

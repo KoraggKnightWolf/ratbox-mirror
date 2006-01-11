@@ -1427,7 +1427,7 @@ server_estab(struct Client *client_p)
 
 	if(client_p->localClient->fullcaps)
 	{
-		DupString(client_p->serv->fullcaps, client_p->localClient->fullcaps);
+		client_p->serv->fullcaps = ircd_strdup(client_p->localClient->fullcaps);
 		ircd_free(client_p->localClient->fullcaps);
 		client_p->localClient->fullcaps = NULL;
 	}
