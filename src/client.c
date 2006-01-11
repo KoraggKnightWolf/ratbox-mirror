@@ -726,45 +726,51 @@ find_chasing(struct Client *source_p, const char *user, int *chasing)
 const char *
 get_client_name(struct Client *client, int showip)
 {
-	static char nbuf[HOSTLEN * 2 + USERLEN + 5];
+        static char empty_name[] = "";
+        static char nbuf[HOSTLEN * 2 + USERLEN + 5];
+        const char *name;
 
-	s_assert(NULL != client);
-	if(client == NULL)
-		return NULL;
+        s_assert(NULL != client);
+        if(client == NULL)
+                return NULL;
 
-	if(MyConnect(client))
-	{
-		if(!irccmp(client->name, client->host))
-			return client->name;
+        if(MyConnect(client))
+        {
+                if(EmptyString(client->name))
+                        name = empty_name;   
+                else
+                        name = client->name;
 
-#ifdef HIDE_SPOOF_IPS
-		if(showip == SHOW_IP && IsIPSpoof(client))
-			showip = MASK_IP;
-#endif
+                if(!irccmp(name, client->host))
+                        return name;
 
-		/* And finally, let's get the host information, ip or name */
-		switch (showip)
-		{
-		case SHOW_IP:
-			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", 
-				   client->name, client->username, 
-				   client->sockhost);
-			break;
-		case MASK_IP:
-			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
-				   client->name, client->username);
-			break;
-		default:
-			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
-				   client->name, client->username, client->host);
-		}
-		return nbuf;
-	}
+                if(ConfigFileEntry.hide_spoof_ips &&
+                   showip == SHOW_IP && IsIPSpoof(client))
+                        showip = MASK_IP;
 
-	/* As pointed out by Adel Mezibra 
-	 * Neph|l|m@EFnet. Was missing a return here.
-	 */
-	return client->name;
+                /* And finally, let's get the host information, ip or name */
+                switch (showip)
+                {
+                case SHOW_IP:
+                        ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
+                                   name, client->username, 
+                                   client->sockhost);
+                        break;
+                case MASK_IP: 
+                        ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
+                                   name, client->username);
+                        break;
+                default:
+                        ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
+                                   name, client->username, client->host);
+                }
+                return nbuf;
+        }
+
+        /* As pointed out by Adel Mezibra 
+         * Neph|l|m@EFnet. Was missing a return here.
+         */
+        return client->name;
 }
 
 /* log_client_name()
@@ -1544,17 +1550,16 @@ show_ip(struct Client *source_p, struct Client *target_p)
 int
 show_ip_conf(struct ConfItem *aconf, struct Client *source_p)
 {
-	if(IsConfDoSpoofIp(aconf))
-	{
-#ifndef HIDE_SPOOF_IPS
-		if(MyOper(source_p))
-			return 1;
-#endif
+        if(IsConfDoSpoofIp(aconf))
+        {
+                if(!ConfigFileEntry.hide_spoof_ips && MyOper(source_p))
+                        return 1;
 
-		return 0;
-	}
-	else
-		return 1;
+                return 0;
+        }
+        else
+                return 1;
+
 }
 
 
