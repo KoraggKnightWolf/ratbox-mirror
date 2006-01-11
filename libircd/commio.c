@@ -70,7 +70,6 @@ static int ircd_inet_socketpair(int d, int type, int protocol, int sv[2]);
 static inline fde_t *
 add_fd(int fd)
 {
-	int hash = hash_fd(fd);
 	fde_t *F;
 	dlink_list *list;
 	/* look up to see if we have it already */
@@ -79,7 +78,7 @@ add_fd(int fd)
 	
 	F = BlockHeapAlloc(fd_heap);
 	F->fd = fd;
-	list = &ircd_fd_table[hash];
+	list = &ircd_fd_table[hash_fd(fd)];
 	ircd_dlinkAdd(F, &F->node, list);
 	return(F);
 }
@@ -92,6 +91,9 @@ remove_fd(int fd)
 	dlink_list *list;
 	list = &ircd_fd_table[hash];
 	F = find_fd(fd);
+	if(F == NULL)
+		return;
+
 	ircd_dlinkDelete(&F->node, list);
 	BlockHeapFree(fd_heap, F);
 }
@@ -210,6 +212,9 @@ ircd_set_nb(int fd)
 	int res;
 	fde_t *F = find_fd(fd);
 
+	if(F == NULL)
+		return 0;
+
 	if((res = ircd_setup_fd(fd)))
 		return res;
 #ifdef O_NONBLOCK
@@ -240,6 +245,8 @@ ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 	struct timeout_data *td;
 	lircd_assert(fd >= 0);
 	F = find_fd(fd);
+	if(F == NULL)
+		return;
 	lircd_assert(F->flags.open);
 	td = F->timeout;
 	if(callback == NULL) /* user wants to remove */
@@ -319,6 +326,9 @@ ircd_connect_tcp(int fd, struct sockaddr *dest,
 	fde_t *F;
 	lircd_assert(fd >= 0);
 	F = find_fd(fd);
+	if(F == NULL)
+		return;
+		
 	F->flags.called_connect = 1;
 	lircd_assert(callback);
 	F->connect.callback = callback;
@@ -357,7 +367,7 @@ ircd_connect_callback(int fd, int status)
 	CNCB *hdl;
 	fde_t *F = find_fd(fd);
 	/* This check is gross..but probably necessary */
-	if(F->connect.callback == NULL)
+	if(F == NULL || F->connect.callback == NULL)
 		return;
 	/* Clear the connect flag + handler */
 	hdl = F->connect.callback;
@@ -398,7 +408,7 @@ ircd_connect_tryconnect(int fd, void *notused)
 	int retval;
 	fde_t *F = find_fd(fd);
 
-	if(F->connect.callback == NULL)
+	if(F == NULL || F->connect.callback == NULL)
 		return;
 	/* Try the connect() */
 	retval = connect(fd,
@@ -732,6 +742,9 @@ ircd_close(int fd)
 	int type;
 	fde_t *F = find_fd(fd);
 
+	if(F == NULL)
+		return;
+		
 	lircd_assert(F->flags.open);
 	/* All disk fd's MUST go through file_close() ! */
 	lircd_assert(F->type != FD_FILE);
@@ -788,6 +801,9 @@ ircd_note(int fd, const char *format, ...)
 {
 	va_list args;
 	fde_t *F = find_fd(fd);
+	if(F == NULL)
+		return;
+		
 	if(format)
 	{
 		va_start(args, format);
@@ -804,7 +820,7 @@ ircd_read(int fd, void *buf, int count)
 	fde_t *F = find_fd(fd);
 	if(F == NULL)
 		return 0;
-
+		
 	switch (F->type)
 	{
 #ifdef __MINGW32__ /* pipes are sockets for us..deal */
@@ -914,7 +930,8 @@ ssize_t
 ircd_writev(int xfd, const struct iovec *vector, int count)
 {
 	fde_t *F = find_fd(xfd);
-
+	if(F == NULL)
+		return;
 	switch (F->type)
 	{
 	case FD_SOCKET:
