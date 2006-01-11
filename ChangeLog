@@ -1,3 +1,11 @@
+androsyn    2006/01/11 21:31:24 UTC	(20060111_11-21633)
+  Log:
+  add some checks on the return value from find_fd
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2006/01/11 21:15:30 UTC	(20060111_10-21631)
   Log:
   the extra ircd_set_time() calls in the check timeout code seemed a bit excessive after thinking about it
