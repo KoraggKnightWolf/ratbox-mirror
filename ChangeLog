@@ -1,3 +1,11 @@
+androsyn    2006/01/11 20:23:49 UTC	(20060111_9-21628)
+  Log:
+  add a macro version of ircd_free in case some module or something pulls in the library without using the correct headers
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_memory.c (File Modified) 
+
+
 androsyn    2006/01/11 17:10:22 UTC	(20060111_8-21626)
   Log:
   - i swear i'll get this right
