@@ -307,8 +307,6 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 
 	auth = BlockHeapAlloc(authheap);
 	
-	auth->authfd = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
-	
 	ircd_inet_pton_sock(bindaddr, (struct sockaddr *)&auth->bindaddr);
 	ircd_inet_pton_sock(destaddr, (struct sockaddr *)&auth->destaddr);
 
@@ -318,6 +316,8 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	else
 #endif
 		((struct sockaddr_in *)&auth->destaddr)->sin_port = htons(113);
+
+	auth->authfd = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
 
 	if(auth->authfd < 0)
 	{
