@@ -93,3 +93,15 @@ ircd_strdup(const char *x)
         strcpy(ret, x);    
         return(ret);
 }       
+
+#ifdef ircd_free
+#undef ircd_free
+#endif
+
+void
+ircd_free(void *ptr)
+{
+	if(likely(ptr != NULL))
+		free(ptr);	
+}
+
