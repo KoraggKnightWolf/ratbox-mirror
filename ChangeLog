@@ -1,3 +1,16 @@
+androsyn    2006/01/11 15:34:41 UTC	(20060111_4-21618)
+  Log:
+  - Tweak the poll and sigio code a bit
+  - when calling ircd_setselect() from ircd_close we must pass IRCD_SELECT_READ | IRCD_SELECT_WRITE
+    otherwise it won't actually clear out anything.
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+
+
 androsyn    2006/01/11 15:02:54 UTC	(20060111_3-21614)
   Log:
   - make ircd_strdup/ircd_strndup inline functions instead of macros.
