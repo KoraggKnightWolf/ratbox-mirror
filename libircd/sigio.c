@@ -52,7 +52,6 @@ struct _pollfd_list
 typedef struct _pollfd_list pollfd_list_t;
 
 pollfd_list_t pollfd_list;
-static void poll_update_pollfds(int, short, PF *);
 static void handle_timer(struct siginfo *si);
 
 static int sigio_signal;
@@ -255,7 +254,6 @@ ircd_select(unsigned long delay)
 					data = F->read_data;
 					F->read_handler = NULL;
 					F->read_data = NULL;
-					poll_update_pollfds(fd, POLLIN, NULL);
 					if(hdl)
 						hdl(F->fd, data);
 				}
@@ -266,7 +264,6 @@ ircd_select(unsigned long delay)
 					data = F->write_data;
 					F->write_handler = NULL;
 					F->write_data = NULL;
-					poll_update_pollfds(fd, POLLOUT, NULL);
 					if(hdl)
 						hdl(F->fd, data);
 				}

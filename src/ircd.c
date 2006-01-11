@@ -590,7 +590,6 @@ ratbox_main(int argc, char *argv[])
 	load_all_modules(1);
 	load_core_modules(1);
 	init_resolver();	/* Needs to be setup before the io loop */
-	init_auth();		/* Initialise the auth code */
 
 		
 	read_conf_files(YES);	/* cold start init conf files */
@@ -604,6 +603,8 @@ ratbox_main(int argc, char *argv[])
 
 	initialize_server_capabs();	/* Set up default_server_capabs */
 	initialize_global_set_options();
+
+	init_auth();		/* Initialise the auth code - depends on global set options */
 
 	if(ServerInfo.name == NULL)
 	{

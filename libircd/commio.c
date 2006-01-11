@@ -242,7 +242,7 @@ ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 	F = find_fd(fd);
 	lircd_assert(F->flags.open);
 	td = F->timeout;
-
+	ircd_set_time();	
 	if(callback == NULL) /* user wants to remove */
 	{
 		if(td == NULL)
@@ -257,7 +257,7 @@ ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 		td = F->timeout = ircd_malloc(sizeof(struct timeout_data));	
 		
 	td->F = F;
-	td->timeout = ircd_currenttime + (timeout / 1000);
+	td->timeout = ircd_currenttime + timeout;
 	td->timeout_handler = callback;
 	td->timeout_data = cbdata;
 	ircd_dlinkAdd(td, &td->node, &timeout_list);
@@ -278,7 +278,8 @@ ircd_checktimeouts(void *notused)
 	fde_t *F;
 	PF *hdl;
 	void *data;
-	
+
+	ircd_set_time();	
 	DLINK_FOREACH_SAFE(ptr, next, timeout_list.head)
 	{
 		td = ptr->data;
@@ -344,7 +345,7 @@ ircd_connect_tcp(int fd, struct sockaddr *dest,
 
 	/* We have a valid IP, so we just call tryconnect */
 	/* Make sure we actually set the timeout here .. */
-	ircd_settimeout(F->fd, timeout * 1000, ircd_connect_timeout, NULL);
+	ircd_settimeout(F->fd, timeout, ircd_connect_timeout, NULL);
 	ircd_connect_tryconnect(F->fd, NULL);
 }
 
