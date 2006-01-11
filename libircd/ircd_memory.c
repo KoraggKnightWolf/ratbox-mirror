@@ -73,3 +73,23 @@ ircd_outofmemory()
 	ircd_lib_log("Out of memory: restarting server...");
 	ircd_lib_restart("Out of Memory");
 }
+
+char *
+ircd_strndup(const char *x, size_t y)
+{
+        char *ret = malloc(y);
+        if(unlikely(ret == NULL))
+                ircd_outofmemory();
+        strlcpy(ret, x, y);
+        return(ret);
+}
+ 
+char *
+ircd_strdup(const char *x)
+{
+        char *ret = malloc(strlen(x) + 1);
+        if(unlikely(ret == NULL))
+                ircd_outofmemory();
+        strcpy(ret, x);    
+        return(ret);
+}       

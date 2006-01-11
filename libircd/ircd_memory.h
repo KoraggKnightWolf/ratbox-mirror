@@ -32,11 +32,11 @@
 #define _I_MEMORY_H
 
 
-extern void ircd_outofmemory(void);
-
-extern void *ircd_malloc(size_t size);
-extern void *ircd_realloc(void *x, size_t y);
-
+void ircd_outofmemory(void);
+void *ircd_malloc(size_t size);
+void *ircd_realloc(void *x, size_t y);
+char *ircd_strdup(const char *);
+char *ircd_strndup(const char *, size_t);
 
 /* forte (and maybe others) dont like double declarations, 
  * so we dont declare the inlines unless GNUC
@@ -64,11 +64,29 @@ ircd_realloc(void *x, size_t y)
 	return (ret);
 }
 
+extern inline char *
+ircd_strndup(const char *x, size_t y)
+{
+	char *ret = malloc(y);
+	if(unlikely(ret == NULL))
+		ircd_outofmemory();
+	strlcpy(ret, x, y);
+	return(ret);
+}
+
+extern inline char *
+ircd_strdup(const char *x)
+{
+	char *ret = malloc(strlen(x) + 1);
+	if(unlikely(ret == NULL))
+		ircd_outofmemory();
+	strcpy(ret, x);
+	return(ret);
+}
+
 #endif /* __GNUC__ */
 #endif /* __APPLE__ */
 
 #define ircd_free(x) do { if(likely(x != NULL)) free(x); } while (0)
-#define ircd_strdup(x) strcpy(ircd_malloc(strlen(x) + 1) , x)
-#define ircd_strndup(x, len) strlcpy(ircd_malloc(strlen(x) + 1), x, len + 1)
 
 #endif /* _I_MEMORY_H */

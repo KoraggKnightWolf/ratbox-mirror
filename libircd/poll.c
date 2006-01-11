@@ -46,7 +46,6 @@ typedef struct _pollfd_list pollfd_list_t;
 
 pollfd_list_t pollfd_list;
 static void poll_update_pollfds(int, short, PF *);
-static int last_index = 0;
 
 int 
 ircd_setup_fd(int fd)
