@@ -1,3 +1,15 @@
+androsyn    2006/01/11 15:02:54 UTC	(20060111_3-21614)
+  Log:
+  - make ircd_strdup/ircd_strndup inline functions instead of macros.
+  - use malloc directly inside of the above, we don't need the memory zeroed here
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_memory.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_memory.h (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+
+
 androsyn    2006/01/11 14:46:39 UTC	(20060111_2-21612)
   Log:
   - s_zip.h hasn't been used in years
