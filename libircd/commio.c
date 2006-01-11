@@ -741,7 +741,7 @@ ircd_close(int fd)
 		lircd_assert(F->read_handler == NULL);
 		lircd_assert(F->write_handler == NULL);
 	}
-	ircd_setselect(F->fd, 0, NULL, NULL);
+	ircd_setselect(F->fd, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
 	ircd_settimeout(F->fd, 0, NULL, NULL);
 
 	F->flags.open = 0;

@@ -45,7 +45,6 @@ struct _pollfd_list
 typedef struct _pollfd_list pollfd_list_t;
 
 pollfd_list_t pollfd_list;
-static void poll_update_pollfds(int, short, PF *);
 
 int 
 ircd_setup_fd(int fd)
@@ -53,54 +52,6 @@ ircd_setup_fd(int fd)
         return 0;
 }
         
-
-/*
- * set and clear entries in the pollfds[] array.
- */
-static void
-poll_update_pollfds(int fd, short event, PF * handler)
-{
-	fde_t *F;
-	
-	if(fd < 0)
-		return;
-
-	F = find_fd(fd);
-
-	if(F == NULL)
-		return;
-
-	/* Update the events */
-	if(handler)
-	{
-		pollfd_list.pollfds[fd].events |= event;
-		pollfd_list.pollfds[fd].fd = fd;
-		/* update maxindex here */
-		if(fd > pollfd_list.maxindex)
-			pollfd_list.maxindex = fd;
-	}
-	else
-	{
-		pollfd_list.pollfds[fd].events &= ~event;
-		if(pollfd_list.pollfds[fd].events == 0)
-		{
-			pollfd_list.pollfds[fd].fd = -1;
-			pollfd_list.pollfds[fd].revents = 0;
-
-			/* update pollfd_list.maxindex here */
-			if(fd == pollfd_list.maxindex) 
-			{
-				while (pollfd_list.maxindex >= 0 && pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
-					pollfd_list.maxindex--;
-			}
-		}
-	}
-}
-
-
-/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
-/* Public functions */
-
 
 /*
  * init_netio
@@ -131,24 +82,51 @@ ircd_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data)
 {
 	fde_t *F = find_fd(fd);
-	lircd_assert(fd >= 0);
-	lircd_assert(F->flags.open);
+	int old_flags;
+	
+	if(F == NULL)
+		return;
+
+	old_flags = F->pflags;
 
 	if(type & IRCD_SELECT_READ)
 	{
 		F->read_handler = handler;
 		F->read_data = client_data;
-		poll_update_pollfds(fd, POLLRDNORM, handler);
+		if(handler != NULL)
+			F->pflags |= POLLRDNORM;
+		else
+			F->pflags &= ~POLLRDNORM;
 	}
 	if(type & IRCD_SELECT_WRITE)
 	{
 		F->write_handler = handler;
 		F->write_data = client_data;
-		poll_update_pollfds(fd, POLLWRNORM, handler);
+		if(handler != NULL)
+			F->pflags |= POLLWRNORM;
+		else
+			F->pflags &= ~POLLWRNORM;
 	}
+
+	if(F->pflags <= 0)
+	{
+		pollfd_list.pollfds[fd].events = 0;
+		pollfd_list.pollfds[fd].fd = -1;
+		if(fd == pollfd_list.maxindex)
+		{
+			while (pollfd_list.maxindex >= 0 && pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
+				pollfd_list.maxindex--;	
+		}
+	} else {
+		pollfd_list.pollfds[fd].events = F->pflags;
+		pollfd_list.pollfds[fd].fd = fd;
+		if(fd > pollfd_list.maxindex)
+			pollfd_list.maxindex = fd;
+	}
+	
 }
 
-/* int ircd_select_fdlist(unsigned long delay)
+/* int ircd_select(unsigned long delay)
  * Input: The maximum time to delay.
  * Output: Returns -1 on error, 0 on success.
  * Side-effects: Deregisters future interest in IO and calls the handlers
@@ -168,7 +146,7 @@ ircd_select(unsigned long delay)
 	int fd;
 	int ci;
 	PF *hdl;
-
+	void *data;
 	for (;;)
 	{
 		num = poll(pollfd_list.pollfds, pollfd_list.maxindex + 1, delay);
@@ -197,21 +175,27 @@ ircd_select(unsigned long delay)
 			continue;
 		fd = pollfd_list.pollfds[ci].fd;
 		F = find_fd(fd);
+		if(F == NULL)
+			continue;
+		
 		if(revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR))
 		{
 			hdl = F->read_handler;
+			data = F->read_data;
 			F->read_handler = NULL;
-			poll_update_pollfds(fd, POLLRDNORM, NULL);
+			F->read_data = NULL;
 			if(hdl)
-				hdl(fd, F->read_data);
+				hdl(fd, data);
 		}
+	
 		if(revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR))
 		{
 			hdl = F->write_handler;
+			data = F->write_data;
 			F->write_handler = NULL;
-			poll_update_pollfds(fd, POLLWRNORM, NULL);
+			F->write_data = NULL;
 			if(hdl)
-				hdl(fd, F->write_data);
+				hdl(fd, data);
 		}
 	}
 	return 0;

@@ -58,7 +58,6 @@ static void handle_timer(struct siginfo *si);
 static int sigio_signal;
 static int sigio_is_screwed = 0;	/* We overflowed our sigio queue */
 static sigset_t our_sigset;
-static void poll_update_pollfds(int, short, PF *);
 
 /* 
  * static void mask_our_signal(int s)
@@ -75,53 +74,6 @@ mask_our_signal(int s)
 	sigaddset(&our_sigset, SIGIO);
 	sigprocmask(SIG_BLOCK, &our_sigset, NULL);
 }
-
-
-/*
- * set and clear entries in the pollfd_list array
- */
-static void
-poll_update_pollfds(int fd, short event, PF * handler)
-{
-        fde_t *F;
-
-        if(fd < 0) 
-                return;
-
-        F = find_fd(fd);
-  
-        if(F == NULL)
-                return;
-  
-        /* Update the events */
-        if(handler)
-        {
-                pollfd_list.pollfds[fd].events |= event;
-                pollfd_list.pollfds[fd].fd = fd;
-                /* update maxindex here */
-                if(fd > pollfd_list.maxindex)
-                        pollfd_list.maxindex = fd;
-        }
-        else
-        {
-                pollfd_list.pollfds[fd].events &= ~event;
-                if(pollfd_list.pollfds[fd].events == 0)
-                {
-                        pollfd_list.pollfds[fd].fd = -1;
-                        pollfd_list.pollfds[fd].revents = 0;
- 
-                        /* update pollfd_list.maxindex here */
-                        if(fd == pollfd_list.maxindex)
-                        {
-                                while (pollfd_list.maxindex >= 0 && pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
-                                        pollfd_list.maxindex--;
-                        }
-                }
-        }
-}
-
-
-
 
 /*
  * init_netio
@@ -184,25 +136,54 @@ ircd_setup_fd(int fd)
  */
 void
 ircd_setselect(int fd, unsigned int type, PF * handler,
-	       void *client_data)
-{
-	fde_t *F = find_fd(fd);
-	if(F == NULL)
-		return;
+               void *client_data)
+{ 
+        fde_t *F = find_fd(fd);
+        int old_flags;
+        
+        if(F == NULL)
+                return;
 
-	if(type & IRCD_SELECT_READ)
-	{
-		F->read_handler = handler;
-		F->read_data = client_data;
-		poll_update_pollfds(fd, POLLIN, handler);
-	}
-	if(type & IRCD_SELECT_WRITE)
-	{
-		F->write_handler = handler;
-		F->write_data = client_data;
-		poll_update_pollfds(fd, POLLOUT, handler);
-	}
+        old_flags = F->pflags;
+ 
+        if(type & IRCD_SELECT_READ)
+        {
+                F->read_handler = handler;
+                F->read_data = client_data;
+                if(handler != NULL)
+                        F->pflags |= POLLRDNORM;
+                else
+                        F->pflags &= ~POLLRDNORM;
+        }
+        if(type & IRCD_SELECT_WRITE)
+        {
+                F->write_handler = handler;
+                F->write_data = client_data;
+                if(handler != NULL)
+                        F->pflags |= POLLWRNORM;
+                else
+                        F->pflags &= ~POLLWRNORM;
+        }
+  
+        if(F->pflags <= 0)
+        {
+                pollfd_list.pollfds[fd].events = 0;
+                pollfd_list.pollfds[fd].fd = -1;
+                if(fd == pollfd_list.maxindex)
+                {
+                        while (pollfd_list.maxindex >= 0 && pollfd_list.pollfds[pollfd_list.maxindex].fd == -1)
+                                pollfd_list.maxindex--;
+                }
+        } else {
+                pollfd_list.pollfds[fd].events = F->pflags;
+                pollfd_list.pollfds[fd].fd = fd;
+                if(fd > pollfd_list.maxindex)
+                        pollfd_list.maxindex = fd;
+        }
+ 
 }
+
+
 
 /* int ircd_select(unsigned long delay)
  * Input: The maximum time to delay.
@@ -342,18 +323,21 @@ ircd_select(unsigned long delay)
 		if(revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR))
 		{
 			hdl = F->read_handler;
+			data = F->read_data;
 			F->read_handler = NULL;
-			poll_update_pollfds(fd, POLLIN, NULL);
+			F->read_data = NULL;
 			if(hdl)
-				hdl(fd, F->read_data);
+				hdl(fd, data);
 		}
+
 		if(revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR))
 		{
 			hdl = F->write_handler;
+			data = F->write_data;
 			F->write_handler = NULL;
-			poll_update_pollfds(fd, POLLOUT, NULL);
+			F->write_data = NULL;
 			if(hdl)
-				hdl(fd, F->write_data);
+				hdl(fd, data);
 		}
 	}
 	return 0;
