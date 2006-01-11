@@ -242,7 +242,6 @@ ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 	F = find_fd(fd);
 	lircd_assert(F->flags.open);
 	td = F->timeout;
-	ircd_set_time();	
 	if(callback == NULL) /* user wants to remove */
 	{
 		if(td == NULL)
@@ -279,7 +278,6 @@ ircd_checktimeouts(void *notused)
 	PF *hdl;
 	void *data;
 
-	ircd_set_time();	
 	DLINK_FOREACH_SAFE(ptr, next, timeout_list.head)
 	{
 		td = ptr->data;
