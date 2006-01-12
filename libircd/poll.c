@@ -76,10 +76,16 @@ init_netio(void)
 static inline void 
 resize_pollarray(int fd)
 {
-	if(unlikely(fd > pollfd_list.allocated))
+	if(unlikely(fd >= pollfd_list.allocated))
 	{
+		int x, old_value = pollfd_list.allocated;
 		pollfd_list.allocated += 1024;
-		pollfd_list.pollfds = ircd_realloc(pollfd_list.pollfds, pollfd_list.allocated);
+		pollfd_list.pollfds = ircd_realloc(pollfd_list.pollfds, pollfd_list.allocated * (sizeof(struct pollfd)));
+		memset(&pollfd_list.pollfds[old_value+1], 0, sizeof(struct pollfd) * 1024);
+		for(x = old_value + 1; x < pollfd_list.allocated; x++)
+		{
+			pollfd_list.pollfds[x].fd = -1;
+		}
 	}	
 }
 
