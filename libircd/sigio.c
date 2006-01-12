@@ -105,7 +105,6 @@ resize_pollarray(int fd)
         if(unlikely(fd > pollfd_list.allocated))
         {
                 pollfd_list.allocated += 1024;
-                fprintf(stderr, "resized poll list\n");
                 pollfd_list.pollfds = ircd_realloc(pollfd_list.pollfds, pollfd_list.allocated);
         }
 } 
