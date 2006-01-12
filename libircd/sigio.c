@@ -86,6 +86,7 @@ init_netio(void)
 {
 	int fd;
         pollfd_list.pollfds = ircd_malloc(ircd_maxconnections * (sizeof(struct pollfd)));
+        pollfd_list.allocated = ircd_maxconnections;
         for (fd = 0; fd < ircd_maxconnections; fd++)
         {
         	pollfd_list.pollfds[fd].fd = -1;
@@ -104,6 +105,7 @@ resize_pollarray(int fd)
         if(unlikely(fd > pollfd_list.allocated))
         {
                 pollfd_list.allocated += 1024;
+                fprintf(stderr, "resized poll list\n");
                 pollfd_list.pollfds = ircd_realloc(pollfd_list.pollfds, pollfd_list.allocated);
         }
 } 
