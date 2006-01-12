@@ -1,3 +1,11 @@
+androsyn    2006/01/12 20:24:06 UTC	(20060112_1-21642)
+  Log:
+  set pollfd_list.allocated correctly for sigio
+
+  Modified:
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+
+
 androsyn    2006/01/12 16:26:41 UTC	(20060112_0-21640)
   Log:
   add support for resizing the poll array should the need arise
