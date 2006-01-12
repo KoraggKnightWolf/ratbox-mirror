@@ -47,6 +47,7 @@ struct _pollfd_list
 {
 	struct pollfd *pollfds;
 	int maxindex;		/* highest FD number */
+	int allocated;
 };
 
 typedef struct _pollfd_list pollfd_list_t;
@@ -96,6 +97,16 @@ init_netio(void)
 	sigio_is_screwed = 1; /* Start off with poll first.. */
 	mask_our_signal(sigio_signal);
 }
+
+static inline void
+resize_pollarray(int fd)
+{
+        if(unlikely(fd > pollfd_list.allocated))
+        {
+                pollfd_list.allocated += 1024;
+                pollfd_list.pollfds = ircd_realloc(pollfd_list.pollfds, pollfd_list.allocated);
+        }
+} 
 
 
 /*
@@ -163,6 +174,8 @@ ircd_setselect(int fd, unsigned int type, PF * handler,
                 else
                         F->pflags &= ~POLLWRNORM;
         }
+
+	resize_pollarray(fd);
   
         if(F->pflags <= 0)
         {

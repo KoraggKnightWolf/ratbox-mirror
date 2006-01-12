@@ -40,6 +40,7 @@ struct _pollfd_list
 {
 	struct pollfd *pollfds;
 	int maxindex;		/* highest FD number */
+	int allocated;		/* number of pollfds allocated */
 };
 
 typedef struct _pollfd_list pollfd_list_t;
@@ -64,11 +65,22 @@ init_netio(void)
 {
 	int fd;
 	pollfd_list.pollfds = ircd_malloc(ircd_maxconnections * (sizeof(struct pollfd)));
+	pollfd_list.allocated = ircd_maxconnections;
 	for (fd = 0; fd < ircd_maxconnections; fd++)
 	{
 		pollfd_list.pollfds[fd].fd = -1;
 	}
 	pollfd_list.maxindex = 0;
+}
+
+static inline void 
+resize_pollarray(int fd)
+{
+	if(unlikely(fd > pollfd_list.allocated))
+	{
+		pollfd_list.allocated += 1024;
+		pollfd_list.pollfds = ircd_realloc(pollfd_list.pollfds, pollfd_list.allocated);
+	}	
 }
 
 /*
@@ -108,6 +120,8 @@ ircd_setselect(int fd, unsigned int type, PF * handler,
 			F->pflags &= ~POLLWRNORM;
 	}
 
+	resize_pollarray(fd);
+	
 	if(F->pflags <= 0)
 	{
 		pollfd_list.pollfds[fd].events = 0;
