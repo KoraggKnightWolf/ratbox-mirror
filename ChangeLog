@@ -1,3 +1,12 @@
+androsyn    2006/01/12 16:26:41 UTC	(20060112_0-21640)
+  Log:
+  add support for resizing the poll array should the need arise
+
+  Modified:
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+
+
 androsyn    2006/01/11 21:31:24 UTC	(20060111_11-21633)
   Log:
   add some checks on the return value from find_fd
