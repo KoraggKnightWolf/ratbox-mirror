@@ -1,3 +1,11 @@
+androsyn    2006/01/12 20:25:18 UTC	(20060112_2-21644)
+  Log:
+  remove debugging fprintf
+
+  Modified:
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+
+
 androsyn    2006/01/12 20:24:06 UTC	(20060112_1-21642)
   Log:
   set pollfd_list.allocated correctly for sigio
