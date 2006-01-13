@@ -70,10 +70,11 @@ static int ircd_inet_socketpair(int d, int type, int protocol, int sv[2]);
 static inline fde_t *
 add_fd(int fd)
 {
-	fde_t *F;
+	fde_t *F = find_fd(fd);
 	dlink_list *list;
+
 	/* look up to see if we have it already */
-	if((F = find_fd(fd)) != NULL)
+	if(F != NULL)
 		return F; 
 	
 	F = BlockHeapAlloc(fd_heap);
@@ -241,12 +242,12 @@ ircd_set_nb(int fd)
 void
 ircd_settimeout(int fd, time_t timeout, PF * callback, void *cbdata)
 {
-	fde_t *F;
 	struct timeout_data *td;
-	lircd_assert(fd >= 0);
-	F = find_fd(fd);
+	fde_t *F = find_fd(fd);
+
 	if(F == NULL)
 		return;
+
 	lircd_assert(F->flags.open);
 	td = F->timeout;
 	if(callback == NULL) /* user wants to remove */
@@ -323,9 +324,7 @@ void
 ircd_connect_tcp(int fd, struct sockaddr *dest,
 		 struct sockaddr *clocal, int socklen, CNCB * callback, void *data, int timeout)
 {
-	fde_t *F;
-	lircd_assert(fd >= 0);
-	F = find_fd(fd);
+	fde_t *F = find_fd(fd);
 	if(F == NULL)
 		return;
 		

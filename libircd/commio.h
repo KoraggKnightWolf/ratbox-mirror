@@ -282,9 +282,14 @@ extern int ircd_maxconnections;
 static inline fde_t *
 find_fd(int fd)
 {
-	dlink_list *hlist = &ircd_fd_table[hash_fd(fd)];
-	
+	dlink_list *hlist;
 	dlink_node *ptr;
+		
+	if(unlikely(fd < 0))
+		return NULL;
+
+	hlist = &ircd_fd_table[hash_fd(fd)];
+
 	DLINK_FOREACH(ptr, hlist->head)
 	{
 		fde_t *F = ptr->data;
