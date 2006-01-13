@@ -779,6 +779,7 @@ ircd_close(int fd)
 void
 ircd_dump_fd(DUMPCB * cb, void *data)
 {
+	static const char *empty = "";
 	int i;
 	for (i = 0; i <= ircd_highest_fd; i++)
 	{
@@ -786,7 +787,7 @@ ircd_dump_fd(DUMPCB * cb, void *data)
 		if(F == NULL || !F->flags.open)
 			continue;
 
-		cb(i, F->desc, data);
+		cb(i, F->desc ? F->desc : empty, data);
 	}
 }
 
