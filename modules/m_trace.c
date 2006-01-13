@@ -58,9 +58,7 @@ mapi_hlist_av1 trace_hlist[] = {
 };
 DECLARE_MODULE_AV1(trace, NULL, NULL, trace_clist, trace_hlist, NULL, "$Revision: 19295 $");
 
-static int report_this_status(struct Client *source_p, struct Client *target_p, int dow,
-			      int link_u_p, int link_u_s);
-
+static int report_this_status(struct Client *source_p, struct Client *target_p, int dow);
 
 /*
  * m_trace
@@ -73,7 +71,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 	struct Client *target_p = NULL;
 	struct Class *cltmp;
 	const char *tname;
-	int doall = 0, link_s[MAXCONNECTIONS], link_u[MAXCONNECTIONS];
+	int doall = 0;
 	int cnt = 0, wilds, dow;
 	dlink_node *ptr;
 
@@ -171,7 +169,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 		 */
 		if(target_p != NULL)
 		{
-			report_this_status(source_p, target_p, 0, 0, 0);
+			report_this_status(source_p, target_p, 0);
 			tname = target_p->name;
 		}
 
@@ -184,23 +182,6 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	trace_spy(source_p, NULL);
 
-	memset(link_s, 0, sizeof(link_s));
-	memset(link_u, 0, sizeof(link_u));
-
-	/* count up the servers behind the server links only if were going
-	 * to be using them --fl
-	 */
-	if(doall)
-	{
-		DLINK_FOREACH(ptr, global_serv_list.head)
-		{
-			target_p = ptr->data;
-
-			link_u[target_p->from->localClient->fd] += ircd_dlink_list_length(&target_p->serv->users);
-			link_s[target_p->from->localClient->fd]++;
-		}
-	}
-
 	/* give non-opers a limited trace output of themselves (if local), 
 	 * opers and servers (if no shide) --fl
 	 */
@@ -209,7 +190,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(MyClient(source_p))
 		{
 			if(doall || (wilds && match(tname, source_p->name)))
-				report_this_status(source_p, source_p, 0, 0, 0);
+				report_this_status(source_p, source_p, 0);
 		}
 
 		DLINK_FOREACH(ptr, oper_list.head)
@@ -219,7 +200,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 			if(!doall && wilds && (match(tname, target_p->name) == 0))
 				continue;
 
-			report_this_status(source_p, target_p, 0, 0, 0);
+			report_this_status(source_p, target_p, 0);
 		}
 
 		DLINK_FOREACH(ptr, serv_list.head)
@@ -229,9 +210,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 			if(!doall && wilds && !match(tname, target_p->name))
 				continue;
 
-			report_this_status(source_p, target_p, 0,
-					link_u[target_p->localClient->fd],
-					link_s[target_p->localClient->fd]);
+			report_this_status(source_p, target_p, 0);
 		}
 
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFTRACE, 
@@ -253,7 +232,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(!doall && wilds && !match(tname, target_p->name))
 			continue;
 
-		cnt = report_this_status(source_p, target_p, dow, 0, 0);
+		cnt = report_this_status(source_p, target_p, dow);
 	}
 
 	DLINK_FOREACH(ptr, serv_list.head)
@@ -263,9 +242,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(!doall && wilds && !match(tname, target_p->name))
 			continue;
 
-		cnt = report_this_status(source_p, target_p, dow,
-					 link_u[target_p->localClient->fd],
-					 link_s[target_p->localClient->fd]);
+		cnt = report_this_status(source_p, target_p, dow);
 	}
 
 	if(MyConnect(source_p))
@@ -277,7 +254,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 			if(!doall && wilds && !match(tname, target_p->name))
 				continue;
 
-			cnt = report_this_status(source_p, target_p, dow, 0, 0);
+			cnt = report_this_status(source_p, target_p, dow);
 		}
 	}
 
@@ -326,7 +303,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
  */
 static int
 report_this_status(struct Client *source_p, struct Client *target_p,
-		   int dow, int link_u_p, int link_s_p)
+		   int dow)
 {
 	const char *name;
 	const char *class_name;
@@ -394,12 +371,29 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 		}
 		break;
 
-	case STAT_SERVER:
-		sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACESERVER, form_str(RPL_TRACESERVER),
-				   class_name, link_s_p, link_u_p, name,
-				   *(target_p->serv->by) ? target_p->serv->by : "*", "*",
-				   me.name, ircd_currenttime - target_p->localClient->lasttime);
-		cnt++;
+
+        case STAT_SERVER:
+               {
+                       struct Client *tmp_p;
+                       dlink_node *ptr;
+                       int usercount = ircd_dlink_list_length(&target_p->serv->users);
+                       int servcount = 0;
+ 
+                       DLINK_FOREACH(ptr, target_p->serv->servers.head)
+                       {
+                               servcount++;
+ 
+                               tmp_p = ptr->data;
+                               usercount += ircd_dlink_list_length(&tmp_p->serv->users);
+                       }
+ 
+                       sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACESERVER, form_str(RPL_TRACESERVER),
+                                  class_name, servcount, usercount, name,
+                                  *(target_p->serv->by) ? target_p->serv->by : "*", "*",
+                                  me.name, ircd_currenttime - target_p->localClient->lasttime);
+                       cnt++;
+
+               }
 		break;
 
 	default:		/* ...we actually shouldn't come here... --msa */
