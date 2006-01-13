@@ -1,3 +1,12 @@
+androsyn    2006/01/13 21:30:55 UTC	(20060113_3-21666)
+  Log:
+  - have find_fd handle fd being < 0 and return NULL in that case
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+
+
 androsyn    2006/01/13 21:09:59 UTC	(20060113_2-21664)
   Log:
   fix ircd_dump_fd to deal with F->desc being unset
