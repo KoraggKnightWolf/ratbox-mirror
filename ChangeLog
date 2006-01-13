@@ -1,3 +1,11 @@
+androsyn    2006/01/13 16:12:58 UTC	(20060113_0-21652)
+  Log:
+  -port m_trace fixes from 2.2
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+
+
 androsyn    2006/01/12 20:48:40 UTC	(20060112_3-21646)
   Log:
   reallocate the poll list using sizeof(struct pollfd) and initialize the new memory for usage
