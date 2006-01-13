@@ -40,10 +40,6 @@
 #include "reject.h"
 #include "s_log.h"
 
-#ifndef INADDR_NONE
-#define INADDR_NONE ((unsigned int) 0xffffffff)
-#endif
-
 #if defined(NO_IN6ADDR_ANY) && defined(IPV6)
 static const struct in6_addr in6addr_any =
 { { { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 } } };

@@ -57,10 +57,6 @@ struct config_server_hide ConfigServerHide;
 extern int yyparse();		/* defined in y.tab.c */
 extern char linebuf[];
 
-#ifndef INADDR_NONE
-#define INADDR_NONE ((unsigned int) 0xffffffff)
-#endif
-
 static BlockHeap *confitem_heap = NULL;
 
 dlink_list temp_klines[LAST_TEMP_TYPE];

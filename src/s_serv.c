@@ -54,10 +54,6 @@ extern char *crypt();
 
 #define MIN_CONN_FREQ 300
 
-#ifndef INADDR_NONE
-#define INADDR_NONE ((unsigned int) 0xffffffff)
-#endif
-
 int MaxConnectionCount = 1;
 int MaxClientCount = 1;
 int refresh_user_links = 0;
