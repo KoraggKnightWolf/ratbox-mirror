@@ -26,14 +26,6 @@
 
 #include "ircd_lib.h"
 
-#ifndef IN_LOOPBACKNET
-#define IN_LOOPBACKNET        0x7f
-#endif
-
-#ifndef INADDR_NONE
-#define INADDR_NONE ((unsigned int) 0xffffffff)
-#endif
-
 #ifndef MSG_NOSIGNAL
 #define MSG_NOSIGNAL 0
 #endif
