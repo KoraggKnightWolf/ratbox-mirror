@@ -1,3 +1,13 @@
+androsyn    2006/01/13 22:02:16 UTC	(20060113_5-21670)
+  Log:
+  don't define INADDR_NONE all over the place since its already defined in stdinc.h
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2006/01/13 21:34:52 UTC	(20060113_4-21668)
   Log:
   - defines for IN_LOOPBACKNET and INADDR_NONE i think are pretty much not needed
