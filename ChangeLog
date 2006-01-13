@@ -1,3 +1,11 @@
+androsyn    2006/01/13 21:34:52 UTC	(20060113_4-21668)
+  Log:
+  - defines for IN_LOOPBACKNET and INADDR_NONE i think are pretty much not needed
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2006/01/13 21:30:55 UTC	(20060113_3-21666)
   Log:
   - have find_fd handle fd being < 0 and return NULL in that case
