@@ -1,3 +1,12 @@
+androsyn    2006/01/13 17:13:24 UTC	(20060113_1-21658)
+  Log:
+  set errno and return -1 if F == NULL in ircd_writev
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2006/01/13 16:12:58 UTC	(20060113_0-21652)
   Log:
   -port m_trace fixes from 2.2
