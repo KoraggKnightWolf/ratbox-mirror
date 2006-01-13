@@ -930,8 +930,10 @@ ssize_t
 ircd_writev(int xfd, const struct iovec *vector, int count)
 {
 	fde_t *F = find_fd(xfd);
-	if(F == NULL)
-		return;
+	if(F == NULL) {
+		errno = EBADF;
+		return -1;
+	}
 	switch (F->type)
 	{
 	case FD_SOCKET:

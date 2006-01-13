@@ -21598,7 +21598,7 @@ if test "$LEX" != flex; then
 fi
 
 # backwards support for IRC_CFLAGS
-CFLAGS="$IRC_CFLAGS $CFLAGS -O0 -Wall"
+CFLAGS="$IRC_CFLAGS $CFLAGS -O2 -Wall"
 
 if test "$libexecdir" = '${exec_prefix}/libexec' &&
    test "$localstatedir" = '${prefix}/var'; then
