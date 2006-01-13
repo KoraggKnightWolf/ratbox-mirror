@@ -1,3 +1,11 @@
+androsyn    2006/01/13 21:09:59 UTC	(20060113_2-21664)
+  Log:
+  fix ircd_dump_fd to deal with F->desc being unset
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2006/01/13 17:13:24 UTC	(20060113_1-21658)
   Log:
   set errno and return -1 if F == NULL in ircd_writev
