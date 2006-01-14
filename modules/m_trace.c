@@ -92,7 +92,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* if we have 3 parameters, then the command is directed at us.  So
 	 * we shouldnt be forwarding it anywhere. --anfl
 	 */
-	if(parc > 3)
+	if(parc < 3)
 	{
 	switch (hunt_server(client_p, source_p, ":%s TRACE :%s", 1, parc, parv))
 	{
