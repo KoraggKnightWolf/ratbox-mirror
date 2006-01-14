@@ -1,3 +1,14 @@
+jilles      2006/01/14 01:14:05 UTC	(20060114_1-21674)
+  Log:
+  Fix mistake in forward porting previous /trace changes,
+  which prevented /trace with a single argument from being
+  sent remotely.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+
+
 jilles      2006/01/14 00:38:40 UTC	(20060114_0-21672)
   Log:
   Forward port from RATBOX_2_1: r20894 and r20664:
