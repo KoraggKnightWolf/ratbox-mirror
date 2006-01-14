@@ -101,7 +101,6 @@ char **myargv;
 int dorehash = 0;
 int dorehashbans = 0;
 int doremotd = 0;
-time_t nextconnect = 1;		/* time for next try_connections call */
 int kline_queued = 0;
 int server_state_foreground = 0;
 
