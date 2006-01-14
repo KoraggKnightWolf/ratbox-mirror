@@ -1,3 +1,15 @@
+jilles      2006/01/14 15:42:45 UTC	(20060114_3-21680)
+  Log:
+  Remove old nextconnect variable. try_connections() calls
+  have been controlled by the event system for years.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/ircd.h (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 jilles      2006/01/14 12:58:36 UTC	(20060114_2-21676)
   Log:
   Fix downlink counts in RPL_TRACESERVER, by recursing over
