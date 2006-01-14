@@ -1,3 +1,13 @@
+jilles      2006/01/14 12:58:36 UTC	(20060114_2-21676)
+  Log:
+  Fix downlink counts in RPL_TRACESERVER, by recursing over
+  the QS data.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+
+
 jilles      2006/01/14 01:14:05 UTC	(20060114_1-21674)
   Log:
   Fix mistake in forward porting previous /trace changes,
