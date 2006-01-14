@@ -1,3 +1,14 @@
+jilles      2006/01/14 00:38:40 UTC	(20060114_0-21672)
+  Log:
+  Forward port from RATBOX_2_1: r20894 and r20664:
+  fix possibility of RPL_WHOISCHANNELS being cut
+  when it's sent over TS6
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+
+
 androsyn    2006/01/13 22:02:16 UTC	(20060113_5-21670)
   Log:
   don't define INADDR_NONE all over the place since its already defined in stdinc.h
