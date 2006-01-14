@@ -58,6 +58,7 @@ mapi_hlist_av1 trace_hlist[] = {
 };
 DECLARE_MODULE_AV1(trace, NULL, NULL, trace_clist, trace_hlist, NULL, "$Revision: 19295 $");
 
+static void count_downlinks(struct Client *server_p, int *pservcount, int *pusercount);
 static int report_this_status(struct Client *source_p, struct Client *target_p, int dow);
 
 /*
@@ -294,6 +295,27 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 }
 
 /*
+ * count_downlinks
+ *
+ * inputs	- pointer to server to count
+ *		- pointers to server and user count
+ * output	- NONE
+ * side effects - server and user counts are added to given values
+ */
+static void
+count_downlinks(struct Client *server_p, int *pservcount, int *pusercount)
+{
+	dlink_node *ptr;
+
+	(*pservcount)++;
+	*pusercount += ircd_dlink_list_length(&server_p->serv->users);
+	DLINK_FOREACH(ptr, server_p->serv->servers.head)
+	{
+		count_downlinks(ptr->data, pservcount, pusercount);
+	}
+}
+
+/*
  * report_this_status
  *
  * inputs	- pointer to client to report to
@@ -374,18 +396,10 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 
         case STAT_SERVER:
                {
-                       struct Client *tmp_p;
-                       dlink_node *ptr;
-                       int usercount = ircd_dlink_list_length(&target_p->serv->users);
+                       int usercount = 0;
                        int servcount = 0;
  
-                       DLINK_FOREACH(ptr, target_p->serv->servers.head)
-                       {
-                               servcount++;
- 
-                               tmp_p = ptr->data;
-                               usercount += ircd_dlink_list_length(&tmp_p->serv->users);
-                       }
+		       count_downlinks(target_p, &servcount, &usercount);
  
                        sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACESERVER, form_str(RPL_TRACESERVER),
                                   class_name, servcount, usercount, name,
