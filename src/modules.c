@@ -55,6 +55,7 @@ struct module **modlist = NULL;
 static char unknown_ver[] = "<unknown>";
 static const char *core_module_table[] = {
 	"m_die",
+	"m_error",
 	"m_join",
 	"m_kick",
 	"m_kill",
