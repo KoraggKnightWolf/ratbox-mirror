@@ -279,7 +279,7 @@ static int
 m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct oper_conf *oper_p;
-	char *challenge;
+	char *challenge = NULL;
 	char chal_line[CHALLENGE_WIDTH]; 
 	u_int8_t *b_response;
 	size_t cnt;
@@ -314,7 +314,8 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		b_response = ircd_base64_decode((const unsigned char *)++parv[1], strlen(parv[1]));
 
-		if(memcmp(source_p->localClient->passwd, b_response, SHA_DIGEST_LENGTH))
+		if((strlen((char *) b_response) != SHA_DIGEST_LENGTH) || 
+		   memcmp(source_p->localClient->passwd, b_response, SHA_DIGEST_LENGTH))
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
