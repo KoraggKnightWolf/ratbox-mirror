@@ -1,3 +1,12 @@
+jilles      2006/01/18 22:54:02 UTC	(20060118_3-21711)
+  Log:
+  Add m_error to core_module_table, so it is loaded by default.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2006/01/18 16:47:13 UTC	(20060118_2-21708)
   Log:
   - Add a check to see if base64 decoded challenge response is equal to SHA_DIGEST_LENGTH and refuse it if not  
