@@ -1,3 +1,13 @@
+androsyn    2006/01/18 16:47:13 UTC	(20060118_2-21708)
+  Log:
+  - Add a check to see if base64 decoded challenge response is equal to SHA_DIGEST_LENGTH and refuse it if not  
+  - Set challenge variable to NULL to shutup gcc warnings
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+
+
 androsyn    2006/01/18 16:28:31 UTC	(20060118_1-21706)
   Log:
   Looks like mkpasswd is the only thing left in here..
