@@ -1,3 +1,12 @@
+androsyn    2006/01/18 16:28:31 UTC	(20060118_1-21706)
+  Log:
+  Looks like mkpasswd is the only thing left in here..
+  
+
+  Modified:
+	ircd-ratbox/trunk/tools/README (File Modified) 
+
+
 androsyn    2006/01/18 16:24:50 UTC	(20060118_0-21704)
   Log:
   i don't think anyone is going to be using this
