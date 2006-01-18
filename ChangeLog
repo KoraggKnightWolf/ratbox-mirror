@@ -1,3 +1,12 @@
+androsyn    2006/01/18 16:24:50 UTC	(20060118_0-21704)
+  Log:
+  i don't think anyone is going to be using this
+  
+
+  Modified:
+	ircd-ratbox/trunk/tools/untabify (File Deleted) 
+
+
 jilles      2006/01/14 15:42:45 UTC	(20060114_3-21680)
   Log:
   Remove old nextconnect variable. try_connections() calls
