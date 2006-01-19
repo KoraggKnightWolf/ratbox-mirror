@@ -251,7 +251,7 @@ ircd_base64_encode(const unsigned char *str, int length)
 }
 
 unsigned char *
-ircd_base64_decode(const unsigned char *str, int length)
+ircd_base64_decode(const unsigned char *str, int length, int *ret)
 {
 	const unsigned char *current = str;
 	int ch, i = 0, j = 0, k;
@@ -298,6 +298,7 @@ ircd_base64_decode(const unsigned char *str, int length)
 		}
 	}
 	result[j] = '\0';
+	*ret = j;
 	return result;
 }
 
