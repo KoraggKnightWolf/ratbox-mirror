@@ -678,6 +678,7 @@ set_default_conf(void)
 	ServerInfo.specific_ipv6_vhost = 0;
 #endif
 	ServerInfo.use_ts6 = YES;
+	ServerInfo.default_max_clients = MAXCONNECTIONS;
 
 	/* Don't reset hub, as that will break lazylinks */
 	/* ServerInfo.hub = NO; */

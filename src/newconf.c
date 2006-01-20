@@ -1728,6 +1728,7 @@ static struct ConfEntry conf_serverinfo_table[] =
 	{ "network_desc", 	CF_QSTRING, NULL, 0, &ServerInfo.network_desc	},
 	{ "hub", 		CF_YESNO,   NULL, 0, &ServerInfo.hub		},
 	{ "use_ts6", 		CF_YESNO,   NULL, 0, &ServerInfo.use_ts6	},
+	{ "default_max_clients",CF_INT,     NULL, 0, &ServerInfo.default_max_clients },
 
 	{ "network_name", 	CF_QSTRING, conf_set_serverinfo_network_name,	0, NULL },
 	{ "name", 		CF_QSTRING, conf_set_serverinfo_name,	0, NULL },
