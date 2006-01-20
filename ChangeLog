@@ -1,3 +1,12 @@
+androsyn    2006/01/20 19:26:45 UTC	(20060120_0-21737)
+  Log:
+  - port r21727 to add logging when we drop servers rather than just notifying opers
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2006/01/19 16:08:14 UTC	(20060119_0-21721)
   Log:
   pass a integer pointer to ircd_base64_decode to return the length of the data decoded
