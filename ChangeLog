@@ -1,3 +1,12 @@
+androsyn    2006/01/20 21:57:45 UTC	(20060120_4-21750)
+  Log:
+  - move bogus_host() check up in ms_server and get rid of the dot check as bogus_host() already does this
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2006/01/20 21:31:20 UTC	(20060120_3-21748)
   Log:
   do a bogus_host() check on servernames in ms_server
