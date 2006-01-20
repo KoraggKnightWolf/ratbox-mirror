@@ -1,3 +1,11 @@
+androsyn    2006/01/20 21:31:20 UTC	(20060120_3-21748)
+  Log:
+  do a bogus_host() check on servernames in ms_server
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2006/01/20 19:40:18 UTC	(20060120_2-21743)
   Log:
   port forward r21729
