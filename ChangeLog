@@ -1,3 +1,11 @@
+androsyn    2006/01/20 21:59:21 UTC	(20060120_5-21752)
+  Log:
+  - doing a ircd_strdup() in find_or_add should be acceptable here as we should have already validated the name and its length
+
+  Modified:
+	ircd-ratbox/trunk/src/scache.c (File Modified) 
+
+
 androsyn    2006/01/20 21:57:45 UTC	(20060120_4-21750)
   Log:
   - move bogus_host() check up in ms_server and get rid of the dot check as bogus_host() already does this
