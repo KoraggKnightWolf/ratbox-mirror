@@ -105,7 +105,7 @@ find_or_add(const char *name)
 
 	ptr = ircd_malloc(sizeof(SCACHE));
 
-	ptr->name = ircd_strndup(name, HOSTLEN+1);
+	ptr->name = ircd_strdup(name);
 
 	ptr->next = scache_hash[hash_index];
 	scache_hash[hash_index] = ptr;
