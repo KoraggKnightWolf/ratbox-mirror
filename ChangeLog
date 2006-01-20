@@ -1,3 +1,23 @@
+androsyn    2006/01/20 19:40:18 UTC	(20060120_2-21743)
+  Log:
+  port forward r21729
+  - add default_max_clients option to serverinfo {};, specifies the default
+    /set option for maxclients
+  - refuse to start if shell fd limits are too low
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/include/defaults.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2006/01/20 19:35:57 UTC	(20060120_1-21739)
   Log:
   change a log to ilog
