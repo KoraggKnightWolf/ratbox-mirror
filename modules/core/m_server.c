@@ -382,7 +382,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 
 
-	if(strlen(name) > HOSTLEN)
+	if(bogus_host(name) || strlen(name) > HOSTLEN)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s introduced server with invalid servername %s",
