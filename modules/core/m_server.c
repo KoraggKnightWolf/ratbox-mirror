@@ -282,24 +282,13 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		return 0;
 	}
 
-	/* 
-	 * User nicks never have '.' in them and server names
-	 * must always have '.' in them.
-	 */
-	if(strchr(name, '.') == NULL)
+	if(bogus_host(name) || strlen(name) > HOSTLEN)
 	{
-		/*
-		 * Server trying to use the same name as a person. Would
-		 * cause a fair bit of confusion. Enough to make it hellish
-		 * for a while and servers to send stuff to the wrong place.
-		 */
-		sendto_one(client_p, POP_QUEUE, "ERROR :Nickname %s already exists!", name);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Link %s cancelled: Server/nick collision on %s",
+				     "Link %s introduced server with invalid servername %s",
 				     client_p->name, name);
-		ilog(L_SERVER, "Link %s cancelled: Server/nick collision on %s", client_p->name, name);
-		
-		exit_client(client_p, client_p, client_p, "Nick as Server");
+		ilog(L_SERVER, "Link %s introduced with invalid servername %s", client_p->name, name);
+		exit_client(NULL, client_p, &me, "Invalid servername introduced.");
 		return 0;
 	}
 
@@ -382,15 +371,6 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 
 
-	if(bogus_host(name) || strlen(name) > HOSTLEN)
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Link %s introduced server with invalid servername %s",
-				     client_p->name, name);
-		ilog(L_SERVER, "Link %s introduced with invalid servername %s", client_p->name, name);
-		exit_client(NULL, client_p, &me, "Invalid servername introduced.");
-		return 0;
-	}
 
 	target_p = make_client(client_p);
 	make_server(target_p);
