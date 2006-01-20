@@ -93,6 +93,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Link %s dropped, non-TS server",
 				     client_p->name);
+				     
 		exit_client(client_p, client_p, client_p, "Non-TS server");
 		return 0;
 	}
@@ -183,6 +184,8 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Attempt to re-introduce server %s from %s",
 				     name, client_p->name);
+		ilog(L_SERVER, "Attempt to re-introduce server %s from %s", 
+		     name, log_client_name(client_p, SHOW_IP));
 
 		sendto_one(client_p, POP_QUEUE, "ERROR :Server already exists.");
 		exit_client(client_p, client_p, client_p, "Server Exists");
@@ -195,6 +198,8 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 				     "Attempt to re-introduce SID %s from %s%s",
 				     client_p->id, name,
 				     client_p->name);
+		log(L_SERVER, "Attempt to re-introduce SID %s from %s", 
+			       name, log_client_name(client_p, SHOW_IP));
 
 		sendto_one(client_p, POP_QUEUE, "ERROR :SID already exists.");
 		exit_client(client_p, client_p, client_p, "SID Exists");
@@ -270,7 +275,9 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, server %s already exists",
 				     client_p->name, name);
-
+		ilog(L_SERVER, "Link %s cancelled, server %s already exists",
+				     client_p->name, name);
+				     
 		exit_client(client_p, client_p, &me, "Server Exists");
 		return 0;
 	}
@@ -290,6 +297,8 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled: Server/nick collision on %s",
 				     client_p->name, name);
+		ilog(L_SERVER, "Link %s cancelled: Server/nick collision on %s", client_p->name, name);
+		
 		exit_client(client_p, client_p, client_p, "Nick as Server");
 		return 0;
 	}
@@ -354,7 +363,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		/* OOOPs nope can't HUB */
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Non-Hub link %s introduced %s.",
 				     client_p->name, name);
-
+		ilog(L_SERVER, "Non-Hub link %s introduced %s.", client_p->name, name);
 		exit_client(NULL, client_p, &me, "No matching hub_mask.");
 		return 0;
 	}
@@ -366,7 +375,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s introduced leafed server %s.",
 				     client_p->name, name);
-
+		ilog(L_SERVER, "Link %s introduced leafed server %s.", client_p->name, name);
 		exit_client(NULL, client_p, &me, "Leafed Server.");
 		return 0;
 	}
@@ -378,7 +387,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s introduced server with invalid servername %s",
 				     client_p->name, name);
-
+		ilog(L_SERVER, "Link %s introduced with invalid servername %s", client_p->name, name);
 		exit_client(NULL, client_p, &me, "Invalid servername introduced.");
 		return 0;
 	}
@@ -437,6 +446,8 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, server %s already exists",
 				     client_p->name, parv[1]);
+		ilog(L_SERVER, "Link %s cancelled, server %s already exists",
+			       client_p->name, parv[1]);
 		exit_client(NULL, client_p, &me, "Server Exists");
 		return 0;
 	}
@@ -448,6 +459,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, SID %s already exists",
 				     client_p->name, parv[3]);
+		ilog(L_SERVER, "Link %s cancelled, SID %s already exists", client_p->name, parv[3]);
 		exit_client(NULL, client_p, &me, "Server Exists");
 		return 0;
 	}
@@ -458,6 +470,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, servername %s invalid",
 				     client_p->name, parv[1]);
+		ilog(L_SERVER, "Link %s cancelled, servername %s invalid", client_p->name, parv[1]);
 		exit_client(NULL, client_p, &me, "Bogus server name");
 		return 0;
 	}
@@ -469,6 +482,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s cancelled, SID %s invalid",
 				     client_p->name, parv[3]);
+		ilog(L_SERVER, "Link %s cancelled, SID %s invalid", client_p->name, parv[3]);
 		exit_client(NULL, client_p, &me, "Bogus SID");
 		return 0;
 	}
@@ -498,6 +512,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Non-Hub link %s introduced %s.",
 				     client_p->name, parv[1]);
+		ilog(L_SERVER, "Non-Hub link %s introduced %s.", client_p->name, parv[1]);
 		exit_client(NULL, client_p, &me, "No matching hub_mask.");
 		return 0;
 	}
@@ -509,6 +524,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s introduced leafed server %s.",
 				     client_p->name, parv[1]);
+		ilog(L_SERVER, "Link %s introduced leafed server %s.", client_p->name, parv[1]);
 		exit_client(NULL, client_p, &me, "Leafed Server.");
 		return 0;
 	}
@@ -1319,6 +1335,7 @@ server_estab(struct Client *client_p)
 		/* This shouldn't happen, better tell the ops... -A1kmm */
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Warning: Lost connect{} block for server %s!", host);
+		ilog(L_SERVER, "Lost connect{} block for server %s", host);
 		return exit_client(client_p, client_p, client_p, "Lost connect{} block!");
 	}
 
@@ -1394,6 +1411,8 @@ server_estab(struct Client *client_p)
 					     "Warning: fork failed for server %s -- check servlink_path (%s)",
 					     client_p->name,
 					     ConfigFileEntry.servlink_path);
+			ilog(L_SERVER, "Fork failed for server %s -- check servlink_path (%s)", client_p->name, 
+			               ConfigFileEntry.servlink_path);
 			return exit_client(client_p, client_p, client_p, "Fork failed");
 		}
 		start_io(client_p);
