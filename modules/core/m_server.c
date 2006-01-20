@@ -198,7 +198,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 				     "Attempt to re-introduce SID %s from %s%s",
 				     client_p->id, name,
 				     client_p->name);
-		log(L_SERVER, "Attempt to re-introduce SID %s from %s", 
+		ilog(L_SERVER, "Attempt to re-introduce SID %s from %s", 
 			       name, log_client_name(client_p, SHOW_IP));
 
 		sendto_one(client_p, POP_QUEUE, "ERROR :SID already exists.");
