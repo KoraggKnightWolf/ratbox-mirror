@@ -86,7 +86,7 @@ ircd_strdup(const char *x)
 
 #endif /* __GNUC__ */
 #endif /* __APPLE__ */
-
+extern void ircd_free(void *);
 #define ircd_free(x) do { if(likely(x != NULL)) free(x); } while (0)
 
 #endif /* _I_MEMORY_H */
