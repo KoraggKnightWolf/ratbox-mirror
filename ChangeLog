@@ -1,3 +1,12 @@
+androsyn    2006/01/21 04:16:51 UTC	(20060121_0-21754)
+  Log:
+  - include a prototype for ircd_free() along with the macro version
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_memory.h (File Modified) 
+
+
 androsyn    2006/01/20 21:59:21 UTC	(20060120_5-21752)
   Log:
   - doing a ircd_strdup() in find_or_add should be acceptable here as we should have already validated the name and its length
