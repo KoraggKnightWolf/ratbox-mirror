@@ -51,9 +51,13 @@
  */
 
 #include "ircd_lib.h"
+#include "event.h"
 
 static const char *last_event_ran = NULL;
-static struct ev_entry event_table[MAX_EVENTS];
+static dlink_list event_list;
+
+//static struct ev_entry *event_table;
+static int event_table_size;
 static time_t event_time_min = -1;
  
 #ifdef USE_POSIX_TIMERS
@@ -88,58 +92,45 @@ event_run_callback(void *data)
 void
 ircd_event_add(const char *name, EVH * func, void *arg, time_t when)
 {
-	int i;
+	struct ev_entry *ev;
+	ev = ircd_malloc(sizeof(struct ev_entry));
 
-	/* find first inactive index */
-	for (i = 0; i < MAX_EVENTS; i++)
-	{
-		if(event_table[i].active == 0)
-		{
-			event_table[i].func = func;
-			event_table[i].name = name;
-			event_table[i].arg = arg;
-			event_table[i].when = ircd_currenttime + when;
-			event_table[i].frequency = when;
-			event_table[i].active = 1;
+	ev->func = func;
+	ev->name = name;
+	ev->arg = arg;
+	ev->when = ircd_currenttime + when;
+	ev->frequency = when;
 
-			if((event_table[i].when < event_time_min) || (event_time_min == -1))
-				event_time_min = event_table[i].when;
+	if((ev->when < event_time_min) || (event_time_min == -1))
+		event_time_min = ev->when;
 
 #ifdef USE_POSIX_TIMERS
-			event_table[i].ircd_id = ircd_schedule_event(when, 1, event_run_callback, &event_table[i]);
+	ev->ircd_id = ircd_schedule_event(when, 1, event_run_callback, ev);
 #endif
-
-			return;
-		}
-	}
+	
+	ircd_dlinkAdd(ev, &ev->node, &event_list);
 }
 
 void
-ircd_event_addonce(const char *name, EVH *func, void *arg, time_t when)
+ircd_event_addonce(const char *name, EVH * func, void *arg, time_t when)
 {
-	int i;
+	struct ev_entry *ev;
+	ev = ircd_malloc(sizeof(struct ev_entry));
 
-	/* find first inactive index */
-	for (i = 0; i < MAX_EVENTS; i++)
-	{
-		if(event_table[i].active == 0)
-		{
-			event_table[i].func = func;
-			event_table[i].name = name;
-			event_table[i].arg = arg;
-			event_table[i].when = ircd_currenttime + when;
-			event_table[i].frequency = 0;
-			event_table[i].active = 1;
+	ev->func = func;
+	ev->name = name;
+	ev->arg = arg;
+	ev->when = ircd_currenttime + when;
+	ev->frequency = 0;
 
-			if ((event_table[i].when < event_time_min) || (event_time_min == -1))
-				event_time_min = event_table[i].when;
+	if((ev->when < event_time_min) || (event_time_min == -1))
+		event_time_min = ev->when;
 
 #ifdef USE_POSIX_TIMERS
-			event_table[i].ircd_id = ircd_schedule_event(when, 0, event_run_callback, &event_table[i]);
+	ev->ircd_id = ircd_schedule_event(when, 0, event_run_callback, ev);
 #endif
-			return;
-		}
-	}
+	
+	ircd_dlinkAdd(ev, &ev->node, &event_list);
 }
 
 /*
@@ -152,21 +143,18 @@ ircd_event_addonce(const char *name, EVH *func, void *arg, time_t when)
 void
 ircd_event_delete(EVH * func, void *arg)
 {
-	int i;
+	struct ev_entry *ev;
 
-	i = ircd_event_find(func, arg);
+	ev = ircd_event_find(func, arg);
 
-	if(i == -1)
+	if(ev == NULL)
 		return;
-
-	event_table[i].name = NULL;
-	event_table[i].func = NULL;
-	event_table[i].arg = NULL;
-	event_table[i].active = 0;
 
 #ifdef USE_POSIX_TIMERS
 	ircd_unschedule_event(event_table[i].ircd_id);
 #endif
+	ircd_dlinkDelete(&ev->node, &event_list);
+	ircd_free(ev);
 }
 
 /* 
@@ -205,24 +193,26 @@ void
 ircd_event_run(void)
 {
 	int i;
-
-	for (i = 0; i < MAX_EVENTS; i++)
+	dlink_node *ptr, *next;
+	struct ev_entry *ev;
+	
+	DLINK_FOREACH_SAFE(ptr, next, event_list.head)
 	{
-		if(event_table[i].active && (event_table[i].when <= ircd_currenttime))
+		ev = ptr->data;
+		
+		if(ev->when <= ircd_currenttime)
 		{
-			last_event_ran = event_table[i].name;
-			event_table[i].func(event_table[i].arg);
+			last_event_ran = ev->name;
+			ev->func(ev->arg);
 			event_time_min = -1;
 
 			/* event is scheduled more than once */
-			if(event_table[i].frequency)
-				event_table[i].when = ircd_currenttime + event_table[i].frequency;
+			if(ev->frequency)
+				ev->when = ircd_currenttime + ev->frequency;
 			else
 			{
-				event_table[i].name = NULL;
-				event_table[i].func = NULL;
-				event_table[i].arg = NULL;
-				event_table[i].active = 0;
+				ircd_dlinkDelete(&ev->node, &event_list);
+				ircd_free(ev);
 			}
 		}
 	}
@@ -248,36 +238,38 @@ void
 ircd_event_init(void)
 {
 	last_event_ran = NULL;
-	memset(event_table, 0, sizeof(event_table));
 }
 
 /*
- * int ircd_event_find(EVH *func, void *arg)
+ * struct ev_entry * ircd_event_find(EVH *func, void *arg)
  *
  * Input: Event function and the argument passed to it
  * Output: Index to the slow in the event_table
  * Side Effects: None
  */
-int
+struct ev_entry *
 ircd_event_find(EVH * func, void *arg)
 {
 	int i;
-
-	for (i = 0; i < MAX_EVENTS; i++)
+	dlink_node *ptr;
+	struct ev_entry *ev;
+	DLINK_FOREACH(ptr, event_list.head)
 	{
-		if((event_table[i].func == func) &&
-		   (event_table[i].arg == arg) && event_table[i].active)
-			return i;
+		ev = ptr->data;
+		if((ev->func == func) && (ev->arg == arg))
+			return ev;
 	}
 
-	return -1;
+	return NULL;
 }
 
-int
+void
 ircd_dump_events(void (*func)(char *, void *), void *ptr)
 {
-	int len, i;
+	int len;
 	char buf[512];
+	dlink_node *dptr;
+	struct ev_entry *ev;
 	len = sizeof(buf);
 	if(last_event_ran) {
 		ircd_snprintf(buf, len, "Last event to run: %s", last_event_ran);
@@ -286,15 +278,13 @@ ircd_dump_events(void (*func)(char *, void *), void *ptr)
 	strlcpy(buf, "Operation                    Next Execution", len);
 	func(buf, ptr);
 
-	for(i = 0; i < MAX_EVENTS;i++)
+	DLINK_FOREACH(dptr, event_list.head)
 	{
-		if(event_table[i].active) {
-			ircd_snprintf(buf, len, "%-28s %-4d seconds", event_table[i].name,
-				    (int)(event_table[i].when - ircd_currenttime));
-			func(buf, ptr);
-		}
+		ev = dptr->data;
+		ircd_snprintf(buf, len, "%-28s %-4ld seconds", ev->name,
+			      ev->when - ircd_currenttime);
+		func(buf, ptr);
 	}	
-	return i;
 }
 
 /* 
@@ -307,13 +297,15 @@ void
 ircd_set_back_events(time_t by)
 {
 	int i;
-
-	for (i = 0; i < MAX_EVENTS; i++)
+	dlink_node *ptr;
+	struct ev_entry *ev;
+	DLINK_FOREACH(ptr, event_list.head)
 	{
-		if(event_table[i].when > by)
-			event_table[i].when -= by;
+		ev = ptr->data;
+		if(ev->when > by)
+			ev->when -= by;
 		else
-			event_table[i].when = 0;
+			ev->when = 0;
 	}
 }
 
@@ -321,19 +313,21 @@ void
 ircd_event_update(const char *name, time_t freq)
 {
         int i;
-  
-        for(i = 0; i < MAX_EVENTS; i++)
+        dlink_node *ptr;
+        struct ev_entry *ev;
+
+        DLINK_FOREACH(ptr, event_list.head)
         {
-                if(event_table[i].active && 
-                   !strcmp(event_table[i].name, name))
+        	ev = ptr->data;
+                if(!strcmp(ev->name, name))
                 {
-                        event_table[i].frequency = freq;
+                        ev->frequency = freq;
 
                         /* update when its scheduled to run if its higher
                          * than the new frequency
                          */
-                        if((ircd_currenttime + freq) < event_table[i].when)  
-                                event_table[i].when = ircd_currenttime + freq;
+                        if((ircd_currenttime + freq) < ev->when)  
+                                ev->when = ircd_currenttime + freq;
 
                         return;
                 }

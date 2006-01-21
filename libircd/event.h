@@ -33,42 +33,35 @@
 
 #if (defined(USE_SIGIO) || (USE_PORTS))  && defined(HAVE_TIMER_CREATE) && defined(_POSIX_TIMERS)
 #define USE_POSIX_TIMERS 1
+struct timer_data; 
 #endif
 
-/*
- * How many event entries we need to allocate at a time in the block
- * allocator. 16 should be plenty at a time.
- */
-#define	MAX_EVENTS	50
-
-
 typedef void EVH(void *);
-struct timer_data; 
 
 /* The list of event processes */
 struct ev_entry
 {
+	dlink_node node;
 	EVH *func;
 	void *arg;
 	const char *name;
 	time_t frequency;
 	time_t when;
-	int active;
 #ifdef USE_POSIX_TIMERS
 	struct timer_data * ircd_id;
 #endif
 };
 
-extern void ircd_event_add(const char *name, EVH * func, void *arg, time_t when);
-extern void ircd_event_addonce(const char *name, EVH * func, void *arg, time_t when);
-extern void ircd_event_addish(const char *name, EVH * func, void *arg, time_t delta_ish);
-extern void ircd_event_run(void);
-extern void ircd_event_init(void);
-extern void ircd_event_delete(EVH * func, void *);
+void ircd_event_add(const char *name, EVH * func, void *arg, time_t when);
+void ircd_event_addonce(const char *name, EVH * func, void *arg, time_t when);
+void ircd_event_addish(const char *name, EVH * func, void *arg, time_t delta_ish);
+void ircd_event_run(void);
+void ircd_event_init(void);
+void ircd_event_delete(EVH * func, void *);
 void ircd_event_update(const char *name, time_t freq);
-extern int ircd_event_find(EVH * func, void *);
-extern void ircd_set_back_events(time_t);
-int ircd_dump_events(void (*func)(char *, void *), void *ptr);
+struct ev_entry *ircd_event_find(EVH * func, void *);
+void ircd_set_back_events(time_t);
+void ircd_dump_events(void (*func)(char *, void *), void *ptr);
 
 
 #endif /* INCLUDED_event_h */
