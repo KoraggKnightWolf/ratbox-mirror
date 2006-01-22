@@ -1,3 +1,11 @@
+androsyn    2006/01/22 18:16:23 UTC	(20060122_1-21760)
+  Log:
+  remove some unused variables
+
+  Modified:
+	ircd-ratbox/trunk/libircd/event.c (File Modified) 
+
+
 androsyn    2006/01/22 18:14:18 UTC	(20060122_0-21758)
   Log:
   Remove the extern from function prototypes as its really not needed.
