@@ -42,22 +42,12 @@
  *  $Id$
  */
 
-/*
- * How its used:
- *
- * Should be pretty self-explanatory. Events are added to the static
- * array event_table with a frequency time telling ircd_event_run how often
- * to execute it.
- */
-
 #include "ircd_lib.h"
 #include "event.h"
 
 static const char *last_event_ran = NULL;
 static dlink_list event_list;
 
-//static struct ev_entry *event_table;
-static int event_table_size;
 static time_t event_time_min = -1;
  
 #ifdef USE_POSIX_TIMERS
@@ -192,7 +182,6 @@ ircd_event_addish(const char *name, EVH * func, void *arg, time_t delta_ish)
 void
 ircd_event_run(void)
 {
-	int i;
 	dlink_node *ptr, *next;
 	struct ev_entry *ev;
 	
@@ -250,7 +239,6 @@ ircd_event_init(void)
 struct ev_entry *
 ircd_event_find(EVH * func, void *arg)
 {
-	int i;
 	dlink_node *ptr;
 	struct ev_entry *ev;
 	DLINK_FOREACH(ptr, event_list.head)
@@ -296,7 +284,6 @@ ircd_dump_events(void (*func)(char *, void *), void *ptr)
 void
 ircd_set_back_events(time_t by)
 {
-	int i;
 	dlink_node *ptr;
 	struct ev_entry *ev;
 	DLINK_FOREACH(ptr, event_list.head)
@@ -312,7 +299,6 @@ ircd_set_back_events(time_t by)
 void
 ircd_event_update(const char *name, time_t freq)
 {
-        int i;
         dlink_node *ptr;
         struct ev_entry *ev;
 
