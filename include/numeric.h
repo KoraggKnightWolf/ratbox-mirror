@@ -31,7 +31,7 @@
  * form_str - return a format string for a message number
  * messages are defined below
  */
-extern const char *form_str(int);
+const char *form_str(int);
 
 /*
  * Reserve numerics 000-099 for server-client connections where the client

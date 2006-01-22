@@ -32,20 +32,20 @@ struct User;
 struct oper_conf;
 extern time_t LastUsedWallops;
 
-extern int valid_hostname(const char *hostname);
-extern int valid_username(const char *username);
+int valid_hostname(const char *hostname);
+int valid_username(const char *username);
 
-extern int user_mode(struct Client *, struct Client *, int, const char **);
-extern void send_umode(struct Client *, struct Client *, int, int, char *);
-extern void send_umode_out(struct Client *, struct Client *, int);
-extern int show_lusers(struct Client *source_p);
-extern int register_local_user(struct Client *, struct Client *, const char *);
+int user_mode(struct Client *, struct Client *, int, const char **);
+void send_umode(struct Client *, struct Client *, int, int, char *);
+void send_umode_out(struct Client *, struct Client *, int);
+int show_lusers(struct Client *source_p);
+int register_local_user(struct Client *, struct Client *, const char *);
 
-extern int introduce_client(struct Client *client_p, struct Client *source_p, 
+int introduce_client(struct Client *client_p, struct Client *source_p, 
 			    struct User *user, const char *nick);
 
 extern int user_modes_from_c_to_bitmask[];
-extern void show_isupport(struct Client *);
+void show_isupport(struct Client *);
 
 #define UserModeBitmask(c) user_modes_from_c_to_bitmask[(unsigned char)c]
 

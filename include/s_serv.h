@@ -141,15 +141,15 @@ extern int refresh_user_links;
 #define HUNTED_PASS     1	/* if message passed onwards successfully */
 
 
-extern int hunt_server(struct Client *client_pt,
+int hunt_server(struct Client *client_pt,
 		       struct Client *source_pt,
 		       const char *command, int server, int parc, const char **parv);
-extern void send_capabilities(struct Client *, int);
-extern const char *show_capabilities(struct Client *client);
-extern void try_connections(void *unused);
-extern void start_collect_zipstats(void);
-extern void collect_zipstats(void *unused);
+void send_capabilities(struct Client *, int);
+const char *show_capabilities(struct Client *client);
+void try_connections(void *unused);
+void start_collect_zipstats(void);
+void collect_zipstats(void *unused);
 
-extern int serv_connect(struct server_conf *, struct Client *);
+int serv_connect(struct server_conf *, struct Client *);
 
 #endif /* INCLUDED_s_serv_h */

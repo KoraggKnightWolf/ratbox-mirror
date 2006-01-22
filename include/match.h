@@ -34,9 +34,9 @@
  * match_esc - compare with support for escaping chars
  * match_cidr - compares u!h@addr with u!h@addr/cidr
  */
-extern int match(const char *mask, const char *name);
-extern int match_esc(const char *mask, const char *name);
-extern int match_cidr(const char *mask, const char *name);
+int match(const char *mask, const char *name);
+int match_esc(const char *mask, const char *name);
+int match_cidr(const char *mask, const char *name);
 
 /*
  * comp_with_mask - compares to IP address
@@ -51,23 +51,23 @@ int comp_with_mask_sock(struct sockaddr *addr, struct sockaddr *dest, u_int mask
  *
  * collapse_esc() - collapse with support for escaping chars
  */
-extern char *collapse(char *pattern);
-extern char *collapse_esc(char *pattern);
+char *collapse(char *pattern);
+char *collapse_esc(char *pattern);
 
 /*
  * irccmp - case insensitive comparison of s1 and s2
  */
-extern int irccmp(const char *s1, const char *s2);
+int irccmp(const char *s1, const char *s2);
 /*
  * ircncmp - counted case insensitive comparison of s1 and s2
  */
-extern int ircncmp(const char *s1, const char *s2, int n);
+int ircncmp(const char *s1, const char *s2, int n);
 /*
 ** canonize - reduce a string of duplicate list entries to contain
 ** only the unique items.
 */
 #ifdef NO_DUPE_MULTI_MESSAGES
-extern char *canonize(char *);
+char *canonize(char *);
 #endif
 
 #define EmptyString(x) (!(x) || (*(x) == '\0'))

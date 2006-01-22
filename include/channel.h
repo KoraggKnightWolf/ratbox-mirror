@@ -173,42 +173,42 @@ struct Ban *allocate_ban(const char *, const char *);
 void free_ban(struct Ban *bptr);
 
 
-extern void destroy_channel(struct Channel *);
+void destroy_channel(struct Channel *);
 
-extern int can_send(struct Channel *chptr, struct Client *who, 
+int can_send(struct Channel *chptr, struct Client *who, 
 		    struct membership *);
-extern int is_banned(struct Channel *chptr, struct Client *who,
+int is_banned(struct Channel *chptr, struct Client *who,
 		     struct membership *msptr, const char *, const char *);
 
-extern struct membership *find_channel_membership(struct Channel *, struct Client *);
-extern const char *find_channel_status(struct membership *msptr, int combine);
-extern void add_user_to_channel(struct Channel *, struct Client *, int flags);
-extern void remove_user_from_channel(struct membership *);
-extern void remove_user_from_channels(struct Client *);
-extern void invalidate_bancache_user(struct Client *);
+struct membership *find_channel_membership(struct Channel *, struct Client *);
+const char *find_channel_status(struct membership *msptr, int combine);
+void add_user_to_channel(struct Channel *, struct Client *, int flags);
+void remove_user_from_channel(struct membership *);
+void remove_user_from_channels(struct Client *);
+void invalidate_bancache_user(struct Client *);
 
-extern void free_channel_list(dlink_list *);
+void free_channel_list(dlink_list *);
 
-extern int check_channel_name(const char *name);
+int check_channel_name(const char *name);
 
-extern void channel_member_names(struct Channel *chptr, struct Client *,
+void channel_member_names(struct Channel *chptr, struct Client *,
 				 int show_eon);
 
-extern void del_invite(struct Channel *chptr, struct Client *who);
+void del_invite(struct Channel *chptr, struct Client *who);
 
 const char *channel_modes(struct Channel *chptr, struct Client *who);
 
-extern void check_spambot_warning(struct Client *source_p, const char *name);
+void check_spambot_warning(struct Client *source_p, const char *name);
 
-extern void check_splitmode(void *);
+void check_splitmode(void *);
 
 void set_channel_topic(struct Channel *chptr, const char *topic,
 		       const char *topic_info, time_t topicts);
 
-extern void init_chcap_usage_counts(void);
-extern void set_chcap_usage_counts(struct Client *serv_p);
-extern void unset_chcap_usage_counts(struct Client *serv_p);
-extern void send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
+void init_chcap_usage_counts(void);
+void set_chcap_usage_counts(struct Client *serv_p);
+void unset_chcap_usage_counts(struct Client *serv_p);
+void send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 				  struct Channel *chptr, struct ChModeChange foo[], int);
 
 

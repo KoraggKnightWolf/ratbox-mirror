@@ -94,11 +94,11 @@ extern dlink_list global_serv_list;
 extern dlink_list oper_list;
 extern dlink_list dead_list;
 
-extern void get_current_bandwidth(struct Client *source_p, struct Client *target_p);
+void get_current_bandwidth(struct Client *source_p, struct Client *target_p);
 
-extern unsigned long get_maxrss(void);
-extern void set_time(void);
-extern int ratbox_main(int argc, char **argv);
+unsigned long get_maxrss(void);
+void set_time(void);
+int ratbox_main(int argc, char **argv);
 extern int testing_conf;
 extern int conf_parse_failure;
 extern int maxconnections;

@@ -60,7 +60,7 @@ struct Whowas
 /*
 ** initwhowas
 */
-extern void initwhowas(void);
+void initwhowas(void);
 
 /*
 ** add_history
@@ -98,6 +98,6 @@ void count_whowas_memory(size_t *, size_t *);
 /* XXX m_whowas.c in modules needs these */
 extern struct Whowas WHOWAS[];
 extern struct Whowas *WHOWASHASH[];
-extern uint32_t hash_whowas_name(const char *name);
+uint32_t hash_whowas_name(const char *name);
 
 #endif /* INCLUDED_whowas_h */

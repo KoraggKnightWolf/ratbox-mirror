@@ -93,19 +93,19 @@ void mod_add_path(const char *path);
 void mod_clear_paths(void);
 
 /* load a module */
-extern void load_module(char *path);
+void load_module(char *path);
 
 /* load all modules */
-extern void load_all_modules(int warn);
+void load_all_modules(int warn);
 
 /* load core modules */
-extern void load_core_modules(int);
+void load_core_modules(int);
 
-extern int unload_one_module(const char *, int);
-extern int load_one_module(const char *, int);
-extern int load_a_module(const char *, int, int);
-extern int findmodule_byname(const char *);
-extern char *irc_basename(const char *);
-extern void modules_init(void);
+int unload_one_module(const char *, int);
+int load_one_module(const char *, int);
+int load_a_module(const char *, int, int);
+int findmodule_byname(const char *);
+char *irc_basename(const char *);
+void modules_init(void);
 
 #endif /* INCLUDED_modules_h */

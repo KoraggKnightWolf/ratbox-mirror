@@ -189,13 +189,13 @@ extern dlink_list ircd_fd_table[];
 
 void ircd_fdlist_init(int closeall, int maxfds);
 
-extern void ircd_open(int, unsigned int, const char *);
-extern void ircd_close(int);
-extern void ircd_dump_fd(DUMPCB *, void *xdata);
+void ircd_open(int, unsigned int, const char *);
+void ircd_close(int);
+void ircd_dump_fd(DUMPCB *, void *xdata);
 #ifndef __GNUC__
-extern void ircd_note(int fd, const char *format, ...);
+void ircd_note(int fd, const char *format, ...);
 #else
-extern void ircd_note(int fd, const char *format, ...) __attribute__ ((format(printf, 2, 3)));
+void ircd_note(int fd, const char *format, ...) __attribute__ ((format(printf, 2, 3)));
 #endif
 
 
@@ -209,8 +209,8 @@ typedef struct timer_data {
 	int		 td_repeat;
 } *ircd_event_id;
 
-extern ircd_event_id ircd_schedule_event(time_t, int, ircd_event_cb_t, void *);
-extern void ircd_unschedule_event(ircd_event_id);
+ircd_event_id ircd_schedule_event(time_t, int, ircd_event_cb_t, void *);
+void ircd_unschedule_event(ircd_event_id);
 #endif
 
 #define FB_EOF  0x01
@@ -227,39 +227,37 @@ extern void ircd_unschedule_event(ircd_event_id);
 #define IRCD_SELECT_ACCEPT		IRCD_SELECT_READ
 #define IRCD_SELECT_CONNECT		IRCD_SELECT_WRITE
 
-extern int readcalls;
+int ircd_set_nb(int);
+int ircd_set_buffers(int, int);
 
-extern int ircd_set_nb(int);
-extern int ircd_set_buffers(int, int);
+int ircd_get_sockerr(int);
 
-extern int ircd_get_sockerr(int);
-
-extern void ircd_settimeout(int fd, time_t, PF *, void *);
-extern void ircd_checktimeouts(void *);
-extern void ircd_connect_tcp(int fd, struct sockaddr *,
+void ircd_settimeout(int fd, time_t, PF *, void *);
+void ircd_checktimeouts(void *);
+void ircd_connect_tcp(int fd, struct sockaddr *,
 			     struct sockaddr *, int, CNCB *, void *, int);
-extern int ircd_connect_sockaddr(int fd, struct sockaddr *addr, socklen_t len);
+int ircd_connect_sockaddr(int fd, struct sockaddr *addr, socklen_t len);
 
-extern const char *ircd_errstr(int status);
-extern int ircd_socket(int family, int sock_type, int proto, const char *note);
-extern int ircd_socketpair(int family, int sock_type, int proto, int *nfd, const char *note);
+const char *ircd_errstr(int status);
+int ircd_socket(int family, int sock_type, int proto, const char *note);
+int ircd_socketpair(int family, int sock_type, int proto, int *nfd, const char *note);
 
-extern int ircd_accept(int fd, struct sockaddr *pn, socklen_t *addrlen);
-extern ssize_t ircd_write(int fd, const void *buf, int count);
+int ircd_accept(int fd, struct sockaddr *pn, socklen_t *addrlen);
+ssize_t ircd_write(int fd, const void *buf, int count);
 #if defined(USE_WRITEV) 
-extern ssize_t ircd_writev(int fd, const struct iovec *vector, int count);
+ssize_t ircd_writev(int fd, const struct iovec *vector, int count);
 #endif
-extern ssize_t ircd_read(int fd, void *buf, int count);
-extern int ircd_pipe(int *fd, const char *desc);
+ssize_t ircd_read(int fd, void *buf, int count);
+int ircd_pipe(int *fd, const char *desc);
 
 /* These must be defined in the network IO loop code of your choice */
-extern void ircd_setselect(int fd, unsigned int type,
+void ircd_setselect(int fd, unsigned int type,
 			   PF * handler, void *client_data);
-extern void init_netio(void);
-extern int read_message(time_t, unsigned char);
-extern int ircd_select(unsigned long);
-extern int disable_sock_options(int);
-extern int ircd_setup_fd(int fd);
+void init_netio(void);
+int read_message(time_t, unsigned char);
+int ircd_select(unsigned long);
+int disable_sock_options(int);
+int ircd_setup_fd(int fd);
 
 const char *ircd_inet_ntop(int af, const void *src, char *dst, unsigned int size);
 int ircd_inet_pton(int af, const char *src, void *dst);

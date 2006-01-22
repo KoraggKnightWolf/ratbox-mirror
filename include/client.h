@@ -321,48 +321,48 @@ enum
 	G_LINED
 };                     
 
-extern void check_banned_lines(void);
-extern void check_klines_event(void *unused);
-extern void check_klines(void);
+void check_banned_lines(void);
+void check_klines_event(void *unused);
+void check_klines(void);
 
-extern const char *get_client_name(struct Client *client, int show_ip);
-extern const char *log_client_name(struct Client *, int);
-extern void init_client(void);
-extern struct Client *make_client(struct Client *from);
-extern void free_client(struct Client *client);
+const char *get_client_name(struct Client *client, int show_ip);
+const char *log_client_name(struct Client *, int);
+void init_client(void);
+struct Client *make_client(struct Client *from);
+void free_client(struct Client *client);
 
-extern int exit_client(struct Client *, struct Client *, struct Client *, const char *);
+int exit_client(struct Client *, struct Client *, struct Client *, const char *);
 
-extern void error_exit_client(struct Client *, int);
+void error_exit_client(struct Client *, int);
 
 
 
-extern void count_local_client_memory(size_t * count, size_t * memory);
-extern void count_remote_client_memory(size_t * count, size_t * memory);
+void count_local_client_memory(size_t * count, size_t * memory);
+void count_remote_client_memory(size_t * count, size_t * memory);
 
-extern struct Client *find_chasing(struct Client *, const char *, int *);
-extern struct Client *find_person(const char *);
-extern struct Client *find_named_person(const char *);
-extern struct Client *next_client(struct Client *, const char *);
-extern void notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban);
+struct Client *find_chasing(struct Client *, const char *, int *);
+struct Client *find_person(const char *);
+struct Client *find_named_person(const char *);
+struct Client *next_client(struct Client *, const char *);
+void notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban);
 
-extern int accept_message(struct Client *source, struct Client *target);
-extern void del_from_accept(struct Client *source, struct Client *target);
+int accept_message(struct Client *source, struct Client *target);
+void del_from_accept(struct Client *source, struct Client *target);
 
 #define accept_message(s, t) ((s) == (t) || (ircd_dlinkFind((s), &((t)->localClient->allow_list))))
-extern void del_all_accepts(struct Client *client_p);
+void del_all_accepts(struct Client *client_p);
 
-extern void dead_link(struct Client *client_p, int);
-extern int show_ip(struct Client *source_p, struct Client *target_p);
-extern int show_ip_conf(struct ConfItem *aconf, struct Client *target_p);
+void dead_link(struct Client *client_p, int);
+int show_ip(struct Client *source_p, struct Client *target_p);
+int show_ip_conf(struct ConfItem *aconf, struct Client *target_p);
 
-extern void free_user(struct User *, struct Client *);
-extern struct User *make_user(struct Client *);
-extern struct Server *make_server(struct Client *);
-extern void close_connection(struct Client *);
-extern void init_uid(void);
-extern char *generate_uid(void);
+void free_user(struct User *, struct Client *);
+struct User *make_user(struct Client *);
+struct Server *make_server(struct Client *);
+void close_connection(struct Client *);
+void init_uid(void);
+char *generate_uid(void);
 
-extern void flood_endgrace(struct Client *);
+void flood_endgrace(struct Client *);
 
 #endif /* INCLUDED_client_h */

@@ -83,15 +83,15 @@ void add_class(struct Class *);
 
 struct Class *make_class(void);
 
-extern long get_sendq(struct Client *);
-extern int get_con_freq(struct Class *);
-extern struct Class *find_class(const char *);
-extern const char *get_client_class(struct Client *);
-extern int get_client_ping(struct Client *);
-extern void check_class(void);
-extern void initclass(void);
-extern void free_class(struct Class *);
-extern void fix_class(struct ConfItem *, struct ConfItem *);
-extern void report_classes(struct Client *);
+long get_sendq(struct Client *);
+int get_con_freq(struct Class *);
+struct Class *find_class(const char *);
+const char *get_client_class(struct Client *);
+int get_client_ping(struct Client *);
+void check_class(void);
+void initclass(void);
+void free_class(struct Class *);
+void fix_class(struct ConfItem *, struct ConfItem *);
+void report_classes(struct Client *);
 
 #endif /* INCLUDED_class_h */

@@ -84,20 +84,20 @@ struct MessageHash
 	struct MessageHash *next;
 };
 
-extern void parse(struct Client *, char *, char *);
+void parse(struct Client *, char *, char *);
 int string_to_array(char *string, char *parv[]);
-extern void handle_encap(struct Client *, struct Client *, 
+void handle_encap(struct Client *, struct Client *, 
 			 const char *, int, const char *parv[]);
-extern void clear_hash_parse(void);
-extern void mod_add_cmd(struct Message *msg);
-extern void mod_del_cmd(struct Message *msg);
-extern void report_messages(struct Client *);
+void clear_hash_parse(void);
+void mod_add_cmd(struct Message *msg);
+void mod_del_cmd(struct Message *msg);
+void report_messages(struct Client *);
 
 /* generic handlers */
-extern int m_ignore(struct Client *, struct Client *, int, const char **);
-extern int m_not_oper(struct Client *, struct Client *, int, const char **);
-extern int m_registered(struct Client *, struct Client *, int, const char **);
-extern int m_unregistered(struct Client *, struct Client *, int, const char **);
+int m_ignore(struct Client *, struct Client *, int, const char **);
+int m_not_oper(struct Client *, struct Client *, int, const char **);
+int m_registered(struct Client *, struct Client *, int, const char **);
+int m_unregistered(struct Client *, struct Client *, int, const char **);
 
 #define mg_ignore { m_ignore, 0 }
 #define mg_not_oper { m_not_oper, 0 }

@@ -85,14 +85,14 @@ struct BlockHeap
 };
 typedef struct BlockHeap BlockHeap;
 
-extern int BlockHeapFree(BlockHeap * bh, void *ptr);
-extern void *BlockHeapAlloc(BlockHeap * bh);
+int BlockHeapFree(BlockHeap * bh, void *ptr);
+void *BlockHeapAlloc(BlockHeap * bh);
 
-extern BlockHeap *BlockHeapCreate(size_t elemsize, int elemsperblock);
-extern int BlockHeapDestroy(BlockHeap * bh);
+BlockHeap *BlockHeapCreate(size_t elemsize, int elemsperblock);
+int BlockHeapDestroy(BlockHeap * bh);
 
-extern void initBlockHeap(void);
-extern void BlockHeapUsage(BlockHeap * bh, size_t * bused, size_t * bfree, size_t * bmemusage);
+void initBlockHeap(void);
+void BlockHeapUsage(BlockHeap * bh, size_t * bused, size_t * bfree, size_t * bmemusage);
 
 
 

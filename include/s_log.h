@@ -52,11 +52,11 @@ typedef enum ilogfile
 
 struct Client;
 
-extern void init_main_logfile(void);
-extern void open_logfiles(void);
-extern void ilog(ilogfile dest, const char *fmt, ...) AFP(2, 3);
-extern void report_operspy(struct Client *, const char *, const char *);
-extern const char *smalldate(time_t);
-extern void report_error(const char *, const char *, const char *, int);
+void init_main_logfile(void);
+void open_logfiles(void);
+void ilog(ilogfile dest, const char *fmt, ...) AFP(2, 3);
+void report_operspy(struct Client *, const char *, const char *);
+const char *smalldate(time_t);
+void report_error(const char *, const char *, const char *, int);
 
 #endif

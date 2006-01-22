@@ -33,15 +33,15 @@ extern struct cacheline *emptyline;
 
 extern char user_motd_changed[MAX_DATE_STRING];
 
-extern void init_cache(void);
-extern struct cachefile *cache_file(const char *, const char *, int);
-extern void cache_links(void *unused);
-extern void free_cachefile(struct cachefile *);
+void init_cache(void);
+struct cachefile *cache_file(const char *, const char *, int);
+void cache_links(void *unused);
+void free_cachefile(struct cachefile *);
 
-extern void load_help(void);
+void load_help(void);
 
-extern void send_user_motd(struct Client *);
-extern void send_oper_motd(struct Client *);
+void send_user_motd(struct Client *);
+void send_oper_motd(struct Client *);
 
 #endif
 

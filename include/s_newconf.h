@@ -48,13 +48,13 @@ extern dlink_list hubleaf_conf_list;
 extern dlink_list server_conf_list;
 extern dlink_list xline_conf_list;
 extern dlink_list resv_conf_list;
-dlink_list tgchange_list;
+extern dlink_list tgchange_list;
 
 struct _patricia_tree_t *tgchange_tree;
 
-extern void init_s_newconf(void);
-extern void clear_s_newconf(void);
-extern void clear_s_newconf_bans(void);
+void init_s_newconf(void);
+void clear_s_newconf(void);
+void clear_s_newconf_bans(void);
 
 #define FREE_TARGET(x) ((x)->localClient->targinfo[0])
 #define USED_TARGETS(x) ((x)->localClient->targinfo[1])
@@ -117,12 +117,12 @@ struct oper_conf
 #endif
 };
 
-extern struct remote_conf *make_remote_conf(void);
-extern void free_remote_conf(struct remote_conf *);
+struct remote_conf *make_remote_conf(void);
+void free_remote_conf(struct remote_conf *);
 
-extern int find_shared_conf(const char *username, const char *host,
+int find_shared_conf(const char *username, const char *host,
 			const char *server, int flags);
-extern void cluster_generic(struct Client *, const char *, int cltype,
+void cluster_generic(struct Client *, const char *, int cltype,
 			const char *format, ...);
 
 #define OPER_ENCRYPTED	0x00001
@@ -170,14 +170,14 @@ extern void cluster_generic(struct Client *, const char *, int cltype,
 #define IsOperInvis(x)          ((x)->operflags & OPER_INVIS)
 #define IsOperRemoteBan(x)	((x)->operflags & OPER_REMOTEBAN)
 
-extern struct oper_conf *make_oper_conf(void);
-extern void free_oper_conf(struct oper_conf *);
-extern void clear_oper_conf(void);
+struct oper_conf *make_oper_conf(void);
+void free_oper_conf(struct oper_conf *);
+void clear_oper_conf(void);
 
-extern struct oper_conf *find_oper_conf(const char *username, const char *host,
+struct oper_conf *find_oper_conf(const char *username, const char *host,
 					const char *locip, const char *oname);
 
-extern const char *get_oper_privs(int flags);
+const char *get_oper_privs(int flags);
 
 struct server_conf
 {
@@ -214,24 +214,24 @@ struct server_conf
 #define ServerConfTb(x)		((x)->flags & SERVER_TB)
 #define ServerConfAutoconn(x)	((x)->flags & SERVER_AUTOCONN)
 
-extern struct server_conf *make_server_conf(void);
-extern void free_server_conf(struct server_conf *);
-extern void clear_server_conf(void);
-extern void add_server_conf(struct server_conf *);
+struct server_conf *make_server_conf(void);
+void free_server_conf(struct server_conf *);
+void clear_server_conf(void);
+void add_server_conf(struct server_conf *);
 
-extern struct server_conf *find_server_conf(const char *name);
+struct server_conf *find_server_conf(const char *name);
 
-extern void attach_server_conf(struct Client *, struct server_conf *);
-extern void detach_server_conf(struct Client *);
-extern void set_server_conf_autoconn(struct Client *source_p, char *name, 
+void attach_server_conf(struct Client *, struct server_conf *);
+void detach_server_conf(struct Client *);
+void set_server_conf_autoconn(struct Client *source_p, char *name, 
 					int newval);
 
 
-extern struct ConfItem *find_xline(const char *, int);
-extern struct ConfItem *find_nick_resv(const char *name);
+struct ConfItem *find_xline(const char *, int);
+struct ConfItem *find_nick_resv(const char *name);
 
-extern int valid_wild_card_simple(const char *);
-extern int clean_resv_nick(const char *);
+int valid_wild_card_simple(const char *);
+int clean_resv_nick(const char *);
 time_t valid_temp_time(const char *p);
 
 struct nd_entry
@@ -244,9 +244,9 @@ struct nd_entry
 	dlink_node lnode;	/* node in ll */
 };
 
-extern void add_nd_entry(const char *name);
-extern void free_nd_entry(struct nd_entry *);
-extern unsigned long get_nd_count(void);
+void add_nd_entry(const char *name);
+void free_nd_entry(struct nd_entry *);
+unsigned long get_nd_count(void);
 
 #endif
 

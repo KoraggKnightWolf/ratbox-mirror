@@ -69,38 +69,38 @@ struct ConfItem;
 struct cachefile;
 struct nd_entry;
 
-extern uint32_t fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused);
-extern uint32_t fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused);
-extern uint32_t fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len);
-extern uint32_t fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len);
+uint32_t fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused);
+uint32_t fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused);
+uint32_t fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len);
+uint32_t fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len);
 
-extern void init_hash(void);
+void init_hash(void);
 
-extern void add_to_hash(hash_type, const char *, void *);
-extern void del_from_hash(hash_type, const char *, void *);
+void add_to_hash(hash_type, const char *, void *);
+void del_from_hash(hash_type, const char *, void *);
 
-extern struct Client *find_any_client(const char *name);
-extern struct Client *find_client(const char *name);
-extern struct Client *find_named_client(const char *name);
-extern struct Client *find_server(struct Client *source_p, const char *name);
+struct Client *find_any_client(const char *name);
+struct Client *find_client(const char *name);
+struct Client *find_named_client(const char *name);
+struct Client *find_server(struct Client *source_p, const char *name);
 
-extern struct Client *find_id(const char *name);
+struct Client *find_id(const char *name);
 
-extern struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
-extern struct Channel *find_channel(const char *name);
+struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
+struct Channel *find_channel(const char *name);
 
-extern dlink_node *find_hostname(const char *);
+dlink_node *find_hostname(const char *);
 
-extern struct ConfItem *hash_find_resv(const char *name);
-extern void clear_resv_hash(void);
+struct ConfItem *hash_find_resv(const char *name);
+void clear_resv_hash(void);
 
-extern void add_to_help_hash(const char *name, struct cachefile *hptr);
-extern void clear_help_hash(void);
-extern struct cachefile *hash_find_help(const char *name, int flags);
+void add_to_help_hash(const char *name, struct cachefile *hptr);
+void clear_help_hash(void);
+struct cachefile *hash_find_help(const char *name, int flags);
 
-extern void add_to_nd_hash(const char *name, struct nd_entry *nd);
-extern struct nd_entry *hash_find_nd(const char *name);
+void add_to_nd_hash(const char *name, struct nd_entry *nd);
+struct nd_entry *hash_find_nd(const char *name);
 
-extern void hash_stats(struct Client *);
+void hash_stats(struct Client *);
 
 #endif /* INCLUDED_hash_h */

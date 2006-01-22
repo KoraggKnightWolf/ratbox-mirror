@@ -71,21 +71,21 @@ typedef struct _buf_head
 #define ircd_linebuf_alloclen(x)	((x)->alloclen)
 #define ircd_linebuf_numlines(x)	((x)->numlines)
 
-extern void ircd_linebuf_init(size_t heap_size);
+void ircd_linebuf_init(size_t heap_size);
 /* declared as static */
-/* extern buf_line_t *ircd_linebuf_new_line(buf_head_t *); */
-/* extern void ircd_linebuf_done_line(buf_head_t *, buf_line_t *, dlink_node *); */
-/* extern int ircd_linebuf_skip_crlf(char *, int); */
-/* extern void ircd_linebuf_terminate_crlf(buf_head_t *, buf_line_t *); */
-extern void ircd_linebuf_newbuf(buf_head_t *);
-extern void client_flush_input(struct Client *);
-extern void ircd_linebuf_donebuf(buf_head_t *);
-extern int ircd_linebuf_parse(buf_head_t *, char *, int, int);
-extern int ircd_linebuf_get(buf_head_t *, char *, int, int, int);
-extern void ircd_linebuf_putmsg(buf_head_t *, const char *, va_list *, const char *, ...);
-extern void ircd_linebuf_put(buf_head_t *, const char *, ...);
-extern void ircd_linebuf_putbuf(buf_head_t *bufhead, const char *buffer);
-extern int ircd_linebuf_flush(int, buf_head_t *);
-extern void ircd_linebuf_attach(buf_head_t *, buf_head_t *);
-extern void ircd_count_ircd_linebuf_memory(size_t *, size_t *);
+/* buf_line_t *ircd_linebuf_new_line(buf_head_t *); */
+/* void ircd_linebuf_done_line(buf_head_t *, buf_line_t *, dlink_node *); */
+/* int ircd_linebuf_skip_crlf(char *, int); */
+/* void ircd_linebuf_terminate_crlf(buf_head_t *, buf_line_t *); */
+void ircd_linebuf_newbuf(buf_head_t *);
+void client_flush_input(struct Client *);
+void ircd_linebuf_donebuf(buf_head_t *);
+int ircd_linebuf_parse(buf_head_t *, char *, int, int);
+int ircd_linebuf_get(buf_head_t *, char *, int, int, int);
+void ircd_linebuf_putmsg(buf_head_t *, const char *, va_list *, const char *, ...);
+void ircd_linebuf_put(buf_head_t *, const char *, ...);
+void ircd_linebuf_putbuf(buf_head_t *bufhead, const char *buffer);
+int ircd_linebuf_flush(int, buf_head_t *);
+void ircd_linebuf_attach(buf_head_t *, buf_head_t *);
+void ircd_count_ircd_linebuf_memory(size_t *, size_t *);
 #endif

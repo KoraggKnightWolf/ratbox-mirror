@@ -299,49 +299,49 @@ typedef enum temp_list
 dlink_list temp_klines[LAST_TEMP_TYPE];
 dlink_list temp_dlines[LAST_TEMP_TYPE];
 
-extern void init_s_conf(void);
+void init_s_conf(void);
 
-extern struct ConfItem *make_conf(void);
-extern void free_conf(struct ConfItem *);
+struct ConfItem *make_conf(void);
+void free_conf(struct ConfItem *);
 
-extern void read_conf_files(int cold);
+void read_conf_files(int cold);
 
-extern int attach_conf(struct Client *, struct ConfItem *);
-extern int check_client(struct Client *client_p, struct Client *source_p, const char *);
+int attach_conf(struct Client *, struct ConfItem *);
+int check_client(struct Client *client_p, struct Client *source_p, const char *);
 
-extern int detach_conf(struct Client *);
+int detach_conf(struct Client *);
 
-extern struct ConfItem *conf_connect_allowed(struct sockaddr *addr, int);
+struct ConfItem *conf_connect_allowed(struct sockaddr *addr, int);
 
-extern struct ConfItem *find_tkline(const char *, const char *, struct sockaddr *);
-extern char *show_iline_prefix(struct Client *, struct ConfItem *, char *);
-extern void get_printable_conf(struct ConfItem *,
+struct ConfItem *find_tkline(const char *, const char *, struct sockaddr *);
+char *show_iline_prefix(struct Client *, struct ConfItem *, char *);
+void get_printable_conf(struct ConfItem *,
 			       char **, char **, char **, char **, int *, char **);
-extern void get_printable_kline(struct Client *, struct ConfItem *,
+void get_printable_kline(struct Client *, struct ConfItem *,
 				char **, char **, char **, char **);
 
-extern void yyerror(const char *);
-extern int conf_yy_fatal_error(const char *);
-extern int conf_fgets(char *, int, FILE *);
+void yyerror(const char *);
+int conf_yy_fatal_error(const char *);
+int conf_fgets(char *, int, FILE *);
 
-extern void add_temp_kline(struct ConfItem *);
-extern void add_temp_dline(struct ConfItem *);
-extern void report_temp_klines(struct Client *);
-extern void show_temp_klines(struct Client *, dlink_list *);
+void add_temp_kline(struct ConfItem *);
+void add_temp_dline(struct ConfItem *);
+void report_temp_klines(struct Client *);
+void show_temp_klines(struct Client *, dlink_list *);
 
-extern int rehash(int);
-extern void rehash_bans(int);
+int rehash(int);
+void rehash_bans(int);
 
-extern int conf_add_server(struct ConfItem *, int);
-extern void conf_add_class_to_conf(struct ConfItem *, const char *);
-extern void conf_add_me(struct ConfItem *);
-extern void conf_add_class(struct ConfItem *, int);
-extern void conf_add_d_conf(struct ConfItem *);
-extern void flush_expired_ips(void *);
+int conf_add_server(struct ConfItem *, int);
+void conf_add_class_to_conf(struct ConfItem *, const char *);
+void conf_add_me(struct ConfItem *);
+void conf_add_class(struct ConfItem *, int);
+void conf_add_d_conf(struct ConfItem *);
+void flush_expired_ips(void *);
 
-extern char *get_oper_name(struct Client *client_p);
+char *get_oper_name(struct Client *client_p);
 
-extern int yylex(void);
+int yylex(void);
 
 extern char conffilebuf[IRCD_BUFSIZE + 1];
 extern int lineno;

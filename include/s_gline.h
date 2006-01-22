@@ -30,7 +30,7 @@
 struct Client;
 struct ConfItem;
 
-extern void cleanup_glines(void *unused);
+void cleanup_glines(void *unused);
 
 typedef struct gline_pending
 {
