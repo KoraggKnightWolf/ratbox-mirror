@@ -262,7 +262,7 @@ const char *ircd_inet_ntop(int af, const void *src, char *dst, unsigned int size
 int ircd_inet_pton(int af, const char *src, void *dst);
 const char *ircd_inet_ntop_sock(struct sockaddr *src, char *dst, unsigned int size);
 int ircd_inet_pton_sock(const char *src, struct sockaddr *dst);
-extern int ircd_maxconnections;
+int ircd_getmaxconnect(void);
 
 #ifndef FD_HASH_SIZE
 #define FD_HASH_SIZE 3000

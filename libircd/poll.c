@@ -64,9 +64,9 @@ void
 init_netio(void)
 {
 	int fd;
-	pollfd_list.pollfds = ircd_malloc(ircd_maxconnections * (sizeof(struct pollfd)));
-	pollfd_list.allocated = ircd_maxconnections;
-	for (fd = 0; fd < ircd_maxconnections; fd++)
+	pollfd_list.pollfds = ircd_malloc(ircd_getmaxconnect() * (sizeof(struct pollfd)));
+	pollfd_list.allocated = ircd_getmaxconnect();
+	for (fd = 0; fd < ircd_getmaxconnect(); fd++)
 	{
 		pollfd_list.pollfds[fd].fd = -1;
 	}

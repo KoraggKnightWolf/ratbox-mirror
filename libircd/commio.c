@@ -43,7 +43,7 @@ static const char *ircd_err_str[] = { "Comm OK", "Error during bind()",
 
 /* Highest FD and number of open FDs .. */
 static int number_fd = 0;
-int ircd_maxconnections = 0;
+static int ircd_maxconnections = 0;
 
 static void ircd_connect_callback(int fd, int status);
 static PF ircd_connect_timeout;
@@ -52,7 +52,6 @@ static PF ircd_connect_tryconnect;
 #ifndef HAVE_SOCKETPAIR
 static int ircd_inet_socketpair(int d, int type, int protocol, int sv[2]);
 #endif
-
 
 static inline fde_t *
 add_fd(int fd)
@@ -165,6 +164,15 @@ ircd_get_sockerr(int fd)
 	errno = errtmp;
 #endif
 	return errtmp;
+}
+
+/*
+ * ircd_getmaxconnect - return the max number of connections allowed
+ */
+int
+ircd_getmaxconnect(void)
+{
+	return(ircd_maxconnections);
 }
 
 /*
