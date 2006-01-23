@@ -1,3 +1,19 @@
+androsyn    2006/01/23 19:14:50 UTC	(20060123_6-21778)
+  Log:
+  - get contrib to compile again
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_olist.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_admin_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_info_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_links_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_motd_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_stats_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_stats_p_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_whois_notice.c (File Modified) 
+	ircd-ratbox/trunk/contrib/spy_whois_notice_global.c (File Modified) 
+
+
 androsyn    2006/01/23 18:16:42 UTC	(20060123_5-21774)
   Log:
   - the event code changes weren't supposed to be in the last commit
