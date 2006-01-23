@@ -1,3 +1,19 @@
+androsyn    2006/01/23 16:43:58 UTC	(20060123_0-21762)
+  Log:
+  - rework ircd_dump_fd to just walk the fd hash and not need ircd_highest_fd
+  - rework select to not need ircd_highest_fd as well
+  - make select fd_sets be static
+  - make number_fd static
+   
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/select.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2006/01/22 18:16:23 UTC	(20060122_1-21760)
   Log:
   remove some unused variables
