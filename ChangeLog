@@ -1,3 +1,13 @@
+androsyn    2006/01/23 18:16:42 UTC	(20060123_5-21774)
+  Log:
+  - the event code changes weren't supposed to be in the last commit
+    but they are there anyways so update the changelog entry to go with it
+  
+
+  Modified:
+	ircd-ratbox/trunk/ChangeLog (File Modified) 
+
+
 androsyn    2006/01/23 18:11:54 UTC	(20060123_4-21770)
   Log:
   - remove mostly useless NULL read/write handler messages from epoll.c
