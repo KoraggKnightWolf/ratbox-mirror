@@ -1,7 +1,8 @@
 androsyn    2006/01/23 18:11:54 UTC	(20060123_4-21770)
   Log:
-  remove mostly useless NULL read/write handler messages from epoll.c
-
+  - remove mostly useless NULL read/write handler messages from epoll.c
+  - add a generic void *data to struct ev_entry and have the posix timer
+    code use that.
   Modified:
 	ircd-ratbox/trunk/libircd/epoll.c (File Modified) 
 	ircd-ratbox/trunk/libircd/event.c (File Modified) 
