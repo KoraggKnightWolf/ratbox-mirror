@@ -53,6 +53,6 @@ show_whois_global(hook_data_client *data)
 				":%s NOTICE %s :*** Notice -- %s (%s@%s) is doing a whois on you [%s]",
 				me.name, target_p->name, source_p->name,
 				source_p->username, source_p->host,
-				source_p->user->server);
+				source_p->servptr->name);
 	}
 }

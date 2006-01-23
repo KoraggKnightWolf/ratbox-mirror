@@ -45,5 +45,5 @@ show_motd(hook_data *data)
 	sendto_realops_flags(UMODE_SPY, L_ALL,
 			     "motd requested by %s (%s@%s) [%s]",
 			     data->client->name, data->client->username,
-			     data->client->host, data->client->user->server);
+			     data->client->host, data->client->servptr->name);
 }

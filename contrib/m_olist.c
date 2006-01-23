@@ -108,7 +108,7 @@ list_all_channels(struct Client *source_p)
 
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_LIST),
 				me.name, source_p->name, chptr->chname,
-				dlink_list_length(&chptr->members),
+				ircd_dlink_list_length(&chptr->members),
 				chptr->topic == NULL ? "" : chptr->topic);
 	}
 
@@ -145,6 +145,6 @@ list_named_channel(struct Client *source_p, const char *name)
 				form_str(ERR_NOSUCHCHANNEL), n);
 	else
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_LIST), me.name, source_p->name,
-			chptr->chname, dlink_list_length(&chptr->members),
+			chptr->chname, ircd_dlink_list_length(&chptr->members),
 			chptr->topic ? chptr->topic : "");
 }
