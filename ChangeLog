@@ -1,3 +1,15 @@
+androsyn    2006/01/23 17:43:11 UTC	(20060123_2-21766)
+  Log:
+  - remove forward defintion of struct Client from commio.h
+  - remove prototype for client_flush_input
+  - remove extern declartion for ircd_highest_fd
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/linebuf.h (File Modified) 
+
+
 androsyn    2006/01/23 16:51:45 UTC	(20060123_1-21764)
   Log:
   - dont export ircd_maxconnections instead have ircd_getmaxconnect() return it
