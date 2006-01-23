@@ -33,18 +33,19 @@
  *   -- adrian
  */
 
-fd_set select_readfds;
-fd_set select_writefds;
+static fd_set select_readfds;
+static fd_set select_writefds;
 
 /*
  * You know, I'd rather have these local to ircd_select but for some
  * reason my gcc decides that I can't modify them at all..
  *   -- adrian
  */
-fd_set tmpreadfds;
-fd_set tmpwritefds;
+static fd_set tmpreadfds;
+static fd_set tmpwritefds;
 
-static void select_update_selectfds(int fd, short event, PF * handler);
+static int maxfd;
+static void select_update_selectfds(fde_t *F, short event, PF * handler);
 
 /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 /* Private functions */
@@ -53,22 +54,48 @@ static void select_update_selectfds(int fd, short event, PF * handler);
  * set and clear entries in the select array ..
  */
 static void
-select_update_selectfds(int fd, short event, PF * handler)
+select_update_selectfds(fde_t *F, short event, PF * handler)
 {
 	/* Update the read / write set */
 	if(event & IRCD_SELECT_READ)
 	{
-		if(handler)
-			FD_SET(fd, &select_readfds);
-		else
-			FD_CLR(fd, &select_readfds);
+		if(handler) 
+		{
+			FD_SET(F->fd, &select_readfds);
+			F->pflags |= IRCD_SELECT_READ;		
+		} 
+		else 
+		{
+			FD_CLR(F->fd, &select_readfds);
+			F->pflags &= ~IRCD_SELECT_READ;
+		}
 	}
+
 	if(event & IRCD_SELECT_WRITE)
 	{
-		if(handler)
-			FD_SET(fd, &select_writefds);
-		else
-			FD_CLR(fd, &select_writefds);
+		if(handler) 
+		{
+			FD_SET(F->fd, &select_writefds);
+			F->pflags |= IRCD_SELECT_WRITE;
+		}
+		else 
+		{
+			FD_CLR(F->fd, &select_writefds);
+			F->pflags &= ~IRCD_SELECT_WRITE;
+		}
+	}
+
+	if(F->pflags & (IRCD_SELECT_READ|IRCD_SELECT_WRITE))
+	{
+		if(F->fd > maxfd)
+		{
+			maxfd = F->fd;		
+		}
+	} 
+	else if(F->fd <= maxfd)
+	{
+		while(maxfd >= 0 && !FD_ISSET(F->fd, &select_readfds) && !FD_ISSET(F->fd, &select_writefds))
+			maxfd--;		
 	}
 }
 
@@ -114,13 +141,13 @@ ircd_setselect(int fd, unsigned int type, PF * handler,
 	{
 		F->read_handler = handler;
 		F->read_data = client_data;
-		select_update_selectfds(fd, IRCD_SELECT_READ, handler);
+		select_update_selectfds(F, IRCD_SELECT_READ, handler);
 	}
 	if(type & IRCD_SELECT_WRITE)
 	{
 		F->write_handler = handler;
 		F->write_data = client_data;
-		select_update_selectfds(fd, IRCD_SELECT_WRITE, handler);
+		select_update_selectfds(F, IRCD_SELECT_WRITE, handler);
 	}
 }
 
@@ -194,9 +221,9 @@ ircd_select(unsigned long delay)
 		}
 
 		if(F->read_handler == NULL)
-			select_update_selectfds(fd, IRCD_SELECT_READ, NULL);
+			select_update_selectfds(F, IRCD_SELECT_READ, NULL);
 		if(F->write_handler == NULL)
-			select_update_selectfds(fd, IRCD_SELECT_WRITE, NULL);
+			select_update_selectfds(F, IRCD_SELECT_WRITE, NULL);
 	}
 	return 0;
 }

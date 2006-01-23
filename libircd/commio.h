@@ -126,7 +126,6 @@ typedef struct _fde fde_t;
 
 
 extern int ircd_highest_fd;
-extern int number_fd;
 
 struct Client;
 

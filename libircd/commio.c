@@ -41,13 +41,8 @@ static const char *ircd_err_str[] = { "Comm OK", "Error during bind()",
 	"Comm Error"
 };
 
-
-
-static void ircd_fdlist_update_biggest(int fd, int opening);
-
 /* Highest FD and number of open FDs .. */
-int ircd_highest_fd = -1;		/* Its -1 because we haven't started yet -- adrian */
-int number_fd = 0;
+static int number_fd = 0;
 int ircd_maxconnections = 0;
 
 static void ircd_connect_callback(int fd, int status);
@@ -655,25 +650,6 @@ ircd_accept(int fd, struct sockaddr *pn, socklen_t * addrlen)
 }
 
 
-
-static void
-ircd_fdlist_update_biggest(int fd, int opening)
-{
-	if(fd < ircd_highest_fd)
-		return;
-
-	if(unlikely(fd > ircd_highest_fd))
-	{
-		/*  
-		 * lircd_assert that we are not closing a FD bigger than
-		 * our known biggest FD
-		 */
-		ircd_highest_fd = fd;
-		return;
-	}
-}
-
-
 void
 ircd_fdlist_init(int closeall, int maxfds)
 {
@@ -719,7 +695,6 @@ ircd_open(int fd, unsigned int type, const char *desc)
 	F->type = type;
 	F->flags.open = 1;
 
-	ircd_fdlist_update_biggest(fd, 1);
 	if(desc)
 		strlcpy(F->desc, desc, sizeof(F->desc));
 	number_fd++;
@@ -748,7 +723,6 @@ ircd_close(int fd)
 	ircd_settimeout(F->fd, 0, NULL, NULL);
 
 	F->flags.open = 0;
-	ircd_fdlist_update_biggest(fd, 0);
 	number_fd--;
 	type = F->type;
 	remove_fd(fd);
@@ -771,14 +745,26 @@ void
 ircd_dump_fd(DUMPCB * cb, void *data)
 {
 	static const char *empty = "";
+	dlink_node *ptr;
+	dlink_list *bucket;
+	fde_t *F;
 	int i;
-	for (i = 0; i <= ircd_highest_fd; i++)
+
+	for(i = 0; i < FD_HASH_SIZE; i++)
 	{
-		fde_t *F = find_fd(i);
-		if(F == NULL || !F->flags.open)
+		bucket = &ircd_fd_table[i];
+
+		if(ircd_dlink_list_length(bucket) <= 0)
 			continue;
 
-		cb(i, F->desc ? F->desc : empty, data);
+		DLINK_FOREACH(ptr, bucket->head)
+		{
+			F = ptr->data;
+			if(F == NULL || !F->flags.open)
+				continue;
+
+			cb(i, F->desc ? F->desc : empty, data);
+		}
 	}
 }
 
