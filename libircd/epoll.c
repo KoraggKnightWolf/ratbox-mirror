@@ -181,9 +181,6 @@ ircd_select(unsigned long delay)
 			if(hdl) {
 				hdl(F->fd, data);
 			}
-			else
-				ircd_lib_log("epoll.c: NULL read handler called");
-	
 		}
 
 		if(F->flags.open == 0)
@@ -198,8 +195,6 @@ ircd_select(unsigned long delay)
 			if(hdl) {
 				hdl(F->fd, data);
 			}
-			else
-				ircd_lib_log("epoll.c: NULL write handler called");
 		}
 		
 		if(F->flags.open == 0)

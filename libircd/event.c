@@ -64,7 +64,6 @@ event_run_callback(void *data)
 		ev->name = NULL;
 		ev->func = NULL;
 		ev->arg = NULL;
-		ev->active = 0;
 	} else {
 		ev->when = ircd_currenttime + ev->frequency;
 	}
@@ -95,7 +94,7 @@ ircd_event_add(const char *name, EVH * func, void *arg, time_t when)
 		event_time_min = ev->when;
 
 #ifdef USE_POSIX_TIMERS
-	ev->ircd_id = ircd_schedule_event(when, 1, event_run_callback, ev);
+	ev->data = ircd_schedule_event(when, 1, event_run_callback, ev);
 #endif
 	
 	ircd_dlinkAdd(ev, &ev->node, &event_list);
@@ -117,7 +116,7 @@ ircd_event_addonce(const char *name, EVH * func, void *arg, time_t when)
 		event_time_min = ev->when;
 
 #ifdef USE_POSIX_TIMERS
-	ev->ircd_id = ircd_schedule_event(when, 0, event_run_callback, ev);
+	ev->data = ircd_schedule_event(when, 0, event_run_callback, ev);
 #endif
 	
 	ircd_dlinkAdd(ev, &ev->node, &event_list);
@@ -141,7 +140,7 @@ ircd_event_delete(EVH * func, void *arg)
 		return;
 
 #ifdef USE_POSIX_TIMERS
-	ircd_unschedule_event(event_table[i].ircd_id);
+	ircd_unschedule_event(ev->data);
 #endif
 	ircd_dlinkDelete(&ev->node, &event_list);
 	ircd_free(ev);

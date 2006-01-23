@@ -33,7 +33,6 @@
 
 #if (defined(USE_SIGIO) || (USE_PORTS))  && defined(HAVE_TIMER_CREATE) && defined(_POSIX_TIMERS)
 #define USE_POSIX_TIMERS 1
-struct timer_data; 
 #endif
 
 typedef void EVH(void *);
@@ -47,9 +46,7 @@ struct ev_entry
 	const char *name;
 	time_t frequency;
 	time_t when;
-#ifdef USE_POSIX_TIMERS
-	struct timer_data * ircd_id;
-#endif
+	void * data;
 };
 
 void ircd_event_add(const char *name, EVH * func, void *arg, time_t when);
