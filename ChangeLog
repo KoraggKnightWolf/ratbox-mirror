@@ -1,3 +1,13 @@
+androsyn    2006/01/23 18:11:54 UTC	(20060123_4-21770)
+  Log:
+  remove mostly useless NULL read/write handler messages from epoll.c
+
+  Modified:
+	ircd-ratbox/trunk/libircd/epoll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.c (File Modified) 
+	ircd-ratbox/trunk/libircd/event.h (File Modified) 
+
+
 androsyn    2006/01/23 17:59:19 UTC	(20060123_3-21768)
   Log:
   remove an instance of ircd_highest_fd from m_set.c
