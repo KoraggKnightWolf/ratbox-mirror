@@ -1,3 +1,11 @@
+androsyn    2006/01/23 17:59:19 UTC	(20060123_3-21768)
+  Log:
+  remove an instance of ircd_highest_fd from m_set.c
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
+
+
 androsyn    2006/01/23 17:43:11 UTC	(20060123_2-21766)
   Log:
   - remove forward defintion of struct Client from commio.h
