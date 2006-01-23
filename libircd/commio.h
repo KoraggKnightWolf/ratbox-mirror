@@ -124,11 +124,6 @@ enum
 
 typedef struct _fde fde_t;
 
-
-extern int ircd_highest_fd;
-
-struct Client;
-
 struct timeout_data
 {
 	fde_t *F;

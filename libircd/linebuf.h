@@ -36,8 +36,6 @@
 #define LINEBUF_PARSED          0
 #define LINEBUF_RAW             1
 
-struct Client;
-
 struct _buf_line;
 struct _buf_head;
 
@@ -78,7 +76,6 @@ void ircd_linebuf_init(size_t heap_size);
 /* int ircd_linebuf_skip_crlf(char *, int); */
 /* void ircd_linebuf_terminate_crlf(buf_head_t *, buf_line_t *); */
 void ircd_linebuf_newbuf(buf_head_t *);
-void client_flush_input(struct Client *);
 void ircd_linebuf_donebuf(buf_head_t *);
 int ircd_linebuf_parse(buf_head_t *, char *, int, int);
 int ircd_linebuf_get(buf_head_t *, char *, int, int, int);
