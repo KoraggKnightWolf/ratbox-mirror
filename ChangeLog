@@ -1,3 +1,14 @@
+androsyn    2006/01/23 16:51:45 UTC	(20060123_1-21764)
+  Log:
+  - dont export ircd_maxconnections instead have ircd_getmaxconnect() return it
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+	ircd-ratbox/trunk/libircd/sigio.c (File Modified) 
+
+
 androsyn    2006/01/23 16:43:58 UTC	(20060123_0-21762)
   Log:
   - rework ircd_dump_fd to just walk the fd hash and not need ircd_highest_fd
