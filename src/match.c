@@ -258,10 +258,63 @@ comp_with_mask_sock(struct sockaddr *addr, struct sockaddr *dest, u_int mask)
 	return(comp_with_mask(iaddr, idest, mask));
 }
 
+/*
+ * match_ips()
+ *
+ * Input - cidr ip mask, address
+ */
+int
+match_ips(const char *s1, const char *s2)
+{
+	struct irc_sockaddr_storage ipaddr, maskaddr;
+	char mask[BUFSIZE];
+	char address[HOSTLEN + 1];
+	char *len;
+	void *ipptr, *maskptr;
+	int cidrlen, aftype;
 
+	strcpy(mask, s1);
+	strcpy(address, s2);
+
+	len = strrchr(mask, '/');
+	if(len == NULL)
+		return 0;
+
+	*len++ = '\0';
+
+	cidrlen = atoi(len);
+	if(cidrlen == 0)
+		return 0;
+
+#ifdef IPV6
+	if(strchr(mask, ':') && strchr(address, ':'))
+	{
+		aftype = AF_INET6;
+		ipptr = &((struct sockaddr_in6 *)&ipaddr)->sin6_addr;
+		maskptr = &((struct sockaddr_in6 *)&maskaddr)->sin6_addr;
+	}
+	else
+#endif
+	if(!strchr(mask, ':') && !strchr(address, ':'))
+	{
+		aftype = AF_INET;
+		ipptr = &((struct sockaddr_in *)&ipaddr)->sin_addr;
+		maskptr = &((struct sockaddr_in *)&maskaddr)->sin_addr;
+	}
+	else
+		return 0;
+
+	ircd_inet_pton(aftype, address, ipptr);
+	ircd_inet_pton(aftype, mask, maskptr);
+	if(comp_with_mask(ipptr, maskptr, cidrlen))
+		return 1;
+	else
+		return 0;
+}
+ 
 
 /* match_cidr()
- *
+ * Matches cidr channel bans in *@host form
  * Input - mask, address
  * Ouput - 1 = Matched 0 = Did not match
  */

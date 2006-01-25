@@ -33,11 +33,12 @@
  *
  * match_esc - compare with support for escaping chars
  * match_cidr - compares u!h@addr with u!h@addr/cidr
+ * match_ips - comapres addr with addr/cidr in ascii form
  */
 int match(const char *mask, const char *name);
 int match_esc(const char *mask, const char *name);
 int match_cidr(const char *mask, const char *name);
-
+int match_ips(const char *mask, const char *addr);
 /*
  * comp_with_mask - compares to IP address
  */

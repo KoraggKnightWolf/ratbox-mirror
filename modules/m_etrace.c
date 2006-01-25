@@ -50,10 +50,16 @@
 static int mo_etrace(struct Client *, struct Client *, int, const char **);
 static int me_etrace(struct Client *, struct Client *, int, const char **);
 static int mo_chantrace(struct Client *, struct Client *, int, const char **);
+static int mo_masktrace(struct Client *, struct Client *, int, const char **);
 
 struct Message chantrace_msgtab = {
 	"CHANTRACE", 0, 0, 0, MFLG_SLOW,
 	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_chantrace, 2}}
+};
+
+struct Message masktrace_msgtab = {
+	"MASKTRACE", 0, 0, 0, MFLG_SLOW,
+	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_masktrace, 2}}
 };
                     
 struct Message etrace_msgtab = {
@@ -61,12 +67,15 @@ struct Message etrace_msgtab = {
 	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_etrace, 0}, {mo_etrace, 0}}
 };
 
-mapi_clist_av1 etrace_clist[] = { &etrace_msgtab, &chantrace_msgtab, NULL };
+mapi_clist_av1 etrace_clist[] = { &etrace_msgtab, &chantrace_msgtab, &masktrace_msgtab, NULL };
 DECLARE_MODULE_AV1(etrace, NULL, NULL, etrace_clist, NULL, NULL, "$Revision: 19256 $");
 
 static void do_etrace(struct Client *source_p, int ipv4, int ipv6);
 static void do_etrace_full(struct Client *source_p);
 static void do_single_etrace(struct Client *source_p, struct Client *target_p);
+
+static const char *empty_sockhost = "255.255.255.255";
+static const char *spoofed_sockhost = "0";
 
 /*
  * m_etrace
@@ -205,8 +214,6 @@ do_single_etrace(struct Client *source_p, struct Client *target_p)
 static int
 mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	static const char empty_sockhost[] = "255.255.255.255";
-	static const char spoofed_sockhost[] = "0";
 	struct Client *target_p;
 	struct Channel *chptr;
 	struct membership *msptr;
@@ -267,6 +274,148 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 				target_p->name, target_p->username, target_p->host,
 				sockhost, target_p->info);
 	}
+
+	sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), me.name); 
+	return 0;
+}
+
+static void
+match_masktrace(struct Client *source_p, dlink_list *list, const char *username, const char *hostname, const char *name, const char *gecos)
+{
+	struct Client *target_p;
+	dlink_node *ptr;
+	const char *sockhost;	
+	char *mangle_gecos = NULL;
+	
+	if(gecos != NULL)
+	{
+		if(strstr(gecos, "\\s"))
+		{
+			char *tmp = LOCAL_COPY(gecos);
+			char *orig = tmp;
+			char *new = tmp;
+	                while(*orig)
+        	        {
+                	        if(*orig == '\\')
+                       		{
+	                                if(*(orig + 1) == 's')
+	                                {
+	                                        *new++ = ' ';
+	                                        orig += 2;   
+	                                }
+	                                /* otherwise skip that and the escaped
+	                                 * character after it, so we dont mistake
+	                                 * \\s as \s --fl
+	                                 */
+	                                else
+	                                {   
+	                                        *new++ = *orig++;
+	                                        *new++ = *orig++;
+	                                }
+	                        }
+	                        else
+	                                *new++ = *orig++;
+	                }
+	
+	                *new = '\0';
+	                mangle_gecos = LOCAL_COPY(tmp);
+	        }
+	        else
+	                mangle_gecos = LOCAL_COPY(gecos);
+	}
+
+	DLINK_FOREACH(ptr, list->head)
+	{
+		target_p = ptr->data;
+		if(!IsPerson(target_p))
+			continue;
+		
+		if(EmptyString(target_p->sockhost))
+			sockhost = empty_sockhost;
+		else if(!show_ip(source_p, target_p))
+			sockhost = spoofed_sockhost;
+		else
+			sockhost = target_p->sockhost;
+
+		if(match(username, target_p->username) && (match(hostname, target_p->host) || match_ips(hostname, sockhost)))
+		{
+			if(name != NULL && !match(name, target_p->name))
+				continue;
+
+			if(mangle_gecos != NULL && !match_esc(mangle_gecos, target_p->info))
+				continue;
+			
+			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_ETRACE),
+				me.name, source_p->name, 
+				IsOper(target_p) ? "Oper" : "User",
+				/* class field -- pretend its server.. */
+				target_p->servptr->name,
+				target_p->name, target_p->username, target_p->host,
+				sockhost, target_p->info);
+		}
+	}
+}
+
+static int
+mo_masktrace(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+{
+	char *name, *username, *hostname, *gecos;
+	const char *mask;
+	int operspy = 0;
+
+	mask = parv[1];	
+	name = LOCAL_COPY(parv[1]);	
+	collapse(name);
+
+	
+	if(IsOperSpy(source_p) && parv[1][0] == '!')
+	{
+		name++;
+		mask++;
+		operspy = 1;
+	}		
+	
+	if(parc > 2 && !EmptyString(parv[2]))
+	{
+		gecos = LOCAL_COPY(parv[2]);
+		collapse_esc(gecos);
+	} else
+		gecos = NULL;
+	
+
+	if((hostname = strchr(name, '@')) == NULL)
+	{
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid parameters", me.name, source_p->name);
+		return 0;
+	}
+
+	*hostname++ = '\0';
+	
+	if((username = strchr(name, '!')) == NULL)
+	{
+		username = name;
+		name = NULL;
+	} else
+		*username++ = '\0';
+
+	if(EmptyString(username) || EmptyString(hostname))
+	{
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid parameters", me.name, source_p->name);
+		return 0;
+	}
+			
+	if(operspy) {
+		char buf[512];
+		strlcpy(buf, mask, sizeof(buf));
+		if(!EmptyString(gecos)) {
+			strlcat(buf, " ", sizeof(buf));
+			strlcat(buf, gecos, sizeof(buf));
+		}		
+
+		report_operspy(source_p, "MASKTRACE", buf);	
+		match_masktrace(source_p, &global_client_list, username, hostname, name, gecos);		
+	} else
+		match_masktrace(source_p, &lclient_list, username, hostname, name, gecos);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), me.name); 
 	return 0;
