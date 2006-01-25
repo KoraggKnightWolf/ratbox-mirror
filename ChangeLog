@@ -1,3 +1,12 @@
+androsyn    2006/01/25 20:53:50 UTC	(20060125_2-21786)
+  Log:
+  - do the numeric part of the testmask changes
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 androsyn    2006/01/25 20:22:53 UTC	(20060125_1-21782)
   Log:
   here is the first half of the testmask stuff. the numeric still needs sorted out
