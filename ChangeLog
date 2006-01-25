@@ -1,3 +1,15 @@
+androsyn    2006/01/25 19:37:53 UTC	(20060125_0-21780)
+  Log:
+  - add masktrace which takes options like MASKTRACE user@host :gecos
+   
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/match.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_etrace.c (File Modified) 
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 androsyn    2006/01/23 19:14:50 UTC	(20060123_6-21778)
   Log:
   - get contrib to compile again
