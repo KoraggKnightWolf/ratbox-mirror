@@ -1,3 +1,12 @@
+androsyn    2006/01/25 20:22:53 UTC	(20060125_1-21782)
+  Log:
+  here is the first half of the testmask stuff. the numeric still needs sorted out
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+
+
 androsyn    2006/01/25 19:37:53 UTC	(20060125_0-21780)
   Log:
   - add masktrace which takes options like MASKTRACE user@host :gecos
