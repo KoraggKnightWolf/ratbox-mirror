@@ -67,7 +67,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	int gcount = 0;
 	char *name, *username, *hostname;
 	const char *sockhost;
-	char *gecos = NULL;
+	char *gecos = NULL, *mangle_gecos = NULL;
 	dlink_node *ptr;
 
 	name = LOCAL_COPY(parv[1]);
@@ -132,8 +132,9 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
                         }
 
                         *new = '\0';
-                        gecos = LOCAL_COPY(tmp);
-                }
+                        mangle_gecos = LOCAL_COPY(tmp);
+                } else
+                	mangle_gecos = gecos;
 	}
 
 	DLINK_FOREACH(ptr, global_client_list.head)
@@ -156,7 +157,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 			if(name && !match(name, target_p->name))
 				continue;
 
-			if(gecos && !match_esc(gecos, target_p->info))
+			if(mangle_gecos && !match_esc(mangle_gecos, target_p->info))
 				continue;
 
 			if(MyClient(target_p))
@@ -166,10 +167,10 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 		}
 	}
 
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_TESTMASK),
+	sendto_one(source_p, POP_QUEUE, form_str(RPL_TESTMASKGECOS),
                                me.name, source_p->name,
-                               name ? name : "*",
-                               username, hostname, lcount, gcount);
+                               lcount, gcount, name ? name : "*",
+                               username, hostname, gecos ? gecos : "*");
 	return 0;
 }
 
