@@ -152,7 +152,6 @@ modules_m_trace_la_LDFLAGS =  -module $(MODULE_FLAGS)
 modules_m_unreject_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_user_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_userhost_la_LDFLAGS =  -module $(MODULE_FLAGS)  
-modules_m_users_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_version_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_wallops_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_who_la_LDFLAGS =  -module $(MODULE_FLAGS)  
@@ -207,7 +206,6 @@ modules_m_trace_la_SOURCES =	modules/m_trace.c
 modules_m_unreject_la_SOURCES =	modules/m_unreject.c
 modules_m_user_la_SOURCES =	modules/m_user.c
 modules_m_userhost_la_SOURCES =	modules/m_userhost.c
-modules_m_users_la_SOURCES =	modules/m_users.c
 modules_m_version_la_SOURCES =	modules/m_version.c
 modules_m_wallops_la_SOURCES =	modules/m_wallops.c
 modules_m_who_la_SOURCES =	modules/m_who.c
@@ -263,7 +261,6 @@ modules/m_trace.la	\
 modules/m_unreject.la	\
 modules/m_user.la	\
 modules/m_userhost.la	\
-modules/m_users.la	\
 modules/m_version.la	\
 modules/m_wallops.la	\
 modules/m_who.la	\
@@ -319,7 +316,6 @@ modules_m_trace_la_LIBADD = $(MODULE_LIBS)
 modules_m_unreject_la_LIBADD = $(MODULE_LIBS)     
 modules_m_user_la_LIBADD = $(MODULE_LIBS)     
 modules_m_userhost_la_LIBADD = $(MODULE_LIBS)     
-modules_m_users_la_LIBADD = $(MODULE_LIBS)     
 modules_m_version_la_LIBADD = $(MODULE_LIBS)     
 modules_m_wallops_la_LIBADD = $(MODULE_LIBS)     
 modules_m_who_la_LIBADD = $(MODULE_LIBS)     

@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
  *  Copyright (C) 1996-2002 Hybrid Development Team
- *  Copyright (C) 2002-2005 ircd-ratbox development team
+ *  Copyright (C) 2002-2006 ircd-ratbox development team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,13 +37,19 @@
 
 static int m_lusers(struct Client *, struct Client *, int, const char **);
 static int ms_lusers(struct Client *, struct Client *, int, const char **);
+static int m_users(struct Client *, struct Client *, int, const char **);
 
 struct Message lusers_msgtab = {
 	"LUSERS", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, {m_lusers, 0}, {ms_lusers, 0}, mg_ignore, mg_ignore, {ms_lusers, 0}}
 };
 
-mapi_clist_av1 lusers_clist[] = { &lusers_msgtab, NULL };
+struct Message users_msgtab = {
+	"USERS", 0, 0, 0, MFLG_SLOW,
+	{mg_unreg, {m_users, 0}, {m_users, 0}, mg_ignore, mg_ignore, {m_users, 0}}
+};
+
+mapi_clist_av1 lusers_clist[] = { &lusers_msgtab, &users_msgtab, NULL };
 DECLARE_MODULE_AV1(lusers, NULL, NULL, lusers_clist, NULL, NULL, "$Revision: 19256 $");
 
 /*
@@ -102,6 +108,33 @@ ms_lusers(struct Client *client_p, struct Client *source_p, int parc, const char
 	}
 
 	show_lusers(source_p);
+
+	return 0;
+}
+
+
+/*
+ * m_users
+ *      parv[0] = sender prefix
+ *      parv[1] = servername
+ */
+static int
+m_users(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+{
+	if(hunt_server(client_p, source_p, ":%s USERS :%s", 1, parc, parv) == HUNTED_ISME)
+	{
+		sendto_one_numeric(source_p, POP_QUEUE, RPL_LOCALUSERS,
+				   form_str(RPL_LOCALUSERS),
+				   ircd_dlink_list_length(&lclient_list), 
+				   Count.max_loc,
+				   ircd_dlink_list_length(&lclient_list), 
+				   Count.max_loc);
+
+		sendto_one_numeric(source_p, POP_QUEUE, RPL_GLOBALUSERS, 
+				   form_str(RPL_GLOBALUSERS),
+				   Count.total, Count.max_tot,
+				   Count.total, Count.max_tot);
+	}
 
 	return 0;
 }
