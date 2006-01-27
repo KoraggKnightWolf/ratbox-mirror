@@ -3,12 +3,12 @@ Help topics available to opers:
 ACCEPT          ADMIN           AWAY            CAPAB
 CHALLENGE       CHANTRACE       CLOSE           CMODE
 CNOTICE         CONNECT         CPRIVMSG        CREDITS
-DIE             DLINE           EOB             ERROR
-ETRACE          GLINE           HELP            INDEX
-INFO            INVITE          ISON            JOIN
-KICK            KILL            KLINE           KNOCK
-LINKS           LIST            LOCOPS          LUSERS
-MAP             MODLIST         MODLOAD         MODRESTART
+DIE             DLINE           ERROR           ETRACE
+GLINE           HELP            INDEX           INFO
+INVITE          ISON            JOIN            KICK
+KILL            KLINE           KNOCK           LINKS
+LIST            LOCOPS          LUSERS          MAP
+MASKTRACE       MODLIST         MODLOAD         MODRESTART
 MODUNLOAD       MONITOR         MOTD            NAMES
 NICK            NOTICE          OPER            OPERSPY
 OPERWALL        PART            PASS            PING
@@ -18,6 +18,7 @@ SET             SJOIN           SQUIT           STATS
 SVINFO          TESTGECOS       TESTLINE        TESTMASK
 TESTMASKGECOS   TIME            TOPIC           TRACE
 UHELP           UMODE           UNDLINE         UNGLINE
-UNKLINE         UNRESV          UNXLINE         USER
-USERHOST        USERS           VERSION         WALLOPS
-WHO             WHOIS           WHOWAS          XLINE
+UNKLINE         UNREJECT        UNRESV          UNXLINE
+USER            USERHOST        USERS           VERSION
+WALLOPS         WHO             WHOIS           WHOWAS
+XLINE
