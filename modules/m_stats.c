@@ -1160,11 +1160,39 @@ stats_gecos(struct Client *source_p)
 static void
 stats_class(struct Client *source_p)
 {
-	if(ConfigFileEntry.stats_y_oper_only && !IsOper(source_p))
+	struct Class *cltmp;
+	dlink_node *ptr;
+
+	if(ConfigFileEntry.stats_y_oper_only && !IsOper(source_p)) 
+	{
 		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOPRIVILEGES,
 				   form_str (ERR_NOPRIVILEGES));
-	else
-		report_classes(source_p);
+		return;
+	}
+
+	DLINK_FOREACH(ptr, class_list.head)
+	{
+		cltmp = ptr->data;
+
+		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSYLINE, 
+				form_str(RPL_STATSYLINE),
+				ClassName(cltmp), PingFreq(cltmp), 
+				ConFreq(cltmp), MaxUsers(cltmp), 
+				MaxSendq(cltmp), 
+				MaxLocal(cltmp), MaxIdent(cltmp),
+				MaxGlobal(cltmp), MaxIdent(cltmp),
+				CurrUsers(cltmp));
+	}
+
+	/* also output the default class */
+	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSYLINE, form_str(RPL_STATSYLINE),
+			ClassName(default_class), PingFreq(default_class), 
+			ConFreq(default_class), MaxUsers(default_class), 
+			MaxSendq(default_class),
+			MaxLocal(default_class), MaxIdent(default_class),
+			MaxGlobal(default_class), MaxIdent(default_class),
+			CurrUsers(default_class));
+	send_pop_queue(source_p);
 }
 
 static void

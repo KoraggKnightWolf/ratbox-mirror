@@ -92,6 +92,5 @@ void check_class(void);
 void initclass(void);
 void free_class(struct Class *);
 void fix_class(struct ConfItem *, struct ConfItem *);
-void report_classes(struct Client *);
 
 #endif /* INCLUDED_class_h */
