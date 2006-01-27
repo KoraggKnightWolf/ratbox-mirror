@@ -55,8 +55,6 @@ struct ConfItem *find_address_conf(const char *host, const char *sockhost,
 			 (struct sockaddr *)&(x)->localClient->ip, CONF_GLINE,\
 			 (x)->localClient->ip.ss_family, (x)->username))
 
-void report_Klines(struct Client *);
-void report_auth(struct Client *);
 #ifdef IPV6
 int match_ipv6(struct sockaddr *, struct sockaddr *, int);
 #endif

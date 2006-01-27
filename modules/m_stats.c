@@ -498,6 +498,11 @@ stats_hubleaf(struct Client *source_p)
 static void
 stats_auth (struct Client *source_p)
 {
+        char *name, *host, *pass, *user, *classname;
+	struct AddressRec *arec;
+	struct ConfItem *aconf;
+	int i, port;
+
 	/* Oper only, if unopered, return ERR_NOPRIVS */
 	if((ConfigFileEntry.stats_i_oper_only == 2) && !IsOper (source_p))
 		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOPRIVILEGES,
@@ -506,10 +511,6 @@ stats_auth (struct Client *source_p)
 	/* If unopered, Only return matching auth blocks */
 	else if((ConfigFileEntry.stats_i_oper_only == 1) && !IsOper (source_p))
 	{
-		struct ConfItem *aconf;
-		char *name, *host, *pass, *user, *classname;
-		int port;
-
 		if(MyConnect (source_p))
 			aconf = find_auth(source_p->host, source_p->sockhost,
 					(struct sockaddr *)&source_p->localClient->ip,
@@ -530,8 +531,26 @@ stats_auth (struct Client *source_p)
 	}
 
 	/* Theyre opered, or allowed to see all auth blocks */
-	else
-		report_auth (source_p);
+	else {
+		HOSTHASH_WALK(i, arec)
+		{
+			if((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT)
+			{
+				aconf = arec->aconf;
+				if(!MyOper(source_p) && IsConfDoSpoofIp(aconf))
+					continue;
+				get_printable_conf(aconf, &name, &host, &pass, &user, &port, &classname);
+
+				sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSILINE, 
+						   form_str(RPL_STATSILINE), name, 
+						   show_iline_prefix(source_p, aconf, user),
+						   show_ip_conf(aconf, source_p) ? host : "255.255.255.255",
+						   port, classname);
+			}
+		}
+		HOSTHASH_WALK_END;
+		send_pop_queue(source_p);                                                                                                                                                                                     				
+	}
 }
 
 
@@ -603,6 +622,11 @@ stats_tklines(struct Client *source_p)
 static void
 stats_klines(struct Client *source_p)
 {
+	struct ConfItem *aconf;
+	char *host, *pass, *user, *oper_reason;
+	struct AddressRec *arec;
+	int i;
+	
 	/* Oper only, if unopered, return ERR_NOPRIVS */
 	if((ConfigFileEntry.stats_k_oper_only == 2) && !IsOper (source_p))
 		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOPRIVILEGES,
@@ -611,8 +635,6 @@ stats_klines(struct Client *source_p)
 	/* If unopered, Only return matching klines */
 	else if((ConfigFileEntry.stats_k_oper_only == 1) && !IsOper (source_p))
 	{
-		struct ConfItem *aconf;
-		char *host, *pass, *user, *oper_reason;
 
 		/* search for a kline */
 		if(MyConnect (source_p))
@@ -639,8 +661,27 @@ stats_klines(struct Client *source_p)
 				   oper_reason ? oper_reason : "");
 	}
 	/* Theyre opered, or allowed to see all klines */
-	else
-		report_Klines (source_p);
+	else {
+		HOSTHASH_WALK(i, arec)
+		{
+			if((arec->type & ~CONF_SKIPUSER) == CONF_KILL)
+			{
+				aconf = arec->aconf;
+				
+				if(aconf->flags & CONF_FLAGS_TEMPORARY) /* skip temps */
+					continue;
+
+				get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
+
+				sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSKLINE, form_str(RPL_STATSKLINE),
+						   'K', host, user, pass, oper_reason ? "|" : "",
+						   oper_reason ? oper_reason : "");
+
+			}
+		}
+		HOSTHASH_WALK_END;
+		send_pop_queue(source_p);                                                                                                                                                                                     				
+	}
 }
 
 static void
