@@ -41,7 +41,6 @@ void free_cachefile(struct cachefile *);
 void load_help(void);
 
 void send_user_motd(struct Client *);
-void send_oper_motd(struct Client *);
 
 #endif
 

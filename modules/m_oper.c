@@ -58,6 +58,7 @@
 static int m_oper(struct Client *, struct Client *, int, const char **);
 static int oper_up(struct Client *source_p, struct oper_conf *oper_p);
 static int match_oper_password(const char *password, struct oper_conf *oper_p);
+static void send_oper_motd(struct Client *source_p);
 
 #ifndef HAVE_CRYPT_H
 extern char *crypt();
@@ -154,6 +155,37 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	return 0;
 }
+
+
+/* send_oper_motd()
+ *
+ * inputs	- client to send motd to
+ * outputs	- client is sent oper motd if exists
+ * side effects -
+ */
+static void
+send_oper_motd(struct Client *source_p)
+{
+	struct cacheline *lineptr;
+	dlink_node *ptr;
+
+	if(oper_motd == NULL || ircd_dlink_list_length(&oper_motd->contents) == 0)
+		return;
+
+	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_OMOTDSTART), 
+		   me.name, source_p->name);
+
+	DLINK_FOREACH(ptr, oper_motd->contents.head)
+	{
+		lineptr = ptr->data;
+		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_OMOTD),
+			   me.name, source_p->name, lineptr->data);
+	}
+
+	sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFOMOTD), 
+		   me.name, source_p->name);
+}
+
 
 /*
  * match_oper_password
