@@ -1,3 +1,15 @@
+androsyn    2006/01/27 05:24:42 UTC	(20060127_4-21800)
+  Log:
+  - move report_messages into stats_messages
+  - put an extern in for msg_hash_table, the variable was already global anyways
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/parse.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2006/01/27 05:14:15 UTC	(20060127_3-21798)
   Log:
   - merge report_classes() into stats_class()
