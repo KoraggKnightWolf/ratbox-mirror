@@ -57,7 +57,6 @@ static int handle_command(struct Message *, struct Client *, struct Client *, in
 static int cmd_hash(const char *p);
 static struct Message *hash_parse(const char *);
 
-#define MAX_MSG_HASH 512 /* don't change this unless you know what you are doing */
 struct MessageHash *msg_hash_table[MAX_MSG_HASH];
 
 static char buffer[1024];
@@ -531,34 +530,6 @@ cmd_hash(const char *p)
 	return (hash_val >> 9) ^ (hash_val & (MAX_MSG_HASH-1));
 }
 
-/*
- * report_messages
- *
- * inputs	- pointer to client to report to
- * output	- NONE
- * side effects	- NONE
- */
-void
-report_messages(struct Client *source_p)
-{
-	int i;
-	struct MessageHash *ptr;
-
-	for (i = 0; i < MAX_MSG_HASH; i++)
-	{
-		for (ptr = msg_hash_table[i]; ptr; ptr = ptr->next)
-		{
-			s_assert(ptr->msg != NULL);
-			s_assert(ptr->cmd != NULL);
-
-			sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSCOMMANDS, 
-					   form_str(RPL_STATSCOMMANDS),
-					   ptr->cmd, ptr->msg->count, 
-					   ptr->msg->bytes, ptr->msg->rcount);
-		}
-	}
-	send_pop_queue(source_p);
-}
 
 /* cancel_clients()
  *

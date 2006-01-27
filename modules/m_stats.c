@@ -687,7 +687,23 @@ stats_klines(struct Client *source_p)
 static void
 stats_messages(struct Client *source_p)
 {
-	report_messages(source_p);
+	int i;
+	struct MessageHash *ptr;
+
+	for (i = 0; i < MAX_MSG_HASH; i++)
+	{
+		for (ptr = msg_hash_table[i]; ptr; ptr = ptr->next)
+		{
+			s_assert(ptr->msg != NULL);
+			s_assert(ptr->cmd != NULL);
+
+			sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSCOMMANDS, 
+					   form_str(RPL_STATSCOMMANDS),
+					   ptr->cmd, ptr->msg->count, 
+					   ptr->msg->bytes, ptr->msg->rcount);
+		}
+	}
+	send_pop_queue(source_p);
 }
 
 static void
