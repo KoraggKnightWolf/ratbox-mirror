@@ -1,3 +1,14 @@
+androsyn    2006/01/27 05:08:59 UTC	(20060127_2-21796)
+  Log:
+  - roll report_auth/report_Klines into their approriate functions in m_stats.c
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/hostmask.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+
+
 androsyn    2006/01/27 02:00:40 UTC	(20060127_1-21794)
   Log:
   - merge users into m_lusers.c
