@@ -1,3 +1,15 @@
+androsyn    2006/01/27 02:00:40 UTC	(20060127_1-21794)
+  Log:
+  - merge users into m_lusers.c
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/m_lusers.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_users.c (File Deleted) 
+
+
 androsyn    2006/01/27 01:58:21 UTC	(20060127_0-21792)
   Log:
   - move send_oper_motd to modules/m_oper.c
