@@ -16,9 +16,8 @@ PONG            POST            PRIVMSG         QUIT
 REHASH          RESTART         RESV            SERVER
 SET             SJOIN           SQUIT           STATS
 SVINFO          TESTGECOS       TESTLINE        TESTMASK
-TESTMASKGECOS   TIME            TOPIC           TRACE
-UHELP           UMODE           UNDLINE         UNGLINE
-UNKLINE         UNREJECT        UNRESV          UNXLINE
-USER            USERHOST        USERS           VERSION
-WALLOPS         WHO             WHOIS           WHOWAS
-XLINE
+TIME            TOPIC           TRACE           UHELP
+UMODE           UNDLINE         UNGLINE         UNKLINE
+UNREJECT        UNRESV          UNXLINE         USER
+USERHOST        USERS           VERSION         WALLOPS
+WHO             WHOIS           WHOWAS          XLINE

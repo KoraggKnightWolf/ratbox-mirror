@@ -1,4 +1,0 @@
-TESTMASKGECOS :<gecos>
-
-Will test the given gecos mask, reporting how many local and global 
-clients match the given gecos.
