@@ -279,8 +279,7 @@ io_loop(void)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Got signal SIGUSR1, reloading ircd motd file");
-			free_cachefile(user_motd);
-			user_motd = cache_file(MPATH, "ircd.motd", 0);
+			cache_user_motd();
 			doremotd = 0;
 		}
 	}
