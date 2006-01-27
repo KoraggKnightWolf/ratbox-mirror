@@ -1,3 +1,14 @@
+androsyn    2006/01/27 05:14:15 UTC	(20060127_3-21798)
+  Log:
+  - merge report_classes() into stats_class()
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/class.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/class.c (File Modified) 
+
+
 androsyn    2006/01/27 05:08:59 UTC	(20060127_2-21796)
   Log:
   - roll report_auth/report_Klines into their approriate functions in m_stats.c
