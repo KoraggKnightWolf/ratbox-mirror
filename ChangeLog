@@ -1,3 +1,13 @@
+jilles      2006/01/27 13:08:42 UTC	(20060127_7-21810)
+  Log:
+  As in RATBOX_2_2 r21808, remove testmaskgecos help file.
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/index (File Modified) 
+	ircd-ratbox/trunk/help/opers/testmaskgecos (File Deleted) 
+
+
 jilles      2006/01/27 12:49:47 UTC	(20060127_6-21806)
   Log:
   - add masktrace and unreject help files
