@@ -1,4 +1,4 @@
-TESTMASK <user@host>
+TESTMASK <[nick!]user@host> [:gecos]
 
-Will test the given user@host mask, reporting how many local and 
-global clients match the given mask.
+Will test the given nick!user@host gecos mask, reporting how many local
+and global clients match the given mask. 
