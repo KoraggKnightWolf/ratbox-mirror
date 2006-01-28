@@ -1,3 +1,12 @@
+androsyn    2006/01/28 23:15:17 UTC	(20060128_0-21812)
+  Log:
+  update testmask with gecos stuff
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/testmask (File Modified) 
+
+
 jilles      2006/01/27 13:08:42 UTC	(20060127_7-21810)
   Log:
   As in RATBOX_2_2 r21808, remove testmaskgecos help file.
