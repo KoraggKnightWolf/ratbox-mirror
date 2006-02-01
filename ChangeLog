@@ -1,3 +1,11 @@
+androsyn    2006/02/01 16:00:44 UTC	(20060201_0-21820)
+  Log:
+  - the inttypes.h include in src/modules.c isn't needed as stdinc.h deals with that
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2006/01/28 23:15:17 UTC	(20060128_0-21812)
   Log:
   update testmask with gecos stuff
