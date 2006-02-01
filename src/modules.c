@@ -38,16 +38,6 @@
 #include "parse.h"
 #include "match.h"
 
-
-/* Needed to use uintptr_t for some pointer manipulation. */
-#ifdef HAVE_INTTYPES_H
-#include <inttypes.h>
-#else /* No inttypes.h */
-#ifndef HAVE_UINTPTR_T
-typedef unsigned long uintptr_t;
-#endif
-#endif
-
 #include "ltdl.h"
 
 
