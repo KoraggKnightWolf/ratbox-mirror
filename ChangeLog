@@ -1,3 +1,14 @@
+jilles      2006/02/02 17:44:05 UTC	(20060202_1-21826)
+  Log:
+  Forward port RATBOX_2_2 r21824:
+  Call cleanup_challenge() before oper_up(), so the real opername
+  is not cleared (which would cause a crash later).
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+
+
 androsyn    2006/02/02 13:51:11 UTC	(20060202_0-21822)
   Log:
   -add a newline at the end of src/cache.c
