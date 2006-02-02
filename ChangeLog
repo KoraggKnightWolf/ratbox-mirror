@@ -1,3 +1,12 @@
+androsyn    2006/02/02 13:51:11 UTC	(20060202_0-21822)
+  Log:
+  -add a newline at the end of src/cache.c
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+
+
 androsyn    2006/02/01 16:00:44 UTC	(20060201_0-21820)
   Log:
   - the inttypes.h include in src/modules.c isn't needed as stdinc.h deals with that
