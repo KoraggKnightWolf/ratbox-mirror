@@ -122,12 +122,11 @@ ircd_close_all(void)
 
 	/* XXX someone tell me why we care about 4 fd's ? */
 	/* XXX btw, fd 3 is used for profiler ! */
-#ifndef __MINGW32__
 	for (i = 4; i < ircd_maxconnections; ++i)
 	{
 		close(i);
 	}
-#endif
+
 	/* XXX should his hack be done in all cases? */
 #ifndef NDEBUG
 	/* fugly hack to reserve fd == 2 */
@@ -221,7 +220,7 @@ ircd_set_nb(int fd)
 #else
 	nonb = 1;
 	res = 0;
-	if(ioctl(fd, FIONBIO, &nonb) == -1)
+	if(ioctl(fd, FIONBIO, (char *)&nonb) == -1)
 		return 0;
 #endif
 

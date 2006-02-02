@@ -257,3 +257,4 @@ cache_user_motd(void)
 	free_cachefile(user_motd);
 	user_motd = cache_file(MPATH, "ircd.motd", 0);
 }
+
