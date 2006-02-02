@@ -387,13 +387,13 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 			return 0;
 		}
 
+		cleanup_challenge(source_p);
+
 		oper_up(source_p, oper_p);
 
 		ilog(L_OPERED, "OPER %s by %s!%s@%s",
 		     source_p->localClient->opername, source_p->name, 
 		     source_p->username, source_p->host);
-
-		cleanup_challenge(source_p);
 		return 0;
 	}
 
