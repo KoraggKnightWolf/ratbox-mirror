@@ -73,6 +73,20 @@ assign_dns_id(void)
 }
 
 
+static void
+failed_resolver(uint16_t xid)
+{
+	struct dnsreq *req;
+
+	req = &querytable[xid];
+	if(req->callback == NULL)
+		return;
+
+	req->callback("FAILED", 0, 0, req->data);
+	req->callback = NULL;
+	req->data = NULL;
+}
+
 void
 cancel_lookup(uint16_t xid)
 {
@@ -344,6 +358,11 @@ dns_write_sendq(int fd, void *unused)
 void 
 submit_dns(char type, int nid, int aftype, const char *addr)
 {
+	if(dns_ofd < 0 || dns_ifd < 0)
+	{
+		failed_resolver(nid);
+		return;
+	}	                        
 	ircd_linebuf_put(&dns_sendq, "%c %x %d %s", type, nid, aftype, addr);
 	dns_write_sendq(dns_ofd, NULL);
 	read_dns(dns_ifd, NULL);

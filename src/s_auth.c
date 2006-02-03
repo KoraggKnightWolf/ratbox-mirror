@@ -377,6 +377,14 @@ start_auth_query(struct AuthRequest *auth)
 		return;
 
 	sendheader(auth->client, REPORT_DO_ID);
+
+	if(auth_ifd < 0 || auth_ofd < 0) /* hmm..ident is dead..skip it */
+	{
+		auth_error(auth);
+		release_auth_client(auth);
+		return;
+	}
+	
 	/* 
 	 * get the local address of the client and bind to that to
 	 * make the auth request.  This used to be done only for
