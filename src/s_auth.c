@@ -139,6 +139,8 @@ fork_ident(void)
                 {
                         ilog(L_MAIN, "Unable to execute ident at %s \"%s\", I give up", fullpath, strerror(errno));
                         fork_ident_count++;
+                        auth_ifd = -1;
+                        auth_ofd = -1;
                         return;   
                 }
                  
@@ -186,6 +188,8 @@ fork_ident(void)
 		ircd_close(ifd[1]);
 		ircd_close(ofd[0]);
 		ircd_close(ofd[1]);
+		auth_ifd = -1;
+		auth_ofd = -1;
 		return;
 	}
 	ircd_close(ifd[1]);
@@ -347,7 +351,9 @@ auth_write_sendq(int fd, void *unused)
 			fork_ident();
 		}
 	}
-	
+	if(auth_ofd == -1)
+		return;
+		
 	if(ircd_linebuf_len(&auth_sendq) > 0)
 	{
 		ircd_setselect(auth_ofd, IRCD_SELECT_WRITE, 
@@ -599,7 +605,9 @@ read_auth_reply(int fd, void *data)
 
 	if(length == -1 && !ignoreErrno(errno))
 		fork_ident();
-	
+	if(auth_ifd == -1)
+		return;
+			
 	ircd_setselect(auth_ifd, IRCD_SELECT_READ, read_auth_reply, NULL);	
 }
 

@@ -237,6 +237,8 @@ fork_resolver(void)
 		{
 			ilog(L_MAIN, "Unable to execute resolver at %s \"%s\", I give up", fullpath, strerror(errno));
 			fork_count++;
+			dns_ifd = -1;
+			dns_ofd = -1;
 			return;
 		}
 		
@@ -280,6 +282,8 @@ fork_resolver(void)
 		ircd_close(ifd[1]);
 		ircd_close(ofd[0]);
 		ircd_close(ofd[1]);
+		dns_ifd = -1;
+		dns_ofd = -1;
 		return;
 	}
 
@@ -331,6 +335,9 @@ read_dns(int fd, void *data)
 	if(length == -1 && !ignoreErrno(errno))
 		fork_resolver(); 
 
+	if(dns_ifd == -1)
+		return;
+	
 	ircd_setselect(dns_ifd, IRCD_SELECT_READ, read_dns, NULL);
 }
 
@@ -346,6 +353,8 @@ dns_write_sendq(int fd, void *unused)
 			fork_resolver();
 		}
 	}
+	if(dns_ofd == -1)
+		return;
 	 
 	if(ircd_linebuf_len(&dns_sendq) > 0)
 	{
