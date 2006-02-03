@@ -1,3 +1,14 @@
+androsyn    2006/02/03 14:36:31 UTC	(20060203_1-21832)
+  Log:
+  - port r21830 from 2.2 
+    do a match() against sockhost as well for testmask and masktrace
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_etrace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+
+
 androsyn    2006/02/03 06:05:21 UTC	(20060203_0-21828)
   Log:
   - have the identd and resolver code deal with the daemons not being found a bit more gracefully
