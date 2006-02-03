@@ -1,3 +1,13 @@
+androsyn    2006/02/03 06:05:21 UTC	(20060203_0-21828)
+  Log:
+  - have the identd and resolver code deal with the daemons not being found a bit more gracefully
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 jilles      2006/02/02 17:44:05 UTC	(20060202_1-21826)
   Log:
   Forward port RATBOX_2_2 r21824:
