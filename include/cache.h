@@ -32,6 +32,7 @@ extern struct cachefile *oper_motd;
 extern struct cacheline *emptyline;
 
 extern char user_motd_changed[MAX_DATE_STRING];
+extern dlink_list links_cache_list;
 
 void init_cache(void);
 struct cachefile *cache_file(const char *, const char *, int);

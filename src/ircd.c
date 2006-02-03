@@ -563,6 +563,11 @@ ratbox_main(int argc, char *argv[])
 		server_state_foreground = 1;
 
 
+	if(ConfigServerHide.links_delay > 0)
+		ircd_event_add("cache_links", cache_links, NULL,
+			    ConfigServerHide.links_delay);
+	else
+		ConfigServerHide.links_disabled = 1;
 
 	/* Check if there is pidfile and daemon already running */
 	if(!testing_conf)
