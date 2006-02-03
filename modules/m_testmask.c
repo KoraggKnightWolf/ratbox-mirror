@@ -152,7 +152,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 			sockhost = target_p->sockhost;
 
 		if(match(username, target_p->username) &&
-		   (match(hostname, target_p->host) || match_ips(hostname, sockhost)))
+		   (match(hostname, target_p->host) || match(hostname, sockhost) || match_ips(hostname, sockhost)))
 		{
 			if(name && !match(name, target_p->name))
 				continue;

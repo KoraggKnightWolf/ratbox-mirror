@@ -337,7 +337,8 @@ match_masktrace(struct Client *source_p, dlink_list *list, const char *username,
 		else
 			sockhost = target_p->sockhost;
 
-		if(match(username, target_p->username) && (match(hostname, target_p->host) || match_ips(hostname, sockhost)))
+		if(match(username, target_p->username) && (match(hostname, target_p->host) || 
+			 match(hostname, sockhost) || match_ips(hostname, sockhost)))
 		{
 			if(name != NULL && !match(name, target_p->name))
 				continue;
