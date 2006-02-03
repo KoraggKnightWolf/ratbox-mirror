@@ -1,3 +1,13 @@
+androsyn    2006/02/03 20:13:28 UTC	(20060203_3-21836)
+  Log:
+  - deal with resolver/ident dying after being started and then not being able to restart them
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2006/02/03 14:40:23 UTC	(20060203_2-21834)
   Log:
   - move links caching code back into cache.c as its not possible to do 
