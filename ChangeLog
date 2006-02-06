@@ -1,3 +1,13 @@
+leeh        2006/02/06 20:14:47 UTC	(20060206_0-21840)
+  Log:
+  - forward port r21838
+    - fix match_esc() logic
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 androsyn    2006/02/03 20:13:28 UTC	(20060203_3-21836)
   Log:
   - deal with resolver/ident dying after being started and then not being able to restart them
