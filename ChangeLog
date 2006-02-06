@@ -1,3 +1,13 @@
+leeh        2006/02/06 20:45:08 UTC	(20060206_1-21842)
+  Log:
+  - forward port r21784
+    - fix log_client_name() so its safe for empty client_p->name
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 leeh        2006/02/06 20:14:47 UTC	(20060206_0-21840)
   Log:
   - forward port r21838
