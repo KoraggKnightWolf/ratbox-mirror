@@ -200,21 +200,21 @@ match_esc(const char *mask, const char *name)
 				m++;
 			return (*m == 0);
 		}
-		if(ToLower(*m) != ToLower(*n) && !(!quote && *m == '?') &&
-			!(!quote && *m == '@' && IsLetter(*n)) &&
-			!(!quote && *m == '#' && IsDigit(*n)))
-		{
-			if(!wild)
-				return 0;
-			m = ma;
-			n = ++na;
-		}
-		else
+
+		if((!quote && ((*m == '?') || (*m == '@' && IsLetter(*n)) || (*m == '#' && IsDigit(*n)))) ||
+		   (ToLower(*m) == ToLower(*n) && (quote || (*m != '@' && *m != '#'))))
 		{
 			if(*m)
 				m++;
 			if(*n)
 				n++;
+		}
+		else
+		{
+			if(!wild)
+				return 0;
+			m = ma;
+			n = ++na;
 		}
 	}
 	return 0;
