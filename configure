@@ -21598,7 +21598,7 @@ if test "$LEX" != flex; then
 fi
 
 # backwards support for IRC_CFLAGS
-CFLAGS="$IRC_CFLAGS $CFLAGS -O2 -Wall"
+CFLAGS="$IRC_CFLAGS $CFLAGS -O0 -Wall"
 
 if test "$libexecdir" = '${exec_prefix}/libexec' &&
    test "$localstatedir" = '${prefix}/var'; then
@@ -30240,7 +30240,7 @@ fi
 # Check whether --enable-warnings or --disable-warnings was given.
 if test "${enable_warnings+set}" = set; then
   enableval="$enable_warnings"
-  CFLAGS="$CFLAGS -Wall -Werror -Wcast-qual -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wwrite-strings -W -Wno-unused"
+  CFLAGS="$CFLAGS -Wall -Werror -Wcast-qual -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wwrite-strings -W -Wno-unused -Wunused-function -Wunused-variable"
 fi;
 
 
