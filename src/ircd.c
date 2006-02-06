@@ -160,9 +160,14 @@ print_startup(int pid)
 {
 	printf("ircd: version %s\n", ircd_version);
 	printf("ircd: pid %d\n", pid);
+#ifndef RATBOX_PROFILE
 	printf("ircd: running in %s mode from %s\n",
 	       !server_state_foreground ? "background" : "foreground",
 		ConfigFileEntry.dpath);
+#else
+	printf("ircd: running in foreground mode from %s for profiling\n",
+			ConfigFileEntry.dpath);
+#endif
 }
 
 /*
@@ -555,7 +560,7 @@ ratbox_main(int argc, char *argv[])
 
 	setup_signals();
 
-#if defined(__CYGWIN__) || defined(__MINGW__)
+#if defined(__CYGWIN__) || defined(__MINGW__) || defined(RATBOX_PROFILE)
 	server_state_foreground = 1;
 #endif
 

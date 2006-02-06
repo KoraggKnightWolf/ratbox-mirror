@@ -300,6 +300,9 @@
 /* configure arguments */
 #undef RATBOX_CONFIGURE_OPTS
 
+/* Defined to mark profiling is enabled */
+#undef RATBOX_PROFILE
+
 /* This is the type of IO loop we are using */
 #undef SELECT_TYPE
 

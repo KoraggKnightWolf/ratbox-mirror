@@ -30228,6 +30228,11 @@ if test "$profile" = yes; then
 		CFLAGS="$CFLAGS -pg -static"
 		echo "$as_me:$LINENO: result: yes, adding -pg -static" >&5
 echo "${ECHO_T}yes, adding -pg -static" >&6
+
+cat >>confdefs.h <<\_ACEOF
+#define RATBOX_PROFILE 1
+_ACEOF
+
 	else
 		echo "$as_me:$LINENO: result: no, profile builds only work with gcc" >&5
 echo "${ECHO_T}no, profile builds only work with gcc" >&6
