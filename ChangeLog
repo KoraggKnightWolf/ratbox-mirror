@@ -1,3 +1,15 @@
+leeh        2006/02/06 21:54:35 UTC	(20060206_2-21844)
+  Log:
+  - forward port r21590
+    - add -Wunused-function and -Wunused-variable to --enable-warnings, as
+      these are the two we actually care about..
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 leeh        2006/02/06 20:45:08 UTC	(20060206_1-21842)
   Log:
   - forward port r21784
