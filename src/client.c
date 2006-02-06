@@ -781,36 +781,43 @@ get_client_name(struct Client *client, int showip)
 const char *
 log_client_name(struct Client *target_p, int showip)
 {
+	static const char empty_name[] = "";
 	static char nbuf[HOSTLEN * 2 + USERLEN + 5];
+	const char *name;
 
 	if(target_p == NULL)
 		return NULL;
 
+	if(EmptyString(target_p->name))
+		name = empty_name;
+	else
+		name = target_p->name;
+
 	if(MyConnect(target_p))
 	{
-		if(irccmp(target_p->name, target_p->host) == 0)
-			return target_p->name;
+		if(irccmp(name, target_p->host) == 0)
+			return name;
 
 		switch (showip)
 		{
 		case SHOW_IP:
-			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", target_p->name,
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", name,
 				   target_p->username, target_p->sockhost);
 			break;
 
 		case MASK_IP:
 			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
-				   target_p->name, target_p->username);
+				   name, target_p->username);
 
 		default:
-			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", target_p->name,
+			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", name,
 				   target_p->username, target_p->host);
 		}
 
 		return nbuf;
 	}
 
-	return target_p->name;
+	return name;
 }
 
 static void
