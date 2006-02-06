@@ -1,3 +1,12 @@
+leeh        2006/02/06 22:03:40 UTC	(20060206_3-21846)
+  Log:
+  - update challenge.txt with the new version
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/challenge.txt (File Modified) 
+
+
 leeh        2006/02/06 21:54:35 UTC	(20060206_2-21844)
   Log:
   - forward port r21590
