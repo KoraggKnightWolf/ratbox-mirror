@@ -1,3 +1,14 @@
+leeh        2006/02/08 20:25:58 UTC	(20060208_0-21856)
+  Log:
+  - forward port r21684
+    - Notify user and don't keep challenge state if generating the
+      challenge fails (e.g. old-style key).
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+
+
 leeh        2006/02/06 22:15:54 UTC	(20060206_4-21848)
   Log:
   - forward port r21566
