@@ -1,3 +1,16 @@
+leeh        2006/02/13 19:00:09 UTC	(20060213_0-21870)
+  Log:
+  - forward port r21860 and r21858
+    - keep RPL_TESTMASK next to numeric 724 and note it was used previously
+    - update testmask/masktrace help files, noting they take cidr masks
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/masktrace (File Modified) 
+	ircd-ratbox/trunk/help/opers/testmask (File Modified) 
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 jilles      2006/02/11 21:14:53 UTC	(20060211_0-21866)
   Log:
   Respect ban exceptions in /knock.
