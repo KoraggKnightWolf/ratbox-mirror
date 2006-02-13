@@ -53,9 +53,6 @@ DECLARE_MODULE_AV1(die, NULL, NULL, die_clist, NULL, NULL, "$Revision: 19256 $")
 static int
 mo_die(struct Client *client_p __unused, struct Client *source_p, int parc, const char *parv[])
 {
-	struct Client *target_p;
-	dlink_node *ptr;
-
 	if(!IsOperDie(source_p))
 	{
 		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
@@ -76,34 +73,8 @@ mo_die(struct Client *client_p __unused, struct Client *source_p, int parc, cons
 		return 0;
 	}
 
-	DLINK_FOREACH(ptr, lclient_list.head)
-	{
-		target_p = ptr->data;
+	ircd_shutdown(get_client_name(source_p, HIDE_IP));
 
-		sendto_one(target_p, POP_QUEUE,
-			   ":%s NOTICE %s :Server Terminating. %s",
-			   me.name, target_p->name, get_client_name(source_p, HIDE_IP));
-	}
-
-	DLINK_FOREACH(ptr, serv_list.head)
-	{
-		target_p = ptr->data;
-
-		sendto_one(target_p, POP_QUEUE, ":%s ERROR :Terminated by %s",
-			   me.name, get_client_name(source_p, HIDE_IP));
-	}
-
-	/*
-	 * XXX we called flush_connections() here. Read server_reboot()
-	 * for an explanation as to what we should do.
-	 *     -- adrian
-	 */
-	ilog(L_MAIN, "Server terminated by %s", get_oper_name(source_p));
-
-	/* this is a normal exit, tell the os it's ok */
-	unlink(pidFileName);
-	exit(0);
 	/* NOT REACHED */
-
 	return 0;
 }
