@@ -1,3 +1,14 @@
+jilles      2006/02/22 21:26:08 UTC	(20060222_0-21883)
+  Log:
+  Forward port RATBOX_2_2 r21878:
+  - remove default of needing identd to *@*
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 leeh        2006/02/13 20:57:35 UTC	(20060213_1-21872)
   Log:
   - forward port r21852
