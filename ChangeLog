@@ -1,3 +1,14 @@
+leeh        2006/02/22 21:46:58 UTC	(20060222_2-21887)
+  Log:
+  - port r21881
+    - remove the special case for *\ that was messing up the
+      logic in match_esc()
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 leeh        2006/02/22 21:32:53 UTC	(20060222_1-21885)
   Log:
   - add in whats-new-2.2.txt here
