@@ -1,3 +1,12 @@
+leeh        2006/02/22 21:32:53 UTC	(20060222_1-21885)
+  Log:
+  - add in whats-new-2.2.txt here
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/whats-new-2.2.txt (File Added) 
+
+
 jilles      2006/02/22 21:26:08 UTC	(20060222_0-21883)
   Log:
   Forward port RATBOX_2_2 r21878:
