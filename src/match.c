@@ -159,17 +159,20 @@ match_esc(const char *mask, const char *name)
 			 */
 			while (*m == '*')
 				m++;
+
+			wild = 1;
+			ma = m;
+			na = n;
+
 			if(*m == '\\')
 			{
 				m++;
 				/* This means it is an invalid mask -A1kmm. */
 				if(!*m)
 					return 0;
-				quote = 2;
+				quote++;
+				continue;
 			}
-			wild = 1;
-			ma = m;
-			na = n;
 		}
 
 		if(!*m)
