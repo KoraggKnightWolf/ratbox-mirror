@@ -82,7 +82,7 @@ case "$host_os" in
      AC_DEFINE_UNQUOTED(MINGW,1,[This is a MinGW system])
      AC_DEFINE_UNQUOTED(WINDOWS,1,[This is a Windows system])
      AC_CHECK_HEADER(winsock2.h, , [AC_MSG_ERROR([** MinGW and no winsock2.h.  I give up.])])
-     LIBS="$LIBS -lws2_32"
+     LIBS="$LIBS -lws2_32 -liphlpapi"
      is_mingw="yes"
      ;;
 *)

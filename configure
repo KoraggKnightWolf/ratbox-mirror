@@ -21566,7 +21566,7 @@ echo "$as_me: error: ** MinGW and no winsock2.h.  I give up." >&2;}
 fi
 
 
-     LIBS="$LIBS -lws2_32"
+     LIBS="$LIBS -lws2_32 -liphlpapi"
      is_mingw="yes"
      ;;
 *)

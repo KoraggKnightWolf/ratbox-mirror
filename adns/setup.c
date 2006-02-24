@@ -33,6 +33,10 @@
 #include <fcntl.h>
 #include <limits.h>
 #include "ircd_lib.h"
+#include "stdinc.h"
+#ifdef WIN32
+#include <iphlpapi.h>
+#endif
 
 #include "internal.h"
 
@@ -532,6 +536,18 @@ int adns_init(adns_state *ads_r, adns_initflags flags, FILE *diagfile) {
   adns_state ads;
   const char *res_options, *adns_res_options;
   int r;
+#ifdef WIN32
+  #define SECURE_PATH_LEN (MAX_PATH - 64)
+  char PathBuf[MAX_PATH];
+  struct in_addr addr;   
+  #define ADNS_PFIXED_INFO_BLEN (2048)
+  PFIXED_INFO network_info = (PFIXED_INFO)alloca(ADNS_PFIXED_INFO_BLEN);
+  ULONG network_info_blen = ADNS_PFIXED_INFO_BLEN;
+  DWORD network_info_result;
+  PIP_ADDR_STRING pip;
+  const char *network_err_str = "";
+#endif
+                  
   
   r= init_begin(&ads, flags, diagfile ? diagfile : stderr);
   if (r) return r;
@@ -541,10 +557,47 @@ int adns_init(adns_state *ads_r, adns_initflags flags, FILE *diagfile) {
   ccf_options(ads,"RES_OPTIONS",-1,res_options);
   ccf_options(ads,"ADNS_RES_OPTIONS",-1,adns_res_options);
 
+#ifdef WIN32 
+/* jesus this is horrible... this ifdef bit was lifted from
+ * adns for Win32 is Copyright 2000 - 2005 Jarle (jgaa) Aase
+ */
+
+  GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
+  strcat(PathBuf,"\\resolv.conf");
+  readconfig(ads,PathBuf,1);
+  GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
+  strcat(PathBuf,"\\resolv-adns.conf");
+  readconfig(ads,PathBuf,0);
+  GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
+  strcat(PathBuf,"\\System32\\Drivers\\etc\\resolv.conf");
+  readconfig(ads,PathBuf,1);
+  GetWindowsDirectory(PathBuf, SECURE_PATH_LEN);
+  strcat(PathBuf,"\\System32\\Drivers\\etc\\resolv-adns.conf");
+  readconfig(ads,PathBuf,0);
+  network_info_result = GetNetworkParams(network_info, &network_info_blen);
+  if (network_info_result != ERROR_SUCCESS){
+    switch(network_info_result) {
+    case ERROR_BUFFER_OVERFLOW: network_err_str = "ERROR_BUFFER_OVERFLOW"; break;
+    case ERROR_INVALID_PARAMETER: network_err_str = "ERROR_INVALID_PARAMETER"; break;
+    case ERROR_NO_DATA: network_err_str = "ERROR_NO_DATA"; break;
+    case ERROR_NOT_SUPPORTED: network_err_str = "ERROR_NOT_SUPPORTED"; break;}
+    adns__diag(ads,-1,0,"GetNetworkParams() failed with error [%d] %s",
+      network_info_result,network_err_str);
+    }
+  else {
+    for(pip = &(network_info->DnsServerList); pip; pip = pip->Next) {
+      addr.s_addr = inet_addr(pip->IpAddress.String);
+      if ((addr.s_addr != INADDR_ANY) && (addr.s_addr != INADDR_NONE))
+        addserver(ads, addr); 
+    }
+  }  
+#else
   readconfig(ads,"/etc/resolv.conf",1);
   readconfig(ads,"/etc/resolv-adns.conf",0);
   /* checking in the current dir for cygwin */
   readconfig(ads,"resolv.conf",0);
+#endif
+
   readconfigenv(ads,"RES_CONF");
   readconfigenv(ads,"ADNS_RES_CONF");
 
