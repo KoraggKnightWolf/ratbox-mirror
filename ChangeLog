@@ -1,3 +1,17 @@
+androsyn    2006/02/24 21:27:16 UTC	(20060224_0-21905)
+  Log:
+  Add better support for finding nameservers on win32.  Checks for resolv.conf 
+  in a bunch of paths and will also check the standard windows places for nameservers.
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/adns/setup.c (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 leeh        2006/02/22 21:46:58 UTC	(20060222_2-21887)
   Log:
   - port r21881
