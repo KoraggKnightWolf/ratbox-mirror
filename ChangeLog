@@ -1,3 +1,11 @@
+androsyn    2006/02/28 18:44:15 UTC	(20060228_0-21935)
+  Log:
+  on win32 we need to close FD_PIPE types like a socket as well, (since they are sockets there)
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2006/02/24 21:27:16 UTC	(20060224_0-21905)
   Log:
   Add better support for finding nameservers on win32.  Checks for resolv.conf 
