@@ -174,6 +174,7 @@ ircd_process_events(HWND nhwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	fde_t *F;
 	PF *hdl;
+	void *data;
 	switch(umsg)
 	{
 		case WM_SOCKET:
@@ -191,7 +192,9 @@ ircd_process_events(HWND nhwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 						if((hdl = F->read_handler) != NULL)
 						{
 							F->read_handler = NULL;
-							hdl(F->fd, F->read_data);
+							data = F->read_data;
+							F->read_data = NULL;
+							hdl(F->fd, data);
 						}
 						break;
 					}	
@@ -202,7 +205,9 @@ ircd_process_events(HWND nhwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 						if((hdl = F->write_handler) != NULL)
 						{
 							F->write_handler = NULL;
-							hdl(F->fd, F->write_data);
+							data = F->write_data;
+							F->write_data = NULL;
+							hdl(F->fd, data);
 						}
 					}					
 				}
