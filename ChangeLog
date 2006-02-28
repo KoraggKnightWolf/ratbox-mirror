@@ -1,3 +1,15 @@
+androsyn    2006/02/28 18:48:26 UTC	(20060228_3-21941)
+  Log:
+  cleanup module loading a bit for fallback cases
+  cleanup warnings when we fallback to other paths for ident and resolver
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2006/02/28 18:47:24 UTC	(20060228_2-21939)
   Log:
   minor tweaks to the win32 i/o loop
