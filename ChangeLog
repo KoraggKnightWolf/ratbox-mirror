@@ -1,3 +1,11 @@
+androsyn    2006/02/28 18:45:26 UTC	(20060228_1-21937)
+  Log:
+  put the last error result back after getting it on win32
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.h (File Modified) 
+
+
 androsyn    2006/02/28 18:44:15 UTC	(20060228_0-21935)
   Log:
   on win32 we need to close FD_PIPE types like a socket as well, (since they are sockets there)
