@@ -1,3 +1,11 @@
+androsyn    2006/02/28 18:47:24 UTC	(20060228_2-21939)
+  Log:
+  minor tweaks to the win32 i/o loop
+
+  Modified:
+	ircd-ratbox/trunk/libircd/win32.c (File Modified) 
+
+
 androsyn    2006/02/28 18:45:26 UTC	(20060228_1-21937)
   Log:
   put the last error result back after getting it on win32
