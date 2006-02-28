@@ -264,7 +264,7 @@ int ircd_getmaxconnect(void);
 #endif
 
 #ifdef __MINGW32__
-#define get_errno()  errno = WSAGetLastError()
+#define get_errno() do { errno = WSAGetLastError(); WSASetLastError(errno); } while(0)
 #else
 #define get_errno()
 #endif
