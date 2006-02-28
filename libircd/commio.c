@@ -891,13 +891,30 @@ ircd_write(int fd, const void *buf, int count)
 static int
 writev(int fd, const struct iovec *iov, size_t iovcnt)
 {
+	fde_t *F = find_fd(fd);
 	size_t i;
 	char *base;
 	int TotalBytesWritten = 0, len;
 	int ret;
+	
 
+	if(F->type == FD_SOCKET || F->type == FD_PIPE)
+	{
+		WSABUF *wsb;
+		wsb = alloca(sizeof(WSABUF) * iovcnt);
+		for(i = 0; i < iovcnt; i++)
+		{
+			wsb[i].len = iov[i].iov_len;
+			wsb[i].buf = iov[i].iov_base;
+		}		
+		WSASend(fd, wsb, iovcnt, (LPDWORD)&ret, 0, NULL, NULL);
+		get_errno();
+		return ret;
+	} 
+	
 	for (i = 0; i < iovcnt; i++)
 	{
+	
 		base = iov[i].iov_base;
 		len = iov[i].iov_len;
 		ret = ircd_write(fd, base, len);

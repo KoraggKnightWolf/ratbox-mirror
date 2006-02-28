@@ -19,6 +19,29 @@
 #include "config.h"
 #include "_stdint.h"
 
+#ifdef __GNUC__
+#undef alloca
+#define alloca __builtin_alloca
+#else
+# ifdef _MSC_VER
+#  include <malloc.h>
+#  define alloca _alloca
+# else
+#  if HAVE_ALLOCA_H
+#   include <alloca.h>
+#  else
+#   ifdef _AIX
+ #pragma alloca
+#   else
+#    ifndef alloca /* predefined by HP cc +Olibcalls */
+char *alloca ();
+#    endif
+#   endif
+#  endif
+# endif
+#endif
+ 
+
 #ifdef STRING_WITH_STRINGS
 # include <string.h>
 # include <strings.h> 
