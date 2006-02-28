@@ -735,7 +735,7 @@ ircd_close(int fd)
 	remove_fd(fd);
 
 #ifdef __MINGW32__
-	if(type == FD_SOCKET)
+	if(type == FD_SOCKET || type == FD_PIPE)
 	{
 		closesocket(fd);
 		return;
