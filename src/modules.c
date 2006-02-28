@@ -341,28 +341,41 @@ load_all_modules(int warn)
 void
 load_core_modules(int warn)
 {
-	char module_name[MAXPATHLEN];
+	char module_name[PATH_MAX + 1];
+	char dir_name[PATH_MAX + 1];
+	DIR *core_dir;
 	int i;
+
+	find_module_suffix();
+	core_dir  = opendir(MODPATH);
+	if(core_dir == NULL)
+	{
+		ircd_snprintf(dir_name, sizeof(dir_name), "%s/modules", ConfigFileEntry.dpath);
+		core_dir = opendir(dir_name);
+	} else {
+		strlcpy(dir_name, MODPATH, sizeof(dir_name));
+	}
+	
+	
+	if(core_dir == NULL)
+	{
+		ilog(L_MAIN, "Cannot find where core modules are located(tried %s and %s): terminating ircd", MODPATH, dir_name);
+		exit(0);
+	}
+
 
 	for (i = 0; core_module_table[i]; i++)
 	{
 
-		ircd_snprintf(module_name, sizeof(module_name), "%s/%s%s", MODPATH,
+		ircd_snprintf(module_name, sizeof(module_name), "%s/%s%s", dir_name,
 			    core_module_table[i], found_suffix);
 
-		
 		if(load_a_module(module_name, warn, 1) == -1)
 		{
-			ircd_snprintf(module_name, sizeof(module_name), "%s/modules/%s%s", ConfigFileEntry.dpath, 
-				    core_module_table[i], found_suffix);
-
-			if(load_a_module(module_name, warn, 1) == -1)
-			{
-				ilog(L_MAIN,
-				"Error loading core module %s%s: terminating ircd",
-				     core_module_table[i], found_suffix);
-				exit(0);
-			}
+			ilog(L_MAIN,
+			"Error loading core module %s%s: terminating ircd",
+			     core_module_table[i], found_suffix);
+			exit(0);
 		}
 	}
 }

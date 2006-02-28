@@ -231,11 +231,10 @@ fork_resolver(void)
 	
 	if(access(fullpath, X_OK) == -1)
 	{
-		ilog(L_MAIN, "Unable to execute resolver at %s \"%s\", trying alternate path", fullpath, strerror(errno));
 		ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/resolver%s", ConfigFileEntry.dpath, suffix);
 		if(access(fullpath, X_OK) == -1)
 		{
-			ilog(L_MAIN, "Unable to execute resolver at %s \"%s\", I give up", fullpath, strerror(errno));
+			ilog(L_MAIN, "Unable to execute resolver in %s or %s/bin", BINPATH, ConfigFileEntry.dpath);
 			fork_count++;
 			dns_ifd = -1;
 			dns_ofd = -1;

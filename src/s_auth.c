@@ -133,11 +133,10 @@ fork_ident(void)
 
         if(access(fullpath, X_OK) == -1)
         {
-                ilog(L_MAIN, "Unable to execute ident at %s \"%s\", trying alternate path", fullpath, strerror(errno));
                 ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
                 if(access(fullpath, X_OK) == -1)
                 {
-                        ilog(L_MAIN, "Unable to execute ident at %s \"%s\", I give up", fullpath, strerror(errno));
+                        ilog(L_MAIN, "Unable to execute ident in %s/bin or %s", ConfigFileEntry.dpath, BINPATH);
                         fork_ident_count++;
                         auth_ifd = -1;
                         auth_ofd = -1;
@@ -155,7 +154,7 @@ fork_ident(void)
 	{
 		kill(auth_pid, SIGKILL);
 	}
-//	ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, fdx, "ident daemon");
+
 	ircd_pipe(ifd, "ident daemon - read");
 	ircd_pipe(ofd, "ident daemon - write");
 
