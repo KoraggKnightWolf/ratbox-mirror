@@ -1,3 +1,14 @@
+androsyn    2006/02/28 22:06:17 UTC	(20060228_4-21951)
+  Log:
+  - hack up support to emulate writev with WSASend()
+  - add alloca goop to ircd_lib.h
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+
+
 androsyn    2006/02/28 18:48:26 UTC	(20060228_3-21941)
   Log:
   cleanup module loading a bit for fallback cases
