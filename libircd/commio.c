@@ -666,8 +666,9 @@ ircd_fdlist_init(int closeall, int maxfds)
 #ifdef __MINGW32__
 	WSADATA wsaData;
 	int err;
-
-	err = WSAStartup(0x101, &wsaData);
+	int vers = MAKEWORD(2, 0);
+	
+	err = WSAStartup(vers, &wsaData);
 	if(err != 0)
 	{
 		ircd_lib_die("WSAStartup failed");
