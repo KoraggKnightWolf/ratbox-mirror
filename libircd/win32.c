@@ -361,7 +361,6 @@ ircd_select(unsigned long delay)
 const char *
 wsock_strerror(int error)
 {
-	static char buf[128];
 	switch(error)
 	{
 		case  0:			return "Success";
