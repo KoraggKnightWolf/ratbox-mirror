@@ -1,3 +1,18 @@
+androsyn    2006/03/01 18:13:39 UTC	(20060301_0-21953)
+  Log:
+  - add some little cleanups here and there for win32
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/stdinc.h (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/win32.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/restart.c (File Modified) 
+
+
 androsyn    2006/02/28 22:06:17 UTC	(20060228_4-21951)
   Log:
   - hack up support to emulate writev with WSASend()
