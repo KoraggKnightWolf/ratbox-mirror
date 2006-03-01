@@ -235,4 +235,5 @@ extern int errno;
 
 #include "_stdint.h"
 #include "ircd_defs.h"
+#include "ircd_lib.h"
 #include "common.h"

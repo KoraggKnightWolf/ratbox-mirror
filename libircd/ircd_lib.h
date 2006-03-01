@@ -6,6 +6,7 @@
 #define IRCD_LIB_H 1
 
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <errno.h>
@@ -88,13 +89,13 @@ char *alloca ();
 
 
 #ifdef __MINGW32__
-#define FD_SETSIZE 16384 /* this is what cygwin uses..it probably sucks too oh well*/
 #include <windows.h>
 #include <winsock2.h>
 #include <process.h>
 #ifndef socklen_t
 #define socklen_t unsigned int
 #endif
+
 
 struct iovec
 {
@@ -106,6 +107,15 @@ struct iovec
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 128
 #endif
+
+
+#ifdef strerror
+#undef strerror
+#endif
+
+#define strerror(x) wsock_strerror(x)
+const char * wsock_strerror(int error);
+
 
 #define ENOBUFS	    WSAENOBUFS
 #define EINPROGRESS WSAEINPROGRESS
@@ -124,6 +134,7 @@ int setenv(const char *, const char *, int);
 int kill(int pid, int sig);
 #define WNOHANG 1
 pid_t waitpid(pid_t pid, int *status, int options);
+pid_t getpid(void);
 unsigned int geteuid(void);
 
 #ifndef SIGKILL

@@ -48,9 +48,8 @@ static buf_head_t dns_sendq;
 static buf_head_t dns_recvq;
 
 static pid_t res_pid;
-#ifndef __MINGW32__
 static int need_restart = 0;
-#endif
+
 struct dnsreq
 {
 	DNSCB *callback;
@@ -72,6 +71,12 @@ assign_dns_id(void)
 	return(id);	
 }
 
+static inline void
+check_resolver(void)
+{
+	if(dns_ifd < 0 || dns_ofd < 0 || need_restart == 1)
+		fork_resolver();
+}
 
 static void
 failed_resolver(uint16_t xid)
@@ -100,7 +105,7 @@ lookup_hostname(const char *hostname, int aftype, DNSCB *callback, void *data)
 	struct dnsreq *req;
 	int aft;
 	uint16_t nid;
-	
+	check_resolver();	
 	nid = assign_dns_id();
 	req = &querytable[nid];
 
@@ -124,6 +129,7 @@ lookup_ip(const char *addr, int aftype, DNSCB *callback, void *data)
 	struct dnsreq *req;
 	int aft;
 	uint16_t nid;
+	check_resolver();
 	
 	nid = assign_dns_id();
 	req = &querytable[nid];
@@ -363,7 +369,7 @@ dns_write_sendq(int fd, void *unused)
 }
  
 
-void 
+static void 
 submit_dns(char type, int nid, int aftype, const char *addr)
 {
 	if(dns_ofd < 0 || dns_ifd < 0)
@@ -403,7 +409,7 @@ resolver_sigchld(void)
 	int status;
 	if(waitpid(res_pid, &status, WNOHANG) == res_pid)
 	{
-		need_restart = 1;		
+		need_restart = 1;
 	}
 #endif
 }

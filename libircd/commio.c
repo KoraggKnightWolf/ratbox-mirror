@@ -150,7 +150,9 @@ ircd_close_all(void)
 int
 ircd_get_sockerr(int fd)
 {
-	int errtmp = errno;
+	int errtmp;
+	get_errno();
+	errtmp = errno;
 #ifdef SO_ERROR
 	int err = 0;
 	socklen_t len = sizeof(err);

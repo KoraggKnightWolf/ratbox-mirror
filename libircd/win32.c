@@ -49,6 +49,12 @@ typedef union {
 /* Number of 100 nanosecond units from 1/1/1601 to 1/1/1970 */
 #define EPOCH_BIAS  Const64(116444736000000000)
 
+pid_t
+getpid()
+{
+	return GetCurrentProcessId();
+}
+
 
 int
 gettimeofday(struct timeval *tp, void *not_used)
@@ -348,3 +354,66 @@ ircd_select(unsigned long delay)
 	return IRCD_OK;
 }
 
+#ifdef strerror
+#undef strerror
+#endif
+
+const char *
+wsock_strerror(int error)
+{
+	static char buf[128];
+	switch(error)
+	{
+		case  0:			return "Success";
+		case  WSAEINTR:			return "Interrupted system call";
+		case  WSAEBADF:			return "Bad file number";
+		case  WSAEACCES:		return "Permission denied";
+		case  WSAEFAULT:		return "Bad address";
+		case  WSAEINVAL:		return "Invalid argument";
+		case  WSAEMFILE:		return "Too many open sockets";
+		case  WSAEWOULDBLOCK:		return "Operation would block";
+		case  WSAEINPROGRESS:		return "Operation now in progress";
+		case  WSAEALREADY:		return "Operation already in progress";
+		case  WSAENOTSOCK:		return "Socket operation on non-socket";
+		case  WSAEDESTADDRREQ:		return "Destination address required";
+		case  WSAEMSGSIZE:		return "Message too long";
+		case  WSAEPROTOTYPE:		return "Protocol wrong type for socket";
+		case  WSAENOPROTOOPT:		return "Bad protocol option";
+		case  WSAEPROTONOSUPPORT:	return "Protocol not supported";
+		case  WSAESOCKTNOSUPPORT:	return "Socket type not supported";
+		case  WSAEOPNOTSUPP:		return "Operation not supported on socket";
+		case  WSAEPFNOSUPPORT:		return "Protocol family not supported";
+		case  WSAEAFNOSUPPORT:		return "Address family not supported";
+		case  WSAEADDRINUSE:		return "Address already in use";
+		case  WSAEADDRNOTAVAIL:		return "Can't assign requested address";
+		case  WSAENETDOWN:		return "Network is down";
+		case  WSAENETUNREACH:		return "Network is unreachable";
+		case  WSAENETRESET:		return "Net connection reset";
+		case  WSAECONNABORTED:		return "Software caused connection abort";
+		case  WSAECONNRESET:		return "Connection reset by peer";
+		case  WSAENOBUFS:		return "No buffer space available";
+		case  WSAEISCONN:		return "Socket is already connected";
+		case  WSAENOTCONN:		return "Socket is not connected";
+		case  WSAESHUTDOWN:		return "Can't send after socket shutdown";
+		case  WSAETOOMANYREFS:		return "Too many references, can't splice";
+		case  WSAETIMEDOUT:		return "Connection timed out";
+		case  WSAECONNREFUSED:		return "Connection refused";
+		case  WSAELOOP:			return "Too many levels of symbolic links";
+		case  WSAENAMETOOLONG:		return "File name too long";
+		case  WSAEHOSTDOWN:		return "Host is down";
+		case  WSAEHOSTUNREACH:		return "No route to host";
+		case  WSAENOTEMPTY:		return "Directory not empty";
+		case  WSAEPROCLIM:		return "Too many processes";
+		case  WSAEUSERS:		return "Too many users";
+		case  WSAEDQUOT:		return "Disc quota exceeded";
+		case  WSAESTALE:		return "Stale NFS file handle";
+		case  WSAEREMOTE:		return "Too many levels of remote in path";
+		case  WSASYSNOTREADY:		return "Network system is unavailable";
+		case  WSAVERNOTSUPPORTED:	return "Winsock version out of range";
+		case  WSANOTINITIALISED:	return "WSAStartup not yet called";
+		case  WSAEDISCON:		return "Graceful shutdown in progress";
+		case  WSAHOST_NOT_FOUND:	return "Host not found";
+		case  WSANO_DATA:	 	return "No host data of that type was found";
+		default:			return strerror(error);
+	}
+};

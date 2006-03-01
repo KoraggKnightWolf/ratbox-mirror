@@ -30,6 +30,7 @@
 #include "ircd.h"
 #include "send.h"
 #include "s_log.h"
+#include "s_conf.h"
 #include "client.h"		/* for FLAGS_ALL */
 
 /* external var */
@@ -53,6 +54,8 @@ void
 server_reboot(void)
 {
 	int i;
+	char path[PATH_MAX+1];
+
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Restarting server...");
 
@@ -73,5 +76,9 @@ server_reboot(void)
 	unlink(pidFileName);
 	execv(SPATH, (void *)myargv);
 
+	/* use this if execv of SPATH fails */
+	ircd_snprintf(path, sizeof(path), "%s/bin/ircd", ConfigFileEntry.dpath);
+
+	execv(path, (void *)myargv);
 	exit(-1);
 }

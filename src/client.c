@@ -23,6 +23,7 @@
  *
  *  $Id$
  */
+#include "ircd_lib.h"
 #include "stdinc.h"
 #include "struct.h"
 #include "client.h"
