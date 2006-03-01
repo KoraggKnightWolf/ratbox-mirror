@@ -1,3 +1,11 @@
+androsyn    2006/03/01 21:52:49 UTC	(20060301_4-21963)
+  Log:
+  - move rehash checking and the like into timed event
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2006/03/01 20:55:16 UTC	(20060301_3-21961)
   Log:
   update copyright
