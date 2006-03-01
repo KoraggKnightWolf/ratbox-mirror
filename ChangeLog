@@ -1,3 +1,11 @@
+androsyn    2006/03/01 20:55:16 UTC	(20060301_3-21961)
+  Log:
+  update copyright
+
+  Modified:
+	ircd-ratbox/trunk/libircd/win32.c (File Modified) 
+
+
 androsyn    2006/03/01 19:42:12 UTC	(20060301_2-21959)
   Log:
   remove an unused variable
