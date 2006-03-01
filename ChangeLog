@@ -1,3 +1,11 @@
+androsyn    2006/03/01 19:37:47 UTC	(20060301_1-21957)
+  Log:
+  pretty certain we need winsock 2.0
+
+  Modified:
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+
+
 androsyn    2006/03/01 18:13:39 UTC	(20060301_0-21953)
   Log:
   - add some little cleanups here and there for win32
