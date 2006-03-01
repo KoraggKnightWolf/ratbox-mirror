@@ -282,6 +282,32 @@ struct lgetopt myopts[] = {
 	{NULL, NULL, STRING, NULL},
 };
 
+static void
+check_rehash(void *unusued)
+{
+	/*
+	 * Check to see whether we have to rehash the configuration ..
+	 */
+	if(dorehash)
+	{
+		rehash(1);
+		dorehash = 0;
+	}
+
+	if(dorehashbans)
+	{
+		rehash_bans(1);
+		dorehashbans = 0;
+	}
+
+	if(doremotd)
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "Got signal SIGUSR1, reloading ircd motd file");
+		cache_user_motd();
+		doremotd = 0;
+	}
+}
 
 static void
 io_loop(void)
@@ -289,34 +315,8 @@ io_loop(void)
 	while (ServerRunning)
 
 	{
-		/* Run pending events, then get the number of seconds to the next
-		 * event
-		 */
-
 		ircd_event_run();
-
 		ircd_select(250);
-
-		/*
-		 * Check to see whether we have to rehash the configuration ..
-		 */
-		if(dorehash)
-		{
-			rehash(1);
-			dorehash = 0;
-		}
-		if(dorehashbans)
-		{
-			rehash_bans(1);
-			dorehashbans = 0;
-		}
-		if(doremotd)
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "Got signal SIGUSR1, reloading ircd motd file");
-			cache_user_motd();
-			doremotd = 0;
-		}
 	}
 }
 
@@ -709,7 +709,7 @@ ratbox_main(int argc, char *argv[])
 	 */
 	ircd_event_addish("try_connections", try_connections, NULL, STARTUP_CONNECTIONS_TIME);
 	ircd_event_addonce("try_connections_startup", try_connections, NULL, 2);
-
+	ircd_event_add("check_rehash", check_rehash, NULL, 3);
 	ircd_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
 
 	if(splitmode)
