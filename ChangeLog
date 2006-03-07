@@ -1,3 +1,17 @@
+jilles      2006/03/07 16:02:48 UTC	(20060307_0-22021)
+  Log:
+  Forward port RATBOX_2_2 r22003:
+  Global /who:
+  - make sure to clear all marks also if the who was aborted
+    because of too many matches (reverting r21999)
+  - give ERR_TOOMANYMATCHES if too many matches
+  - clarify comments
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_who.c (File Modified) 
+
+
 androsyn    2006/03/01 21:52:49 UTC	(20060301_4-21963)
   Log:
   - move rehash checking and the like into timed event
