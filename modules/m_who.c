@@ -208,9 +208,8 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
  *		- int if oper on a server or not
  *		- pointer to int maxmatches
  * output	- NONE
- * side effects - lists matching clients on specified channel,
+ * side effects - lists matching invisible clients on specified channel,
  * 		  marks matched clients.
- *
  */
 static void
 who_common_channel(struct Client *source_p, struct Channel *chptr,
@@ -233,21 +232,16 @@ who_common_channel(struct Client *source_p, struct Channel *chptr,
 
 		SetMark(target_p);
 
-		if((mask == NULL) ||
-		   match(mask, target_p->name) || match(mask, target_p->username) ||
-		   match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
-		   match(mask, target_p->info))
+		if(*maxmatches > 0)
 		{
-
-			do_who(source_p, target_p, NULL, "");
-
-			if(*maxmatches > 0)
+			if((mask == NULL) ||
+			   match(mask, target_p->name) || match(mask, target_p->username) ||
+			   match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
+			   match(mask, target_p->info))
 			{
+				do_who(source_p, target_p, NULL, "");
 				--(*maxmatches);
-				if(*maxmatches == 0)
-					return;
 			}
-
 		}
 	}
 }
@@ -261,6 +255,8 @@ who_common_channel(struct Client *source_p, struct Channel *chptr,
  * output	- NONE
  * side effects - do a global scan of all clients looking for match
  *		  this is slightly expensive on EFnet ...
+ *		  marks assumed cleared for all clients initially
+ *		  and will be left cleared on return
  */
 static void
 who_global(struct Client *source_p, const char *mask, int server_oper, int operspy)
@@ -270,7 +266,9 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 	dlink_node *lp, *ptr;
 	int maxmatches = 500;
 
-	/* first, list all matching INvisible clients on common channels */
+	/* first, list all matching INvisible clients on common channels
+	 * if this is not an operspy who
+	 */
 	if(!operspy)
 	{
 		DLINK_FOREACH(lp, source_p->user->channel.head)
@@ -282,7 +280,11 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 	else
 		report_operspy(source_p, "WHO", mask);
 
-	/* second, list all matching visible clients */
+	/* second, list all matching visible clients and clear all marks
+	 * on invisible clients
+	 * if this is an operspy who, list all matching clients, no need
+	 * to clear marks
+	 */
 	DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		target_p = ptr->data;
@@ -298,23 +300,24 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 		if(server_oper && !IsOper(target_p))
 			continue;
 
-		if(!mask ||
-		   match(mask, target_p->name) || match(mask, target_p->username) ||
-		   match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
-		   match(mask, target_p->info))
+		if(maxmatches > 0)
 		{
-
-			do_who(source_p, target_p, NULL, "");
-			if(maxmatches > 0)
+			if(!mask ||
+			   match(mask, target_p->name) || match(mask, target_p->username) ||
+			   match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
+			   match(mask, target_p->info))
 			{
+				do_who(source_p, target_p, NULL, "");
 				--maxmatches;
-				if(maxmatches == 0)
-					return;
 			}
-
 		}
 
 	}
+
+	if (maxmatches <= 0)
+		sendto_one(source_p, HOLD_QUEUE,
+			form_str(ERR_TOOMANYMATCHES),
+			me.name, source_p->name, "WHO");
 }
 
 /*
