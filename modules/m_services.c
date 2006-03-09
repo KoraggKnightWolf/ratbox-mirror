@@ -159,7 +159,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 	if(target_p->tsinfo != curts)
 		return 0;
 
-	if((exist_p = find_person(parv[2])))
+	if((exist_p = find_named_client(parv[2])))
 	{
 		char buf[BUFSIZE];
 
@@ -175,8 +175,10 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 				me.name, exist_p->name);
 
 		exist_p->flags |= FLAGS_KILLED;
-		kill_client_serv_butone(NULL, exist_p, "%s (Nickname regained by services)",
-					me.name);
+		/* Do not send kills to servers for unknowns -- jilles */
+		if(IsClient(exist_p))
+			kill_client_serv_butone(NULL, exist_p, "%s (Nickname regained by services)",
+						me.name);
 
 		ircd_snprintf(buf, sizeof(buf), "Killed (%s (Nickname regained by services))",
 			me.name);
