@@ -1,3 +1,14 @@
+jilles      2006/03/09 16:17:54 UTC	(20060309_0-22041)
+  Log:
+  Forward port RATBOX_2_2 r22039:
+  RSFNC: consider unknowns also for detecting a collide,
+  otherwise we can get two clients with the same nick.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+
+
 jilles      2006/03/07 16:02:48 UTC	(20060307_0-22021)
   Log:
   Forward port RATBOX_2_2 r22003:
