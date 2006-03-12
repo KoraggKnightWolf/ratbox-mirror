@@ -38,8 +38,8 @@ index:
 	echo 'Help topics available to users:' > users/index
 	echo '' >> users/index
 	cat users/index.tmp \
-		| sort -u \
 		| sed -e 's|^users/||' \
+		| sort -u \
 		| tr a-z A-Z \
 		| column -c 65 -x \
 		| expand \
@@ -54,8 +54,8 @@ index:
 	echo 'Help topics available to opers:' > opers/index
 	echo '' >> opers/index
 	cat opers/index.tmp \
-		| sort -u \
 		| sed -e 's|^opers/||' \
+		| sort -u \
 		| tr a-z A-Z \
 		| column -c 65 -s ' ' -x \
 		| expand \
