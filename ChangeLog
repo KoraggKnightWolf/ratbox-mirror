@@ -1,3 +1,14 @@
+jilles      2006/03/12 17:10:19 UTC	(20060312_0-22095)
+  Log:
+  Forward port RATBOX_2_2 r22093:
+  User /quote help index was not sorted properly.
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/help/users/index (File Modified) 
+
+
 jilles      2006/03/09 16:17:54 UTC	(20060309_0-22041)
   Log:
   Forward port RATBOX_2_2 r22039:
