@@ -1,3 +1,24 @@
+androsyn    2006/04/24 20:06:01 UTC	(20060424_0-22367)
+  Log:
+  Add LOCAL_COPY_N which is like LOCAL_COPY but copies up to N number of bytes of the string the total allocation ends up
+  being N+1. (Except on non-gcc compilers where it'll end up being allocate the length of the original string, just like LOCAL_COPY, but will
+  still at least terminate it as expected.)
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/stdinc.h (File Modified) 
+	ircd-ratbox/trunk/libircd/tools.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_kick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_part.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_quit.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_away.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 jilles      2006/03/12 17:10:19 UTC	(20060312_0-22095)
   Log:
   Forward port RATBOX_2_2 r22093:
