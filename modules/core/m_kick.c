@@ -71,9 +71,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	if(MyClient(source_p) && !IsFloodDone(source_p))
 		flood_endgrace(source_p);
 
-	comment = LOCAL_COPY((EmptyString(parv[3])) ? parv[2] : parv[3]);
-	if(strlen(comment) > (size_t) REASONLEN)
-		comment[REASONLEN] = '\0';
+	comment = LOCAL_COPY_N((EmptyString(parv[3])) ? parv[2] : parv[3], REASONLEN);
 
 	*buf = '\0';
 	if((p = strchr(parv[1], ',')))

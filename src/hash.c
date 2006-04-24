@@ -512,7 +512,6 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 	len = strlen(s);
 	if(len > CHANNELLEN)
 	{
-		char *t;
 		if(IsServer(client_p))
 		{
 			sendto_realops_flags(UMODE_DEBUG, L_ALL,
@@ -520,9 +519,7 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 					     client_p->name, len, CHANNELLEN, s);
 		}
 		len = CHANNELLEN;
-		t = LOCAL_COPY(s);
-		*(t + CHANNELLEN) = '\0';
-		s = t;
+		s = LOCAL_COPY_N(s, CHANNELLEN);
 	}
 
 	hashv = hash_channel(s);

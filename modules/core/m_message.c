@@ -239,7 +239,7 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 	struct Channel *chptr = NULL;
 	struct Client *target_p;
 
-	target_list = LOCAL_COPY(nicks_channels);	/* skip strcpy for non-lazyleafs */
+	target_list = LOCAL_COPY(nicks_channels);
 
 	ntargets = 0;
 

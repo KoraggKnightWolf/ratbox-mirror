@@ -351,14 +351,13 @@ ms_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* check the length of the clients gecos */
 	if(strlen(parv[8]) > REALLEN)
 	{
-		char *s = LOCAL_COPY(parv[8]);
+		parv[8] = LOCAL_COPY_N(parv[8], REALLEN);
 		/* why exactly do we care? --fl */
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				"Long realname from server %s for %s", parv[7],
-				parv[1]);
-
-		s[REALLEN] = '\0';
-		parv[8] = s;
+		/* sendto_realops_flags(UMODE_ALL, L_ALL,
+		 *		"Long realname from server %s for %s", parv[7],
+		 *		parv[1]);
+		 * i don't care, nobody else does. --androsyn 
+		 */
 	}
 
 	newts = atol(parv[3]);
@@ -461,11 +460,7 @@ ms_uid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	/* check length of clients gecos */
 	if(strlen(parv[9]) > REALLEN)
 	{
-		char *s = LOCAL_COPY(parv[9]);
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Long realname from server %s for %s",
-				     parv[0], parv[1]);
-		s[REALLEN] = '\0';
-		parv[9] = s;
+		parv[9] = LOCAL_COPY_N(parv[9], REALLEN);
 	}
 
 	target_p = find_client(parv[1]);

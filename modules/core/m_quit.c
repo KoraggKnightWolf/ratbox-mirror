@@ -61,13 +61,10 @@ mr_quit(struct Client *client_p, struct Client *source_p, int parc, const char *
 static int
 m_quit(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	char *comment = LOCAL_COPY((parc > 1 && parv[1]) ? parv[1] : client_p->name);
+	char *comment = LOCAL_COPY_N((parc > 1 && parv[1]) ? parv[1] : client_p->name, REASONLEN);
 	char reason[REASONLEN + 1];
 
 	source_p->flags |= FLAGS_NORMALEX;
-
-	if(strlen(comment) > (size_t) REASONLEN)
-		comment[REASONLEN] = '\0';
 
 	if(ConfigFileEntry.client_exit && comment[0])
 	{
@@ -95,12 +92,9 @@ m_quit(struct Client *client_p, struct Client *source_p, int parc, const char *p
 static int
 ms_quit(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	char *comment = LOCAL_COPY((parc > 1 && parv[1]) ? parv[1] : client_p->name);
+	char *comment = LOCAL_COPY_N((parc > 1 && parv[1]) ? parv[1] : client_p->name, REASONLEN);
 
 	source_p->flags |= FLAGS_NORMALEX;
-	if(strlen(comment) > (size_t) REASONLEN)
-		comment[REASONLEN] = '\0';
-
 	exit_client(client_p, source_p, source_p, comment);
 
 	return 0;

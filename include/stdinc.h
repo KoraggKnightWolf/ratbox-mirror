@@ -206,6 +206,29 @@ extern int errno;
 #endif /* defined(__INTEL_COMPILER) || defined(__GNUC__) */
 #endif /* strdupa */
 
+/* LOCAL_COPY_N copies n part of string and adds one to terminate the string */
+#ifdef strndupa 
+#define LOCAL_COPY_N(s, n) strndupa(s, n)
+#else
+#if defined(__INTEL_COMPILER) || defined(__GNUC__)
+#define LOCAL_COPY_N(s, n) __extension__({ char *_s = alloca(n); memcpy(_s, s, n); _s[n] = '\0' ; _s; })
+#else
+#define LOCAL_COPY_N(s, n) xc_strlcpy(alloca(strlen(s+1)), s, n)
+INLINE_FUNC size_t
+xc_strlcpy(char *dest, const char *src, size_t size)
+{ 
+        size_t ret = strlen(src);
+   
+        if (size) {
+                size_t len = (ret >= size) ? size-1 : ret;
+                memcpy(dest, src, len);
+                dest[len] = '\0';
+        }
+        return dest;
+}
+#endif /* defined(__INTEL_COMPILER) || defined(__GNUC__) */
+#endif /* strndupa */
+
 #ifndef INADDR_NONE
 # define INADDR_NONE ((in_addr_t) 0xffffffff)
 #endif

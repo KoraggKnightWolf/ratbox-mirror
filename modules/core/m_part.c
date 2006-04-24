@@ -62,12 +62,13 @@ static int
 m_part(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	char *p, *name;
-	char reason[REASONLEN + 1];
+	char *reason = NULL;
 	char *s = LOCAL_COPY(parv[1]);
 
 	reason[0] = '\0';
 
 	if(parc > 2)
+		reason = LOCAL_COPY_N(parv[2], REASONLEN);
 		strlcpy(reason, parv[2], sizeof(reason));
 
 	name = strtok_r(s, ",", &p);
@@ -121,7 +122,7 @@ part_one_client(struct Client *client_p, struct Client *source_p, char *name, ch
 	 *  Remove user from the old channel (if any)
 	 *  only allow /part reasons in -m chans
 	 */
-	if(reason[0] && (is_chanop(msptr) || !MyConnect(source_p) ||
+	if(!EmptyString(reason) && (is_chanop(msptr) || !MyConnect(source_p) ||
 			 ((can_send(chptr, source_p, msptr) > 0 &&
 			   (source_p->localClient->firsttime + ConfigFileEntry.anti_spam_exit_message_time)
 			   < ircd_currenttime))))

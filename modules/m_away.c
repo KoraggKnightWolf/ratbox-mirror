@@ -100,9 +100,7 @@ m_away(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	/* Marking as away */
 
-	awy2 = LOCAL_COPY(parv[1]);
-	if(strlen(awy2) > AWAYLEN)
-		awy2[AWAYLEN] = '\0';
+	awy2 = LOCAL_COPY_N(parv[1], AWAYLEN);
 
 	/* we now send this only if they weren't away already --is */
 	if(!away)

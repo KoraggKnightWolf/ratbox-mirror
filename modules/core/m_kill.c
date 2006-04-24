@@ -79,11 +79,7 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(!EmptyString(parv[2]))
 	{
-		char *s;
-		s = LOCAL_COPY(parv[2]);
-		if(strlen(s) > (size_t) KILLLEN)
-			s[KILLLEN] = '\0';
-		reason = s;
+		reason = LOCAL_COPY_N(parv[2], KILLLEN);
 	}
 	else
 		reason = "<No reason given>";
