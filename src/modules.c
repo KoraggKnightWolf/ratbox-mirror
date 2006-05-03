@@ -629,17 +629,6 @@ unload_one_module(const char *name, int warn)
 	if((modindex = findmodule_byname(name)) == -1)
 		return -1;
 
-	/*
-	 ** XXX - The type system in C does not allow direct conversion between
-	 ** data and function pointers, but as it happens, most C compilers will
-	 ** safely do this, however it is a theoretical overlow to cast as we 
-	 ** must do here.  I have library functions to take care of this, but 
-	 ** despite being more "correct" for the C language, this is more 
-	 ** practical.  Removing the abuse of the ability to cast ANY pointer
-	 ** to and from an integer value here will break some compilers.
-	 **          -jmallett
-	 */
-	/* Left the comment in but the code isn't here any more         -larne */
 	switch (modlist[modindex]->mapi_version)
 	{
 	case 1:
