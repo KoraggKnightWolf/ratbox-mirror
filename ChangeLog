@@ -1,3 +1,13 @@
+androsyn    2006/05/03 19:07:45 UTC	(20060503_0-22377)
+  Log:
+  Add code to reseed srand() once every 10 minutes or so for the sake of paranoia.  Use /dev/urandom instead of
+  /dev/random in this case.  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2006/04/24 20:06:01 UTC	(20060424_0-22367)
   Log:
   Add LOCAL_COPY_N which is like LOCAL_COPY but copies up to N number of bytes of the string the total allocation ends up
