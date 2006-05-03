@@ -493,11 +493,11 @@ diecb(const char *buf)
 }
 
 static void
-seed_random(void)
+seed_random(void *unused)
 {
 	int fd;
 	unsigned int seed;
-	fd = open("/dev/random", O_RDONLY);
+	fd = open("/dev/urandom", O_RDONLY);
 	if(fd >= 0)
 	{
 		if(read(fd, &seed, sizeof(seed)) == sizeof(seed))
@@ -538,7 +538,7 @@ ratbox_main(int argc, char *argv[])
 
 	ServerRunning = 0;
 
-	seed_random();
+	seed_random(NULL);
 
 	memset(&me, 0, sizeof(me));
 	me.name = emptyname;
@@ -711,6 +711,7 @@ ratbox_main(int argc, char *argv[])
 	ircd_event_addonce("try_connections_startup", try_connections, NULL, 2);
 	ircd_event_add("check_rehash", check_rehash, NULL, 3);
 	ircd_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
+	ircd_event_addish("reseed_srand", seed_random, NULL, 300); /* reseed every 10 minutes */
 
 	if(splitmode)
 		ircd_event_add("check_splitmode", check_splitmode, NULL, 5);
