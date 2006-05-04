@@ -340,6 +340,7 @@ void conf_add_d_conf(struct ConfItem *);
 void flush_expired_ips(void *);
 
 char *get_oper_name(struct Client *client_p);
+char *get_class_name(struct ConfItem *aconf);
 
 int yylex(void);
 

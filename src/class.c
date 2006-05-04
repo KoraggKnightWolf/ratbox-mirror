@@ -106,18 +106,8 @@ get_client_class(struct Client *target_p)
 		struct server_conf *server_p = target_p->localClient->att_sconf;
 		return server_p->class_name;
 	}
-	else
-	{
-		struct ConfItem *aconf;
-		aconf = target_p->localClient->att_conf;
 
-		if((aconf == NULL) || (aconf->c_class == NULL))
-			retc = "default";
-		else
-			retc = ConfClassName(aconf);
-	}
-
-	return (retc);
+	return get_class_name(target_p->localClient->att_conf);;
 }
 
 /*

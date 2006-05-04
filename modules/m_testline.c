@@ -175,7 +175,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSILINE, form_str(RPL_STATSILINE),
 				aconf->info.name, show_iline_prefix(source_p, aconf, aconf->user),
-				aconf->host, aconf->port, ConfClassName(aconf));
+				aconf->host, aconf->port, get_class_name(aconf));
 		return 0;
 	}
 
