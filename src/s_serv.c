@@ -102,6 +102,7 @@ slink_error(unsigned int rpl, unsigned int len, unsigned char *data, struct Clie
 	data[len - 1] = '\0';
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "SlinkError for %s: %s", server_p->name, data);
+	ilog(L_SERVER, "SlinkError for %s: %s", server_p->name, data);
 	exit_client(server_p, server_p, &me, "servlink error -- terminating link");
 }
 
@@ -403,10 +404,9 @@ try_connections(void *unused)
 	 * error afterwards if it fails.
 	 *   -- adrian
 	 */
-	sendto_realops_flags(UMODE_ALL, L_ALL,
-			"Connection to %s activated",
-			server_p->name);
-
+	sendto_realops_flags(UMODE_ALL, L_ALL, "Connection to %s activated", server_p->name);
+	ilog(L_SERVER, "Connection to %s activated", server_p->name);
+	
 	serv_connect(server_p, 0);
 }
 
@@ -679,18 +679,21 @@ serv_connect_callback(int fd, int status, void *data)
 		/* IRCD_ERR_TIMEOUT wont have an errno associated with it,
 		 * the others will.. --fl
 		 */
-		if(status == IRCD_ERR_TIMEOUT)
+		if(status == IRCD_ERR_TIMEOUT) 
+		{
+			sendto_realops_flags(UMODE_ALL, L_ALL, "Error connecting to %s[255.255.255.255]: %s",
+					client_p->name, ircd_errstr(status));
+			ilog(L_SERVER, "Error connecting to %s: %s", client_p->name, ircd_errstr(status));
+		}
+		else 
+		{
+			char *errstr = strerror(ircd_get_sockerr(fd));
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"Error connecting to %s[%s]: %s",
-					client_p->name, 
-					"255.255.255.255",
-					ircd_errstr(status));
-		else
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"Error connecting to %s: %s (%s)",
+					"Error connecting to %s[255.255.255.255]: %s (%s)",
 					client_p->name,
-					ircd_errstr(status), strerror(ircd_get_sockerr(fd)));
-
+					ircd_errstr(status), errstr);
+			ilog(L_SERVER, "Error connecting to %s: %s (%s)", client_p->name, ircd_errstr(status), errstr);
+		}
 		exit_client(client_p, client_p, &me, ircd_errstr(status));
 		return;
 	}
@@ -701,6 +704,7 @@ serv_connect_callback(int fd, int status, void *data)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Lost connect{} block for %s",
 				client_p->name);
+		ilog(L_SERVER, "Lost connect{} block for %s", client_p->name);
 		exit_client(client_p, client_p, &me, "Lost connect{} block");
 		return;
 	}
@@ -738,6 +742,7 @@ serv_connect_callback(int fd, int status, void *data)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s went dead during handshake", client_p->name);
+		ilog(L_SERVER, "%s went dead during handshake", client_p->name);
 		exit_client(client_p, client_p, &me, "Went dead during handshake");
 		return;
 	}
