@@ -1,3 +1,11 @@
+androsyn    2006/05/04 15:08:21 UTC	(20060504_0-22381)
+  Log:
+  remove notification of non-TS server
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2006/05/03 19:16:02 UTC	(20060503_1-22379)
   Log:
   remove pointless comment
