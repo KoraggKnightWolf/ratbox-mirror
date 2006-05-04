@@ -91,9 +91,6 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	 */
 	if(!DoesTS(client_p))
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Link %s dropped, non-TS server",
-				     client_p->name);
-				     
 		exit_client(client_p, client_p, client_p, "Non-TS server");
 		return 0;
 	}
