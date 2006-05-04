@@ -1,3 +1,15 @@
+androsyn    2006/05/04 15:45:08 UTC	(20060504_1-22383)
+  Log:
+  Add get_class_name() to return a class name of a conf.  
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+	ircd-ratbox/trunk/src/class.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2006/05/04 15:08:21 UTC	(20060504_0-22381)
   Log:
   remove notification of non-TS server
