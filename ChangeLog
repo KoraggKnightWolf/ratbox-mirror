@@ -1,3 +1,12 @@
+androsyn    2006/05/04 16:01:12 UTC	(20060504_2-22385)
+  Log:
+  Add more logging on server connects, mostly a port of r21854
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2006/05/04 15:45:08 UTC	(20060504_1-22383)
   Log:
   Add get_class_name() to return a class name of a conf.  
