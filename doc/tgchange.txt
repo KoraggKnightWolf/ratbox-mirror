@@ -1,6 +1,6 @@
-Target Change for Messages
-Lee H <lee -at- leeh.co.uk>
----------------------------
+- Target Change for Messages  -
+- Lee H <lee -at- leeh.co.uk> -
+-------------------------------
 
 If the server you are using uses the target change mechanism, then
 restrictions are placed on how many different users you can message in a set
@@ -18,7 +18,7 @@ When all slots are filled, messages to new clients will not be accepted.
 Messages to clients already filling a slot will be accepted.  If all slots
 are full, you will receive the ERR_TARGCHANGE numeric, number 707 in the
 form:
-:<server> 707 <yournick> <targetnick> :Targets changing too fast, message dropped
+	:<server> 707 <yournick> <targetnick> :Targets changing too fast, message dropped
 
 The slots are operated as a FIFO (first in, first out), so the first person
 you message will be the first person removed from a slot, even if you are
