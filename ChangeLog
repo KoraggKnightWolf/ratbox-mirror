@@ -1,3 +1,12 @@
+leeh        2006/05/07 10:56:24 UTC	(20060507_0-22397)
+  Log:
+  - minor cosmetic changes to ts6 doc so it can run through my text2html
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/technical/ts6.txt (File Modified) 
+
+
 androsyn    2006/05/04 16:01:12 UTC	(20060504_2-22385)
   Log:
   Add more logging on server connects, mostly a port of r21854
