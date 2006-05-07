@@ -1,3 +1,16 @@
+androsyn    2006/05/07 15:51:04 UTC	(20060507_2-22409)
+  Log:
+  fix some minor type issues
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/match.h (File Modified) 
+	ircd-ratbox/trunk/include/patricia.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+	ircd-ratbox/trunk/src/patricia.c (File Modified) 
+
+
 leeh        2006/05/07 11:18:13 UTC	(20060507_1-22399)
   Log:
   - more minor formatting changes for text2html
