@@ -4,8 +4,8 @@ TS6 Proposal (v7)
 Written by Lee H <lee@leeh.co.uk>
 Ideas borrowed heavily from ircnet (Beeth, jv, Q)
 
-Introduction
-------------
+- Introduction -
+----------------
 
 This document aims to fix some of the flaws that are still present in the
 current TS system.
@@ -28,8 +28,8 @@ issue a mode during a netburst and the mode will be set on the server
 we are bursting to.
 
 
-Definitions
------------
+- Definitions -
+---------------
 
 Throughout this document, the following terms are used:
 
@@ -43,8 +43,8 @@ UID     - An ID concateneted to a SID.  This forms the clients UID.
 TS6     - The TS version 6.
 
 
-Support
--------
+- Support -
+-----------
 
 Support for this document is given by the TS version 6.
 
@@ -60,8 +60,8 @@ http://www.leeh.co.uk/ircd/encap.txt
 The TS6 protocol does not supports masked entities.
 
 
-Nick TS rules
--------------
+- Nick TS rules -
+-----------------
 
 A server receiving a command that requires nick TS rules must check for a
 collision between an existing user, and the nick in the received message.
@@ -81,8 +81,8 @@ clients user@host are different it will collide the new user and drop the
 message.
 
 
-Nick TS collisions
-------------------
+- Nick TS collisions -
+----------------------
 
 If both users are to be collided, we must issue a KILL for the existing 
 user to all servers.  If the new user has a UID then we must also issue a 
@@ -98,8 +98,8 @@ If only the new user is being collided, we must issue a KILL for the new user
 back to the server sending us data if the new user has a UID.
 
 
-Channel TS rules
-----------------
+- Channel TS rules -
+--------------------
 
 A server receiving a command that requires normal channel TS rules must 
 apply the following rules to the command.
@@ -125,8 +125,8 @@ losing their op (+o) status who do not have a UID as 'deopped'.  A server must
 ignore any "MODE" commands from a user marked as 'deopped'.
 
 
-Simple channel TS rules
------------------------
+- Simple channel TS rules -
+---------------------------
 
 A server receiving a command that requires simple channel TS rules must
 apply the following rules to the command.
@@ -139,11 +139,11 @@ Simple channel TS rules do not affect current modes in the channel except
 for the modes we are accepting.
 
 
-The following commands are defined here as the TS6 protocol
------------------------------------------------------------
+- The following commands are defined here as the TS6 protocol -
+---------------------------------------------------------------
 
-PASS:
-PASS <PASSWORD> TS <TS_CURRENT> :<SID>
+- PASS -
+	PASS <PASSWORD> TS <TS_CURRENT> :<SID>
 
 This command is used for password verification with the server we are
 connecting to.
@@ -156,8 +156,8 @@ The <PASSWORD> field is the password we have stored for this server,
 <TS_CURRENT> is our current TS version.  If this field is not present then
 the server does not support TS6.  <SID> is the SID of the server.
 
-UID:
-:<SID> UID <NICK> <HOPS> <TS> +<UMODE> <USERNAME> <HOSTNAME> <IP> <UID> :<GECOS>
+- UID -
+	:<SID> UID <NICK> <HOPS> <TS> +<UMODE> <USERNAME> <HOSTNAME> <IP> <UID> :<GECOS>
 
 This command is used for introducing clients to the network.
 
@@ -176,8 +176,8 @@ clients UID.  The <GECOS> field is the clients gecos.
 
 A server receiving a UID command must apply nick TS rules to the nick.
 
-SID:
-:<SID> SID <SERVERNAME> <HOPS> <SID> :<GECOS>
+- SID -
+	:<SID> SID <SERVERNAME> <HOPS> <SID> :<GECOS>
 
 This command is used for introducing servers to the network.
 
@@ -196,8 +196,8 @@ connected server through which the command was received.
 Client and servers which do not have a UID/SID must be introduced by old
 methods.
 
-SJOIN:
-:<SID> SJOIN <TS> <CHANNAME> +<CHANMODES> :<UIDS>
+- SJOIN -
+	:<SID> SJOIN <TS> <CHANNAME> +<CHANMODES> :<UIDS>
 
 This command is used for introducing users to channels.
 
@@ -216,8 +216,8 @@ to introduce a single user to an existing channel.  It must instead
 use the "JOIN" command defined in this specification.  A TS6 server must
 still use SJOIN for creating channels.
 
-JOIN:
-:<UID> JOIN <TS> <CHANNAME> +<CHANMODES>
+- JOIN -
+	:<UID> JOIN <TS> <CHANNAME> +<CHANMODES>
 
 This command is used for introducing one user unopped to an existing channel.
 
@@ -231,8 +231,8 @@ It should be noted that whilst JOIN would not normally create a
 channel, during specific race conditions it can.  This can create
 a ban desync that this specification does not rectify.
 
-BMASK:
-:<SID> BMASK <TS> <CHANNAME> <TYPE> :<MASKS>
+- BMASK -
+	:<SID> BMASK <TS> <CHANNAME> <TYPE> :<MASKS>
 
 This command is used for bursting channel bans to a network.
 
@@ -253,8 +253,8 @@ It should be noted however, that a BMASK with a lower TS should
 not be possible without a desync, due to it being sent after
 SJOIN.
 
-TMODE:
-:<UID> TMODE <TS> <CHANNAME> <MODESTRING>
+- TMODE -
+	:<UID> TMODE <TS> <CHANNAME> <MODESTRING>
 
 This command is used for clients issuing modes on a channel.
 
