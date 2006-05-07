@@ -1,3 +1,13 @@
+leeh        2006/05/07 11:18:13 UTC	(20060507_1-22399)
+  Log:
+  - more minor formatting changes for text2html
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/services.txt (File Modified) 
+	ircd-ratbox/trunk/doc/tgchange.txt (File Modified) 
+
+
 leeh        2006/05/07 10:56:24 UTC	(20060507_0-22397)
   Log:
   - minor cosmetic changes to ts6 doc so it can run through my text2html
