@@ -53,7 +53,7 @@ prefix_tochar(prefix_t * prefix)
 
 #if 0
 static int
-comp_with_mask(void *addr, void *dest, u_int mask)
+comp_with_mask(void *addr, void *dest, unsigned int mask)
 {
 
 	if( /* mask/8 == 0 || */ memcmp(addr, dest, mask / 8) == 0)
@@ -375,7 +375,7 @@ patricia_search_exact(patricia_tree_t * patricia, prefix_t * prefix)
 {
 	patricia_node_t *node;
 	u_char *addr;
-	u_int bitlen;
+	unsigned int bitlen;
 
 	assert(patricia);
 	assert(prefix);
@@ -451,7 +451,7 @@ patricia_search_best2(patricia_tree_t * patricia, prefix_t * prefix, int inclusi
 	patricia_node_t *node;
 	patricia_node_t *stack[PATRICIA_MAXBITS + 1];
 	u_char *addr;
-	u_int bitlen;
+	unsigned int bitlen;
 	int cnt = 0;
 
 	assert(patricia);
@@ -559,7 +559,7 @@ patricia_lookup(patricia_tree_t * patricia, prefix_t * prefix)
 {
 	patricia_node_t *node, *new_node, *parent, *glue;
 	u_char *addr, *test_addr;
-	u_int bitlen, check_bit, differ_bit;
+	unsigned int bitlen, check_bit, differ_bit;
 	unsigned int i, j, r;
 
 	assert(patricia);

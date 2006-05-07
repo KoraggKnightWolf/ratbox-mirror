@@ -224,7 +224,7 @@ match_esc(const char *mask, const char *name)
 }
 
 int
-comp_with_mask(void *addr, void *dest, u_int mask)
+comp_with_mask(void *addr, void *dest, unsigned int mask)
 {
 	if(memcmp(addr, dest, mask / 8) == 0)
 	{
@@ -239,7 +239,7 @@ comp_with_mask(void *addr, void *dest, u_int mask)
 }
 
 int
-comp_with_mask_sock(struct sockaddr *addr, struct sockaddr *dest, u_int mask)
+comp_with_mask_sock(struct sockaddr *addr, struct sockaddr *dest, unsigned int mask)
 {
 	void *iaddr = NULL;
 	void *idest = NULL;

@@ -313,7 +313,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 	struct oper_conf *oper_p;
 	char *challenge = NULL;
 	char chal_line[CHALLENGE_WIDTH]; 
-	u_int8_t *b_response;
+	uint8_t *b_response;
 	int len = 0;
 	size_t cnt;
 
@@ -487,9 +487,9 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 	if(get_randomness(secret, CHALLENGE_SECRET_LENGTH))
 	{
 		SHA1_Init(&ctx);
-		SHA1_Update(&ctx, (u_int8_t *)secret, CHALLENGE_SECRET_LENGTH);
+		SHA1_Update(&ctx, (uint8_t *)secret, CHALLENGE_SECRET_LENGTH);
 		*r_response = malloc(SHA_DIGEST_LENGTH);
-		SHA1_Final((u_int8_t *)*r_response, &ctx);
+		SHA1_Final((uint8_t *)*r_response, &ctx);
 
 		length = RSA_size(rsa);
 		tmp = ircd_malloc(length);
