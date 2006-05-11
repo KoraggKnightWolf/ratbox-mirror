@@ -635,8 +635,12 @@ ratbox_main(int argc, char *argv[])
 	init_reject();
 	init_cache();
 	init_monitor();
+#ifdef STATIC_MODULES
+	load_static_modules();
+#else
 	load_all_modules(1);
 	load_core_modules(1);
+#endif
 	init_resolver();	/* Needs to be setup before the io loop */
 
 		

@@ -65,12 +65,14 @@ int max_mods = MODS_INCREMENT;
 
 static dlink_list mod_paths;
 
+static void increase_modlist(void);
+
+#ifndef STATIC_MODULES
+
 static int mo_modload(struct Client *, struct Client *, int, const char **);
-static int mo_modlist(struct Client *, struct Client *, int, const char **);
 static int mo_modreload(struct Client *, struct Client *, int, const char **);
 static int mo_modunload(struct Client *, struct Client *, int, const char **);
 static int mo_modrestart(struct Client *, struct Client *, int, const char **);
-static void increase_modlist(void);
 
 struct Message modload_msgtab = {
 	"MODLOAD", 0, 0, 0, MFLG_SLOW,
@@ -87,20 +89,30 @@ struct Message modreload_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_modreload, 2}}
 };
 
-struct Message modlist_msgtab = {
-	"MODLIST", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_modlist, 0}}
-};
 
 struct Message modrestart_msgtab = {
 	"MODRESTART", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_modrestart, 0}}
 };
 
+#endif
+
+static int mo_modlist(struct Client *, struct Client *, int, const char **);
+
+struct Message modlist_msgtab = {
+	"MODLIST", 0, 0, 0, MFLG_SLOW,
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_modlist, 0}}
+};
+
+
+
+
 extern struct Message error_msgtab;
+
 #ifdef STATIC_MODULES
 extern const lt_dlsymlist lt_preloaded_symbols[];
 #endif
+
 void
 modules_init(void)
 {
@@ -113,12 +125,126 @@ modules_init(void)
 		exit(0);
 	}
 
+	modlist = ircd_malloc(sizeof(struct module) * (MODS_INCREMENT));
+
+#ifndef STATIC_MODULES
 	mod_add_cmd(&modload_msgtab);
 	mod_add_cmd(&modunload_msgtab);
 	mod_add_cmd(&modreload_msgtab);
-	mod_add_cmd(&modlist_msgtab);
 	mod_add_cmd(&modrestart_msgtab);
+#endif
+	mod_add_cmd(&modlist_msgtab); /* have modlist if we are static or not */
+
 }
+
+
+void
+load_static_modules(void)
+{
+	int x = 1;
+	char *p, *basename;
+	lt_dlhandle tmpptr = NULL;
+	int *mapi_version;
+	const char *ver;
+
+	/* i'm going to hell for this..i know it */
+	/* note that we abort() in here because if any failures happen in here..something is broken badly */
+	
+	modules_init();
+    
+	while(lt_preloaded_symbols[x].name != NULL)
+	{
+		if(lt_preloaded_symbols[x].address == NULL)		
+		{
+			basename = LOCAL_COPY(lt_preloaded_symbols[x].name);
+			p = strchr(basename, '.');
+			if(p != NULL)
+				*p = '\0';
+
+			tmpptr = lt_dlopen(lt_preloaded_symbols[x].name);
+			if(tmpptr == NULL) 
+				abort();
+
+			mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, "_mheader");
+
+			if(mapi_version == NULL)
+			{
+				char buf[512];
+				strlcpy(buf, basename, sizeof(buf));
+				strlcat(buf, "_LTX__mheader", sizeof(buf));
+				mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, buf);
+			}
+
+			if(mapi_version == NULL || MAPI_MAGIC(*mapi_version) != MAPI_MAGIC_HDR)		
+			{
+				ilog(L_MAIN, "Data format error: module %s has no MAPI header.", basename);
+				abort();
+			}
+
+			switch (MAPI_VERSION(*mapi_version))
+			{
+				case 1:
+				{
+					struct mapi_mheader_av1 *mheader = (struct mapi_mheader_av1 *) mapi_version;	/* see above */
+					if(mheader->mapi_register && (mheader->mapi_register() == -1))
+					{
+						
+						ilog(L_MAIN, "Module %s indicated failure during load.", basename);
+						abort();
+					}
+				
+					if(mheader->mapi_command_list)
+					{
+						struct Message **m;
+						for (m = mheader->mapi_command_list; *m; ++m)
+							mod_add_cmd(*m);
+					}
+
+					if(mheader->mapi_hook_list)
+					{
+						mapi_hlist_av1 *m;
+						for (m = mheader->mapi_hook_list; m->hapi_name; ++m)
+							*m->hapi_id = register_hook(m->hapi_name);
+					}
+
+					if(mheader->mapi_hfn_list)
+					{
+						mapi_hfn_list_av1 *m;
+						for (m = mheader->mapi_hfn_list; m->hapi_name; ++m)
+							add_hook(m->hapi_name, m->hookfn);
+					}
+
+					ver = mheader->mapi_module_version;
+					break;
+				}
+				
+				default:
+				{
+					ilog(L_MAIN, "Module %s has unknown/unsupported MAPI version %d.", 
+						     basename, MAPI_VERSION(*mapi_version));
+					abort();
+				}
+			}
+
+			if(ver == NULL)
+				ver = unknown_ver;
+
+			increase_modlist();
+
+			modlist[num_mods] = ircd_malloc(sizeof(struct module));
+			modlist[num_mods]->address = tmpptr;
+			modlist[num_mods]->version = ver;
+			modlist[num_mods]->core = 1;
+			modlist[num_mods]->name = ircd_strdup(basename);
+			modlist[num_mods]->mapi_header = mapi_version;
+			modlist[num_mods]->mapi_version = MAPI_VERSION(*mapi_version);
+			num_mods++;
+
+		}
+		x++;
+	}
+}
+
 
 /* mod_find_path()
  *
@@ -299,7 +425,6 @@ load_all_modules(int warn)
 	int len;
 	modules_init();
 
-	modlist = ircd_malloc(sizeof(struct module) * (MODS_INCREMENT));
 
 	find_module_suffix();
 	max_mods = MODS_INCREMENT;
@@ -422,7 +547,7 @@ load_one_module(const char *path, int coremodule)
 	return -1;
 }
 
-
+#ifndef STATIC_MODULES
 /* load a module .. */
 static int
 mo_modload(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
@@ -544,6 +669,38 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 	return 0;
 }
 
+
+/* unload and reload all modules */
+static int
+mo_modrestart(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
+{
+	int modnum;
+
+	if(!IsOperAdmin(source_p))
+	{
+		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+			   me.name, source_p->name, "admin");
+		return 0;
+	}
+
+	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Reloading all modules", me.name, parv[0]);
+
+	modnum = num_mods;
+	while (num_mods)
+		unload_one_module(modlist[0]->name, 0);
+
+	load_all_modules(0);
+	load_core_modules(0);
+	rehash(0);
+
+	sendto_realops_flags(UMODE_ALL, L_ALL,
+			     "Module Restart: %d modules unloaded, %d modules loaded",
+			     modnum, num_mods);
+	ilog(L_MAIN, "Module Restart: %d modules unloaded, %d modules loaded", modnum, num_mods);
+	return 0;
+}
+#endif
+
 /* list modules .. */
 static int
 mo_modlist(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
@@ -580,36 +737,6 @@ mo_modlist(struct Client *client_p, struct Client *source_p, int parc, const cha
 	}
 
 	sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFMODLIST), me.name, source_p->name);
-	return 0;
-}
-
-/* unload and reload all modules */
-static int
-mo_modrestart(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
-{
-	int modnum;
-
-	if(!IsOperAdmin(source_p))
-	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "admin");
-		return 0;
-	}
-
-	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Reloading all modules", me.name, parv[0]);
-
-	modnum = num_mods;
-	while (num_mods)
-		unload_one_module(modlist[0]->name, 0);
-
-	load_all_modules(0);
-	load_core_modules(0);
-	rehash(0);
-
-	sendto_realops_flags(UMODE_ALL, L_ALL,
-			     "Module Restart: %d modules unloaded, %d modules loaded",
-			     modnum, num_mods);
-	ilog(L_MAIN, "Module Restart: %d modules unloaded, %d modules loaded", modnum, num_mods);
 	return 0;
 }
 
@@ -714,7 +841,10 @@ load_a_module(const char *path, int warn, int core)
 		ircd_free(mod_basename);
 		return -1;
 	}
+#ifdef STATIC_MODULES
+	
 
+#endif
 
 	/*
 	 * _mheader is actually a struct mapi_mheader_*, but mapi_version
@@ -825,17 +955,10 @@ load_a_module(const char *path, int warn, int core)
 static void
 increase_modlist(void)
 {
-	struct module **new_modlist = NULL;
-
 	if((num_mods + 1) < max_mods)
 		return;
 
-	new_modlist = ircd_malloc(sizeof(struct module) *
-						  (max_mods + MODS_INCREMENT));
-	memcpy(new_modlist, modlist, sizeof(struct module) * num_mods);
-
-	ircd_free(modlist);
-	modlist = new_modlist;
+	modlist = ircd_realloc(modlist, sizeof(struct module) * (max_mods + MODS_INCREMENT));
 	max_mods += MODS_INCREMENT;
 }
 
