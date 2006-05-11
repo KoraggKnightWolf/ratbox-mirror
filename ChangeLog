@@ -1,3 +1,18 @@
+androsyn    2006/05/11 15:03:03 UTC	(20060511_5-22437)
+  Log:
+  change some mingw32 ifdefs to _WIN32 ones
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_signal.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_log.c (File Modified) 
+
+
 androsyn    2006/05/11 14:00:06 UTC	(20060511_4-22435)
   Log:
   default to using .la as a module suffix if nothing else is found
