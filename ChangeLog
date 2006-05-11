@@ -1,3 +1,11 @@
+androsyn    2006/05/11 02:12:36 UTC	(20060511_0-22427)
+  Log:
+  fix capab memory leak
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_capab.c (File Modified) 
+
+
 androsyn    2006/05/09 19:33:42 UTC	(20060509_0-22425)
   Log:
   fix CAP core dump
