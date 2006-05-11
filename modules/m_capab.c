@@ -74,6 +74,7 @@ mr_capab(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		client_p->localClient->caps |= CAP_CAP;
 
+	ircd_free(client_p->localClient->fullcaps);
 	client_p->localClient->fullcaps = ircd_strdup(parv[1]);
 
 	for (i = 1; i < parc; i++)
