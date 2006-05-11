@@ -910,6 +910,9 @@ sendto_realops_flags(int flags, int level, const char *pattern, ...)
 	va_list args;
 	buf_head_t linebuf;
 
+	if(EmptyString(me.name))
+		return;
+	
 	ircd_linebuf_newbuf(&linebuf);
 
 	va_start(args, pattern);
