@@ -1,3 +1,11 @@
+androsyn    2006/05/11 14:00:06 UTC	(20060511_4-22435)
+  Log:
+  default to using .la as a module suffix if nothing else is found
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2006/05/11 13:46:43 UTC	(20060511_3-22433)
   Log:
   add an ifdef around load_static_modules
