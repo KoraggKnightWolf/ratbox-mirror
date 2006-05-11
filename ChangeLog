@@ -1,3 +1,11 @@
+androsyn    2006/05/11 13:31:24 UTC	(20060511_1-22429)
+  Log:
+  don't bother sending to ops if me.name isn't defined yet, there are no ops to send to
+
+  Modified:
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2006/05/11 02:12:36 UTC	(20060511_0-22427)
   Log:
   fix capab memory leak
