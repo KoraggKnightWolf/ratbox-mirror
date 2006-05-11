@@ -137,7 +137,7 @@ modules_init(void)
 
 }
 
-
+#ifdef STATIC_MODULES
 void
 load_static_modules(void)
 {
@@ -244,7 +244,7 @@ load_static_modules(void)
 		x++;
 	}
 }
-
+#endif
 
 /* mod_find_path()
  *
