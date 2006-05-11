@@ -422,7 +422,7 @@ int main(int argc, char **argv)
 	irc_ofd = atoi(tofd);
 	ident_timeout = atoi(tident_timeout);
 	
-#ifndef __MINGW32__
+#ifndef _WIN32
 	for(x = 0; x < maxfd; x++)
 	{
 		if(x != irc_ifd && x != irc_ofd)

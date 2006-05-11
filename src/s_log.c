@@ -126,7 +126,7 @@ ilog(ilogfile dest, const char *format, ...)
 	char buf2[BUFSIZE];
 	va_list args;
 
-#ifndef __MINGW32__
+#ifndef _WIN32
 
 	if(logfile == NULL)
 		return;
@@ -136,7 +136,7 @@ ilog(ilogfile dest, const char *format, ...)
 	va_end(args);
 
 	ircd_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(ircd_currenttime), buf);
-#ifdef __MINGW32__
+#ifdef _WIN32
 	fputs(buf2, stderr);
 	fflush(stderr);
 	

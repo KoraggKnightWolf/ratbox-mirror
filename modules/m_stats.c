@@ -846,7 +846,7 @@ stats_resv(struct Client *source_p)
 static void
 stats_usage (struct Client *source_p)
 {
-#ifndef __MINGW32__
+#ifndef _WIN32
 	struct rusage rus;
 	time_t secs;
 	time_t rup;

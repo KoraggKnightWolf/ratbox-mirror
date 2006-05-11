@@ -130,7 +130,7 @@ restart_resolver(int sig)
 static void
 setup_signals(void)
 {
-#ifndef __MINGW32__
+#ifndef _WIN32
 	struct sigaction act;
 	act.sa_flags = 0;
 	act.sa_handler = SIG_IGN;
@@ -555,7 +555,7 @@ int main(int argc, char **argv)
 	ofd = (int)strtol(tofd, NULL, 10);
 	maxfd = (int)strtol(tmaxfd, NULL, 10);
 
-#ifndef __MINGW32__
+#ifndef _WIN32
 	for(x = 0; x < maxfd; x++)
 	{
 		if(x != ifd && x != ofd)

@@ -210,7 +210,7 @@ fork_resolver(void)
 {
 	const char *parv[2];
 	char fullpath [PATH_MAX + 1];
-#ifdef __MINGW32__
+#ifdef _WIN32
 	const char *suffix = ".exe";
 #else
 	const char *suffix = "";
@@ -273,7 +273,7 @@ fork_resolver(void)
 	parv[0] = "-ircd dns resolver";
 	parv[1] = NULL;
 	
-#ifdef __MINGW32__      
+#ifdef _WIN32      
         SetHandleInformation((HANDLE)ifd[1], HANDLE_FLAG_INHERIT, 1);
         SetHandleInformation((HANDLE)ofd[0], HANDLE_FLAG_INHERIT, 1);
 #endif
@@ -405,7 +405,7 @@ restart_resolver(void)
 void
 resolver_sigchld(void)
 {
-#ifndef __MINGW32__
+#ifndef _WIN32
 	int status;
 	if(waitpid(res_pid, &status, WNOHANG) == res_pid)
 	{

@@ -30,7 +30,7 @@
 #include "dns.h"
 #include "s_auth.h"
 
-#ifndef MINGW
+#ifndef _WIN32
 /*
  * dummy_handler - don't know if this is really needed but if alarm is still
  * being used we probably will

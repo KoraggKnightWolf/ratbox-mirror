@@ -114,7 +114,7 @@ fork_ident(void)
 	char timeout[6];
 	const char *parv[2];
 	char fullpath[PATH_MAX + 1];
-#ifdef __MINGW32__
+#ifdef _WIN32
 	const char *suffix = ".exe";
 #else
 	const char *suffix = "";
@@ -165,7 +165,7 @@ fork_ident(void)
 	ircd_set_nb(ifd[0]);
 	ircd_set_nb(ofd[1]);
 
-#ifdef __MINGW32__	
+#ifdef _WIN32	
 	SetHandleInformation((HANDLE)ifd[1], HANDLE_FLAG_INHERIT, 1);
 	SetHandleInformation((HANDLE)ofd[0], HANDLE_FLAG_INHERIT, 1);
 #endif

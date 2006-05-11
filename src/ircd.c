@@ -165,7 +165,7 @@ get_vm_top(void)
 	 * offset from 0 (NULL), so the result of sbrk is cast to a size_t and 
 	 * returned. We really shouldn't be using it here but...
 	 */
-#ifndef MINGW
+#ifndef _WIN32
 	void *vptr = sbrk(0);
 	return (unsigned long) vptr;
 #else
@@ -231,7 +231,7 @@ init_sys(void)
 static int
 make_daemon(void)
 {
-#ifndef MINGW
+#ifndef _WIN32
 	int pid;
 
 	if((pid = fork()) < 0)
@@ -515,7 +515,7 @@ ratbox_main(int argc, char *argv[])
 {
 	char emptyname[] = "";
 	/* Check to see if the user is running us as root, which is a nono */
-#ifndef __MINGW32__
+#ifndef _WIN32
 	if(geteuid() == 0)
 	{
 		fprintf(stderr, "Don't run ircd as root!!!\n");
@@ -590,7 +590,7 @@ ratbox_main(int argc, char *argv[])
 
 	setup_signals();
 
-#if defined(__CYGWIN__) || defined(__MINGW__) || defined(RATBOX_PROFILE)
+#if defined(__CYGWIN__) || defined(_WIN32) || defined(RATBOX_PROFILE)
 	server_state_foreground = 1;
 #endif
 
