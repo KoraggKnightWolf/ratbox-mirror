@@ -351,13 +351,8 @@ findmodule_byname(const char *name)
 	return -1;
 }
 
-#ifdef STATIC_MODULES
-static char found_suffix[] = ".la";
-static int suffix_len = 3;
-#else
 static char found_suffix[4];
 static int suffix_len = 0;
-#endif
 
 static
 void find_module_suffix(void)
@@ -369,6 +364,9 @@ void find_module_suffix(void)
 	if(strlen(found_suffix) > 0)
 		return;
 
+        /* default to libtool suffix */
+        strcpy(found_suffix, ".la");
+        suffix_len = strlen(found_suffix);
 
 	dir = opendir(AUTOMODPATH);
 	if(dir == NULL)
@@ -400,7 +398,6 @@ void find_module_suffix(void)
 		else
 		if((len > 4) && !strcmp(ldirent->d_name+len-4, ".dll"))
 			strcpy(found_suffix, ".dll");
-
 				
 		if((suffix_len = strlen(found_suffix)) > 0)
 			return;
