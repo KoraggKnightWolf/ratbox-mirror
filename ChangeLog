@@ -1,3 +1,11 @@
+androsyn    2006/05/11 13:46:43 UTC	(20060511_3-22433)
+  Log:
+  add an ifdef around load_static_modules
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2006/05/11 13:40:41 UTC	(20060511_2-22431)
   Log:
   do some hackish stuff for static modules
