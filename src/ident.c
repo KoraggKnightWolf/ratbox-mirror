@@ -68,66 +68,6 @@ send_sprintf(int fd, const char *format, ...)
 
 
 
-/* io_to_array()
- *   Changes a given buffer into an array of parameters.
- *   Taken from ircd-ratbox.
- *
- * inputs	- string to parse, array to put in
- * outputs	- number of parameters
- */
-static inline int
-io_to_array(char *string, char *parv[MAXPARA])
-{
-	char *p, *xbuf = string;
-	int x = 0;
-
-	parv[x] = NULL;
-
-	if(EmptyString(string))
-		return x;
-
-	while (*xbuf == ' ')	/* skip leading spaces */
-		xbuf++;
-	if(*xbuf == '\0')	/* ignore all-space args */
-		return x;
-
-	do
-	{
-		if(*xbuf == ':')	/* Last parameter */
-		{
-			xbuf++;
-			parv[x++] = xbuf;
-			parv[x] = NULL;
-			return x;
-		}
-		else
-		{
-			parv[x++] = xbuf;
-			parv[x] = NULL;
-			if((p = strchr(xbuf, ' ')) != NULL)
-			{
-				*p++ = '\0';
-				xbuf = p;
-			}
-			else
-				return x;
-		}
-		while (*xbuf == ' ')
-			xbuf++;
-		if(*xbuf == '\0')
-			return x;
-	}
-	while (x < MAXPARA - 1);
-
-	if(*p == ':')
-		p++;
-
-	parv[x++] = p;
-	parv[x] = NULL;
-	return x;
-}
-
-
 /*
 request protocol:
 
@@ -344,7 +284,7 @@ parse_request(void)
 	while((len = ircd_linebuf_get(&recvq, readBuf, sizeof(readBuf),
 				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 	{
-		parc = io_to_array(readBuf, parv);
+		parc = ircd_string_to_array(readBuf, parv, MAXPARA);
 		switch(parc)
 		{
 			case 5:

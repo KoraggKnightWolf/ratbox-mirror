@@ -41,7 +41,6 @@ static void process_adns_incoming(void);
 static char readBuf[READBUF_SIZE];
 static void resolve_ip(char **parv);
 static void resolve_host(char **parv);
-static int io_to_array(char *string, char **parv);
 
 buf_head_t sendq;
 buf_head_t recvq;
@@ -188,7 +187,7 @@ parse_request(void)
 	while((len = ircd_linebuf_get(&recvq, readBuf, sizeof(readBuf),
 				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 	{
-		parc = io_to_array(readBuf, parv);
+		parc = ircd_string_to_array(readBuf, parv, MAXPARA);
 		if(parc != 4)
 			exit(1);
 		switch(*parv[0])
@@ -370,69 +369,6 @@ read_io(void)
 		ircd_select(1000);
 	}
 }
-
-
-/* io_to_array()
- *   Changes a given buffer into an array of parameters.
- *   Taken from ircd-ratbox.
- *
- * inputs	- string to parse, array to put in
- * outputs	- number of parameters
- */
-static int
-io_to_array(char *string, char **parv)
-{
-	char *p, *buf = string;
-	int x = 0;
-
-	parv[x] = NULL;
-
-	if(EmptyString(string))
-		return x;
-
-	while (*buf == ' ')	/* skip leading spaces */
-		buf++;
-	if(*buf == '\0')	/* ignore all-space args */
-		return x;
-
-	do
-	{
-		if(*buf == ':')	/* Last parameter */
-		{
-			buf++;
-			parv[x++] = buf;
-			parv[x] = NULL;
-			return x;
-		}
-		else
-		{
-			parv[x++] = buf;
-			parv[x] = NULL;
-			if((p = strchr(buf, ' ')) != NULL)
-			{
-				*p++ = '\0';
-				buf = p;
-			}
-			else
-				return x;
-		}
-		while (*buf == ' ')
-			buf++;
-		if(*buf == '\0')
-			return x;
-	}
-	while (x < MAXPARA - 1);
-
-	if(*p == ':')
-		p++;
-
-	parv[x++] = p;
-	parv[x] = NULL;
-	return x;
-}
-
-
-
 
 static void
 resolve_host(char **parv)

@@ -118,4 +118,61 @@ slow_list_length(dlink_list *list)
 }
 #endif
 
+/* ircd_string_to_array()
+ *   Changes a given buffer into an array of parameters.
+ *   Taken from ircd-ratbox.
+ *
+ * inputs	- string to parse, array to put in
+ * outputs	- number of parameters
+ */
+int
+ircd_string_to_array(char *string, char **parv, int maxpara)
+{
+	char *p, *xbuf = string;
+	int x = 0;
 
+	parv[x] = NULL;
+
+	if(string == NULL || string[0] == '\0')
+		return x;
+
+	while (*xbuf == ' ')	/* skip leading spaces */
+		xbuf++;
+	if(*xbuf == '\0')	/* ignore all-space args */
+		return x;
+
+	do
+	{
+		if(*xbuf == ':')	/* Last parameter */
+		{
+			xbuf++;
+			parv[x++] = xbuf;
+			parv[x] = NULL;
+			return x;
+		}
+		else
+		{
+			parv[x++] = xbuf;
+			parv[x] = NULL;
+			if((p = strchr(xbuf, ' ')) != NULL)
+			{
+				*p++ = '\0';
+				xbuf = p;
+			}
+			else
+				return x;
+		}
+		while (*xbuf == ' ')
+			xbuf++;
+		if(*xbuf == '\0')
+			return x;
+	}
+	while (x < maxpara - 1);
+
+	if(*p == ':')
+		p++;
+
+	parv[x++] = p;
+	parv[x] = NULL;
+	return x;
+}

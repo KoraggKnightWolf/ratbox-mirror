@@ -42,6 +42,7 @@ size_t strlcpy(char *dst, const char *src, size_t siz);
 size_t strlcat(char *dst, const char *src, size_t siz);
 #endif
 
+int ircd_string_to_array(char *string, char **parv, int maxpara);
 
 /*
  * double-linked-list stuff
