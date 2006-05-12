@@ -1,3 +1,14 @@
+jilles      2006/05/12 18:35:26 UTC	(20060512_8-22461)
+  Log:
+  Expand blah.blah and blah:blah to *!*@... instead of ...!*@* for bans.
+  (longstanding bug, && instead of ||...)
+  Allows stuff like /mode +b 127.0.0.1 to ban that IP.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+
+
 androsyn    2006/05/12 18:12:02 UTC	(20060512_7-22459)
   Log:
   sigh..not having a good day here...
