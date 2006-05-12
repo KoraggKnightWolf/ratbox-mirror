@@ -65,11 +65,8 @@ m_part(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	char *reason = NULL;
 	char *s = LOCAL_COPY(parv[1]);
 
-	reason[0] = '\0';
-
 	if(parc > 2)
 		reason = LOCAL_COPY_N(parv[2], REASONLEN);
-		strlcpy(reason, parv[2], sizeof(reason));
 
 	name = strtok_r(s, ",", &p);
 
