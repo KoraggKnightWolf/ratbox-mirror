@@ -1,3 +1,11 @@
+androsyn    2006/05/12 18:04:22 UTC	(20060512_5-22455)
+  Log:
+  put back the arguments for LOCAL_COPY_N
+
+  Modified:
+	ircd-ratbox/trunk/include/stdinc.h (File Modified) 
+
+
 androsyn    2006/05/12 17:54:12 UTC	(20060512_4-22453)
   Log:
   fix LOCAL_COPY_N
