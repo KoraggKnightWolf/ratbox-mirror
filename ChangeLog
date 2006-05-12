@@ -1,3 +1,22 @@
+leeh        2006/05/12 22:25:43 UTC	(20060512_11-22469)
+  Log:
+  - add in the beginnings of the bandb helper..
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/ (File Added) 
+	ircd-ratbox/trunk/bandb/Makefile.am (File Added) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Added) 
+	ircd-ratbox/trunk/bandb/bandb.c (File Added) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/bandbi.h (File Added) 
+	ircd-ratbox/trunk/src/bandbi.c (File Added) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 leeh        2006/05/12 21:23:30 UTC	(20060512_10-22467)
   Log:
   - add in sqlite3 sources
