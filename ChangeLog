@@ -1,3 +1,14 @@
+jilles      2006/05/12 16:24:42 UTC	(20060512_2-22447)
+  Log:
+  Add service{} block to example.conf, commented out to
+  avoid trouble if ratbox-services support is not
+  compiled in.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 jilles      2006/05/12 16:02:23 UTC	(20060512_1-22445)
   Log:
   Idletime checking was removed some time ago, also purge
