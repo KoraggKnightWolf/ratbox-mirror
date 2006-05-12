@@ -1,3 +1,14 @@
+jilles      2006/05/12 16:02:23 UTC	(20060512_1-22445)
+  Log:
+  Idletime checking was removed some time ago, also purge
+  it from the example confs.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 jilles      2006/05/12 15:37:25 UTC	(20060512_0-22439)
   Log:
   Doh! Remove double */ in example confs.
