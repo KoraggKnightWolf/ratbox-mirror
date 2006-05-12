@@ -1,3 +1,13 @@
+jilles      2006/05/12 15:37:25 UTC	(20060512_0-22439)
+  Log:
+  Doh! Remove double */ in example confs.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 androsyn    2006/05/11 15:03:03 UTC	(20060511_5-22437)
   Log:
   change some mingw32 ifdefs to _WIN32 ones
