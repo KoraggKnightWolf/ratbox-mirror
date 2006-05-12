@@ -1,3 +1,15 @@
+leeh        2006/05/12 20:41:18 UTC	(20060512_9-22465)
+  Log:
+  - move io_to_array into libircd as ircd_string_to_array()
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/tools.c (File Modified) 
+	ircd-ratbox/trunk/libircd/tools.h (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+
+
 jilles      2006/05/12 18:35:26 UTC	(20060512_8-22461)
   Log:
   Expand blah.blah and blah:blah to *!*@... instead of ...!*@* for bans.
