@@ -465,7 +465,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subdirs_all="$ac_subdirs_all libltdl"
+ac_subdirs_all="$ac_subdirs_all libltdl sqlite3"
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot LEX CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE LEXLIB LEX_OUTPUT_ROOT EGREP INCLTDL LIBLTDL MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CPP AS RM CP MV LN SED AR LD RANLIB TOUCH YACC STATIC_MODULES_TRUE STATIC_MODULES_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os LN_S ECHO ac_ct_AR ac_ct_RANLIB CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL subdirs MINGW_TRUE MINGW_FALSE RESOLVER NEED_CRYPT_TRUE NEED_CRYPT_FALSE CRYPT_LIB ALLOCA ZLIB_LD SERVLINK ETC_DIR confdir LOG_DIR logdir HELP_DIR helpdir MODULE_DIR moduledir SELECT_TYPE ENABLE_SERVICES_TRUE ENABLE_SERVICES_FALSE SSL_SRCS_ENABLE SSL_INCLUDES SSL_LIBS PICFLAGS SEDOBJ IRCD_PREFIX LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
@@ -21392,7 +21392,7 @@ LIBTOOL="$LIBTOOL --silent"
 
 
 
-subdirs="$subdirs libltdl"
+subdirs="$subdirs libltdl sqlite3"
 
 
 RESOLVER="adns resolver"

@@ -69,7 +69,7 @@ AC_PROG_LIBTOOL
 
 LIBTOOL="$LIBTOOL --silent"
 
-AC_CONFIG_SUBDIRS(libltdl)
+AC_CONFIG_SUBDIRS(libltdl sqlite3)
 
 RESOLVER="adns resolver"
 

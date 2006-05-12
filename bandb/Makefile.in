@@ -53,7 +53,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_bandb_OBJECTS = bandb.$(OBJEXT)
 bandb_OBJECTS = $(am_bandb_OBJECTS)
-bandb_DEPENDENCIES = ../libircd/libircd.la
+bandb_DEPENDENCIES = ../libircd/libircd.la ../sqlite3/libsqlite3.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -213,7 +213,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I../include -I../libircd
 bandb_SOURCES = bandb.c
-bandb_LDADD = ../libircd/libircd.la
+bandb_LDADD = ../libircd/libircd.la ../sqlite3/libsqlite3.la
 all: all-am
 
 .SUFFIXES:
