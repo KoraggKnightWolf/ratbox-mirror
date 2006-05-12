@@ -60,6 +60,7 @@
 #include "monitor.h"
 #include "dns.h"
 #include "translog.h"
+#include "bandbi.h"
 
 /*
  * Try and find the correct name to use with getrlimit() for setting the max.
@@ -642,6 +643,7 @@ ratbox_main(int argc, char *argv[])
 	load_core_modules(1);
 #endif
 	init_resolver();	/* Needs to be setup before the io loop */
+	init_bandb();
 
 		
 	read_conf_files(YES);	/* cold start init conf files */

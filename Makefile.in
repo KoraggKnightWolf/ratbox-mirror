@@ -73,16 +73,16 @@ LTLIBRARIES = $(core_LTLIBRARIES) $(libratbox_LTLIBRARIES) \
 	$(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 am__dirstamp = $(am__leading_dot)dirstamp
-am_libratbox_la_OBJECTS = src/dns.lo src/banconf.lo src/cache.lo \
-	src/channel.lo src/class.lo src/client.lo src/getopt.lo \
-	src/hash.lo src/hook.lo src/hostmask.lo src/ircd.lo \
-	src/ircd_signal.lo src/listener.lo src/match.lo src/modules.lo \
-	src/monitor.lo src/newconf.lo src/numeric.lo src/operhash.lo \
-	src/packet.lo src/parse.lo src/patricia.lo src/reject.lo \
-	src/restart.lo src/s_auth.lo src/s_conf.lo src/s_newconf.lo \
-	src/s_log.lo src/s_serv.lo src/s_user.lo src/scache.lo \
-	src/send.lo src/translog.lo src/whowas.lo src/version.lo \
-	src/ircd_parser.lo src/ircd_lexer.lo
+am_libratbox_la_OBJECTS = src/dns.lo src/banconf.lo src/bandbi.lo \
+	src/cache.lo src/channel.lo src/class.lo src/client.lo \
+	src/getopt.lo src/hash.lo src/hook.lo src/hostmask.lo \
+	src/ircd.lo src/ircd_signal.lo src/listener.lo src/match.lo \
+	src/modules.lo src/monitor.lo src/newconf.lo src/numeric.lo \
+	src/operhash.lo src/packet.lo src/parse.lo src/patricia.lo \
+	src/reject.lo src/restart.lo src/s_auth.lo src/s_conf.lo \
+	src/s_newconf.lo src/s_log.lo src/s_serv.lo src/s_user.lo \
+	src/scache.lo src/send.lo src/translog.lo src/whowas.lo \
+	src/version.lo src/ircd_parser.lo src/ircd_lexer.lo
 libratbox_la_OBJECTS = $(am_libratbox_la_OBJECTS)
 @MINGW_TRUE@@STATIC_MODULES_FALSE@am__DEPENDENCIES_2 =  \
 @MINGW_TRUE@@STATIC_MODULES_FALSE@	libircd/libircd.la \
@@ -403,12 +403,13 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	modules/core/$(DEPDIR)/m_quit.Plo \
 @AMDEP_TRUE@	modules/core/$(DEPDIR)/m_server.Plo \
 @AMDEP_TRUE@	modules/core/$(DEPDIR)/m_squit.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/banconf.Plo src/$(DEPDIR)/cache.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/channel.Plo src/$(DEPDIR)/class.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/client.Plo src/$(DEPDIR)/dns.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/getopt.Plo src/$(DEPDIR)/hash.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/hook.Plo src/$(DEPDIR)/hostmask.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/ident.Po src/$(DEPDIR)/ircd.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/banconf.Plo src/$(DEPDIR)/bandbi.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/cache.Plo src/$(DEPDIR)/channel.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/class.Plo src/$(DEPDIR)/client.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/dns.Plo src/$(DEPDIR)/getopt.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/hash.Plo src/$(DEPDIR)/hook.Plo \
+@AMDEP_TRUE@	src/$(DEPDIR)/hostmask.Plo src/$(DEPDIR)/ident.Po \
+@AMDEP_TRUE@	src/$(DEPDIR)/ircd.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_lexer.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_parser.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/ircd_signal.Plo \
@@ -692,7 +693,7 @@ libratboxdir = @libdir@
 modulesdir = @moduledir@/autoload
 coredir = @moduledir@
 servicesdir = @moduledir@
-SUBDIRS = libircd libltdl adns tools doc help @SERVLINK@ 
+SUBDIRS = libircd libltdl adns tools doc help bandb @SERVLINK@ 
 AM_YFLAGS = -d
 INCLUDES = -Ilibircd -Ilibltdl -Iadns
 @MINGW_TRUE@EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
@@ -708,6 +709,7 @@ ident_SOURCES = src/ident.c
 libratbox_la_SOURCES = \
   src/dns.c                        \
   src/banconf.c			\
+  src/bandbi.c			\
   src/cache.c                       \
   src/channel.c                     \
   src/class.c                       \
@@ -1197,6 +1199,7 @@ src/$(DEPDIR)/$(am__dirstamp):
 	@: > src/$(DEPDIR)/$(am__dirstamp)
 src/dns.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/banconf.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/bandbi.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/cache.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/channel.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/class.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -1693,6 +1696,8 @@ mostlyclean-compile:
 	-rm -f modules/m_xline.lo
 	-rm -f src/banconf.$(OBJEXT)
 	-rm -f src/banconf.lo
+	-rm -f src/bandbi.$(OBJEXT)
+	-rm -f src/bandbi.lo
 	-rm -f src/cache.$(OBJEXT)
 	-rm -f src/cache.lo
 	-rm -f src/channel.$(OBJEXT)
@@ -1839,6 +1844,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@modules/core/$(DEPDIR)/m_server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/core/$(DEPDIR)/m_squit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/banconf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/bandbi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/channel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/class.Plo@am__quote@
@@ -1950,6 +1956,30 @@ src/banconf.lo: src/banconf.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/banconf.Plo' tmpdepfile='src/$(DEPDIR)/banconf.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/banconf.lo `test -f 'src/banconf.c' || echo '$(srcdir)/'`src/banconf.c
+
+src/bandbi.o: src/bandbi.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/bandbi.o -MD -MP -MF "src/$(DEPDIR)/bandbi.Tpo" -c -o src/bandbi.o `test -f 'src/bandbi.c' || echo '$(srcdir)/'`src/bandbi.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/bandbi.Tpo" "src/$(DEPDIR)/bandbi.Po"; else rm -f "src/$(DEPDIR)/bandbi.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/bandbi.c' object='src/bandbi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/bandbi.Po' tmpdepfile='src/$(DEPDIR)/bandbi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/bandbi.o `test -f 'src/bandbi.c' || echo '$(srcdir)/'`src/bandbi.c
+
+src/bandbi.obj: src/bandbi.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/bandbi.obj -MD -MP -MF "src/$(DEPDIR)/bandbi.Tpo" -c -o src/bandbi.obj `if test -f 'src/bandbi.c'; then $(CYGPATH_W) 'src/bandbi.c'; else $(CYGPATH_W) '$(srcdir)/src/bandbi.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/bandbi.Tpo" "src/$(DEPDIR)/bandbi.Po"; else rm -f "src/$(DEPDIR)/bandbi.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/bandbi.c' object='src/bandbi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/bandbi.Po' tmpdepfile='src/$(DEPDIR)/bandbi.TPo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/bandbi.obj `if test -f 'src/bandbi.c'; then $(CYGPATH_W) 'src/bandbi.c'; else $(CYGPATH_W) '$(srcdir)/src/bandbi.c'; fi`
+
+src/bandbi.lo: src/bandbi.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/bandbi.lo -MD -MP -MF "src/$(DEPDIR)/bandbi.Tpo" -c -o src/bandbi.lo `test -f 'src/bandbi.c' || echo '$(srcdir)/'`src/bandbi.c; \
+@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/bandbi.Tpo" "src/$(DEPDIR)/bandbi.Plo"; else rm -f "src/$(DEPDIR)/bandbi.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/bandbi.c' object='src/bandbi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/bandbi.Plo' tmpdepfile='src/$(DEPDIR)/bandbi.TPlo' @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/bandbi.lo `test -f 'src/bandbi.c' || echo '$(srcdir)/'`src/bandbi.c
 
 src/cache.o: src/cache.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/cache.o -MD -MP -MF "src/$(DEPDIR)/cache.Tpo" -c -o src/cache.o `test -f 'src/cache.c' || echo '$(srcdir)/'`src/cache.c; \

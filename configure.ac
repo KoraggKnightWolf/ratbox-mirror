@@ -939,6 +939,7 @@ AC_SUBST(IRCD_PREFIX)
 AC_CONFIG_FILES(		\
 	Makefile		\
 	libircd/Makefile	\
+	bandb/Makefile		\
 	adns/Makefile		\
 	servlink/Makefile	\
 	contrib/Makefile	\

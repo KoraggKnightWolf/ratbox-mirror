@@ -30549,7 +30549,7 @@ fi
 
 
 
-                                                                                ac_config_files="$ac_config_files Makefile libircd/Makefile adns/Makefile servlink/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile"
+                                                                                          ac_config_files="$ac_config_files Makefile libircd/Makefile bandb/Makefile adns/Makefile servlink/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -31170,6 +31170,7 @@ do
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "libircd/Makefile" ) CONFIG_FILES="$CONFIG_FILES libircd/Makefile" ;;
+  "bandb/Makefile" ) CONFIG_FILES="$CONFIG_FILES bandb/Makefile" ;;
   "adns/Makefile" ) CONFIG_FILES="$CONFIG_FILES adns/Makefile" ;;
   "servlink/Makefile" ) CONFIG_FILES="$CONFIG_FILES servlink/Makefile" ;;
   "contrib/Makefile" ) CONFIG_FILES="$CONFIG_FILES contrib/Makefile" ;;

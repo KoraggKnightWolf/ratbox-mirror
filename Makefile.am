@@ -12,7 +12,7 @@ modulesdir	= @moduledir@/autoload
 coredir		= @moduledir@
 servicesdir	= @moduledir@
 
-SUBDIRS = libircd libltdl adns tools doc help @SERVLINK@ 
+SUBDIRS = libircd libltdl adns tools doc help bandb @SERVLINK@ 
 
 AM_YFLAGS = -d
 
@@ -48,6 +48,7 @@ ident_SOURCES = src/ident.c
 libratbox_la_SOURCES =                     \
   src/dns.c                        \
   src/banconf.c			\
+  src/bandbi.c			\
   src/cache.c                       \
   src/channel.c                     \
   src/class.c                       \
