@@ -51,13 +51,16 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_bandb_OBJECTS = bandb.$(OBJEXT)
+am_bandb_OBJECTS = bandb.$(OBJEXT) rsdb_sqlite3.$(OBJEXT) \
+	rsdb_snprintf.$(OBJEXT)
 bandb_OBJECTS = $(am_bandb_OBJECTS)
 bandb_DEPENDENCIES = ../libircd/libircd.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/bandb.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/bandb.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/rsdb_snprintf.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/rsdb_sqlite3.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -214,7 +217,7 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I../include -I../libircd
-bandb_SOURCES = bandb.c
+bandb_SOURCES = bandb.c rsdb_sqlite3.c rsdb_snprintf.c
 bandb_LDADD = ../libircd/libircd.la @SQLITE_LD@
 all: all-am
 
@@ -288,6 +291,8 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bandb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsdb_snprintf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsdb_sqlite3.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

@@ -59,6 +59,7 @@
 #define SPATH    BINPATH "/ircd"	/* ircd executable */
 #define SLPATH   BINPATH "/servlink"	/* servlink executable */
 #define CPATH    ETCPATH "/ircd.conf"	/* ircd.conf file */
+#define DBPATH   ETCPATH "/ban.db"
 #define KPATH    ETCPATH "/kline.conf"	/* kline file */
 #define DLPATH   ETCPATH "/dline.conf"	/* dline file */
 #define XPATH	 ETCPATH "/xline.conf"	/* xline file */
