@@ -1,3 +1,17 @@
+leeh        2006/05/13 20:52:23 UTC	(20060513_3-22479)
+  Log:
+  - add in code for dealing with sqlite database
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/rsdb.h (File Added) 
+	ircd-ratbox/trunk/bandb/rsdb_snprintf.c (File Added) 
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Added) 
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+
+
 leeh        2006/05/13 19:40:21 UTC	(20060513_2-22477)
   Log:
   - add missing bandbi.h includes in modules
