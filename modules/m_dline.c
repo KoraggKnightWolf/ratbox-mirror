@@ -39,6 +39,7 @@
 #include "parse.h"
 #include "modules.h"
 #include "operhash.h"
+#include "bandbi.h"
 
 static int mo_dline(struct Client *, struct Client *, int, const char **);
 static int mo_undline(struct Client *, struct Client *, int, const char **);

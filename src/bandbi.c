@@ -34,6 +34,7 @@
 #include "ircd_lib.h"
 #include "s_conf.h"
 #include "s_log.h"
+#include "match.h"
 #include "bandbi.h"
 
 static pid_t bandb_pid;
@@ -142,14 +143,53 @@ fork_bandb(void)
 	ircd_close(ofd[0]);
 
 	bandb_ifd = ifd[0];
-	bandb_ofd = ifd[1];
+	bandb_ofd = ofd[1];
 
 	fork_count = 0;
 	bandb_pid = pid;
 	return;
 }
 
-static char bandb_add_letter[] =
+static void
+bandb_write_sendq(int fd, void *unused)
+{
+	int retlen;
+
+	if(ircd_linebuf_len(&bandb_sendq) > 0)
+	{
+		while((retlen = ircd_linebuf_flush(bandb_ofd, &bandb_sendq)) > 0)
+			;
+
+		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
+			fork_bandb();
+	}
+
+	if(bandb_ofd < 0)
+		return;
+
+	if(ircd_linebuf_len(&bandb_sendq) > 0)
+		ircd_setselect(bandb_ofd, IRCD_SELECT_WRITE, bandb_write_sendq, NULL);
+}
+
+static void
+bandb_write(const char *format, ...)
+{
+	va_list args;
+
+	if(bandb_ifd < 0 || bandb_ofd < 0)
+	{
+		/* XXX error */
+		return;
+	}
+
+	va_start(args, format);
+	ircd_linebuf_putmsg(&bandb_sendq, format, &args, NULL);
+	va_end(args);
+
+	bandb_write_sendq(bandb_ofd, NULL);
+}
+
+static char bandb_add_letter[LAST_BANDB_TYPE] =
 {
 	'K', 'D', 'X', 'R'
 };
@@ -158,9 +198,41 @@ void
 bandb_add(bandb_type type, struct Client *source_p, const char *mask1,
 		const char *mask2, const char *reason, const char *oper_reason)
 {
+	static char buf[BUFSIZE];
+
+	buf[0] = '\0';
+
+	ircd_snprintf_append(buf, sizeof(buf), "%c %s ",
+				bandb_add_letter[type], mask1);
+
+	if(!EmptyString(mask2))
+		ircd_snprintf_append(buf, sizeof(buf), "%s ", mask2);
+
+	ircd_snprintf_append(buf, sizeof(buf), ":%s", reason);
+
+	if(!EmptyString(oper_reason))
+		ircd_snprintf_append(buf, sizeof(buf), "|%s", oper_reason);
+
+	bandb_write("%s", buf);
 }
+
+static char bandb_del_letter[LAST_BANDB_TYPE] =
+{
+	'k', 'd', 'x', 'r'
+};
 
 void
 bandb_del(bandb_type type, const char *mask1, const char *mask2)
 {
+	static char buf[BUFSIZE];
+
+	buf[0] = '\0';
+
+	ircd_snprintf_append(buf, sizeof(buf), "%c %s",
+				bandb_del_letter[type], mask1);
+
+	if(!EmptyString(mask2))
+		ircd_snprintf_append(buf, sizeof(buf), " %s", mask2);
+
+	bandb_write("%s", buf);
 }

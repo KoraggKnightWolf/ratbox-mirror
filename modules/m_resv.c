@@ -39,6 +39,7 @@
 #include "s_log.h"
 #include "match.h"
 #include "operhash.h"
+#include "bandbi.h"
 
 static int mo_resv(struct Client *, struct Client *, int, const char **);
 static int me_resv(struct Client *, struct Client *, int, const char **);

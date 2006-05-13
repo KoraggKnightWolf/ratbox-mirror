@@ -46,6 +46,7 @@
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "operhash.h"
+#include "bandbi.h"
 
 static int mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);

@@ -8,7 +8,8 @@ typedef enum
 	BANDB_KLINE,
 	BANDB_DLINE,
 	BANDB_XLINE,
-	BANDB_RESV
+	BANDB_RESV,
+	LAST_BANDB_TYPE
 } bandb_type;
 
 void bandb_add(bandb_type, struct Client *source_p, const char *mask1, 

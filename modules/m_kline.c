@@ -39,6 +39,7 @@
 #include "parse.h"
 #include "modules.h"
 #include "operhash.h"
+#include "bandbi.h"
 
 static int mo_kline(struct Client *, struct Client *, int, const char **);
 static int me_kline(struct Client *, struct Client *, int, const char **);
