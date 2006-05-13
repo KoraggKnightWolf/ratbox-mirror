@@ -1,3 +1,17 @@
+androsyn    2006/05/12 23:59:52 UTC	(20060512_12-22471)
+  Log:
+  Make configure go into the sqlite3 directory and configure sqlite3.  Then have the Makefiles in bandb use
+  the sqlite libtool archives.
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/sqlite3/sqlite3.pc (File Deleted) 
+
+
 leeh        2006/05/12 22:25:43 UTC	(20060512_11-22469)
   Log:
   - add in the beginnings of the bandb helper..
