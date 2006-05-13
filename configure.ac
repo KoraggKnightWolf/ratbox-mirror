@@ -69,7 +69,7 @@ AC_PROG_LIBTOOL
 
 LIBTOOL="$LIBTOOL --silent"
 
-AC_CONFIG_SUBDIRS(libltdl sqlite3)
+AC_CONFIG_SUBDIRS(libltdl)
 
 RESOLVER="adns resolver"
 
@@ -408,6 +408,30 @@ CPPFLAGS="$save_CPPFLAGS"
 LIBS="$save_LIBS"
 
 dnl End OpenSSL detection
+
+ac_cv_build_sqlite3=no
+
+AC_ARG_WITH(sqlite3-path,
+AC_HELP_STRING([--with-sqlite3-path=DIR],[Path to libsqlite3.so]),
+[LIBS="$LIBS -L$withval"],)
+
+AC_CHECK_HEADER(sqlite3.h, [
+	AC_CHECK_LIB([sqlite3], [main],
+	[
+		AC_SUBST(SQLITE_LD, [-lsqlite3])
+		AC_DEFINE(HAVE_SQLITE3, 1, [Define to 1 if sqlite3 is available.])
+	], ac_cv_build_sqlite3=yes)
+], ac_cv_build_sqlite3=yes)
+
+if test "$ac_cv_build_sqlite3" = yes; then
+	AC_CONFIG_SUBDIRS(sqlite3)
+	AC_SUBST(SQLITE_LD, [../sqlite3/libsqlite3.la])
+	SQLITE_SUBDIR="sqlite3"
+else
+	SQLITE_SUBDIR=""
+fi
+
+AC_SUBST(SQLITE_SUBDIR)
 
 
 dnl Specialized functions and libraries

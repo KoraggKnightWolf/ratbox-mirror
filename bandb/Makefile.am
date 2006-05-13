@@ -8,6 +8,6 @@ INCLUDES = -I../include -I../libircd
 
 bandb_SOURCES = bandb.c
 
-bandb_LDADD = ../libircd/libircd.la ../sqlite3/libsqlite3.la
+bandb_LDADD = ../libircd/libircd.la @SQLITE_LD@
 
 

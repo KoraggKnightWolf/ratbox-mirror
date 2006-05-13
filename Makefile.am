@@ -12,7 +12,7 @@ modulesdir	= @moduledir@/autoload
 coredir		= @moduledir@
 servicesdir	= @moduledir@
 
-SUBDIRS = libircd libltdl adns tools doc help bandb @SERVLINK@ 
+SUBDIRS = libircd libltdl adns tools doc help @SQLITE_SUBDIR@ bandb @SERVLINK@ 
 
 AM_YFLAGS = -d
 
