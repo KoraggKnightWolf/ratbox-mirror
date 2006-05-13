@@ -1,3 +1,18 @@
+leeh        2006/05/13 19:40:21 UTC	(20060513_2-22477)
+  Log:
+  - add missing bandbi.h includes in modules
+  - flesh bandb code out so we write bans and unbans to the bandb helper
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/bandbi.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+
+
 leeh        2006/05/13 13:03:55 UTC	(20060513_1-22475)
   Log:
   - remove the transaction log code, replace calls to it with (empty) bandb
