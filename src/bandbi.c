@@ -148,3 +148,19 @@ fork_bandb(void)
 	bandb_pid = pid;
 	return;
 }
+
+static char bandb_add_letter[] =
+{
+	'K', 'D', 'X', 'R'
+};
+
+void
+bandb_add(bandb_type type, struct Client *source_p, const char *mask1,
+		const char *mask2, const char *reason, const char *oper_reason)
+{
+}
+
+void
+bandb_del(bandb_type type, const char *mask1, const char *mask2)
+{
+}

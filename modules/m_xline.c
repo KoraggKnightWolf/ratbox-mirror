@@ -45,7 +45,6 @@
 #include "modules.h"
 #include "s_conf.h"
 #include "s_newconf.h"
-#include "translog.h"
 #include "operhash.h"
 
 static int mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
@@ -358,7 +357,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	else
 	{
 		aconf->hold = ircd_currenttime;
-		translog_add_ban(TRANS_XLINE, source_p, aconf->host, "0", reason, NULL, 0);
+		bandb_add(BANDB_XLINE, source_p, aconf->host, NULL, reason, NULL);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
 				aconf->info.oper, aconf->host, aconf->passwd);
@@ -455,7 +454,7 @@ remove_xline(struct Client *source_p, const char *name)
 
 
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
-			translog_del_ban(TRANS_XLINE, name, NULL);
+			bandb_del(BANDB_XLINE, aconf->host, NULL);
 
 		free_conf(aconf);
 		ircd_dlinkDestroy(ptr, &xline_conf_list);

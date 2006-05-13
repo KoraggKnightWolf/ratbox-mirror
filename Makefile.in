@@ -81,8 +81,8 @@ am_libratbox_la_OBJECTS = src/dns.lo src/banconf.lo src/bandbi.lo \
 	src/operhash.lo src/packet.lo src/parse.lo src/patricia.lo \
 	src/reject.lo src/restart.lo src/s_auth.lo src/s_conf.lo \
 	src/s_newconf.lo src/s_log.lo src/s_serv.lo src/s_user.lo \
-	src/scache.lo src/send.lo src/translog.lo src/whowas.lo \
-	src/version.lo src/ircd_parser.lo src/ircd_lexer.lo
+	src/scache.lo src/send.lo src/whowas.lo src/version.lo \
+	src/ircd_parser.lo src/ircd_lexer.lo
 libratbox_la_OBJECTS = $(am_libratbox_la_OBJECTS)
 @MINGW_TRUE@@STATIC_MODULES_FALSE@am__DEPENDENCIES_2 =  \
 @MINGW_TRUE@@STATIC_MODULES_FALSE@	libircd/libircd.la \
@@ -427,7 +427,6 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	src/$(DEPDIR)/s_newconf.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/s_serv.Plo src/$(DEPDIR)/s_user.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/scache.Plo src/$(DEPDIR)/send.Plo \
-@AMDEP_TRUE@	src/$(DEPDIR)/translog.Plo \
 @AMDEP_TRUE@	src/$(DEPDIR)/version.Plo src/$(DEPDIR)/whowas.Plo
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -742,7 +741,6 @@ libratbox_la_SOURCES = \
   src/s_user.c                      \
   src/scache.c                      \
   src/send.c                        \
-  src/translog.c		\
   src/whowas.c			    \
   src/version.c			\
   src/ircd_parser.y			\
@@ -1232,7 +1230,6 @@ src/s_serv.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/s_user.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/scache.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/send.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/translog.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/whowas.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/version.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ircd_parser.h: src/ircd_parser.c
@@ -1769,8 +1766,6 @@ mostlyclean-compile:
 	-rm -f src/scache.lo
 	-rm -f src/send.$(OBJEXT)
 	-rm -f src/send.lo
-	-rm -f src/translog.$(OBJEXT)
-	-rm -f src/translog.lo
 	-rm -f src/version.$(OBJEXT)
 	-rm -f src/version.lo
 	-rm -f src/whowas.$(OBJEXT)
@@ -1883,7 +1878,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/s_user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/scache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/send.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/translog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/whowas.Plo@am__quote@
 
@@ -2702,30 +2696,6 @@ src/send.lo: src/send.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/send.Plo' tmpdepfile='src/$(DEPDIR)/send.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/send.lo `test -f 'src/send.c' || echo '$(srcdir)/'`src/send.c
-
-src/translog.o: src/translog.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/translog.o -MD -MP -MF "src/$(DEPDIR)/translog.Tpo" -c -o src/translog.o `test -f 'src/translog.c' || echo '$(srcdir)/'`src/translog.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/translog.Tpo" "src/$(DEPDIR)/translog.Po"; else rm -f "src/$(DEPDIR)/translog.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/translog.c' object='src/translog.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/translog.Po' tmpdepfile='src/$(DEPDIR)/translog.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/translog.o `test -f 'src/translog.c' || echo '$(srcdir)/'`src/translog.c
-
-src/translog.obj: src/translog.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/translog.obj -MD -MP -MF "src/$(DEPDIR)/translog.Tpo" -c -o src/translog.obj `if test -f 'src/translog.c'; then $(CYGPATH_W) 'src/translog.c'; else $(CYGPATH_W) '$(srcdir)/src/translog.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/translog.Tpo" "src/$(DEPDIR)/translog.Po"; else rm -f "src/$(DEPDIR)/translog.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/translog.c' object='src/translog.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/translog.Po' tmpdepfile='src/$(DEPDIR)/translog.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/translog.obj `if test -f 'src/translog.c'; then $(CYGPATH_W) 'src/translog.c'; else $(CYGPATH_W) '$(srcdir)/src/translog.c'; fi`
-
-src/translog.lo: src/translog.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/translog.lo -MD -MP -MF "src/$(DEPDIR)/translog.Tpo" -c -o src/translog.lo `test -f 'src/translog.c' || echo '$(srcdir)/'`src/translog.c; \
-@am__fastdepCC_TRUE@	then mv -f "src/$(DEPDIR)/translog.Tpo" "src/$(DEPDIR)/translog.Plo"; else rm -f "src/$(DEPDIR)/translog.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/translog.c' object='src/translog.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='src/$(DEPDIR)/translog.Plo' tmpdepfile='src/$(DEPDIR)/translog.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o src/translog.lo `test -f 'src/translog.c' || echo '$(srcdir)/'`src/translog.c
 
 src/whowas.o: src/whowas.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT src/whowas.o -MD -MP -MF "src/$(DEPDIR)/whowas.Tpo" -c -o src/whowas.o `test -f 'src/whowas.c' || echo '$(srcdir)/'`src/whowas.c; \

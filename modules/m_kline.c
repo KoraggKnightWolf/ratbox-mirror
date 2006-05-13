@@ -38,7 +38,6 @@
 #include "s_serv.h"
 #include "parse.h"
 #include "modules.h"
-#include "translog.h"
 #include "operhash.h"
 
 static int mo_kline(struct Client *, struct Client *, int, const char **);
@@ -435,8 +434,8 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 			  aconf->user, aconf->host);
 
 	add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
-	translog_add_ban(TRANS_KLINE, source_p, aconf->user, aconf->host,
-			reason, EmptyString(oper_reason) ? "" : oper_reason, 1);
+	bandb_add(BANDB_KLINE, source_p, aconf->user, aconf->host,
+			reason, EmptyString(oper_reason) ? NULL : oper_reason);
 }
 
 /* apply_tkline()
@@ -768,7 +767,7 @@ remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 				continue;
 
 			delete_one_address_conf(host, aconf);
-			translog_del_ban(TRANS_KLINE, user, host);
+			bandb_del(BANDB_KLINE, aconf->host, aconf->user);
 
 			sendto_one_notice(source_p, POP_QUEUE, ":K-Line for [%s@%s] is removed",
 					  user, host);

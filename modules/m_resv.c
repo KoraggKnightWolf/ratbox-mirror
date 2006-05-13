@@ -38,7 +38,6 @@
 #include "hash.h"
 #include "s_log.h"
 #include "match.h"
-#include "translog.h"
 #include "operhash.h"
 
 static int mo_resv(struct Client *, struct Client *, int, const char **);
@@ -247,8 +246,7 @@ parse_resv(struct Client *source_p, const char *name,
 		}
 		else
 		{
-			translog_add_ban(TRANS_RESV, source_p, aconf->host, NULL,
-					aconf->passwd, NULL, 0);
+			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL);
 			aconf->hold = ircd_currenttime;
 		}
 	}
@@ -302,8 +300,7 @@ parse_resv(struct Client *source_p, const char *name,
 		}
 		else
 		{
-			translog_add_ban(TRANS_RESV, source_p, aconf->host, NULL,
-					aconf->passwd, NULL, 0);
+			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL);
 			aconf->hold = ircd_currenttime;
 		}
 			
@@ -382,7 +379,7 @@ remove_resv(struct Client *source_p, const char *name)
 
 		/* schedule it to transaction log */
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
-			translog_del_ban(TRANS_RESV, name, NULL);
+			bandb_del(BANDB_RESV, name, NULL);
 
 		del_from_hash(HASH_RESV, name, aconf);
 		free_conf(aconf);
@@ -410,7 +407,7 @@ remove_resv(struct Client *source_p, const char *name)
 
 		/* schedule it to transaction log */
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
-			translog_del_ban(TRANS_RESV, name, NULL);
+			bandb_del(BANDB_RESV, name, NULL);
 
 		/* already have ptr from the loop above.. */
 		ircd_dlinkDestroy(ptr, &resv_conf_list);

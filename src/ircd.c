@@ -59,7 +59,6 @@
 #include "cache.h"
 #include "monitor.h"
 #include "dns.h"
-#include "translog.h"
 #include "bandbi.h"
 
 /*
@@ -648,7 +647,6 @@ ratbox_main(int argc, char *argv[])
 		
 	read_conf_files(YES);	/* cold start init conf files */
 	rehash_bans(0);
-	translog_parse();
 
 #ifndef STATIC_MODULES
 	mod_add_path(MODULE_DIR); 

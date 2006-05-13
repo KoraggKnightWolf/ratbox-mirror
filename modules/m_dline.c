@@ -38,7 +38,6 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
-#include "translog.h"
 #include "operhash.h"
 
 static int mo_dline(struct Client *, struct Client *, int, const char **);
@@ -260,11 +259,11 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		}
 
 		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :Added D-Line [%s] to %s", me.name,
-			   source_p->name, aconf->host, ConfigFileEntry.dlinefile);
+			   ":%s NOTICE %s :Added D-Line [%s]", me.name,
+			   source_p->name, aconf->host);
 
-		translog_add_ban(TRANS_DLINE, source_p, aconf->host, NULL,
-				reason, EmptyString(oper_reason) ? "" : oper_reason, 1);
+		bandb_add(BANDB_DLINE, source_p, aconf->host, NULL,
+				reason, EmptyString(oper_reason) ? NULL : oper_reason);
 	}
 
 	check_dlines();
@@ -385,8 +384,7 @@ remove_perm_dline(struct Client *source_p, const char *host)
 				continue;
 
 			delete_one_address_conf(host, aconf);
-			translog_del_ban(TRANS_DLINE, host, NULL);
-
+			bandb_del(BANDB_DLINE, aconf->host, NULL);
 
 			sendto_one(source_p, POP_QUEUE, 
 					":%s NOTICE %s :D-Line for [%s] is removed", 
