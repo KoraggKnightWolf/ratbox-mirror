@@ -39,7 +39,7 @@ static int ms_quit(struct Client *, struct Client *, int, const char **);
 
 struct Message quit_msgtab = {
 	"QUIT", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_quit, 0}, {m_quit, 0}, {ms_quit, 0}, {ms_quit, 0}, mg_ignore, {m_quit, 0}}
+	{{mr_quit, 0}, {m_quit, 0}, {ms_quit, 0}, mg_ignore, mg_ignore, {m_quit, 0}}
 };
 
 mapi_clist_av1 quit_clist[] = { &quit_msgtab, NULL };
