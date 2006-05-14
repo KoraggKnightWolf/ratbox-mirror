@@ -171,7 +171,7 @@ bandb_write_sendq(int fd, void *unused)
 		ircd_setselect(bandb_ofd, IRCD_SELECT_WRITE, bandb_write_sendq, NULL);
 }
 
-static void
+void
 bandb_write(const char *format, ...)
 {
 	va_list args;

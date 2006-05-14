@@ -49,7 +49,6 @@
 #include "reject.h"
 #include "cache.h"
 #include "dns.h"
-#include "banconf.h"
 #include "operhash.h"
 
 struct config_server_hide ConfigServerHide;
@@ -643,7 +642,7 @@ rehash_bans(int sig)
 
 	clear_out_address_conf_bans();
 	clear_s_newconf_bans();
-	banconf_parse();
+	bandb_write("L");
 	check_banned_lines();
 }
 

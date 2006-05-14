@@ -47,7 +47,6 @@ ident_SOURCES = src/ident.c
 
 libratbox_la_SOURCES =                     \
   src/dns.c                        \
-  src/banconf.c			\
   src/bandbi.c			\
   src/cache.c                       \
   src/channel.c                     \
