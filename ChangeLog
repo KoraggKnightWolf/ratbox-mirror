@@ -1,3 +1,12 @@
+leeh        2006/05/14 18:24:30 UTC	(20060514_2-22489)
+  Log:
+  - make bandb accept 'L' command to output a list of bans
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+
+
 leeh        2006/05/14 14:55:05 UTC	(20060514_1-22487)
   Log:
   - make resv call bandb_del() with the exact data from the ban rather than
