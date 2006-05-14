@@ -50,13 +50,17 @@ typedef enum
 	LAST_BANDB_TYPE
 } bandb_type;
 
+static char bandb_letter[LAST_BANDB_TYPE] =
+{
+	'K', 'D', 'X', 'R'
+};
+
 static const char *bandb_table[LAST_BANDB_TYPE] = 
 {
 	"kline", "dline", "xline", "resv"
 };
 
-static void write_sendq(int fd, void *unused);
-
+static void write_request(const char *format, ...);
 static void check_schema(void);
 
 static void
@@ -114,6 +118,35 @@ parse_unban(bandb_type type, char *parv[], int parc)
 }
 
 static void
+list_bans(void)
+{
+	static char buf[512];
+	struct rsdb_table table;
+	int i, j;
+
+	for(i = 0; i < LAST_BANDB_TYPE; i++)
+	{
+		rsdb_exec_fetch(&table, "SELECT mask1,mask2,reason FROM %s WHERE 1",
+				bandb_table[i]);
+
+		for(j = 0; j < table.row_count; j++)
+		{
+			if(i == BANDB_KLINE)
+				snprintf(buf, sizeof(buf), "%c %s %s :%s",
+					bandb_letter[i], table.row[i][0],
+					table.row[i][1], table.row[i][2]);
+			else
+				snprintf(buf, sizeof(buf), "%c %s :%s",
+					bandb_letter[i], table.row[i][0], table.row[i][2]);
+
+			write_request("%s", buf);
+		}
+				
+		rsdb_exec_fetch_end(&table);
+	}
+}
+
+static void
 parse_request(void)
 {
 	static char *parv[MAXPARA+1];
@@ -160,6 +193,10 @@ parse_request(void)
 
 			case 'r':
 				parse_unban(BANDB_RESV, parv, parc);
+				break;
+
+			case 'L':
+				list_bans();
 		}
 	}
 }
@@ -214,6 +251,18 @@ write_sendq(int fd, void *unused)
 
 	if(ircd_linebuf_len(&sendq) > 0)
 		ircd_setselect(irc_ofd, IRCD_SELECT_WRITE, write_sendq, NULL);
+}
+
+static void
+write_request(const char *format, ...)
+{
+	va_list args;
+
+	va_start(args, format);
+	ircd_linebuf_putmsg(&sendq, format, &args, NULL);
+	va_end(args);
+
+	write_sendq(irc_ofd, NULL);
 }
 
 int
