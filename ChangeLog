@@ -1,3 +1,18 @@
+leeh        2006/05/14 14:55:05 UTC	(20060514_1-22487)
+  Log:
+  - make resv call bandb_del() with the exact data from the ban rather than
+    what the user sends
+  - include oper and time when adding bans
+  - have bandb helper check and create tables if it needs to
+  - bandb helper code so it actually writes stuff to the db
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+
+
 jilles      2006/05/14 13:11:32 UTC	(20060514_0-22485)
   Log:
   Don't allow servers to QUIT (they should use SQUIT).
