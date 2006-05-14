@@ -200,15 +200,14 @@ bandb_add(bandb_type type, struct Client *source_p, const char *mask1,
 {
 	static char buf[BUFSIZE];
 
-	buf[0] = '\0';
-
-	ircd_snprintf_append(buf, sizeof(buf), "%c %s ",
-				bandb_add_letter[type], mask1);
+	ircd_snprintf(buf, sizeof(buf), "%c %s ",
+			bandb_add_letter[type], mask1);
 
 	if(!EmptyString(mask2))
 		ircd_snprintf_append(buf, sizeof(buf), "%s ", mask2);
 
-	ircd_snprintf_append(buf, sizeof(buf), ":%s", reason);
+	ircd_snprintf_append(buf, sizeof(buf), "%s %lu :%s", 
+				get_oper_name(source_p), ircd_currenttime, reason);
 
 	if(!EmptyString(oper_reason))
 		ircd_snprintf_append(buf, sizeof(buf), "|%s", oper_reason);

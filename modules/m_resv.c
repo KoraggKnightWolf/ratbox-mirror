@@ -380,7 +380,7 @@ remove_resv(struct Client *source_p, const char *name)
 
 		/* schedule it to transaction log */
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
-			bandb_del(BANDB_RESV, name, NULL);
+			bandb_del(BANDB_RESV, aconf->host, NULL);
 
 		del_from_hash(HASH_RESV, name, aconf);
 		free_conf(aconf);
@@ -408,7 +408,7 @@ remove_resv(struct Client *source_p, const char *name)
 
 		/* schedule it to transaction log */
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
-			bandb_del(BANDB_RESV, name, NULL);
+			bandb_del(BANDB_RESV, aconf->host, NULL);
 
 		/* already have ptr from the loop above.. */
 		ircd_dlinkDestroy(ptr, &resv_conf_list);

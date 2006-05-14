@@ -31,6 +31,7 @@
  */
 #include "setup.h"
 #include "ircd_lib.h"
+#include "rsdb.h"
 
 #define MAXPARA 10
 
@@ -40,7 +41,77 @@ int irc_ofd;	/* control fd */
 buf_head_t sendq;
 buf_head_t recvq;
 
+typedef enum
+{
+	BANDB_KLINE,
+	BANDB_DLINE,
+	BANDB_XLINE,
+	BANDB_RESV,
+	LAST_BANDB_TYPE
+} bandb_type;
+
+static const char *bandb_table[LAST_BANDB_TYPE] = 
+{
+	"kline", "dline", "xline", "resv"
+};
+
 static void write_sendq(int fd, void *unused);
+
+static void check_schema(void);
+
+static void
+parse_ban(bandb_type type, char *parv[], int parc)
+{
+	const char *mask1 = NULL;
+	const char *mask2 = NULL;
+	const char *oper = NULL;
+	const char *curtime = NULL;
+	const char *reason = NULL;
+	int para = 1;
+
+	if(type == BANDB_KLINE)
+	{
+		if(parc != 6)
+			return;
+	}
+	else if(parc != 5)
+		return;
+
+	mask1 = parv[para++];
+
+	if(type == BANDB_KLINE)
+		mask2 = parv[para++];
+
+	oper = parv[para++];
+	curtime = parv[para++];
+	reason = parv[para++];
+
+	rsdb_exec(NULL, "INSERT INTO %s (mask1, mask2, oper, time, reason) VALUES('%Q', '%Q', '%Q', %s, '%Q')",
+			bandb_table[type], mask1, mask2 ? mask2 : "", oper, curtime, reason);
+}
+
+static void
+parse_unban(bandb_type type, char *parv[], int parc)
+{
+	const char *mask1 = NULL;
+	const char *mask2 = NULL;
+
+	if(type == BANDB_KLINE)
+	{
+		if(parc != 3)
+			return;
+	}
+	else if(parc != 2)
+		return;
+
+	mask1 = parv[1];
+
+	if(type == BANDB_KLINE)
+		mask2 = parv[2];
+
+	rsdb_exec(NULL, "DELETE FROM %s WHERE mask1='%Q' AND mask2='%Q'",
+			bandb_table[type], mask1, mask2 ? mask2 : "");
+}
 
 static void
 parse_request(void)
@@ -53,6 +124,43 @@ parse_request(void)
 	while((len = ircd_linebuf_get(&recvq, readbuf, sizeof(readbuf), LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 	{
 		parc = ircd_string_to_array(readbuf, parv, MAXPARA);
+
+		if(parc < 1)
+			continue;
+
+		switch(parv[0][0])
+		{
+			case 'K':
+				parse_ban(BANDB_KLINE, parv, parc);
+				break;
+
+			case 'D':
+				parse_ban(BANDB_DLINE, parv, parc);
+				break;
+
+			case 'X':
+				parse_ban(BANDB_XLINE, parv, parc);
+				break;
+
+			case 'R':
+				parse_ban(BANDB_RESV, parv, parc);
+				break;
+
+			case 'k':
+				parse_unban(BANDB_KLINE, parv, parc);
+				break;
+
+			case 'd':
+				parse_unban(BANDB_DLINE, parv, parc);
+				break;
+
+			case 'x':
+				parse_unban(BANDB_XLINE, parv, parc);
+				break;
+
+			case 'r':
+				parse_unban(BANDB_RESV, parv, parc);
+		}
 	}
 }
 		
@@ -148,7 +256,29 @@ main(int argc, char *argv[])
 	ircd_set_nb(irc_ifd);
 	ircd_set_nb(irc_ofd);
 
+	rsdb_init();
+	check_schema();
 	read_io();
 
 	return 0;
 }
+
+static void
+check_schema(void)
+{
+	struct rsdb_table table;
+	int i;
+
+	for(i = 0; i < LAST_BANDB_TYPE; i++)
+	{
+		rsdb_exec_fetch(&table, "SELECT name FROM sqlite_master WHERE type='table' AND name='%s'",
+				bandb_table[i]);
+
+		rsdb_exec_fetch_end(&table);
+
+		if(!table.row_count)
+			rsdb_exec(NULL, "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, reason TEXT)",
+					bandb_table[i]);
+	}
+}
+
