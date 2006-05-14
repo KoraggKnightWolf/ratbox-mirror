@@ -1,3 +1,12 @@
+jilles      2006/05/14 13:11:32 UTC	(20060514_0-22485)
+  Log:
+  Don't allow servers to QUIT (they should use SQUIT).
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_quit.c (File Modified) 
+
+
 leeh        2006/05/13 20:52:23 UTC	(20060513_3-22479)
   Log:
   - add in code for dealing with sqlite database
