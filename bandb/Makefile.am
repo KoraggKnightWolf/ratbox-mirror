@@ -3,7 +3,7 @@
 #
 bin_PROGRAMS = bandb
 
-INCLUDES = -I../include -I../libircd
+INCLUDES = -I../include -I../libircd @SQLITE_INCLUDES@
 
 
 bandb_SOURCES = bandb.c rsdb_sqlite3.c rsdb_snprintf.c

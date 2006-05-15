@@ -258,8 +258,9 @@ AC_CHECK_TYPE([sa_family_t], [],
 
 AC_CHECK_TYPES([uintptr_t])
 
+
 dnl check for various functions...
-AC_CHECK_FUNCS([socketpair vsnprintf mmap gettimeofday writev sendmsg ctime_r strtok_r])
+AC_CHECK_FUNCS([socketpair vsnprintf mmap gettimeofday writev sendmsg ctime_r strtok_r usleep])
 
 AC_FUNC_ALLOCA
 AC_FUNC_VFORK
@@ -380,14 +381,25 @@ AC_CHECK_HEADER(sqlite3.h, [
 ], ac_cv_build_sqlite3=yes)
 
 if test "$ac_cv_build_sqlite3" = yes; then
-	AC_CONFIG_SUBDIRS(sqlite3)
-	AC_SUBST(SQLITE_LD, [../sqlite3/libsqlite3.la])
-	SQLITE_SUBDIR="sqlite3"
-else
-	SQLITE_SUBDIR=""
+	SQLITE_SUBDIR=sqlite3
+	AC_SUBST(SQLITE_SUBDIR)
+	AC_SUBST(SQLITE_INCLUDES, [-I../sqlite3/])
+	save_LIBS=$LIBS
+	AC_SEARCH_LIBS(fdatasync, [rt],,)
+	FDATASYNCLIB=$ac_cv_search_fdatasync
+	LIBS=$save_LIBS
+
+	if test "$FDATASYNCLIB" = "none required"; then
+	        unset FDATASYNCLIB
+	fi
+        	
+	SQLITE_LD="$FDATASYNCLIB ../sqlite3/libsqlite3.a"
+	AC_SUBST(SQLITE_LD, $SQLITE_LD)
+	
 fi
 
-AC_SUBST(SQLITE_SUBDIR)
+AM_CONDITIONAL([BUILD_SQLITE], [test "$ac_cv_build_sqlite3" = yes])
+
 
 
 dnl Specialized functions and libraries
@@ -925,7 +937,8 @@ AC_CONFIG_FILES(		\
 	contrib/Makefile	\
 	tools/Makefile		\
 	doc/Makefile		\
-	help/Makefile		
+	help/Makefile		\
+	sqlite3/Makefile
 )
 
 AC_OUTPUT
@@ -960,3 +973,4 @@ echo "Configured limits:"
 echo "NICKLEN ................. $NICKLEN"
 echo "TOPICLEN ................ $TOPICLEN"
 echo
+
