@@ -392,6 +392,10 @@ if test "$ac_cv_build_sqlite3" = yes; then
 	if test "$FDATASYNCLIB" = "none required"; then
 	        unset FDATASYNCLIB
 	fi
+	
+	if test "$FDATASYNCLIB" = "no"; then
+		unset FDATASYNCLIB
+	fi
         	
 	SQLITE_LD="$FDATASYNCLIB ../sqlite3/libsqlite3.a"
 	AC_SUBST(SQLITE_LD, $SQLITE_LD)

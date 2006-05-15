@@ -28150,6 +28150,10 @@ fi
 	        unset FDATASYNCLIB
 	fi
 
+	if test "$FDATASYNCLIB" = "no"; then
+		unset FDATASYNCLIB
+	fi
+
 	SQLITE_LD="$FDATASYNCLIB ../sqlite3/libsqlite3.a"
 	SQLITE_LD=$SQLITE_LD
 
