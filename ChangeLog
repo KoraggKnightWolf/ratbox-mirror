@@ -1,3 +1,12 @@
+leeh        2006/05/15 19:32:37 UTC	(20060515_4-22501)
+  Log:
+  - remove an empty subdir
+  
+
+  Modified:
+	ircd-ratbox/trunk/sqlite3/src/ex/ (File Deleted) 
+
+
 androsyn    2006/05/15 18:48:13 UTC	(20060515_3-22499)
   Log:
   fix the fdatasync check...
