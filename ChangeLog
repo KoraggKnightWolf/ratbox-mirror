@@ -1,3 +1,13 @@
+androsyn    2006/05/15 18:48:13 UTC	(20060515_3-22499)
+  Log:
+  fix the fdatasync check...
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2006/05/15 18:43:02 UTC	(20060515_2-22497)
   Log:
   - strip down sqlite3 for ircd purposes
