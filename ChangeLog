@@ -1,3 +1,16 @@
+leeh        2006/05/15 20:25:49 UTC	(20060515_5-22503)
+  Log:
+  - missing #include bandbi.h in s_conf.c
+  - make bandb helper send oper too
+  - make bandb ircd side capable of parsing bans from the helper
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 leeh        2006/05/15 19:32:37 UTC	(20060515_4-22501)
   Log:
   - remove an empty subdir
