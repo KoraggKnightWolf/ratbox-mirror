@@ -242,51 +242,7 @@ AC_C_BIGENDIAN
 dnl Check for stdarg.h - if we can't find it, halt configure
 AC_CHECK_HEADER(stdarg.h, , [AC_MSG_ERROR([** stdarg.h could not be found - ircd-ratbox will not compile without it **])])
 
-dnl Checks for the existence of strlcat, strlcpy, basename...
-dnl This more reliable test only works with gcc though.
-
-if test "$ac_cv_c_compiler_gnu" = yes; then
-
-AC_MSG_CHECKING(for strlcpy)
-save_CFLAGS=$CFLAGS
-CFLAGS="$CFLAGS -Wimplicit -Werror"
-
-AC_LINK_IFELSE(
-	[AC_LANG_PROGRAM(
-		[[#include <string.h>
-		#include <stdlib.h>]],
-		[[char *a = malloc(6);
-		strlcpy(a, "hello", 6);]]
-	)],
-	[AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_STRLCPY, 1, [Define if strlcpy is available (most BSDs.)])],
-	[AC_MSG_RESULT(no)]
-)
-
-AC_MSG_CHECKING(for strlcat)
-AC_LINK_IFELSE(
-	[AC_LANG_PROGRAM(
-		[[#include <string.h>
-		#include <stdlib.h>]],
-		[[char *a = malloc(6);
-		a[0] = '\0';
-		strlcat(a, "hello", 6);]]
-	)],
-	[AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_STRLCAT, 1, [Define if strlcat is available (most BSDs.)])],
-	[AC_MSG_RESULT(no)]
-)
-
-CFLAGS=$save_CFLAGS
-
-else
-
-dnl Better than nothing. The more complicated test above probably fixes powerpc,
-dnl so who cares.
-
 AC_CHECK_FUNCS([strlcat strlcpy])
-
-fi
 
 AX_CREATE_STDINT_H([include/_stdint.h])
 
