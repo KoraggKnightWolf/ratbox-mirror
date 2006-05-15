@@ -1,3 +1,12 @@
+androsyn    2006/05/15 16:44:19 UTC	(20060515_1-22495)
+  Log:
+  i think doing AC_CHECK_FUNCS for strlcat/strlcpy is probably okay
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2006/05/15 16:09:37 UTC	(20060515_0-22493)
   Log:
   Set signal handlers to dummies when doing a restart so we don't get messed up
