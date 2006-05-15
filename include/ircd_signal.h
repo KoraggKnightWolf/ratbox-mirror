@@ -28,5 +28,6 @@
 #define INCLUDED_ircd_signal_h
 
 void setup_signals(void);
+void setup_reboot_signals(void);
 
 #endif /* INCLUDED_ircd_signal_h */

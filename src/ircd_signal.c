@@ -163,9 +163,65 @@ setup_signals()
 	sigaction(SIGCHLD, &act, 0);
 
 }
+/*
+ * setup_reboot_signals() we need to not try to do stuff before reboot with signals
+ */
+void
+setup_reboot_signals()
+{
+	struct sigaction act;
+	
+	act.sa_flags = 0;
+	act.sa_handler = dummy_handler;
+	
+	sigemptyset(&act.sa_mask);
+
+#ifdef SIGTRAP
+	sigaddset(&act.sa_mask, SIGTRAP);
+	sigaction(SIGTRAP, &act, 0);
+#endif
+
+# ifdef SIGWINCH
+	sigaddset(&act.sa_mask, SIGWINCH);
+	sigaction(SIGWINCH, &act, 0);
+# endif
+	sigaddset(&act.sa_mask, SIGALRM);
+	sigaddset(&act.sa_mask, SIGPIPE);
+	sigaddset(&act.sa_mask, SIGHUP);
+	sigaddset(&act.sa_mask, SIGINT);
+	sigaddset(&act.sa_mask, SIGTERM);
+	sigaddset(&act.sa_mask, SIGUSR1);
+	sigaddset(&act.sa_mask, SIGUSR2);
+	sigaddset(&act.sa_mask, SIGCHLD);
+	
+	sigaction(SIGALRM, &act, 0);
+	sigaction(SIGPIPE, &act, 0);
+	sigaction(SIGHUP, &act, 0);
+	sigaction(SIGINT, &act, 0);
+	sigaction(SIGTERM, &act, 0);
+	sigaction(SIGUSR1, &act, 0);
+	sigaction(SIGUSR2, &act, 0);
+	sigaction(SIGTERM, &act, 0);	
+	sigaction(SIGUSR1, &act, 0);
+	sigaction(SIGUSR2, &act, 0);
+	sigaction(SIGCHLD, &act, 0);
+	
+	
+
+
+}
+
+
+
 #else
 void
 setup_signals()
+{
+/* this is a stub for mingw32 */
+}
+
+void
+setup_reboot_signals()
 {
 /* this is a stub for mingw32 */
 }

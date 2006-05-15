@@ -31,7 +31,8 @@
 #include "send.h"
 #include "s_log.h"
 #include "s_conf.h"
-#include "client.h"		/* for FLAGS_ALL */
+#include "client.h"		
+#include "ircd_signal.h"
 
 /* external var */
 extern char **myargv;
@@ -56,10 +57,12 @@ server_reboot(void)
 	int i;
 	char path[PATH_MAX+1];
 
-
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Restarting server...");
 
 	ilog(L_MAIN, "Restarting server...");
+	
+	/* set all the signal handlers to a dummy */
+	setup_reboot_signals();
 	/*
 	 * XXX we used to call flush_connections() here. But since this routine
 	 * doesn't exist anymore, we won't be flushing. This is ok, since 
