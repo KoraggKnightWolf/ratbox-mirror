@@ -50,6 +50,7 @@
 #include "cache.h"
 #include "dns.h"
 #include "operhash.h"
+#include "bandbi.h"
 
 struct config_server_hide ConfigServerHide;
 

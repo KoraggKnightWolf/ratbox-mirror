@@ -126,18 +126,20 @@ list_bans(void)
 
 	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
-		rsdb_exec_fetch(&table, "SELECT mask1,mask2,reason FROM %s WHERE 1",
+		rsdb_exec_fetch(&table, "SELECT mask1,mask2,oper,reason FROM %s WHERE 1",
 				bandb_table[i]);
 
 		for(j = 0; j < table.row_count; j++)
 		{
 			if(i == BANDB_KLINE)
-				snprintf(buf, sizeof(buf), "%c %s %s :%s",
+				snprintf(buf, sizeof(buf), "%c %s %s %s :%s",
 					bandb_letter[i], table.row[i][0],
-					table.row[i][1], table.row[i][2]);
+					table.row[i][1], table.row[i][2],
+					table.row[i][3]);
 			else
-				snprintf(buf, sizeof(buf), "%c %s :%s",
-					bandb_letter[i], table.row[i][0], table.row[i][2]);
+				snprintf(buf, sizeof(buf), "%c %s %s :%s",
+					bandb_letter[i], table.row[i][0], 
+					table.row[i][2], table.row[i][3]);
 
 			write_request("%s", buf);
 		}

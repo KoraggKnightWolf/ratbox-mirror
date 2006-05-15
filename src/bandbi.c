@@ -36,16 +36,29 @@
 #include "s_log.h"
 #include "match.h"
 #include "bandbi.h"
+#include "parse.h"
+#include "channel.h"
+#include "operhash.h"
 
 static pid_t bandb_pid;
 
 static int bandb_ifd = -1;
 static int bandb_ofd = -1;
 
+static char bandb_add_letter[LAST_BANDB_TYPE] =
+{
+	'K', 'D', 'X', 'R'
+};
+
+dlink_list bandb_pending;
+
 static buf_head_t bandb_sendq;
 static buf_head_t bandb_recvq;
 
 static void fork_bandb(void);
+
+static void bandb_read(int fd, void *unused);
+static void bandb_parse(void);
 
 void
 init_bandb(void)
@@ -147,6 +160,9 @@ fork_bandb(void)
 
 	fork_count = 0;
 	bandb_pid = pid;
+
+	bandb_read(bandb_ifd, NULL);
+
 	return;
 }
 
@@ -189,10 +205,26 @@ bandb_write(const char *format, ...)
 	bandb_write_sendq(bandb_ofd, NULL);
 }
 
-static char bandb_add_letter[LAST_BANDB_TYPE] =
+static void
+bandb_read(int fd, void *unused)
 {
-	'K', 'D', 'X', 'R'
-};
+	static char buf[READBUF_SIZE];
+	int length;
+
+	while((length = ircd_read(fd, buf, sizeof(buf))) > 0)
+	{
+		ircd_linebuf_parse(&bandb_recvq, buf, length, 0);
+		bandb_parse();
+	}
+
+	if(length == 0 || (length < 0 && !ignoreErrno(errno)))
+		fork_bandb();
+
+	if(bandb_ifd == -1)
+		return;
+
+	ircd_setselect(fd, IRCD_SELECT_READ, bandb_read, NULL);
+}
 
 void
 bandb_add(bandb_type type, struct Client *source_p, const char *mask1,
@@ -234,4 +266,81 @@ bandb_del(bandb_type type, const char *mask1, const char *mask2)
 		ircd_snprintf_append(buf, sizeof(buf), " %s", mask2);
 
 	bandb_write("%s", buf);
+}
+
+static void
+bandb_handle_ban(char *parv[], int parc)
+{
+	struct ConfItem *aconf;
+	char *p;
+	int para = 1;
+
+	aconf = make_conf();
+	aconf->port = 0;
+
+	if(parv[0][0] == 'K')
+		aconf->user = ircd_strdup(parv[para++]);
+
+	aconf->host = ircd_strdup(parv[para++]);
+	aconf->info.oper = operhash_add(parv[para++]);
+
+	switch(parv[0][0])
+	{
+		case 'K':
+			aconf->status = CONF_KILL;
+			break;
+
+		case 'D':
+			aconf->status = CONF_DLINE;
+			break;
+
+		case 'X':
+			aconf->status = CONF_XLINE;
+			break;
+
+		case 'R':
+			if(IsChannelName(aconf->host))
+				aconf->status = CONF_RESV_CHANNEL;
+			else
+				aconf->status = CONF_RESV_NICK;
+
+			break;
+	}
+
+	if((p = strchr(parv[para], '|')))
+	{
+		*p++ = '\0';
+		aconf->spasswd = ircd_strdup(p);
+	}
+
+	aconf->passwd = ircd_strdup(parv[para]);
+
+	ircd_dlinkAddAlloc(aconf, &bandb_pending);
+}
+
+static void
+bandb_parse(void)
+{
+	static char buf[READBUF_SIZE];
+	char *parv[MAXPARA+1];
+	int len, parc;
+
+	while((len = ircd_linebuf_get(&bandb_recvq, buf, sizeof(buf),
+					LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
+	{
+		parc = ircd_string_to_array(buf, parv, MAXPARA);
+
+		if(parc < 1)
+			continue;
+
+		switch(parv[0][0])
+		{
+			case 'K':
+			case 'D':
+			case 'X':
+			case 'R':
+				bandb_handle_ban(parv, parc);
+				break;
+		}
+	}
 }
