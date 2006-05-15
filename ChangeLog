@@ -1,3 +1,58 @@
+androsyn    2006/05/15 18:43:02 UTC	(20060515_2-22497)
+  Log:
+  - strip down sqlite3 for ircd purposes
+  - have the few autoconf checks sqlite needs done in the main autoconf
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/adns/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/servlink/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/sqlite3/aclocal.m4 (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/addopcodes.awk (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/config.guess (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/config.sub (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/configure (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/configure.ac (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/install-sh (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/ltmain.sh (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/main.mk (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/mkopcodec.awk (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/mkopcodeh.awk (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/mkso.sh (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/spec.template (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/sqlite.pc.in (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/sqlite3.1 (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/sqlite3.def (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/sqlite3.h (File Added) 
+	ircd-ratbox/trunk/sqlite3/sqlite3.pc.in (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/src/keywordhash.h (File Added) 
+	ircd-ratbox/trunk/sqlite3/src/opcodes.c (File Added) 
+	ircd-ratbox/trunk/sqlite3/src/opcodes.h (File Added) 
+	ircd-ratbox/trunk/sqlite3/src/parse.c (File Added) 
+	ircd-ratbox/trunk/sqlite3/src/parse.h (File Added) 
+	ircd-ratbox/trunk/sqlite3/tclinstaller.tcl (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/tool/addopcodes.awk (File Added) 
+	ircd-ratbox/trunk/sqlite3/tool/memleak3.tcl (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/tool/mkopcodec.awk (File Added) 
+	ircd-ratbox/trunk/sqlite3/tool/mkopcodeh.awk (File Added) 
+	ircd-ratbox/trunk/sqlite3/tool/mkopts.tcl (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/tool/omittest.tcl (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/tool/space_used.tcl (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/tool/spaceanal.tcl (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/tool/speedtest.tcl (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/tool/speedtest2.tcl (File Deleted) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2006/05/15 16:44:19 UTC	(20060515_1-22495)
   Log:
   i think doing AC_CHECK_FUNCS for strlcat/strlcpy is probably okay
