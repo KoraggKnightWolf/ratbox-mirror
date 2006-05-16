@@ -197,6 +197,7 @@ fork_ident(void)
 	auth_ifd = ifd[0];
 	auth_ofd = ofd[1];
 	auth_pid = pid;
+	read_auth_reply(auth_ifd, NULL);	
 	return;
 }
 
@@ -431,8 +432,6 @@ start_auth_query(struct AuthRequest *auth)
 
 
 	auth_write_sendq(auth_ofd, NULL);
-
-	read_auth_reply(auth_ifd, NULL);
 	return;
 }
 
