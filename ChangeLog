@@ -1,3 +1,11 @@
+androsyn    2006/05/16 14:57:19 UTC	(20060516_0-22505)
+  Log:
+  wrap the /dev/urandom code in an ifdef for that win32 stuff
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 leeh        2006/05/15 20:25:49 UTC	(20060515_5-22503)
   Log:
   - missing #include bandbi.h in s_conf.c
