@@ -1,3 +1,13 @@
+leeh        2006/05/16 20:56:47 UTC	(20060516_5-22527)
+  Log:
+  - clear all pending uncommited bans before a new list is sent
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+
+
 leeh        2006/05/16 20:45:54 UTC	(20060516_4-22525)
   Log:
   - I mean to use j here, not i
