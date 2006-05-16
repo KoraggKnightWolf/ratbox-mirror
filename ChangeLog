@@ -1,3 +1,11 @@
+androsyn    2006/05/16 15:01:11 UTC	(20060516_1-22507)
+  Log:
+  call read_dns in fork_resolver initially and don't call it in submit_dns()
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 androsyn    2006/05/16 14:57:19 UTC	(20060516_0-22505)
   Log:
   wrap the /dev/urandom code in an ifdef for that win32 stuff
