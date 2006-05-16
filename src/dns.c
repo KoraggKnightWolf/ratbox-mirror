@@ -42,6 +42,7 @@
 
 static void submit_dns(const char, int id, int aftype, const char *addr);
 static void fork_resolver(void);
+static void read_dns(int fd, void *unused);
 
 static char dnsBuf[READBUF_SIZE];
 static buf_head_t dns_sendq;
@@ -300,6 +301,7 @@ fork_resolver(void)
 
 	fork_count = 0;
 	res_pid = pid;
+	read_dns(dns_ifd, NULL);
 	return;
 }
 
@@ -379,16 +381,15 @@ submit_dns(char type, int nid, int aftype, const char *addr)
 	}	                        
 	ircd_linebuf_put(&dns_sendq, "%c %x %d %s", type, nid, aftype, addr);
 	dns_write_sendq(dns_ofd, NULL);
-	read_dns(dns_ifd, NULL);
 }
 
 void
 init_resolver(void)
 {
-	fork_resolver();
 	ircd_linebuf_newbuf(&dns_sendq);
 	ircd_linebuf_newbuf(&dns_recvq);
-	
+	fork_resolver();
+
 	if(res_pid < 0)
 	{
 		ilog(L_MAIN, "Unable to fork resolver: %s", strerror(errno));		
