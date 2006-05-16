@@ -1,3 +1,16 @@
+leeh        2006/05/16 20:40:52 UTC	(20060516_3-22523)
+  Log:
+  - make bandb send "F" when its finished issuing bans
+  - make ircd apply bans on "F", adding code to do the checking for redundancy
+    and validity
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2006/05/16 15:06:04 UTC	(20060516_2-22509)
   Log:
   call read_auth_reply after forking, not after sending...wtf was i smoking when i did this crap?
