@@ -1,3 +1,12 @@
+leeh        2006/05/16 20:45:54 UTC	(20060516_4-22525)
+  Log:
+  - I mean to use j here, not i
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+
+
 leeh        2006/05/16 20:40:52 UTC	(20060516_3-22523)
   Log:
   - make bandb send "F" when its finished issuing bans
