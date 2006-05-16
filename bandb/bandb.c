@@ -133,13 +133,13 @@ list_bans(void)
 		{
 			if(i == BANDB_KLINE)
 				snprintf(buf, sizeof(buf), "%c %s %s %s :%s",
-					bandb_letter[i], table.row[i][0],
-					table.row[i][1], table.row[i][2],
-					table.row[i][3]);
+					bandb_letter[i], table.row[j][0],
+					table.row[j][1], table.row[j][2],
+					table.row[j][3]);
 			else
 				snprintf(buf, sizeof(buf), "%c %s %s :%s",
-					bandb_letter[i], table.row[i][0], 
-					table.row[i][2], table.row[i][3]);
+					bandb_letter[i], table.row[j][0], 
+					table.row[j][2], table.row[j][3]);
 
 			write_request("%s", buf);
 		}
