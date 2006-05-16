@@ -460,7 +460,19 @@ bandb_check_resv_nick(struct ConfItem *aconf)
 }
 
 static void
-bandb_handle_finish()
+bandb_handle_clear(void)
+{
+	dlink_node *ptr, *next_ptr;
+
+	DLINK_FOREACH_SAFE(ptr, next_ptr, bandb_pending.head)
+	{
+		free_conf(ptr->data);
+		ircd_dlinkDestroy(ptr, &bandb_pending);
+	}
+}
+
+static void
+bandb_handle_finish(void)
 {
 	struct ConfItem *aconf;
 	dlink_node *ptr, *next_ptr;
@@ -545,6 +557,8 @@ bandb_parse(void)
 				bandb_handle_ban(parv, parc);
 				break;
 
+			case 'C':
+				bandb_handle_clear();
 			case 'F':
 				bandb_handle_finish();
 				break;

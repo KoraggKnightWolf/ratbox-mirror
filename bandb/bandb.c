@@ -124,6 +124,9 @@ list_bans(void)
 	struct rsdb_table table;
 	int i, j;
 
+	/* schedule a clear of anything already pending */
+	write_request("C");
+
 	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
 		rsdb_exec_fetch(&table, "SELECT mask1,mask2,oper,reason FROM %s WHERE 1",
