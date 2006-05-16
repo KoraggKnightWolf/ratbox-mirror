@@ -32,6 +32,8 @@
  */
 #include "stdinc.h"
 #include "ircd_lib.h"
+#include "struct.h"
+#include "client.h"
 #include "s_conf.h"
 #include "s_log.h"
 #include "match.h"
@@ -39,6 +41,10 @@
 #include "parse.h"
 #include "channel.h"
 #include "operhash.h"
+#include "hostmask.h"
+#include "hash.h"
+#include "s_newconf.h"
+#include "reject.h"
 
 static pid_t bandb_pid;
 
@@ -318,6 +324,203 @@ bandb_handle_ban(char *parv[], int parc)
 	ircd_dlinkAddAlloc(aconf, &bandb_pending);
 }
 
+static int
+bandb_check_kline(struct ConfItem *aconf)
+{
+	struct irc_sockaddr_storage daddr;
+	struct ConfItem *kconf = NULL;
+	int aftype;
+	const char *p;
+
+	aftype = parse_netmask(aconf->host, (struct sockaddr *) &daddr, NULL);
+
+	if(aftype != HM_HOST)
+	{
+#ifdef IPV6
+		if(aftype == HM_IPV6)
+			aftype = AF_INET
+		else
+#endif
+			aftype = AF_INET;
+
+		kconf = find_conf_by_address(aconf->host, NULL, (struct sockaddr *) &daddr, CONF_KILL, aftype, aconf->user);
+	}
+	else
+		kconf = find_conf_by_address(aconf->host, NULL, NULL, CONF_KILL, 0, aconf->user);
+
+	if(kconf && ((kconf->flags & CONF_FLAGS_TEMPORARY) == 0))
+		return 0;
+
+	for(p = aconf->user; *p; p++)
+	{
+		if(!IsUserChar(*p) && !IsKWildChar(*p))
+			return 0;
+	}
+
+	for(p = aconf->host; *p; p++)
+	{
+		if(!IsHostChar(*p) && !IsKWildChar(*p))
+			return 0;
+	}
+
+	return 1;
+}
+
+static int
+bandb_check_dline(struct ConfItem *aconf)
+{
+	struct irc_sockaddr_storage daddr;
+	struct ConfItem *dconf;
+	int bits;
+
+	if(!parse_netmask(aconf->host, &daddr, &bits))
+		return 0;
+
+	if((dconf = find_dline((struct sockaddr *) &daddr)))
+	{
+		int bits_d;
+
+		parse_netmask(dconf->host, NULL, &bits_d);
+
+		if(bits >= bits_d)
+			return 0;
+	}
+
+	return 1;
+}
+
+static int
+bandb_check_xline(struct ConfItem *aconf)
+{
+	if(strstr(aconf->host, "\\s"))
+	{
+		char *tmp = LOCAL_COPY(aconf->host);
+		char *orig = tmp;
+		char *new = tmp;
+
+		ircd_free(aconf->host);
+
+		while(*orig)
+		{
+			if(*orig == '\\')
+			{
+				if(*(orig+1) == 's')
+				{
+					*new++ = ' ';
+					orig += 2;
+				}
+				/* skip next two chars, to avoid
+				 * mistaking \\s as \s
+				 */
+				else
+				{
+					*new++ = *orig++;
+					*new++ = *orig++;
+				}
+			}
+			else
+				*new++ = *orig++;
+		}
+
+		*new = '\0';
+
+		aconf->host = ircd_strdup(tmp);
+	}
+
+	return 1;
+}
+
+static int
+bandb_check_resv_channel(struct ConfItem *aconf)
+{
+	const char *p;
+
+	if(hash_find_resv(aconf->host) || strlen(aconf->host) > CHANNELLEN)
+		return 0;
+
+	for(p = aconf->host; *p; p++)
+	{
+		if(!IsChanChar(*p))
+			return 0;
+	}
+
+	return 1;
+}
+
+static int
+bandb_check_resv_nick(struct ConfItem *aconf)
+{
+	if(!clean_resv_nick(aconf->host))
+		return 0;
+
+	if(find_nick_resv(aconf->host))
+		return 0;
+
+	return 1;
+}
+
+static void
+bandb_handle_finish()
+{
+	struct ConfItem *aconf;
+	dlink_node *ptr, *next_ptr;
+
+	clear_out_address_conf_bans();
+	clear_s_newconf_bans();
+
+	DLINK_FOREACH_SAFE(ptr, next_ptr, bandb_pending.head)
+	{
+		aconf = ptr->data;
+
+		ircd_dlinkDestroy(ptr, &bandb_pending);
+
+		switch(aconf->status)
+		{
+			case CONF_KILL:
+				if(bandb_check_kline(aconf))
+					add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
+				else
+					free_conf(aconf);
+
+				break;
+
+			case CONF_DLINE:
+				if(bandb_check_dline(aconf))
+					add_dline(aconf);
+				else
+					free_conf(aconf);
+
+				break;
+
+			case CONF_XLINE:
+				if(bandb_check_xline(aconf))
+					ircd_dlinkAddAlloc(aconf, &xline_conf_list);
+				else
+					free_conf(aconf);
+
+				break;
+
+			case CONF_RESV_CHANNEL:
+				if(bandb_check_resv_channel(aconf))
+					add_to_hash(HASH_RESV, aconf->host, aconf);
+				else
+					free_conf(aconf);
+
+				break;
+
+			case CONF_RESV_NICK:
+				if(bandb_check_resv_nick(aconf))
+					ircd_dlinkAddAlloc(aconf, &resv_conf_list);
+				else
+					free_conf(aconf);
+
+				break;
+		}
+	}
+
+	check_banned_lines();
+}
+
 static void
 bandb_parse(void)
 {
@@ -340,6 +543,10 @@ bandb_parse(void)
 			case 'X':
 			case 'R':
 				bandb_handle_ban(parv, parc);
+				break;
+
+			case 'F':
+				bandb_handle_finish();
 				break;
 		}
 	}

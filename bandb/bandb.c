@@ -146,6 +146,8 @@ list_bans(void)
 				
 		rsdb_exec_fetch_end(&table);
 	}
+
+	write_request("F");
 }
 
 static void
