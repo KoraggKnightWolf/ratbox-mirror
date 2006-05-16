@@ -495,6 +495,7 @@ diecb(const char *buf)
 static void
 seed_random(void *unused)
 {
+#ifndef _WIN32
 	int fd;
 	unsigned int seed;
 	fd = open("/dev/urandom", O_RDONLY);
@@ -506,6 +507,7 @@ seed_random(void *unused)
 			srand(seed);
 		}
 	}
+#endif
 	ircd_set_time();
 	srand(ircd_systemtime.tv_sec ^ (ircd_systemtime.tv_usec | (getpid() << 20)));
 }
