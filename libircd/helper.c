@@ -24,7 +24,6 @@
 
 #include "ircd_lib.h"
 
-
 /*
  * start_fork_helper
  * starts a new ircd helper
@@ -32,7 +31,7 @@
  */
 
 ircd_helper *
-ircd_start_fork_helper(const char *name, const char *fullpath, ircd_helper_cb *read_cb, ircd_helper_cb *restart_cb)
+ircd_helper_start(const char *name, const char *fullpath, ircd_helper_cb *read_cb, ircd_helper_cb *restart_cb)
 {
 	ircd_helper *helper;
 	const char *parv[2];
@@ -102,7 +101,7 @@ ircd_start_fork_helper(const char *name, const char *fullpath, ircd_helper_cb *r
 	helper->restart_cb = restart_cb;	
 	helper->fork_count = 0;
 	helper->pid = pid;
-	
+
 	return helper;
 }
 
@@ -168,5 +167,16 @@ ircd_helper_read(int fd, void *helper_ptr)
 		return;
 	
 	ircd_setselect(helper->ifd, IRCD_SELECT_READ, ircd_helper_read, helper);
-	
 }
+
+void
+ircd_helper_close(ircd_helper *helper)
+{
+	if(helper == NULL)
+		return;
+		
+	ircd_close(helper->ifd);
+	ircd_close(helper->ofd);
+	ircd_free(helper);	
+}
+
