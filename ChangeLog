@@ -1,3 +1,12 @@
+androsyn    2006/05/17 14:12:37 UTC	(20060517_0-22537)
+  Log:
+  Starts of the generic ircd helper code. 
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/helper.c (File Added) 
+
+
 leeh        2006/05/16 20:56:47 UTC	(20060516_5-22527)
   Log:
   - clear all pending uncommited bans before a new list is sent
