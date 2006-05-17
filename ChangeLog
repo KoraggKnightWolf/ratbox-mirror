@@ -1,3 +1,14 @@
+androsyn    2006/05/17 15:18:17 UTC	(20060517_4-22547)
+  Log:
+  make the resolver code use the new helper stuff
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/dns.h (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_signal.c (File Modified) 
+
+
 androsyn    2006/05/17 15:17:29 UTC	(20060517_3-22545)
   Log:
   - tweak the helper code a bit more
