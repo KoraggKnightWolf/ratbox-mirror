@@ -1,3 +1,12 @@
+androsyn    2006/05/17 15:20:49 UTC	(20060517_5-22549)
+  Log:
+  set Id properties
+
+  Modified:
+	ircd-ratbox/trunk/libircd/helper.c  (Property Modified)
+	ircd-ratbox/trunk/libircd/helper.h  (Property Modified)
+
+
 androsyn    2006/05/17 15:18:17 UTC	(20060517_4-22547)
   Log:
   make the resolver code use the new helper stuff
