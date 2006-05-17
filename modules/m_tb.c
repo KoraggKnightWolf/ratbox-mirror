@@ -38,6 +38,7 @@
 #include "ircd.h"
 #include "s_conf.h"
 #include "parse.h"
+#include "match.h"
 #include "modules.h"
 #include "hash.h"
 #include "s_serv.h"
@@ -84,6 +85,9 @@ ms_tb(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 		newtopic = parv[3];
 		newtopicwho = source_p->name;
 	}
+
+	if (EmptyString(newtopic))
+		return 0;
 
 	if(chptr->topic == NULL || chptr->topic_time > newtopicts)
 	{
