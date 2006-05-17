@@ -305,7 +305,7 @@ unsigned char * ircd_base64_decode(const unsigned char *str, int length, int *re
 #include "snprintf.h"
 #include "commio.h"
 #include "event.h"
-
+#include "helper.h"
 
 #endif
 

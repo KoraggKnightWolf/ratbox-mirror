@@ -54,13 +54,13 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libircd_la_LIBADD =
 am__libircd_la_SOURCES_DIST = unix.c crypt.c balloc.c commio.c event.c \
-	ircd_lib.c ircd_memory.c linebuf.c snprintf.c tools.c \
+	ircd_lib.c ircd_memory.c linebuf.c snprintf.c tools.c helper.c \
 	@SELECT_TYPE@.c
 @MINGW_FALSE@am__objects_1 = unix.lo
 @NEED_CRYPT_TRUE@am__objects_2 = crypt.lo
 am_libircd_la_OBJECTS = $(am__objects_1) $(am__objects_2) balloc.lo \
 	commio.lo event.lo ircd_lib.lo ircd_memory.lo linebuf.lo \
-	snprintf.lo tools.lo @SELECT_TYPE@.lo
+	snprintf.lo tools.lo helper.lo @SELECT_TYPE@.lo
 libircd_la_OBJECTS = $(am_libircd_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -68,7 +68,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/@SELECT_TYPE@.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/balloc.Plo ./$(DEPDIR)/commio.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/crypt.Plo ./$(DEPDIR)/event.Plo \
-@AMDEP_TRUE@	./$(DEPDIR)/ircd_lib.Plo \
+@AMDEP_TRUE@	./$(DEPDIR)/helper.Plo ./$(DEPDIR)/ircd_lib.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/ircd_memory.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/linebuf.Plo ./$(DEPDIR)/snprintf.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/tools.Plo ./$(DEPDIR)/unix.Plo
@@ -243,6 +243,7 @@ libircd_la_SOURCES = $(OS_FILES) $(CRYPT)	\
 	linebuf.c			\
 	snprintf.c			\
 	tools.c				\
+	helper.c			\
 	@SELECT_TYPE@.c		
 
 libircd_la_LDFLAGS = -avoid-version -no-undefined
@@ -321,6 +322,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crypt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircd_lib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircd_memory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linebuf.Plo@am__quote@

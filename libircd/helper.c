@@ -22,17 +22,7 @@
  *  $Id$
  */
 
-
-struct ircd_helper
-{
-	char *path;
-	buf_head_t sendq;
-	buf_head_t recvq;
-	int ifd;
-	int ofd;
-	pid_t pid;
-	int fork_count;
-};
+#include "ircd_lib.h"
 
 
 /*
@@ -41,33 +31,32 @@ struct ircd_helper
  * note that this function doesn't start doing reading..thats the job of the caller
  */
 
-struct ircd_helper *
-start_fork_helper(const char *name, const char *fullpath, void *read_cb, void *restart_cb)
+ircd_helper *
+ircd_start_fork_helper(const char *name, const char *fullpath, ircd_helper_cb *read_cb, ircd_helper_cb *restart_cb)
 {
-	struct ircd_helper *new_helper;
+	ircd_helper *helper;
 	const char *parv[2];
 	char buf[128];
 	char fx[16], fy[16];
-	int nifd[2];
-	int nofd[2];
+	int ifd[2];
+	int ofd[2];
 	pid_t pid;
 			
 	if(access(fullpath, X_OK) == -1)
-	{
 		return NULL;
-	}
-	new_helper = ircd_malloc(sizeof(strut ircd_helper));
+	
+	helper = ircd_malloc(sizeof(ircd_helper));
 
-	ircd_snprintf(buf, sizeof(buf), "%s helper - read");
-	if(ircd_pipe(nifd, buf) < 0) 
+	ircd_snprintf(buf, sizeof(buf), "%s helper - read", name);
+	if(ircd_pipe(ifd, buf) < 0) 
 	{
-		ircd_free(new_helper);
+		ircd_free(helper);
 		return NULL;
 	}
-	ircd_snprintf(buf, sizeof(buf), "%s helper - write");
-	if(ircd_pipe(nofd, buf) < 0)
+	ircd_snprintf(buf, sizeof(buf), "%s helper - write", name);
+	if(ircd_pipe(ofd, buf) < 0)
 	{
-		ircd_free(new_helper);
+		ircd_free(helper);
 		return NULL;
 	}
 	
@@ -100,7 +89,7 @@ start_fork_helper(const char *name, const char *fullpath, void *read_cb, void *r
 		ircd_close(ifd[1]);
 		ircd_close(ofd[0]);
 		ircd_close(ofd[1]);
-		ircd_free(new_helper);
+		ircd_free(helper);
 		return NULL;
 	}
 
@@ -109,7 +98,8 @@ start_fork_helper(const char *name, const char *fullpath, void *read_cb, void *r
 	
 	helper->ifd = ifd[0];
 	helper->ofd = ofd[1];
-	
+	helper->read_cb = read_cb;
+	helper->restart_cb = restart_cb;	
 	helper->fork_count = 0;
 	helper->pid = pid;
 	
@@ -118,15 +108,16 @@ start_fork_helper(const char *name, const char *fullpath, void *read_cb, void *r
 
 
 void
-helper_restart(struct ircd_helper *helper)
+ircd_helper_restart(ircd_helper *helper)
 {
-	(helper->restart_cb)(helper);
+	helper->restart_cb(helper);
 }
 
-void
-helper_write_sendq(int fd, void *helper_ptr)
+
+static void
+ircd_helper_write_sendq(int fd, void *helper_ptr)
 {
-	struct ircd_helper *helper = helper_ptr;
+	ircd_helper *helper = helper_ptr;
 	int retlen;
 	
 	if(ircd_linebuf_len(&helper->sendq) > 0)
@@ -134,56 +125,48 @@ helper_write_sendq(int fd, void *helper_ptr)
 		while((retlen = ircd_linebuf_flush(fd, &helper->sendq)) > 0)
 			;;
 		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
-			helper_restart(helper);
+			ircd_helper_restart(helper);
 		
 	}
 	if(helper->ofd < 0)
 		return;
 
 	if(ircd_linebuf_len(&helper->sendq) > 0)
-		ircd_setselect(bandb_ofd, IRCD_SELECT_WRITE, help_write_sendq, &helper->sendq);
+		ircd_setselect(helper->ofd, IRCD_SELECT_WRITE, ircd_helper_write_sendq, &helper->sendq);
 }
 
 void
-helper_vwrite(struct ircd_helper *helper, const char *format, va_list ap)
-{
-	ircd_linebuf_putmsg(helper->sendq, format, ap, NULL);
-	helper_write_sendq(helper->ofd, helper);	
-}
-
-void
-helper_write(struct ircd_helper *helper, const char *format, ...)
+ircd_helper_write(ircd_helper *helper, const char *format, ...)
 {
 	va_list ap;
 	if(helper->ifd < 0 || helper->ofd < 0) 
 		return; /* XXX error */
 	
 	va_start(ap, format);
-	helper_vwrite(helper, format, ap);
+	ircd_linebuf_putmsg(&helper->sendq, format, &ap, NULL);
+	ircd_helper_write_sendq(helper->ofd, helper);	
 	va_end(ap);
-	
 }
 
 void
-helper_read(int fd, void *helper_ptr)
+ircd_helper_read(int fd, void *helper_ptr)
 {
-	struct ircd_helper *helper = helper_ptr;
+	ircd_helper *helper = helper_ptr;
 	char buf[READBUF_SIZE];
 	int length;
 	
 	while((length = ircd_read(helper->ifd, buf, sizeof(buf))) > 0)
 	{
 		ircd_linebuf_parse(&helper->recvq, buf, length, 0);
-		(helper->read_callback)(helper);
-		
+		helper->read_cb(helper);
 	}
 
 	if(length == 0 || (length < 0 && !ignoreErrno(errno)))
-		helper_restart(helper);
+		ircd_helper_restart(helper);
 	
-	if(helper_ifd < 0)
+	if(helper->ifd < 0)
 		return;
 	
-	ircd_setselect(helper->ifd, IRCD_SELECT_READ, helper_read, helper);
+	ircd_setselect(helper->ifd, IRCD_SELECT_READ, ircd_helper_read, helper);
 	
 }
