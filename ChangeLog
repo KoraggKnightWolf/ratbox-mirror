@@ -1,3 +1,14 @@
+androsyn    2006/05/17 16:03:52 UTC	(20060517_6-22551)
+  Log:
+  rework resolver daemon to use the ircd_helper_child interface
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/helper.c (File Modified) 
+	ircd-ratbox/trunk/libircd/helper.h (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+
+
 androsyn    2006/05/17 15:20:49 UTC	(20060517_5-22549)
   Log:
   set Id properties
