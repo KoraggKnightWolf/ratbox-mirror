@@ -1,3 +1,13 @@
+androsyn    2006/05/17 15:17:29 UTC	(20060517_3-22545)
+  Log:
+  - tweak the helper code a bit more
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/helper.c (File Modified) 
+	ircd-ratbox/trunk/libircd/helper.h (File Modified) 
+
+
 jilles      2006/05/17 14:40:59 UTC	(20060517_2-22541)
   Log:
   Unbreak IPv6 compile.
