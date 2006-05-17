@@ -231,3 +231,4 @@ ircd_helper_readline(ircd_helper *helper, void *buf, size_t bufsize)
 {
 	return ircd_linebuf_get(&helper->recvq, buf, bufsize, LINEBUF_COMPLETE, LINEBUF_PARSED);
 }
+
