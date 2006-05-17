@@ -1,3 +1,17 @@
+androsyn    2006/05/17 16:23:56 UTC	(20060517_7-22553)
+  Log:
+  - have the ident daemon use the helper interface
+  - add a ircd_helper_readline() function to grab lines off the recvq
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/helper.c (File Modified) 
+	ircd-ratbox/trunk/libircd/helper.h (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+
+
 androsyn    2006/05/17 16:03:52 UTC	(20060517_6-22551)
   Log:
   rework resolver daemon to use the ircd_helper_child interface
