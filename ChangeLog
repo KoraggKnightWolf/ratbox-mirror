@@ -1,3 +1,11 @@
+androsyn    2006/05/17 16:47:20 UTC	(20060517_9-22557)
+  Log:
+  - make the bandb daemon use the helper code too
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+
+
 androsyn    2006/05/17 16:31:54 UTC	(20060517_8-22555)
   Log:
   adding clients to the global client list twice is bad ;)
