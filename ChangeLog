@@ -1,3 +1,14 @@
+jilles      2006/05/17 17:03:38 UTC	(20060517_10-22559)
+  Log:
+  Don't allow TB to set an empty topic.
+  This would be possible if a server sent bad protocol
+  and could cause a crash.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_tb.c (File Modified) 
+
+
 androsyn    2006/05/17 16:47:20 UTC	(20060517_9-22557)
   Log:
   - make the bandb daemon use the helper code too
