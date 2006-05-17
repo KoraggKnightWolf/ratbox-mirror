@@ -1,3 +1,11 @@
+androsyn    2006/05/17 18:26:58 UTC	(20060517_14-22569)
+  Log:
+  make gcc shut up about missing newline at the end of the file
+
+  Modified:
+	ircd-ratbox/trunk/libircd/helper.c (File Modified) 
+
+
 androsyn    2006/05/17 18:21:19 UTC	(20060517_13-22567)
   Log:
   you know you are having a slow day when you update FSF's address on everything...
