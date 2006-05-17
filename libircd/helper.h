@@ -57,5 +57,7 @@ void ircd_helper_restart(ircd_helper *helper);
 void ircd_helper_write(ircd_helper *helper, const char *format, ...);
 void ircd_helper_read(int, void *);
 void ircd_helper_close(ircd_helper *helper);
+int ircd_helper_readline(ircd_helper *helper, void *buf, size_t bufsize);
+
 #endif
 

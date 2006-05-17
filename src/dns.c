@@ -226,8 +226,7 @@ parse_dns_reply(ircd_helper *helper)
 	static char dnsBuf[READBUF_SIZE];
 	
 	char *parv[MAXPARA+1];
-	while((len = ircd_linebuf_get(&helper->recvq, dnsBuf, sizeof(dnsBuf), 
-				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
+	while((len = ircd_helper_readline(helper, dnsBuf, sizeof(dnsBuf))) > 0)
 	{
 		parc = string_to_array(dnsBuf, parv); /* we shouldn't be using this here, but oh well */
 

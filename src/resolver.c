@@ -166,8 +166,7 @@ parse_request(ircd_helper *helper)
 	int len;  
 	static char *parv[MAXPARA + 1];
 	int parc;  
-	while((len = ircd_linebuf_get(&helper->recvq, readBuf, sizeof(readBuf),
-				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
+	while((len = ircd_helper_readline(helper, readBuf, sizeof(readBuf))) > 0)
 	{
 		parc = ircd_string_to_array(readBuf, parv, MAXPARA);
 		if(parc != 4)

@@ -17,11 +17,6 @@
 #include "ircd_lib.h"
 #define USERLEN 10
 
-/* data fd from ircd */
-int irc_ifd;
-/* control fd from ircd */
-int irc_ofd; 
-
 int ident_timeout;
 
 #define MAXPARA 10
@@ -53,8 +48,8 @@ static BlockHeap *authheap;
 static char buf[512]; /* scratch buffer */
 static char readBuf[READBUF_SIZE];
 
-static buf_head_t recvq;
-static buf_head_t sendq;
+static ircd_helper *ident_helper;
+
 
 static int
 send_sprintf(int fd, const char *format, ...)
@@ -84,33 +79,10 @@ ID success/failure username
 */
 
 static void
-write_sendq(int fd, void *unused)
-{
-	int retlen;
-	if(ircd_linebuf_len(&sendq) > 0)
-	{
-		while((retlen = ircd_linebuf_flush(irc_ofd, &sendq)) > 0);
-		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
-		{
-			exit(1);
-		}
-	}
-	 
-	if(ircd_linebuf_len(&sendq) > 0)
-	{
-		ircd_setselect(irc_ofd, IRCD_SELECT_WRITE,
-			       write_sendq, NULL);
-	}
-}
- 
-
-
-static void
 read_auth_timeout(int fd, void *data)
 {
 	struct auth_request *auth = data;
-	ircd_linebuf_put(&sendq, "%s 0", auth->reqid);
-	write_sendq(irc_ofd, NULL);
+	ircd_helper_write(ident_helper, "%s 0", auth->reqid);
 	BlockHeapFree(authheap, auth);
 	ircd_close(fd);
 }
@@ -204,10 +176,9 @@ read_auth(int fd, void *data)
 				}
 			}
 			*t = '\0';
-			ircd_linebuf_put(&sendq, "%s %s", auth->reqid, username);
+			ircd_helper_write(ident_helper, "%s %s", auth->reqid, username);
 		} else
-			ircd_linebuf_put(&sendq, "%s 0", auth->reqid);
-		write_sendq(irc_ofd, NULL);
+			ircd_helper_write(ident_helper, "%s 0", auth->reqid);
 		ircd_close(fd);
 		BlockHeapFree(authheap, auth);
 	}
@@ -225,16 +196,14 @@ connect_callback(int fd, int status, void *data)
 		 */
 		if(send_sprintf(fd, "%u , %u\r\n", auth->srcport, auth->dstport) <= 0)
 		{
-			ircd_linebuf_put(&sendq, "%s 0", auth->reqid);
-			write_sendq(irc_ofd, NULL);
+			ircd_helper_write(ident_helper, "%s 0", auth->reqid);
 			ircd_close(fd);
 			BlockHeapFree(authheap, auth);
 			return;
 		}
 		read_auth(fd, auth);
 	} else {
-		ircd_linebuf_put(&sendq, "%s 0", auth->reqid);
-		write_sendq(irc_ofd, NULL);
+		ircd_helper_write(ident_helper, "%s 0", auth->reqid);
 		ircd_close(fd);
 		BlockHeapFree(authheap, auth);
 	}
@@ -261,8 +230,7 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 
 	if(auth->authfd < 0)
 	{
-		ircd_linebuf_put(&sendq, "%s 0", id);
-		write_sendq(irc_ofd, NULL);
+		ircd_helper_write(ident_helper, "%s 0", id);
 		BlockHeapFree(authheap, auth);
 		return;	
 	}
@@ -276,13 +244,12 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 }
 
 static void
-parse_request(void)
+parse_request(ircd_helper *helper)
 {
 	int len;
 	static char *parv[MAXPARA + 1];
 	int parc;
-	while((len = ircd_linebuf_get(&recvq, readBuf, sizeof(readBuf),
-				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
+	while((len = ircd_helper_readline(helper, readBuf, sizeof(readBuf))) > 0)
 	{
 		parc = ircd_string_to_array(readBuf, parv, MAXPARA);
 		switch(parc)
@@ -303,24 +270,6 @@ parse_request(void)
 }
 
 
-static void
-read_request(int fd, void *unusued)
-{
-        int length;
-        while((length = ircd_read(fd, readBuf, sizeof(readBuf))) > 0)
-        {
-                ircd_linebuf_parse(&recvq, readBuf, length, 0);
-                parse_request();
-        }
-         
-        if(length == 0)
-                exit(1);
-
-        if(length == -1 && !ignoreErrno(errno))
-                exit(1);
-
-	ircd_setselect(irc_ifd, IRCD_SELECT_READ, read_request, NULL);
-}
 
 static void
 ilogcb(const char *str)
@@ -340,48 +289,30 @@ diecb(const char *str)
         exit(0);  
 }
 
+static void
+error_cb(ircd_helper *helper)
+{
+	exit(0);
+}
 
 int main(int argc, char **argv)
 {
-	char *tifd, *tofd, *tmaxfd, *tident_timeout;
-	int maxfd, x;
+	char *tident_timeout;
 
-	tifd = getenv("IFD");
-	tofd = getenv("OFD");
-	tmaxfd = getenv("MAXFD");
+	ident_helper = ircd_helper_child(parse_request, error_cb, ilogcb, restartcb, diecb, 1024, 1024, 1024);	
 	tident_timeout = getenv("IDENT_TIMEOUT");
-	if(tifd == NULL || tofd == NULL || tmaxfd == NULL || tident_timeout == NULL)
+	if(ident_helper == NULL || tident_timeout == NULL)
 	{
 		fprintf(stderr, "This is ircd-ratbox ident.  You aren't supposed to run be directly.\n");
 		fprintf(stderr, "However I will print my Id tag $Id$\n"); 
 		fprintf(stderr, "Have a nice day\n");
 		exit(1);
 	}
-	maxfd = atoi(tmaxfd);
-	irc_ifd = atoi(tifd);
-	irc_ofd = atoi(tofd);
 	ident_timeout = atoi(tident_timeout);
 	
-#ifndef _WIN32
-	for(x = 0; x < maxfd; x++)
-	{
-		if(x != irc_ifd && x != irc_ofd)
-			close(x);
-	}
-#endif
-	ircd_lib(ilogcb, restartcb, diecb, 0, 1024, 1024, 1024); /* XXX fix me */
-	ircd_linebuf_newbuf(&sendq);
-	ircd_linebuf_newbuf(&recvq);
 	authheap = BlockHeapCreate(sizeof(struct auth_request), 2048);
 
-	ircd_open(irc_ifd, FD_PIPE, "ircd ifd");
-	ircd_open(irc_ofd, FD_PIPE, "ircd ofd");
-
-	ircd_set_nb(irc_ifd);
-	ircd_set_nb(irc_ofd);
-	read_request(irc_ifd, NULL);
-	
-
+	ircd_helper_read(ident_helper->ifd, ident_helper);
 	while(1) {
 		ircd_select(1000);
 		ircd_checktimeouts(NULL);
