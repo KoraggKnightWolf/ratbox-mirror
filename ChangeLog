@@ -1,3 +1,11 @@
+androsyn    2006/05/17 18:15:25 UTC	(20060517_12-22565)
+  Log:
+  update GPL with a version with FSF's current address
+
+  Modified:
+	ircd-ratbox/trunk/LICENSE (File Modified) 
+
+
 androsyn    2006/05/17 18:08:24 UTC	(20060517_11-22563)
   Log:
   remove SQLITE_BUILD ifdef, not needed
