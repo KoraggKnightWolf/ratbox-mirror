@@ -33,12 +33,7 @@
 #include "stdinc.h"
 #include "rsdb.h"
 
-/* build sqlite, so use local version */
-#ifdef SQLITE_BUILD
-#include "../sqlite3/sqlite3.h"
-#else
 #include <sqlite3.h>
-#endif
 
 struct sqlite3 *ircd_bandb;
 
