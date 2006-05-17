@@ -15,10 +15,6 @@
 #include "ircd_lib.h"
 #include "internal.h"
 
-/* data fd from ircd */
-int ifd = -1;
-/* data to ircd */
-int ofd = -1; 
 
 #define MAXPARA 10
 #define REQIDLEN 10
@@ -34,6 +30,8 @@ int ofd = -1;
 
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 
+static ircd_helper *res_helper;
+
 static void dns_readable(int fd, void *ptr);
 static void dns_writeable(int fd, void *ptr);
 static void process_adns_incoming(void);
@@ -42,8 +40,6 @@ static char readBuf[READBUF_SIZE];
 static void resolve_ip(char **parv);
 static void resolve_host(char **parv);
 
-buf_head_t sendq;
-buf_head_t recvq;
 
 struct dns_request
 {
@@ -62,11 +58,7 @@ struct dns_request
 #endif
 };
 
-fd_set readfds;
-fd_set writefds;
-fd_set exceptfds;
-
-adns_state dns_state;
+static adns_state dns_state;
 
 /* void dns_select(void)
  * Input: None.
@@ -141,19 +133,9 @@ setup_signals(void)
 }
 
 static void
-write_sendq(int fd, void *unused)
+error_cb(ircd_helper *helper)
 {
-	int retlen;
-	if(ircd_linebuf_len(&sendq) > 0)
-	{
-		while((retlen = ircd_linebuf_flush(fd, &sendq)) > 0);
-		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
-		{
-			exit(1);
-		}
-	}
-	if(ircd_linebuf_len(&sendq) > 0)
-		ircd_setselect(fd, IRCD_SELECT_WRITE, write_sendq, NULL);
+	exit(1);
 }
 
 /*
@@ -179,12 +161,12 @@ REV requestid PASS/FAIL IP or reason
 
 
 static void
-parse_request(void)
+parse_request(ircd_helper *helper)
 {
 	int len;  
 	static char *parv[MAXPARA + 1];
 	int parc;  
-	while((len = ircd_linebuf_get(&recvq, readBuf, sizeof(readBuf),
+	while((len = ircd_linebuf_get(&helper->recvq, readBuf, sizeof(readBuf),
 				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 	{
 		parc = ircd_string_to_array(readBuf, parv, MAXPARA);
@@ -204,25 +186,6 @@ parse_request(void)
 	}
 	
 
-}
-
-static void                       
-read_request(int fd, void *unusued)
-{
-	int length;
-
-	while((length = ircd_read(fd, readBuf, sizeof(readBuf))) > 0)
-	{
-		ircd_linebuf_parse(&recvq, readBuf, length, 0);
-		parse_request();
-	}
-	 
-	if(length == 0)
-		exit(1);
-
-	if(length == -1 && !ignoreErrno(errno))
-		exit(1);
-	ircd_setselect(fd, IRCD_SELECT_READ, read_request, NULL);
 }
 
 
@@ -306,8 +269,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 			ircd_free(reply);
 			if(result != 0)
 			{
-				ircd_linebuf_put(&sendq, "%s 0 FAILED", req->reqid);
-				write_sendq(ofd, NULL);
+				ircd_helper_write(res_helper, "%s 0 FAILED", req->reqid);
 				ircd_free(reply);
 				ircd_free(req);
 
@@ -318,8 +280,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 		strcpy(response, "FAILED");
 		result = 0;
 	}
-	ircd_linebuf_put(&sendq, "%s %d %d %s\n", req->reqid, result, aftype, response);
-	write_sendq(ofd, NULL);
+	ircd_helper_write(res_helper, "%s %d %d %s\n", req->reqid, result, aftype, response);
 	ircd_free(reply);
 	ircd_free(req);
 }
@@ -361,7 +322,7 @@ static void process_adns_incoming(void)
 static void
 read_io(void)
 {
-	read_request(ifd, NULL);
+	ircd_helper_read(res_helper->ifd, res_helper);
 	while(1)
 	{
 		dns_select();
@@ -472,41 +433,16 @@ resolve_ip(char **parv)
 
 int main(int argc, char **argv)
 {
-	int x, maxfd;
-	char *tifd;
-	char *tofd;
-	char *tmaxfd;
-	
-	tifd = getenv("IFD");
-	tofd = getenv("OFD");
-	tmaxfd = getenv("MAXFD");
-	if(tifd == NULL || tofd == NULL || tmaxfd == NULL)
+	res_helper = ircd_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256); /* XXX fix me */
+
+	if(res_helper == NULL)
 	{
 		fprintf(stderr, "This is ircd-ratbox resolver.  You know you aren't supposed to run me directly?\n");
 		fprintf(stderr, "You get an Id tag for this: $Id$\n");
 		fprintf(stderr, "Have a nice life\n");
 		exit(1);
 	}
-	ifd = (int)strtol(tifd, NULL, 10);
-	ofd = (int)strtol(tofd, NULL, 10);
-	maxfd = (int)strtol(tmaxfd, NULL, 10);
 
-#ifndef _WIN32
-	for(x = 0; x < maxfd; x++)
-	{
-		if(x != ifd && x != ofd)
-			close(x);
-	}
-#endif
-	ircd_lib(NULL, NULL, NULL, 0, 256, 1024, 256); /* XXX fix me */
-
-	ircd_linebuf_newbuf(&sendq);
-	ircd_linebuf_newbuf(&recvq);
-
-	ircd_open(ifd, FD_PIPE, "incoming pipe");
-	ircd_open(ofd, FD_PIPE, "outgoing pipe");
-	ircd_set_nb(ifd);
-	ircd_set_nb(ofd);
 	adns_init(&dns_state, adns_if_noautosys, 0);
 	setup_signals();
 	read_io();	

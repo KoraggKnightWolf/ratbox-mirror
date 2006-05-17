@@ -24,6 +24,49 @@
 
 #include "ircd_lib.h"
 
+/* setup all the stuff a new child needs */
+ircd_helper *
+ircd_helper_child(ircd_helper_cb *read_cb, ircd_helper_cb *error_cb, log_cb *ilog, restart_cb *irestart, die_cb *idie, 
+		  int maxcon, size_t lb_heap_size, size_t dh_size)
+{
+	ircd_helper *helper;
+	int x, maxfd;
+	char *tifd, *tofd, *tmaxfd;
+	
+	tifd = getenv("IFD");
+	tofd = getenv("OFD");
+	tmaxfd = getenv("MAXFD");
+	
+	if(tifd == NULL || tofd == NULL || tmaxfd == NULL)
+		return NULL;
+
+	helper = ircd_malloc(sizeof(ircd_helper));
+	helper->ifd = (int)strtol(tifd, NULL, 10);     
+	helper->ofd = (int)strtol(tofd, NULL, 10);
+	maxfd = (int)strtol(tmaxfd, NULL, 10);
+
+#ifndef _WIN32
+        for(x = 0; x < maxfd; x++)
+        {
+        	if(x != helper->ifd && x != helper->ofd)
+        		close(x);
+	}
+#endif
+
+	ircd_lib(ilog, irestart, idie, 0, maxfd, lb_heap_size, dh_size);
+	ircd_linebuf_newbuf(&helper->sendq);
+	ircd_linebuf_newbuf(&helper->recvq);
+
+	ircd_open(helper->ifd, FD_PIPE, "incoming connection");
+	ircd_open(helper->ofd, FD_PIPE, "outgoing connection");
+	ircd_set_nb(helper->ifd);
+	ircd_set_nb(helper->ofd);
+	
+	helper->read_cb = read_cb;
+	helper->error_cb = error_cb;
+	return helper;
+}
+
 /*
  * start_fork_helper
  * starts a new ircd helper
@@ -31,7 +74,7 @@
  */
 
 ircd_helper *
-ircd_helper_start(const char *name, const char *fullpath, ircd_helper_cb *read_cb, ircd_helper_cb *restart_cb)
+ircd_helper_start(const char *name, const char *fullpath, ircd_helper_cb *read_cb, ircd_helper_cb *error_cb)
 {
 	ircd_helper *helper;
 	const char *parv[2];
@@ -95,10 +138,13 @@ ircd_helper_start(const char *name, const char *fullpath, ircd_helper_cb *read_c
 	ircd_close(ifd[1]);
 	ircd_close(ofd[0]);
 	
+	ircd_linebuf_newbuf(&helper->sendq);
+	ircd_linebuf_newbuf(&helper->recvq);
+		
 	helper->ifd = ifd[0];
 	helper->ofd = ofd[1];
 	helper->read_cb = read_cb;
-	helper->restart_cb = restart_cb;	
+	helper->error_cb = error_cb;	
 	helper->fork_count = 0;
 	helper->pid = pid;
 
@@ -109,7 +155,7 @@ ircd_helper_start(const char *name, const char *fullpath, ircd_helper_cb *read_c
 void
 ircd_helper_restart(ircd_helper *helper)
 {
-	helper->restart_cb(helper);
+	helper->error_cb(helper);
 }
 
 

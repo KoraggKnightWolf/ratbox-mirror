@@ -43,11 +43,16 @@ typedef struct _ircd_helper
 	pid_t pid;
 	int fork_count;
 	ircd_helper_cb *read_cb;
-	ircd_helper_cb *restart_cb;
+	ircd_helper_cb *error_cb;
 } ircd_helper;
 
 
-ircd_helper *ircd_helper_start(const char *name, const char *fullpath, ircd_helper_cb *read_cb, ircd_helper_cb *restart_cb);
+ircd_helper *ircd_helper_start(const char *name, const char *fullpath, ircd_helper_cb *read_cb, ircd_helper_cb *error_cb);
+
+ircd_helper *ircd_helper_child(ircd_helper_cb *read_cb, ircd_helper_cb *error_cb,
+			       log_cb *ilog, restart_cb *irestart, die_cb *idie,
+                               int maxcon, size_t lb_heap_size, size_t dh_size);
+
 void ircd_helper_restart(ircd_helper *helper);
 void ircd_helper_write(ircd_helper *helper, const char *format, ...);
 void ircd_helper_read(int, void *);
