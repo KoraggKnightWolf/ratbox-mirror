@@ -939,7 +939,6 @@ register_client(struct Client *client_p, struct Client *server,
 
 	source_p = make_client(client_p);
 	user = make_user(source_p);
-	ircd_dlinkAddTail(source_p, &source_p->node, &global_client_list);
 
 	source_p->hopcount = atoi(parv[2]);
 	source_p->tsinfo = newts;
