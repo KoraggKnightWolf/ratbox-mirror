@@ -338,7 +338,7 @@ bandb_check_kline(struct ConfItem *aconf)
 	{
 #ifdef IPV6
 		if(aftype == HM_IPV6)
-			aftype = AF_INET
+			aftype = AF_INET6;
 		else
 #endif
 			aftype = AF_INET;
