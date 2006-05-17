@@ -46,8 +46,6 @@ static void
 sigchld_handler(int sig)
 {
 	int status;
-	resolver_sigchld(); /* let the resolver check its children first */
-	ident_sigchld(); /* let the ident daemon check its children too */
 	waitpid(-1, &status, WNOHANG);
 	errno = 0; /* test this so that it doesn't goof up anything else */
 }

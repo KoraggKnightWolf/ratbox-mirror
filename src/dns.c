@@ -1,4 +1,4 @@
- /*
+/*
  *  dns.c: An interface to the resolver daemon
  *  Copyright (C) 2005 Aaron Sethman <androsyn@ratbox.org>
  *  Copyright (C) 2005 ircd-ratbox development team
@@ -41,15 +41,11 @@
 #define DNS_REVERSE 	((char)'I')
 
 static void submit_dns(const char, int id, int aftype, const char *addr);
-static void fork_resolver(void);
-static void read_dns(int fd, void *unused);
+static int start_resolver(void);
+static void parse_dns_reply(ircd_helper *helper);
+static void restart_resolver_cb(ircd_helper *helper);
 
-static char dnsBuf[READBUF_SIZE];
-static buf_head_t dns_sendq;
-static buf_head_t dns_recvq;
-
-static pid_t res_pid;
-static int need_restart = 0;
+static ircd_helper *dns_helper;
 
 struct dnsreq
 {
@@ -59,8 +55,6 @@ struct dnsreq
 
 static struct dnsreq querytable[IDTABLE];
 static uint16_t id = 1;
-static int dns_ifd = -1;
-static int dns_ofd = -1;
 
 static inline uint16_t 
 assign_dns_id(void)
@@ -75,8 +69,8 @@ assign_dns_id(void)
 static inline void
 check_resolver(void)
 {
-	if(dns_ifd < 0 || dns_ofd < 0 || need_restart == 1)
-		fork_resolver();
+	if(dns_helper == NULL || dns_helper->ifd < 0 || dns_helper->ofd < 0)
+		restart_resolver();
 }
 
 static void
@@ -185,132 +179,54 @@ results_callback(const char *callid, const char *status, const char *aftype, con
 }
 
 
-static int fork_count = 0;
-#if 0
-static int spin_restart = 0;
-static void
-restart_spinning_resolver(void *unused)
-{
-	if(spin_restart > 10)
-	{
-		ilog(L_MAIN, "Tried to wait and restart the resolver %d times, giving up", spin_restart);
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Tried to wait and restart the resolver %d times, giving up", spin_restart);
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Try a manual restart with /rehash dns");
-		spin_restart = 0;
-		fork_count = 0;
-		return;
-	}
-	fork_count = 0; /* reset the fork_count to 0 to let it try again */
-	spin_restart++;
-	fork_resolver();
-}
-#endif
+static char *resolver_path;
 
-static void
-fork_resolver(void)
+static int
+start_resolver(void)
 {
-	const char *parv[2];
 	char fullpath [PATH_MAX + 1];
 #ifdef _WIN32
 	const char *suffix = ".exe";
 #else
 	const char *suffix = "";
 #endif
-	pid_t pid;
-	int ifd[2];
-	int ofd[2];
+	if(resolver_path == NULL)
+	{	
+		ircd_snprintf(fullpath, sizeof(fullpath), "%s/resolver%s", BINPATH, suffix);
 	
-	char fx[6];   
-	char fy[6];
-
-#if 0
-	if(fork_count > 10)
-	{
-		ilog(L_MAIN, "Resolver has forked %d times, waiting 30 seconds to restart it again", fork_count);
-		ilog(L_MAIN, "DNS resolution will be unavailable during this time");
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Resolver has forked %d times waiting 30 seconds to restart it again", fork_count);
-		sendto_realops_flags(UMODE_ALL, L_ALL, "DNS resolution will be unavailable during this time");
-		ircd_event_addonce("restart_spinning_resolver", restart_spinning_resolver, NULL, 30);		
-		return;
-	}
-#endif
-	ircd_snprintf(fullpath, sizeof(fullpath), "%s/resolver%s", BINPATH, suffix);
-	
-	if(access(fullpath, X_OK) == -1)
-	{
-		ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/resolver%s", ConfigFileEntry.dpath, suffix);
 		if(access(fullpath, X_OK) == -1)
 		{
-			ilog(L_MAIN, "Unable to execute resolver in %s or %s/bin", BINPATH, ConfigFileEntry.dpath);
-			fork_count++;
-			dns_ifd = -1;
-			dns_ofd = -1;
-			return;
-		}
+			ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/resolver%s", ConfigFileEntry.dpath, suffix);
+			if(access(fullpath, X_OK) == -1)
+			{
+				ilog(L_MAIN, "Unable to execute resolver in %s or %s/bin", BINPATH, ConfigFileEntry.dpath);
+				return 1;
+			}
 		
-	} 
- 
-	fork_count++;
-	if(dns_ifd > 0)
-		ircd_close(dns_ifd);
-	if(dns_ofd > 0)
-		ircd_close(dns_ofd);
-	if(res_pid > 0)
-		kill(res_pid, SIGKILL);
+		} 
 
-	ircd_pipe(ifd, "resolver daemon - read");
-	ircd_pipe(ofd, "resolver daemon - write");
-
-	ircd_snprintf(fx, sizeof(fx), "%d", ifd[1]); /*dns write*/
-	ircd_snprintf(fy, sizeof(fy), "%d", ofd[0]); /*dns read*/ 
-	ircd_set_nb(ifd[0]);
-	ircd_set_nb(ifd[1]);
-	ircd_set_nb(ifd[0]);
-	ircd_set_nb(ofd[1]);
-
-	setenv("IFD", fy, 1);
-	setenv("OFD", fx, 1);
-	setenv("MAXFD", "128", 1);
-	parv[0] = "-ircd dns resolver";
-	parv[1] = NULL;
-	
-#ifdef _WIN32      
-        SetHandleInformation((HANDLE)ifd[1], HANDLE_FLAG_INHERIT, 1);
-        SetHandleInformation((HANDLE)ofd[0], HANDLE_FLAG_INHERIT, 1);
-#endif
-                	
-	pid = ircd_spawn_process(fullpath, (const char **)parv);	
-
-	if(pid == -1)
-	{
-		ilog(L_MAIN, "ircd_spawn_process failed: %s", strerror(errno));
-		ircd_close(ifd[0]);
-		ircd_close(ifd[1]);
-		ircd_close(ofd[0]);
-		ircd_close(ofd[1]);
-		dns_ifd = -1;
-		dns_ofd = -1;
-		return;
+		resolver_path = ircd_strdup(fullpath);
 	}
 
-	ircd_close(ifd[1]);
-	ircd_close(ofd[0]);
+	dns_helper = ircd_helper_start("resolver", resolver_path, parse_dns_reply, restart_resolver_cb);
 
-	dns_ifd = ifd[0];
-	dns_ofd = ofd[1];
+	if(dns_helper == NULL)
+	{
+		ilog(L_MAIN, "ircd_spawn_process failed: %s", strerror(errno));
+		return 1;
+	}
 
-	fork_count = 0;
-	res_pid = pid;
-	read_dns(dns_ifd, NULL);
-	return;
+	return 0;
 }
 
 static void
-parse_dns_reply(void)
+parse_dns_reply(ircd_helper *helper)
 {
 	int len, parc;
+	static char dnsBuf[READBUF_SIZE];
+	
 	char *parv[MAXPARA+1];
-	while((len = ircd_linebuf_get(&dns_recvq, dnsBuf, sizeof(dnsBuf), 
+	while((len = ircd_linebuf_get(&helper->recvq, dnsBuf, sizeof(dnsBuf), 
 				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 	{
 		parc = string_to_array(dnsBuf, parv); /* we shouldn't be using this here, but oh well */
@@ -318,100 +234,49 @@ parse_dns_reply(void)
 		if(parc != 5)
 		{
 			ilog(L_MAIN, "Resolver sent a result with wrong number of arguments");
-			fork_resolver();
+			restart_resolver();
 			return;
 		}
 		results_callback(parv[1], parv[2], parv[3], parv[4]);
 	}
 }
 
-static void
-read_dns(int fd, void *data)
-{
-	int length;
-
-	while((length = ircd_read(dns_ifd, dnsBuf, sizeof(dnsBuf))) > 0)
-	{
-		ircd_linebuf_parse(&dns_recvq, dnsBuf, length, 0);
-		parse_dns_reply();
-	}
-   
-	if(length == 0)
-		fork_resolver();
- 
-	if(length == -1 && !ignoreErrno(errno))
-		fork_resolver(); 
-
-	if(dns_ifd == -1)
-		return;
-	
-	ircd_setselect(dns_ifd, IRCD_SELECT_READ, read_dns, NULL);
-}
-
-static void
-dns_write_sendq(int fd, void *unused)
-{
-	int retlen;
-	if(ircd_linebuf_len(&dns_sendq) > 0)
-	{
-		while((retlen = ircd_linebuf_flush(dns_ofd, &dns_sendq)) > 0);
-		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
-		{
-			fork_resolver();
-		}
-	}
-	if(dns_ofd == -1)
-		return;
-	 
-	if(ircd_linebuf_len(&dns_sendq) > 0)
-	{
-		ircd_setselect(dns_ofd, IRCD_SELECT_WRITE,
-			       dns_write_sendq, NULL);
-	}
-}
- 
-
 static void 
 submit_dns(char type, int nid, int aftype, const char *addr)
 {
-	if(dns_ofd < 0 || dns_ifd < 0)
+	if(dns_helper == NULL)
 	{
 		failed_resolver(nid);
 		return;
 	}	                        
-	ircd_linebuf_put(&dns_sendq, "%c %x %d %s", type, nid, aftype, addr);
-	dns_write_sendq(dns_ofd, NULL);
+	ircd_helper_write(dns_helper, "%c %x %d %s", type, nid, aftype, addr);
 }
 
 void
 init_resolver(void)
 {
-	ircd_linebuf_newbuf(&dns_sendq);
-	ircd_linebuf_newbuf(&dns_recvq);
-	fork_resolver();
-
-	if(res_pid < 0)
+	if(start_resolver())
 	{
 		ilog(L_MAIN, "Unable to fork resolver: %s", strerror(errno));		
 		exit(0);
 	}
+	ircd_helper_read(dns_helper->ifd, dns_helper);
 }
 
-void 
-restart_resolver(void)
+
+static void 
+restart_resolver_cb(ircd_helper *helper)
 {
-	fork_resolver();
+	if(helper != NULL) 
+	{
+		ircd_helper_close(helper);	
+		dns_helper = NULL;
+	}
+	start_resolver();
 }
 
 void
-resolver_sigchld(void)
+restart_resolver(void)
 {
-#ifndef _WIN32
-	int status;
-	if(waitpid(res_pid, &status, WNOHANG) == res_pid)
-	{
-		need_restart = 1;
-	}
-#endif
+	restart_resolver_cb(dns_helper);
 }
-
