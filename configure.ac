@@ -85,6 +85,9 @@ case "$host_os" in
      LIBS="$LIBS -lws2_32 -liphlpapi"
      is_mingw="yes"
      ;;
+*solaris*)
+     CPPFLAGS="$CFLAGS -D_POSIX_PTHREAD_SEMANTICS"
+     ;;
 *)
      ;;
 esac

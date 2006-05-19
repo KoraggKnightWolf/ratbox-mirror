@@ -96,7 +96,7 @@ init_netio(void)
  * and deregister interest in a pending IO state for a given FD.
  */
 void
-ircd_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
+ircd_setselect(int fd, unsigned int type, PF * handler,
 	       void *client_data)
 {
 	fde_t *F = find_fd(fd);
@@ -104,8 +104,6 @@ ircd_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
 	lircd_assert(F->flags.open);
 
 	/* Update the list, even though we're not using it .. */
-	F->list = list;
-
 	if(type & IRCD_SELECT_READ) {
 		pe_update_events(F, POLLRDNORM, handler);
 		F->read_handler = handler;
