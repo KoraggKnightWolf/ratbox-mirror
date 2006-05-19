@@ -1,3 +1,12 @@
+leeh        2006/05/19 20:57:43 UTC	(20060519_0-22577)
+  Log:
+  - handle SQLITE_BUSY properly, and retry the sql statement
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+
+
 androsyn    2006/05/17 18:26:58 UTC	(20060517_14-22569)
   Log:
   make gcc shut up about missing newline at the end of the file
