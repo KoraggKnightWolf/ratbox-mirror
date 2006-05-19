@@ -1,3 +1,13 @@
+androsyn    2006/05/19 21:03:13 UTC	(20060519_1-22579)
+  Log:
+  at least get it to compile on solaris 10
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/libircd/ports.c (File Modified) 
+
+
 leeh        2006/05/19 20:57:43 UTC	(20060519_0-22577)
   Log:
   - handle SQLITE_BUSY properly, and retry the sql statement
