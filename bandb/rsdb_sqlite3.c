@@ -90,6 +90,7 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 	va_list args;
 	char *errmsg;
 	unsigned int i;
+	int j;
 
 	va_start(args, format);
 	i = rs_vsnprintf(buf, sizeof(buf), format, args);
@@ -103,8 +104,25 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 
 	if((i = sqlite3_exec(ircd_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg)))
 	{
-//		mlog("fatal error: problem with db file: %s", errmsg);
-		exit(1);
+		switch(i)
+		{
+			case SQLITE_BUSY:
+				for(j = 0; j < 5; j++)
+				{
+					sleep(1);
+					if(!sqlite3_exec(ircd_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg)))
+						return;
+				}
+
+				/* failed, fall through to default */
+//				mlog("fatal error: problem with db file: %s", errmsg);
+				exit(1);
+				break;
+
+			default:
+//				mlog("fatal error: problem with db file: %s", errmsg);
+				exit(1);
+				break;
 	}
 }
 
@@ -116,23 +134,47 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 	char *errmsg;
 	char **data;
 	int pos;
-	unsigned int retlen;
+	unsigned int retval;
 	int i, j;
 
 	va_start(args, format);
-	retlen = rs_vsnprintf(buf, sizeof(buf), format, args);
+	retval = rs_vsnprintf(buf, sizeof(buf), format, args);
 	va_end(args);
 
-	if(retlen >= sizeof(buf))
+	if(retval >= sizeof(buf))
 	{
 //		mlog("fatal error: length problem with compiling sql");
 		exit(1);
 	}
 
-	if(sqlite3_get_table(ircd_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg))
+	if((retval = sqlite3_get_table(ircd_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg)))
 	{
-//		mlog("fatal error: problem with db file: %s", errmsg);
-		exit(1);
+		int success = 0;
+
+		switch(retval)
+		{
+			case SQLITE_BUSY:
+				for(i = 0; i < 5; i++)
+				{
+					sleep(1);
+					if(!sqlite3_get_table(ircd_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg))
+					{
+						success++;
+						break;
+					}
+				}
+
+				if(success)
+					break;
+
+//				mlog("fatal error: problem with db file: %s", errmsg);
+				exit(1);
+				break;
+
+			default:
+//				mlog("fatal error: problem with db file: %s", errmsg);
+				exit(1);
+				break;
 	}
 
 	/* we need to be able to free data afterward */
