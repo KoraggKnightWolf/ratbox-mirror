@@ -1,3 +1,12 @@
+jilles      2006/05/20 20:45:05 UTC	(20060520_1-22591)
+  Log:
+  Don't pace /list on a single channel.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_list.c (File Modified) 
+
+
 jilles      2006/05/20 20:32:19 UTC	(20060520_0-22589)
   Log:
   Unbreak compile.
