@@ -110,7 +110,7 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 				for(j = 0; j < 5; j++)
 				{
 					sleep(1);
-					if(!sqlite3_exec(ircd_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg)))
+					if(!sqlite3_exec(ircd_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg))
 						return;
 				}
 
@@ -123,6 +123,7 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 //				mlog("fatal error: problem with db file: %s", errmsg);
 				exit(1);
 				break;
+		}
 	}
 }
 
@@ -175,6 +176,7 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 //				mlog("fatal error: problem with db file: %s", errmsg);
 				exit(1);
 				break;
+		}
 	}
 
 	/* we need to be able to free data afterward */
