@@ -1,3 +1,14 @@
+jilles      2006/05/20 21:11:27 UTC	(20060520_2-22593)
+  Log:
+  Fix a long standing hybrid 7 bug: when getting a read error
+  on a server, report_error() is called with a %d instead of
+  a %s in the format string ("Lost connection" in +d).
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 jilles      2006/05/20 20:45:05 UTC	(20060520_1-22591)
   Log:
   Don't pace /list on a single channel.
