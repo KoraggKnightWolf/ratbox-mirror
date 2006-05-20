@@ -1,3 +1,12 @@
+jilles      2006/05/20 20:32:19 UTC	(20060520_0-22589)
+  Log:
+  Unbreak compile.
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+
+
 androsyn    2006/05/19 21:03:13 UTC	(20060519_1-22579)
   Log:
   at least get it to compile on solaris 10
