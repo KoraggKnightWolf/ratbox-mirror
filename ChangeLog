@@ -1,3 +1,11 @@
+androsyn    2006/05/22 19:57:02 UTC	(20060522_5-22619)
+  Log:
+  remove an unused variable from helper.c
+
+  Modified:
+	ircd-ratbox/trunk/libircd/helper.c (File Modified) 
+
+
 androsyn    2006/05/22 19:56:37 UTC	(20060522_4-22617)
   Log:
   add ircd_sleep()
