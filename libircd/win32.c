@@ -263,6 +263,11 @@ init_netio(void)
 		
 }
 
+void
+ircd_sleep(unsigned int seconds)
+{
+	Sleep(seconds);
+}
 
 int
 ircd_setup_fd(int fd)

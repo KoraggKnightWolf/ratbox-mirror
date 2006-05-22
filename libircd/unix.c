@@ -54,3 +54,21 @@ gettimeofday(struct timeval *tv, void *tz)
 }
 #endif
 
+void
+ircd_sleep(unsigned int seconds)
+{
+#ifdef HAVE_NANOSLEEP
+	struct timespec tv;
+	tv.tv_nsec = 0;
+	tv.tv_sec = seconds;
+	nanosleep(&tv, NULL);
+#else 
+	struct timeval tv;
+	tv.tv_sec = seconds;
+	tv.tv_usec = 0;
+	select(0, NULL, NULL, NULL, &tv);
+#endif
+}
+
+
+

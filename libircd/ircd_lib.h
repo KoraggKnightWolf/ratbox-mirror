@@ -297,6 +297,8 @@ char * crypt(const char *pw, const char *salt);
  #endif
 #endif
 
+void ircd_sleep(unsigned int seconds);
+
 unsigned char * ircd_base64_encode(const unsigned char *str, int length);
 unsigned char * ircd_base64_decode(const unsigned char *str, int length, int *ret);
 
