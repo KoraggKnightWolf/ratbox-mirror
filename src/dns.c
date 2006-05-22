@@ -20,7 +20,7 @@
  *
  *  $Id$
  */
-
+#define __EXTENSIONS__ 1
 
 
 #include "stdinc.h"

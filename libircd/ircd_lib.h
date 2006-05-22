@@ -291,6 +291,10 @@ int gettimeofday(struct timeval *, void *);
 
 #ifdef NEED_CRYPT
 char * crypt(const char *pw, const char *salt);
+#else
+ #ifdef HAVE_CRYPT_H
+  #include <crypt.h>
+ #endif
 #endif
 
 unsigned char * ircd_base64_encode(const unsigned char *str, int length);
