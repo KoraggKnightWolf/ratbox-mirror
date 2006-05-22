@@ -30,9 +30,9 @@ endif
 
 DLOPEN=$(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_LTLIBRARIES) ;do echo -dlpreopen $$x ;done)
 if !STATIC_MODULES
-ircd_LDADD = libircd/libircd.la libratbox.la $(LIBLTDLC)
+ircd_LDADD = libircd/libircd.la libratbox.la $(LIBLTDL)
 else
-ircd_LDADD = libircd/libircd.la libratbox.la $(LIBLTDLC) $(DLOPEN) 
+ircd_LDADD = libircd/libircd.la libratbox.la $(LIBLTDL) $(DLOPEN) 
 endif
 
 ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
@@ -87,7 +87,7 @@ libratbox_LTLIBRARIES = libratbox.la
 libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
 
 if MINGW
-libratbox_la_DEPENDENCIES = $(LIBLTDLC) libircd/libircd.la
+libratbox_la_DEPENDENCIES = $(LIBLTDL) libircd/libircd.la
 libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 else
 libratbox_la_DEPENDENCIES = libircd/libircd.la
