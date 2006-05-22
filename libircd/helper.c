@@ -30,7 +30,7 @@ ircd_helper_child(ircd_helper_cb *read_cb, ircd_helper_cb *error_cb, log_cb *ilo
 		  int maxcon, size_t lb_heap_size, size_t dh_size)
 {
 	ircd_helper *helper;
-	int x, maxfd;
+	int maxfd;
 	char *tifd, *tofd, *tmaxfd;
 	
 	tifd = getenv("IFD");
