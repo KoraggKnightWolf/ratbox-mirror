@@ -1,3 +1,16 @@
+androsyn    2006/05/22 19:26:09 UTC	(20060522_3-22615)
+  Log:
+  make the stupid thing compile/link on solaris...
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/adns/transmit.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 androsyn    2006/05/22 05:19:42 UTC	(20060522_2-22613)
   Log:
   - special case where num < 10 not just num == 0
