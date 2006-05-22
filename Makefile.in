@@ -49,7 +49,8 @@ DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure \
 	$(top_srcdir)/contrib/Makefile.in \
 	$(top_srcdir)/doc/Makefile.in $(top_srcdir)/help/Makefile.in \
-	$(top_srcdir)/include/setup.h.in ChangeLog INSTALL compile \
+	$(top_srcdir)/include/setup.h.in \
+	$(top_srcdir)/sqlite3/Makefile.in ChangeLog INSTALL compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing \
 	mkinstalldirs src/ircd_lexer.c src/ircd_parser.c \
 	src/ircd_parser.h
@@ -63,7 +64,8 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/setup.h
-CONFIG_CLEAN_FILES = contrib/Makefile doc/Makefile help/Makefile
+CONFIG_CLEAN_FILES = contrib/Makefile doc/Makefile help/Makefile \
+	sqlite3/Makefile
 am__installdirs = "$(DESTDIR)$(coredir)" "$(DESTDIR)$(libratboxdir)" "$(DESTDIR)$(modulesdir)" "$(DESTDIR)$(servicesdir)" "$(DESTDIR)$(bindir)"
 coreLTLIBRARIES_INSTALL = $(INSTALL)
 libratboxLTLIBRARIES_INSTALL = $(INSTALL)
@@ -71,6 +73,7 @@ modulesLTLIBRARIES_INSTALL = $(INSTALL)
 servicesLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(core_LTLIBRARIES) $(libratbox_LTLIBRARIES) \
 	$(modules_LTLIBRARIES) $(services_LTLIBRARIES)
+am__DEPENDENCIES_1 =
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libratbox_la_OBJECTS = src/dns.lo src/bandbi.lo src/cache.lo \
 	src/channel.lo src/class.lo src/client.lo src/getopt.lo \
@@ -83,212 +86,212 @@ am_libratbox_la_OBJECTS = src/dns.lo src/bandbi.lo src/cache.lo \
 	src/send.lo src/whowas.lo src/version.lo src/ircd_parser.lo \
 	src/ircd_lexer.lo
 libratbox_la_OBJECTS = $(am_libratbox_la_OBJECTS)
-@MINGW_TRUE@@STATIC_MODULES_FALSE@am__DEPENDENCIES_1 =  \
+@MINGW_TRUE@@STATIC_MODULES_FALSE@am__DEPENDENCIES_2 =  \
 @MINGW_TRUE@@STATIC_MODULES_FALSE@	libircd/libircd.la \
 @MINGW_TRUE@@STATIC_MODULES_FALSE@	libratbox.la
-modules_core_m_die_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_die_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_die_la_OBJECTS = modules/core/m_die.lo
 modules_core_m_die_la_OBJECTS = $(am_modules_core_m_die_la_OBJECTS)
-modules_core_m_error_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_error_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_error_la_OBJECTS = modules/core/m_error.lo
 modules_core_m_error_la_OBJECTS =  \
 	$(am_modules_core_m_error_la_OBJECTS)
-modules_core_m_join_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_join_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_join_la_OBJECTS = modules/core/m_join.lo
 modules_core_m_join_la_OBJECTS = $(am_modules_core_m_join_la_OBJECTS)
-modules_core_m_kick_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_kick_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_kick_la_OBJECTS = modules/core/m_kick.lo
 modules_core_m_kick_la_OBJECTS = $(am_modules_core_m_kick_la_OBJECTS)
-modules_core_m_kill_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_kill_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_kill_la_OBJECTS = modules/core/m_kill.lo
 modules_core_m_kill_la_OBJECTS = $(am_modules_core_m_kill_la_OBJECTS)
-modules_core_m_message_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_message_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_message_la_OBJECTS = modules/core/m_message.lo
 modules_core_m_message_la_OBJECTS =  \
 	$(am_modules_core_m_message_la_OBJECTS)
-modules_core_m_mode_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_mode_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_mode_la_OBJECTS = modules/core/m_mode.lo
 modules_core_m_mode_la_OBJECTS = $(am_modules_core_m_mode_la_OBJECTS)
-modules_core_m_nick_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_nick_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_nick_la_OBJECTS = modules/core/m_nick.lo
 modules_core_m_nick_la_OBJECTS = $(am_modules_core_m_nick_la_OBJECTS)
-modules_core_m_part_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_part_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_part_la_OBJECTS = modules/core/m_part.lo
 modules_core_m_part_la_OBJECTS = $(am_modules_core_m_part_la_OBJECTS)
-modules_core_m_quit_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_quit_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_quit_la_OBJECTS = modules/core/m_quit.lo
 modules_core_m_quit_la_OBJECTS = $(am_modules_core_m_quit_la_OBJECTS)
-modules_core_m_server_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_server_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_server_la_OBJECTS = modules/core/m_server.lo
 modules_core_m_server_la_OBJECTS =  \
 	$(am_modules_core_m_server_la_OBJECTS)
-modules_core_m_squit_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_core_m_squit_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_squit_la_OBJECTS = modules/core/m_squit.lo
 modules_core_m_squit_la_OBJECTS =  \
 	$(am_modules_core_m_squit_la_OBJECTS)
-modules_m_accept_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_accept_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_accept_la_OBJECTS = modules/m_accept.lo
 modules_m_accept_la_OBJECTS = $(am_modules_m_accept_la_OBJECTS)
-modules_m_admin_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_admin_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_admin_la_OBJECTS = modules/m_admin.lo
 modules_m_admin_la_OBJECTS = $(am_modules_m_admin_la_OBJECTS)
-modules_m_away_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_away_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_away_la_OBJECTS = modules/m_away.lo
 modules_m_away_la_OBJECTS = $(am_modules_m_away_la_OBJECTS)
-modules_m_cap_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_cap_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_cap_la_OBJECTS = modules/m_cap.lo
 modules_m_cap_la_OBJECTS = $(am_modules_m_cap_la_OBJECTS)
-modules_m_capab_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_capab_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_capab_la_OBJECTS = modules/m_capab.lo
 modules_m_capab_la_OBJECTS = $(am_modules_m_capab_la_OBJECTS)
-modules_m_close_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_close_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_close_la_OBJECTS = modules/m_close.lo
 modules_m_close_la_OBJECTS = $(am_modules_m_close_la_OBJECTS)
-modules_m_cmessage_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_cmessage_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_cmessage_la_OBJECTS = modules/m_cmessage.lo
 modules_m_cmessage_la_OBJECTS = $(am_modules_m_cmessage_la_OBJECTS)
-modules_m_connect_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_connect_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_connect_la_OBJECTS = modules/m_connect.lo
 modules_m_connect_la_OBJECTS = $(am_modules_m_connect_la_OBJECTS)
-modules_m_dline_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_dline_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_dline_la_OBJECTS = modules/m_dline.lo
 modules_m_dline_la_OBJECTS = $(am_modules_m_dline_la_OBJECTS)
-modules_m_encap_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_encap_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_encap_la_OBJECTS = modules/m_encap.lo
 modules_m_encap_la_OBJECTS = $(am_modules_m_encap_la_OBJECTS)
-modules_m_etrace_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_etrace_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_etrace_la_OBJECTS = modules/m_etrace.lo
 modules_m_etrace_la_OBJECTS = $(am_modules_m_etrace_la_OBJECTS)
-modules_m_gline_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_gline_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_gline_la_OBJECTS = modules/m_gline.lo
 modules_m_gline_la_OBJECTS = $(am_modules_m_gline_la_OBJECTS)
-modules_m_help_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_help_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_help_la_OBJECTS = modules/m_help.lo
 modules_m_help_la_OBJECTS = $(am_modules_m_help_la_OBJECTS)
-modules_m_info_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_info_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_info_la_OBJECTS = modules/m_info.lo
 modules_m_info_la_OBJECTS = $(am_modules_m_info_la_OBJECTS)
-modules_m_invite_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_invite_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_invite_la_OBJECTS = modules/m_invite.lo
 modules_m_invite_la_OBJECTS = $(am_modules_m_invite_la_OBJECTS)
-modules_m_ison_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_ison_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_ison_la_OBJECTS = modules/m_ison.lo
 modules_m_ison_la_OBJECTS = $(am_modules_m_ison_la_OBJECTS)
-modules_m_kline_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_kline_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_kline_la_OBJECTS = modules/m_kline.lo
 modules_m_kline_la_OBJECTS = $(am_modules_m_kline_la_OBJECTS)
-modules_m_knock_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_knock_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_knock_la_OBJECTS = modules/m_knock.lo
 modules_m_knock_la_OBJECTS = $(am_modules_m_knock_la_OBJECTS)
-modules_m_links_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_links_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_links_la_OBJECTS = modules/m_links.lo
 modules_m_links_la_OBJECTS = $(am_modules_m_links_la_OBJECTS)
-modules_m_list_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_list_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_list_la_OBJECTS = modules/m_list.lo
 modules_m_list_la_OBJECTS = $(am_modules_m_list_la_OBJECTS)
-modules_m_locops_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_locops_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_locops_la_OBJECTS = modules/m_locops.lo
 modules_m_locops_la_OBJECTS = $(am_modules_m_locops_la_OBJECTS)
-modules_m_lusers_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_lusers_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_lusers_la_OBJECTS = modules/m_lusers.lo
 modules_m_lusers_la_OBJECTS = $(am_modules_m_lusers_la_OBJECTS)
-modules_m_map_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_map_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_map_la_OBJECTS = modules/m_map.lo
 modules_m_map_la_OBJECTS = $(am_modules_m_map_la_OBJECTS)
-modules_m_monitor_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_monitor_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_monitor_la_OBJECTS = modules/m_monitor.lo
 modules_m_monitor_la_OBJECTS = $(am_modules_m_monitor_la_OBJECTS)
-modules_m_motd_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_motd_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_motd_la_OBJECTS = modules/m_motd.lo
 modules_m_motd_la_OBJECTS = $(am_modules_m_motd_la_OBJECTS)
-modules_m_names_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_names_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_names_la_OBJECTS = modules/m_names.lo
 modules_m_names_la_OBJECTS = $(am_modules_m_names_la_OBJECTS)
-modules_m_oper_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_oper_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_oper_la_OBJECTS = modules/m_oper.lo
 modules_m_oper_la_OBJECTS = $(am_modules_m_oper_la_OBJECTS)
-modules_m_operspy_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_operspy_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_operspy_la_OBJECTS = modules/m_operspy.lo
 modules_m_operspy_la_OBJECTS = $(am_modules_m_operspy_la_OBJECTS)
-modules_m_pass_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_pass_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_pass_la_OBJECTS = modules/m_pass.lo
 modules_m_pass_la_OBJECTS = $(am_modules_m_pass_la_OBJECTS)
-modules_m_ping_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_ping_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_ping_la_OBJECTS = modules/m_ping.lo
 modules_m_ping_la_OBJECTS = $(am_modules_m_ping_la_OBJECTS)
-modules_m_pong_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_pong_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_pong_la_OBJECTS = modules/m_pong.lo
 modules_m_pong_la_OBJECTS = $(am_modules_m_pong_la_OBJECTS)
-modules_m_post_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_post_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_post_la_OBJECTS = modules/m_post.lo
 modules_m_post_la_OBJECTS = $(am_modules_m_post_la_OBJECTS)
-modules_m_rehash_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_rehash_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_rehash_la_OBJECTS = modules/m_rehash.lo
 modules_m_rehash_la_OBJECTS = $(am_modules_m_rehash_la_OBJECTS)
-modules_m_restart_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_restart_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_restart_la_OBJECTS = modules/m_restart.lo
 modules_m_restart_la_OBJECTS = $(am_modules_m_restart_la_OBJECTS)
-modules_m_resv_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_resv_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_resv_la_OBJECTS = modules/m_resv.lo
 modules_m_resv_la_OBJECTS = $(am_modules_m_resv_la_OBJECTS)
 @ENABLE_SERVICES_TRUE@modules_m_services_la_DEPENDENCIES =  \
-@ENABLE_SERVICES_TRUE@	$(am__DEPENDENCIES_1)
+@ENABLE_SERVICES_TRUE@	$(am__DEPENDENCIES_2)
 am__modules_m_services_la_SOURCES_DIST = modules/m_services.c
 @ENABLE_SERVICES_TRUE@am_modules_m_services_la_OBJECTS =  \
 @ENABLE_SERVICES_TRUE@	modules/m_services.lo
 modules_m_services_la_OBJECTS = $(am_modules_m_services_la_OBJECTS)
-modules_m_set_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_set_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_set_la_OBJECTS = modules/m_set.lo
 modules_m_set_la_OBJECTS = $(am_modules_m_set_la_OBJECTS)
-modules_m_stats_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_stats_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_stats_la_OBJECTS = modules/m_stats.lo
 modules_m_stats_la_OBJECTS = $(am_modules_m_stats_la_OBJECTS)
-modules_m_svinfo_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_svinfo_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_svinfo_la_OBJECTS = modules/m_svinfo.lo
 modules_m_svinfo_la_OBJECTS = $(am_modules_m_svinfo_la_OBJECTS)
-modules_m_tb_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_tb_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_tb_la_OBJECTS = modules/m_tb.lo
 modules_m_tb_la_OBJECTS = $(am_modules_m_tb_la_OBJECTS)
-modules_m_testline_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_testline_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_testline_la_OBJECTS = modules/m_testline.lo
 modules_m_testline_la_OBJECTS = $(am_modules_m_testline_la_OBJECTS)
-modules_m_testmask_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_testmask_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_testmask_la_OBJECTS = modules/m_testmask.lo
 modules_m_testmask_la_OBJECTS = $(am_modules_m_testmask_la_OBJECTS)
-modules_m_time_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_time_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_time_la_OBJECTS = modules/m_time.lo
 modules_m_time_la_OBJECTS = $(am_modules_m_time_la_OBJECTS)
-modules_m_topic_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_topic_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_topic_la_OBJECTS = modules/m_topic.lo
 modules_m_topic_la_OBJECTS = $(am_modules_m_topic_la_OBJECTS)
-modules_m_trace_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_trace_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_trace_la_OBJECTS = modules/m_trace.lo
 modules_m_trace_la_OBJECTS = $(am_modules_m_trace_la_OBJECTS)
-modules_m_unreject_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_unreject_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_unreject_la_OBJECTS = modules/m_unreject.lo
 modules_m_unreject_la_OBJECTS = $(am_modules_m_unreject_la_OBJECTS)
-modules_m_user_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_user_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_user_la_OBJECTS = modules/m_user.lo
 modules_m_user_la_OBJECTS = $(am_modules_m_user_la_OBJECTS)
-modules_m_userhost_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_userhost_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_userhost_la_OBJECTS = modules/m_userhost.lo
 modules_m_userhost_la_OBJECTS = $(am_modules_m_userhost_la_OBJECTS)
-modules_m_version_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_version_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_version_la_OBJECTS = modules/m_version.lo
 modules_m_version_la_OBJECTS = $(am_modules_m_version_la_OBJECTS)
-modules_m_wallops_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_wallops_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_wallops_la_OBJECTS = modules/m_wallops.lo
 modules_m_wallops_la_OBJECTS = $(am_modules_m_wallops_la_OBJECTS)
-modules_m_who_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_who_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_who_la_OBJECTS = modules/m_who.lo
 modules_m_who_la_OBJECTS = $(am_modules_m_who_la_OBJECTS)
-modules_m_whois_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_whois_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_whois_la_OBJECTS = modules/m_whois.lo
 modules_m_whois_la_OBJECTS = $(am_modules_m_whois_la_OBJECTS)
-modules_m_whowas_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_whowas_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_whowas_la_OBJECTS = modules/m_whowas.lo
 modules_m_whowas_la_OBJECTS = $(am_modules_m_whowas_la_OBJECTS)
-modules_m_xline_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+modules_m_xline_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_xline_la_OBJECTS = modules/m_xline.lo
 modules_m_xline_la_OBJECTS = $(am_modules_m_xline_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -298,7 +301,7 @@ ident_OBJECTS = $(am_ident_OBJECTS)
 ident_DEPENDENCIES = libircd/libircd.la
 am_ircd_OBJECTS = src/main.$(OBJEXT)
 ircd_OBJECTS = $(am_ircd_OBJECTS)
-am__DEPENDENCIES_2 = modules/m_accept.la modules/m_admin.la \
+am__DEPENDENCIES_3 = modules/m_accept.la modules/m_admin.la \
 	modules/m_away.la modules/m_capab.la modules/m_cap.la \
 	modules/m_close.la modules/m_cmessage.la modules/m_connect.la \
 	modules/m_dline.la modules/m_encap.la modules/m_etrace.la \
@@ -316,20 +319,20 @@ am__DEPENDENCIES_2 = modules/m_accept.la modules/m_admin.la \
 	modules/m_unreject.la modules/m_user.la modules/m_userhost.la \
 	modules/m_version.la modules/m_wallops.la modules/m_who.la \
 	modules/m_whois.la modules/m_whowas.la modules/m_xline.la
-am__DEPENDENCIES_3 = modules/core/m_die.la modules/core/m_error.la \
+am__DEPENDENCIES_4 = modules/core/m_die.la modules/core/m_error.la \
 	modules/core/m_join.la modules/core/m_kick.la \
 	modules/core/m_kill.la modules/core/m_message.la \
 	modules/core/m_mode.la modules/core/m_nick.la \
 	modules/core/m_part.la modules/core/m_quit.la \
 	modules/core/m_server.la modules/core/m_squit.la
-@ENABLE_SERVICES_TRUE@am__DEPENDENCIES_4 = modules/m_services.la
-am__DEPENDENCIES_5 = $(shell for x in $(am__DEPENDENCIES_2) \
-	$(am__DEPENDENCIES_3) $(am__DEPENDENCIES_4) ;do echo $$x \
+@ENABLE_SERVICES_TRUE@am__DEPENDENCIES_5 = modules/m_services.la
+am__DEPENDENCIES_6 = $(shell for x in $(am__DEPENDENCIES_3) \
+	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_5) ;do echo $$x \
 	;done)
 @STATIC_MODULES_FALSE@ircd_DEPENDENCIES = libircd/libircd.la \
 @STATIC_MODULES_FALSE@	libratbox.la
 @STATIC_MODULES_TRUE@ircd_DEPENDENCIES = libircd/libircd.la \
-@STATIC_MODULES_TRUE@	libratbox.la $(am__DEPENDENCIES_5)
+@STATIC_MODULES_TRUE@	libratbox.la $(am__DEPENDENCIES_6)
 am_resolver_OBJECTS = src/resolver.$(OBJEXT)
 resolver_OBJECTS = $(am_resolver_OBJECTS)
 resolver_DEPENDENCIES = adns/libadns.a libircd/libircd.la
@@ -748,8 +751,10 @@ libratbox_la_SOURCES = \
 
 libratbox_LTLIBRARIES = libratbox.la
 libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
-libratbox_la_DEPENDENCIES = libircd/libircd.la
-libratbox_la_LIBADD = libircd/libircd.la @SSL_LIBS@ @CRYPT_LIB@
+@MINGW_FALSE@libratbox_la_DEPENDENCIES = libircd/libircd.la
+@MINGW_TRUE@libratbox_la_DEPENDENCIES = $(LIBLTDLC) libircd/libircd.la
+@MINGW_FALSE@libratbox_la_LIBADD = libircd/libircd.la @SSL_LIBS@ @CRYPT_LIB@
+@MINGW_TRUE@libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 
 # now the modules..
 MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version 
@@ -1082,6 +1087,8 @@ contrib/Makefile: $(top_builddir)/config.status $(top_srcdir)/contrib/Makefile.i
 doc/Makefile: $(top_builddir)/config.status $(top_srcdir)/doc/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 help/Makefile: $(top_builddir)/config.status $(top_srcdir)/help/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+sqlite3/Makefile: $(top_builddir)/config.status $(top_srcdir)/sqlite3/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-coreLTLIBRARIES: $(core_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -4599,7 +4606,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/contrib $(distdir)/doc $(distdir)/help $(distdir)/include $(distdir)/src
+	$(mkdir_p) $(distdir)/contrib $(distdir)/doc $(distdir)/help $(distdir)/include $(distdir)/sqlite3 $(distdir)/src
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

@@ -84,10 +84,15 @@ libratbox_la_SOURCES =                     \
   src/ircd_lexer.l			
 
 libratbox_LTLIBRARIES = libratbox.la
-  
 libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
-libratbox_la_DEPENDENCIES =  libircd/libircd.la
+
+if MINGW
+libratbox_la_DEPENDENCIES = $(LIBLTDLC) libircd/libircd.la
+libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
+else
+libratbox_la_DEPENDENCIES = libircd/libircd.la
 libratbox_la_LIBADD = libircd/libircd.la @SSL_LIBS@ @CRYPT_LIB@
+endif
 
 
 # now the modules..
