@@ -1,3 +1,13 @@
+androsyn    2006/05/22 19:56:37 UTC	(20060522_4-22617)
+  Log:
+  add ircd_sleep()
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/unix.c (File Modified) 
+	ircd-ratbox/trunk/libircd/win32.c (File Modified) 
+
+
 androsyn    2006/05/22 19:26:09 UTC	(20060522_3-22615)
   Log:
   make the stupid thing compile/link on solaris...
