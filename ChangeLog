@@ -1,3 +1,13 @@
+androsyn    2006/05/22 05:19:42 UTC	(20060522_2-22613)
+  Log:
+  - special case where num < 10 not just num == 0
+  (i think lee made a comment about us never changing sprint the other day)
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/snprintf.c (File Modified) 
+
+
 androsyn    2006/05/22 05:05:54 UTC	(20060522_1-22611)
   Log:
   A long time ago avoiding division was a good thing, namely 
