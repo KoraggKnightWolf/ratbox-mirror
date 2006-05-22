@@ -8,8 +8,11 @@
  *
  * $Id$
  */
-
 #include "ircd_lib.h"
+
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
 
 /*
  *  This table is arranged in chronological order from 0-999,
@@ -242,6 +245,9 @@ static const char *IntTable[] = {
 	"599", "699", "799", "899", "999"
 };
 
+static const char HexLower[] = "0123456789abcdef"; 
+static const char HexUpper[] = "0123456789ABCDEF"; 
+
 /*
  * Since we calculate the right-most digits for %d %u etc first,
  * we need a temporary buffer to store them in until we get
@@ -251,6 +257,219 @@ static const char *IntTable[] = {
 #define TEMPBUF_MAX  20
 
 static char TempBuffer[TEMPBUF_MAX];
+
+
+#define TYPE_TO_STR(type) {		 			\
+								\
+	type num = va_arg(args, type);				\
+	type quotient;						\
+	const char *str;					\
+	char *digitptr = TempBuffer;				\
+	if(num == 0)						\
+	{							\
+		*dest++ = '0';					\
+		++written;					\
+		continue;					\
+	}							\
+	do							\
+	{							\
+		quotient = num / TABLE_MAX;			\
+		str = IntTable[num - (quotient * TABLE_MAX)];	\
+		while ((*digitptr = *str))			\
+		{						\
+			++digitptr;				\
+			++str;					\
+		}						\
+	} while ((num = quotient) != 0);			\
+								\
+	while (*(digitptr - 1) == '0')				\
+		--digitptr;					\
+								\
+	while (digitptr != TempBuffer)				\
+	{							\
+		*dest++ = *--digitptr;				\
+		++written;					\
+	}							\
+	continue;						\
+}		
+
+
+#define TYPE_TO_STRN(type) {				 	\
+								\
+	type num = va_arg(args, type);				\
+	type quotient;						\
+	const char *str;					\
+	char *digitptr = TempBuffer;				\
+	if(num == 0)						\
+	{							\
+		*dest++ = '0';					\
+		++written;					\
+		continue;					\
+	}							\
+	do							\
+	{							\
+		quotient = num / TABLE_MAX;			\
+		str = IntTable[num - (quotient * TABLE_MAX)];	\
+		while ((*digitptr = *str))			\
+		{						\
+			++digitptr;				\
+			++str;					\
+		}						\
+	} while ((num = quotient) != 0);			\
+								\
+	while (*(digitptr - 1) == '0')				\
+		--digitptr;					\
+								\
+	while (digitptr != TempBuffer)				\
+	{							\
+		*dest++ = *--digitptr;				\
+		if(++written >= maxbytes)			\
+			break;					\
+	}							\
+	continue;						\
+}		
+
+
+#define TYPE_TO_STR_SIGNED(type) {				\
+								\
+	type num = va_arg(args, type);				\
+	type quotient;						\
+	const char *str;					\
+	char *digitptr = TempBuffer;				\
+	if(num == 0)						\
+	{							\
+		*dest++ = '0';					\
+		++written;					\
+		continue;					\
+	}							\
+	if(num < 0)						\
+	{							\
+		*dest++ = '-';					\
+		++written;					\
+		num = -num;					\
+	}							\
+	do							\
+	{							\
+		quotient = num / TABLE_MAX;			\
+		str = IntTable[num - (quotient * TABLE_MAX)];	\
+		while ((*digitptr = *str))			\
+		{						\
+			++digitptr;				\
+			++str;					\
+		}						\
+	} while ((num = quotient) != 0);			\
+								\
+	while (*(digitptr - 1) == '0')				\
+		--digitptr;					\
+								\
+	while (digitptr != TempBuffer)				\
+	{							\
+		*dest++ = *--digitptr;				\
+		++written;					\
+	}							\
+	continue;						\
+}		
+
+
+
+#define TYPE_TO_STRN_SIGNED(type) {				\
+								\
+	type num = va_arg(args, type);				\
+	type quotient;						\
+	const char *str;					\
+	char *digitptr = TempBuffer;				\
+	if(num == 0)						\
+	{							\
+		*dest++ = '0';					\
+		++written;					\
+		continue;					\
+	}							\
+	if(num < 0)						\
+	{							\
+		*dest++ = '-';					\
+		if(++written >= maxbytes)			\
+			continue;				\
+		num = -num;					\
+	}							\
+	do							\
+	{							\
+		quotient = num / TABLE_MAX;			\
+		str = IntTable[num - (quotient * TABLE_MAX)];	\
+		while ((*digitptr = *str))			\
+		{						\
+			++digitptr;				\
+			++str;					\
+		}						\
+	} while ((num = quotient) != 0);			\
+								\
+	while (*(digitptr - 1) == '0')				\
+		--digitptr;					\
+								\
+	while (digitptr != TempBuffer)				\
+	{							\
+		*dest++ = *--digitptr;				\
+		if(++written >= maxbytes)			\
+			break;					\
+	}							\
+	continue;						\
+}		
+
+#define HEX_TO_STRN(type, table) {				\
+								\
+	type num = va_arg(args, type);				\
+	char *digitptr = TempBuffer;				\
+	if(num == 0)						\
+	{							\
+		*dest++ = '0';					\
+		++written;					\
+		continue;					\
+	}							\
+	do 							\
+	{							\
+		*digitptr++ = table[num & 15];			\
+		num >>= 4;					\
+	} while(num != 0);					\
+								\
+	while (*(digitptr - 1) == '0') --digitptr;		\
+								\
+	while (digitptr != TempBuffer)				\
+	{							\
+		*dest++ = *--digitptr;				\
+		if(++written >= maxbytes)			\
+			break;					\
+	}							\
+	continue;						\
+}		
+		
+
+#define HEX_TO_STR(type,table) {	 			\
+								\
+	type num = va_arg(args, type);				\
+	char *digitptr = TempBuffer;				\
+	if(num == 0)						\
+	{							\
+		*dest++ = '0';					\
+		++written;					\
+		continue;					\
+	}							\
+	do 							\
+	{							\
+		*digitptr++ = table[num & 15];			\
+		num >>= 4;					\
+	} while(num != 0);					\
+								\
+	while (*(digitptr - 1) == '0')				\
+		--digitptr;					\
+								\
+	while (digitptr != TempBuffer)				\
+	{							\
+		*dest++ = *--digitptr;				\
+		++written;					\
+	}							\
+	continue;						\
+}		
+	
+		
 
 /*
 vSnprintf()
@@ -265,7 +484,7 @@ Return: Number of characters written, NOT including the terminating
         \0 character which is *always* placed at the end of the string
 
 NOTE: This function handles the following flags only:
-        %s %d %c %u %ld %lu
+        %s %d %c %u %ld %lu %x %X %lx %lX
       In addition, this function performs *NO* precision, padding,
       or width formatting. If it receives an unknown % character,
       it will call vsprintf() to complete the remainder of the
@@ -309,261 +528,48 @@ ircd_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 			}
 
 			if(ch == 'd')
-			{
-				int num = va_arg(args, int);
-				int quotient;
-				const char *str;
-				char *digitptr = TempBuffer;
-
-				/*
-				 * We have to special-case "0" unfortunately
-				 */
-				if(num == 0)
-				{
-					*dest++ = '0';
-					++written;
-					continue;
-				}
-
-				if(num < 0)
-				{
-					*dest++ = '-';
-					if(++written >= maxbytes)
-						continue;
-
-					num = -num;
-				}
-
-				do
-				{
-					quotient = num / TABLE_MAX;
-
-					/*
-					 * We'll start with the right-most digits of 'num'.
-					 * Dividing by TABLE_MAX cuts off all but the X
-					 * right-most digits, where X is such that:
-					 *
-					 *     10^X = TABLE_MAX
-					 *
-					 * For example, if num = 1200, and TABLE_MAX = 1000,
-					 * quotient will be 1. Multiplying this by 1000 and
-					 * subtracting from 1200 gives: 1200 - (1 * 1000) = 200.
-					 * We then go right to slot 200 in our array and behold!
-					 * The string "002" (200 backwards) is conveniently
-					 * waiting for us. Then repeat the process with the
-					 * digits left.
-					 *
-					 * The reason we need to have the integers written
-					 * backwards, is because we don't know how many digits
-					 * there are. If we want to express the number 12130
-					 * for example, our first pass would leave us with 130,
-					 * whose slot in the array yields "031", which we
-					 * plug into our TempBuffer[]. The next pass gives us
-					 * 12, whose slot yields "21" which we append to
-					 * TempBuffer[], leaving us with "03121". This is the
-					 * exact number we want, only backwards, so it is
-					 * a simple matter to reverse the string. If we used
-					 * straightfoward numbers, we would have a TempBuffer
-					 * looking like this: "13012" which would be a nightmare
-					 * to deal with.
-					 */
-
-					str = IntTable[num - (quotient * TABLE_MAX)];
-
-					while ((*digitptr = *str))
-					{
-						++digitptr;
-						++str;
-					}
-				}
-				while ((num = quotient) != 0);
-
-				/*
-				 * If the last quotient was a 1 or 2 digit number, there
-				 * will be one or more leading zeroes in TempBuffer[] -
-				 * get rid of them.
-				 */
-				while (*(digitptr - 1) == '0')
-					--digitptr;
-
-				while (digitptr != TempBuffer)
-				{
-					*dest++ = *--digitptr;
-					if(++written >= maxbytes)
-						break;
-				}
-
-				continue;
-			}	/* if (ch == 'd') */
+				TYPE_TO_STRN_SIGNED(int);
 
 			if(ch == 'c')
 			{
 				*dest++ = va_arg(args, int);
-
 				++written;
-
 				continue;
 			}	/* if (ch == 'c') */
 
 			if(ch == 'u')
-			{
-				unsigned int num = va_arg(args, unsigned int);
-				unsigned int quotient;
-				const char *str;
-				char *digitptr = TempBuffer;
+				TYPE_TO_STRN(unsigned int);
 
-				if(num == 0)
-				{
-					*dest++ = '0';
-					++written;
-					continue;
-				}
+			if(ch == 'x')
+				HEX_TO_STRN(unsigned int, HexLower);
 
-				do
-				{
-					quotient = num / TABLE_MAX;
-
-					/*
-					 * Very similar to case 'd'
-					 */
-
-					str = IntTable[num - (quotient * TABLE_MAX)];
-
-					while ((*digitptr = *str))
-					{
-						++digitptr;
-						++str;
-					}
-				}
-				while ((num = quotient) != 0);
-
-				while (*(digitptr - 1) == '0')
-					--digitptr;
-
-				while (digitptr != TempBuffer)
-				{
-					*dest++ = *--digitptr;
-					if(++written >= maxbytes)
-						break;
-				}
-
-				continue;
-			}	/* if (ch == 'u') */
-
+			if(ch == 'X')
+				HEX_TO_STRN(unsigned int, HexUpper);
+                        
 			if(ch == 'l')
 			{
-				if(*format == 'u')
+				if(*format == 'u') {
+					format++;
+					TYPE_TO_STRN(unsigned long);
+		                }
+
+				if(*format == 'x') 
 				{
-					unsigned long num = va_arg(args, unsigned long);
-					unsigned long quotient;
-					const char *str;
-					char *digitptr = TempBuffer;
+					format++;
+					HEX_TO_STRN(unsigned long, HexLower);
+				}
 
-					++format;
-
-					if(num == 0)
-					{
-						*dest++ = '0';
-						++written;
-						continue;
-					}
-
-					do
-					{
-						quotient = num / TABLE_MAX;
-
-						/*
-						 * Very similar to case 'u'
-						 */
-
-						str = IntTable[num - (quotient * TABLE_MAX)];
-
-						while ((*digitptr = *str))
-						{
-							++digitptr;
-							++str;
-						}
-					}
-					while ((num = quotient) != 0);
-
-					while (*(digitptr - 1) == '0')
-						--digitptr;
-
-					while (digitptr != TempBuffer)
-					{
-						*dest++ = *--digitptr;
-						if(++written >= maxbytes)
-							break;
-					}
-
-					continue;
-				} else	/* if (*format == 'u') */
-
-				if(*format == 'd')
+				if(*format == 'X') 
 				{
-					long num = va_arg(args, long);
-					long quotient;
-					const char *str;
-					char *digitptr = TempBuffer;
-
-					++format;
-
-					if(num == 0)
-					{
-						*dest++ = '0';
-						++written;
-						continue;
-					}
-
-					if(num < 0)
-					{
-						*dest++ = '-';
-						if(++written >= maxbytes)
-							continue;
-
-						num = -num;
-					}
-
-					do
-					{
-						quotient = num / TABLE_MAX;
-
-						str = IntTable[num - (quotient * TABLE_MAX)];
-
-						while ((*digitptr = *str))
-						{
-							++digitptr;
-							++str;
-						}
-					}
-					while ((num = quotient) != 0);
-
-					while (*(digitptr - 1) == '0')
-						--digitptr;
-
-					while (digitptr != TempBuffer)
-					{
-						*dest++ = *--digitptr;
-						if(++written >= maxbytes)
-							break;
-					}
-
-					continue;
-				} else	/* if (*format == 'd') */
-				{
-					int ret;
-					format -= 2;
-					#ifdef HAVE_VSNPRINTF
-						ret = vsnprintf(dest, maxbytes - written, format, args);
-					#else
-						ret = vsprintf(dest, format, args);
-					#endif
-					dest += ret;
-					written += ret;
-					break;
+					format++;
+					HEX_TO_STRN(unsigned long, HexUpper);
 				}
 				
-				
+				if(*format == 'd') 
+				{
+					format++;
+					TYPE_TO_STRN_SIGNED(long);
+				}
 			}	/* if (ch == 'l') */
 
 			if(ch != '%')
@@ -612,7 +618,7 @@ Return: Number of characters written, NOT including the terminating
         \0 character which is *always* placed at the end of the string
 
 NOTE: This function handles the following flags only:
-        %s %d %c %u %ld %lu
+        %s %d %c %u %ld %lu %x %X %lx %lX
       In addition, this function performs *NO* precision, padding,
       or width formatting. If it receives an unknown % character,
       it will call vsprintf() to complete the remainder of the
@@ -655,90 +661,7 @@ ircd_vsprintf(char *dest, const char *format, va_list args)
 			
 			
 			if(ch == 'd')
-			{
-				int num = va_arg(args, int);
-				int quotient;
-				const char *str;
-				char *digitptr = TempBuffer;
-
-				/*
-				 * We have to special-case "0" unfortunately
-				 */
-				if(num == 0)
-				{
-					*dest++ = '0';
-					++written;
-					continue;
-				}
-
-				if(num < 0)
-				{
-					*dest++ = '-';
-					++written;
-
-					num = -num;
-				}
-
-				do
-				{
-					quotient = num / TABLE_MAX;
-
-					/*
-					 * We'll start with the right-most digits of 'num'.
-					 * Dividing by TABLE_MAX cuts off all but the X
-					 * right-most digits, where X is such that:
-					 *
-					 *     10^X = TABLE_MAX
-					 *
-					 * For example, if num = 1200, and TABLE_MAX = 1000,
-					 * quotient will be 1. Multiplying this by 1000 and
-					 * subtracting from 1200 gives: 1200 - (1 * 1000) = 200.
-					 * We then go right to slot 200 in our array and behold!
-					 * The string "002" (200 backwards) is conveniently
-					 * waiting for us. Then repeat the process with the
-					 * digits left.
-					 *
-					 * The reason we need to have the integers written
-					 * backwards, is because we don't know how many digits
-					 * there are. If we want to express the number 12130
-					 * for example, our first pass would leave us with 130,
-					 * whose slot in the array yields "031", which we
-					 * plug into our TempBuffer[]. The next pass gives us
-					 * 12, whose slot yields "21" which we append to
-					 * TempBuffer[], leaving us with "03121". This is the
-					 * exact number we want, only backwards, so it is
-					 * a simple matter to reverse the string. If we used
-					 * straightfoward numbers, we would have a TempBuffer
-					 * looking like this: "13012" which would be a nightmare
-					 * to deal with.
-					 */
-
-					str = IntTable[num - (quotient * TABLE_MAX)];
-
-					while ((*digitptr = *str))
-					{
-						++digitptr;
-						++str;
-					}
-				}
-				while ((num = quotient) != 0);
-
-				/*
-				 * If the last quotient was a 1 or 2 digit number, there
-				 * will be one or more leading zeroes in TempBuffer[] -
-				 * get rid of them.
-				 */
-				while (*(digitptr - 1) == '0')
-					--digitptr;
-
-				while (digitptr != TempBuffer)
-				{
-					*dest++ = *--digitptr;
-					++written;
-				}
-
-				continue;
-			}	/* if (ch == 'd') */
+				TYPE_TO_STR_SIGNED(int);
 
 			if(ch == 'c')
 			{
@@ -750,148 +673,40 @@ ircd_vsprintf(char *dest, const char *format, va_list args)
 			}	/* if (ch == 'c') */
 
 			if(ch == 'u')
-			{
-				unsigned int num = va_arg(args, unsigned int);
-				unsigned int quotient;
-				const char *str;
-				char *digitptr = TempBuffer;
+				TYPE_TO_STR(unsigned int);
 
-				if(num == 0)
-				{
-					*dest++ = '0';
-					++written;
-					continue;
-				}
-
-				do
-				{
-					quotient = num / TABLE_MAX;
-
-					/*
-					 * Very similar to case 'd'
-					 */
-
-					str = IntTable[num - (quotient * TABLE_MAX)];
-
-					while ((*digitptr = *str))
-					{
-						++digitptr;
-						++str;
-					}
-				}
-				while ((num = quotient) != 0);
-
-				while (*(digitptr - 1) == '0')
-					--digitptr;
-
-				while (digitptr != TempBuffer)
-				{
-					*dest++ = *--digitptr;
-					++written;
-				}
-
-				continue;
-			}	/* if (ch == 'u') */
+			if(ch == 'x')
+				HEX_TO_STR(unsigned int, HexLower);
+			
+			if(ch == 'X')
+				HEX_TO_STR(unsigned int, HexUpper);
 
 			if(ch == 'l')
 			{
-				if(*format == 'u')
-				{
-					unsigned long num = va_arg(args, unsigned long);
-					unsigned long quotient;
-					const char *str;
-					char *digitptr = TempBuffer;
+				if(*format == 'u') {
+					format++;
+					TYPE_TO_STR(unsigned long);
+				}
 
-					++format;
-
-					if(num == 0)
-					{
-						*dest++ = '0';
-						++written;
-						continue;
-					}
-
-					do
-					{
-						quotient = num / TABLE_MAX;
-
-						/*
-						 * Very similar to case 'u'
-						 */
-
-						str = IntTable[num - (quotient * TABLE_MAX)];
-
-						while ((*digitptr = *str))
-						{
-							++digitptr;
-							++str;
-						}
-					}
-					while ((num = quotient) != 0);
-
-					while (*(digitptr - 1) == '0')
-						--digitptr;
-
-					while (digitptr != TempBuffer)
-					{
-						*dest++ = *--digitptr;
-						++written;
-					}
-
-					continue;
-				}	/* if (*format == 'u') */
 
 				if(*format == 'd')
 				{
-					long num = va_arg(args, long);
-					long quotient;
-					const char *str;
-					char *digitptr = TempBuffer;
-
-					++format;
-
-					if(num == 0)
-					{
-						*dest++ = '0';
-						++written;
-						continue;
-					}
-
-					if(num < 0)
-					{
-						*dest++ = '-';
-						++written;
-
-						num = -num;
-					}
-
-					do
-					{
-						quotient = num / TABLE_MAX;
-
-						str = IntTable[num - (quotient * TABLE_MAX)];
-
-						while ((*digitptr = *str))
-						{
-							++digitptr;
-							++str;
-						}
-					}
-					while ((num = quotient) != 0);
-
-					while (*(digitptr - 1) == '0')
-						--digitptr;
-
-					while (digitptr != TempBuffer)
-					{
-						*dest++ = *--digitptr;
-						++written;
-					}
-
-					continue;
-				}	/* if (*format == 'd') */
-
-				continue;
+					format++;
+					TYPE_TO_STR_SIGNED(long);
+				}
+				
+				if(*format == 'x')
+				{
+					format++;
+					HEX_TO_STR(unsigned long, HexLower);
+				}	
+				
+				if(*format == 'X')
+				{
+					format++;
+					HEX_TO_STR(unsigned long, HexUpper);
+				}
+				
 			}	/* if (ch == 'l') */
 
 			if(ch != '%')
@@ -1030,3 +845,5 @@ ircd_snprintf_append(char *str, size_t len, const char *format, ...)
         va_end(ap);
         return(x); 
 }
+
+
