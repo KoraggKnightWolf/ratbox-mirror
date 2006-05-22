@@ -1,3 +1,12 @@
+androsyn    2006/05/22 20:15:31 UTC	(20060522_9-22627)
+  Log:
+  bleh..more automake goo
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 androsyn    2006/05/22 20:09:23 UTC	(20060522_8-22625)
   Log:
   i hate life some days..put back that variable..
