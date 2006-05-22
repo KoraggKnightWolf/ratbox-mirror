@@ -1,3 +1,15 @@
+androsyn    2006/05/22 02:45:56 UTC	(20060522_0-22609)
+  Log:
+  Add support for %x, %X, %lx and %lX formats to sprintf
+  functions.  Also move some of the mostly duplicated code
+  into a few macros, it might look ugly, but I think makes things
+  more readable.
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/snprintf.c (File Modified) 
+
+
 jilles      2006/05/20 21:11:27 UTC	(20060520_2-22593)
   Log:
   Fix a long standing hybrid 7 bug: when getting a read error
