@@ -40,12 +40,6 @@ static char TempBuffer[TEMPBUF_MAX];
 								\
 	type num = va_arg(args, type);				\
 	char *digitptr = TempBuffer;				\
-	if(num == 0)						\
-	{							\
-		*dest++ = '0';					\
-		++written;					\
-		continue;					\
-	}							\
 	do 							\
 	{							\
 		*digitptr++ = table[num & 0xF];			\
@@ -68,12 +62,6 @@ static char TempBuffer[TEMPBUF_MAX];
 								\
 	type num = va_arg(args, type);				\
 	char *digitptr = TempBuffer;				\
-	if(num == 0)						\
-	{							\
-		*dest++ = '0';					\
-		++written;					\
-		continue;					\
-	}							\
 	do 							\
 	{							\
 		*digitptr++ = table[num & 0xF];			\
@@ -100,9 +88,9 @@ static char TempBuffer[TEMPBUF_MAX];
 								\
 	type num = va_arg(args, type);				\
 	char *digitptr = TempBuffer;				\
-	if(num == 0)						\
+	if(num < 10)						\
 	{							\
-		*dest++ = '0';					\
+		*dest++ = TO_CHAR(num);				\
 		++written;					\
 		continue;					\
 	}							\
@@ -127,9 +115,9 @@ static char TempBuffer[TEMPBUF_MAX];
 								\
 	type num = va_arg(args, type);				\
 	char *digitptr = TempBuffer;				\
-	if(num == 0)						\
+	if(num < 10)						\
 	{							\
-		*dest++ = '0';					\
+		*dest++ = TO_CHAR(num);				\
 		++written;					\
 		continue;					\
 	}							\
@@ -155,9 +143,9 @@ static char TempBuffer[TEMPBUF_MAX];
 								\
 	type num = va_arg(args, type);				\
 	char *digitptr = TempBuffer;				\
-	if(num == 0)						\
+	if(num < 10)						\
 	{							\
-		*dest++ = '0';					\
+		*dest++ = TO_CHAR(num);				\
 		++written;					\
 		continue;					\
 	}							\
@@ -183,17 +171,17 @@ static char TempBuffer[TEMPBUF_MAX];
 								\
 	type num = va_arg(args, type);				\
 	char *digitptr = TempBuffer;				\
-	if(num == 0)						\
-	{							\
-		*dest++ = '0';					\
-		++written;					\
-		continue;					\
-	}							\
 	if(num < 0)						\
 	{							\
 		*dest++ = '-';					\
 		++written;					\
 		num = -num;					\
+	}							\
+	if(num < 10)						\
+	{							\
+		*dest++ = TO_CHAR(num);				\
+		++written;					\
+		continue;					\
 	}							\
 	do 							\
 	{							\
@@ -216,17 +204,17 @@ static char TempBuffer[TEMPBUF_MAX];
 								\
 	type num = va_arg(args, type);				\
 	char *digitptr = TempBuffer;				\
-	if(num == 0)						\
-	{							\
-		*dest++ = '0';					\
-		++written;					\
-		continue;					\
-	}							\
 	if(num < 0)						\
 	{							\
 		*dest++ = '-';					\
 		++written;					\
 		num = -num;					\
+	}							\
+	if(num < 10)						\
+	{							\
+		*dest++ = TO_CHAR(num);				\
+		++written;					\
+		continue;					\
 	}							\
 	do 							\
 	{							\
