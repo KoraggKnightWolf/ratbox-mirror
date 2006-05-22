@@ -1,3 +1,16 @@
+androsyn    2006/05/22 05:05:54 UTC	(20060522_1-22611)
+  Log:
+  A long time ago avoiding division was a good thing, namely 
+  on processors that lacked divide instructions.  Well folks
+  its 2006 and most any sane processor that is likely to be
+  running an ircd will support division. So with that, do
+  the base 10 number conversion the normal way...
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/snprintf.c (File Modified) 
+
+
 androsyn    2006/05/22 02:45:56 UTC	(20060522_0-22609)
   Log:
   Add support for %x, %X, %lx and %lX formats to sprintf
