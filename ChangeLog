@@ -1,3 +1,11 @@
+androsyn    2006/05/22 19:58:39 UTC	(20060522_6-22621)
+  Log:
+  make bandb use ircd_sleep
+
+  Modified:
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+
+
 androsyn    2006/05/22 19:57:02 UTC	(20060522_5-22619)
   Log:
   remove an unused variable from helper.c
