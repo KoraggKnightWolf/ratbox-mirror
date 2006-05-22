@@ -1,3 +1,16 @@
+androsyn    2006/05/22 20:07:10 UTC	(20060522_7-22623)
+  Log:
+  - add a check for nanosleep in configure
+  - make automake be able to deal with solaris which doesn't want libltdlc linked to libratbox
+    and win32 which *does* want it...
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2006/05/22 19:58:39 UTC	(20060522_6-22621)
   Log:
   make bandb use ircd_sleep
