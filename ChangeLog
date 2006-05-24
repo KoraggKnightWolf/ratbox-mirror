@@ -1,3 +1,18 @@
+androsyn    2006/05/24 15:29:43 UTC	(20060524_0-22641)
+  Log:
+  port r22639 forward
+    - move the daddr variable down into the non_redundant_klines block
+      gcc 4.x seems to miscompile the previous code on sparc generating SIGBUS
+      further down...
+  
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+
+
 androsyn    2006/05/22 20:15:31 UTC	(20060522_9-22627)
   Log:
   bleh..more automake goo
