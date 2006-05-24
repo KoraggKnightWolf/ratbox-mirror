@@ -74,7 +74,6 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	const char *dlhost;
 	char *oper_reason;
 	char *reason = def;
-	struct irc_sockaddr_storage daddr;
 	char cidr_form_host[HOSTLEN + 1];
 	struct ConfItem *aconf;
 	int bits;
@@ -150,6 +149,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 
 	if(ConfigFileEntry.non_redundant_klines)
 	{
+		struct irc_sockaddr_storage daddr;
 		const char *creason;
 		int t = AF_INET, ty, b;
 		ty = parse_netmask(dlhost, (struct sockaddr *)&daddr, &b);
