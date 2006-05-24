@@ -1,3 +1,11 @@
+androsyn    2006/05/24 15:46:36 UTC	(20060524_1-22647)
+  Log:
+  remove useless ircd_socket in the /dev/zero mmap stuff
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+
+
 androsyn    2006/05/24 15:29:43 UTC	(20060524_0-22641)
   Log:
   port r22639 forward
