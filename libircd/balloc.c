@@ -216,7 +216,6 @@ initBlockHeap(void)
 
 	if(zero_fd < 0)
 		blockheap_fail("Failed opening /dev/zero");
-	ircd_socket(zero_fd, FD_FILE, "Anonymous mmap()");
 #endif
 	ircd_event_addish("block_heap_gc", block_heap_gc, NULL, 30);
 }
