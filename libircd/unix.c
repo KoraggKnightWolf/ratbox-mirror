@@ -40,7 +40,7 @@ ircd_spawn_process(const char *path, const char **argv)
 
 #ifndef HAVE_GETTIMEOFDAY
 int
-gettimeofday(struct timeval *tv, void *tz)
+ircd_gettimeofday(struct timeval *tv, void *tz)
 {
 	if(tv == NULL)
 	{

@@ -58,7 +58,7 @@ getpid()
 
 
 int
-gettimeofday(struct timeval *tp, void *not_used)
+ircd_gettimeofday(struct timeval *tp, void *not_used)
 {
     FT_t ft;
 

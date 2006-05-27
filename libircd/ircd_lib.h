@@ -278,7 +278,9 @@ char *strtok_r(char *, const char *, char **);
 #endif
 
 #ifndef HAVE_GETTIMEOFDAY
-int gettimeofday(struct timeval *, void *);
+int ircd_gettimeofday(struct timeval *, void *);
+#else
+#define ircd_gettimeofday(x, y) gettimeofday(x, y)
 #endif
 
 #ifndef ircd_currenttime

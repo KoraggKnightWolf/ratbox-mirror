@@ -119,7 +119,7 @@ ircd_set_time(void)
 	{
 		ircd_time = ircd_malloc(sizeof(struct timeval));
 	}
-	if(gettimeofday(&newtime, NULL) == -1)
+	if(ircd_gettimeofday(&newtime, NULL) == -1)
 	{
 		ircd_lib_log("Clock Failure (%s)", strerror(errno));
 		ircd_lib_restart("Clock Failure");
@@ -141,7 +141,7 @@ ircd_lib(log_cb *ilog, restart_cb *irestart, die_cb *idie, int closeall, int max
 	ircd_event_init();
 	ircd_fdlist_init(closeall, maxcon);
 	init_netio();
-	initBlockHeap();
+	ircd_init_bh();
 	init_dlink_nodes(dh_size);
 	ircd_linebuf_init(lb_heap_size);
 }
