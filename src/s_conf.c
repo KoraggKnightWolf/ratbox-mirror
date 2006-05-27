@@ -1303,9 +1303,7 @@ conf_fgets(char *lbuf, int max_size, FILE * fb)
 	if(fgets(lbuf, max_size, fb) == NULL)
 		return (0);
 
-	p = strpbrk(lbuf, "\r\n");
-	
-	if(p != NULL) {
+	if((p = strpbrk(lbuf, "\r\n")) != NULL) {
 		*p++ = '\n';
 		*p = '\0';
 	}	
