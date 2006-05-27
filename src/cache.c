@@ -97,7 +97,7 @@ cache_file(const char *filename, const char *shortname, int flags)
 	/* cache the file... */
 	while(fgets(line, sizeof(line), in) != NULL)
 	{
-		if((p = strchr(line, '\n')) != NULL)
+		if((p = strpbrk(line, "\r\n")) != NULL)
 			*p = '\0';
 
 		if(!EmptyString(line))
