@@ -37,7 +37,8 @@
  *
  * 1. mmap() anonymous pages with the MMAP_ANON flag.
  * 2. mmap() via the /dev/zero trick.
- * 3. malloc() 
+ * 3. HeapCreate/HeapAlloc (on win32) 
+ * 4. malloc() 
  *
  * The advantages of 1 and 2 are this.  We can munmap() the pages which will
  * return the pages back to the operating system, thus reducing the size 
@@ -50,9 +51,6 @@
  * the block and return it back to the OS, thus causing our memory consumption to go
  * down after we no longer need it.
  * 
- * Of course it is up to the caller to make sure BlockHeapGarbageCollect() gets
- * called periodically to do this cleanup, otherwise you'll keep the memory in the
- * process.
  *
  *
  */
@@ -73,21 +71,25 @@
 #endif
 #endif
 
-static int newblock(BlockHeap * bh);
-static int BlockHeapGarbageCollect(BlockHeap *);
-static void block_heap_gc(void *unused);
+static int newblock(ircd_bh * bh);
+static int ircd_bh_gc(ircd_bh *);
+static void ircd_bh_gc_event(void *unused);
 static dlink_list heap_lists;
 
 #if defined(HAVE_MMAP) && !defined(MAP_ANON)
 static int zero_fd = -1;
 #endif
 
-#define blockheap_fail(x) _blockheap_fail(x, __FILE__, __LINE__)
+#if defined(_WIN32)
+static HANDLE block_heap;
+#endif
+
+#define ircd_bh_fail(x) _ircd_bh_fail(x, __FILE__, __LINE__)
 
 static void
-_blockheap_fail(const char *reason, const char *file, int line)
+_ircd_bh_fail(const char *reason, const char *file, int line)
 {
-	ircd_lib_log("Blockheap failure: %s (%s:%d)", reason, file, line);
+	ircd_lib_log("ircd_heap_blockheap failure: %s (%s:%d)", reason, file, line);
 	abort();
 }
                 
@@ -105,7 +107,11 @@ free_block(void *ptr, size_t size)
 #ifdef HAVE_MMAP
 	munmap(ptr, size);
 #else
+#ifdef _WIN32
+	HeapFree(block_heap, 0, ptr);
+#else
 	free(ptr);
+#endif
 #endif
 }
 
@@ -122,39 +128,39 @@ slow_list_length(dlink_list *list)
 		count++;
 		if(count > list->length * 2)
 		{
-			blockheap_fail("count > list->length * 2 - I give up");
+			ircd_bh_fail("count > list->length * 2 - I give up");
 		}
 	}
 	return count;
 }
 
 static void
-bh_sanity_check_block(BlockHeap *bh, Block *block)
+bh_sanity_check_block(ircd_bh *bh, ircd_heap_block *block)
 {
 	unsigned long s_used, s_free;
 	s_used = slow_list_length(&block->used_list);
 	s_free = slow_list_length(&block->free_list);
 	if(s_used != ircd_dlink_list_length(&block->used_list))
-		blockheap_fail("used link count doesn't match head count");
+		ircd_bh_fail("used link count doesn't match head count");
 	if(s_free != ircd_dlink_list_length(&block->free_list))
-		blockheap_fail("free link count doesn't match head count");
+		ircd_bh_fail("free link count doesn't match head count");
 	
 	if(ircd_dlink_list_length(&block->used_list) + ircd_dlink_list_length(&block->free_list) != bh->elemsPerBlock)
-		blockheap_fail("used_list + free_list != elemsPerBlock");
+		ircd_bh_fail("used_list + free_list != elemsPerBlock");
 }
 
 #if 0
 /* See how confused we are */
 static void
-bh_sanity_check(BlockHeap *bh)
+bh_sanity_check(ircd_bh *bh)
 {
-	Block *walker;
+	ircd_heap_block *walker;
 	unsigned long real_alloc = 0;
 	unsigned long s_used, s_free;
 	unsigned long blockcount = 0;
 	unsigned long allocated;
 	if(bh == NULL)
-		blockheap_fail("Trying to sanity check a NULL block");		
+		ircd_bh_fail("Trying to sanity check a NULL block");		
 	
 	allocated = bh->blocksAllocated * bh->elemsPerBlock;
 	
@@ -165,22 +171,22 @@ bh_sanity_check(BlockHeap *bh)
 		s_free = slow_list_length(&walker->free_list);
 		
 		if(s_used != ircd_dlink_list_length(&walker->used_list))
-			blockheap_fail("used link count doesn't match head count");
+			ircd_bh_fail("used link count doesn't match head count");
 		if(s_free != ircd_dlink_list_length(&walker->free_list))
-			blockheap_fail("free link count doesn't match head count");
+			ircd_bh_fail("free link count doesn't match head count");
 		
 		if(ircd_dlink_list_length(&walker->used_list) + ircd_dlink_list_length(&walker->free_list) != bh->elemsPerBlock)
-			blockheap_fail("used_list + free_list != elemsPerBlock");
+			ircd_bh_fail("used_list + free_list != elemsPerBlock");
 
 		real_alloc += ircd_dlink_list_length(&walker->used_list);
 		real_alloc += ircd_dlink_list_length(&walker->free_list);
 	}
 
 	if(allocated != real_alloc)
-		blockheap_fail("block allocations don't match heap");
+		ircd_bh_fail("block allocations don't match heap");
 
 	if(bh->blocksAllocated != blockcount)
-		blockheap_fail("blocksAllocated don't match blockcount");
+		ircd_bh_fail("blocksAllocated don't match blockcount");
 
 	 
 }
@@ -201,7 +207,7 @@ bh_sanity_check_all(void *unused)
 
 
 /*
- * void initBlockHeap(void)
+ * void ircd_init_bh(void)
  * 
  * Inputs: None
  * Outputs: None
@@ -209,15 +215,19 @@ bh_sanity_check_all(void *unused)
  */
 
 void
-initBlockHeap(void)
+ircd_init_bh(void)
 {
 #if defined(HAVE_MMAP) && !defined(MAP_ANON)
 	zero_fd = open("/dev/zero", O_RDWR);
 
 	if(zero_fd < 0)
-		blockheap_fail("Failed opening /dev/zero");
+		ircd_bh_fail("Failed opening /dev/zero");
+#else
+#ifdef _WIN32
+ 	block_heap = HeapCreate(HEAP_NO_SERIALIZE, 0, 0);	
 #endif
-	ircd_event_addish("block_heap_gc", block_heap_gc, NULL, 30);
+#endif
+	ircd_event_addish("ircd_bh_gc_event", ircd_bh_gc_event, NULL, 120);
 }
 
 /*
@@ -236,25 +246,29 @@ get_block(size_t size)
 	ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 #else
 	ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, zero_fd, 0);
-#endif
+#endif /* MAP_ANON */
 	if(ptr == MAP_FAILED)
 	{
 		ptr = NULL;
 	}
 #else
+#ifdef _WIN32
+	ptr = HeapAlloc(block_heap, 0, size);
+#else 
 	ptr = malloc(size);
 #endif
-	return (ptr);
+#endif
+	return(ptr);
 }
 
 
 static void
-block_heap_gc(void *unused)
+ircd_bh_gc_event(void *unused)
 {
 	dlink_node *ptr;
 	DLINK_FOREACH(ptr, heap_lists.head)
 	{
-		BlockHeapGarbageCollect(ptr->data);
+		ircd_bh_gc(ptr->data);
 	}
 }
 
@@ -270,21 +284,21 @@ block_heap_gc(void *unused)
 /* ************************************************************************ */
 
 static int
-newblock(BlockHeap * bh)
+newblock(ircd_bh * bh)
 {
-	MemBlock *newblk;
-	Block *b;
+	ircd_heap_memblock *newblk;
+	ircd_heap_block *b;
 	unsigned long i;
 	void *offset;
 
 	/* Setup the initial data structure. */
-	b = ircd_malloc(sizeof(Block));
+	b = ircd_malloc(sizeof(ircd_heap_block));
 
 	b->free_list.head = b->free_list.tail = NULL;
 	b->used_list.head = b->used_list.tail = NULL;
 	b->next = bh->base;
 
-	b->alloc_size = (bh->elemsPerBlock + 1) * (bh->elemSize + sizeof(MemBlock));
+	b->alloc_size = (bh->elemsPerBlock + 1) * (bh->elemSize + sizeof(ircd_heap_memblock));
 
 	b->elems = get_block(b->alloc_size);
 	if(unlikely(b->elems == NULL))
@@ -301,11 +315,11 @@ newblock(BlockHeap * bh)
 #ifdef DEBUG_BALLOC
 		newblk->magic = BALLOC_MAGIC;
 #endif
-		data = (void *) ((size_t) offset + sizeof(MemBlock));
+		data = (void *) ((size_t) offset + sizeof(ircd_heap_memblock));
 		newblk->block = b;
 		ircd_dlinkAdd(data, &newblk->self, &b->free_list);
 		offset = (unsigned char *) ((unsigned char *) offset +
-					    bh->elemSize + sizeof(MemBlock));
+					    bh->elemSize + sizeof(ircd_heap_memblock));
 	}
 
 	++bh->blocksAllocated;
@@ -318,7 +332,7 @@ newblock(BlockHeap * bh)
 
 /* ************************************************************************ */
 /* FUNCTION DOCUMENTATION:                                                  */
-/*    BlockHeapCreate                                                       */
+/*    ircd_bh_create                                                       */
 /* Description:                                                             */
 /*   Creates a new blockheap from which smaller blocks can be allocated.    */
 /*   Intended to be used instead of multiple calls to malloc() when         */
@@ -329,22 +343,22 @@ newblock(BlockHeap * bh)
 /*         of memory.  When the blockheap runs out of free memory, it will  */
 /*         allocate elemsize * elemsperblock more.                          */
 /* Returns:                                                                 */
-/*   Pointer to new BlockHeap, or NULL if unsuccessful                      */
+/*   Pointer to new ircd_bh, or NULL if unsuccessful                      */
 /* ************************************************************************ */
-BlockHeap *
-BlockHeapCreate(size_t elemsize, int elemsperblock)
+ircd_bh *
+ircd_bh_create(size_t elemsize, int elemsperblock)
 {
-	BlockHeap *bh;
+	ircd_bh *bh;
 	lircd_assert(elemsize > 0 && elemsperblock > 0);
 
 	/* Catch idiotic requests up front */
 	if((elemsize <= 0) || (elemsperblock <= 0))
 	{
-		blockheap_fail("Attempting to BlockHeapCreate idiotic sizes");
+		ircd_bh_fail("Attempting to ircd_bh_create idiotic sizes");
 	}
 
-	/* Allocate our new BlockHeap */
-	bh = ircd_malloc(sizeof(BlockHeap));
+	/* Allocate our new ircd_bh */
+	bh = ircd_malloc(sizeof(ircd_bh));
 
 	if((elemsize % sizeof(void *)) != 0)
 	{
@@ -370,7 +384,7 @@ BlockHeapCreate(size_t elemsize, int elemsperblock)
 
 	if(bh == NULL)
 	{
-		blockheap_fail("bh == NULL when it shouldn't be");
+		ircd_bh_fail("bh == NULL when it shouldn't be");
 	}
 	ircd_dlinkAdd(bh, &bh->hlist, &heap_lists);
 	return (bh);
@@ -378,9 +392,9 @@ BlockHeapCreate(size_t elemsize, int elemsperblock)
 
 /* ************************************************************************ */
 /* FUNCTION DOCUMENTATION:                                                  */
-/*    BlockHeapAlloc                                                        */
+/*    ircd_bh_alloc                                                        */
 /* Description:                                                             */
-/*    Returns a pointer to a struct within our BlockHeap that's free for    */
+/*    Returns a pointer to a struct within our ircd_bh that's free for    */
 /*    the taking.                                                           */
 /* Parameters:                                                              */
 /*    bh (IN):  Pointer to the Blockheap.                                   */
@@ -389,15 +403,15 @@ BlockHeapCreate(size_t elemsize, int elemsperblock)
 /* ************************************************************************ */
 
 void *
-BlockHeapAlloc(BlockHeap * bh)
+ircd_bh_alloc(ircd_bh * bh)
 {
-	Block *walker;
+	ircd_heap_block *walker;
 	dlink_node *new_node;
 
 	lircd_assert(bh != NULL);
 	if(unlikely(bh == NULL))
 	{
-		blockheap_fail("Cannot allocate if bh == NULL");
+		ircd_bh_fail("Cannot allocate if bh == NULL");
 	}
 
 	if(bh->freeElems == 0)
@@ -408,7 +422,7 @@ BlockHeapAlloc(BlockHeap * bh)
 		if(unlikely(newblock(bh)))
 		{
 			/* That didn't work..try to garbage collect */
-			BlockHeapGarbageCollect(bh);
+			ircd_bh_gc(bh);
 			if(bh->freeElems == 0)
 			{
 				ircd_lib_log("newblock() failed and garbage collection didn't help");
@@ -429,12 +443,12 @@ BlockHeapAlloc(BlockHeap * bh)
 			ircd_dlinkMoveNode(new_node, &walker->free_list, &walker->used_list);
 			lircd_assert(new_node->data != NULL);
 			if(new_node->data == NULL)
-				blockheap_fail("new_node->data is NULL and that shouldn't happen!!!");
+				ircd_bh_fail("new_node->data is NULL and that shouldn't happen!!!");
 			memset(new_node->data, 0, bh->elemSize);
 #ifdef DEBUG_BALLOC
 			do
 			{
-				struct MemBlock *memblock = (void *) ((size_t) new_node->data - sizeof(MemBlock));
+				struct ircd_heap_memblock *memblock = (void *) ((size_t) new_node->data - sizeof(ircd_heap_memblock));
 				if(memblock->magic == BALLOC_FREE_MAGIC)
 					memblock->magic = BALLOC_MAGIC;
 			
@@ -444,27 +458,27 @@ BlockHeapAlloc(BlockHeap * bh)
 			return (new_node->data);
 		}
 	}
-	blockheap_fail("BlockHeapAlloc failed, giving up");
+	ircd_bh_fail("ircd_bh_alloc failed, giving up");
 	return NULL;
 }
 
 
 /* ************************************************************************ */
 /* FUNCTION DOCUMENTATION:                                                  */
-/*    BlockHeapFree                                                         */
+/*    ircd_bh_free                                                          */
 /* Description:                                                             */
 /*    Returns an element to the free pool, does not free()                  */
 /* Parameters:                                                              */
-/*    bh (IN): Pointer to BlockHeap containing element                      */
+/*    bh (IN): Pointer to ircd_bh containing element                        */
 /*    ptr (in):  Pointer to element to be "freed"                           */
 /* Returns:                                                                 */
-/*    0 if successful, 1 if element not contained within BlockHeap.         */
+/*    0 if successful, 1 if element not contained within ircd_bh.           */
 /* ************************************************************************ */
 int
-BlockHeapFree(BlockHeap * bh, void *ptr)
+ircd_bh_free(ircd_bh * bh, void *ptr)
 {
-	Block *block;
-	struct MemBlock *memblock;
+	ircd_heap_block *block;
+	struct ircd_heap_memblock *memblock;
 
 	lircd_assert(bh != NULL);
 	lircd_assert(ptr != NULL);
@@ -472,33 +486,33 @@ BlockHeapFree(BlockHeap * bh, void *ptr)
 	if(unlikely(bh == NULL))
 	{
 
-		ircd_lib_log("balloc.c:BlockHeapFree() bh == NULL");
+		ircd_lib_log("balloc.c:ircd_bhFree() bh == NULL");
 		return (1);
 	}
 
 	if(unlikely(ptr == NULL))
 	{
-		ircd_lib_log("balloc.BlockHeapFree() ptr == NULL");
+		ircd_lib_log("balloc.ircd_bhFree() ptr == NULL");
 		return (1);
 	}
 
-	memblock = (void *) ((size_t) ptr - sizeof(MemBlock));
+	memblock = (void *) ((size_t) ptr - sizeof(ircd_heap_memblock));
 #ifdef DEBUG_BALLOC
 	if(memblock->magic == BALLOC_FREE_MAGIC)
 	{
-		blockheap_fail("double free of a block");
+		ircd_bh_fail("double free of a block");
 		ircd_outofmemory();
 	} else 
 	if(memblock->magic != BALLOC_MAGIC)
 	{
-		blockheap_fail("memblock->magic != BALLOC_MAGIC");
+		ircd_bh_fail("memblock->magic != BALLOC_MAGIC");
 		ircd_outofmemory();
 	}
 #endif
 	lircd_assert(memblock->block != NULL);
 	if(unlikely(memblock->block == NULL))
 	{
-		blockheap_fail("memblock->block == NULL, not a valid block?");
+		ircd_bh_fail("memblock->block == NULL, not a valid block?");
 		ircd_outofmemory();
 	}
 
@@ -517,20 +531,20 @@ BlockHeapFree(BlockHeap * bh, void *ptr)
 
 /* ************************************************************************ */
 /* FUNCTION DOCUMENTATION:                                                  */
-/*    BlockHeapGarbageCollect                                               */
+/*    ircd_bh_gc	                                                    */
 /* Description:                                                             */
 /*    Performs garbage collection on the block heap.  Any blocks that are   */
 /*    completely unallocated are removed from the heap.  Garbage collection */
 /*    will never remove the root node of the heap.                          */
 /* Parameters:                                                              */
-/*    bh (IN):  Pointer to the BlockHeap to be cleaned up                   */
+/*    bh (IN):  Pointer to the ircd_bh to be cleaned up                     */
 /* Returns:                                                                 */
 /*   0 if successful, 1 if bh == NULL                                       */
 /* ************************************************************************ */
 static int
-BlockHeapGarbageCollect(BlockHeap * bh)
+ircd_bh_gc(ircd_bh * bh)
 {
-	Block *walker, *last;
+	ircd_heap_block *walker, *last;
 	if(bh == NULL)
 	{
 		return (1);
@@ -578,18 +592,18 @@ BlockHeapGarbageCollect(BlockHeap * bh)
 
 /* ************************************************************************ */
 /* FUNCTION DOCUMENTATION:                                                  */
-/*    BlockHeapDestroy                                                      */
+/*    ircd_bhDestroy                                                      */
 /* Description:                                                             */
-/*    Completely free()s a BlockHeap.  Use for cleanup.                     */
+/*    Completely free()s a ircd_bh.  Use for cleanup.                     */
 /* Parameters:                                                              */
-/*    bh (IN):  Pointer to the BlockHeap to be destroyed.                   */
+/*    bh (IN):  Pointer to the ircd_bh to be destroyed.                   */
 /* Returns:                                                                 */
 /*   0 if successful, 1 if bh == NULL                                       */
 /* ************************************************************************ */
 int
-BlockHeapDestroy(BlockHeap * bh)
+ircd_bh_destroy(ircd_bh * bh)
 {
-	Block *walker, *next;
+	ircd_heap_block *walker, *next;
 
 	if(bh == NULL)
 	{
@@ -609,7 +623,7 @@ BlockHeapDestroy(BlockHeap * bh)
 }
 
 void
-BlockHeapUsage(BlockHeap * bh, size_t * bused, size_t * bfree, size_t * bmemusage)
+ircd_bh_usage(ircd_bh * bh, size_t * bused, size_t * bfree, size_t * bmemusage)
 {
 	size_t used;
 	size_t freem;
@@ -621,7 +635,7 @@ BlockHeapUsage(BlockHeap * bh, size_t * bused, size_t * bfree, size_t * bmemusag
 
 	freem = bh->freeElems;
 	used = (bh->blocksAllocated * bh->elemsPerBlock) - bh->freeElems;
-	memusage = used * (bh->elemSize + sizeof(MemBlock));
+	memusage = used * (bh->elemSize + sizeof(ircd_heap_memblock));
 
 	if(bused != NULL)
 		*bused = used;

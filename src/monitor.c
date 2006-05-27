@@ -41,12 +41,12 @@
 #include "send.h"
 
 struct monitor *monitorTable[MONITOR_HASH_SIZE];
-BlockHeap *monitor_heap;
+ircd_bh *monitor_heap;
 
 void
 init_monitor(void)
 {
-	monitor_heap = BlockHeapCreate(sizeof(struct monitor), MONITOR_HEAP_SIZE);
+	monitor_heap = ircd_bh_create(sizeof(struct monitor), MONITOR_HEAP_SIZE);
 }
 
 static inline unsigned int
@@ -70,7 +70,7 @@ find_monitor(const char *name, int add)
 
 	if(add)
 	{
-		monptr = BlockHeapAlloc(monitor_heap);
+		monptr = ircd_bh_alloc(monitor_heap);
 		strlcpy(monptr->name, name, sizeof(monptr->name));
 
 		monptr->hnext = monitorTable[hashv];

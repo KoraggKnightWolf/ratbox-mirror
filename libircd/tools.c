@@ -61,12 +61,12 @@ mem_frob(void *data, int len)
  * init_dlink_nodes
  *
  */
-static BlockHeap *dnode_heap;
+static ircd_bh *dnode_heap;
 void
 init_dlink_nodes(size_t dh_size)
 {
 
-	dnode_heap = BlockHeapCreate(sizeof(dlink_node), dh_size);
+	dnode_heap = ircd_bh_create(sizeof(dlink_node), dh_size);
 	if(dnode_heap == NULL)
 		ircd_outofmemory();
 }
@@ -81,7 +81,7 @@ init_dlink_nodes(size_t dh_size)
 dlink_node *
 make_dlink_node(void)
 {
-	return(BlockHeapAlloc(dnode_heap));
+	return(ircd_bh_alloc(dnode_heap));
 }
 
 /*
@@ -95,7 +95,7 @@ void
 free_dlink_node(dlink_node * ptr)
 {
 	assert(ptr != NULL);
-	BlockHeapFree(dnode_heap, ptr);
+	ircd_bh_free(dnode_heap, ptr);
 }
 
 #ifdef LIST_SANITY_CHECK

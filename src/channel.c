@@ -43,10 +43,10 @@
 
 struct config_channel_entry ConfigChannel;
 dlink_list global_channel_list;
-static BlockHeap *channel_heap;
-static BlockHeap *ban_heap;
-static BlockHeap *topic_heap;
-static BlockHeap *member_heap;
+static ircd_bh *channel_heap;
+static ircd_bh *ban_heap;
+static ircd_bh *topic_heap;
+static ircd_bh *member_heap;
 
 static int channel_capabs[] = { CAP_EX, CAP_IE, 
 #ifdef ENABLE_SERVICES
@@ -69,10 +69,10 @@ static void free_topic(struct Channel *chptr);
 void
 init_channels(void)
 {
-	channel_heap = BlockHeapCreate(sizeof(struct Channel), CHANNEL_HEAP_SIZE);
-	ban_heap = BlockHeapCreate(sizeof(struct Ban), BAN_HEAP_SIZE);
-	topic_heap = BlockHeapCreate(TOPICLEN + 1 + USERHOST_REPLYLEN, TOPIC_HEAP_SIZE);
-	member_heap = BlockHeapCreate(sizeof(struct membership), MEMBER_HEAP_SIZE);
+	channel_heap = ircd_bh_create(sizeof(struct Channel), CHANNEL_HEAP_SIZE);
+	ban_heap = ircd_bh_create(sizeof(struct Ban), BAN_HEAP_SIZE);
+	topic_heap = ircd_bh_create(TOPICLEN + 1 + USERHOST_REPLYLEN, TOPIC_HEAP_SIZE);
+	member_heap = ircd_bh_create(sizeof(struct membership), MEMBER_HEAP_SIZE);
 }
 
 /*
@@ -82,7 +82,7 @@ struct Channel *
 allocate_channel(const char *chname)
 {
 	struct Channel *chptr;
-	chptr = BlockHeapAlloc(channel_heap);
+	chptr = ircd_bh_alloc(channel_heap);
 	chptr->chname = ircd_strndup(chname, CHANNELLEN);
 	return(chptr);
 }
@@ -91,14 +91,14 @@ void
 free_channel(struct Channel *chptr)
 {
 	ircd_free(chptr->chname);
-	BlockHeapFree(channel_heap, chptr);
+	ircd_bh_free(channel_heap, chptr);
 }
 
 struct Ban *
 allocate_ban(const char *banstr, const char *who)
 {
 	struct Ban *bptr;
-	bptr = BlockHeapAlloc(ban_heap);
+	bptr = ircd_bh_alloc(ban_heap);
 	bptr->banstr = ircd_strndup(banstr, BANLEN);
 	bptr->who = ircd_strndup(who, BANLEN);
 	
@@ -110,7 +110,7 @@ free_ban(struct Ban *bptr)
 {
 	ircd_free(bptr->banstr);
 	ircd_free(bptr->who);
-	BlockHeapFree(ban_heap, bptr);
+	ircd_bh_free(ban_heap, bptr);
 }
 
 
@@ -182,7 +182,7 @@ add_user_to_channel(struct Channel *chptr, struct Client *client_p, int flags)
 	if(client_p->user == NULL)
 		return;
 
-	msptr = BlockHeapAlloc(member_heap);
+	msptr = ircd_bh_alloc(member_heap);
 
 	msptr->chptr = chptr;
 	msptr->client_p = client_p;
@@ -222,7 +222,7 @@ remove_user_from_channel(struct membership *msptr)
 	if(ircd_dlink_list_length(&chptr->members) <= 0)
 		destroy_channel(chptr);
 
-	BlockHeapFree(member_heap, msptr);
+	ircd_bh_free(member_heap, msptr);
 
 	return;
 }
@@ -257,7 +257,7 @@ remove_user_from_channels(struct Client *client_p)
 		if(ircd_dlink_list_length(&chptr->members) <= 0)
 			destroy_channel(chptr);
 
-		BlockHeapFree(member_heap, msptr);
+		ircd_bh_free(member_heap, msptr);
 	}
 
 	client_p->user->channel.head = client_p->user->channel.tail = NULL;
@@ -725,7 +725,7 @@ allocate_topic(struct Channel *chptr)
 	if(chptr == NULL)
 		return;
 
-	ptr = BlockHeapAlloc(topic_heap);
+	ptr = ircd_bh_alloc(topic_heap);
 
 	/* Basically we allocate one large block for the topic and
 	 * the topic info.  We then split it up into two and shove it
@@ -755,7 +755,7 @@ free_topic(struct Channel *chptr)
 	 * MUST change this as well
 	 */
 	ptr = chptr->topic;
-	BlockHeapFree(topic_heap, ptr);
+	ircd_bh_free(topic_heap, ptr);
 	chptr->topic = NULL;
 	chptr->topic_info = NULL;
 }

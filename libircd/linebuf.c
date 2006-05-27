@@ -27,7 +27,7 @@
 #include "ircd_lib.h"
 
 #ifndef NO_BLOCKHEAP
-static BlockHeap *ircd_linebuf_heap;
+static ircd_bh *ircd_linebuf_heap;
 #endif
 
 static int bufline_count = 0;
@@ -46,7 +46,7 @@ void
 ircd_linebuf_init(size_t heap_size)
 {
 #ifndef NO_BLOCKHEAP
-	ircd_linebuf_heap = BlockHeapCreate(sizeof(buf_line_t), heap_size);
+	ircd_linebuf_heap = ircd_bh_create(sizeof(buf_line_t), heap_size);
 #endif
 }
 
@@ -55,7 +55,7 @@ ircd_linebuf_allocate(void)
 {
 	buf_line_t *t;
 #ifndef NO_BLOCKHEAP
-	t = BlockHeapAlloc(ircd_linebuf_heap);
+	t = ircd_bh_alloc(ircd_linebuf_heap);
 #else
 	t = ircd_malloc(sizeof(buf_line_t));
 #endif
@@ -67,7 +67,7 @@ static void
 ircd_linebuf_free(buf_line_t * p)
 {
 #ifndef NO_BLOCKHEAP
-	BlockHeapFree(ircd_linebuf_heap, p);
+	ircd_bh_free(ircd_linebuf_heap, p);
 #else
 	ircd_free(p);
 #endif
@@ -857,7 +857,7 @@ void
 ircd_count_ircd_linebuf_memory(size_t * count, size_t * ircd_linebuf_memory_used)
 {
 #ifndef NO_BLOCKHEAP
-	BlockHeapUsage(ircd_linebuf_heap, count, NULL, ircd_linebuf_memory_used);
+	ircd_bh_usage(ircd_linebuf_heap, count, NULL, ircd_linebuf_memory_used);
 #else
 	*count = 0;
 	*ircd_linebuf_memory_used = 0;

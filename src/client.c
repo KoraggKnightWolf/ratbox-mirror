@@ -68,9 +68,9 @@ static int qs_server(struct Client *);
 
 static EVH check_pings;
 
-static BlockHeap *client_heap = NULL;
-static BlockHeap *lclient_heap = NULL;
-static BlockHeap *user_heap = NULL;
+static ircd_bh *client_heap = NULL;
+static ircd_bh *lclient_heap = NULL;
+static ircd_bh *user_heap = NULL;
 
 static char current_uid[IDLEN];
 
@@ -104,9 +104,9 @@ init_client(void)
 	 * start off the check ping event ..  -- adrian
 	 * Every 30 seconds is plenty -- db
 	 */
-	client_heap = BlockHeapCreate(sizeof(struct Client), CLIENT_HEAP_SIZE);
-	lclient_heap = BlockHeapCreate(sizeof(struct LocalUser), LCLIENT_HEAP_SIZE);
-	user_heap = BlockHeapCreate(sizeof(struct User), USER_HEAP_SIZE);
+	client_heap = ircd_bh_create(sizeof(struct Client), CLIENT_HEAP_SIZE);
+	lclient_heap = ircd_bh_create(sizeof(struct LocalUser), LCLIENT_HEAP_SIZE);
+	user_heap = ircd_bh_create(sizeof(struct User), USER_HEAP_SIZE);
 	ircd_event_addish("check_pings", check_pings, NULL, 30);
 	ircd_event_addish("free_exited_clients", &free_exited_clients, NULL, 5);
 	ircd_event_addish("exit_aborted_clients", exit_aborted_clients, NULL, 5);
@@ -130,13 +130,13 @@ make_client(struct Client *from)
 	struct Client *client_p = NULL;
 	struct LocalUser *localClient;
 
-	client_p = BlockHeapAlloc(client_heap);
+	client_p = ircd_bh_alloc(client_heap);
 
 	if(from == NULL)
 	{
 		client_p->from = client_p;	/* 'from' of local client is self! */
 
-		localClient = BlockHeapAlloc(lclient_heap);
+		localClient = ircd_bh_alloc(lclient_heap);
 		SetMyConnect(client_p);
 		client_p->localClient = localClient;
 
@@ -194,7 +194,7 @@ free_local_client(struct Client *client_p)
 	ircd_free(client_p->localClient->opername);
 	ircd_free(client_p->localClient->slink);
 
-	BlockHeapFree(lclient_heap, client_p->localClient);
+	ircd_bh_free(lclient_heap, client_p->localClient);
 	client_p->localClient = NULL;
 }
 
@@ -204,7 +204,7 @@ free_client(struct Client *client_p)
 	s_assert(NULL != client_p);
 	s_assert(&me != client_p);
 	free_local_client(client_p);
-	BlockHeapFree(client_heap, client_p);
+	ircd_bh_free(client_heap, client_p);
 }
 
 /*
@@ -1456,8 +1456,8 @@ void
 count_local_client_memory(size_t * count, size_t * local_client_memory_used)
 {
 	size_t lusage;
-	BlockHeapUsage(lclient_heap, count, NULL, &lusage);
-	*local_client_memory_used = lusage + (*count * (sizeof(MemBlock) + sizeof(struct Client)));
+	ircd_bh_usage(lclient_heap, count, NULL, &lusage);
+	*local_client_memory_used = lusage + (*count * (sizeof(ircd_heap_memblock) + sizeof(struct Client)));
 }
 
 /*
@@ -1467,10 +1467,10 @@ void
 count_remote_client_memory(size_t * count, size_t * remote_client_memory_used)
 {
 	size_t lcount, rcount;
-	BlockHeapUsage(lclient_heap, &lcount, NULL, NULL);
-	BlockHeapUsage(client_heap, &rcount, NULL, NULL);
+	ircd_bh_usage(lclient_heap, &lcount, NULL, NULL);
+	ircd_bh_usage(client_heap, &rcount, NULL, NULL);
 	*count = rcount - lcount;
-	*remote_client_memory_used = *count * (sizeof(MemBlock) + sizeof(struct Client));
+	*remote_client_memory_used = *count * (sizeof(ircd_heap_memblock) + sizeof(struct Client));
 }
 
 
@@ -1587,7 +1587,7 @@ make_user(struct Client *client_p)
 	user = client_p->user;
 	if(!user)
 	{
-		user = BlockHeapAlloc(user_heap);
+		user = ircd_bh_alloc(user_heap);
 		client_p->user = user;
 	}
 	return user;
@@ -1646,7 +1646,7 @@ free_user(struct User *user, struct Client *client_p)
 		s_assert(!user->channel.head);
 	}
 
-	BlockHeapFree(user_heap, user);
+	ircd_bh_free(user_heap, user);
 }
 
 void

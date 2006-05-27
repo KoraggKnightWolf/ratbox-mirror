@@ -31,7 +31,7 @@
 #endif
 
 dlink_list ircd_fd_table[FD_HASH_SIZE];
-static BlockHeap *fd_heap;
+static ircd_bh *fd_heap;
 
 static dlink_list timeout_list;
 
@@ -63,7 +63,7 @@ add_fd(int fd)
 	if(F != NULL)
 		return F; 
 	
-	F = BlockHeapAlloc(fd_heap);
+	F = ircd_bh_alloc(fd_heap);
 	F->fd = fd;
 	list = &ircd_fd_table[hash_fd(fd)];
 	ircd_dlinkAdd(F, &F->node, list);
@@ -82,7 +82,7 @@ remove_fd(int fd)
 		return;
 
 	ircd_dlinkDelete(&F->node, list);
-	BlockHeapFree(fd_heap, F);
+	ircd_bh_free(fd_heap, F);
 }
 
 
@@ -683,7 +683,7 @@ ircd_fdlist_init(int closeall, int maxfds)
 		/* Since we're doing this once .. */
 		initialized = 1;
 	}
-	fd_heap = BlockHeapCreate(sizeof(fde_t), FD_HEAP_SIZE);
+	fd_heap = ircd_bh_create(sizeof(fde_t), FD_HEAP_SIZE);
 	ircd_event_add("ircd_checktimeouts", ircd_checktimeouts, NULL, 2);
 
 }

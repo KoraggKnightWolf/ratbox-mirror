@@ -80,7 +80,7 @@ ReportType;
 #define sendheader(c, r) sendto_one(c, POP_QUEUE, HeaderMessages[(r)])
 
 static dlink_list auth_poll_list;
-static BlockHeap *auth_heap;
+static ircd_bh *auth_heap;
 static EVH timeout_auth_queries_event;
 
 static buf_head_t auth_sendq;
@@ -236,7 +236,7 @@ init_auth(void)
 	}
 	memset(&auth_poll_list, 0, sizeof(auth_poll_list));
 	ircd_event_addish("timeout_auth_queries_event", timeout_auth_queries_event, NULL, 3);
-	auth_heap = BlockHeapCreate(sizeof(struct AuthRequest), AUTH_HEAP_SIZE);
+	auth_heap = ircd_bh_create(sizeof(struct AuthRequest), AUTH_HEAP_SIZE);
 
 }
 
@@ -246,7 +246,7 @@ init_auth(void)
 static struct AuthRequest *
 make_auth_request(struct Client *client)
 {
-	struct AuthRequest *request = BlockHeapAlloc(auth_heap);
+	struct AuthRequest *request = ircd_bh_alloc(auth_heap);
 	client->localClient->auth_request = request;
 	request->client = client;
 	request->dns_query = 0;
@@ -261,7 +261,7 @@ make_auth_request(struct Client *client)
 static void
 free_auth_request(struct AuthRequest *request)
 {
-	BlockHeapFree(auth_heap, request);
+	ircd_bh_free(auth_heap, request);
 }
 
 /*

@@ -343,7 +343,7 @@ static void cleanup_monitor(void *unused)
 				else
 					monitorTable[i] = next_ptr;
 
-				BlockHeapFree(monitor_heap, ptr);
+				ircd_bh_free(monitor_heap, ptr);
 			}
 			else
 				last_ptr = ptr;

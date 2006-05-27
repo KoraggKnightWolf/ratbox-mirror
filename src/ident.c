@@ -43,7 +43,7 @@ struct auth_request
 	int authfd;
 };
 
-static BlockHeap *authheap;
+static ircd_bh *authheap;
 
 static char buf[512]; /* scratch buffer */
 static char readBuf[READBUF_SIZE];
@@ -83,7 +83,7 @@ read_auth_timeout(int fd, void *data)
 {
 	struct auth_request *auth = data;
 	ircd_helper_write(ident_helper, "%s 0", auth->reqid);
-	BlockHeapFree(authheap, auth);
+	ircd_bh_free(authheap, auth);
 	ircd_close(fd);
 }
 
@@ -180,7 +180,7 @@ read_auth(int fd, void *data)
 		} else
 			ircd_helper_write(ident_helper, "%s 0", auth->reqid);
 		ircd_close(fd);
-		BlockHeapFree(authheap, auth);
+		ircd_bh_free(authheap, auth);
 	}
 }
 
@@ -198,14 +198,14 @@ connect_callback(int fd, int status, void *data)
 		{
 			ircd_helper_write(ident_helper, "%s 0", auth->reqid);
 			ircd_close(fd);
-			BlockHeapFree(authheap, auth);
+			ircd_bh_free(authheap, auth);
 			return;
 		}
 		read_auth(fd, auth);
 	} else {
 		ircd_helper_write(ident_helper, "%s 0", auth->reqid);
 		ircd_close(fd);
-		BlockHeapFree(authheap, auth);
+		ircd_bh_free(authheap, auth);
 	}
 }
 
@@ -214,7 +214,7 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 {
 	struct auth_request *auth;
 
-	auth = BlockHeapAlloc(authheap);
+	auth = ircd_bh_alloc(authheap);
 	
 	ircd_inet_pton_sock(bindaddr, (struct sockaddr *)&auth->bindaddr);
 	ircd_inet_pton_sock(destaddr, (struct sockaddr *)&auth->destaddr);
@@ -231,7 +231,7 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	if(auth->authfd < 0)
 	{
 		ircd_helper_write(ident_helper, "%s 0", id);
-		BlockHeapFree(authheap, auth);
+		ircd_bh_free(authheap, auth);
 		return;	
 	}
 
@@ -310,7 +310,7 @@ int main(int argc, char **argv)
 	}
 	ident_timeout = atoi(tident_timeout);
 	
-	authheap = BlockHeapCreate(sizeof(struct auth_request), 2048);
+	authheap = ircd_bh_create(sizeof(struct auth_request), 2048);
 
 	ircd_helper_read(ident_helper->ifd, ident_helper);
 	while(1) {

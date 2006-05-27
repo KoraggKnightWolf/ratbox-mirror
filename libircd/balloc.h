@@ -33,14 +33,13 @@
 
 #ifdef NOBALLOC 
 	 
-typedef struct BlockHeap BlockHeap; 	 
-#define initBlockHeap() 	 
-#define BlockHeapGarbageCollect(x) 	 
-#define BlockHeapCreate(es, epb) ((BlockHeap*)(es)) 	 
-#define BlockHeapDestroy(x) 	 
-#define BlockHeapAlloc(x) ircd_malloc((int)x) 	 
-#define BlockHeapFree(x,y) ircd_free(y) 	 
-#define BlockHeapUsage(bh, bused, bfree, bmemusage) do { (*(size_t *)bused) = 0; *((size_t *)bfree) = 0; *((size_t *)bmemusage) = 0; } while(0)
+typedef struct ircd_bh ircd_bh; 	 
+#define ircd_init_bh() 	 
+#define ircd_bh_create(es, epb) ((ircd_blockheap*)(es)) 	 
+#define ircd_bh_destroy(x) 	 
+#define ircd_bh_alloc(x) ircd_malloc((int)x) 	 
+#define ircd_bh_free(x,y) ircd_free(y) 	 
+#define ircd_bh_usage(bh, bused, bfree, bmemusage) do { (*(size_t *)bused) = 0; *((size_t *)bfree) = 0; *((size_t *)bmemusage) = 0; } while(0)
  
 #else
 
@@ -52,47 +51,47 @@ typedef struct BlockHeap BlockHeap;
 #endif
 
 /* status information for an allocated block in heap */
-struct Block
+struct ircd_heap_block
 {
 	size_t alloc_size;
-	struct Block *next;	/* Next in our chain of blocks */
+	struct ircd_heap_block *next;	/* Next in our chain of blocks */
 	void *elems;		/* Points to allocated memory */
 	dlink_list free_list;
 	dlink_list used_list;
 };
-typedef struct Block Block;
+typedef struct ircd_heap_block ircd_heap_block;
 
-struct MemBlock
+struct ircd_heap_memblock
 {
 #ifdef DEBUG_BALLOC
 	unsigned long magic;
 #endif
 	dlink_node self;
-	Block *block;		/* Which block we belong to */
+	ircd_heap_block *block;		/* Which block we belong to */
 };
 
-typedef struct MemBlock MemBlock;
+typedef struct ircd_heap_memblock ircd_heap_memblock;
 
 /* information for the root node of the heap */
-struct BlockHeap
+struct ircd_bh
 {
 	dlink_node hlist;
 	size_t elemSize;	/* Size of each element to be stored */
 	unsigned long elemsPerBlock;	/* Number of elements per block */
 	unsigned long blocksAllocated;	/* Number of blocks allocated */
 	unsigned long freeElems;		/* Number of free elements */
-	Block *base;		/* Pointer to first block */
+	ircd_heap_block *base;		/* Pointer to first block */
 };
-typedef struct BlockHeap BlockHeap;
+typedef struct ircd_bh ircd_bh;
 
-int BlockHeapFree(BlockHeap * bh, void *ptr);
-void *BlockHeapAlloc(BlockHeap * bh);
+int ircd_bh_free(ircd_bh *, void *);
+void *ircd_bh_alloc(ircd_bh *);
 
-BlockHeap *BlockHeapCreate(size_t elemsize, int elemsperblock);
-int BlockHeapDestroy(BlockHeap * bh);
+ircd_bh *ircd_bh_create(size_t elemsize, int elemsperblock);
+int ircd_bh_destroy(ircd_bh * bh);
 
-void initBlockHeap(void);
-void BlockHeapUsage(BlockHeap * bh, size_t * bused, size_t * bfree, size_t * bmemusage);
+void ircd_init_bh(void);
+void ircd_bh_usage(ircd_bh * bh, size_t * bused, size_t * bfree, size_t * bmemusage);
 
 
 
