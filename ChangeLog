@@ -1,3 +1,15 @@
+androsyn    2006/05/27 01:13:05 UTC	(20060527_0-22659)
+  Log:
+  - make cases where we use fgets() deal with both \r and \n
+    this fixes the conf parser from blowing up on config files 
+    edited on windows...
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2006/05/24 15:46:36 UTC	(20060524_1-22647)
   Log:
   remove useless ircd_socket in the /dev/zero mmap stuff
