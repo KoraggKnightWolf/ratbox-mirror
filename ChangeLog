@@ -1,3 +1,26 @@
+androsyn    2006/05/27 21:15:57 UTC	(20060527_4-22673)
+  Log:
+  rename the blockheap functions to ircd_bh_*
+
+  Modified:
+	ircd-ratbox/trunk/include/monitor.h (File Modified) 
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+	ircd-ratbox/trunk/libircd/balloc.h (File Modified) 
+	ircd-ratbox/trunk/libircd/commio.c (File Modified) 
+	ircd-ratbox/trunk/libircd/linebuf.c (File Modified) 
+	ircd-ratbox/trunk/libircd/tools.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/sqlite3/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 androsyn    2006/05/27 20:21:36 UTC	(20060527_3-22671)
   Log:
   Forgot to add Makefile.am..oops
