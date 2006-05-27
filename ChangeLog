@@ -1,3 +1,12 @@
+androsyn    2006/05/27 20:21:36 UTC	(20060527_3-22671)
+  Log:
+  Forgot to add Makefile.am..oops
+  
+
+  Modified:
+	ircd-ratbox/trunk/sqlite3/Makefile.am (File Added) 
+
+
 androsyn    2006/05/27 20:09:46 UTC	(20060527_2-22669)
   Log:
   change gettimeofday to ircd_gettimeofday
