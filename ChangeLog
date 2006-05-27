@@ -1,3 +1,14 @@
+androsyn    2006/05/27 20:09:46 UTC	(20060527_2-22669)
+  Log:
+  change gettimeofday to ircd_gettimeofday
+
+  Modified:
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/unix.c (File Modified) 
+	ircd-ratbox/trunk/libircd/win32.c (File Modified) 
+
+
 androsyn    2006/05/27 01:20:17 UTC	(20060527_1-22661)
   Log:
   minor style change to conf_fgets
