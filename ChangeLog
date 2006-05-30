@@ -1,3 +1,13 @@
+jilles      2006/05/30 18:33:35 UTC	(20060530_0-22679)
+  Log:
+  Forward port RATBOX_2_2 r22677:
+  get_client_name() fix
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2006/05/27 21:15:57 UTC	(20060527_4-22673)
   Log:
   rename the blockheap functions to ircd_bh_*
