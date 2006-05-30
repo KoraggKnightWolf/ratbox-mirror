@@ -748,6 +748,8 @@ get_client_name(struct Client *client, int showip)
                 if(ConfigFileEntry.hide_spoof_ips &&
                    showip == SHOW_IP && IsIPSpoof(client))
                         showip = MASK_IP;
+                if(IsAnyServer(client))
+                        showip = MASK_IP;
 
                 /* And finally, let's get the host information, ip or name */
                 switch (showip)
