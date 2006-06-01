@@ -83,6 +83,9 @@ m_cmessage(int p_or_n, const char *command,
 	struct Channel *chptr;
 	struct membership *msptr;
 
+	if(!IsFloodDone(source_p))
+		flood_endgrace(source_p);
+
 	if((target_p = find_named_person(parv[1])) == NULL)
 	{
 		if(p_or_n != NOTICE)
