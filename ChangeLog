@@ -1,3 +1,13 @@
+jilles      2006/06/01 18:16:22 UTC	(20060601_0-22683)
+  Log:
+  Forward port RATBOX_2_2 r22681:
+  End the flood grace period in CPRIVMSG/CNOTICE.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_cmessage.c (File Modified) 
+
+
 jilles      2006/05/30 18:33:35 UTC	(20060530_0-22679)
   Log:
   Forward port RATBOX_2_2 r22677:
