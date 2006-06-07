@@ -115,21 +115,28 @@ ms_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 	const char *comment = (parc > 2 && parv[2]) ? parv[2] : client_p->name;
 
 	if(parc < 2)
+		target_p = client_p;
+	else
 	{
-		exit_client(client_p, client_p, source_p, comment);
-		return 0;
+		if((target_p = find_server(NULL, parv[1])) == NULL)
+			return 0;
+
+		if(IsMe(target_p))
+			target_p = client_p;
+		if(!IsServer(target_p))
+			return 0;
 	}
 	
-	if((target_p = find_server(NULL, parv[1])) == NULL)
-		return 0;
-		
-	if(!IsServer(target_p) || IsMe(target_p))
-		return 0;
-	
+	/* Server is closing its link */
+	if (target_p == client_p)
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Server %s closing link (%s)",
+				target_p->name, comment);
+	}
 	/*
 	 **  Notify all opers, if my local link is remotely squitted
 	 */
-	if(MyConnect(target_p))
+	else if(MyConnect(target_p))
 	{
 		sendto_wallops_flags(UMODE_WALLOP, &me,
 				     "Remote SQUIT %s from %s (%s)",
