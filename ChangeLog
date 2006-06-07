@@ -1,3 +1,14 @@
+jilles      2006/06/07 17:03:34 UTC	(20060607_0-22713)
+  Log:
+  - Generate a server notice (no wallops) if a server
+    announces it's closing its link via SQUIT
+  - Exit a server which sends us an SQUIT for our name
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_squit.c (File Modified) 
+
+
 jilles      2006/06/01 18:16:22 UTC	(20060601_0-22683)
   Log:
   Forward port RATBOX_2_2 r22681:
