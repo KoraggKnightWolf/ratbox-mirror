@@ -63,7 +63,7 @@ static int exit_remote_client(struct Client *, struct Client *, struct Client *,
 static int exit_remote_server(struct Client *, struct Client *, struct Client *,const char *);
 static int exit_local_client(struct Client *, struct Client *, struct Client *,const char *);
 static int exit_unknown_client(struct Client *, struct Client *, const char *);
-static int exit_local_server(struct Client *, struct Client *,const char *);
+static int exit_local_server(struct Client *, struct Client *, struct Client *, const char *);
 static int qs_server(struct Client *);
 
 static EVH check_pings;
@@ -905,8 +905,8 @@ free_exited_clients(void *unused)
 */
 static void
 recurse_send_quits(struct Client *client_p, struct Client *source_p, 
-		   struct Client *to, const char *comment,
-		   const char *myname)
+		   struct Client *to, const char *comment1,
+		   const char *comment)
 {
 	struct Client *target_p;
 	dlink_node *ptr, *ptr_next;
@@ -917,22 +917,21 @@ recurse_send_quits(struct Client *client_p, struct Client *source_p,
 	if(IsCapable(to, CAP_QS))
 	{
 		sendto_one(to, POP_QUEUE, "SQUIT %s :%s", 
-			   get_id(source_p, to), me.name);
+			   get_id(source_p, to), comment);
 	}
 	else
 	{
 		DLINK_FOREACH_SAFE(ptr, ptr_next, source_p->serv->users.head)
 		{
 			target_p = ptr->data;
-			sendto_one(to, POP_QUEUE, ":%s QUIT :%s", target_p->name, comment);
+			sendto_one(to, POP_QUEUE, ":%s QUIT :%s", target_p->name, comment1);
 		}
 		DLINK_FOREACH_SAFE(ptr, ptr_next, source_p->serv->servers.head)
 		{
 			target_p = ptr->data;
-			recurse_send_quits(client_p, target_p, to, comment, myname);
+			recurse_send_quits(client_p, target_p, to, comment1, comment);
 		}
-		if(!match(myname, source_p->name))
-			sendto_one(to, POP_QUEUE, "SQUIT %s :%s", source_p->name, me.name);
+		sendto_one(to, POP_QUEUE, "SQUIT %s :%s", source_p->name, comment);
 	}
 }
 
@@ -998,10 +997,10 @@ recurse_remove_clients(struct Client *source_p, const char *comment)
 static void
 remove_dependents(struct Client *client_p,
 		  struct Client *source_p,
+		  const char *comment,
 		  const char *comment1)
 {
 	struct Client *to;
-	static char myname[HOSTLEN + 1];
 	dlink_node *ptr, *next;
 
 	DLINK_FOREACH_SAFE(ptr, next, serv_list.head)
@@ -1012,15 +1011,7 @@ remove_dependents(struct Client *client_p,
 		   (to == client_p && IsCapable(to, CAP_QS)))
 			continue;
 
-		/* MyConnect(source_p) is rotten at this point: if source_p
-		 * was mine, ->from is NULL. 
-		 */
-		/* The WALLOPS isn't needed here as pointed out by
-		 * comstud, since m_squit already does the notification.
-		 */
-
-		strlcpy(myname, me.name, sizeof(myname));
-		recurse_send_quits(client_p, source_p, to, comment1, myname);
+		recurse_send_quits(client_p, source_p, to, comment1, comment);
 	}
 
 	recurse_remove_clients(source_p, comment1);
@@ -1189,6 +1180,7 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 		  const char *comment)
 {
 	static char comment1[(HOSTLEN*2)+2];
+	static char newcomment[BUFSIZE];
 	struct Client *target_p;
 	
 	if(source_p->servptr)
@@ -1197,9 +1189,13 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 		strcpy(comment1, "<Unknown>");
 	
 	strcat(comment1, " ");
-	strcat(comment1, source_p->name);							        		                		                                                                      		
+	strcat(comment1, source_p->name);
+	if (IsPerson(from))
+		ircd_snprintf(newcomment, sizeof(newcomment), "by %s: %s",
+				from->name, comment);
+
 	if(source_p->serv != NULL)
-		remove_dependents(client_p, source_p, comment1);
+		remove_dependents(client_p, source_p, IsPerson(from) ? newcomment : comment, comment1);
 
 	if(source_p->servptr && source_p->servptr->serv)
 		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
@@ -1257,9 +1253,10 @@ qs_server(struct Client *source_p)
 }
 
 static int
-exit_local_server(struct Client *client_p, struct Client *source_p, const char *comment)
+exit_local_server(struct Client *client_p, struct Client *source_p, struct Client *from, const char *comment)
 {
 	static char comment1[(HOSTLEN*2)+2];
+	static char newcomment[BUFSIZE];
 	unsigned int sendk, recvk;
 	
 	ircd_dlinkDelete(&source_p->localClient->tnode, &serv_list);
@@ -1269,6 +1266,16 @@ exit_local_server(struct Client *client_p, struct Client *source_p, const char *
 	sendk = source_p->localClient->sendK;
 	recvk = source_p->localClient->receiveK;
 
+	/* Always show source here, so the server notices show
+	 * which side initiated the split -- jilles
+	 */
+	ircd_snprintf(newcomment, sizeof(newcomment), "by %s: %s",
+			from == source_p ? me.name : from->name, comment);
+#if 0 /* let's not do this for now -- jilles */
+	if (!IsIOError(source_p))
+		sendto_one(source_p, POP_QUEUE, "SQUIT %s :%s",
+				use_id(source_p), newcomment);
+#endif
 	if(client_p != NULL && source_p != client_p && !IsIOError(source_p))
 	{
 		sendto_one(source_p, POP_QUEUE, "ERROR :Closing Link: 127.0.0.1 %s (%s)",
@@ -1298,7 +1305,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, const char *
 	strcat(comment1, source_p->name);
 
 	if(source_p->serv != NULL)
-		remove_dependents(client_p, source_p, comment1);
+		remove_dependents(client_p, source_p, IsPerson(from) ? newcomment : comment, comment1);
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s was connected"
 			     " for %ld seconds.  %d/%d sendK/recvK.",
@@ -1432,7 +1439,7 @@ exit_client(struct Client *client_p,	/* The local client originating the
 		if(IsPerson(source_p))
 			return exit_local_client(client_p, source_p, from, comment);
 		else if(IsServer(source_p))
-			return exit_local_server(client_p, source_p, comment);
+			return exit_local_server(client_p, source_p, from, comment);
 		/* IsUnknown || IsConnecting || IsHandShake */
 		else if(!IsReject(source_p))
 			return exit_unknown_client(client_p, source_p, comment);
