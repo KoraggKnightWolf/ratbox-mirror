@@ -1,3 +1,16 @@
+jilles      2006/06/11 13:51:49 UTC	(20060611_0-22723)
+  Log:
+  Pass through SQUIT reasons to other servers.
+  Not sending an SQUIT to a server when closing its link
+  for now as this can generate unwanted wallops in some
+  older daemons.
+  Code obtained from charybdis, written by myself.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 jilles      2006/06/07 17:03:34 UTC	(20060607_0-22713)
   Log:
   - Generate a server notice (no wallops) if a server
