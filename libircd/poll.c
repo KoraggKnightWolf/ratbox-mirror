@@ -186,9 +186,9 @@ ircd_select(unsigned long delay)
 
 	for (;;)
 	{
-		if(ndelay > 0)
-			ircd_sleep(0, ndelay);
-
+		if(ndelay > 0) {
+			ircd_sleep(ndelay / 1000000, ndelay % 1000000);
+		}
 		num = poll(pollfd_list.pollfds, pollfd_list.maxindex + 1, 0);
 		if(num >= 0)
 			break;
