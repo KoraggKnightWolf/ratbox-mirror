@@ -169,6 +169,7 @@ ircd_select(unsigned long delay)
 	int num;
 	int fd;
 	int ci;
+	unsigned int ndelay;
 	PF *hdl;
 	void *data;
 
@@ -186,7 +187,7 @@ ircd_select(unsigned long delay)
 	for (;;)
 	{
 		if(ndelay > 0)
-			ircd_sleep(0, ndelay)
+			ircd_sleep(0, ndelay);
 
 		num = poll(pollfd_list.pollfds, pollfd_list.maxindex + 1, 0);
 		if(num >= 0)
