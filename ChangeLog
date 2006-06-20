@@ -1,3 +1,12 @@
+androsyn    2006/06/20 19:03:32 UTC	(20060620_2-22805)
+  Log:
+  make the poll code actually compile
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+
+
 androsyn    2006/06/20 13:39:22 UTC	(20060620_1-22803)
   Log:
   forward port poll() sleep crap
