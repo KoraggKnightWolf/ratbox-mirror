@@ -1,3 +1,14 @@
+androsyn    2006/06/20 19:41:45 UTC	(20060620_3-22807)
+  Log:
+  Check and see if nanosleep can be found first without -lrt and -lposix4 and if not check those...
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+
+
 androsyn    2006/06/20 19:03:32 UTC	(20060620_2-22805)
   Log:
   make the poll code actually compile
