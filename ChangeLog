@@ -1,3 +1,11 @@
+androsyn    2006/06/20 13:39:22 UTC	(20060620_1-22803)
+  Log:
+  forward port poll() sleep crap
+
+  Modified:
+	ircd-ratbox/trunk/libircd/poll.c (File Modified) 
+
+
 androsyn    2006/06/20 13:34:20 UTC	(20060620_0-22801)
   Log:
   Modify ircd_sleep() to use take (seconds, useconds) as arguments
