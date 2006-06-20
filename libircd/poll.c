@@ -45,7 +45,11 @@ struct _pollfd_list
 
 typedef struct _pollfd_list pollfd_list_t;
 
-pollfd_list_t pollfd_list;
+static pollfd_list_t pollfd_list;
+
+static unsigned long last_count = 0;
+static unsigned long empty_count = 0;
+
 
 int 
 ircd_setup_fd(int fd)
@@ -167,9 +171,24 @@ ircd_select(unsigned long delay)
 	int ci;
 	PF *hdl;
 	void *data;
+
+	if(last_count > 0)
+	{
+		empty_count = 0;
+		ndelay = 0;
+		
+	} else {
+		ndelay = ++empty_count * 15000;
+		if(ndelay > delay * 1000)
+			ndelay = delay * 1000;
+	}
+
 	for (;;)
 	{
-		num = poll(pollfd_list.pollfds, pollfd_list.maxindex + 1, delay);
+		if(ndelay > 0)
+			ircd_sleep(0, ndelay)
+
+		num = poll(pollfd_list.pollfds, pollfd_list.maxindex + 1, 0);
 		if(num >= 0)
 			break;
 		if(ignoreErrno(errno))
