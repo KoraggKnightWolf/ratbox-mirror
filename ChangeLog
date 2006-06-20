@@ -1,3 +1,15 @@
+androsyn    2006/06/20 13:34:20 UTC	(20060620_0-22801)
+  Log:
+  Modify ircd_sleep() to use take (seconds, useconds) as arguments
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/libircd/unix.c (File Modified) 
+	ircd-ratbox/trunk/libircd/win32.c (File Modified) 
+
+
 jilles      2006/06/11 13:51:49 UTC	(20060611_0-22723)
   Log:
   Pass through SQUIT reasons to other servers.
