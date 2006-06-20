@@ -265,7 +265,26 @@ AC_CHECK_TYPES([uintptr_t])
 dnl check for various functions...
 AC_CHECK_FUNCS([socketpair vsnprintf mmap gettimeofday writev sendmsg ctime_r strtok_r usleep])
 
-AC_SEARCH_LIBS(nanosleep, rt posix4, AC_DEFINE(HAVE_NANOSLEEP, 1, [Define if you have nanosleep]))
+
+AC_CHECK_FUNC(nanosleep)
+if test x"$ac_cv_func_nanosleep" = xno; then
+	save_LIBS=$LIBS
+	AC_SEARCH_LIBS(nanosleep, [rt posix4],,)
+	LIBS=$save_LIBS
+	NANO_LIB=$ac_cv_search_nanosleep	
+	if test "$ac_cv_search_nanosleep" = "none required"; then
+		unset NANO_LIB
+	elif test "$ac_cv_search_nanosleep" = "no"; then
+		unset NANO_LIB
+        else
+        	AC_DEFINE([HAVE_NANOSLEEP], [1], [Have nanosleep])
+        fi
+else
+	AC_DEFINE([HAVE_NANOSLEEP], [1], [Have nanosleep])
+fi
+
+
+LIBS="$LIBS $NANO_LIB"
 
 AC_FUNC_ALLOCA
 AC_FUNC_VFORK
