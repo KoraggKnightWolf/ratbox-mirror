@@ -1,3 +1,11 @@
+androsyn    2006/06/20 20:57:57 UTC	(20060620_4-22814)
+  Log:
+  get the select() code to compile
+
+  Modified:
+	ircd-ratbox/trunk/libircd/select.c (File Modified) 
+
+
 androsyn    2006/06/20 20:51:40 UTC	(20060620_3-22812)
   Log:
   nanosleep really doesn't like if you pass microseconds > 1 second
