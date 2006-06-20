@@ -109,7 +109,7 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 			case SQLITE_BUSY:
 				for(j = 0; j < 5; j++)
 				{
-					ircd_sleep(1);
+					ircd_sleep(0, 500000);
 					if(!sqlite3_exec(ircd_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg))
 						return;
 				}
@@ -157,7 +157,7 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 			case SQLITE_BUSY:
 				for(i = 0; i < 5; i++)
 				{
-					ircd_sleep(1);
+					ircd_sleep(0, 500000);
 					if(!sqlite3_get_table(ircd_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg))
 					{
 						success++;

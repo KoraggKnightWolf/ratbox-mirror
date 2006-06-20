@@ -264,9 +264,12 @@ init_netio(void)
 }
 
 void
-ircd_sleep(unsigned int seconds)
+ircd_sleep(unsigned int seconds, unsigned int useconds)
 {
-	Sleep(seconds);
+	struct timeval tv;
+	tv.tv_sec = seconds;
+	tv.tv_usec = useconds;
+	select(0, NULL, NULL, NULL, &tv);
 }
 
 int
