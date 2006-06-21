@@ -44,7 +44,7 @@ static fd_set select_writefds;
 static fd_set tmpreadfds;
 static fd_set tmpwritefds;
 
-static int maxfd;
+static int ircd_maxfd = -1;
 static void select_update_selectfds(fde_t *F, short event, PF * handler);
 
 /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
@@ -87,15 +87,15 @@ select_update_selectfds(fde_t *F, short event, PF * handler)
 
 	if(F->pflags & (IRCD_SELECT_READ|IRCD_SELECT_WRITE))
 	{
-		if(F->fd > maxfd)
+		if(F->fd > ircd_maxfd)
 		{
-			maxfd = F->fd;		
+			ircd_maxfd = F->fd;		
 		}
 	} 
-	else if(F->fd <= maxfd)
+	else if(F->fd <= ircd_maxfd)
 	{
-		while(maxfd >= 0 && !FD_ISSET(F->fd, &select_readfds) && !FD_ISSET(F->fd, &select_writefds))
-			maxfd--;		
+		while(ircd_maxfd >= 0 && !FD_ISSET(ircd_maxfd, &select_readfds) && !FD_ISSET(ircd_maxfd, &select_writefds))
+			ircd_maxfd--;		
 	}
 }
 
@@ -180,7 +180,7 @@ ircd_select(unsigned long delay)
 	{
 		to.tv_sec = 0;
 		to.tv_usec = delay * 1000;
-		num = select(maxfd + 1, &tmpreadfds, &tmpwritefds, NULL, &to);
+		num = select(ircd_maxfd + 1, &tmpreadfds, &tmpwritefds, NULL, &to);
 		if(num >= 0)
 			break;
 		if(ignoreErrno(errno))
@@ -196,7 +196,7 @@ ircd_select(unsigned long delay)
 		return 0;
 
 	/* XXX we *could* optimise by falling out after doing num fds ... */
-	for (fd = 0; fd < maxfd + 1; fd++)
+	for (fd = 0; fd < ircd_maxfd + 1; fd++)
 	{
 		F = find_fd(fd);
 		if(F == NULL)
