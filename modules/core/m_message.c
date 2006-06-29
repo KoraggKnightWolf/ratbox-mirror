@@ -339,7 +339,7 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 
 				msptr = find_channel_membership(chptr, source_p);
 
-				if(!is_chanop_voiced(msptr))
+				if(!IsServer(source_p) && !is_chanop_voiced(msptr))
 				{
 					sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
 						   me.name, source_p->name, with_prefix);
