@@ -1,3 +1,15 @@
+jilles      2006/07/02 21:03:01 UTC	(20060702_0-22842)
+  Log:
+  Do not send RPL_USERNOTINCHANNEL remotely (MODE +-ov, KICK).
+  Sending them remotely causes UID leaks and is (IMHO) not very
+  useful as the command was successful on the local server.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_kick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+
+
 jilles      2006/06/29 23:43:38 UTC	(20060629_0-22838)
   Log:
   Allow servers to send to @#chan and +#chan.
