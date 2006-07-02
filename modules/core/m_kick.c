@@ -188,7 +188,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			      source_p->name, chptr->chname, who->name, comment);
 		remove_user_from_channel(msptr);
 	}
-	else
+	else if (MyClient(source_p))
 		sendto_one_numeric(source_p, POP_QUEUE, ERR_USERNOTINCHANNEL,
 				   form_str(ERR_USERNOTINCHANNEL), user, name);
 

@@ -945,7 +945,7 @@ chm_op(struct Client *source_p, struct Channel *chptr,
 
 	if(mstptr == NULL)
 	{
-		if(!(*errors & SM_ERR_NOTONCHANNEL))
+		if(!(*errors & SM_ERR_NOTONCHANNEL) && MyClient(source_p))
 			sendto_one_numeric(source_p, POP_QUEUE, ERR_USERNOTINCHANNEL,
 					   form_str(ERR_USERNOTINCHANNEL), opnick, chptr->chname);
 		*errors |= SM_ERR_NOTONCHANNEL;
@@ -1038,7 +1038,7 @@ chm_voice(struct Client *source_p, struct Channel *chptr,
 
 	if(mstptr == NULL)
 	{
-		if(!(*errors & SM_ERR_NOTONCHANNEL))
+		if(!(*errors & SM_ERR_NOTONCHANNEL) && MyClient(source_p))
 			sendto_one_numeric(source_p, POP_QUEUE, ERR_USERNOTINCHANNEL,
 					   form_str(ERR_USERNOTINCHANNEL), opnick, chptr->chname);
 		*errors |= SM_ERR_NOTONCHANNEL;
