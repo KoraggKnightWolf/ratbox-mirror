@@ -1,3 +1,12 @@
+jilles      2006/07/05 13:31:24 UTC	(20060705_0-22846)
+  Log:
+  Invalidate can_send ban cache when a TS6 SJOIN clears the ban list.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+
+
 jilles      2006/07/02 21:03:01 UTC	(20060702_0-22842)
   Log:
   Do not send RPL_USERNOTINCHANNEL remotely (MODE +-ov, KICK).
