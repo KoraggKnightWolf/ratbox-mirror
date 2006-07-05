@@ -879,6 +879,8 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(ircd_dlink_list_length(&chptr->invexlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->invexlist,
 					'I', CAP_IE, ONLY_CHANOPS);
+
+		chptr->bants++;
 	}
 
 	
