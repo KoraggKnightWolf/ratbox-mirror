@@ -1,3 +1,12 @@
+androsyn    2006/07/13 13:59:53 UTC	(20060713_0-22880)
+  Log:
+  rework balloc to use have the used/free lists in the ircd_block_heap structure itself, rather than per block
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+	ircd-ratbox/trunk/libircd/balloc.h (File Modified) 
+
+
 jilles      2006/07/05 13:31:24 UTC	(20060705_0-22846)
   Log:
   Invalidate can_send ban cache when a TS6 SJOIN clears the ban list.
