@@ -115,97 +115,6 @@ free_block(void *ptr, size_t size)
 #endif
 }
 
-#ifdef DEBUG_BALLOC
-/* Check the list length the very slow way */
-static unsigned long
-slow_list_length(dlink_list *list)
-{
-	dlink_node *ptr;
-	unsigned long count = 0;
-    
-	for (ptr = list->head; ptr; ptr = ptr->next)
-	{
-		count++;
-		if(count > list->length * 2)
-		{
-			ircd_bh_fail("count > list->length * 2 - I give up");
-		}
-	}
-	return count;
-}
-
-static void
-bh_sanity_check_block(ircd_bh *bh, ircd_heap_block *block)
-{
-	unsigned long s_used, s_free;
-	s_used = slow_list_length(&block->used_list);
-	s_free = slow_list_length(&block->free_list);
-	if(s_used != ircd_dlink_list_length(&block->used_list))
-		ircd_bh_fail("used link count doesn't match head count");
-	if(s_free != ircd_dlink_list_length(&block->free_list))
-		ircd_bh_fail("free link count doesn't match head count");
-	
-	if(ircd_dlink_list_length(&block->used_list) + ircd_dlink_list_length(&block->free_list) != bh->elemsPerBlock)
-		ircd_bh_fail("used_list + free_list != elemsPerBlock");
-}
-
-#if 0
-/* See how confused we are */
-static void
-bh_sanity_check(ircd_bh *bh)
-{
-	ircd_heap_block *walker;
-	unsigned long real_alloc = 0;
-	unsigned long s_used, s_free;
-	unsigned long blockcount = 0;
-	unsigned long allocated;
-	if(bh == NULL)
-		ircd_bh_fail("Trying to sanity check a NULL block");		
-	
-	allocated = bh->blocksAllocated * bh->elemsPerBlock;
-	
-	for(walker = bh->base; walker != NULL; walker = walker->next)
-	{
-		blockcount++;
-		s_used = slow_list_length(&walker->used_list);
-		s_free = slow_list_length(&walker->free_list);
-		
-		if(s_used != ircd_dlink_list_length(&walker->used_list))
-			ircd_bh_fail("used link count doesn't match head count");
-		if(s_free != ircd_dlink_list_length(&walker->free_list))
-			ircd_bh_fail("free link count doesn't match head count");
-		
-		if(ircd_dlink_list_length(&walker->used_list) + ircd_dlink_list_length(&walker->free_list) != bh->elemsPerBlock)
-			ircd_bh_fail("used_list + free_list != elemsPerBlock");
-
-		real_alloc += ircd_dlink_list_length(&walker->used_list);
-		real_alloc += ircd_dlink_list_length(&walker->free_list);
-	}
-
-	if(allocated != real_alloc)
-		ircd_bh_fail("block allocations don't match heap");
-
-	if(bh->blocksAllocated != blockcount)
-		ircd_bh_fail("blocksAllocated don't match blockcount");
-
-	 
-}
-
-static void
-bh_sanity_check_all(void *unused)
-{
-        dlink_node *ptr;
-	DLINK_FOREACH(ptr, heap_lists.head)
-	{
-		bh_sanity_check(ptr->data);
-	}				
-}
-#endif
-
-#endif
-
-
-
 /*
  * void ircd_init_bh(void)
  * 
@@ -294,10 +203,7 @@ newblock(ircd_bh * bh)
 	/* Setup the initial data structure. */
 	b = ircd_malloc(sizeof(ircd_heap_block));
 
-	b->free_list.head = b->free_list.tail = NULL;
-	b->used_list.head = b->used_list.tail = NULL;
 	b->next = bh->base;
-
 	b->alloc_size = (bh->elemsPerBlock + 1) * (bh->elemSize + sizeof(ircd_heap_memblock));
 
 	b->elems = get_block(b->alloc_size);
@@ -312,18 +218,17 @@ newblock(ircd_bh * bh)
 		void *data;
 		newblk = (void *) offset;
 		newblk->block = b;
-#ifdef DEBUG_BALLOC
-		newblk->magic = BALLOC_MAGIC;
-#endif
+
 		data = (void *) ((size_t) offset + sizeof(ircd_heap_memblock));
 		newblk->block = b;
-		ircd_dlinkAdd(data, &newblk->self, &b->free_list);
+		ircd_dlinkAdd(data, &newblk->self, &bh->free_list);
 		offset = (unsigned char *) ((unsigned char *) offset +
 					    bh->elemSize + sizeof(ircd_heap_memblock));
 	}
 
-	++bh->blocksAllocated;
+	bh->blocksAllocated++;
 	bh->freeElems += bh->elemsPerBlock;
+	b->free_count = bh->elemsPerBlock;
 	bh->base = b;
 
 	return (0);
@@ -405,7 +310,6 @@ ircd_bh_create(size_t elemsize, int elemsperblock)
 void *
 ircd_bh_alloc(ircd_bh * bh)
 {
-	ircd_heap_block *walker;
 	dlink_node *new_node;
 
 	lircd_assert(bh != NULL);
@@ -431,35 +335,15 @@ ircd_bh_alloc(ircd_bh * bh)
 		}
 	}
 
-	for (walker = bh->base; walker != NULL; walker = walker->next)
-	{
-		if(ircd_dlink_list_length(&walker->free_list) > 0)
-		{
-#ifdef DEBUG_BALLOC
-			bh_sanity_check_block(bh, walker);
-#endif
-			bh->freeElems--;
-			new_node = walker->free_list.head;
-			ircd_dlinkMoveNode(new_node, &walker->free_list, &walker->used_list);
-			lircd_assert(new_node->data != NULL);
-			if(new_node->data == NULL)
-				ircd_bh_fail("new_node->data is NULL and that shouldn't happen!!!");
-			memset(new_node->data, 0, bh->elemSize);
-#ifdef DEBUG_BALLOC
-			do
-			{
-				struct ircd_heap_memblock *memblock = (void *) ((size_t) new_node->data - sizeof(ircd_heap_memblock));
-				if(memblock->magic == BALLOC_FREE_MAGIC)
-					memblock->magic = BALLOC_MAGIC;
-			
-			} while(0);
-			bh_sanity_check_block(bh, walker);
-#endif
-			return (new_node->data);
-		}
-	}
-	ircd_bh_fail("ircd_bh_alloc failed, giving up");
-	return NULL;
+
+	new_node = bh->free_list.head;
+	ircd_dlinkMoveNode(new_node, &bh->free_list, &bh->used_list);
+	lircd_assert(new_node->data != NULL);
+	if(new_node->data == NULL)
+		ircd_bh_fail("new_node->data is NULL and that shouldn't happen!!!");
+	memset(new_node->data, 0, bh->elemSize);
+
+	return(new_node->data);	
 }
 
 
@@ -517,15 +401,10 @@ ircd_bh_free(ircd_bh * bh, void *ptr)
 	}
 
 	block = memblock->block;
-#ifdef DEBUG_BALLOC
-	bh_sanity_check_block(bh, block);
-#endif
 	bh->freeElems++;
+	block->free_count++;
 	mem_frob(ptr, bh->elemSize);
-	ircd_dlinkMoveNode(&memblock->self, &block->used_list, &block->free_list);
-#ifdef DEBUG_BALLOC
-	bh_sanity_check_block(bh, block);
-#endif
+	ircd_dlinkMoveNode(&memblock->self, &bh->used_list, &bh->free_list);
 	return (0);
 }
 
@@ -561,7 +440,7 @@ ircd_bh_gc(ircd_bh * bh)
 
 	while (walker != NULL)
 	{
-		if((ircd_dlink_list_length(&walker->free_list) == bh->elemsPerBlock) != 0)
+		if(walker->free_count == bh->elemsPerBlock)
 		{
 			free_block(walker->elems, walker->alloc_size);
 			if(last != NULL)

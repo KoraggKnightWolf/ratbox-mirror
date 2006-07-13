@@ -43,29 +43,18 @@ typedef struct ircd_bh ircd_bh;
  
 #else
 
-#undef DEBUG_BALLOC
-
-#ifdef DEBUG_BALLOC
-#define BALLOC_MAGIC 0x3d3a3c3d
-#define BALLOC_FREE_MAGIC 0xafafafaf
-#endif
-
 /* status information for an allocated block in heap */
 struct ircd_heap_block
 {
 	size_t alloc_size;
 	struct ircd_heap_block *next;	/* Next in our chain of blocks */
 	void *elems;		/* Points to allocated memory */
-	dlink_list free_list;
-	dlink_list used_list;
+	unsigned long free_count;
 };
 typedef struct ircd_heap_block ircd_heap_block;
 
 struct ircd_heap_memblock
 {
-#ifdef DEBUG_BALLOC
-	unsigned long magic;
-#endif
 	dlink_node self;
 	ircd_heap_block *block;		/* Which block we belong to */
 };
@@ -81,6 +70,8 @@ struct ircd_bh
 	unsigned long blocksAllocated;	/* Number of blocks allocated */
 	unsigned long freeElems;		/* Number of free elements */
 	ircd_heap_block *base;		/* Pointer to first block */
+	dlink_list free_list;
+	dlink_list used_list;
 };
 typedef struct ircd_bh ircd_bh;
 
