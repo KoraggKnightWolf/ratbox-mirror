@@ -91,7 +91,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	 * this code has a side effect of losing keys, but..
 	 */
 	chanlist = LOCAL_COPY(parv[1]);
-	for(i = 0, name = strtok_r(chanlist, ",", &p); name;
+	for(name = strtok_r(chanlist, ",", &p); name;
 	    name = strtok_r(NULL, ",", &p))
 	{
 		/* check the length and name of channel is ok */
@@ -150,8 +150,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 		if(*jbuf)
 			(void) strcat(jbuf, ",");
-		(void) strlcat(jbuf, name, sizeof(jbuf) - i - 1);
-		i += strlen(name)+1;
+		(void) strlcat(jbuf, name, sizeof(jbuf));
 	}
 
 	if(parc > 2)
