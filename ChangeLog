@@ -1,3 +1,12 @@
+jilles      2006/07/17 16:42:37 UTC	(20060717_0-22884)
+  Log:
+  Fix too early truncation of JOIN channel list.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+
+
 androsyn    2006/07/13 13:59:53 UTC	(20060713_0-22880)
   Log:
   rework balloc to use have the used/free lists in the ircd_block_heap structure itself, rather than per block
