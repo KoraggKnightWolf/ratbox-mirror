@@ -1,3 +1,11 @@
+androsyn    2006/07/18 18:44:38 UTC	(20060718_0-22898)
+  Log:
+  decrement the free_count in each block when allocating memory
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+
+
 jilles      2006/07/17 16:42:37 UTC	(20060717_0-22884)
   Log:
   Fix too early truncation of JOIN channel list.
