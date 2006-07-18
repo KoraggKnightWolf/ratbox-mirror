@@ -86,6 +86,8 @@ static HANDLE block_heap;
 
 #define ircd_bh_fail(x) _ircd_bh_fail(x, __FILE__, __LINE__)
 
+#define get_memblock(ptr) (void *) ((size_t) ptr - sizeof(ircd_heap_memblock));
+
 static void
 _ircd_bh_fail(const char *reason, const char *file, int line)
 {
@@ -311,7 +313,8 @@ void *
 ircd_bh_alloc(ircd_bh * bh)
 {
 	dlink_node *new_node;
-
+	ircd_heap_memblock *memblock;
+	
 	lircd_assert(bh != NULL);
 	if(unlikely(bh == NULL))
 	{
@@ -341,6 +344,12 @@ ircd_bh_alloc(ircd_bh * bh)
 	lircd_assert(new_node->data != NULL);
 	if(new_node->data == NULL)
 		ircd_bh_fail("new_node->data is NULL and that shouldn't happen!!!");
+
+	/* this is ugly..but... */
+	memblock = get_memblock(new_node->data);
+	lircd_assert(memblock->block != NULL);
+	memblock->block->free_count--;
+
 	memset(new_node->data, 0, bh->elemSize);
 
 	return(new_node->data);	
@@ -380,19 +389,8 @@ ircd_bh_free(ircd_bh * bh, void *ptr)
 		return (1);
 	}
 
-	memblock = (void *) ((size_t) ptr - sizeof(ircd_heap_memblock));
-#ifdef DEBUG_BALLOC
-	if(memblock->magic == BALLOC_FREE_MAGIC)
-	{
-		ircd_bh_fail("double free of a block");
-		ircd_outofmemory();
-	} else 
-	if(memblock->magic != BALLOC_MAGIC)
-	{
-		ircd_bh_fail("memblock->magic != BALLOC_MAGIC");
-		ircd_outofmemory();
-	}
-#endif
+	memblock = get_memblock(ptr);
+
 	lircd_assert(memblock->block != NULL);
 	if(unlikely(memblock->block == NULL))
 	{
