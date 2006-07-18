@@ -86,7 +86,7 @@ static HANDLE block_heap;
 
 #define ircd_bh_fail(x) _ircd_bh_fail(x, __FILE__, __LINE__)
 
-#define get_memblock(ptr) (void *) ((size_t) ptr - sizeof(ircd_heap_memblock));
+#define get_memblock(ptr) (void *) ((size_t) ptr - sizeof(ircd_heap_memblock))
 
 static void
 _ircd_bh_fail(const char *reason, const char *file, int line)
