@@ -1,3 +1,19 @@
+androsyn    2006/07/19 15:18:23 UTC	(20060719_0-22914)
+  Log:
+  A bit of a balloc rewrite:
+  - Have balloc only keep memblocks on lists if they are freed
+  - Reduce overhead of each memblock to just sizeof(ircd_heap_block *) from sizeof(ircd_heap_block) + sizeof(dlink_node)
+    This should save around 7MB on a large network...
+  - Allocations should always be O(1) now as the free_list is kept on the block heap itself and not kept per ircd_heap_block
+  - Reworked the garbage collection code to deal with the above changes
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+	ircd-ratbox/trunk/libircd/balloc.h (File Modified) 
+
+
 androsyn    2006/07/18 20:14:16 UTC	(20060718_2-22912)
   Log:
   revert balloc changes..I need to think about things a bit
