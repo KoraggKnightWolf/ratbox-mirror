@@ -54,23 +54,11 @@ typedef struct ircd_bh ircd_bh;
 struct ircd_heap_block
 {
 	size_t alloc_size;
-	struct ircd_heap_block *next;	/* Next in our chain of blocks */
+	dlink_node node;
+	unsigned long free_count;
 	void *elems;		/* Points to allocated memory */
-	dlink_list free_list;
-	dlink_list used_list;
 };
 typedef struct ircd_heap_block ircd_heap_block;
-
-struct ircd_heap_memblock
-{
-#ifdef DEBUG_BALLOC
-	unsigned long magic;
-#endif
-	dlink_node self;
-	ircd_heap_block *block;		/* Which block we belong to */
-};
-
-typedef struct ircd_heap_memblock ircd_heap_memblock;
 
 /* information for the root node of the heap */
 struct ircd_bh
@@ -78,10 +66,23 @@ struct ircd_bh
 	dlink_node hlist;
 	size_t elemSize;	/* Size of each element to be stored */
 	unsigned long elemsPerBlock;	/* Number of elements per block */
-	unsigned long blocksAllocated;	/* Number of blocks allocated */
-	unsigned long freeElems;		/* Number of free elements */
-	ircd_heap_block *base;		/* Pointer to first block */
+//	unsigned long blocksAllocated;	/* Number of blocks allocated */
+	dlink_list block_list;
+	dlink_list free_list;
 };
+
+struct ircd_heap_memblock 
+{
+	ircd_heap_block *block;
+	union {
+		dlink_node node;
+		char data[1];		/* stub pointer..this is ugly */
+	} ndata;
+};
+
+typedef struct ircd_heap_memblock ircd_heap_memblock;
+
+
 typedef struct ircd_bh ircd_bh;
 
 int ircd_bh_free(ircd_bh *, void *);
