@@ -90,10 +90,9 @@ void *ircd_bh_alloc(ircd_bh *);
 
 ircd_bh *ircd_bh_create(size_t elemsize, int elemsperblock);
 int ircd_bh_destroy(ircd_bh * bh);
-
+int ircd_bh_gc(ircd_bh *bh);
 void ircd_init_bh(void);
 void ircd_bh_usage(ircd_bh * bh, size_t * bused, size_t * bfree, size_t * bmemusage);
-
 
 
 #endif /* NOBALLOC */
