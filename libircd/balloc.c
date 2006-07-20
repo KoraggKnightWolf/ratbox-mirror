@@ -4,7 +4,9 @@
  *
  * Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
  * Copyright (C) 1996-2002 Hybrid Development Team
- * Copyright (C) 2002-2005 ircd-ratbox development team
+ * Copyright (C) 2002-2006 ircd-ratbox development team
+ *
+ *  Below are the orignal headers from the old blalloc.c 
  *
  *  File:   blalloc.c
  *  Owner:  Wohali (Joan Touzet)
@@ -381,7 +383,7 @@ ircd_bh_free(ircd_bh * bh, void *ptr)
 	}
 	
 	node = ptr;
-	memblock = (ircd_heap_memblock *) (ptr - sizeof(void *));
+	memblock = (ircd_heap_memblock *) (ptr - sizeof(ircd_heap_block *));
 	memblock->block->free_count++;
 	memset(node, 0, sizeof(dlink_node));
 	ircd_dlinkAdd(memblock, node, &bh->free_list);
