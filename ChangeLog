@@ -1,3 +1,11 @@
+androsyn    2006/07/20 15:31:02 UTC	(20060720_0-22918)
+  Log:
+  Change a sizeof(void *) to a sizeof(ircd_heap_block *). Also update copyrights
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+
+
 androsyn    2006/07/19 15:52:10 UTC	(20060719_1-22916)
   Log:
   - Deal with /dev/zero possibly getting closed on us.
