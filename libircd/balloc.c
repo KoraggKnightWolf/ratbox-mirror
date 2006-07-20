@@ -77,10 +77,6 @@ static int newblock(ircd_bh * bh);
 static void ircd_bh_gc_event(void *unused);
 static dlink_list heap_lists;
 
-#if defined(HAVE_MMAP) && !defined(MAP_ANON)
-static int zero_fd = -1;
-#endif
-
 #if defined(_WIN32)
 static HANDLE block_heap;
 #endif
@@ -116,18 +112,6 @@ free_block(void *ptr, size_t size)
 #endif
 }
 
-
-#if defined(HAVE_MMAP) && !defined(MAP_ANON)
-void
-reopen_devzero(void)
-{
-	zero_fd = open("/dev/zero", O_RDWR);
-	if(zero_fd < 0)
-		ircd_bh_fail("Failed opening /dev/zero");
-}
-
-#endif
-
 /*
  * void ircd_init_bh(void)
  * 
@@ -139,12 +123,8 @@ reopen_devzero(void)
 void
 ircd_init_bh(void)
 {
-#if defined(HAVE_MMAP) && !defined(MAP_ANON)
-	reopen_devzero();
-#else
 #ifdef _WIN32
  	block_heap = HeapCreate(HEAP_NO_SERIALIZE, 0, 0);	
-#endif
 #endif
 	ircd_event_addish("ircd_bh_gc_event", ircd_bh_gc_event, NULL, 120);
 }
@@ -164,20 +144,15 @@ get_block(size_t size)
 #ifdef MAP_ANON
 	ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 #else
+	int zero_fd;
+	zero_fd = open("/dev/zero", O_RDWR);
+	if(zero_fd < 0)
+		ircd_bh_fail("Failed opening /dev/zero");
 	ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, zero_fd, 0);
+	close(zero_fd);
 #endif /* MAP_ANON */
 	if(ptr == MAP_FAILED)
-	{
 		ptr = NULL;		
-#ifndef MAP_ANON
-		if(errno == EBADF) {
-			reopen_devzero();
-			ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, zero_fd, 0);
-			if(ptr == MAP_FAILED)
-				ptr = NULL;
-		}
-#endif
-	}
 #else
 #ifdef _WIN32
 	ptr = HeapAlloc(block_heap, 0, size);
