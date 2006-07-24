@@ -204,7 +204,7 @@ newblock(ircd_bh * bh)
 	}
 	offset = b->elems;
 	/* Setup our blocks now */
-	for (i = 0; i < bh->elemsPerBlock; i++, offset += (bh->elemSize + sizeof(ircd_heap_block *)))
+	for (i = 0; i < bh->elemsPerBlock; i++, offset += (bh->elemSize + sizeof(ircd_heap_memblock *)))
 	{
 		ircd_heap_memblock *memblock = (ircd_heap_memblock *)offset;
 		memblock->block = b;
@@ -358,7 +358,7 @@ ircd_bh_free(ircd_bh * bh, void *ptr)
 	}
 	
 	node = ptr;
-	memblock = (ircd_heap_memblock *) (ptr - sizeof(ircd_heap_block *));
+	memblock = (ircd_heap_memblock *) (ptr - sizeof(ircd_heap_memblock *));
 	memblock->block->free_count++;
 	memset(node, 0, sizeof(dlink_node));
 	ircd_dlinkAdd(memblock, node, &bh->free_list);
@@ -451,7 +451,7 @@ ircd_bh_gc(ircd_bh * bh)
 			void *offset;
 
 			offset = b->elems;
-			for (i = 0; i < bh->elemsPerBlock; i++, offset += (bh->elemSize + sizeof(ircd_heap_block *)))
+			for (i = 0; i < bh->elemsPerBlock; i++, offset += (bh->elemSize + sizeof(ircd_heap_memblock *)))
 			{
 				ircd_heap_memblock *memblock = (ircd_heap_memblock *)offset;
 				ircd_dlinkDelete(&memblock->ndata.node, &bh->free_list);

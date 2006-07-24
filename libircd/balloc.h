@@ -43,13 +43,6 @@ typedef struct ircd_bh ircd_bh;
  
 #else
 
-#undef DEBUG_BALLOC
-
-#ifdef DEBUG_BALLOC
-#define BALLOC_MAGIC 0x3d3a3c3d
-#define BALLOC_FREE_MAGIC 0xafafafaf
-#endif
-
 /* status information for an allocated block in heap */
 struct ircd_heap_block
 {
@@ -66,7 +59,6 @@ struct ircd_bh
 	dlink_node hlist;
 	size_t elemSize;	/* Size of each element to be stored */
 	unsigned long elemsPerBlock;	/* Number of elements per block */
-//	unsigned long blocksAllocated;	/* Number of blocks allocated */
 	dlink_list block_list;
 	dlink_list free_list;
 };
