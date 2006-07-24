@@ -1,3 +1,12 @@
+androsyn    2006/07/24 20:38:14 UTC	(20060724_0-22938)
+  Log:
+  change some sizeof types
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.c (File Modified) 
+	ircd-ratbox/trunk/libircd/balloc.h (File Modified) 
+
+
 androsyn    2006/07/20 16:42:42 UTC	(20060720_1-22920)
   Log:
   Have the /dev/zero mmap code open/close /dev/zero when needed.
