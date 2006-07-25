@@ -1466,7 +1466,7 @@ count_local_client_memory(size_t * count, size_t * local_client_memory_used)
 {
 	size_t lusage;
 	ircd_bh_usage(lclient_heap, count, NULL, &lusage);
-	*local_client_memory_used = lusage + (*count * (sizeof(ircd_heap_memblock) + sizeof(struct Client)));
+	*local_client_memory_used = lusage + (*count * (sizeof(void *) + sizeof(struct Client)));
 }
 
 /*
@@ -1479,7 +1479,7 @@ count_remote_client_memory(size_t * count, size_t * remote_client_memory_used)
 	ircd_bh_usage(lclient_heap, &lcount, NULL, NULL);
 	ircd_bh_usage(client_heap, &rcount, NULL, NULL);
 	*count = rcount - lcount;
-	*remote_client_memory_used = *count * (sizeof(ircd_heap_memblock) + sizeof(struct Client));
+	*remote_client_memory_used = *count * (sizeof(void *) + sizeof(struct Client));
 }
 
 
