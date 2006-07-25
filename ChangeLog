@@ -1,3 +1,11 @@
+androsyn    2006/07/25 16:41:31 UTC	(20060725_1-22942)
+  Log:
+  fix compile error when using NOBALLOC...the memory usage counts need to be fixed though...
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2006/07/25 16:38:53 UTC	(20060725_0-22940)
   Log:
   fix NOBALLOC code
