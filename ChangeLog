@@ -1,3 +1,17 @@
+jilles      2006/07/25 18:32:58 UTC	(20060725_4-22948)
+  Log:
+  exit_unknown_client(), exit_local_client(): do not call
+  linebuf_donebuf() on client_p's receive queue, client_p
+  may be NULL or another client than source_p. The receive
+  and send queues are cleared out in close_connection().
+  2.1/2.2 do this via client_flush_input() on source_p
+  (no crash problem).
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2006/07/25 17:10:46 UTC	(20060725_3-22946)
   Log:
   Rerun autotools
