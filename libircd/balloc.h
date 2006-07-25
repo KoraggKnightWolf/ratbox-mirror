@@ -35,9 +35,9 @@
 	 
 typedef struct ircd_bh ircd_bh; 	 
 #define ircd_init_bh() 	 
-#define ircd_bh_create(es, epb) ((ircd_blockheap*)(es)) 	 
+#define ircd_bh_create(es, epb) ((ircd_bh*)(es)) 	 
 #define ircd_bh_destroy(x) 	 
-#define ircd_bh_alloc(x) ircd_malloc((int)x) 	 
+#define ircd_bh_alloc(x) ircd_malloc((size_t)x) 	 
 #define ircd_bh_free(x,y) ircd_free(y) 	 
 #define ircd_bh_usage(bh, bused, bfree, bmemusage) do { (*(size_t *)bused) = 0; *((size_t *)bfree) = 0; *((size_t *)bmemusage) = 0; } while(0)
  
