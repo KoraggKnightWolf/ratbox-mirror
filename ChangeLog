@@ -1,3 +1,13 @@
+jilles      2006/07/25 17:07:37 UTC	(20060725_2-22944)
+  Log:
+  Add --disable-balloc configure option to disable the
+  block allocator and use malloc/free directly.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2006/07/25 16:41:31 UTC	(20060725_1-22942)
   Log:
   fix compile error when using NOBALLOC...the memory usage counts need to be fixed though...
