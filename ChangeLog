@@ -1,3 +1,11 @@
+androsyn    2006/08/07 18:16:10 UTC	(20060807_0-22955)
+  Log:
+  test commit
+
+  Modified:
+	ircd-ratbox/trunk/BUGS (File Modified) 
+
+
 jilles      2006/07/25 18:32:58 UTC	(20060725_4-22948)
   Log:
   exit_unknown_client(), exit_local_client(): do not call
