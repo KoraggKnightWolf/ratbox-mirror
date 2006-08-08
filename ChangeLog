@@ -1,3 +1,13 @@
+androsyn    2006/08/08 19:16:36 UTC	(20060808_8-22975)
+  Log:
+  having a int and a function named the same isn't good
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+
+
 androsyn    2006/08/08 19:14:05 UTC	(20060808_7-22973)
   Log:
   Do config file processing outside of the signal handler for the resolver daemon
