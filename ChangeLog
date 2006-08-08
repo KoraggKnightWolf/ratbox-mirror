@@ -1,3 +1,12 @@
+androsyn    2006/08/08 19:14:05 UTC	(20060808_7-22973)
+  Log:
+  Do config file processing outside of the signal handler for the resolver daemon
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+
+
 androsyn    2006/08/08 18:44:39 UTC	(20060808_6-22971)
   Log:
   don't do a restart_resolver() on /rehash, if people need the resolver restarted they can do /rehash dns
