@@ -1,3 +1,19 @@
+jilles      2006/08/08 17:31:57 UTC	(20060808_5-22969)
+  Log:
+  Remove some unnecessary send_pop_queue():
+  at signon after 004 (005 does POP_QUEUE), after
+  /stats B, P, d, D, e (RPL_ENDOFSTATS does POP_QUEUE),
+  first line of /users.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_lusers.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 jilles      2006/08/08 17:29:05 UTC	(20060808_4-22967)
   Log:
   send_pop_queue(): for remote clients make this apply to
