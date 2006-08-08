@@ -125,7 +125,6 @@ show_ports(struct Client *source_p)
 			   IsOperAdmin(source_p) ? listener->name : me.name,
 			   listener->ref_count, (listener->active) ? "active" : "disabled");
 	}
-	send_pop_queue(source_p);
 }
 
 /*

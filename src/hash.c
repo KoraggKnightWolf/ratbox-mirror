@@ -682,7 +682,6 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 				"B :Nodes with %d entries: %d",
 				i, counts[i]);
 	}
-	send_pop_queue(source_p);
 }
 	
 
@@ -719,5 +718,4 @@ hash_stats(struct Client *source_p)
 	count_hash(source_p, idTable, U_MAX, "ID");
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG, "B :--");
 	count_hash(source_p, hostTable, HOST_MAX, "Hostname");
-	send_pop_queue(source_p);
 }	

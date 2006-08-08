@@ -316,7 +316,6 @@ report_dlines(struct Client *source_p)
                                              oper_reason ? oper_reason : "");
 	}
 	PATRICIA_WALK_END;
-	send_pop_queue(source_p);
 }
 
 void
@@ -338,7 +337,6 @@ report_tdlines(struct Client *source_p)
                                              oper_reason ? oper_reason : "");
 	}
 	PATRICIA_WALK_END;
-	send_pop_queue(source_p);
 }
 
 void
@@ -358,6 +356,5 @@ report_elines(struct Client *source_p)
                                              "", "");
 	}
 	PATRICIA_WALK_END;
-	send_pop_queue(source_p);
 }
 

@@ -1074,7 +1074,6 @@ user_welcome(struct Client *source_p)
 
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_CREATED), me.name, source_p->name, creation);
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MYINFO), me.name, source_p->name, me.name, ircd_version);
-	send_pop_queue(source_p);
 	show_isupport(source_p);
 
 	show_lusers(source_p);
