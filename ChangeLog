@@ -1,3 +1,14 @@
+jilles      2006/08/08 17:29:05 UTC	(20060808_4-22967)
+  Log:
+  send_pop_queue(): for remote clients make this apply to
+  the local connection the client is behind, instead of
+  doing nothing.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 jilles      2006/08/08 16:10:30 UTC	(20060808_3-22965)
   Log:
   Always do ircd_helper_read(dns_helper->ifd, dns_helper);
