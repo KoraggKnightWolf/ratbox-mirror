@@ -1,3 +1,13 @@
+jilles      2006/08/08 14:57:35 UTC	(20060808_2-22963)
+  Log:
+  Make ircd_bh_usage() stub for --disable-balloc deal
+  with null pointers.
+  
+
+  Modified:
+	ircd-ratbox/trunk/libircd/balloc.h (File Modified) 
+
+
 androsyn    2006/08/08 14:38:37 UTC	(20060808_1-22961)
   Log:
   fix core in stats_memory
