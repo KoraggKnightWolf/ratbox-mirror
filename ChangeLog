@@ -1,3 +1,11 @@
+androsyn    2006/08/08 14:30:13 UTC	(20060808_0-22959)
+  Log:
+  fix core dump in report elines
+
+  Modified:
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2006/08/07 18:19:33 UTC	(20060807_1-22957)
   Log:
   test commit
