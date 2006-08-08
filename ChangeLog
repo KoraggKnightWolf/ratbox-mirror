@@ -1,3 +1,11 @@
+androsyn    2006/08/08 18:44:39 UTC	(20060808_6-22971)
+  Log:
+  don't do a restart_resolver() on /rehash, if people need the resolver restarted they can do /rehash dns
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 jilles      2006/08/08 17:31:57 UTC	(20060808_5-22969)
   Log:
   Remove some unnecessary send_pop_queue():
