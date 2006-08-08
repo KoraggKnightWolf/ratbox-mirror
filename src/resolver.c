@@ -31,7 +31,7 @@
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 
 static ircd_helper *res_helper;
-
+static int rehash;
 static void dns_readable(int fd, void *ptr);
 static void dns_writeable(int fd, void *ptr);
 static void process_adns_incoming(void);
@@ -111,8 +111,14 @@ dns_writeable(int fd, void *ptr)
 	dns_select();
 }
 
+static void 
+rehash(int sig)
+{
+	rehash = 1;
+}
+
 static void
-restart_resolver(int sig)
+restart_resolver(void)
 {
 	/* Rehash dns configuration */
 	adns__rereadconfig(dns_state);
@@ -126,7 +132,7 @@ setup_signals(void)
 	act.sa_flags = 0;
 	act.sa_handler = SIG_IGN;
 	sigemptyset(&act.sa_mask);
-	act.sa_handler = restart_resolver;
+	act.sa_handler = rehash;
 	sigaddset(&act.sa_mask, SIGHUP);
 	sigaction(SIGHUP, &act, 0);
 #endif
@@ -327,6 +333,11 @@ read_io(void)
 		dns_select();
 		ircd_event_run();
 		ircd_select(1000);
+		if(rehash)
+		{
+			restart_resolver();
+			rehash = 0;
+		}
 	}
 }
 
