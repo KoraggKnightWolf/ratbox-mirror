@@ -216,6 +216,7 @@ start_resolver(void)
 		return 1;
 	}
 
+	ircd_helper_read(dns_helper->ifd, dns_helper);
 	return 0;
 }
 
@@ -259,7 +260,6 @@ init_resolver(void)
 		ilog(L_MAIN, "Unable to fork resolver: %s", strerror(errno));		
 		exit(0);
 	}
-	ircd_helper_read(dns_helper->ifd, dns_helper);
 }
 
 
