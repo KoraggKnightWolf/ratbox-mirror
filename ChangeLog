@@ -1,3 +1,11 @@
+androsyn    2006/08/08 14:38:37 UTC	(20060808_1-22961)
+  Log:
+  fix core in stats_memory
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2006/08/08 14:30:13 UTC	(20060808_0-22959)
   Log:
   fix core dump in report elines
