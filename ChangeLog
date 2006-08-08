@@ -1,3 +1,14 @@
+jilles      2006/08/08 16:10:30 UTC	(20060808_3-22965)
+  Log:
+  Always do ircd_helper_read(dns_helper->ifd, dns_helper);
+  after starting the resolver helper, otherwise we'll never
+  read any data from it (after /rehash dns etc).
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 jilles      2006/08/08 14:57:35 UTC	(20060808_2-22963)
   Log:
   Make ircd_bh_usage() stub for --disable-balloc deal
