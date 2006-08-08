@@ -314,7 +314,6 @@ report_dlines(struct Client *source_p)
                                              'D', host, pass,
                                              oper_reason ? "|" : "",
                                              oper_reason ? oper_reason : "");
-
 	}
 	PATRICIA_WALK_END;
 	send_pop_queue(source_p);
@@ -353,8 +352,10 @@ report_elines(struct Client *source_p)
 	{
 		aconf = pnode->data;
 		get_printable_conf(aconf, &name, &host, &pass, &user, &port, &classname);
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_STATSDLINE), me.name, source_p->name, 'e', host,
-			   pass);
+		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDLINE,
+                            		     form_str (RPL_STATSDLINE),
+                                             'e', host, pass,
+                                             "", "");
 	}
 	PATRICIA_WALK_END;
 	send_pop_queue(source_p);
