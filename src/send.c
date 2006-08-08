@@ -108,6 +108,8 @@ _send_linebuf(struct Client *to, buf_head_t *linebuf, int queue)
 void
 send_pop_queue(struct Client *to)
 {
+	if(to->from != NULL)
+		to = to->from;
 	if(!MyConnect(to) || IsIOError(to))
 		return;
 	if(ircd_linebuf_len(&to->localClient->buf_sendq) > 0)
