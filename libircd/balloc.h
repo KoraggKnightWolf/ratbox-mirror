@@ -39,7 +39,7 @@ typedef struct ircd_bh ircd_bh;
 #define ircd_bh_destroy(x) 	 
 #define ircd_bh_alloc(x) ircd_malloc((size_t)x) 	 
 #define ircd_bh_free(x,y) ircd_free(y) 	 
-#define ircd_bh_usage(bh, bused, bfree, bmemusage) do { (*(size_t *)bused) = 0; *((size_t *)bfree) = 0; *((size_t *)bmemusage) = 0; } while(0)
+#define ircd_bh_usage(bh, bused, bfree, bmemusage) do { if (bused) (*(size_t *)bused) = 0; if (bfree) *((size_t *)bfree) = 0; if (bmemusage) *((size_t *)bmemusage) = 0; } while(0)
  
 #else
 
