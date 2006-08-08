@@ -621,7 +621,6 @@ rehash(int sig)
 				     "Got signal SIGHUP, reloading ircd conf. file");
 	}
 
-	restart_resolver();
 	/* don't close listeners until we know we can go ahead with the rehash */
 	read_conf_files(NO);
 
