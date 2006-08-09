@@ -1,3 +1,12 @@
+jilles      2006/08/09 18:39:08 UTC	(20060809_1-22979)
+  Log:
+  CREDITS: As in 2.2, move larne from ircd-ratbox team to contributors.
+  
+
+  Modified:
+	ircd-ratbox/trunk/CREDITS (File Modified) 
+
+
 jilles      2006/08/09 18:23:31 UTC	(20060809_0-22977)
   Log:
   Fix ircd_ctime(), always returned an empty string.
