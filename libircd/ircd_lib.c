@@ -42,7 +42,6 @@ ircd_ctime(const time_t t, char *buf)
 #else
 	if(unlikely((p = ctime(&t)) == NULL))
 #endif
-		return NULL;
 	{
 		strcpy(buf, "");
 		return buf;
