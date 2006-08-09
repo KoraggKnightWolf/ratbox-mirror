@@ -245,6 +245,9 @@ show_isupport(struct Client *source_p)
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
 
 	ircd_sprintf(isupportbuffer, FEATURES2, FEATURES2VALUES);
+	sendto_one_numeric(source_p, HOLD_QUEUE,  RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
+
+	ircd_sprintf(isupportbuffer, FEATURES3, FEATURES3VALUES);
 	sendto_one_numeric(source_p, POP_QUEUE,  RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
 
 	return;

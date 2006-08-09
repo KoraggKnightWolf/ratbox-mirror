@@ -37,8 +37,7 @@
 		" MODES=%i"		\
 		" STATUSMSG=@+"		\
 		"%s"			\
-		" CALLERID=g"		\
-		" NICKLEN=%i"
+		" CALLERID=g"
 
 #define FEATURESVALUES \
 	ConfigChannel.use_except ? " EXCEPTS" : "", \
@@ -49,15 +48,15 @@
 	ConfigChannel.use_except ? "e" : "", \
 	ConfigChannel.use_invex ? "I" : "", \
 	ConfigChannel.max_bans, ServerInfo.network_name, \
-	MAXMODEPARAMS, ConfigChannel.use_knock ? " KNOCK" : "", NICKLEN-1
+	MAXMODEPARAMS, ConfigChannel.use_knock ? " KNOCK" : ""
 
 #define FEATURES2 "SAFELIST"		\
 		" ELIST=U"		\
 		" CASEMAPPING=rfc1459"	\
 		" CHARSET=ascii"	\
+		" NICKLEN=%i"		\
 		" CHANNELLEN=%i"	\
 		" TOPICLEN=%i"		\
-		" KICKLEN=%i"		\
 		" ETRACE"		\
 		" CPRIVMSG"		\
 		" CNOTICE"		\
@@ -65,9 +64,13 @@
 		" MONITOR=%d"
 
 #define FEATURES2VALUES \
-	LOC_CHANNELLEN, TOPICLEN, REASONLEN, \
+	NICKLEN-1, LOC_CHANNELLEN, TOPICLEN, \
 	ConfigFileEntry.max_monitor
 
+#define FEATURES3 "TARGMAX=NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:%d,NOTICE:%d,ACCEPT:,MONITOR:"
+
+#define FEATURES3VALUES \
+	ConfigFileEntry.max_targets, ConfigFileEntry.max_targets
 /*
  * - from mirc's versions.txt
  *
