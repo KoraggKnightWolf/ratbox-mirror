@@ -264,6 +264,7 @@ typedef void restart_cb(const char *buffer);
 typedef void die_cb(const char *buffer);
 
 char *ircd_ctime(const time_t, char *);
+char *ircd_date(const time_t, char *, size_t);
 void ircd_lib_log(const char *, ...);
 void ircd_lib_restart(const char *, ...);
 void ircd_lib_die(const char *, ...);

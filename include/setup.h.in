@@ -51,11 +51,11 @@
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
+/* Define to 1 if you have the `asctime_r' function. */
+#undef HAVE_ASCTIME_R
+
 /* Define to 1 if you have the <crypt.h> header file. */
 #undef HAVE_CRYPT_H
-
-/* Define to 1 if you have the `ctime_r' function. */
-#undef HAVE_CTIME_R
 
 /* Define to 1 if you have the <devpoll.h> header file. */
 #undef HAVE_DEVPOLL_H
@@ -81,6 +81,9 @@
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the `gmtime_r' function. */
+#undef HAVE_GMTIME_R
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H

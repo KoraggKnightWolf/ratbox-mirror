@@ -263,7 +263,7 @@ AC_CHECK_TYPES([uintptr_t])
 
 
 dnl check for various functions...
-AC_CHECK_FUNCS([socketpair vsnprintf mmap gettimeofday writev sendmsg ctime_r strtok_r usleep])
+AC_CHECK_FUNCS([socketpair vsnprintf mmap gettimeofday writev sendmsg asctime_r gmtime_r strtok_r usleep])
 
 AC_SEARCH_LIBS(nanosleep, rt posix4, AC_DEFINE(HAVE_NANOSLEEP, 1, [Define if you have nanosleep]))
 

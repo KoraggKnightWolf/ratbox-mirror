@@ -2,8 +2,8 @@
  *  ircd-ratbox: A slightly useful ircd.
  *  ircd_lib.c: libircd initialization functions at the like
  *
- *  Copyright (C) 2005 ircd-ratbox development team
- *  Copyright (C) 2005 Aaron Sethman <androsyn@ratbox.org>
+ *  Copyright (C) 2005,2006 ircd-ratbox development team
+ *  Copyright (C) 2005,2006 Aaron Sethman <androsyn@ratbox.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,29 +30,74 @@ static restart_cb *ircd_restart;
 static die_cb *ircd_die;
 
 static struct timeval *ircd_time;
-
-
 static char errbuf[512];
+
 char *
 ircd_ctime(const time_t t, char *buf)
 {
 	char *p;
-#ifdef HAVE_CTIME_R
-	if(unlikely((p = ctime_r(&t, buf)) == NULL))
-#else
-	if(unlikely((p = ctime(&t)) == NULL))
-#endif
+#if defined(HAVE_GMTIME_R) && defined(HAVE_ASCTIME_R)
+	struct tm tmr;
+	
+	if(unlikely((asctime_r(gmtime_r(&t, &tmr), buf) == NULL)))
 	{
 		strcpy(buf, "");
-		return buf;
+		return(buf);
 	}
-	strcpy(buf, p);
-
 	p = strchr(buf, '\n');
+
 	if(p != NULL)
 		*p = '\0';
+	return(buf);
+#else
+	if(unlikely((p = asctime(gmtime(&t))) == NULL))
+	{
+		strcpy(buf, "");
+		return(buf);
+	}
+	strcpy(buf, p);
+	p = strchr(buf, '\n');
 
-	return buf;
+	if(p != NULL)
+		*p = '\0';
+	return(buf);
+#endif
+}
+
+static const char *months[] = {
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+};
+
+static const char *weekdays[] = {
+        "Sunday", "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday"
+};
+ 
+
+/* I hate this..but its sort of ircd standard now.. */
+char *
+ircd_date(const time_t t, char *buf, size_t len)
+{
+	struct tm *gm;
+#if defined(HAVE_GMTIME_R)
+	struct tm gmbuf;
+	gm = gmtime_r(&t, &gmbuf);
+#else
+	gm = gmtime(&t);
+#endif
+
+	if(unlikely(gm == NULL))
+	{
+		strlcpy(buf, "", len);	
+		return(buf);
+	}
+	
+	ircd_snprintf(buf, len, "%s %s %d %d -- %02u:%02u:%02u +00:00", 
+		      weekdays[gm->tm_wday], months[gm->tm_mon], gm->tm_mday,  
+		      gm->tm_year + 1900, gm->tm_hour, gm->tm_min, gm->tm_sec);
+	return(buf);
 }
 
 time_t
