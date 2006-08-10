@@ -1,3 +1,19 @@
+androsyn    2006/08/10 15:15:27 UTC	(20060810_0-22987)
+  Log:
+  Have ircd_ctime() return times in UTC.
+  Add ircd_date() which returns a date in ircd like /time format also in UTC
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.c (File Modified) 
+	ircd-ratbox/trunk/libircd/ircd_lib.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_time.c (File Modified) 
+
+
 jilles      2006/08/09 19:25:12 UTC	(20060809_3-22985)
   Log:
   Port over some 005 (isupport) stuff from 2.2:
