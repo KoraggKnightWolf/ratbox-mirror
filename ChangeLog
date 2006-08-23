@@ -1,3 +1,13 @@
+jilles      2006/08/23 18:06:09 UTC	(20060823_0-22998)
+  Log:
+  Port m_webirc (RATBOX_2_2 r22996) to trunk,
+  allows showing real host of CGI:IRC users.
+  
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_webirc.c (File Added) 
+
+
 androsyn    2006/08/10 15:15:27 UTC	(20060810_0-22987)
   Log:
   Have ircd_ctime() return times in UTC.
