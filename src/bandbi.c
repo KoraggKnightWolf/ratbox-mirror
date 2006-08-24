@@ -376,16 +376,6 @@ bandb_check_dline(struct ConfItem *aconf)
 	if(!parse_netmask(aconf->host, &daddr, &bits))
 		return 0;
 
-	if((dconf = find_dline((struct sockaddr *) &daddr)))
-	{
-		int bits_d;
-
-		parse_netmask(dconf->host, NULL, &bits_d);
-
-		if(bits >= bits_d)
-			return 0;
-	}
-
 	return 1;
 }
 

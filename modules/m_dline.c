@@ -321,6 +321,9 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 			             get_oper_name(source_p), host);
 
 	} else {
+		dlink_list *list;
+		list = &temp_dlines[aconf->port];
+		ircd_dlinkFindDestroy(aconf, list);
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Un-dlined [%s] from temporary D-lines",
 			   me.name, parv[0], host);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
