@@ -1,3 +1,14 @@
+androsyn    2006/08/24 19:04:50 UTC	(20060824_1-23002)
+  Log:
+  - don't check for overlapping dlines in bandb_check_dline
+  - remove the dline from temp_dlines[] when doing an undline
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+
+
 androsyn    2006/08/24 18:36:04 UTC	(20060824_0-23000)
   Log:
   Fix undline code
