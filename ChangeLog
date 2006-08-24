@@ -1,3 +1,16 @@
+androsyn    2006/08/24 18:36:04 UTC	(20060824_0-23000)
+  Log:
+  Fix undline code
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/patricia.h (File Modified) 
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/src/patricia.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 jilles      2006/08/23 18:06:09 UTC	(20060823_0-22998)
   Log:
   Port m_webirc (RATBOX_2_2 r22996) to trunk,
