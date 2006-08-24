@@ -263,6 +263,7 @@ add_ipline(struct ConfItem *aconf, patricia_tree_t *t, struct sockaddr *addr, in
 
 	return 1;
 }
+#endif
 
 static void
 delete_ipline(struct ConfItem *aconf, patricia_tree_t *t)
@@ -273,7 +274,6 @@ delete_ipline(struct ConfItem *aconf, patricia_tree_t *t)
 		free_conf(aconf);
 	}
 }
-#endif
 
 static struct ConfItem *
 find_ipline(patricia_tree_t *t, struct sockaddr *addr)
@@ -285,6 +285,17 @@ find_ipline(patricia_tree_t *t, struct sockaddr *addr)
 	return NULL;
 }
 
+static struct ConfItem *
+find_ipline_exact(patricia_tree_t *t, struct sockaddr *addr, unsigned int bitlen)
+{
+	patricia_node_t *pnode;
+	pnode = match_ip_exact(t, addr, bitlen);
+	if(pnode != NULL)
+		return (struct ConfItem *) pnode->data;
+	return NULL;
+}
+
+
 struct ConfItem *
 find_dline(struct sockaddr *addr)
 {
@@ -295,6 +306,18 @@ find_dline(struct sockaddr *addr)
 		return aconf;
 	}
 	return (find_ipline(dline_tree, addr));
+}
+
+struct ConfItem *
+find_dline_exact(struct sockaddr *addr, unsigned int bitlen)
+{
+	return find_ipline_exact(dline_tree, addr, bitlen);
+}
+
+void
+remove_dline(struct ConfItem *aconf)
+{
+	delete_ipline(aconf, dline_tree);
 }
 
 void

@@ -1038,6 +1038,45 @@ match_ip(patricia_tree_t * tree, struct sockaddr *ip)
 }
 
 patricia_node_t *
+match_ip_exact(patricia_tree_t * tree, struct sockaddr *ip, unsigned int len)
+{
+	prefix_t *prefix;
+	patricia_node_t *node;
+	void *ipptr;
+	int family;
+#ifndef IPV6
+	if(len > 128)
+		len = 128;
+
+	family = AF_INET;
+	ipptr = &((struct sockaddr_in *)ip)->sin_addr;
+#else
+	if(ip->sa_family == AF_INET6)
+	{
+		if(len > 128)
+			len = 128;
+		family = AF_INET6;
+		ipptr = &((struct sockaddr_in6 *)ip)->sin6_addr;
+	} else {
+		if(len > 32)
+			len = 32;
+		family = AF_INET;
+		ipptr = &((struct sockaddr_in *)ip)->sin_addr;
+	}
+#endif
+	
+	if((prefix = New_Prefix(family, ipptr, len)) != NULL)
+	{
+		node = patricia_search_exact(tree, prefix);
+		Deref_Prefix(prefix);
+		return (node);
+	}
+	return NULL;
+}
+
+
+
+patricia_node_t *
 match_string(patricia_tree_t * tree, const char *string)
 {
 	patricia_node_t *node;

@@ -57,8 +57,6 @@ mapi_clist_av1 dline_clist[] = { &dline_msgtab, &undline_msgtab, NULL };
 DECLARE_MODULE_AV1(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision: 19295 $");
 
 static int valid_comment(char *comment);
-static int remove_temp_dline(const char *);
-static void remove_perm_dline(struct Client *source_p, const char *host);
 static void check_dlines(void);
 
 /* mo_dline()
@@ -278,8 +276,11 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 static int
 mo_undline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	const char *cidr;
-
+	struct irc_sockaddr_storage daddr;
+	struct ConfItem *aconf;
+	int b, ty;
+	const char *cidr = parv[1];
+	const char *host;
 	if(!IsOperUnkline(source_p))
 	{
 		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
@@ -287,28 +288,49 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		return 0;
 	}
 
-	cidr = parv[1];
-
-	if(parse_netmask(cidr, NULL, NULL) == HM_HOST)
+	if((ty = parse_netmask(cidr, (struct sockaddr *)&daddr, &b)) == HM_HOST)
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid D-Line",
 			   me.name, source_p->name);
 		return 0;
 	}
 
-	if(remove_temp_dline(cidr))
+	aconf = find_dline_exact((struct sockaddr *)&daddr, b);
+
+	if(aconf == NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, 
-			   ":%s NOTICE %s :Un-dlined [%s] from temporary D-lines",
-			   me.name, parv[0], cidr);
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s has removed the temporary D-Line for: [%s]",
-				     get_oper_name(source_p), cidr);
-		ilog(L_KLINE, "UD %s %s", get_oper_name(source_p), cidr);
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :No D-Line for %s",  me.name, source_p->name, cidr);
 		return 0;
 	}
 
-	remove_perm_dline(source_p, cidr);
+	if(IsConfPermanent(aconf))
+	{
+		sendto_one(source_p, POP_QUEUE, "%s NOTICE %s :Cannot remove permanent D-Line %s", me.name, source_p->name, cidr);
+		return 0;
+	}	
+
+	host = LOCAL_COPY(aconf->host);	
+	remove_dline(aconf);
+
+	if(!(aconf->flags & CONF_FLAGS_TEMPORARY))
+	{
+		bandb_del(BANDB_DLINE, host, NULL);
+		
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :D-Line for [%s] is removed", me.name, source_p->name, host);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "%s has removed the D-Line for: [%s]", 
+			             get_oper_name(source_p), host);
+
+	} else {
+		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Un-dlined [%s] from temporary D-lines",
+			   me.name, parv[0], host);
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "%s has removed the temporary D-Line for: [%s]",
+				     get_oper_name(source_p), host);
+		return 0;
+	}
+
+	ilog(L_KLINE, "UD %s %s", get_oper_name(source_p), host);
+
 	return 0;
 }
 
@@ -329,79 +351,6 @@ valid_comment(char *comment)
 		comment[REASONLEN] = '\0';
 
 	return 1;
-}
-
-/* remove_temp_dline()
- *
- * inputs       - hostname to undline
- * outputs      -
- * side effects - tries to undline anything that matches
- */
-static int
-remove_temp_dline(const char *host)
-{
-	struct ConfItem *aconf;
-	dlink_node *ptr;
-	int i;
-
-	for (i = 0; i < LAST_TEMP_TYPE; i++)
-	{
-		DLINK_FOREACH(ptr, temp_dlines[i].head)
-		{
-			aconf = ptr->data;
-
-			if(irccmp(aconf->host, host))
-				continue;
-
-			ircd_dlinkDestroy(ptr, &temp_dlines[i]);
-			delete_one_address_conf(aconf->host, aconf);
-			return YES;
-		}
-	}
-
-	return NO;
-}
-
-void
-remove_perm_dline(struct Client *source_p, const char *host)
-{
-	struct AddressRec *arec;
-	struct ConfItem *aconf;
-	int i;
-
-	HOSTHASH_WALK(i, arec)
-	{
-		if((arec->type & ~CONF_SKIPUSER) == CONF_DLINE)
-		{
-			aconf = arec->aconf;
-
-			if(aconf->flags & CONF_FLAGS_TEMPORARY)
-				continue;
-
-			if(IsConfPermanent(aconf))
-				continue;
-
-			if(irccmp(aconf->host, host))
-				continue;
-
-			delete_one_address_conf(host, aconf);
-			bandb_del(BANDB_DLINE, aconf->host, NULL);
-
-			sendto_one(source_p, POP_QUEUE, 
-					":%s NOTICE %s :D-Line for [%s] is removed", 
-					me.name, source_p->name, host);
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"%s has removed the D-Line for: [%s]", 
-					get_oper_name(source_p), host);
-			ilog(L_KLINE, "UD %s %s", get_oper_name(source_p), host);
-
-			return;
-		}
-	}
-	HOSTHASH_WALK_END
-
-	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :No D-Line for %s",
-		   me.name, source_p->name, host);
 }
 
 /* check_dlines()
