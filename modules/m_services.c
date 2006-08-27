@@ -97,8 +97,7 @@ me_su(struct Client *client_p, struct Client *source_p,
 	if((target_p = find_client(parv[1])) == NULL)
 		return 0;
 
-	/* we only care about all clients if we're a hub */
-	if(!IsPerson(target_p) || (!ServerInfo.hub && !MyClient(target_p)))
+	if(!IsPerson(target_p))
 		return 0;
 
 	if(EmptyString(parv[2]))
@@ -271,7 +270,8 @@ h_svc_whois(hook_data_client *data)
 	if(!EmptyString(data->target->user->suser))
 	{
 		sendto_one(data->client, POP_QUEUE, form_str(RPL_WHOISLOGGEDIN),
-				me.name, data->client->name,
+				get_id(&me, data->client),
+				get_id(data->client, data->client),
 				data->target->name,
 				data->target->user->suser);
 	}
