@@ -119,7 +119,11 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
 	}
 
 	strlcpy(source_p->sockhost, parv[4], sizeof(source_p->sockhost));
-	strlcpy(source_p->host, parv[3], sizeof(source_p->host));
+	if(strlen(parv[3]) <= HOSTLEN)
+		strlcpy(source_p->host, parv[3], sizeof(source_p->host));
+	else
+		strlcpy(source_p->host, source_p->sockhost, sizeof(source_p->host));
+
 	ircd_inet_pton_sock(parv[4], (struct sockaddr *)&source_p->localClient->ip);
 
 	/* Check dlines now, k/glines will be checked on registration */
