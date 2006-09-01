@@ -28,7 +28,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: rsdb_sqlite3.c 22247 2006-03-24 23:39:15Z leeh $
+ * $Id$
  */
 #include "stdinc.h"
 #include "rsdb.h"

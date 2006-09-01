@@ -37,7 +37,7 @@ mapi_hfn_list_av1 whois_hfnlist[] = {
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(whois_spy, NULL, NULL, NULL, NULL, whois_hfnlist, "$Revision: 18297 $");
+DECLARE_MODULE_AV1(whois_spy, NULL, NULL, NULL, NULL, whois_hfnlist, "$Revision$");
 
 void
 show_whois(hook_data_client *data)

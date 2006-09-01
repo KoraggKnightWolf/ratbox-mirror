@@ -37,7 +37,7 @@ mapi_hfn_list_av1 links_hfnlist[] = {
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(links_spy, NULL, NULL, NULL, NULL, links_hfnlist, "$Revision: 18297 $");
+DECLARE_MODULE_AV1(links_spy, NULL, NULL, NULL, NULL, links_hfnlist, "$Revision$");
 
 void
 show_links(hook_data *data)

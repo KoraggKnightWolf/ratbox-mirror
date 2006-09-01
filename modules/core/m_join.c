@@ -52,7 +52,7 @@ struct Message sjoin_msgtab = {
 };
 
 mapi_clist_av1 join_clist[] = { &join_msgtab, &sjoin_msgtab, NULL };
-DECLARE_MODULE_AV1(join, NULL, NULL, join_clist, NULL, NULL, "$Revision: 19295 $");
+DECLARE_MODULE_AV1(join, NULL, NULL, join_clist, NULL, NULL, "$Revision$");
 
 static void do_join_0(struct Client *client_p, struct Client *source_p);
 static int check_channel_name_loc(struct Client *source_p, const char *name);

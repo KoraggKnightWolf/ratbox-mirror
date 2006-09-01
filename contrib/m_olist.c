@@ -54,7 +54,7 @@ struct Message olist_msgtab = {
 
 mapi_clist_av1 olist_clist[] = { &olist_msgtab, NULL };
 
-DECLARE_MODULE_AV1(okick, NULL, NULL, olist_clist, NULL, NULL, "$Revision: 16950 $");
+DECLARE_MODULE_AV1(okick, NULL, NULL, olist_clist, NULL, NULL, "$Revision$");
 
 #endif
 

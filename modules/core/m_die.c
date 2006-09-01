@@ -45,7 +45,7 @@ static struct Message die_msgtab = {
 };
 
 mapi_clist_av1 die_clist[] = { &die_msgtab, NULL };
-DECLARE_MODULE_AV1(die, NULL, NULL, die_clist, NULL, NULL, "$Revision: 19256 $");
+DECLARE_MODULE_AV1(die, NULL, NULL, die_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_die - DIE command handler

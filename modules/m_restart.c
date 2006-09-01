@@ -45,7 +45,7 @@ struct Message restart_msgtab = {
 };
 
 mapi_clist_av1 restart_clist[] = { &restart_msgtab, NULL };
-DECLARE_MODULE_AV1(restart, NULL, NULL, restart_clist, NULL, NULL, "$Revision: 19295 $");
+DECLARE_MODULE_AV1(restart, NULL, NULL, restart_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_restart

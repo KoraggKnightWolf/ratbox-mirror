@@ -51,7 +51,7 @@ struct Message tb_msgtab = {
 };
 
 mapi_clist_av1 tb_clist[] =  { &tb_msgtab, NULL };
-DECLARE_MODULE_AV1(tb, NULL, NULL, tb_clist, NULL, NULL, "$Revision: 18720 $");
+DECLARE_MODULE_AV1(tb, NULL, NULL, tb_clist, NULL, NULL, "$Revision$");
 
 /* m_tb()
  *

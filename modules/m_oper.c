@@ -79,7 +79,7 @@ struct Message challenge_msgtab = {
 
 mapi_clist_av1 oper_clist[] = { &oper_msgtab, &challenge_msgtab, NULL };
 
-DECLARE_MODULE_AV1(oper, NULL, NULL, oper_clist, NULL, NULL, "$Revision: 19256 $");
+DECLARE_MODULE_AV1(oper, NULL, NULL, oper_clist, NULL, NULL, "$Revision$");
 
 
 /*

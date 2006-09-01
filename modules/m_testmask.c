@@ -53,7 +53,7 @@ struct Message testmask_msgtab = {
 };
 
 mapi_clist_av1 testmask_clist[] = { &testmask_msgtab, NULL };
-DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision: 19256 $");
+DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision$");
 
 static const char *empty_sockhost = "255.255.255.255";
 static const char *spoofed_sockhost = "0";

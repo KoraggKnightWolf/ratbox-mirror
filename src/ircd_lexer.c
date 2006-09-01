@@ -421,7 +421,7 @@ char *yytext;
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  *  USA
  *
- * $Id: ircd_lexer.l 20940 2005-10-12 22:58:03Z androsyn $
+ * $Id$
  */
 #define YY_NO_UNPUT 1
 #line 26 "src/ircd_lexer.l"

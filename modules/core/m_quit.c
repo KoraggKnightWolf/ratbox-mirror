@@ -43,7 +43,7 @@ struct Message quit_msgtab = {
 };
 
 mapi_clist_av1 quit_clist[] = { &quit_msgtab, NULL };
-DECLARE_MODULE_AV1(quit, NULL, NULL, quit_clist, NULL, NULL, "$Revision: 19295 $");
+DECLARE_MODULE_AV1(quit, NULL, NULL, quit_clist, NULL, NULL, "$Revision$");
 
 
 static int

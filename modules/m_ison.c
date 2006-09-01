@@ -44,7 +44,7 @@ struct Message ison_msgtab = {
 };
 
 mapi_clist_av1 ison_clist[] = { &ison_msgtab, NULL };
-DECLARE_MODULE_AV1(ison, NULL, NULL, ison_clist, NULL, NULL, "$Revision: 19295 $");
+DECLARE_MODULE_AV1(ison, NULL, NULL, ison_clist, NULL, NULL, "$Revision$");
 
 static char buf[BUFSIZE];
 static char buf2[BUFSIZE];

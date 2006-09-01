@@ -47,7 +47,7 @@ struct Message mkpasswd_msgtab = {
 
 mapi_clist_av1 mkpasswd_clist[] = { &mkpasswd_msgtab, NULL };
 
-DECLARE_MODULE_AV1(mkpasswd, NULL, NULL, mkpasswd_clist, NULL, NULL, "$Revision: 15964 $");
+DECLARE_MODULE_AV1(mkpasswd, NULL, NULL, mkpasswd_clist, NULL, NULL, "$Revision$");
 
 
 static int

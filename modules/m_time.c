@@ -42,7 +42,7 @@ struct Message time_msgtab = {
 };
 
 mapi_clist_av1 time_clist[] = { &time_msgtab, NULL };
-DECLARE_MODULE_AV1(time, NULL, NULL, time_clist, NULL, NULL, "$Revision: 19295 $");
+DECLARE_MODULE_AV1(time, NULL, NULL, time_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_time

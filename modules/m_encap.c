@@ -48,7 +48,7 @@ struct Message encap_msgtab = {
 };
 
 mapi_clist_av1 encap_clist[] = { &encap_msgtab, NULL };
-DECLARE_MODULE_AV1(encap, NULL, NULL, encap_clist, NULL, NULL, "$Revision: 19295 $");
+DECLARE_MODULE_AV1(encap, NULL, NULL, encap_clist, NULL, NULL, "$Revision$");
 
 /* ms_encap()
  *

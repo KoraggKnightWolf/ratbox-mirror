@@ -1,4 +1,4 @@
-/* $Id: rsdb.h 22343 2006-04-10 18:56:26Z leeh $ */
+/* $Id$ */
 #ifndef INCLUDED_rsdb_h
 #define INCLUDED_rsdb_h
 

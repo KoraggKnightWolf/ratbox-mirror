@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 21086 2005-11-05 03:11:25Z androsyn $
+# $Id$
 #
 bin_PROGRAMS = bandb
 

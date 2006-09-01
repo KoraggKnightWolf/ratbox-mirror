@@ -47,7 +47,7 @@ struct Message clearchan_msgtab = {
 
 mapi_clist_av1 clearchan_clist[] = { &clearchan_msgtab, NULL };
 
-DECLARE_MODULE_AV1(clearchan, NULL, NULL, clearchan_clist, NULL, NULL, "$Revision: 16480 $");
+DECLARE_MODULE_AV1(clearchan, NULL, NULL, clearchan_clist, NULL, NULL, "$Revision$");
 
 /*
 ** mo_clearchan

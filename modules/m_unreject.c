@@ -41,7 +41,7 @@ struct Message unreject_msgtab = {
 };
 
 mapi_clist_av1 unreject_clist[] = { &unreject_msgtab, NULL };
-DECLARE_MODULE_AV1(unreject, NULL, NULL, unreject_clist, NULL, NULL, "$Revision: 19256 $");
+DECLARE_MODULE_AV1(unreject, NULL, NULL, unreject_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_unreject

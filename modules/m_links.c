@@ -56,7 +56,7 @@ mapi_hlist_av1 links_hlist[] = {
 	{ NULL, NULL }
 };
 
-DECLARE_MODULE_AV1(links, NULL, NULL, links_clist, links_hlist, NULL, "$Revision: 19256 $");
+DECLARE_MODULE_AV1(links, NULL, NULL, links_clist, links_hlist, NULL, "$Revision$");
 
 static void send_links_cache(struct Client *source_p);
 

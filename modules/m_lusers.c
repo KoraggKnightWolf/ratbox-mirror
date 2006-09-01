@@ -50,7 +50,7 @@ struct Message users_msgtab = {
 };
 
 mapi_clist_av1 lusers_clist[] = { &lusers_msgtab, &users_msgtab, NULL };
-DECLARE_MODULE_AV1(lusers, NULL, NULL, lusers_clist, NULL, NULL, "$Revision: 19256 $");
+DECLARE_MODULE_AV1(lusers, NULL, NULL, lusers_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_lusers - LUSERS message handler

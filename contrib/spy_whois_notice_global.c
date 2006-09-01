@@ -38,7 +38,7 @@ mapi_hfn_list_av1 whois_global_hfnlist[] = {
 };
 
 DECLARE_MODULE_AV1(whois_global_spy, NULL, NULL, NULL, NULL, whois_global_hfnlist,
-		   "$Revision: 18297 $");
+		   "$Revision$");
 
 void
 show_whois_global(hook_data_client *data)

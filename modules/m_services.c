@@ -83,7 +83,7 @@ mapi_hfn_list_av1 services_hfnlist[] = {
 	{ NULL, NULL }
 };
 
-DECLARE_MODULE_AV1(services, NULL, NULL, services_clist, NULL, services_hfnlist, "$Revision: 18720 $");
+DECLARE_MODULE_AV1(services, NULL, NULL, services_clist, NULL, services_hfnlist, "$Revision$");
 
 static int
 me_su(struct Client *client_p, struct Client *source_p,
