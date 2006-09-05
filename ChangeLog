@@ -1,3 +1,14 @@
+androsyn    2006/09/05 15:07:04 UTC	(20060905_0-23025)
+  Log:
+  Fix bug in match_esc where abc*# will match abc1x
+  I don't think this change will cause other breakage...but I haven't tested it that heavily either...
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 androsyn    2006/08/31 20:52:24 UTC	(20060831_0-23016)
   Log:
   - Fix bug in WEBIRC to deal with hosts being longer than HOSTLEN.  We should use the IP and not
