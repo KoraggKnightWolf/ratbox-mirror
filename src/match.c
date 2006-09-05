@@ -181,15 +181,10 @@ match_esc(const char *mask, const char *name)
 				return 1;
 			if(quote)
 				return 0;
-			for (m--; (m > (const unsigned char *) mask) && 
-					(*m == '?' || *m == '#' || *m == '@' ); m--)
-				;
-			
-			/*
-			 *  what is the point of this? -androsyn
-			 *  if(*m == '*' && (m > (const unsigned char *) mask))
- 			 *	return 1;
- 			 */
+			for (m--; (m > (const unsigned char *) mask) && (*m == '?'); m--);;
+
+			if(*m == '*' && (m > (const unsigned char *) mask))
+				return 1;
 			if(!wild)
 				return 0;
 			m = ma;
