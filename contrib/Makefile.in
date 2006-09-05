@@ -13,8 +13,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
-# $Id$
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -23,6 +21,7 @@ pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 top_builddir = ..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
+INSTALL = @INSTALL@
 install_sh_DATA = $(install_sh) -c -m 644
 install_sh_PROGRAM = $(install_sh) -c
 install_sh_SCRIPT = $(install_sh) -c
@@ -48,7 +47,6 @@ CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-INSTALL = @INSTALL@
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMDEP_FALSE = @AMDEP_FALSE@
@@ -60,6 +58,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BUILD_SQLITE_FALSE = @BUILD_SQLITE_FALSE@
+BUILD_SQLITE_TRUE = @BUILD_SQLITE_TRUE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -81,11 +81,11 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 ENABLE_SERVICES_FALSE = @ENABLE_SERVICES_FALSE@
 ENABLE_SERVICES_TRUE = @ENABLE_SERVICES_TRUE@
-ENCSPEED = @ENCSPEED@
 ETC_DIR = @ETC_DIR@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+GREP = @GREP@
 HELP_DIR = @HELP_DIR@
 INCLTDL = @INCLTDL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -114,6 +114,8 @@ MINGW_FALSE = @MINGW_FALSE@
 MINGW_TRUE = @MINGW_TRUE@
 MODULE_DIR = @MODULE_DIR@
 MV = @MV@
+NEED_CRYPT_FALSE = @NEED_CRYPT_FALSE@
+NEED_CRYPT_TRUE = @NEED_CRYPT_TRUE@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -132,6 +134,9 @@ SELECT_TYPE = @SELECT_TYPE@
 SERVLINK = @SERVLINK@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SQLITE_INCLUDES = @SQLITE_INCLUDES@
+SQLITE_LD = @SQLITE_LD@
+SQLITE_SUBDIR = @SQLITE_SUBDIR@
 SSL_INCLUDES = @SSL_INCLUDES@
 SSL_LIBS = @SSL_LIBS@
 SSL_SRCS_ENABLE = @SSL_SRCS_ENABLE@
@@ -141,13 +146,11 @@ STRIP = @STRIP@
 TOUCH = @TOUCH@
 VERSION = @VERSION@
 YACC = @YACC@
+YFLAGS = @YFLAGS@
 ZLIB_LD = @ZLIB_LD@
-ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -163,6 +166,9 @@ build_os = @build_os@
 build_vendor = @build_vendor@
 confdir = @confdir@
 datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 helpdir = @helpdir@
 host = @host@
@@ -170,44 +176,47 @@ host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 logdir = @logdir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
-moduledir = @moduledir@/contrib
+moduledir = @moduledir@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-automoduledir = @moduledir@/autoload
 INCLUDES = -I../include -I../libircd $(INCLTDL)
 SRCS = \
-example_module.c	\
-m_42.c	\
-m_clearchan.c	\
-m_flags.c	\
-m_force.c	\
-m_mkpasswd.c	\
-m_ojoin.c	\
-m_okick.c	\
-m_olist.c	\
-m_opme.c	\
-spy_admin_notice.c	\
-spy_info_notice.c	\
-spy_links_notice.c	\
-spy_motd_notice.c	\
-spy_stats_notice.c	\
-spy_stats_p_notice.c	\
-spy_whois_notice.c	\
+example_module.c        \
+m_42.c  	\
+m_clearchan.c   \
+m_flags.c       \
+m_force.c       \
+m_mkpasswd.c    \
+m_ojoin.c       \
+m_okick.c       \
+m_olist.c       \
+m_opme.c        \
+spy_admin_notice.c      \
+spy_info_notice.c       \
+spy_links_notice.c      \
+spy_motd_notice.c       \
+spy_stats_notice.c      \
+spy_stats_p_notice.c    \
+spy_whois_notice.c      \
 spy_whois_notice_global.c
 
 ALL_SRCS = $(SRCS)
@@ -380,34 +389,30 @@ uninstall-am: uninstall-info-am
 .lo.la:
 	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -module -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS) 
 
-#BUILD
-default: 	build
-build:		all
-
 all: $(S_OBJS) $(S_CORE_OBJS) 
 
 clean-generic:
-	$(LIBTOOL) --mode=clean $(RM) -f $(S_OBJS) $(S_CORE_OBJS)  $(ST_OBJS) static_modules.lo
+	$(LIBTOOL) --mode=clean $(RM) -f $(S_OBJS) $(S_CORE_OBJS)  $(ST_OBJS)
 
 install_modules: $(S_OBJS)
 	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_OBJS) $(DESTDIR)$(moduledir);
 
-install-mkdirs:
-	@echo "ircd: setting up modular directory structure"
-	-@if test ! -d $(DESTDIR)$(moduledir); then \
-		mkdir $(DESTDIR)$(moduledir); \
-	fi
-	-@if test -d $(DESTDIR)$(moduledir)-old; then \
-		rm -rf $(DESTDIR)$(moduledir)-old; \
-	fi
-	-@if test -d $(DESTDIR)$(moduledir); then \
-		echo "ircd: backing up modules"; \
-		mv $(DESTDIR)$(moduledir) $(DESTDIR)$(moduledir)-old; \
-	fi
+#install-mkdirs:
+#	@echo "ircd: setting up modular directory structure"
+#	-@if test ! -d $(DESTDIR)$(moduledir); then \
+#		mkdir $(DESTDIR)$(moduledir); \
+#	fi
+#	-@if test -d $(DESTDIR)$(moduledir)-old; then \
+#		rm -rf $(DESTDIR)$(moduledir)-old; \
+#	fi
+#	-@if test -d $(DESTDIR)$(moduledir); then \
+#		echo "ircd: backing up modules"; \
+#		mv $(DESTDIR)$(moduledir) $(DESTDIR)$(moduledir)-old; \
+#	fi
+#
+#	@mkdir -p -m 755 $(DESTDIR)$(moduledir)
 
-	@mkdir -p -m 755 $(DESTDIR)$(moduledir)
-
-install: install-mkdirs install_modules
+install: install_modules
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
