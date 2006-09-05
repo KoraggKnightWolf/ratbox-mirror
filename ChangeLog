@@ -1,3 +1,12 @@
+androsyn    2006/09/05 15:42:59 UTC	(20060905_2-23031)
+  Log:
+  recreate Makefile.am and regenerate Makefile.in
+
+  Modified:
+	ircd-ratbox/trunk/contrib/Makefile.am (File Added) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+
+
 androsyn    2006/09/05 15:16:59 UTC	(20060905_1-23027)
   Log:
   commit jilles change to fix some match_esc stupidness
