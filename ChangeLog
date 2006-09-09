@@ -1,3 +1,15 @@
+leeh        2006/09/09 15:27:25 UTC	(20060909_0-23039)
+  Log:
+  - port r23037 from 2.2
+    - make find_channel_membership() choose the most optimal list to search to
+      make ircd more friendly when dealing with services thats in lots of
+      channels
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+
+
 androsyn    2006/09/05 15:42:59 UTC	(20060905_2-23031)
   Log:
   recreate Makefile.am and regenerate Makefile.in
