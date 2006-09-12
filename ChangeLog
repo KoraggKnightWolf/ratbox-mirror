@@ -1,3 +1,13 @@
+leeh        2006/09/12 21:12:13 UTC	(20060912_0-23055)
+  Log:
+  - did someone mention a new RPL_YOUREOPER?
+    Morbo will destroy you!!!!
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 leeh        2006/09/09 15:27:25 UTC	(20060909_0-23039)
   Log:
   - port r23037 from 2.2
