@@ -403,7 +403,7 @@ static  const char *  replies[] = {
 /* 378 */       NULL,
 /* 379 */       NULL,
 /* 380 */       NULL,
-/* 381 RPL_YOUREOPER, */        ":%s 381 %s :You have entered... the anti-alz Zone!.",
+/* 381 RPL_YOUREOPER, */        ":%s 381 %s :Won't you take me to... FUNKY TOWN!",
 /* 382 RPL_REHASHING, */        ":%s 382 %s %s :Rehashing",
 /* 383 */       NULL,
 /* 384 RPL_MYPORTIS, */		NULL,
