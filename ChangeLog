@@ -1,3 +1,16 @@
+androsyn    2006/09/18 18:03:14 UTC	(20060918_0-23057)
+  Log:
+  Forward port -r20746
+  
+  - fix buffer overflow and unterminated buffer when removing TS6 bans
+  - fix rebuilding of SJOIN
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+
+
 leeh        2006/09/12 21:12:13 UTC	(20060912_0-23055)
   Log:
   - did someone mention a new RPL_YOUREOPER?
