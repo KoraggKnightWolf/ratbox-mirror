@@ -132,7 +132,7 @@ find_channel_membership(struct Channel *chptr, struct Client *client_p)
 	/* Pick the most efficient list to use to be nice to things like
 	 * CHANSERV which could be in a large number of channels
 	 */
-	if(dlink_list_length(&chptr->members) < dlink_list_length(&client_p->user->channel))
+	if(ircd_dlink_list_length(&chptr->members) < ircd_dlink_list_length(&client_p->user->channel))
 	{
 		DLINK_FOREACH(ptr, chptr->members.head)
 		{
