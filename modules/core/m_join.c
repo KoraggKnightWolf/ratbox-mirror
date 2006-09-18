@@ -504,7 +504,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	int keep_new_modes = 1;
 	int fl;
 	int isnew;
-	int mlen;
+	int mlen_nick, mlen_uid;
 	int len_nick;
 	int len_uid;
 	int len;
@@ -650,18 +650,18 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		modes = empty_modes;
 
-	mlen = ircd_sprintf(buf_nick, ":%s SJOIN %ld %s %s :",
+	mlen_nick = ircd_sprintf(buf_nick, ":%s SJOIN %ld %s %s :",
 			  source_p->name, (long) chptr->channelts,
 			  parv[2], modes);
-	ptr_nick = buf_nick + mlen;
+	ptr_nick = buf_nick + mlen_nick;
 
 	/* working on the presumption eventually itll be more efficient to
 	 * build a TS6 buffer without checking its needed..
 	 */
-	mlen = ircd_sprintf(buf_uid, ":%s SJOIN %ld %s %s :",
+	mlen_uid = ircd_sprintf(buf_uid, ":%s SJOIN %ld %s %s :",
 			  use_id(source_p), (long) chptr->channelts,
 			  parv[2], modes);
-	ptr_uid = buf_uid + mlen;
+	ptr_uid = buf_uid + mlen_uid;
 
 	mbuf = modebuf;
 	para[0] = para[1] = para[2] = para[3] = empty;
@@ -705,21 +705,21 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* we assume for these we can fit at least one nick/uid in.. */
 
 		/* check we can fit another status+nick+space into a buffer */
-		if((mlen + len_nick + NICKLEN + 3) > (BUFSIZE - 3))
+		if((mlen_nick + len_nick + NICKLEN + 3) > (BUFSIZE - 3))
 		{
 			*(ptr_nick - 1) = '\0';
 			sendto_server(client_p->from, NULL, NOCAPS, CAP_TS6,
 				      "%s", buf_nick);
-			ptr_nick = buf_nick + mlen;
+			ptr_nick = buf_nick + mlen_nick;
 			len_nick = 0;
 		}
 
-		if((mlen + len_uid + IDLEN + 3) > (BUFSIZE - 3))
+		if((mlen_uid + len_uid + IDLEN + 3) > (BUFSIZE - 3))
 		{
 			*(ptr_uid - 1) = '\0';
 			sendto_server(client_p->from, NULL, CAP_TS6, NOCAPS,
 				      "%s", buf_uid);
-			ptr_uid = buf_uid + mlen;
+			ptr_uid = buf_uid + mlen_uid;
 			len_uid = 0;
 		}
 
@@ -1268,6 +1268,7 @@ remove_ban_list(struct Channel *chptr, struct Client *source_p,
 		if(count >= MAXMODEPARAMS || (cur_len + plen) > BUFSIZE - 4)
 		{
 			/* remove trailing space */
+			*mbuf = '\0';
 			*(pbuf - 1) = '\0';
 
 			sendto_channel_local(mems, chptr, "%s %s",
@@ -1277,6 +1278,7 @@ remove_ban_list(struct Channel *chptr, struct Client *source_p,
 
 			cur_len = mlen;
 			mbuf = lmodebuf + mlen;
+			pbuf = lparabuf;
 			count = 0;
 		}
 
@@ -1288,6 +1290,7 @@ remove_ban_list(struct Channel *chptr, struct Client *source_p,
 		free_ban(banptr);
 	}
 
+	*mbuf = '\0';
 	*(pbuf - 1) = '\0';
 	sendto_channel_local(mems, chptr, "%s %s", lmodebuf, lparabuf);
 	sendto_server(source_p, chptr, cap, CAP_TS6,
