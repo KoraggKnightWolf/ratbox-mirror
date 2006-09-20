@@ -1,3 +1,13 @@
+androsyn    2006/09/20 15:48:16 UTC	(20060920_0-23065)
+  Log:
+  Run autoconf/automake again..
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+
+
 androsyn    2006/09/18 18:07:12 UTC	(20060918_1-23059)
   Log:
   change dlink_list_length to ircd_dlink_list_length here
