@@ -1,3 +1,15 @@
+jilles      2006/09/23 17:31:05 UTC	(20060923_0-23067)
+  Log:
+  Call channel_modes() with &me instead of source_p when
+  sending out a JOIN and SJOIN for a local user. This
+  saves checking whether they are on the channel they
+  have just joined.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+
+
 androsyn    2006/09/20 15:48:16 UTC	(20060920_0-23065)
   Log:
   Run autoconf/automake again..
