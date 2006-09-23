@@ -273,7 +273,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		}
 		else
 		{
-			const char *modes = channel_modes(chptr, source_p);
+			const char *modes = channel_modes(chptr, &me);
 
 			sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
 				      ":%s JOIN %ld %s %s",
