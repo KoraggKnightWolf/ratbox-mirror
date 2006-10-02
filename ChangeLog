@@ -1,3 +1,11 @@
+androsyn    2006/10/02 14:20:08 UTC	(20061002_0-23085)
+  Log:
+  count escaped wildcards as non-wildcard characters
+
+  Modified:
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 jilles      2006/09/23 17:31:05 UTC	(20060923_0-23067)
   Log:
   Call channel_modes() with &me instead of source_p when
