@@ -655,6 +655,8 @@ valid_wild_card_simple(const char *data)
 		if(tmpch == '\\')
 		{
 			p++;
+			if(++nonwild >= ConfigFileEntry.min_nonwildcard_simple)
+				return 1;
 		}
 		else if(!IsMWildChar(tmpch))
 		{
