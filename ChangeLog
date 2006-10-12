@@ -1,3 +1,11 @@
+androsyn    2006/10/12 05:15:07 UTC	(20061012_1-23218)
+  Log:
+  kick by the i/o type we're running with
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+
+
 androsyn    2006/10/12 02:21:43 UTC	(20061012_0-23176)
   Log:
   Set svn:externals to grab libircd from the repo
