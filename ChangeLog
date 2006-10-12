@@ -1,3 +1,12 @@
+androsyn    2006/10/12 02:21:43 UTC	(20061012_0-23176)
+  Log:
+  Set svn:externals to grab libircd from the repo
+  
+
+  Modified:
+	ircd-ratbox/trunk/  (Property Modified)
+
+
 androsyn    2006/10/11 23:47:26 UTC	(20061011_0-23143)
   Log:
   Lets back this out and try it again
