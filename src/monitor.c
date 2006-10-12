@@ -71,7 +71,7 @@ find_monitor(const char *name, int add)
 	if(add)
 	{
 		monptr = ircd_bh_alloc(monitor_heap);
-		strlcpy(monptr->name, name, sizeof(monptr->name));
+		ircd_strlcpy(monptr->name, name, sizeof(monptr->name));
 
 		monptr->hnext = monitorTable[hashv];
 		monitorTable[hashv] = monptr;
@@ -153,7 +153,7 @@ clear_monitor(struct Client *client_p)
 		 * cleaned up periodically by cleanup_monitor() --anfl
 		 */
 		ircd_dlinkFindDestroy(client_p, &monptr->users);
-		free_dlink_node(ptr);
+		ircd_free_dlink_node(ptr);
 	}
 
 	client_p->localClient->monitor_list.head = client_p->localClient->monitor_list.tail = NULL;

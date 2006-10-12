@@ -228,7 +228,7 @@ int
 main(int argc, char *argv[])
 {
 
-	bandb_helper = ircd_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256); /* XXX fix me */
+	bandb_helper = ircd_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256, 256); /* XXX fix me */
 
 	rsdb_init();
 	check_schema();

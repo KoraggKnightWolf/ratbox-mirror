@@ -439,7 +439,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 		ircd_sprintf(who, "%s!%s@%s",
 			   source_p->name, source_p->username, source_p->host);
 	else
-		strlcpy(who, source_p->name, sizeof(who));
+		ircd_strlcpy(who, source_p->name, sizeof(who));
 
 	actualBan = allocate_ban(realban, who);
 	actualBan->when = ircd_currenttime;
@@ -1167,7 +1167,7 @@ chm_key(struct Client *source_p, struct Channel *chptr,
 			return;
 
 		s_assert(key[0] != ' ');
-		strlcpy(chptr->mode.key, key, sizeof(chptr->mode.key));
+		ircd_strlcpy(chptr->mode.key, key, sizeof(chptr->mode.key));
 
 		mode_changes[mode_count].letter = c;
 		mode_changes[mode_count].dir = MODE_ADD;

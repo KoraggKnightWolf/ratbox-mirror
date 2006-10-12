@@ -313,8 +313,8 @@ verify_access(struct Client *client_p, const char *username)
 	}
 	else
 	{
-		strlcpy(non_ident, "~", sizeof(non_ident));
-		strlcat(non_ident, username, sizeof(non_ident));
+		ircd_strlcpy(non_ident, "~", sizeof(non_ident));
+		ircd_strlcat(non_ident, username, sizeof(non_ident));
 		aconf = find_address_conf(client_p->host, client_p->sockhost,
 					non_ident, 
 					(struct sockaddr *) &client_p->localClient->ip,
@@ -354,14 +354,14 @@ verify_access(struct Client *client_p, const char *username)
 				char *host = p+1;
 				*p = '\0';
 
-				strlcpy(client_p->username, aconf->info.name,
+				ircd_strlcpy(client_p->username, aconf->info.name,
 					sizeof(client_p->username));
-				strlcpy(client_p->host, host,
+				ircd_strlcpy(client_p->host, host,
 					sizeof(client_p->host));
 				*p = '@';
 			}
 			else
-				strlcpy(client_p->host, aconf->info.name, sizeof(client_p->host));
+				ircd_strlcpy(client_p->host, aconf->info.name, sizeof(client_p->host));
 		}
 		return (attach_iline(client_p, aconf));
 	}
@@ -625,9 +625,9 @@ rehash(int sig)
 	read_conf_files(NO);
 
 	if(ServerInfo.description != NULL)
-		strlcpy(me.info, ServerInfo.description, sizeof(me.info));
+		ircd_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
 	else
-		strlcpy(me.info, "unknown", sizeof(me.info));
+		ircd_strlcpy(me.info, "unknown", sizeof(me.info));
 
 	open_logfiles();
 	return (0);
@@ -1110,7 +1110,7 @@ read_conf_files(int cold)
 
 	   - Gozem 2002-07-21 
 	 */
-	strlcpy(conffilebuf, filename, sizeof(conffilebuf));
+	ircd_strlcpy(conffilebuf, filename, sizeof(conffilebuf));
 
 	if((conf_fbfile_in = fopen(filename, "r")) == NULL)
 	{

@@ -82,14 +82,14 @@ do_local_user(struct Client *client_p, struct Client *source_p,
 
 	user = make_user(source_p);
 
-	strlcpy(source_p->info, realname, sizeof(source_p->info));
+	ircd_strlcpy(source_p->info, realname, sizeof(source_p->info));
 
 	if(!IsGotId(source_p))
 	{
 		/* This is in this location for a reason..If there is no identd
 		 * and ping cookies are enabled..we need to have a copy of this
 		 */
-		strlcpy(source_p->username, username, sizeof(source_p->username));
+		ircd_strlcpy(source_p->username, username, sizeof(source_p->username));
 	}
 
 	if(source_p->name)

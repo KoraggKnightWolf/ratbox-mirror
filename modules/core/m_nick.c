@@ -109,7 +109,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 		*s = '\0';
 
 	/* copy the nick and terminate it */
-	strlcpy(nick, parv[1], sizeof(nick));
+	ircd_strlcpy(nick, parv[1], sizeof(nick));
 
 	/* check the nickname is ok */
 	if(!clean_nick(nick, 1))
@@ -176,7 +176,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		flood_endgrace(source_p);
 
 	/* terminate nick to NICKLEN, we dont want clean_nick() to error! */
-	strlcpy(nick, parv[1], sizeof(nick));
+	ircd_strlcpy(nick, parv[1], sizeof(nick));
 
 	/* check the nickname is ok */
 	if(!clean_nick(nick, 1))
@@ -609,7 +609,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	 */
 	if(source_p->user != NULL && !EmptyString(source_p->username) && source_p->localClient->fullcaps != NULL)
 	{
-		strlcpy(buf, source_p->username, sizeof(buf));
+		ircd_strlcpy(buf, source_p->username, sizeof(buf));
 
 		/* got user, heres nick. */
 		register_local_user(client_p, source_p, buf);
@@ -945,19 +945,19 @@ register_client(struct Client *client_p, struct Client *server,
 
 	strcpy(source_p->user->name, nick);
 	source_p->name = source_p->user->name;
-	strlcpy(source_p->username, parv[5], sizeof(source_p->username));
-	strlcpy(source_p->host, parv[6], sizeof(source_p->host));
+	ircd_strlcpy(source_p->username, parv[5], sizeof(source_p->username));
+	ircd_strlcpy(source_p->host, parv[6], sizeof(source_p->host));
 	
 	if(parc == 10)
 	{
-		strlcpy(source_p->info, parv[9], sizeof(source_p->info));
-		strlcpy(source_p->sockhost, parv[7], sizeof(source_p->sockhost));
-		strlcpy(source_p->id, parv[8], sizeof(source_p->id));
+		ircd_strlcpy(source_p->info, parv[9], sizeof(source_p->info));
+		ircd_strlcpy(source_p->sockhost, parv[7], sizeof(source_p->sockhost));
+		ircd_strlcpy(source_p->id, parv[8], sizeof(source_p->id));
 		add_to_hash(HASH_ID, source_p->id, source_p);
 	}
 	else
 	{
-		strlcpy(source_p->info, parv[8], sizeof(source_p->info));
+		ircd_strlcpy(source_p->info, parv[8], sizeof(source_p->info));
 
 		if((server = find_server(NULL, parv[7])) == NULL)
 		{

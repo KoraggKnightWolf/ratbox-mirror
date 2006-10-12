@@ -103,7 +103,7 @@ me_su(struct Client *client_p, struct Client *source_p,
 	if(EmptyString(parv[2]))
 		target_p->user->suser[0] = '\0';
 	else
-		strlcpy(target_p->user->suser, parv[2], sizeof(target_p->user->suser));
+		ircd_strlcpy(target_p->user->suser, parv[2], sizeof(target_p->user->suser));
 
 	return 0;
 }
@@ -234,7 +234,7 @@ me_login(struct Client *client_p, struct Client *source_p,
 	if(HasSentEob(source_p->servptr))
 		return 0;
 
-	strlcpy(source_p->user->suser, parv[1], sizeof(source_p->user->suser));
+	ircd_strlcpy(source_p->user->suser, parv[1], sizeof(source_p->user->suser));
 	return 0;
 }
 

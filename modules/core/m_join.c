@@ -150,7 +150,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 		if(*jbuf)
 			(void) strcat(jbuf, ",");
-		(void) strlcat(jbuf, name, sizeof(jbuf));
+		(void) ircd_strlcat(jbuf, name, sizeof(jbuf));
 	}
 
 	if(parc > 2)
@@ -384,7 +384,7 @@ ms_join(struct Client *client_p, struct Client *source_p, int parc, const char *
 			/* sent a +k without a key, eek. */
 			if(parc < 5 + args)
 				return 0;
-			strlcpy(mode.key, parv[4 + args], sizeof(mode.key));
+			ircd_strlcpy(mode.key, parv[4 + args], sizeof(mode.key));
 			args++;
 			break;
 		case 'l':
@@ -564,7 +564,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 			break;
 #endif
 		case 'k':
-			strlcpy(mode.key, parv[4 + args], sizeof(mode.key));
+			ircd_strlcpy(mode.key, parv[4 + args], sizeof(mode.key));
 			args++;
 			if(parc < 5 + args)
 				return 0;

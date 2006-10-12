@@ -360,10 +360,10 @@ initialize_global_set_options(void)
 
 	GlobalSetOptions.ident_timeout = IDENT_TIMEOUT;
 
-	strlcpy(GlobalSetOptions.operstring,
+	ircd_strlcpy(GlobalSetOptions.operstring,
 		ConfigFileEntry.default_operstring,
 		sizeof(GlobalSetOptions.operstring));
-	strlcpy(GlobalSetOptions.adminstring,
+	ircd_strlcpy(GlobalSetOptions.adminstring,
 		ConfigFileEntry.default_adminstring,
 		sizeof(GlobalSetOptions.adminstring));
 
@@ -619,7 +619,7 @@ ratbox_main(int argc, char *argv[])
 
 	init_sys();
 	/* This must be after we daemonize.. */
-	ircd_lib(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE);
+	ircd_lib_init(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE, FD_HEAP_SIZE);
 	init_main_logfile();
 	init_patricia();
 	newconf_init();
@@ -684,7 +684,7 @@ ratbox_main(int argc, char *argv[])
 		ilog(L_MAIN, "ERROR: No server description specified in serverinfo block.");
 		exit(EXIT_FAILURE);
 	}
-	strlcpy(me.info, ServerInfo.description, sizeof(me.info));
+	ircd_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
 
 	if (testing_conf)
 	{

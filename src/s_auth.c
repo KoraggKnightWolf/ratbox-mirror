@@ -310,7 +310,7 @@ auth_dns_callback(const char *res, int status, int aftype, void *data)
 	/* The resolver won't return us anything > HOSTLEN */
 	if(status == 1)
 	{
-		strlcpy(auth->client->host, res, sizeof(auth->client->host));
+		ircd_strlcpy(auth->client->host, res, sizeof(auth->client->host));
 		sendheader(auth->client, REPORT_FIN_DNS);
 	}
 	else
@@ -576,7 +576,7 @@ parse_auth_reply(void)
 			continue;
 		}
 
-		strlcpy(auth->client->username, q, sizeof(auth->client->username));
+		ircd_strlcpy(auth->client->username, q, sizeof(auth->client->username));
 		ClearAuth(auth);
 		ServerStats.is_asuc++;
 		sendheader(auth->client, REPORT_FIN_ID);

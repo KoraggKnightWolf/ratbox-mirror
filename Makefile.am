@@ -16,7 +16,7 @@ SUBDIRS = libircd libltdl adns tools doc help @SQLITE_SUBDIR@ bandb @SERVLINK@
 
 AM_YFLAGS = -d
 
-INCLUDES = -Ilibircd -Ilibltdl -Iadns
+INCLUDES = -Ilibircd/include -Ilibltdl -Iadns
 src/version.c: src/version.c.SH
 	$(SHELL) -c "(cd src; $(SHELL) ./version.c.SH)"
 
@@ -30,15 +30,15 @@ endif
 
 DLOPEN=$(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_LTLIBRARIES) ;do echo -dlpreopen $$x ;done)
 if !STATIC_MODULES
-ircd_LDADD = libircd/libircd.la libratbox.la $(LIBLTDL)
+ircd_LDADD = libircd/src/libircd.la libratbox.la $(LIBLTDL)
 else
-ircd_LDADD = libircd/libircd.la libratbox.la $(LIBLTDL) $(DLOPEN) 
+ircd_LDADD = libircd/src/libircd.la libratbox.la $(LIBLTDL) $(DLOPEN) 
 endif
 
 ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
-resolver_LDADD = adns/libadns.a libircd/libircd.la
-ident_LDADD = libircd/libircd.la
+resolver_LDADD = adns/libadns.a libircd/src/libircd.la
+ident_LDADD = libircd/src/libircd.la
 
 ircd_SOURCES = src/main.c
 resolver_SOURCES = src/resolver.c
@@ -87,11 +87,11 @@ libratbox_LTLIBRARIES = libratbox.la
 libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
 
 if MINGW
-libratbox_la_DEPENDENCIES = $(LIBLTDL) libircd/libircd.la
-libratbox_la_LIBADD = libircd/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
+libratbox_la_DEPENDENCIES = $(LIBLTDL) libircd/src/libircd.la
+libratbox_la_LIBADD = libircd/src/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 else
-libratbox_la_DEPENDENCIES = libircd/libircd.la
-libratbox_la_LIBADD = libircd/libircd.la @SSL_LIBS@ @CRYPT_LIB@
+libratbox_la_DEPENDENCIES = libircd/src/libircd.la
+libratbox_la_LIBADD = libircd/src/libircd.la @SSL_LIBS@ @CRYPT_LIB@
 endif
 
 
@@ -102,7 +102,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 if !STATIC_MODULES
 
 if MINGW
-MODULE_LIBS = libircd/libircd.la libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
+MODULE_LIBS = libircd/src/libircd.la libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
 else
 MODULE_LIBS = @SSL_LIBS@ @CRYPT_LIB@
 endif # MINGW

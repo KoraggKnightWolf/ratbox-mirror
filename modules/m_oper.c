@@ -429,7 +429,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		source_p->localClient->chal_time = ircd_currenttime;
 		for(;;)
 		{
-			cnt = strlcpy(chal_line, chal, CHALLENGE_WIDTH);
+			cnt = ircd_strlcpy(chal_line, chal, CHALLENGE_WIDTH);
 			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_RSACHALLENGE2), me.name, source_p->name, chal_line);
 			if(cnt > CHALLENGE_WIDTH)
 				chal += CHALLENGE_WIDTH - 1;

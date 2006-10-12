@@ -170,8 +170,8 @@ load_static_modules(void)
 			if(mapi_version == NULL)
 			{
 				char buf[512];
-				strlcpy(buf, basename, sizeof(buf));
-				strlcat(buf, "_LTX__mheader", sizeof(buf));
+				ircd_strlcpy(buf, basename, sizeof(buf));
+				ircd_strlcat(buf, "_LTX__mheader", sizeof(buf));
 				mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, buf);
 			}
 
@@ -303,7 +303,7 @@ mod_clear_paths(void)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, mod_paths.head)
 	{
 		ircd_free(ptr->data);
-		free_dlink_node(ptr);
+		ircd_free_dlink_node(ptr);
 	}
 
 	mod_paths.head = mod_paths.tail = NULL;
@@ -371,8 +371,8 @@ void find_module_suffix(void)
 	dir = opendir(AUTOMODPATH);
 	if(dir == NULL)
 	{
-		strlcpy(module_dir, ConfigFileEntry.dpath, sizeof(module_dir));
-		strlcat(module_dir, "/modules/autoload", sizeof(module_dir));
+		ircd_strlcpy(module_dir, ConfigFileEntry.dpath, sizeof(module_dir));
+		ircd_strlcat(module_dir, "/modules/autoload", sizeof(module_dir));
 		dir = opendir(module_dir);
  	}
 
@@ -425,13 +425,13 @@ load_all_modules(int warn)
 
 	find_module_suffix();
 	max_mods = MODS_INCREMENT;
-	strlcpy(module_dir_name, AUTOMODPATH, sizeof(module_dir_name));
+	ircd_strlcpy(module_dir_name, AUTOMODPATH, sizeof(module_dir_name));
 	system_module_dir = opendir(module_dir_name);
 
 	if(system_module_dir == NULL)
 	{
-		strlcpy(module_dir_name, ConfigFileEntry.dpath, sizeof(module_dir_name));
-		strlcat(module_dir_name, "/modules/autoload", sizeof(module_dir_name));
+		ircd_strlcpy(module_dir_name, ConfigFileEntry.dpath, sizeof(module_dir_name));
+		ircd_strlcat(module_dir_name, "/modules/autoload", sizeof(module_dir_name));
 		system_module_dir = opendir(module_dir_name);
 	}
 	
@@ -475,7 +475,7 @@ load_core_modules(int warn)
 		ircd_snprintf(dir_name, sizeof(dir_name), "%s/modules", ConfigFileEntry.dpath);
 		core_dir = opendir(dir_name);
 	} else {
-		strlcpy(dir_name, MODPATH, sizeof(dir_name));
+		ircd_strlcpy(dir_name, MODPATH, sizeof(dir_name));
 	}
 	
 	

@@ -293,7 +293,7 @@ hash_find_masked_server(struct Client *source_p, const char *name)
 		return NULL;
 
 	/* copy it across to give us a buffer to work on */
-	strlcpy(buf, name, sizeof(buf));
+	ircd_strlcpy(buf, name, sizeof(buf));
 
 	while ((s = strchr(p, '.')) != 0)
 	{

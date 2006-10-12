@@ -84,7 +84,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	name = parv[1];
 	hop = atoi(parv[2]);
-	strlcpy(info, parv[3], sizeof(info));
+	ircd_strlcpy(info, parv[3], sizeof(info));
 
 	/* 
 	 * Reject a direct nonTS server connection if we're TS_ONLY -orabidoo
@@ -239,7 +239,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	name = parv[1];
 	hop = atoi(parv[2]);
-	strlcpy(info, parv[3], sizeof(info));
+	ircd_strlcpy(info, parv[3], sizeof(info));
 
 	if((target_p = server_exists(name)))
 	{
@@ -605,13 +605,13 @@ set_server_gecos(struct Client *client_p, const char *info)
 			/* if there was a trailing space, s could point to \0, so check */
 			if(s && (*s != '\0'))
 			{
-				strlcpy(client_p->info, s, sizeof(client_p->info));
+				ircd_strlcpy(client_p->info, s, sizeof(client_p->info));
 				return 1;
 			}
 		}
 	}
 
-	strlcpy(client_p->info, "(Unknown Location)", sizeof(client_p->info));
+	ircd_strlcpy(client_p->info, "(Unknown Location)", sizeof(client_p->info));
 
 	return 1;
 }

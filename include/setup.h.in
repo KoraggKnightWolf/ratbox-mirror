@@ -35,9 +35,6 @@
 /* Prefix where config files are installed. */
 #undef ETC_DIR
 
-/* Size of fd hash. */
-#undef FD_HASH_SIZE
-
 /* Size of fd heap. */
 #undef FD_HEAP_SIZE
 
@@ -57,21 +54,12 @@
 /* Define to 1 if you have the <crypt.h> header file. */
 #undef HAVE_CRYPT_H
 
-/* Define to 1 if you have the <devpoll.h> header file. */
-#undef HAVE_DEVPOLL_H
-
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
 #undef HAVE_DIRENT_H
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
-
-/* Define if your system supports the epoll system calls */
-#undef HAVE_EPOLL
-
-/* Define to 1 if you have the `epoll_ctl' function. */
-#undef HAVE_EPOLL_CTL
 
 /* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
@@ -87,9 +75,6 @@
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
-
-/* Define to 1 if you have the `kevent' function. */
-#undef HAVE_KEVENT
 
 /* Define to 1 if you have the `crypto' library (-lcrypto). */
 #undef HAVE_LIBCRYPTO
@@ -118,26 +103,8 @@
 /* Define to 1 if you have the <netinet/tcp.h> header file. */
 #undef HAVE_NETINET_TCP_H
 
-/* Define to 1 if you have the `poll' function. */
-#undef HAVE_POLL
-
-/* using ports */
-#undef HAVE_PORTS
-
-/* Define to 1 if you have the `port_create' function. */
-#undef HAVE_PORT_CREATE
-
-/* Define to 1 if you have the `select' function. */
-#undef HAVE_SELECT
-
 /* Define to 1 if you have the `sendmsg' function. */
 #undef HAVE_SENDMSG
-
-/* using rtsigio */
-#undef HAVE_SIGIO
-
-/* Define to 1 if you have the `sigtimedwait' function. */
-#undef HAVE_SIGTIMEDWAIT
 
 /* Define to 1 if you have the `socketpair' function. */
 #undef HAVE_SOCKETPAIR
@@ -168,9 +135,6 @@
 
 /* Define to 1 if you have the `strtok_r' function. */
 #undef HAVE_STRTOK_R
-
-/* Define to 1 if you have the <sys/devpoll.h> header file. */
-#undef HAVE_SYS_DEVPOLL_H
 
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
    */
@@ -209,9 +173,6 @@
 
 /* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
 #undef HAVE_SYS_WAIT_H
-
-/* Have timer_create */
-#undef HAVE_TIMER_CREATE
 
 /* Define to 1 if the system has the type `uintptr_t'. */
 #undef HAVE_UINTPTR_T
@@ -285,9 +246,6 @@
 /* Size of the WHOWAS array. */
 #undef NICKNAMEHISTORYLENGTH
 
-/* Define to 1 if you wish to disable the block allocator. */
-#undef NOBALLOC
-
 /* Define to 1 if your system has no in6addr_any. */
 #undef NO_IN6ADDR_ANY
 
@@ -317,9 +275,6 @@
 
 /* Defined to mark profiling is enabled */
 #undef RATBOX_PROFILE
-
-/* This is the type of IO loop we are using */
-#undef SELECT_TYPE
 
 /* The size of `char', as computed by sizeof. */
 #undef SIZEOF_CHAR
@@ -371,29 +326,8 @@
 /* Size of the user heap. */
 #undef USER_HEAP_SIZE
 
-/* Define to use epoll */
-#undef USE_EPOLL
-
 /* Define this to enable IO Debug hooks. */
 #undef USE_IODEBUG_HOOKS
-
-/* Define to use kqueue */
-#undef USE_KQUEUE
-
-/* Define to use poll */
-#undef USE_POLL
-
-/* Define to use ports */
-#undef USE_PORTS
-
-/* Define to use select */
-#undef USE_SELECT
-
-/* Define to use sigio */
-#undef USE_SIGIO
-
-/* Define to use win32 io */
-#undef USE_WIN32
 
 /* Version number of package */
 #undef VERSION

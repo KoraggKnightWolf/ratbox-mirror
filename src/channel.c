@@ -791,8 +791,8 @@ set_channel_topic(struct Channel *chptr, const char *topic,
 	{
 		if(chptr->topic == NULL)
 			allocate_topic(chptr);
-		strlcpy(chptr->topic, topic, TOPICLEN + 1);
-		strlcpy(chptr->topic_info, topic_info, USERHOST_REPLYLEN);
+		ircd_strlcpy(chptr->topic, topic, TOPICLEN + 1);
+		ircd_strlcpy(chptr->topic_info, topic_info, USERHOST_REPLYLEN);
 		chptr->topic_time = topicts;
 	}
 	else

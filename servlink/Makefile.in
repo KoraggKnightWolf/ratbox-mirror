@@ -156,7 +156,6 @@ RESOLVER = @RESOLVER@
 RM = @RM@
 SED = @SED@
 SEDOBJ = @SEDOBJ@
-SELECT_TYPE = @SELECT_TYPE@
 SERVLINK = @SERVLINK@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -224,7 +223,7 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-INCLUDES = -I../include -I../libircd
+INCLUDES = -I../include -I../libircd/include
 servlink_SOURCES = servlink.c control.c io.c
 servlink_LDADD = @ZLIB_LD@
 all: all-am

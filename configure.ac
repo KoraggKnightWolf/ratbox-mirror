@@ -69,7 +69,7 @@ AC_PROG_LIBTOOL
 
 LIBTOOL="$LIBTOOL --silent"
 
-AC_CONFIG_SUBDIRS(libltdl)
+AC_CONFIG_SUBDIRS(libltdl libircd)
 
 RESOLVER="adns resolver"
 
@@ -439,69 +439,6 @@ if test "$zlib" = "yes"; then
 	AC_SUBST(SERVLINK)
 fi
 
-dnl IO Loop Selection
-dnl =================
-
-AC_ARG_ENABLE(poll, AC_HELP_STRING([--enable-poll],[Force poll() usage.]),
-[ if test $enableval = yes; then 
-	SELECT_TYPE_EXPLICIT="poll"
-  else
-  	use_poll=no
-  fi
-],)
-
-AC_ARG_ENABLE(select, AC_HELP_STRING([--enable-select],[Force select() usage.]),
-[ if test $enableval = yes; then 
-	SELECT_TYPE_EXPLICIT="select" 
-  else
-  	use_select=no
-  fi
-],)
-
-AC_ARG_ENABLE(kqueue, AC_HELP_STRING([--enable-kqueue],[Force kqueue() usage.]),
-[ if test $enableval = yes; then 
-	SELECT_TYPE_EXPLICIT="kqueue"
-  else
-  	use_kqueue=no
-  fi
-],)
-
-AC_ARG_ENABLE(ports, AC_HELP_STRING([--enable-ports],[Force Solaris ports usage.]),
-[ if test $enableval = yes; then
-	SELECT_TYPE_EXPLICIT="ports"
-  else
-	use_ports=no
-  fi
-],)
-
-AC_ARG_ENABLE(devpoll,AC_HELP_STRING([--enable-devpoll],[Force usage of /dev/poll.]),
-[ if test $enableval = yes; then 
-	SELECT_TYPE_EXPLICIT="devpoll" 
-	dnl These need to be defined or not defined
-	AC_CHECK_HEADERS([sys/devpoll.h devpoll.h])
-  else
-  	use_devpoll=no;
-  fi
-],)
-
-AC_ARG_ENABLE(epoll, AC_HELP_STRING([--enable-epoll],[Force sys_epoll usage (Linux only).]),
-[ if test $enableval = yes; then 
-	SELECT_TYPE_EXPLICIT="epoll"
-	AC_CHECK_FUNCS(epoll_ctl, [haveepoll=yes], [haveepoll=no])
-  else
-  	use_epoll=no
-  fi
-],)
-
-AC_ARG_ENABLE(rtsigio, AC_HELP_STRING([--enable-rtsigio],[Force rtsigio usage (Linux only).]),
-[ if test $enableval = yes; then
-        SELECT_TYPE_EXPLICIT="sigio"
-  else
-        use_sigio=no
-  fi
-],)
-
-
 dnl **********************************************************************
 dnl Check for --with-confdir
 dnl **********************************************************************
@@ -574,192 +511,6 @@ AC_HELP_STRING([--with-moduledir=DIR],
 	  	 AC_SUBST_DIR([moduledir])]
 )
 
-dnl The force type assumes the users knows what they are doing..
-dnl if it doesn't work, their problem.
-if test ! -z "$SELECT_TYPE_EXPLICIT"; then
-	SELECT_TYPE="$SELECT_TYPE_EXPLICIT";
-	echo "Forcing $SELECT_TYPE to be enabled"
-	if test "x$SELECT_TYPE" = "xports" ; then
-		AC_DEFINE(HAVE_PORTS, 1, [using ports])
-	fi
-	if test "x$SELECT_TYPE" = "xsigio" ; then
-		AC_DEFINE(HAVE_SIGIO, 1, [using rtsigio])
-	fi
-else
-
-if test ! "x$use_select" = "xno"; then
-	AC_CHECK_FUNCS(select, [haveselect=yes], [haveselect=no])
-	if test "x$haveselect" = "xyes" ; then
-		SELECT_TYPE="select"
-	fi
-fi
-
-
-if test ! "x$use_poll" = "xno"; then
-	AC_CHECK_FUNCS(poll, [havepoll=yes], [havepoll=no])
-	if test "x$havepoll" = "xyes" ; then
-		SELECT_TYPE="poll"
-	fi
-fi
-
-if test ! "x$use_devpoll" = "xno"; then
-	AC_MSG_CHECKING(for /dev/poll)
-	if test -c "/dev/poll"; then
-	        AC_MSG_RESULT(yes)
-		AC_CHECK_HEADERS([devpoll.h sys/devpoll.h])
-	        SELECT_TYPE="devpoll"
-	else
-		AC_MSG_RESULT(no)	
-	fi
-fi
-
-if test ! "x$use_kqueue" = "xno"; then
-	AC_CHECK_FUNCS(kevent, [havekqueue=yes], [havekqueue=no])
-	if test "x$havekqueue" = "xyes" ; then
-		SELECT_TYPE="kqueue"
-	fi
-fi
-
-if test ! "x$use_ports" = "xno"; then
-	AC_CHECK_FUNCS(port_create, [haveports=yes], [haveports=no])
-	if test "x$haveports" = "xyes" ; then
-		SELECT_TYPE="ports"
-		AC_DEFINE(HAVE_PORTS, 1, [using ports])
-	fi
-fi
-
-if test ! "x$use_rtsigio" = "xno"; then
-	havertsig=no
-	if test "x$havepoll" = "xyes" ; then
-		AC_CHECK_FUNCS(sigtimedwait, [havertsig=yes], )
-	fi
-
-	if test "x$havertsig" = "xyes" ; then
-		AC_MSG_CHECKING(for F_SETSIG in fcntl.h)
-		AC_EGREP_CPP(yes,
-[
-#define _GNU_SOURCE
-#include <fcntl.h>
-#ifdef F_SETSIG
-yes
-#endif
-],	[ AC_MSG_RESULT(yes) ], [ AC_MSG_RESULT(no); havertsig=no])
-
-	fi
-
-	if test "x$havertsig" = "xyes"; then
-		SELECT_TYPE="sigio"
-		AC_DEFINE(HAVE_SIGIO, 1, [using rtsigio])
-	fi
-fi
-
-if test ! "x$use_epoll" = "xno"; then
-	AC_CHECK_FUNCS(epoll_ctl, [haveepoll=yes], [haveepoll=no])
-	if test "x$ac_cv_header_sys_epoll_h" = "xyes"; then
-		if test "x$haveepoll" = "xyes" ; then
-                	AC_MSG_CHECKING(for epoll support in kernel)
-	                AC_TRY_RUN(
-#include <sys/param.h>
-#include <sys/types.h>
-#include <sys/epoll.h>
-#include <sys/syscall.h>
-#include <unistd.h>     
-
-int
-main(int argc, char **argv)
-{
-        int epfd;
-
-        epfd = epoll_create(256);
-        exit (epfd == -1 ? 1 : 0);
-}, [AC_MSG_RESULT(yes)
-	    AC_DEFINE(HAVE_EPOLL, 1,
-	        [Define if your system supports the epoll system calls])
-	    SELECT_TYPE="epoll"], 
-	    AC_MSG_RESULT(no), AC_MSG_RESULT(no))
-		fi
-	fi
-
-haveepollsyscall=no
-
-if test "x$ac_cv_header_sys_epoll_h" = "xyes"; then
-	if test "x$haveepoll" = "xno" ; then
-                AC_MSG_CHECKING(for epoll system call)
-                AC_TRY_RUN(
-#include <sys/param.h>
-#include <sys/types.h>
-#include <sys/epoll.h>
-#include <sys/syscall.h>
-#include <unistd.h>     
-
-int
-epoll_create(int size)
-{
-        return (syscall(__NR_epoll_create, size));
-}
- 
-int
-main(int argc, char **argv)
-{
-        int epfd;
-
-        epfd = epoll_create(256);
-        exit (epfd == -1 ? 1 : 0);
-}, [AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_EPOLL, 1,
-        [Define if your system supports the epoll system calls])
-    SELECT_TYPE="epoll"], 
-    AC_MSG_RESULT(no), AC_MSG_RESULT(no))
-	fi
-fi
-
-fi
-
-fi
-
-if test "$is_mingw" = "yes"; then
-	SELECT_TYPE="win32"
-fi
-
-if test -z "$SELECT_TYPE"; then
-	AC_MSG_WARN([Unable to find an i/o interface using select],)
-	SELECT_TYPE="select"
-fi
-
-echo "Using $SELECT_TYPE for select loop."
-
-case  $SELECT_TYPE in
-	epoll)
-		AC_DEFINE([USE_EPOLL], 1, [Define to use epoll])
-		;;
-	kqueue) 
-		AC_DEFINE([USE_KQUEUE], 1, [Define to use kqueue])
-		;;
-	ports)
-		AC_DEFINE([USE_PORTS], 1, [Define to use ports])
-		AC_CHECK_FUNC(timer_create,,[AC_CHECK_LIB(rt, timer_create, AC_DEFINE(HAVE_TIMER_CREATE, 1, [Have timer_create]) LIBS="${LIBS} -lrt",,)])
-		;;
-	poll)
-		AC_DEFINE([USE_POLL], 1, [Define to use poll])
-		;;
-	sigio)
-		AC_DEFINE([USE_SIGIO],1 , [Define to use sigio])
-		AC_CHECK_FUNC(timer_create,,[AC_CHECK_LIB(rt, timer_create, AC_DEFINE(HAVE_TIMER_CREATE, 1, [Have timer_create]) LIBS="${LIBS} -lrt",,)])
-		;;
-	select)
-		AC_DEFINE([USE_SELECT], 1, [Define to use select])
-		;;
-	win32)
-		AC_DEFINE([USE_WIN32], 1, [Define to use win32 io])
-		;;
-	*)
-		AC_DEFINE([USE_SELECT], 1, [Define to use select])
-		;;
-esac
-	
-AC_DEFINE_UNQUOTED(SELECT_TYPE, "$SELECT_TYPE", [This is the type of IO loop we are using])
-AC_SUBST(SELECT_TYPE)
-
 dnl Debug-related options
 dnl =====================
 
@@ -806,14 +557,6 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-AC_ARG_ENABLE(balloc,
-AC_HELP_STRING([--disable-balloc],[Disable the block allocator.]),
-[balloc=$enableval], [balloc=yes])
-
-if test "$balloc" = no; then
-	AC_DEFINE([NOBALLOC], 1, [Define to 1 if you wish to disable the block allocator.])
-fi
-
 AC_ARG_ENABLE(warnings,
 AC_HELP_STRING([--enable-warnings],[Enable all sorts of warnings for debugging.]),
 [CFLAGS="$CFLAGS -Wall -Werror -Wcast-qual -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wwrite-strings -W -Wno-unused -Wunused-function -Wunused-variable"],[])
@@ -854,7 +597,6 @@ dnl	AC_DEFINE([HASHSIZE], 4096, [Max number of buckets in hash tables.])
 	AC_DEFINE([CONFITEM_HEAP_SIZE], 128, [Size of the confitem heap.])
 	AC_DEFINE([MONITOR_HEAP_SIZE], 128, [Size of the monitor heap.])
 	AC_DEFINE([AUTH_HEAP_SIZE], 128, [Size of the auth heap.])
-	AC_DEFINE([FD_HASH_SIZE], 1000, [Size of fd hash.])
 	AC_DEFINE([FD_HEAP_SIZE], 128, [Size of fd heap.])
 else
 dnl These settings are for a large network like efnet..they will use lots of memory
@@ -873,7 +615,6 @@ dnl so enable small net unless you really need this much support
         AC_DEFINE([CONFITEM_HEAP_SIZE], 1024, [Size of the confitem heap.])
 	AC_DEFINE([MONITOR_HEAP_SIZE], 1024, [Size of the monitor heap.])
 	AC_DEFINE([AUTH_HEAP_SIZE], 256, [Size of the auth heap.])
-	AC_DEFINE([FD_HASH_SIZE], 12000, [Size of fd hash.])
 	AC_DEFINE([FD_HEAP_SIZE], 1024, [Size of fd heap.])
 fi
 
@@ -903,24 +644,6 @@ AC_DEFINE_UNQUOTED(TOPICLEN, ${TOPICLEN}, [Maximum topic length (<=390)])
 AC_DEFINE_UNQUOTED(NICKLEN, (${NICKLEN}+1), [Nickname length])
 AC_DEFINE_UNQUOTED(RATBOX_CONFIGURE_OPTS, "$ac_configure_args", [configure arguments])
 
-#case $PLATFORM in
-#	*hpux* )
-#	AC_DEFINE([MODULE_SUFFIX], ".sl", [Use .sl for hpux])
-#	;;
-#	*aix* )
-#	AC_DEFINE([MODULE_SUFFIX], ".a", [Use .a for AIX])
-#	;;
-#	* )
-#	AC_DEFINE([MODULE_SUFFIX], ".so", [Assume .so for anything else])
-#	;;
-#esac
-#fi
-    
-
-#AC_SUBST(MODULE_SUFFIX)
-#AC_SUBST(MODULES_LIBS)
-#AC_SUBST(MOD_TARGET)
-
 AC_SUBST(SSL_SRCS_ENABLE)
 AC_SUBST(SSL_INCLUDES)
 AC_SUBST(SSL_LIBS)
@@ -947,7 +670,6 @@ AC_SUBST(IRCD_PREFIX)
 
 AC_CONFIG_FILES(		\
 	Makefile		\
-	libircd/Makefile	\
 	bandb/Makefile		\
 	adns/Makefile		\
 	servlink/Makefile	\
@@ -980,11 +702,9 @@ fi
 
 echo "Modules ........................ $tmpresult"
 echo "IPv6 support ................... $have_v6"
-echo "Net I/O implementation ......... $SELECT_TYPE"
 echo "IO Debugging hooks ............. $iodebug"
 echo "Assert debugging ............... $assert"
 echo "Small network .................. $small_net"
-echo "Block allocator ................ $balloc"
 echo "ratbox-services compatibility .. $ratbox_services"
 echo
 echo "Configured limits:"

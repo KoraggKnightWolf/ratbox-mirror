@@ -407,10 +407,10 @@ mo_masktrace(struct Client *client_p, struct Client *source_p, int parc, const c
 			
 	if(operspy) {
 		char buf[512];
-		strlcpy(buf, mask, sizeof(buf));
+		ircd_strlcpy(buf, mask, sizeof(buf));
 		if(!EmptyString(gecos)) {
-			strlcat(buf, " ", sizeof(buf));
-			strlcat(buf, gecos, sizeof(buf));
+			ircd_strlcat(buf, " ", sizeof(buf));
+			ircd_strlcat(buf, gecos, sizeof(buf));
 		}		
 
 		report_operspy(source_p, "MASKTRACE", buf);	

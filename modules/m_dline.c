@@ -99,7 +99,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	}
 
 	dlhost = parv[loc];
-	strlcpy(cidr_form_host, dlhost, sizeof(cidr_form_host));
+	ircd_strlcpy(cidr_form_host, dlhost, sizeof(cidr_form_host));
 
 	if(!parse_netmask(dlhost, NULL, &bits))
 	{

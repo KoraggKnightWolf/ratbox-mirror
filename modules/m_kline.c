@@ -568,14 +568,14 @@ find_user_host(const char *userhost, char *luser, char *lhost)
 	{
 		*(hostp++) = '\0';	/* short and squat */
 		if(*userhost)
-			strlcpy(luser, userhost, USERLEN + 1);	/* here is my user */
+			ircd_strlcpy(luser, userhost, USERLEN + 1);	/* here is my user */
 		else
 			strcpy(luser, "*");
 		if(*hostp) {
 			ptr = mangle_wildcard_to_cidr(hostp);
 			if(ptr == NULL)
 				ptr = hostp;
-			strlcpy(lhost, ptr, HOSTLEN + 1);	/* here is my host */
+			ircd_strlcpy(lhost, ptr, HOSTLEN + 1);	/* here is my host */
 		}
 		else
 			strcpy(lhost, "*");
@@ -595,7 +595,7 @@ find_user_host(const char *userhost, char *luser, char *lhost)
 		if(ptr == NULL)
 			ptr = userhost;
 
-		strlcpy(lhost, ptr, HOSTLEN + 1);
+		ircd_strlcpy(lhost, ptr, HOSTLEN + 1);
 	}
 
 	return 1;

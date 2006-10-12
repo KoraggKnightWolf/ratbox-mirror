@@ -261,7 +261,7 @@ quote_operstring(struct Client *source_p, const char *arg)
 	}
 	else
 	{
-		strlcpy(GlobalSetOptions.operstring, arg,
+		ircd_strlcpy(GlobalSetOptions.operstring, arg,
 			sizeof(GlobalSetOptions.operstring));
 		
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -281,7 +281,7 @@ quote_adminstring(struct Client *source_p, const char *arg)
 	}
 	else
 	{
-		strlcpy(GlobalSetOptions.adminstring, arg,
+		ircd_strlcpy(GlobalSetOptions.adminstring, arg,
 			sizeof(GlobalSetOptions.adminstring));
 		
 		sendto_realops_flags(UMODE_ALL, L_ALL,

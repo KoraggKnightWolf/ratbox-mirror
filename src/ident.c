@@ -299,7 +299,7 @@ int main(int argc, char **argv)
 {
 	char *tident_timeout;
 
-	ident_helper = ircd_helper_child(parse_request, error_cb, ilogcb, restartcb, diecb, 1024, 1024, 1024);	
+	ident_helper = ircd_helper_child(parse_request, error_cb, ilogcb, restartcb, diecb, 1024, 1024, 1024, 1024);	
 	tident_timeout = getenv("IDENT_TIMEOUT");
 	if(ident_helper == NULL || tident_timeout == NULL)
 	{

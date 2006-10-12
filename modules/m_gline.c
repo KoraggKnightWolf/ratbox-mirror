@@ -737,11 +737,11 @@ majority_gline(struct Client *source_p, const char *user,
 			}
 			else
 			{
-				strlcpy(pending->oper_nick2, source_p->name,
+				ircd_strlcpy(pending->oper_nick2, source_p->name,
 					sizeof(pending->oper_nick2));
-				strlcpy(pending->oper_user2, source_p->username,
+				ircd_strlcpy(pending->oper_user2, source_p->username,
 					sizeof(pending->oper_user2));
-				strlcpy(pending->oper_host2, source_p->host,
+				ircd_strlcpy(pending->oper_host2, source_p->host,
 					sizeof(pending->oper_host2));
 				pending->reason2 = ircd_strdup(reason);
 				pending->oper_server2 = find_or_add(source_p->servptr->name);
@@ -756,17 +756,17 @@ majority_gline(struct Client *source_p, const char *user,
 	pending = (struct gline_pending *) 
 			    ircd_malloc(sizeof(struct gline_pending));
 
-	strlcpy(pending->oper_nick1, source_p->name,
+	ircd_strlcpy(pending->oper_nick1, source_p->name,
 		sizeof(pending->oper_nick1));
-	strlcpy(pending->oper_user1, source_p->username,
+	ircd_strlcpy(pending->oper_user1, source_p->username,
 		sizeof(pending->oper_user1));
-	strlcpy(pending->oper_host1, source_p->host,
+	ircd_strlcpy(pending->oper_host1, source_p->host,
 		sizeof(pending->oper_host1));
 
 	pending->oper_server1 = find_or_add(source_p->servptr->name);
 
-	strlcpy(pending->user, user, sizeof(pending->user));
-	strlcpy(pending->host, host, sizeof(pending->host));
+	ircd_strlcpy(pending->user, user, sizeof(pending->user));
+	ircd_strlcpy(pending->host, host, sizeof(pending->host));
 	pending->reason1 = ircd_strdup(reason);
 	pending->reason2 = NULL;
 

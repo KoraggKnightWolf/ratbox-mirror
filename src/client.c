@@ -1076,7 +1076,7 @@ dead_link(struct Client *client_p, int sendqex)
 	abt = ircd_malloc(sizeof(struct abort_client));
 
 	if(sendqex)
-		strlcpy(abt->notice, "Max SendQ exceeded", sizeof(abt->notice));
+		ircd_strlcpy(abt->notice, "Max SendQ exceeded", sizeof(abt->notice));
 	else
 		ircd_snprintf(abt->notice, sizeof(abt->notice), "Write error: %s", strerror(errno));
 
@@ -1865,7 +1865,7 @@ error_exit_client(struct Client *client_p, int error)
 	}
 
 	if(error == 0)
-		strlcpy(errmsg, "Remote host closed the connection", sizeof(errmsg));
+		ircd_strlcpy(errmsg, "Remote host closed the connection", sizeof(errmsg));
 	else
 		ircd_snprintf(errmsg, sizeof(errmsg), "Read error: %s", strerror(current_error));
 

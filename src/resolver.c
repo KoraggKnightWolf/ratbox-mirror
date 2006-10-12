@@ -443,7 +443,7 @@ resolve_ip(char **parv)
 
 int main(int argc, char **argv)
 {
-	res_helper = ircd_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256); /* XXX fix me */
+	res_helper = ircd_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256, 256); /* XXX fix me */
 
 	if(res_helper == NULL)
 	{

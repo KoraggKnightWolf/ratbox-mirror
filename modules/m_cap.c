@@ -115,7 +115,7 @@ clicap_find(const char *data, int *negate, int *finished)
 
 	if(data)
 	{
-		strlcpy(buf, data, sizeof(buf));
+		ircd_strlcpy(buf, data, sizeof(buf));
 		p = buf;
 	}
 
@@ -321,7 +321,7 @@ cap_end(struct Client *source_p, const char *arg)
 	if(source_p->name && source_p->user)
 	{
 		char buf[USERLEN+1];
-		strlcpy(buf, source_p->username, sizeof(buf));
+		ircd_strlcpy(buf, source_p->username, sizeof(buf));
 		register_local_user(source_p, source_p, buf);
 	}
 }

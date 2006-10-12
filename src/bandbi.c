@@ -370,7 +370,7 @@ static int
 bandb_check_dline(struct ConfItem *aconf)
 {
 	struct irc_sockaddr_storage daddr;
-	struct ConfItem *dconf;
+/* 	struct ConfItem *dconf; */
 	int bits;
 
 	if(!parse_netmask(aconf->host, &daddr, &bits))

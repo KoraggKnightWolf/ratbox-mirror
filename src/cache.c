@@ -91,7 +91,7 @@ cache_file(const char *filename, const char *shortname, int flags)
 
 	cacheptr = ircd_malloc(sizeof(struct cachefile));
 
-	strlcpy(cacheptr->name, shortname, sizeof(cacheptr->name));
+	ircd_strlcpy(cacheptr->name, shortname, sizeof(cacheptr->name));
 	cacheptr->flags = flags;
 
 	/* cache the file... */
@@ -103,7 +103,7 @@ cache_file(const char *filename, const char *shortname, int flags)
 		if(!EmptyString(line))
 		{
 			lineptr = ircd_malloc(sizeof(struct cacheline));
-			strlcpy(lineptr->data, line, sizeof(lineptr->data));
+			ircd_strlcpy(lineptr->data, line, sizeof(lineptr->data));
 			ircd_dlinkAddTail(lineptr, &lineptr->linenode, &cacheptr->contents);
 		}
 		else
@@ -125,7 +125,7 @@ cache_links(void *unused)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, links_cache_list.head)
 	{
 		ircd_free(ptr->data);
-		free_dlink_node(ptr);
+		ircd_free_dlink_node(ptr);
 	}
 
 	links_cache_list.head = links_cache_list.tail = NULL;
