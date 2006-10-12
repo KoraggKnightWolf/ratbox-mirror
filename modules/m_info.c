@@ -25,6 +25,7 @@
  */
 
 #include "stdinc.h"
+#include "ircd_lib.h"
 #include "struct.h"
 #include "client.h"
 #include "match.h"
@@ -298,12 +299,6 @@ static struct InfoStruct info_table[] = {
 		OUTPUT_STRING_PTR,
 		{ PPATH },
 		"Path to Pid File"
-	},
-	{
-		"SELECT_TYPE", 
-		OUTPUT_STRING_PTR,
-		{ SELECT_TYPE }, 
-		"Method of Multiplexed I/O"
 	},
 	{
 		"SPATH", 
@@ -1121,6 +1116,12 @@ send_conf_options(struct Client *source_p)
 	}			/* forloop */
 
 
+	sendto_one(source_p, POP_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+					   get_id(&me, source_p), RPL_INFO,
+					   get_id(source_p, source_p),
+					   "io_type",
+					   ircd_get_iotype(),
+					   "Method of Multiplexed I/O");
 	/* Don't send oper_only_umodes...it's a bit mask, we will have to decode it
 	 ** in order for it to show up properly to opers who issue INFO
 	 */
