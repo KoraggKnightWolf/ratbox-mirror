@@ -1,3 +1,12 @@
+jilles      2006/10/29 18:57:53 UTC	(20061029_1-23263)
+  Log:
+  Fix /stats y on amd64.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 jilles      2006/10/29 17:24:57 UTC	(20061029_0-23261)
   Log:
   Forward port RATBOX_2_2 r23253:
