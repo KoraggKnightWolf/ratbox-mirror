@@ -1,3 +1,15 @@
+jilles      2006/10/29 17:24:57 UTC	(20061029_0-23261)
+  Log:
+  Forward port RATBOX_2_2 r23253:
+  - remove the cached storage of how many +beI there are, thereby fixing a        
+    case where it can get desynced from reality
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+
+
 androsyn    2006/10/12 05:41:02 UTC	(20061012_2-23220)
   Log:
   Wad of changes to deal with the libircd changes.
