@@ -1,3 +1,15 @@
+jilles      2006/11/09 17:55:55 UTC	(20061109_2-23269)
+  Log:
+  Call h_server_introduced hook for remote TS6 servers also.
+  This fixes TS6 services not being recognized as services
+  until a rehash.
+  This was fixed long ago in 2.x.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 jilles      2006/11/09 17:54:13 UTC	(20061109_1-23267)
   Log:
   Install m_services.so into modules/autoload instead of modules.
