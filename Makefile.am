@@ -10,7 +10,7 @@ prefix		= @prefix@
 libratboxdir 	= @libdir@
 modulesdir	= @moduledir@/autoload
 coredir		= @moduledir@
-servicesdir	= @moduledir@
+servicesdir	= @moduledir@/autoload
 
 SUBDIRS = libircd libltdl adns tools doc help @SQLITE_SUBDIR@ bandb @SERVLINK@ 
 
