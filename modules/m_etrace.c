@@ -162,7 +162,7 @@ do_etrace(struct Client *source_p, int ipv4, int ipv6)
 			   get_client_class(target_p),
 			   target_p->name, target_p->username, target_p->host,
 			   show_ip(source_p, target_p) ? target_p->sockhost : "255.255.255.255",
-			   target_p->sockhost, target_p->info);
+			   target_p->info);
 	}
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), me.name);
