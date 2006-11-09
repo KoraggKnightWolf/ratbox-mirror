@@ -1,3 +1,16 @@
+jilles      2006/11/09 17:54:13 UTC	(20061109_1-23267)
+  Log:
+  Install m_services.so into modules/autoload instead of modules.
+  This commit is done in a somewhat dirty way, by hand-editing the
+  Makefile.in to correspond with the Makefile.am, androsyn may want
+  to regenerate it properly.
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 jilles      2006/11/09 16:02:24 UTC	(20061109_0-23265)
   Log:
   Fix ETRACE output. This bug is not in 2.x.
