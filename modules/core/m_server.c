@@ -409,6 +409,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 {
 	struct Client *target_p;
 	struct remote_conf *hub_p;
+	hook_data_client hdata;
 	dlink_node *ptr;
 	int hop;
 	int hlined = 0;
@@ -542,6 +543,11 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	/* quick, dirty EOB.  you know you love it. */
 	sendto_one(target_p, POP_QUEUE, ":%s PING %s %s",
 			get_id(&me, target_p), me.name, get_id(target_p, target_p));
+
+	hdata.client = source_p;
+	hdata.target = target_p;
+	call_hook(h_server_introduced, &hdata);
+
 	return 0;
 }
 	
