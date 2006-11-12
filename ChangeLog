@@ -1,3 +1,12 @@
+androsyn    2006/11/12 07:37:35 UTC	(20061112_0-23279)
+  Log:
+  fix warning on max bans and change an iovec to an ircd_iovec
+
+  Modified:
+	ircd-ratbox/trunk/adns/transmit.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+
+
 jilles      2006/11/09 17:55:55 UTC	(20061109_2-23269)
   Log:
   Call h_server_introduced hook for remote TS6 servers also.
