@@ -407,7 +407,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 	 */
 	if(MyClient(source_p))
 	{
-		if((ircd_dlink_list_length(&chptr->banlist) + ircd_dlink_list_length(&chptr->exceptlist) + ircd_dlink_list_length(&chptr->invexlist)) >= ConfigChannel.max_bans)
+		if((ircd_dlink_list_length(&chptr->banlist) + ircd_dlink_list_length(&chptr->exceptlist) + ircd_dlink_list_length(&chptr->invexlist)) >= (unsigned long)ConfigChannel.max_bans)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_BANLISTFULL),
 				   me.name, source_p->name, chptr->chname, realban);

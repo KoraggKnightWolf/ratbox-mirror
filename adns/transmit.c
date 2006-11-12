@@ -164,7 +164,7 @@ adns_status adns__mkquery_frdgram(adns_state ads, vbuf *vb, int *id_r,
 
 void adns__querysend_tcp(adns_query qu, struct timeval now) {
   byte length[2];
-  struct iovec iov[2];
+  struct ircd_iovec iov[2];
   int wr, r;
   adns_state ads;
 
