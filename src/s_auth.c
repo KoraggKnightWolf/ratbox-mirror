@@ -81,16 +81,9 @@ ReportType;
 
 static dlink_list auth_poll_list;
 static ircd_bh *auth_heap;
+static void read_auth_reply(ircd_helper *);
 static EVH timeout_auth_queries_event;
 
-static buf_head_t auth_sendq;
-static buf_head_t auth_recvq;
-
-static PF read_auth_reply;
-static int fork_ident_count = 0;
-static int auth_ofd = -1;
-static int auth_ifd = -1;
-static pid_t auth_pid = -1;
 static uint16_t id;
 #define IDTABLE 0x1000
 
@@ -106,109 +99,53 @@ assign_auth_id(void)
 	return id;
 }
 
+static char *ident_path;
+static ircd_helper *ident_helper;
+static void
+ident_restart_cb(ircd_helper *helper)
+{
+	return;
+}
+
 static void
 fork_ident(void)
 {
-	int ifd[2], ofd[2];
-	char fx[6], fy[6];
-	char timeout[6];
-	const char *parv[2];
 	char fullpath[PATH_MAX + 1];
 #ifdef _WIN32
 	const char *suffix = ".exe";
 #else
 	const char *suffix = "";
 #endif
-	pid_t pid;
+	char timeout[6];
 
-
-#if 0
-	if(fork_ident_count > 10)
+	if(ident_path == NULL)
 	{
-		ilog(L_MAIN, "Ident daemon is spinning: %d\n", fork_ident_count);
+	        ircd_snprintf(fullpath, sizeof(fullpath), "%s/ident%s", BINPATH, suffix);
 
-	}
-#endif
-        ircd_snprintf(fullpath, sizeof(fullpath), "%s/ident%s", BINPATH, suffix);
-
-        if(access(fullpath, X_OK) == -1)
-        {
-                ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
-                if(access(fullpath, X_OK) == -1)
-                {
-                        ilog(L_MAIN, "Unable to execute ident in %s/bin or %s", ConfigFileEntry.dpath, BINPATH);
-                        fork_ident_count++;
-                        auth_ifd = -1;
-                        auth_ofd = -1;
-                        return;   
-                }
+	        if(access(fullpath, X_OK) == -1)
+	        {
+	                ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
+	                if(access(fullpath, X_OK) == -1)
+	                {
+	                        ilog(L_MAIN, "Unable to execute ident in %s/bin or %s", ConfigFileEntry.dpath, BINPATH);
+	                        return;   
+        	        }
                  
-        }        
-
-	fork_ident_count++;
-	if(auth_ifd > 0)
-		ircd_close(auth_ifd);
-	if(auth_ofd > 0)
-		ircd_close(auth_ofd);
-	if(auth_pid > 0)
-	{
-		kill(auth_pid, SIGKILL);
+	        }
+	        ident_path = ircd_strdup(fullpath);
 	}
-
-	ircd_pipe(ifd, "ident daemon - read");
-	ircd_pipe(ofd, "ident daemon - write");
-
-	ircd_snprintf(fx, sizeof(fx), "%d", ifd[1]); /*ident write*/
-	ircd_snprintf(fy, sizeof(fy), "%d", ofd[0]); /*ident read*/
-	ircd_set_nb(ifd[0]);
-	ircd_set_nb(ifd[1]);
-	ircd_set_nb(ifd[0]);
-	ircd_set_nb(ofd[1]);
-
-#ifdef _WIN32	
-	SetHandleInformation((HANDLE)ifd[1], HANDLE_FLAG_INHERIT, 1);
-	SetHandleInformation((HANDLE)ofd[0], HANDLE_FLAG_INHERIT, 1);
-#endif
-	setenv("IFD", fy, 1);
-	setenv("OFD", fx, 1);
-
 	ircd_snprintf(timeout, sizeof(timeout), "%d", GlobalSetOptions.ident_timeout);
 	setenv("IDENT_TIMEOUT", timeout, 1);
-		
-	parv[0] = "-ircd ident daemon";
-	parv[1] = NULL;
-
-	pid = ircd_spawn_process(fullpath, parv);
-
-	if(pid == -1)
+	
+	ident_helper = ircd_helper_start("ident", ident_path, read_auth_reply, ident_restart_cb);
+	setenv("IDENT_TIMEOUT", "", 1);
+        if(ident_helper == NULL)
 	{
-		ilog(L_MAIN, "ircd_spawn_process failed: %s", strerror(errno));
-		ircd_close(ifd[0]);
-		ircd_close(ifd[1]);
-		ircd_close(ofd[0]);
-		ircd_close(ofd[1]);
-		auth_ifd = -1;
-		auth_ofd = -1;
+		ilog(L_MAIN, "ident - ircd_helper_start failed: %s", strerror(errno));
 		return;
 	}
-	ircd_close(ifd[1]);
-	ircd_close(ofd[0]);
-
-	auth_ifd = ifd[0];
-	auth_ofd = ofd[1];
-	auth_pid = pid;
-	read_auth_reply(auth_ifd, NULL);	
+        ircd_helper_read(ident_helper->ifd, ident_helper);
 	return;
-}
-
-void
-ident_sigchld(void)
-{
-	int status;
-	if(waitpid(auth_pid, &status, WNOHANG) == auth_pid)
-	{
-		fork_ident();
-	}
 }
 
 void
@@ -228,12 +165,11 @@ init_auth(void)
 {
 	/* This hook takes a struct Client for its argument */
 	fork_ident();
-	ircd_linebuf_newbuf(&auth_sendq);
-	ircd_linebuf_newbuf(&auth_recvq);
-	if(auth_pid < 0)
+	if(ident_helper == NULL)
 	{
 		ilog(L_MAIN, "Unable to fork ident daemon");
 	}
+
 	memset(&auth_poll_list, 0, sizeof(auth_poll_list));
 	ircd_event_addish("timeout_auth_queries_event", timeout_auth_queries_event, NULL, 3);
 	auth_heap = ircd_bh_create(sizeof(struct AuthRequest), AUTH_HEAP_SIZE);
@@ -339,27 +275,6 @@ auth_error(struct AuthRequest *auth)
 	sendheader(auth->client, REPORT_FAIL_ID);
 }
 
-static void
-auth_write_sendq(int fd, void *unused)
-{
-	int retlen;
-	if(ircd_linebuf_len(&auth_sendq) > 0)
-	{
-		while((retlen = ircd_linebuf_flush(auth_ofd, &auth_sendq)) > 0);
-		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
-		{
-			fork_ident();
-		}
-	}
-	if(auth_ofd == -1)
-		return;
-		
-	if(ircd_linebuf_len(&auth_sendq) > 0)
-	{
-		ircd_setselect(auth_ofd, IRCD_SELECT_WRITE, 
-			       auth_write_sendq, NULL);
-	}
-}
 
 /*
  * start_auth_query - Flag the client to show that an attempt to 
@@ -384,7 +299,7 @@ start_auth_query(struct AuthRequest *auth)
 
 	sendheader(auth->client, REPORT_DO_ID);
 
-	if(auth_ifd < 0 || auth_ofd < 0) /* hmm..ident is dead..skip it */
+	if(ident_helper == NULL) /* hmm..ident is dead..skip it */
 	{
 		auth_error(auth);
 		release_auth_client(auth);
@@ -427,11 +342,9 @@ start_auth_query(struct AuthRequest *auth)
 	auth->reqid = assign_auth_id();
 	authtable[auth->reqid] = auth;
 
-	ircd_linebuf_put(&auth_sendq, "%x %s %s %u %u", auth->reqid, myip, 
+	ircd_helper_write(ident_helper, "%x %s %s %u %u", auth->reqid, myip, 
 		    auth->client->sockhost, (unsigned int)rport, (unsigned int)lport); 
 
-
-	auth_write_sendq(auth_ofd, NULL);
 	return;
 }
 
@@ -537,19 +450,18 @@ delete_auth_queries(struct Client *target_p)
 }
 
 /* read auth reply from ident daemon */
-
 static char authBuf[READBUF_SIZE];
 
+
 static void
-parse_auth_reply(void)
+read_auth_reply(ircd_helper *helper)
 {
-	int len;
-	struct AuthRequest *auth;	
+	int length;
 	char *q, *p;
-	while((len = ircd_linebuf_get(&auth_recvq, authBuf, sizeof(authBuf), 
-				 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)	
+	struct AuthRequest *auth;
+
+	while((length = ircd_helper_readline(helper, authBuf, sizeof(authBuf))) > 0)
 	{
-		
 		q = strchr(authBuf, ' ');
 
 		if(q == NULL)
@@ -587,33 +499,10 @@ parse_auth_reply(void)
 
 }
 
-static void
-read_auth_reply(int fd, void *data)
-{
-	int length;
-
-	while((length = ircd_read(auth_ifd, authBuf, sizeof(authBuf))) > 0)
-	{
-		ircd_linebuf_parse(&auth_recvq, authBuf, length, 0);
-		parse_auth_reply();
-	}
-
-	if(length == 0)
-		fork_ident();
-
-	if(length == -1 && !ignoreErrno(errno))
-		fork_ident();
-	if(auth_ifd == -1)
-		return;
-			
-	ircd_setselect(auth_ifd, IRCD_SELECT_READ, read_auth_reply, NULL);	
-}
-
 void
 change_ident_timeout(int timeout)
 {
-	ircd_linebuf_put(&auth_sendq, "T %d", timeout); 
-	auth_write_sendq(auth_ofd, NULL);
+	ircd_helper_write(ident_helper, "T %d", timeout);
 }
 
 
