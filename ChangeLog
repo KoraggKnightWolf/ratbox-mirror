@@ -1,3 +1,14 @@
+androsyn    2006/11/24 20:12:15 UTC	(20061124_0-23283)
+  Log:
+  make the bandbi code use the ircd_helper interface
+
+  Modified:
+	ircd-ratbox/trunk/include/bandbi.h (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2006/11/12 07:37:35 UTC	(20061112_0-23279)
   Log:
   fix warning on max bans and change an iovec to an ircd_iovec
