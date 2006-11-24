@@ -1,3 +1,11 @@
+androsyn    2006/11/24 20:53:03 UTC	(20061124_1-23285)
+  Log:
+  make the ircd side of the ident helper handling use the ircd_helper stuff
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2006/11/24 20:12:15 UTC	(20061124_0-23283)
   Log:
   make the bandbi code use the ircd_helper interface
