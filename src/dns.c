@@ -212,7 +212,7 @@ start_resolver(void)
 
 	if(dns_helper == NULL)
 	{
-		ilog(L_MAIN, "ircd_spawn_process failed: %s", strerror(errno));
+		ilog(L_MAIN, "ircd_helper_start failed: %s", strerror(errno));
 		return 1;
 	}
 

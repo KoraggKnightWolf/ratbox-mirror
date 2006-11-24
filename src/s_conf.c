@@ -640,7 +640,7 @@ rehash_bans(int sig)
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				"Got signal SIGUSR2, reloading ban confs");
 
-	bandb_write("L");
+	bandb_rehash_bans();
 }
 
 /*
