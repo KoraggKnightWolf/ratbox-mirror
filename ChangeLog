@@ -1,3 +1,16 @@
+jilles      2006/11/27 17:52:45 UTC	(20061127_0-23293)
+  Log:
+  Forward port RATBOX_2_2 r23291:
+  Tweak \s code a little.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_etrace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+
+
 jilles      2006/11/26 00:54:54 UTC	(20061126_0-23287)
   Log:
   Change vx0's email address, requested by him on IRC.
