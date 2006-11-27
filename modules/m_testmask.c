@@ -110,7 +110,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
                         char *new = tmp; 
                         while(*orig)
                         {
-                                if(*orig == '\\')
+                                if(*orig == '\\' && *(orig + 1) != '\0')
                                 {
                                         if(*(orig + 1) == 's')
                                         {

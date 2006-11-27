@@ -269,7 +269,7 @@ bandb_check_xline(struct ConfItem *aconf)
 
 		while(*orig)
 		{
-			if(*orig == '\\')
+			if(*orig == '\\' && *(orig + 1) != '\0')
 			{
 				if(*(orig+1) == 's')
 				{

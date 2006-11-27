@@ -308,7 +308,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 
 		while(*orig)
 		{
-			if(*orig == '\\')
+			if(*orig == '\\' && *(orig + 1) != '\0')
 			{
 				if(*(orig + 1) == 's')
 				{

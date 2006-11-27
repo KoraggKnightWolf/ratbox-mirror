@@ -296,7 +296,7 @@ match_masktrace(struct Client *source_p, dlink_list *list, const char *username,
 			char *new = tmp;
 	                while(*orig)
         	        {
-                	        if(*orig == '\\')
+				if(*orig == '\\' && *(orig + 1) != '\0')
                        		{
 	                                if(*(orig + 1) == 's')
 	                                {
