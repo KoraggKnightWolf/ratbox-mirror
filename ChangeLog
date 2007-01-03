@@ -1,3 +1,12 @@
+androsyn    2007/01/03 20:14:52 UTC	(20070103_0-23325)
+  Log:
+  parts of r21281 never made it up to devel. thanks to tydel for the bug report
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_error.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 jilles      2006/11/27 17:52:45 UTC	(20061127_0-23293)
   Log:
   Forward port RATBOX_2_2 r23291:
