@@ -70,12 +70,12 @@ m_error(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		sendto_realops_flags(UMODE_ALL, L_ADMIN,
 				"ERROR :from %s -- %s",
-				client_p->name, para);
+				EmptyString(client_p->name) ? "" : client_p->name, para);
 
 		if(!ConfigFileEntry.hide_error_messages)
 			sendto_realops_flags(UMODE_ALL, L_OPER,
 					"ERROR :from %s -- %s",
-					client_p->name, para);
+					EmptyString(client_p->name) ? "" : client_p->name, para);
 	}
 
 	exit_client(client_p, source_p, source_p, "ERROR");

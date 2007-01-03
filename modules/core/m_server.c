@@ -109,9 +109,8 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		if(ConfigFileEntry.warn_no_nline)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"Unauthorised server connection attempt from %s: "
+					"Unauthorised server connection attempt from [@255.255.255.255]: "
 					"No entry for servername %s",
-					client_p->name,
 					name);
 
 			ilog(L_SERVER, "Access denied, No N line for server %s",
@@ -125,9 +124,9 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	case -2:
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				"Unauthorised server connection attempt from %s: "
+				"Unauthorised server connection attempt from [@255.255.255.255]: "
 				"Bad password for server %s", 
-				client_p->name, name);
+				name);
 
 		ilog(L_SERVER, "Access denied, invalid password for server %s",
 		     log_client_name(client_p, SHOW_IP));
@@ -139,9 +138,9 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	case -3:
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Unauthorised server connection attempt from %s: "
+				     "Unauthorised server connection attempt from [@255.255.255.255]: "
 				     "Invalid host for server %s", 
-				     client_p->name, name);
+				     name);
 
 		ilog(L_SERVER, "Access denied, invalid host for server %s",
 		     log_client_name(client_p, SHOW_IP));
@@ -154,8 +153,8 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		/* servername is > HOSTLEN */
 	case -4:
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Invalid servername %s from %s",
-				     name, client_p->name);
+				     "Invalid servername %s from [@255.255.255.255]",
+				     client_p->name);
 		ilog(L_SERVER, "Access denied, invalid servername from %s",
 		     log_client_name(client_p, SHOW_IP));
 
@@ -179,8 +178,8 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		 * connect - A1kmm.
 		 */
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Attempt to re-introduce server %s from %s",
-				     name, client_p->name);
+				     "Attempt to re-introduce server %s from [@255.255.255.255]",
+				     name);
 		ilog(L_SERVER, "Attempt to re-introduce server %s from %s", 
 		     name, log_client_name(client_p, SHOW_IP));
 
@@ -192,7 +191,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	if(has_id(client_p) && (target_p = find_id(client_p->id)) != NULL)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Attempt to re-introduce SID %s from %s%s",
+				     "Attempt to re-introduce SID %s from %s[@255.255.255.255]",
 				     client_p->id, name,
 				     client_p->name);
 		ilog(L_SERVER, "Attempt to re-introduce SID %s from %s", 
