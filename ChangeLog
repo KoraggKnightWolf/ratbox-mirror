@@ -1,3 +1,13 @@
+androsyn    2007/01/04 15:02:02 UTC	(20070104_0-23327)
+  Log:
+  fix install of modules
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+
+
 androsyn    2007/01/03 20:14:52 UTC	(20070103_0-23325)
   Log:
   parts of r21281 never made it up to devel. thanks to tydel for the bug report
