@@ -415,6 +415,7 @@ move-old-modules:
 	-@if test -d $(DESTDIR)$(moduledir); then \
 		echo "ircd: backing up modules"; \
 		mv $(DESTDIR)$(moduledir) $(DESTDIR)$(moduledir)-old; \
+		mkdir $(DESTDIR)$(moduledir); \
 	fi
 
 
