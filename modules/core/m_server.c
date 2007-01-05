@@ -192,8 +192,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Attempt to re-introduce SID %s from %s[@255.255.255.255]",
-				     client_p->id, name,
-				     client_p->name);
+				     client_p->id, name);
 		ilog(L_SERVER, "Attempt to re-introduce SID %s from %s", 
 			       name, log_client_name(client_p, SHOW_IP));
 
