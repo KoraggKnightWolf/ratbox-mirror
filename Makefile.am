@@ -119,7 +119,6 @@ modules_m_cmessage_la_LDFLAGS =  -module $(MODULE_FLAGS)
 modules_m_connect_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_dline_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_encap_la_LDFLAGS =  -module $(MODULE_FLAGS)  
-modules_m_etrace_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_gline_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_help_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_info_la_LDFLAGS =  -module $(MODULE_FLAGS)  
@@ -173,7 +172,6 @@ modules_m_cmessage_la_SOURCES =	modules/m_cmessage.c
 modules_m_connect_la_SOURCES =	modules/m_connect.c
 modules_m_dline_la_SOURCES =	modules/m_dline.c
 modules_m_encap_la_SOURCES =	modules/m_encap.c
-modules_m_etrace_la_SOURCES =	modules/m_etrace.c
 modules_m_gline_la_SOURCES =	modules/m_gline.c
 modules_m_help_la_SOURCES =	modules/m_help.c
 modules_m_info_la_SOURCES =	modules/m_info.c
@@ -228,7 +226,6 @@ modules/m_cmessage.la	\
 modules/m_connect.la	\
 modules/m_dline.la	\
 modules/m_encap.la	\
-modules/m_etrace.la	\
 modules/m_gline.la	\
 modules/m_help.la	\
 modules/m_info.la	\
@@ -283,7 +280,6 @@ modules_m_cmessage_la_LIBADD = $(MODULE_LIBS)
 modules_m_connect_la_LIBADD = $(MODULE_LIBS)     
 modules_m_dline_la_LIBADD = $(MODULE_LIBS)     
 modules_m_encap_la_LIBADD = $(MODULE_LIBS)     
-modules_m_etrace_la_LIBADD = $(MODULE_LIBS)     
 modules_m_gline_la_LIBADD = $(MODULE_LIBS)     
 modules_m_help_la_LIBADD = $(MODULE_LIBS)     
 modules_m_info_la_LIBADD = $(MODULE_LIBS)     

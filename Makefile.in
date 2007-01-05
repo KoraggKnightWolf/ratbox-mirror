@@ -21,7 +21,7 @@
 # on each other now..
 
 
-SOURCES = $(libratbox_la_SOURCES) $(modules_core_m_die_la_SOURCES) $(modules_core_m_error_la_SOURCES) $(modules_core_m_join_la_SOURCES) $(modules_core_m_kick_la_SOURCES) $(modules_core_m_kill_la_SOURCES) $(modules_core_m_message_la_SOURCES) $(modules_core_m_mode_la_SOURCES) $(modules_core_m_nick_la_SOURCES) $(modules_core_m_part_la_SOURCES) $(modules_core_m_quit_la_SOURCES) $(modules_core_m_server_la_SOURCES) $(modules_core_m_squit_la_SOURCES) $(modules_m_accept_la_SOURCES) $(modules_m_admin_la_SOURCES) $(modules_m_away_la_SOURCES) $(modules_m_cap_la_SOURCES) $(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) $(modules_m_cmessage_la_SOURCES) $(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) $(modules_m_encap_la_SOURCES) $(modules_m_etrace_la_SOURCES) $(modules_m_gline_la_SOURCES) $(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) $(modules_m_invite_la_SOURCES) $(modules_m_ison_la_SOURCES) $(modules_m_kline_la_SOURCES) $(modules_m_knock_la_SOURCES) $(modules_m_links_la_SOURCES) $(modules_m_list_la_SOURCES) $(modules_m_locops_la_SOURCES) $(modules_m_lusers_la_SOURCES) $(modules_m_map_la_SOURCES) $(modules_m_monitor_la_SOURCES) $(modules_m_motd_la_SOURCES) $(modules_m_names_la_SOURCES) $(modules_m_oper_la_SOURCES) $(modules_m_operspy_la_SOURCES) $(modules_m_pass_la_SOURCES) $(modules_m_ping_la_SOURCES) $(modules_m_pong_la_SOURCES) $(modules_m_post_la_SOURCES) $(modules_m_rehash_la_SOURCES) $(modules_m_restart_la_SOURCES) $(modules_m_resv_la_SOURCES) $(modules_m_services_la_SOURCES) $(modules_m_set_la_SOURCES) $(modules_m_stats_la_SOURCES) $(modules_m_svinfo_la_SOURCES) $(modules_m_tb_la_SOURCES) $(modules_m_testline_la_SOURCES) $(modules_m_testmask_la_SOURCES) $(modules_m_time_la_SOURCES) $(modules_m_topic_la_SOURCES) $(modules_m_trace_la_SOURCES) $(modules_m_unreject_la_SOURCES) $(modules_m_user_la_SOURCES) $(modules_m_userhost_la_SOURCES) $(modules_m_version_la_SOURCES) $(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) $(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) $(modules_m_xline_la_SOURCES) $(ident_SOURCES) $(ircd_SOURCES) $(resolver_SOURCES)
+SOURCES = $(libratbox_la_SOURCES) $(modules_core_m_die_la_SOURCES) $(modules_core_m_error_la_SOURCES) $(modules_core_m_join_la_SOURCES) $(modules_core_m_kick_la_SOURCES) $(modules_core_m_kill_la_SOURCES) $(modules_core_m_message_la_SOURCES) $(modules_core_m_mode_la_SOURCES) $(modules_core_m_nick_la_SOURCES) $(modules_core_m_part_la_SOURCES) $(modules_core_m_quit_la_SOURCES) $(modules_core_m_server_la_SOURCES) $(modules_core_m_squit_la_SOURCES) $(modules_m_accept_la_SOURCES) $(modules_m_admin_la_SOURCES) $(modules_m_away_la_SOURCES) $(modules_m_cap_la_SOURCES) $(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) $(modules_m_cmessage_la_SOURCES) $(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) $(modules_m_encap_la_SOURCES) $(modules_m_gline_la_SOURCES) $(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) $(modules_m_invite_la_SOURCES) $(modules_m_ison_la_SOURCES) $(modules_m_kline_la_SOURCES) $(modules_m_knock_la_SOURCES) $(modules_m_links_la_SOURCES) $(modules_m_list_la_SOURCES) $(modules_m_locops_la_SOURCES) $(modules_m_lusers_la_SOURCES) $(modules_m_map_la_SOURCES) $(modules_m_monitor_la_SOURCES) $(modules_m_motd_la_SOURCES) $(modules_m_names_la_SOURCES) $(modules_m_oper_la_SOURCES) $(modules_m_operspy_la_SOURCES) $(modules_m_pass_la_SOURCES) $(modules_m_ping_la_SOURCES) $(modules_m_pong_la_SOURCES) $(modules_m_post_la_SOURCES) $(modules_m_rehash_la_SOURCES) $(modules_m_restart_la_SOURCES) $(modules_m_resv_la_SOURCES) $(modules_m_services_la_SOURCES) $(modules_m_set_la_SOURCES) $(modules_m_stats_la_SOURCES) $(modules_m_svinfo_la_SOURCES) $(modules_m_tb_la_SOURCES) $(modules_m_testline_la_SOURCES) $(modules_m_testmask_la_SOURCES) $(modules_m_time_la_SOURCES) $(modules_m_topic_la_SOURCES) $(modules_m_trace_la_SOURCES) $(modules_m_unreject_la_SOURCES) $(modules_m_user_la_SOURCES) $(modules_m_userhost_la_SOURCES) $(modules_m_version_la_SOURCES) $(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) $(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) $(modules_m_xline_la_SOURCES) $(ident_SOURCES) $(ircd_SOURCES) $(resolver_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -156,9 +156,6 @@ modules_m_dline_la_OBJECTS = $(am_modules_m_dline_la_OBJECTS)
 modules_m_encap_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_encap_la_OBJECTS = modules/m_encap.lo
 modules_m_encap_la_OBJECTS = $(am_modules_m_encap_la_OBJECTS)
-modules_m_etrace_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_modules_m_etrace_la_OBJECTS = modules/m_etrace.lo
-modules_m_etrace_la_OBJECTS = $(am_modules_m_etrace_la_OBJECTS)
 modules_m_gline_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_gline_la_OBJECTS = modules/m_gline.lo
 modules_m_gline_la_OBJECTS = $(am_modules_m_gline_la_OBJECTS)
@@ -301,21 +298,21 @@ ircd_OBJECTS = $(am_ircd_OBJECTS)
 am__DEPENDENCIES_3 = modules/m_accept.la modules/m_admin.la \
 	modules/m_away.la modules/m_capab.la modules/m_cap.la \
 	modules/m_close.la modules/m_cmessage.la modules/m_connect.la \
-	modules/m_dline.la modules/m_encap.la modules/m_etrace.la \
-	modules/m_gline.la modules/m_help.la modules/m_info.la \
-	modules/m_invite.la modules/m_ison.la modules/m_kline.la \
-	modules/m_knock.la modules/m_links.la modules/m_list.la \
-	modules/m_locops.la modules/m_lusers.la modules/m_map.la \
-	modules/m_monitor.la modules/m_motd.la modules/m_names.la \
-	modules/m_oper.la modules/m_operspy.la modules/m_pass.la \
-	modules/m_ping.la modules/m_pong.la modules/m_post.la \
-	modules/m_rehash.la modules/m_restart.la modules/m_resv.la \
-	modules/m_set.la modules/m_stats.la modules/m_svinfo.la \
-	modules/m_tb.la modules/m_testline.la modules/m_testmask.la \
-	modules/m_time.la modules/m_topic.la modules/m_trace.la \
-	modules/m_unreject.la modules/m_user.la modules/m_userhost.la \
-	modules/m_version.la modules/m_wallops.la modules/m_who.la \
-	modules/m_whois.la modules/m_whowas.la modules/m_xline.la
+	modules/m_dline.la modules/m_encap.la modules/m_gline.la \
+	modules/m_help.la modules/m_info.la modules/m_invite.la \
+	modules/m_ison.la modules/m_kline.la modules/m_knock.la \
+	modules/m_links.la modules/m_list.la modules/m_locops.la \
+	modules/m_lusers.la modules/m_map.la modules/m_monitor.la \
+	modules/m_motd.la modules/m_names.la modules/m_oper.la \
+	modules/m_operspy.la modules/m_pass.la modules/m_ping.la \
+	modules/m_pong.la modules/m_post.la modules/m_rehash.la \
+	modules/m_restart.la modules/m_resv.la modules/m_set.la \
+	modules/m_stats.la modules/m_svinfo.la modules/m_tb.la \
+	modules/m_testline.la modules/m_testmask.la modules/m_time.la \
+	modules/m_topic.la modules/m_trace.la modules/m_unreject.la \
+	modules/m_user.la modules/m_userhost.la modules/m_version.la \
+	modules/m_wallops.la modules/m_who.la modules/m_whois.la \
+	modules/m_whowas.la modules/m_xline.la
 am__DEPENDENCIES_4 = modules/core/m_die.la modules/core/m_error.la \
 	modules/core/m_join.la modules/core/m_kick.la \
 	modules/core/m_kill.la modules/core/m_message.la \
@@ -347,7 +344,6 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	modules/$(DEPDIR)/m_connect.Plo \
 @AMDEP_TRUE@	modules/$(DEPDIR)/m_dline.Plo \
 @AMDEP_TRUE@	modules/$(DEPDIR)/m_encap.Plo \
-@AMDEP_TRUE@	modules/$(DEPDIR)/m_etrace.Plo \
 @AMDEP_TRUE@	modules/$(DEPDIR)/m_gline.Plo \
 @AMDEP_TRUE@	modules/$(DEPDIR)/m_help.Plo \
 @AMDEP_TRUE@	modules/$(DEPDIR)/m_info.Plo \
@@ -457,22 +453,22 @@ SOURCES = $(libratbox_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) \
 	$(modules_m_cmessage_la_SOURCES) \
 	$(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) \
-	$(modules_m_encap_la_SOURCES) $(modules_m_etrace_la_SOURCES) \
-	$(modules_m_gline_la_SOURCES) $(modules_m_help_la_SOURCES) \
-	$(modules_m_info_la_SOURCES) $(modules_m_invite_la_SOURCES) \
-	$(modules_m_ison_la_SOURCES) $(modules_m_kline_la_SOURCES) \
-	$(modules_m_knock_la_SOURCES) $(modules_m_links_la_SOURCES) \
-	$(modules_m_list_la_SOURCES) $(modules_m_locops_la_SOURCES) \
-	$(modules_m_lusers_la_SOURCES) $(modules_m_map_la_SOURCES) \
-	$(modules_m_monitor_la_SOURCES) $(modules_m_motd_la_SOURCES) \
-	$(modules_m_names_la_SOURCES) $(modules_m_oper_la_SOURCES) \
-	$(modules_m_operspy_la_SOURCES) $(modules_m_pass_la_SOURCES) \
-	$(modules_m_ping_la_SOURCES) $(modules_m_pong_la_SOURCES) \
-	$(modules_m_post_la_SOURCES) $(modules_m_rehash_la_SOURCES) \
-	$(modules_m_restart_la_SOURCES) $(modules_m_resv_la_SOURCES) \
-	$(modules_m_services_la_SOURCES) $(modules_m_set_la_SOURCES) \
-	$(modules_m_stats_la_SOURCES) $(modules_m_svinfo_la_SOURCES) \
-	$(modules_m_tb_la_SOURCES) $(modules_m_testline_la_SOURCES) \
+	$(modules_m_encap_la_SOURCES) $(modules_m_gline_la_SOURCES) \
+	$(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) \
+	$(modules_m_invite_la_SOURCES) $(modules_m_ison_la_SOURCES) \
+	$(modules_m_kline_la_SOURCES) $(modules_m_knock_la_SOURCES) \
+	$(modules_m_links_la_SOURCES) $(modules_m_list_la_SOURCES) \
+	$(modules_m_locops_la_SOURCES) $(modules_m_lusers_la_SOURCES) \
+	$(modules_m_map_la_SOURCES) $(modules_m_monitor_la_SOURCES) \
+	$(modules_m_motd_la_SOURCES) $(modules_m_names_la_SOURCES) \
+	$(modules_m_oper_la_SOURCES) $(modules_m_operspy_la_SOURCES) \
+	$(modules_m_pass_la_SOURCES) $(modules_m_ping_la_SOURCES) \
+	$(modules_m_pong_la_SOURCES) $(modules_m_post_la_SOURCES) \
+	$(modules_m_rehash_la_SOURCES) $(modules_m_restart_la_SOURCES) \
+	$(modules_m_resv_la_SOURCES) $(modules_m_services_la_SOURCES) \
+	$(modules_m_set_la_SOURCES) $(modules_m_stats_la_SOURCES) \
+	$(modules_m_svinfo_la_SOURCES) $(modules_m_tb_la_SOURCES) \
+	$(modules_m_testline_la_SOURCES) \
 	$(modules_m_testmask_la_SOURCES) $(modules_m_time_la_SOURCES) \
 	$(modules_m_topic_la_SOURCES) $(modules_m_trace_la_SOURCES) \
 	$(modules_m_unreject_la_SOURCES) $(modules_m_user_la_SOURCES) \
@@ -500,19 +496,19 @@ DIST_SOURCES = $(libratbox_la_SOURCES) \
 	$(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) \
 	$(modules_m_cmessage_la_SOURCES) \
 	$(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) \
-	$(modules_m_encap_la_SOURCES) $(modules_m_etrace_la_SOURCES) \
-	$(modules_m_gline_la_SOURCES) $(modules_m_help_la_SOURCES) \
-	$(modules_m_info_la_SOURCES) $(modules_m_invite_la_SOURCES) \
-	$(modules_m_ison_la_SOURCES) $(modules_m_kline_la_SOURCES) \
-	$(modules_m_knock_la_SOURCES) $(modules_m_links_la_SOURCES) \
-	$(modules_m_list_la_SOURCES) $(modules_m_locops_la_SOURCES) \
-	$(modules_m_lusers_la_SOURCES) $(modules_m_map_la_SOURCES) \
-	$(modules_m_monitor_la_SOURCES) $(modules_m_motd_la_SOURCES) \
-	$(modules_m_names_la_SOURCES) $(modules_m_oper_la_SOURCES) \
-	$(modules_m_operspy_la_SOURCES) $(modules_m_pass_la_SOURCES) \
-	$(modules_m_ping_la_SOURCES) $(modules_m_pong_la_SOURCES) \
-	$(modules_m_post_la_SOURCES) $(modules_m_rehash_la_SOURCES) \
-	$(modules_m_restart_la_SOURCES) $(modules_m_resv_la_SOURCES) \
+	$(modules_m_encap_la_SOURCES) $(modules_m_gline_la_SOURCES) \
+	$(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) \
+	$(modules_m_invite_la_SOURCES) $(modules_m_ison_la_SOURCES) \
+	$(modules_m_kline_la_SOURCES) $(modules_m_knock_la_SOURCES) \
+	$(modules_m_links_la_SOURCES) $(modules_m_list_la_SOURCES) \
+	$(modules_m_locops_la_SOURCES) $(modules_m_lusers_la_SOURCES) \
+	$(modules_m_map_la_SOURCES) $(modules_m_monitor_la_SOURCES) \
+	$(modules_m_motd_la_SOURCES) $(modules_m_names_la_SOURCES) \
+	$(modules_m_oper_la_SOURCES) $(modules_m_operspy_la_SOURCES) \
+	$(modules_m_pass_la_SOURCES) $(modules_m_ping_la_SOURCES) \
+	$(modules_m_pong_la_SOURCES) $(modules_m_post_la_SOURCES) \
+	$(modules_m_rehash_la_SOURCES) $(modules_m_restart_la_SOURCES) \
+	$(modules_m_resv_la_SOURCES) \
 	$(am__modules_m_services_la_SOURCES_DIST) \
 	$(modules_m_set_la_SOURCES) $(modules_m_stats_la_SOURCES) \
 	$(modules_m_svinfo_la_SOURCES) $(modules_m_tb_la_SOURCES) \
@@ -773,7 +769,6 @@ modules_m_cmessage_la_LDFLAGS = -module $(MODULE_FLAGS)
 modules_m_connect_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_dline_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_encap_la_LDFLAGS = -module $(MODULE_FLAGS)  
-modules_m_etrace_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_gline_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_help_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_info_la_LDFLAGS = -module $(MODULE_FLAGS)  
@@ -826,7 +821,6 @@ modules_m_cmessage_la_SOURCES = modules/m_cmessage.c
 modules_m_connect_la_SOURCES = modules/m_connect.c
 modules_m_dline_la_SOURCES = modules/m_dline.c
 modules_m_encap_la_SOURCES = modules/m_encap.c
-modules_m_etrace_la_SOURCES = modules/m_etrace.c
 modules_m_gline_la_SOURCES = modules/m_gline.c
 modules_m_help_la_SOURCES = modules/m_help.c
 modules_m_info_la_SOURCES = modules/m_info.c
@@ -880,7 +874,6 @@ modules/m_cmessage.la	\
 modules/m_connect.la	\
 modules/m_dline.la	\
 modules/m_encap.la	\
-modules/m_etrace.la	\
 modules/m_gline.la	\
 modules/m_help.la	\
 modules/m_info.la	\
@@ -934,7 +927,6 @@ modules_m_cmessage_la_LIBADD = $(MODULE_LIBS)
 modules_m_connect_la_LIBADD = $(MODULE_LIBS)     
 modules_m_dline_la_LIBADD = $(MODULE_LIBS)     
 modules_m_encap_la_LIBADD = $(MODULE_LIBS)     
-modules_m_etrace_la_LIBADD = $(MODULE_LIBS)     
 modules_m_gline_la_LIBADD = $(MODULE_LIBS)     
 modules_m_help_la_LIBADD = $(MODULE_LIBS)     
 modules_m_info_la_LIBADD = $(MODULE_LIBS)     
@@ -1346,10 +1338,6 @@ modules/m_encap.lo: modules/$(am__dirstamp) \
 	modules/$(DEPDIR)/$(am__dirstamp)
 modules/m_encap.la: $(modules_m_encap_la_OBJECTS) $(modules_m_encap_la_DEPENDENCIES) modules/$(am__dirstamp)
 	$(LINK) -rpath $(modulesdir) $(modules_m_encap_la_LDFLAGS) $(modules_m_encap_la_OBJECTS) $(modules_m_encap_la_LIBADD) $(LIBS)
-modules/m_etrace.lo: modules/$(am__dirstamp) \
-	modules/$(DEPDIR)/$(am__dirstamp)
-modules/m_etrace.la: $(modules_m_etrace_la_OBJECTS) $(modules_m_etrace_la_DEPENDENCIES) modules/$(am__dirstamp)
-	$(LINK) -rpath $(modulesdir) $(modules_m_etrace_la_LDFLAGS) $(modules_m_etrace_la_OBJECTS) $(modules_m_etrace_la_LIBADD) $(LIBS)
 modules/m_gline.lo: modules/$(am__dirstamp) \
 	modules/$(DEPDIR)/$(am__dirstamp)
 modules/m_gline.la: $(modules_m_gline_la_OBJECTS) $(modules_m_gline_la_DEPENDENCIES) modules/$(am__dirstamp)
@@ -1610,8 +1598,6 @@ mostlyclean-compile:
 	-rm -f modules/m_dline.lo
 	-rm -f modules/m_encap.$(OBJEXT)
 	-rm -f modules/m_encap.lo
-	-rm -f modules/m_etrace.$(OBJEXT)
-	-rm -f modules/m_etrace.lo
 	-rm -f modules/m_gline.$(OBJEXT)
 	-rm -f modules/m_gline.lo
 	-rm -f modules/m_help.$(OBJEXT)
@@ -1787,7 +1773,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_connect.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_dline.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_encap.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_etrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_gline.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_help.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_info.Plo@am__quote@
@@ -3290,30 +3275,6 @@ modules/m_encap.lo: modules/m_encap.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='modules/$(DEPDIR)/m_encap.Plo' tmpdepfile='modules/$(DEPDIR)/m_encap.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o modules/m_encap.lo `test -f 'modules/m_encap.c' || echo '$(srcdir)/'`modules/m_encap.c
-
-modules/m_etrace.o: modules/m_etrace.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT modules/m_etrace.o -MD -MP -MF "modules/$(DEPDIR)/m_etrace.Tpo" -c -o modules/m_etrace.o `test -f 'modules/m_etrace.c' || echo '$(srcdir)/'`modules/m_etrace.c; \
-@am__fastdepCC_TRUE@	then mv -f "modules/$(DEPDIR)/m_etrace.Tpo" "modules/$(DEPDIR)/m_etrace.Po"; else rm -f "modules/$(DEPDIR)/m_etrace.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='modules/m_etrace.c' object='modules/m_etrace.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='modules/$(DEPDIR)/m_etrace.Po' tmpdepfile='modules/$(DEPDIR)/m_etrace.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o modules/m_etrace.o `test -f 'modules/m_etrace.c' || echo '$(srcdir)/'`modules/m_etrace.c
-
-modules/m_etrace.obj: modules/m_etrace.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT modules/m_etrace.obj -MD -MP -MF "modules/$(DEPDIR)/m_etrace.Tpo" -c -o modules/m_etrace.obj `if test -f 'modules/m_etrace.c'; then $(CYGPATH_W) 'modules/m_etrace.c'; else $(CYGPATH_W) '$(srcdir)/modules/m_etrace.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "modules/$(DEPDIR)/m_etrace.Tpo" "modules/$(DEPDIR)/m_etrace.Po"; else rm -f "modules/$(DEPDIR)/m_etrace.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='modules/m_etrace.c' object='modules/m_etrace.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='modules/$(DEPDIR)/m_etrace.Po' tmpdepfile='modules/$(DEPDIR)/m_etrace.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o modules/m_etrace.obj `if test -f 'modules/m_etrace.c'; then $(CYGPATH_W) 'modules/m_etrace.c'; else $(CYGPATH_W) '$(srcdir)/modules/m_etrace.c'; fi`
-
-modules/m_etrace.lo: modules/m_etrace.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT modules/m_etrace.lo -MD -MP -MF "modules/$(DEPDIR)/m_etrace.Tpo" -c -o modules/m_etrace.lo `test -f 'modules/m_etrace.c' || echo '$(srcdir)/'`modules/m_etrace.c; \
-@am__fastdepCC_TRUE@	then mv -f "modules/$(DEPDIR)/m_etrace.Tpo" "modules/$(DEPDIR)/m_etrace.Plo"; else rm -f "modules/$(DEPDIR)/m_etrace.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='modules/m_etrace.c' object='modules/m_etrace.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='modules/$(DEPDIR)/m_etrace.Plo' tmpdepfile='modules/$(DEPDIR)/m_etrace.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o modules/m_etrace.lo `test -f 'modules/m_etrace.c' || echo '$(srcdir)/'`modules/m_etrace.c
 
 modules/m_gline.o: modules/m_gline.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT modules/m_gline.o -MD -MP -MF "modules/$(DEPDIR)/m_gline.Tpo" -c -o modules/m_gline.o `test -f 'modules/m_gline.c' || echo '$(srcdir)/'`modules/m_gline.c; \
