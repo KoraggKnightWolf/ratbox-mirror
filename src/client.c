@@ -71,7 +71,7 @@ static EVH check_pings;
 static ircd_bh *client_heap = NULL;
 static ircd_bh *lclient_heap = NULL;
 static ircd_bh *user_heap = NULL;
-
+static ircd_bh *away_heap = NULL;
 static char current_uid[IDLEN];
 
 
@@ -107,6 +107,7 @@ init_client(void)
 	client_heap = ircd_bh_create(sizeof(struct Client), CLIENT_HEAP_SIZE, "client_heap");
 	lclient_heap = ircd_bh_create(sizeof(struct LocalUser), LCLIENT_HEAP_SIZE, "lclient_heap");
 	user_heap = ircd_bh_create(sizeof(struct User), USER_HEAP_SIZE, "user_heap");
+	away_heap = ircd_bh_create(AWAYLEN, AWAY_HEAP_SIZE, "away_heap");
 	ircd_event_addish("check_pings", check_pings, NULL, 30);
 	ircd_event_addish("free_exited_clients", &free_exited_clients, NULL, 5);
 	ircd_event_addish("exit_aborted_clients", exit_aborted_clients, NULL, 5);
@@ -1633,8 +1634,7 @@ make_server(struct Client *client_p)
 void
 free_user(struct User *user, struct Client *client_p)
 {
-	if(user->away)
-		ircd_free((char *) user->away);
+	free_away(client_p);
 	/*
 	 * sanity check
 	 */
@@ -1654,6 +1654,23 @@ free_user(struct User *user, struct Client *client_p)
 	}
 
 	ircd_bh_free(user_heap, user);
+}
+
+void
+allocate_away(struct Client *client_p)
+{
+	if(client_p->user->away == NULL)
+		client_p->user->away = ircd_bh_alloc(away_heap);	
+}
+
+
+void
+free_away(struct Client *client_p)
+{
+	if(client_p->user->away != NULL) {
+		ircd_bh_free(away_heap, client_p->user->away);
+		client_p->user->away = NULL;
+	}
 }
 
 void

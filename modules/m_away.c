@@ -68,29 +68,23 @@ DECLARE_MODULE_AV1(away, NULL, NULL, away_clist, NULL, NULL, "$Revision$");
 static int
 m_away(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	char *away;
-	char *awy2;
-
 	if(MyClient(source_p) && !IsFloodDone(source_p))
 		flood_endgrace(source_p);
 
 	if(!IsClient(source_p))
 		return 0;
 
-	away = source_p->user->away;
-
 	if(parc < 2 || EmptyString(parv[1]))
 	{
 		/* Marking as not away */
-		if(away)
+		if(source_p->user->away != NULL)
 		{
 			/* we now send this only if they were away before --is */
 			sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
 				      ":%s AWAY", use_id(source_p));
 			sendto_server(client_p, NULL, NOCAPS, CAP_TS6, 
 				      ":%s AWAY", source_p->name);
-			ircd_free(away);
-			source_p->user->away = NULL;
+			free_away(source_p);
 		}
 		if(MyConnect(source_p))
 			sendto_one(source_p, POP_QUEUE, form_str(RPL_UNAWAY),
@@ -98,25 +92,20 @@ m_away(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		return 0;
 	}
 
-	/* Marking as away */
 
-	awy2 = LOCAL_COPY_N(parv[1], AWAYLEN);
-
-	/* we now send this only if they weren't away already --is */
-	if(!away)
+	if(source_p->user->away == NULL)
 	{
+		allocate_away(source_p);
+		ircd_strlcpy(source_p->user->away, parv[1], AWAYLEN);
 		sendto_server(client_p, NULL, CAP_TS6, NOCAPS, 
-			      ":%s AWAY :%s", use_id(source_p), awy2);
+			      ":%s AWAY :%s", use_id(source_p), source_p->user->away);
 		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
-			      ":%s AWAY :%s", source_p->name, awy2);
+			      ":%s AWAY :%s", source_p->name, source_p->user->away);
+			
+	} else {
+		ircd_strlcpy(source_p->user->away, parv[1], AWAYLEN);
 	}
-	else
-		ircd_free(away);
-
-	away = ircd_strdup(awy2);
-
-	source_p->user->away = away;
-
+	
 	if(MyConnect(source_p))
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_NOWAWAY), me.name, source_p->name);
 

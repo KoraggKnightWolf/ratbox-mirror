@@ -3,6 +3,9 @@
 /* Size of the auth heap. */
 #undef AUTH_HEAP_SIZE
 
+/* Size of away heap. */
+#undef AWAY_HEAP_SIZE
+
 /* Size of the ban heap. */
 #undef BAN_HEAP_SIZE
 

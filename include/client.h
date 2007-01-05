@@ -364,5 +364,7 @@ void init_uid(void);
 char *generate_uid(void);
 
 void flood_endgrace(struct Client *);
+void allocate_away(struct Client *);
+void free_away(struct Client *);
 
 #endif /* INCLUDED_client_h */
