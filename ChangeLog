@@ -1,3 +1,11 @@
+androsyn    2007/01/05 19:01:52 UTC	(20070105_9-23363)
+  Log:
+  some compilers whine if there is no default: case
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+
+
 androsyn    2007/01/05 17:52:39 UTC	(20070105_8-23361)
   Log:
   Store away messages in an away heap
