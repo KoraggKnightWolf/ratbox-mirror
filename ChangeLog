@@ -1,3 +1,12 @@
+androsyn    2007/01/05 14:26:35 UTC	(20070105_0-23329)
+  Log:
+  fix contrib include path
+
+  Modified:
+	ircd-ratbox/trunk/contrib/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+
+
 androsyn    2007/01/04 15:02:02 UTC	(20070104_0-23327)
   Log:
   fix install of modules
