@@ -1,3 +1,18 @@
+androsyn    2007/01/05 17:12:02 UTC	(20070105_6-23357)
+  Log:
+  some initial memory usage things...
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 androsyn    2007/01/05 15:34:06 UTC	(20070105_5-23339)
   Log:
   m_error needs match.h
