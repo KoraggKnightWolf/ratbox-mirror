@@ -1,3 +1,11 @@
+androsyn    2007/01/05 15:31:50 UTC	(20070105_4-23337)
+  Log:
+  changed status and handler variables to uint8_t
+
+  Modified:
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+
+
 androsyn    2007/01/05 15:29:44 UTC	(20070105_3-23335)
   Log:
   remove an extra argument to sendto_realops_flags
