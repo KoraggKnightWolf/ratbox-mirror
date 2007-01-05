@@ -201,6 +201,9 @@ parse_request(ircd_helper *helper)
 
 			case 'L':
 				list_bans();
+				break;
+			default:
+				break;
 		}
 	}
 }
