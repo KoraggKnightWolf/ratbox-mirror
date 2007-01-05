@@ -1,3 +1,17 @@
+androsyn    2007/01/05 17:52:39 UTC	(20070105_8-23361)
+  Log:
+  Store away messages in an away heap
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/modules/m_away.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 jilles      2007/01/05 17:23:04 UTC	(20070105_7-23359)
   Log:
   Change xline handling:
