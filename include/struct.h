@@ -99,8 +99,8 @@ struct Client
 	uint32_t operflags;	/* ugh. overflow */
 
 	int hopcount;		/* number of servers to this 0 = local */
-	unsigned short status;	/* Client type */
-	unsigned char handler;	/* Handler index */
+	uint8_t status;	/* Client type */
+	uint8_t handler;	/* Handler index */
 
 	/* client->name is the unique name for a client nick or host */
 	const char *name;
