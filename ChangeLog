@@ -1,3 +1,33 @@
+jilles      2007/01/05 17:23:04 UTC	(20070105_7-23359)
+  Log:
+  Change xline handling:
+  - Make match_esc() additionally understand \s to match
+    a space (and nothing else).
+  - Add a new function find_xline_mask() to find an xline
+    which is a superset of the given mask, used for
+    loading xlines and the already-xlined check in
+    mo_xline(). Currently this does irccmp but it could
+    be changed to an mmatch-like function. This is
+    necessary because a match_esc mask containing '#'
+    or '@' generally does not match itself.
+  - Remove \s-to-space conversion from xline, masktrace and
+    testmask and xline db load as match_esc does this now.
+  - Fix already-xlined notice to not show duration for
+    a temp xline.
+  
+  mostly taken from charybdis r2047 (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 androsyn    2007/01/05 17:12:02 UTC	(20070105_6-23357)
   Log:
   some initial memory usage things...
