@@ -1,3 +1,11 @@
+androsyn    2007/01/05 15:29:44 UTC	(20070105_3-23335)
+  Log:
+  remove an extra argument to sendto_realops_flags
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2007/01/05 15:27:31 UTC	(20070105_2-23333)
   Log:
   make gcc shutup about computed value not used on BIO_set_close()
