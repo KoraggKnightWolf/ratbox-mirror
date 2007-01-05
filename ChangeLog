@@ -1,3 +1,11 @@
+androsyn    2007/01/05 15:34:06 UTC	(20070105_5-23339)
+  Log:
+  m_error needs match.h
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_error.c (File Modified) 
+
+
 androsyn    2007/01/05 15:31:50 UTC	(20070105_4-23337)
   Log:
   changed status and handler variables to uint8_t
