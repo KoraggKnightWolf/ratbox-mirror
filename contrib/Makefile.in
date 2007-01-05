@@ -197,7 +197,7 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-INCLUDES = -I../include -I../libircd $(INCLTDL)
+INCLUDES = -I../include -I../libircd/include $(INCLTDL)
 SRCS = \
 example_module.c        \
 m_42.c  	\
