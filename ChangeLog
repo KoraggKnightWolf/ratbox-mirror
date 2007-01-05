@@ -1,3 +1,15 @@
+androsyn    2007/01/05 15:01:54 UTC	(20070105_1-23331)
+  Log:
+  Merge etrace into m_trace.c
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/m_etrace.c (File Deleted) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+
+
 androsyn    2007/01/05 14:26:35 UTC	(20070105_0-23329)
   Log:
   fix contrib include path
