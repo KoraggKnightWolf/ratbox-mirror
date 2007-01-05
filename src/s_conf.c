@@ -85,7 +85,7 @@ static int attach_iline(struct Client *, struct ConfItem *);
 void
 init_s_conf(void)
 {
-	confitem_heap = ircd_bh_create(sizeof(struct ConfItem), CONFITEM_HEAP_SIZE);
+	confitem_heap = ircd_bh_create(sizeof(struct ConfItem), CONFITEM_HEAP_SIZE, "confitem_heap");
 
 	ircd_event_addish("expire_temp_klines", expire_temp_kd, &temp_klines[TEMP_MIN], 60);
 	ircd_event_addish("expire_temp_dlines", expire_temp_kd, &temp_dlines[TEMP_MIN], 60);

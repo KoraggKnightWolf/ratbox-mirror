@@ -26,6 +26,7 @@
 
 #include "stdinc.h"
 #include "struct.h"
+#include "ircd_lib.h"
 #include "class.h"		/* report_classes */
 #include "client.h"		/* Client */
 #include "channel.h"
@@ -1211,6 +1212,17 @@ stats_class(struct Client *source_p)
 	send_pop_queue(source_p);
 }
 
+static void 
+stats_bh_callback(size_t bused, size_t bfree, size_t bmemusage, size_t heapalloc, const char *desc, void *data)
+{
+	struct Client *source_p = (struct Client *)data;
+	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
+			   "z :blockheap %s elements used: %lu elements free: %lu memory in use: %lu total memory: %lu",
+			   desc, bused, bfree, bmemusage, heapalloc);
+	
+	return;
+}
+
 static void
 stats_memory (struct Client *source_p)
 {
@@ -1260,8 +1272,16 @@ stats_memory (struct Client *source_p)
 	size_t remote_client_memory_used = 0;
 
 	size_t total_memory = 0;
-
+	size_t bh_total, bh_used;
+	ircd_bh_usage_all(stats_bh_callback, (void *)source_p);
+	ircd_bh_total_usage(&bh_total, &bh_used);
+	
+	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
+			   "z :blockheap Total Allocated: %lu Total Used: %lu",
+			   bh_total, bh_used);
+	
 	count_whowas_memory(&wwu, &wwm);
+
 
 	DLINK_FOREACH(ptr, global_client_list.head)
 	{

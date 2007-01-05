@@ -46,7 +46,7 @@ ircd_bh *monitor_heap;
 void
 init_monitor(void)
 {
-	monitor_heap = ircd_bh_create(sizeof(struct monitor), MONITOR_HEAP_SIZE);
+	monitor_heap = ircd_bh_create(sizeof(struct monitor), MONITOR_HEAP_SIZE, "monitor_heap");
 }
 
 static inline unsigned int

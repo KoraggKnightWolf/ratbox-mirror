@@ -310,7 +310,7 @@ int main(int argc, char **argv)
 	}
 	ident_timeout = atoi(tident_timeout);
 	
-	authheap = ircd_bh_create(sizeof(struct auth_request), 2048);
+	authheap = ircd_bh_create(sizeof(struct auth_request), 2048, "auth_heap");
 
 	ircd_helper_read(ident_helper->ifd, ident_helper);
 	while(1) {

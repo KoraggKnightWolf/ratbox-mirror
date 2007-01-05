@@ -104,9 +104,9 @@ init_client(void)
 	 * start off the check ping event ..  -- adrian
 	 * Every 30 seconds is plenty -- db
 	 */
-	client_heap = ircd_bh_create(sizeof(struct Client), CLIENT_HEAP_SIZE);
-	lclient_heap = ircd_bh_create(sizeof(struct LocalUser), LCLIENT_HEAP_SIZE);
-	user_heap = ircd_bh_create(sizeof(struct User), USER_HEAP_SIZE);
+	client_heap = ircd_bh_create(sizeof(struct Client), CLIENT_HEAP_SIZE, "client_heap");
+	lclient_heap = ircd_bh_create(sizeof(struct LocalUser), LCLIENT_HEAP_SIZE, "lclient_heap");
+	user_heap = ircd_bh_create(sizeof(struct User), USER_HEAP_SIZE, "user_heap");
 	ircd_event_addish("check_pings", check_pings, NULL, 30);
 	ircd_event_addish("free_exited_clients", &free_exited_clients, NULL, 5);
 	ircd_event_addish("exit_aborted_clients", exit_aborted_clients, NULL, 5);
@@ -1463,7 +1463,7 @@ void
 count_local_client_memory(size_t * count, size_t * local_client_memory_used)
 {
 	size_t lusage;
-	ircd_bh_usage(lclient_heap, count, NULL, &lusage);
+	ircd_bh_usage(lclient_heap, count, NULL, &lusage, NULL);
 	*local_client_memory_used = lusage + (*count * (sizeof(void *) + sizeof(struct Client)));
 }
 
@@ -1474,8 +1474,8 @@ void
 count_remote_client_memory(size_t * count, size_t * remote_client_memory_used)
 {
 	size_t lcount, rcount;
-	ircd_bh_usage(lclient_heap, &lcount, NULL, NULL);
-	ircd_bh_usage(client_heap, &rcount, NULL, NULL);
+	ircd_bh_usage(lclient_heap, &lcount, NULL, NULL, NULL);
+	ircd_bh_usage(client_heap, &rcount, NULL, NULL, NULL);
 	*count = rcount - lcount;
 	*remote_client_memory_used = *count * (sizeof(void *) + sizeof(struct Client));
 }

@@ -73,7 +73,7 @@ void
 init_s_newconf(void)
 {
 	tgchange_tree = New_Patricia(PATRICIA_BITS);
-	nd_heap = ircd_bh_create(sizeof(struct nd_entry), ND_HEAP_SIZE);
+	nd_heap = ircd_bh_create(sizeof(struct nd_entry), ND_HEAP_SIZE, "nd_heap");
 	ircd_event_addish("expire_nd_entries", expire_nd_entries, NULL, 30);
 	ircd_event_addish("expire_temp_rxlines", expire_temp_rxlines, NULL, 60);
 	ircd_event_addish("expire_glines", expire_glines, NULL, CLEANUP_GLINES_TIME);

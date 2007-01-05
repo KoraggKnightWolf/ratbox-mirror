@@ -69,10 +69,10 @@ static void free_topic(struct Channel *chptr);
 void
 init_channels(void)
 {
-	channel_heap = ircd_bh_create(sizeof(struct Channel), CHANNEL_HEAP_SIZE);
-	ban_heap = ircd_bh_create(sizeof(struct Ban), BAN_HEAP_SIZE);
-	topic_heap = ircd_bh_create(TOPICLEN + 1 + USERHOST_REPLYLEN, TOPIC_HEAP_SIZE);
-	member_heap = ircd_bh_create(sizeof(struct membership), MEMBER_HEAP_SIZE);
+	channel_heap = ircd_bh_create(sizeof(struct Channel), CHANNEL_HEAP_SIZE, "channel_heap");
+	ban_heap = ircd_bh_create(sizeof(struct Ban), BAN_HEAP_SIZE, "ban_heap");
+	topic_heap = ircd_bh_create(TOPICLEN + 1 + USERHOST_REPLYLEN, TOPIC_HEAP_SIZE, "topic_heap");
+	member_heap = ircd_bh_create(sizeof(struct membership), MEMBER_HEAP_SIZE, "member_heap");
 }
 
 /*
