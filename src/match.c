@@ -128,6 +128,7 @@ match_esc(const char *mask, const char *name)
 	int wild = 0;
 	int calls = 0;
 	int quote = 0;
+	int match1 = 0;
 
 	s_assert(mask != NULL);
 	s_assert(name != NULL);
@@ -203,8 +204,17 @@ match_esc(const char *mask, const char *name)
 			return (*m == 0);
 		}
 
-		if((!quote && ((*m == '?') || (*m == '@' && IsLetter(*n)) || (*m == '#' && IsDigit(*n)))) ||
-		   (ToLower(*m) == ToLower(*n) && (quote || (*m != '@' && *m != '#'))))
+		if (quote)
+			match1 = *m == 's' ? *n == ' ' : ToLower(*m) == ToLower(*n);
+		else if (*m == '?')
+			match1 = 1;
+		else if (*m == '@')
+			match1 = IsLetter(*n);
+		else if (*m == '#')
+			match1 = IsDigit(*n);
+		else
+			match1 = ToLower(*m) == ToLower(*n);
+		if (match1)
 		{
 			if(*m)
 				m++;

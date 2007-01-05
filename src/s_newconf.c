@@ -577,6 +577,23 @@ find_xline(const char *gecos, int counter)
 }
 
 struct ConfItem *
+find_xline_mask(const char *gecos)
+{
+	struct ConfItem *aconf;
+	dlink_node *ptr;
+
+	DLINK_FOREACH(ptr, xline_conf_list.head)
+	{
+		aconf = ptr->data;
+
+		if(!irccmp(aconf->host, gecos))
+			return aconf;
+	}
+
+	return NULL;
+}
+
+struct ConfItem *
 find_nick_resv(const char *name)
 {
 	struct ConfItem *aconf;

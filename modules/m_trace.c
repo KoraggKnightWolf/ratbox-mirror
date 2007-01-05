@@ -677,45 +677,7 @@ match_masktrace(struct Client *source_p, dlink_list *list, const char *username,
 	struct Client *target_p;
 	dlink_node *ptr;
 	const char *sockhost;	
-	char *mangle_gecos = NULL;
 	
-	if(gecos != NULL)
-	{
-		if(strstr(gecos, "\\s"))
-		{
-			char *tmp = LOCAL_COPY(gecos);
-			char *orig = tmp;
-			char *new = tmp;
-	                while(*orig)
-        	        {
-				if(*orig == '\\' && *(orig + 1) != '\0')
-                       		{
-	                                if(*(orig + 1) == 's')
-	                                {
-	                                        *new++ = ' ';
-	                                        orig += 2;   
-	                                }
-	                                /* otherwise skip that and the escaped
-	                                 * character after it, so we dont mistake
-	                                 * \\s as \s --fl
-	                                 */
-	                                else
-	                                {   
-	                                        *new++ = *orig++;
-	                                        *new++ = *orig++;
-	                                }
-	                        }
-	                        else
-	                                *new++ = *orig++;
-	                }
-	
-	                *new = '\0';
-	                mangle_gecos = LOCAL_COPY(tmp);
-	        }
-	        else
-	                mangle_gecos = LOCAL_COPY(gecos);
-	}
-
 	DLINK_FOREACH(ptr, list->head)
 	{
 		target_p = ptr->data;
@@ -735,7 +697,7 @@ match_masktrace(struct Client *source_p, dlink_list *list, const char *username,
 			if(name != NULL && !match(name, target_p->name))
 				continue;
 
-			if(mangle_gecos != NULL && !match_esc(mangle_gecos, target_p->info))
+			if(gecos != NULL && !match_esc(gecos, target_p->info))
 				continue;
 			
 			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_ETRACE),

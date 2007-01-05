@@ -259,40 +259,12 @@ bandb_check_dline(struct ConfItem *aconf)
 static int
 bandb_check_xline(struct ConfItem *aconf)
 {
-	if(strstr(aconf->host, "\\s"))
-	{
-		char *tmp = LOCAL_COPY(aconf->host);
-		char *orig = tmp;
-		char *new = tmp;
+	struct ConfItem *xconf;
+	/* XXX perhaps convert spaces to \s? -- jilles */
 
-		ircd_free(aconf->host);
-
-		while(*orig)
-		{
-			if(*orig == '\\' && *(orig + 1) != '\0')
-			{
-				if(*(orig+1) == 's')
-				{
-					*new++ = ' ';
-					orig += 2;
-				}
-				/* skip next two chars, to avoid
-				 * mistaking \\s as \s
-				 */
-				else
-				{
-					*new++ = *orig++;
-					*new++ = *orig++;
-				}
-			}
-			else
-				*new++ = *orig++;
-		}
-
-		*new = '\0';
-
-		aconf->host = ircd_strdup(tmp);
-	}
+	xconf = find_xline_mask(aconf->host);
+	if (xconf != NULL && !(xconf->flags & CONF_FLAGS_TEMPORARY))
+		return 0;
 
 	return 1;
 }

@@ -142,10 +142,10 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 				"%d %s 2 :%s",
 				temp_time, name, reason);
 
-	if((aconf = find_xline(name, 0)) != NULL)
+	if((aconf = find_xline_mask(name)) != NULL)
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :[%s] already X-Lined by [%s] - %s",
-			   me.name, source_p->name, parv[1], aconf->host, aconf->passwd);
+			   me.name, source_p->name, name, aconf->host, aconf->passwd);
 		return 0;
 	}
 
@@ -181,7 +181,7 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 
 	/* already xlined */
-	if((aconf = find_xline(name, 0)) != NULL)
+	if((aconf = find_xline_mask(name)) != NULL)
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :[%s] already X-Lined by [%s] - %s",
 				me.name, source_p->name, name, 
@@ -299,42 +299,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 
 	aconf = make_conf();
 	aconf->status = CONF_XLINE;
-
-	if(strstr(name, "\\s"))
-	{
-		char *tmp = LOCAL_COPY(name);
-		char *orig = tmp;
-		char *new = tmp;
-
-		while(*orig)
-		{
-			if(*orig == '\\' && *(orig + 1) != '\0')
-			{
-				if(*(orig + 1) == 's')
-				{
-					*new++ = ' ';
-					orig += 2;
-				}
-				/* otherwise skip that and the escaped
-				 * character after it, so we dont mistake
-				 * \\s as \s --fl
-				 */
-				else
-				{
-					*new++ = *orig++;
-					*new++ = *orig++;
-				}
-			}
-			else
-				*new++ = *orig++;
-		}
-
-		*new = '\0';
-		aconf->host = ircd_strdup(tmp);
-	}
-	else
-		aconf->host = ircd_strdup(name);
-
+	aconf->host = ircd_strdup(name);
 	aconf->passwd = ircd_strdup(reason);
 	collapse(aconf->host);
 

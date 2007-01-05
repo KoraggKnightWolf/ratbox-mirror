@@ -229,6 +229,7 @@ void set_server_conf_autoconn(struct Client *source_p, char *name,
 
 struct ConfItem *find_xline(const char *, int);
 struct ConfItem *find_nick_resv(const char *name);
+struct ConfItem *find_xline_mask(const char *);
 
 int valid_wild_card_simple(const char *);
 int clean_resv_nick(const char *);
