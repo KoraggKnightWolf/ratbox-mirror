@@ -31,7 +31,9 @@ else
 	enable_static="no"
 fi
 
-F77=no
+F77=false
+CXX=false
+GCJ=false
 
 AC_LIBLTDL_CONVENIENCE
 AC_SUBST(INCLTDL)
