@@ -4858,9 +4858,9 @@ else
 	enable_static="no"
 fi
 
-F77=false
-CXX=false
-GCJ=false
+F77=no
+CXX=no
+GCJ=no
 
   case $enable_ltdl_convenience in
   no) { { echo "$as_me:$LINENO: error: this package needs a convenience libltdl" >&5
