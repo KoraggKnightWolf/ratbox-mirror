@@ -1,3 +1,13 @@
+androsyn    2007/01/08 15:31:59 UTC	(20070108_0-23389)
+  Log:
+  Disable checks for fortran, c++ and java...
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2007/01/05 19:01:52 UTC	(20070105_9-23363)
   Log:
   some compilers whine if there is no default: case
