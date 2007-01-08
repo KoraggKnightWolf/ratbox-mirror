@@ -303,7 +303,7 @@ int main(int argc, char **argv)
 	tident_timeout = getenv("IDENT_TIMEOUT");
 	if(ident_helper == NULL || tident_timeout == NULL)
 	{
-		fprintf(stderr, "This is ircd-ratbox ident.  You aren't supposed to run be directly.\n");
+		fprintf(stderr, "This is ircd-ratbox ident.  You aren't supposed to run me directly.\n");
 		fprintf(stderr, "However I will print my Id tag $Id$\n"); 
 		fprintf(stderr, "Have a nice day\n");
 		exit(1);
