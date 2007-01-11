@@ -32,8 +32,6 @@ else
 fi
 
 F77=no
-CXX=no
-CXXCPP=no
 GCJ=no
 
 AC_LIBLTDL_CONVENIENCE
