@@ -1,3 +1,12 @@
+androsyn    2007/01/11 20:31:25 UTC	(20070111_0-23419)
+  Log:
+  get the c++ preprocessor checks removed too
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2007/01/08 15:39:16 UTC	(20070108_2-23401)
   Log:
   fix typo
