@@ -1,3 +1,11 @@
+androsyn    2007/01/14 00:20:58 UTC	(20070114_0-23455)
+  Log:
+  fix bug where if the class name was empty the server conf would be borked
+
+  Modified:
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 androsyn    2007/01/11 20:49:37 UTC	(20070111_1-23423)
   Log:
   give up on trying to disable the c++ parts of autoconf..at least the fortran stuff is...
