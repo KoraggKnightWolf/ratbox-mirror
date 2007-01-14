@@ -446,13 +446,9 @@ void
 add_server_conf(struct server_conf *server_p)
 {
 	if(EmptyString(server_p->class_name))
-	{
-		server_p->class_name = ircd_strdup("default");
 		server_p->class = default_class;
-		return;
-	}
-
-	server_p->class = find_class(server_p->class_name);
+	else 
+		server_p->class = find_class(server_p->class_name);
 
 	if(server_p->class == default_class)
 	{
