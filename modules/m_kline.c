@@ -727,7 +727,11 @@ already_placed_kline(struct Client *source_p, const char *luser, const char *lho
 		if((aconf = find_conf_by_address(lhost, NULL, (struct sockaddr *)piphost, CONF_KILL, t, luser)))
 		{
 			/* setting a tkline, or existing one is perm */
-			if(tkline || ((aconf->flags & CONF_FLAGS_TEMPORARY) == 0))
+			/* there is a possibility the hash will return a
+			 * temporary kline, when a permanent one also
+			 * exists.  It isn't worth fixing, so disable below --anfl
+			 */
+			/*if(tkline || ((aconf->flags & CONF_FLAGS_TEMPORARY) == 0))*/
 			{
 				reason = aconf->passwd ? aconf->passwd : "<No Reason>";
 
