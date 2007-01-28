@@ -302,7 +302,7 @@ sendto_one_buffer(struct Client *target_p, int queue, const char *buffer)
 		return;
 
 	ircd_linebuf_newbuf(&linebuf);
-	ircd_linebuf_put(&linebuf, buffer);
+	ircd_linebuf_putbuf(&linebuf, buffer);
 	send_linebuf(target_p, &linebuf, queue);
 	ircd_linebuf_donebuf(&linebuf);	
 }
