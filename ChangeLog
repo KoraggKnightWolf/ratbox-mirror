@@ -1,3 +1,13 @@
+jilles      2007/01/28 15:27:48 UTC	(20070128_0-23537)
+  Log:
+  sendto_one_buffer(): don't call ircd_linebuf_put() which
+  interprets formatting codes
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2007/01/22 13:56:41 UTC	(20070122_0-23505)
   Log:
   from -r23503
