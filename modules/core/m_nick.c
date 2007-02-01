@@ -500,7 +500,7 @@ ms_save(struct Client *client_p, struct Client *source_p, int parc, const char *
 	target_p = find_id(parv[1]);
 	if (target_p == NULL)
 		return 0;
-	if (!IsPerson(target_p))
+	if (!IsClient(target_p))
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				"Ignored SAVE message for non-person %s from %s",
 				target_p->name, source_p->name);

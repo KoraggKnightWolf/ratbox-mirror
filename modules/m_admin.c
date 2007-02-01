@@ -146,7 +146,7 @@ do_admin(struct Client *source_p)
 	const char *myname;
 	const char *nick;
 
-	if(IsPerson(source_p))
+	if(IsClient(source_p))
 		admin_spy(source_p);
 
 	myname = get_id(&me, source_p);

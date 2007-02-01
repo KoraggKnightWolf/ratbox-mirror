@@ -137,7 +137,7 @@ me_resv(struct Client *client_p, struct Client *source_p,
 	int parc, const char *parv[])
 {
 	/* time name 0 :reason */
-	if(!IsPerson(source_p))
+	if(!IsClient(source_p))
 		return 0;
 
 	parse_resv(source_p, parv[2], parv[4], atoi(parv[1]));
@@ -350,7 +350,7 @@ me_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 	const char *name;
 
 	/* name */
-	if(!IsPerson(source_p))
+	if(!IsClient(source_p))
 		return 0;
 
 	name = parv[1];

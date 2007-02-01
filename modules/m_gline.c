@@ -580,7 +580,7 @@ check_glines(void)
 	{
 		client_p = ptr->data;
 
-		if(IsMe(client_p) || !IsPerson(client_p))
+		if(IsMe(client_p) || !IsClient(client_p))
 			continue;
 
 		if((aconf = find_gline(client_p)) != NULL)

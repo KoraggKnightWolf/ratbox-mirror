@@ -146,7 +146,7 @@ names_global(struct Client *source_p)
 		target_p = ptr->data;
 		dont_show = NO;
 
-		if(!IsPerson(target_p) || IsInvisible(target_p))
+		if(!IsClient(target_p) || IsInvisible(target_p))
 			continue;
 
 		/* we want to show -i clients that are either:

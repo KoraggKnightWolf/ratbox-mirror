@@ -1055,7 +1055,7 @@ burst_TS5(struct Client *client_p)
 	{
 		target_p = ptr->data;
 
-		if(!IsPerson(target_p))
+		if(!IsClient(target_p))
 			continue;
 
 		send_umode(NULL, target_p, 0, SEND_UMODES, ubuf);
@@ -1180,7 +1180,7 @@ burst_TS6(struct Client *client_p)
 	{
 		target_p = ptr->data;
 
-		if(!IsPerson(target_p))
+		if(!IsClient(target_p))
 			continue;
 
 		send_umode(NULL, target_p, 0, SEND_UMODES, ubuf);

@@ -126,7 +126,7 @@ send_ircd_linebuf_remote(struct Client *to, struct Client *from, buf_head_t *lin
 		to = to->from;
 
 	/* test for fake direction */
-	if(!MyClient(from) && IsPerson(to) && (to == from->from))
+	if(!MyClient(from) && IsClient(to) && (to == from->from))
 	{
 		if(IsServer(from))
 		{
@@ -959,7 +959,7 @@ sendto_wallops_flags(int flags, struct Client *source_p, const char *pattern, ..
 
 	va_start(args, pattern);
 
-	if(IsPerson(source_p))
+	if(IsClient(source_p))
 		ircd_linebuf_putmsg(&linebuf, pattern, &args,
 			       ":%s!%s@%s WALLOPS :", source_p->name,
 			       source_p->username, source_p->host);

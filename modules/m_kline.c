@@ -224,7 +224,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	int tkline_time;
 
 	/* <tkline_time> <user> <host> :<reason> */
-	if(!IsPerson(source_p))
+	if(!IsClient(source_p))
 		return 0;
 
 	tkline_time = atoi(parv[1]);
@@ -379,7 +379,7 @@ me_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	const char *user, *host;
 
 	/* user host */
-	if(!IsPerson(source_p))
+	if(!IsClient(source_p))
 		return 0;
 
 	user = parv[1];

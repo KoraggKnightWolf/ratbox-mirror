@@ -377,7 +377,7 @@ notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban)
 		}
 	}
 
-	if(ban == D_LINED && !IsPerson(client_p))
+	if(ban == D_LINED && !IsClient(client_p))
 		sendto_one(client_p, POP_QUEUE, "NOTICE DLINE :*** You have been D-lined");
 	else
 		sendto_one(client_p, POP_QUEUE, form_str(ERR_YOUREBANNEDCREEP),
@@ -423,7 +423,7 @@ check_banned_lines(void)
 			continue;	/* and go examine next fd/client_p */
 		}
 
-		if(!IsPerson(client_p))
+		if(!IsClient(client_p))
 			continue;
 
 		if((aconf = find_kline(client_p)) != NULL)
@@ -536,7 +536,7 @@ check_klines(void)
 	{
 		client_p = ptr->data;
 
-		if(IsMe(client_p) || !IsPerson(client_p))
+		if(IsMe(client_p) || !IsClient(client_p))
 			continue;
 
 		if((aconf = find_kline(client_p)) != NULL)
@@ -655,7 +655,7 @@ find_person(const char *name)
 
 	c2ptr = find_client(name);
 
-	if(c2ptr && IsPerson(c2ptr))
+	if(c2ptr && IsClient(c2ptr))
 		return (c2ptr);
 	return (NULL);
 }
@@ -667,7 +667,7 @@ find_named_person(const char *name)
 
 	c2ptr = find_named_client(name);
 
-	if(c2ptr && IsPerson(c2ptr))
+	if(c2ptr && IsClient(c2ptr))
 		return (c2ptr);
 	return (NULL);
 }
@@ -1119,7 +1119,7 @@ exit_generic_client(struct Client *source_p, const char *comment)
 }
 
 /* 
- * Assumes IsPerson(source_p) && !MyConnect(source_p)
+ * Assumes IsClient(source_p) && !MyConnect(source_p)
  */
 
 static int
@@ -1192,12 +1192,12 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 	
 	strcat(comment1, " ");
 	strcat(comment1, source_p->name);
-	if (IsPerson(from))
+	if (IsClient(from))
 		ircd_snprintf(newcomment, sizeof(newcomment), "by %s: %s",
 				from->name, comment);
 
 	if(source_p->serv != NULL)
-		remove_dependents(client_p, source_p, IsPerson(from) ? newcomment : comment, comment1);
+		remove_dependents(client_p, source_p, IsClient(from) ? newcomment : comment, comment1);
 
 	if(source_p->servptr && source_p->servptr->serv)
 		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
@@ -1307,7 +1307,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	strcat(comment1, source_p->name);
 
 	if(source_p->serv != NULL)
-		remove_dependents(client_p, source_p, IsPerson(from) ? newcomment : comment, comment1);
+		remove_dependents(client_p, source_p, IsClient(from) ? newcomment : comment, comment1);
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s was connected"
 			     " for %ld seconds.  %d/%d sendK/recvK.",
@@ -1329,7 +1329,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 
 
 /* 
- * This assumes IsPerson(source_p) == TRUE && MyConnect(source_p) == TRUE
+ * This assumes IsClient(source_p) == TRUE && MyConnect(source_p) == TRUE
  */
 
 static int
@@ -1343,7 +1343,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	exit_generic_client(source_p, comment);
 	clear_monitor(source_p);
 
-	s_assert(IsPerson(source_p));
+	s_assert(IsClient(source_p));
 	ircd_dlinkDelete(&source_p->localClient->tnode, &lclient_list);
 	ircd_dlinkDelete(&source_p->lnode, &me.serv->users);
 
@@ -1437,7 +1437,7 @@ exit_client(struct Client *client_p,	/* The local client originating the
 	if(MyConnect(source_p))
 	{
 		/* Local clients of various types */
-		if(IsPerson(source_p))
+		if(IsClient(source_p))
 			return exit_local_client(client_p, source_p, from, comment);
 		else if(IsServer(source_p))
 			return exit_local_server(client_p, source_p, from, comment);
@@ -1448,7 +1448,7 @@ exit_client(struct Client *client_p,	/* The local client originating the
 	else 
 	{
 		/* Remotes */
-		if(IsPerson(source_p))
+		if(IsClient(source_p))
 			return exit_remote_client(client_p, source_p, from, comment);
 		else if(IsServer(source_p))
 			return exit_remote_server(client_p, source_p, from, comment);

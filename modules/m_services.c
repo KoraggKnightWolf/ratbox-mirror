@@ -97,7 +97,7 @@ me_su(struct Client *client_p, struct Client *source_p,
 	if((target_p = find_client(parv[1])) == NULL)
 		return 0;
 
-	if(!IsPerson(target_p))
+	if(!IsClient(target_p))
 		return 0;
 
 	if(EmptyString(parv[2]))
@@ -227,7 +227,7 @@ static int
 me_login(struct Client *client_p, struct Client *source_p,
 	int parc, const char *parv[])
 {
-	if(!IsPerson(source_p) || !ServerInfo.hub)
+	if(!IsClient(source_p) || !ServerInfo.hub)
 		return 0;
 
 	/* this command is *only* accepted from bursting servers */

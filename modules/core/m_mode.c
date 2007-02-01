@@ -435,7 +435,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 	}
 
 
-	if(IsPerson(source_p))
+	if(IsClient(source_p))
 		ircd_sprintf(who, "%s!%s@%s",
 			   source_p->name, source_p->username, source_p->host);
 	else

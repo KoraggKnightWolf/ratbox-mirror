@@ -165,7 +165,7 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	int temp_time;
 
 	/* time name type :reason */
-	if(!IsPerson(source_p))
+	if(!IsClient(source_p))
 		return 0;
 
 	temp_time = atoi(parv[1]);
@@ -268,7 +268,7 @@ check_xlines(void)
 	{
 		client_p = ptr->data;
 
-		if(IsMe(client_p) || !IsPerson(client_p))
+		if(IsMe(client_p) || !IsClient(client_p))
 			continue;
 
 		if((aconf = find_xline(client_p->info, 1)) != NULL)
@@ -381,7 +381,7 @@ me_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	const char *name;
 
 	/* name */
-	if(!IsPerson(source_p))
+	if(!IsClient(source_p))
 		return 0;
 
 	name = parv[1];

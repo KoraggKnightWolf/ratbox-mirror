@@ -531,7 +531,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Server %s already present from %s",
 				     server_p->name, client_p->name);
-		if(by && IsPerson(by) && !MyClient(by))
+		if(by && IsClient(by) && !MyClient(by))
 			sendto_one_notice(by, POP_QUEUE, ":Server %s already present from %s",
 					  server_p->name, client_p->name);
 		return 0;
@@ -594,7 +594,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	 * The socket has been connected or connect is in progress.
 	 */
 	make_server(client_p);
-	if(by && IsPerson(by))
+	if(by && IsClient(by))
 		strcpy(client_p->serv->by, by->name);
 	else
 		strcpy(client_p->serv->by, "AutoConn.");

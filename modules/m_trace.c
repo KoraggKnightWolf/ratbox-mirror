@@ -681,7 +681,7 @@ match_masktrace(struct Client *source_p, dlink_list *list, const char *username,
 	DLINK_FOREACH(ptr, list->head)
 	{
 		target_p = ptr->data;
-		if(!IsPerson(target_p))
+		if(!IsClient(target_p))
 			continue;
 		
 		if(EmptyString(target_p->sockhost))

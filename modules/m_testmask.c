@@ -109,7 +109,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	{
 		target_p = ptr->data;
 
-		if(!IsPerson(target_p))
+		if(!IsClient(target_p))
 			continue;
 
 		if(EmptyString(target_p->sockhost))

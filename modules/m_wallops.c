@@ -99,7 +99,7 @@ ms_operwall(struct Client *client_p, struct Client *source_p, int parc, const ch
 static int
 ms_wallops(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	if(IsPerson(source_p))
+	if(IsClient(source_p))
 		sendto_wallops_flags(UMODE_OPERWALL, source_p, "OPERWALL - %s", parv[1]);
 	else
 		sendto_wallops_flags(UMODE_WALLOP, source_p, "%s", parv[1]);

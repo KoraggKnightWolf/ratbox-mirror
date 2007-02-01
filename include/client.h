@@ -210,7 +210,6 @@ struct exit_client_hook
 /*
  * flags macros.
  */
-#define IsPerson(x)             (IsClient(x) && (x)->user)
 #define HasServlink(x)          ((x)->flags &  FLAGS_SERVLINK)
 #define SetServlink(x)          ((x)->flags |= FLAGS_SERVLINK)
 #define MyConnect(x)		((x)->flags & FLAGS_MYCONNECT)

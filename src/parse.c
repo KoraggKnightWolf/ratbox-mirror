@@ -233,7 +233,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 			 */
 			if(pbuffer[0] != '\0')
 			{
-				if(IsPerson(from))
+				if(IsClient(from))
 					sendto_one(from, POP_QUEUE, form_str(ERR_UNKNOWNCOMMAND),
 						   me.name, from->name, ch);
 			}

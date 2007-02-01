@@ -635,7 +635,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 		/* if the client doesnt exist or is fake direction, skip. */
 		if(!(target_p = find_client(s)) ||
-		   (target_p->from != client_p) || !IsPerson(target_p))
+		   (target_p->from != client_p) || !IsClient(target_p))
 			goto nextnick;
 
 		/* we assume for these we can fit at least one nick/uid in.. */
