@@ -296,8 +296,8 @@ typedef enum temp_list
 	LAST_TEMP_TYPE
 } temp_list;
 
-dlink_list temp_klines[LAST_TEMP_TYPE];
-dlink_list temp_dlines[LAST_TEMP_TYPE];
+extern dlink_list temp_klines[LAST_TEMP_TYPE];
+extern dlink_list temp_dlines[LAST_TEMP_TYPE];
 
 void init_s_conf(void);
 

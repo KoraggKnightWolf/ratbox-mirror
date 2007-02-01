@@ -50,7 +50,7 @@ extern dlink_list xline_conf_list;
 extern dlink_list resv_conf_list;
 extern dlink_list tgchange_list;
 
-struct _patricia_tree_t *tgchange_tree;
+extern struct _patricia_tree_t *tgchange_tree;
 
 void init_s_newconf(void);
 void clear_s_newconf(void);
