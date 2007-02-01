@@ -1,3 +1,11 @@
+androsyn    2007/02/01 18:10:19 UTC	(20070201_5-23569)
+  Log:
+  extern server_list
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+
+
 jilles      2007/02/01 17:54:19 UTC	(20070201_4-23567)
   Log:
   Add support for receiving and propagating SAVE messages
