@@ -1,3 +1,12 @@
+jilles      2007/02/01 17:05:55 UTC	(20070201_1-23557)
+  Log:
+  use libircd's #define IPV6, don't craft our own
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2007/02/01 16:54:55 UTC	(20070201_0-23553)
   Log:
   fix some variables that should be extern's in .h files
