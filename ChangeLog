@@ -1,3 +1,23 @@
+jilles      2007/02/01 18:28:00 UTC	(20070201_6-23571)
+  Log:
+  Forward port RATBOX_2_2 r23507:
+  Change TS6 JOIN processing
+  - don't send out simple modes in TS6 JOIN and TS5 SJOIN when
+    a local user joins an existing channel
+  - don't send out simple modes in TS6 JOIN and TS5 SJOIN when
+    propagating a TS6 JOIN
+  - don't interpret simple modes in an incoming TS6 JOIN
+  
+  This is to avoid desyncs when certain mode changes (e.g. -im)
+  cross with joins. A downside is that simple modes will be
+  more desynched when a JOIN creates a channel or lowers TS,
+  but that's less important.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+
+
 androsyn    2007/02/01 18:10:19 UTC	(20070201_5-23569)
   Log:
   extern server_list
