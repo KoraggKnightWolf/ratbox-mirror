@@ -63,7 +63,7 @@ static  const char *  replies[] = {
 /* 040 */       NULL,
 /* 041 */       NULL,
 /* 042 */       NULL,
-/* 043 */       NULL,
+/* 043 RPL_SAVENICK */       "%s :Nick collision, forcing nick change to your unique ID",
 /* 044 */       NULL,
 /* 045 */       NULL,
 /* 046 */       NULL,

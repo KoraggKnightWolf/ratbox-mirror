@@ -82,6 +82,7 @@ struct Capability captab[] = {
 	{ "SERVICES",	CAP_SERVICE },
 	{ "RSFNC",	CAP_RSFNC },
 #endif
+	{ "SAVE",	CAP_SAVE },
 	{0, 0}
 };
 
