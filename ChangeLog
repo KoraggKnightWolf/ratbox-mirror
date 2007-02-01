@@ -1,3 +1,13 @@
+androsyn    2007/02/01 17:22:34 UTC	(20070201_2-23561)
+  Log:
+   move in6addr_any check outside of the enable-ipv6 check
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+
+
 jilles      2007/02/01 17:05:55 UTC	(20070201_1-23557)
   Log:
   use libircd's #define IPV6, don't craft our own
