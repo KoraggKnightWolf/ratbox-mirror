@@ -284,7 +284,7 @@ extern struct admin_info AdminInfo;	/* defined in ircd.c */
 /* End GLOBAL section */
 
 #ifdef ENABLE_SERVICES
-dlink_list service_list;
+extern dlink_list service_list;
 #endif
 
 typedef enum temp_list
