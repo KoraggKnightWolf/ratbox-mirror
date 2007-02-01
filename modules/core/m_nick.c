@@ -639,10 +639,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	/* fd_desc is long enough */
 	ircd_note(client_p->localClient->fd, "Nick: %s", nick);
 
-	/* note that fullcaps is the main part of checking to see if we got a USER command..
-	 * source_p->username would be set if we had got ident..its a hack but oh well
-	 */
-	if(source_p->user != NULL && !EmptyString(source_p->username) && source_p->localClient->fullcaps != NULL)
+	if(!EmptyString(source_p->info))
 	{
 		ircd_strlcpy(buf, source_p->username, sizeof(buf));
 
