@@ -40,11 +40,6 @@
 #include "reject.h"
 #include "s_log.h"
 
-#if defined(NO_IN6ADDR_ANY) && defined(IPV6)
-static const struct in6_addr in6addr_any =
-{ { { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 } } };
-#endif 
-
 static PF accept_connection;
 
 static dlink_list listener_list;

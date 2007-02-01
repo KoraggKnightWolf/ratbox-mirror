@@ -190,24 +190,6 @@ AC_COMPILE_IFELSE(
 have_v6="no"])
 fi
 
-AC_MSG_CHECKING([for struct in6addr_any])
-AC_COMPILE_IFELSE(
-		[AC_LANG_PROGRAM(
-			[[#define IN_AUTOCONF
-			#include <sys/types.h>
-			#include <sys/socket.h>
-			#include <netinet/in.h>]],
-			[[struct in6_addr a = in6addr_any; void foo() { struct in6_addr *p; p = &a;  }]]
-		)],
-		[AC_MSG_RESULT(yes)],
-		[
-			AC_MSG_RESULT(no)
-			AC_DEFINE(NO_IN6ADDR_ANY, 1, [Define to 1 if your system has no in6addr_any.])
-			inet_misc=1
-		]
-	)
-
-
 save_LIBS=$LIBS
 AC_SEARCH_LIBS(crypt, [crypt descrypt],,)
 LIBS=$save_LIBS
