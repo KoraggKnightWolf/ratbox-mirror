@@ -183,7 +183,6 @@ AC_COMPILE_IFELSE(
 		have_v6=no
 	else
 		have_v6=yes
-		AC_DEFINE(IPV6, 1, [Define if IPv6 support is present and available.])
 		AC_MSG_RESULT(yes)
 		AC_MSG_CHECKING([for struct in6addr_any])
 		AC_COMPILE_IFELSE(
