@@ -1,3 +1,16 @@
+jilles      2007/02/01 18:47:00 UTC	(20070201_7-23573)
+  Log:
+  To see if the client has already sent USER, check if their
+  info (realname) field is nonempty. The previous check could
+  sometimes allow a client to register without having sent USER.
+  SERVER can also set the info field, but will then either exit
+  the client or set them to server state.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+
+
 jilles      2007/02/01 18:28:00 UTC	(20070201_6-23571)
   Log:
   Forward port RATBOX_2_2 r23507:
