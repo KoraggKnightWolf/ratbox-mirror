@@ -26,7 +26,7 @@ AC_PROG_EGREP
 if test "$enable_static" = "yes"; then
 	AM_DISABLE_SHARED
 	AM_ENABLE_STATIC	
-        AC_DEFINE([STATIC_MODULES], 1, [Define to 1 if dynamic modules can't be used.])
+        AC_DEFINE([STATIC_MODULES], 1, [Define to 1 if dynamic modules cant be used.])
 else
 	enable_static="no"
 fi
@@ -184,27 +184,29 @@ AC_COMPILE_IFELSE(
 	else
 		have_v6=yes
 		AC_MSG_RESULT(yes)
-		AC_MSG_CHECKING([for struct in6addr_any])
-		AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM(
-				[[#define IN_AUTOCONF
-				#include <sys/types.h>
-				#include <sys/socket.h>
-				#include <netinet/in.h>]],
-				[[struct in6_addr a = in6addr_any; void foo() { struct in6_addr *p; p = &a;  }]]
-			)],
-			[AC_MSG_RESULT(yes)],
-			[
-				AC_MSG_RESULT(no)
-				AC_DEFINE(NO_IN6ADDR_ANY, 1, [Define to 1 if your system has no in6addr_any.])
-				inet_misc=1
-			]
-		)
 	fi
 ],
 [AC_MSG_RESULT(no)
 have_v6="no"])
 fi
+
+AC_MSG_CHECKING([for struct in6addr_any])
+AC_COMPILE_IFELSE(
+		[AC_LANG_PROGRAM(
+			[[#define IN_AUTOCONF
+			#include <sys/types.h>
+			#include <sys/socket.h>
+			#include <netinet/in.h>]],
+			[[struct in6_addr a = in6addr_any; void foo() { struct in6_addr *p; p = &a;  }]]
+		)],
+		[AC_MSG_RESULT(yes)],
+		[
+			AC_MSG_RESULT(no)
+			AC_DEFINE(NO_IN6ADDR_ANY, 1, [Define to 1 if your system has no in6addr_any.])
+			inet_misc=1
+		]
+	)
+
 
 save_LIBS=$LIBS
 AC_SEARCH_LIBS(crypt, [crypt descrypt],,)

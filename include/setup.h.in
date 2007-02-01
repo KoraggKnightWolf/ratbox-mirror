@@ -207,9 +207,6 @@
 /* Prefix where help file are installed. */
 #undef HELP_DIR
 
-/* Define if IPv6 support is present and available. */
-#undef IPV6
-
 /* Prefix where the ircd is installed. */
 #undef IRCD_PREFIX
 
@@ -308,7 +305,7 @@
 	STACK_DIRECTION = 0 => direction of growth unknown */
 #undef STACK_DIRECTION
 
-/* Define to 1 if dynamic modules can't be used. */
+/* Define to 1 if dynamic modules cant be used. */
 #undef STATIC_MODULES
 
 /* Define to 1 if you have the ANSI C header files. */
