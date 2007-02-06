@@ -1,3 +1,11 @@
+androsyn    2007/02/06 18:35:46 UTC	(20070206_0-23600)
+  Log:
+  port forward r23598 to fix a dumb bug in mangle_wildcard_to_cidr
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+
+
 androsyn    2007/02/01 19:48:01 UTC	(20070201_10-23579)
   Log:
   test commit
