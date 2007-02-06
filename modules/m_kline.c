@@ -518,9 +518,9 @@ mangle_wildcard_to_cidr(const char *text)
 
 	if(n2 == NULL || !strcmp(n2, splat))
 	{
-		if(n3 == NULL || (!strcmp(n3, splat) && !strcmp(n4, splat)))
+		if(n3 == NULL || (!strcmp(n3, splat) && (n4 == NULL || !strcmp(n4, splat))))
 		{
-			ircd_sprintf(buf, "%s.0.0.0/8", n1);
+			ircd_snprintf(buf, sizeof(buf), "%s.0.0.0/8", n1);
 			return buf;
 		}
 	}
@@ -532,7 +532,7 @@ mangle_wildcard_to_cidr(const char *text)
 	{
 		if(n4 == NULL || !strcmp(n4, splat))
 		{
-			ircd_sprintf(buf, "%s.%s.0.0/16", n1, n2);
+			ircd_snprintf(buf, sizeof(buf), "%s.%s.0.0/16", n1, n2);
 			return buf;
 		}
 	}
@@ -542,7 +542,7 @@ mangle_wildcard_to_cidr(const char *text)
 
 	if(n4 == NULL || !strcmp(n4, splat))
 	{
-		ircd_sprintf(buf, "%s.%s.%s.0/24", n1, n2, n3);
+		ircd_snprintf(buf, sizeof(buf), "%s.%s.%s.0/24", n1, n2, n3);
 		return buf;
 	}
 	
