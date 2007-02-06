@@ -516,7 +516,7 @@ mangle_wildcard_to_cidr(const char *text)
 	if(!strcmp(n1, splat) || !is_ip_number(n1))
 		return NULL;	
 
-	if(!strcmp(n2, splat))
+	if(n2 == NULL || !strcmp(n2, splat))
 	{
 		if(n3 == NULL || (!strcmp(n3, splat) && !strcmp(n4, splat)))
 		{
@@ -528,7 +528,7 @@ mangle_wildcard_to_cidr(const char *text)
 	if(!is_ip_number(n2))
 		return NULL;
 	
-	if(!strcmp(n3, splat))
+	if(n3 == NULL || !strcmp(n3, splat))
 	{
 		if(n4 == NULL || !strcmp(n4, splat))
 		{
