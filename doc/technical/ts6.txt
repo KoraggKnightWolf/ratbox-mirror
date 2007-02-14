@@ -1,8 +1,32 @@
 $Id$
 
-TS6 Proposal (v7)
+TS6 Proposal (v8)
 Written by Lee H <lee@leeh.co.uk>
 Ideas borrowed heavily from ircnet (Beeth, jv, Q)
+
+- Changes between v7 and v8 -
+-----------------------------
+
+In the v7 specification, the JOIN command included the channel modes of a
+channel, and acted on them following TS rules.  In the v8 specification,
+JOIN will never send modes.
+
+Desyncs can occur both when they are sent and when they are not.  If they
+are sent, then you can have a situation where a user on one side of the
+network issues "MODE #channel -l", and a user on another side of the network
+issues "JOIN #channel" whilst the +l still exists.  As the JOIN string sent 
+server<->server includes the full modes at the time of the user joining, 
+this will propagate the +l, but there is a -l crossing in the other
+direction.  Desync will occur beyond where they intersect.
+
+If the modes are not sent, then a lower TS JOIN command, or a JOIN command
+that creates a channel will cause a desync.
+
+It is judged that the desync with sending the modes is worse than the desync
+by not sending them, as such the v8 specification dictates modes are not
+sent with a JOIN command server<->server.
+
+The v8 specification also clarifies that servers may issue TMODE.
 
 - Introduction -
 ----------------
@@ -217,19 +241,24 @@ use the "JOIN" command defined in this specification.  A TS6 server must
 still use SJOIN for creating channels.
 
 - JOIN -
-	:<UID> JOIN <TS> <CHANNAME> +<CHANMODES>
+	:<UID> JOIN <TS> <CHANNAME> +
 
 This command is used for introducing one user unopped to an existing channel.
 
 The <UID> field is the UID of the client joining the channel.  The
 <TS> field is the channels current TS, <CHANNAME> is the channels
-current name, <CHANMODES> are the channels current modes.
+current name.
 
 A server receiving a JOIN must apply normal channel TS rules to the JOIN.
 
+No channel modes are sent with the JOIN command.  In previous versions of
+this specification, the "+" parameter contained the channels current modes.
+A server following this version of the specification must not interpret this
+argument and must not propagate any value other than "+" for this parameter.
+
 It should be noted that whilst JOIN would not normally create a 
-channel, during specific race conditions it can.  This can create
-a ban desync that this specification does not rectify.
+channel or lower the timestamp, during specific conditions it can.  This 
+can create a desync that this specification does not rectify.
 
 - BMASK -
 	:<SID> BMASK <TS> <CHANNAME> <TYPE> :<MASKS>
@@ -254,16 +283,17 @@ not be possible without a desync, due to it being sent after
 SJOIN.
 
 - TMODE -
-	:<UID> TMODE <TS> <CHANNAME> <MODESTRING>
+	:<SID|UID> TMODE <TS> <CHANNAME> <MODESTRING>
 
 This command is used for clients issuing modes on a channel.
 
-<UID> is the UID of the client setting the mode.  <TS> is the
-current TS of the channel, <CHANNAME> is the channels name.
-<MODESTRING> is the raw mode the client is setting.
+<SID|UID> is either the UID of the client setting the mode, or the SID of
+the server setting the mode.  <TS> is the current TS of the channel, 
+<CHANNAME> is the channels name. <MODESTRING> is the raw mode the client is 
+setting.
 
 A server receiving a TMODE must apply simple channel TS rules to the TMODE.
 
-A TS6 server must translate MODEs issued by a local client into TMODE 
-to send to other TS6 capable servers.
+A TS6 server must translate MODEs issued by a local client, or received from
+a server into TMODE to send to other TS6 capable servers.
 
