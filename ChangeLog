@@ -1,3 +1,17 @@
+leeh        2007/02/14 19:03:07 UTC	(20070214_0-23628)
+  Log:
+  - update ts6.txt via stable
+    - update TS6 specification to include the new rules for JOIN, namely that
+      the mode value must always be propagated as "+" and must never be
+      interpreted
+    - clarify that TMODE can come from a server, and TS6 mandates MODE is
+      translated into TMODE from other servers too
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/technical/ts6.txt (File Modified) 
+
+
 androsyn    2007/02/06 19:55:37 UTC	(20070206_1-23606)
   Log:
   change ircd_sprintf calls to ircd_snprintf in mangle_wildcard_to_cidr
