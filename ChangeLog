@@ -1,3 +1,11 @@
+androsyn    2007/02/15 19:59:55 UTC	(20070215_0-23636)
+  Log:
+  change some strcpy's to strlcpy out of paranoia.  i don't think this will likely overflow ever, but who knows..
+
+  Modified:
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 leeh        2007/02/14 19:03:07 UTC	(20070214_0-23628)
   Log:
   - update ts6.txt via stable
