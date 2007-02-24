@@ -1,3 +1,13 @@
+jilles      2007/02/24 21:01:47 UTC	(20070224_1-23658)
+  Log:
+  Add a definition for pending_glines to src/s_newconf.c
+  This makes /gline, /rehash and /stats load again.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 jilles      2007/02/24 20:53:23 UTC	(20070224_0-23656)
   Log:
   Fix invisible count being corrupted when +i is set
