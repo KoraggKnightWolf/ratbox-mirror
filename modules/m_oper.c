@@ -264,6 +264,10 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s (%s@%s) is now an operator", source_p->name,
 			     source_p->username, source_p->host);
+	if(!(old & UMODE_INVISIBLE) && IsInvisible(source_p))
+		++Count.invisi;
+	if((old & UMODE_INVISIBLE) && !IsInvisible(source_p))
+		--Count.invisi;
 	send_umode_out(source_p, source_p, old);
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_YOUREOPER), me.name, source_p->name);
 	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :*** Oper privs are %s", me.name,
