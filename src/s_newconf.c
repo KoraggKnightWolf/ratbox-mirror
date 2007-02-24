@@ -57,6 +57,7 @@ dlink_list hubleaf_conf_list;
 dlink_list server_conf_list;
 dlink_list xline_conf_list;
 dlink_list resv_conf_list;	/* nicks only! */
+dlink_list pending_glines;
 dlink_list glines;
 static dlink_list nd_list;	/* nick delay */
 dlink_list tgchange_list;
