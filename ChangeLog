@@ -1,3 +1,14 @@
+androsyn    2007/02/27 20:47:08 UTC	(20070227_0-23676)
+  Log:
+  - forward port r23674
+    don't leak spoofed ip addresses in +f notices
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 jilles      2007/02/24 21:01:47 UTC	(20070224_1-23658)
   Log:
   Add a definition for pending_glines to src/s_newconf.c
