@@ -1,3 +1,13 @@
+jilles      2007/02/28 00:24:21 UTC	(20070228_0-23680)
+  Log:
+  Forward port RATBOX_2_2 r23678:
+  tweak the +f messages a bit
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2007/02/27 20:47:08 UTC	(20070227_0-23676)
   Log:
   - forward port r23674
