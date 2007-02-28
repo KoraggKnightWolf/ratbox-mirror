@@ -189,7 +189,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		sendto_realops_flags(UMODE_FULL, L_ALL,
 				"Too many local connections for %s!%s%s@%s",
 				source_p->name, IsGotId(source_p) ? "" : "~",
-				source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255");
+				source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
 
 		ilog(L_FUSER, "Too many local connections from %s!%s%s@%s",
 			source_p->name, IsGotId(source_p) ? "" : "~",
@@ -203,7 +203,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		sendto_realops_flags(UMODE_FULL, L_ALL,
 				"Too many global connections for %s!%s%s@%s",
 				source_p->name, IsGotId(source_p) ? "" : "~",
-				source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255");
+				source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
 		ilog(L_FUSER, "Too many global connections from %s!%s%s@%s",
 			source_p->name, IsGotId(source_p) ? "" : "~",
 			source_p->username, source_p->sockhost);
@@ -216,7 +216,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		sendto_realops_flags(UMODE_FULL, L_ALL,
 				"Too many user connections for %s!%s%s@%s",
 				source_p->name, IsGotId(source_p) ? "" : "~",
-				source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255");
+				source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
 		ilog(L_FUSER, "Too many user connections from %s!%s%s@%s",
 			source_p->name, IsGotId(source_p) ? "" : "~",
 			source_p->username, source_p->sockhost);
@@ -230,7 +230,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 				"I-line is full for %s!%s%s@%s (%s).",
 				source_p->name, IsGotId(source_p) ? "" : "~",
 				source_p->username, source_p->host,
-				show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255");
+				show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
 
 		ilog(L_FUSER, "Too many connections from %s!%s%s@%s.", 
 			source_p->name, IsGotId(source_p) ? "" : "~",
@@ -264,7 +264,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 					"%s!%s%s@%s [%s] on [%s/%u].",
 					source_p->name, IsGotId(source_p) ? "" : "~",
 					source_p->username, source_p->host,
-					show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255",
+					source_p->sockhost,
 					source_p->localClient->listener->name, port);
 
 			ilog(L_FUSER,
