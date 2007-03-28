@@ -1,3 +1,13 @@
+jilles      2007/03/28 14:03:34 UTC	(20070328_1-23732)
+  Log:
+  For --enable-services, do not show channels when using
+  whois on a service (+S).
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+
+
 jilles      2007/03/28 13:31:09 UTC	(20070328_0-23728)
   Log:
   Fix /who on channels with ** in their name.
