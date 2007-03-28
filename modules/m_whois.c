@@ -278,28 +278,33 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 
 	t = buf + mlen;
 
-	DLINK_FOREACH(ptr, target_p->user->channel.head)
+#ifdef ENABLE_SERVICES
+	if (!IsService(target_p))
+#endif
 	{
-		msptr = ptr->data;
-		chptr = msptr->chptr;
-
-		visible = ShowChannel(source_p, chptr);
-
-		if(visible || operspy)
+		DLINK_FOREACH(ptr, target_p->user->channel.head)
 		{
-			if((cur_len + strlen(chptr->chname) + 3) > (BUFSIZE - 5))
-			{
-				sendto_one_buffer(source_p, HOLD_QUEUE, buf);
-				cur_len = mlen + extra_space;
-				t = buf + mlen;
-			}
+			msptr = ptr->data;
+			chptr = msptr->chptr;
 
-			tlen = ircd_sprintf(t, "%s%s%s ",
-					visible ? "" : "!",
-					find_channel_status(msptr, 1),
-					chptr->chname);
-			t += tlen;
-			cur_len += tlen;
+			visible = ShowChannel(source_p, chptr);
+
+			if(visible || operspy)
+			{
+				if((cur_len + strlen(chptr->chname) + 3) > (BUFSIZE - 5))
+				{
+					sendto_one_buffer(source_p, HOLD_QUEUE, buf);
+					cur_len = mlen + extra_space;
+					t = buf + mlen;
+				}
+
+				tlen = ircd_sprintf(t, "%s%s%s ",
+						visible ? "" : "!",
+						find_channel_status(msptr, 1),
+						chptr->chname);
+				t += tlen;
+				cur_len += tlen;
+			}
 		}
 	}
 
