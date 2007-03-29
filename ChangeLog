@@ -1,3 +1,14 @@
+jilles      2007/03/29 18:12:41 UTC	(20070329_0-23745)
+  Log:
+  Don't show the UID if a TS6 server sends a kick with
+  an empty or no comment. Note that ratbox never sends
+  such kicks, but csircd does.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_kick.c (File Modified) 
+
+
 jilles      2007/03/28 14:03:34 UTC	(20070328_1-23732)
   Log:
   For --enable-services, do not show channels when using
