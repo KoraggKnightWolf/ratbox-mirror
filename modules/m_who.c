@@ -116,7 +116,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	if(IsChannelName(mask))
 	{
 		/* List all users on a given channel */
-		chptr = find_channel(parv[1]);
+		chptr = find_channel(parv[1] + operspy);
 		if(chptr != NULL)
 		{
 			if(operspy)
@@ -128,7 +128,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 				do_who_on_channel(source_p, chptr, server_oper, NO);
 		}
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFWHO),
-			   me.name, source_p->name, parv[1]);
+			   me.name, source_p->name, parv[1] + operspy);
 		return 0;
 	}
 
