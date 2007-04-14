@@ -1,3 +1,12 @@
+jilles      2007/04/14 22:08:32 UTC	(20070414_0-23831)
+  Log:
+  Use TS6 prefix for server-server JOIN 0.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+
+
 jilles      2007/04/03 00:15:54 UTC	(20070403_0-23795)
   Log:
   Repair operspy who !#channel, broken by my ** fix.
