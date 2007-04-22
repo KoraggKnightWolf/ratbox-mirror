@@ -1,3 +1,16 @@
+jilles      2007/04/22 18:17:36 UTC	(20070422_5-23861)
+  Log:
+  Forward port RATBOX_2_2 r23859:
+  - add capab SAVETS_100 to note we SAVE at TS 100, and warn when servers link
+    with SAVE but without SAVETS_100
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_serv.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 jilles      2007/04/22 14:36:23 UTC	(20070422_4-23857)
   Log:
   Fix description of 043 numeric.
