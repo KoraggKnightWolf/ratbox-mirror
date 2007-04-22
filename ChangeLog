@@ -1,3 +1,14 @@
+leeh        2007/04/22 11:40:34 UTC	(20070422_1-23849)
+  Log:
+  - forward port r23843
+    - move the test for a user having tripped nickflood up a few lines, so
+      that if a user cannot change nick we do not penalise them any further.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+
+
 jilles      2007/04/22 11:35:50 UTC	(20070422_0-23845)
   Log:
   Force nickTS to increase when a local user changes their nick.
