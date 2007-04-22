@@ -1,3 +1,12 @@
+jilles      2007/04/22 14:36:23 UTC	(20070422_4-23857)
+  Log:
+  Fix description of 043 numeric.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/collision_fnc.txt (File Modified) 
+
+
 jilles      2007/04/22 14:13:29 UTC	(20070422_3-23855)
   Log:
   Add SAVE documentation from charybdis, with a note about
