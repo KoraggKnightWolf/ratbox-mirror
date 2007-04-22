@@ -1,3 +1,13 @@
+jilles      2007/04/22 14:13:29 UTC	(20070422_3-23855)
+  Log:
+  Add SAVE documentation from charybdis, with a note about
+  how much ircd-ratbox implements of it.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/collision_fnc.txt (File Added) 
+
+
 jilles      2007/04/22 14:08:35 UTC	(20070422_2-23851)
   Log:
   SAVE: make the nickTS of the UID nick equal to 100, so it
