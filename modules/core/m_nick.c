@@ -46,6 +46,13 @@
 #include "s_newconf.h"
 #include "monitor.h"
 
+/* Give all UID nicks the same TS. This ensures nick TS is always the same on
+ * all servers for each nick-user pair, also if a user with a UID nick changes
+ * their nick but is collided again (the server detecting the collision will
+ * not propagate the nick change further). -- jilles
+ */
+#define SAVE_NICKTS 100
+
 static int mr_nick(struct Client *, struct Client *, int, const char **);
 static int m_nick(struct Client *, struct Client *, int, const char **);
 static int mc_nick(struct Client *, struct Client *, int, const char **);
@@ -1122,9 +1129,9 @@ save_user(struct Client *client_p, struct Client *source_p,
 	sendto_server(client_p, NULL, CAP_SAVE|CAP_TS6, NOCAPS, ":%s SAVE %s %ld",
 			source_p->id, target_p->id, (long)target_p->tsinfo);
 	sendto_server(client_p, NULL, CAP_TS6, CAP_SAVE, ":%s NICK %s :%ld",
-			target_p->id, target_p->id, (long)ircd_currenttime);
+			target_p->id, target_p->id, (long)SAVE_NICKTS);
 	sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%ld",
-			target_p->name, target_p->id, (long)ircd_currenttime);
+			target_p->name, target_p->id, (long)SAVE_NICKTS);
 	if (!IsMe(client_p))
 		sendto_realops_flags(UMODE_SKILL, L_ALL,
 				"Received SAVE message for %s from %s",
@@ -1134,10 +1141,8 @@ save_user(struct Client *client_p, struct Client *source_p,
 		sendto_one_numeric(target_p, HOLD_QUEUE, RPL_SAVENICK,
 				form_str(RPL_SAVENICK), target_p->id);
 		change_local_nick(target_p, target_p, target_p->id, 0);
+		target_p->tsinfo = SAVE_NICKTS;
 	}
 	else
-	{
-		/* XXX the uid nick gets garbage TS; shouldn't matter though */
-		change_remote_nick(target_p, target_p, ircd_currenttime, target_p->id, 0);
-	}
+		change_remote_nick(target_p, target_p, SAVE_NICKTS, target_p->id, 0);
 }
