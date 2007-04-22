@@ -1,3 +1,12 @@
+jilles      2007/04/22 20:55:39 UTC	(20070422_6-23863)
+  Log:
+  Document SAVETS_100 capab.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/collision_fnc.txt (File Modified) 
+
+
 jilles      2007/04/22 18:17:36 UTC	(20070422_5-23861)
   Log:
   Forward port RATBOX_2_2 r23859:
