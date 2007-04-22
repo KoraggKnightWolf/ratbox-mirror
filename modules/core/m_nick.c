@@ -679,7 +679,11 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick,
 	/* dont reset TS if theyre just changing case of nick */
 	if(!samenick)
 	{
-		source_p->tsinfo = ircd_currenttime;
+		/* force the TS to increase -- jilles */
+		if (source_p->tsinfo >= ircd_currenttime)
+			source_p->tsinfo++;
+		else
+			source_p->tsinfo = ircd_currenttime;
 		monitor_signoff(source_p);
 		/* we only do bancache for local users -- jilles */
 		if (source_p->user)
