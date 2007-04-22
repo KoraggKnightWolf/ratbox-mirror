@@ -1,3 +1,13 @@
+jilles      2007/04/22 14:08:35 UTC	(20070422_2-23851)
+  Log:
+  SAVE: make the nickTS of the UID nick equal to 100, so it
+  is always in sync on the network.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+
+
 leeh        2007/04/22 11:40:34 UTC	(20070422_1-23849)
   Log:
   - forward port r23843
