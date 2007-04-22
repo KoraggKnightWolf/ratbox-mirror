@@ -68,12 +68,13 @@ struct Capability
 #define CAP_SERVICE	0x10000
 #define CAP_RSFNC	0x20000	/* rserv FNC */
 #define CAP_SAVE	0x40000 /* supports SAVE (nick collision FNC) */
+#define CAP_SAVETS_100	0x80000 /* supports SAVE at TS 100 */
 
 #define CAP_MASK        (CAP_QS  | CAP_EX   | CAP_CHW  | \
 			 CAP_IE  | CAP_SERVICE |\
 			 CAP_GLN | CAP_ENCAP | \
 			 CAP_ZIP  | CAP_KNOCK  | \
-			 CAP_RSFNC | CAP_SAVE)
+			 CAP_RSFNC | CAP_SAVE | CAP_SAVETS_100)
 
 #ifdef HAVE_LIBZ
 #define CAP_ZIP_SUPPORTED       CAP_ZIP

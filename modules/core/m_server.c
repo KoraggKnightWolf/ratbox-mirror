@@ -1446,6 +1446,15 @@ server_estab(struct Client *client_p)
 	ilog(L_SERVER, "Link with %s established: (%s) link",
 	     log_client_name(client_p, SHOW_IP), show_capabilities(client_p));
 
+	if(IsCapable(client_p, CAP_SAVE) && !IsCapable(client_p, CAP_SAVETS_100))
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				"Link %s SAVE protocol mismatch.  Users timestamps may be desynced after SAVE",
+				client_p->name);
+		ilog(L_SERVER, "Link %s SAVE protocol mismatch.  Users timestamps may be desynced after SAVE",
+			log_client_name(client_p, SHOW_IP));
+	}
+
 	hdata.client = &me;
 	hdata.target = client_p;
 	call_hook(h_server_introduced, &hdata);
