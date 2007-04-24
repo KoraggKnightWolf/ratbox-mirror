@@ -1,3 +1,12 @@
+jilles      2007/04/24 17:37:57 UTC	(20070424_0-23871)
+  Log:
+  webirc bugfix
+  
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_webirc.c (File Modified) 
+
+
 jilles      2007/04/22 20:55:39 UTC	(20070422_6-23863)
   Log:
   Document SAVETS_100 capab.
