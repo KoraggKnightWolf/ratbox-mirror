@@ -61,7 +61,7 @@ static int mr_webirc(struct Client *, struct Client *, int, const char **);
 
 struct Message webirc_msgtab = {
 	"WEBIRC", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_webirc, 4}, mg_reg, mg_ignore, mg_ignore, mg_ignore, mg_reg}
+	{{mr_webirc, 5}, mg_reg, mg_ignore, mg_ignore, mg_ignore, mg_reg}
 };
 
 mapi_clist_av1 webirc_clist[] = { &webirc_msgtab, NULL };
