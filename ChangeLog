@@ -1,3 +1,11 @@
+androsyn    2007/05/05 17:50:06 UTC	(20070505_0-23920)
+  Log:
+  add patch from upstream adns that causes adns to spin if tcp connections fail immediately
+
+  Modified:
+	ircd-ratbox/trunk/adns/event.c (File Modified) 
+
+
 jilles      2007/04/24 17:37:57 UTC	(20070424_0-23871)
   Log:
   webirc bugfix
