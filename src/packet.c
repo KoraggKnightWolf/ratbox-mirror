@@ -53,12 +53,9 @@ parse_client_queued(struct Client *client_p)
 
 	if(IsUnknown(client_p))
 	{
-		int i = 0;
-
 		for (;;)
 		{
-			/* rate unknown clients at MAX_FLOOD per loop */
-			if(i >= MAX_FLOOD)
+			if(client_p->localClient->sent_parsed >= client_p->localClient->allow_read)
 				break;
 
 			dolen = ircd_linebuf_get(&client_p->localClient->
@@ -69,7 +66,7 @@ parse_client_queued(struct Client *client_p)
 				break;
 
 			client_dopacket(client_p, readBuf, dolen);
-			i++;
+			client_p->localClient->sent_parsed++;
 
 			/* He's dead cap'n */
 			if(IsAnyDead(client_p))
@@ -78,8 +75,13 @@ parse_client_queued(struct Client *client_p)
 			 * to the parsing for their appropriate status.  --fl
 			 */
 			if(!IsUnknown(client_p))
+			{
+				/* reset their flood limits, they're now
+				 * graced to flood
+				 */
+				client_p->localClient->sent_parsed = 0;
 				break;
-
+			}
 		}
 	}
 
@@ -183,6 +185,24 @@ flood_recalc(void *unused)
 			continue;
 
 	}
+
+	DLINK_FOREACH_SAFE(ptr, next, unknown_list.head)
+	{
+		client_p = ptr->data;
+
+		if(client_p->localClient == NULL)
+			continue;
+
+		client_p->localClient->sent_parsed--;
+
+		if(client_p->localClient->sent_parsed < 0)
+			client_p->localClient->sent_parsed = 0;
+
+		if(--client_p->localClient->actually_read < 0)
+			client_p->localClient->actually_read = 0;
+
+		parse_client_queued(client_p);
+       }
 }
 
 

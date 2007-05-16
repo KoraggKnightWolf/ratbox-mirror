@@ -1158,6 +1158,7 @@ static int
 exit_unknown_client(struct Client *client_p, struct Client *source_p, const char *comment)
 {
 	delete_auth_queries(source_p);
+	del_unknown_ip(source_p);
 	ircd_dlinkDelete(&source_p->localClient->tnode, &unknown_list);
 
 	if(!IsIOError(source_p))

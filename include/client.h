@@ -159,7 +159,7 @@ struct exit_client_hook
 #define FLAGS_EXEMPTSPAMBOT	0x04000000
 #define FLAGS_EXEMPTSHIDE	0x08000000
 #define FLAGS_EXEMPTJUPE	0x10000000
-
+#define FLAGS_EXUNKNOWN		0x20000000
 
 /* umodes, settable flags */
 
@@ -236,6 +236,9 @@ struct exit_client_hook
 #define IsTGChange(x)		((x)->flags & FLAGS_TGCHANGE)
 #define SetTGChange(x)		((x)->flags |= FLAGS_TGCHANGE)
 #define ClearTGChange(x)	((x)->flags &= ~FLAGS_TGCHANGE)
+#define IsExUnknown(x)		((x)->flags & FLAGS_EXUNKNOWN)
+#define SetExUnknown(x)		((x)->flags |= FLAGS_EXUNKNOWN)
+
 
 /* oper flags */
 #define MyOper(x)               (MyConnect(x) && IsOper(x))

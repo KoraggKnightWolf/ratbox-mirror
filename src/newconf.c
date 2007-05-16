@@ -1862,6 +1862,7 @@ static struct ConfEntry conf_general_table[] =
 	{ "max_nick_time",	CF_TIME,  NULL, 0, &ConfigFileEntry.max_nick_time	},
 	{ "max_nick_changes",	CF_INT,   NULL, 0, &ConfigFileEntry.max_nick_changes	},
 	{ "max_targets",	CF_INT,   NULL, 0, &ConfigFileEntry.max_targets		},
+	{ "max_unknown_ip",	CF_INT,   NULL, 0, &ConfigFileEntry.max_unknown_ip	},
 	{ "min_nonwildcard",	CF_INT,   NULL, 0, &ConfigFileEntry.min_nonwildcard	},
 	{ "nick_delay",		CF_TIME,  NULL, 0, &ConfigFileEntry.nick_delay		},
 	{ "no_oper_flood",	CF_YESNO, NULL, 0, &ConfigFileEntry.no_oper_flood	},

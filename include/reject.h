@@ -46,5 +46,8 @@ void report_dlines(struct Client *);
 void report_tdlines(struct Client *);
 void report_elines(struct Client *);
 
+int add_unknown_ip(struct Client *client_p);
+void del_unknown_ip(struct Client *client_p);
+
 #endif
 

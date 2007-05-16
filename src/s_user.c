@@ -515,6 +515,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	}
 
 	s_assert(!IsClient(source_p));
+	del_unknown_ip(source_p);
 	ircd_dlinkMoveNode(&source_p->localClient->tnode, &unknown_list, &lclient_list);
 	SetClient(source_p);
 

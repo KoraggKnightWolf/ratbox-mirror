@@ -451,6 +451,9 @@ add_connection(struct Listener *listener, int fd, struct sockaddr *sai)
 
 	if(check_reject(new_client))
 		return; 
+	if(add_unknown_ip(new_client))
+		return;
+		
 	start_auth(new_client);
 }
 
