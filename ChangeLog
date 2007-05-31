@@ -1,3 +1,11 @@
+androsyn    2007/05/31 14:55:55 UTC	(20070531_0-23969)
+  Log:
+  minor mode documentation changes from dubkat
+
+  Modified:
+	ircd-ratbox/trunk/doc/modes.txt (File Modified) 
+
+
 androsyn    2007/05/16 14:28:44 UTC	(20070516_0-23961)
   Log:
   - forward port -r23955 that fixes a potential DoS
