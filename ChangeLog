@@ -1,3 +1,11 @@
+androsyn    2007/06/08 15:24:28 UTC	(20070608_0-23971)
+  Log:
+  fix compile errors
+
+  Modified:
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2007/05/31 14:55:55 UTC	(20070531_0-23969)
   Log:
   minor mode documentation changes from dubkat
