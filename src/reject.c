@@ -112,7 +112,7 @@ reject_exit(void *unused)
 		if(!IsIOError(client_p))
 		{
 			if(IsExUnknown(client_p))
-				sendto_one(client_p, "ERROR :Closing Link: %s (*** Too many unknown connections)", client_p->host);
+				sendto_one(client_p, POP_QUEUE, "ERROR :Closing Link: %s (*** Too many unknown connections)", client_p->host);
 			else
 				sendto_one(client_p, POP_QUEUE, "ERROR :Closing Link: %s (*** Banned (cache))", client_p->host);
 		}
@@ -413,10 +413,10 @@ add_unknown_ip(struct Client *client_p)
 	{
 		SetExUnknown(client_p);
 		SetReject(client_p);
-		comm_setselect(client_p->localClient->fd, FDLIST_NONE, COMM_SELECT_WRITE | COMM_SELECT_READ, NULL, NULL);
+		ircd_setselect(client_p->localClient->fd, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
 		SetClosing(client_p);
 		del_unknown_ip(client_p); /* maybe do this in delay exit code instead? */
-		dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &delay_exit);
+		ircd_dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &delay_exit);
 		return 1;
 	}
 	return 0;
