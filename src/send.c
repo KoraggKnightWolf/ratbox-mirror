@@ -39,6 +39,7 @@
 #include "s_newconf.h"
 #include "s_log.h"
 #include "hook.h"
+#include "monitor.h"
 
 #define LOG_BUFSIZE 2048
 
@@ -848,6 +849,40 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap,
 
 	ircd_linebuf_donebuf(&ircd_linebuf_id);
 	ircd_linebuf_donebuf(&ircd_linebuf_name);
+}
+
+/* sendto_monitor()
+ *
+ * inputs	- monitor nick to send to, format, va_args
+ * outputs	- message to local users monitoring the given nick
+ * side effects -
+ */
+void
+sendto_monitor(struct monitor *monptr, const char *pattern, ...)
+{
+	va_list args;
+	buf_head_t linebuf;
+	struct Client *target_p;
+	dlink_node *ptr;
+	dlink_node *next_ptr;
+	
+	ircd_linebuf_newbuf(&linebuf); 
+	
+	va_start(args, pattern);
+	ircd_linebuf_putmsg(&linebuf, pattern, &args, NULL);
+	va_end(args);
+
+	DLINK_FOREACH_SAFE(ptr, next_ptr, monptr->users.head)
+	{
+		target_p = ptr->data;
+
+		if(IsIOError(target_p))
+			continue;
+
+		send_linebuf(target_p, &linebuf, 0);
+	}
+
+	ircd_linebuf_donebuf(&linebuf);
 }
 
 /* sendto_anywhere()
