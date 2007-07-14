@@ -414,8 +414,6 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 			return 0;
 		}
 
-		collapse(realban);
-
 		DLINK_FOREACH(ptr, list->head)
 		{
 			actualBan = ptr->data;
