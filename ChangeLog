@@ -1,3 +1,14 @@
+jilles      2007/07/14 12:42:35 UTC	(20070714_0-23977)
+  Log:
+  add_id() for local client: do not collapse() the ban mask.
+  The code calling this already collapses the mask, and if
+  not, doing it here would cause a desync.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+
+
 jilles      2007/06/30 22:28:55 UTC	(20070630_0-23973)
   Log:
   monitor: send the same message buffer to all users
