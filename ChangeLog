@@ -1,3 +1,13 @@
+androsyn    2007/07/17 02:39:07 UTC	(20070717_0-23997)
+  Log:
+  introduce_client always return 0, change it to void
+
+  Modified:
+	ircd-ratbox/trunk/include/s_user.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 jilles      2007/07/14 12:42:35 UTC	(20070714_0-23977)
   Log:
   add_id() for local client: do not collapse() the ban mask.
