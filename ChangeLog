@@ -1,3 +1,11 @@
+androsyn    2007/07/20 14:55:28 UTC	(20070720_1-24013)
+  Log:
+  fix compile error
+
+  Modified:
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2007/07/20 14:52:52 UTC	(20070720_0-24011)
   Log:
   fix a compile error
