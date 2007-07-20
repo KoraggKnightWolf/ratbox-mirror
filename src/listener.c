@@ -43,6 +43,10 @@
 static PF accept_connection;
 
 static dlink_list listener_list;
+static int accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data);
+static void accept_callback(int fd, int status, struct sockaddr *addr, socklen_t addrlen, void *data);
+
+
 
 static struct Listener *
 make_listener(struct irc_sockaddr_storage *addr)
@@ -221,9 +225,7 @@ inetport(struct Listener *listener)
 
 	listener->fd = fd;
 
-	/* Listen completion events are READ events .. */
-
-	accept_connection(fd, listener);
+	ircd_accept_tcp(listener->fd, accept_precallback, accept_callback, listener);
 	return 1;
 }
 
@@ -457,95 +459,67 @@ add_connection(struct Listener *listener, int fd, struct sockaddr *sai)
 	start_auth(new_client);
 }
 
+static time_t last_oper_notice = 0;
 
-static void
-accept_connection(int pfd, void *data)
+
+static int
+accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 {
-	static time_t last_oper_notice = 0;
-
-	struct irc_sockaddr_storage sai;
-	socklen_t addrlen = sizeof(sai);
-	int fd;
-	struct Listener *listener = data;
-	struct ConfItem *aconf;
+	struct Listener *listener = (struct Listener *)data;
 	char buf[BUFSIZE];
-    
-	s_assert(listener != NULL);
-	if(listener == NULL)
-		return;
-	/*
-	 * There may be many reasons for error return, but
-	 * in otherwise correctly working environment the
-	 * probable cause is running out of file descriptors
-	 * (EMFILE, ENFILE or others?). The man pages for
-	 * accept don't seem to list these as possible,
-	 * although it's obvious that it may happen here.
-	 * Thus no specific errors are tested at this
-	 * point, just assume that connections cannot
-	 * be accepted until some old is closed first.
-	 */
+	struct ConfItem *aconf;
 
-
-	 while(1)
-	 {
-		fd = ircd_accept(listener->fd, (struct sockaddr *)&sai, &addrlen);
-
-		if(fd < 0)
-		{
-			/* Re-register a new IO request for the next accept .. */
-			ircd_setselect(listener->fd,
-				      IRCD_SELECT_ACCEPT, accept_connection, listener);
-			return;
-		}
-		
+	if((maxconnections - 10) < fd)
+	{
+		++ServerStats.is_ref;
 		/*
-		 * check for connection limit
+		 * slow down the whining to opers bit
 		 */
-		if((maxconnections - 10) < fd)
+		if((last_oper_notice + 20) <= ircd_currenttime)
 		{
-			++ServerStats.is_ref;
-			/*
-			 * slow down the whining to opers bit
-			 */
-			if((last_oper_notice + 20) <= ircd_currenttime)
-			{
-				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "All connections in use. (%s)",
-						     get_listener_name(listener));
-				last_oper_notice = ircd_currenttime;
-			}
-			
-			ircd_write(fd, "ERROR :All connections in use\r\n", 32);
-			ircd_close(fd);
-			/* Re-register a new IO request for the next accept .. */
-			continue;
+			sendto_realops_flags(UMODE_ALL, L_ALL,
+					     "All connections in use. (%s)",
+					     get_listener_name(listener));
+			last_oper_notice = ircd_currenttime;
 		}
-
-		/* Do an initial check we aren't connecting too fast or with too many
-		 * from this IP... */
-		if((aconf = conf_connect_allowed((struct sockaddr *)&sai, sai.ss_family)) != NULL)
-		{
-			ServerStats.is_ref++;
 			
-			if(ConfigFileEntry.dline_with_reason)
+		ircd_write(fd, "ERROR :All connections in use\r\n", 32);
+		ircd_close(fd);
+		/* Re-register a new IO request for the next accept .. */
+		return 0;
+	}
+	
+	/* Do an initial check we aren't connecting too fast or with too many
+	 * from this IP... */
+	if((aconf = conf_connect_allowed(addr, addr->ss_family)) != NULL)
+	{
+		ServerStats.is_ref++;
+			
+		if(ConfigFileEntry.dline_with_reason)
+		{
+			if (ircd_snprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd) >= (int)(sizeof(buf)-1))
 			{
-			    if (ircd_snprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd) >= (int)(sizeof(buf)-1))
-			    {
 				buf[sizeof(buf) - 3] = '\r';
 				buf[sizeof(buf) - 2] = '\n';
 				buf[sizeof(buf) - 1] = '\0';
-			    }
 			}
-			else
-			   ircd_sprintf(buf, "ERROR :You have been D-lined.\r\n");
-	
-			ircd_write(fd, buf, strlen(buf));
-			ircd_close(fd);
-			continue;
-			
 		}
-
-		ServerStats.is_ac++;
-		add_connection(listener, fd, (struct sockaddr *)&sai);
+		else
+			ircd_sprintf(buf, "ERROR :You have been D-lined.\r\n");
+	
+		ircd_write(fd, buf, strlen(buf));
+		ircd_close(fd);
+		return 0;
 	}
+	return 1;
 }
+
+static void
+accept_callback(int fd, int status, struct sockaddr *addr, socklen_t addrlen, void *data)
+{
+	struct Listener *listener = data;
+
+	ServerStats.is_ac++;
+	add_connection(listener, fd, addr);
+}
+
