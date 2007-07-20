@@ -1105,7 +1105,7 @@ register_client(struct Client *client_p, struct Client *server,
 		return exit_client(source_p, source_p, &me, "USER server wrong direction");
 	}
 
-	introduce_client(client_p, source_p, user, nick));
+	introduce_client(client_p, source_p, user, nick);
 	return 0;
 }
 
