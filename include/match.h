@@ -71,7 +71,7 @@ int ircncmp(const char *s1, const char *s2, int n);
 char *canonize(char *);
 #endif
 
-#define EmptyString(x) (!(x) || (*(x) == '\0'))
+#define EmptyString(x) ((x == NULL) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
 
 /*
