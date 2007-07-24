@@ -1,3 +1,11 @@
+androsyn    2007/07/24 18:10:41 UTC	(20070724_1-24063)
+  Log:
+  change EmptyString so gcc 4.2 doesn't complain
+
+  Modified:
+	ircd-ratbox/trunk/include/match.h (File Modified) 
+
+
 androsyn    2007/07/24 16:16:08 UTC	(20070724_0-24053)
   Log:
   - make ircd use the updated helper interface
