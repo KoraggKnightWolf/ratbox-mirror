@@ -32,6 +32,7 @@
 #include "setup.h"
 #include "ircd_lib.h"
 #include "rsdb.h"
+#include "common.h"
 
 #define MAXPARA 10
 

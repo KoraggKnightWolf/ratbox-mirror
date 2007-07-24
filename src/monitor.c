@@ -115,7 +115,6 @@ void
 monitor_signoff(struct Client *client_p)
 {
 	struct monitor *monptr = find_monitor(client_p->name, 0);
-	struct Client *target_p;
 
 	/* noones watching this nick */
 	if(monptr == NULL)

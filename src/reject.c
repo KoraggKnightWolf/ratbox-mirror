@@ -406,10 +406,10 @@ add_unknown_ip(struct Client *client_p)
 			bitlen = 128;
 #endif
 		pnode = make_and_lookup_ip(unknown_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);
-		pnode->data = (void *)1;
+		pnode->data = (void *)(long)1;
 	}
 
-	if((unsigned long)pnode->data >= ConfigFileEntry.max_unknown_ip)
+	if((long)pnode->data >= ConfigFileEntry.max_unknown_ip)
 	{
 		SetExUnknown(client_p);
 		SetReject(client_p);
@@ -429,8 +429,8 @@ del_unknown_ip(struct Client *client_p)
 
 	if((pnode = match_ip(unknown_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
 	{
-		pnode->data = (void *)((unsigned long)pnode->data - 1);
-		if((unsigned long)pnode->data <= 0)
+		pnode->data = (void *)((long)pnode->data - 1);
+		if((long)pnode->data <= 0)
 		{
 			patricia_remove(unknown_tree, pnode);
 		}

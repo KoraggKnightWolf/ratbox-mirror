@@ -40,8 +40,6 @@
 #include "reject.h"
 #include "s_log.h"
 
-static PF accept_connection;
-
 static dlink_list listener_list;
 static int accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data);
 static void accept_callback(int fd, int status, struct sockaddr *addr, socklen_t addrlen, void *data);

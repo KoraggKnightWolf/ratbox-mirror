@@ -43,6 +43,7 @@
 #include "s_stats.h"
 #include "packet.h"
 #include "s_user.h"
+#include "reject.h"
 
 static int mr_server(struct Client *, struct Client *, int, const char **);
 static int ms_server(struct Client *, struct Client *, int, const char **);

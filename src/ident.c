@@ -15,6 +15,7 @@
 
 #include "setup.h"
 #include "ircd_lib.h"
+#include "common.h"
 #define USERLEN 10
 
 int ident_timeout;
