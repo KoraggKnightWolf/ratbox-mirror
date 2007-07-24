@@ -105,7 +105,7 @@ fork_bandb(void)
 		return;
 	}
 
-	ircd_helper_read(bandb_helper->ifd, bandb_helper);
+	ircd_helper_run(bandb_helper);
 	return;
 }
 
@@ -379,7 +379,7 @@ bandb_parse(ircd_helper *helper)
 	char *parv[MAXPARA+1];
 	int len, parc;
 
-	while((len = ircd_helper_readline(helper, buf, sizeof(buf))))
+	while((len = ircd_helper_read(helper, buf, sizeof(buf))))
 	{
 		parc = ircd_string_to_array(buf, parv, MAXPARA);
 

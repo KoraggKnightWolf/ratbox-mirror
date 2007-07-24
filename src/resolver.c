@@ -172,7 +172,7 @@ parse_request(ircd_helper *helper)
 	int len;  
 	static char *parv[MAXPARA + 1];
 	int parc;  
-	while((len = ircd_helper_readline(helper, readBuf, sizeof(readBuf))) > 0)
+	while((len = ircd_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
 	{
 		parc = ircd_string_to_array(readBuf, parv, MAXPARA);
 		if(parc != 4)
@@ -327,7 +327,7 @@ static void process_adns_incoming(void)
 static void
 read_io(void)
 {
-	ircd_helper_read(res_helper->ifd, res_helper);
+	ircd_helper_run(res_helper);
 	while(1)
 	{
 		dns_select();

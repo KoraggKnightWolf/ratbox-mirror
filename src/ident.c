@@ -249,7 +249,7 @@ parse_request(ircd_helper *helper)
 	int len;
 	static char *parv[MAXPARA + 1];
 	int parc;
-	while((len = ircd_helper_readline(helper, readBuf, sizeof(readBuf))) > 0)
+	while((len = ircd_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
 	{
 		parc = ircd_string_to_array(readBuf, parv, MAXPARA);
 		switch(parc)
@@ -312,12 +312,7 @@ int main(int argc, char **argv)
 	
 	authheap = ircd_bh_create(sizeof(struct auth_request), 2048, "auth_heap");
 
-	ircd_helper_read(ident_helper->ifd, ident_helper);
-	while(1) {
-		ircd_select(1000);
-		ircd_checktimeouts(NULL);
-		ircd_event_run();
-	}
+	ircd_helper_loop(ident_helper, 1000);
 	return 0;
 }
 

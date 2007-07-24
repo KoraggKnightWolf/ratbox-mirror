@@ -144,7 +144,7 @@ fork_ident(void)
 		ilog(L_MAIN, "ident - ircd_helper_start failed: %s", strerror(errno));
 		return;
 	}
-        ircd_helper_read(ident_helper->ifd, ident_helper);
+        ircd_helper_run(ident_helper);
 	return;
 }
 
@@ -460,7 +460,7 @@ read_auth_reply(ircd_helper *helper)
 	char *q, *p;
 	struct AuthRequest *auth;
 
-	while((length = ircd_helper_readline(helper, authBuf, sizeof(authBuf))) > 0)
+	while((length = ircd_helper_read(helper, authBuf, sizeof(authBuf))) > 0)
 	{
 		q = strchr(authBuf, ' ');
 

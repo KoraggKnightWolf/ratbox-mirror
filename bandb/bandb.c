@@ -158,7 +158,7 @@ parse_request(ircd_helper *helper)
 	int len;
 
 		
-	while((len = ircd_helper_readline(helper, readbuf, sizeof(readbuf))) > 0)
+	while((len = ircd_helper_read(helper, readbuf, sizeof(readbuf))) > 0)
 	{
 		parc = ircd_string_to_array(readbuf, parv, MAXPARA);
 
@@ -210,18 +210,6 @@ parse_request(ircd_helper *helper)
 		
 
 static void
-read_io(void)
-{
-	ircd_helper_read(bandb_helper->ifd, bandb_helper);
-
-	while(1)
-	{
-		ircd_select(1000);
-		ircd_event_run();
-	}
-}
-
-static void
 error_cb(ircd_helper *helper)
 {
 	exit(1);
@@ -232,10 +220,17 @@ main(int argc, char *argv[])
 {
 
 	bandb_helper = ircd_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256, 256); /* XXX fix me */
+	if(bandb_helper == NULL)
+	{
+		fprintf(stderr, "This is ircd-ratbox bandb.  You aren't supposed to run me directly.\n");
+                fprintf(stderr, "However I will print my Id tag $Id$\n");
+		fprintf(stderr, "Have a nice day\n");
+		exit(1);
+	}
 
 	rsdb_init();
 	check_schema();
-	read_io();
+	ircd_helper_loop(bandb_helper, 1000);
 
 	return 0;
 }

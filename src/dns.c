@@ -69,7 +69,7 @@ assign_dns_id(void)
 static inline void
 check_resolver(void)
 {
-	if(dns_helper == NULL || dns_helper->ifd < 0 || dns_helper->ofd < 0)
+	if(dns_helper == NULL)
 		restart_resolver();
 }
 
@@ -216,7 +216,7 @@ start_resolver(void)
 		return 1;
 	}
 
-	ircd_helper_read(dns_helper->ifd, dns_helper);
+	ircd_helper_run(dns_helper);
 	return 0;
 }
 
@@ -227,7 +227,7 @@ parse_dns_reply(ircd_helper *helper)
 	static char dnsBuf[READBUF_SIZE];
 	
 	char *parv[MAXPARA+1];
-	while((len = ircd_helper_readline(helper, dnsBuf, sizeof(dnsBuf))) > 0)
+	while((len = ircd_helper_read(helper, dnsBuf, sizeof(dnsBuf))) > 0)
 	{
 		parc = string_to_array(dnsBuf, parv); /* we shouldn't be using this here, but oh well */
 
