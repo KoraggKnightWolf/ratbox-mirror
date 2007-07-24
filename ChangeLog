@@ -1,3 +1,18 @@
+androsyn    2007/07/24 16:16:08 UTC	(20070724_0-24053)
+  Log:
+  - make ircd use the updated helper interface
+  - don't let bandb dump core when run directly from the commandline
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2007/07/20 15:34:24 UTC	(20070720_2-24027)
   Log:
   add the code to use the new accept callback stuff
