@@ -304,6 +304,7 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 	 */
 	if(port == 0)
 		return;
+		
 	memset(&vaddr, 0, sizeof(vaddr));
 	GET_SS_FAMILY(&vaddr) = family;
 
@@ -472,6 +473,12 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 	struct Listener *listener = (struct Listener *)data;
 	char buf[BUFSIZE];
 	struct ConfItem *aconf;
+
+	if(listener->ssl && !ssl_ok)
+	{
+		ircd_close(fd);
+		return 0;
+	}
 
 	if((maxconnections - 10) < fd)
 	{

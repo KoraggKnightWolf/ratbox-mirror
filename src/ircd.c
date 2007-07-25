@@ -103,7 +103,7 @@ int dorehashbans = 0;
 int doremotd = 0;
 int kline_queued = 0;
 int server_state_foreground = 0;
-
+int ssl_ok = 0;
 int testing_conf = 0;
 int conf_parse_failure = 0;
 time_t startup_time;
@@ -691,7 +691,14 @@ ratbox_main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	ircd_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
-	ircd_setup_ssl_server(ServerInfo.ssl_ca_cert, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
+
+	if(ServerInfo.ssl_cert != NULL && ServerInfo.ssl_private_key != NULL)
+	{
+		if(!ircd_setup_ssl_server(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params))
+			ilog(L_MAIN, "WARNING: Unable to setup SSL.");
+		else
+			ssl_ok = 1;
+	}
 
 	if (testing_conf)
 	{

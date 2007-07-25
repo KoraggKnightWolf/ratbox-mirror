@@ -80,7 +80,6 @@ extern struct Counter Count;
 extern int default_server_capabs;
 
 extern time_t startup_time;
-
 extern int splitmode;
 extern int splitchecking;
 extern int split_users;
@@ -104,5 +103,6 @@ int ratbox_main(int argc, char **argv);
 extern int testing_conf;
 extern int conf_parse_failure;
 extern int maxconnections;
+extern int ssl_ok;
 
 #endif
