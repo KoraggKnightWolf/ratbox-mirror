@@ -1,3 +1,13 @@
+androsyn    2007/07/25 23:53:21 UTC	(20070725_5-24113)
+  Log:
+  drop ssl connections if ssl_ok isn't set
+
+  Modified:
+	ircd-ratbox/trunk/include/ircd.h (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2007/07/25 19:19:36 UTC	(20070725_4-24105)
   Log:
   setup seeding the libircd prng
