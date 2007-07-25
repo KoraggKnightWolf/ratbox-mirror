@@ -1,3 +1,24 @@
+androsyn    2007/07/25 16:07:55 UTC	(20070725_1-24087)
+  Log:
+  make changes for the new irc_sockaddr_storage stuff
+
+  Modified:
+	ircd-ratbox/trunk/include/hostmask.h (File Modified) 
+	ircd-ratbox/trunk/include/listener.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2007/07/25 14:16:11 UTC	(20070725_0-24077)
   Log:
   change ping cookie format specifier to be unsigned int instead of unsigned long
