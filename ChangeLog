@@ -1,3 +1,11 @@
+androsyn    2007/07/25 14:16:11 UTC	(20070725_0-24077)
+  Log:
+  change ping cookie format specifier to be unsigned int instead of unsigned long
+
+  Modified:
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2007/07/24 18:15:02 UTC	(20070724_2-24067)
   Log:
   various warning cleanups
