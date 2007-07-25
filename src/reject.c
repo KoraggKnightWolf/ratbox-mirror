@@ -178,7 +178,7 @@ add_reject(struct Client *client_p)
 	{
 		int bitlen = 32;
 #ifdef IPV6
-		if(client_p->localClient->ip.ss_family == AF_INET6)
+		if(GET_SS_FAMILY(&client_p->localClient->ip) == AF_INET6)
 			bitlen = 128;
 #endif
 		pnode = make_and_lookup_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);
@@ -402,7 +402,7 @@ add_unknown_ip(struct Client *client_p)
 	{
 		int bitlen = 32;
 #ifdef IPV6
-		if(client_p->localClient->ip.ss_family == AF_INET6)
+		if(GET_SS_FAMILY(&client_p->localClient->ip) == AF_INET6)
 			bitlen = 128;
 #endif
 		pnode = make_and_lookup_ip(unknown_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);

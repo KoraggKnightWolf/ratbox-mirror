@@ -744,14 +744,14 @@ check_server(const char *name, struct Client *client_p)
 		ClearCap(client_p, CAP_TB);
 
 #ifdef IPV6
-	if(client_p->localClient->ip.ss_family == AF_INET6)
+	if(GET_SS_FAMILY(&client_p->localClient->ip) == AF_INET6)
 	{
 		if(IN6_IS_ADDR_UNSPECIFIED(&((struct sockaddr_in6 *)&server_p->ipnum)->sin6_addr))
 		{
 			memcpy(&((struct sockaddr_in6 *)&server_p->ipnum)->sin6_addr, 
 				&((struct sockaddr_in6 *)&client_p->localClient->ip)->sin6_addr, 
 				sizeof(struct in6_addr)); 
-			SET_SS_LEN(server_p->ipnum, sizeof(struct sockaddr_in6));
+			SET_SS_LEN(&server_p->ipnum, sizeof(struct sockaddr_in6));
 		} 
 	}
 	else
@@ -762,7 +762,7 @@ check_server(const char *name, struct Client *client_p)
 			((struct sockaddr_in *)&server_p->ipnum)->sin_addr.s_addr = 
 				((struct sockaddr_in *)&client_p->localClient->ip)->sin_addr.s_addr;
 		}
-		SET_SS_LEN(server_p->ipnum, sizeof(struct sockaddr_in));
+		SET_SS_LEN(&server_p->ipnum, sizeof(struct sockaddr_in));
 	}
 
 	return 0;

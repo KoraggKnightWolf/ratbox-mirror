@@ -515,7 +515,7 @@ stats_auth (struct Client *source_p)
 		if(MyConnect (source_p))
 			aconf = find_auth(source_p->host, source_p->sockhost,
 					(struct sockaddr *)&source_p->localClient->ip,
-					source_p->localClient->ip.ss_family,
+					GET_SS_FAMILY(&source_p->localClient->ip),
 					source_p->username);
 		else
 			aconf = find_auth(source_p->host, NULL, NULL,
@@ -573,7 +573,7 @@ stats_tklines(struct Client *source_p)
 			aconf = find_conf_by_address (source_p->host, source_p->sockhost,
 						      (struct sockaddr *)&source_p->localClient->ip,
 						      CONF_KILL,
-						      source_p->localClient->ip.ss_family,
+						      GET_SS_FAMILY(&source_p->localClient->ip),
 						      source_p->username);
 		else
 			aconf = find_conf_by_address (source_p->host, NULL, NULL, CONF_KILL,
@@ -642,7 +642,7 @@ stats_klines(struct Client *source_p)
 			aconf = find_conf_by_address (source_p->host, source_p->sockhost,
 						      (struct sockaddr *)&source_p->localClient->ip,
 						      CONF_KILL,
-						      source_p->localClient->ip.ss_family,
+						      GET_SS_FAMILY(&source_p->localClient->ip),
 						      source_p->username);
 		else
 			aconf = find_conf_by_address (source_p->host, NULL, NULL, CONF_KILL,

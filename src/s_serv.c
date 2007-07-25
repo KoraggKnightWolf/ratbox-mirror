@@ -539,7 +539,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	}
 
 	/* create a socket for the server connection */
-	if((fd = ircd_socket(server_p->ipnum.ss_family, SOCK_STREAM, 0, NULL)) < 0)
+	if((fd = ircd_socket(GET_SS_FAMILY(&server_p->ipnum), SOCK_STREAM, 0, NULL)) < 0)
 	{
 		/* Eek, failure to create the socket */
 		report_error("opening stream socket to %s: %s", 
@@ -561,7 +561,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 
 	/* shove the port number into the sockaddr */
 #ifdef IPV6
-	if(server_p->ipnum.ss_family == AF_INET6)
+	if(GET_SS_FAMILY(&server_p->ipnum) == AF_INET6)
 		((struct sockaddr_in6 *)&server_p->ipnum)->sin6_port = htons(server_p->port);
 	else
 #endif
@@ -607,24 +607,24 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	{
 		memcpy(&myipnum, &server_p->my_ipnum, sizeof(myipnum));
 		((struct sockaddr_in *)&myipnum)->sin_port = 0;
-		myipnum.ss_family = server_p->my_ipnum.ss_family;
+		GET_SS_FAMILY(&myipnum) = GET_SS_FAMILY(&server_p->my_ipnum);
 				
 	}
-	else if(server_p->ipnum.ss_family == AF_INET && ServerInfo.specific_ipv4_vhost)
+	else if(GET_SS_FAMILY(&server_p->ipnum) == AF_INET && ServerInfo.specific_ipv4_vhost)
 	{
 		memcpy(&myipnum, &ServerInfo.ip, sizeof(myipnum));
 		((struct sockaddr_in *)&myipnum)->sin_port = 0;
-		myipnum.ss_family = AF_INET;
-		SET_SS_LEN(myipnum, sizeof(struct sockaddr_in));
+		GET_SS_FAMILY(&myipnum) = AF_INET;
+		SET_SS_LEN(&myipnum, sizeof(struct sockaddr_in));
 	}
 	
 #ifdef IPV6
-	else if((server_p->ipnum.ss_family == AF_INET6) && ServerInfo.specific_ipv6_vhost)
+	else if((GET_SS_FAMILY(&server_p->ipnum) == AF_INET6) && ServerInfo.specific_ipv6_vhost)
 	{
 		memcpy(&myipnum, &ServerInfo.ip6, sizeof(myipnum));
 		((struct sockaddr_in6 *)&myipnum)->sin6_port = 0;
-		myipnum.ss_family = AF_INET6;
-		SET_SS_LEN(myipnum, sizeof(struct sockaddr_in6));
+		GET_SS_FAMILY(&myipnum)= AF_INET6;
+		SET_SS_LEN(&myipnum, sizeof(struct sockaddr_in6));
 	}
 #endif
 	else
@@ -637,7 +637,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 
 	ircd_connect_tcp(client_p->localClient->fd, (struct sockaddr *)&server_p->ipnum,
 			 (struct sockaddr *) &myipnum,
-			 GET_SS_LEN(myipnum), serv_connect_callback, client_p,
+			 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
 			 ConfigFileEntry.connect_timeout);
 
 	return 1;

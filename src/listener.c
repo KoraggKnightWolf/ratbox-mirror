@@ -76,7 +76,7 @@ free_listener(struct Listener *listener)
  * returns "host.foo.org:6667" for a given listener
  */
 const char *
-get_listener_name(const struct Listener *listener)
+get_listener_name(struct Listener *listener)
 {
 	static char buf[HOSTLEN + HOSTLEN + PORTNAMELEN + 4];
 	int port = 0;
@@ -86,7 +86,7 @@ get_listener_name(const struct Listener *listener)
 		return NULL;
 
 #ifdef IPV6
-	if(listener->addr.ss_family == AF_INET6)
+	if(GET_SS_FAMILY(&listener->addr) == AF_INET6)
 		port = ntohs(((const struct sockaddr_in6 *)&listener->addr)->sin6_port);
 	else
 #endif
@@ -114,7 +114,7 @@ show_ports(struct Client *source_p)
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSPLINE, 
 				   form_str(RPL_STATSPLINE), 'P',
 #ifdef IPV6
-			   ntohs(listener->addr.ss_family == AF_INET ? ((struct sockaddr_in *)&listener->addr)->sin_port :
+			   ntohs(GET_SS_FAMILY(&listener->addr) == AF_INET ? ((struct sockaddr_in *)&listener->addr)->sin_port :
 				 ((struct sockaddr_in6 *)&listener->addr)->sin6_port),
 #else
 			   ntohs(((struct sockaddr_in *)&listener->addr)->sin_port),
@@ -147,10 +147,10 @@ inetport(struct Listener *listener)
 	 * At first, open a new socket
 	 */
 	
-	fd = ircd_socket(listener->addr.ss_family, SOCK_STREAM, 0, "Listener socket");
+	fd = ircd_socket(GET_SS_FAMILY(&listener->addr), SOCK_STREAM, 0, "Listener socket");
 
 #ifdef IPV6
-	if(listener->addr.ss_family == AF_INET6)
+	if(GET_SS_FAMILY(&listener->addr) == AF_INET6)
 	{
 		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)&listener->addr;
 		if(!IN6_ARE_ADDR_EQUAL(&in6->sin6_addr, &in6addr_any))
@@ -203,7 +203,7 @@ inetport(struct Listener *listener)
 	 * else assume it is already open and try get something from it.
 	 */
 
-	if(bind(fd, (struct sockaddr *) &listener->addr, GET_SS_LEN(listener->addr)))
+	if(bind(fd, (struct sockaddr *) &listener->addr, GET_SS_LEN(&listener->addr)))
 	{
 		report_error("binding listener socket %s:%s",
 			     get_listener_name(listener), 
@@ -237,10 +237,10 @@ find_listener(struct irc_sockaddr_storage *addr)
 	DLINK_FOREACH(ptr, listener_list.head)
 	{
 		listener = ptr->data;
-		if(addr->ss_family != listener->addr.ss_family)
+		if(GET_SS_FAMILY(addr) != GET_SS_FAMILY(&listener->addr))
 			continue;
 		
-		switch(addr->ss_family)
+		switch(GET_SS_FAMILY(addr))
 		{
 			case AF_INET:
 			{
@@ -299,7 +299,7 @@ add_listener(int port, const char *vhost_ip, int family)
 	if(port == 0)
 		return;
 	memset(&vaddr, 0, sizeof(vaddr));
-	vaddr.ss_family = family;
+	GET_SS_FAMILY(&vaddr) = family;
 
 	if(vhost_ip != NULL)
 	{
@@ -335,12 +335,12 @@ add_listener(int port, const char *vhost_ip, int family)
 	switch(family)
 	{
 		case AF_INET:
-			SET_SS_LEN(vaddr, sizeof(struct sockaddr_in));
+			SET_SS_LEN(&vaddr, sizeof(struct sockaddr_in));
 			((struct sockaddr_in *)&vaddr)->sin_port = htons(port);
 			break;
 #ifdef IPV6
 		case AF_INET6:
-			SET_SS_LEN(vaddr, sizeof(struct sockaddr_in6));
+			SET_SS_LEN(&vaddr, sizeof(struct sockaddr_in6));
 			((struct sockaddr_in6 *)&vaddr)->sin6_port = htons(port);
 			break;
 #endif
@@ -438,7 +438,7 @@ add_connection(struct Listener *listener, int fd, struct sockaddr *sai)
 	ircd_strlcpy(new_client->host, new_client->sockhost, sizeof(new_client->host));
 
 #ifdef IPV6
-	if(new_client->localClient->ip.ss_family == AF_INET6 && ConfigFileEntry.dot_in_ip6_addr == 1)
+	if(GET_SS_FAMILY(&new_client->localClient->ip) == AF_INET6 && ConfigFileEntry.dot_in_ip6_addr == 1)
 	{
 		ircd_strlcat(new_client->host, ".", sizeof(new_client->host));
 	}
@@ -489,7 +489,7 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 	
 	/* Do an initial check we aren't connecting too fast or with too many
 	 * from this IP... */
-	if((aconf = conf_connect_allowed(addr, addr->ss_family)) != NULL)
+	if((aconf = conf_connect_allowed(addr, GET_SS_FAMILY(addr))) != NULL)
 	{
 		ServerStats.is_ref++;
 			

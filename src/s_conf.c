@@ -245,7 +245,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		{
 			int port = -1;
 #ifdef IPV6
-			if(source_p->localClient->ip.ss_family == AF_INET6)
+			if(GET_SS_FAMILY(&source_p->localClient->ip) == AF_INET6)
 				port = ntohs(((struct sockaddr_in6 *)&source_p->localClient->listener->addr)->sin6_port);
 			else
 #endif
@@ -254,11 +254,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 			ServerStats.is_ref++;
 			/* jdc - lists server name & port connections are on */
 			/*       a purely cosmetical change */
-			/* why ipaddr, and not just source_p->sockhost? --fl */
-#if 0
-			static char ipaddr[HOSTIPLEN];
-			ircd_inet_ntop_sock(&source_p->localClient->ip, ipaddr, sizeof(ipaddr));
-#endif
+
 			sendto_realops_flags(UMODE_UNAUTH, L_ALL,
 					"Unauthorised client connection from "
 					"%s!%s%s@%s [%s] on [%s/%u].",
@@ -309,7 +305,7 @@ verify_access(struct Client *client_p, const char *username)
 		aconf = find_address_conf(client_p->host, client_p->sockhost, 
 					client_p->username,
 					(struct sockaddr *) &client_p->localClient->ip,
-					client_p->localClient->ip.ss_family);
+					GET_SS_FAMILY(&client_p->localClient->ip));
 	}
 	else
 	{
@@ -318,7 +314,7 @@ verify_access(struct Client *client_p, const char *username)
 		aconf = find_address_conf(client_p->host, client_p->sockhost,
 					non_ident, 
 					(struct sockaddr *) &client_p->localClient->ip,
-					client_p->localClient->ip.ss_family);
+					GET_SS_FAMILY(&client_p->localClient->ip));
 	}
 
 	if(aconf == NULL)

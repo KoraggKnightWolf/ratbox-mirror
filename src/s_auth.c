@@ -326,14 +326,14 @@ start_auth_query(struct AuthRequest *auth)
 	ircd_inet_ntop_sock((struct sockaddr *) &localaddr, myip, sizeof(myip));
 
 #ifdef IPV6
-	if(localaddr.ss_family == AF_INET6)
+	if(GET_SS_FAMILY(&localaddr) == AF_INET6)
 		lport = ntohs(((struct sockaddr_in6 *) &localaddr)->sin6_port);
 	else
 #endif
 		lport = ntohs(((struct sockaddr_in *) &localaddr)->sin_port);
 
 #ifdef IPV6
-	if(localaddr.ss_family == AF_INET6)
+	if(GET_SS_FAMILY(&localaddr) == AF_INET6)
 		rport = ntohs(((struct sockaddr_in6 *) &remoteaddr)->sin6_port);
 	else
 #endif
@@ -387,7 +387,7 @@ start_auth(struct Client *client)
 	} else 
 		ClearAuth(auth);
 
-	auth->dns_query = lookup_ip(client->sockhost, client->localClient->ip.ss_family, auth_dns_callback, auth);
+	auth->dns_query = lookup_ip(client->sockhost, GET_SS_FAMILY(&client->localClient->ip), auth_dns_callback, auth);
 }
 
 /*

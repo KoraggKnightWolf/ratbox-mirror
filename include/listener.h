@@ -45,7 +45,7 @@ struct Listener
 void add_listener(int port, const char *vaddr_ip, int family);
 void close_listener(struct Listener *listener);
 void close_listeners(void);
-const char *get_listener_name(const struct Listener *listener);
+const char *get_listener_name(struct Listener *listener);
 void show_ports(struct Client *client);
 void free_listener(struct Listener *);
 

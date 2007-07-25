@@ -305,7 +305,7 @@ find_oper_conf(const char *username, const char *host, const char *locip, const 
 
 		if(parse_netmask(addr, (struct sockaddr *)&ip, &bits) != HM_HOST)
 		{
-			if(ip.ss_family == cip.ss_family &&
+			if(GET_SS_FAMILY(&ip) == GET_SS_FAMILY(&cip) &&
 			   comp_with_mask_sock((struct sockaddr *)&ip, (struct sockaddr *)&cip, bits))
 				return oper_p;
 		}
@@ -373,7 +373,7 @@ struct server_conf *
 make_server_conf(void)
 {
 	struct server_conf *server_p = ircd_malloc(sizeof(struct server_conf));
-	server_p->ipnum.ss_family = AF_INET;
+	GET_SS_FAMILY(&server_p->ipnum) = AF_INET;
 	return server_p;
 }
 
@@ -426,7 +426,7 @@ conf_dns_callback(const char *result, int status, int aftype, void *data)
 		if(aftype == AF_INET6)
 		{
 			struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)&server_p->ipnum;
-			SET_SS_LEN(server_p->ipnum, sizeof(struct sockaddr_in6));
+			SET_SS_LEN(&server_p->ipnum, sizeof(struct sockaddr_in6));
 			in6->sin6_family = AF_INET6;
 			in6->sin6_port = 0;
 		}
@@ -434,7 +434,7 @@ conf_dns_callback(const char *result, int status, int aftype, void *data)
 #endif
 		{
 			struct sockaddr_in *in = (struct sockaddr_in *)&server_p->ipnum;
-			SET_SS_LEN(server_p->ipnum, sizeof(struct sockaddr_in));
+			SET_SS_LEN(&server_p->ipnum, sizeof(struct sockaddr_in));
 			in->sin_family = AF_INET;
 			in->sin_port = 0;
 		}
@@ -466,7 +466,7 @@ add_server_conf(struct server_conf *server_p)
 	if(ircd_inet_pton_sock(server_p->host, (struct sockaddr *)&server_p->ipnum) > 0)
 		return;
 
-	server_p->dns_query = lookup_hostname(server_p->host, server_p->ipnum.ss_family, conf_dns_callback, server_p);
+	server_p->dns_query = lookup_hostname(server_p->host, GET_SS_FAMILY(&server_p->ipnum), conf_dns_callback, server_p);
 }
 
 struct server_conf *

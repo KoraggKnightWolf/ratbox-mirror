@@ -250,7 +250,7 @@ bandb_check_dline(struct ConfItem *aconf)
 /* 	struct ConfItem *dconf; */
 	int bits;
 
-	if(!parse_netmask(aconf->host, &daddr, &bits))
+	if(!parse_netmask(aconf->host, (struct sockaddr *)&daddr, &bits))
 		return 0;
 
 	return 1;
