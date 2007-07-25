@@ -620,6 +620,12 @@ ratbox_main(int argc, char *argv[])
 	init_sys();
 	/* This must be after we daemonize.. */
 	ircd_lib_init(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE, FD_HEAP_SIZE);
+	if(ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
+	{
+		ircd_init_prng(ConfigFileEntry.egdpool_path, IRCD_PRNG_EGD);
+	} else
+	ircd_init_prng(NULL, IRCD_PRNG_DEFAULT);
+	
 	init_main_logfile();
 	init_patricia();
 	newconf_init();

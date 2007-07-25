@@ -455,28 +455,6 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 
 static int
-get_randomness(unsigned char *buf, int length)
-{
-	/* Seed OpenSSL PRNG with EGD enthropy pool -kre */
-	if(ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
-	{
-		if(RAND_egd(ConfigFileEntry.egdpool_path) == -1)
-			return -1;
-	}
-
-	if(RAND_status())
-	{
-		if(RAND_bytes(buf, length) > 0)
-			return 1;
-	}
-	else {
-		if(RAND_pseudo_bytes(buf, length) >= 0)
-			return 1;
-	}
-	return 0;
-}
-
-static int
 generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 {
 	SHA_CTX ctx;
@@ -488,7 +466,7 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 
 	if(!rsa)
 		return -1;
-	if(get_randomness(secret, CHALLENGE_SECRET_LENGTH))
+	if(ircd_get_random(secret, CHALLENGE_SECRET_LENGTH))
 	{
 		SHA1_Init(&ctx);
 		SHA1_Update(&ctx, (uint8_t *)secret, CHALLENGE_SECRET_LENGTH);
