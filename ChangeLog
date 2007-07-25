@@ -1,3 +1,16 @@
+androsyn    2007/07/25 16:48:16 UTC	(20070725_2-24093)
+  Log:
+  Initial first pass at getting SSL connections to work.  The conf stuff needs cleaned up to deal with errors still.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/listener.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/07/25 16:07:55 UTC	(20070725_1-24087)
   Log:
   make changes for the new irc_sockaddr_storage stuff
