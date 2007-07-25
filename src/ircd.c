@@ -685,6 +685,7 @@ ratbox_main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	ircd_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
+	ircd_setup_ssl_server(ServerInfo.ssl_ca_cert, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 
 	if (testing_conf)
 	{

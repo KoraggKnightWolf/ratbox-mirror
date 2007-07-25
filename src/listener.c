@@ -140,7 +140,7 @@ show_ports(struct Client *source_p)
 static int
 inetport(struct Listener *listener)
 {
-	int fd;
+	int fd, ret;
 	int opt = 1;
 
 	/*
@@ -212,7 +212,13 @@ inetport(struct Listener *listener)
 		return 0;
 	}
 
-	if(listen(fd, RATBOX_SOMAXCONN))
+	
+	if(listener->ssl)
+		ret = ircd_ssl_listen(fd, RATBOX_SOMAXCONN);
+	else
+		ret = ircd_listen(fd, RATBOX_SOMAXCONN);
+
+	if(ret)
 	{
 		report_error("listen failed for %s:%s", 
 			     get_listener_name(listener), 
@@ -288,7 +294,7 @@ find_listener(struct irc_sockaddr_storage *addr)
  * the format "255.255.255.255"
  */
 void
-add_listener(int port, const char *vhost_ip, int family)
+add_listener(int port, const char *vhost_ip, int family, int ssl)
 {
 	struct Listener *listener;
 	struct irc_sockaddr_storage vaddr;
@@ -359,7 +365,7 @@ add_listener(int port, const char *vhost_ip, int family)
 	}
 
 	listener->fd = -1;
-
+	listener->ssl = ssl;
 	if(inetport(listener))
 		listener->active = 1;
 	else

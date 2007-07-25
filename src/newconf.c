@@ -753,9 +753,9 @@ conf_set_listen_port(void *data)
 		}
 		if(listener_address == NULL)
 		{
-			add_listener(args->v.number, listener_address, AF_INET);
+			add_listener(args->v.number, listener_address, AF_INET, 0);
 #ifdef IPV6
-			add_listener(args->v.number, listener_address, AF_INET6);
+			add_listener(args->v.number, listener_address, AF_INET6, 0);
 #endif
 		}
 		else
@@ -768,12 +768,49 @@ conf_set_listen_port(void *data)
 #endif
 				family = AF_INET;
 		
-			add_listener(args->v.number, listener_address, family);
+			add_listener(args->v.number, listener_address, family, 0);
 		
 		}
 
 	}
 }
+
+static void
+conf_set_listen_sslport(void *data)
+{
+	conf_parm_t *args = data;
+	for (; args; args = args->next)
+	{
+		if((args->type & CF_MTYPE) != CF_INT)
+		{
+			conf_report_error
+				("listener::port argument is not an integer " "-- ignoring.");
+			continue;
+		}
+		if(listener_address == NULL)
+		{
+			add_listener(args->v.number, listener_address, AF_INET, 1);
+#ifdef IPV6
+			add_listener(args->v.number, listener_address, AF_INET6, 1);
+#endif
+		}
+		else
+		{
+			int family;
+#ifdef IPV6
+			if(strchr(listener_address, ':') != NULL)
+				family = AF_INET6;
+			else 
+#endif
+				family = AF_INET;
+		
+			add_listener(args->v.number, listener_address, family, 1);
+		
+		}
+
+	}
+}
+
 
 static void
 conf_set_listen_address(void *data)
@@ -1736,7 +1773,10 @@ static struct ConfEntry conf_serverinfo_table[] =
 	{ "sid", 		CF_QSTRING, conf_set_serverinfo_sid,	0, NULL },
 	{ "vhost", 		CF_QSTRING, conf_set_serverinfo_vhost,	0, NULL },
 	{ "vhost6", 		CF_QSTRING, conf_set_serverinfo_vhost6,	0, NULL },
-
+	{ "ssl_private_key",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_private_key },
+	{ "ssl_ca_cert",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_ca_cert },
+	{ "ssl_cert",		CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },
+	{ "ssl_dh_params",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
 	{ "\0",	0, NULL, 0, NULL }
 };
 
@@ -1936,6 +1976,7 @@ newconf_init()
 
 	add_top_conf("listen", conf_begin_listen, conf_end_listen, NULL);
 	add_conf_item("listen", "port", CF_INT | CF_FLIST, conf_set_listen_port);
+	add_conf_item("listen", "sslport", CF_INT | CF_FLIST, conf_set_listen_sslport);
 	add_conf_item("listen", "ip", CF_QSTRING, conf_set_listen_address);
 	add_conf_item("listen", "host", CF_QSTRING, conf_set_listen_address);
 

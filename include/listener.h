@@ -36,13 +36,12 @@ struct Listener
 	int fd;			/* file descriptor */
 	int ref_count;		/* number of connection references */
 	int active;		/* current state of listener */
-	int index;		/* index into poll array */
-	pid_t ssl_pid;		/* ssl listener */
+	int ssl;		/* ssl listener */
 	struct irc_sockaddr_storage addr;
 	char vhost[HOSTLEN + 1];	/* virtual name of listener */
 };
 
-void add_listener(int port, const char *vaddr_ip, int family);
+void add_listener(int port, const char *vaddr_ip, int family, int ssl);
 void close_listener(struct Listener *listener);
 void close_listeners(void);
 const char *get_listener_name(struct Listener *listener);

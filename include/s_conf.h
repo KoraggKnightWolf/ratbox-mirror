@@ -265,6 +265,10 @@ struct server_info
 #ifdef IPV6
 	int specific_ipv6_vhost;
 #endif
+	char *ssl_private_key;
+	char *ssl_ca_cert;
+	char *ssl_cert;
+	char *ssl_dh_params;
 };
 
 struct admin_info
