@@ -1,3 +1,11 @@
+androsyn    2007/07/25 17:39:51 UTC	(20070725_3-24095)
+  Log:
+  i'm not sure how valid it is to assume that a short read will return EAGAIN and some i/o methods probably won't like this either
+
+  Modified:
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+
+
 androsyn    2007/07/25 16:48:16 UTC	(20070725_2-24093)
   Log:
   Initial first pass at getting SSL connections to work.  The conf stuff needs cleaned up to deal with errors still.
