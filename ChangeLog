@@ -1,3 +1,12 @@
+androsyn    2007/07/25 19:19:36 UTC	(20070725_4-24105)
+  Log:
+  setup seeding the libircd prng
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2007/07/25 17:39:51 UTC	(20070725_3-24095)
   Log:
   i'm not sure how valid it is to assume that a short read will return EAGAIN and some i/o methods probably won't like this either
