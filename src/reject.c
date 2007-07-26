@@ -149,7 +149,7 @@ init_reject(void)
 	throttle_tree = New_Patricia(PATRICIA_BITS);
 	ircd_event_add("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
 	ircd_event_add("reject_expires", reject_expires, NULL, 60);
-	ircd_event_add("throttle_expires", throttle_expires, NULL, 60);
+	ircd_event_add("throttle_expires", throttle_expires, NULL, 10);
 }
 
 
