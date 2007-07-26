@@ -101,11 +101,7 @@ assign_auth_id(void)
 
 static char *ident_path;
 static ircd_helper *ident_helper;
-static void
-ident_restart_cb(ircd_helper *helper)
-{
-	return;
-}
+static void ident_restart_cb(ircd_helper *helper);
 
 static void
 fork_ident(void)
@@ -148,10 +144,22 @@ fork_ident(void)
 	return;
 }
 
+static void ident_restart_cb(ircd_helper *helper)
+{
+	if(helper != NULL)
+	{
+		ircd_helper_close(helper);
+		ident_helper = NULL;
+	
+	}
+	fork_ident();
+}
+
+
 void
 restart_ident(void)
 {
-	fork_ident();
+	ident_restart_cb(ident_helper);
 }
 
 

@@ -413,6 +413,12 @@ bandb_rehash_bans(void)
 
 static void bandb_restart_cb(ircd_helper *helper)
 {
+	if(helper != NULL)
+	{
+		ircd_helper_close(helper);
+		bandb_helper = NULL;
+	}	
+	fork_bandb();	
 	return;
 }
 
