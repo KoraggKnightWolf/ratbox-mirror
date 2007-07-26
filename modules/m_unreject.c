@@ -50,8 +50,7 @@ DECLARE_MODULE_AV1(unreject, NULL, NULL, unreject_clist, NULL, NULL, "$Revision$
 static int
 mo_unreject(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_ban_time == 0 ||
-	   ConfigFileEntry.reject_duration == 0)
+	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Reject cache is disabled",
 			   me.name, source_p->name);

@@ -648,12 +648,6 @@ static struct InfoStruct info_table[] = {
 		"Client rejection threshold setting",
 	},
 	{
-		"reject_ban_time",
-		OUTPUT_DECIMAL,
-		{ &ConfigFileEntry.reject_ban_time }, 
-		"Client rejection time interval",
-	},
-	{
 		"reject_duration",
 		OUTPUT_DECIMAL,
 		{ &ConfigFileEntry.reject_duration }, 
@@ -718,6 +712,18 @@ static struct InfoStruct info_table[] = {
 		OUTPUT_BOOLEAN,
 		{ &ConfigFileEntry.target_change },
 		"Target change anti-spam system"
+	},
+	{
+		"throttle_count",
+		OUTPUT_DECIMAL,
+		{ &ConfigFileEntry.throttle_count }, 
+		"Connection throttle threshold",
+	},
+	{
+		"throttle_duration",
+		OUTPUT_DECIMAL,
+		{ &ConfigFileEntry.throttle_duration }, 
+		"Connection throttle duration",
 	},
 	{
 		"tkline_expire_notices",

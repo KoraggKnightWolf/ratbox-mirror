@@ -456,16 +456,12 @@ add_connection(struct Listener *listener, int fd, struct sockaddr *sai)
 	new_client->localClient->listener = listener;
 	++listener->ref_count;
 
-	if(check_reject(new_client))
-		return; 
-	if(add_unknown_ip(new_client))
-		return;
-		
 	start_auth(new_client);
 }
 
 static time_t last_oper_notice = 0;
 
+static const char *toofast = "ERROR :Reconnecting too fast, throttled.\r\n";
 
 static int
 accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
@@ -479,7 +475,7 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 		ircd_close(fd);
 		return 0;
 	}
-
+	
 	if((maxconnections - 10) < fd)
 	{
 		++ServerStats.is_ref;
@@ -499,10 +495,14 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 		/* Re-register a new IO request for the next accept .. */
 		return 0;
 	}
+
+	aconf = find_dline(addr);
+	if(aconf != NULL && (aconf->status & CONF_EXEMPTDLINE))
+		return 1;
 	
 	/* Do an initial check we aren't connecting too fast or with too many
 	 * from this IP... */
-	if((aconf = conf_connect_allowed(addr, GET_SS_FAMILY(addr))) != NULL)
+	if(aconf != NULL)
 	{
 		ServerStats.is_ref++;
 			
@@ -516,12 +516,23 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 			}
 		}
 		else
-			ircd_sprintf(buf, "ERROR :You have been D-lined.\r\n");
+			strcpy(buf, "ERROR :You have been D-lined.\r\n");
 	
 		ircd_write(fd, buf, strlen(buf));
 		ircd_close(fd);
 		return 0;
 	}
+
+	if(check_reject(fd, addr))
+		return 0;
+		
+	if(throttle_add(addr))
+	{
+		ircd_write(fd, toofast, strlen(toofast));
+		ircd_close(fd);
+		return 0;
+	}
+
 	return 1;
 }
 

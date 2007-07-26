@@ -41,7 +41,9 @@ patricia_tree_t *dline_tree;
 static patricia_tree_t *eline_tree;
 dlink_list delay_exit;
 static dlink_list reject_list;
-static patricia_tree_t *unknown_tree;
+static dlink_list throttle_list;
+static patricia_tree_t *throttle_tree;
+static void throttle_expires(void *unused);
 
 
 struct reject_data
@@ -51,10 +53,15 @@ struct reject_data
 	unsigned int count;
 };
 
+struct delay_data
+{
+	dlink_node node;
+	int fd;
+};
 
 
 static patricia_node_t *
-add_line(struct ConfItem *aconf, patricia_tree_t *tree, struct sockaddr *addr, int cidr)
+add_ipline(struct ConfItem *aconf, patricia_tree_t *tree, struct sockaddr *addr, int cidr)
 {
 	patricia_node_t *pnode;
 	pnode = make_and_lookup_ip(tree, addr, cidr);
@@ -73,7 +80,7 @@ add_dline(struct ConfItem *aconf)
 	if(parse_netmask(aconf->host, (struct sockaddr *)&st, &bitlen) == HM_HOST)
 		return 0;
 
-	if(add_line(aconf, dline_tree, (struct sockaddr *)&st, bitlen) != NULL)
+	if(add_ipline(aconf, dline_tree, (struct sockaddr *)&st, bitlen) != NULL)
 		return 1;
 	return 0;
 }
@@ -86,39 +93,26 @@ add_eline(struct ConfItem *aconf)
 	if(parse_netmask(aconf->host, (struct sockaddr *)&st, &bitlen) == HM_HOST)
 		return 0;
 
-	if(add_line(aconf, eline_tree, (struct sockaddr *)&st, bitlen) != NULL)
+	if(add_ipline(aconf, eline_tree, (struct sockaddr *)&st, bitlen) != NULL)
 		return 1;
 	return 0;
 }
 
 
-
 static void
 reject_exit(void *unused)
 {
-	struct Client *client_p;
 	dlink_node *ptr, *ptr_next;
-
+	struct delay_data *ddata;
+	static const char *errbuf = "ERROR :Closing Link: (*** Banned (cache))\r\n";
+	
 	DLINK_FOREACH_SAFE(ptr, ptr_next, delay_exit.head)
 	{
-		client_p = ptr->data;
-		if(IsDead(client_p))
-			continue;
+		ddata = ptr->data;
 
-		/* this MUST be here, to prevent the possibility
-		 * sendto_one() generates a write error, and then a client
-		 * ends up on the dead_list and the abort_list --fl
-		 */
-		if(!IsIOError(client_p))
-		{
-			if(IsExUnknown(client_p))
-				sendto_one(client_p, POP_QUEUE, "ERROR :Closing Link: %s (*** Too many unknown connections)", client_p->host);
-			else
-				sendto_one(client_p, POP_QUEUE, "ERROR :Closing Link: %s (*** Banned (cache))", client_p->host);
-		}
-		close_connection(client_p);
-		SetDead(client_p);
-		ircd_dlinkAddAlloc(client_p, &dead_list);
+		ircd_write(ddata->fd, errbuf, strlen(errbuf));		
+		ircd_close(ddata->fd);
+		ircd_free(ddata);
 	}
 
 	delay_exit.head = delay_exit.tail = NULL;
@@ -152,9 +146,10 @@ init_reject(void)
 	reject_tree = New_Patricia(PATRICIA_BITS);
 	dline_tree = New_Patricia(PATRICIA_BITS);
 	eline_tree = New_Patricia(PATRICIA_BITS);
-	unknown_tree = New_Patricia(PATRICIA_BITS);
+	throttle_tree = New_Patricia(PATRICIA_BITS);
 	ircd_event_add("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
 	ircd_event_add("reject_expires", reject_expires, NULL, 60);
+	ircd_event_add("throttle_expires", throttle_expires, NULL, 60);
 }
 
 
@@ -165,7 +160,7 @@ add_reject(struct Client *client_p)
 	struct reject_data *rdata;
 
 	/* Reject is disabled */
-	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_ban_time == 0)
+	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return;
 
 	if((pnode = match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
@@ -190,17 +185,16 @@ add_reject(struct Client *client_p)
 }
 
 int
-check_reject(struct Client *client_p)
+check_reject(int fd, struct sockaddr *addr)
 {
 	patricia_node_t *pnode;
 	struct reject_data *rdata;
-	
+	struct delay_data *ddata;
 	/* Reject is disabled */
-	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_ban_time == 0 ||
-	   ConfigFileEntry.reject_duration == 0)
+	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return 0;
 		
-	pnode = match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip);
+	pnode = match_ip(reject_tree, addr);
 	if(pnode != NULL)
 	{
 		rdata = pnode->data;
@@ -208,11 +202,11 @@ check_reject(struct Client *client_p)
 		rdata->time = ircd_currenttime;
 		if(rdata->count > (unsigned long)ConfigFileEntry.reject_after_count)
 		{
+			ddata = ircd_malloc(sizeof(struct delay_data));
 			ServerStats.is_rej++;
-			SetReject(client_p);
-			ircd_setselect(client_p->localClient->fd, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
-			SetClosing(client_p);
-			ircd_dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &delay_exit);
+			ircd_setselect(fd, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
+			ddata->fd = fd;
+			ircd_dlinkAdd(ddata, &ddata->node, &delay_exit);
 			return 1;
 		}
 	}	
@@ -243,8 +237,7 @@ remove_reject(const char *ip)
 	patricia_node_t *pnode;
 	
 	/* Reject is disabled */
-	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_ban_time == 0 ||
-	   ConfigFileEntry.reject_duration == 0)
+	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return -1;
 
 	if((pnode = match_string(reject_tree, ip)) != NULL)
@@ -257,20 +250,6 @@ remove_reject(const char *ip)
 	}
 	return 0;
 }
-
-#if 0
-static int
-add_ipline(struct ConfItem *aconf, patricia_tree_t *t, struct sockaddr *addr, int cidr)
-{
-	patricia_node_t *pnode;
-
-	pnode = add_line(aconf, t, addr, cidr);
-	if(pnode == NULL)
-		return 0;
-
-	return 1;
-}
-#endif
 
 static void
 delete_ipline(struct ConfItem *aconf, patricia_tree_t *t)
@@ -389,53 +368,67 @@ report_elines(struct Client *source_p)
 }
 
 
-int
-add_unknown_ip(struct Client *client_p)
+typedef struct _throttle
 {
+	dlink_node node;
+	time_t last;
+	int count;
+} throttle_t;
+
+
+int
+throttle_add(struct sockaddr *addr)
+{
+	throttle_t *t;
 	patricia_node_t *pnode;
 
-	if((pnode = match_ip(unknown_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
+	if((pnode = match_ip(throttle_tree, addr)) != NULL)
 	{
-		pnode->data = (void *)((unsigned long)pnode->data + 1);
-	}
-	else
-	{
+		t = pnode->data;
+
+		if(t->count > ConfigFileEntry.throttle_count)
+			return 1;			
+
+		/* Stop penalizing them after they've been throttled */
+		t->last = ircd_currenttime;
+		t->count++;
+
+	} else {
 		int bitlen = 32;
 #ifdef IPV6
-		if(GET_SS_FAMILY(&client_p->localClient->ip) == AF_INET6)
+		if(GET_SS_FAMILY(addr) == AF_INET6)
 			bitlen = 128;
 #endif
-		pnode = make_and_lookup_ip(unknown_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);
-		pnode->data = (void *)(long)1;
-	}
-
-	if((long)pnode->data >= ConfigFileEntry.max_unknown_ip)
-	{
-		SetExUnknown(client_p);
-		SetReject(client_p);
-		ircd_setselect(client_p->localClient->fd, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
-		SetClosing(client_p);
-		del_unknown_ip(client_p); /* maybe do this in delay exit code instead? */
-		ircd_dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &delay_exit);
-		return 1;
-	}
+		t = ircd_malloc(sizeof(throttle_t));	
+		t->last = ircd_currenttime;
+		t->count = 1;
+		pnode = make_and_lookup_ip(throttle_tree, addr, bitlen);
+		pnode->data = t;
+		ircd_dlinkAdd(pnode, &t->node, &throttle_list); 
+	}	
 	return 0;
 }
 
-void
-del_unknown_ip(struct Client *client_p)
+static void
+throttle_expires(void *unused)
 {
+	dlink_node *ptr, *next;
 	patricia_node_t *pnode;
-
-	if((pnode = match_ip(unknown_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
+	throttle_t *t;
+	
+	DLINK_FOREACH_SAFE(ptr, next, throttle_list.head)
 	{
-		pnode->data = (void *)((long)pnode->data - 1);
-		if((long)pnode->data <= 0)
-		{
-			patricia_remove(unknown_tree, pnode);
-		}
+		pnode = ptr->data;
+		t = pnode->data;		
+
+		if(t->last + ConfigFileEntry.throttle_duration > ircd_currenttime)
+			continue;
+
+		ircd_dlinkDelete(ptr, &throttle_list);
+		ircd_free(t);
+		patricia_remove(throttle_tree, pnode);
 	}
-	/* well..this shouldn't happen */
-	s_assert(0);
 }
+
+
 

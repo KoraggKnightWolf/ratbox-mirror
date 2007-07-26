@@ -33,7 +33,7 @@ extern struct _patricia_tree_t *dline_tree;
 extern dlink_list delay_exit;
 
 void init_reject(void);
-int check_reject(struct Client *);
+int check_reject(int fd, struct sockaddr *addr);
 void add_reject(struct Client *);
 void flush_reject(void);
 int remove_reject(const char *ip);
@@ -46,8 +46,7 @@ void report_dlines(struct Client *);
 void report_tdlines(struct Client *);
 void report_elines(struct Client *);
 
-int add_unknown_ip(struct Client *client_p);
-void del_unknown_ip(struct Client *client_p);
+int throttle_add(struct sockaddr *addr);
 
 #endif
 

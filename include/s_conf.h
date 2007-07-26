@@ -208,12 +208,12 @@ struct config_file_entry
 	int disable_auth;
 	int connect_timeout;
 	int burst_away;
-	int reject_ban_time;
 	int reject_after_count;
 	int reject_duration;
+	int throttle_count;
+	int throttle_duration;
 	int target_change;
 	int hide_spoof_ips;
-	int max_unknown_ip;
 #ifdef IPV6
 	int fallback_to_ip6_int;
 #endif
