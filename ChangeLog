@@ -1,3 +1,11 @@
+androsyn    2007/07/26 18:19:36 UTC	(20070726_2-24123)
+  Log:
+  run the throttle_expires event a bit more often
+
+  Modified:
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2007/07/26 16:45:08 UTC	(20070726_1-24121)
   Log:
   Remove the unknown clients per ip checking, replace with connection throttling.
