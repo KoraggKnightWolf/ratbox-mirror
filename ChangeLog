@@ -1,3 +1,12 @@
+androsyn    2007/07/26 16:30:31 UTC	(20070726_0-24119)
+  Log:
+  handle restarting the ident and bandb helpers a bit better
+
+  Modified:
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2007/07/25 23:53:21 UTC	(20070725_5-24113)
   Log:
   drop ssl connections if ssl_ok isn't set
