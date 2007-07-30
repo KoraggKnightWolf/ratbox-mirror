@@ -1,3 +1,18 @@
+androsyn    2007/07/30 15:22:32 UTC	(20070730_0-24127)
+  Log:
+  Fix conf parser line number bug. 
+  Reformat the lexer/parser so that its closer to the rest of the code.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd_lexer.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_lexer.l (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.h (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.y (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2007/07/26 18:19:36 UTC	(20070726_2-24123)
   Log:
   run the throttle_expires event a bit more often
