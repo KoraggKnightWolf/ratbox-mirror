@@ -5,7 +5,6 @@
 
 %{
 
-#define WE_ARE_MEMORY_C
 #include "stdinc.h"
 #include "setup.h"
 #include "ircd_lib.h"
@@ -50,18 +49,17 @@ static struct {
 	{NULL, NULL, 0},
 };
 
-time_t conf_find_time(char *name)
+time_t 
+conf_find_time(char *name)
 {
-  int i;
+	int i;
 
-  for (i = 0; ircd_times[i].name; i++)
-    {
-      if (strcasecmp(ircd_times[i].name, name) == 0 ||
-	  (ircd_times[i].plural && strcasecmp(ircd_times[i].plural, name) == 0))
-	return ircd_times[i].val;
-    }
-
-  return 0;
+	for (i = 0; ircd_times[i].name; i++)
+	{
+		if (strcasecmp(ircd_times[i].name, name) == 0 || (ircd_times[i].plural && strcasecmp(ircd_times[i].plural, name) == 0))
+			return ircd_times[i].val;
+	}
+	return 0;
 }
 
 static struct
@@ -78,7 +76,8 @@ static struct
 	{NULL,		0}
 };
 
-static int	conf_get_yesno_value(char *str)
+static int 
+conf_get_yesno_value(char *str)
 {
 	int i;
 
@@ -93,7 +92,8 @@ static int	conf_get_yesno_value(char *str)
 	return -1;
 }
 
-static void	free_cur_list(conf_parm_t* list)
+static void
+free_cur_list(conf_parm_t* list)
 {
 	switch (list->type & CF_MTYPE)
 	{
@@ -112,9 +112,10 @@ static void	free_cur_list(conf_parm_t* list)
 }
 
 		
-conf_parm_t *	cur_list = NULL;
+conf_parm_t *cur_list = NULL;
 
-static void	add_cur_list_cpt(conf_parm_t *new)
+static void
+add_cur_list_cpt(conf_parm_t *new)
 {
 	if (cur_list == NULL)
 	{
@@ -129,7 +130,8 @@ static void	add_cur_list_cpt(conf_parm_t *new)
 	}
 }
 
-static void	add_cur_list(int type, char *str, int number)
+static void
+add_cur_list(int type, char *str, int number)
 {
 	conf_parm_t *new;
 
@@ -181,40 +183,42 @@ conf:
 	;
 
 conf_item: block
-	 | loadmodule
-         ;
+	| loadmodule
+	;
 
 block: string 
-         { 
-           conf_start_block($1, NULL);
-         }
-       '{' block_items '}' ';' 
-         {
-	   if (conf_cur_block)
-           	conf_end_block(conf_cur_block);
-         }
-     | string qstring 
-         { 
-           conf_start_block($1, $2);
-         }
-       '{' block_items '}' ';'
-         {
-	   if (conf_cur_block)
-           	conf_end_block(conf_cur_block);
-         }
-     ;
+	{ 
+		conf_start_block($1, NULL);
+	}
+       
+	'{' block_items '}' ';' 
+	{
+		if (conf_cur_block)
+			conf_end_block(conf_cur_block);
+	}
 
-block_items: block_items block_item 
-           | block_item 
-           ;
+	| string qstring 
+	{ 
+		conf_start_block($1, $2);
+	}
+	'{' block_items '}' ';'
+	{
+		if (conf_cur_block)
+			conf_end_block(conf_cur_block);
+	}
+	;
+
+	block_items: block_items block_item 
+		| block_item 
+	;
 
 block_item:	string '=' itemlist ';'
-		{
-			conf_call_set(conf_cur_block, $1, cur_list, CF_LIST);
-			free_cur_list(cur_list);
-			cur_list = NULL;
-		}
-		;
+	{
+		conf_call_set(conf_cur_block, $1, cur_list, CF_LIST);
+		free_cur_list(cur_list);
+		cur_list = NULL;
+	}
+	;
 
 itemlist: itemlist ',' single
 	| single
@@ -246,27 +250,28 @@ single: oneitem
 	;
 
 oneitem: qstring
-            {
+	{
 		$$ = ircd_malloc(sizeof(conf_parm_t));
 		$$->type = CF_QSTRING;
 		$$->v.string = ircd_strdup($1);
-	    }
-          | timespec
-            {
+	}
+	| timespec
+	{
 		$$ = ircd_malloc(sizeof(conf_parm_t));
 		$$->type = CF_TIME;
 		$$->v.number = $1;
-	    }
-          | number
-            {
+	}
+	| number
+	{
 		$$ = ircd_malloc(sizeof(conf_parm_t));
 		$$->type = CF_INT;
 		$$->v.number = $1;
-	    }
-          | string
-            {
+	}
+	| string
+	{
 		/* a 'string' could also be a yes/no value .. 
-		   so pass it as that, if so */
+		 so pass it as that, if so */
+		 
 		int val = conf_get_yesno_value($1);
 
 		$$ = ircd_malloc(sizeof(conf_parm_t));
@@ -281,41 +286,42 @@ oneitem: qstring
 			$$->type = CF_STRING;
 			$$->v.string = ircd_strdup($1);
 		}
-            }
-          ;
+	}
+	;
 
 loadmodule:
-	  LOADMODULE QSTRING
-            {
+	LOADMODULE QSTRING
+	{
 #ifndef STATIC_MODULES
-	      load_one_module($2, 0);
+	load_one_module($2, 0);
 #endif
-	    }
-	  ';'
-          ;
+	}
+	';'
+	;
 
 qstring: QSTRING { strcpy($$, $1); } ;
 string: STRING { strcpy($$, $1); } ;
 number: NUMBER { $$ = $1; } ;
 
-timespec:	number string
-         	{
-			time_t t;
+timespec:	
+	number string
+         {
+		time_t t;
 
-			if ((t = conf_find_time($2)) == 0)
-			{
-				conf_report_error("Unrecognised time type/size '%s'", $2);
-				t = 1;
-			}
-	    
-			$$ = $1 * t;
-		}
-		| timespec timespec
+		if ((t = conf_find_time($2)) == 0)
 		{
-			$$ = $1 + $2;
+			conf_report_error("Unrecognised time type/size '%s'", $2);
+			t = 1;
 		}
-		| timespec number
-		{
-			$$ = $1 + $2;
-		}
-		;
+
+		$$ = $1 * t;
+	}
+	| timespec timespec
+	{
+		$$ = $1 + $2;
+	}
+	| timespec number
+	{
+		$$ = $1 + $2;
+	}
+	;

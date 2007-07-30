@@ -147,7 +147,7 @@ inetport(struct Listener *listener)
 	 * At first, open a new socket
 	 */
 	
-	fd = ircd_socket(GET_SS_FAMILY(&listener->addr), SOCK_STREAM, 0, "Listener socket");
+	fd = ircd_socket(GET_SS_FAMILY(&listener->addr), SOCK_STREAM, IPPROTO_SCTP, "Listener socket");
 
 #ifdef IPV6
 	if(GET_SS_FAMILY(&listener->addr) == AF_INET6)
@@ -460,7 +460,8 @@ add_connection(struct Listener *listener, int fd, struct sockaddr *sai)
 }
 
 static time_t last_oper_notice = 0;
-
+static time_t last_time = 0;
+static int count = 0;
 static const char *toofast = "ERROR :Reconnecting too fast, throttled.\r\n";
 
 static int
@@ -475,7 +476,19 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 		ircd_close(fd);
 		return 0;
 	}
-	
+	count++;
+
+	if(last_time == 0)
+		last_time = ircd_currenttime;
+
+	if(!(last_time + 10 > ircd_currenttime))
+	{
+		long connsec = (long)count / (long)(ircd_currenttime - last_time);
+		fprintf(stderr, "Got %ld conn/seconds\n", connsec);
+		count = 0;
+		last_time = ircd_currenttime;
+	}
+		
 	if((maxconnections - 10) < fd)
 	{
 		++ServerStats.is_ref;
