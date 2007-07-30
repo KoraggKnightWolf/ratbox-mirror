@@ -420,25 +420,8 @@ conf_dns_callback(const char *result, int status, int aftype, void *data)
 	struct server_conf *server_p = data;
 
 	if(status == 1)
-	{
-		ircd_inet_pton(aftype, result, &server_p->ipnum);
-#ifdef IPV6
-		if(aftype == AF_INET6)
-		{
-			struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)&server_p->ipnum;
-			SET_SS_LEN(&server_p->ipnum, sizeof(struct sockaddr_in6));
-			in6->sin6_family = AF_INET6;
-			in6->sin6_port = 0;
-		}
-		else
-#endif
-		{
-			struct sockaddr_in *in = (struct sockaddr_in *)&server_p->ipnum;
-			SET_SS_LEN(&server_p->ipnum, sizeof(struct sockaddr_in));
-			in->sin_family = AF_INET;
-			in->sin_port = 0;
-		}
-	}
+		ircd_inet_pton_sock(result, (struct sockaddr *)&server_p->ipnum);
+
 	server_p->dns_query = 0;
 }
 

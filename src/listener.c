@@ -310,19 +310,8 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 
 	if(vhost_ip != NULL)
 	{
-		if(family == AF_INET)
-		{
-			if(ircd_inet_pton(family, vhost_ip, &((struct sockaddr_in *)&vaddr)->sin_addr) <= 0)
-				return;
-		} 
-#ifdef IPV6
-		else
-		{
-			if(ircd_inet_pton(family, vhost_ip, &((struct sockaddr_in6 *)&vaddr)->sin6_addr) <= 0)
-				return;
-		
-		}
-#endif
+		if(ircd_inet_pton_sock(vhost_ip, (struct sockaddr *)&vaddr) <= 0)
+			return;
 	} else
 	{
 		switch(family)
@@ -334,9 +323,9 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 			case AF_INET6:
 				memcpy(&((struct sockaddr_in6 *)&vaddr)->sin6_addr, &in6addr_any, sizeof(struct in6_addr));
 				break;
+#endif
 			default:
 				return;
-#endif
 		} 
 	}
 	switch(family)
