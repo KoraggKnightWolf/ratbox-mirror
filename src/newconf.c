@@ -1698,7 +1698,7 @@ conf_set_connect_aftype(confentry_t *entry, conf_t *conf, struct conf_items *ite
 		GET_SS_FAMILY(&t_server->ipnum) = AF_INET6;
 #endif
 	else 
-		conf_warning_error_nl("connect::aftype '%s' at %s:%d is unknown", aft, entry->filename, entry->line);
+		conf_report_warning_nl("connect::aftype '%s' at %s:%d is unknown", aft, entry->filename, entry->line);
 }
 
 static void
