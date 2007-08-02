@@ -1,3 +1,24 @@
+androsyn    2007/08/02 15:05:18 UTC	(20070802_0-24137)
+  Log:
+  - Rework the stuff in newconf.c so that it operates in more of a two pass fashion.
+  - Make comment handling in the lexer not be so goddamn brain damaged.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/include/newconf.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_lexer.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_lexer.l (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.h (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.y (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2007/07/30 16:10:57 UTC	(20070730_2-24131)
   Log:
   use ircd_inet_pton_sock in a few places
