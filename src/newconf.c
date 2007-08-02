@@ -517,7 +517,7 @@ conf_start_block(char *block, char *name)
 	conf_t *conf;
 	if(curconf != NULL)
 	{
-		conf_report_error("\"%s\", Previous block \"%s\" never closed: line %d", conffilebuf, curconf->confname, lineno + 1);
+		conf_report_error("\"%s\", Previous block \"%s\" never closed", conffilebuf, curconf->confname);
 		return 1;
 	}
 	conf = make_conf_block(block);
