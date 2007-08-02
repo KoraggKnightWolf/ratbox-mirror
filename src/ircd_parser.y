@@ -5,21 +5,13 @@
 
 %{
 
-#include "stdinc.h"
-#include "setup.h"
 #include "ircd_lib.h"
-#include "struct.h"
-#include "common.h"
-#include "ircd_defs.h"
-#include "client.h"
-#include "match.h"
-#include "modules.h"
+#include "stdinc.h"
 #include "newconf.h"
 
 #define YY_NO_UNPUT
 
 int yyparse();
-int yyerror(const char *);
 int yylex();
 
 static time_t conf_find_time(char*);
@@ -117,16 +109,17 @@ conf_parm_t *cur_list = NULL;
 static void
 add_cur_list_cpt(conf_parm_t *new)
 {
+	
 	if (cur_list == NULL)
 	{
 		cur_list = ircd_malloc(sizeof(conf_parm_t));
-		cur_list->type |= CF_FLIST;
 		cur_list->v.list = new;
 	}
 	else
 	{
 		new->next = cur_list->v.list;
 		cur_list->v.list = new;
+		cur_list->type |= CF_FLIST;
 	}
 }
 
@@ -168,7 +161,6 @@ add_cur_list(int type, char *str, int number)
 
 %token <string> QSTRING STRING
 %token <number> NUMBER
-
 %type <string> qstring string
 %type <number> number timespec 
 %type <conf_parm> oneitem single itemlist
@@ -186,15 +178,13 @@ conf_item: block
 	| loadmodule
 	;
 
-block: string 
-	{ 
+block: string { 
 		conf_start_block($1, NULL);
 	}
        
 	'{' block_items '}' ';' 
 	{
-		if (conf_cur_block)
-			conf_end_block(conf_cur_block);
+		conf_end_block();
 	}
 
 	| string qstring 
@@ -203,8 +193,7 @@ block: string
 	}
 	'{' block_items '}' ';'
 	{
-		if (conf_cur_block)
-			conf_end_block(conf_cur_block);
+		conf_end_block();
 	}
 	;
 
@@ -214,7 +203,7 @@ block: string
 
 block_item:	string '=' itemlist ';'
 	{
-		conf_call_set(conf_cur_block, $1, cur_list, CF_LIST);
+		conf_call_set($1, cur_list, CF_LIST);
 		free_cur_list(cur_list);
 		cur_list = NULL;
 	}
@@ -293,7 +282,7 @@ loadmodule:
 	LOADMODULE QSTRING
 	{
 #ifndef STATIC_MODULES
-	load_one_module($2, 0);
+//	load_one_module($2, 0);
 #endif
 	}
 	';'

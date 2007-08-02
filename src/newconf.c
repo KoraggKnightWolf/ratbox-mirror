@@ -1,285 +1,115 @@
-/* This code is in the public domain.
- * $Id$
- */
+/*
+ *  ircd-ratbox: A slightly useful ircd.
+ *  newconf.c: Our new two-pass config file mangler
+ *
+ *  Copyright (C) 2007 Aaron Sethman <androsyn@ratbox.org>
+ *  Copyright (C) 2007 ircd-ratbox development team
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ *  USA
+ *
+ *  $Id$               
+ * 
+ */ 
 
+
+#include "ircd_lib.h"
 #include "stdinc.h"
-
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 #endif
 
+
 #include "struct.h"
 #include "client.h"
-#include "newconf.h"
 #include "s_log.h"
 #include "s_conf.h"
 #include "s_user.h"
 #include "s_newconf.h"
-#include "send.h"
-#include "hook.h"
-#include "modules.h"
-#include "listener.h"
 #include "hostmask.h"
-#include "s_serv.h"
-#include "hash.h"
-#include "cache.h"
+#include "send.h"
 #include "ircd.h"
+#include "newconf.h"
+#include "modules.h"
 #include "match.h"
 #include "class.h"
+#include "listener.h"
+#include "cache.h"
 #include "reject.h"
+#include "channel.h"
 
 #define CF_TYPE(x) ((x) & CF_MTYPE)
 
-struct TopConf *conf_cur_block;
-static char *conf_cur_block_name;
 
-static dlink_list conf_items;
+FILE *conf_fbfile_in;
+char conffilebuf[512];
+extern int conf_parse_failure;
+static dlink_list conflist;
+static conf_t *curconf;
 
-static struct ConfItem *yy_aconf = NULL;
-static char *yy_aconf_class;
-static struct Class *yy_class = NULL;
+extern char *current_file;
 
-static struct remote_conf *yy_shared = NULL;
-static struct server_conf *yy_server = NULL;
+typedef struct _valid_entry
+{
+	dlink_node node;
+	char *name;
+	int type;
+} valid_entry_t;
 
-static dlink_list yy_aconf_list;
-static dlink_list yy_oper_list;
-static dlink_list yy_shared_list;
-static dlink_list yy_cluster_list;
-static struct oper_conf *yy_oper = NULL;
+
+typedef struct _valid_block
+{
+	char *name;
+	dlink_list valid_entries;
+	dlink_node node;
+	int needsub;
+} valid_block_t;
+
+
+struct topconf
+{
+	dlink_node node;
+	char *tc_name;
+	void (*start_func) (conf_t *);
+	void (*end_func) (conf_t *);
+	int needsub;
+	struct conf_items *itemtable;
+};
+
+static dlink_list toplist;
+static dlink_list valid_blocks;
 
 static const char *
 conf_strtype(int type)
 {
-	switch (type & CF_MTYPE)
-	{
-	case CF_INT:
-		return "integer value";
-	case CF_STRING:
-		return "unquoted string";
-	case CF_YESNO:
-		return "yes/no value";
-	case CF_QSTRING:
-		return "quoted string";
-	case CF_TIME:
-		return "time/size value";
-	default:
-		return "unknown type";
-	}
-}
-
-static int
-add_top_conf(const char *name, int (*sfunc) (struct TopConf *), 
-		int (*efunc) (struct TopConf *), struct ConfEntry *items)
-{
-	struct TopConf *tc;
-
-	tc = ircd_malloc(sizeof(struct TopConf));
-
-	tc->tc_name = ircd_strdup(name);
-	tc->tc_sfunc = sfunc;
-	tc->tc_efunc = efunc;
-	tc->tc_entries = items;
-
-	ircd_dlinkAddAlloc(tc, &conf_items);
-	return 0;
-}
-
-static struct TopConf *
-find_top_conf(const char *name)
-{
-	dlink_node *d;
-	struct TopConf *tc;
-
-	DLINK_FOREACH(d, conf_items.head)
-	{
-		tc = d->data;
-		if(strcasecmp(tc->tc_name, name) == 0)
-			return tc;
-	}
-
-	return NULL;
-}
-
-
-static struct ConfEntry *
-find_conf_item(const struct TopConf *top, const char *name)
-{
-	struct ConfEntry *cf;
-	dlink_node *d;
-
-	if(top->tc_entries)
-	{
-		int i;
-
-		for(i = 0; top->tc_entries[i].cf_type; i++)
-		{
-			cf = &top->tc_entries[i];
-
-			if(!strcasecmp(cf->cf_name, name))
-				return cf;
-		}
-	}
-
-	DLINK_FOREACH(d, top->tc_items.head)
-	{
-		cf = d->data;
-		if(strcasecmp(cf->cf_name, name) == 0)
-			return cf;
-	}
-
-	return NULL;
-}
-
-#if 0				/* XXX unused */
-static int
-remove_top_conf(char *name)
-{
-	struct TopConf *tc;
-	dlink_node *ptr;
-
-	if((tc = find_top_conf(name)) == NULL)
-		return -1;
-
-	if((ptr = ircd_dlinkFind(tc, &conf_items)) == NULL)
-		return -1;
-
-	ircd_dlinkDestroy(ptr, &conf_items);
-	ircd_free(tc->tc_name);
-	ircd_free(tc);
-
-	return 0;
-}
-#endif
-
-static void
-conf_set_serverinfo_name(void *data)
-{
-	if(ServerInfo.name == NULL)
-	{
-		const char *s;
-		int dots = 0;
-
-		for(s = data; *s != '\0'; s++)
-		{
-			if(!IsServChar(*s))
-			{
-				conf_report_error("Ignoring serverinfo::name "
-						  "-- bogus servername.");
-				return;
-			}
-			else if(*s == '.')
-				++dots;
-		}
-
-		if(!dots)
-		{
-			conf_report_error("Ignoring serverinfo::name -- must contain '.'");
-			return;
-		}
-
-		s = data;
-
-		if(IsDigit(*s))
-		{
-			conf_report_error("Ignoring serverinfo::name -- cannot begin with digit.");
-			return;
-		}
-
-		/* the ircd will exit() in main() if we dont set one */
-		if(strlen(s) <= HOSTLEN)
-			ServerInfo.name = ircd_strdup(data);
-	}
-}
-
-static void
-conf_set_serverinfo_sid(void *data)
-{
-	char *sid = data;
-
-	if(ServerInfo.sid[0] == '\0')
-	{
-		if(!IsDigit(sid[0]) || !IsIdChar(sid[1]) ||
-		   !IsIdChar(sid[2]) || sid[3] != '\0')
-		{
-			conf_report_error("Ignoring serverinfo::sid "
-					  "-- bogus sid.");
-			return;
-		}
-
-		strcpy(ServerInfo.sid, sid);
-	}
-}
-
-static void
-conf_set_serverinfo_network_name(void *data)
-{
-	char *p;
-
-	if((p = strchr((char *) data, ' ')))
-		*p = '\0';
-
-	ircd_free(ServerInfo.network_name);
-	ServerInfo.network_name = ircd_strdup(data);
-}
-
-static void
-conf_set_serverinfo_vhost(void *data)
-{
-	if(ircd_inet_pton(AF_INET, (char *) data, &ServerInfo.ip.sin_addr) <= 0)
-	{
-		conf_report_error("Invalid netmask for server IPv4 vhost (%s)", (char *) data);
-		return;
-	}
-	ServerInfo.ip.sin_family = AF_INET;
-	ServerInfo.specific_ipv4_vhost = 1;
-}
-
-static void
-conf_set_serverinfo_vhost6(void *data)
-{
-#ifdef IPV6
-	if(ircd_inet_pton(AF_INET6, (char *) data, &ServerInfo.ip6.sin6_addr) <= 0)
-	{
-		conf_report_error("Invalid netmask for server IPv6 vhost (%s)", (char *) data);
-		return;
-	}
-
-	ServerInfo.specific_ipv6_vhost = 1;
-	ServerInfo.ip6.sin6_family = AF_INET6;
-#else
-	conf_report_error("Warning -- ignoring serverinfo::vhost6 -- IPv6 support not available.");
-#endif
-}
-
-static void
-conf_set_modules_module(void *data)
-{
-#ifndef STATIC_MODULES
-	char *m_bn;
-
-	m_bn = irc_basename((char *) data);
-
-	if(findmodule_byname(m_bn) != -1)
-		return;
-
-	load_one_module((char *) data, 0);
-
-	ircd_free(m_bn);
-#else
-	conf_report_error("Ignoring modules::module -- loadable module support not present.");
-#endif
-}
-
-static void
-conf_set_modules_path(void *data)
-{
-#ifndef STATIC_MODULES
-	mod_add_path((char *) data);
-#else
-	conf_report_error("Ignoring modules::path -- loadable module support not present.");
-#endif
+        switch (type & CF_MTYPE)
+        {
+        case CF_INT:
+                return "integer value";
+        case CF_STRING:
+                return "unquoted string";
+        case CF_YESNO:
+                return "yes/no value";
+        case CF_QSTRING:
+                return "quoted string";
+        case CF_TIME:
+                return "time/size value";
+        default:
+                return "unknown type";
+        }
 }
 
 struct mode_table
@@ -357,6 +187,7 @@ static struct mode_table connect_table[] = {
 	{ NULL,		0			},
 };
 
+
 static struct mode_table cluster_table[] = {
 	{ "kline",	SHARED_PKLINE	},
 	{ "tkline",	SHARED_TKLINE	},
@@ -390,6 +221,28 @@ static struct mode_table shared_table[] =
 };
 /* *INDENT-ON* */
 
+
+static void
+conf_report_error_nl(const char *fmt, ...)
+{
+	va_list ap;
+	char msg[IRCD_BUFSIZE + 1];
+
+	va_start(ap, fmt);
+	ircd_vsnprintf(msg, sizeof(msg), fmt, ap);
+	va_end(ap);
+	
+	conf_parse_failure++;
+	if (testing_conf)
+	{
+		fprintf(stderr, "%s\n", msg);
+		return;
+	}
+
+	ilog(L_MAIN, "%s", msg);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "%s", msg);
+}
+
 static int
 find_umode(struct mode_table *tab, const char *name)
 {
@@ -405,550 +258,914 @@ find_umode(struct mode_table *tab, const char *name)
 }
 
 static void
-set_modes_from_table(int *modes, const char *whatis, struct mode_table *tab, conf_parm_t * args)
+set_modes_from_table(int *modes, const char *whatis, struct mode_table *tab, confentry_t *entry)
 {
-	for (; args; args = args->next)
+	dlink_node *ptr;
+	confentry_t *sub;
+	const char *umode;
+	int dir, mode;
+
+	DLINK_FOREACH(ptr, entry->flist.head)
 	{
-		const char *umode;
-		int dir = 1;
-		int mode;
-
-		if((args->type & CF_MTYPE) != CF_STRING)
-		{
-			conf_report_error("Warning -- %s is not a string; ignoring.", whatis);
-			continue;
-		}
-
-		umode = args->v.string;
-
+		sub = ptr->data;
+		dir = 1;
+		umode = sub->string;
 		if(*umode == '~')
 		{
 			dir = 0;
 			umode++;
 		}
-
+		
 		mode = find_umode(tab, umode);
-
 		if(mode == -1)
 		{
-			conf_report_error("Warning -- unknown %s %s.", whatis, args->v.string);
+			conf_report_error_nl("Warning -- unknown flag %s %s", whatis, sub->string);
 			continue;
-		}
-
+		}	
+		
 		if(mode)
 		{
 			if(dir)
 				*modes |= mode;
 			else
 				*modes &= ~mode;
-		}
-		else
+		} else
 			*modes = 0;
 	}
+
 }
 
-static int
-conf_begin_oper(struct TopConf *tc)
+static conf_t *
+make_conf_block(const char *blockname)
 {
-	dlink_node *ptr;
-	dlink_node *next_ptr;
-
-	if(yy_oper != NULL)
-	{
-		free_oper_conf(yy_oper);
-		yy_oper = NULL;
-	}
-
-	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_oper_list.head)
-	{
-		free_oper_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &yy_oper_list);
-	}
-
-	yy_oper = make_oper_conf();
-	yy_oper->flags |= OPER_ENCRYPTED|OPER_OPERWALL|OPER_REMOTEBAN;
-
-	return 0;
+	conf_t *conf;
+	conf = ircd_malloc(sizeof(conf_t));
+	conf->confname = ircd_strdup(blockname);
+	ircd_dlinkAddTail(conf, &conf->node, &conflist);
+	return(conf);
 }
 
-static int
-conf_end_oper(struct TopConf *tc)
+static void
+add_entry(conf_t *conf, const char *name, void *value, int type)
 {
-	struct oper_conf *yy_tmpoper;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
-
-	if(conf_cur_block_name != NULL)
+	confentry_t *entry = ircd_malloc(sizeof(confentry_t));
+	if(name == NULL)  
 	{
-		if(strlen(conf_cur_block_name) > OPERNICKLEN)
-			conf_cur_block_name[OPERNICKLEN] = '\0';
-
-		yy_oper->name = ircd_strdup(conf_cur_block_name);
+		return;
 	}
-
-	if(EmptyString(yy_oper->name))
+	entry->entryname = ircd_strdup(name);
+	entry->line = lineno;
+	entry->filename = ircd_strdup(current_file);
+	switch(CF_TYPE(type))
 	{
-		conf_report_error("Ignoring operator block -- missing name.");
-		return 0;
-	}
+		
+		case CF_YESNO:
+			if((long)value == 1)
+				entry->string = ircd_strdup("yes");
+			else
+				entry->string = ircd_strdup("no");
+		case CF_INT:
+		case CF_TIME:
+			entry->number = (long)value;
+			entry->type = type;
+			break;
+		case CF_STRING:
+		case CF_QSTRING:
+			entry->string = ircd_strdup(value);
+			entry->type = type;
+			break;
+		default:
+			ircd_free(entry);
+			return;
+	}	
+	ircd_dlinkAddTail(entry, &entry->node, &conf->entries);
 
-#ifdef HAVE_LIBCRYPTO
-	if(EmptyString(yy_oper->passwd) && EmptyString(yy_oper->rsa_pubkey_file))
-#else
-	if(EmptyString(yy_oper->passwd))
-#endif
-	{
-		conf_report_error("Ignoring operator block for %s -- missing password",
-					yy_oper->name);
-		return 0;
-	}
-
-	/* now, yy_oper_list contains a stack of oper_conf's with just user
-	 * and host in, yy_oper contains the rest of the information which
-	 * we need to copy into each element in yy_oper_list
+	/* must use ircd_malloc here as we are running too early
+	 * to use ircd_dlinkAddAlloc as the block heap isn't ready
+	 * yet 
 	 */
-	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_oper_list.head)
+	ircd_dlinkAdd(entry, ircd_malloc(sizeof(dlink_node)), &entry->flist);
+
+}
+
+static void
+del_entry(conf_t *conf, confentry_t *entry)
+{
+	dlink_node *ptr, *next;
+	confentry_t *xentry;
+	if(entry->type & CF_FLIST)
 	{
-		yy_tmpoper = ptr->data;
-
-		yy_tmpoper->name = ircd_strdup(yy_oper->name);
-
-		/* could be an rsa key instead.. */
-		if(!EmptyString(yy_oper->passwd))
-			yy_tmpoper->passwd = ircd_strdup(yy_oper->passwd);
-
-		yy_tmpoper->flags = yy_oper->flags;
-		yy_tmpoper->umodes = yy_oper->umodes;
-
-#ifdef HAVE_LIBCRYPTO
-		if(yy_oper->rsa_pubkey_file)
+		DLINK_FOREACH_SAFE(ptr, next, entry->flist.head)
 		{
-			BIO *file;
-
-			if((file = BIO_new_file(yy_oper->rsa_pubkey_file, "r")) == NULL)
+			xentry = ptr->data;
+			switch(CF_TYPE(xentry->type))
 			{
-				conf_report_error("Ignoring operator block for %s -- "
-						"rsa_public_key_file cant be opened",
-						yy_tmpoper->name);
-				return 0;
+				case CF_STRING:
+				case CF_QSTRING:
+				case CF_YESNO:
+					ircd_free(xentry->string);
+				default:
+					break;
 			}
-				
-			yy_tmpoper->rsa_pubkey =
-				(RSA *) PEM_read_bio_RSA_PUBKEY(file, NULL, 0, NULL);
-
-			(void)BIO_set_close(file, BIO_CLOSE);
-			BIO_free(file);
-
-			if(yy_tmpoper->rsa_pubkey == NULL)
-			{
-				conf_report_error("Ignoring operator block for %s -- "
-						"rsa_public_key_file key invalid; check syntax",
-						yy_tmpoper->name);
-				return 0;
-			}
+			ircd_dlinkDelete(&xentry->node, &entry->flist);
 		}
-#endif
-
-		/* all is ok, put it on oper_conf_list */
-		ircd_dlinkMoveNode(ptr, &yy_oper_list, &oper_conf_list);
+	} else {
+		ptr = entry->flist.head;
+		ircd_dlinkDelete(ptr, &entry->flist);
+		ircd_free(ptr);
 	}
-
-	free_oper_conf(yy_oper);
-	yy_oper = NULL;
-
-	return 0;
+	switch(CF_TYPE(entry->type))
+	{
+		case CF_STRING:
+		case CF_QSTRING:
+		case CF_YESNO:
+			ircd_free(entry->string);
+		default:
+			break;
+	}
+	ircd_free(entry->filename);
+	ircd_dlinkDelete(&entry->node, &conf->entries);
+	
+	ircd_free(entry);
 }
 
-static void
-conf_set_oper_flags(void *data)
-{
-	conf_parm_t *args = data;
 
-	set_modes_from_table(&yy_oper->flags, "flag", flag_table, args);
+static void
+del_conf(conf_t *conf)
+{
+	dlink_node *ptr, *next;
+	DLINK_FOREACH_SAFE(ptr, next, conf->entries.head)
+	{
+		confentry_t *entry = ptr->data;
+		del_entry(conf, entry);
+	}
+	ircd_free(conf->confname);
+	ircd_free(conf->filename);
+	ircd_dlinkDelete(&conf->node, &conflist);
+	ircd_free(conf);
 }
 
-static void
-conf_set_oper_user(void *data)
+
+
+void
+delete_all_conf(void)
 {
-	struct oper_conf *yy_tmpoper;
-	char *p;
-	char *host = (char *) data;
-
-	yy_tmpoper = make_oper_conf();
-
-	if((p = strchr(host, '@')))
+	dlink_node *ptr, *next;
+	
+	DLINK_FOREACH_SAFE(ptr, next, conflist.head)
 	{
-		*p++ = '\0';
+		conf_t *conf = ptr->data;
+		del_conf(conf);		
+	}	
+}
 
-		yy_tmpoper->username = ircd_strdup(host);
-		yy_tmpoper->host = ircd_strdup(p);
+
+static char *
+strip_tabs(char *dest, const char *src, size_t len)
+{
+	char *d = dest;
+
+	if(dest == NULL || src == NULL)
+		return NULL;
+
+	ircd_strlcpy(dest, src, len);
+
+	while(*d)
+	{
+		if(*d == '\t')
+			*d = ' ';
+		d++;
 	}
-	else
-	{
+	return dest;
+}
 
-		yy_tmpoper->username = ircd_strdup("*");
-		yy_tmpoper->host = ircd_strdup(host);
-	}
+/*
+ * yyerror
+ *
+ * inputs	- message from parser
+ * output	- none
+ * side effects	- message to opers and log file entry is made
+ */
+void
+yyerror(const char *msg)
+{
+	char newlinebuf[IRCD_BUFSIZE];
 
-	if(EmptyString(yy_tmpoper->username) || EmptyString(yy_tmpoper->host))
+	strip_tabs(newlinebuf, linebuf, sizeof(newlinebuf));
+	conf_parse_failure++;
+
+	if(testing_conf)
 	{
-		conf_report_error("Ignoring user -- missing username/host");
-		free_oper_conf(yy_tmpoper);
+		fprintf(stderr, "\"%s\", line %d: %s\n", current_file, lineno + 1, msg);
 		return;
 	}
 
-	ircd_dlinkAddAlloc(yy_tmpoper, &yy_oper_list);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "\"%s\", line %d: %s at '%s'",
+			     conffilebuf, lineno + 1, msg, newlinebuf);
+			     
+	ilog(L_MAIN, "\"%s\", line %d: %s at '%s'", conffilebuf, lineno + 1, msg, newlinebuf);
 }
 
-static void
-conf_set_oper_password(void *data)
+int
+conf_fgets(char *lbuf, int max_size, FILE * fb)
 {
-	if(yy_oper->passwd)
+	char *p;
+
+	if(fgets(lbuf, max_size, fb) == NULL)
+		return (0);
+
+	if((p = strpbrk(lbuf, "\r\n")) != NULL) {
+		*p++ = '\n';
+		*p = '\0';
+	}	
+	return (strlen(lbuf));
+}
+
+int
+conf_yy_fatal_error(const char *msg)
+{
+	conf_report_error("conf_yy_fatal_error: %s", msg);
+	return (0);
+}
+
+
+void
+conf_report_error(const char *fmt, ...)
+{
+	va_list ap;
+	char msg[IRCD_BUFSIZE + 1];
+
+	va_start(ap, fmt);
+	ircd_vsnprintf(msg, sizeof(msg), fmt, ap);
+	va_end(ap);
+	
+	conf_parse_failure++;
+	if (testing_conf)
 	{
-		memset(yy_oper->passwd, 0, strlen(yy_oper->passwd));
-		ircd_free(yy_oper->passwd);
+		fprintf(stderr, "\"%s\", line %d: %s\n", current_file, lineno + 1, msg);
+		return;
 	}
 
-	yy_oper->passwd = ircd_strdup((char *) data);
+	ilog(L_MAIN, "\"%s\", line %d: %s", current_file, lineno + 1, msg);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "\"%s\", line %d: %s", current_file, lineno + 1, msg);
 }
 
-static void
-conf_set_oper_rsa_public_key_file(void *data)
-{
-#ifdef HAVE_LIBCRYPTO
-	ircd_free(yy_oper->rsa_pubkey_file);
-	yy_oper->rsa_pubkey_file = ircd_strdup((char *) data);
-#else
-	conf_report_error("Warning -- ignoring rsa_public_key_file (OpenSSL support not available");
-#endif
-}
 
-static void
-conf_set_oper_umodes(void *data)
+int
+conf_start_block(char *block, char *name)
 {
-	set_modes_from_table(&yy_oper->umodes, "umode", umode_table, data);
-}
-
-static int
-conf_begin_class(struct TopConf *tc)
-{
-	if(yy_class)
-		free_class(yy_class);
-
-	yy_class = make_class();
+	conf_t *conf;
+	if(curconf != NULL)
+	{
+		conf_report_error("\"%s\", Previous block \"%s\" never closed: line %d", conffilebuf, curconf->confname, lineno + 1);
+		return 1;
+	}
+	conf = make_conf_block(block);
+	if(name != NULL)
+		conf->subname = ircd_strdup(name);
+	conf->line = lineno;
+	conf->filename = ircd_strdup(current_file);
+	curconf = conf;
 	return 0;
 }
 
-static int
-conf_end_class(struct TopConf *tc)
-{
-	if(conf_cur_block_name != NULL)
-		yy_class->class_name = ircd_strdup(conf_cur_block_name);
 
-	if(EmptyString(yy_class->class_name))
+int
+conf_end_block(void)
+{
+	if(curconf != NULL)
 	{
-		conf_report_error("Ignoring connect block -- missing name.");
+		curconf = NULL;
+	}
+	return 0;
+}
+
+// add_entry(conf_t *conf, const char *name, void *value, int type)
+
+static void
+add_entry_flist(conf_t *conf, const char *name, conf_parm_t *cp)
+{
+	confentry_t *entry = ircd_malloc(sizeof(confentry_t));
+	confentry_t *sub;
+	if(name == NULL)  
+	{
+		return;
+	}
+	entry->entryname = ircd_strdup(name);
+	entry->line = lineno;
+	entry->filename = ircd_strdup(current_file);
+	entry->type = cp->type | CF_FLIST;
+	for(;cp != NULL; cp = cp->next)
+	{
+		sub = ircd_malloc(sizeof(confentry_t));
+		sub->entryname = ircd_strdup(name);
+		sub->line = lineno;
+		sub->filename = ircd_strdup(current_file);
+		
+		switch(CF_TYPE(cp->type))
+		{
+			case CF_YESNO:
+				if((long)cp->v.number == 1)
+					sub->string = ircd_strdup("yes");
+				else
+					sub->string = ircd_strdup("no");
+			case CF_INT:
+			case CF_TIME:
+				sub->number = (long)cp->v.number;
+				sub->type = cp->type;
+				break;
+			case CF_STRING:
+			case CF_QSTRING:
+				sub->string = ircd_strdup(cp->v.string);
+				sub->type = cp->type;
+				break;
+			default:
+				ircd_free(sub);
+				return;
+		}
+		ircd_dlinkAddTail(sub, &sub->node, &entry->flist);
+	}	
+		
+	ircd_dlinkAddTail(entry, &entry->node, &conf->entries);
+}
+
+int
+conf_call_set(char *item, conf_parm_t * value, int type)
+{
+	conf_parm_t *cp;
+	cp = value->v.list;
+
+	if(value->type & CF_FLIST)
+	{
+		add_entry_flist(curconf, item, value->v.list);
 		return 0;
 	}
 
-	add_class(yy_class);
-	yy_class = NULL;
-	return 0;
-}
-
-static void
-conf_set_class_ping_time(void *data)
-{
-	yy_class->ping_freq = *(unsigned int *) data;
-}
-
-static void
-conf_set_class_cidr_bitlen(void *data)
-{
-#ifdef IPV6
-	unsigned int maxsize = 128;
-#else
-	unsigned int maxsize = 32;
-#endif
-	if(*(unsigned int *) data > maxsize)
-		conf_report_error
-			("class::cidr_bitlen argument exceeds maxsize (%d > %d) - ignoring.",
-			 *(unsigned int *) data, maxsize);
-	else
-		yy_class->cidr_bitlen = *(unsigned int *) data;
-
-}
-static void
-conf_set_class_number_per_cidr(void *data)
-{
-	yy_class->cidr_amount = *(unsigned int *) data;
-}
-
-static void
-conf_set_class_number_per_ip(void *data)
-{
-	yy_class->max_local = *(unsigned int *) data;
-}
-
-
-static void
-conf_set_class_number_per_ip_global(void *data)
-{
-	yy_class->max_global = *(unsigned int *) data;
-}
-
-static void
-conf_set_class_number_per_ident(void *data)
-{
-	yy_class->max_ident = *(unsigned int *) data;
-}
-
-static void
-conf_set_class_connectfreq(void *data)
-{
-	yy_class->con_freq = *(unsigned int *) data;
-}
-
-static void
-conf_set_class_max_number(void *data)
-{
-	yy_class->max_total = *(unsigned int *) data;
-}
-
-static void
-conf_set_class_sendq(void *data)
-{
-	yy_class->max_sendq = *(unsigned int *) data;
-}
-
-static char *listener_address;
-
-static int
-conf_begin_listen(struct TopConf *tc)
-{
-	ircd_free(listener_address);
-	listener_address = NULL;
-	return 0;
-}
-
-static int
-conf_end_listen(struct TopConf *tc)
-{
-	ircd_free(listener_address);
-	listener_address = NULL;
-	return 0;
-}
-
-static void
-conf_set_listen_port(void *data)
-{
-	conf_parm_t *args = data;
-	for (; args; args = args->next)
+	for(;cp != NULL; cp = cp->next)
 	{
-		if((args->type & CF_MTYPE) != CF_INT)
+		switch(CF_TYPE(cp->type))
 		{
-			conf_report_error
-				("listener::port argument is not an integer " "-- ignoring.");
-			continue;
+			case CF_STRING:
+			case CF_QSTRING:
+				add_entry(curconf, item, (void *)cp->v.string, cp->type);
+				break;
+			case CF_TIME:
+			case CF_INT:
+			case CF_YESNO:
+				add_entry(curconf, item, (void *)(unsigned long)cp->v.number, cp->type);
+				break;
+			case CF_LIST:
+				break;
+			default:
+				break;
+	
 		}
-		if(listener_address == NULL)
-		{
-			add_listener(args->v.number, listener_address, AF_INET, 0);
-#ifdef IPV6
-			add_listener(args->v.number, listener_address, AF_INET6, 0);
-#endif
-		}
-		else
-		{
-			int family;
-#ifdef IPV6
-			if(strchr(listener_address, ':') != NULL)
-				family = AF_INET6;
-			else 
-#endif
-				family = AF_INET;
-		
-			add_listener(args->v.number, listener_address, family, 0);
-		
-		}
-
 	}
+	
+	return 0;
 }
 
-static void
-conf_set_listen_sslport(void *data)
+int
+read_config_file(const char *filename)
 {
-	conf_parm_t *args = data;
-	for (; args; args = args->next)
+	conf_parse_failure = 0;
+	delete_all_conf();
+	ircd_strlcpy(conffilebuf, filename, sizeof(conffilebuf));
+	if((conf_fbfile_in = fopen(filename, "r")) == NULL)
 	{
-		if((args->type & CF_MTYPE) != CF_INT)
-		{
-			conf_report_error
-				("listener::port argument is not an integer " "-- ignoring.");
-			continue;
-		}
-		if(listener_address == NULL)
-		{
-			add_listener(args->v.number, listener_address, AF_INET, 1);
-#ifdef IPV6
-			add_listener(args->v.number, listener_address, AF_INET6, 1);
-#endif
-		}
-		else
-		{
-			int family;
-#ifdef IPV6
-			if(strchr(listener_address, ':') != NULL)
-				family = AF_INET6;
-			else 
-#endif
-				family = AF_INET;
-		
-			add_listener(args->v.number, listener_address, family, 1);
-		
-		}
-
+		conf_report_error_nl("Unable to open file %s %s", filename, strerror(errno));
+		return 1;
 	}
+	yyparse();
+
+	fclose(conf_fbfile_in);
+	return conf_parse_failure;
+	
 }
 
-
-static void
-conf_set_listen_address(void *data)
+void
+add_valid_block(const char *name, int needsub)
 {
-	ircd_free(listener_address);
-	listener_address = ircd_strdup(data);
+	valid_block_t *valid = ircd_malloc(sizeof(valid_block_t));
+	valid->name = ircd_strdup(name);
+	valid->needsub = needsub;
+	ircd_dlinkAdd(valid, &valid->node, &valid_blocks);
+}
+
+static valid_block_t *
+find_valid_block(const char *name)
+{
+	valid_block_t *t;
+	dlink_node *ptr;
+	DLINK_FOREACH(ptr, valid_blocks.head)
+	{
+		t = ptr->data;
+		if(!strcasecmp(t->name, name))
+			return t;	
+	}
+	return NULL;
+}
+
+void
+add_valid_entry(const char *bname, const char *entryname, int type)
+{
+	valid_block_t *b;
+	valid_entry_t *e;
+	b = find_valid_block(bname);
+	if(b == NULL)
+		return;
+	e = ircd_malloc(sizeof(valid_entry_t));
+	e->name = ircd_strdup(entryname);
+	e->type = type;
+	ircd_dlinkAdd(e, &e->node, &b->valid_entries);
 }
 
 static int
-conf_begin_auth(struct TopConf *tc)
+check_valid_block(const char *name)
 {
 	dlink_node *ptr;
-	dlink_node *next_ptr;
+	valid_block_t *t;
+	DLINK_FOREACH(ptr, valid_blocks.head) 
+	{
+		t = ptr->data;
+		if(!strcasecmp(t->name, name))
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
 
-	if(yy_aconf)
-		free_conf(yy_aconf);
+int
+check_valid_blocks(void)
+{
+	dlink_node *ptr;
+	DLINK_FOREACH(ptr, conflist.head)
+	{
+		conf_t *conf = ptr->data;
+		if(!check_valid_block(conf->confname))
+		{
+			conf_report_error_nl("Invalid block: %s at %s:%d", conf->confname, conf->filename, conf->line);
+			return 0;
+		}
+		
+	}
+	return 1;
+}
 
-	ircd_free(yy_aconf_class);
-	yy_aconf_class = NULL;
+static int
+check_valid_entry(valid_block_t *vt, conf_t *conf, confentry_t *entry)
+{
+	dlink_node *ptr, *xptr;
+	DLINK_FOREACH(ptr, vt->valid_entries.head)
+	{
+		valid_entry_t *ve = ptr->data;
+		if(!strcasecmp(ve->name, entry->entryname))
+		{
+			if(entry->type & CF_FLIST && !(ve->type & CF_FLIST))
+			{
+				conf_report_error_nl("Option %s:%s at %s:%d does not take a list of values", conf->confname, entry->entryname, entry->filename, entry->line);
+				return 0;
+			}
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_aconf_list.head)
+			if(entry->type & CF_FLIST)
+			{
+				DLINK_FOREACH(xptr, entry->flist.head)
+				{
+					confentry_t *xentry = xptr->data;
+					if(CF_TYPE(xentry->type) != CF_TYPE(ve->type))
+					{
+						conf_report_error_nl("Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", 
+							conf->confname, ve->name, 
+							xentry->filename, xentry->line, 
+							conf_strtype(ve->type), conf_strtype(xentry->type));
+						return 0;	
+					}					
+				}
+				return 1;
+			}
+
+			if(CF_TYPE(entry->type) != CF_TYPE(ve->type))
+			{
+				if((CF_TYPE(entry->type) == CF_INT && CF_TYPE(ve->type) == CF_TIME) || 
+				   (CF_TYPE(entry->type) == CF_TIME && CF_TYPE(ve->type) == CF_INT))
+					return 1;
+
+				if(CF_TYPE(entry->type) == CF_YESNO && CF_TYPE(ve->type) == CF_STRING)
+				{
+					return 1;
+				}
+				conf_report_error_nl("Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", conf->confname, ve->name, entry->filename, entry->line, conf_strtype(ve->type), conf_strtype(entry->type));
+				return 0;
+			}
+			return 1;
+		}	
+	}
+	conf_report_error_nl("Invalid entry: %s::%s at %s:%d", conf->confname, entry->entryname, entry->filename, entry->line);
+	return 0;
+}
+
+int
+check_valid_entries(void)
+{
+	dlink_node *ptr, *xptr;
+	conf_t *conf;
+	confentry_t *entry;
+	valid_block_t *vt;
+	int ret = 0;
+	DLINK_FOREACH(ptr, conflist.head)
+	{
+		conf = ptr->data;
+		vt = find_valid_block(conf->confname);
+		if(vt == NULL)
+		{
+			conf_report_error_nl("Invalid block: %s at %s:%d", conf->confname, conf->filename, conf->line);
+			ret++;
+			continue;
+		}
+		if(vt->needsub && conf->subname == NULL)
+		{
+			conf_report_error_nl("Block %s at %s:%d requires a name", conf->confname, conf->filename, conf->line);
+			ret++;
+			continue;
+		}
+		if(!vt->needsub && conf->subname != NULL)
+		{
+			conf_report_error_nl("Block %s at %s:%d does not require a name, but has one", conf->confname, conf->filename, conf->line);
+			ret++;
+			continue;
+		}
+		DLINK_FOREACH(xptr, conf->entries.head)
+		{
+			entry = xptr->data;
+			if(entry->entryname == NULL)
+				continue;
+			if(!check_valid_entry(vt, conf, entry))
+			{
+				ret++;
+			} 
+		}
+	
+	}
+	return ret;
+
+}
+
+static void
+conf_set_modules_path(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+#ifndef STATIC_MODULES
+	mod_add_path(entry->string);
+#else
+	conf_report_error_nl("Ignoring modules::path at %s:%d -- loadable module support not present", entry->file, entry->line);
+#endif	
+}
+
+static void
+conf_set_modules_module(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+#ifndef STATIC_MODULES
+	char *m_bn;  
+
+	m_bn = irc_basename(entry->string);
+
+	if(findmodule_byname(m_bn) != -1)
+		return;
+
+	load_one_module(entry->string, 0);
+
+	ircd_free(m_bn);
+#else
+	conf_report_error("Ignoring modules::module at %s:%d -- loadable module support not present.", entry->file, entry->line);
+#endif
+	
+
+}
+
+
+static void
+conf_set_generic_value_cb(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	char **location = item->data;
+
+	switch(CF_TYPE(entry->type))
+	{
+		case CF_INT:
+		case CF_TIME:
+		case CF_YESNO:
+			*((int *) item->data) = entry->number;
+			break;
+		case CF_STRING:
+		case CF_QSTRING:
+			if(item->len)
+				*location = ircd_strndup(entry->string, item->len);
+			else 
+				*location = ircd_strdup(entry->string);
+	}	
+}
+
+
+static void
+conf_set_serverinfo_name(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	if(ServerInfo.name == NULL)
+	{
+		const char *s;
+		int dots = 0;
+
+		for(s = entry->string; *s != '\0'; s++)
+		{
+			if(!IsServChar(*s))
+			{
+				conf_report_error("Ignoring serverinfo::name "
+						  "-- bogus servername.");
+				return;
+			}
+			else if(*s == '.')
+				++dots;
+		}
+
+		if(!dots)
+		{
+			conf_report_error("Ignoring serverinfo::name -- must contain '.'");
+			return;
+		}
+
+		s = entry->string;
+
+		if(IsDigit(*s))
+		{
+			conf_report_error("Ignoring serverinfo::name -- cannot begin with digit.");
+			return;
+		}
+
+		/* the ircd will exit() in main() if we dont set one */
+		if(strlen(s) <= HOSTLEN)
+			ServerInfo.name = ircd_strdup(entry->string);
+	}
+}
+
+
+static void
+conf_set_serverinfo_network_name(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+        char *p; 
+
+        if((p = strchr((char *) entry->string, ' ')))
+                *p = '\0';
+
+        ircd_free(ServerInfo.network_name);
+        ServerInfo.network_name = ircd_strdup(entry->string);
+}
+
+
+static void
+conf_set_serverinfo_vhost(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+        if(ircd_inet_pton(AF_INET, (char *) entry->string, &ServerInfo.ip.sin_addr) <= 0)
+        {
+                conf_report_error_nl("Invalid netmask for server IPv4 vhost (%s)", entry->string);
+                return;
+        }
+        ServerInfo.ip.sin_family = AF_INET;
+        ServerInfo.specific_ipv4_vhost = 1;
+}
+ 
+static void
+conf_set_serverinfo_vhost6(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+#ifdef IPV6
+        if(ircd_inet_pton(AF_INET6, (char *) entry->string, &ServerInfo.ip6.sin6_addr) <= 0)
+        {
+                conf_report_error_nl("Invalid netmask for server IPv6 vhost (%s)", entry->string);
+                return;
+        }
+
+        ServerInfo.specific_ipv6_vhost = 1;
+        ServerInfo.ip6.sin6_family = AF_INET6;
+#else
+        conf_report_error_nl("Warning -- ignoring serverinfo::vhost6 -- IPv6 support not available.");
+#endif
+}
+
+
+static void
+conf_set_serverinfo_sid(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	char *sid = entry->string;
+
+	if(ServerInfo.sid[0] == '\0')
+	{
+		if(!IsDigit(sid[0]) || !IsIdChar(sid[1]) ||
+		   !IsIdChar(sid[2]) || sid[3] != '\0')
+		{
+			conf_report_error("Ignoring serverinfo::sid "
+					  "-- bogus sid.");
+			return;
+		}
+
+		strcpy(ServerInfo.sid, sid);
+	}
+}
+
+
+
+
+static struct Class *t_class;
+static void
+conf_set_class_end(conf_t *conf)
+{
+	add_class(t_class);
+	t_class = NULL;
+}
+
+static void
+conf_set_class_start(conf_t *conf)
+{
+	t_class = make_class();
+	t_class->class_name = ircd_strdup(conf->subname);
+}
+
+static void
+conf_set_class_ping_time(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	t_class->ping_freq = entry->number;
+	return;
+}
+
+static void
+conf_set_class_cidr_bitlen(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	int maxsize = 32;
+#ifdef IPV6
+	maxsize = 128;
+#endif		
+	t_class->cidr_bitlen = entry->number;
+	if(t_class->cidr_bitlen > maxsize)
+	{
+		conf_report_error_nl("class::cidr_bitlen argument exceeds maxsize (%d > %d) - truncating to %d.", t_class->cidr_bitlen, maxsize, maxsize);
+		t_class->cidr_bitlen = 32;
+	}
+	return;
+}
+
+static void
+conf_set_class_number_per_cidr(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	t_class->cidr_amount = entry->number;
+}
+
+static void
+conf_set_class_number_per_ip(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	t_class->max_local = entry->number;
+}
+
+static void
+conf_set_class_number_per_ip_global(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	t_class->max_global = entry->number;
+
+}
+
+static void
+conf_set_class_number_per_ident(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	t_class->max_ident = entry->number;
+}
+
+static void
+conf_set_class_connectfreq(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	t_class->con_freq = entry->number;	
+}
+
+static void
+conf_set_class_max_number(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	t_class->max_total = entry->number;
+}
+
+static void
+conf_set_class_sendq(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	t_class->max_sendq = entry->number;
+}
+
+static struct ConfItem *t_aconf;
+static char *t_aconf_class;
+static dlink_list t_aconf_list;
+
+
+static void
+conf_set_auth_end(conf_t *conf)
+{
+	dlink_node *ptr, *next;
+	struct ConfItem *tmp_conf;
+	if(EmptyString(t_aconf->info.name))
+		t_aconf->info.name = ircd_strdup("NOMATCH");
+		
+	if(EmptyString(t_aconf->host))
+	{
+		conf_report_error_nl("Ignoring auth block at %s:%d  -- missing user@host", conf->filename, conf->line);
+		return;
+	}
+		
+	collapse(t_aconf->user);
+	collapse(t_aconf->host);
+	conf_add_class_to_conf(t_aconf, t_aconf_class);
+	add_conf_by_address(t_aconf->host, CONF_CLIENT, t_aconf->user, t_aconf);
+		
+	DLINK_FOREACH_SAFE(ptr, next, t_aconf_list.head)
+	{
+		tmp_conf = ptr->data;
+			
+		if(t_aconf->passwd)
+			tmp_conf->passwd = ircd_strdup(t_aconf->passwd);
+			
+		tmp_conf->info.name = ircd_strdup(t_aconf->info.name);
+		tmp_conf->flags = t_aconf->flags;
+		tmp_conf->port = t_aconf->port;
+		collapse(tmp_conf->user);
+		collapse(tmp_conf->host);
+		conf_add_class_to_conf(tmp_conf, t_aconf_class);
+		add_conf_by_address(tmp_conf->host, CONF_CLIENT, tmp_conf->user, tmp_conf);
+		ircd_dlinkDestroy(ptr, &t_aconf_list);
+	}
+	ircd_free(t_aconf_class);
+	t_aconf_class = NULL;
+	t_aconf = NULL;
+}
+
+static void
+conf_set_auth_start(conf_t *conf)
+{
+	dlink_node *ptr, *next;
+	ircd_free(t_aconf_class);
+	t_aconf_class = NULL;
+	DLINK_FOREACH_SAFE(ptr, next, t_aconf_list.head)
 	{
 		free_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &yy_aconf_list);
+		ircd_dlinkDestroy(ptr, &t_aconf_list);
 	}
-
-	yy_aconf = make_conf();
-	yy_aconf->status = CONF_CLIENT;
-
-	return 0;
-}
-
-static int
-conf_end_auth(struct TopConf *tc)
-{
-	struct ConfItem *yy_tmp;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
-
-	if(EmptyString(yy_aconf->info.name))
-		yy_aconf->info.name = ircd_strdup("NOMATCH");
-
-	/* didnt even get one ->host? */
-	if(EmptyString(yy_aconf->host))
-	{
-		conf_report_error("Ignoring auth block -- missing user@host");
-		return 0;
-	}
-
-	/* so the stacking works in order.. */
-	collapse(yy_aconf->user);
-	collapse(yy_aconf->host);
-	conf_add_class_to_conf(yy_aconf, yy_aconf_class);
-	add_conf_by_address(yy_aconf->host, CONF_CLIENT, yy_aconf->user, yy_aconf);
-
-	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_aconf_list.head)
-	{
-		yy_tmp = ptr->data;
-
-		if(yy_aconf->passwd)
-			yy_tmp->passwd = ircd_strdup(yy_aconf->passwd);
-
-		/* this will always exist.. */
-		yy_tmp->info.name = ircd_strdup(yy_aconf->info.name);
-
-		yy_tmp->flags = yy_aconf->flags;
-		yy_tmp->port = yy_aconf->port;
-
-		collapse(yy_tmp->user);
-		collapse(yy_tmp->host);
-
-		conf_add_class_to_conf(yy_tmp, yy_aconf_class);
-
-		add_conf_by_address(yy_tmp->host, CONF_CLIENT, yy_tmp->user, yy_tmp);
-		ircd_dlinkDestroy(ptr, &yy_aconf_list);
-	}
-
-	yy_aconf = NULL;
-	return 0;
+	t_aconf = make_conf();
+	t_aconf->status = CONF_CLIENT;	
 }
 
 static void
-conf_set_auth_user(void *data)
+conf_set_auth_user(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	struct ConfItem *yy_tmp;
-	char *p;
-
-	/* The first user= line doesn't allocate a new conf */
-	if(!EmptyString(yy_aconf->host))
+	struct ConfItem *tmp_conf;
+	char *tmpname, *p;
+	
+	if(!EmptyString(t_aconf->host))
 	{
-		yy_tmp = make_conf();
-		yy_tmp->status = CONF_CLIENT;
-	}
-	else
-		yy_tmp = yy_aconf;
-
-	if((p = strchr(data, '@')))
+		tmp_conf = make_conf();
+		tmp_conf->status = CONF_CLIENT;
+	} else 
+		tmp_conf = t_aconf;
+		
+	tmpname = LOCAL_COPY(entry->string);
+	
+	if((p = strchr(tmpname, '@')))
 	{
 		*p++ = '\0';
-
-		yy_tmp->user = ircd_strdup(data);
-		yy_tmp->host = ircd_strdup(p);
-	}
-	else
+			
+		tmp_conf->user = ircd_strdup(tmpname);
+		tmp_conf->host = ircd_strdup(p);
+	} else
 	{
-		yy_tmp->user = ircd_strdup("*");
-		yy_tmp->host = ircd_strdup(data);
+		tmp_conf->user = ircd_strdup("*");
+		tmp_conf->host = ircd_strdup(tmpname);
 	}
-
-	if(yy_aconf != yy_tmp)
-		ircd_dlinkAddAlloc(yy_tmp, &yy_aconf_list);
+	if(t_aconf != tmp_conf)
+		ircd_dlinkAddAlloc(tmp_conf, &t_aconf_list);
+	return;
 }
 
 static void
-conf_set_auth_passwd(void *data)
+conf_set_auth_pass(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	if(yy_aconf->passwd)
-		memset(yy_aconf->passwd, 0, strlen(yy_aconf->passwd));
-	ircd_free(yy_aconf->passwd);
-	yy_aconf->passwd = ircd_strdup(data);
+	if(t_aconf->passwd)
+		memset(t_aconf->passwd, 0, strlen(t_aconf->passwd));
+	ircd_free(t_aconf->passwd);
+	t_aconf->passwd = ircd_strdup(entry->string);
+	return;
 }
 
 static void
-conf_set_auth_spoof(void *data)
+conf_set_auth_spoof(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	char *p;
-	char *user = NULL;
-	char *host = NULL;
+	char *user = NULL, *host = NULL, *p;
 
-	host = data;
+	host = LOCAL_COPY(entry->string);
 
 	/* user@host spoof */
 	if((p = strchr(host, '@')) != NULL)
 	{
 		*p = '\0';
-		user = data;
+		user = host;
 		host = p+1;
-
 		if(EmptyString(user))
 		{
 			conf_report_error("Warning -- spoof ident empty.");
@@ -989,798 +1206,822 @@ conf_set_auth_spoof(void *data)
 		return;
 	}
 
-	ircd_free(yy_aconf->info.name);
-	yy_aconf->info.name = ircd_strdup(data);
-	yy_aconf->flags |= CONF_FLAGS_SPOOF_IP;
+	ircd_free(t_aconf->info.name);
+	t_aconf->info.name = ircd_strdup(host);
+	t_aconf->flags |= CONF_FLAGS_SPOOF_IP;
+	return;
 }
 
 static void
-conf_set_auth_flags(void *data)
+conf_set_auth_flags(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	conf_parm_t *args = data;
-
-	set_modes_from_table((int *) &yy_aconf->flags, "flag", auth_table, args);
+	set_modes_from_table((int *)&t_aconf->flags, "flag", auth_table, entry);
 }
 
 static void
-conf_set_auth_redir_serv(void *data)
+conf_set_auth_redirserv(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	yy_aconf->flags |= CONF_FLAGS_REDIR;
-	ircd_free(yy_aconf->info.name);
-	yy_aconf->info.name = ircd_strdup(data);
+	t_aconf->flags |= CONF_FLAGS_REDIR;
+	ircd_free(t_aconf->info.name);
+	t_aconf->info.name = ircd_strdup(entry->string);
+	return;
 }
 
 static void
-conf_set_auth_redir_port(void *data)
+conf_set_auth_redirport(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	int port = *(unsigned int *) data;
+	t_aconf->flags |= CONF_FLAGS_REDIR;
+	t_aconf->port = entry->number;
 
-	yy_aconf->flags |= CONF_FLAGS_REDIR;
-	yy_aconf->port = port;
 }
 
 static void
-conf_set_auth_class(void *data)
+conf_set_auth_class(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	ircd_free(yy_aconf_class);
-	yy_aconf_class = ircd_strdup(data);
+	ircd_free(t_aconf_class);
+	t_aconf_class = ircd_strdup(entry->string);
 }
 
-/* ok, shared_oper handles the stacking, shared_flags handles adding
- * things.. so all we need to do when we start and end a shared block, is
- * clean up anything thats been left over.
- */
-static int
-conf_cleanup_shared(struct TopConf *tc)
-{
-	dlink_node *ptr, *next_ptr;
+static struct oper_conf *t_oper;
+static dlink_list t_oper_list;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_shared_list.head)
+static void
+conf_set_start_operator(conf_t *conf)
+{
+	dlink_node *ptr, *next;
+	if(t_oper != NULL)
 	{
-		free_remote_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &yy_shared_list);
+		free_oper_conf(t_oper);
+		t_oper = NULL;
 	}
-
-	if(yy_shared != NULL)
+	DLINK_FOREACH_SAFE(ptr, next, t_oper_list.head)
 	{
-		free_remote_conf(yy_shared);
-		yy_shared = NULL;
+		free_oper_conf(ptr->data);
+		ircd_dlinkDestroy(ptr, &t_oper_list);
 	}
-
-	return 0;
+	
+	t_oper = make_oper_conf();
+	t_oper->name = ircd_strdup(conf->subname);
+	t_oper->flags = OPER_ENCRYPTED|OPER_OPERWALL|OPER_REMOTEBAN;
 }
 
+
 static void
-conf_set_shared_oper(void *data)
+conf_set_end_operator(conf_t *conf)
 {
-	conf_parm_t *args = data;
-	const char *username;
-	char *p;
-
-	if(yy_shared != NULL)
-		free_remote_conf(yy_shared);
-
-	yy_shared = make_remote_conf();
-
-	if(args->next != NULL)
+	struct oper_conf *tmp_oper;
+	dlink_node *ptr, *next;
+	
+	if(EmptyString(t_oper->name))
 	{
-		if((args->type & CF_MTYPE) != CF_QSTRING)
+		conf_report_error_nl("Ignoring operator block at %s:%d -- missing name", conf->filename, conf->line);
+		return;
+	}
+	
+	if(EmptyString(t_oper->passwd)  
+#ifdef HAVE_LIBCRYPTO
+		&& EmptyString(t_oper->rsa_pubkey_file))
+#else
+	)
+#endif
+	{
+		conf_report_error_nl("Ignoring operator block at %s:%d -- missing password", conf->filename, conf->line);
+		return;
+	}
+	
+	DLINK_FOREACH_SAFE(ptr, next, t_oper_list.head)
+	{
+		tmp_oper = ptr->data;
+		tmp_oper->name = ircd_strdup(t_oper->name);
+
+		tmp_oper->flags = t_oper->flags;
+		tmp_oper->umodes = t_oper->umodes;
+		
+		/* maybe an rsa key */
+		if(!EmptyString(t_oper->passwd))
+			tmp_oper->passwd = ircd_strdup(t_oper->passwd);
+#ifdef HAVE_LIBCRYPTO
+		if(t_oper->rsa_pubkey_file != NULL)
 		{
-			conf_report_error("Ignoring shared::oper -- server is not a qstring");
-			return;
+			BIO *file;
+			if((file = BIO_new_file(t_oper->rsa_pubkey_file, "r")) == NULL)
+			{
+				conf_report_error("Ignoring operator block for %s at %s:%d rsa_public_key_file cant be opened",
+						  tmp_oper->name, conf->filename, conf->line);
+				return;
+			}
+			tmp_oper->rsa_pubkey = (RSA *)PEM_read_bio_RSA_PUBKEY(file, NULL, 0, NULL);
+			BIO_set_close(file, BIO_CLOSE);
+			BIO_free(file);
+			
+			if(tmp_oper->rsa_pubkey == NULL)
+			{
+				conf_report_error("Ignoring operator block for %s at %s:%d -- invalid rsa_public_key_file",
+						tmp_oper->name, conf->filename, conf->line);
+				return;
+			} 
 		}
-
-		yy_shared->server = ircd_strdup(args->v.string);
-		args = args->next;
-	}
-	else
-		yy_shared->server = ircd_strdup("*");
-
-	if((args->type & CF_MTYPE) != CF_QSTRING)
-	{
-		conf_report_error("Ignoring shared::oper -- oper is not a qstring");
-		return;
+#endif		
+		ircd_dlinkMoveNode(ptr, &t_oper_list, &oper_conf_list);
 	}
 
-	if((p = strchr(args->v.string, '@')) == NULL)
-	{
-		conf_report_error("Ignoring shard::oper -- oper is not a user@host");
-		return;
-	}
-
-	username = args->v.string;
-	*p++ = '\0';
-
-	if(EmptyString(p))
-		yy_shared->host = ircd_strdup("*");
-	else
-		yy_shared->host = ircd_strdup(p);
-
-	if(EmptyString(username))
-		yy_shared->username = ircd_strdup("*");
-	else
-		yy_shared->username = ircd_strdup(username);
-
-	ircd_dlinkAddAlloc(yy_shared, &yy_shared_list);
-	yy_shared = NULL;
+}
+static void
+conf_set_oper_flags(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	set_modes_from_table((int *)&t_oper->flags, "flag", flag_table, entry);
 }
 
 static void
-conf_set_shared_flags(void *data)
+conf_set_oper_user(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	conf_parm_t *args = data;
-	int flags = 0;
-	dlink_node *ptr, *next_ptr;
-
-	if(yy_shared != NULL)
-		free_remote_conf(yy_shared);
-
-	set_modes_from_table(&flags, "flag", shared_table, args);
-
-	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_shared_list.head)
+	struct oper_conf *tmp_oper;
+	char *p;
+	char *host = LOCAL_COPY(entry->string);
+	
+	tmp_oper = make_oper_conf();
+	
+	if((p = strchr(host, '@')))
 	{
-		yy_shared = ptr->data;
-
-		yy_shared->flags = flags;
-		ircd_dlinkDestroy(ptr, &yy_shared_list);
-		ircd_dlinkAddTail(yy_shared, &yy_shared->node, &shared_conf_list);
+		*p++ = '\0';
+		tmp_oper->username = ircd_strdup(host);
+		tmp_oper->host = ircd_strdup(p);
+	} else {
+		tmp_oper->username = ircd_strdup("*");
+		tmp_oper->host = ircd_strdup(host);
 	}
-
-	yy_shared = NULL;
+	
+	if(EmptyString(tmp_oper->username) || EmptyString(tmp_oper->host))
+	{
+		conf_report_error_nl("Ignoring operator at %s:%d -- missing username/host", entry->filename, entry->line);
+		free_oper_conf(tmp_oper);
+		return;
+	}
+	ircd_dlinkAddAlloc(tmp_oper, &t_oper_list);
 }
 
-static int
-conf_begin_connect(struct TopConf *tc)
+static void
+conf_set_oper_password(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	if(yy_server)
-		free_server_conf(yy_server);
-
-	yy_server = make_server_conf();
-	yy_server->port = PORTNUM;
-
-	if(conf_cur_block_name != NULL)
-		yy_server->name = ircd_strdup(conf_cur_block_name);
-
-	return 0;
+	if(t_oper->passwd != NULL)
+	{
+		memset(t_oper->passwd, 0, strlen(t_oper->passwd));
+		ircd_free(t_oper->passwd);
+	}
+	t_oper->passwd = ircd_strdup(entry->string);
 }
 
-static int
-conf_end_connect(struct TopConf *tc)
+static void
+conf_set_oper_rsa_public_key_file(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	if(EmptyString(yy_server->name))
-	{
-		conf_report_error("Ignoring connect block -- missing name.");
-		return 0;
-	}
-
-	if(EmptyString(yy_server->passwd) || EmptyString(yy_server->spasswd))
-	{
-		conf_report_error("Ignoring connect block for %s -- missing password.",
-					yy_server->name);
-		return 0;
-	}
-
-	if(EmptyString(yy_server->host))
-	{
-		conf_report_error("Ignoring connect block for %s -- missing host.",
-					yy_server->name);
-		return 0;
-	}
-
-#ifndef HAVE_LIBZ
-	if(ServerConfCompressed(yy_server))
-	{
-		conf_report_error("Ignoring connect::flags::compressed -- zlib not available.");
-		yy_server->flags &= ~SERVER_COMPRESSED;
-	}
+#ifdef HAVE_LIBCRYPTO
+	ircd_free(t_oper->rsa_pubkey_file);
+	t_oper->rsa_pubkey_file = ircd_strdup(entry->string);
+#else
+	conf_report_error_nl("Warning -- ignoring rsa_public_key_file (OpenSSL support not available");
 #endif
-
-	add_server_conf(yy_server);
-	ircd_dlinkAdd(yy_server, &yy_server->node, &server_conf_list);
-
-	yy_server = NULL;
-	return 0;
 }
 
 static void
-conf_set_connect_host(void *data)
+conf_set_oper_umodes(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	ircd_free(yy_server->host);
-	yy_server->host = ircd_strdup(data);
+	set_modes_from_table(&t_oper->umodes, "umode", umode_table, entry);
+}
+
+
+static char *listener_address;
+
+static void
+conf_set_listen_init(conf_t *conf)
+{
+	ircd_free(listener_address);
+	listener_address = NULL;
 }
 
 static void
-conf_set_connect_vhost(void *data)
+conf_set_listen_address(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	if(ircd_inet_pton_sock(data, (struct sockaddr *)&yy_server->my_ipnum) <= 0)
+	ircd_free(listener_address);
+	listener_address = ircd_strdup(entry->string);
+}
+
+
+static void
+conf_set_listen_port_both(confentry_t *entry, conf_t *conf, struct conf_items *item, int ssl)
+{
+	if(listener_address == NULL)
 	{
-		conf_report_error("Invalid netmask for server vhost (%s)",
-				  (char *) data);
-		return;
-	}
-
-	yy_server->flags |= SERVER_VHOSTED;
-}
-
-static void
-conf_set_connect_send_password(void *data)
-{
-	if(yy_server->spasswd)
-	{
-		memset(yy_server->spasswd, 0, strlen(yy_server->spasswd));
-		ircd_free(yy_server->spasswd);
-	}
-
-	yy_server->spasswd = ircd_strdup(data);
-}
-
-static void
-conf_set_connect_accept_password(void *data)
-{
-	if(yy_server->passwd)
-	{
-		memset(yy_server->passwd, 0, strlen(yy_server->passwd));
-		ircd_free(yy_server->passwd);
-	}
-	yy_server->passwd = ircd_strdup(data);
-}
-
-static void
-conf_set_connect_port(void *data)
-{
-	int port = *(unsigned int *) data;
-
-	if(port < 1)
-		port = PORTNUM;
-
-	yy_server->port = port;
-}
-
-static void
-conf_set_connect_aftype(void *data)
-{
-	char *aft = data;
-
-	if(strcasecmp(aft, "ipv4") == 0)
-		GET_SS_FAMILY(&yy_server->ipnum) = AF_INET;
+		add_listener(entry->number, listener_address, AF_INET, ssl);
 #ifdef IPV6
-	else if(strcasecmp(aft, "ipv6") == 0)
-		GET_SS_FAMILY(&yy_server->ipnum) = AF_INET6;
+		add_listener(entry->number, listener_address, AF_INET6, ssl);
+#endif		
+	} else {
+		int family = AF_INET;
+#ifdef IPV6
+		if(strchr(listener_address, ':') != NULL)
+			family = AF_INET6;
 #endif
-	else
-		conf_report_error("connect::aftype '%s' is unknown.", aft);
-}
-
-static void
-conf_set_connect_flags(void *data)
-{
-	conf_parm_t *args = data;
-
-	/* note, we allow them to set compressed, then remove it later if
-	 * they do and LIBZ isnt available
-	 */
-	set_modes_from_table(&yy_server->flags, "flag", connect_table, args);
-}
-
-static void
-conf_set_connect_hub_mask(void *data)
-{
-	struct remote_conf *yy_hub;
-
-	if(EmptyString(yy_server->name))
-		return;
-
-	yy_hub = make_remote_conf();
-	yy_hub->flags = CONF_HUB;
-
-	yy_hub->host = ircd_strdup(data);
-	yy_hub->server = ircd_strdup(yy_server->name);
-	ircd_dlinkAdd(yy_hub, &yy_hub->node, &hubleaf_conf_list);
-}
-
-static void
-conf_set_connect_leaf_mask(void *data)
-{
-	struct remote_conf *yy_leaf;
-
-	if(EmptyString(yy_server->name))
-		return;
-
-	yy_leaf = make_remote_conf();
-	yy_leaf->flags = CONF_LEAF;
-
-	yy_leaf->host = ircd_strdup(data);
-	yy_leaf->server = ircd_strdup(yy_server->name);
-	ircd_dlinkAdd(yy_leaf, &yy_leaf->node, &hubleaf_conf_list);
-}
-
-static void
-conf_set_connect_class(void *data)
-{
-	ircd_free(yy_server->class_name);
-	yy_server->class_name = ircd_strdup(data);
-}
-
-static void
-conf_set_exempt_ip(void *data)
-{
-	struct ConfItem *yy_tmp;
-
-	if(parse_netmask(data, NULL, NULL) == HM_HOST)
-	{
-		conf_report_error("Ignoring exempt -- invalid exempt::ip.");
-		return;
-	}
-
-	yy_tmp = make_conf();
-	yy_tmp->passwd = ircd_strdup("*");
-	yy_tmp->host = ircd_strdup(data);
-	yy_tmp->status = CONF_EXEMPTDLINE;
-	add_eline(yy_tmp);
-}
-
-static int
-conf_cleanup_cluster(struct TopConf *tc)
-{
-	dlink_node *ptr, *next_ptr;
-
-	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_cluster_list.head)
-	{
-		free_remote_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &yy_cluster_list);
-	}
-
-	if(yy_shared != NULL)
-	{
-		free_remote_conf(yy_shared);
-		yy_shared = NULL;
-	}
-
-	return 0;
-}
-
-static void
-conf_set_cluster_name(void *data)
-{
-	if(yy_shared != NULL)
-		free_remote_conf(yy_shared);
-
-	yy_shared = make_remote_conf();
-	yy_shared->server = ircd_strdup(data);
-	ircd_dlinkAddAlloc(yy_shared, &yy_cluster_list);
-
-	yy_shared = NULL;
-}
-
-static void
-conf_set_cluster_flags(void *data)
-{
-	conf_parm_t *args = data;
-	int flags = 0;
-	dlink_node *ptr, *next_ptr;
-
-	if(yy_shared != NULL)
-		free_remote_conf(yy_shared);
-
-	set_modes_from_table(&flags, "flag", cluster_table, args);
-
-	DLINK_FOREACH_SAFE(ptr, next_ptr, yy_cluster_list.head)
-	{
-		yy_shared = ptr->data;
-		yy_shared->flags = flags;
-		ircd_dlinkAddTail(yy_shared, &yy_shared->node, &cluster_conf_list);
-		ircd_dlinkDestroy(ptr, &yy_cluster_list);
-	}
-
-	yy_shared = NULL;
-}
-
-static void
-conf_set_general_havent_read_conf(void *data)
-{
-	if(*(unsigned int *) data)
-	{
-		conf_report_error("You haven't read your config file properly.");
-		conf_report_error
-			("There is a line in the example conf that will kill your server if not removed.");
-		conf_report_error
-			("Consider actually reading/editing the conf file, and removing this line.");
-		if (!testing_conf)
-			exit(0);
+		add_listener(entry->number, listener_address, family, ssl);		
 	}
 }
 
 static void
-conf_set_general_hide_error_messages(void *data)
+conf_set_listen_port(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	char *val = data;
-
-	if(strcasecmp(val, "yes") == 0)
-		ConfigFileEntry.hide_error_messages = 2;
-	else if(strcasecmp(val, "opers") == 0)
-		ConfigFileEntry.hide_error_messages = 1;
-	else if(strcasecmp(val, "no") == 0)
-		ConfigFileEntry.hide_error_messages = 0;
-	else
-		conf_report_error("Invalid setting '%s' for general::hide_error_messages.", val);
+	conf_set_listen_port_both(entry, conf, item, 0);
 }
 
 static void
-conf_set_general_kline_delay(void *data)
+conf_set_listen_sslport(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	ConfigFileEntry.kline_delay = *(unsigned int *) data;
+	conf_set_listen_port_both(entry, conf, item, 1);
+}
+
+
+static void
+conf_set_serverhide_links_delay(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+        int val = entry->number;
+
+        if((val > 0) && ConfigServerHide.links_disabled == 1)
+        {
+                ircd_event_addish("cache_links", cache_links, NULL, val);
+                ConfigServerHide.links_disabled = 0;
+        }
+        else if(val != ConfigServerHide.links_delay)
+                ircd_event_update("cache_links", val);
+
+        ConfigServerHide.links_delay = val;
+}
+
+static void
+conf_set_exempt_ip(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	struct ConfItem *tmp;
+
+	if(parse_netmask(entry->string, NULL, NULL) == HM_HOST)
+        {
+                conf_report_error("Ignoring exempt -- invalid exempt::ip.");
+                return;
+        }
+
+        tmp = make_conf();
+        tmp->passwd = ircd_strdup("*");
+        tmp->host = ircd_strdup(entry->string);
+        tmp->status = CONF_EXEMPTDLINE;
+        add_eline(tmp);   
+}
+
+static void
+conf_set_general_kline_delay(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	ConfigFileEntry.kline_delay = entry->number;
 
 	/* THIS MUST BE HERE to stop us being unable to check klines */
 	kline_queued = 0;
 }
 
 static void
-conf_set_general_stats_k_oper_only(void *data)
+conf_set_general_hide_error_messages(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	char *val = data;
-
-	if(strcasecmp(val, "yes") == 0)
-		ConfigFileEntry.stats_k_oper_only = 2;
-	else if(strcasecmp(val, "masked") == 0)
-		ConfigFileEntry.stats_k_oper_only = 1;
-	else if(strcasecmp(val, "no") == 0)
-		ConfigFileEntry.stats_k_oper_only = 0;
-	else
-		conf_report_error("Invalid setting '%s' for general::stats_k_oper_only.", val);
+	char *val = entry->string;
+        if(strcasecmp(val, "yes") == 0)
+                ConfigFileEntry.hide_error_messages = 2;
+        else if(strcasecmp(val, "opers") == 0)
+                ConfigFileEntry.hide_error_messages = 1;
+        else if(strcasecmp(val, "no") == 0)
+                ConfigFileEntry.hide_error_messages = 0;
+        else
+                conf_report_error_nl("Invalid setting '%s' for general::hide_error_messages at %s:%d", val, entry->filename, entry->line);
 }
 
 static void
-conf_set_general_stats_i_oper_only(void *data)
+conf_set_general_oper_only_umodes(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	char *val = data;
+	set_modes_from_table(&ConfigFileEntry.oper_only_umodes, "umode", umode_table, entry);
+}  
 
-	if(strcasecmp(val, "yes") == 0)
-		ConfigFileEntry.stats_i_oper_only = 2;
-	else if(strcasecmp(val, "masked") == 0)
-		ConfigFileEntry.stats_i_oper_only = 1;
-	else if(strcasecmp(val, "no") == 0)
-		ConfigFileEntry.stats_i_oper_only = 0;
-	else
-		conf_report_error("Invalid setting '%s' for general::stats_i_oper_only.", val);
+static void
+conf_set_general_oper_umodes(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	set_modes_from_table(&ConfigFileEntry.oper_umodes, "umode", umode_table, entry);
+}  
+        
+
+static void
+conf_set_general_stats_k_oper_only(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+        char *val = entry->string;
+
+        if(strcasecmp(val, "yes") == 0)
+                ConfigFileEntry.stats_k_oper_only = 2;
+        else if(strcasecmp(val, "masked") == 0)
+                ConfigFileEntry.stats_k_oper_only = 1;
+        else if(strcasecmp(val, "no") == 0)
+                ConfigFileEntry.stats_k_oper_only = 0;
+        else
+                conf_report_error("Invalid setting '%s' for general::stats_k_oper_only.", val);
 }
 
 static void
-conf_set_general_compression_level(void *data)
+conf_set_general_stats_i_oper_only(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+        char *val = entry->string;
+
+        if(strcasecmp(val, "yes") == 0)
+                ConfigFileEntry.stats_i_oper_only = 2;
+        else if(strcasecmp(val, "masked") == 0)
+                ConfigFileEntry.stats_i_oper_only = 1;
+        else if(strcasecmp(val, "no") == 0)
+                ConfigFileEntry.stats_i_oper_only = 0;
+        else
+                conf_report_error("Invalid setting '%s' for general::stats_i_oper_only.", val);
+}
+
+static void
+conf_set_general_compression_level(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
 #ifdef HAVE_LIBZ
-	ConfigFileEntry.compression_level = *(unsigned int *) data;
+	ConfigFileEntry.compression_level = entry->number;
 
 	if((ConfigFileEntry.compression_level < 1) || (ConfigFileEntry.compression_level > 9))
 	{
-		conf_report_error
-			("Invalid general::compression_level %d -- using default.",
-			 ConfigFileEntry.compression_level);
+                conf_report_error_nl("Invalid general::compression_level %d at %s:%d -- using default.",
+					ConfigFileEntry.compression_level, entry->filename, entry->line);
 		ConfigFileEntry.compression_level = 0;
 	}
 #else
-	conf_report_error("Ignoring general::compression_level -- zlib not available.");
-#endif
+	conf_report_error_nl("Ignoring general::compression_level at %s:%d -- zlib not available.",
+				entry->filename, entry->line);
+#endif	
+
 }
 
 static void
-conf_set_general_oper_umodes(void *data)
+conf_set_general_havent_read_conf(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	set_modes_from_table(&ConfigFileEntry.oper_umodes, "umode", umode_table, data);
+        if(entry->number)
+        {
+                conf_report_error_nl("ERROR: You haven't read your config file properly.");
+                conf_report_error_nl
+                        ("ERROR: There is a line in the example conf that will kill your server if not removed.");
+                conf_report_error_nl
+                        ("ERROR: Consider actually reading/editing the conf file, and removing this line.");
+                if (!testing_conf) 
+                        exit(0);
+        }
 }
 
+static struct server_conf *t_server;
 static void
-conf_set_general_oper_only_umodes(void *data)
+conf_set_start_connect(conf_t *conf)
 {
-	set_modes_from_table(&ConfigFileEntry.oper_only_umodes, "umode", umode_table, data);
+	if(t_server != NULL)
+		free_server_conf(t_server);
+
+	t_server = make_server_conf();
+	t_server->port = PORTNUM;
+	t_server->name = ircd_strdup(conf->subname);
 }
 
-static void
-conf_set_serverhide_links_delay(void *data)
-{
-	int val = *(unsigned int *) data;
 
-	if((val > 0) && ConfigServerHide.links_disabled == 1)
+static void
+conf_set_end_connect(conf_t *conf)
+{
+	if(EmptyString(t_server->name))
 	{
-		ircd_event_addish("cache_links", cache_links, NULL, val);
-		ConfigServerHide.links_disabled = 0;
+	
 	}
-	else if(val != ConfigServerHide.links_delay)
-		ircd_event_update("cache_links", val);
+	
+	if(EmptyString(t_server->passwd) || EmptyString(t_server->spasswd))
+	{
 
-	ConfigServerHide.links_delay = val;
+	}
+	
+	if(EmptyString(t_server->host))
+	{
+	
+	}
+	
+#ifndef HAVE_LIBZ
+	if(ServerConfCompressed(t_server))
+	{
+		t_server->flags &= ~SERVER_COMPRESSED;
+	}
+#endif
+	add_server_conf(t_server);
+	ircd_dlinkAdd(t_server, &t_server->node, &server_conf_list);
+	t_server = NULL;
 }
 
-#ifdef ENABLE_SERVICES
-static int
-conf_begin_service(struct TopConf *tc)
+static void
+conf_set_connect_host(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
-	struct Client *target_p;
+	ircd_free(t_server->host);
+	t_server->host = ircd_strdup(entry->string);
+}
+
+static void
+conf_set_connect_vhost(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+        if(ircd_inet_pton_sock(entry->string, (struct sockaddr *)&t_server->my_ipnum) <= 0)
+        {
+                conf_report_error("Invalid netmask for server vhost (%s)",
+                                  entry->string);
+                return;
+        }
+
+        t_server->flags |= SERVER_VHOSTED;
+}
+
+static void
+conf_set_connect_send_password(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	if(t_server->spasswd != NULL)
+	{
+		memset(t_server->spasswd, 0, strlen(t_server->spasswd));
+		ircd_free(t_server->spasswd);
+	}
+	t_server->spasswd = ircd_strdup(entry->string);
+}
+
+static void
+conf_set_connect_accept_password(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	if(t_server->passwd != NULL)
+	{
+		memset(t_server->passwd, 0, strlen(t_server->passwd));
+		ircd_free(t_server->passwd);
+	}
+	t_server->passwd = ircd_strdup(entry->string);
+}
+
+static void
+conf_set_connect_port(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	int port = entry->number;
+	if(port < 1)
+		port = PORTNUM;
+	t_server->port = port;
+}
+
+static void
+conf_set_connect_aftype(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	char *aft = entry->string;
+
+	if(!strcasecmp(aft, "ipv4")) 
+		GET_SS_FAMILY(&t_server->ipnum) = AF_INET;
+#ifdef IPV6
+	else if(!strcasecmp(aftp, "ipv6"))
+		GET_SS_FAMILY(&t_server->ipnum) = AF_INET6;
+#endif
+	else
+		conf_report_error("connect::aftype '%s' at %s:%d is unknown", aft, entry->filename, entry->line);
+}
+
+static void
+conf_set_connect_flags(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	set_modes_from_table(&t_server->flags, "flag", connect_table, entry);
+}
+
+static void
+conf_set_connect_class(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	ircd_free(t_server->class_name);
+	t_server->class_name = ircd_strdup(entry->string);
+}
+
+static void
+conf_set_connect_leaf_mask(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	struct remote_conf *t_leaf;
+	
+	if(EmptyString(t_server->name))
+		return;
+	
+	t_leaf = make_remote_conf();
+	t_leaf->flags = CONF_LEAF;
+	t_leaf->host = ircd_strdup(entry->string);
+	t_leaf->server = ircd_strdup(t_server->name);
+	ircd_dlinkAdd(t_leaf, &t_leaf->node, &hubleaf_conf_list);
+}
+
+static void
+conf_set_connect_hub_mask(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	struct remote_conf *t_hub;
+	
+	if(EmptyString(t_server->name))
+		return;
+	
+	t_hub = make_remote_conf();
+	t_hub->flags = CONF_HUB;
+	t_hub->host = ircd_strdup(entry->string);
+	t_hub->server = ircd_strdup(t_server->name);
+	ircd_dlinkAdd(t_hub, &t_hub->node, &hubleaf_conf_list);
+}
+
+
+
+static dlink_list t_shared_list;
+static dlink_list t_cluster_list;
+static struct remote_conf *t_shared;
+
+static void
+conf_set_cluster_cleanup(conf_t *conf)
+{
+	dlink_node *ptr, *next;
+	DLINK_FOREACH_SAFE(ptr, next, t_cluster_list.head)
+	{
+		free_remote_conf(ptr->data);
+		ircd_dlinkDestroy(ptr, &t_cluster_list);
+	}
+	if(t_shared != NULL)
+	{
+		free_remote_conf(t_shared);
+		t_shared = NULL;
+	}
+}
+
+static void
+conf_set_cluster_name(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	if(t_shared != NULL)
+		free_remote_conf(t_shared);
+	
+	t_shared = make_remote_conf();
+	t_shared->server = ircd_strdup(entry->string);
+	ircd_dlinkAddAlloc(t_shared, &t_cluster_list);
+	t_shared = NULL;
+}
+
+static void
+conf_set_cluster_flags(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	int flags = 0;
+	dlink_node *ptr, *next;
+	
+	if(t_shared != NULL)
+		free_remote_conf(t_shared);
+	
+	set_modes_from_table(&flags, "flag", cluster_table, entry);
+	
+	DLINK_FOREACH_SAFE(ptr, next, t_cluster_list.head)
+	{
+		t_shared = ptr->data;
+		t_shared->flags = flags;
+		ircd_dlinkAddTail(t_shared, &t_shared->node, &cluster_conf_list);
+		ircd_dlinkDestroy(ptr, &t_cluster_list);
+	}
+	t_shared = NULL;
+}
+
+
+static void
+conf_set_shared_cleanup(conf_t *conf)
+{
+	dlink_node *ptr, *next;
+	
+	DLINK_FOREACH_SAFE(ptr, next, t_shared_list.head)
+	{
+		free_remote_conf(ptr->data);
+		ircd_dlinkDestroy(ptr, &t_shared_list);
+	}
+	
+	if(t_shared != NULL)
+	{
+		free_remote_conf(t_shared);
+		t_shared = NULL;
+	}
+}
+
+static void
+conf_set_shared_oper(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
 	dlink_node *ptr;
-	 
-	DLINK_FOREACH(ptr, global_serv_list.head)
+	confentry_t *xentry;
+	char *username, *p;
+	int len;
+
+	len = ircd_dlink_list_length(&entry->flist);
+
+	if(len > 2)
 	{
-		target_p = ptr->data;
-		target_p->flags &= ~FLAGS_SERVICE;
-	}
-	return 0;
-}
-
-static void
-conf_set_service_name(void *data)
-{
-	struct Client *target_p;
-	const char *s;
-	char *tmp;
-	int dots = 0;
-
-	 for(s = data; *s != '\0'; s++)
-	 {
-		 if(!IsServChar(*s))
-		 {
-			 conf_report_error("Ignoring service::name "
-					 "-- bogus servername.");
-			 return;
-		 }
-		 else if(*s == '.')
-			 dots++;
-	 }
-
-	 if(!dots)
-	 {
-		 conf_report_error("Ignoring service::name -- must contain '.'");
-		 return;
-	 }
-
-	 tmp = ircd_strdup(data);
-	 ircd_dlinkAddAlloc(tmp, &service_list);
-
-	if((target_p = find_server(NULL, tmp)))
-		target_p->flags |= FLAGS_SERVICE;
-}
-#endif
-
-/* public functions */
-
-
-void
-conf_report_error(const char *fmt, ...)
-{
-	va_list ap;
-	char msg[IRCD_BUFSIZE + 1] = { 0 };
-
-	va_start(ap, fmt);
-	ircd_vsnprintf(msg, IRCD_BUFSIZE, fmt, ap);
-	va_end(ap);
-
-	if (testing_conf)
-	{
-		conf_parse_failure++;
-		fprintf(stderr, "\"%s\", line %d: %s\n", current_file, lineno + 1, msg);
+		conf_report_error_nl("Too many options for shared::oper at %s:%d", entry->filename, entry->line);
 		return;
 	}
 
-	ilog(L_MAIN, "\"%s\", line %d: %s", current_file, lineno + 1, msg);
-	sendto_realops_flags(UMODE_ALL, L_ALL, "\"%s\", line %d: %s", current_file, lineno + 1, msg);
-}
+	if(t_shared != NULL)
+		free_remote_conf(t_shared);
 
-int
-conf_start_block(char *block, char *name)
-{
-	if((conf_cur_block = find_top_conf(block)) == NULL)
+	t_shared = make_remote_conf();
+
+	/* if the list is one, head and tail are the same, 
+	 * if its two, we still get what we want 
+	 */
+	xentry = entry->flist.tail->data;
+	username = LOCAL_COPY(xentry->string);
+	
+
+	if(len == 1)
 	{
-		conf_report_error("Configuration block '%s' is not defined.", block);
-		return -1;
+		t_shared->server = ircd_strdup("*");
+	} else {
+		xentry = entry->flist.head->data;
+		t_shared->server = ircd_strdup(xentry->string);
 	}
-
-	if(name)
-		conf_cur_block_name = ircd_strdup(name);
+	
+	if((p = strchr(username, '@')) == NULL)
+	{
+		conf_report_error_nl("Ignoring shared::oper at %s:%d -- oper is not a user@host", entry->filename, entry->line);
+		return;
+	}
+	
+	*p++ = '\0';
+	
+	if(EmptyString(p))
+		t_shared->host = ircd_strdup("*");
 	else
-		conf_cur_block_name = NULL;
-
-	if(conf_cur_block->tc_sfunc)
-		if(conf_cur_block->tc_sfunc(conf_cur_block) < 0)
-			return -1;
-
-	return 0;
+		t_shared->host = ircd_strdup(p);
+	
+	if(EmptyString(username))
+		t_shared->username = ircd_strdup("*");
+	else
+		t_shared->username = ircd_strdup(username);
+	
+	ircd_dlinkAddAlloc(t_shared, &t_shared_list);
+	t_shared = NULL;
+	DLINK_FOREACH(ptr, entry->flist.head)
+	{	
+		xentry = ptr->data;	
+		t_shared = make_remote_conf();
+		ircd_strdup(xentry->string);
+	}
 }
 
-int
-conf_end_block(struct TopConf *tc)
-{
-	if(tc->tc_efunc)
-		return tc->tc_efunc(tc);
 
-	ircd_free(conf_cur_block_name);
-	return 0;
+static void
+conf_set_shared_flags(confentry_t *entry, conf_t *conf, struct conf_items *item)
+{
+	int flags = 0;
+	dlink_node *ptr, *next;
+	
+	if(t_shared != NULL)	
+		free_remote_conf(t_shared);
+	
+	set_modes_from_table(&flags, "flag", shared_table, entry);
+
+	DLINK_FOREACH_SAFE(ptr, next, t_shared_list.head)
+	{
+		t_shared = ptr->data;
+		t_shared->flags = flags;
+		ircd_dlinkDestroy(ptr, &t_shared_list);
+		ircd_dlinkAddTail(t_shared, &t_shared->node, &shared_conf_list);
+	}
+	t_shared = NULL;
 }
 
 static void
-conf_set_generic_int(void *data, void *location)
+add_top_conf(const char *name, void (*startfunc) (conf_t *conf), void (*endfunc) (conf_t *conf), struct conf_items *itemtable, int needsub)
 {
-	*((int *) location) = *((unsigned int *) data);
+	int i;
+	struct topconf *top;
+	top = ircd_malloc(sizeof(struct topconf));
+	
+	add_valid_block(name, needsub);
+	top->tc_name = ircd_strdup(name);
+	top->start_func = startfunc;
+	top->end_func = endfunc;
+	top->itemtable = itemtable;	
+	for(i = 0; itemtable[i].type; i++)
+	{
+		add_valid_entry(name, itemtable[i].c_name, itemtable[i].type);
+	}	
+	
+	ircd_dlinkAddTail(top, &top->node, &toplist);
+}
+
+static struct conf_items *
+find_item(const char *name, struct conf_items *itemtable)
+{
+	int i;
+	for(i = 0; itemtable[i].type != 0; i++)
+	{
+		if(!strcasecmp(name, itemtable[i].c_name))
+			return &(itemtable[i]);
+	}
+	return NULL; 
 }
 
 static void
-conf_set_generic_string(void *data, int len, void *location)
+register_top_confs(void)
 {
-	char **loc = location;
-	char *input = data;
+	CONF_CB *func;
+	dlink_node *ptr, *xptr, *yptr;
+	struct topconf *top;
+	conf_t *conf;
+	confentry_t *entry;
+	struct conf_items *tab;
 
-	if(len && (int)strlen(input) > len)
-		input[len] = '\0';
-
-	ircd_free(*loc);
-	*loc = ircd_strdup(input);
-}
-
-int
-conf_call_set(struct TopConf *tc, char *item, conf_parm_t * value, int type)
-{
-	struct ConfEntry *cf;
-	conf_parm_t *cp;
-
-	if(!tc)
-		return -1;
-
-	if((cf = find_conf_item(tc, item)) == NULL)
+	DLINK_FOREACH(ptr, toplist.head)
 	{
-		conf_report_error
-			("Non-existant configuration setting %s::%s.", tc->tc_name, (char *) item);
-		return -1;
-	}
-
-	/* if it takes one thing, make sure they only passed one thing,
-	   and handle as needed. */
-	if(value->type & CF_FLIST && !cf->cf_type & CF_FLIST)
-	{
-		conf_report_error
-			("Option %s::%s does not take a list of values.", tc->tc_name, item);
-		return -1;
-	}
-
-	cp = value->v.list;
-
-
-	if(CF_TYPE(value->v.list->type) != CF_TYPE(cf->cf_type))
-	{
-		/* if it expects a string value, but we got a yesno, 
-		 * convert it back
-		 */
-		if((CF_TYPE(value->v.list->type) == CF_YESNO) &&
-		   (CF_TYPE(cf->cf_type) == CF_STRING))
+		top = ptr->data;
+		DLINK_FOREACH(xptr, conflist.head)
 		{
-			value->v.list->type = CF_STRING;
+			conf = xptr->data;
+			if(strcasecmp(conf->confname, top->tc_name))
+				continue;
 
-			if(cp->v.number == 1)
-				cp->v.string = ircd_strdup("yes");
-			else
-				cp->v.string = ircd_strdup("no");
-		}
+			if(top->start_func != NULL)
+				top->start_func(conf);
+			DLINK_FOREACH(yptr, conf->entries.head)
+			{
+				entry = yptr->data;
+				tab = find_item(entry->entryname, top->itemtable);
+				if(tab == NULL)
+					continue;
+				if(tab->cb_func == NULL)
+					func = conf_set_generic_value_cb;
+				else 
+					func = tab->cb_func;
 
-		/* maybe it's a CF_TIME and they passed CF_INT --
-		   should still be valid */
-		else if(!((CF_TYPE(value->v.list->type) == CF_INT) &&
-			  (CF_TYPE(cf->cf_type) == CF_TIME)))
-		{
-			conf_report_error
-				("Wrong type for %s::%s (expected %s, got %s)",
-				 tc->tc_name, (char *) item,
-				 conf_strtype(cf->cf_type), conf_strtype(value->v.list->type));
-			return -1;
+				func(entry, conf, tab);
+			}   
+			if(top->end_func != NULL)
+				top->end_func(conf);			
 		}
 	}
-
-	if(cf->cf_type & CF_FLIST)
-	{
-#if 0
-		if(cf->cf_arg)
-			conf_set_generic_list(value->v.list, cf->cf_arg);
-		else
-#endif
-		/* just pass it the extended argument list */
-		cf->cf_func(value->v.list);
-	}
-	else
-	{
-		/* it's old-style, needs only one arg */
-		switch (cf->cf_type)
-		{
-		case CF_INT:
-		case CF_TIME:
-		case CF_YESNO:
-			if(cf->cf_arg)
-				conf_set_generic_int(&cp->v.number, cf->cf_arg);
-			else
-				cf->cf_func(&cp->v.number);
-			break;
-		case CF_STRING:
-		case CF_QSTRING:
-			if(EmptyString(cp->v.string))
-				conf_report_error("Ignoring %s::%s -- empty field",
-						tc->tc_name, item);
-			else if(cf->cf_arg)
-				conf_set_generic_string(cp->v.string, cf->cf_len, cf->cf_arg);
-			else
-				cf->cf_func(cp->v.string);
-			break;
-		}
-	}
-
-
-	return 0;
 }
 
-int
-add_conf_item(const char *topconf, const char *name, int type, void (*func) (void *))
+
+
+void
+load_conf_settings(void)
 {
-	struct TopConf *tc;
-	struct ConfEntry *cf;
+	register_top_confs();
 
-	if((tc = find_top_conf(topconf)) == NULL)
-		return -1;
+	/* sanity check things */
+	if(ConfigFileEntry.ts_warn_delta < TS_WARN_DELTA_MIN)
+		ConfigFileEntry.ts_warn_delta = TS_WARN_DELTA_DEFAULT;
 
-	if((cf = find_conf_item(tc, name)) != NULL)
-		return -1;
+	if(ConfigFileEntry.ts_max_delta < TS_MAX_DELTA_MIN)
+		ConfigFileEntry.ts_max_delta = TS_MAX_DELTA_DEFAULT;
 
-	cf = ircd_malloc(sizeof(struct ConfEntry));
+	if(ConfigFileEntry.servlink_path == NULL)
+		ConfigFileEntry.servlink_path = ircd_strdup(SLPATH);
 
-	cf->cf_name = ircd_strdup(name);
-	cf->cf_type = type;
-	cf->cf_func = func;
-	cf->cf_arg = NULL;
+	if(ServerInfo.network_name == NULL)
+		ServerInfo.network_name = ircd_strdup(NETWORK_NAME_DEFAULT);
 
-	ircd_dlinkAddAlloc(cf, &tc->tc_items);
+	if(ServerInfo.network_desc == NULL)
+		ServerInfo.network_desc = ircd_strdup(NETWORK_DESC_DEFAULT);
 
-	return 0;
+	if((ConfigFileEntry.client_flood < CLIENT_FLOOD_MIN) ||
+	   (ConfigFileEntry.client_flood > CLIENT_FLOOD_MAX))
+		ConfigFileEntry.client_flood = CLIENT_FLOOD_MAX;
+
+	if(!split_users || !split_servers ||
+	   (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
+	{
+		ircd_event_delete(check_splitmode, NULL);
+		splitmode = 0;
+		splitchecking = 0;
+	}
+	check_class();
 }
 
-#if 0
-int
-remove_conf_item(const char *topconf, const char *name)
-{
-	struct TopConf *tc;
-	struct ConfEntry *cf;
-	dlink_node *ptr;
-
-	if((tc = find_top_conf(topconf)) == NULL)
-		return -1;
-
-	if((cf = find_conf_item(tc, name)) == NULL)
-		return -1;
-
-	if((ptr = ircd_dlinkFind(cf, &tc->tc_items)) == NULL)
-		return -1;
-
-	ircd_dlinkDestroy(ptr, &tc->tc_items);
-	ircd_free(cf->cf_name);
-	ircd_free(cf);
-
-	return 0;
-}
-#endif
 
 /* *INDENT-OFF* */
-static struct ConfEntry conf_serverinfo_table[] =
+static struct conf_items conf_modules_table[] =
 {
-	{ "description", 	CF_QSTRING, NULL, 0, &ServerInfo.description	},
-	{ "network_desc", 	CF_QSTRING, NULL, 0, &ServerInfo.network_desc	},
-	{ "hub", 		CF_YESNO,   NULL, 0, &ServerInfo.hub		},
-	{ "use_ts6", 		CF_YESNO,   NULL, 0, &ServerInfo.use_ts6	},
-	{ "default_max_clients",CF_INT,     NULL, 0, &ServerInfo.default_max_clients },
-
-	{ "network_name", 	CF_QSTRING, conf_set_serverinfo_network_name,	0, NULL },
-	{ "name", 		CF_QSTRING, conf_set_serverinfo_name,	0, NULL },
-	{ "sid", 		CF_QSTRING, conf_set_serverinfo_sid,	0, NULL },
-	{ "vhost", 		CF_QSTRING, conf_set_serverinfo_vhost,	0, NULL },
-	{ "vhost6", 		CF_QSTRING, conf_set_serverinfo_vhost6,	0, NULL },
-	{ "ssl_private_key",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_private_key },
-	{ "ssl_ca_cert",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_ca_cert },
-	{ "ssl_cert",		CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },
-	{ "ssl_dh_params",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
-	{ "\0",	0, NULL, 0, NULL }
+	{ "path",	CF_QSTRING,	conf_set_modules_path, 		0, NULL },
+	{ "module",	CF_QSTRING,	conf_set_modules_module,	0, NULL },
+	{ NULL,		0,		NULL,				0, NULL }
 };
 
-static struct ConfEntry conf_admin_table[] =
+static struct conf_items conf_serverinfo_table[] =
+{
+        { "description",        CF_QSTRING, NULL, 0, &ServerInfo.description    },
+        { "network_desc",       CF_QSTRING, NULL, 0, &ServerInfo.network_desc   },
+        { "hub",                CF_YESNO,   NULL, 0, &ServerInfo.hub            },
+        { "use_ts6",            CF_YESNO,   NULL, 0, &ServerInfo.use_ts6        },
+        { "default_max_clients",CF_INT,     NULL, 0, &ServerInfo.default_max_clients },
+
+        { "network_name",       CF_QSTRING, conf_set_serverinfo_network_name,   0, NULL },
+        { "name",               CF_QSTRING, conf_set_serverinfo_name,   0, NULL },
+        { "sid",                CF_QSTRING, conf_set_serverinfo_sid,    0, NULL },
+        { "vhost",              CF_QSTRING, conf_set_serverinfo_vhost,  0, NULL },
+        { "vhost6",             CF_QSTRING, conf_set_serverinfo_vhost6, 0, NULL },
+        { "ssl_private_key",    CF_QSTRING, NULL, 0, &ServerInfo.ssl_private_key },
+        { "ssl_ca_cert",        CF_QSTRING, NULL, 0, &ServerInfo.ssl_ca_cert },
+        { "ssl_cert",           CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },   
+        { "ssl_dh_params",      CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
+        { "\0", 0, NULL, 0, NULL }
+};
+
+static struct conf_items conf_admin_table[] =
 {
 	{ "name",	CF_QSTRING, NULL, 200, &AdminInfo.name		},
 	{ "description",CF_QSTRING, NULL, 200, &AdminInfo.description	},
@@ -1788,7 +2029,7 @@ static struct ConfEntry conf_admin_table[] =
 	{ "\0",	0, NULL, 0, NULL }
 };
 
-static struct ConfEntry conf_log_table[] =
+static struct conf_items conf_log_table[] =
 {
 	{ "fname_userlog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_userlog	},
 	{ "fname_fuserlog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_fuserlog	},
@@ -1803,7 +2044,48 @@ static struct ConfEntry conf_log_table[] =
 	{ "\0",			0,	    NULL, 0,          NULL }
 };
 
-static struct ConfEntry conf_operator_table[] =
+static struct conf_items conf_class_table[] =
+{
+	{ "ping_time", 		CF_TIME, conf_set_class_ping_time,			0, NULL },
+	{ "cidr_bitlen",	CF_INT,  conf_set_class_cidr_bitlen,		0, NULL },
+	{ "number_per_cidr",	CF_INT,  conf_set_class_number_per_cidr,		0, NULL },
+	{ "number_per_ip",	CF_INT,  conf_set_class_number_per_ip,		0, NULL },
+	{ "number_per_ip_global",CF_INT, conf_set_class_number_per_ip_global,	0, NULL },
+	{ "number_per_ident", 	CF_INT,  conf_set_class_number_per_ident,		0, NULL },
+	{ "connectfreq", 	CF_TIME, conf_set_class_connectfreq,		0, NULL },
+	{ "max_number", 	CF_INT,  conf_set_class_max_number,			0, NULL },
+	{ "sendq", 		CF_TIME, conf_set_class_sendq,			0, NULL },
+	{ "\0",	0, NULL, 0, NULL }
+};
+
+static struct conf_items conf_auth_table[] =
+{
+	{ "user",	CF_QSTRING, conf_set_auth_user,		0, NULL },
+	{ "password",	CF_QSTRING, conf_set_auth_pass,		0, NULL },
+	{ "class",	CF_QSTRING, conf_set_auth_class,	0, NULL },
+	{ "spoof",	CF_QSTRING, conf_set_auth_spoof,	0, NULL },
+	{ "redirserv",	CF_QSTRING, conf_set_auth_redirserv,	0, NULL },
+	{ "redirport",	CF_INT,     conf_set_auth_redirport,	0, NULL },
+	{ "flags",	CF_STRING | CF_FLIST, conf_set_auth_flags,	0, NULL },
+	{ "\0",	0, NULL, 0, NULL }
+};
+
+static struct conf_items conf_listen_table[] =
+{
+	{ "host",    CF_QSTRING, conf_set_listen_address, 0, NULL },
+	{ "ip",	     CF_QSTRING, conf_set_listen_address, 0, NULL },
+	{ "port",    CF_INT | CF_FLIST, conf_set_listen_port,    0, NULL},
+	{ "sslport", CF_INT | CF_FLIST, conf_set_listen_sslport, 0, NULL},
+	{ "\0", 	0, 	NULL, 0, NULL}
+};
+
+static struct conf_items conf_exempt_table[] = 
+{
+	{ "ip",	CF_QSTRING, conf_set_exempt_ip, 0, NULL },
+	{ "\0", 	0, 	NULL, 0, NULL}
+};
+
+static struct conf_items conf_operator_table[] =
 {
 	{ "rsa_public_key_file",  CF_QSTRING, conf_set_oper_rsa_public_key_file, 0, NULL },
 	{ "flags",	CF_STRING | CF_FLIST, conf_set_oper_flags,	0, NULL },
@@ -1813,58 +2095,16 @@ static struct ConfEntry conf_operator_table[] =
 	{ "\0",	0, NULL, 0, NULL }
 };
 
-static struct ConfEntry conf_class_table[] =
-{
-	{ "ping_time", 		CF_TIME, conf_set_class_ping_time,		0, NULL },
-	{ "cidr_bitlen",	CF_INT,  conf_set_class_cidr_bitlen,		0, NULL },
-	{ "number_per_cidr",	CF_INT,  conf_set_class_number_per_cidr,	0, NULL },
-	{ "number_per_ip",	CF_INT,  conf_set_class_number_per_ip,		0, NULL },
-	{ "number_per_ip_global", CF_INT,conf_set_class_number_per_ip_global,	0, NULL },
-	{ "number_per_ident", 	CF_INT,  conf_set_class_number_per_ident,	0, NULL },
-	{ "connectfreq", 	CF_TIME, conf_set_class_connectfreq,		0, NULL },
-	{ "max_number", 	CF_INT,  conf_set_class_max_number,		0, NULL },
-	{ "sendq", 		CF_TIME, conf_set_class_sendq,			0, NULL },
-	{ "\0",	0, NULL, 0, NULL }
-};
-
-static struct ConfEntry conf_auth_table[] =
-{
-	{ "user",	CF_QSTRING, conf_set_auth_user,		0, NULL },
-	{ "password",	CF_QSTRING, conf_set_auth_passwd,	0, NULL },
-	{ "class",	CF_QSTRING, conf_set_auth_class,	0, NULL },
-	{ "spoof",	CF_QSTRING, conf_set_auth_spoof,	0, NULL },
-	{ "redirserv",	CF_QSTRING, conf_set_auth_redir_serv,	0, NULL },
-	{ "redirport",	CF_INT,     conf_set_auth_redir_port,	0, NULL },
-	{ "flags",	CF_STRING | CF_FLIST, conf_set_auth_flags,	0, NULL },
-	{ "\0",	0, NULL, 0, NULL }
-};
-
-static struct ConfEntry conf_connect_table[] =
-{
-	{ "send_password",	CF_QSTRING,   conf_set_connect_send_password,	0, NULL },
-	{ "accept_password",	CF_QSTRING,   conf_set_connect_accept_password,	0, NULL },
-	{ "flags",	CF_STRING | CF_FLIST, conf_set_connect_flags,	0, NULL },
-	{ "host",	CF_QSTRING, conf_set_connect_host,	0, NULL },
-	{ "vhost",	CF_QSTRING, conf_set_connect_vhost,	0, NULL },
-	{ "port",	CF_INT,     conf_set_connect_port,	0, NULL },
-	{ "aftype",	CF_STRING,  conf_set_connect_aftype,	0, NULL },
-	{ "hub_mask",	CF_QSTRING, conf_set_connect_hub_mask,	0, NULL },
-	{ "leaf_mask",	CF_QSTRING, conf_set_connect_leaf_mask,	0, NULL },
-	{ "class",	CF_QSTRING, conf_set_connect_class,	0, NULL },
-	{ "\0",	0, NULL, 0, NULL }
-};
-
-static struct ConfEntry conf_general_table[] =
+static struct conf_items conf_general_table[] =
 {
 	{ "oper_only_umodes", 	CF_STRING | CF_FLIST, conf_set_general_oper_only_umodes, 0, NULL },
 	{ "oper_umodes", 	CF_STRING | CF_FLIST, conf_set_general_oper_umodes,	 0, NULL },
 	{ "compression_level", 	CF_INT,    conf_set_general_compression_level,	0, NULL },
 	{ "havent_read_conf", 	CF_YESNO,  conf_set_general_havent_read_conf,	0, NULL },
-	{ "hide_error_messages",CF_STRING, conf_set_general_hide_error_messages,0, NULL },
-	{ "kline_delay", 	CF_TIME,   conf_set_general_kline_delay,	0, NULL },
 	{ "stats_k_oper_only", 	CF_STRING, conf_set_general_stats_k_oper_only,	0, NULL },
 	{ "stats_i_oper_only", 	CF_STRING, conf_set_general_stats_i_oper_only,	0, NULL },
-
+	{ "hide_error_messages",CF_STRING, conf_set_general_hide_error_messages,0, NULL },
+	{ "kline_delay", 	CF_TIME,   conf_set_general_kline_delay,	0, NULL },
 	{ "default_operstring",	CF_QSTRING, NULL, REALLEN,    &ConfigFileEntry.default_operstring },
 	{ "default_adminstring",CF_QSTRING, NULL, REALLEN,    &ConfigFileEntry.default_adminstring },
 	{ "egdpool_path",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.egdpool_path },
@@ -1932,7 +2172,7 @@ static struct ConfEntry conf_general_table[] =
 	{ "\0", 		0, 	  NULL, 0, NULL }
 };
 
-static struct ConfEntry conf_channel_table[] =
+static struct conf_items conf_channel_table[] =
 {
 	{ "default_split_user_count",	CF_INT,  NULL, 0, &ConfigChannel.default_split_user_count	 },
 	{ "default_split_server_count",	CF_INT,	 NULL, 0, &ConfigChannel.default_split_server_count },
@@ -1951,7 +2191,7 @@ static struct ConfEntry conf_channel_table[] =
 	{ "\0", 		0, 	  NULL, 0, NULL }
 };
 
-static struct ConfEntry conf_serverhide_table[] =
+static struct conf_items conf_serverhide_table[] =
 {
 	{ "disable_hidden",	CF_YESNO, NULL, 0, &ConfigServerHide.disable_hidden	},
 	{ "flatten_links",	CF_YESNO, NULL, 0, &ConfigServerHide.flatten_links	},
@@ -1959,48 +2199,79 @@ static struct ConfEntry conf_serverhide_table[] =
 	{ "links_delay",        CF_TIME,  conf_set_serverhide_links_delay, 0, NULL      },
 	{ "\0", 		0, 	  NULL, 0, NULL }
 };
+
+static struct conf_items conf_connect_table[] =
+{
+	{ "send_password",	CF_QSTRING,   conf_set_connect_send_password,	0, NULL },
+	{ "accept_password",	CF_QSTRING,   conf_set_connect_accept_password,	0, NULL },
+	{ "flags",	CF_STRING | CF_FLIST, conf_set_connect_flags,	0, NULL },
+	{ "host",	CF_QSTRING, conf_set_connect_host,	0, NULL },
+	{ "vhost",	CF_QSTRING, conf_set_connect_vhost,	0, NULL },
+	{ "port",	CF_INT,     conf_set_connect_port,	0, NULL },
+	{ "aftype",	CF_STRING,  conf_set_connect_aftype,	0, NULL },
+	{ "hub_mask",	CF_QSTRING, conf_set_connect_hub_mask,	0, NULL },
+	{ "leaf_mask",	CF_QSTRING, conf_set_connect_leaf_mask,	0, NULL },
+	{ "class",	CF_QSTRING, conf_set_connect_class,	0, NULL },
+	{ "\0",	0, NULL, 0, NULL }
+};
+
+static struct conf_items conf_shared_table[] =
+{
+	{ "oper",  CF_QSTRING | CF_FLIST, conf_set_shared_oper,  0, NULL },
+	{ "flags", CF_STRING | CF_FLIST,  conf_set_shared_flags, 0, NULL },
+	{ "\0",	0, NULL, 0, NULL }
+};
+
+static struct conf_items conf_cluster_table[] =
+{
+	{ "name",  CF_QSTRING,		  conf_set_cluster_name,  0, NULL },
+	{ "flags", CF_STRING | CF_FLIST,  conf_set_cluster_flags, 0, NULL },
+	{ "\0",	0, NULL, 0, NULL }
+};
+
+
+struct top_conf_table_t
+{
+	const char *name;
+	void (*start) (conf_t *);
+	void (*end)  (conf_t *);
+	struct conf_items *items;
+	int needsub;
+};
+
+static struct top_conf_table_t top_conf_table[] =
+{
+	{ "modules", 	NULL,			 NULL,			conf_modules_table, 	0},
+	{ "serverinfo",	NULL,			 NULL,			conf_serverinfo_table, 	0},
+	{ "admin",	NULL,			 NULL,			conf_admin_table, 	0},
+	{ "log",	NULL,			 NULL,			conf_log_table,		0},
+	{ "general",	NULL,			 NULL,			conf_general_table,	0},
+	{ "class",	conf_set_class_start,	 conf_set_class_end, 	conf_class_table,	1},
+	{ "auth",	conf_set_auth_start,	 conf_set_auth_end,	conf_auth_table,	0},
+	{ "channel",	NULL,			 NULL,			conf_channel_table,	0},
+	{ "serverhide",	NULL,			 NULL,			conf_serverhide_table,	0},
+	{ "listen",	conf_set_listen_init,	 conf_set_listen_init,	conf_listen_table,	0},
+	{ "exempt",	NULL,			 NULL,			conf_exempt_table,	0},
+	{ "operator",	conf_set_start_operator, conf_set_end_operator,	conf_operator_table,	1},
+	{ "connect",	conf_set_start_connect,  conf_set_end_connect,	conf_connect_table,	1},
+	{ "shared",	conf_set_shared_cleanup, conf_set_shared_cleanup,conf_shared_table,	0},
+	{ "cluster",	conf_set_cluster_cleanup,conf_set_cluster_cleanup,conf_cluster_table,	0},
+	{ NULL,		NULL,			 NULL,			NULL,			0},
+};
+
 /* *INDENT-ON* */
 
-void
-newconf_init()
+
+
+void 
+add_all_conf_settings(void)
 {
-	add_top_conf("modules", NULL, NULL, NULL);
-	add_conf_item("modules", "path", CF_QSTRING, conf_set_modules_path);
-	add_conf_item("modules", "module", CF_QSTRING, conf_set_modules_module);
-
-	add_top_conf("serverinfo", NULL, NULL, conf_serverinfo_table);
-	add_top_conf("admin", NULL, NULL, conf_admin_table);
-	add_top_conf("log", NULL, NULL, conf_log_table);
-	add_top_conf("operator", conf_begin_oper, conf_end_oper, conf_operator_table);
-	add_top_conf("class", conf_begin_class, conf_end_class, conf_class_table);
-
-	add_top_conf("listen", conf_begin_listen, conf_end_listen, NULL);
-	add_conf_item("listen", "port", CF_INT | CF_FLIST, conf_set_listen_port);
-	add_conf_item("listen", "sslport", CF_INT | CF_FLIST, conf_set_listen_sslport);
-	add_conf_item("listen", "ip", CF_QSTRING, conf_set_listen_address);
-	add_conf_item("listen", "host", CF_QSTRING, conf_set_listen_address);
-
-	add_top_conf("auth", conf_begin_auth, conf_end_auth, conf_auth_table);
-
-	add_top_conf("shared", conf_cleanup_shared, conf_cleanup_shared, NULL);
-	add_conf_item("shared", "oper", CF_QSTRING|CF_FLIST, conf_set_shared_oper);
-	add_conf_item("shared", "flags", CF_STRING | CF_FLIST, conf_set_shared_flags);
-
-	add_top_conf("connect", conf_begin_connect, conf_end_connect, conf_connect_table);
-
-	add_top_conf("exempt", NULL, NULL, NULL);
-	add_conf_item("exempt", "ip", CF_QSTRING, conf_set_exempt_ip);
-
-	add_top_conf("cluster", conf_cleanup_cluster, conf_cleanup_cluster, NULL);
-	add_conf_item("cluster", "name", CF_QSTRING, conf_set_cluster_name);
-	add_conf_item("cluster", "flags", CF_STRING | CF_FLIST, conf_set_cluster_flags);
-
-	add_top_conf("general", NULL, NULL, conf_general_table);
-	add_top_conf("channel", NULL, NULL, conf_channel_table);
-	add_top_conf("serverhide", NULL, NULL, conf_serverhide_table);
-
-#ifdef ENABLE_SERVICES
-	add_top_conf("service", conf_begin_service, NULL, NULL);
-	add_conf_item("service", "name", CF_QSTRING, conf_set_service_name);
-#endif
+	int i;
+	struct top_conf_table_t *t;
+	for(i = 0; top_conf_table[i].name != NULL; i++)
+	{
+		t = &top_conf_table[i];
+		add_top_conf(t->name, t->start, t->end, t->items, t->needsub);
+	}
 }
+

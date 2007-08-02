@@ -87,21 +87,13 @@
 #line 6 "src/ircd_parser.y"
 
 
-#include "stdinc.h"
-#include "setup.h"
 #include "ircd_lib.h"
-#include "struct.h"
-#include "common.h"
-#include "ircd_defs.h"
-#include "client.h"
-#include "match.h"
-#include "modules.h"
+#include "stdinc.h"
 #include "newconf.h"
 
 #define YY_NO_UNPUT
 
 int yyparse();
-int yyerror(const char *);
 int yylex();
 
 static time_t conf_find_time(char*);
@@ -199,16 +191,17 @@ conf_parm_t *cur_list = NULL;
 static void
 add_cur_list_cpt(conf_parm_t *new)
 {
+	
 	if (cur_list == NULL)
 	{
 		cur_list = ircd_malloc(sizeof(conf_parm_t));
-		cur_list->type |= CF_FLIST;
 		cur_list->v.list = new;
 	}
 	else
 	{
 		new->next = cur_list->v.list;
 		cur_list->v.list = new;
+		cur_list->type |= CF_FLIST;
 	}
 }
 
@@ -260,14 +253,14 @@ add_cur_list(int type, char *str, int number)
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 161 "src/ircd_parser.y"
+#line 154 "src/ircd_parser.y"
 {
 	int 		number;
 	char 		string[IRCD_BUFSIZE + 1];
 	conf_parm_t *	conf_parm;
 }
 /* Line 187 of yacc.c.  */
-#line 271 "src/ircd_parser.c"
+#line 264 "src/ircd_parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -280,7 +273,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 284 "src/ircd_parser.c"
+#line 277 "src/ircd_parser.c"
 
 #ifdef short
 # undef short
@@ -572,9 +565,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   180,   180,   181,   182,   185,   186,   190,   189,   201,
-     200,   211,   212,   215,   223,   224,   227,   231,   252,   258,
-     264,   270,   294,   293,   302,   303,   304,   307,   319,   323
+       0,   172,   172,   173,   174,   177,   178,   181,   181,   191,
+     190,   200,   201,   204,   212,   213,   216,   220,   241,   247,
+     253,   259,   283,   282,   291,   292,   293,   296,   308,   312
 };
 #endif
 
@@ -1501,53 +1494,51 @@ yyreduce:
   switch (yyn)
     {
         case 7:
-#line 190 "src/ircd_parser.y"
+#line 181 "src/ircd_parser.y"
     { 
 		conf_start_block((yyvsp[(1) - (1)].string), NULL);
 	}
     break;
 
   case 8:
-#line 195 "src/ircd_parser.y"
+#line 186 "src/ircd_parser.y"
     {
-		if (conf_cur_block)
-			conf_end_block(conf_cur_block);
+		conf_end_block();
 	}
     break;
 
   case 9:
-#line 201 "src/ircd_parser.y"
+#line 191 "src/ircd_parser.y"
     { 
 		conf_start_block((yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));
 	}
     break;
 
   case 10:
-#line 205 "src/ircd_parser.y"
+#line 195 "src/ircd_parser.y"
     {
-		if (conf_cur_block)
-			conf_end_block(conf_cur_block);
+		conf_end_block();
 	}
     break;
 
   case 13:
-#line 216 "src/ircd_parser.y"
+#line 205 "src/ircd_parser.y"
     {
-		conf_call_set(conf_cur_block, (yyvsp[(1) - (4)].string), cur_list, CF_LIST);
+		conf_call_set((yyvsp[(1) - (4)].string), cur_list, CF_LIST);
 		free_cur_list(cur_list);
 		cur_list = NULL;
 	}
     break;
 
   case 16:
-#line 228 "src/ircd_parser.y"
+#line 217 "src/ircd_parser.y"
     {
 		add_cur_list_cpt((yyvsp[(1) - (1)].conf_parm));
 	}
     break;
 
   case 17:
-#line 232 "src/ircd_parser.y"
+#line 221 "src/ircd_parser.y"
     {
 		/* "1 .. 5" meaning 1,2,3,4,5 - only valid for integers */
 		if (((yyvsp[(1) - (3)].conf_parm)->type & CF_MTYPE) != CF_INT ||
@@ -1569,7 +1560,7 @@ yyreduce:
     break;
 
   case 18:
-#line 253 "src/ircd_parser.y"
+#line 242 "src/ircd_parser.y"
     {
 		(yyval.conf_parm) = ircd_malloc(sizeof(conf_parm_t));
 		(yyval.conf_parm)->type = CF_QSTRING;
@@ -1578,7 +1569,7 @@ yyreduce:
     break;
 
   case 19:
-#line 259 "src/ircd_parser.y"
+#line 248 "src/ircd_parser.y"
     {
 		(yyval.conf_parm) = ircd_malloc(sizeof(conf_parm_t));
 		(yyval.conf_parm)->type = CF_TIME;
@@ -1587,7 +1578,7 @@ yyreduce:
     break;
 
   case 20:
-#line 265 "src/ircd_parser.y"
+#line 254 "src/ircd_parser.y"
     {
 		(yyval.conf_parm) = ircd_malloc(sizeof(conf_parm_t));
 		(yyval.conf_parm)->type = CF_INT;
@@ -1596,7 +1587,7 @@ yyreduce:
     break;
 
   case 21:
-#line 271 "src/ircd_parser.y"
+#line 260 "src/ircd_parser.y"
     {
 		/* a 'string' could also be a yes/no value .. 
 		 so pass it as that, if so */
@@ -1619,31 +1610,31 @@ yyreduce:
     break;
 
   case 22:
-#line 294 "src/ircd_parser.y"
+#line 283 "src/ircd_parser.y"
     {
 #ifndef STATIC_MODULES
-	load_one_module((yyvsp[(2) - (2)].string), 0);
+//	load_one_module($2, 0);
 #endif
 	}
     break;
 
   case 24:
-#line 302 "src/ircd_parser.y"
+#line 291 "src/ircd_parser.y"
     { strcpy((yyval.string), (yyvsp[(1) - (1)].string)); }
     break;
 
   case 25:
-#line 303 "src/ircd_parser.y"
+#line 292 "src/ircd_parser.y"
     { strcpy((yyval.string), (yyvsp[(1) - (1)].string)); }
     break;
 
   case 26:
-#line 304 "src/ircd_parser.y"
+#line 293 "src/ircd_parser.y"
     { (yyval.number) = (yyvsp[(1) - (1)].number); }
     break;
 
   case 27:
-#line 308 "src/ircd_parser.y"
+#line 297 "src/ircd_parser.y"
     {
 		time_t t;
 
@@ -1658,14 +1649,14 @@ yyreduce:
     break;
 
   case 28:
-#line 320 "src/ircd_parser.y"
+#line 309 "src/ircd_parser.y"
     {
 		(yyval.number) = (yyvsp[(1) - (2)].number) + (yyvsp[(2) - (2)].number);
 	}
     break;
 
   case 29:
-#line 324 "src/ircd_parser.y"
+#line 313 "src/ircd_parser.y"
     {
 		(yyval.number) = (yyvsp[(1) - (2)].number) + (yyvsp[(2) - (2)].number);
 	}
@@ -1673,7 +1664,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1677 "src/ircd_parser.c"
+#line 1668 "src/ircd_parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

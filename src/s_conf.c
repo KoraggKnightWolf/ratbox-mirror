@@ -51,6 +51,7 @@
 #include "dns.h"
 #include "operhash.h"
 #include "bandbi.h"
+#include "newconf.h"
 
 struct config_server_hide ConfigServerHide;
 
@@ -67,11 +68,8 @@ dlink_list service_list;
 #endif
 
 /* internally defined functions */
-static void set_default_conf(void);
-static void validate_conf(void);
-static void read_conf(void);
+void set_default_conf(void);
 static void clear_out_old_conf(void);
-static char *strip_tabs(char *dest, const unsigned char *src, size_t len);
 
 static void expire_temp_kd(void *list);
 static void reorganise_temp_kd(void *list);
@@ -654,7 +652,7 @@ rehash_bans(int sig)
 #define NO      0
 #define UNSET  -1
 
-static void
+void
 set_default_conf(void)
 {
 	/* ServerInfo.name is not rehashable */
@@ -780,57 +778,6 @@ set_default_conf(void)
 
 #undef YES
 #undef NO
-
-/*
- * read_conf() 
- *
- *
- * inputs       - file descriptor pointing to config file to use
- * output       - None
- * side effects	- Read configuration file.
- */
-static void
-read_conf(void)
-{
-	lineno = 0;
-
-	set_default_conf();	/* Set default values prior to conf parsing */
-	yyparse();		/* Load the values from the conf */
-	validate_conf();	/* Check to make sure some values are still okay. */
-	/* Some global values are also loaded here. */
-	check_class();		/* Make sure classes are valid */
-}
-
-static void
-validate_conf(void)
-{
-	if(ConfigFileEntry.ts_warn_delta < TS_WARN_DELTA_MIN)
-		ConfigFileEntry.ts_warn_delta = TS_WARN_DELTA_DEFAULT;
-
-	if(ConfigFileEntry.ts_max_delta < TS_MAX_DELTA_MIN)
-		ConfigFileEntry.ts_max_delta = TS_MAX_DELTA_DEFAULT;
-
-	if(ConfigFileEntry.servlink_path == NULL)
-		ConfigFileEntry.servlink_path = ircd_strdup(SLPATH);
-
-	if(ServerInfo.network_name == NULL)
-		ServerInfo.network_name = ircd_strdup(NETWORK_NAME_DEFAULT);
-
-	if(ServerInfo.network_desc == NULL)
-		ServerInfo.network_desc = ircd_strdup(NETWORK_DESC_DEFAULT);
-
-	if((ConfigFileEntry.client_flood < CLIENT_FLOOD_MIN) ||
-	   (ConfigFileEntry.client_flood > CLIENT_FLOOD_MAX))
-		ConfigFileEntry.client_flood = CLIENT_FLOOD_MAX;
-
-	if(!split_users || !split_servers ||
-	   (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
-	{
-		ircd_event_delete(check_splitmode, NULL);
-		splitmode = 0;
-		splitchecking = 0;
-	}
-}
 
 /*
  * lookup_confhost - start DNS lookups of all hostnames in the conf
@@ -1095,41 +1042,33 @@ void
 read_conf_files(int cold)
 {
 	const char *filename;
-
+	int r;
 	conf_fbfile_in = NULL;
 
 	filename = ConfigFileEntry.configfile;
 
-	/* We need to know the initial filename for the yyerror() to report
-	   FIXME: The full path is in conffilenamebuf first time since we
-	   dont know anything else
-
-	   - Gozem 2002-07-21 
-	 */
-	ircd_strlcpy(conffilebuf, filename, sizeof(conffilebuf));
-
-	if((conf_fbfile_in = fopen(filename, "r")) == NULL)
+	r = read_config_file(filename);
+	
+	if(r > 0)
 	{
-		if(cold)
-		{
-			ilog(L_MAIN, "Failed in reading configuration file %s", filename);
-			exit(-1);
-		}
-		else
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "Can't open file '%s' - aborting rehash!", filename);
-			return;
-		}
+		ilog(L_MAIN, "Config file %s has %d error(s) - aborting rehash", filename, r);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Config file %s has %d error(s) aborting rehash", filename, r);
+		return;
 	}
 
-	if(!cold)
+	r = check_valid_entries();
+	
+	if(r > 0)
 	{
-		clear_out_old_conf();
+		ilog(L_MAIN, "Config file %s reports %d error(s) on second pass - aborting rehash", filename, r);
+		sendto_realops_flags(UMODE_ALL, L_ALL, 
+			"Config file %s reports %d error(s) on second pass - aborting rehash",
+			filename, r);
+		return;
 	}
-
-	read_conf();
-	fclose(conf_fbfile_in);
+	
+	clear_out_old_conf();
+	load_conf_settings();
 }
 
 /*
@@ -1270,78 +1209,3 @@ conf_add_d_conf(struct ConfItem *aconf)
 }
 
 
-/*
- * yyerror
- *
- * inputs	- message from parser
- * output	- none
- * side effects	- message to opers and log file entry is made
- */
-void
-yyerror(const char *msg)
-{
-	char newlinebuf[BUFSIZE];
-
-	strip_tabs(newlinebuf, (const unsigned char *) linebuf, strlen(linebuf));
-
-	sendto_realops_flags(UMODE_ALL, L_ALL, "\"%s\", line %d: %s at '%s'",
-			     conffilebuf, lineno + 1, msg, newlinebuf);
-
-	ilog(L_MAIN, "\"%s\", line %d: %s at '%s'", conffilebuf, lineno + 1, msg, newlinebuf);
-}
-
-int
-conf_fgets(char *lbuf, int max_size, FILE * fb)
-{
-	char *p;
-
-	if(fgets(lbuf, max_size, fb) == NULL)
-		return (0);
-
-	if((p = strpbrk(lbuf, "\r\n")) != NULL) {
-		*p++ = '\n';
-		*p = '\0';
-	}	
-	return (strlen(lbuf));
-}
-
-int
-conf_yy_fatal_error(const char *msg)
-{
-	return (0);
-}
-
-/*
- * strip_tabs(dst, src, length)
- *
- *   Copies src to dst, while converting all \t (tabs) into spaces.
- *
- * NOTE: jdc: I have a gut feeling there's a faster way to do this.
- */
-static char *
-strip_tabs(char *dest, const unsigned char *src, size_t len)
-{
-	char *d = dest;
-	/* Sanity check; we don't want anything nasty... */
-	s_assert(0 != dest);
-	s_assert(0 != src);
-
-	if(dest == NULL || src == NULL)
-		return NULL;
-
-	while (*src && (len > 0))
-	{
-		if(*src == '\t')
-		{
-			*d++ = ' ';	/* Translate the tab into a space */
-		}
-		else
-		{
-			*d++ = *src;	/* Copy src to dst */
-		}
-		++src;
-		--len;
-	}
-	*d = '\0';		/* Null terminate, thanks and goodbye */
-	return dest;
-}

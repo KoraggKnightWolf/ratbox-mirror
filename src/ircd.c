@@ -254,21 +254,16 @@ make_daemon(void)
 }
 
 static int printVersion = 0;
+static const char *basedir = DPATH;
+static const char *configfile = CPATH;
+static const char *logfile = LPATH;
 
 struct lgetopt myopts[] = {
-	{"basedir", &ConfigFileEntry.dpath,
+	{"basedir", &basedir,
 	 STRING, "Base directory to run ircd from"},
-	{"dlinefile", &ConfigFileEntry.dlinefile,
-	 STRING, "File to use for dlines.conf"},
-	{"configfile", &ConfigFileEntry.configfile,
+	{"configfile", &configfile,
 	 STRING, "File to use for ircd.conf"},
-	{"klinefile", &ConfigFileEntry.klinefile,
-	 STRING, "File to use for klines.conf"},
-	{"xlinefile", &ConfigFileEntry.xlinefile,
-	 STRING, "File to use for xlines.conf"},
-	{"resvfile", &ConfigFileEntry.resvfile,
-	 STRING, "File to use for resv.conf"},
-	{"logfile", &logFileName,
+	{"logfile", &logfile,
 	 STRING, "File to use for ircd.log"},
 	{"pidfile", &pidFileName,
 	 STRING, "File to use for process ID"},
@@ -516,30 +511,70 @@ int
 ratbox_main(int argc, char *argv[])
 {
 	char emptyname[] = "";
+	int r;
 	/* Check to see if the user is running us as root, which is a nono */
 #ifndef _WIN32
 	if(geteuid() == 0)
 	{
 		fprintf(stderr, "Don't run ircd as root!!!\n");
-		return -1;
+		return 1;
 	}
 #endif
-	/*
-	 * save server boot time right away, so getrusage works correctly
-	 */
+	init_sys();
+
+
+	if(chdir(basedir))
+	{
+		fprintf(stderr, "Unable to chdir to %s: %s\n", basedir, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	parseargs(&argc, &argv, myopts);
+	add_all_conf_settings();
+
+	r = read_config_file(configfile);
+	if(r > 0)
+	{
+		fprintf(stderr, "Configuration has %d syntax error(s). Giving up (perhaps try running with -conftest)\n", r);
+		return 1;
+	}
+
+	if(testing_conf)
+		fprintf(stderr, "Syntax OK, doing second pass...\n");
+
+
+	r = check_valid_entries();	
+	if(r > 0)
+	{
+		fprintf(stderr, "Second pass reports %d errors(s). Giving up (perhaps try running with -conftest)\n", r);
+		return 1;
+	}
+
+	if(testing_conf)
+		fprintf(stderr, "Second pass reports OK\n");
+	
+	ConfigFileEntry.dpath = basedir;
+	ConfigFileEntry.configfile = configfile;	/* Server configuration file */
+
+	/* Check if there is pidfile and daemon already running */
+	if(!testing_conf)
+	{
+		check_pidfile(pidFileName);
+
+		if(!server_state_foreground)
+			make_daemon();
+		else
+			print_startup(getpid());
+	}
+
+	/* This must be after we daemonize.. */
+	ircd_lib_init(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE, FD_HEAP_SIZE);
+
+	set_default_conf();
 	ircd_set_time();
-	/*
-	 * Setup corefile size immediately after boot -kre
-	 */
 	setup_corefile();
-
-	/*
-	 * set initialVMTop before we allocate any memory
-	 */
 	initialVMTop = get_vm_top();
-
 	ServerRunning = 0;
-
 	seed_random(NULL);
 
 	memset(&me, 0, sizeof(me));
@@ -561,20 +596,15 @@ ratbox_main(int argc, char *argv[])
 	memset(&AdminInfo, 0, sizeof(AdminInfo));
 	memset(&ServerStats, 0, sizeof(struct ServerStatistics));
 
+
 	/* Initialise the channel capability usage counts... */
 	init_chcap_usage_counts();
 
-	ConfigFileEntry.dpath = DPATH;
-	ConfigFileEntry.configfile = CPATH;	/* Server configuration file */
-	ConfigFileEntry.klinefile = KPATH;	/* Server kline file */
-	ConfigFileEntry.dlinefile = DLPATH;	/* dline file */
-	ConfigFileEntry.xlinefile = XPATH;
-	ConfigFileEntry.resvfile = RESVPATH;
 	ConfigFileEntry.connect_timeout = 30;	/* Default to 30 */
+
 	myargv = argv;
 	umask(077);		/* better safe than sorry --SRB */
 
-	parseargs(&argc, &argv, myopts);
 
 	if(printVersion)
 	{
@@ -584,21 +614,16 @@ ratbox_main(int argc, char *argv[])
 		exit(EXIT_SUCCESS);
 	}
 
-	if(chdir(ConfigFileEntry.dpath))
-	{
-		fprintf(stderr, "Unable to chdir to %s: %s\n", ConfigFileEntry.dpath, strerror(errno));
-		exit(EXIT_FAILURE);
-	}
 
 	setup_signals();
+	init_s_conf();
+	init_s_newconf();
+
+	
 
 #if defined(__CYGWIN__) || defined(_WIN32) || defined(RATBOX_PROFILE)
 	server_state_foreground = 1;
 #endif
-
-	if (testing_conf)
-		server_state_foreground = 1;
-
 
 	if(ConfigServerHide.links_delay > 0)
 		ircd_event_add("cache_links", cache_links, NULL,
@@ -606,20 +631,6 @@ ratbox_main(int argc, char *argv[])
 	else
 		ConfigServerHide.links_disabled = 1;
 
-	/* Check if there is pidfile and daemon already running */
-	if(!testing_conf)
-	{
-		check_pidfile(pidFileName);
-
-		if(!server_state_foreground)
-			make_daemon();
-		else
-			print_startup(getpid());
-	}
-
-	init_sys();
-	/* This must be after we daemonize.. */
-	ircd_lib_init(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE, FD_HEAP_SIZE);
 	if(ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
 	{
 		ircd_init_prng(ConfigFileEntry.egdpool_path, IRCD_PRNG_EGD);
@@ -628,9 +639,11 @@ ratbox_main(int argc, char *argv[])
 	
 	init_main_logfile();
 	init_patricia();
-	newconf_init();
-	init_s_conf();
-	init_s_newconf();
+
+
+
+
+
 	init_hash();
 	clear_scache_hash_table();	/* server cache name table */
 	init_host_hash();
@@ -652,8 +665,10 @@ ratbox_main(int argc, char *argv[])
 	init_resolver();	/* Needs to be setup before the io loop */
 	init_bandb();
 
+	load_conf_settings();
+
 		
-	read_conf_files(YES);	/* cold start init conf files */
+//	read_conf_files(YES);	/* cold start init conf files */
 	rehash_bans(0);
 
 #ifndef STATIC_MODULES

@@ -58,7 +58,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 161 "src/ircd_parser.y"
+#line 154 "src/ircd_parser.y"
 {
 	int 		number;
 	char 		string[IRCD_BUFSIZE + 1];

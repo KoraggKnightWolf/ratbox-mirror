@@ -6,24 +6,7 @@
 #ifndef _NEWCONF_H_INCLUDED
 #define _NEWCONF_H_INCLUDED
 
-struct ConfEntry
-{
-	const char *cf_name;
-	int cf_type;
-	void (*cf_func) (void *);
-	int cf_len;
-	void *cf_arg;
-};
-
-struct TopConf
-{
-	char *tc_name;
-	int (*tc_sfunc) (struct TopConf *);
-	int (*tc_efunc) (struct TopConf *);
-	dlink_list tc_items;
-	struct ConfEntry *tc_entries;
-};
-
+extern FILE *conf_fbfile_in;
 
 #define CF_QSTRING	0x01
 #define CF_INT		0x02
@@ -37,6 +20,8 @@ struct TopConf
 
 #define CF_FLIST	0x1000
 #define CF_MFLAG	0xFF00
+
+
 
 typedef struct conf_parm_t_stru
 {
@@ -52,18 +37,74 @@ typedef struct conf_parm_t_stru
 }
 conf_parm_t;
 
-extern struct TopConf *conf_cur_block;
+struct _confentry;
 
-extern char *current_file;
+extern int lineno;
+extern char linebuf[];
 
-int read_config(char *);
+extern int yyparse(void);
+
+
+typedef struct _confentry 
+{
+	dlink_node node;
+	char *entryname;
+	long number;
+	char *string;
+	dlink_list flist;
+	unsigned int line;
+	char *filename;
+	int type;
+} confentry_t;
+
+typedef struct _conf
+{
+	dlink_node node;
+	char *confname;
+	char *subname;
+	dlink_list entries;
+	char *filename;
+	unsigned int line;
+} conf_t;
+
+struct conf_items;
+
+typedef void CONF_CB(confentry_t *, conf_t *, struct conf_items *);
+
+struct conf_items
+{
+	const char *c_name;
+	int type;
+	CONF_CB *cb_func;
+	int len;
+	void *data;
+};
+
+
+
+/* parser/lexer support functions */
+int conf_yy_fatal_error(const char *msg);
+void conf_yy_report_error(const char *msg);
+void conf_report_warning(const char *format, ...);
+
+void yyerror(const char *msg);
+int conf_fgets(char *, int, FILE *);
+
+                                        
+void delete_all_conf(void);
+void add_valid_block(const char *name, int needsub);
+void add_valid_entry(const char *bname, const char *entryname, int type);
+int check_valid_blocks(void);
+int check_valid_entries(void);
+
+int read_config_file(const char *);
 int conf_start_block(char *, char *);
-int conf_end_block(struct TopConf *);
-int conf_call_set(struct TopConf *, char *, conf_parm_t *, int);
+int conf_end_block(void);
+int conf_call_set(char *, conf_parm_t *, int);
 void conf_report_error(const char *, ...);
 void newconf_init(void);
 int add_conf_item(const char *topconf, const char *name, int type, void (*func) (void *));
 int remove_conf_item(const char *topconf, const char *name);
-
-
+void add_all_conf_settings(void);
+void load_conf_settings(void);
 #endif

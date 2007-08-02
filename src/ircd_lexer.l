@@ -24,17 +24,15 @@
 
 %{
 
-#include "stdinc.h"
-#include "config.h"
 #include "ircd_lib.h"
-#include "ircd_defs.h"
-#include "common.h"
-#include "config.h"
-#include "s_log.h"
-#include "s_conf.h"
+#include "stdinc.h"
 #include "newconf.h"
-
 #include "ircd_parser.h"
+#include "common.h"
+#include "s_log.h"
+
+int conf_fgets(char *lbuf, int max_size, FILE * fb);
+int conf_yy_fatal_error(const char *msg);
 
 int yylex(void);
 
@@ -57,9 +55,7 @@ int yylex_destroy(void);
 YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
 int include_stack_ptr=0;
 int lineno = 1;
-void ccomment(void);
 void cinclude(void);
-void hashcomment(void);
 int ieof(void);
 int lineno_stack[MAX_INCLUDE_DEPTH];
 char conffile_stack[MAX_INCLUDE_DEPTH][IRCD_BUFSIZE];
@@ -75,8 +71,7 @@ char linebuf[512];
 #define YY_FATAL_ERROR(msg) conf_yy_fatal_error(msg)
 
 #define YY_INPUT(buf,result,max_size) \
-  if (!(result = conf_fgets(buf, max_size, conf_fbfile_in))) \
-    YY_FATAL_ERROR("input in flex scanner failed"); 
+	(result = conf_fgets(buf, max_size, conf_fbfile_in))
 %}
 
 ws        [ \t]*
@@ -85,14 +80,22 @@ comment   #.*
 qstring   \"[^\"\n]*[\"\n]
 string    [a-zA-Z_\~][a-zA-Z0-9_]*
 include   \.include{ws}(\<.*\>|\".*\")
+%x ccomment
+
 
 %%
+"/*"         BEGIN(ccomment);
+<ccomment>[^*\n]*        /* eat anything that's not a '*' */
+<ccomment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
+<ccomment>\n             ++lineno;
+<ccomment>"*"+"/"        BEGIN(INITIAL);
+            
+            
 {include}       { cinclude(); }
-"/*"            { ccomment(); }
 \n.*            { strcpy(linebuf, yytext+1); lineno++; yyless(1); }
 
 {ws}            ;
-{comment}       { hashcomment(); }
+{comment}       ;
 
 {digit}+        { yylval.number = atoi(yytext); return NUMBER; }
 
@@ -152,44 +155,6 @@ loadmodule	{ return LOADMODULE; }
 <<EOF>>		{ if (ieof()) yyterminate(); }
 %%
 
-/* C-comment ignoring routine -kre*/
-void ccomment()
-{
-	int c;
-  
-	/* log(L_NOTICE, "got comment"); */
-	while (1)
-	{
-		while ((c = input()) != '*' && c != EOF)
-		{
-			if(c == '\n')
-				++lineno;
-                        
-		}
-
-		if (c == '*')
-		{
-			while ((c = input()) == '*');
-			
-			if (c == '/') 
-				break;
-
-			if (c == '\n')
-				++lineno;
-		}
-
-		if (c == EOF)
-		{
-			YY_FATAL_ERROR("EOF in comment");
-			/* XXX hack alert this disables
-			 * the stupid unused function warning
-			 * gcc generates
-			 */
-			yy_fatal_error("EOF in comment");
-			break;
-		}
-	}
-}
 
 void cinclude(void)
 {
@@ -198,7 +163,7 @@ void cinclude(void)
 		*strchr(c = strchr(yytext, '"') + 1, '"') = 0;
 	else
 		*strchr(++c, '>') = 0;
-
+	
 	/* do stacking and co. */ 
 	if (include_stack_ptr >= MAX_INCLUDE_DEPTH) 
 	{
@@ -263,16 +228,6 @@ int ieof(void)
 
 	yy_switch_to_buffer(include_stack[include_stack_ptr]);
 	return 0;
+	yy_fatal_error(NULL);
 }
 
-/* #-comment style, look for #include */
-#define INCLUDE "#include"
-
-void hashcomment(void)
-{
-	if (strlen(yytext) < sizeof(INCLUDE) - 1)
-		return;
-
-	if (!strncasecmp(yytext, INCLUDE, sizeof(INCLUDE) - 1))
-		yyerror("You probably meant '.include', skipping");
-}

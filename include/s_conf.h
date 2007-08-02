@@ -129,10 +129,6 @@ struct config_file_entry
 {
 	const char *dpath;	/* DPATH if set from command line */
 	const char *configfile;
-	const char *klinefile;
-	const char *dlinefile;
-	const char *xlinefile;
-	const char *resvfile;
 
 	char *servlink_path;
 	char *egdpool_path;
@@ -346,11 +342,8 @@ void flush_expired_ips(void *);
 
 char *get_oper_name(struct Client *client_p);
 char *get_class_name(struct ConfItem *aconf);
+void set_default_conf();
 
-int yylex(void);
-
-extern char conffilebuf[IRCD_BUFSIZE + 1];
-extern int lineno;
 
 #define NOT_AUTHORISED  (-1)
 #define I_SOCKET_ERROR    (-2)
