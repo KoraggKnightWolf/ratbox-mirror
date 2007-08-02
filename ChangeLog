@@ -1,3 +1,11 @@
+androsyn    2007/08/02 17:44:07 UTC	(20070802_4-24145)
+  Log:
+  oops. make it compile
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/08/02 17:41:56 UTC	(20070802_3-24143)
   Log:
   make some things in the conf warnings not errors
