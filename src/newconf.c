@@ -235,12 +235,12 @@ conf_report_error_nl(const char *fmt, ...)
 	conf_parse_failure++;
 	if (testing_conf)
 	{
-		fprintf(stderr, "%s\n", msg);
+		fprintf(stderr, "ERROR: %s\n", msg);
 		return;
 	}
 
-	ilog(L_MAIN, "%s", msg);
-	sendto_realops_flags(UMODE_ALL, L_ALL, "%s", msg);
+	ilog(L_MAIN, "ERROR: %s", msg);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "ERROR: %s", msg);
 }
 
 static void
@@ -255,12 +255,12 @@ conf_report_warning_nl(const char *fmt, ...)
 	
 	if (testing_conf)
 	{
-		fprintf(stderr, "%s\n", msg);
+		fprintf(stderr, "WARNING: %s\n", msg);
 		return;
 	}
 
-	ilog(L_MAIN, "%s", msg);
-	sendto_realops_flags(UMODE_ALL, L_ALL, "%s", msg);
+	ilog(L_MAIN, "WARNING: %s", msg);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "WARNING: %s", msg);
 }
 
 
@@ -654,7 +654,7 @@ read_config_file(const char *filename)
 	ircd_strlcpy(conffilebuf, filename, sizeof(conffilebuf));
 	if((conf_fbfile_in = fopen(filename, "r")) == NULL)
 	{
-		conf_report_error_nl("ERROR: Unable to open file %s %s", filename, strerror(errno));
+		conf_report_error_nl("Unable to open file %s %s", filename, strerror(errno));
 		return 1;
 	}
 	yyparse();
@@ -745,7 +745,7 @@ check_valid_entry(valid_block_t *vt, conf_t *conf, confentry_t *entry)
 		{
 			if(entry->type & CF_FLIST && !(ve->type & CF_FLIST))
 			{
-				conf_report_error_nl("ERROR: Option %s:%s at %s:%d does not take a list of values", conf->confname, entry->entryname, entry->filename, entry->line);
+				conf_report_error_nl("Option %s:%s at %s:%d does not take a list of values", conf->confname, entry->entryname, entry->filename, entry->line);
 				return 0;
 			}
 
@@ -756,7 +756,7 @@ check_valid_entry(valid_block_t *vt, conf_t *conf, confentry_t *entry)
 					confentry_t *xentry = xptr->data;
 					if(CF_TYPE(xentry->type) != CF_TYPE(ve->type))
 					{
-						conf_report_error_nl("ERROR: Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", 
+						conf_report_error_nl("Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", 
 							conf->confname, ve->name, 
 							xentry->filename, xentry->line, 
 							conf_strtype(ve->type), conf_strtype(xentry->type));
@@ -776,7 +776,7 @@ check_valid_entry(valid_block_t *vt, conf_t *conf, confentry_t *entry)
 				{
 					return 1;
 				}
-				conf_report_error_nl("ERROR: Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", conf->confname, ve->name, entry->filename, entry->line, conf_strtype(ve->type), conf_strtype(entry->type));
+				conf_report_error_nl("Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", conf->confname, ve->name, entry->filename, entry->line, conf_strtype(ve->type), conf_strtype(entry->type));
 				return 0;
 			}
 			return 1;
@@ -806,7 +806,7 @@ check_valid_entries(void)
 		}
 		if(vt->needsub && conf->subname == NULL)
 		{
-			conf_report_error_nl("ERROR: Block %s at %s:%d requires a name", conf->confname, conf->filename, conf->line);
+			conf_report_error_nl("Block %s at %s:%d requires a name", conf->confname, conf->filename, conf->line);
 			ret++;
 			continue;
 		}
@@ -958,7 +958,7 @@ conf_set_serverinfo_vhost6(confentry_t *entry, conf_t *conf, struct conf_items *
 #ifdef IPV6
         if(ircd_inet_pton(AF_INET6, (char *) entry->string, &ServerInfo.ip6.sin6_addr) <= 0)
         {
-                conf_report_error_nl("ERROR: Invalid netmask for server IPv6 vhost (%s)", entry->string);
+                conf_report_error_nl("Invalid netmask for server IPv6 vhost (%s)", entry->string);
                 return;
         }
 
@@ -1088,7 +1088,7 @@ conf_set_auth_end(conf_t *conf)
 		
 	if(EmptyString(t_aconf->host))
 	{
-		conf_report_error_nl("ERROR: auth block at %s:%d  -- missing user@host", conf->filename, conf->line);
+		conf_report_error_nl("auth block at %s:%d  -- missing user@host", conf->filename, conf->line);
 		return;
 	}
 		
@@ -1295,7 +1295,7 @@ conf_set_end_operator(conf_t *conf)
 	
 	if(EmptyString(t_oper->name))
 	{
-		conf_report_error_nl("ERROR: operator block at %s:%d -- missing name", conf->filename, conf->line);
+		conf_report_error_nl("operator block at %s:%d -- missing name", conf->filename, conf->line);
 		return;
 	}
 	
@@ -1306,7 +1306,7 @@ conf_set_end_operator(conf_t *conf)
 	)
 #endif
 	{
-		conf_report_error_nl("ERROR: operator block at %s:%d -- missing password", conf->filename, conf->line);
+		conf_report_error_nl("operator block at %s:%d -- missing password", conf->filename, conf->line);
 		return;
 	}
 	
@@ -1374,7 +1374,7 @@ conf_set_oper_user(confentry_t *entry, conf_t *conf, struct conf_items *item)
 	
 	if(EmptyString(tmp_oper->username) || EmptyString(tmp_oper->host))
 	{
-		conf_report_error_nl("ERROR: operator at %s:%d -- missing username/host", entry->filename, entry->line);
+		conf_report_error_nl("operator at %s:%d -- missing username/host", entry->filename, entry->line);
 		free_oper_conf(tmp_oper);
 		return;
 	}
@@ -1583,11 +1583,11 @@ conf_set_general_havent_read_conf(confentry_t *entry, conf_t *conf, struct conf_
 {
         if(entry->number)
         {
-                conf_report_error_nl("ERROR: You haven't read your config file properly.");
+                conf_report_error_nl("You haven't read your config file properly.");
                 conf_report_error_nl
-                        ("ERROR: There is a line in the example conf that will kill your server if not removed.");
+                        ("There is a line in the example conf that will kill your server if not removed.");
                 conf_report_error_nl
-                        ("ERROR: Consider actually reading/editing the conf file, and removing this line.");
+                        ("Consider actually reading/editing the conf file, and removing this line.");
                 if (!testing_conf) 
                         exit(0);
         }
@@ -1830,7 +1830,7 @@ conf_set_shared_oper(confentry_t *entry, conf_t *conf, struct conf_items *item)
 
 	if(len > 2)
 	{
-		conf_report_error_nl("ERROR: Too many options for shared::oper at %s:%d", entry->filename, entry->line);
+		conf_report_error_nl("Too many options for shared::oper at %s:%d", entry->filename, entry->line);
 		return;
 	}
 
@@ -1856,7 +1856,7 @@ conf_set_shared_oper(confentry_t *entry, conf_t *conf, struct conf_items *item)
 	
 	if((p = strchr(username, '@')) == NULL)
 	{
-		conf_report_error_nl("ERROR: shared::oper at %s:%d -- oper is not a user@host", entry->filename, entry->line);
+		conf_report_error_nl("shared::oper at %s:%d -- oper is not a user@host", entry->filename, entry->line);
 		return;
 	}
 	

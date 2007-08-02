@@ -535,7 +535,7 @@ ratbox_main(int argc, char *argv[])
 	r = read_config_file(configfile);
 	if(r > 0)
 	{
-		fprintf(stderr, "Configuration has %d syntax error(s). Giving up (perhaps try running with -conftest)\n", r);
+		fprintf(stderr, "ERROR: Unable to start ircd: found %d syntax error(s) whlist loading config file.  Try running with -conftest\n", r);
 		return 1;
 	}
 
@@ -546,7 +546,7 @@ ratbox_main(int argc, char *argv[])
 	r = check_valid_entries();	
 	if(r > 0)
 	{
-		fprintf(stderr, "Second pass reports %d errors(s). Giving up (perhaps try running with -conftest)\n", r);
+		fprintf(stderr, "ERROR: Unable to start ircd: found %d error(s) whilst loading config file.  Try running with -conftest\n", r);
 		return 1;
 	}
 
