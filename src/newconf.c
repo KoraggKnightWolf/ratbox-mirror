@@ -813,7 +813,7 @@ check_valid_entries(void)
 		if(!vt->needsub && conf->subname != NULL)
 		{
 			conf_report_warning_nl("Block %s at %s:%d does not require a name, but has one", conf->confname, conf->filename, conf->line);
-			ret++;
+			/* ret++; treat this as a warning as well */
 			continue;
 		}
 		DLINK_FOREACH(xptr, conf->entries.head)
