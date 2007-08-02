@@ -1,3 +1,11 @@
+androsyn    2007/08/02 17:41:56 UTC	(20070802_3-24143)
+  Log:
+  make some things in the conf warnings not errors
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/08/02 15:30:46 UTC	(20070802_2-24141)
   Log:
   clean up an error message regarding unclosed blocks
