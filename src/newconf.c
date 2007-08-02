@@ -783,7 +783,7 @@ check_valid_entry(valid_block_t *vt, conf_t *conf, confentry_t *entry)
 		}	
 	}
 	conf_report_warning_nl("Invalid entry: %s::%s at %s:%d", conf->confname, entry->entryname, entry->filename, entry->line);
-	return 0;
+	return 2;
 }
 
 int
@@ -801,7 +801,7 @@ check_valid_entries(void)
 		if(vt == NULL)
 		{
 			conf_report_warning_nl("Invalid block: %s at %s:%d", conf->confname, conf->filename, conf->line);
-			ret++;
+			/* ret++; treat invalid blocks as warnings only */
 			continue;
 		}
 		if(vt->needsub && conf->subname == NULL)
