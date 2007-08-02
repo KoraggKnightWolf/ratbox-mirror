@@ -1,3 +1,11 @@
+androsyn    2007/08/02 15:30:46 UTC	(20070802_2-24141)
+  Log:
+  clean up an error message regarding unclosed blocks
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/08/02 15:11:50 UTC	(20070802_1-24139)
   Log:
   make connect_aftype call report_error_nl instead
