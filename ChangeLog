@@ -1,3 +1,11 @@
+androsyn    2007/08/02 18:09:01 UTC	(20070802_8-24153)
+  Log:
+  fl insists on Warning instead of WARNING, i think he's too polite
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/08/02 18:08:09 UTC	(20070802_7-24151)
   Log:
   clarify error reporting and warnings
