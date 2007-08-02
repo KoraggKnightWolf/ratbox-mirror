@@ -1,3 +1,11 @@
+androsyn    2007/08/02 15:11:50 UTC	(20070802_1-24139)
+  Log:
+  make connect_aftype call report_error_nl instead
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/08/02 15:05:18 UTC	(20070802_0-24137)
   Log:
   - Rework the stuff in newconf.c so that it operates in more of a two pass fashion.
