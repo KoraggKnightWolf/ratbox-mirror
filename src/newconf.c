@@ -243,6 +243,27 @@ conf_report_error_nl(const char *fmt, ...)
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s", msg);
 }
 
+static void
+conf_report_warning_nl(const char *fmt, ...)
+{
+	va_list ap;
+	char msg[IRCD_BUFSIZE + 1];
+
+	va_start(ap, fmt);
+	ircd_vsnprintf(msg, sizeof(msg), fmt, ap);
+	va_end(ap);
+	
+	if (testing_conf)
+	{
+		fprintf(stderr, "%s\n", msg);
+		return;
+	}
+
+	ilog(L_MAIN, "%s", msg);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "%s", msg);
+}
+
+
 static int
 find_umode(struct mode_table *tab, const char *name)
 {
@@ -279,7 +300,7 @@ set_modes_from_table(int *modes, const char *whatis, struct mode_table *tab, con
 		mode = find_umode(tab, umode);
 		if(mode == -1)
 		{
-			conf_report_error_nl("Warning -- unknown flag %s %s", whatis, sub->string);
+			conf_report_warning_nl("Warning -- unknown flag %s %s", whatis, sub->string);
 			continue;
 		}	
 		
@@ -633,7 +654,7 @@ read_config_file(const char *filename)
 	ircd_strlcpy(conffilebuf, filename, sizeof(conffilebuf));
 	if((conf_fbfile_in = fopen(filename, "r")) == NULL)
 	{
-		conf_report_error_nl("Unable to open file %s %s", filename, strerror(errno));
+		conf_report_error_nl("ERROR: Unable to open file %s %s", filename, strerror(errno));
 		return 1;
 	}
 	yyparse();
@@ -705,7 +726,7 @@ check_valid_blocks(void)
 		conf_t *conf = ptr->data;
 		if(!check_valid_block(conf->confname))
 		{
-			conf_report_error_nl("Invalid block: %s at %s:%d", conf->confname, conf->filename, conf->line);
+			conf_report_warning_nl("Invalid block: %s at %s:%d", conf->confname, conf->filename, conf->line);
 			return 0;
 		}
 		
@@ -724,7 +745,7 @@ check_valid_entry(valid_block_t *vt, conf_t *conf, confentry_t *entry)
 		{
 			if(entry->type & CF_FLIST && !(ve->type & CF_FLIST))
 			{
-				conf_report_error_nl("Option %s:%s at %s:%d does not take a list of values", conf->confname, entry->entryname, entry->filename, entry->line);
+				conf_report_error_nl("ERROR: Option %s:%s at %s:%d does not take a list of values", conf->confname, entry->entryname, entry->filename, entry->line);
 				return 0;
 			}
 
@@ -735,7 +756,7 @@ check_valid_entry(valid_block_t *vt, conf_t *conf, confentry_t *entry)
 					confentry_t *xentry = xptr->data;
 					if(CF_TYPE(xentry->type) != CF_TYPE(ve->type))
 					{
-						conf_report_error_nl("Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", 
+						conf_report_error_nl("ERROR: Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", 
 							conf->confname, ve->name, 
 							xentry->filename, xentry->line, 
 							conf_strtype(ve->type), conf_strtype(xentry->type));
@@ -755,13 +776,13 @@ check_valid_entry(valid_block_t *vt, conf_t *conf, confentry_t *entry)
 				{
 					return 1;
 				}
-				conf_report_error_nl("Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", conf->confname, ve->name, entry->filename, entry->line, conf_strtype(ve->type), conf_strtype(entry->type));
+				conf_report_error_nl("ERROR: Option %s:%s at %s:%d takes type \"%s\" not \"%s\"", conf->confname, ve->name, entry->filename, entry->line, conf_strtype(ve->type), conf_strtype(entry->type));
 				return 0;
 			}
 			return 1;
 		}	
 	}
-	conf_report_error_nl("Invalid entry: %s::%s at %s:%d", conf->confname, entry->entryname, entry->filename, entry->line);
+	conf_report_warning_nl("Invalid entry: %s::%s at %s:%d", conf->confname, entry->entryname, entry->filename, entry->line);
 	return 0;
 }
 
@@ -779,19 +800,19 @@ check_valid_entries(void)
 		vt = find_valid_block(conf->confname);
 		if(vt == NULL)
 		{
-			conf_report_error_nl("Invalid block: %s at %s:%d", conf->confname, conf->filename, conf->line);
+			conf_report_warning_nl("Invalid block: %s at %s:%d", conf->confname, conf->filename, conf->line);
 			ret++;
 			continue;
 		}
 		if(vt->needsub && conf->subname == NULL)
 		{
-			conf_report_error_nl("Block %s at %s:%d requires a name", conf->confname, conf->filename, conf->line);
+			conf_report_error_nl("ERROR: Block %s at %s:%d requires a name", conf->confname, conf->filename, conf->line);
 			ret++;
 			continue;
 		}
 		if(!vt->needsub && conf->subname != NULL)
 		{
-			conf_report_error_nl("Block %s at %s:%d does not require a name, but has one", conf->confname, conf->filename, conf->line);
+			conf_report_warning_nl("Block %s at %s:%d does not require a name, but has one", conf->confname, conf->filename, conf->line);
 			ret++;
 			continue;
 		}
@@ -817,7 +838,7 @@ conf_set_modules_path(confentry_t *entry, conf_t *conf, struct conf_items *item)
 #ifndef STATIC_MODULES
 	mod_add_path(entry->string);
 #else
-	conf_report_error_nl("Ignoring modules::path at %s:%d -- loadable module support not present", entry->file, entry->line);
+	conf_report_warning_nl("Ignoring modules::path at %s:%d -- loadable module support not present", entry->file, entry->line);
 #endif	
 }
 
@@ -877,7 +898,7 @@ conf_set_serverinfo_name(confentry_t *entry, conf_t *conf, struct conf_items *it
 		{
 			if(!IsServChar(*s))
 			{
-				conf_report_error("Ignoring serverinfo::name "
+				conf_report_error("Error serverinfo::name "
 						  "-- bogus servername.");
 				return;
 			}
@@ -887,7 +908,7 @@ conf_set_serverinfo_name(confentry_t *entry, conf_t *conf, struct conf_items *it
 
 		if(!dots)
 		{
-			conf_report_error("Ignoring serverinfo::name -- must contain '.'");
+			conf_report_error("Error serverinfo::name -- must contain '.'");
 			return;
 		}
 
@@ -895,7 +916,7 @@ conf_set_serverinfo_name(confentry_t *entry, conf_t *conf, struct conf_items *it
 
 		if(IsDigit(*s))
 		{
-			conf_report_error("Ignoring serverinfo::name -- cannot begin with digit.");
+			conf_report_error("Error serverinfo::name -- cannot begin with digit.");
 			return;
 		}
 
@@ -924,7 +945,7 @@ conf_set_serverinfo_vhost(confentry_t *entry, conf_t *conf, struct conf_items *i
 {
         if(ircd_inet_pton(AF_INET, (char *) entry->string, &ServerInfo.ip.sin_addr) <= 0)
         {
-                conf_report_error_nl("Invalid netmask for server IPv4 vhost (%s)", entry->string);
+                conf_report_warning_nl("Invalid netmask for server IPv4 vhost (%s)", entry->string);
                 return;
         }
         ServerInfo.ip.sin_family = AF_INET;
@@ -937,14 +958,14 @@ conf_set_serverinfo_vhost6(confentry_t *entry, conf_t *conf, struct conf_items *
 #ifdef IPV6
         if(ircd_inet_pton(AF_INET6, (char *) entry->string, &ServerInfo.ip6.sin6_addr) <= 0)
         {
-                conf_report_error_nl("Invalid netmask for server IPv6 vhost (%s)", entry->string);
+                conf_report_error_nl("ERROR: Invalid netmask for server IPv6 vhost (%s)", entry->string);
                 return;
         }
 
         ServerInfo.specific_ipv6_vhost = 1;
         ServerInfo.ip6.sin6_family = AF_INET6;
 #else
-        conf_report_error_nl("Warning -- ignoring serverinfo::vhost6 -- IPv6 support not available.");
+        conf_report_warning_nl("Warning -- ignoring serverinfo::vhost6 -- IPv6 support not available.");
 #endif
 }
 
@@ -959,7 +980,7 @@ conf_set_serverinfo_sid(confentry_t *entry, conf_t *conf, struct conf_items *ite
 		if(!IsDigit(sid[0]) || !IsIdChar(sid[1]) ||
 		   !IsIdChar(sid[2]) || sid[3] != '\0')
 		{
-			conf_report_error("Ignoring serverinfo::sid "
+			conf_report_error("Error serverinfo::sid "
 					  "-- bogus sid.");
 			return;
 		}
@@ -1003,7 +1024,7 @@ conf_set_class_cidr_bitlen(confentry_t *entry, conf_t *conf, struct conf_items *
 	t_class->cidr_bitlen = entry->number;
 	if(t_class->cidr_bitlen > maxsize)
 	{
-		conf_report_error_nl("class::cidr_bitlen argument exceeds maxsize (%d > %d) - truncating to %d.", t_class->cidr_bitlen, maxsize, maxsize);
+		conf_report_warning_nl("class::cidr_bitlen argument exceeds maxsize (%d > %d) - truncating to %d.", t_class->cidr_bitlen, maxsize, maxsize);
 		t_class->cidr_bitlen = 32;
 	}
 	return;
@@ -1067,7 +1088,7 @@ conf_set_auth_end(conf_t *conf)
 		
 	if(EmptyString(t_aconf->host))
 	{
-		conf_report_error_nl("Ignoring auth block at %s:%d  -- missing user@host", conf->filename, conf->line);
+		conf_report_error_nl("ERROR: auth block at %s:%d  -- missing user@host", conf->filename, conf->line);
 		return;
 	}
 		
@@ -1274,7 +1295,7 @@ conf_set_end_operator(conf_t *conf)
 	
 	if(EmptyString(t_oper->name))
 	{
-		conf_report_error_nl("Ignoring operator block at %s:%d -- missing name", conf->filename, conf->line);
+		conf_report_error_nl("ERROR: operator block at %s:%d -- missing name", conf->filename, conf->line);
 		return;
 	}
 	
@@ -1285,7 +1306,7 @@ conf_set_end_operator(conf_t *conf)
 	)
 #endif
 	{
-		conf_report_error_nl("Ignoring operator block at %s:%d -- missing password", conf->filename, conf->line);
+		conf_report_error_nl("ERROR: operator block at %s:%d -- missing password", conf->filename, conf->line);
 		return;
 	}
 	
@@ -1306,7 +1327,7 @@ conf_set_end_operator(conf_t *conf)
 			BIO *file;
 			if((file = BIO_new_file(t_oper->rsa_pubkey_file, "r")) == NULL)
 			{
-				conf_report_error("Ignoring operator block for %s at %s:%d rsa_public_key_file cant be opened",
+				conf_report_error("ERROR: operator block for %s at %s:%d rsa_public_key_file cant be opened",
 						  tmp_oper->name, conf->filename, conf->line);
 				return;
 			}
@@ -1316,7 +1337,7 @@ conf_set_end_operator(conf_t *conf)
 			
 			if(tmp_oper->rsa_pubkey == NULL)
 			{
-				conf_report_error("Ignoring operator block for %s at %s:%d -- invalid rsa_public_key_file",
+				conf_report_error("ERROR: operator block for %s at %s:%d -- invalid rsa_public_key_file",
 						tmp_oper->name, conf->filename, conf->line);
 				return;
 			} 
@@ -1353,7 +1374,7 @@ conf_set_oper_user(confentry_t *entry, conf_t *conf, struct conf_items *item)
 	
 	if(EmptyString(tmp_oper->username) || EmptyString(tmp_oper->host))
 	{
-		conf_report_error_nl("Ignoring operator at %s:%d -- missing username/host", entry->filename, entry->line);
+		conf_report_error_nl("ERROR: operator at %s:%d -- missing username/host", entry->filename, entry->line);
 		free_oper_conf(tmp_oper);
 		return;
 	}
@@ -1378,7 +1399,7 @@ conf_set_oper_rsa_public_key_file(confentry_t *entry, conf_t *conf, struct conf_
 	ircd_free(t_oper->rsa_pubkey_file);
 	t_oper->rsa_pubkey_file = ircd_strdup(entry->string);
 #else
-	conf_report_error_nl("Warning -- ignoring rsa_public_key_file (OpenSSL support not available");
+	conf_report_warning_nl("Warning -- ignoring rsa_public_key_file (OpenSSL support not available");
 #endif
 }
 
@@ -1461,7 +1482,7 @@ conf_set_exempt_ip(confentry_t *entry, conf_t *conf, struct conf_items *item)
 
 	if(parse_netmask(entry->string, NULL, NULL) == HM_HOST)
         {
-                conf_report_error("Ignoring exempt -- invalid exempt::ip.");
+                conf_report_warning_nl("Ignoring exempt -- invalid exempt::ip.");
                 return;
         }
 
@@ -1492,7 +1513,7 @@ conf_set_general_hide_error_messages(confentry_t *entry, conf_t *conf, struct co
         else if(strcasecmp(val, "no") == 0)
                 ConfigFileEntry.hide_error_messages = 0;
         else
-                conf_report_error_nl("Invalid setting '%s' for general::hide_error_messages at %s:%d", val, entry->filename, entry->line);
+                conf_report_warning_nl("Invalid setting '%s' for general::hide_error_messages at %s:%d", val, entry->filename, entry->line);
 }
 
 static void
@@ -1546,12 +1567,12 @@ conf_set_general_compression_level(confentry_t *entry, conf_t *conf, struct conf
 
 	if((ConfigFileEntry.compression_level < 1) || (ConfigFileEntry.compression_level > 9))
 	{
-                conf_report_error_nl("Invalid general::compression_level %d at %s:%d -- using default.",
+                conf_report_warning_nl("Invalid general::compression_level %d at %s:%d -- using default.",
 					ConfigFileEntry.compression_level, entry->filename, entry->line);
 		ConfigFileEntry.compression_level = 0;
 	}
 #else
-	conf_report_error_nl("Ignoring general::compression_level at %s:%d -- zlib not available.",
+	conf_report_warning_nl("Ignoring general::compression_level at %s:%d -- zlib not available.",
 				entry->filename, entry->line);
 #endif	
 
@@ -1676,8 +1697,8 @@ conf_set_connect_aftype(confentry_t *entry, conf_t *conf, struct conf_items *ite
 	else if(!strcasecmp(aftp, "ipv6"))
 		GET_SS_FAMILY(&t_server->ipnum) = AF_INET6;
 #endif
-	else
-		conf_report_error_nl("connect::aftype '%s' at %s:%d is unknown", aft, entry->filename, entry->line);
+	else 
+		conf_warning_error_nl("connect::aftype '%s' at %s:%d is unknown", aft, entry->filename, entry->line);
 }
 
 static void
@@ -1809,7 +1830,7 @@ conf_set_shared_oper(confentry_t *entry, conf_t *conf, struct conf_items *item)
 
 	if(len > 2)
 	{
-		conf_report_error_nl("Too many options for shared::oper at %s:%d", entry->filename, entry->line);
+		conf_report_error_nl("ERROR: Too many options for shared::oper at %s:%d", entry->filename, entry->line);
 		return;
 	}
 
@@ -1835,7 +1856,7 @@ conf_set_shared_oper(confentry_t *entry, conf_t *conf, struct conf_items *item)
 	
 	if((p = strchr(username, '@')) == NULL)
 	{
-		conf_report_error_nl("Ignoring shared::oper at %s:%d -- oper is not a user@host", entry->filename, entry->line);
+		conf_report_error_nl("ERROR: shared::oper at %s:%d -- oper is not a user@host", entry->filename, entry->line);
 		return;
 	}
 	
