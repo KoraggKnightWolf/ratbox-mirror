@@ -255,12 +255,12 @@ conf_report_warning_nl(const char *fmt, ...)
 	
 	if (testing_conf)
 	{
-		fprintf(stderr, "WARNING: %s\n", msg);
+		fprintf(stderr, "Warning: %s\n", msg);
 		return;
 	}
 
-	ilog(L_MAIN, "WARNING: %s", msg);
-	sendto_realops_flags(UMODE_ALL, L_ALL, "WARNING: %s", msg);
+	ilog(L_MAIN, "Warning: %s", msg);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "Warning: %s", msg);
 }
 
 
