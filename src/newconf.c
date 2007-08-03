@@ -892,10 +892,9 @@ conf_set_serverinfo_name(confentry_t *entry, conf_t *conf, struct conf_items *it
 {
 	if(ServerInfo.name == NULL)
 	{
-		
 		if(!valid_servername(entry->string))
 		{
-			conf_report_error("Error serverinfo::name -- Invalid servername"
+			conf_report_error("Error serverinfo::name -- Invalid servername");
 			return;
 		}
 
@@ -906,7 +905,7 @@ conf_set_serverinfo_name(confentry_t *entry, conf_t *conf, struct conf_items *it
 		}
 
 		/* the ircd will exit() in main() if we dont set one */
-		if(strlen(s) <= HOSTLEN)
+		if(strlen(entry->string) <= HOSTLEN)
 			ServerInfo.name = ircd_strdup(entry->string);
 	}
 }
@@ -1906,9 +1905,7 @@ static void
 conf_set_service_name(confentry_t *entry, conf_t *conf, struct conf_items *item)
 {
 	struct Client *target_p;
-	const char *s;
-	int dots = 0;
-	
+
 	if(!valid_servername(entry->string))
 	{
 		conf_report_warning_nl("Ignoring service::name at %s:%d -- Invalid servername",
