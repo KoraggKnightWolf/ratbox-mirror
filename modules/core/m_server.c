@@ -277,7 +277,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		return 0;
 	}
 
-	if(bogus_host(name) || strlen(name) > HOSTLEN)
+	if(!valid_servername(name) || strlen(name) > HOSTLEN)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s introduced server with invalid servername %s",
@@ -440,7 +440,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		return 0;
 	}
 
-	if(bogus_host(parv[1]) || strlen(parv[1]) > HOSTLEN)
+	if(!valid_servername(parv[1]) || strlen(parv[1]) > HOSTLEN)
 	{
 		sendto_one(client_p, POP_QUEUE, "ERROR :Invalid servername");
 		sendto_realops_flags(UMODE_ALL, L_ALL,
