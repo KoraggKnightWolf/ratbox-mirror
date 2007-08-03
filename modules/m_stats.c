@@ -1278,7 +1278,7 @@ stats_memory (struct Client *source_p)
 	
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :blockheap Total Allocated: %lu Total Used: %lu",
-			   bh_total, bh_used);
+			   (unsigned long)bh_total, (unsigned long)bh_used);
 	
 	count_whowas_memory(&wwu, &wwm);
 
