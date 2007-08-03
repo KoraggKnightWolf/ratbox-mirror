@@ -1,3 +1,11 @@
+androsyn    2007/08/03 01:18:18 UTC	(20070803_1-24157)
+  Log:
+  quell more type warnings
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2007/08/03 01:17:13 UTC	(20070803_0-24155)
   Log:
   quell type warnings
