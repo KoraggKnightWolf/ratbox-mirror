@@ -665,7 +665,7 @@ read_config_file(const char *filename)
 	
 }
 
-void
+static void
 add_valid_block(const char *name, int needsub)
 {
 	valid_block_t *valid = ircd_malloc(sizeof(valid_block_t));
@@ -688,7 +688,7 @@ find_valid_block(const char *name)
 	return NULL;
 }
 
-void
+static void
 add_valid_entry(const char *bname, const char *entryname, int type)
 {
 	valid_block_t *b;

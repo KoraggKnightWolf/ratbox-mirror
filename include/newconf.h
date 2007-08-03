@@ -92,8 +92,6 @@ int conf_fgets(char *, int, FILE *);
 
                                         
 void delete_all_conf(void);
-void add_valid_block(const char *name, int needsub);
-void add_valid_entry(const char *bname, const char *entryname, int type);
 int check_valid_blocks(void);
 int check_valid_entries(void);
 
@@ -104,7 +102,6 @@ int conf_call_set(char *, conf_parm_t *, int);
 void conf_report_error(const char *, ...);
 void newconf_init(void);
 int add_conf_item(const char *topconf, const char *name, int type, void (*func) (void *));
-int remove_conf_item(const char *topconf, const char *name);
 void add_all_conf_settings(void);
 void load_conf_settings(void);
 #endif
