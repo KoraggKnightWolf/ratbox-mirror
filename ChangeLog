@@ -1,3 +1,11 @@
+androsyn    2007/08/03 03:25:14 UTC	(20070803_2-24159)
+  Log:
+  oops..forgot the service block
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/08/03 01:18:18 UTC	(20070803_1-24157)
   Log:
   quell more type warnings
