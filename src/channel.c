@@ -71,7 +71,7 @@ init_channels(void)
 {
 	channel_heap = ircd_bh_create(sizeof(struct Channel), CHANNEL_HEAP_SIZE, "channel_heap");
 	ban_heap = ircd_bh_create(sizeof(struct Ban), BAN_HEAP_SIZE, "ban_heap");
-	topic_heap = ircd_bh_create(TOPICLEN + 1 + USERHOST_REPLYLEN, TOPIC_HEAP_SIZE, "topic_heap");
+	topic_heap = ircd_bh_create(sizeof(struct topic_info), TOPIC_HEAP_SIZE, "topic_heap");
 	member_heap = ircd_bh_create(sizeof(struct membership), MEMBER_HEAP_SIZE, "member_heap");
 }
 
@@ -737,21 +737,10 @@ check_splitmode(void *unused)
 static void
 allocate_topic(struct Channel *chptr)
 {
-	void *ptr;
-
 	if(chptr == NULL)
 		return;
 
-	ptr = ircd_bh_alloc(topic_heap);
-
-	/* Basically we allocate one large block for the topic and
-	 * the topic info.  We then split it up into two and shove it
-	 * in the chptr 
-	 */
-	chptr->topic = ptr;
-	chptr->topic_info = (char *) ptr + TOPICLEN + 1;
-	*chptr->topic = '\0';
-	*chptr->topic_info = '\0';
+	chptr->topic = ircd_bh_alloc(topic_heap);
 }
 
 /* free_topic()
@@ -763,18 +752,14 @@ allocate_topic(struct Channel *chptr)
 static void
 free_topic(struct Channel *chptr)
 {
-	void *ptr;
-
 	if(chptr == NULL || chptr->topic == NULL)
 		return;
 
 	/* This is safe for now - If you change allocate_topic you
 	 * MUST change this as well
 	 */
-	ptr = chptr->topic;
-	ircd_bh_free(topic_heap, ptr);
+	ircd_bh_free(topic_heap, chptr->topic);
 	chptr->topic = NULL;
-	chptr->topic_info = NULL;
 }
 
 /* set_channel_topic()
@@ -791,15 +776,14 @@ set_channel_topic(struct Channel *chptr, const char *topic,
 	{
 		if(chptr->topic == NULL)
 			allocate_topic(chptr);
-		ircd_strlcpy(chptr->topic, topic, TOPICLEN + 1);
-		ircd_strlcpy(chptr->topic_info, topic_info, USERHOST_REPLYLEN);
-		chptr->topic_time = topicts;
-	}
+		ircd_strlcpy(chptr->topic->topic, topic, sizeof(chptr->topic->topic));
+		ircd_strlcpy(chptr->topic->topic_info, topic_info, sizeof(chptr->topic->topic_info));
+		chptr->topic->topic_time = topicts;
+	} 
 	else
 	{
 		if(chptr->topic != NULL)
 			free_topic(chptr);
-		chptr->topic_time = 0;
 	}
 }
 

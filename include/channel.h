@@ -43,14 +43,19 @@ struct Mode
 	char key[KEYLEN];
 };
 
+struct topic_info
+{
+	char topic[TOPICLEN+1];
+	char topic_info[USERHOST_REPLYLEN];
+	time_t topic_time;
+};
+
 /* channel structure */
 struct Channel
 {
 	dlink_node node;
 	struct Mode mode;
-	char *topic;
-	char *topic_info;
-	time_t topic_time;
+	struct topic_info *topic;
 	time_t last_knock;	/* don't allow knock to flood */
 
 	dlink_list members;	/* channel members */

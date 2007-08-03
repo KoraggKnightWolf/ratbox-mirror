@@ -1106,10 +1106,10 @@ burst_TS5(struct Client *client_p)
 
 		if(IsCapable(client_p, CAP_TB) && chptr->topic != NULL)
 			sendto_one(client_p, HOLD_QUEUE, ":%s TB %s %ld %s%s:%s",
-				   me.name, chptr->chname, (long) chptr->topic_time,
-				   ConfigChannel.burst_topicwho ? chptr->topic_info : "",
+				   me.name, chptr->chname, (long) chptr->topic->topic_time,
+				   ConfigChannel.burst_topicwho ? chptr->topic->topic_info : "",
 				   ConfigChannel.burst_topicwho ? " " : "",
-				   chptr->topic);
+				   chptr->topic->topic);
 
 		hchaninfo.chptr = chptr;
 		call_hook(h_burst_channel, &hchaninfo);
@@ -1244,10 +1244,10 @@ burst_TS6(struct Client *client_p)
 
 		if(IsCapable(client_p, CAP_TB) && chptr->topic != NULL)
 			sendto_one(client_p, HOLD_QUEUE, ":%s TB %s %ld %s%s:%s",
-				   me.id, chptr->chname, (long) chptr->topic_time,
-				   ConfigChannel.burst_topicwho ? chptr->topic_info : "",
+				   me.id, chptr->chname, (long) chptr->topic->topic_time,
+				   ConfigChannel.burst_topicwho ? chptr->topic->topic_info : "",
 				   ConfigChannel.burst_topicwho ? " " : "",
-				   chptr->topic);
+				   chptr->topic->topic);
 
 		hchaninfo.chptr = chptr;
 		call_hook(h_burst_channel, &hchaninfo);

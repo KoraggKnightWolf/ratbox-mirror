@@ -89,13 +89,13 @@ ms_tb(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	if (EmptyString(newtopic))
 		return 0;
 
-	if(chptr->topic == NULL || chptr->topic_time > newtopicts)
+	if(chptr->topic == NULL || (chptr->topic != NULL && chptr->topic->topic_time > newtopicts))
 	{
 		/* its possible the topicts is a few seconds out on some
 		 * servers, due to lag when propagating it, so if theyre the
 		 * same topic just drop the message --fl
 		 */
-		if(chptr->topic != NULL && strcmp(chptr->topic, newtopic) == 0)
+		if(chptr->topic != NULL && strcmp(chptr->topic->topic, newtopic) == 0)
 			return 0;
 
 		set_channel_topic(chptr, newtopic, newtopicwho, newtopicts);
@@ -103,14 +103,14 @@ ms_tb(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 				     source_p->name, chptr->chname, newtopic);
 		sendto_server(client_p, chptr, CAP_TB|CAP_TS6, NOCAPS,
 			      ":%s TB %s %ld %s%s:%s",
-			      use_id(source_p), chptr->chname, (long) chptr->topic_time,
-			      ConfigChannel.burst_topicwho ? chptr->topic_info : "",
-			      ConfigChannel.burst_topicwho ? " " : "", chptr->topic);
+			      use_id(source_p), chptr->chname, (long) chptr->topic->topic_time,
+			      ConfigChannel.burst_topicwho ? chptr->topic->topic_info : "",
+			      ConfigChannel.burst_topicwho ? " " : "", chptr->topic->topic);
 		sendto_server(client_p, chptr, CAP_TB, CAP_TS6,
 			      ":%s TB %s %ld %s%s:%s",
-			      source_p->name, chptr->chname, (long) chptr->topic_time,
-			      ConfigChannel.burst_topicwho ? chptr->topic_info : "",
-			      ConfigChannel.burst_topicwho ? " " : "", chptr->topic);
+			      source_p->name, chptr->chname, (long) chptr->topic->topic_time,
+			      ConfigChannel.burst_topicwho ? chptr->topic->topic_info : "",
+			      ConfigChannel.burst_topicwho ? " " : "", chptr->topic->topic);
 	}
 
 	return 0;

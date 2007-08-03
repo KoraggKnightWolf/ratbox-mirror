@@ -104,16 +104,16 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 			sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
 					":%s TOPIC %s :%s",
 					use_id(source_p), chptr->chname,
-					chptr->topic == NULL ? "" : chptr->topic);
+					chptr->topic == NULL ? "" : chptr->topic->topic);
 			sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
 					":%s TOPIC %s :%s",
 					source_p->name, chptr->chname,
-					chptr->topic == NULL ? "" : chptr->topic);
+					chptr->topic == NULL ? "" : chptr->topic->topic);
 			sendto_channel_local(ALL_MEMBERS,
 					chptr, ":%s!%s@%s TOPIC %s :%s",
 					source_p->name, source_p->username,
 					source_p->host, chptr->chname,
-					chptr->topic == NULL ? "" : chptr->topic);
+					chptr->topic == NULL ? "" : chptr->topic->topic);
 		}
 		else
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
@@ -133,11 +133,11 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 		else
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(RPL_TOPIC),
-					me.name, source_p->name, chptr->chname, chptr->topic);
+					me.name, source_p->name, chptr->chname, chptr->topic->topic);
 
 			sendto_one(source_p, POP_QUEUE, form_str(RPL_TOPICWHOTIME),
 					me.name, source_p->name, chptr->chname,
-					chptr->topic_info, chptr->topic_time);
+					chptr->topic->topic_info, chptr->topic->topic_time);
 		}
 	}
 

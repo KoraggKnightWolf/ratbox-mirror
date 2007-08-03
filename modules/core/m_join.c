@@ -289,11 +289,11 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		if(chptr->topic != NULL)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(RPL_TOPIC), me.name,
-				   source_p->name, chptr->chname, chptr->topic);
+				   source_p->name, chptr->chname, chptr->topic->topic);
 
 			sendto_one(source_p, POP_QUEUE, form_str(RPL_TOPICWHOTIME),
 				   me.name, source_p->name, chptr->chname,
-				   chptr->topic_info, chptr->topic_time);
+				   chptr->topic->topic_info, chptr->topic->topic_time);
 		}
 
 		channel_member_names(chptr, source_p, 1);
