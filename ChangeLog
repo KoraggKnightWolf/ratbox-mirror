@@ -1,3 +1,11 @@
+androsyn    2007/08/03 01:17:13 UTC	(20070803_0-24155)
+  Log:
+  quell type warnings
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2007/08/02 18:09:01 UTC	(20070802_8-24153)
   Log:
   fl insists on Warning instead of WARNING, i think he's too polite
