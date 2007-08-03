@@ -1,3 +1,19 @@
+androsyn    2007/08/03 18:56:49 UTC	(20070803_8-24171)
+  Log:
+  Store topic information in a struct topic_info and allocate that instead of whate we were doing before.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_list.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_tb.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_topic.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+
+
 androsyn    2007/08/03 18:40:11 UTC	(20070803_7-24169)
   Log:
   make m_server.c use valid_servername
