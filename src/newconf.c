@@ -892,30 +892,14 @@ conf_set_serverinfo_name(confentry_t *entry, conf_t *conf, struct conf_items *it
 {
 	if(ServerInfo.name == NULL)
 	{
-		const char *s;
-		int dots = 0;
-
-		for(s = entry->string; *s != '\0'; s++)
+		
+		if(!valid_servername(entry->string))
 		{
-			if(!IsServChar(*s))
-			{
-				conf_report_error("Error serverinfo::name "
-						  "-- bogus servername.");
-				return;
-			}
-			else if(*s == '.')
-				++dots;
-		}
-
-		if(!dots)
-		{
-			conf_report_error("Error serverinfo::name -- must contain '.'");
+			conf_report_error("Error serverinfo::name -- Invalid servername"
 			return;
 		}
 
-		s = entry->string;
-
-		if(IsDigit(*s))
+		if(IsDigit(*entry->string))
 		{
 			conf_report_error("Error serverinfo::name -- cannot begin with digit.");
 			return;
@@ -1925,24 +1909,13 @@ conf_set_service_name(confentry_t *entry, conf_t *conf, struct conf_items *item)
 	const char *s;
 	int dots = 0;
 	
-	for(s = entry->string; *s != '\0'; s++)
+	if(!valid_servername(entry->string))
 	{
-		if(!IsServChar(*s))
-		{
-			conf_report_warning_nl("Ignoring service::name at %s:%d -- Invalid servername",
-					entry->filename, entry->line);
-			return;
-		} else if(*s == '.')
-			dots++;
-	}
-	
-	if(!dots)
-	{
-		conf_report_warning_nl("Ignoring service::name at %s:%d -- servername must contain '.'",
-					entry->filename, entry->line);
+		conf_report_warning_nl("Ignoring service::name at %s:%d -- Invalid servername",
+				entry->filename, entry->line);
 		return;
 	}
-	
+
 	ircd_dlinkAddAlloc(ircd_strdup(entry->string), &service_list);
 	if((target_p = find_server(NULL, entry->string)))
 		target_p->flags |= FLAGS_SERVICE;

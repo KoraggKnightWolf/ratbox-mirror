@@ -63,13 +63,11 @@ int irccmp(const char *s1, const char *s2);
  * ircncmp - counted case insensitive comparison of s1 and s2
  */
 int ircncmp(const char *s1, const char *s2, int n);
-/*
-** canonize - reduce a string of duplicate list entries to contain
-** only the unique items.
-*/
-#ifdef NO_DUPE_MULTI_MESSAGES
-char *canonize(char *);
-#endif
+
+int valid_hostname(const char *hostname);
+int valid_username(const char *username);
+int valid_servername(const char *servername);
+
 
 #define EmptyString(x) ((x == NULL) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x

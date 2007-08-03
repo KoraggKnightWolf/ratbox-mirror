@@ -61,7 +61,6 @@ struct Message sid_msgtab = {
 mapi_clist_av1 server_clist[] = { &server_msgtab, &sid_msgtab, NULL };
 DECLARE_MODULE_AV1(server, NULL, NULL, server_clist, NULL, NULL, "$Revision$");
 
-int bogus_host(const char *host);
 struct Client *server_exists(const char *);
 static int set_server_gecos(struct Client *, const char *);
 
@@ -96,9 +95,9 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		return 0;
 	}
 
-	if(bogus_host(name))
+	if(!valid_servername(name))
 	{
-		exit_client(client_p, client_p, client_p, "Bogus server name");
+		exit_client(client_p, client_p, client_p, "Invalid servername.");
 		return 0;
 	}
 
@@ -619,37 +618,6 @@ set_server_gecos(struct Client *client_p, const char *info)
 	ircd_strlcpy(client_p->info, "(Unknown Location)", sizeof(client_p->info));
 
 	return 1;
-}
-
-/*
- * bogus_host
- *
- * inputs	- hostname
- * output	- 1 if a bogus hostname input, 0 if its valid
- * side effects	- none
- */
-int
-bogus_host(const char *host)
-{
-	int bogus_server = 0;
-	const char *s;
-	int dots = 0;
-
-	for (s = host; *s; s++)
-	{
-		if(!IsServChar(*s))
-		{
-			bogus_server = 1;
-			break;
-		}
-		if('.' == *s)
-			++dots;
-	}
-
-	if(!dots || bogus_server)
-		return 1;
-
-	return 0;
 }
 
 /*

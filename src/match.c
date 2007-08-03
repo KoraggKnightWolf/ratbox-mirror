@@ -511,6 +511,119 @@ ircncmp(const char *s1, const char *s2, int n)
 	return (res);
 }
 
+
+/* 
+ * valid_hostname - check hostname for validity
+ *
+ * Inputs       - pointer to user
+ * Output       - YES if valid, NO if not
+ * Side effects - NONE
+ *
+ * NOTE: this doesn't allow a hostname to begin with a dot and
+ * will not allow more dots than chars.
+ */
+int
+valid_hostname(const char *hostname)
+{
+	const char *p = hostname;
+	int found_sep = 0;
+
+	s_assert(NULL != p);
+
+	if(hostname == NULL)
+		return NO;
+
+	if('.' == *p || ':' == *p)
+		return NO;
+
+	while (*p)
+	{
+		if(!IsHostChar(*p))
+			return NO;
+		if(*p == '.' || *p == ':')
+			found_sep++;
+		p++;
+	}
+
+	if(found_sep == 0)
+		return(NO);
+
+	return (YES);
+}
+
+/* 
+ * valid_username - check username for validity
+ *
+ * Inputs       - pointer to user
+ * Output       - YES if valid, NO if not
+ * Side effects - NONE
+ * 
+ * Absolutely always reject any '*' '!' '?' '@' in an user name
+ * reject any odd control characters names.
+ * Allow '.' in username to allow for "first.last"
+ * style of username
+ */
+int
+valid_username(const char *username)
+{
+	int dots = 0;
+	const char *p = username;
+
+	s_assert(NULL != p);
+
+	if(username == NULL)
+		return NO;
+
+	if('~' == *p)
+		++p;
+
+	/* reject usernames that don't start with an alphanum
+	 * i.e. reject jokers who have '-@somehost' or '.@somehost'
+	 * or "-hi-@somehost", "h-----@somehost" would still be accepted.
+	 */
+	if(!IsAlNum(*p))
+		return NO;
+
+	while (*++p)
+	{
+		if((*p == '.') && ConfigFileEntry.dots_in_ident)
+		{
+			dots++;
+			if(dots > ConfigFileEntry.dots_in_ident)
+				return NO;
+			if(!IsUserChar(p[1]))
+				return NO;
+		}
+		else if(!IsUserChar(*p))
+			return NO;
+	}
+	return YES;
+}
+
+int
+valid_servername(const char *servername)
+{
+	const char *s;
+	int dots = 0;
+	
+	for(s = servername; *s != '\0'; s++)
+	{
+		if(!IsServChar(*s))
+		{
+			return NO;
+		}
+		if(*s == '.')
+			dots++;
+	}
+	if(dots == 0)
+	{
+		return NO;
+	}	
+	return YES;
+}
+
+
+
 const unsigned char ToLowerTab[] = {
 	0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa,
 	0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11, 0x12, 0x13, 0x14,
