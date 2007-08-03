@@ -1218,7 +1218,7 @@ stats_bh_callback(size_t bused, size_t bfree, size_t bmemusage, size_t heapalloc
 	struct Client *source_p = (struct Client *)data;
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :blockheap %s elements used: %lu elements free: %lu memory in use: %lu total memory: %lu",
-			   desc, bused, bfree, bmemusage, heapalloc);
+			   desc, (unsigned long)bused, (unsigned long)bfree, (unsigned long)bmemusage, (unsigned long)heapalloc);
 	
 	return;
 }
