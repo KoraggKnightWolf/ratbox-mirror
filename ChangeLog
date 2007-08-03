@@ -1,3 +1,19 @@
+androsyn    2007/08/03 15:22:40 UTC	(20070803_4-24163)
+  Log:
+  - move valid_username, valid_hostname to match.c
+  - add a valid_servername to match.c
+  - make servername checking use valid_servername rather than self rolled ways of doing it
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/match.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2007/08/03 14:05:48 UTC	(20070803_3-24161)
   Log:
   make a few functions that static as they're not needed outside newconf.c
