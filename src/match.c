@@ -23,6 +23,7 @@
 #include "ircd_lib.h"
 #include "ircd.h"
 #include "match.h"
+#include "s_conf.h"
 
 /* match()
  * 
