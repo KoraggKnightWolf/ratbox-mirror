@@ -1,3 +1,11 @@
+androsyn    2007/08/04 16:08:06 UTC	(20070804_0-24173)
+  Log:
+  run newconf.c through indent
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/08/03 18:56:49 UTC	(20070803_8-24171)
   Log:
   Store topic information in a struct topic_info and allocate that instead of whate we were doing before.
