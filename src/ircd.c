@@ -529,6 +529,7 @@ ratbox_main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	myargv = argv;
 	parseargs(&argc, &argv, myopts);
 	add_all_conf_settings();
 
@@ -602,7 +603,6 @@ ratbox_main(int argc, char *argv[])
 
 	ConfigFileEntry.connect_timeout = 30;	/* Default to 30 */
 
-	myargv = argv;
 	umask(077);		/* better safe than sorry --SRB */
 
 
