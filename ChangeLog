@@ -1,3 +1,11 @@
+androsyn    2007/08/06 11:25:22 UTC	(20070806_0-24177)
+  Log:
+  move up setting myargv otherwise it gets trashed by parseargs thus after a few restarts, we get trashed argvs
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2007/08/04 16:08:06 UTC	(20070804_0-24173)
   Log:
   run newconf.c through indent
