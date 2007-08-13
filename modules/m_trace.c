@@ -397,7 +397,7 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACEUNKNOWN,
 				   form_str(RPL_TRACEUNKNOWN),
 				   class_name, name, ip,
-				   ircd_currenttime - target_p->localClient->firsttime);
+				   ircd_current_time() - target_p->localClient->firsttime);
 		cnt++;
 		break;
 
@@ -416,8 +416,8 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 			sendto_one_numeric(source_p, POP_QUEUE, tnumeric, form_str(tnumeric),
 					class_name, name,
 					show_ip(source_p, target_p) ? ip : empty_sockhost,
-					ircd_currenttime - target_p->localClient->lasttime,
-					ircd_currenttime - target_p->localClient->last);
+					ircd_current_time() - target_p->localClient->lasttime,
+					ircd_current_time() - target_p->localClient->last);
 			cnt++;
 		}
 		break;
@@ -433,7 +433,7 @@ report_this_status(struct Client *source_p, struct Client *target_p,
                        sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACESERVER, form_str(RPL_TRACESERVER),
                                   class_name, servcount, usercount, name,
                                   *(target_p->serv->by) ? target_p->serv->by : "*", "*",
-                                  me.name, ircd_currenttime - target_p->localClient->lasttime);
+                                  me.name, ircd_current_time() - target_p->localClient->lasttime);
                        cnt++;
 
                }

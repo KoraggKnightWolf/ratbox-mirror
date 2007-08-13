@@ -87,7 +87,7 @@ ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "End of burst (emulated) from %s (%d seconds)",
 					     source_p->name,
-					     (signed int) (ircd_currenttime - source_p->localClient->firsttime));
+					     (signed int) (ircd_current_time() - source_p->localClient->firsttime));
 		SetEob(source_p);
 		eob_count++;
 	}

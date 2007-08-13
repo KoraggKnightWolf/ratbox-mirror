@@ -165,7 +165,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 		return 0;
 
 	ircd_set_time();
-	current_date = smalldate(ircd_currenttime);
+	current_date = smalldate(ircd_current_time());
 	aconf = make_conf();
 	aconf->status = CONF_KILL;
 	aconf->host = ircd_strdup(host);
@@ -261,7 +261,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 			aconf->spasswd = ircd_strdup(oper_reason);
 	}
 
-	current_date = smalldate(ircd_currenttime);
+	current_date = smalldate(ircd_current_time());
 
 	if(tkline_time > 0)
 	{
@@ -410,7 +410,7 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	const char *oper = get_oper_name(source_p);
 
 	aconf->info.oper = operhash_add(oper);
-	aconf->hold = ircd_currenttime;
+	aconf->hold = ircd_current_time();
 
 	if(EmptyString(oper_reason))
 	{
@@ -452,7 +452,7 @@ apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 	const char *oper = get_oper_name(source_p);
 
 	aconf->info.oper = operhash_add(oper);
-	aconf->hold = ircd_currenttime + tkline_time;
+	aconf->hold = ircd_current_time() + tkline_time;
 	add_temp_kline(aconf);
 
 	/* no oper reason.. */

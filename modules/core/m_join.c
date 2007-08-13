@@ -205,7 +205,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYCHANNELS),
 				   me.name, source_p->name, name);
 			if(successful_join_count)
-				source_p->localClient->last_join_time = ircd_currenttime;
+				source_p->localClient->last_join_time = ircd_current_time();
 			return 0;
 		}
 
@@ -252,7 +252,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		/* its a new channel, set +nt and burst. */
 		if(flags & CHFL_CHANOP)
 		{
-			chptr->channelts = ircd_currenttime;
+			chptr->channelts = ircd_current_time();
 			chptr->mode.mode |= MODE_TOPICLIMIT;
 			chptr->mode.mode |= MODE_NOPRIVMSGS;
 
@@ -299,7 +299,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		channel_member_names(chptr, source_p, 1);
 
 		if(successful_join_count)
-			source_p->localClient->last_join_time = ircd_currenttime;
+			source_p->localClient->last_join_time = ircd_current_time();
 	}
 
 	return 0;

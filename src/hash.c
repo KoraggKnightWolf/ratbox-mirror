@@ -543,7 +543,7 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 
 	ircd_dlinkAdd(chptr, &chptr->node, &global_channel_list);
 
-	chptr->channelts = ircd_currenttime;	/* doesn't hurt to set it here */
+	chptr->channelts = ircd_current_time();	/* doesn't hurt to set it here */
 
 	ircd_dlinkAddAlloc(chptr, &channelTable[hashv]);
 

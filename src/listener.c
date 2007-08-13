@@ -470,12 +470,12 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 		/*
 		 * slow down the whining to opers bit
 		 */
-		if((last_oper_notice + 20) <= ircd_currenttime)
+		if((last_oper_notice + 20) <= ircd_current_time())
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "All connections in use. (%s)",
 					     get_listener_name(listener));
-			last_oper_notice = ircd_currenttime;
+			last_oper_notice = ircd_current_time();
 		}
 			
 		ircd_write(fd, "ERROR :All connections in use\r\n", 32);

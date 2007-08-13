@@ -871,7 +871,7 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 {
 	static time_t last_used = 0L;
 
-	if((last_used + ConfigFileEntry.pace_wait) > ircd_currenttime)
+	if((last_used + ConfigFileEntry.pace_wait) > ircd_current_time())
 	{
 		/* safe enough to give this on a local connect only */
 		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
@@ -880,7 +880,7 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		return 0;
 	}
 	else
-		last_used = ircd_currenttime;
+		last_used = ircd_current_time();
 
 	if(hunt_server(client_p, source_p, ":%s INFO :%s", 1, parc, parv) != HUNTED_ISME)
 		return 0;

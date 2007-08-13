@@ -629,7 +629,7 @@ set_local_gline(struct Client *source_p, const char *user,
 	char *my_reason;
 	char *oper_reason;
 
-	current_date = smalldate(ircd_currenttime);
+	current_date = smalldate(ircd_current_time());
 
 	my_reason = LOCAL_COPY(reason);
 
@@ -654,7 +654,7 @@ set_local_gline(struct Client *source_p, const char *user,
 	aconf->passwd = ircd_strdup(buffer);
 	aconf->user = ircd_strdup(user);
 	aconf->host = ircd_strdup(host);
-	aconf->hold = ircd_currenttime + ConfigFileEntry.gline_time;
+	aconf->hold = ircd_current_time() + ConfigFileEntry.gline_time;
 
 	ircd_dlinkAddTailAlloc(aconf, &glines);
 	add_conf_by_address(aconf->host, CONF_GLINE, aconf->user, aconf);
@@ -745,8 +745,8 @@ majority_gline(struct Client *source_p, const char *user,
 					sizeof(pending->oper_host2));
 				pending->reason2 = ircd_strdup(reason);
 				pending->oper_server2 = find_or_add(source_p->servptr->name);
-				pending->last_gline_time = ircd_currenttime;
-				pending->time_request2 = ircd_currenttime;
+				pending->last_gline_time = ircd_current_time();
+				pending->time_request2 = ircd_current_time();
 				return NO;
 			}
 		}
@@ -770,8 +770,8 @@ majority_gline(struct Client *source_p, const char *user,
 	pending->reason1 = ircd_strdup(reason);
 	pending->reason2 = NULL;
 
-	pending->last_gline_time = ircd_currenttime;
-	pending->time_request1 = ircd_currenttime;
+	pending->last_gline_time = ircd_current_time();
+	pending->time_request1 = ircd_current_time();
 
 	ircd_dlinkAddAlloc(pending, &pending_glines);
 
@@ -844,7 +844,7 @@ expire_pending_glines(void *unused)
 		glp_ptr = pending_node->data;
 
 		if(((glp_ptr->last_gline_time + GLINE_PENDING_EXPIRE) <=
-		    ircd_currenttime) || find_is_glined(glp_ptr->host, glp_ptr->user))
+		    ircd_current_time()) || find_is_glined(glp_ptr->host, glp_ptr->user))
 
 		{
 			ircd_free(glp_ptr->reason1);

@@ -664,7 +664,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
 	else
 	{
 		if((t_delta =
-		    (ircd_currenttime - source_p->localClient->last_leave_time)) >
+		    (ircd_current_time() - source_p->localClient->last_leave_time)) >
 		   JOIN_LEAVE_COUNT_EXPIRE_TIME)
 		{
 			decrement_count = (t_delta / JOIN_LEAVE_COUNT_EXPIRE_TIME);
@@ -675,7 +675,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
 		}
 		else
 		{
-			if((ircd_currenttime -
+			if((ircd_current_time() -
 			    (source_p->localClient->last_join_time)) < GlobalSetOptions.spam_time)
 			{
 				/* oh, its a possible spambot */
@@ -683,9 +683,9 @@ check_spambot_warning(struct Client *source_p, const char *name)
 			}
 		}
 		if(name != NULL)
-			source_p->localClient->last_join_time = ircd_currenttime;
+			source_p->localClient->last_join_time = ircd_current_time();
 		else
-			source_p->localClient->last_leave_time = ircd_currenttime;
+			source_p->localClient->last_leave_time = ircd_current_time();
 	}
 }
 

@@ -131,7 +131,7 @@ reject_expires(void *unused)
 		pnode = ptr->data;
 		rdata = pnode->data;		
 
-		if(rdata->time + ConfigFileEntry.reject_duration > ircd_currenttime)
+		if(rdata->time + ConfigFileEntry.reject_duration > ircd_current_time())
 			continue;
 
 		ircd_dlinkDelete(ptr, &reject_list);
@@ -166,7 +166,7 @@ add_reject(struct Client *client_p)
 	if((pnode = match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
 	{
 		rdata = pnode->data;
-		rdata->time = ircd_currenttime;
+		rdata->time = ircd_current_time();
 		rdata->count++;
 	}
 	else
@@ -179,7 +179,7 @@ add_reject(struct Client *client_p)
 		pnode = make_and_lookup_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);
 		pnode->data = rdata = ircd_malloc(sizeof(struct reject_data));
 		ircd_dlinkAddTail(pnode, &rdata->rnode, &reject_list);
-		rdata->time = ircd_currenttime;
+		rdata->time = ircd_current_time();
 		rdata->count = 1;
 	}
 }
@@ -199,7 +199,7 @@ check_reject(int fd, struct sockaddr *addr)
 	{
 		rdata = pnode->data;
 
-		rdata->time = ircd_currenttime;
+		rdata->time = ircd_current_time();
 		if(rdata->count > (unsigned long)ConfigFileEntry.reject_after_count)
 		{
 			ddata = ircd_malloc(sizeof(struct delay_data));
@@ -390,7 +390,7 @@ throttle_add(struct sockaddr *addr)
 			return 1;			
 
 		/* Stop penalizing them after they've been throttled */
-		t->last = ircd_currenttime;
+		t->last = ircd_current_time();
 		t->count++;
 
 	} else {
@@ -400,7 +400,7 @@ throttle_add(struct sockaddr *addr)
 			bitlen = 128;
 #endif
 		t = ircd_malloc(sizeof(throttle_t));	
-		t->last = ircd_currenttime;
+		t->last = ircd_current_time();
 		t->count = 1;
 		pnode = make_and_lookup_ip(throttle_tree, addr, bitlen);
 		pnode->data = t;
@@ -421,7 +421,7 @@ throttle_expires(void *unused)
 		pnode = ptr->data;
 		t = pnode->data;		
 
-		if(t->last + ConfigFileEntry.throttle_duration > ircd_currenttime)
+		if(t->last + ConfigFileEntry.throttle_duration > ircd_current_time())
 			continue;
 
 		ircd_dlinkDelete(ptr, &throttle_list);

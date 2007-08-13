@@ -79,7 +79,6 @@ struct admin_info AdminInfo;
 struct Counter Count;
 struct ServerStatistics ServerStats;
 
-int ServerRunning;		/* GLOBAL - server execution state */
 int maxconnections;
 struct Client me;		/* That's me */
 struct LocalUser meLocalUser;	/* That's also part of me */
@@ -307,8 +306,7 @@ check_rehash(void *unusued)
 static void
 io_loop(void)
 {
-	while (ServerRunning)
-
+	while(1)
 	{
 		ircd_event_run();
 		ircd_select(250);
@@ -490,6 +488,7 @@ diecb(const char *buf)
 static void
 seed_random(void *unused)
 {
+	struct timeval *tv;	
 #ifndef _WIN32
 	int fd;
 	unsigned int seed;
@@ -500,11 +499,13 @@ seed_random(void *unused)
 		{
 			close(fd);
 			srand(seed);
+			return;
 		}
 	}
 #endif
 	ircd_set_time();
-	srand(ircd_systemtime.tv_sec ^ (ircd_systemtime.tv_usec | (getpid() << 20)));
+	tv = ircd_current_time_tv();
+	srand(tv->tv_sec ^ (tv->tv_usec | (getpid() << 20)));
 }
 
 int
@@ -575,7 +576,6 @@ ratbox_main(int argc, char *argv[])
 	ircd_set_time();
 	setup_corefile();
 	initialVMTop = get_vm_top();
-	ServerRunning = 0;
 	seed_random(NULL);
 
 	memset(&me, 0, sizeof(me));
@@ -724,7 +724,7 @@ ratbox_main(int argc, char *argv[])
 	me.servptr = &me;
 	SetMe(&me);
 	make_server(&me);
-	startup_time = ircd_currenttime;
+	startup_time = ircd_current_time();
 	add_to_hash(HASH_CLIENT, me.name, &me);
 	add_to_hash(HASH_ID, me.id, &me);
 
@@ -750,8 +750,6 @@ ratbox_main(int argc, char *argv[])
 
 	if(splitmode)
 		ircd_event_add("check_splitmode", check_splitmode, NULL, 5);
-
-	ServerRunning = 1;
 
 	io_loop();
 	return 0;

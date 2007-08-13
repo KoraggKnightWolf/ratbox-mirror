@@ -68,7 +68,7 @@ m_lusers(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if (parc > 2)
 	{
-		if((last_used + ConfigFileEntry.pace_wait) > ircd_currenttime)
+		if((last_used + ConfigFileEntry.pace_wait) > ircd_current_time())
 		{
 			/* safe enough to give this on a local connect only */
 			sendto_one(source_p, POP_QUEUE, form_str(RPL_LOAD2HI),
@@ -76,7 +76,7 @@ m_lusers(struct Client *client_p, struct Client *source_p, int parc, const char 
 			return 0;
 		}
 		else
-			last_used = ircd_currenttime;
+			last_used = ircd_current_time();
 
 		if(hunt_server(client_p, source_p, ":%s LUSERS %s :%s", 2, parc, parv) !=
 			   HUNTED_ISME)

@@ -1369,7 +1369,7 @@ server_estab(struct Client *client_p)
 		SetServlink(client_p);
 	}
 
-	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, ircd_currenttime);
+	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, ircd_current_time());
 
 	client_p->servptr = &me;
 
@@ -1403,7 +1403,7 @@ server_estab(struct Client *client_p)
 
 	/* add it to scache */
 	find_or_add(client_p->name);
-	client_p->localClient->firsttime = ircd_currenttime;
+	client_p->localClient->firsttime = ircd_current_time();
 	/* fixing eob timings.. -gnp */
 
 	/* Show the real host/IP to admins */

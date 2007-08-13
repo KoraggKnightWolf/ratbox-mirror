@@ -179,7 +179,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	}
 
 	ircd_set_time();
-	current_date = smalldate(ircd_currenttime);
+	current_date = smalldate(ircd_current_time());
 
 	aconf = make_conf();
 	aconf->status = CONF_DLINE;
@@ -204,7 +204,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 			 "Temporary D-line %d min. - %s (%s)",
 			 (int) (tdline_time / 60), reason, current_date);
 		aconf->passwd = ircd_strdup(dlbuffer);
-		aconf->hold = ircd_currenttime + tdline_time;
+		aconf->hold = ircd_current_time() + tdline_time;
 		add_temp_dline(aconf);
 
 		if(EmptyString(oper_reason))
@@ -235,7 +235,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	{
 		ircd_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
 		aconf->passwd = ircd_strdup(dlbuffer);
-		aconf->hold = ircd_currenttime;
+		aconf->hold = ircd_current_time();
 		add_dline(aconf);
 
 		if(EmptyString(oper_reason))

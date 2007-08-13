@@ -87,7 +87,7 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(!IsOper(source_p))
 		{
 			/* seeing as this is going across servers, we should limit it */
-			if((last_used + ConfigFileEntry.pace_wait_simple) > ircd_currenttime)
+			if((last_used + ConfigFileEntry.pace_wait_simple) > ircd_current_time())
 			{
 				sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
 					   me.name, source_p->name, "WHOIS");
@@ -96,7 +96,7 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 				return 0;
 			}
 			else
-				last_used = ircd_currenttime;
+				last_used = ircd_current_time();
 		}
 
 		if(hunt_server(client_p, source_p, ":%s WHOIS %s :%s", 1, parc, parv) !=
@@ -336,7 +336,7 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_WHOISIDLE, form_str(RPL_WHOISIDLE),
 				   target_p->name, 
-				   ircd_currenttime - target_p->localClient->last, 
+				   ircd_current_time() - target_p->localClient->last, 
 				   target_p->localClient->firsttime);
 	}
 	else

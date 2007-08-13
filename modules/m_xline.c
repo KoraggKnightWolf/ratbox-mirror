@@ -308,7 +308,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	if(temp_time > 0)
 	{
 		aconf->flags |= CONF_FLAGS_TEMPORARY;
-		aconf->hold = ircd_currenttime + temp_time;
+		aconf->hold = ircd_current_time() + temp_time;
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s added temporary %d min. X-Line for [%s] [%s]",
@@ -322,7 +322,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	}
 	else
 	{
-		aconf->hold = ircd_currenttime;
+		aconf->hold = ircd_current_time();
 		bandb_add(BANDB_XLINE, source_p, aconf->host, NULL, reason, NULL);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",

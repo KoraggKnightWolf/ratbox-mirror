@@ -357,7 +357,7 @@ try_connections(void *unused)
 		 * made one successfull connection... [this algorithm is
 		 * a bit fuzzy... -- msa >;) ]
 		 */
-		if(tmp_p->hold > ircd_currenttime)
+		if(tmp_p->hold > ircd_current_time())
 		{
 			if(next > tmp_p->hold || next == 0)
 				next = tmp_p->hold;
@@ -367,7 +367,7 @@ try_connections(void *unused)
 		if((confrq = get_con_freq(cltmp)) < MIN_CONN_FREQ)
 			confrq = MIN_CONN_FREQ;
 
-		tmp_p->hold = ircd_currenttime + confrq;
+		tmp_p->hold = ircd_current_time() + confrq;
 		/*
 		 * Found a CONNECT config with port specified, scan clients
 		 * and see if this server is already connected?

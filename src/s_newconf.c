@@ -240,7 +240,7 @@ expire_glines(void *unused)
 		aconf = ptr->data;
 
 		/* if gline_time changes, these could end up out of order */
-		if(aconf->hold > ircd_currenttime)
+		if(aconf->hold > ircd_current_time())
 			continue;
 
 		delete_one_address_conf(aconf->host, aconf);
@@ -701,7 +701,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_currenttime)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_current_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -718,7 +718,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_currenttime)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_current_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -733,7 +733,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_currenttime)
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_current_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -763,7 +763,7 @@ add_nd_entry(const char *name)
 	nd = ircd_bh_alloc(nd_heap);
 	
 	ircd_strlcpy(nd->name, name, sizeof(nd->name));
-	nd->expire = ircd_currenttime + ConfigFileEntry.nick_delay;
+	nd->expire = ircd_current_time() + ConfigFileEntry.nick_delay;
 
 	/* this list is ordered */
 	ircd_dlinkAddTail(nd, &nd->lnode, &nd_list);
@@ -792,7 +792,7 @@ expire_nd_entries(void *unused)
 		/* this list is ordered - we can stop when we hit the first
 		 * entry that doesnt expire..
 		 */
-		if(nd->expire > ircd_currenttime)
+		if(nd->expire > ircd_current_time())
 			return;
 
 		free_nd_entry(nd);
@@ -815,7 +815,7 @@ add_tgchange(const char *host)
 	target->pnode = pnode;
 
 	target->ip = ircd_strdup(host);
-	target->expiry = ircd_currenttime + (60*60*12);
+	target->expiry = ircd_current_time() + (60*60*12);
 
 	ircd_dlinkAdd(target, &target->node, &tgchange_list);
 }

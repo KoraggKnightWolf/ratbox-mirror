@@ -135,7 +135,7 @@ ilog(ilogfile dest, const char *format, ...)
 	ircd_vsnprintf(buf, sizeof(buf), format, args);
 	va_end(args);
 
-	ircd_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(ircd_currenttime), buf);
+	ircd_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(ircd_current_time()), buf);
 #ifdef _WIN32
 	fputs(buf2, stderr);
 	fflush(stderr);
