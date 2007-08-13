@@ -303,16 +303,6 @@ check_rehash(void *unusued)
 	}
 }
 
-static void
-io_loop(void)
-{
-	while(1)
-	{
-		ircd_event_run();
-		ircd_select(250);
-	}
-}
-
 /*
  * initalialize_global_set_options
  *
@@ -751,6 +741,6 @@ ratbox_main(int argc, char *argv[])
 	if(splitmode)
 		ircd_event_add("check_splitmode", check_splitmode, NULL, 5);
 
-	io_loop();
+	ircd_lib_loop(250); /* we'll never return from here */
 	return 0;
 }
