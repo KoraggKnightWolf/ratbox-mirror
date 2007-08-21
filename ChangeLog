@@ -1,3 +1,30 @@
+androsyn    2007/08/21 19:16:59 UTC	(20070821_0-24235)
+  Log:
+  make things use ircd_fde_t instead of int fd
+
+  Modified:
+	ircd-ratbox/trunk/adns/event.c (File Modified) 
+	ircd-ratbox/trunk/adns/setup.c (File Modified) 
+	ircd-ratbox/trunk/adns/transmit.c (File Modified) 
+	ircd-ratbox/trunk/include/listener.h (File Modified) 
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/include/send.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2007/08/13 18:44:39 UTC	(20070813_1-24201)
   Log:
   remove io_loop and use ircd_lib_loop
