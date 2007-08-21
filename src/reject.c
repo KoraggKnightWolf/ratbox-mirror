@@ -56,7 +56,7 @@ struct reject_data
 struct delay_data
 {
 	dlink_node node;
-	int fd;
+	ircd_fde_t *F;
 };
 
 
@@ -110,8 +110,8 @@ reject_exit(void *unused)
 	{
 		ddata = ptr->data;
 
-		ircd_write(ddata->fd, errbuf, strlen(errbuf));		
-		ircd_close(ddata->fd);
+		ircd_write(ddata->F, errbuf, strlen(errbuf));		
+		ircd_close(ddata->F);
 		ircd_free(ddata);
 	}
 
@@ -185,7 +185,7 @@ add_reject(struct Client *client_p)
 }
 
 int
-check_reject(int fd, struct sockaddr *addr)
+check_reject(ircd_fde_t *F, struct sockaddr *addr)
 {
 	patricia_node_t *pnode;
 	struct reject_data *rdata;
@@ -204,8 +204,8 @@ check_reject(int fd, struct sockaddr *addr)
 		{
 			ddata = ircd_malloc(sizeof(struct delay_data));
 			ServerStats.is_rej++;
-			ircd_setselect(fd, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
-			ddata->fd = fd;
+			ircd_setselect(F, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
+			ddata->F = F;
 			ircd_dlinkAdd(ddata, &ddata->node, &delay_exit);
 			return 1;
 		}

@@ -478,7 +478,7 @@ diecb(const char *buf)
 static void
 seed_random(void *unused)
 {
-	struct timeval *tv;	
+	const struct timeval *tv;	
 #ifndef _WIN32
 	int fd;
 	unsigned int seed;

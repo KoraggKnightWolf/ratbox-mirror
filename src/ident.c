@@ -41,7 +41,7 @@ struct auth_request
 	int srcport;
 	int dstport;
 	char reqid[REQIDLEN];
-	int authfd;
+	ircd_fde_t *authF;
 };
 
 static ircd_bh *authheap;
@@ -53,13 +53,13 @@ static ircd_helper *ident_helper;
 
 
 static int
-send_sprintf(int fd, const char *format, ...)
+send_sprintf(ircd_fde_t *F, const char *format, ...)
 {
 	va_list args; 
 	va_start(args, format);
 	ircd_vsprintf(buf, format, args);
 	va_end(args); 
-	return(ircd_write(fd, buf, strlen(buf)));
+	return(ircd_write(F, buf, strlen(buf)));
 }
 
 
@@ -80,12 +80,12 @@ ID success/failure username
 */
 
 static void
-read_auth_timeout(int fd, void *data)
+read_auth_timeout(ircd_fde_t *F, void *data)
 {
 	struct auth_request *auth = data;
 	ircd_helper_write(ident_helper, "%s 0", auth->reqid);
 	ircd_bh_free(authheap, auth);
-	ircd_close(fd);
+	ircd_close(F);
 }
 
 
@@ -146,18 +146,18 @@ GetValidIdent(char *xbuf)
 
 
 static void
-read_auth(int fd, void *data)
+read_auth(ircd_fde_t *F, void *data)
 {
 	struct auth_request *auth = data;
 	char username[USERLEN], *s, *t;
 	int len, count;
 
-	len = ircd_read(fd, buf, sizeof(buf));
+	len = ircd_read(F, buf, sizeof(buf));
 
 	if(len < 0 && ignoreErrno(errno))
 	{
-		ircd_settimeout(fd, 30, read_auth_timeout, auth);
-		ircd_setselect(fd, IRCD_SELECT_READ, read_auth, auth);
+		ircd_settimeout(F, 30, read_auth_timeout, auth);
+		ircd_setselect(F, IRCD_SELECT_READ, read_auth, auth);
 		return;
 	} else {
 		buf[len] = '\0';
@@ -180,13 +180,13 @@ read_auth(int fd, void *data)
 			ircd_helper_write(ident_helper, "%s %s", auth->reqid, username);
 		} else
 			ircd_helper_write(ident_helper, "%s 0", auth->reqid);
-		ircd_close(fd);
+		ircd_close(F);
 		ircd_bh_free(authheap, auth);
 	}
 }
 
 static void
-connect_callback(int fd, int status, void *data)
+connect_callback(ircd_fde_t *F, int status, void *data)
 {
 	struct auth_request *auth = data;
 
@@ -195,17 +195,17 @@ connect_callback(int fd, int status, void *data)
 		/* one shot at the send, socket buffers should be able to handle it
 		 * if not, oh well, you lose
 		 */
-		if(send_sprintf(fd, "%u , %u\r\n", auth->srcport, auth->dstport) <= 0)
+		if(send_sprintf(F, "%u , %u\r\n", auth->srcport, auth->dstport) <= 0)
 		{
 			ircd_helper_write(ident_helper, "%s 0", auth->reqid);
-			ircd_close(fd);
+			ircd_close(F);
 			ircd_bh_free(authheap, auth);
 			return;
 		}
-		read_auth(fd, auth);
+		read_auth(F, auth);
 	} else {
 		ircd_helper_write(ident_helper, "%s 0", auth->reqid);
-		ircd_close(fd);
+		ircd_close(F);
 		ircd_bh_free(authheap, auth);
 	}
 }
@@ -227,9 +227,9 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 #endif
 		((struct sockaddr_in *)&auth->destaddr)->sin_port = htons(113);
 
-	auth->authfd = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
+	auth->authF = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
 
-	if(auth->authfd < 0)
+	if(auth->authF == NULL)
 	{
 		ircd_helper_write(ident_helper, "%s 0", id);
 		ircd_bh_free(authheap, auth);
@@ -240,7 +240,7 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	auth->dstport = atoi(dstport);
 	strcpy(auth->reqid, id);
 
-	ircd_connect_tcp(auth->authfd, (struct sockaddr *)&auth->destaddr, 
+	ircd_connect_tcp(auth->authF, (struct sockaddr *)&auth->destaddr, 
 		(struct sockaddr *)&auth->bindaddr, GET_SS_LEN(&auth->destaddr), connect_callback, auth, ident_timeout);
 }
 

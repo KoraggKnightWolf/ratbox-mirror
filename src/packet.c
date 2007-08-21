@@ -213,7 +213,7 @@ flood_recalc(void *unused)
  *                    link and process it.
  */
 void
-read_ctrl_packet(int fd, void *data)
+read_ctrl_packet(ircd_fde_t *F, void *data)
 {
 	struct Client *server = data;
 	struct LocalUser *lserver = server->localClient;
@@ -239,7 +239,7 @@ read_ctrl_packet(int fd, void *data)
 		reply->readdata = 0;
 		reply->data = NULL;
 
-		length = ircd_read(fd, tmp, 1);
+		length = ircd_read(F, tmp, 1);
 
 		if(length <= 0)
 		{
@@ -265,7 +265,7 @@ read_ctrl_packet(int fd, void *data)
 	if((replydef->flags & SLINKRPL_FLAG_DATA) && (reply->gotdatalen < 2))
 	{
 		/* we need a datalen u16 which we don't have yet... */
-		length = ircd_read(fd, len, (2 - reply->gotdatalen));
+		length = ircd_read(F, len, (2 - reply->gotdatalen));
 		if(length <= 0)
 		{
 			if((length == -1) && ignoreErrno(errno))
@@ -295,7 +295,7 @@ read_ctrl_packet(int fd, void *data)
 
 	if(reply->readdata < reply->datalen)	/* try to get any remaining data */
 	{
-		length = ircd_read(fd, (reply->data + reply->readdata),
+		length = ircd_read(F, (reply->data + reply->readdata),
 			      (reply->datalen - reply->readdata));
 		if(length <= 0)
 		{
@@ -331,14 +331,14 @@ read_ctrl_packet(int fd, void *data)
 
       nodata:
 	/* If we get here, we need to register for another IRCD_SELECT_READ */
-	ircd_setselect(fd, IRCD_SELECT_READ, read_ctrl_packet, server);
+	ircd_setselect(F, IRCD_SELECT_READ, read_ctrl_packet, server);
 }
 
 /*
  * read_packet - Read a 'packet' of data from a connection and process it.
  */
 void
-read_packet(int fd, void *data)
+read_packet(ircd_fde_t *F, void *data)
 {
 	struct Client *client_p = data;
 	struct LocalUser *lclient_p = client_p->localClient;
@@ -361,13 +361,13 @@ read_packet(int fd, void *data)
 		 * I personally think it makes the code too hairy to make sane.
 		 *     -- adrian
 		 */
-		length = ircd_read(client_p->localClient->fd, readBuf, READBUF_SIZE);
+		length = ircd_read(client_p->localClient->F, readBuf, READBUF_SIZE);
 
 		if(length < 0)
 		{
 			if(ignoreErrno(errno))
 			{
-				ircd_setselect(client_p->localClient->fd, 
+				ircd_setselect(client_p->localClient->F, 
 						IRCD_SELECT_READ, read_packet, client_p);
 			} else
 				error_exit_client(client_p, length);

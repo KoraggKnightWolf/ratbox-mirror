@@ -458,7 +458,7 @@ static void readconfigenvtext(adns_state ads, const char *envvar) {
 
 int adns__setnonblock(adns_state ads, int fd) {
   
-  ircd_set_nb(fd);
+  ircd_set_nb(ircd_get_fde(fd));
   return 0;
 }
 
@@ -508,7 +508,7 @@ static int init_finish(adns_state ads) {
   proto= getprotobyname("udp"); if (!proto) { r= ENOPROTOOPT; goto x_free; }
   ads->udpsocket= socket(AF_INET,SOCK_DGRAM,proto->p_proto);
 #endif
-  ads->udpsocket= ircd_socket(AF_INET, SOCK_DGRAM, 0, "adns udp socket");
+  ads->udpsocket= ircd_get_fd(ircd_socket(AF_INET, SOCK_DGRAM, 0, "adns udp socket"));
   
   if (ads->udpsocket<0) { r= errno; goto x_free; }
 
@@ -518,7 +518,7 @@ static int init_finish(adns_state ads) {
   return 0;
 
  x_closeudp:
-  ircd_close(ads->udpsocket);
+  ircd_close(ircd_get_fde(ads->udpsocket));
  x_free:
   free(ads);
   return r;
@@ -654,8 +654,8 @@ void adns_finish(adns_state ads) {
     else if (ads->output.head) adns_cancel(ads->output.head);
     else break;
   }
-  ircd_close(ads->udpsocket);
-  if (ads->tcpsocket >= 0) ircd_close(ads->tcpsocket);
+  ircd_close(ircd_get_fde(ads->udpsocket));
+  if (ads->tcpsocket >= 0) ircd_close(ircd_get_fde(ads->tcpsocket));
   adns__vbuf_free(&ads->tcpsend);
   adns__vbuf_free(&ads->tcprecv);
   freesearchlist(ads);

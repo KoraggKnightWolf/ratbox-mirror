@@ -644,7 +644,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	add_to_hash(HASH_CLIENT, nick, source_p);
 
 	/* fd_desc is long enough */
-	ircd_note(client_p->localClient->fd, "Nick: %s", nick);
+	ircd_note(client_p->localClient->F, "Nick: %s", nick);
 
 	if(!EmptyString(source_p->info))
 	{
@@ -742,7 +742,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick,
 	}
 
 	/* fd_desc is long enough */
-	ircd_note(client_p->localClient->fd, "Nick: %s", nick);
+	ircd_note(client_p->localClient->F, "Nick: %s", nick);
 
 	return;
 }

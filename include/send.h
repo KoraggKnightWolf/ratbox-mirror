@@ -35,8 +35,8 @@ struct monitor;
 /* The nasty global also used in s_serv.c for server bursts */
 extern unsigned long current_serial;
 
-void send_queued_write(int fd, void *data);
-void send_queued_slink_write(int fd, void *data);
+void send_queued_write(ircd_fde_t *, void *data);
+void send_queued_slink_write(ircd_fde_t *, void *data);
 
 #define POP_QUEUE 0
 #define HOLD_QUEUE 1

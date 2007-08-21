@@ -41,8 +41,8 @@
 #include "s_log.h"
 
 static dlink_list listener_list;
-static int accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data);
-static void accept_callback(int fd, int status, struct sockaddr *addr, socklen_t addrlen, void *data);
+static int accept_precallback(ircd_fde_t *F, struct sockaddr *addr, socklen_t addrlen, void *data);
+static void accept_callback(ircd_fde_t *F, int status, struct sockaddr *addr, socklen_t addrlen, void *data);
 
 
 
@@ -52,7 +52,7 @@ make_listener(struct irc_sockaddr_storage *addr)
 	struct Listener *listener = ircd_malloc(sizeof(struct Listener));
 	s_assert(0 != listener);
 	listener->name = ServerInfo.name; /* me.name may not be valid yet -- jilles */
-	listener->fd = -1;
+	listener->F = NULL;
 	memcpy(&listener->addr, addr, sizeof(struct irc_sockaddr_storage));
 	return listener;
 }
@@ -139,14 +139,15 @@ show_ports(struct Client *source_p)
 static int
 inetport(struct Listener *listener)
 {
-	int fd, ret;
+	ircd_fde_t *F;
+	int ret;
 	int opt = 1;
 
 	/*
 	 * At first, open a new socket
 	 */
 	
-	fd = ircd_socket(GET_SS_FAMILY(&listener->addr), SOCK_STREAM, 0, "Listener socket");
+	F = ircd_socket(GET_SS_FAMILY(&listener->addr), SOCK_STREAM, 0, "Listener socket");
 
 #ifdef IPV6
 	if(GET_SS_FAMILY(&listener->addr) == AF_INET6)
@@ -169,31 +170,31 @@ inetport(struct Listener *listener)
 	}
 
 
-	if(fd == -1)
+	if(F == NULL)
 	{
 		report_error("opening listener socket %s:%s",
 			     get_listener_name(listener), 
 			     get_listener_name(listener), errno);
 		return 0;
 	}
-	else if((maxconnections - 10) < fd)
+	else if((maxconnections - 10) < ircd_get_fd(F)) /* XXX this is kinda bogus*/
 	{
 		report_error("no more connections left for listener %s:%s",
 			     get_listener_name(listener), 
 			     get_listener_name(listener), errno);
-		ircd_close(fd);
+		ircd_close(F);
 		return 0;
 	}
 	/*
 	 * XXX - we don't want to do all this crap for a listener
 	 * set_sock_opts(listener);
 	 */
-	if(setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof(opt)))
+	if(setsockopt(ircd_get_fd(F), SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof(opt)))
 	{
 		report_error("setting SO_REUSEADDR for listener %s:%s",
 			     get_listener_name(listener), 
 			     get_listener_name(listener), errno);
-		ircd_close(fd);
+		ircd_close(F);
 		return 0;
 	}
 
@@ -202,33 +203,33 @@ inetport(struct Listener *listener)
 	 * else assume it is already open and try get something from it.
 	 */
 
-	if(bind(fd, (struct sockaddr *) &listener->addr, GET_SS_LEN(&listener->addr)))
+	if(bind(ircd_get_fd(F), (struct sockaddr *) &listener->addr, GET_SS_LEN(&listener->addr)))
 	{
 		report_error("binding listener socket %s:%s",
 			     get_listener_name(listener), 
 			     get_listener_name(listener), errno);
-		ircd_close(fd);
+		ircd_close(F);
 		return 0;
 	}
 
 	
 	if(listener->ssl)
-		ret = ircd_ssl_listen(fd, RATBOX_SOMAXCONN);
+		ret = ircd_ssl_listen(F, RATBOX_SOMAXCONN);
 	else
-		ret = ircd_listen(fd, RATBOX_SOMAXCONN);
+		ret = ircd_listen(F, RATBOX_SOMAXCONN);
 
 	if(ret)
 	{
 		report_error("listen failed for %s:%s", 
 			     get_listener_name(listener), 
 			     get_listener_name(listener), errno);
-		ircd_close(fd);
+		ircd_close(F);
 		return 0;
 	}
 
-	listener->fd = fd;
+	listener->F = F;
 
-	ircd_accept_tcp(listener->fd, accept_precallback, accept_callback, listener);
+	ircd_accept_tcp(listener->F, accept_precallback, accept_callback, listener);
 	return 1;
 }
 
@@ -254,7 +255,7 @@ find_listener(struct irc_sockaddr_storage *addr)
 				if(in4->sin_addr.s_addr == lin4->sin_addr.s_addr && 
 					in4->sin_port == lin4->sin_port )
 				{
-					if(listener->fd == -1)
+					if(listener->F == NULL)
 						last_closed = listener;
 					else
 						return(listener);
@@ -269,7 +270,7 @@ find_listener(struct irc_sockaddr_storage *addr)
 				if(IN6_ARE_ADDR_EQUAL(&in6->sin6_addr, &lin6->sin6_addr) &&
 				  in6->sin6_port == lin6->sin6_port)
 				{
-					if(listener->fd == -1)
+					if(listener->F == NULL)
 						last_closed = listener;
 					else
 						return(listener);
@@ -344,7 +345,7 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 	}
 	if((listener = find_listener(&vaddr)))
 	{
-		if(listener->fd > -1)
+		if(listener->F != NULL)
 			return;
 	}
 	else
@@ -353,7 +354,7 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 		ircd_dlinkAdd(listener, &listener->node, &listener_list);
 	}
 
-	listener->fd = -1;
+	listener->F = NULL;
 	listener->ssl = ssl;
 	if(inetport(listener))
 		listener->active = 1;
@@ -370,10 +371,10 @@ close_listener(struct Listener *listener)
 	s_assert(listener != NULL);
 	if(listener == NULL)
 		return;
-	if(listener->fd >= 0)
+	if(listener->F != NULL)
 	{
-		ircd_close(listener->fd);
-		listener->fd = -1;
+		ircd_close(listener->F);
+		listener->F = NULL;
 	}
 
 	listener->active = 0;
@@ -409,7 +410,7 @@ close_listeners()
  * any client list yet.
  */
 static void
-add_connection(struct Listener *listener, int fd, struct sockaddr *sai)
+add_connection(struct Listener *listener, ircd_fde_t *F, struct sockaddr *sai)
 {
 	struct Client *new_client;
 	s_assert(NULL != listener);
@@ -439,7 +440,7 @@ add_connection(struct Listener *listener, int fd, struct sockaddr *sai)
 	}
 #endif
 
-	new_client->localClient->fd = fd;
+	new_client->localClient->F = F;
 
 	new_client->localClient->listener = listener;
 	++listener->ref_count;
@@ -452,7 +453,7 @@ static time_t last_oper_notice = 0;
 static const char *toofast = "ERROR :Reconnecting too fast, throttled.\r\n";
 
 static int
-accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
+accept_precallback(ircd_fde_t *F, struct sockaddr *addr, socklen_t addrlen, void *data)
 {
 	struct Listener *listener = (struct Listener *)data;
 	char buf[BUFSIZE];
@@ -460,11 +461,11 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 
 	if(listener->ssl && !ssl_ok)
 	{
-		ircd_close(fd);
+		ircd_close(F);
 		return 0;
 	}
 	
-	if((maxconnections - 10) < fd)
+	if((maxconnections - 10) < ircd_get_fd(F)) /* XXX this is kinda bogus */
 	{
 		++ServerStats.is_ref;
 		/*
@@ -478,8 +479,8 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 			last_oper_notice = ircd_current_time();
 		}
 			
-		ircd_write(fd, "ERROR :All connections in use\r\n", 32);
-		ircd_close(fd);
+		ircd_write(F, "ERROR :All connections in use\r\n", 32);
+		ircd_close(F);
 		/* Re-register a new IO request for the next accept .. */
 		return 0;
 	}
@@ -506,18 +507,18 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 		else
 			strcpy(buf, "ERROR :You have been D-lined.\r\n");
 	
-		ircd_write(fd, buf, strlen(buf));
-		ircd_close(fd);
+		ircd_write(F, buf, strlen(buf));
+		ircd_close(F);
 		return 0;
 	}
 
-	if(check_reject(fd, addr))
+	if(check_reject(F, addr))
 		return 0;
 		
 	if(throttle_add(addr))
 	{
-		ircd_write(fd, toofast, strlen(toofast));
-		ircd_close(fd);
+		ircd_write(F, toofast, strlen(toofast));
+		ircd_close(F);
 		return 0;
 	}
 
@@ -525,11 +526,11 @@ accept_precallback(int fd, struct sockaddr *addr, socklen_t addrlen, void *data)
 }
 
 static void
-accept_callback(int fd, int status, struct sockaddr *addr, socklen_t addrlen, void *data)
+accept_callback(ircd_fde_t *F, int status, struct sockaddr *addr, socklen_t addrlen, void *data)
 {
 	struct Listener *listener = data;
 
 	ServerStats.is_ac++;
-	add_connection(listener, fd, addr);
+	add_connection(listener, F, addr);
 }
 

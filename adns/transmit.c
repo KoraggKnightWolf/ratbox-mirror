@@ -191,7 +191,7 @@ void adns__querysend_tcp(adns_query qu, struct timeval now) {
     iov[1].iov_base= (void *)qu->query_dgram;
     iov[1].iov_len= qu->query_dglen;
     adns__sigpipe_protect(qu->ads);
-    wr= ircd_writev(qu->ads->tcpsocket,iov,2);
+    wr= ircd_writev(ircd_get_fde(qu->ads->tcpsocket),iov,2);
     adns__sigpipe_unprotect(qu->ads);
     if (wr < 0) {
       if (!(errno == EAGAIN || errno == EINTR || errno == ENOSPC ||

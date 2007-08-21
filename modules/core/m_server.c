@@ -747,8 +747,8 @@ check_server(const char *name, struct Client *client_p)
 static int
 fork_server(struct Client *server)
 {
-	int ctrl_fds[2];
-	int data_fds[2];
+	ircd_fde_t *ctrl_fds[2];
+	ircd_fde_t *data_fds[2];
 	char maxfd[6];
 	char fd_str[4][6];
 	char *kid_argv[3];
@@ -756,16 +756,16 @@ fork_server(struct Client *server)
 	char servname[HOSTLEN+1];
 
 	/* ctrl */
-	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, ctrl_fds, "slink control fds") < 0)
+	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, &ctrl_fds[0], &ctrl_fds[1],  "slink control fds") < 0)
 		goto fork_error;
 
 	/* data */
-	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, data_fds, "slink data fds") < 0)
+	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, &data_fds[0], &data_fds[1], "slink data fds") < 0)
 		goto fork_error;
 
-	ircd_snprintf(fd_str[0], sizeof(fd_str[0]), "%d", ctrl_fds[1]);
-	ircd_snprintf(fd_str[1], sizeof(fd_str[1]), "%d", data_fds[1]);
-	ircd_snprintf(fd_str[2], sizeof(fd_str[2]), "%d", server->localClient->fd);
+	ircd_snprintf(fd_str[0], sizeof(fd_str[0]), "%d", ircd_get_fd(ctrl_fds[1]));
+	ircd_snprintf(fd_str[1], sizeof(fd_str[1]), "%d", ircd_get_fd(data_fds[1]));
+	ircd_snprintf(fd_str[2], sizeof(fd_str[2]), "%d", ircd_get_fd(server->localClient->F));
 	ircd_snprintf(maxfd, sizeof(maxfd), "%d", maxconnections);
 	ircd_snprintf(servname, sizeof(servname), "(%s)", server->name);
 
@@ -780,7 +780,7 @@ fork_server(struct Client *server)
 		
 	if(ircd_spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
 	{
-		ircd_close(server->localClient->fd);
+		ircd_close(server->localClient->F);
 
 		/* close the childs end of the pipes */
 		ircd_close(ctrl_fds[1]);
@@ -788,10 +788,10 @@ fork_server(struct Client *server)
 		
 		s_assert(server->localClient);
 		server->localClient->slink->ctrlfd = ctrl_fds[0];
-		server->localClient->fd = data_fds[0];
+		server->localClient->F = data_fds[0];
 
 		read_ctrl_packet(server->localClient->slink->ctrlfd, server);
-		read_packet(server->localClient->fd, server);
+		read_packet(server->localClient->F, server);
 		return 0;
 	}
 
@@ -1345,7 +1345,7 @@ server_estab(struct Client *client_p)
 			   (me.info[0]) ? (me.info) : "IRCers United");
 	}
 
-	if(!ircd_set_buffers(client_p->localClient->fd, READBUF_SIZE))
+	if(!ircd_set_buffers(client_p->localClient->F, READBUF_SIZE))
 		report_error("ircd_set_buffers failed for server %s:%s", 
 			     client_p->name, 
 			     log_client_name(client_p, SHOW_IP), errno);
@@ -1433,11 +1433,11 @@ server_estab(struct Client *client_p)
 		/* we won't overflow FD_DESC_SZ here, as it can hold
 		 * client_p->name + 64
 		 */
-		ircd_note(client_p->localClient->fd, "slink data: %s", client_p->name);
+		ircd_note(client_p->localClient->F, "slink data: %s", client_p->name);
 		ircd_note(client_p->localClient->slink->ctrlfd, "slink ctrl: %s", client_p->name);
 	}
 	else
-		ircd_note(client_p->localClient->fd, "Server: %s", client_p->name);
+		ircd_note(client_p->localClient->F, "Server: %s", client_p->name);
 
 	/*
 	 ** Old sendto_serv_but_one() call removed because we now

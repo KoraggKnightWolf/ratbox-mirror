@@ -75,7 +75,7 @@ struct servlink_data
 	unsigned char *slinkq;	/* sendq for control data */
 	int slinkq_ofs;		/* ofset into slinkq */
 	int slinkq_len;		/* length remaining after slinkq_ofs */
-	int ctrlfd;		/* For servers:
+	ircd_fde_t *ctrlfd;		/* For servers:
 				   control fd used for sending commands
 				   to servlink */
 
@@ -187,8 +187,7 @@ struct LocalUser
 	char *fullcaps;
 
 	int caps;		/* capabilities bit-field */
-	int fd;			/* >= 0, for local clients */
-
+	ircd_fde_t *F;
 
 	struct servlink_data *slink;	/* slink reply being parsed */
 

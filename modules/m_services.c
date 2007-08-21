@@ -219,7 +219,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 
 	del_all_accepts(target_p);
 
-	ircd_note(target_p->localClient->fd, "Nick: %s", target_p->name);
+	ircd_note(target_p->localClient->F, "Nick: %s", target_p->name);
 	return 0;
 }
 

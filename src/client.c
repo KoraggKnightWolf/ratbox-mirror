@@ -143,7 +143,7 @@ make_client(struct Client *from)
 
 		client_p->localClient->lasttime = client_p->localClient->firsttime = ircd_current_time();
 
-		client_p->localClient->fd = -1;
+		client_p->localClient->F = NULL;
 
 		/* as good a place as any... */
 		ircd_dlinkAdd(client_p, &client_p->localClient->tnode, &unknown_list);
@@ -181,8 +181,8 @@ free_local_client(struct Client *client_p)
 		client_p->localClient->listener = 0;
 	}
 
-	if(client_p->localClient->fd >= 0)
-		ircd_close(client_p->localClient->fd);
+	if(client_p->localClient->F != NULL)
+		ircd_close(client_p->localClient->F);
 
 	if(client_p->localClient->passwd)
 	{
@@ -1284,10 +1284,10 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 			   source_p->name, comment);
 	}
 	
-	if(source_p->localClient->slink != NULL && source_p->localClient->slink->ctrlfd >= 0)
+	if(source_p->localClient->slink != NULL && source_p->localClient->slink->ctrlfd != NULL)
 	{
 		ircd_close(source_p->localClient->slink->ctrlfd);
-		source_p->localClient->slink->ctrlfd = -1;
+		source_p->localClient->slink->ctrlfd = NULL;
 	}
 
 	if(source_p->servptr && source_p->servptr->serv)
@@ -1801,24 +1801,24 @@ close_connection(struct Client *client_p)
 	else
 		ServerStats.is_ni++;
 
-	if(-1 < client_p->localClient->fd)
+	if(client_p->localClient->F != NULL)
 	{
-		/* attempt to flush any pending dbufs. Evil, but .. -- adrian */
+		/* attempt to flush any pending linebufs. Evil, but .. -- adrian */
 		if(!IsIOError(client_p))
-			send_queued_write(client_p->localClient->fd, client_p);
+			send_queued_write(client_p->localClient->F, client_p);
 
-		ircd_close(client_p->localClient->fd);
-		client_p->localClient->fd = -1;
+		ircd_close(client_p->localClient->F);
+		client_p->localClient->F = NULL;
 	}
 
 	if(HasServlink(client_p))
 	{
-		if(client_p->localClient->fd >= 0)
+		if(client_p->localClient->F != NULL)
 		{
-			if(client_p->localClient->slink != NULL && client_p->localClient->slink->ctrlfd >= 0)
+			if(client_p->localClient->slink != NULL && client_p->localClient->slink->ctrlfd != NULL)
 			{
 				ircd_close(client_p->localClient->slink->ctrlfd);
-				client_p->localClient->slink->ctrlfd = -1;
+				client_p->localClient->slink->ctrlfd = NULL;
 			}
 		}
 	}
@@ -1850,7 +1850,7 @@ error_exit_client(struct Client *client_p, int error)
 	 * for reading even though it ends up being an EOF. -avalon
 	 */
 	char errmsg[255];
-	int current_error = ircd_get_sockerr(client_p->localClient->fd);
+	int current_error = ircd_get_sockerr(client_p->localClient->F);
 
 	SetIOError(client_p);
 

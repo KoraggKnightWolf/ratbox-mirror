@@ -99,7 +99,7 @@ send_linebuf(struct Client *to, buf_head_t *linebuf, int queue)
 	me.localClient->sendM += 1;
 
 	if(ircd_linebuf_len(&to->localClient->buf_sendq) > 0 && queue == 0)
-		send_queued_write(to->localClient->fd, to);
+		send_queued_write(to->localClient->F, to);
 	return 0;
 }
 
@@ -111,7 +111,7 @@ send_pop_queue(struct Client *to)
 	if(!MyConnect(to) || IsIOError(to))
 		return;
 	if(ircd_linebuf_len(&to->localClient->buf_sendq) > 0)
-		send_queued_write(to->localClient->fd, to);
+		send_queued_write(to->localClient->F, to);
 }
 
 /* send_ircd_linebuf_remote()
@@ -162,7 +162,7 @@ send_ircd_linebuf_remote(struct Client *to, struct Client *from, buf_head_t *lin
  * side effects - write is dns.heduled if queue isnt emptied
  */
 void
-send_queued_write(int fd, void *data)
+send_queued_write(ircd_fde_t *F, void *data)
 {
 	struct Client *to = data;
 	int retlen;
@@ -183,7 +183,7 @@ send_queued_write(int fd, void *data)
 	if(ircd_linebuf_len(&to->localClient->buf_sendq))
 	{
 		while ((retlen =
-			ircd_linebuf_flush(to->localClient->fd, &to->localClient->buf_sendq)) > 0)
+			ircd_linebuf_flush(to->localClient->F, &to->localClient->buf_sendq)) > 0)
 		{
 			/* We have some data written .. update counters */
 #ifdef USE_IODEBUG_HOOKS
@@ -219,7 +219,7 @@ send_queued_write(int fd, void *data)
 	}
 
 	if(ircd_linebuf_len(&to->localClient->buf_sendq))
-		ircd_setselect(fd, IRCD_SELECT_WRITE,
+		ircd_setselect(F, IRCD_SELECT_WRITE,
 			       send_queued_write, to);
 }
 
@@ -230,7 +230,7 @@ send_queued_write(int fd, void *data)
  * side effects - write is dns.heduled if queue isnt emptied
  */
 void
-send_queued_slink_write(int fd, void *data)
+send_queued_slink_write(ircd_fde_t *F, void *data)
 {
 	struct Client *to = data;
 	int retlen;

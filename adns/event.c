@@ -44,7 +44,7 @@ static void tcp_close(adns_state ads) {
   int serv;
   
   serv= ads->tcpserver;
-  ircd_close(ads->tcpsocket);
+  ircd_close(ircd_get_fde(ads->tcpsocket));
   ads->tcpsocket= -1;
   ads->tcprecv.used= ads->tcprecv_skip= ads->tcpsend.used= 0;
 }
@@ -122,7 +122,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now) {
     if (!proto) { adns__diag(ads,-1,0,"unable to find protocol no. for TCP !"); return; }
     fd= socket(AF_INET,SOCK_STREAM,proto->p_proto);
 #endif
-    fd= ircd_socket(AF_INET, SOCK_STREAM, 0, "adns tcp socket");
+    fd= ircd_get_fd(ircd_socket(AF_INET, SOCK_STREAM, 0, "adns tcp socket"));
     
     if (fd<0) {
       adns__diag(ads,-1,0,"cannot create TCP socket: %s",strerror(errno));
@@ -131,7 +131,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now) {
     r= adns__setnonblock(ads,fd);
     if (r) {
       adns__diag(ads,-1,0,"cannot make TCP socket nonblocking: %s",strerror(r));
-      ircd_close(fd);
+      ircd_close(ircd_get_fde(fd));
       return;
     }
     memset(&addr,0,sizeof(addr));

@@ -32,8 +32,8 @@
 
 static ircd_helper *res_helper;
 static int do_rehash;
-static void dns_readable(int fd, void *ptr);
-static void dns_writeable(int fd, void *ptr);
+static void dns_readable(ircd_fde_t *F, void *ptr);
+static void dns_writeable(ircd_fde_t *F, void *ptr);
 static void process_adns_incoming(void);
 
 static char readBuf[READBUF_SIZE];
@@ -76,9 +76,9 @@ dns_select(void)
 	{
 		fd = pollfds[i].fd;
 		if(pollfds[i].events & ADNS_POLLIN)
-			ircd_setselect(fd, IRCD_SELECT_READ, dns_readable, NULL);
+			ircd_setselect(ircd_get_fde(fd), IRCD_SELECT_READ, dns_readable, NULL);
 		if(pollfds[i].events & ADNS_POLLOUT)
-			ircd_setselect(fd, IRCD_SELECT_WRITE,
+			ircd_setselect(ircd_get_fde(fd), IRCD_SELECT_WRITE,
 				       dns_writeable, NULL);
 	}
 }
@@ -90,9 +90,9 @@ dns_select(void)
  * Note: Called by the fd system.
  */
 static void
-dns_readable(int fd, void *ptr)
+dns_readable(ircd_fde_t *F, void *ptr)
 {
-	adns_processreadable(dns_state, fd, ircd_current_time_tv());
+	adns_processreadable(dns_state, ircd_get_fd(F), ircd_current_time_tv());
 	process_adns_incoming();
 	dns_select();
 }   
@@ -104,9 +104,9 @@ dns_readable(int fd, void *ptr)
  * Note: Called by the fd system.
  */
 static void
-dns_writeable(int fd, void *ptr)
+dns_writeable(ircd_fde_t *F, void *ptr)
 {
-	adns_processwriteable(dns_state, fd, ircd_current_time_tv() );
+	adns_processwriteable(dns_state, ircd_get_fd(F), ircd_current_time_tv() );
 	process_adns_incoming();
 	dns_select();
 }

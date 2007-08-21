@@ -235,7 +235,7 @@ release_auth_client(struct AuthRequest *auth)
 	 */
 	client->localClient->allow_read = MAX_FLOOD;
 	ircd_dlinkAddTail(client, &client->node, &global_client_list);
-	read_packet(client->localClient->fd, client);
+	read_packet(client->localClient->F, client);
 }
 
 /*
@@ -323,8 +323,8 @@ start_auth_query(struct AuthRequest *auth)
 	 */
 	memset(&localaddr, 0, locallen);
 
-	if(getsockname(auth->client->localClient->fd, (struct sockaddr *) &localaddr, &locallen) ||
-	   getpeername(auth->client->localClient->fd, (struct sockaddr *) &remoteaddr, &remotelen))
+	if(getsockname(ircd_get_fd(auth->client->localClient->F), (struct sockaddr *) &localaddr, &locallen) ||
+	   getpeername(ircd_get_fd(auth->client->localClient->F), (struct sockaddr *) &remoteaddr, &remotelen))
 	{
 		auth_error(auth);
 		release_auth_client(auth);

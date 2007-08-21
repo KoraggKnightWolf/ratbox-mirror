@@ -514,7 +514,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 {
 	struct Client *client_p;
 	struct irc_sockaddr_storage myipnum; 
-	int fd;
+	ircd_fde_t *F;
 
 	s_assert(server_p != NULL);
 	if(server_p == NULL)
@@ -539,7 +539,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	}
 
 	/* create a socket for the server connection */
-	if((fd = ircd_socket(GET_SS_FAMILY(&server_p->ipnum), SOCK_STREAM, 0, NULL)) < 0)
+	if((F = ircd_socket(GET_SS_FAMILY(&server_p->ipnum), SOCK_STREAM, 0, NULL)) == NULL)
 	{
 		/* Eek, failure to create the socket */
 		report_error("opening stream socket to %s: %s", 
@@ -548,7 +548,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	}
 
 	/* servernames are always guaranteed under HOSTLEN chars */
-	ircd_note(fd, "Server: %s", server_p->name);
+	ircd_note(F, "Server: %s", server_p->name);
 
 	/* Create a local client */
 	client_p = make_client(NULL);
@@ -557,7 +557,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	client_p->name = find_or_add(server_p->name);
 	ircd_strlcpy(client_p->host, server_p->host, sizeof(client_p->host));
 	ircd_strlcpy(client_p->sockhost, buf, sizeof(client_p->sockhost));
-	client_p->localClient->fd = fd;
+	client_p->localClient->F = F;
 
 	/* shove the port number into the sockaddr */
 #ifdef IPV6
@@ -573,7 +573,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	 *   -- adrian
 	 */
 
-	if(!ircd_set_buffers(client_p->localClient->fd, READBUF_SIZE))
+	if(!ircd_set_buffers(client_p->localClient->F, READBUF_SIZE))
 	{
 		report_error("ircd_set_buffers failed for server %s:%s",
 				client_p->name,
@@ -629,13 +629,13 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 #endif
 	else
 	{
-		ircd_connect_tcp(client_p->localClient->fd, (struct sockaddr *)&server_p->ipnum,
+		ircd_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 				 NULL, 0, serv_connect_callback, 
 				 client_p, ConfigFileEntry.connect_timeout);
 		 return 1;
 	}
 
-	ircd_connect_tcp(client_p->localClient->fd, (struct sockaddr *)&server_p->ipnum,
+	ircd_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 			 (struct sockaddr *) &myipnum,
 			 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
 			 ConfigFileEntry.connect_timeout);
@@ -653,13 +653,12 @@ serv_connect(struct server_conf *server_p, struct Client *by)
  * marked for reading.
  */
 static void
-serv_connect_callback(int fd, int status, void *data)
+serv_connect_callback(ircd_fde_t *F, int status, void *data)
 {
 	struct Client *client_p = data;
 	struct server_conf *server_p;
 	/* First, make sure its a real client! */
 	s_assert(client_p != NULL);
-	s_assert(client_p->localClient->fd == fd);
 
 	if(client_p == NULL)
 		return;
@@ -673,7 +672,7 @@ serv_connect_callback(int fd, int status, void *data)
 		return;
 	}
 
-	ircd_connect_sockaddr(fd, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
+	ircd_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
 	
 	/* Check the status */
 	if(status != IRCD_OK)
@@ -689,7 +688,7 @@ serv_connect_callback(int fd, int status, void *data)
 		}
 		else 
 		{
-			char *errstr = strerror(ircd_get_sockerr(fd));
+			char *errstr = strerror(ircd_get_sockerr(F));
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"Error connecting to %s[255.255.255.255]: %s (%s)",
 					client_p->name,
@@ -752,6 +751,6 @@ serv_connect_callback(int fd, int status, void *data)
 	/* don't move to serv_list yet -- we haven't sent a burst! */
 
 	/* If we get here, we're ok, so lets start reading some data */
-	read_packet(fd, client_p);
+	read_packet(F, client_p);
 }
 
