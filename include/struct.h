@@ -26,7 +26,7 @@
 #ifndef INCLUDED_struct_h
 #define INCLUDED_struct_h
 
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 
 /*** client.h ***/
 
@@ -75,7 +75,7 @@ struct servlink_data
 	unsigned char *slinkq;	/* sendq for control data */
 	int slinkq_ofs;		/* ofset into slinkq */
 	int slinkq_len;		/* length remaining after slinkq_ofs */
-	ircd_fde_t *ctrlfd;		/* For servers:
+	rb_fde_t *ctrlfd;		/* For servers:
 				   control fd used for sending commands
 				   to servlink */
 
@@ -187,7 +187,7 @@ struct LocalUser
 	char *fullcaps;
 
 	int caps;		/* capabilities bit-field */
-	ircd_fde_t *F;
+	rb_fde_t *F;
 
 	struct servlink_data *slink;	/* slink reply being parsed */
 

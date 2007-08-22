@@ -87,7 +87,7 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(!IsOper(source_p))
 		{
 			/* seeing as this is going across servers, we should limit it */
-			if((last_used + ConfigFileEntry.pace_wait_simple) > ircd_current_time())
+			if((last_used + ConfigFileEntry.pace_wait_simple) > rb_current_time())
 			{
 				sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
 					   me.name, source_p->name, "WHOIS");
@@ -96,7 +96,7 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 				return 0;
 			}
 			else
-				last_used = ircd_current_time();
+				last_used = rb_current_time();
 		}
 
 		if(hunt_server(client_p, source_p, ":%s WHOIS %s :%s", 1, parc, parv) !=
@@ -199,7 +199,7 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 		{
 			char buffer[BUFSIZE];
 
-			ircd_snprintf(buffer, sizeof(buffer), "%s!%s@%s %s",
+			rb_snprintf(buffer, sizeof(buffer), "%s!%s@%s %s",
 				target_p->name, target_p->username,
 				target_p->host, target_p->servptr->name);
 			report_operspy(source_p, "WHOIS", buffer);
@@ -261,7 +261,7 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 			   target_p->name, target_p->username, 
 			   target_p->host, target_p->info);
 
-	cur_len = mlen = ircd_sprintf(buf, form_str(RPL_WHOISCHANNELS), 
+	cur_len = mlen = rb_sprintf(buf, form_str(RPL_WHOISCHANNELS), 
 				    get_id(&me, source_p), get_id(source_p, source_p), 
 				    target_p->name);
 	/* Make sure it won't overflow when sending it to the client
@@ -298,7 +298,7 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 					t = buf + mlen;
 				}
 
-				tlen = ircd_sprintf(t, "%s%s%s ",
+				tlen = rb_sprintf(t, "%s%s%s ",
 						visible ? "" : "!",
 						find_channel_status(msptr, 1),
 						chptr->chname);
@@ -336,7 +336,7 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_WHOISIDLE, form_str(RPL_WHOISIDLE),
 				   target_p->name, 
-				   ircd_current_time() - target_p->localClient->last, 
+				   rb_current_time() - target_p->localClient->last, 
 				   target_p->localClient->firsttime);
 	}
 	else

@@ -30,7 +30,7 @@
  */
 
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "channel.h"
 #include "class.h"
@@ -209,7 +209,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s MODE %s +nt", me.name, chptr->chname);
 
-		target_p->localClient->last_join_time = ircd_currenttime;
+		target_p->localClient->last_join_time = rb_currenttime;
 		channel_member_names(chptr, target_p, 1);
 
 		/* we do this to let the oper know that a channel was created, this will be

@@ -20,7 +20,7 @@
  *   $Id$
  */
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "channel.h"
 #include "client.h"

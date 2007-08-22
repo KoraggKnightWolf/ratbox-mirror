@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "internal.h"
 
 #define LOG_BUFSIZE 512
@@ -72,7 +72,7 @@ void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
   
   if (serv>=0) {
     char buf[16];
-    ircd_inet_ntop(AF_INET, &ads->servers[serv].addr, buf, sizeof(buf)
+    rb_inet_ntop(AF_INET, &ads->servers[serv].addr, buf, sizeof(buf)
     fprintf(ads->diagfile,"%sNS=%s",bef,buf);
     bef=", "; aft=")\n";
   }

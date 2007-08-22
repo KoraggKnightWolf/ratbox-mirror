@@ -174,7 +174,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	/* it has to be a global who at this point, limit it */
 	if(!IsOper(source_p))
 	{
-		if((last_used + ConfigFileEntry.pace_wait) > ircd_current_time())
+		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
 			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
 					me.name, source_p->name, "WHO");
@@ -183,7 +183,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 			return 0;
 		}
 		else
-			last_used = ircd_current_time();
+			last_used = rb_current_time();
 	}
 
 	/* '/who 0' for a global list.  this forces clients to actually
@@ -370,7 +370,7 @@ do_who(struct Client *source_p, struct Client *target_p, const char *chname, con
 {
 	char status[5];
 
-	ircd_sprintf(status, "%c%s%s",
+	rb_sprintf(status, "%c%s%s",
 		   target_p->user->away ? 'G' : 'H', IsOper(target_p) ? "*" : "", op_flags);
 
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_WHOREPLY), me.name, source_p->name,

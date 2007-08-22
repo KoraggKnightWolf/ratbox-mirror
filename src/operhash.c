@@ -67,11 +67,11 @@ operhash_add(const char *name)
 		}
 	}
 
-	ohash = ircd_malloc(sizeof(struct operhash_entry));
+	ohash = rb_malloc(sizeof(struct operhash_entry));
 	ohash->refcount = 1;
-	ohash->name = ircd_strdup(name);
+	ohash->name = rb_strdup(name);
 
-	ircd_dlinkAddAlloc(ohash, &operhash_table[hashv]);
+	rb_dlinkAddAlloc(ohash, &operhash_table[hashv]);
 
 	return ohash->name;
 }
@@ -122,9 +122,9 @@ operhash_delete(const char *name)
 
 		if(ohash->refcount == 0)
 		{
-			ircd_free(ohash->name);
-			ircd_free(ohash);
-			ircd_dlinkDestroy(ptr, &operhash_table[hashv]);
+			rb_free(ohash->name);
+			rb_free(ohash);
+			rb_dlinkDestroy(ptr, &operhash_table[hashv]);
 			return;
 		}
 	}

@@ -87,7 +87,7 @@ ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "End of burst (emulated) from %s (%d seconds)",
 					     source_p->name,
-					     (signed int) (ircd_current_time() - source_p->localClient->firsttime));
+					     (signed int) (rb_current_time() - source_p->localClient->firsttime));
 		SetEob(source_p);
 		eob_count++;
 	}
@@ -108,7 +108,7 @@ mr_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 				if(source_p->localClient->random_ping == incoming_ping)
 				{
 					char buf[USERLEN + 1];
-					ircd_strlcpy(buf, source_p->username, sizeof(buf));
+					rb_strlcpy(buf, source_p->username, sizeof(buf));
 					source_p->flags |= FLAGS_PING_COOKIE;
 					register_local_user(client_p, source_p, buf);
 				}

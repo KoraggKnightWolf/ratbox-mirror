@@ -19,7 +19,7 @@ struct monitor
 	dlink_list users;
 };
 
-extern struct ircd_bh *monitor_heap;
+extern struct rb_bh *monitor_heap;
 extern struct monitor *monitorTable[];
 
 #define MONITOR_HASH_SIZE 65536

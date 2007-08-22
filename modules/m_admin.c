@@ -69,7 +69,7 @@ mr_admin(struct Client *client_p, struct Client *source_p, int parc, const char 
 {
 	static time_t last_used = 0L;
 
-	if((last_used + ConfigFileEntry.pace_wait) > ircd_current_time())
+	if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 	{
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_LOAD2HI), 
 			   me.name, 
@@ -78,7 +78,7 @@ mr_admin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 	}
 	else
-		last_used = ircd_current_time();
+		last_used = rb_current_time();
 
 	do_admin(source_p);
 
@@ -97,14 +97,14 @@ m_admin(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(parc > 1)
 	{
-		if((last_used + ConfigFileEntry.pace_wait) > ircd_current_time())
+		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(RPL_LOAD2HI),
 				   me.name, source_p->name, "ADMIN");
 			return 0;
 		}
 		else
-			last_used = ircd_current_time();
+			last_used = rb_current_time();
 		
 		if(hunt_server(client_p, source_p, ":%s ADMIN :%s", 1, parc, parv) != HUNTED_ISME)
 			return 0;

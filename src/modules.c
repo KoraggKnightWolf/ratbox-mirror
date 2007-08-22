@@ -125,7 +125,7 @@ modules_init(void)
 		exit(0);
 	}
 
-	modlist = ircd_malloc(sizeof(struct module) * (MODS_INCREMENT));
+	modlist = rb_malloc(sizeof(struct module) * (MODS_INCREMENT));
 
 #ifndef STATIC_MODULES
 	mod_add_cmd(&modload_msgtab);
@@ -170,8 +170,8 @@ load_static_modules(void)
 			if(mapi_version == NULL)
 			{
 				char buf[512];
-				ircd_strlcpy(buf, basename, sizeof(buf));
-				ircd_strlcat(buf, "_LTX__mheader", sizeof(buf));
+				rb_strlcpy(buf, basename, sizeof(buf));
+				rb_strlcat(buf, "_LTX__mheader", sizeof(buf));
 				mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, buf);
 			}
 
@@ -231,11 +231,11 @@ load_static_modules(void)
 
 			increase_modlist();
 
-			modlist[num_mods] = ircd_malloc(sizeof(struct module));
+			modlist[num_mods] = rb_malloc(sizeof(struct module));
 			modlist[num_mods]->address = tmpptr;
 			modlist[num_mods]->version = ver;
 			modlist[num_mods]->core = 1;
-			modlist[num_mods]->name = ircd_strdup(basename);
+			modlist[num_mods]->name = rb_strdup(basename);
 			modlist[num_mods]->mapi_header = mapi_version;
 			modlist[num_mods]->mapi_version = MAPI_VERSION(*mapi_version);
 			num_mods++;
@@ -283,10 +283,10 @@ mod_add_path(const char *path)
 	if(mod_find_path(path))
 		return;
 
-	pathst = ircd_malloc(sizeof(struct module_path));
+	pathst = rb_malloc(sizeof(struct module_path));
 
 	strcpy(pathst->path, path);
-	ircd_dlinkAddAlloc(pathst, &mod_paths);
+	rb_dlinkAddAlloc(pathst, &mod_paths);
 }
 
 /* mod_clear_paths()
@@ -302,8 +302,8 @@ mod_clear_paths(void)
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, mod_paths.head)
 	{
-		ircd_free(ptr->data);
-		ircd_free_dlink_node(ptr);
+		rb_free(ptr->data);
+		rb_free_dlink_node(ptr);
 	}
 
 	mod_paths.head = mod_paths.tail = NULL;
@@ -319,7 +319,7 @@ mod_clear_paths(void)
 char *
 irc_basename(const char *path)
 {
-	char *mod_basename = ircd_malloc(strlen(path) + 1);
+	char *mod_basename = rb_malloc(strlen(path) + 1);
 	const char *s;
 
 	if(!(s = strrchr(path, '/')))
@@ -371,8 +371,8 @@ void find_module_suffix(void)
 	dir = opendir(AUTOMODPATH);
 	if(dir == NULL)
 	{
-		ircd_strlcpy(module_dir, ConfigFileEntry.dpath, sizeof(module_dir));
-		ircd_strlcat(module_dir, "/modules/autoload", sizeof(module_dir));
+		rb_strlcpy(module_dir, ConfigFileEntry.dpath, sizeof(module_dir));
+		rb_strlcat(module_dir, "/modules/autoload", sizeof(module_dir));
 		dir = opendir(module_dir);
  	}
 
@@ -425,13 +425,13 @@ load_all_modules(int warn)
 
 	find_module_suffix();
 	max_mods = MODS_INCREMENT;
-	ircd_strlcpy(module_dir_name, AUTOMODPATH, sizeof(module_dir_name));
+	rb_strlcpy(module_dir_name, AUTOMODPATH, sizeof(module_dir_name));
 	system_module_dir = opendir(module_dir_name);
 
 	if(system_module_dir == NULL)
 	{
-		ircd_strlcpy(module_dir_name, ConfigFileEntry.dpath, sizeof(module_dir_name));
-		ircd_strlcat(module_dir_name, "/modules/autoload", sizeof(module_dir_name));
+		rb_strlcpy(module_dir_name, ConfigFileEntry.dpath, sizeof(module_dir_name));
+		rb_strlcat(module_dir_name, "/modules/autoload", sizeof(module_dir_name));
 		system_module_dir = opendir(module_dir_name);
 	}
 	
@@ -447,7 +447,7 @@ load_all_modules(int warn)
 
 		if((len > suffix_len) && !strcmp(ldirent->d_name+len-suffix_len, found_suffix))
 		{
-			(void) ircd_snprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", module_dir_name, ldirent->d_name);
+			(void) rb_snprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", module_dir_name, ldirent->d_name);
 			(void) load_a_module(module_fq_name, warn, 0);
 		} 
 	}
@@ -472,10 +472,10 @@ load_core_modules(int warn)
 	core_dir  = opendir(MODPATH);
 	if(core_dir == NULL)
 	{
-		ircd_snprintf(dir_name, sizeof(dir_name), "%s/modules", ConfigFileEntry.dpath);
+		rb_snprintf(dir_name, sizeof(dir_name), "%s/modules", ConfigFileEntry.dpath);
 		core_dir = opendir(dir_name);
 	} else {
-		ircd_strlcpy(dir_name, MODPATH, sizeof(dir_name));
+		rb_strlcpy(dir_name, MODPATH, sizeof(dir_name));
 	}
 	
 	
@@ -489,7 +489,7 @@ load_core_modules(int warn)
 	for (i = 0; core_module_table[i]; i++)
 	{
 
-		ircd_snprintf(module_name, sizeof(module_name), "%s/%s%s", dir_name,
+		rb_snprintf(module_name, sizeof(module_name), "%s/%s%s", dir_name,
 			    core_module_table[i], found_suffix);
 
 		if(load_a_module(module_name, warn, 1) == -1)
@@ -521,7 +521,7 @@ load_one_module(const char *path, int coremodule)
 	{
 		mpath = pathst->data;
 
-		ircd_snprintf(modpath, sizeof(modpath), "%s/%s", mpath->path, path);
+		rb_snprintf(modpath, sizeof(modpath), "%s/%s", mpath->path, path);
 		if((strstr(modpath, "../") == NULL) && (strstr(modpath, "/..") == NULL))
 		{
 			if(stat(modpath, &statbuf) == 0)
@@ -565,13 +565,13 @@ mo_modload(struct Client *client_p, struct Client *source_p, int parc, const cha
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is already loaded",
 			   me.name, source_p->name, m_bn);
-		ircd_free(m_bn);
+		rb_free(m_bn);
 		return 0;
 	}
 
 	load_one_module(parv[1], 0);
 
-	ircd_free(m_bn);
+	rb_free(m_bn);
 
 	return 0;
 }
@@ -597,7 +597,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 	{
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
-		ircd_free(m_bn);
+		rb_free(m_bn);
 		return 0;
 	}
 
@@ -606,7 +606,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is a core module and may not be unloaded",
 			   me.name, source_p->name, m_bn);
-		ircd_free(m_bn);
+		rb_free(m_bn);
 		return 0;
 	}
 
@@ -615,7 +615,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
 	}
-	ircd_free(m_bn);
+	rb_free(m_bn);
 	return 0;
 }
 
@@ -640,7 +640,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 	{
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
-		ircd_free(m_bn);
+		rb_free(m_bn);
 		return 0;
 	}
 
@@ -650,7 +650,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 	{
 		sendto_one(source_p, POP_QUEUE,
 			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
-		ircd_free(m_bn);
+		rb_free(m_bn);
 		return 0;
 	}
 
@@ -662,7 +662,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 		exit(0);
 	}
 
-	ircd_free(m_bn);
+	rb_free(m_bn);
 	return 0;
 }
 
@@ -790,7 +790,7 @@ unload_one_module(const char *name, int warn)
 
 	lt_dlclose(modlist[modindex]->address);
 
-	ircd_free(modlist[modindex]->name);
+	rb_free(modlist[modindex]->name);
 	memcpy(&modlist[modindex], &modlist[modindex + 1],
 	       sizeof(struct module) * ((num_mods - 1) - modindex));
 
@@ -835,7 +835,7 @@ load_a_module(const char *path, int warn, int core)
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Error loading module %s: %s", mod_basename, err);
 		ilog(L_MAIN, "Error loading module %s: %s", mod_basename, err);
-		ircd_free(mod_basename);
+		rb_free(mod_basename);
 		return -1;
 	}
 #ifdef STATIC_MODULES
@@ -859,7 +859,7 @@ load_a_module(const char *path, int warn, int core)
 				     mod_basename);
 		ilog(L_MAIN, "Data format error: module %s has no MAPI header.", mod_basename);
 		lt_dlclose(tmpptr);
-		ircd_free(mod_basename);
+		rb_free(mod_basename);
 		return -1;
 	}
 
@@ -876,7 +876,7 @@ load_a_module(const char *path, int warn, int core)
 						     "Module %s indicated failure during load.",
 						     mod_basename);
 				lt_dlclose(tmpptr);
-				ircd_free(mod_basename);
+				rb_free(mod_basename);
 				return -1;
 			}
 			if(mheader->mapi_command_list)
@@ -911,7 +911,7 @@ load_a_module(const char *path, int warn, int core)
 				     "Module %s has unknown/unsupported MAPI version %d.",
 				     mod_basename, *mapi_version);
 		lt_dlclose(tmpptr); 
-		ircd_free(mod_basename);
+		rb_free(mod_basename);
 		return -1;
 	}
 
@@ -920,11 +920,11 @@ load_a_module(const char *path, int warn, int core)
 
 	increase_modlist();
 
-	modlist[num_mods] = ircd_malloc(sizeof(struct module));
+	modlist[num_mods] = rb_malloc(sizeof(struct module));
 	modlist[num_mods]->address = tmpptr;
 	modlist[num_mods]->version = ver;
 	modlist[num_mods]->core = core;
-	modlist[num_mods]->name = ircd_strdup(mod_basename);
+	modlist[num_mods]->name = rb_strdup(mod_basename);
 	modlist[num_mods]->mapi_header = mapi_version;
 	modlist[num_mods]->mapi_version = MAPI_VERSION(*mapi_version);
 	num_mods++;
@@ -938,7 +938,7 @@ load_a_module(const char *path, int warn, int core)
 		ilog(L_MAIN, "Module %s [version: %s; MAPI version: %d] loaded at 0x%lx",
 		     mod_basename, ver, MAPI_VERSION(*mapi_version), (unsigned long) tmpptr);
 	}
-	ircd_free(mod_basename);
+	rb_free(mod_basename);
 	return 0;
 }
 
@@ -955,7 +955,7 @@ increase_modlist(void)
 	if((num_mods + 1) < max_mods)
 		return;
 
-	modlist = ircd_realloc(modlist, sizeof(struct module) * (max_mods + MODS_INCREMENT));
+	modlist = rb_realloc(modlist, sizeof(struct module) * (max_mods + MODS_INCREMENT));
 	max_mods += MODS_INCREMENT;
 }
 

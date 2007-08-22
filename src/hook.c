@@ -37,7 +37,7 @@
  * $Id$
  */
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "hook.h"
 #include "match.h"
 
@@ -62,7 +62,7 @@ int h_server_introduced;
 void
 init_hook(void)
 {
-	hooks = ircd_malloc(sizeof(hook) * HOOK_INCREMENT);
+	hooks = rb_malloc(sizeof(hook) * HOOK_INCREMENT);
 
 #ifdef USE_IODEBUG_HOOKS
 	h_iosend_id = register_hook("iosend");
@@ -84,10 +84,10 @@ grow_hooktable(void)
 {
 	hook *newhooks;
 
-	newhooks = ircd_malloc(sizeof(hook) * (max_hooks + HOOK_INCREMENT));
+	newhooks = rb_malloc(sizeof(hook) * (max_hooks + HOOK_INCREMENT));
 	memcpy(newhooks, hooks, sizeof(hook) * num_hooks);
 
-	ircd_free(hooks);
+	rb_free(hooks);
 	hooks = newhooks;
 	max_hooks += HOOK_INCREMENT;
 }
@@ -146,7 +146,7 @@ register_hook(const char *name)
 	if((i = find_hook(name)) < 0)
 	{
 		i = find_freehookslot();
-		hooks[i].name = ircd_strdup(name);
+		hooks[i].name = rb_strdup(name);
 		num_hooks++;
 	}
 
@@ -164,7 +164,7 @@ add_hook(const char *name, hookfn fn)
 
 	i = register_hook(name);
 
-	ircd_dlinkAddAlloc(fn, &hooks[i].hooks);
+	rb_dlinkAddAlloc(fn, &hooks[i].hooks);
 }
 
 /* remove_hook()
@@ -178,7 +178,7 @@ remove_hook(const char *name, hookfn fn)
 	if((i = find_hook(name)) < 0)
 		return;
 
-	ircd_dlinkFindDestroy(fn, &hooks[i].hooks);
+	rb_dlinkFindDestroy(fn, &hooks[i].hooks);
 }
 
 /* call_hook()

@@ -150,7 +150,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 		if(*jbuf)
 			(void) strcat(jbuf, ",");
-		(void) ircd_strlcat(jbuf, name, sizeof(jbuf));
+		(void) rb_strlcat(jbuf, name, sizeof(jbuf));
 	}
 
 	if(parc > 2)
@@ -178,7 +178,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			if(IsMember(source_p, chptr))
 				continue;
 		
-			if(ircd_dlink_list_length(&chptr->members) == 0)
+			if(rb_dlink_list_length(&chptr->members) == 0)
 				flags = CHFL_CHANOP;
 			else
 				flags = 0;
@@ -196,16 +196,16 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			flags = CHFL_CHANOP;
 		}
 
-		if((ircd_dlink_list_length(&source_p->user->channel) >= 
+		if((rb_dlink_list_length(&source_p->user->channel) >= 
 					(unsigned long)ConfigChannel.max_chans_per_user) &&
 		   (!IsOper(source_p) || 
-		    (ircd_dlink_list_length(&source_p->user->channel) >=
+		    (rb_dlink_list_length(&source_p->user->channel) >=
 				 (unsigned long)ConfigChannel.max_chans_per_user * 3)))
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYCHANNELS),
 				   me.name, source_p->name, name);
 			if(successful_join_count)
-				source_p->localClient->last_join_time = ircd_current_time();
+				source_p->localClient->last_join_time = rb_current_time();
 			return 0;
 		}
 
@@ -252,7 +252,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		/* its a new channel, set +nt and burst. */
 		if(flags & CHFL_CHANOP)
 		{
-			chptr->channelts = ircd_current_time();
+			chptr->channelts = rb_current_time();
 			chptr->mode.mode |= MODE_TOPICLIMIT;
 			chptr->mode.mode |= MODE_NOPRIVMSGS;
 
@@ -299,7 +299,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		channel_member_names(chptr, source_p, 1);
 
 		if(successful_join_count)
-			source_p->localClient->last_join_time = ircd_current_time();
+			source_p->localClient->last_join_time = rb_current_time();
 	}
 
 	return 0;
@@ -500,7 +500,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 			break;
 #endif
 		case 'k':
-			ircd_strlcpy(mode.key, parv[4 + args], sizeof(mode.key));
+			rb_strlcpy(mode.key, parv[4 + args], sizeof(mode.key));
 			args++;
 			if(parc < 5 + args)
 				return 0;
@@ -586,7 +586,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		modes = empty_modes;
 
-	mlen_nick = ircd_sprintf(buf_nick, ":%s SJOIN %ld %s %s :",
+	mlen_nick = rb_sprintf(buf_nick, ":%s SJOIN %ld %s %s :",
 			  source_p->name, (long) chptr->channelts,
 			  parv[2], modes);
 	ptr_nick = buf_nick + mlen_nick;
@@ -594,7 +594,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* working on the presumption eventually itll be more efficient to
 	 * build a TS6 buffer without checking its needed..
 	 */
-	mlen_uid = ircd_sprintf(buf_uid, ":%s SJOIN %ld %s %s :",
+	mlen_uid = rb_sprintf(buf_uid, ":%s SJOIN %ld %s %s :",
 			  use_id(source_p), (long) chptr->channelts,
 			  parv[2], modes);
 	ptr_uid = buf_uid + mlen_uid;
@@ -678,10 +678,10 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		}
 
 		/* copy the nick to the two buffers */
-		len = ircd_sprintf(ptr_nick, "%s ", target_p->name);
+		len = rb_sprintf(ptr_nick, "%s ", target_p->name);
 		ptr_nick += len;
 		len_nick += len;
-		len = ircd_sprintf(ptr_uid, "%s ", use_id(target_p));
+		len = rb_sprintf(ptr_uid, "%s ", use_id(target_p));
 		ptr_uid += len;
 		len_uid += len;
 
@@ -803,15 +803,15 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	 */
 	if(!keep_our_modes && source_p->id[0] != '\0')
 	{
-		if(ircd_dlink_list_length(&chptr->banlist) > 0)
+		if(rb_dlink_list_length(&chptr->banlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->banlist,
 					'b', NOCAPS, ALL_MEMBERS);
 
-		if(ircd_dlink_list_length(&chptr->exceptlist) > 0)
+		if(rb_dlink_list_length(&chptr->exceptlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->exceptlist,
 					'e', CAP_EX, ONLY_CHANOPS);
 
-		if(ircd_dlink_list_length(&chptr->invexlist) > 0)
+		if(rb_dlink_list_length(&chptr->invexlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->invexlist,
 					'I', CAP_IE, ONLY_CHANOPS);
 
@@ -907,9 +907,9 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 
 	s_assert(source_p->localClient != NULL);
 
-	ircd_sprintf(src_host, "%s!%s@%s", 
+	rb_sprintf(src_host, "%s!%s@%s", 
 		   source_p->name, source_p->username, source_p->host);
-	ircd_sprintf(src_iphost, "%s!%s@%s",
+	rb_sprintf(src_iphost, "%s!%s@%s",
 		   source_p->name, source_p->username, source_p->sockhost);
 
 	if((is_banned(chptr, source_p, NULL, src_host, src_iphost)) == CHFL_BAN)
@@ -943,7 +943,7 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 		return (ERR_BADCHANNELKEY);
 
 	if(chptr->mode.limit && 
-	   ircd_dlink_list_length(&chptr->members) >= (unsigned long)chptr->mode.limit)
+	   rb_dlink_list_length(&chptr->members) >= (unsigned long)chptr->mode.limit)
 		return (ERR_CHANNELISFULL);
 
 #ifdef ENABLE_SERVICES
@@ -1029,7 +1029,7 @@ set_final_mode(struct Client *source_p, struct Channel *chptr,
 			dir = MODE_DEL;
 		}
 		*mbuf++ = 'k';
-		pbuf += ircd_sprintf(pbuf, "%s ", oldmode->key);
+		pbuf += rb_sprintf(pbuf, "%s ", oldmode->key);
 	}
 	if(mode->limit && oldmode->limit != mode->limit)
 	{
@@ -1039,7 +1039,7 @@ set_final_mode(struct Client *source_p, struct Channel *chptr,
 			dir = MODE_ADD;
 		}
 		*mbuf++ = 'l';
-		pbuf += ircd_sprintf(pbuf, "%d ", mode->limit);
+		pbuf += rb_sprintf(pbuf, "%d ", mode->limit);
 	}
 	if(mode->key[0] && strcmp(oldmode->key, mode->key))
 	{
@@ -1049,7 +1049,7 @@ set_final_mode(struct Client *source_p, struct Channel *chptr,
 			dir = MODE_ADD;
 		}
 		*mbuf++ = 'k';
-		pbuf += ircd_sprintf(pbuf, "%s ", mode->key);
+		pbuf += rb_sprintf(pbuf, "%s ", mode->key);
 	}
 
 	*mbuf = '\0';
@@ -1191,7 +1191,7 @@ remove_ban_list(struct Channel *chptr, struct Client *source_p,
 
 	pbuf = lparabuf;
 
-	cur_len = mlen = ircd_sprintf(lmodebuf, ":%s MODE %s -", 
+	cur_len = mlen = rb_sprintf(lmodebuf, ":%s MODE %s -", 
 				    source_p->name, chptr->chname);
 	mbuf = lmodebuf + mlen;
 
@@ -1221,7 +1221,7 @@ remove_ban_list(struct Channel *chptr, struct Client *source_p,
 
 		*mbuf++ = c;
 		cur_len += plen;
-		pbuf += ircd_sprintf(pbuf, "%s ", banptr->banstr);
+		pbuf += rb_sprintf(pbuf, "%s ", banptr->banstr);
 		count++;
 
 		free_ban(banptr);

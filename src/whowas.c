@@ -70,7 +70,7 @@ add_history(struct Client *client_p, int online)
 		del_whowas_from_list(&WHOWASHASH[who->hashv], who);
 	}
 	who->hashv = hash_whowas_name(client_p->name);
-	who->logoff = ircd_current_time();
+	who->logoff = rb_current_time();
 
 	strcpy(who->name, client_p->name);
 	strcpy(who->username, client_p->username);
@@ -111,7 +111,7 @@ get_history(const char *nick, time_t timelimit)
 	struct Whowas *temp;
 	uint32_t nhash;
 
-	timelimit = ircd_current_time() - timelimit;
+	timelimit = rb_current_time() - timelimit;
 	nhash = hash_whowas_name(nick);
 	temp = WHOWASHASH[nhash];
 	for (; temp; temp = temp->next)

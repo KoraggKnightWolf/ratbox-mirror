@@ -20,7 +20,7 @@
 
 
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "patricia.h"
 #include "match.h"
 
@@ -80,7 +80,7 @@ prefix_toa2x(prefix_t * prefix, char *buf, int buf_len, int with_len)
 	inet_ntop(prefix->family, &prefix->add.sin, buf, buf_len);
 	if(with_len)
 	{
-		ircd_snprintf(tmp, sizeof(tmp), "/%d", prefix->bitlen);
+		rb_snprintf(tmp, sizeof(tmp), "/%d", prefix->bitlen);
 		strcat(buf, tmp);
 	}
 	return (buf);
@@ -122,7 +122,7 @@ New_Prefix2(int family, void *dest, int bitlen, prefix_t * prefix)
 		default_bitlen = 128;
 		if(prefix == NULL)
 		{
-			prefix = ircd_malloc(sizeof(prefix_t));
+			prefix = rb_malloc(sizeof(prefix_t));
 			dynamic_allocated++;
 		}
 		memcpy(&prefix->add.sin6, dest, 16);
@@ -133,7 +133,7 @@ New_Prefix2(int family, void *dest, int bitlen, prefix_t * prefix)
 	{
 		if(prefix == NULL)
 		{
-			prefix = ircd_malloc(sizeof(prefix_t));			
+			prefix = rb_malloc(sizeof(prefix_t));			
 			dynamic_allocated++;
 		}
 		memcpy(&prefix->add.sin, dest, 4);
@@ -215,14 +215,14 @@ ascii2prefix(int family, const char *string)
 
 	if(family == AF_INET)
 	{
-		if((result = ircd_inet_pton(AF_INET, string, &sinaddr)) <= 0)
+		if((result = rb_inet_pton(AF_INET, string, &sinaddr)) <= 0)
 			return (NULL);
 		return (New_Prefix(AF_INET, &sinaddr, bitlen));
 	}
 #ifdef IPV6
 	else if(family == AF_INET6)
 	{
-		if((result = ircd_inet_pton(AF_INET6, string, &sinaddr6)) <= 0)
+		if((result = rb_inet_pton(AF_INET6, string, &sinaddr6)) <= 0)
 			return (NULL);
 		return (New_Prefix(AF_INET6, &sinaddr6, bitlen));
 	}
@@ -257,7 +257,7 @@ Deref_Prefix(prefix_t * prefix)
 	assert(prefix->ref_count >= 0);
 	if(prefix->ref_count <= 0)
 	{
-		ircd_free(prefix);
+		rb_free(prefix);
 		return;
 	}
 }
@@ -273,7 +273,7 @@ static int num_active_patricia = 0;
 patricia_tree_t *
 New_Patricia(int maxbits)
 {
-	patricia_tree_t *patricia = ircd_malloc(sizeof(patricia_tree_t));
+	patricia_tree_t *patricia = rb_malloc(sizeof(patricia_tree_t));
 
 	patricia->maxbits = maxbits;
 	patricia->head = NULL;
@@ -315,7 +315,7 @@ Clear_Patricia(patricia_tree_t * patricia, void_fn_t func)
 			{
 				assert(Xrn->data == NULL);
 			}
-			ircd_free(Xrn);
+			rb_free(Xrn);
 			patricia->num_active_node--;
 
 			if(l)
@@ -341,7 +341,7 @@ Clear_Patricia(patricia_tree_t * patricia, void_fn_t func)
 		}
 	}
 	assert(patricia->num_active_node == 0);
-	ircd_free(patricia);
+	rb_free(patricia);
 }
 
 
@@ -568,7 +568,7 @@ patricia_lookup(patricia_tree_t * patricia, prefix_t * prefix)
 
 	if(patricia->head == NULL)
 	{
-		node = ircd_malloc(sizeof(patricia_node_t)); 
+		node = rb_malloc(sizeof(patricia_node_t)); 
 		node->bit = prefix->bitlen;
 		node->prefix = Ref_Prefix(prefix);
 		node->parent = NULL;
@@ -692,7 +692,7 @@ patricia_lookup(patricia_tree_t * patricia, prefix_t * prefix)
 		return (node);
 	}
 
-	new_node = ircd_malloc(sizeof(patricia_node_t)); 
+	new_node = rb_malloc(sizeof(patricia_node_t)); 
 	new_node->bit = prefix->bitlen;
 	new_node->prefix = Ref_Prefix(prefix);
 	new_node->parent = NULL;
@@ -756,7 +756,7 @@ patricia_lookup(patricia_tree_t * patricia, prefix_t * prefix)
 	}
 	else
 	{
-		glue = ircd_malloc(sizeof(patricia_node_t));
+		glue = rb_malloc(sizeof(patricia_node_t));
 		glue->bit = differ_bit;
 		glue->prefix = NULL;
 		glue->parent = node->parent;
@@ -832,7 +832,7 @@ patricia_remove(patricia_tree_t * patricia, patricia_node_t * node)
 #endif /* PATRICIA_DEBUG */
 		parent = node->parent;
 		Deref_Prefix(node->prefix);
-		ircd_free(node);
+		rb_free(node);
 		patricia->num_active_node--;
 
 		if(parent == NULL)
@@ -874,7 +874,7 @@ patricia_remove(patricia_tree_t * patricia, patricia_node_t * node)
 			parent->parent->l = child;
 		}
 		child->parent = parent->parent;
-		ircd_free(parent);
+		rb_free(parent);
 		patricia->num_active_node--;
 		return;
 	}
@@ -895,7 +895,7 @@ patricia_remove(patricia_tree_t * patricia, patricia_node_t * node)
 	child->parent = parent;
 
 	Deref_Prefix(node->prefix);
-	ircd_free(node);
+	rb_free(node);
 	patricia->num_active_node--;
 
 	if(parent == NULL)

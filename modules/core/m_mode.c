@@ -301,7 +301,7 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 	parabuf[0] = '\0';
 	s = LOCAL_COPY(parv[4]);
 
-	mlen = ircd_sprintf(modebuf, ":%s MODE %s +",
+	mlen = rb_sprintf(modebuf, ":%s MODE %s +",
 			  source_p->name, chptr->chname);
 	mbuf = modebuf + mlen;
 	pbuf = parabuf;
@@ -351,7 +351,7 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 			}
 
 			*mbuf++ = parv[3][0];
-			arglen = ircd_sprintf(pbuf, "%s ", s);
+			arglen = rb_sprintf(pbuf, "%s ", s);
 			pbuf += arglen;
 			plen += arglen;
 			modecount++;
@@ -407,7 +407,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 	 */
 	if(MyClient(source_p))
 	{
-		if((ircd_dlink_list_length(&chptr->banlist) + ircd_dlink_list_length(&chptr->exceptlist) + ircd_dlink_list_length(&chptr->invexlist)) >= (unsigned long)ConfigChannel.max_bans)
+		if((rb_dlink_list_length(&chptr->banlist) + rb_dlink_list_length(&chptr->exceptlist) + rb_dlink_list_length(&chptr->invexlist)) >= (unsigned long)ConfigChannel.max_bans)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_BANLISTFULL),
 				   me.name, source_p->name, chptr->chname, realban);
@@ -434,15 +434,15 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 
 
 	if(IsClient(source_p))
-		ircd_sprintf(who, "%s!%s@%s",
+		rb_sprintf(who, "%s!%s@%s",
 			   source_p->name, source_p->username, source_p->host);
 	else
-		ircd_strlcpy(who, source_p->name, sizeof(who));
+		rb_strlcpy(who, source_p->name, sizeof(who));
 
 	actualBan = allocate_ban(realban, who);
-	actualBan->when = ircd_current_time();
+	actualBan->when = rb_current_time();
 
-	ircd_dlinkAdd(actualBan, &actualBan->node, list);
+	rb_dlinkAdd(actualBan, &actualBan->node, list);
 
 	/* invalidate the can_send() cache */
 	if(mode_type == CHFL_BAN || mode_type == CHFL_EXCEPTION)
@@ -473,7 +473,7 @@ del_id(struct Channel *chptr, const char *banid, dlink_list *list,
 
 		if(irccmp(banid, banptr->banstr) == 0)
 		{
-			ircd_dlinkDelete(&banptr->node, list);
+			rb_dlinkDelete(&banptr->node, list);
 			free_ban(banptr);
 
 			/* invalidate the can_send() cache */
@@ -605,7 +605,7 @@ pretty_mask(const char *idmask)
 		host[HOSTLEN] = '\0';
 	}
 
-	mask_pos += ircd_sprintf(mask_buf + mask_pos, "%s!%s@%s", nick, user, host) + 1;
+	mask_pos += rb_sprintf(mask_buf + mask_pos, "%s!%s@%s", nick, user, host) + 1;
 
 	/* restore mask, since we may need to use it again later */
 	if(at)
@@ -1096,7 +1096,7 @@ chm_limit(struct Client *source_p, struct Channel *chptr,
 		if(EmptyString(lstr) || (limit = atoi(lstr)) <= 0)
 			return;
 
-		ircd_sprintf(limitstr, "%d", limit);
+		rb_sprintf(limitstr, "%d", limit);
 
 		mode_changes[mode_count].letter = c;
 		mode_changes[mode_count].dir = MODE_ADD;
@@ -1158,7 +1158,7 @@ chm_key(struct Client *source_p, struct Channel *chptr,
 			return;
 
 		s_assert(key[0] != ' ');
-		ircd_strlcpy(chptr->mode.key, key, sizeof(chptr->mode.key));
+		rb_strlcpy(chptr->mode.key, key, sizeof(chptr->mode.key));
 
 		mode_changes[mode_count].letter = c;
 		mode_changes[mode_count].dir = MODE_ADD;
@@ -1387,10 +1387,10 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 		return;
 
 	if(IsServer(source_p))
-		mlen = ircd_sprintf(modebuf, ":%s MODE %s ", 
+		mlen = rb_sprintf(modebuf, ":%s MODE %s ", 
 				  source_p->name, chptr->chname);
 	else
-		mlen = ircd_sprintf(modebuf, ":%s!%s@%s MODE %s ",
+		mlen = rb_sprintf(modebuf, ":%s!%s@%s MODE %s ",
 				  source_p->name, source_p->username, 
 				  source_p->host, chptr->chname);
 
@@ -1454,7 +1454,7 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 			if(mode_changes[i].arg != NULL)
 			{
 				paracount++;
-				len = ircd_sprintf(pbuf, "%s ", mode_changes[i].arg);
+				len = rb_sprintf(pbuf, "%s ", mode_changes[i].arg);
 				pbuf += len;
 				paralen += len;
 			}
@@ -1469,7 +1469,7 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 	}
 
 	/* only propagate modes originating locally, or if we're hubbing */
-	if(MyClient(source_p) || ircd_dlink_list_length(&serv_list) > 1)
+	if(MyClient(source_p) || rb_dlink_list_length(&serv_list) > 1)
 		send_cap_mode_changes(client_p, source_p, chptr, mode_changes, mode_count);
 }
 

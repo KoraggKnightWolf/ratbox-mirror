@@ -258,5 +258,5 @@ xc_strlcpy(char *dest, const char *src, size_t size)
 
 #include "_stdint.h"
 #include "ircd_defs.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "common.h"

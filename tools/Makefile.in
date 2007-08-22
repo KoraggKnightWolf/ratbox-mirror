@@ -55,7 +55,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_mkpasswd_OBJECTS = mkpasswd.$(OBJEXT)
 mkpasswd_OBJECTS = $(am_mkpasswd_OBJECTS)
-mkpasswd_DEPENDENCIES = ../libircd/src/libircd.la
+mkpasswd_DEPENDENCIES = ../libratbox/src/libratbox.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -223,9 +223,9 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-INCLUDES = $(DEFAULT_INCLUDES) -I../libircd/include -I.
+INCLUDES = $(DEFAULT_INCLUDES) -I../libratbox/include -I.
 mkpasswd_SOURCES = mkpasswd.c
-mkpasswd_LDADD = @CRYPT_LIB@ ../libircd/src/libircd.la
+mkpasswd_LDADD = @CRYPT_LIB@ ../libratbox/src/libratbox.la
 all: all-am
 
 .SUFFIXES:

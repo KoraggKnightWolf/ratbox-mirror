@@ -24,6 +24,7 @@
  *  $Id$
  */
 
+#include "ratbox_lib.h"
 #include "setup.h"
 #include "config.h"
 #include "stdinc.h"
@@ -35,7 +36,6 @@
 #include "hash.h"
 #include "match.h"
 #include "ircd_signal.h"
-#include "ircd_lib.h"
 #include "hostmask.h"
 #include "numeric.h"
 #include "parse.h"
@@ -343,10 +343,10 @@ initialize_global_set_options(void)
 
 	GlobalSetOptions.ident_timeout = IDENT_TIMEOUT;
 
-	ircd_strlcpy(GlobalSetOptions.operstring,
+	rb_strlcpy(GlobalSetOptions.operstring,
 		ConfigFileEntry.default_operstring,
 		sizeof(GlobalSetOptions.operstring));
-	ircd_strlcpy(GlobalSetOptions.adminstring,
+	rb_strlcpy(GlobalSetOptions.adminstring,
 		ConfigFileEntry.default_adminstring,
 		sizeof(GlobalSetOptions.adminstring));
 
@@ -385,7 +385,7 @@ write_pidfile(const char *filename)
 	{
 		unsigned int pid = (unsigned int) getpid();
 
-		ircd_snprintf(buff, sizeof(buff), "%u\n", pid);
+		rb_snprintf(buff, sizeof(buff), "%u\n", pid);
 		if((fputs(buff, fb) == -1))
 		{
 			ilog(L_MAIN, "Error writing %u to pid file %s (%s)",
@@ -493,8 +493,8 @@ seed_random(void *unused)
 		}
 	}
 #endif
-	ircd_set_time();
-	tv = ircd_current_time_tv();
+	rb_set_time();
+	tv = rb_current_time_tv();
 	srand(tv->tv_sec ^ (tv->tv_usec | (getpid() << 20)));
 }
 
@@ -560,10 +560,10 @@ ratbox_main(int argc, char *argv[])
 	}
 
 	/* This must be after we daemonize.. */
-	ircd_lib_init(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE, FD_HEAP_SIZE);
+	rb_lib_init(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE, FD_HEAP_SIZE);
 
 	set_default_conf();
-	ircd_set_time();
+	rb_set_time();
 	setup_corefile();
 	initialVMTop = get_vm_top();
 	seed_random(NULL);
@@ -580,7 +580,7 @@ ratbox_main(int argc, char *argv[])
 	memset(&global_serv_list, 0, sizeof(global_serv_list));
 	memset(&oper_list, 0, sizeof(oper_list));
 
-	ircd_dlinkAddTail(&me, &me.node, &global_client_list);
+	rb_dlinkAddTail(&me, &me.node, &global_client_list);
 
 	memset(&Count, 0, sizeof(Count));
 	memset(&ServerInfo, 0, sizeof(ServerInfo));
@@ -616,16 +616,16 @@ ratbox_main(int argc, char *argv[])
 #endif
 
 	if(ConfigServerHide.links_delay > 0)
-		ircd_event_add("cache_links", cache_links, NULL,
+		rb_event_add("cache_links", cache_links, NULL,
 			    ConfigServerHide.links_delay);
 	else
 		ConfigServerHide.links_disabled = 1;
 
 	if(ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
 	{
-		ircd_init_prng(ConfigFileEntry.egdpool_path, IRCD_PRNG_EGD);
+		rb_init_prng(ConfigFileEntry.egdpool_path, IRCD_PRNG_EGD);
 	} else
-	ircd_init_prng(NULL, IRCD_PRNG_DEFAULT);
+	rb_init_prng(NULL, IRCD_PRNG_DEFAULT);
 	
 	init_main_logfile();
 	init_patricia();
@@ -695,11 +695,11 @@ ratbox_main(int argc, char *argv[])
 		ilog(L_MAIN, "ERROR: No server description specified in serverinfo block.");
 		exit(EXIT_FAILURE);
 	}
-	ircd_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
+	rb_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
 
 	if(ServerInfo.ssl_cert != NULL && ServerInfo.ssl_private_key != NULL)
 	{
-		if(!ircd_setup_ssl_server(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params))
+		if(!rb_setup_ssl_server(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params))
 			ilog(L_MAIN, "WARNING: Unable to setup SSL.");
 		else
 			ssl_ok = 1;
@@ -714,11 +714,11 @@ ratbox_main(int argc, char *argv[])
 	me.servptr = &me;
 	SetMe(&me);
 	make_server(&me);
-	startup_time = ircd_current_time();
+	startup_time = rb_current_time();
 	add_to_hash(HASH_CLIENT, me.name, &me);
 	add_to_hash(HASH_ID, me.id, &me);
 
-	ircd_dlinkAddAlloc(&me, &global_serv_list);
+	rb_dlinkAddAlloc(&me, &global_serv_list);
 
 	check_class();
 	write_pidfile(pidFileName);
@@ -732,15 +732,15 @@ ratbox_main(int argc, char *argv[])
 	/* um.  by waiting even longer, that just means we have even *more*
 	 * nick collisions.  what a stupid idea. set an event for the IO loop --fl
 	 */
-	ircd_event_addish("try_connections", try_connections, NULL, STARTUP_CONNECTIONS_TIME);
-	ircd_event_addonce("try_connections_startup", try_connections, NULL, 2);
-	ircd_event_add("check_rehash", check_rehash, NULL, 3);
-	ircd_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
-	ircd_event_addish("reseed_srand", seed_random, NULL, 300); /* reseed every 10 minutes */
+	rb_event_addish("try_connections", try_connections, NULL, STARTUP_CONNECTIONS_TIME);
+	rb_event_addonce("try_connections_startup", try_connections, NULL, 2);
+	rb_event_add("check_rehash", check_rehash, NULL, 3);
+	rb_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
+	rb_event_addish("reseed_srand", seed_random, NULL, 300); /* reseed every 10 minutes */
 
 	if(splitmode)
-		ircd_event_add("check_splitmode", check_splitmode, NULL, 5);
+		rb_event_add("check_splitmode", check_splitmode, NULL, 5);
 
-	ircd_lib_loop(250); /* we'll never return from here */
+	rb_lib_loop(250); /* we'll never return from here */
 	return 0;
 }

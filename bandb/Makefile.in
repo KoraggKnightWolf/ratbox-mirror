@@ -54,7 +54,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_bandb_OBJECTS = bandb.$(OBJEXT) rsdb_sqlite3.$(OBJEXT) \
 	rsdb_snprintf.$(OBJEXT)
 bandb_OBJECTS = $(am_bandb_OBJECTS)
-bandb_DEPENDENCIES = ../libircd/src/libircd.la
+bandb_DEPENDENCIES = ../libratbox/src/libratbox.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -224,9 +224,9 @@ sharedstatedir = @sharedstatedir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-INCLUDES = -I../include -I../libircd/include @SQLITE_INCLUDES@
+INCLUDES = -I../include -I../libratbox/include @SQLITE_INCLUDES@
 bandb_SOURCES = bandb.c rsdb_sqlite3.c rsdb_snprintf.c
-bandb_LDADD = ../libircd/src/libircd.la @SQLITE_LD@
+bandb_LDADD = ../libratbox/src/libratbox.la @SQLITE_LD@
 all: all-am
 
 .SUFFIXES:

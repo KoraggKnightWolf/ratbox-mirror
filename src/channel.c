@@ -43,10 +43,10 @@
 
 struct config_channel_entry ConfigChannel;
 dlink_list global_channel_list;
-static ircd_bh *channel_heap;
-static ircd_bh *ban_heap;
-static ircd_bh *topic_heap;
-static ircd_bh *member_heap;
+static rb_bh *channel_heap;
+static rb_bh *ban_heap;
+static rb_bh *topic_heap;
+static rb_bh *member_heap;
 
 static int channel_capabs[] = { CAP_EX, CAP_IE, 
 #ifdef ENABLE_SERVICES
@@ -69,10 +69,10 @@ static void free_topic(struct Channel *chptr);
 void
 init_channels(void)
 {
-	channel_heap = ircd_bh_create(sizeof(struct Channel), CHANNEL_HEAP_SIZE, "channel_heap");
-	ban_heap = ircd_bh_create(sizeof(struct Ban), BAN_HEAP_SIZE, "ban_heap");
-	topic_heap = ircd_bh_create(sizeof(struct topic_info), TOPIC_HEAP_SIZE, "topic_heap");
-	member_heap = ircd_bh_create(sizeof(struct membership), MEMBER_HEAP_SIZE, "member_heap");
+	channel_heap = rb_bh_create(sizeof(struct Channel), CHANNEL_HEAP_SIZE, "channel_heap");
+	ban_heap = rb_bh_create(sizeof(struct Ban), BAN_HEAP_SIZE, "ban_heap");
+	topic_heap = rb_bh_create(sizeof(struct topic_info), TOPIC_HEAP_SIZE, "topic_heap");
+	member_heap = rb_bh_create(sizeof(struct membership), MEMBER_HEAP_SIZE, "member_heap");
 }
 
 /*
@@ -82,25 +82,25 @@ struct Channel *
 allocate_channel(const char *chname)
 {
 	struct Channel *chptr;
-	chptr = ircd_bh_alloc(channel_heap);
-	chptr->chname = ircd_strndup(chname, CHANNELLEN);
+	chptr = rb_bh_alloc(channel_heap);
+	chptr->chname = rb_strndup(chname, CHANNELLEN);
 	return(chptr);
 }
 
 void
 free_channel(struct Channel *chptr)
 {
-	ircd_free(chptr->chname);
-	ircd_bh_free(channel_heap, chptr);
+	rb_free(chptr->chname);
+	rb_bh_free(channel_heap, chptr);
 }
 
 struct Ban *
 allocate_ban(const char *banstr, const char *who)
 {
 	struct Ban *bptr;
-	bptr = ircd_bh_alloc(ban_heap);
-	bptr->banstr = ircd_strndup(banstr, BANLEN);
-	bptr->who = ircd_strndup(who, BANLEN);
+	bptr = rb_bh_alloc(ban_heap);
+	bptr->banstr = rb_strndup(banstr, BANLEN);
+	bptr->who = rb_strndup(who, BANLEN);
 	
 	return(bptr);
 }
@@ -108,9 +108,9 @@ allocate_ban(const char *banstr, const char *who)
 void
 free_ban(struct Ban *bptr)
 {
-	ircd_free(bptr->banstr);
-	ircd_free(bptr->who);
-	ircd_bh_free(ban_heap, bptr);
+	rb_free(bptr->banstr);
+	rb_free(bptr->who);
+	rb_bh_free(ban_heap, bptr);
 }
 
 
@@ -132,7 +132,7 @@ find_channel_membership(struct Channel *chptr, struct Client *client_p)
 	/* Pick the most efficient list to use to be nice to things like
 	 * CHANSERV which could be in a large number of channels
 	 */
-	if(ircd_dlink_list_length(&chptr->members) < ircd_dlink_list_length(&client_p->user->channel))
+	if(rb_dlink_list_length(&chptr->members) < rb_dlink_list_length(&client_p->user->channel))
 	{
 		DLINK_FOREACH(ptr, chptr->members.head)
 		{
@@ -199,17 +199,17 @@ add_user_to_channel(struct Channel *chptr, struct Client *client_p, int flags)
 	if(client_p->user == NULL)
 		return;
 
-	msptr = ircd_bh_alloc(member_heap);
+	msptr = rb_bh_alloc(member_heap);
 
 	msptr->chptr = chptr;
 	msptr->client_p = client_p;
 	msptr->flags = flags;
 
-	ircd_dlinkAdd(msptr, &msptr->usernode, &client_p->user->channel);
-	ircd_dlinkAdd(msptr, &msptr->channode, &chptr->members);
+	rb_dlinkAdd(msptr, &msptr->usernode, &client_p->user->channel);
+	rb_dlinkAdd(msptr, &msptr->channode, &chptr->members);
 
 	if(MyClient(client_p))
-		ircd_dlinkAdd(msptr, &msptr->locchannode, &chptr->locmembers);
+		rb_dlinkAdd(msptr, &msptr->locchannode, &chptr->locmembers);
 }
 
 /* remove_user_from_channel()
@@ -230,16 +230,16 @@ remove_user_from_channel(struct membership *msptr)
 	client_p = msptr->client_p;
 	chptr = msptr->chptr;
 
-	ircd_dlinkDelete(&msptr->usernode, &client_p->user->channel);
-	ircd_dlinkDelete(&msptr->channode, &chptr->members);
+	rb_dlinkDelete(&msptr->usernode, &client_p->user->channel);
+	rb_dlinkDelete(&msptr->channode, &chptr->members);
 
 	if(client_p->servptr == &me)
-		ircd_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
+		rb_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-	if(ircd_dlink_list_length(&chptr->members) <= 0)
+	if(rb_dlink_list_length(&chptr->members) <= 0)
 		destroy_channel(chptr);
 
-	ircd_bh_free(member_heap, msptr);
+	rb_bh_free(member_heap, msptr);
 
 	return;
 }
@@ -266,15 +266,15 @@ remove_user_from_channels(struct Client *client_p)
 		msptr = ptr->data;
 		chptr = msptr->chptr;
 
-		ircd_dlinkDelete(&msptr->channode, &chptr->members);
+		rb_dlinkDelete(&msptr->channode, &chptr->members);
 
 		if(client_p->servptr == &me)
-			ircd_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
+			rb_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-		if(ircd_dlink_list_length(&chptr->members) <= 0)
+		if(rb_dlink_list_length(&chptr->members) <= 0)
 			destroy_channel(chptr);
 
-		ircd_bh_free(member_heap, msptr);
+		rb_bh_free(member_heap, msptr);
 	}
 
 	client_p->user->channel.head = client_p->user->channel.tail = NULL;
@@ -374,7 +374,7 @@ destroy_channel(struct Channel *chptr)
 	/* Free the topic */
 	free_topic(chptr);
 
-	ircd_dlinkDelete(&chptr->node, &global_channel_list);
+	rb_dlinkDelete(&chptr->node, &global_channel_list);
 	del_from_hash(HASH_CHANNEL, chptr->chname, chptr);
 	free_channel(chptr);
 }
@@ -419,7 +419,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 	{
 		is_member = IsMember(client_p, chptr);
 
-		cur_len = mlen = ircd_sprintf(lbuf, form_str(RPL_NAMREPLY),
+		cur_len = mlen = rb_sprintf(lbuf, form_str(RPL_NAMREPLY),
 					    me.name, client_p->name, 
 					    channel_pub_or_secret(chptr),
 					    chptr->chname);
@@ -443,7 +443,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 				t = lbuf + mlen;
 			}
 
-			tlen = ircd_sprintf(t, "%s%s ", find_channel_status(msptr, stack),
+			tlen = rb_sprintf(t, "%s%s ", find_channel_status(msptr, stack),
 				   target_p->name);
 
 			cur_len += tlen;
@@ -480,8 +480,8 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 void
 del_invite(struct Channel *chptr, struct Client *who)
 {
-	ircd_dlinkFindDestroy(who, &chptr->invites);
-	ircd_dlinkFindDestroy(chptr, &who->localClient->invited);
+	rb_dlinkFindDestroy(who, &chptr->invites);
+	rb_dlinkFindDestroy(chptr, &who->localClient->invited);
 }
 
 /* is_banned()
@@ -507,9 +507,9 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 	/* if the buffers havent been built, do it here */
 	if(s == NULL)
 	{
-		ircd_sprintf(src_host, "%s!%s@%s",
+		rb_sprintf(src_host, "%s!%s@%s",
 			   who->name, who->username, who->host);
-		ircd_sprintf(src_iphost, "%s!%s@%s",
+		rb_sprintf(src_iphost, "%s!%s@%s",
 			   who->name, who->username, who->sockhost);
 
 		s = src_host;
@@ -664,7 +664,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
 	else
 	{
 		if((t_delta =
-		    (ircd_current_time() - source_p->localClient->last_leave_time)) >
+		    (rb_current_time() - source_p->localClient->last_leave_time)) >
 		   JOIN_LEAVE_COUNT_EXPIRE_TIME)
 		{
 			decrement_count = (t_delta / JOIN_LEAVE_COUNT_EXPIRE_TIME);
@@ -675,7 +675,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
 		}
 		else
 		{
-			if((ircd_current_time() -
+			if((rb_current_time() -
 			    (source_p->localClient->last_join_time)) < GlobalSetOptions.spam_time)
 			{
 				/* oh, its a possible spambot */
@@ -683,9 +683,9 @@ check_spambot_warning(struct Client *source_p, const char *name)
 			}
 		}
 		if(name != NULL)
-			source_p->localClient->last_join_time = ircd_current_time();
+			source_p->localClient->last_join_time = rb_current_time();
 		else
-			source_p->localClient->last_leave_time = ircd_current_time();
+			source_p->localClient->last_leave_time = rb_current_time();
 	}
 }
 
@@ -711,7 +711,7 @@ check_splitmode(void *unused)
 				splitmode = 1;
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Network split, activating splitmode");
-				ircd_event_addish("check_splitmode", check_splitmode, NULL, 5);
+				rb_event_addish("check_splitmode", check_splitmode, NULL, 5);
 			}
 		}
 		/* in splitmode, check whether its finished */
@@ -722,7 +722,7 @@ check_splitmode(void *unused)
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Network rejoined, deactivating splitmode");
 
-			ircd_event_delete(check_splitmode, NULL);
+			rb_event_delete(check_splitmode, NULL);
 		}
 	}
 }
@@ -740,7 +740,7 @@ allocate_topic(struct Channel *chptr)
 	if(chptr == NULL)
 		return;
 
-	chptr->topic = ircd_bh_alloc(topic_heap);
+	chptr->topic = rb_bh_alloc(topic_heap);
 }
 
 /* free_topic()
@@ -758,7 +758,7 @@ free_topic(struct Channel *chptr)
 	/* This is safe for now - If you change allocate_topic you
 	 * MUST change this as well
 	 */
-	ircd_bh_free(topic_heap, chptr->topic);
+	rb_bh_free(topic_heap, chptr->topic);
 	chptr->topic = NULL;
 }
 
@@ -776,8 +776,8 @@ set_channel_topic(struct Channel *chptr, const char *topic,
 	{
 		if(chptr->topic == NULL)
 			allocate_topic(chptr);
-		ircd_strlcpy(chptr->topic->topic, topic, sizeof(chptr->topic->topic));
-		ircd_strlcpy(chptr->topic->topic_info, topic_info, sizeof(chptr->topic->topic_info));
+		rb_strlcpy(chptr->topic->topic, topic, sizeof(chptr->topic->topic));
+		rb_strlcpy(chptr->topic->topic_info, topic_info, sizeof(chptr->topic->topic_info));
 		chptr->topic->topic_time = topicts;
 	} 
 	else
@@ -821,21 +821,21 @@ channel_modes(struct Channel *chptr, struct Client *client_p)
 	if(chptr->mode.limit && *chptr->mode.key)
 	{
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))
-			ircd_sprintf(mbuf, "lk %d %s", chptr->mode.limit, chptr->mode.key);
+			rb_sprintf(mbuf, "lk %d %s", chptr->mode.limit, chptr->mode.key);
 		else
 			strcpy(mbuf, "lk");
 	}
 	else if(chptr->mode.limit)
 	{
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))
-			ircd_sprintf(mbuf, "l %d", chptr->mode.limit);
+			rb_sprintf(mbuf, "l %d", chptr->mode.limit);
 		else
 			strcpy(mbuf, "l");
 	}
 	else if(*chptr->mode.key)
 	{
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))
-			ircd_sprintf(mbuf, "k %s", chptr->mode.key);
+			rb_sprintf(mbuf, "k %s", chptr->mode.key);
 		else
 			strcpy(mbuf, "k");
 	}
@@ -986,11 +986,11 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 		nocap = chcap_combos[j].cap_no;
 
 		if(cap & CAP_TS6)
-			mbl = preflen = ircd_sprintf(modebuf, ":%s TMODE %ld %s ",
+			mbl = preflen = rb_sprintf(modebuf, ":%s TMODE %ld %s ",
 						use_id(source_p), (long) chptr->channelts,
 						chptr->chname);
 		else
-			mbl = preflen = ircd_sprintf(modebuf, ":%s MODE %s ",
+			mbl = preflen = rb_sprintf(modebuf, ":%s MODE %s ",
 						source_p->name, chptr->chname);
 
 		/* loop the list of - modes we have */
@@ -1054,7 +1054,7 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 
 			if(arg != NULL)
 			{
-				len = ircd_sprintf(pbuf, "%s ", arg);
+				len = rb_sprintf(pbuf, "%s ", arg);
 				pbuf += len;
 				pbl += len;
 				mc++;

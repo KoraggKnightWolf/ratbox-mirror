@@ -25,7 +25,7 @@
  */
 
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "match.h"
 #include "ircd.h"
 #include "numeric.h"
@@ -103,9 +103,9 @@ find_or_add(const char *name)
 			return (ptr->name);
 	}
 
-	ptr = ircd_malloc(sizeof(SCACHE));
+	ptr = rb_malloc(sizeof(SCACHE));
 
-	ptr->name = ircd_strdup(name);
+	ptr->name = rb_strdup(name);
 
 	ptr->next = scache_hash[hash_index];
 	scache_hash[hash_index] = ptr;

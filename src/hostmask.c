@@ -26,7 +26,7 @@
 
 #include "stdinc.h"
 #include "struct.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "client.h"
 #include "s_conf.h"
 #include "hostmask.h"
@@ -76,7 +76,7 @@ parse_netmask(const char *text, struct sockaddr  *naddr, int *nb)
 				*b = 128;
 		} else
 			*b = 128;
-		if(ircd_inet_pton_sock(ip, (struct sockaddr *)addr) > 0)
+		if(rb_inet_pton_sock(ip, (struct sockaddr *)addr) > 0)
 			return HM_IPV6;
 		else
 			return HM_HOST;
@@ -93,7 +93,7 @@ parse_netmask(const char *text, struct sockaddr  *naddr, int *nb)
 				*b = 32;
 		} else
 			*b = 32;
-		if(ircd_inet_pton_sock(ip, (struct sockaddr *)addr) > 0)
+		if(rb_inet_pton_sock(ip, (struct sockaddr *)addr) > 0)
 			return HM_IPV4;
 		else
 			return HM_HOST;
@@ -474,7 +474,7 @@ add_conf_by_address(const char *address, int type, const char *username, struct 
 
 	if(address == NULL)
 		address = "/NOMATCH!/";
-	arec = ircd_malloc(sizeof(struct AddressRec));
+	arec = rb_malloc(sizeof(struct AddressRec));
 	masktype = parse_netmask(address, (struct sockaddr *)&arec->Mask.ipa.addr, &bits);
 	arec->Mask.ipa.bits = bits;
 	arec->masktype = masktype;
@@ -555,7 +555,7 @@ delete_one_address_conf(const char *address, struct ConfItem *aconf)
 			aconf->status |= CONF_ILLEGAL;
 			if(!aconf->clients)
 				free_conf(aconf);
-			ircd_free(arec);
+			rb_free(arec);
 			return;
 		}
 		arecl = arec;
@@ -596,7 +596,7 @@ clear_out_address_conf(void)
 				arec->aconf->status |= CONF_ILLEGAL;
 				if(!arec->aconf->clients)
 					free_conf(arec->aconf);
-				ircd_free(arec);
+				rb_free(arec);
 			}
 		}
 		*store_next = NULL;
@@ -630,7 +630,7 @@ clear_out_address_conf_bans(void)
 				arec->aconf->status |= CONF_ILLEGAL;
 				if(!arec->aconf->clients)
 					free_conf(arec->aconf);
-				ircd_free(arec);
+				rb_free(arec);
 			}
 		}
 		*store_next = NULL;

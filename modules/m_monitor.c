@@ -62,7 +62,7 @@ DECLARE_MODULE_AV1(monitor, modinit, moddeinit, monitor_clist, NULL, NULL, "$Rev
 static int
 modinit(void)
 {
-	ircd_event_addish("cleanup_monitor", cleanup_monitor, NULL, 3600);
+	rb_event_addish("cleanup_monitor", cleanup_monitor, NULL, 3600);
 	return 0;
 
 }
@@ -70,7 +70,7 @@ modinit(void)
 static void
 moddeinit(void)
 {
-	ircd_event_delete(cleanup_monitor, NULL);
+	rb_event_delete(cleanup_monitor, NULL);
 }
 
 static void
@@ -87,9 +87,9 @@ add_monitor(struct Client *client_p, const char *nicks)
 	int cur_onlen, cur_offlen;
 
 	/* these two are same length, just diff numeric */
-	cur_offlen = cur_onlen = mlen = ircd_sprintf(onbuf, form_str(RPL_MONONLINE),
+	cur_offlen = cur_onlen = mlen = rb_sprintf(onbuf, form_str(RPL_MONONLINE),
 						me.name, client_p->name, "");
-	ircd_sprintf(offbuf, form_str(RPL_MONOFFLINE),
+	rb_sprintf(offbuf, form_str(RPL_MONOFFLINE),
 			me.name, client_p->name, "");
 
 	onptr = onbuf + mlen;
@@ -102,7 +102,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 		if(EmptyString(name) || strlen(name) > NICKLEN-1)
 			continue;
 
-		if((int)ircd_dlink_list_length(&client_p->localClient->monitor_list) >=
+		if((int)rb_dlink_list_length(&client_p->localClient->monitor_list) >=
 			ConfigFileEntry.max_monitor)
 		{
 			char buf[100];
@@ -113,9 +113,9 @@ add_monitor(struct Client *client_p, const char *nicks)
 				sendto_one_buffer(client_p, POP_QUEUE, offbuf);
 
 			if(p)
-				ircd_snprintf(buf, sizeof(buf), "%s,%s", name, p);
+				rb_snprintf(buf, sizeof(buf), "%s,%s", name, p);
 			else
-				ircd_snprintf(buf, sizeof(buf), "%s", name);
+				rb_snprintf(buf, sizeof(buf), "%s", name);
 
 			sendto_one(client_p, POP_QUEUE, form_str(ERR_MONLISTFULL),
 					me.name, client_p->name,
@@ -126,11 +126,11 @@ add_monitor(struct Client *client_p, const char *nicks)
 		monptr = find_monitor(name, 1);
 
 		/* already monitoring this nick */
-		if(ircd_dlinkFind(client_p, &monptr->users))
+		if(rb_dlinkFind(client_p, &monptr->users))
 			continue;
 
-		ircd_dlinkAddAlloc(client_p, &monptr->users);
-		ircd_dlinkAddAlloc(monptr, &client_p->localClient->monitor_list);
+		rb_dlinkAddAlloc(client_p, &monptr->users);
+		rb_dlinkAddAlloc(monptr, &client_p->localClient->monitor_list);
 
 		if((target_p = find_named_person(name)) != NULL)
 		{
@@ -147,7 +147,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 				*onptr++ = ',';
 				cur_onlen++;
 			}
-			arglen = ircd_sprintf(onptr, "%s!%s@%s",
+			arglen = rb_sprintf(onptr, "%s!%s@%s",
 					target_p->name, target_p->username,
 					target_p->host);
 			onptr += arglen;
@@ -167,7 +167,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 				*offptr++ = ',';
 				cur_offlen++;
 			}
-			arglen = ircd_sprintf(offptr, "%s", name);
+			arglen = rb_sprintf(offptr, "%s", name);
 			offptr += arglen;
 			cur_offlen += arglen;
 		}
@@ -187,7 +187,7 @@ del_monitor(struct Client *client_p, const char *nicks)
 	char *tmp;
 	char *p;
 
-	if(!ircd_dlink_list_length(&client_p->localClient->monitor_list))
+	if(!rb_dlink_list_length(&client_p->localClient->monitor_list))
 		return;
 
 	tmp = LOCAL_COPY(nicks);
@@ -201,8 +201,8 @@ del_monitor(struct Client *client_p, const char *nicks)
 		if((monptr = find_monitor(name, 0)) == NULL)
 			continue;
 
-		ircd_dlinkFindDestroy(client_p, &monptr->users);
-		ircd_dlinkFindDestroy(monptr, &client_p->localClient->monitor_list);
+		rb_dlinkFindDestroy(client_p, &monptr->users);
+		rb_dlinkFindDestroy(monptr, &client_p->localClient->monitor_list);
 	}
 }
 
@@ -215,14 +215,14 @@ list_monitor(struct Client *client_p)
 	dlink_node *ptr;
 	int mlen, arglen, cur_len;
 
-	if(!ircd_dlink_list_length(&client_p->localClient->monitor_list))
+	if(!rb_dlink_list_length(&client_p->localClient->monitor_list))
 	{
 		sendto_one(client_p, POP_QUEUE, form_str(RPL_ENDOFMONLIST),
 				me.name, client_p->name);
 		return;
 	}
 
-	cur_len = mlen = ircd_sprintf(buf, form_str(RPL_MONLIST),
+	cur_len = mlen = rb_sprintf(buf, form_str(RPL_MONLIST),
 				me.name, client_p->name, "");
 	nbuf = buf + mlen;
 
@@ -241,7 +241,7 @@ list_monitor(struct Client *client_p)
 			*nbuf++ = ',';
 			cur_len++;
 		}
-		arglen = ircd_sprintf(nbuf, "%s", monptr->name);
+		arglen = rb_sprintf(nbuf, "%s", monptr->name);
 		cur_len += arglen;
 		nbuf += arglen;
 	}
@@ -262,9 +262,9 @@ show_monitor_status(struct Client *client_p)
 	int mlen, arglen;
 	dlink_node *ptr;
 
-	mlen = cur_onlen = ircd_sprintf(onbuf, form_str(RPL_MONONLINE),
+	mlen = cur_onlen = rb_sprintf(onbuf, form_str(RPL_MONONLINE),
 					me.name, client_p->name, "");
-	cur_offlen = ircd_sprintf(offbuf, form_str(RPL_MONOFFLINE),
+	cur_offlen = rb_sprintf(offbuf, form_str(RPL_MONOFFLINE),
 				me.name, client_p->name, "");
 
 	onptr = onbuf + mlen;
@@ -289,7 +289,7 @@ show_monitor_status(struct Client *client_p)
 				*onptr++ = ',';
 				cur_onlen++;
 			}
-			arglen = ircd_sprintf(onptr, "%s!%s@%s",
+			arglen = rb_sprintf(onptr, "%s!%s@%s",
 					target_p->name, target_p->username,
 					target_p->host);
 			onptr += arglen;
@@ -310,7 +310,7 @@ show_monitor_status(struct Client *client_p)
 				cur_offlen++;
 			}
 
-			arglen = ircd_sprintf(offptr, "%s", monptr->name);
+			arglen = rb_sprintf(offptr, "%s", monptr->name);
 			offptr += arglen;
 			cur_offlen += arglen;
 		}
@@ -336,14 +336,14 @@ static void cleanup_monitor(void *unused)
 		{
 			next_ptr = ptr->hnext;
 
-			if(!ircd_dlink_list_length(&ptr->users))
+			if(!rb_dlink_list_length(&ptr->users))
 			{
 				if(last_ptr)
 					last_ptr->hnext = next_ptr;
 				else
 					monitorTable[i] = next_ptr;
 
-				ircd_bh_free(monitor_heap, ptr);
+				rb_bh_free(monitor_heap, ptr);
 			}
 			else
 				last_ptr = ptr;

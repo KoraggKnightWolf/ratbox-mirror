@@ -1,6 +1,6 @@
 /*
  *  ircd-ratbox: A slightly useful ircd.
- *  ircd_signal.h: A header for ircd signals.
+ *  rb_signal.h: A header for ircd signals.
  *
  *  Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
  *  Copyright (C) 1996-2002 Hybrid Development Team
@@ -24,10 +24,10 @@
  *  $Id$
  */
 
-#ifndef INCLUDED_ircd_signal_h
-#define INCLUDED_ircd_signal_h
+#ifndef INCLUDED_rb_signal_h
+#define INCLUDED_rb_signal_h
 
 void setup_signals(void);
 void setup_reboot_signals(void);
 
-#endif /* INCLUDED_ircd_signal_h */
+#endif /* INCLUDED_rb_signal_h */

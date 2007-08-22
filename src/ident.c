@@ -14,7 +14,7 @@
  */
 
 #include "setup.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "common.h"
 #define USERLEN 10
 
@@ -41,25 +41,25 @@ struct auth_request
 	int srcport;
 	int dstport;
 	char reqid[REQIDLEN];
-	ircd_fde_t *authF;
+	rb_fde_t *authF;
 };
 
-static ircd_bh *authheap;
+static rb_bh *authheap;
 
 static char buf[512]; /* scratch buffer */
 static char readBuf[READBUF_SIZE];
 
-static ircd_helper *ident_helper;
+static rb_helper *ident_helper;
 
 
 static int
-send_sprintf(ircd_fde_t *F, const char *format, ...)
+send_sprintf(rb_fde_t *F, const char *format, ...)
 {
 	va_list args; 
 	va_start(args, format);
-	ircd_vsprintf(buf, format, args);
+	rb_vsprintf(buf, format, args);
 	va_end(args); 
-	return(ircd_write(F, buf, strlen(buf)));
+	return(rb_write(F, buf, strlen(buf)));
 }
 
 
@@ -80,12 +80,12 @@ ID success/failure username
 */
 
 static void
-read_auth_timeout(ircd_fde_t *F, void *data)
+read_auth_timeout(rb_fde_t *F, void *data)
 {
 	struct auth_request *auth = data;
-	ircd_helper_write(ident_helper, "%s 0", auth->reqid);
-	ircd_bh_free(authheap, auth);
-	ircd_close(F);
+	rb_helper_write(ident_helper, "%s 0", auth->reqid);
+	rb_bh_free(authheap, auth);
+	rb_close(F);
 }
 
 
@@ -146,18 +146,18 @@ GetValidIdent(char *xbuf)
 
 
 static void
-read_auth(ircd_fde_t *F, void *data)
+read_auth(rb_fde_t *F, void *data)
 {
 	struct auth_request *auth = data;
 	char username[USERLEN], *s, *t;
 	int len, count;
 
-	len = ircd_read(F, buf, sizeof(buf));
+	len = rb_read(F, buf, sizeof(buf));
 
 	if(len < 0 && ignoreErrno(errno))
 	{
-		ircd_settimeout(F, 30, read_auth_timeout, auth);
-		ircd_setselect(F, IRCD_SELECT_READ, read_auth, auth);
+		rb_settimeout(F, 30, read_auth_timeout, auth);
+		rb_setselect(F, IRCD_SELECT_READ, read_auth, auth);
 		return;
 	} else {
 		buf[len] = '\0';
@@ -177,16 +177,16 @@ read_auth(ircd_fde_t *F, void *data)
 				}
 			}
 			*t = '\0';
-			ircd_helper_write(ident_helper, "%s %s", auth->reqid, username);
+			rb_helper_write(ident_helper, "%s %s", auth->reqid, username);
 		} else
-			ircd_helper_write(ident_helper, "%s 0", auth->reqid);
-		ircd_close(F);
-		ircd_bh_free(authheap, auth);
+			rb_helper_write(ident_helper, "%s 0", auth->reqid);
+		rb_close(F);
+		rb_bh_free(authheap, auth);
 	}
 }
 
 static void
-connect_callback(ircd_fde_t *F, int status, void *data)
+connect_callback(rb_fde_t *F, int status, void *data)
 {
 	struct auth_request *auth = data;
 
@@ -197,16 +197,16 @@ connect_callback(ircd_fde_t *F, int status, void *data)
 		 */
 		if(send_sprintf(F, "%u , %u\r\n", auth->srcport, auth->dstport) <= 0)
 		{
-			ircd_helper_write(ident_helper, "%s 0", auth->reqid);
-			ircd_close(F);
-			ircd_bh_free(authheap, auth);
+			rb_helper_write(ident_helper, "%s 0", auth->reqid);
+			rb_close(F);
+			rb_bh_free(authheap, auth);
 			return;
 		}
 		read_auth(F, auth);
 	} else {
-		ircd_helper_write(ident_helper, "%s 0", auth->reqid);
-		ircd_close(F);
-		ircd_bh_free(authheap, auth);
+		rb_helper_write(ident_helper, "%s 0", auth->reqid);
+		rb_close(F);
+		rb_bh_free(authheap, auth);
 	}
 }
 
@@ -215,10 +215,10 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 {
 	struct auth_request *auth;
 
-	auth = ircd_bh_alloc(authheap);
+	auth = rb_bh_alloc(authheap);
 	
-	ircd_inet_pton_sock(bindaddr, (struct sockaddr *)&auth->bindaddr);
-	ircd_inet_pton_sock(destaddr, (struct sockaddr *)&auth->destaddr);
+	rb_inet_pton_sock(bindaddr, (struct sockaddr *)&auth->bindaddr);
+	rb_inet_pton_sock(destaddr, (struct sockaddr *)&auth->destaddr);
 
 #ifdef IPV6
 	if(((struct sockaddr *)&auth->destaddr)->sa_family == AF_INET6)
@@ -227,12 +227,12 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 #endif
 		((struct sockaddr_in *)&auth->destaddr)->sin_port = htons(113);
 
-	auth->authF = ircd_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
+	auth->authF = rb_socket(((struct sockaddr *)&auth->destaddr)->sa_family, SOCK_STREAM, 0, "auth fd");
 
 	if(auth->authF == NULL)
 	{
-		ircd_helper_write(ident_helper, "%s 0", id);
-		ircd_bh_free(authheap, auth);
+		rb_helper_write(ident_helper, "%s 0", id);
+		rb_bh_free(authheap, auth);
 		return;	
 	}
 
@@ -240,19 +240,19 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	auth->dstport = atoi(dstport);
 	strcpy(auth->reqid, id);
 
-	ircd_connect_tcp(auth->authF, (struct sockaddr *)&auth->destaddr, 
+	rb_connect_tcp(auth->authF, (struct sockaddr *)&auth->destaddr, 
 		(struct sockaddr *)&auth->bindaddr, GET_SS_LEN(&auth->destaddr), connect_callback, auth, ident_timeout);
 }
 
 static void
-parse_request(ircd_helper *helper)
+parse_request(rb_helper *helper)
 {
 	int len;
 	static char *parv[MAXPARA + 1];
 	int parc;
-	while((len = ircd_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
+	while((len = rb_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
 	{
-		parc = ircd_string_to_array(readBuf, parv, MAXPARA);
+		parc = rb_string_to_array(readBuf, parv, MAXPARA);
 		switch(parc)
 		{
 			case 5:
@@ -291,7 +291,7 @@ diecb(const char *str)
 }
 
 static void
-error_cb(ircd_helper *helper)
+error_cb(rb_helper *helper)
 {
 	exit(0);
 }
@@ -300,7 +300,7 @@ int main(int argc, char **argv)
 {
 	char *tident_timeout;
 
-	ident_helper = ircd_helper_child(parse_request, error_cb, ilogcb, restartcb, diecb, 1024, 1024, 1024, 1024);	
+	ident_helper = rb_helper_child(parse_request, error_cb, ilogcb, restartcb, diecb, 1024, 1024, 1024, 1024);	
 	tident_timeout = getenv("IDENT_TIMEOUT");
 	if(ident_helper == NULL || tident_timeout == NULL)
 	{
@@ -311,9 +311,9 @@ int main(int argc, char **argv)
 	}
 	ident_timeout = atoi(tident_timeout);
 	
-	authheap = ircd_bh_create(sizeof(struct auth_request), 2048, "auth_heap");
+	authheap = rb_bh_create(sizeof(struct auth_request), 2048, "auth_heap");
 
-	ircd_helper_loop(ident_helper, 1000);
+	rb_helper_loop(ident_helper, 1000);
 	return 0;
 }
 

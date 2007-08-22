@@ -66,7 +66,7 @@ server_reboot(void)
 	/*
 	 * XXX we used to call flush_connections() here. But since this routine
 	 * doesn't exist anymore, we won't be flushing. This is ok, since 
-	 * when close handlers come into existance, ircd_close() will be called
+	 * when close handlers come into existance, rb_close() will be called
 	 * below, and the data flushing will be implicit.
 	 *    -- adrian
 	 *
@@ -80,7 +80,7 @@ server_reboot(void)
 	execv(SPATH, (void *)myargv);
 
 	/* use this if execv of SPATH fails */
-	ircd_snprintf(path, sizeof(path), "%s/bin/ircd", ConfigFileEntry.dpath);
+	rb_snprintf(path, sizeof(path), "%s/bin/ircd", ConfigFileEntry.dpath);
 
 	execv(path, (void *)myargv);
 	exit(-1);

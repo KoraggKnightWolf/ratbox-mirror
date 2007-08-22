@@ -48,7 +48,7 @@ make_class(void)
 {
 	struct Class *tmp;
 
-	tmp = ircd_malloc(sizeof(struct Class));
+	tmp = rb_malloc(sizeof(struct Class));
 
 	ConFreq(tmp) = DEFAULT_CONNECTFREQUENCY;
 	PingFreq(tmp) = DEFAULT_PINGFREQUENCY;
@@ -65,8 +65,8 @@ free_class(struct Class *tmp)
 	if(tmp->ip_limits)
 		Destroy_Patricia(tmp->ip_limits, NULL);
 
-	ircd_free(tmp->class_name);
-	ircd_free(tmp);
+	rb_free(tmp->class_name);
+	rb_free(tmp);
 
 }
 
@@ -176,7 +176,7 @@ add_class(struct Class *classptr)
 
 	if(tmpptr == default_class)
 	{
-		ircd_dlinkAddAlloc(classptr, &class_list);
+		rb_dlinkAddAlloc(classptr, &class_list);
 		CurrUsers(classptr) = 0;
 	}
 	else
@@ -243,7 +243,7 @@ check_class()
 
 		if(MaxUsers(cltmp) < 0)
 		{
-			ircd_dlinkDestroy(ptr, &class_list);
+			rb_dlinkDestroy(ptr, &class_list);
 			if(CurrUsers(cltmp) <= 0)
 				free_class(cltmp);
 		}
@@ -261,7 +261,7 @@ void
 initclass()
 {
 	default_class = make_class();
-	ClassName(default_class) = ircd_strdup("default");
+	ClassName(default_class) = rb_strdup("default");
 }
 
 /*

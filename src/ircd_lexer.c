@@ -521,7 +521,7 @@ char *yytext;
  */
 #line 26 "src/ircd_lexer.l"
 
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "stdinc.h"
 #include "newconf.h"
 #include "ircd_parser.h"
@@ -1922,7 +1922,7 @@ void cinclude(void)
 			/* if its not found in PREFIX, look in ETCPATH */
 			char fnamebuf[IRCD_BUFSIZE];
 
-			ircd_snprintf(fnamebuf, sizeof(fnamebuf), "%s/%s", ETCPATH, c);
+			rb_snprintf(fnamebuf, sizeof(fnamebuf), "%s/%s", ETCPATH, c);
 			tmp_fbfile_in = fopen(fnamebuf, "r");
 
 			/* wasnt found there either.. error. */

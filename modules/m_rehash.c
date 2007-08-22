@@ -28,7 +28,7 @@
 #include "struct.h"
 #include "client.h"
 #include "match.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "ircd.h"
 #include "s_gline.h"
 #include "numeric.h"
@@ -124,7 +124,7 @@ rehash_glines(struct Client *source_p)
 		aconf = ptr->data;
 
 		delete_one_address_conf(aconf->host, aconf);
-		ircd_dlinkDestroy(ptr, &glines);
+		rb_dlinkDestroy(ptr, &glines);
 	}
 }
 
@@ -142,10 +142,10 @@ rehash_pglines(struct Client *source_p)
 	{
 		glp_ptr = ptr->data;
 
-		ircd_free(glp_ptr->reason1);
-		ircd_free(glp_ptr->reason2);
-		ircd_free(glp_ptr);
-		ircd_dlinkDestroy(ptr, &pending_glines);
+		rb_free(glp_ptr->reason1);
+		rb_free(glp_ptr->reason2);
+		rb_free(glp_ptr);
+		rb_dlinkDestroy(ptr, &pending_glines);
 	}
 }
 
@@ -166,7 +166,7 @@ rehash_tklines(struct Client *source_p)
 			aconf = ptr->data;
 
 			delete_one_address_conf(aconf->host, aconf);
-			ircd_dlinkDestroy(ptr, &temp_klines[i]);
+			rb_dlinkDestroy(ptr, &temp_klines[i]);
 		}
 	}
 }
@@ -188,7 +188,7 @@ rehash_tdlines(struct Client *source_p)
 			aconf = ptr->data;
 
 			delete_one_address_conf(aconf->host, aconf);
-			ircd_dlinkDestroy(ptr, &temp_dlines[i]);
+			rb_dlinkDestroy(ptr, &temp_dlines[i]);
 		}
 	}
 }
@@ -211,7 +211,7 @@ rehash_txlines(struct Client *source_p)
 			continue;
 
 		free_conf(aconf);
-		ircd_dlinkDestroy(ptr, &xline_conf_list);
+		rb_dlinkDestroy(ptr, &xline_conf_list);
 	}
 }
 
@@ -234,7 +234,7 @@ rehash_tresvs(struct Client *source_p)
 			continue;
 
 		free_conf(aconf);
-		ircd_dlinkDestroy(ptr, &resvTable[i]);
+		rb_dlinkDestroy(ptr, &resvTable[i]);
 	}
 	HASH_WALK_END
 
@@ -246,7 +246,7 @@ rehash_tresvs(struct Client *source_p)
 			continue;
 
 		free_conf(aconf);
-		ircd_dlinkDestroy(ptr, &resv_conf_list);
+		rb_dlinkDestroy(ptr, &resv_conf_list);
 	}
 }
 
@@ -327,7 +327,7 @@ mo_rehash(struct Client *client_p, struct Client *source_p, int parc, const char
 		for (x = 0; rehash_commands[x].cmd != NULL && rehash_commands[x].handler != NULL;
 		     x++)
 		{
-			ircd_snprintf_append(cmdbuf, sizeof(cmdbuf), " %s", rehash_commands[x].cmd);
+			rb_snprintf_append(cmdbuf, sizeof(cmdbuf), " %s", rehash_commands[x].cmd);
 		}
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :rehash one of:%s", me.name, source_p->name,
 			   cmdbuf);

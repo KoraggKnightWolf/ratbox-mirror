@@ -30,21 +30,21 @@
  */
 
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #include "internal.h"
 #include "tvarith.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 /* TCP connection management. */
 
 static void tcp_close(adns_state ads) {
   int serv;
   
   serv= ads->tcpserver;
-  ircd_close(ircd_get_fde(ads->tcpsocket));
+  rb_close(rb_get_fde(ads->tcpsocket));
   ads->tcpsocket= -1;
   ads->tcprecv.used= ads->tcprecv_skip= ads->tcpsend.used= 0;
 }
@@ -122,7 +122,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now) {
     if (!proto) { adns__diag(ads,-1,0,"unable to find protocol no. for TCP !"); return; }
     fd= socket(AF_INET,SOCK_STREAM,proto->p_proto);
 #endif
-    fd= ircd_get_fd(ircd_socket(AF_INET, SOCK_STREAM, 0, "adns tcp socket"));
+    fd= rb_get_fd(rb_socket(AF_INET, SOCK_STREAM, 0, "adns tcp socket"));
     
     if (fd<0) {
       adns__diag(ads,-1,0,"cannot create TCP socket: %s",strerror(errno));
@@ -131,7 +131,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now) {
     r= adns__setnonblock(ads,fd);
     if (r) {
       adns__diag(ads,-1,0,"cannot make TCP socket nonblocking: %s",strerror(r));
-      ircd_close(ircd_get_fde(fd));
+      rb_close(rb_get_fde(fd));
       return;
     }
     memset(&addr,0,sizeof(addr));
@@ -421,7 +421,7 @@ int adns_processreadable(adns_state ads, int fd, const struct timeval *now) {
 	   serv++);
       if (serv >= ads->nservers) {
         char buf[16];
-        ircd_inet_ntop(AF_INET, &udpaddr.sin_addr, buf, sizeof(buf));
+        rb_inet_ntop(AF_INET, &udpaddr.sin_addr, buf, sizeof(buf));
 	adns__warn(ads,-1,0,"datagram received from unknown nameserver %s", buf);
 	continue;
       }

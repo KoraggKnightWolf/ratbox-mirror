@@ -433,10 +433,10 @@ mod_add_cmd(struct Message *msg)
 		last_ptr = ptr;
 	}
 
-	new_ptr = ircd_malloc(sizeof(struct MessageHash));
+	new_ptr = rb_malloc(sizeof(struct MessageHash));
 
 	new_ptr->next = NULL;
-	new_ptr->cmd = ircd_strdup(msg->cmd);
+	new_ptr->cmd = rb_strdup(msg->cmd);
 	new_ptr->msg = msg;
 
 	msg->count = 0;
@@ -472,12 +472,12 @@ mod_del_cmd(struct Message *msg)
 	{
 		if(strcasecmp(msg->cmd, ptr->cmd) == 0)
 		{
-			ircd_free(ptr->cmd);
+			rb_free(ptr->cmd);
 			if(last_ptr != NULL)
 				last_ptr->next = ptr->next;
 			else
 				msg_hash_table[msgindex] = ptr->next;
-			ircd_free(ptr);
+			rb_free(ptr);
 			return;
 		}
 		last_ptr = ptr;
@@ -640,10 +640,10 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 		int tl;		/* current length of presently being built string in t */
 		for (i = 2; i < (parc - 1); i++)
 		{
-			tl = ircd_sprintf(t, " %s", parv[i]);
+			tl = rb_sprintf(t, " %s", parv[i]);
 			t += tl;
 		}
-		ircd_sprintf(t, " :%s", parv[parc - 1]);
+		rb_sprintf(t, " :%s", parv[parc - 1]);
 	}
 
 	if((target_p = find_client(parv[1])) != NULL)

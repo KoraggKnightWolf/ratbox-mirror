@@ -25,7 +25,7 @@
  */
 
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "client.h"
 #include "match.h"
@@ -871,7 +871,7 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 {
 	static time_t last_used = 0L;
 
-	if((last_used + ConfigFileEntry.pace_wait) > ircd_current_time())
+	if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
 		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
@@ -880,7 +880,7 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		return 0;
 	}
 	else
-		last_used = ircd_current_time();
+		last_used = rb_current_time();
 
 	if(hunt_server(client_p, source_p, ":%s INFO :%s", 1, parc, parv) != HUNTED_ISME)
 		return 0;
@@ -956,7 +956,7 @@ send_birthdate_online_time(struct Client *source_p)
 
 	sendto_one(source_p, POP_QUEUE, ":%s %d %s :On-line since %s",
 		   get_id(&me, source_p), RPL_INFO, 
-		   get_id(source_p, source_p), ircd_ctime(startup_time, tbuf));
+		   get_id(source_p, source_p), rb_ctime(startup_time, tbuf));
 }
 
 /*
@@ -1126,7 +1126,7 @@ send_conf_options(struct Client *source_p)
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   "io_type",
-					   ircd_get_iotype(),
+					   rb_get_iotype(),
 					   "Method of Multiplexed I/O");
 	/* Don't send oper_only_umodes...it's a bit mask, we will have to decode it
 	 ** in order for it to show up properly to opers who issue INFO

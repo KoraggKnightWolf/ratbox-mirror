@@ -103,7 +103,7 @@ me_su(struct Client *client_p, struct Client *source_p,
 	if(EmptyString(parv[2]))
 		target_p->user->suser[0] = '\0';
 	else
-		ircd_strlcpy(target_p->user->suser, parv[2], sizeof(target_p->user->suser));
+		rb_strlcpy(target_p->user->suser, parv[2], sizeof(target_p->user->suser));
 
 	return 0;
 }
@@ -179,7 +179,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 			kill_client_serv_butone(NULL, exist_p, "%s (Nickname regained by services)",
 						me.name);
 
-		ircd_snprintf(buf, sizeof(buf), "Killed (%s (Nickname regained by services))",
+		rb_snprintf(buf, sizeof(buf), "Killed (%s (Nickname regained by services))",
 			me.name);
 		exit_client(NULL, exist_p, &me, buf);
 	}
@@ -187,8 +187,8 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 	newts = atol(parv[3]);
 
 	/* timestamp is older than 15mins, ignore it */
-	if(newts < (ircd_current_time() - 900))
-		newts = ircd_current_time() - 900;
+	if(newts < (rb_current_time() - 900))
+		newts = rb_current_time() - 900;
 
 	target_p->tsinfo = newts;
 
@@ -219,7 +219,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 
 	del_all_accepts(target_p);
 
-	ircd_note(target_p->localClient->F, "Nick: %s", target_p->name);
+	rb_note(target_p->localClient->F, "Nick: %s", target_p->name);
 	return 0;
 }
 
@@ -234,7 +234,7 @@ me_login(struct Client *client_p, struct Client *source_p,
 	if(HasSentEob(source_p->servptr))
 		return 0;
 
-	ircd_strlcpy(source_p->user->suser, parv[1], sizeof(source_p->user->suser));
+	rb_strlcpy(source_p->user->suser, parv[1], sizeof(source_p->user->suser));
 	return 0;
 }
 

@@ -57,7 +57,7 @@ m_locops(struct Client *client_p, struct Client *source_p, int parc, const char 
 {
 	sendto_wallops_flags(UMODE_LOCOPS, source_p, "LOCOPS - %s", parv[1]);
 	
-	if(ircd_dlink_list_length(&cluster_conf_list) > 0)
+	if(rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "LOCOPS", SHARED_LOCOPS, 
 				":%s", parv[1]);
 

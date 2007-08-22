@@ -12,7 +12,7 @@
 
 #define READBUF_SIZE    16384
 
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "internal.h"
 
 
@@ -30,10 +30,10 @@
 
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 
-static ircd_helper *res_helper;
+static rb_helper *res_helper;
 static int do_rehash;
-static void dns_readable(ircd_fde_t *F, void *ptr);
-static void dns_writeable(ircd_fde_t *F, void *ptr);
+static void dns_readable(rb_fde_t *F, void *ptr);
+static void dns_writeable(rb_fde_t *F, void *ptr);
 static void process_adns_incoming(void);
 
 static char readBuf[READBUF_SIZE];
@@ -76,9 +76,9 @@ dns_select(void)
 	{
 		fd = pollfds[i].fd;
 		if(pollfds[i].events & ADNS_POLLIN)
-			ircd_setselect(ircd_get_fde(fd), IRCD_SELECT_READ, dns_readable, NULL);
+			rb_setselect(rb_get_fde(fd), IRCD_SELECT_READ, dns_readable, NULL);
 		if(pollfds[i].events & ADNS_POLLOUT)
-			ircd_setselect(ircd_get_fde(fd), IRCD_SELECT_WRITE,
+			rb_setselect(rb_get_fde(fd), IRCD_SELECT_WRITE,
 				       dns_writeable, NULL);
 	}
 }
@@ -90,9 +90,9 @@ dns_select(void)
  * Note: Called by the fd system.
  */
 static void
-dns_readable(ircd_fde_t *F, void *ptr)
+dns_readable(rb_fde_t *F, void *ptr)
 {
-	adns_processreadable(dns_state, ircd_get_fd(F), ircd_current_time_tv());
+	adns_processreadable(dns_state, rb_get_fd(F), rb_current_time_tv());
 	process_adns_incoming();
 	dns_select();
 }   
@@ -104,9 +104,9 @@ dns_readable(ircd_fde_t *F, void *ptr)
  * Note: Called by the fd system.
  */
 static void
-dns_writeable(ircd_fde_t *F, void *ptr)
+dns_writeable(rb_fde_t *F, void *ptr)
 {
-	adns_processwriteable(dns_state, ircd_get_fd(F), ircd_current_time_tv() );
+	adns_processwriteable(dns_state, rb_get_fd(F), rb_current_time_tv() );
 	process_adns_incoming();
 	dns_select();
 }
@@ -139,7 +139,7 @@ setup_signals(void)
 }
 
 static void
-error_cb(ircd_helper *helper)
+error_cb(rb_helper *helper)
 {
 	exit(1);
 }
@@ -167,14 +167,14 @@ REV requestid PASS/FAIL IP or reason
 
 
 static void
-parse_request(ircd_helper *helper)
+parse_request(rb_helper *helper)
 {
 	int len;  
 	static char *parv[MAXPARA + 1];
 	int parc;  
-	while((len = ircd_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
+	while((len = rb_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
 	{
-		parc = ircd_string_to_array(readBuf, parv, MAXPARA);
+		parc = rb_string_to_array(readBuf, parv, MAXPARA);
 		if(parc != 4)
 			exit(1);
 		switch(*parv[0])
@@ -224,7 +224,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 					case adns_r_addr6:
 					{
 						char tmpres[65];
-						ircd_inet_ntop(AF_INET6, &reply->rrs.addr->addr.inet6.sin6_addr, tmpres, sizeof(tmpres)-1);
+						rb_inet_ntop(AF_INET6, &reply->rrs.addr->addr.inet6.sin6_addr, tmpres, sizeof(tmpres)-1);
 						aftype = 6;
 						if(*tmpres == ':')
 						{
@@ -240,7 +240,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 					{
 						result = 1;
 						aftype = 4;
-						ircd_inet_ntop(AF_INET, &reply->rrs.addr->addr.inet.sin_addr, response, sizeof(response));
+						rb_inet_ntop(AF_INET, &reply->rrs.addr->addr.inet.sin_addr, response, sizeof(response));
 						break;
 					} 
 					default:
@@ -271,12 +271,12 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 				    adns_r_ptr_ip6_old,
 				    adns_qf_owner | adns_qf_cname_loose |
 				    adns_qf_quoteok_anshost, req, &req->query);
-			ircd_free(reply);
+			rb_free(reply);
 			if(result != 0)
 			{
-				ircd_helper_write(res_helper, "%s 0 FAILED", req->reqid);
-				ircd_free(reply);
-				ircd_free(req);
+				rb_helper_write(res_helper, "%s 0 FAILED", req->reqid);
+				rb_free(reply);
+				rb_free(req);
 
 			}							
 			return;
@@ -285,9 +285,9 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 		strcpy(response, "FAILED");
 		result = 0;
 	}
-	ircd_helper_write(res_helper, "%s %d %d %s\n", req->reqid, result, aftype, response);
-	ircd_free(reply);
-	ircd_free(req);
+	rb_helper_write(res_helper, "%s %d %d %s\n", req->reqid, result, aftype, response);
+	rb_free(reply);
+	rb_free(req);
 }
 
 
@@ -327,12 +327,12 @@ static void process_adns_incoming(void)
 static void
 read_io(void)
 {
-	ircd_helper_run(res_helper);
+	rb_helper_run(res_helper);
 	while(1)
 	{
 		dns_select();
-		ircd_event_run();
-		ircd_select(1000);
+		rb_event_run();
+		rb_select(1000);
 		if(do_rehash)
 		{
 			restart_resolver();
@@ -350,7 +350,7 @@ resolve_host(char **parv)
 	char *rec = parv[3];
 	int result;
 	int flags;
-	req = ircd_malloc(sizeof(struct dns_request));
+	req = rb_malloc(sizeof(struct dns_request));
 	strcpy(req->reqid, requestid);
 
 	req->revfwd = REQFWD;
@@ -393,7 +393,7 @@ resolve_ip(char **parv)
 	{
 		exit(3);
 	}
-	req = ircd_malloc(sizeof(struct dns_request));
+	req = rb_malloc(sizeof(struct dns_request));
 	req->revfwd = REQREV;
 	strcpy(req->reqid, requestid);
 	switch(*iptype)
@@ -401,7 +401,7 @@ resolve_ip(char **parv)
 		case '4':
 			flags = adns_r_ptr;
 			req->reqtype = REVIPV4;
-			if(!ircd_inet_pton(AF_INET, rec, &req->sins.in.sin_addr))
+			if(!rb_inet_pton(AF_INET, rec, &req->sins.in.sin_addr))
 				exit(6);
 			req->sins.in.sin_family = AF_INET;
 
@@ -410,7 +410,7 @@ resolve_ip(char **parv)
 		case '5': /* This is the case of having to fall back to "ip6.int" */
 			req->reqtype = REVIPV6FALLBACK;
 			flags = adns_r_ptr_ip6;
-			if(!ircd_inet_pton(AF_INET6, rec, &req->sins.in6.sin6_addr))
+			if(!rb_inet_pton(AF_INET6, rec, &req->sins.in6.sin6_addr))
 				exit(6);
 			req->sins.in6.sin6_family = AF_INET6;
 			req->fallback = 0;
@@ -418,7 +418,7 @@ resolve_ip(char **parv)
 		case '6':
 			req->reqtype = REVIPV6;
 			flags = adns_r_ptr_ip6;
-			if(!ircd_inet_pton(AF_INET6, rec, &req->sins.in6.sin6_addr))
+			if(!rb_inet_pton(AF_INET6, rec, &req->sins.in6.sin6_addr))
 				exit(6);
 			req->sins.in6.sin6_family = AF_INET6;
 			break;
@@ -443,7 +443,7 @@ resolve_ip(char **parv)
 
 int main(int argc, char **argv)
 {
-	res_helper = ircd_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256, 256); /* XXX fix me */
+	res_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256, 256); /* XXX fix me */
 
 	if(res_helper == NULL)
 	{

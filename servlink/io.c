@@ -19,7 +19,7 @@
  */
 
 #include "setup.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 

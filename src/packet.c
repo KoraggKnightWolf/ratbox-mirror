@@ -58,7 +58,7 @@ parse_client_queued(struct Client *client_p)
 			if(client_p->localClient->sent_parsed >= client_p->localClient->allow_read)
 				break;
 
-			dolen = ircd_linebuf_get(&client_p->localClient->
+			dolen = rb_linebuf_get(&client_p->localClient->
 					    buf_recvq, readBuf, READBUF_SIZE,
 					    LINEBUF_COMPLETE, LINEBUF_PARSED);
 
@@ -87,7 +87,7 @@ parse_client_queued(struct Client *client_p)
 
 	if(IsAnyServer(client_p) || IsExemptFlood(client_p))
 	{
-		while (!IsAnyDead(client_p) && (dolen = ircd_linebuf_get(&client_p->localClient->buf_recvq,
+		while (!IsAnyDead(client_p) && (dolen = rb_linebuf_get(&client_p->localClient->buf_recvq,
 					   readBuf, READBUF_SIZE, LINEBUF_COMPLETE,
 					   LINEBUF_PARSED)) > 0)
 		{
@@ -131,7 +131,7 @@ parse_client_queued(struct Client *client_p)
 			else if(client_p->localClient->sent_parsed >= (4 * client_p->localClient->allow_read))
 				break;
 
-			dolen = ircd_linebuf_get(&client_p->localClient->
+			dolen = rb_linebuf_get(&client_p->localClient->
 					    buf_recvq, readBuf, READBUF_SIZE,
 					    LINEBUF_COMPLETE, LINEBUF_PARSED);
 
@@ -213,7 +213,7 @@ flood_recalc(void *unused)
  *                    link and process it.
  */
 void
-read_ctrl_packet(ircd_fde_t *F, void *data)
+read_ctrl_packet(rb_fde_t *F, void *data)
 {
 	struct Client *server = data;
 	struct LocalUser *lserver = server->localClient;
@@ -239,7 +239,7 @@ read_ctrl_packet(ircd_fde_t *F, void *data)
 		reply->readdata = 0;
 		reply->data = NULL;
 
-		length = ircd_read(F, tmp, 1);
+		length = rb_read(F, tmp, 1);
 
 		if(length <= 0)
 		{
@@ -265,7 +265,7 @@ read_ctrl_packet(ircd_fde_t *F, void *data)
 	if((replydef->flags & SLINKRPL_FLAG_DATA) && (reply->gotdatalen < 2))
 	{
 		/* we need a datalen u16 which we don't have yet... */
-		length = ircd_read(F, len, (2 - reply->gotdatalen));
+		length = rb_read(F, len, (2 - reply->gotdatalen));
 		if(length <= 0)
 		{
 			if((length == -1) && ignoreErrno(errno))
@@ -286,7 +286,7 @@ read_ctrl_packet(ircd_fde_t *F, void *data)
 			reply->datalen |= *len;
 			reply->gotdatalen++;
 			if(reply->datalen > 0)
-				reply->data = ircd_malloc(reply->datalen);
+				reply->data = rb_malloc(reply->datalen);
 		}
 
 		if(reply->gotdatalen < 2)
@@ -295,7 +295,7 @@ read_ctrl_packet(ircd_fde_t *F, void *data)
 
 	if(reply->readdata < reply->datalen)	/* try to get any remaining data */
 	{
-		length = ircd_read(F, (reply->data + reply->readdata),
+		length = rb_read(F, (reply->data + reply->readdata),
 			      (reply->datalen - reply->readdata));
 		if(length <= 0)
 		{
@@ -323,7 +323,7 @@ read_ctrl_packet(ircd_fde_t *F, void *data)
 
 	/* reset SlinkRpl */
 	if(reply->datalen > 0)
-		ircd_free(reply->data);
+		rb_free(reply->data);
 	reply->command = 0;
 
 	if(IsAnyDead(server))
@@ -331,14 +331,14 @@ read_ctrl_packet(ircd_fde_t *F, void *data)
 
       nodata:
 	/* If we get here, we need to register for another IRCD_SELECT_READ */
-	ircd_setselect(F, IRCD_SELECT_READ, read_ctrl_packet, server);
+	rb_setselect(F, IRCD_SELECT_READ, read_ctrl_packet, server);
 }
 
 /*
  * read_packet - Read a 'packet' of data from a connection and process it.
  */
 void
-read_packet(ircd_fde_t *F, void *data)
+read_packet(rb_fde_t *F, void *data)
 {
 	struct Client *client_p = data;
 	struct LocalUser *lclient_p = client_p->localClient;
@@ -361,13 +361,13 @@ read_packet(ircd_fde_t *F, void *data)
 		 * I personally think it makes the code too hairy to make sane.
 		 *     -- adrian
 		 */
-		length = ircd_read(client_p->localClient->F, readBuf, READBUF_SIZE);
+		length = rb_read(client_p->localClient->F, readBuf, READBUF_SIZE);
 
 		if(length < 0)
 		{
 			if(ignoreErrno(errno))
 			{
-				ircd_setselect(client_p->localClient->F, 
+				rb_setselect(client_p->localClient->F, 
 						IRCD_SELECT_READ, read_packet, client_p);
 			} else
 				error_exit_client(client_p, length);
@@ -386,8 +386,8 @@ read_packet(ircd_fde_t *F, void *data)
 		call_hook(h_iorecv_id, &hdata);
 #endif
 
-		if(client_p->localClient->lasttime < ircd_current_time())
-			client_p->localClient->lasttime = ircd_current_time();
+		if(client_p->localClient->lasttime < rb_current_time())
+			client_p->localClient->lasttime = rb_current_time();
 			client_p->flags &= ~FLAGS_PINGSENT;
 
 		/*
@@ -398,7 +398,7 @@ read_packet(ircd_fde_t *F, void *data)
 		if(IsHandshake(client_p) || IsUnknown(client_p))
 			binary = 1;
 
-		lbuf_len = ircd_linebuf_parse(&client_p->localClient->buf_recvq, readBuf, length, binary);
+		lbuf_len = rb_linebuf_parse(&client_p->localClient->buf_recvq, readBuf, length, binary);
 
 		lclient_p->actually_read += lbuf_len;
 
@@ -413,7 +413,7 @@ read_packet(ircd_fde_t *F, void *data)
 		
 		/* Check to make sure we're not flooding */
 		if(!IsAnyServer(client_p) &&
-		   (ircd_linebuf_alloclen(&client_p->localClient->buf_recvq) > ConfigFileEntry.client_flood))
+		   (rb_linebuf_alloclen(&client_p->localClient->buf_recvq) > ConfigFileEntry.client_flood))
 		{
 			if(!(ConfigFileEntry.no_oper_flood && IsOper(client_p)))
 			{

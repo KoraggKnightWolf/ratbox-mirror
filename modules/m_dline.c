@@ -99,7 +99,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	}
 
 	dlhost = parv[loc];
-	ircd_strlcpy(cidr_form_host, dlhost, sizeof(cidr_form_host));
+	rb_strlcpy(cidr_form_host, dlhost, sizeof(cidr_form_host));
 
 	if(!parse_netmask(dlhost, NULL, &bits))
 	{
@@ -178,12 +178,12 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		}
 	}
 
-	ircd_set_time();
-	current_date = smalldate(ircd_current_time());
+	rb_set_time();
+	current_date = smalldate(rb_current_time());
 
 	aconf = make_conf();
 	aconf->status = CONF_DLINE;
-	aconf->host = ircd_strdup(dlhost);
+	aconf->host = rb_strdup(dlhost);
 
 	oper = get_oper_name(source_p);
 	aconf->info.oper = operhash_add(oper);
@@ -195,16 +195,16 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		oper_reason++;
 
 		if(!EmptyString(oper_reason))
-			aconf->spasswd = ircd_strdup(oper_reason);
+			aconf->spasswd = rb_strdup(oper_reason);
 	}
 
 	if(tdline_time > 0)
 	{
-		ircd_snprintf(dlbuffer, sizeof(dlbuffer), 
+		rb_snprintf(dlbuffer, sizeof(dlbuffer), 
 			 "Temporary D-line %d min. - %s (%s)",
 			 (int) (tdline_time / 60), reason, current_date);
-		aconf->passwd = ircd_strdup(dlbuffer);
-		aconf->hold = ircd_current_time() + tdline_time;
+		aconf->passwd = rb_strdup(dlbuffer);
+		aconf->hold = rb_current_time() + tdline_time;
 		add_temp_dline(aconf);
 
 		if(EmptyString(oper_reason))
@@ -233,9 +233,9 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	}
 	else
 	{
-		ircd_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
-		aconf->passwd = ircd_strdup(dlbuffer);
-		aconf->hold = ircd_current_time();
+		rb_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
+		aconf->passwd = rb_strdup(dlbuffer);
+		aconf->hold = rb_current_time();
 		add_dline(aconf);
 
 		if(EmptyString(oper_reason))
@@ -323,7 +323,7 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	} else {
 		dlink_list *list;
 		list = &temp_dlines[aconf->port];
-		ircd_dlinkFindDestroy(aconf, list);
+		rb_dlinkFindDestroy(aconf, list);
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Un-dlined [%s] from temporary D-lines",
 			   me.name, parv[0], host);
 		sendto_realops_flags(UMODE_ALL, L_ALL,

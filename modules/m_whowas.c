@@ -65,7 +65,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(!IsOper(source_p))
 	{
-		if((last_used + ConfigFileEntry.pace_wait_simple) > ircd_current_time())
+		if((last_used + ConfigFileEntry.pace_wait_simple) > rb_current_time())
 		{
 			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
 				   me.name, source_p->name, "WHOWAS");
@@ -74,7 +74,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 			return 0;
 		}
 		else
-			last_used = ircd_current_time();
+			last_used = rb_current_time();
 	}
 
 
@@ -105,7 +105,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 			sendto_one_numeric(source_p, HOLD_QUEUE, RPL_WHOISSERVER,
 					   form_str(RPL_WHOISSERVER),
 					   temp->name, temp->servername,
-					   ircd_ctime(temp->logoff, tbuf));
+					   rb_ctime(temp->logoff, tbuf));
 			cur++;
 			found++;
 		}

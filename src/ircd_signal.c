@@ -21,7 +21,7 @@
  */
 
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "ircd_signal.h"
 #include "ircd.h"		/* dorehash */
 #include "restart.h"		/* server_reboot */

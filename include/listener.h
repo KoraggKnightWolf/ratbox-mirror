@@ -33,7 +33,7 @@ struct Listener
 {
 	dlink_node node;
 	const char *name;	/* listener name */
-	ircd_fde_t *F;		/* file descriptor */
+	rb_fde_t *F;		/* file descriptor */
 	int ref_count;		/* number of connection references */
 	int active;		/* current state of listener */
 	int ssl;		/* ssl listener */

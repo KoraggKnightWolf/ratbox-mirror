@@ -33,7 +33,7 @@
  */
 
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "s_conf.h"
 #include "client.h"
@@ -60,7 +60,7 @@ void
 init_cache(void)
 {
 	/* allocate the emptyline */
-	emptyline = ircd_malloc(sizeof(struct cacheline));
+	emptyline = rb_malloc(sizeof(struct cacheline));
 	emptyline->data[0] = ' ';
 	emptyline->data[1] = '\0';
 	user_motd_changed[0] = '\0';
@@ -89,9 +89,9 @@ cache_file(const char *filename, const char *shortname, int flags)
 		return NULL;
 
 
-	cacheptr = ircd_malloc(sizeof(struct cachefile));
+	cacheptr = rb_malloc(sizeof(struct cachefile));
 
-	ircd_strlcpy(cacheptr->name, shortname, sizeof(cacheptr->name));
+	rb_strlcpy(cacheptr->name, shortname, sizeof(cacheptr->name));
 	cacheptr->flags = flags;
 
 	/* cache the file... */
@@ -102,12 +102,12 @@ cache_file(const char *filename, const char *shortname, int flags)
 
 		if(!EmptyString(line))
 		{
-			lineptr = ircd_malloc(sizeof(struct cacheline));
-			ircd_strlcpy(lineptr->data, line, sizeof(lineptr->data));
-			ircd_dlinkAddTail(lineptr, &lineptr->linenode, &cacheptr->contents);
+			lineptr = rb_malloc(sizeof(struct cacheline));
+			rb_strlcpy(lineptr->data, line, sizeof(lineptr->data));
+			rb_dlinkAddTail(lineptr, &lineptr->linenode, &cacheptr->contents);
 		}
 		else
-			ircd_dlinkAddTailAlloc(emptyline, &cacheptr->contents);
+			rb_dlinkAddTailAlloc(emptyline, &cacheptr->contents);
 	}
 
 	fclose(in);
@@ -124,8 +124,8 @@ cache_links(void *unused)
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, links_cache_list.head)
 	{
-		ircd_free(ptr->data);
-		ircd_free_dlink_node(ptr);
+		rb_free(ptr->data);
+		rb_free_dlink_node(ptr);
 	}
 
 	links_cache_list.head = links_cache_list.tail = NULL;
@@ -141,13 +141,13 @@ cache_links(void *unused)
 			continue;
 
 		/* if the below is ever modified, change LINKSLINELEN */
-		links_line = ircd_malloc(LINKSLINELEN);
-		ircd_snprintf(links_line, LINKSLINELEN, "%s %s :1 %s",
+		links_line = rb_malloc(LINKSLINELEN);
+		rb_snprintf(links_line, LINKSLINELEN, "%s %s :1 %s",
 			   target_p->name, me.name, 
 			   target_p->info[0] ? target_p->info : 
 			    "(Unknown Location)");
 
-		ircd_dlinkAddTailAlloc(links_line, &links_cache_list);
+		rb_dlinkAddTailAlloc(links_line, &links_cache_list);
 	}
 }
 
@@ -169,10 +169,10 @@ free_cachefile(struct cachefile *cacheptr)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, cacheptr->contents.head)
 	{
 		if(ptr->data != emptyline)
-			ircd_free(ptr->data);
+			rb_free(ptr->data);
 	}
 
-	ircd_free(cacheptr);
+	rb_free(cacheptr);
 }
 
 /* load_help()
@@ -201,7 +201,7 @@ load_help(void)
 
 	while((ldirent = readdir(helpfile_dir)) != NULL)
 	{
-		ircd_snprintf(filename, sizeof(filename), "%s/%s", HPATH, ldirent->d_name);
+		rb_snprintf(filename, sizeof(filename), "%s/%s", HPATH, ldirent->d_name);
 		cacheptr = cache_file(filename, ldirent->d_name, HELP_OPER);
 		add_to_help_hash(cacheptr->name, cacheptr);
 	}
@@ -214,7 +214,7 @@ load_help(void)
 
 	while((ldirent = readdir(helpfile_dir)) != NULL)
 	{
-		ircd_snprintf(filename, sizeof(filename), "%s/%s", UHPATH, ldirent->d_name);
+		rb_snprintf(filename, sizeof(filename), "%s/%s", UHPATH, ldirent->d_name);
 
 #if defined(S_ISLNK) && defined(HAVE_LSTAT)
 		if(lstat(filename, &sb) < 0)
@@ -256,7 +256,7 @@ send_user_motd(struct Client *source_p)
 	const char *myname = get_id(&me, source_p);
 	const char *nick = get_id(source_p, source_p);
 
-	if(user_motd == NULL || ircd_dlink_list_length(&user_motd->contents) == 0)
+	if(user_motd == NULL || rb_dlink_list_length(&user_motd->contents) == 0)
 	{
 		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOMOTD), myname, nick);
 		return;
@@ -285,7 +285,7 @@ cache_user_motd(void)
 
 		if(local_tm != NULL) 
 		{
-			ircd_snprintf(user_motd_changed, sizeof(user_motd_changed),
+			rb_snprintf(user_motd_changed, sizeof(user_motd_changed),
 				 "%d/%d/%d %d:%d",
 				 local_tm->tm_mday, local_tm->tm_mon + 1,
 				 1900 + local_tm->tm_year, local_tm->tm_hour,

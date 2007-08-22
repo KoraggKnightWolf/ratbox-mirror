@@ -23,7 +23,7 @@
  *
  *  $Id$
  */
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "stdinc.h"
 #include "struct.h"
 #include "client.h"
@@ -68,10 +68,10 @@ static int qs_server(struct Client *);
 
 static EVH check_pings;
 
-static ircd_bh *client_heap = NULL;
-static ircd_bh *lclient_heap = NULL;
-static ircd_bh *user_heap = NULL;
-static ircd_bh *away_heap = NULL;
+static rb_bh *client_heap = NULL;
+static rb_bh *lclient_heap = NULL;
+static rb_bh *user_heap = NULL;
+static rb_bh *away_heap = NULL;
 static char current_uid[IDLEN];
 
 
@@ -104,14 +104,14 @@ init_client(void)
 	 * start off the check ping event ..  -- adrian
 	 * Every 30 seconds is plenty -- db
 	 */
-	client_heap = ircd_bh_create(sizeof(struct Client), CLIENT_HEAP_SIZE, "client_heap");
-	lclient_heap = ircd_bh_create(sizeof(struct LocalUser), LCLIENT_HEAP_SIZE, "lclient_heap");
-	user_heap = ircd_bh_create(sizeof(struct User), USER_HEAP_SIZE, "user_heap");
-	away_heap = ircd_bh_create(AWAYLEN, AWAY_HEAP_SIZE, "away_heap");
-	ircd_event_addish("check_pings", check_pings, NULL, 30);
-	ircd_event_addish("free_exited_clients", &free_exited_clients, NULL, 5);
-	ircd_event_addish("exit_aborted_clients", exit_aborted_clients, NULL, 5);
-	ircd_event_add("flood_recalc", flood_recalc, NULL, 1);
+	client_heap = rb_bh_create(sizeof(struct Client), CLIENT_HEAP_SIZE, "client_heap");
+	lclient_heap = rb_bh_create(sizeof(struct LocalUser), LCLIENT_HEAP_SIZE, "lclient_heap");
+	user_heap = rb_bh_create(sizeof(struct User), USER_HEAP_SIZE, "user_heap");
+	away_heap = rb_bh_create(AWAYLEN, AWAY_HEAP_SIZE, "away_heap");
+	rb_event_addish("check_pings", check_pings, NULL, 30);
+	rb_event_addish("free_exited_clients", &free_exited_clients, NULL, 5);
+	rb_event_addish("exit_aborted_clients", exit_aborted_clients, NULL, 5);
+	rb_event_add("flood_recalc", flood_recalc, NULL, 1);
 }
 
 
@@ -131,22 +131,22 @@ make_client(struct Client *from)
 	struct Client *client_p = NULL;
 	struct LocalUser *localClient;
 
-	client_p = ircd_bh_alloc(client_heap);
+	client_p = rb_bh_alloc(client_heap);
 
 	if(from == NULL)
 	{
 		client_p->from = client_p;	/* 'from' of local client is self! */
 
-		localClient = ircd_bh_alloc(lclient_heap);
+		localClient = rb_bh_alloc(lclient_heap);
 		SetMyConnect(client_p);
 		client_p->localClient = localClient;
 
-		client_p->localClient->lasttime = client_p->localClient->firsttime = ircd_current_time();
+		client_p->localClient->lasttime = client_p->localClient->firsttime = rb_current_time();
 
 		client_p->localClient->F = NULL;
 
 		/* as good a place as any... */
-		ircd_dlinkAdd(client_p, &client_p->localClient->tnode, &unknown_list);
+		rb_dlinkAdd(client_p, &client_p->localClient->tnode, &unknown_list);
 	}
 	else
 	{			/* from is not NULL */
@@ -182,20 +182,20 @@ free_local_client(struct Client *client_p)
 	}
 
 	if(client_p->localClient->F != NULL)
-		ircd_close(client_p->localClient->F);
+		rb_close(client_p->localClient->F);
 
 	if(client_p->localClient->passwd)
 	{
 		memset(client_p->localClient->passwd, 0,
 			strlen(client_p->localClient->passwd));
-		ircd_free(client_p->localClient->passwd);
+		rb_free(client_p->localClient->passwd);
 	}
 
-	ircd_free(client_p->localClient->fullcaps);
-	ircd_free(client_p->localClient->opername);
-	ircd_free(client_p->localClient->slink);
+	rb_free(client_p->localClient->fullcaps);
+	rb_free(client_p->localClient->opername);
+	rb_free(client_p->localClient->slink);
 
-	ircd_bh_free(lclient_heap, client_p->localClient);
+	rb_bh_free(lclient_heap, client_p->localClient);
 	client_p->localClient = NULL;
 }
 
@@ -205,7 +205,7 @@ free_client(struct Client *client_p)
 	s_assert(NULL != client_p);
 	s_assert(&me != client_p);
 	free_local_client(client_p);
-	ircd_bh_free(client_heap, client_p);
+	rb_bh_free(client_heap, client_p);
 }
 
 /*
@@ -273,13 +273,13 @@ check_pings_list(dlink_list * list)
 		else
 			ping = get_client_ping(client_p);
 
-		if(ping < (ircd_current_time() - client_p->localClient->lasttime))
+		if(ping < (rb_current_time() - client_p->localClient->lasttime))
 		{
 			/*
 			 * If the client/server hasnt talked to us in 2*ping seconds
 			 * and it has a ping time, then close its connection.
 			 */
-			if(((ircd_current_time() - client_p->localClient->lasttime) >= (2 * ping)
+			if(((rb_current_time() - client_p->localClient->lasttime) >= (2 * ping)
 			    && (client_p->flags & FLAGS_PINGSENT)))
 			{
 				if(IsAnyServer(client_p))
@@ -291,9 +291,9 @@ check_pings_list(dlink_list * list)
 					     "No response from %s, closing link",
 					     log_client_name(client_p, HIDE_IP));
 				}
-				(void) ircd_snprintf(scratch, sizeof(scratch),
+				(void) rb_snprintf(scratch, sizeof(scratch),
 						  "Ping timeout: %d seconds",
-						  (int) (ircd_current_time() - client_p->localClient->lasttime));
+						  (int) (rb_current_time() - client_p->localClient->lasttime));
 
 				exit_client(client_p, client_p, &me, scratch);
 				continue;
@@ -307,7 +307,7 @@ check_pings_list(dlink_list * list)
 				 */
 				client_p->flags |= FLAGS_PINGSENT;
 				/* not nice but does the job */
-				client_p->localClient->lasttime = ircd_current_time() - ping;
+				client_p->localClient->lasttime = rb_current_time() - ping;
 				sendto_one(client_p, POP_QUEUE, "PING :%s", me.name);
 			}
 		}
@@ -341,7 +341,7 @@ check_unknowns_list(dlink_list * list)
 		 * for > 30s, close them.
 		 */
 
-		if((ircd_current_time() - client_p->localClient->firsttime) > 30)
+		if((rb_current_time() - client_p->localClient->firsttime) > 30)
 			exit_client(client_p, client_p, &me, "Connection timed out");
 	}
 }
@@ -607,8 +607,8 @@ release_client_state(struct Client *client_p)
 	if(client_p->serv)
 	{
 		if(client_p->serv->fullcaps)
-			ircd_free(client_p->serv->fullcaps);
-		ircd_free(client_p->serv);
+			rb_free(client_p->serv->fullcaps);
+		rb_free(client_p->serv);
 	}
 }
 
@@ -636,7 +636,7 @@ remove_client_from_list(struct Client *client_p)
 	if(client_p->node.prev == NULL && client_p->node.next == NULL)
 		return;
 
-	ircd_dlinkDelete(&client_p->node, &global_client_list);
+	rb_dlinkDelete(&client_p->node, &global_client_list);
 
 	update_client_exit_stats(client_p);
 }
@@ -756,16 +756,16 @@ get_client_name(struct Client *client, int showip)
                 switch (showip)
                 {
                 case SHOW_IP:
-                        ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
+                        rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
                                    name, client->username, 
                                    client->sockhost);
                         break;
                 case MASK_IP: 
-                        ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
+                        rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
                                    name, client->username);
                         break;
                 default:
-                        ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
+                        rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
                                    name, client->username, client->host);
                 }
                 return nbuf;
@@ -805,16 +805,16 @@ log_client_name(struct Client *target_p, int showip)
 		switch (showip)
 		{
 		case SHOW_IP:
-			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", name,
+			rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", name,
 				   target_p->username, target_p->sockhost);
 			break;
 
 		case MASK_IP:
-			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
+			rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
 				   name, target_p->username);
 
 		default:
-			ircd_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", name,
+			rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", name,
 				   target_p->username, target_p->host);
 		}
 
@@ -858,7 +858,7 @@ free_exited_clients(void *unused)
 
 			if(found)
 			{
-				ircd_dlinkDestroy(ptr, &dead_list);
+				rb_dlinkDestroy(ptr, &dead_list);
 				continue;
 			}
 		}
@@ -868,12 +868,12 @@ free_exited_clients(void *unused)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Warning: null client on dead_list!");
-			ircd_dlinkDestroy(ptr, &dead_list);
+			rb_dlinkDestroy(ptr, &dead_list);
 			continue;
 		}
 		release_client_state(target_p);
 		free_client(target_p);
-		ircd_dlinkDestroy(ptr, &dead_list);
+		rb_dlinkDestroy(ptr, &dead_list);
 	}
 
 #ifdef DEBUG_EXITED_CLIENTS
@@ -885,12 +885,12 @@ free_exited_clients(void *unused)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Warning: null client on dead_list!");
-			ircd_dlinkDestroy(ptr, &dead_list);
+			rb_dlinkDestroy(ptr, &dead_list);
 			continue;
 		}
 		release_client_state(target_p);
 		free_client(target_p);
-		ircd_dlinkDestroy(ptr, &dead_remote_list);
+		rb_dlinkDestroy(ptr, &dead_remote_list);
 	}
 #endif
 	
@@ -1029,7 +1029,7 @@ exit_aborted_clients(void *unused)
 
 #ifdef DEBUG_EXITED_CLIENTS
 		{
-			if(ircd_dlinkFind(abt->client, &dead_list))
+			if(rb_dlinkFind(abt->client, &dead_list))
 			{
 				s_assert(0);
 				sendto_realops_flags(UMODE_ALL, L_ALL, 
@@ -1044,7 +1044,7 @@ exit_aborted_clients(void *unused)
 #endif
 
 		s_assert(*((unsigned long*)abt->client) != 0xdeadbeef); /* This is lame but its a debug thing */
-		ircd_dlinkDelete(ptr, &abort_list);
+		rb_dlinkDelete(ptr, &abort_list);
 
 		if(IsAnyServer(abt->client))
 			sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -1056,7 +1056,7 @@ exit_aborted_clients(void *unused)
 		 */
 		abt->client->flags &= ~FLAGS_CLOSING;
 		exit_client(abt->client, abt->client, &me, abt->notice);
-		ircd_free(abt);
+		rb_free(abt);
 	}
 }
 
@@ -1074,18 +1074,18 @@ dead_link(struct Client *client_p, int sendqex)
 	if(IsDead(client_p) || IsClosing(client_p) || IsMe(client_p))
 		return;
 
-	abt = ircd_malloc(sizeof(struct abort_client));
+	abt = rb_malloc(sizeof(struct abort_client));
 
 	if(sendqex)
-		ircd_strlcpy(abt->notice, "Max SendQ exceeded", sizeof(abt->notice));
+		rb_strlcpy(abt->notice, "Max SendQ exceeded", sizeof(abt->notice));
 	else
-		ircd_snprintf(abt->notice, sizeof(abt->notice), "Write error: %s", strerror(errno));
+		rb_snprintf(abt->notice, sizeof(abt->notice), "Write error: %s", strerror(errno));
 
 	abt->client = client_p;
 	SetIOError(client_p);
 	SetDead(client_p);
 	SetClosing(client_p);
-	ircd_dlinkAdd(abt, &abt->node, &abort_list);
+	rb_dlinkAdd(abt, &abt->node, &abort_list);
 }
 
 
@@ -1130,7 +1130,7 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
 	
 	if(source_p->servptr && source_p->servptr->serv)
 	{
-		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->users);
+		rb_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->users);
 	}
 
 	if((source_p->flags & FLAGS_KILLED) == 0)
@@ -1143,9 +1143,9 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
 
 	SetDead(source_p);
 #ifdef DEBUG_EXITED_CLIENTS
-	ircd_dlinkAddAlloc(source_p, &dead_remote_list);
+	rb_dlinkAddAlloc(source_p, &dead_remote_list);
 #else
-	ircd_dlinkAddAlloc(source_p, &dead_list);
+	rb_dlinkAddAlloc(source_p, &dead_list);
 #endif
 	return(CLIENT_EXITED);
 }
@@ -1158,7 +1158,7 @@ static int
 exit_unknown_client(struct Client *client_p, struct Client *source_p, const char *comment)
 {
 	delete_auth_queries(source_p);
-	ircd_dlinkDelete(&source_p->localClient->tnode, &unknown_list);
+	rb_dlinkDelete(&source_p->localClient->tnode, &unknown_list);
 
 	if(!IsIOError(source_p))
 		sendto_one(source_p, POP_QUEUE, "ERROR :Closing Link: %s (%s)",
@@ -1171,7 +1171,7 @@ exit_unknown_client(struct Client *client_p, struct Client *source_p, const char
 	del_from_hash(HASH_CLIENT, source_p->name, source_p);
 	remove_client_from_list(source_p);
 	SetDead(source_p);
-	ircd_dlinkAddAlloc(source_p, &dead_list);
+	rb_dlinkAddAlloc(source_p, &dead_list);
 
 	/* Note that we don't need to add unknowns to the dead_list */
 	return(CLIENT_EXITED);
@@ -1193,18 +1193,18 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 	strcat(comment1, " ");
 	strcat(comment1, source_p->name);
 	if (IsClient(from))
-		ircd_snprintf(newcomment, sizeof(newcomment), "by %s: %s",
+		rb_snprintf(newcomment, sizeof(newcomment), "by %s: %s",
 				from->name, comment);
 
 	if(source_p->serv != NULL)
 		remove_dependents(client_p, source_p, IsClient(from) ? newcomment : comment, comment1);
 
 	if(source_p->servptr && source_p->servptr->serv)
-		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
+		rb_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
 	else
 		s_assert(0);
 
-	ircd_dlinkFindDestroy(source_p, &global_serv_list);
+	rb_dlinkFindDestroy(source_p, &global_serv_list);
 	target_p = source_p->from;
 	
 	if(target_p != NULL && IsServer(target_p) && target_p != client_p &&
@@ -1223,9 +1223,9 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 	
 	SetDead(source_p);
 #ifdef DEBUG_EXITED_CLIENTS
-	ircd_dlinkAddAlloc(source_p, &dead_remote_list);
+	rb_dlinkAddAlloc(source_p, &dead_remote_list);
 #else
-	ircd_dlinkAddAlloc(source_p, &dead_list);
+	rb_dlinkAddAlloc(source_p, &dead_list);
 #endif
 	return 0;
 }
@@ -1236,11 +1236,11 @@ qs_server(struct Client *source_p)
 	struct Client *target_p;
 
 	if(source_p->servptr && source_p->servptr->serv)
-		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
+		rb_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
 	else
 		s_assert(0);
 
-	ircd_dlinkFindDestroy(source_p, &global_serv_list);
+	rb_dlinkFindDestroy(source_p, &global_serv_list);
 	target_p = source_p->from;
 	
 	if(has_id(source_p))
@@ -1250,7 +1250,7 @@ qs_server(struct Client *source_p)
 	remove_client_from_list(source_p);  
 	
 	SetDead(source_p);
-	ircd_dlinkAddAlloc(source_p, &dead_list);	
+	rb_dlinkAddAlloc(source_p, &dead_list);	
 	return 0;
 }
 
@@ -1261,8 +1261,8 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	static char newcomment[BUFSIZE];
 	unsigned int sendk, recvk;
 	
-	ircd_dlinkDelete(&source_p->localClient->tnode, &serv_list);
-	ircd_dlinkFindDestroy(source_p, &global_serv_list);
+	rb_dlinkDelete(&source_p->localClient->tnode, &serv_list);
+	rb_dlinkFindDestroy(source_p, &global_serv_list);
 	
 	unset_chcap_usage_counts(source_p);
 	sendk = source_p->localClient->sendK;
@@ -1271,7 +1271,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	/* Always show source here, so the server notices show
 	 * which side initiated the split -- jilles
 	 */
-	ircd_snprintf(newcomment, sizeof(newcomment), "by %s: %s",
+	rb_snprintf(newcomment, sizeof(newcomment), "by %s: %s",
 			from == source_p ? me.name : from->name, comment);
 #if 0 /* let's not do this for now -- jilles */
 	if (!IsIOError(source_p))
@@ -1286,12 +1286,12 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	
 	if(source_p->localClient->slink != NULL && source_p->localClient->slink->ctrlfd != NULL)
 	{
-		ircd_close(source_p->localClient->slink->ctrlfd);
+		rb_close(source_p->localClient->slink->ctrlfd);
 		source_p->localClient->slink->ctrlfd = NULL;
 	}
 
 	if(source_p->servptr && source_p->servptr->serv)
-		ircd_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
+		rb_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
 	else
 		s_assert(0);
 
@@ -1311,10 +1311,10 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s was connected"
 			     " for %ld seconds.  %d/%d sendK/recvK.",
-			     source_p->name, ircd_current_time() - source_p->localClient->firsttime, sendk, recvk);
+			     source_p->name, rb_current_time() - source_p->localClient->firsttime, sendk, recvk);
 
 	ilog(L_SERVER, "%s was connected for %ld seconds.  %d/%d sendK/recvK.",
-	     source_p->name, ircd_current_time() - source_p->localClient->firsttime, sendk, recvk);
+	     source_p->name, rb_current_time() - source_p->localClient->firsttime, sendk, recvk);
 	
 	if(has_id(source_p))
 		del_from_hash(HASH_ID, source_p->id, source_p);
@@ -1323,7 +1323,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	remove_client_from_list(source_p);
 	
 	SetDead(source_p);
-	ircd_dlinkAddAlloc(source_p, &dead_list);
+	rb_dlinkAddAlloc(source_p, &dead_list);
 	return 0;
 }
 
@@ -1344,11 +1344,11 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	clear_monitor(source_p);
 
 	s_assert(IsClient(source_p));
-	ircd_dlinkDelete(&source_p->localClient->tnode, &lclient_list);
-	ircd_dlinkDelete(&source_p->lnode, &me.serv->users);
+	rb_dlinkDelete(&source_p->localClient->tnode, &lclient_list);
+	rb_dlinkDelete(&source_p->lnode, &me.serv->users);
 
 	if(IsOper(source_p))
-		ircd_dlinkFindDestroy(source_p, &oper_list);
+		rb_dlinkFindDestroy(source_p, &oper_list);
 
 	/* Clean up invitefield */
 	DLINK_FOREACH_SAFE(ptr, next_ptr, source_p->localClient->invited.head)
@@ -1367,10 +1367,10 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 			source_p->name, source_p->username, source_p->host,
 			show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255", comment);
 
-	on_for = ircd_current_time() - source_p->localClient->firsttime;
+	on_for = rb_current_time() - source_p->localClient->firsttime;
 
 	ilog(L_USER, "%s (%3lu:%02lu:%02lu): %s!%s@%s %d/%d",
-		ircd_ctime(ircd_current_time(), tbuf), on_for / 3600,
+		rb_ctime(rb_current_time(), tbuf), on_for / 3600,
 		(on_for % 3600) / 60, on_for % 60,
 		source_p->name, source_p->username, source_p->host,
 		source_p->localClient->sendK, source_p->localClient->receiveK);
@@ -1387,7 +1387,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	}
 
 	SetDead(source_p);
-	ircd_dlinkAddAlloc(source_p, &dead_list);
+	rb_dlinkAddAlloc(source_p, &dead_list);
 	return(CLIENT_EXITED);
 }
 
@@ -1466,7 +1466,7 @@ void
 count_local_client_memory(size_t * count, size_t * local_client_memory_used)
 {
 	size_t lusage;
-	ircd_bh_usage(lclient_heap, count, NULL, &lusage, NULL);
+	rb_bh_usage(lclient_heap, count, NULL, &lusage, NULL);
 	*local_client_memory_used = lusage + (*count * (sizeof(void *) + sizeof(struct Client)));
 }
 
@@ -1477,8 +1477,8 @@ void
 count_remote_client_memory(size_t * count, size_t * remote_client_memory_used)
 {
 	size_t lcount, rcount;
-	ircd_bh_usage(lclient_heap, &lcount, NULL, NULL, NULL);
-	ircd_bh_usage(client_heap, &rcount, NULL, NULL, NULL);
+	rb_bh_usage(lclient_heap, &lcount, NULL, NULL, NULL);
+	rb_bh_usage(client_heap, &rcount, NULL, NULL, NULL);
 	*count = rcount - lcount;
 	*remote_client_memory_used = *count * (sizeof(void *) + sizeof(struct Client));
 }
@@ -1527,8 +1527,8 @@ del_all_accepts(struct Client *client_p)
 		DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->allow_list.head)
 		{
 			target_p = ptr->data;
-			ircd_dlinkFindDestroy(client_p, &target_p->on_allow_list);
-			ircd_dlinkDestroy(ptr, &client_p->localClient->allow_list);
+			rb_dlinkFindDestroy(client_p, &target_p->on_allow_list);
+			rb_dlinkDestroy(ptr, &client_p->localClient->allow_list);
 		}
 	}
 
@@ -1536,8 +1536,8 @@ del_all_accepts(struct Client *client_p)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->on_allow_list.head)
 	{
 		target_p = ptr->data;
-		ircd_dlinkFindDestroy(client_p, &target_p->localClient->allow_list);
-		ircd_dlinkDestroy(ptr, &client_p->on_allow_list);
+		rb_dlinkFindDestroy(client_p, &target_p->localClient->allow_list);
+		rb_dlinkDestroy(ptr, &client_p->on_allow_list);
 	}
 }
 
@@ -1597,7 +1597,7 @@ make_user(struct Client *client_p)
 	user = client_p->user;
 	if(!user)
 	{
-		user = ircd_bh_alloc(user_heap);
+		user = rb_bh_alloc(user_heap);
 		client_p->user = user;
 	}
 	return user;
@@ -1618,7 +1618,7 @@ make_server(struct Client *client_p)
 
 	if(!serv)
 	{
-		serv = ircd_malloc(sizeof(struct Server));
+		serv = rb_malloc(sizeof(struct Server));
 		client_p->serv = serv;
 	}
 	return client_p->serv;
@@ -1651,18 +1651,18 @@ free_user(struct User *user, struct Client *client_p)
 				     client_p->host,
 				     (unsigned long) user,
 				     (unsigned long) user->channel.head, 
-				     ircd_dlink_list_length(&user->channel));
+				     rb_dlink_list_length(&user->channel));
 		s_assert(!user->channel.head);
 	}
 
-	ircd_bh_free(user_heap, user);
+	rb_bh_free(user_heap, user);
 }
 
 void
 allocate_away(struct Client *client_p)
 {
 	if(client_p->user->away == NULL)
-		client_p->user->away = ircd_bh_alloc(away_heap);	
+		client_p->user->away = rb_bh_alloc(away_heap);	
 }
 
 
@@ -1670,7 +1670,7 @@ void
 free_away(struct Client *client_p)
 {
 	if(client_p->user->away != NULL) {
-		ircd_bh_free(away_heap, client_p->user->away);
+		rb_bh_free(away_heap, client_p->user->away);
 		client_p->user->away = NULL;
 	}
 }
@@ -1748,7 +1748,7 @@ close_connection(struct Client *client_p)
 		ServerStats.is_sbr += client_p->localClient->receiveB;
 		ServerStats.is_sks += client_p->localClient->sendK;
 		ServerStats.is_skr += client_p->localClient->receiveK;
-		ServerStats.is_sti += ircd_current_time() - client_p->localClient->firsttime;
+		ServerStats.is_sti += rb_current_time() - client_p->localClient->firsttime;
 		if(ServerStats.is_sbs > 2047)
 		{
 			ServerStats.is_sks += (ServerStats.is_sbs >> 10);
@@ -1786,7 +1786,7 @@ close_connection(struct Client *client_p)
 		ServerStats.is_cbr += client_p->localClient->receiveB;
 		ServerStats.is_cks += client_p->localClient->sendK;
 		ServerStats.is_ckr += client_p->localClient->receiveK;
-		ServerStats.is_cti += ircd_current_time() - client_p->localClient->firsttime;
+		ServerStats.is_cti += rb_current_time() - client_p->localClient->firsttime;
 		if(ServerStats.is_cbs > 2047)
 		{
 			ServerStats.is_cks += (ServerStats.is_cbs >> 10);
@@ -1807,7 +1807,7 @@ close_connection(struct Client *client_p)
 		if(!IsIOError(client_p))
 			send_queued_write(client_p->localClient->F, client_p);
 
-		ircd_close(client_p->localClient->F);
+		rb_close(client_p->localClient->F);
 		client_p->localClient->F = NULL;
 	}
 
@@ -1817,14 +1817,14 @@ close_connection(struct Client *client_p)
 		{
 			if(client_p->localClient->slink != NULL && client_p->localClient->slink->ctrlfd != NULL)
 			{
-				ircd_close(client_p->localClient->slink->ctrlfd);
+				rb_close(client_p->localClient->slink->ctrlfd);
 				client_p->localClient->slink->ctrlfd = NULL;
 			}
 		}
 	}
 
-	ircd_linebuf_donebuf(&client_p->localClient->buf_sendq);
-	ircd_linebuf_donebuf(&client_p->localClient->buf_recvq);
+	rb_linebuf_donebuf(&client_p->localClient->buf_sendq);
+	rb_linebuf_donebuf(&client_p->localClient->buf_recvq);
 	detach_conf(client_p);
 
 	/* XXX shouldnt really be done here. */
@@ -1850,13 +1850,13 @@ error_exit_client(struct Client *client_p, int error)
 	 * for reading even though it ends up being an EOF. -avalon
 	 */
 	char errmsg[255];
-	int current_error = ircd_get_sockerr(client_p->localClient->F);
+	int current_error = rb_get_sockerr(client_p->localClient->F);
 
 	SetIOError(client_p);
 
 	if(IsServer(client_p) || IsHandshake(client_p))
 	{
-		int connected = ircd_current_time() - client_p->localClient->firsttime;
+		int connected = rb_current_time() - client_p->localClient->firsttime;
 
 		if(error == 0)
 		{
@@ -1884,9 +1884,9 @@ error_exit_client(struct Client *client_p, int error)
 	}
 
 	if(error == 0)
-		ircd_strlcpy(errmsg, "Remote host closed the connection", sizeof(errmsg));
+		rb_strlcpy(errmsg, "Remote host closed the connection", sizeof(errmsg));
 	else
-		ircd_snprintf(errmsg, sizeof(errmsg), "Read error: %s", strerror(current_error));
+		rb_snprintf(errmsg, sizeof(errmsg), "Read error: %s", strerror(current_error));
 
 	exit_client(client_p, client_p, &me, errmsg);
 }

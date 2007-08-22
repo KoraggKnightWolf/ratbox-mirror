@@ -62,10 +62,10 @@ mr_pass(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		memset(client_p->localClient->passwd, 0,
 			strlen(client_p->localClient->passwd));
-		ircd_free(client_p->localClient->passwd);
+		rb_free(client_p->localClient->passwd);
 	}
 
-	client_p->localClient->passwd = ircd_strndup(parv[1], PASSWDLEN);
+	client_p->localClient->passwd = rb_strndup(parv[1], PASSWDLEN);
 
 	if(parc > 2)
 	{

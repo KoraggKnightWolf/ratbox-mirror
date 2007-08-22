@@ -35,7 +35,7 @@
 #include "client.h"
 #include "hash.h"
 #include "match.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "ircd.h"
 #include "listener.h"
 #include "hostmask.h"
@@ -58,7 +58,7 @@ struct config_server_hide ConfigServerHide;
 extern int yyparse();		/* defined in y.tab.c */
 extern char linebuf[];
 
-static ircd_bh *confitem_heap = NULL;
+static rb_bh *confitem_heap = NULL;
 
 dlink_list temp_klines[LAST_TEMP_TYPE];
 dlink_list temp_dlines[LAST_TEMP_TYPE];
@@ -83,22 +83,22 @@ static int attach_iline(struct Client *, struct ConfItem *);
 void
 init_s_conf(void)
 {
-	confitem_heap = ircd_bh_create(sizeof(struct ConfItem), CONFITEM_HEAP_SIZE, "confitem_heap");
+	confitem_heap = rb_bh_create(sizeof(struct ConfItem), CONFITEM_HEAP_SIZE, "confitem_heap");
 
-	ircd_event_addish("expire_temp_klines", expire_temp_kd, &temp_klines[TEMP_MIN], 60);
-	ircd_event_addish("expire_temp_dlines", expire_temp_kd, &temp_dlines[TEMP_MIN], 60);
+	rb_event_addish("expire_temp_klines", expire_temp_kd, &temp_klines[TEMP_MIN], 60);
+	rb_event_addish("expire_temp_dlines", expire_temp_kd, &temp_dlines[TEMP_MIN], 60);
 
-	ircd_event_addish("expire_temp_klines_hour", reorganise_temp_kd,
+	rb_event_addish("expire_temp_klines_hour", reorganise_temp_kd,
 			&temp_klines[TEMP_HOUR], 3600);
-	ircd_event_addish("expire_temp_dlines_hour", reorganise_temp_kd,
+	rb_event_addish("expire_temp_dlines_hour", reorganise_temp_kd,
 			&temp_dlines[TEMP_HOUR], 3600);
-	ircd_event_addish("expire_temp_klines_day", reorganise_temp_kd,
+	rb_event_addish("expire_temp_klines_day", reorganise_temp_kd,
 			&temp_klines[TEMP_DAY], 86400);
-	ircd_event_addish("expire_temp_dlines_day", reorganise_temp_kd,
+	rb_event_addish("expire_temp_dlines_day", reorganise_temp_kd,
 			&temp_dlines[TEMP_DAY], 86400);
-	ircd_event_addish("expire_temp_klines_week", reorganise_temp_kd,
+	rb_event_addish("expire_temp_klines_week", reorganise_temp_kd,
 			&temp_klines[TEMP_WEEK], 604800);
-	ircd_event_addish("expire_temp_dlines_week", reorganise_temp_kd,
+	rb_event_addish("expire_temp_dlines_week", reorganise_temp_kd,
 			&temp_dlines[TEMP_WEEK], 604800);
 }
 
@@ -114,7 +114,7 @@ make_conf()
 {
 	struct ConfItem *aconf;
 
-	aconf = ircd_bh_alloc(confitem_heap);
+	aconf = rb_bh_alloc(confitem_heap);
 	aconf->status = CONF_ILLEGAL;
 	return (aconf);
 }
@@ -139,17 +139,17 @@ free_conf(struct ConfItem *aconf)
 	if(aconf->spasswd)
 		memset(aconf->spasswd, 0, strlen(aconf->spasswd));
 
-	ircd_free(aconf->passwd);
-	ircd_free(aconf->spasswd);
-	ircd_free(aconf->user);
-	ircd_free(aconf->host);
+	rb_free(aconf->passwd);
+	rb_free(aconf->spasswd);
+	rb_free(aconf->user);
+	rb_free(aconf->host);
 
 	if(IsConfBan(aconf))
 		operhash_delete(aconf->info.oper);
 	else
-		ircd_free(aconf->info.name);
+		rb_free(aconf->info.name);
 
-	ircd_bh_free(confitem_heap, aconf);
+	rb_bh_free(confitem_heap, aconf);
 }
 
 /*
@@ -307,8 +307,8 @@ verify_access(struct Client *client_p, const char *username)
 	}
 	else
 	{
-		ircd_strlcpy(non_ident, "~", sizeof(non_ident));
-		ircd_strlcat(non_ident, username, sizeof(non_ident));
+		rb_strlcpy(non_ident, "~", sizeof(non_ident));
+		rb_strlcat(non_ident, username, sizeof(non_ident));
 		aconf = find_address_conf(client_p->host, client_p->sockhost,
 					non_ident, 
 					(struct sockaddr *) &client_p->localClient->ip,
@@ -348,14 +348,14 @@ verify_access(struct Client *client_p, const char *username)
 				char *host = p+1;
 				*p = '\0';
 
-				ircd_strlcpy(client_p->username, aconf->info.name,
+				rb_strlcpy(client_p->username, aconf->info.name,
 					sizeof(client_p->username));
-				ircd_strlcpy(client_p->host, host,
+				rb_strlcpy(client_p->host, host,
 					sizeof(client_p->host));
 				*p = '@';
 			}
 			else
-				ircd_strlcpy(client_p->host, aconf->info.name, sizeof(client_p->host));
+				rb_strlcpy(client_p->host, aconf->info.name, sizeof(client_p->host));
 		}
 		return (attach_iline(client_p, aconf));
 	}
@@ -619,9 +619,9 @@ rehash(int sig)
 	read_conf_files(NO);
 
 	if(ServerInfo.description != NULL)
-		ircd_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
+		rb_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
 	else
-		ircd_strlcpy(me.info, "unknown", sizeof(me.info));
+		rb_strlcpy(me.info, "unknown", sizeof(me.info));
 
 	open_logfiles();
 	return (0);
@@ -658,8 +658,8 @@ set_default_conf(void)
 	/* ServerInfo.name is not rehashable */
 	/* ServerInfo.name = ServerInfo.name; */
 	ServerInfo.description = NULL;
-	ServerInfo.network_name = ircd_strdup(NETWORK_NAME_DEFAULT);
-	ServerInfo.network_desc = ircd_strdup(NETWORK_DESC_DEFAULT);
+	ServerInfo.network_name = rb_strdup(NETWORK_NAME_DEFAULT);
+	ServerInfo.network_desc = rb_strdup(NETWORK_DESC_DEFAULT);
 
 	memset(&ServerInfo.ip, 0, sizeof(ServerInfo.ip));
 	ServerInfo.specific_ipv4_vhost = 0;
@@ -676,8 +676,8 @@ set_default_conf(void)
 	AdminInfo.email = NULL;
 	AdminInfo.description = NULL;
 
-	ConfigFileEntry.default_operstring = ircd_strdup("is an IRC operator");
-	ConfigFileEntry.default_adminstring = ircd_strdup("is a Server Administrator");
+	ConfigFileEntry.default_operstring = rb_strdup("is an IRC operator");
+	ConfigFileEntry.default_adminstring = rb_strdup("is a Server Administrator");
 	
 	ConfigFileEntry.failed_oper_notice = YES;
 	ConfigFileEntry.anti_nick_flood = NO;
@@ -730,7 +730,7 @@ set_default_conf(void)
 	ConfigFileEntry.hide_error_messages = 1;
 	ConfigFileEntry.dots_in_ident = 0;
 	ConfigFileEntry.max_targets = MAX_TARGETS_DEFAULT;
-	ConfigFileEntry.servlink_path = ircd_strdup(SLPATH);
+	ConfigFileEntry.servlink_path = rb_strdup(SLPATH);
 	ConfigFileEntry.egdpool_path = NULL;
 	ConfigFileEntry.use_whois_actually = YES;
 	ConfigFileEntry.burst_away = NO;
@@ -818,24 +818,24 @@ conf_connect_allowed(struct sockaddr *addr, int aftype)
 void
 add_temp_kline(struct ConfItem *aconf)
 {
-	if(aconf->hold >= ircd_current_time() + (10080 * 60))
+	if(aconf->hold >= rb_current_time() + (10080 * 60))
 	{
-		ircd_dlinkAddAlloc(aconf, &temp_klines[TEMP_WEEK]);
+		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
-	else if(aconf->hold >= ircd_current_time() + (1440 * 60))
+	else if(aconf->hold >= rb_current_time() + (1440 * 60))
 	{
-		ircd_dlinkAddAlloc(aconf, &temp_klines[TEMP_DAY]);
+		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
-	else if(aconf->hold >= ircd_current_time() + (60 * 60))
+	else if(aconf->hold >= rb_current_time() + (60 * 60))
 	{
-		ircd_dlinkAddAlloc(aconf, &temp_klines[TEMP_HOUR]);
+		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
 	}
 	else
 	{
-		ircd_dlinkAddAlloc(aconf, &temp_klines[TEMP_MIN]);
+		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_MIN]);
 		aconf->port = TEMP_MIN;
 	}
 
@@ -852,24 +852,24 @@ add_temp_kline(struct ConfItem *aconf)
 void
 add_temp_dline(struct ConfItem *aconf)
 {
-	if(aconf->hold >= ircd_current_time() + (10080 * 60))
+	if(aconf->hold >= rb_current_time() + (10080 * 60))
 	{
-		ircd_dlinkAddAlloc(aconf, &temp_dlines[TEMP_WEEK]);
+		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
-	else if(aconf->hold >= ircd_current_time() + (1440 * 60))
+	else if(aconf->hold >= rb_current_time() + (1440 * 60))
 	{
-		ircd_dlinkAddAlloc(aconf, &temp_dlines[TEMP_DAY]);
+		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
-	else if(aconf->hold >= ircd_current_time() + (60 * 60))
+	else if(aconf->hold >= rb_current_time() + (60 * 60))
 	{
-		ircd_dlinkAddAlloc(aconf, &temp_dlines[TEMP_HOUR]);
+		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
 	}
 	else
 	{
-		ircd_dlinkAddAlloc(aconf, &temp_dlines[TEMP_MIN]);
+		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_MIN]);
 		aconf->port = TEMP_MIN;
 	}
 
@@ -895,7 +895,7 @@ expire_temp_kd(void *list)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold <= ircd_current_time())
+		if(aconf->hold <= rb_current_time())
 		{
 			/* Alert opers that a TKline expired - Hwy */
 			if(ConfigFileEntry.tkline_expire_notices)
@@ -905,7 +905,7 @@ expire_temp_kd(void *list)
 						     user : "*", (aconf->host) ? aconf->host : "*");
 
 			delete_one_address_conf(aconf->host, aconf);
-			ircd_dlinkDestroy(ptr, list);
+			rb_dlinkDestroy(ptr, list);
 		}
 	}
 }
@@ -920,24 +920,24 @@ reorganise_temp_kd(void *list)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold < (ircd_current_time() + (60 * 60)))
+		if(aconf->hold < (rb_current_time() + (60 * 60)))
 		{
-			ircd_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
+			rb_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
 					&temp_klines[TEMP_MIN] : &temp_dlines[TEMP_MIN]);
 			aconf->port = TEMP_MIN;
 		}
 		else if(aconf->port > TEMP_HOUR)
 		{
-			if(aconf->hold < (ircd_current_time() + (1440 * 60)))
+			if(aconf->hold < (rb_current_time() + (1440 * 60)))
 			{
-				ircd_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
+				rb_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
 						&temp_klines[TEMP_HOUR] : &temp_dlines[TEMP_HOUR]);
 				aconf->port = TEMP_HOUR;
 			}
 			else if(aconf->port > TEMP_DAY && 
-				(aconf->hold < (ircd_current_time() + (10080 * 60))))
+				(aconf->hold < (rb_current_time() + (10080 * 60))))
 			{
-				ircd_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
+				rb_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ? 
 						&temp_klines[TEMP_DAY] : &temp_dlines[TEMP_DAY]);
 				aconf->port = TEMP_DAY;
 			}
@@ -960,13 +960,13 @@ get_oper_name(struct Client *client_p)
 
 	if(MyOper(client_p))
 	{
-		ircd_snprintf(buffer, sizeof(buffer), "%s!%s@%s{%s}",
+		rb_snprintf(buffer, sizeof(buffer), "%s!%s@%s{%s}",
 				client_p->name, client_p->username,
 				client_p->host, client_p->localClient->opername);
 		return buffer;
 	}
 
-	ircd_snprintf(buffer, sizeof(buffer), "%s!%s@%s{%s}",
+	rb_snprintf(buffer, sizeof(buffer), "%s!%s@%s{%s}",
 		   client_p->name, client_p->username, 
 		   client_p->host, client_p->servptr->name);
 	return buffer;
@@ -1108,19 +1108,19 @@ clear_out_old_conf(void)
 #endif
 
 	/* clean out ServerInfo */
-	ircd_free(ServerInfo.description);
+	rb_free(ServerInfo.description);
 	ServerInfo.description = NULL;
-	ircd_free(ServerInfo.network_name);
+	rb_free(ServerInfo.network_name);
 	ServerInfo.network_name = NULL;
-	ircd_free(ServerInfo.network_desc);
+	rb_free(ServerInfo.network_desc);
 	ServerInfo.network_desc = NULL;
 
 	/* clean out AdminInfo */
-	ircd_free(AdminInfo.name);
+	rb_free(AdminInfo.name);
 	AdminInfo.name = NULL;
-	ircd_free(AdminInfo.email);
+	rb_free(AdminInfo.email);
 	AdminInfo.email = NULL;
-	ircd_free(AdminInfo.description);
+	rb_free(AdminInfo.description);
 	AdminInfo.description = NULL;
 
 	/* operator{} and class{} blocks are freed above */
@@ -1132,14 +1132,14 @@ clear_out_old_conf(void)
 	 */
 
 	/* clean out general */
-	ircd_free(ConfigFileEntry.servlink_path);
+	rb_free(ConfigFileEntry.servlink_path);
 	ConfigFileEntry.servlink_path = NULL;
 
 #ifdef ENABLE_SERVICES
 	DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
 	{
-		ircd_free(ptr->data);
-		ircd_dlinkDestroy(ptr, &service_list);
+		rb_free(ptr->data);
+		rb_dlinkDestroy(ptr, &service_list);
 	}
 #endif
 

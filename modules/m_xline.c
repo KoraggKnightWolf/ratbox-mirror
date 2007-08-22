@@ -40,7 +40,7 @@
 #include "s_log.h"
 #include "s_serv.h"
 #include "match.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "parse.h"
 #include "modules.h"
 #include "s_conf.h"
@@ -136,7 +136,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(!match(target_server, me.name))
 			return 0;
 	}
-	else if(ircd_dlink_list_length(&cluster_conf_list) > 0)
+	else if(rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "XLINE",
 				(temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE,
 				"%d %s 2 :%s",
@@ -299,8 +299,8 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 
 	aconf = make_conf();
 	aconf->status = CONF_XLINE;
-	aconf->host = ircd_strdup(name);
-	aconf->passwd = ircd_strdup(reason);
+	aconf->host = rb_strdup(name);
+	aconf->passwd = rb_strdup(reason);
 	collapse(aconf->host);
 
 	aconf->info.oper = operhash_add(oper);
@@ -308,7 +308,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	if(temp_time > 0)
 	{
 		aconf->flags |= CONF_FLAGS_TEMPORARY;
-		aconf->hold = ircd_current_time() + temp_time;
+		aconf->hold = rb_current_time() + temp_time;
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s added temporary %d min. X-Line for [%s] [%s]",
@@ -322,7 +322,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	}
 	else
 	{
-		aconf->hold = ircd_current_time();
+		aconf->hold = rb_current_time();
 		bandb_add(BANDB_XLINE, source_p, aconf->host, NULL, reason, NULL);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
@@ -333,7 +333,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 			aconf->info.oper, name, reason);
 	}
 
-	ircd_dlinkAddAlloc(aconf, &xline_conf_list);
+	rb_dlinkAddAlloc(aconf, &xline_conf_list);
 	check_xlines();
 }
 
@@ -367,7 +367,7 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
-	else if(ircd_dlink_list_length(&cluster_conf_list))
+	else if(rb_dlink_list_length(&cluster_conf_list))
 		cluster_generic(source_p, "UNXLINE", SHARED_UNXLINE, 
 				"%s", parv[1]);
 
@@ -423,7 +423,7 @@ remove_xline(struct Client *source_p, const char *name)
 			bandb_del(BANDB_XLINE, aconf->host, NULL);
 
 		free_conf(aconf);
-		ircd_dlinkDestroy(ptr, &xline_conf_list);
+		rb_dlinkDestroy(ptr, &xline_conf_list);
 		return;
 	}
 }

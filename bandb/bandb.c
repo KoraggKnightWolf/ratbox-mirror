@@ -30,7 +30,7 @@
  * $Id$
  */
 #include "setup.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "rsdb.h"
 #include "common.h"
 
@@ -56,7 +56,7 @@ static const char *bandb_table[LAST_BANDB_TYPE] =
 };
 
 
-static ircd_helper *bandb_helper;
+static rb_helper *bandb_helper;
 
 static void check_schema(void);
 
@@ -122,7 +122,7 @@ list_bans(void)
 	int i, j;
 
 	/* schedule a clear of anything already pending */
-	ircd_helper_write(bandb_helper, "C");
+	rb_helper_write(bandb_helper, "C");
 
 	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
@@ -141,17 +141,17 @@ list_bans(void)
 					bandb_letter[i], table.row[j][0], 
 					table.row[j][2], table.row[j][3]);
 
-			ircd_helper_write(bandb_helper, "%s", buf);
+			rb_helper_write(bandb_helper, "%s", buf);
 		}
 				
 		rsdb_exec_fetch_end(&table);
 	}
 
-	ircd_helper_write(bandb_helper, "F");
+	rb_helper_write(bandb_helper, "F");
 }
 
 static void
-parse_request(ircd_helper *helper)
+parse_request(rb_helper *helper)
 {
 	static char *parv[MAXPARA+1];
 	static char readbuf[READBUF_SIZE];
@@ -159,9 +159,9 @@ parse_request(ircd_helper *helper)
 	int len;
 
 		
-	while((len = ircd_helper_read(helper, readbuf, sizeof(readbuf))) > 0)
+	while((len = rb_helper_read(helper, readbuf, sizeof(readbuf))) > 0)
 	{
-		parc = ircd_string_to_array(readbuf, parv, MAXPARA);
+		parc = rb_string_to_array(readbuf, parv, MAXPARA);
 
 		if(parc < 1)
 			continue;
@@ -211,7 +211,7 @@ parse_request(ircd_helper *helper)
 		
 
 static void
-error_cb(ircd_helper *helper)
+error_cb(rb_helper *helper)
 {
 	exit(1);
 }
@@ -220,7 +220,7 @@ int
 main(int argc, char *argv[])
 {
 
-	bandb_helper = ircd_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256, 256); /* XXX fix me */
+	bandb_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256, 256); /* XXX fix me */
 	if(bandb_helper == NULL)
 	{
 		fprintf(stderr, "This is ircd-ratbox bandb.  You aren't supposed to run me directly.\n");
@@ -231,7 +231,7 @@ main(int argc, char *argv[])
 
 	rsdb_init();
 	check_schema();
-	ircd_helper_loop(bandb_helper, 1000);
+	rb_helper_loop(bandb_helper, 1000);
 
 	return 0;
 }

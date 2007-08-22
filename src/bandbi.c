@@ -31,7 +31,7 @@
  * $Id$
  */
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "client.h"
 #include "s_conf.h"
@@ -53,11 +53,11 @@ static char bandb_add_letter[LAST_BANDB_TYPE] =
 
 dlink_list bandb_pending;
 
-static ircd_helper *bandb_helper;
+static rb_helper *bandb_helper;
 static void fork_bandb(void);
 
-static void bandb_parse(ircd_helper *);
-static void bandb_restart_cb(ircd_helper *);
+static void bandb_parse(rb_helper *);
+static void bandb_restart_cb(rb_helper *);
 static char *bandb_path;
 
 void
@@ -80,11 +80,11 @@ fork_bandb(void)
 
 	if(bandb_path == NULL)
 	{
-		ircd_snprintf(fullpath, sizeof(fullpath), "%s/bandb%s", BINPATH, suffix);
+		rb_snprintf(fullpath, sizeof(fullpath), "%s/bandb%s", BINPATH, suffix);
 
 		if(access(fullpath, X_OK) == -1)
 		{
-			ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/bandb%s", ConfigFileEntry.dpath, suffix);
+			rb_snprintf(fullpath, sizeof(fullpath), "%s/bin/bandb%s", ConfigFileEntry.dpath, suffix);
 
 			if(access(fullpath, X_OK) == -1)
 			{
@@ -93,19 +93,19 @@ fork_bandb(void)
 				return;
 			}
 		}
-		bandb_path = ircd_strdup(fullpath);
+		bandb_path = rb_strdup(fullpath);
 	}
 
 
-	bandb_helper = ircd_helper_start("bandb", bandb_path, bandb_parse, bandb_restart_cb);
+	bandb_helper = rb_helper_start("bandb", bandb_path, bandb_parse, bandb_restart_cb);
 
 	if(bandb_helper == NULL)
 	{
-		ilog(L_MAIN, "ircd_helper_start failed: %s", strerror(errno));
+		ilog(L_MAIN, "rb_helper_start failed: %s", strerror(errno));
 		return;
 	}
 
-	ircd_helper_run(bandb_helper);
+	rb_helper_run(bandb_helper);
 	return;
 }
 
@@ -115,19 +115,19 @@ bandb_add(bandb_type type, struct Client *source_p, const char *mask1,
 {
 	static char buf[BUFSIZE];
 
-	ircd_snprintf(buf, sizeof(buf), "%c %s ",
+	rb_snprintf(buf, sizeof(buf), "%c %s ",
 			bandb_add_letter[type], mask1);
 
 	if(!EmptyString(mask2))
-		ircd_snprintf_append(buf, sizeof(buf), "%s ", mask2);
+		rb_snprintf_append(buf, sizeof(buf), "%s ", mask2);
 
-	ircd_snprintf_append(buf, sizeof(buf), "%s %lu :%s", 
-				get_oper_name(source_p), ircd_current_time(), reason);
+	rb_snprintf_append(buf, sizeof(buf), "%s %lu :%s", 
+				get_oper_name(source_p), rb_current_time(), reason);
 
 	if(!EmptyString(oper_reason))
-		ircd_snprintf_append(buf, sizeof(buf), "|%s", oper_reason);
+		rb_snprintf_append(buf, sizeof(buf), "|%s", oper_reason);
 
-	ircd_helper_write(bandb_helper, "%s", buf);
+	rb_helper_write(bandb_helper, "%s", buf);
 }
 
 static char bandb_del_letter[LAST_BANDB_TYPE] =
@@ -142,13 +142,13 @@ bandb_del(bandb_type type, const char *mask1, const char *mask2)
 
 	buf[0] = '\0';
 
-	ircd_snprintf_append(buf, sizeof(buf), "%c %s",
+	rb_snprintf_append(buf, sizeof(buf), "%c %s",
 				bandb_del_letter[type], mask1);
 
 	if(!EmptyString(mask2))
-		ircd_snprintf_append(buf, sizeof(buf), " %s", mask2);
+		rb_snprintf_append(buf, sizeof(buf), " %s", mask2);
 
-	ircd_helper_write(bandb_helper, "%s", buf);
+	rb_helper_write(bandb_helper, "%s", buf);
 }
 
 static void
@@ -162,9 +162,9 @@ bandb_handle_ban(char *parv[], int parc)
 	aconf->port = 0;
 
 	if(parv[0][0] == 'K')
-		aconf->user = ircd_strdup(parv[para++]);
+		aconf->user = rb_strdup(parv[para++]);
 
-	aconf->host = ircd_strdup(parv[para++]);
+	aconf->host = rb_strdup(parv[para++]);
 	aconf->info.oper = operhash_add(parv[para++]);
 
 	switch(parv[0][0])
@@ -193,12 +193,12 @@ bandb_handle_ban(char *parv[], int parc)
 	if((p = strchr(parv[para], '|')))
 	{
 		*p++ = '\0';
-		aconf->spasswd = ircd_strdup(p);
+		aconf->spasswd = rb_strdup(p);
 	}
 
-	aconf->passwd = ircd_strdup(parv[para]);
+	aconf->passwd = rb_strdup(parv[para]);
 
-	ircd_dlinkAddAlloc(aconf, &bandb_pending);
+	rb_dlinkAddAlloc(aconf, &bandb_pending);
 }
 
 static int
@@ -306,7 +306,7 @@ bandb_handle_clear(void)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, bandb_pending.head)
 	{
 		free_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &bandb_pending);
+		rb_dlinkDestroy(ptr, &bandb_pending);
 	}
 }
 
@@ -323,7 +323,7 @@ bandb_handle_finish(void)
 	{
 		aconf = ptr->data;
 
-		ircd_dlinkDestroy(ptr, &bandb_pending);
+		rb_dlinkDestroy(ptr, &bandb_pending);
 
 		switch(aconf->status)
 		{
@@ -345,7 +345,7 @@ bandb_handle_finish(void)
 
 			case CONF_XLINE:
 				if(bandb_check_xline(aconf))
-					ircd_dlinkAddAlloc(aconf, &xline_conf_list);
+					rb_dlinkAddAlloc(aconf, &xline_conf_list);
 				else
 					free_conf(aconf);
 
@@ -361,7 +361,7 @@ bandb_handle_finish(void)
 
 			case CONF_RESV_NICK:
 				if(bandb_check_resv_nick(aconf))
-					ircd_dlinkAddAlloc(aconf, &resv_conf_list);
+					rb_dlinkAddAlloc(aconf, &resv_conf_list);
 				else
 					free_conf(aconf);
 
@@ -373,15 +373,15 @@ bandb_handle_finish(void)
 }
 
 static void
-bandb_parse(ircd_helper *helper)
+bandb_parse(rb_helper *helper)
 {
 	static char buf[READBUF_SIZE];
 	char *parv[MAXPARA+1];
 	int len, parc;
 
-	while((len = ircd_helper_read(helper, buf, sizeof(buf))))
+	while((len = rb_helper_read(helper, buf, sizeof(buf))))
 	{
-		parc = ircd_string_to_array(buf, parv, MAXPARA);
+		parc = rb_string_to_array(buf, parv, MAXPARA);
 
 		if(parc < 1)
 			continue;
@@ -408,14 +408,14 @@ void
 bandb_rehash_bans(void)
 {
 	if(bandb_helper != NULL)
-		ircd_helper_write(bandb_helper, "L");
+		rb_helper_write(bandb_helper, "L");
 }
 
-static void bandb_restart_cb(ircd_helper *helper)
+static void bandb_restart_cb(rb_helper *helper)
 {
 	if(helper != NULL)
 	{
-		ircd_helper_close(helper);
+		rb_helper_close(helper);
 		bandb_helper = NULL;
 	}	
 	fork_bandb();	

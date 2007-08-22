@@ -33,7 +33,7 @@ extern struct _patricia_tree_t *dline_tree;
 extern dlink_list delay_exit;
 
 void init_reject(void);
-int check_reject(ircd_fde_t *F, struct sockaddr *addr);
+int check_reject(rb_fde_t *F, struct sockaddr *addr);
 void add_reject(struct Client *);
 void flush_reject(void);
 int remove_reject(const char *ip);

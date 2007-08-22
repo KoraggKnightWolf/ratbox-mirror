@@ -11,7 +11,7 @@
 
 /* List of ircd includes from ../include/ */
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "client.h"
 #include "common.h"		
@@ -56,7 +56,7 @@ m_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const cha
 	static time_t last_used = 0;
 	int is_md5 = 0;
 
-	if((last_used + ConfigFileEntry.pace_wait) > ircd_currenttime)
+	if((last_used + ConfigFileEntry.pace_wait) > rb_currenttime)
 	{
 		/* safe enough to give this on a local connect only */
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_LOAD2HI), me.name, parv[0]);
@@ -64,7 +64,7 @@ m_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const cha
 	}
 	else
 	{
-		last_used = ircd_currenttime;
+		last_used = rb_currenttime;
 	}
 
 	if(parc == 3)

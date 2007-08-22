@@ -190,8 +190,8 @@ add_to_hash(hash_type type, const char *hashindex, void *pointer)
 	hashv = (hash_function[type].func)((const unsigned char *) hashindex, 
 					hash_function[type].hashbits, 
 					hash_function[type].hashlen);
-//	ircd_dlinkAddAlloc(pointer, &hash_function[type].table[hashv]);
-	ircd_dlinkAddAlloc(pointer, &table[hashv]);
+//	rb_dlinkAddAlloc(pointer, &hash_function[type].table[hashv]);
+	rb_dlinkAddAlloc(pointer, &table[hashv]);
 }
 
 void
@@ -206,7 +206,7 @@ del_from_hash(hash_type type, const char *hashindex, void *pointer)
 	hashv = (hash_function[type].func)((const unsigned char *) hashindex,
 					hash_function[type].hashbits,
 					hash_function[type].hashlen);
-	ircd_dlinkFindDestroy(pointer, &table[hashv]);
+	rb_dlinkFindDestroy(pointer, &table[hashv]);
 }
 
 void
@@ -218,14 +218,14 @@ add_to_help_hash(const char *name, struct cachefile *hptr)
 		return;
 
 	hashv = hash_help(name);
-	ircd_dlinkAddAlloc(hptr, &helpTable[hashv]);
+	rb_dlinkAddAlloc(hptr, &helpTable[hashv]);
 }
 
 void
 add_to_nd_hash(const char *name, struct nd_entry *nd)
 {
 	nd->hashv = hash_nick(name);
-	ircd_dlinkAdd(nd, &nd->hnode, &ndTable[nd->hashv]);
+	rb_dlinkAdd(nd, &nd->hnode, &ndTable[nd->hashv]);
 }
 
 void
@@ -238,7 +238,7 @@ clear_help_hash(void)
 	HASH_WALK_SAFE(i, HELP_MAX, ptr, next_ptr, helpTable)
 	{
 		free_cachefile(ptr->data);
-		ircd_dlinkDestroy(ptr, &helpTable[i]);
+		rb_dlinkDestroy(ptr, &helpTable[i]);
 	}
 	HASH_WALK_END
 }
@@ -293,7 +293,7 @@ hash_find_masked_server(struct Client *source_p, const char *name)
 		return NULL;
 
 	/* copy it across to give us a buffer to work on */
-	ircd_strlcpy(buf, name, sizeof(buf));
+	rb_strlcpy(buf, name, sizeof(buf));
 
 	while ((s = strchr(p, '.')) != 0)
 	{
@@ -541,11 +541,11 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 
 	chptr = allocate_channel(s);
 
-	ircd_dlinkAdd(chptr, &chptr->node, &global_channel_list);
+	rb_dlinkAdd(chptr, &chptr->node, &global_channel_list);
 
-	chptr->channelts = ircd_current_time();	/* doesn't hurt to set it here */
+	chptr->channelts = rb_current_time();	/* doesn't hurt to set it here */
 
-	ircd_dlinkAddAlloc(chptr, &channelTable[hashv]);
+	rb_dlinkAddAlloc(chptr, &channelTable[hashv]);
 
 	return chptr;
 }
@@ -622,7 +622,7 @@ clear_resv_hash(void)
 			continue;
 
 		free_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &resvTable[i]);
+		rb_dlinkDestroy(ptr, &resvTable[i]);
 	}
 	HASH_WALK_END
 }
@@ -696,13 +696,13 @@ count_hash(struct Client *source_p, dlink_list *table, int length, const char *n
 	
 	for(i = 0; i < length; i++)
 	{
-		if(ircd_dlink_list_length(&table[i]) >= 10)
+		if(rb_dlink_list_length(&table[i]) >= 10)
 			counts[10]++;
 		else
-			counts[ircd_dlink_list_length(&table[i])]++;
+			counts[rb_dlink_list_length(&table[i])]++;
 
-		if(ircd_dlink_list_length(&table[i]) > deepest)
-			deepest = ircd_dlink_list_length(&table[i]);
+		if(rb_dlink_list_length(&table[i]) > deepest)
+			deepest = rb_dlink_list_length(&table[i]);
 	}
 
 	output_hash(source_p, name, length, counts, deepest);

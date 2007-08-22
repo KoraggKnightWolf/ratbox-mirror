@@ -150,7 +150,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 			return 0;
 	}
 	/* if we have cluster servers, send it to them.. */
-	else if(ircd_dlink_list_length(&cluster_conf_list) > 0)
+	else if(rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "KLINE", 
 				(tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE,
 				"%lu %s %s :%s",
@@ -164,12 +164,12 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 	if(already_placed_kline(source_p, user, host, tkline_time))
 		return 0;
 
-	ircd_set_time();
-	current_date = smalldate(ircd_current_time());
+	rb_set_time();
+	current_date = smalldate(rb_current_time());
 	aconf = make_conf();
 	aconf->status = CONF_KILL;
-	aconf->host = ircd_strdup(host);
-	aconf->user = ircd_strdup(user);
+	aconf->host = rb_strdup(host);
+	aconf->user = rb_strdup(user);
 	aconf->port = 0;
 
 	/* Look for an oper reason */
@@ -179,21 +179,21 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 		oper_reason++;
 
 		if(!EmptyString(oper_reason))
-			aconf->spasswd = ircd_strdup(oper_reason);
+			aconf->spasswd = rb_strdup(oper_reason);
 	}
 
 	if(tkline_time > 0)
 	{
-		ircd_snprintf(buffer, sizeof(buffer),
+		rb_snprintf(buffer, sizeof(buffer),
 			   "Temporary K-line %d min. - %s (%s)",
 			   (int) (tkline_time / 60), reason, current_date);
-		aconf->passwd = ircd_strdup(buffer);
+		aconf->passwd = rb_strdup(buffer);
 		apply_tkline(source_p, aconf, reason, oper_reason, current_date, tkline_time);
 	}
 	else
 	{
-		ircd_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
-		aconf->passwd = ircd_strdup(buffer);
+		rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
+		aconf->passwd = rb_strdup(buffer);
 		apply_kline(source_p, aconf, reason, oper_reason, current_date);
 	}
 
@@ -201,7 +201,7 @@ mo_kline(struct Client *client_p, struct Client *source_p,
 	{
 		if(kline_queued == 0)
 		{
-			ircd_event_addonce("check_klines", check_klines_event, NULL,
+			rb_event_addonce("check_klines", check_klines_event, NULL,
 				     ConfigFileEntry.kline_delay);
 			kline_queued = 1;
 		}
@@ -248,8 +248,8 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	aconf = make_conf();
 
 	aconf->status = CONF_KILL;
-	aconf->user = ircd_strdup(user);
-	aconf->host = ircd_strdup(host);
+	aconf->user = rb_strdup(user);
+	aconf->host = rb_strdup(host);
 
 	/* Look for an oper reason */
 	if((oper_reason = strchr(reason, '|')) != NULL)
@@ -258,24 +258,24 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		oper_reason++;
 
 		if(!EmptyString(oper_reason))
-			aconf->spasswd = ircd_strdup(oper_reason);
+			aconf->spasswd = rb_strdup(oper_reason);
 	}
 
-	current_date = smalldate(ircd_current_time());
+	current_date = smalldate(rb_current_time());
 
 	if(tkline_time > 0)
 	{
-		ircd_snprintf(buffer, sizeof(buffer),
+		rb_snprintf(buffer, sizeof(buffer),
 				"Temporary K-line %d min. - %s (%s)",
 				(int) (tkline_time / 60), reason, current_date);
-		aconf->passwd = ircd_strdup(buffer);
+		aconf->passwd = rb_strdup(buffer);
 		apply_tkline(source_p, aconf, reason, oper_reason,
 				current_date, tkline_time);
 	}
 	else
 	{
-		ircd_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
-		aconf->passwd = ircd_strdup(buffer);
+		rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
+		aconf->passwd = rb_strdup(buffer);
 		apply_kline(source_p, aconf, reason, oper_reason, current_date);
 	}
 
@@ -283,7 +283,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		if(kline_queued == 0)
 		{
-			ircd_event_addonce("check_klines", check_klines_event, NULL,
+			rb_event_addonce("check_klines", check_klines_event, NULL,
 				     ConfigFileEntry.kline_delay);
 			kline_queued = 1;
 		}
@@ -362,7 +362,7 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
-	else if(ircd_dlink_list_length(&cluster_conf_list) > 0)
+	else if(rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "UNKLINE", SHARED_UNKLINE, 
 				"%s %s", user, host);
 
@@ -410,7 +410,7 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	const char *oper = get_oper_name(source_p);
 
 	aconf->info.oper = operhash_add(oper);
-	aconf->hold = ircd_current_time();
+	aconf->hold = rb_current_time();
 
 	if(EmptyString(oper_reason))
 	{
@@ -452,7 +452,7 @@ apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 	const char *oper = get_oper_name(source_p);
 
 	aconf->info.oper = operhash_add(oper);
-	aconf->hold = ircd_current_time() + tkline_time;
+	aconf->hold = rb_current_time() + tkline_time;
 	add_temp_kline(aconf);
 
 	/* no oper reason.. */
@@ -520,7 +520,7 @@ mangle_wildcard_to_cidr(const char *text)
 	{
 		if(n3 == NULL || (!strcmp(n3, splat) && (n4 == NULL || !strcmp(n4, splat))))
 		{
-			ircd_snprintf(buf, sizeof(buf), "%s.0.0.0/8", n1);
+			rb_snprintf(buf, sizeof(buf), "%s.0.0.0/8", n1);
 			return buf;
 		}
 	}
@@ -532,7 +532,7 @@ mangle_wildcard_to_cidr(const char *text)
 	{
 		if(n4 == NULL || !strcmp(n4, splat))
 		{
-			ircd_snprintf(buf, sizeof(buf), "%s.%s.0.0/16", n1, n2);
+			rb_snprintf(buf, sizeof(buf), "%s.%s.0.0/16", n1, n2);
 			return buf;
 		}
 	}
@@ -542,7 +542,7 @@ mangle_wildcard_to_cidr(const char *text)
 
 	if(n4 == NULL || !strcmp(n4, splat))
 	{
-		ircd_snprintf(buf, sizeof(buf), "%s.%s.%s.0/24", n1, n2, n3);
+		rb_snprintf(buf, sizeof(buf), "%s.%s.%s.0/24", n1, n2, n3);
 		return buf;
 	}
 	
@@ -568,14 +568,14 @@ find_user_host(const char *userhost, char *luser, char *lhost)
 	{
 		*(hostp++) = '\0';	/* short and squat */
 		if(*userhost)
-			ircd_strlcpy(luser, userhost, USERLEN + 1);	/* here is my user */
+			rb_strlcpy(luser, userhost, USERLEN + 1);	/* here is my user */
 		else
 			strcpy(luser, "*");
 		if(*hostp) {
 			ptr = mangle_wildcard_to_cidr(hostp);
 			if(ptr == NULL)
 				ptr = hostp;
-			ircd_strlcpy(lhost, ptr, HOSTLEN + 1);	/* here is my host */
+			rb_strlcpy(lhost, ptr, HOSTLEN + 1);	/* here is my host */
 		}
 		else
 			strcpy(lhost, "*");
@@ -595,7 +595,7 @@ find_user_host(const char *userhost, char *luser, char *lhost)
 		if(ptr == NULL)
 			ptr = userhost;
 
-		ircd_strlcpy(lhost, ptr, HOSTLEN + 1);
+		rb_strlcpy(lhost, ptr, HOSTLEN + 1);
 	}
 
 	return 1;
@@ -816,7 +816,7 @@ remove_temp_kline(struct Client *source_p, const char *user, const char *host)
 			if(irccmp(aconf->host, host))
 				continue;
 
-			ircd_dlinkDestroy(ptr, &temp_klines[i]);
+			rb_dlinkDestroy(ptr, &temp_klines[i]);
 			delete_one_address_conf(aconf->host, aconf);
 
 			sendto_one(source_p, POP_QUEUE, 

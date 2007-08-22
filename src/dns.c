@@ -24,7 +24,7 @@
 
 
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "ircd_defs.h"
 #include "parse.h"
@@ -42,10 +42,10 @@
 
 static void submit_dns(const char, int id, int aftype, const char *addr);
 static int start_resolver(void);
-static void parse_dns_reply(ircd_helper *helper);
-static void restart_resolver_cb(ircd_helper *helper);
+static void parse_dns_reply(rb_helper *helper);
+static void restart_resolver_cb(rb_helper *helper);
 
-static ircd_helper *dns_helper;
+static rb_helper *dns_helper;
 
 struct dnsreq
 {
@@ -192,11 +192,11 @@ start_resolver(void)
 #endif
 	if(resolver_path == NULL)
 	{	
-		ircd_snprintf(fullpath, sizeof(fullpath), "%s/resolver%s", BINPATH, suffix);
+		rb_snprintf(fullpath, sizeof(fullpath), "%s/resolver%s", BINPATH, suffix);
 	
 		if(access(fullpath, X_OK) == -1)
 		{
-			ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/resolver%s", ConfigFileEntry.dpath, suffix);
+			rb_snprintf(fullpath, sizeof(fullpath), "%s/bin/resolver%s", ConfigFileEntry.dpath, suffix);
 			if(access(fullpath, X_OK) == -1)
 			{
 				ilog(L_MAIN, "Unable to execute resolver in %s or %s/bin", BINPATH, ConfigFileEntry.dpath);
@@ -205,29 +205,29 @@ start_resolver(void)
 		
 		} 
 
-		resolver_path = ircd_strdup(fullpath);
+		resolver_path = rb_strdup(fullpath);
 	}
 
-	dns_helper = ircd_helper_start("resolver", resolver_path, parse_dns_reply, restart_resolver_cb);
+	dns_helper = rb_helper_start("resolver", resolver_path, parse_dns_reply, restart_resolver_cb);
 
 	if(dns_helper == NULL)
 	{
-		ilog(L_MAIN, "ircd_helper_start failed: %s", strerror(errno));
+		ilog(L_MAIN, "rb_helper_start failed: %s", strerror(errno));
 		return 1;
 	}
 
-	ircd_helper_run(dns_helper);
+	rb_helper_run(dns_helper);
 	return 0;
 }
 
 static void
-parse_dns_reply(ircd_helper *helper)
+parse_dns_reply(rb_helper *helper)
 {
 	int len, parc;
 	static char dnsBuf[READBUF_SIZE];
 	
 	char *parv[MAXPARA+1];
-	while((len = ircd_helper_read(helper, dnsBuf, sizeof(dnsBuf))) > 0)
+	while((len = rb_helper_read(helper, dnsBuf, sizeof(dnsBuf))) > 0)
 	{
 		parc = string_to_array(dnsBuf, parv); /* we shouldn't be using this here, but oh well */
 
@@ -249,7 +249,7 @@ submit_dns(char type, int nid, int aftype, const char *addr)
 		failed_resolver(nid);
 		return;
 	}	                        
-	ircd_helper_write(dns_helper, "%c %x %d %s", type, nid, aftype, addr);
+	rb_helper_write(dns_helper, "%c %x %d %s", type, nid, aftype, addr);
 }
 
 void
@@ -264,11 +264,11 @@ init_resolver(void)
 
 
 static void 
-restart_resolver_cb(ircd_helper *helper)
+restart_resolver_cb(rb_helper *helper)
 {
 	if(helper != NULL) 
 	{
-		ircd_helper_close(helper);	
+		rb_helper_close(helper);	
 		dns_helper = NULL;
 	}
 	start_resolver();

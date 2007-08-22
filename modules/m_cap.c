@@ -115,7 +115,7 @@ clicap_find(const char *data, int *negate, int *finished)
 
 	if(data)
 	{
-		ircd_strlcpy(buf, data, sizeof(buf));
+		rb_strlcpy(buf, data, sizeof(buf));
 		p = buf;
 	}
 
@@ -175,7 +175,7 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 	int curlen, mlen;
 	unsigned int i;
 
-	mlen = ircd_sprintf(buf, ":%s CAP %s %s",
+	mlen = rb_sprintf(buf, ":%s CAP %s %s",
 			me.name, 
 			EmptyString(source_p->name) ? "*" : source_p->name, 
 			subcmd);
@@ -249,7 +249,7 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 			}
 		}
 
-		curlen = ircd_sprintf(p, "%s ", clicap_list[i].name);
+		curlen = rb_sprintf(p, "%s ", clicap_list[i].name);
 		p += curlen;
 		buflen += curlen;
 	}
@@ -321,7 +321,7 @@ cap_end(struct Client *source_p, const char *arg)
 	if(source_p->name && source_p->user)
 	{
 		char buf[USERLEN+1];
-		ircd_strlcpy(buf, source_p->username, sizeof(buf));
+		rb_strlcpy(buf, source_p->username, sizeof(buf));
 		register_local_user(source_p, source_p, buf);
 	}
 }
@@ -361,7 +361,7 @@ cap_req(struct Client *source_p, const char *arg)
 	if(EmptyString(arg))
 		return;
 
-	buflen = ircd_snprintf(buf, sizeof(buf), ":%s CAP %s ACK",
+	buflen = rb_snprintf(buf, sizeof(buf), ":%s CAP %s ACK",
 			me.name, EmptyString(source_p->name) ? "*" : source_p->name);
 
 	pbuf[0][0] = '\0';

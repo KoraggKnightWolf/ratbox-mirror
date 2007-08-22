@@ -132,10 +132,10 @@ ilog(ilogfile dest, const char *format, ...)
 		return;
 #endif
 	va_start(args, format);
-	ircd_vsnprintf(buf, sizeof(buf), format, args);
+	rb_vsnprintf(buf, sizeof(buf), format, args);
 	va_end(args);
 
-	ircd_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(ircd_current_time()), buf);
+	rb_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(rb_current_time()), buf);
 #ifdef _WIN32
 	fputs(buf2, stderr);
 	fflush(stderr);
@@ -179,7 +179,7 @@ smalldate(time_t ltime)
 
 	lt = localtime(&ltime);
 
-	ircd_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
+	rb_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
 		    lt->tm_year + 1900, lt->tm_mon + 1,
 		    lt->tm_mday, lt->tm_hour, lt->tm_min);
 

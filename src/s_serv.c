@@ -196,7 +196,7 @@ collect_zipstats(void *unused)
 			/* only bother if we haven't already got something queued... */
 			if(!target_p->localClient->slink->slinkq)
 			{
-				target_p->localClient->slink->slinkq = ircd_malloc(1);	/* sigh.. */
+				target_p->localClient->slink->slinkq = rb_malloc(1);	/* sigh.. */
 				target_p->localClient->slink->slinkq[0] = SLINKCMD_ZIPSTATS;
 				target_p->localClient->slink->slinkq_ofs = 0;
 				target_p->localClient->slink->slinkq_len = 1;
@@ -357,7 +357,7 @@ try_connections(void *unused)
 		 * made one successfull connection... [this algorithm is
 		 * a bit fuzzy... -- msa >;) ]
 		 */
-		if(tmp_p->hold > ircd_current_time())
+		if(tmp_p->hold > rb_current_time())
 		{
 			if(next > tmp_p->hold || next == 0)
 				next = tmp_p->hold;
@@ -367,7 +367,7 @@ try_connections(void *unused)
 		if((confrq = get_con_freq(cltmp)) < MIN_CONN_FREQ)
 			confrq = MIN_CONN_FREQ;
 
-		tmp_p->hold = ircd_current_time() + confrq;
+		tmp_p->hold = rb_current_time() + confrq;
 		/*
 		 * Found a CONNECT config with port specified, scan clients
 		 * and see if this server is already connected?
@@ -394,12 +394,12 @@ try_connections(void *unused)
 		return;
 
 	/* move this connect entry to end.. */
-	ircd_dlinkDelete(&server_p->node, &server_conf_list);
-	ircd_dlinkAddTail(server_p, &server_p->node, &server_conf_list);
+	rb_dlinkDelete(&server_p->node, &server_conf_list);
+	rb_dlinkAddTail(server_p, &server_p->node, &server_conf_list);
 
 	/*
 	 * We used to only print this if serv_connect() actually
-	 * suceeded, but since ircd_tcp_connect() can call the callback
+	 * suceeded, but since rb_tcp_connect() can call the callback
 	 * immediately if there is an error, we were getting error messages
 	 * in the wrong order. SO, we just print out the activated line,
 	 * and let serv_connect() / serv_connect_callback() print an
@@ -435,7 +435,7 @@ send_capabilities(struct Client *client_p, int cap_can_send)
 	{
 		if(cap->cap & cap_can_send)
 		{
-			tl = ircd_sprintf(t, "%s ", cap->name);
+			tl = rb_sprintf(t, "%s ", cap->name);
 			t += tl;
 		}
 	}
@@ -462,7 +462,7 @@ show_capabilities(struct Client *target_p)
 	int tl;
 
 	t = msgbuf;
-	tl = ircd_sprintf(msgbuf, "TS ");
+	tl = rb_sprintf(msgbuf, "TS ");
 	t += tl;
 
 	if(!IsServer(target_p) || !target_p->serv->caps)	/* short circuit if no caps */
@@ -475,7 +475,7 @@ show_capabilities(struct Client *target_p)
 	{
 		if(cap->cap & target_p->serv->caps)
 		{
-			tl = ircd_sprintf(t, "%s ", cap->name);
+			tl = rb_sprintf(t, "%s ", cap->name);
 			t += tl;
 		}
 	}
@@ -503,7 +503,7 @@ show_capabilities(struct Client *target_p)
  * This code initiates a connection to a server. It first checks to make
  * sure the given server exists. If this is the case, it creates a socket,
  * creates a client, saves the socket information in the client, and
- * initiates a connection to the server through ircd_connect_tcp(). The
+ * initiates a connection to the server through rb_connect_tcp(). The
  * completion of this goes through serv_completed_connection().
  *
  * We return 1 if the connection is attempted, since we don't know whether
@@ -514,14 +514,14 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 {
 	struct Client *client_p;
 	struct irc_sockaddr_storage myipnum; 
-	ircd_fde_t *F;
+	rb_fde_t *F;
 
 	s_assert(server_p != NULL);
 	if(server_p == NULL)
 		return 0;
 
 	/* log */
-	ircd_inet_ntop_sock((struct sockaddr *)&server_p->ipnum, buf, sizeof(buf));
+	rb_inet_ntop_sock((struct sockaddr *)&server_p->ipnum, buf, sizeof(buf));
 	ilog(L_SERVER, "Connect to *[%s] @%s", server_p->name, buf);
 
 	/*
@@ -539,7 +539,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	}
 
 	/* create a socket for the server connection */
-	if((F = ircd_socket(GET_SS_FAMILY(&server_p->ipnum), SOCK_STREAM, 0, NULL)) == NULL)
+	if((F = rb_socket(GET_SS_FAMILY(&server_p->ipnum), SOCK_STREAM, 0, NULL)) == NULL)
 	{
 		/* Eek, failure to create the socket */
 		report_error("opening stream socket to %s: %s", 
@@ -548,15 +548,15 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	}
 
 	/* servernames are always guaranteed under HOSTLEN chars */
-	ircd_note(F, "Server: %s", server_p->name);
+	rb_note(F, "Server: %s", server_p->name);
 
 	/* Create a local client */
 	client_p = make_client(NULL);
 
 	/* Copy in the server, hostname, fd */
 	client_p->name = find_or_add(server_p->name);
-	ircd_strlcpy(client_p->host, server_p->host, sizeof(client_p->host));
-	ircd_strlcpy(client_p->sockhost, buf, sizeof(client_p->sockhost));
+	rb_strlcpy(client_p->host, server_p->host, sizeof(client_p->host));
+	rb_strlcpy(client_p->sockhost, buf, sizeof(client_p->sockhost));
 	client_p->localClient->F = F;
 
 	/* shove the port number into the sockaddr */
@@ -573,9 +573,9 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	 *   -- adrian
 	 */
 
-	if(!ircd_set_buffers(client_p->localClient->F, READBUF_SIZE))
+	if(!rb_set_buffers(client_p->localClient->F, READBUF_SIZE))
 	{
-		report_error("ircd_set_buffers failed for server %s:%s",
+		report_error("rb_set_buffers failed for server %s:%s",
 				client_p->name,
 				log_client_name(client_p, SHOW_IP),
 				errno);
@@ -601,7 +601,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 		strcpy(client_p->serv->by, "AutoConn.");
 
 	SetConnecting(client_p);
-	ircd_dlinkAddTail(client_p, &client_p->node, &global_client_list);
+	rb_dlinkAddTail(client_p, &client_p->node, &global_client_list);
 
 	if(ServerConfVhosted(server_p))
 	{
@@ -629,13 +629,13 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 #endif
 	else
 	{
-		ircd_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
+		rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 				 NULL, 0, serv_connect_callback, 
 				 client_p, ConfigFileEntry.connect_timeout);
 		 return 1;
 	}
 
-	ircd_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
+	rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 			 (struct sockaddr *) &myipnum,
 			 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
 			 ConfigFileEntry.connect_timeout);
@@ -653,7 +653,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
  * marked for reading.
  */
 static void
-serv_connect_callback(ircd_fde_t *F, int status, void *data)
+serv_connect_callback(rb_fde_t *F, int status, void *data)
 {
 	struct Client *client_p = data;
 	struct server_conf *server_p;
@@ -672,7 +672,7 @@ serv_connect_callback(ircd_fde_t *F, int status, void *data)
 		return;
 	}
 
-	ircd_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
+	rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
 	
 	/* Check the status */
 	if(status != IRCD_OK)
@@ -683,19 +683,19 @@ serv_connect_callback(ircd_fde_t *F, int status, void *data)
 		if(status == IRCD_ERR_TIMEOUT) 
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL, "Error connecting to %s[255.255.255.255]: %s",
-					client_p->name, ircd_errstr(status));
-			ilog(L_SERVER, "Error connecting to %s: %s", client_p->name, ircd_errstr(status));
+					client_p->name, rb_errstr(status));
+			ilog(L_SERVER, "Error connecting to %s: %s", client_p->name, rb_errstr(status));
 		}
 		else 
 		{
-			char *errstr = strerror(ircd_get_sockerr(F));
+			char *errstr = strerror(rb_get_sockerr(F));
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"Error connecting to %s[255.255.255.255]: %s (%s)",
 					client_p->name,
-					ircd_errstr(status), errstr);
-			ilog(L_SERVER, "Error connecting to %s: %s (%s)", client_p->name, ircd_errstr(status), errstr);
+					rb_errstr(status), errstr);
+			ilog(L_SERVER, "Error connecting to %s: %s (%s)", client_p->name, rb_errstr(status), errstr);
 		}
-		exit_client(client_p, client_p, &me, ircd_errstr(status));
+		exit_client(client_p, client_p, &me, rb_errstr(status));
 		return;
 	}
 

@@ -26,7 +26,7 @@
 
 #include "stdinc.h"
 #include "struct.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "class.h"		/* report_classes */
 #include "client.h"		/* Client */
 #include "channel.h"
@@ -196,7 +196,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(MyClient(source_p) && !IsOper(source_p))
 	{
 		/* Check the user is actually allowed to do /stats, and isnt flooding */
-		if((last_used + ConfigFileEntry.pace_wait) > ircd_current_time())
+		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
 			/* safe enough to give this on a local connect only */
 			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
@@ -206,7 +206,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 			return 0;
 		}
 		else
-			last_used = ircd_current_time();
+			last_used = rb_current_time();
 	}
 
 	if(hunt_server (client_p, source_p, ":%s STATS %s :%s", 2, parc, parv) != HUNTED_ISME)
@@ -378,7 +378,7 @@ stats_events_cb(char *str, void *ptr)
 static void
 stats_events (struct Client *source_p)
 {
-	ircd_dump_events(stats_events_cb, source_p);
+	rb_dump_events(stats_events_cb, source_p);
 	send_pop_queue(source_p);
 }
 
@@ -425,7 +425,7 @@ stats_pending_glines (struct Client *source_p)
 			}
 		}
 
-		if(ircd_dlink_list_length (&pending_glines) > 0)
+		if(rb_dlink_list_length (&pending_glines) > 0)
 			sendto_one_notice(source_p, POP_QUEUE, ":End of Pending G-lines");
 	}
 	else
@@ -761,7 +761,7 @@ stats_operedup (struct Client *source_p)
 					   IsAdmin (target_p) ? 'A' : 'O',
 					   get_oper_privs(target_p->operflags),
 					   target_p->name, target_p->username, target_p->host,
-					   (int) (ircd_current_time() - target_p->localClient->last));
+					   (int) (rb_current_time() - target_p->localClient->last));
 		}
 		else
 		{
@@ -769,7 +769,7 @@ stats_operedup (struct Client *source_p)
 					   "p :[%c] %s (%s@%s) Idle: %d",
 					   IsAdmin (target_p) ? 'A' : 'O',
 					   target_p->name, target_p->username, target_p->host,
-					   (int) (ircd_current_time() - target_p->localClient->last));
+					   (int) (rb_current_time() - target_p->localClient->last));
 		}
 	}
 
@@ -871,7 +871,7 @@ stats_usage (struct Client *source_p)
 	if(0 == secs)
 		secs = 1;
 
-	rup = (ircd_current_time() - startup_time) * hzz;
+	rup = (rb_current_time() - startup_time) * hzz;
 	if(0 == rup)
 		rup = 1;
   
@@ -919,7 +919,7 @@ stats_tstats(struct Client *source_p)
 		sp.is_sbr += target_p->localClient->receiveB;
 		sp.is_sks += target_p->localClient->sendK;
 		sp.is_skr += target_p->localClient->receiveK;
-		sp.is_sti += ircd_current_time() - target_p->localClient->firsttime;
+		sp.is_sti += rb_current_time() - target_p->localClient->firsttime;
 		sp.is_sv++;
 		if(sp.is_sbs > 1023)
 		{
@@ -941,7 +941,7 @@ stats_tstats(struct Client *source_p)
 		sp.is_cbr += target_p->localClient->receiveB;
 		sp.is_cks += target_p->localClient->sendK;
 		sp.is_ckr += target_p->localClient->receiveK;
-		sp.is_cti += ircd_current_time() - target_p->localClient->firsttime;
+		sp.is_cti += rb_current_time() - target_p->localClient->firsttime;
 		sp.is_cl++;
 		if(sp.is_cbs > 1023)
 		{
@@ -961,7 +961,7 @@ stats_tstats(struct Client *source_p)
 				sp.is_ac, sp.is_ref);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 				"T :rejected %u delaying %lu", 
-				sp.is_rej, ircd_dlink_list_length(&delay_exit));
+				sp.is_rej, rb_dlink_list_length(&delay_exit));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 				"T :nicks being delayed %lu", get_nd_count());
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
@@ -1001,7 +1001,7 @@ stats_uptime (struct Client *source_p)
 {
 	time_t now;
 
-	now = ircd_current_time() - startup_time;
+	now = rb_current_time() - startup_time;
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSUPTIME, 
 			   form_str (RPL_STATSUPTIME),
 			   now / 86400, (now / 3600) % 24, 
@@ -1114,7 +1114,7 @@ stats_servers (struct Client *source_p)
 		target_p = ptr->data;
 
 		j++;
-		seconds = ircd_current_time() - target_p->localClient->firsttime;
+		seconds = rb_current_time() - target_p->localClient->firsttime;
 
 		days = (int) (seconds / 86400);
 		seconds %= 86400;
@@ -1128,8 +1128,8 @@ stats_servers (struct Client *source_p)
 				   "Connected: %d day%s, %d:%02d:%02d",
 				   target_p->name,
 				   (target_p->serv->by[0] ? target_p->serv->by : "Remote."),
-				   (int) (ircd_current_time() - target_p->localClient->lasttime),
-				   (int) ircd_linebuf_len (&target_p->localClient->buf_sendq),
+				   (int) (rb_current_time() - target_p->localClient->lasttime),
+				   (int) rb_linebuf_len (&target_p->localClient->buf_sendq),
 				   days, (days == 1) ? "" : "s", hours, minutes, 
 				   (int) seconds);
 	}
@@ -1259,8 +1259,8 @@ stats_memory (struct Client *source_p)
 	size_t conf_memory = 0;	/* memory used by conf lines */
 	size_t mem_servers_cached;	/* memory used by scache */
 
-	size_t ircd_linebuf_count = 0;
-	size_t ircd_linebuf_memory_used = 0;
+	size_t rb_linebuf_count = 0;
+	size_t rb_linebuf_memory_used = 0;
 
 	size_t total_channel_memory = 0;
 	size_t totww = 0;
@@ -1273,8 +1273,8 @@ stats_memory (struct Client *source_p)
 
 	size_t total_memory = 0;
 	size_t bh_total, bh_used;
-	ircd_bh_usage_all(stats_bh_callback, (void *)source_p);
-	ircd_bh_total_usage(&bh_total, &bh_used);
+	rb_bh_usage_all(stats_bh_callback, (void *)source_p);
+	rb_bh_total_usage(&bh_total, &bh_used);
 	
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :blockheap Total Allocated: %lu Total Used: %lu",
@@ -1295,8 +1295,8 @@ stats_memory (struct Client *source_p)
 		{
 			users_counted++;
 			if(MyConnect(target_p))
-				users_invited_count += ircd_dlink_list_length(&target_p->localClient->invited);
-			user_channels += ircd_dlink_list_length(&target_p->user->channel);
+				users_invited_count += rb_dlink_list_length(&target_p->localClient->invited);
+			user_channels += rb_dlink_list_length(&target_p->user->channel);
 			if(target_p->user->away)
 			{
 				aways_counted++;
@@ -1312,8 +1312,8 @@ stats_memory (struct Client *source_p)
 		channel_count++;
 		channel_memory += (strlen(chptr->chname) + sizeof(struct Channel));
 
-		channel_users += ircd_dlink_list_length(&chptr->members);
-		channel_invites += ircd_dlink_list_length(&chptr->invites);
+		channel_users += rb_dlink_list_length(&chptr->members);
+		channel_invites += rb_dlink_list_length(&chptr->invites);
 
 		DLINK_FOREACH(dlink, chptr->banlist.head)
 		{
@@ -1342,9 +1342,9 @@ stats_memory (struct Client *source_p)
 
 	/* count up all classes */
 
-	class_count = ircd_dlink_list_length(&class_list) + 1;
+	class_count = rb_dlink_list_length(&class_list) + 1;
 
-	ircd_count_ircd_linebuf_memory(&ircd_linebuf_count, &ircd_linebuf_memory_used);
+	rb_count_rb_linebuf_memory(&rb_linebuf_count, &rb_linebuf_memory_used);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :Users %u(%lu) Invites %u(%lu)",
@@ -1416,7 +1416,7 @@ stats_memory (struct Client *source_p)
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :linebuf %ld(%ld)",
-			   (long)ircd_linebuf_count, (long)ircd_linebuf_memory_used);
+			   (long)rb_linebuf_count, (long)rb_linebuf_memory_used);
 
 	count_scache(&number_servers_cached, &mem_servers_cached);
 
@@ -1523,14 +1523,14 @@ stats_servlinks (struct Client *source_p)
 		sendto_one(source_p, POP_QUEUE, Sformat,
 			get_id(&me, source_p), RPL_STATSLINKINFO, get_id(source_p, source_p),
 			target_p->name,
-			(int) ircd_linebuf_len (&target_p->localClient->buf_sendq),
+			(int) rb_linebuf_len (&target_p->localClient->buf_sendq),
 			(int) target_p->localClient->sendM,
 			(int) target_p->localClient->sendK,
 			(int) target_p->localClient->receiveM,
 			(int) target_p->localClient->receiveK,
-			ircd_current_time() - target_p->localClient->firsttime,
-			(ircd_current_time() > target_p->localClient->lasttime) ? 
-			 (ircd_current_time() - target_p->localClient->lasttime) : 0,
+			rb_current_time() - target_p->localClient->firsttime,
+			(rb_current_time() > target_p->localClient->lasttime) ? 
+			 (rb_current_time() - target_p->localClient->lasttime) : 0,
 			IsOper (source_p) ? show_capabilities (target_p) : "TS");
 	}
 
@@ -1544,7 +1544,7 @@ stats_servlinks (struct Client *source_p)
 			   "? :Recv total : %7.2f %s",
 			   _GMKv (receiveK), _GMKs (receiveK));
 
-	uptime = (ircd_current_time() - startup_time);
+	uptime = (rb_current_time() - startup_time);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :Server send: %7.2f %s (%4.1f K/s)",
@@ -1674,14 +1674,14 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSLINKINFO, Lformat,
 				target_p->name,
-				(int) ircd_linebuf_len(&target_p->localClient->buf_sendq),
+				(int) rb_linebuf_len(&target_p->localClient->buf_sendq),
 				(int) target_p->localClient->sendM,
 				(int) target_p->localClient->sendK,
 				(int) target_p->localClient->receiveM,
 				(int) target_p->localClient->receiveK,
-				ircd_current_time() - target_p->localClient->firsttime,
-				(ircd_current_time() > target_p->localClient->lasttime) ? 
-				 (ircd_current_time() - target_p->localClient->lasttime) : 0,
+				rb_current_time() - target_p->localClient->firsttime,
+				(rb_current_time() > target_p->localClient->lasttime) ? 
+				 (rb_current_time() - target_p->localClient->lasttime) : 0,
 				IsOper(source_p) ? show_capabilities(target_p) : "-");
 	}
 
@@ -1689,14 +1689,14 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSLINKINFO, Lformat,
 				    get_client_name(target_p, MASK_IP),
-				    (int) ircd_linebuf_len(&target_p->localClient->buf_sendq),
+				    (int) rb_linebuf_len(&target_p->localClient->buf_sendq),
 				    (int) target_p->localClient->sendM,
 				    (int) target_p->localClient->sendK,
 				    (int) target_p->localClient->receiveM,
 				    (int) target_p->localClient->receiveK,
-				    ircd_current_time() - target_p->localClient->firsttime,
-				    (ircd_current_time() > target_p->localClient->lasttime) ? 
-				     (ircd_current_time() - target_p->localClient->lasttime) : 0,
+				    rb_current_time() - target_p->localClient->firsttime,
+				    (rb_current_time() > target_p->localClient->lasttime) ? 
+				     (rb_current_time() - target_p->localClient->lasttime) : 0,
 				    "-");
 	}
 
@@ -1706,20 +1706,20 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				   IsUpper(statchar) ?
 				   get_client_name(target_p, SHOW_IP) :
 				   get_client_name(target_p, HIDE_IP),
-				   (int) ircd_linebuf_len(&target_p->localClient->buf_sendq),
+				   (int) rb_linebuf_len(&target_p->localClient->buf_sendq),
 				   (int) target_p->localClient->sendM,
 				   (int) target_p->localClient->sendK,
 				   (int) target_p->localClient->receiveM,
 				   (int) target_p->localClient->receiveK,
-				   ircd_current_time() - target_p->localClient->firsttime,
-				   (ircd_current_time() > target_p->localClient->lasttime) ? 
-				    (ircd_current_time() - target_p->localClient->lasttime) : 0,
+				   rb_current_time() - target_p->localClient->firsttime,
+				   (rb_current_time() > target_p->localClient->lasttime) ? 
+				    (rb_current_time() - target_p->localClient->lasttime) : 0,
 				   "-");
 	}
 }
 
 static void
-ircd_dump_fd_callback(int fd, const char *desc, void *data)
+rb_dump_fd_callback(int fd, const char *desc, void *data)
 {
 	struct Client *source_p = data;
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG, "F :fd %-3d desc '%s'", fd, desc);
@@ -1728,7 +1728,7 @@ ircd_dump_fd_callback(int fd, const char *desc, void *data)
 static void
 stats_comm(struct Client *source_p)
 {
-	ircd_dump_fd(ircd_dump_fd_callback, source_p);
+	rb_dump_fd(rb_dump_fd_callback, source_p);
 	send_pop_queue(source_p);
 }
 /*

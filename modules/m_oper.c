@@ -169,7 +169,7 @@ send_oper_motd(struct Client *source_p)
 	struct cacheline *lineptr;
 	dlink_node *ptr;
 
-	if(oper_motd == NULL || ircd_dlink_list_length(&oper_motd->contents) == 0)
+	if(oper_motd == NULL || rb_dlink_list_length(&oper_motd->contents) == 0)
 		return;
 
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_OMOTDSTART), 
@@ -252,9 +252,9 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 	SetExemptKline(source_p);
 
 	source_p->operflags |= oper_p->flags;
-	source_p->localClient->opername = ircd_strdup(oper_p->name);
+	source_p->localClient->opername = rb_strdup(oper_p->name);
 
-	ircd_dlinkAddAlloc(source_p, &oper_list);
+	rb_dlinkAddAlloc(source_p, &oper_list);
 
 	if(IsOperAdmin(source_p) && !IsOperHiddenAdmin(source_p))
 		source_p->umodes |= UMODE_ADMIN;
@@ -297,8 +297,8 @@ cleanup_challenge(struct Client *target_p)
 	if(target_p->localClient == NULL)
 		return;
 	
-	ircd_free(target_p->localClient->passwd);
-	ircd_free(target_p->localClient->opername);
+	rb_free(target_p->localClient->passwd);
+	rb_free(target_p->localClient->opername);
 	target_p->localClient->passwd = NULL;
 	target_p->localClient->opername = NULL;
 	target_p->localClient->chal_time = 0;
@@ -333,7 +333,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		if(source_p->localClient->passwd == NULL)
 			return 0;
 
-		if((ircd_current_time() - source_p->localClient->chal_time) > CHALLENGE_EXPIRES)
+		if((rb_current_time() - source_p->localClient->chal_time) > CHALLENGE_EXPIRES)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "EXPIRED CHALLENGE (%s) by (%s!%s@%s)",
@@ -349,7 +349,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 			return 0;			
 		}
 
-		b_response = ircd_base64_decode((const unsigned char *)++parv[1], strlen(parv[1]), &len);
+		b_response = rb_base64_decode((const unsigned char *)++parv[1], strlen(parv[1]), &len);
 
 		if(len != SHA_DIGEST_LENGTH || memcmp(source_p->localClient->passwd, b_response, SHA_DIGEST_LENGTH))
 		{
@@ -364,12 +364,12 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 						     source_p->name, source_p->username,
 						     source_p->host);
 
-			ircd_free(b_response);
+			rb_free(b_response);
 			cleanup_challenge(source_p);
 			return 0;
 		}
 
-		ircd_free(b_response);
+		rb_free(b_response);
 
 		oper_p = find_oper_conf(source_p->username, source_p->host, 
 					source_p->sockhost, 
@@ -430,10 +430,10 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 	if(!generate_challenge(&challenge, &(source_p->localClient->passwd), oper_p->rsa_pubkey))
 	{
 		char *chal = challenge;
-		source_p->localClient->chal_time = ircd_current_time();
+		source_p->localClient->chal_time = rb_current_time();
 		for(;;)
 		{
-			cnt = ircd_strlcpy(chal_line, chal, CHALLENGE_WIDTH);
+			cnt = rb_strlcpy(chal_line, chal, CHALLENGE_WIDTH);
 			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_RSACHALLENGE2), me.name, source_p->name, chal_line);
 			if(cnt > CHALLENGE_WIDTH)
 				chal += CHALLENGE_WIDTH - 1;
@@ -444,8 +444,8 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFRSACHALLENGE2), 
 			   me.name, source_p->name);
 
-		source_p->localClient->opername = ircd_strdup(oper_p->name);
-		ircd_free(challenge);
+		source_p->localClient->opername = rb_strdup(oper_p->name);
+		rb_free(challenge);
 	}
 	else
 		sendto_one_notice(source_p, POP_QUEUE, ":Failed to generate challenge.");
@@ -466,7 +466,7 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 
 	if(!rsa)
 		return -1;
-	if(ircd_get_random(secret, CHALLENGE_SECRET_LENGTH))
+	if(rb_get_random(secret, CHALLENGE_SECRET_LENGTH))
 	{
 		SHA1_Init(&ctx);
 		SHA1_Update(&ctx, (uint8_t *)secret, CHALLENGE_SECRET_LENGTH);
@@ -474,18 +474,18 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 		SHA1_Final((uint8_t *)*r_response, &ctx);
 
 		length = RSA_size(rsa);
-		tmp = ircd_malloc(length);
+		tmp = rb_malloc(length);
 		ret = RSA_public_encrypt(CHALLENGE_SECRET_LENGTH, secret, tmp, rsa, RSA_PKCS1_OAEP_PADDING);
 
 		if(ret >= 0)
 		{
-			*r_challenge = (char *)ircd_base64_encode(tmp, ret);
-			ircd_free(tmp);
+			*r_challenge = (char *)rb_base64_encode(tmp, ret);
+			rb_free(tmp);
 			return 0;
 		}
 
-		ircd_free(tmp);
-		ircd_free(*r_response);
+		rb_free(tmp);
+		rb_free(*r_response);
 		*r_response = NULL;
 	}
 

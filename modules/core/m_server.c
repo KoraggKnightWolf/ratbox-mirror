@@ -84,7 +84,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	name = parv[1];
 	hop = atoi(parv[2]);
-	ircd_strlcpy(info, parv[3], sizeof(info));
+	rb_strlcpy(info, parv[3], sizeof(info));
 
 	/* 
 	 * Reject a direct nonTS server connection if we're TS_ONLY -orabidoo
@@ -237,7 +237,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	name = parv[1];
 	hop = atoi(parv[2]);
-	ircd_strlcpy(info, parv[3], sizeof(info));
+	rb_strlcpy(info, parv[3], sizeof(info));
 
 	if((target_p = server_exists(name)))
 	{
@@ -378,10 +378,10 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	SetServer(target_p);
 
-	ircd_dlinkAddTail(target_p, &target_p->node, &global_client_list);
-	ircd_dlinkAddTailAlloc(target_p, &global_serv_list);
+	rb_dlinkAddTail(target_p, &target_p->node, &global_client_list);
+	rb_dlinkAddTailAlloc(target_p, &global_serv_list);
 	add_to_hash(HASH_CLIENT, target_p->name, target_p);
-	ircd_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
+	rb_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
 
 	sendto_server(client_p, NULL, NOCAPS, NOCAPS,
 		      ":%s SERVER %s %d :%s%s",
@@ -518,11 +518,11 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	target_p->servptr = source_p;
 	SetServer(target_p);
 
-	ircd_dlinkAddTail(target_p, &target_p->node, &global_client_list);
-	ircd_dlinkAddTailAlloc(target_p, &global_serv_list);
+	rb_dlinkAddTail(target_p, &target_p->node, &global_client_list);
+	rb_dlinkAddTailAlloc(target_p, &global_serv_list);
 	add_to_hash(HASH_CLIENT, target_p->name, target_p);
 	add_to_hash(HASH_ID, target_p->id, target_p);
-	ircd_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
+	rb_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
 
 	sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
 		      ":%s SID %s %d %s :%s%s",
@@ -609,13 +609,13 @@ set_server_gecos(struct Client *client_p, const char *info)
 			/* if there was a trailing space, s could point to \0, so check */
 			if(s && (*s != '\0'))
 			{
-				ircd_strlcpy(client_p->info, s, sizeof(client_p->info));
+				rb_strlcpy(client_p->info, s, sizeof(client_p->info));
 				return 1;
 			}
 		}
 	}
 
-	ircd_strlcpy(client_p->info, "(Unknown Location)", sizeof(client_p->info));
+	rb_strlcpy(client_p->info, "(Unknown Location)", sizeof(client_p->info));
 
 	return 1;
 }
@@ -747,8 +747,8 @@ check_server(const char *name, struct Client *client_p)
 static int
 fork_server(struct Client *server)
 {
-	ircd_fde_t *ctrl_fds[2];
-	ircd_fde_t *data_fds[2];
+	rb_fde_t *ctrl_fds[2];
+	rb_fde_t *data_fds[2];
 	char maxfd[6];
 	char fd_str[4][6];
 	char *kid_argv[3];
@@ -756,18 +756,18 @@ fork_server(struct Client *server)
 	char servname[HOSTLEN+1];
 
 	/* ctrl */
-	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, &ctrl_fds[0], &ctrl_fds[1],  "slink control fds") < 0)
+	if(rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &ctrl_fds[0], &ctrl_fds[1],  "slink control fds") < 0)
 		goto fork_error;
 
 	/* data */
-	if(ircd_socketpair(AF_UNIX, SOCK_STREAM, 0, &data_fds[0], &data_fds[1], "slink data fds") < 0)
+	if(rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &data_fds[0], &data_fds[1], "slink data fds") < 0)
 		goto fork_error;
 
-	ircd_snprintf(fd_str[0], sizeof(fd_str[0]), "%d", ircd_get_fd(ctrl_fds[1]));
-	ircd_snprintf(fd_str[1], sizeof(fd_str[1]), "%d", ircd_get_fd(data_fds[1]));
-	ircd_snprintf(fd_str[2], sizeof(fd_str[2]), "%d", ircd_get_fd(server->localClient->F));
-	ircd_snprintf(maxfd, sizeof(maxfd), "%d", maxconnections);
-	ircd_snprintf(servname, sizeof(servname), "(%s)", server->name);
+	rb_snprintf(fd_str[0], sizeof(fd_str[0]), "%d", rb_get_fd(ctrl_fds[1]));
+	rb_snprintf(fd_str[1], sizeof(fd_str[1]), "%d", rb_get_fd(data_fds[1]));
+	rb_snprintf(fd_str[2], sizeof(fd_str[2]), "%d", rb_get_fd(server->localClient->F));
+	rb_snprintf(maxfd, sizeof(maxfd), "%d", maxconnections);
+	rb_snprintf(servname, sizeof(servname), "(%s)", server->name);
 
 	setenv("MAXFD", maxfd, 1);	  
 	setenv("CTRLFD", fd_str[0], 1);
@@ -778,13 +778,13 @@ fork_server(struct Client *server)
         kid_argv[1] = servname; 
         kid_argv[2] = NULL;
 		
-	if(ircd_spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
+	if(rb_spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
 	{
-		ircd_close(server->localClient->F);
+		rb_close(server->localClient->F);
 
 		/* close the childs end of the pipes */
-		ircd_close(ctrl_fds[1]);
-		ircd_close(data_fds[1]);
+		rb_close(ctrl_fds[1]);
+		rb_close(data_fds[1]);
 		
 		s_assert(server->localClient);
 		server->localClient->slink->ctrlfd = ctrl_fds[0];
@@ -799,10 +799,10 @@ fork_server(struct Client *server)
       fork_error:
 	/* this is ugly, but nicer than repeating
 	 * about 50 close() statements everywhre... */
-	ircd_close(data_fds[0]);
-	ircd_close(data_fds[1]);
-	ircd_close(ctrl_fds[0]);
-	ircd_close(ctrl_fds[1]);
+	rb_close(data_fds[0]);
+	rb_close(data_fds[1]);
+	rb_close(ctrl_fds[0]);
+	rb_close(ctrl_fds[1]);
 	return -1;
 }
 
@@ -814,7 +814,7 @@ start_io(struct Client *server)
 	int linecount = 0;
 	int linelen;
 
-	iobuf = ircd_malloc(256);
+	iobuf = rb_malloc(256);
 
 	if(IsCapable(server, CAP_ZIP))
 	{
@@ -831,10 +831,10 @@ start_io(struct Client *server)
 	{
 		linecount++;
 
-		iobuf = ircd_realloc(iobuf, (c + READBUF_SIZE + 64));
+		iobuf = rb_realloc(iobuf, (c + READBUF_SIZE + 64));
 
 		/* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
-		linelen = ircd_linebuf_get(&server->localClient->buf_recvq, (char *) (iobuf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL, LINEBUF_RAW);	/* include partial lines */
+		linelen = rb_linebuf_get(&server->localClient->buf_recvq, (char *) (iobuf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL, LINEBUF_RAW);	/* include partial lines */
 
 		if(linelen)
 		{
@@ -851,10 +851,10 @@ start_io(struct Client *server)
 	{
 		linecount++;
 
-		iobuf = ircd_realloc(iobuf, (c + BUF_DATA_SIZE + 64));
+		iobuf = rb_realloc(iobuf, (c + BUF_DATA_SIZE + 64));
 
 		/* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
-		linelen = ircd_linebuf_get(&server->localClient->buf_sendq, 
+		linelen = rb_linebuf_get(&server->localClient->buf_sendq, 
 				      (char *) (iobuf + c + 3), READBUF_SIZE, 
 				      LINEBUF_PARTIAL, LINEBUF_PARSED);	/* include partial lines */
 
@@ -901,7 +901,7 @@ burst_modes_TS5(struct Client *client_p, char *chname, dlink_list *list, char fl
 	char *pp;
 	int count = 0;
 
-	mlen = ircd_sprintf(buf, ":%s MODE %s +", me.name, chname);
+	mlen = rb_sprintf(buf, ":%s MODE %s +", me.name, chname);
 	cur_len = mlen;
 
 	mp = mbuf;
@@ -928,7 +928,7 @@ burst_modes_TS5(struct Client *client_p, char *chname, dlink_list *list, char fl
 
 		*mp++ = flag;
 		*mp = '\0';
-		pp += ircd_sprintf(pp, "%s ", banptr->banstr);
+		pp += rb_sprintf(pp, "%s ", banptr->banstr);
 		cur_len += tlen;
 		count++;
 	}
@@ -955,7 +955,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr,
 	int mlen;
 	int cur_len;
 
-	cur_len = mlen = ircd_sprintf(buf, ":%s BMASK %ld %s %c :",
+	cur_len = mlen = rb_sprintf(buf, ":%s BMASK %ld %s %c :",
 				    me.id, (long) chptr->channelts, chptr->chname, flag);
 	t = buf + mlen;
 
@@ -982,7 +982,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr,
 			t = buf + mlen;
 		}
 
-		ircd_sprintf(t, "%s ", banptr->banstr);
+		rb_sprintf(t, "%s ", banptr->banstr);
 		t += tlen;
 		cur_len += tlen;
 	}
@@ -1052,14 +1052,14 @@ burst_TS5(struct Client *client_p)
 	{
 		chptr = ptr->data;
 
-		s_assert(ircd_dlink_list_length(&chptr->members) > 0);
-		if(ircd_dlink_list_length(&chptr->members) <= 0)
+		s_assert(rb_dlink_list_length(&chptr->members) > 0);
+		if(rb_dlink_list_length(&chptr->members) <= 0)
 			continue;
 
 		if(*chptr->chname != '#')
 			continue;
 
-		cur_len = mlen = ircd_sprintf(buf, ":%s SJOIN %ld %s %s :", me.name,
+		cur_len = mlen = rb_sprintf(buf, ":%s SJOIN %ld %s %s :", me.name,
 				(long) chptr->channelts, chptr->chname, 
 				channel_modes(chptr, client_p));
 
@@ -1084,7 +1084,7 @@ burst_TS5(struct Client *client_p)
 				t = buf + mlen;
 			}
 
-			ircd_sprintf(t, "%s%s ", find_channel_status(msptr, 1), 
+			rb_sprintf(t, "%s%s ", find_channel_status(msptr, 1), 
 				   msptr->client_p->name);
 
 			cur_len += tlen;
@@ -1189,14 +1189,14 @@ burst_TS6(struct Client *client_p)
 	{
 		chptr = ptr->data;
 
-		s_assert(ircd_dlink_list_length(&chptr->members) > 0);
-		if(ircd_dlink_list_length(&chptr->members) <= 0)
+		s_assert(rb_dlink_list_length(&chptr->members) > 0);
+		if(rb_dlink_list_length(&chptr->members) <= 0)
 			continue;
 
 		if(*chptr->chname != '#')
 			continue;
 
-		cur_len = mlen = ircd_sprintf(buf, ":%s SJOIN %ld %s %s :", me.id,
+		cur_len = mlen = rb_sprintf(buf, ":%s SJOIN %ld %s %s :", me.id,
 				(long) chptr->channelts, chptr->chname,
 				channel_modes(chptr, client_p));
 
@@ -1220,7 +1220,7 @@ burst_TS6(struct Client *client_p)
 				t = buf + mlen;
 			}
 
-			ircd_sprintf(t, "%s%s ", find_channel_status(msptr, 1), 
+			rb_sprintf(t, "%s%s ", find_channel_status(msptr, 1), 
 				   use_id(msptr->client_p));
 
 			cur_len += tlen;
@@ -1231,15 +1231,15 @@ burst_TS6(struct Client *client_p)
 		*(t-1) = '\0';
 		sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 
-		if(ircd_dlink_list_length(&chptr->banlist) > 0)
+		if(rb_dlink_list_length(&chptr->banlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->banlist, 'b');
 
 		if(IsCapable(client_p, CAP_EX) &&
-		   ircd_dlink_list_length(&chptr->exceptlist) > 0)
+		   rb_dlink_list_length(&chptr->exceptlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->exceptlist, 'e');
 
 		if(IsCapable(client_p, CAP_IE) &&
-		   ircd_dlink_list_length(&chptr->invexlist) > 0)
+		   rb_dlink_list_length(&chptr->invexlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->invexlist, 'I');
 
 		if(IsCapable(client_p, CAP_TB) && chptr->topic != NULL)
@@ -1295,7 +1295,7 @@ server_estab(struct Client *client_p)
 	if(client_p->localClient->passwd)
 	{
 		memset(client_p->localClient->passwd, 0, strlen(client_p->localClient->passwd));
-		ircd_free(client_p->localClient->passwd);
+		rb_free(client_p->localClient->passwd);
 		client_p->localClient->passwd = NULL;
 	}
 
@@ -1345,15 +1345,15 @@ server_estab(struct Client *client_p)
 			   (me.info[0]) ? (me.info) : "IRCers United");
 	}
 
-	if(!ircd_set_buffers(client_p->localClient->F, READBUF_SIZE))
-		report_error("ircd_set_buffers failed for server %s:%s", 
+	if(!rb_set_buffers(client_p->localClient->F, READBUF_SIZE))
+		report_error("rb_set_buffers failed for server %s:%s", 
 			     client_p->name, 
 			     log_client_name(client_p, SHOW_IP), errno);
 
 	/* Hand the server off to servlink now */
 	if(IsCapable(client_p, CAP_ZIP))
 	{
-		client_p->localClient->slink = ircd_malloc(sizeof(struct servlink_data));
+		client_p->localClient->slink = rb_malloc(sizeof(struct servlink_data));
 		
 		if(fork_server(client_p) < 0)
 		{
@@ -1369,7 +1369,7 @@ server_estab(struct Client *client_p)
 		SetServlink(client_p);
 	}
 
-	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, ircd_current_time());
+	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, rb_current_time());
 
 	client_p->servptr = &me;
 
@@ -1381,9 +1381,9 @@ server_estab(struct Client *client_p)
 	/* Update the capability combination usage counts */
 	set_chcap_usage_counts(client_p);
 
-	ircd_dlinkAdd(client_p, &client_p->lnode, &me.serv->servers);
-	ircd_dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &serv_list);
-	ircd_dlinkAddTailAlloc(client_p, &global_serv_list);
+	rb_dlinkAdd(client_p, &client_p->lnode, &me.serv->servers);
+	rb_dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &serv_list);
+	rb_dlinkAddTailAlloc(client_p, &global_serv_list);
 
 	if(has_id(client_p))
 		add_to_hash(HASH_ID, client_p->id, client_p);
@@ -1396,14 +1396,14 @@ server_estab(struct Client *client_p)
 
 	if(client_p->localClient->fullcaps)
 	{
-		client_p->serv->fullcaps = ircd_strdup(client_p->localClient->fullcaps);
-		ircd_free(client_p->localClient->fullcaps);
+		client_p->serv->fullcaps = rb_strdup(client_p->localClient->fullcaps);
+		rb_free(client_p->localClient->fullcaps);
 		client_p->localClient->fullcaps = NULL;
 	}
 
 	/* add it to scache */
 	find_or_add(client_p->name);
-	client_p->localClient->firsttime = ircd_current_time();
+	client_p->localClient->firsttime = rb_current_time();
 	/* fixing eob timings.. -gnp */
 
 	/* Show the real host/IP to admins */
@@ -1433,11 +1433,11 @@ server_estab(struct Client *client_p)
 		/* we won't overflow FD_DESC_SZ here, as it can hold
 		 * client_p->name + 64
 		 */
-		ircd_note(client_p->localClient->F, "slink data: %s", client_p->name);
-		ircd_note(client_p->localClient->slink->ctrlfd, "slink ctrl: %s", client_p->name);
+		rb_note(client_p->localClient->F, "slink data: %s", client_p->name);
+		rb_note(client_p->localClient->slink->ctrlfd, "slink ctrl: %s", client_p->name);
 	}
 	else
-		ircd_note(client_p->localClient->F, "Server: %s", client_p->name);
+		rb_note(client_p->localClient->F, "Server: %s", client_p->name);
 
 	/*
 	 ** Old sendto_serv_but_one() call removed because we now

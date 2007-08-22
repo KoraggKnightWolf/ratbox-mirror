@@ -87,7 +87,7 @@
 #line 6 "src/ircd_parser.y"
 
 
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "stdinc.h"
 #include "newconf.h"
 
@@ -173,7 +173,7 @@ free_cur_list(conf_parm_t* list)
 	{
 		case CF_STRING:
 		case CF_QSTRING:
-			ircd_free(list->v.string);
+			rb_free(list->v.string);
 			break;
 		case CF_LIST:
 			free_cur_list(list->v.list);
@@ -194,7 +194,7 @@ add_cur_list_cpt(conf_parm_t *new)
 	
 	if (cur_list == NULL)
 	{
-		cur_list = ircd_malloc(sizeof(conf_parm_t));
+		cur_list = rb_malloc(sizeof(conf_parm_t));
 		cur_list->v.list = new;
 	}
 	else
@@ -210,7 +210,7 @@ add_cur_list(int type, char *str, int number)
 {
 	conf_parm_t *new;
 
-	new = ircd_malloc(sizeof(conf_parm_t));
+	new = rb_malloc(sizeof(conf_parm_t));
 	new->next = NULL;
 	new->type = type;
 
@@ -223,7 +223,7 @@ add_cur_list(int type, char *str, int number)
 		break;
 	case CF_STRING:
 	case CF_QSTRING:
-		new->v.string = ircd_strdup(str);
+		new->v.string = rb_strdup(str);
 		break;
 	}
 
@@ -1562,16 +1562,16 @@ yyreduce:
   case 18:
 #line 242 "src/ircd_parser.y"
     {
-		(yyval.conf_parm) = ircd_malloc(sizeof(conf_parm_t));
+		(yyval.conf_parm) = rb_malloc(sizeof(conf_parm_t));
 		(yyval.conf_parm)->type = CF_QSTRING;
-		(yyval.conf_parm)->v.string = ircd_strdup((yyvsp[(1) - (1)].string));
+		(yyval.conf_parm)->v.string = rb_strdup((yyvsp[(1) - (1)].string));
 	}
     break;
 
   case 19:
 #line 248 "src/ircd_parser.y"
     {
-		(yyval.conf_parm) = ircd_malloc(sizeof(conf_parm_t));
+		(yyval.conf_parm) = rb_malloc(sizeof(conf_parm_t));
 		(yyval.conf_parm)->type = CF_TIME;
 		(yyval.conf_parm)->v.number = (yyvsp[(1) - (1)].number);
 	}
@@ -1580,7 +1580,7 @@ yyreduce:
   case 20:
 #line 254 "src/ircd_parser.y"
     {
-		(yyval.conf_parm) = ircd_malloc(sizeof(conf_parm_t));
+		(yyval.conf_parm) = rb_malloc(sizeof(conf_parm_t));
 		(yyval.conf_parm)->type = CF_INT;
 		(yyval.conf_parm)->v.number = (yyvsp[(1) - (1)].number);
 	}
@@ -1594,7 +1594,7 @@ yyreduce:
 		 
 		int val = conf_get_yesno_value((yyvsp[(1) - (1)].string));
 
-		(yyval.conf_parm) = ircd_malloc(sizeof(conf_parm_t));
+		(yyval.conf_parm) = rb_malloc(sizeof(conf_parm_t));
 
 		if (val != -1)
 		{
@@ -1604,7 +1604,7 @@ yyreduce:
 		else
 		{
 			(yyval.conf_parm)->type = CF_STRING;
-			(yyval.conf_parm)->v.string = ircd_strdup((yyvsp[(1) - (1)].string));
+			(yyval.conf_parm)->v.string = rb_strdup((yyvsp[(1) - (1)].string));
 		}
 	}
     break;

@@ -25,7 +25,7 @@
  */
 
 
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "stdinc.h"
 #ifdef HAVE_LIBCRYPTO
 #include <openssl/pem.h>
@@ -230,7 +230,7 @@ conf_report_error_nl(const char *fmt, ...)
 	char msg[IRCD_BUFSIZE + 1];
 
 	va_start(ap, fmt);
-	ircd_vsnprintf(msg, sizeof(msg), fmt, ap);
+	rb_vsnprintf(msg, sizeof(msg), fmt, ap);
 	va_end(ap);
 
 	conf_parse_failure++;
@@ -251,7 +251,7 @@ conf_report_warning_nl(const char *fmt, ...)
 	char msg[IRCD_BUFSIZE + 1];
 
 	va_start(ap, fmt);
-	ircd_vsnprintf(msg, sizeof(msg), fmt, ap);
+	rb_vsnprintf(msg, sizeof(msg), fmt, ap);
 	va_end(ap);
 
 	if(testing_conf)
@@ -322,31 +322,31 @@ static conf_t *
 make_conf_block(const char *blockname)
 {
 	conf_t *conf;
-	conf = ircd_malloc(sizeof(conf_t));
-	conf->confname = ircd_strdup(blockname);
-	ircd_dlinkAddTail(conf, &conf->node, &conflist);
+	conf = rb_malloc(sizeof(conf_t));
+	conf->confname = rb_strdup(blockname);
+	rb_dlinkAddTail(conf, &conf->node, &conflist);
 	return (conf);
 }
 
 static void
 add_entry(conf_t * conf, const char *name, void *value, int type)
 {
-	confentry_t *entry = ircd_malloc(sizeof(confentry_t));
+	confentry_t *entry = rb_malloc(sizeof(confentry_t));
 	if(name == NULL)
 	{
 		return;
 	}
-	entry->entryname = ircd_strdup(name);
+	entry->entryname = rb_strdup(name);
 	entry->line = lineno;
-	entry->filename = ircd_strdup(current_file);
+	entry->filename = rb_strdup(current_file);
 	switch (CF_TYPE(type))
 	{
 
 	case CF_YESNO:
 		if((long) value == 1)
-			entry->string = ircd_strdup("yes");
+			entry->string = rb_strdup("yes");
 		else
-			entry->string = ircd_strdup("no");
+			entry->string = rb_strdup("no");
 	case CF_INT:
 	case CF_TIME:
 		entry->number = (long) value;
@@ -354,20 +354,20 @@ add_entry(conf_t * conf, const char *name, void *value, int type)
 		break;
 	case CF_STRING:
 	case CF_QSTRING:
-		entry->string = ircd_strdup(value);
+		entry->string = rb_strdup(value);
 		entry->type = type;
 		break;
 	default:
-		ircd_free(entry);
+		rb_free(entry);
 		return;
 	}
-	ircd_dlinkAddTail(entry, &entry->node, &conf->entries);
+	rb_dlinkAddTail(entry, &entry->node, &conf->entries);
 
-	/* must use ircd_malloc here as we are running too early
-	 * to use ircd_dlinkAddAlloc as the block heap isn't ready
+	/* must use rb_malloc here as we are running too early
+	 * to use rb_dlinkAddAlloc as the block heap isn't ready
 	 * yet 
 	 */
-	ircd_dlinkAdd(entry, ircd_malloc(sizeof(dlink_node)), &entry->flist);
+	rb_dlinkAdd(entry, rb_malloc(sizeof(dlink_node)), &entry->flist);
 
 }
 
@@ -386,32 +386,32 @@ del_entry(conf_t * conf, confentry_t * entry)
 			case CF_STRING:
 			case CF_QSTRING:
 			case CF_YESNO:
-				ircd_free(xentry->string);
+				rb_free(xentry->string);
 			default:
 				break;
 			}
-			ircd_dlinkDelete(&xentry->node, &entry->flist);
+			rb_dlinkDelete(&xentry->node, &entry->flist);
 		}
 	}
 	else
 	{
 		ptr = entry->flist.head;
-		ircd_dlinkDelete(ptr, &entry->flist);
-		ircd_free(ptr);
+		rb_dlinkDelete(ptr, &entry->flist);
+		rb_free(ptr);
 	}
 	switch (CF_TYPE(entry->type))
 	{
 	case CF_STRING:
 	case CF_QSTRING:
 	case CF_YESNO:
-		ircd_free(entry->string);
+		rb_free(entry->string);
 	default:
 		break;
 	}
-	ircd_free(entry->filename);
-	ircd_dlinkDelete(&entry->node, &conf->entries);
+	rb_free(entry->filename);
+	rb_dlinkDelete(&entry->node, &conf->entries);
 
-	ircd_free(entry);
+	rb_free(entry);
 }
 
 
@@ -424,10 +424,10 @@ del_conf(conf_t * conf)
 		confentry_t *entry = ptr->data;
 		del_entry(conf, entry);
 	}
-	ircd_free(conf->confname);
-	ircd_free(conf->filename);
-	ircd_dlinkDelete(&conf->node, &conflist);
-	ircd_free(conf);
+	rb_free(conf->confname);
+	rb_free(conf->filename);
+	rb_dlinkDelete(&conf->node, &conflist);
+	rb_free(conf);
 }
 
 
@@ -453,7 +453,7 @@ strip_tabs(char *dest, const char *src, size_t len)
 	if(dest == NULL || src == NULL)
 		return NULL;
 
-	ircd_strlcpy(dest, src, len);
+	rb_strlcpy(dest, src, len);
 
 	while(*d)
 	{
@@ -521,7 +521,7 @@ conf_report_error(const char *fmt, ...)
 	char msg[IRCD_BUFSIZE + 1];
 
 	va_start(ap, fmt);
-	ircd_vsnprintf(msg, sizeof(msg), fmt, ap);
+	rb_vsnprintf(msg, sizeof(msg), fmt, ap);
 	va_end(ap);
 
 	conf_parse_failure++;
@@ -547,9 +547,9 @@ conf_start_block(char *block, char *name)
 	}
 	conf = make_conf_block(block);
 	if(name != NULL)
-		conf->subname = ircd_strdup(name);
+		conf->subname = rb_strdup(name);
 	conf->line = lineno;
-	conf->filename = ircd_strdup(current_file);
+	conf->filename = rb_strdup(current_file);
 	curconf = conf;
 	return 0;
 }
@@ -570,30 +570,30 @@ conf_end_block(void)
 static void
 add_entry_flist(conf_t * conf, const char *name, conf_parm_t * cp)
 {
-	confentry_t *entry = ircd_malloc(sizeof(confentry_t));
+	confentry_t *entry = rb_malloc(sizeof(confentry_t));
 	confentry_t *sub;
 	if(name == NULL)
 	{
 		return;
 	}
-	entry->entryname = ircd_strdup(name);
+	entry->entryname = rb_strdup(name);
 	entry->line = lineno;
-	entry->filename = ircd_strdup(current_file);
+	entry->filename = rb_strdup(current_file);
 	entry->type = cp->type | CF_FLIST;
 	for(; cp != NULL; cp = cp->next)
 	{
-		sub = ircd_malloc(sizeof(confentry_t));
-		sub->entryname = ircd_strdup(name);
+		sub = rb_malloc(sizeof(confentry_t));
+		sub->entryname = rb_strdup(name);
 		sub->line = lineno;
-		sub->filename = ircd_strdup(current_file);
+		sub->filename = rb_strdup(current_file);
 
 		switch (CF_TYPE(cp->type))
 		{
 		case CF_YESNO:
 			if((long) cp->v.number == 1)
-				sub->string = ircd_strdup("yes");
+				sub->string = rb_strdup("yes");
 			else
-				sub->string = ircd_strdup("no");
+				sub->string = rb_strdup("no");
 		case CF_INT:
 		case CF_TIME:
 			sub->number = (long) cp->v.number;
@@ -601,17 +601,17 @@ add_entry_flist(conf_t * conf, const char *name, conf_parm_t * cp)
 			break;
 		case CF_STRING:
 		case CF_QSTRING:
-			sub->string = ircd_strdup(cp->v.string);
+			sub->string = rb_strdup(cp->v.string);
 			sub->type = cp->type;
 			break;
 		default:
-			ircd_free(sub);
+			rb_free(sub);
 			return;
 		}
-		ircd_dlinkAddTail(sub, &sub->node, &entry->flist);
+		rb_dlinkAddTail(sub, &sub->node, &entry->flist);
 	}
 
-	ircd_dlinkAddTail(entry, &entry->node, &conf->entries);
+	rb_dlinkAddTail(entry, &entry->node, &conf->entries);
 }
 
 int
@@ -655,7 +655,7 @@ read_config_file(const char *filename)
 {
 	conf_parse_failure = 0;
 	delete_all_conf();
-	ircd_strlcpy(conffilebuf, filename, sizeof(conffilebuf));
+	rb_strlcpy(conffilebuf, filename, sizeof(conffilebuf));
 	if((conf_fbfile_in = fopen(filename, "r")) == NULL)
 	{
 		conf_report_error_nl("Unable to open file %s %s", filename, strerror(errno));
@@ -671,10 +671,10 @@ read_config_file(const char *filename)
 static void
 add_valid_block(const char *name, int needsub)
 {
-	valid_block_t *valid = ircd_malloc(sizeof(valid_block_t));
-	valid->name = ircd_strdup(name);
+	valid_block_t *valid = rb_malloc(sizeof(valid_block_t));
+	valid->name = rb_strdup(name);
 	valid->needsub = needsub;
-	ircd_dlinkAdd(valid, &valid->node, &valid_blocks);
+	rb_dlinkAdd(valid, &valid->node, &valid_blocks);
 }
 
 static valid_block_t *
@@ -699,10 +699,10 @@ add_valid_entry(const char *bname, const char *entryname, int type)
 	b = find_valid_block(bname);
 	if(b == NULL)
 		return;
-	e = ircd_malloc(sizeof(valid_entry_t));
-	e->name = ircd_strdup(entryname);
+	e = rb_malloc(sizeof(valid_entry_t));
+	e->name = rb_strdup(entryname);
 	e->type = type;
-	ircd_dlinkAdd(e, &e->node, &b->valid_entries);
+	rb_dlinkAdd(e, &e->node, &b->valid_entries);
 }
 
 static int
@@ -868,7 +868,7 @@ conf_set_modules_module(confentry_t * entry, conf_t * conf, struct conf_items *i
 
 	load_one_module(entry->string, 0);
 
-	ircd_free(m_bn);
+	rb_free(m_bn);
 #else
 	conf_report_error("Ignoring modules::module at %s:%d -- loadable module support not present.", entry->file,
 			  entry->line);
@@ -893,9 +893,9 @@ conf_set_generic_value_cb(confentry_t * entry, conf_t * conf, struct conf_items 
 	case CF_STRING:
 	case CF_QSTRING:
 		if(item->len)
-			*location = ircd_strndup(entry->string, item->len);
+			*location = rb_strndup(entry->string, item->len);
 		else
-			*location = ircd_strdup(entry->string);
+			*location = rb_strdup(entry->string);
 	}
 }
 
@@ -919,7 +919,7 @@ conf_set_serverinfo_name(confentry_t * entry, conf_t * conf, struct conf_items *
 
 		/* the ircd will exit() in main() if we dont set one */
 		if(strlen(entry->string) <= HOSTLEN)
-			ServerInfo.name = ircd_strdup(entry->string);
+			ServerInfo.name = rb_strdup(entry->string);
 	}
 }
 
@@ -932,15 +932,15 @@ conf_set_serverinfo_network_name(confentry_t * entry, conf_t * conf, struct conf
 	if((p = strchr((char *) entry->string, ' ')))
 		*p = '\0';
 
-	ircd_free(ServerInfo.network_name);
-	ServerInfo.network_name = ircd_strdup(entry->string);
+	rb_free(ServerInfo.network_name);
+	ServerInfo.network_name = rb_strdup(entry->string);
 }
 
 
 static void
 conf_set_serverinfo_vhost(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	if(ircd_inet_pton(AF_INET, (char *) entry->string, &ServerInfo.ip.sin_addr) <= 0)
+	if(rb_inet_pton(AF_INET, (char *) entry->string, &ServerInfo.ip.sin_addr) <= 0)
 	{
 		conf_report_warning_nl("Invalid netmask for server IPv4 vhost (%s)", entry->string);
 		return;
@@ -953,7 +953,7 @@ static void
 conf_set_serverinfo_vhost6(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 #ifdef IPV6
-	if(ircd_inet_pton(AF_INET6, (char *) entry->string, &ServerInfo.ip6.sin6_addr) <= 0)
+	if(rb_inet_pton(AF_INET6, (char *) entry->string, &ServerInfo.ip6.sin6_addr) <= 0)
 	{
 		conf_report_error_nl("Invalid netmask for server IPv6 vhost (%s)", entry->string);
 		return;
@@ -999,7 +999,7 @@ static void
 conf_set_class_start(conf_t * conf)
 {
 	t_class = make_class();
-	t_class->class_name = ircd_strdup(conf->subname);
+	t_class->class_name = rb_strdup(conf->subname);
 }
 
 static void
@@ -1080,7 +1080,7 @@ conf_set_auth_end(conf_t * conf)
 	dlink_node *ptr, *next;
 	struct ConfItem *tmp_conf;
 	if(EmptyString(t_aconf->info.name))
-		t_aconf->info.name = ircd_strdup("NOMATCH");
+		t_aconf->info.name = rb_strdup("NOMATCH");
 
 	if(EmptyString(t_aconf->host))
 	{
@@ -1098,18 +1098,18 @@ conf_set_auth_end(conf_t * conf)
 		tmp_conf = ptr->data;
 
 		if(t_aconf->passwd)
-			tmp_conf->passwd = ircd_strdup(t_aconf->passwd);
+			tmp_conf->passwd = rb_strdup(t_aconf->passwd);
 
-		tmp_conf->info.name = ircd_strdup(t_aconf->info.name);
+		tmp_conf->info.name = rb_strdup(t_aconf->info.name);
 		tmp_conf->flags = t_aconf->flags;
 		tmp_conf->port = t_aconf->port;
 		collapse(tmp_conf->user);
 		collapse(tmp_conf->host);
 		conf_add_class_to_conf(tmp_conf, t_aconf_class);
 		add_conf_by_address(tmp_conf->host, CONF_CLIENT, tmp_conf->user, tmp_conf);
-		ircd_dlinkDestroy(ptr, &t_aconf_list);
+		rb_dlinkDestroy(ptr, &t_aconf_list);
 	}
-	ircd_free(t_aconf_class);
+	rb_free(t_aconf_class);
 	t_aconf_class = NULL;
 	t_aconf = NULL;
 }
@@ -1118,12 +1118,12 @@ static void
 conf_set_auth_start(conf_t * conf)
 {
 	dlink_node *ptr, *next;
-	ircd_free(t_aconf_class);
+	rb_free(t_aconf_class);
 	t_aconf_class = NULL;
 	DLINK_FOREACH_SAFE(ptr, next, t_aconf_list.head)
 	{
 		free_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &t_aconf_list);
+		rb_dlinkDestroy(ptr, &t_aconf_list);
 	}
 	t_aconf = make_conf();
 	t_aconf->status = CONF_CLIENT;
@@ -1149,16 +1149,16 @@ conf_set_auth_user(confentry_t * entry, conf_t * conf, struct conf_items *item)
 	{
 		*p++ = '\0';
 
-		tmp_conf->user = ircd_strdup(tmpname);
-		tmp_conf->host = ircd_strdup(p);
+		tmp_conf->user = rb_strdup(tmpname);
+		tmp_conf->host = rb_strdup(p);
 	}
 	else
 	{
-		tmp_conf->user = ircd_strdup("*");
-		tmp_conf->host = ircd_strdup(tmpname);
+		tmp_conf->user = rb_strdup("*");
+		tmp_conf->host = rb_strdup(tmpname);
 	}
 	if(t_aconf != tmp_conf)
-		ircd_dlinkAddAlloc(tmp_conf, &t_aconf_list);
+		rb_dlinkAddAlloc(tmp_conf, &t_aconf_list);
 	return;
 }
 
@@ -1167,8 +1167,8 @@ conf_set_auth_pass(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	if(t_aconf->passwd)
 		memset(t_aconf->passwd, 0, strlen(t_aconf->passwd));
-	ircd_free(t_aconf->passwd);
-	t_aconf->passwd = ircd_strdup(entry->string);
+	rb_free(t_aconf->passwd);
+	t_aconf->passwd = rb_strdup(entry->string);
 	return;
 }
 
@@ -1225,8 +1225,8 @@ conf_set_auth_spoof(confentry_t * entry, conf_t * conf, struct conf_items *item)
 		return;
 	}
 
-	ircd_free(t_aconf->info.name);
-	t_aconf->info.name = ircd_strdup(host);
+	rb_free(t_aconf->info.name);
+	t_aconf->info.name = rb_strdup(host);
 	t_aconf->flags |= CONF_FLAGS_SPOOF_IP;
 	return;
 }
@@ -1241,8 +1241,8 @@ static void
 conf_set_auth_redirserv(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	t_aconf->flags |= CONF_FLAGS_REDIR;
-	ircd_free(t_aconf->info.name);
-	t_aconf->info.name = ircd_strdup(entry->string);
+	rb_free(t_aconf->info.name);
+	t_aconf->info.name = rb_strdup(entry->string);
 	return;
 }
 
@@ -1257,8 +1257,8 @@ conf_set_auth_redirport(confentry_t * entry, conf_t * conf, struct conf_items *i
 static void
 conf_set_auth_class(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	ircd_free(t_aconf_class);
-	t_aconf_class = ircd_strdup(entry->string);
+	rb_free(t_aconf_class);
+	t_aconf_class = rb_strdup(entry->string);
 }
 
 static struct oper_conf *t_oper;
@@ -1276,11 +1276,11 @@ conf_set_start_operator(conf_t * conf)
 	DLINK_FOREACH_SAFE(ptr, next, t_oper_list.head)
 	{
 		free_oper_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &t_oper_list);
+		rb_dlinkDestroy(ptr, &t_oper_list);
 	}
 
 	t_oper = make_oper_conf();
-	t_oper->name = ircd_strdup(conf->subname);
+	t_oper->name = rb_strdup(conf->subname);
 	t_oper->flags = OPER_ENCRYPTED | OPER_OPERWALL | OPER_REMOTEBAN;
 }
 
@@ -1311,14 +1311,14 @@ conf_set_end_operator(conf_t * conf)
 	DLINK_FOREACH_SAFE(ptr, next, t_oper_list.head)
 	{
 		tmp_oper = ptr->data;
-		tmp_oper->name = ircd_strdup(t_oper->name);
+		tmp_oper->name = rb_strdup(t_oper->name);
 
 		tmp_oper->flags = t_oper->flags;
 		tmp_oper->umodes = t_oper->umodes;
 
 		/* maybe an rsa key */
 		if(!EmptyString(t_oper->passwd))
-			tmp_oper->passwd = ircd_strdup(t_oper->passwd);
+			tmp_oper->passwd = rb_strdup(t_oper->passwd);
 #ifdef HAVE_LIBCRYPTO
 		if(t_oper->rsa_pubkey_file != NULL)
 		{
@@ -1342,7 +1342,7 @@ conf_set_end_operator(conf_t * conf)
 			}
 		}
 #endif
-		ircd_dlinkMoveNode(ptr, &t_oper_list, &oper_conf_list);
+		rb_dlinkMoveNode(ptr, &t_oper_list, &oper_conf_list);
 	}
 
 }
@@ -1364,13 +1364,13 @@ conf_set_oper_user(confentry_t * entry, conf_t * conf, struct conf_items *item)
 	if((p = strchr(host, '@')))
 	{
 		*p++ = '\0';
-		tmp_oper->username = ircd_strdup(host);
-		tmp_oper->host = ircd_strdup(p);
+		tmp_oper->username = rb_strdup(host);
+		tmp_oper->host = rb_strdup(p);
 	}
 	else
 	{
-		tmp_oper->username = ircd_strdup("*");
-		tmp_oper->host = ircd_strdup(host);
+		tmp_oper->username = rb_strdup("*");
+		tmp_oper->host = rb_strdup(host);
 	}
 
 	if(EmptyString(tmp_oper->username) || EmptyString(tmp_oper->host))
@@ -1379,7 +1379,7 @@ conf_set_oper_user(confentry_t * entry, conf_t * conf, struct conf_items *item)
 		free_oper_conf(tmp_oper);
 		return;
 	}
-	ircd_dlinkAddAlloc(tmp_oper, &t_oper_list);
+	rb_dlinkAddAlloc(tmp_oper, &t_oper_list);
 }
 
 static void
@@ -1388,17 +1388,17 @@ conf_set_oper_password(confentry_t * entry, conf_t * conf, struct conf_items *it
 	if(t_oper->passwd != NULL)
 	{
 		memset(t_oper->passwd, 0, strlen(t_oper->passwd));
-		ircd_free(t_oper->passwd);
+		rb_free(t_oper->passwd);
 	}
-	t_oper->passwd = ircd_strdup(entry->string);
+	t_oper->passwd = rb_strdup(entry->string);
 }
 
 static void
 conf_set_oper_rsa_public_key_file(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 #ifdef HAVE_LIBCRYPTO
-	ircd_free(t_oper->rsa_pubkey_file);
-	t_oper->rsa_pubkey_file = ircd_strdup(entry->string);
+	rb_free(t_oper->rsa_pubkey_file);
+	t_oper->rsa_pubkey_file = rb_strdup(entry->string);
 #else
 	conf_report_warning_nl("Warning -- ignoring rsa_public_key_file (OpenSSL support not available");
 #endif
@@ -1416,15 +1416,15 @@ static char *listener_address;
 static void
 conf_set_listen_init(conf_t * conf)
 {
-	ircd_free(listener_address);
+	rb_free(listener_address);
 	listener_address = NULL;
 }
 
 static void
 conf_set_listen_address(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	ircd_free(listener_address);
-	listener_address = ircd_strdup(entry->string);
+	rb_free(listener_address);
+	listener_address = rb_strdup(entry->string);
 }
 
 
@@ -1469,11 +1469,11 @@ conf_set_serverhide_links_delay(confentry_t * entry, conf_t * conf, struct conf_
 
 	if((val > 0) && ConfigServerHide.links_disabled == 1)
 	{
-		ircd_event_addish("cache_links", cache_links, NULL, val);
+		rb_event_addish("cache_links", cache_links, NULL, val);
 		ConfigServerHide.links_disabled = 0;
 	}
 	else if(val != ConfigServerHide.links_delay)
-		ircd_event_update("cache_links", val);
+		rb_event_update("cache_links", val);
 
 	ConfigServerHide.links_delay = val;
 }
@@ -1490,8 +1490,8 @@ conf_set_exempt_ip(confentry_t * entry, conf_t * conf, struct conf_items *item)
 	}
 
 	tmp = make_conf();
-	tmp->passwd = ircd_strdup("*");
-	tmp->host = ircd_strdup(entry->string);
+	tmp->passwd = rb_strdup("*");
+	tmp->host = rb_strdup(entry->string);
 	tmp->status = CONF_EXEMPTDLINE;
 	add_eline(tmp);
 }
@@ -1604,7 +1604,7 @@ conf_set_start_connect(conf_t * conf)
 
 	t_server = make_server_conf();
 	t_server->port = PORTNUM;
-	t_server->name = ircd_strdup(conf->subname);
+	t_server->name = rb_strdup(conf->subname);
 }
 
 
@@ -1638,21 +1638,21 @@ conf_set_end_connect(conf_t * conf)
 	}
 #endif
 	add_server_conf(t_server);
-	ircd_dlinkAdd(t_server, &t_server->node, &server_conf_list);
+	rb_dlinkAdd(t_server, &t_server->node, &server_conf_list);
 	t_server = NULL;
 }
 
 static void
 conf_set_connect_host(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	ircd_free(t_server->host);
-	t_server->host = ircd_strdup(entry->string);
+	rb_free(t_server->host);
+	t_server->host = rb_strdup(entry->string);
 }
 
 static void
 conf_set_connect_vhost(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	if(ircd_inet_pton_sock(entry->string, (struct sockaddr *) &t_server->my_ipnum) <= 0)
+	if(rb_inet_pton_sock(entry->string, (struct sockaddr *) &t_server->my_ipnum) <= 0)
 	{
 		conf_report_error("Invalid netmask for server vhost (%s)", entry->string);
 		return;
@@ -1667,9 +1667,9 @@ conf_set_connect_send_password(confentry_t * entry, conf_t * conf, struct conf_i
 	if(t_server->spasswd != NULL)
 	{
 		memset(t_server->spasswd, 0, strlen(t_server->spasswd));
-		ircd_free(t_server->spasswd);
+		rb_free(t_server->spasswd);
 	}
-	t_server->spasswd = ircd_strdup(entry->string);
+	t_server->spasswd = rb_strdup(entry->string);
 }
 
 static void
@@ -1678,9 +1678,9 @@ conf_set_connect_accept_password(confentry_t * entry, conf_t * conf, struct conf
 	if(t_server->passwd != NULL)
 	{
 		memset(t_server->passwd, 0, strlen(t_server->passwd));
-		ircd_free(t_server->passwd);
+		rb_free(t_server->passwd);
 	}
-	t_server->passwd = ircd_strdup(entry->string);
+	t_server->passwd = rb_strdup(entry->string);
 }
 
 static void
@@ -1716,8 +1716,8 @@ conf_set_connect_flags(confentry_t * entry, conf_t * conf, struct conf_items *it
 static void
 conf_set_connect_class(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	ircd_free(t_server->class_name);
-	t_server->class_name = ircd_strdup(entry->string);
+	rb_free(t_server->class_name);
+	t_server->class_name = rb_strdup(entry->string);
 }
 
 static void
@@ -1730,9 +1730,9 @@ conf_set_connect_leaf_mask(confentry_t * entry, conf_t * conf, struct conf_items
 
 	t_leaf = make_remote_conf();
 	t_leaf->flags = CONF_LEAF;
-	t_leaf->host = ircd_strdup(entry->string);
-	t_leaf->server = ircd_strdup(t_server->name);
-	ircd_dlinkAdd(t_leaf, &t_leaf->node, &hubleaf_conf_list);
+	t_leaf->host = rb_strdup(entry->string);
+	t_leaf->server = rb_strdup(t_server->name);
+	rb_dlinkAdd(t_leaf, &t_leaf->node, &hubleaf_conf_list);
 }
 
 static void
@@ -1745,9 +1745,9 @@ conf_set_connect_hub_mask(confentry_t * entry, conf_t * conf, struct conf_items 
 
 	t_hub = make_remote_conf();
 	t_hub->flags = CONF_HUB;
-	t_hub->host = ircd_strdup(entry->string);
-	t_hub->server = ircd_strdup(t_server->name);
-	ircd_dlinkAdd(t_hub, &t_hub->node, &hubleaf_conf_list);
+	t_hub->host = rb_strdup(entry->string);
+	t_hub->server = rb_strdup(t_server->name);
+	rb_dlinkAdd(t_hub, &t_hub->node, &hubleaf_conf_list);
 }
 
 
@@ -1763,7 +1763,7 @@ conf_set_cluster_cleanup(conf_t * conf)
 	DLINK_FOREACH_SAFE(ptr, next, t_cluster_list.head)
 	{
 		free_remote_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &t_cluster_list);
+		rb_dlinkDestroy(ptr, &t_cluster_list);
 	}
 	if(t_shared != NULL)
 	{
@@ -1779,8 +1779,8 @@ conf_set_cluster_name(confentry_t * entry, conf_t * conf, struct conf_items *ite
 		free_remote_conf(t_shared);
 
 	t_shared = make_remote_conf();
-	t_shared->server = ircd_strdup(entry->string);
-	ircd_dlinkAddAlloc(t_shared, &t_cluster_list);
+	t_shared->server = rb_strdup(entry->string);
+	rb_dlinkAddAlloc(t_shared, &t_cluster_list);
 	t_shared = NULL;
 }
 
@@ -1799,8 +1799,8 @@ conf_set_cluster_flags(confentry_t * entry, conf_t * conf, struct conf_items *it
 	{
 		t_shared = ptr->data;
 		t_shared->flags = flags;
-		ircd_dlinkAddTail(t_shared, &t_shared->node, &cluster_conf_list);
-		ircd_dlinkDestroy(ptr, &t_cluster_list);
+		rb_dlinkAddTail(t_shared, &t_shared->node, &cluster_conf_list);
+		rb_dlinkDestroy(ptr, &t_cluster_list);
 	}
 	t_shared = NULL;
 }
@@ -1814,7 +1814,7 @@ conf_set_shared_cleanup(conf_t * conf)
 	DLINK_FOREACH_SAFE(ptr, next, t_shared_list.head)
 	{
 		free_remote_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &t_shared_list);
+		rb_dlinkDestroy(ptr, &t_shared_list);
 	}
 
 	if(t_shared != NULL)
@@ -1832,7 +1832,7 @@ conf_set_shared_oper(confentry_t * entry, conf_t * conf, struct conf_items *item
 	char *username, *p;
 	int len;
 
-	len = ircd_dlink_list_length(&entry->flist);
+	len = rb_dlink_list_length(&entry->flist);
 
 	if(len > 2)
 	{
@@ -1854,12 +1854,12 @@ conf_set_shared_oper(confentry_t * entry, conf_t * conf, struct conf_items *item
 
 	if(len == 1)
 	{
-		t_shared->server = ircd_strdup("*");
+		t_shared->server = rb_strdup("*");
 	}
 	else
 	{
 		xentry = entry->flist.head->data;
-		t_shared->server = ircd_strdup(xentry->string);
+		t_shared->server = rb_strdup(xentry->string);
 	}
 
 	if((p = strchr(username, '@')) == NULL)
@@ -1871,22 +1871,22 @@ conf_set_shared_oper(confentry_t * entry, conf_t * conf, struct conf_items *item
 	*p++ = '\0';
 
 	if(EmptyString(p))
-		t_shared->host = ircd_strdup("*");
+		t_shared->host = rb_strdup("*");
 	else
-		t_shared->host = ircd_strdup(p);
+		t_shared->host = rb_strdup(p);
 
 	if(EmptyString(username))
-		t_shared->username = ircd_strdup("*");
+		t_shared->username = rb_strdup("*");
 	else
-		t_shared->username = ircd_strdup(username);
+		t_shared->username = rb_strdup(username);
 
-	ircd_dlinkAddAlloc(t_shared, &t_shared_list);
+	rb_dlinkAddAlloc(t_shared, &t_shared_list);
 	t_shared = NULL;
 	DLINK_FOREACH(ptr, entry->flist.head)
 	{
 		xentry = ptr->data;
 		t_shared = make_remote_conf();
-		ircd_strdup(xentry->string);
+		rb_strdup(xentry->string);
 	}
 }
 
@@ -1906,8 +1906,8 @@ conf_set_shared_flags(confentry_t * entry, conf_t * conf, struct conf_items *ite
 	{
 		t_shared = ptr->data;
 		t_shared->flags = flags;
-		ircd_dlinkDestroy(ptr, &t_shared_list);
-		ircd_dlinkAddTail(t_shared, &t_shared->node, &shared_conf_list);
+		rb_dlinkDestroy(ptr, &t_shared_list);
+		rb_dlinkAddTail(t_shared, &t_shared->node, &shared_conf_list);
 	}
 	t_shared = NULL;
 }
@@ -1938,7 +1938,7 @@ conf_set_service_name(confentry_t * entry, conf_t * conf, struct conf_items *ite
 		return;
 	}
 
-	ircd_dlinkAddAlloc(ircd_strdup(entry->string), &service_list);
+	rb_dlinkAddAlloc(rb_strdup(entry->string), &service_list);
 	if((target_p = find_server(NULL, entry->string)))
 		target_p->flags |= FLAGS_SERVICE;
 }
@@ -1951,10 +1951,10 @@ add_top_conf(const char *name, void (*startfunc) (conf_t * conf), void (*endfunc
 {
 	int i;
 	struct topconf *top;
-	top = ircd_malloc(sizeof(struct topconf));
+	top = rb_malloc(sizeof(struct topconf));
 
 	add_valid_block(name, needsub);
-	top->tc_name = ircd_strdup(name);
+	top->tc_name = rb_strdup(name);
 	top->start_func = startfunc;
 	top->end_func = endfunc;
 	top->itemtable = itemtable;
@@ -1963,7 +1963,7 @@ add_top_conf(const char *name, void (*startfunc) (conf_t * conf), void (*endfunc
 		add_valid_entry(name, itemtable[i].c_name, itemtable[i].type);
 	}
 
-	ircd_dlinkAddTail(top, &top->node, &toplist);
+	rb_dlinkAddTail(top, &top->node, &toplist);
 }
 
 static struct conf_items *
@@ -2033,20 +2033,20 @@ load_conf_settings(void)
 		ConfigFileEntry.ts_max_delta = TS_MAX_DELTA_DEFAULT;
 
 	if(ConfigFileEntry.servlink_path == NULL)
-		ConfigFileEntry.servlink_path = ircd_strdup(SLPATH);
+		ConfigFileEntry.servlink_path = rb_strdup(SLPATH);
 
 	if(ServerInfo.network_name == NULL)
-		ServerInfo.network_name = ircd_strdup(NETWORK_NAME_DEFAULT);
+		ServerInfo.network_name = rb_strdup(NETWORK_NAME_DEFAULT);
 
 	if(ServerInfo.network_desc == NULL)
-		ServerInfo.network_desc = ircd_strdup(NETWORK_DESC_DEFAULT);
+		ServerInfo.network_desc = rb_strdup(NETWORK_DESC_DEFAULT);
 
 	if((ConfigFileEntry.client_flood < CLIENT_FLOOD_MIN) || (ConfigFileEntry.client_flood > CLIENT_FLOOD_MAX))
 		ConfigFileEntry.client_flood = CLIENT_FLOOD_MAX;
 
 	if(!split_users || !split_servers || (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
 	{
-		ircd_event_delete(check_splitmode, NULL);
+		rb_event_delete(check_splitmode, NULL);
 		splitmode = 0;
 		splitchecking = 0;
 	}

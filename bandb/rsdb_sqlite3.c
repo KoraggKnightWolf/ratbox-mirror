@@ -35,12 +35,12 @@
 
 #include <sqlite3.h>
 
-struct sqlite3 *ircd_bandb;
+struct sqlite3 *rb_bandb;
 
 void
 rsdb_init(void)
 {
-	if(sqlite3_open(DBPATH, &ircd_bandb))
+	if(sqlite3_open(DBPATH, &rb_bandb))
 	{
 		exit(1);
 	}
@@ -49,8 +49,8 @@ rsdb_init(void)
 void
 rsdb_shutdown(void)
 {
-	if(ircd_bandb)
-		sqlite3_close(ircd_bandb);
+	if(rb_bandb)
+		sqlite3_close(rb_bandb);
 }
 
 const char *
@@ -102,15 +102,15 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 		exit(1);
 	}
 
-	if((i = sqlite3_exec(ircd_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg)))
+	if((i = sqlite3_exec(rb_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg)))
 	{
 		switch(i)
 		{
 			case SQLITE_BUSY:
 				for(j = 0; j < 5; j++)
 				{
-					ircd_sleep(0, 500000);
-					if(!sqlite3_exec(ircd_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg))
+					rb_sleep(0, 500000);
+					if(!sqlite3_exec(rb_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg))
 						return;
 				}
 
@@ -148,7 +148,7 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 		exit(1);
 	}
 
-	if((retval = sqlite3_get_table(ircd_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg)))
+	if((retval = sqlite3_get_table(rb_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg)))
 	{
 		int success = 0;
 
@@ -157,8 +157,8 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 			case SQLITE_BUSY:
 				for(i = 0; i < 5; i++)
 				{
-					ircd_sleep(0, 500000);
-					if(!sqlite3_get_table(ircd_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg))
+					rb_sleep(0, 500000);
+					if(!sqlite3_get_table(rb_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg))
 					{
 						success++;
 						break;
@@ -190,10 +190,10 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 
 	/* sqlite puts the column names as the first row */
 	pos = table->col_count;
-	table->row = ircd_malloc(sizeof(char **) * table->row_count);
+	table->row = rb_malloc(sizeof(char **) * table->row_count);
 	for(i = 0; i < table->row_count; i++)
 	{
-		table->row[i] = ircd_malloc(sizeof(char *) * table->col_count);
+		table->row[i] = rb_malloc(sizeof(char *) * table->col_count);
 
 		for(j = 0; j < table->col_count; j++)
 		{
@@ -209,9 +209,9 @@ rsdb_exec_fetch_end(struct rsdb_table *table)
 
 	for(i = 0; i < table->row_count; i++)
 	{
-		ircd_free(table->row[i]);
+		rb_free(table->row[i]);
 	}
-	ircd_free(table->row);
+	rb_free(table->row);
 
 	sqlite3_free_table((char **) table->arg);
 }

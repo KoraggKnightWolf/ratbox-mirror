@@ -89,7 +89,7 @@ m_names(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		if(!IsOper(source_p))
 		{
-			if((last_used + ConfigFileEntry.pace_wait) > ircd_current_time())
+			if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 			{
 				sendto_one(source_p, POP_QUEUE, form_str(RPL_LOAD2HI),
 					   me.name, source_p->name, "NAMES");
@@ -98,7 +98,7 @@ m_names(struct Client *client_p, struct Client *source_p, int parc, const char *
 				return 0;
 			}
 			else
-				last_used = ircd_current_time();
+				last_used = rb_current_time();
 		}
 
 		names_global(source_p);
@@ -136,7 +136,7 @@ names_global(struct Client *source_p)
 		chptr = ptr->data;
 		channel_member_names(chptr, source_p, 0);
 	}
-	cur_len = mlen = ircd_sprintf(buf, form_str(RPL_NAMREPLY), 
+	cur_len = mlen = rb_sprintf(buf, form_str(RPL_NAMREPLY), 
 				    me.name, source_p->name, "*", "*");
 	t = buf + mlen;
 
@@ -179,7 +179,7 @@ names_global(struct Client *source_p)
 			t = buf + mlen;
 		}
 
-		tlen = ircd_sprintf(t, "%s ", target_p->name);
+		tlen = rb_sprintf(t, "%s ", target_p->name);
 		cur_len += tlen;
 		t += tlen;
 	}

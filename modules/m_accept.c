@@ -93,13 +93,13 @@ m_accept(struct Client *client_p, struct Client *source_p, int parc, const char 
 			continue;
 		}
 
-		ircd_dlinkFindDestroy(target_p, &source_p->localClient->allow_list);
-		ircd_dlinkFindDestroy(source_p, &target_p->on_allow_list);
+		rb_dlinkFindDestroy(target_p, &source_p->localClient->allow_list);
+		rb_dlinkFindDestroy(source_p, &target_p->on_allow_list);
 
 	}
 
 	/* get the number of accepts they have */
-	accept_num = ircd_dlink_list_length(&source_p->localClient->allow_list);
+	accept_num = rb_dlink_list_length(&source_p->localClient->allow_list);
 
 	/* parse the add list */
 	for (nick = strtok_r(addbuf, ",", &p); nick; nick = strtok_r(NULL, ",", &p), accept_num++)
@@ -207,8 +207,8 @@ build_nicklist(struct Client *source_p, char *addbuf, char *delbuf, const char *
 static void
 add_accept(struct Client *source_p, struct Client *target_p)
 {
-	ircd_dlinkAddAlloc(target_p, &source_p->localClient->allow_list);
-	ircd_dlinkAddAlloc(source_p, &target_p->on_allow_list);
+	rb_dlinkAddAlloc(target_p, &source_p->localClient->allow_list);
+	rb_dlinkAddAlloc(source_p, &target_p->on_allow_list);
 }
 
 
@@ -248,7 +248,7 @@ list_accepts(struct Client *source_p)
 				*nicks = '\0';
 			}
 
-			len += ircd_snprintf(nicks + len, sizeof(nicks) - len, "%s ", target_p->name);
+			len += rb_snprintf(nicks + len, sizeof(nicks) - len, "%s ", target_p->name);
 			count++;
 		}
 	}

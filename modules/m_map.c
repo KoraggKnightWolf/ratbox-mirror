@@ -94,12 +94,12 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 	dlink_node *ptr;
 	*pbuf = '\0';
 
-	ircd_strlcat(pbuf, root_p->name, BUFSIZE);
+	rb_strlcat(pbuf, root_p->name, BUFSIZE);
 	if (has_id(root_p))
 	{
-		ircd_strlcat(pbuf, "[", BUFSIZE);
-		ircd_strlcat(pbuf, root_p->id, BUFSIZE);
-		ircd_strlcat(pbuf, "]", BUFSIZE);
+		rb_strlcat(pbuf, "[", BUFSIZE);
+		rb_strlcat(pbuf, root_p->id, BUFSIZE);
+		rb_strlcat(pbuf, "]", BUFSIZE);
 	}
 	len = strlen(buf);
 	buf[len] = ' ';
@@ -112,15 +112,15 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 		}
 	}
 
-	ircd_snprintf(buf + USER_COL, BUFSIZE - USER_COL,
-		 " | Users: %5lu (%4.1f%%)", ircd_dlink_list_length(&root_p->serv->users),
-		 100 * (float) ircd_dlink_list_length(&root_p->serv->users) / (float) Count.total);
+	rb_snprintf(buf + USER_COL, BUFSIZE - USER_COL,
+		 " | Users: %5lu (%4.1f%%)", rb_dlink_list_length(&root_p->serv->users),
+		 100 * (float) rb_dlink_list_length(&root_p->serv->users) / (float) Count.total);
 
 	sendto_one(client_p, HOLD_QUEUE, form_str(RPL_MAP), me.name, client_p->name, buf);
 
 	if(root_p->serv->servers.head != NULL)
 	{
-		cnt += ircd_dlink_list_length(&root_p->serv->servers);
+		cnt += rb_dlink_list_length(&root_p->serv->servers);
 
 		if(cnt)
 		{

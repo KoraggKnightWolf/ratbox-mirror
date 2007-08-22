@@ -41,12 +41,12 @@
 #include "send.h"
 
 struct monitor *monitorTable[MONITOR_HASH_SIZE];
-ircd_bh *monitor_heap;
+rb_bh *monitor_heap;
 
 void
 init_monitor(void)
 {
-	monitor_heap = ircd_bh_create(sizeof(struct monitor), MONITOR_HEAP_SIZE, "monitor_heap");
+	monitor_heap = rb_bh_create(sizeof(struct monitor), MONITOR_HEAP_SIZE, "monitor_heap");
 }
 
 static inline unsigned int
@@ -70,8 +70,8 @@ find_monitor(const char *name, int add)
 
 	if(add)
 	{
-		monptr = ircd_bh_alloc(monitor_heap);
-		ircd_strlcpy(monptr->name, name, sizeof(monptr->name));
+		monptr = rb_bh_alloc(monitor_heap);
+		rb_strlcpy(monptr->name, name, sizeof(monptr->name));
 
 		monptr->hnext = monitorTable[hashv];
 		monitorTable[hashv] = monptr;
@@ -99,7 +99,7 @@ monitor_signon(struct Client *client_p)
 	if(monptr == NULL)
 		return;
 
-	ircd_snprintf(buf, sizeof(buf), "%s!%s@%s", client_p->name, client_p->username, client_p->host);
+	rb_snprintf(buf, sizeof(buf), "%s!%s@%s", client_p->name, client_p->username, client_p->host);
 
 	sendto_monitor(monptr, form_str(RPL_MONONLINE), me.name, "*", buf);
 }
@@ -138,8 +138,8 @@ clear_monitor(struct Client *client_p)
 		/* we leave the actual entry around with no users, itll be
 		 * cleaned up periodically by cleanup_monitor() --anfl
 		 */
-		ircd_dlinkFindDestroy(client_p, &monptr->users);
-		ircd_free_dlink_node(ptr);
+		rb_dlinkFindDestroy(client_p, &monptr->users);
+		rb_free_dlink_node(ptr);
 	}
 
 	client_p->localClient->monitor_list.head = client_p->localClient->monitor_list.tail = NULL;

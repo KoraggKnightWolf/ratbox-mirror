@@ -17,7 +17,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 
 #define FLAG_MD5     0x00000001
 #define FLAG_DES     0x00000002

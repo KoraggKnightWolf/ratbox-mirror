@@ -228,7 +228,7 @@ quote_max(struct Client *source_p, int newval)
 			sendto_one(source_p, POP_QUEUE,
 				   ":%s NOTICE %s :You cannot set MAXCLIENTS to < 32 (%d:%d)",
 				   me.name, source_p->name, GlobalSetOptions.maxclients,
-				   ircd_getmaxconnect());
+				   rb_getmaxconnect());
 			return;
 		}
 
@@ -238,7 +238,7 @@ quote_max(struct Client *source_p, int newval)
 				     "%s!%s@%s set new MAXCLIENTS to %d (%lu current)",
 				     source_p->name, source_p->username, source_p->host,
 				     GlobalSetOptions.maxclients, 
-				     ircd_dlink_list_length(&lclient_list));
+				     rb_dlink_list_length(&lclient_list));
 
 		return;
 	}
@@ -246,7 +246,7 @@ quote_max(struct Client *source_p, int newval)
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current Maxclients = %d (%lu)",
 			   me.name, source_p->name, GlobalSetOptions.maxclients,
-			   ircd_dlink_list_length(&lclient_list));
+			   rb_dlink_list_length(&lclient_list));
 	}
 }
 
@@ -261,7 +261,7 @@ quote_operstring(struct Client *source_p, const char *arg)
 	}
 	else
 	{
-		ircd_strlcpy(GlobalSetOptions.operstring, arg,
+		rb_strlcpy(GlobalSetOptions.operstring, arg,
 			sizeof(GlobalSetOptions.operstring));
 		
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -281,7 +281,7 @@ quote_adminstring(struct Client *source_p, const char *arg)
 	}
 	else
 	{
-		ircd_strlcpy(GlobalSetOptions.adminstring, arg,
+		rb_strlcpy(GlobalSetOptions.adminstring, arg,
 			sizeof(GlobalSetOptions.adminstring));
 		
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -385,7 +385,7 @@ quote_splitmode(struct Client *source_p, char *charval)
 			splitmode = 0;
 			splitchecking = 0;
 
-			ircd_event_delete(check_splitmode, NULL);
+			rb_event_delete(check_splitmode, NULL);
 		}
 		/* ON */
 		else if(newval == 1)
@@ -398,7 +398,7 @@ quote_splitmode(struct Client *source_p, char *charval)
 			splitchecking = 0;
 
 			/* we might be deactivating an automatic splitmode, so pull the event */
-			ircd_event_delete(check_splitmode, NULL);
+			rb_event_delete(check_splitmode, NULL);
 		}
 		/* AUTO */
 		else if(newval == 2)

@@ -33,7 +33,7 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 
 static int mr_user(struct Client *, struct Client *, int, const char **);
 
@@ -63,9 +63,9 @@ mr_user(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if((p = strchr(parv[1], '@')))
 		*p = '\0';
 
-	ircd_snprintf(buf, sizeof(buf), "%s %s", parv[2], parv[3]);
-	ircd_free(source_p->localClient->fullcaps);
-	source_p->localClient->fullcaps = ircd_strdup(buf);
+	rb_snprintf(buf, sizeof(buf), "%s %s", parv[2], parv[3]);
+	rb_free(source_p->localClient->fullcaps);
+	source_p->localClient->fullcaps = rb_strdup(buf);
 
 	do_local_user(client_p, source_p, parv[1], parv[4]);
 	return 0;
@@ -82,14 +82,14 @@ do_local_user(struct Client *client_p, struct Client *source_p,
 
 	user = make_user(source_p);
 
-	ircd_strlcpy(source_p->info, realname, sizeof(source_p->info));
+	rb_strlcpy(source_p->info, realname, sizeof(source_p->info));
 
 	if(!IsGotId(source_p))
 	{
 		/* This is in this location for a reason..If there is no identd
 		 * and ping cookies are enabled..we need to have a copy of this
 		 */
-		ircd_strlcpy(source_p->username, username, sizeof(source_p->username));
+		rb_strlcpy(source_p->username, username, sizeof(source_p->username));
 	}
 
 	if(source_p->name)

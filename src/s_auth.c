@@ -35,7 +35,7 @@
  */
 #include "stdinc.h"
 #include "setup.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "s_auth.h"
 #include "s_conf.h"
@@ -80,8 +80,8 @@ ReportType;
 #define sendheader(c, r) sendto_one(c, POP_QUEUE, HeaderMessages[(r)])
 
 static dlink_list auth_poll_list;
-static ircd_bh *auth_heap;
-static void read_auth_reply(ircd_helper *);
+static rb_bh *auth_heap;
+static void read_auth_reply(rb_helper *);
 static EVH timeout_auth_queries_event;
 
 static uint16_t id;
@@ -100,8 +100,8 @@ assign_auth_id(void)
 }
 
 static char *ident_path;
-static ircd_helper *ident_helper;
-static void ident_restart_cb(ircd_helper *helper);
+static rb_helper *ident_helper;
+static void ident_restart_cb(rb_helper *helper);
 
 static void
 fork_ident(void)
@@ -116,11 +116,11 @@ fork_ident(void)
 
 	if(ident_path == NULL)
 	{
-	        ircd_snprintf(fullpath, sizeof(fullpath), "%s/ident%s", BINPATH, suffix);
+	        rb_snprintf(fullpath, sizeof(fullpath), "%s/ident%s", BINPATH, suffix);
 
 	        if(access(fullpath, X_OK) == -1)
 	        {
-	                ircd_snprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
+	                rb_snprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
 	                if(access(fullpath, X_OK) == -1)
 	                {
 	                        ilog(L_MAIN, "Unable to execute ident in %s/bin or %s", ConfigFileEntry.dpath, BINPATH);
@@ -128,27 +128,27 @@ fork_ident(void)
         	        }
                  
 	        }
-	        ident_path = ircd_strdup(fullpath);
+	        ident_path = rb_strdup(fullpath);
 	}
-	ircd_snprintf(timeout, sizeof(timeout), "%d", GlobalSetOptions.ident_timeout);
+	rb_snprintf(timeout, sizeof(timeout), "%d", GlobalSetOptions.ident_timeout);
 	setenv("IDENT_TIMEOUT", timeout, 1);
 	
-	ident_helper = ircd_helper_start("ident", ident_path, read_auth_reply, ident_restart_cb);
+	ident_helper = rb_helper_start("ident", ident_path, read_auth_reply, ident_restart_cb);
 	setenv("IDENT_TIMEOUT", "", 1);
         if(ident_helper == NULL)
 	{
-		ilog(L_MAIN, "ident - ircd_helper_start failed: %s", strerror(errno));
+		ilog(L_MAIN, "ident - rb_helper_start failed: %s", strerror(errno));
 		return;
 	}
-        ircd_helper_run(ident_helper);
+        rb_helper_run(ident_helper);
 	return;
 }
 
-static void ident_restart_cb(ircd_helper *helper)
+static void ident_restart_cb(rb_helper *helper)
 {
 	if(helper != NULL)
 	{
-		ircd_helper_close(helper);
+		rb_helper_close(helper);
 		ident_helper = NULL;
 	
 	}
@@ -179,8 +179,8 @@ init_auth(void)
 	}
 
 	memset(&auth_poll_list, 0, sizeof(auth_poll_list));
-	ircd_event_addish("timeout_auth_queries_event", timeout_auth_queries_event, NULL, 3);
-	auth_heap = ircd_bh_create(sizeof(struct AuthRequest), AUTH_HEAP_SIZE, "auth_heap");
+	rb_event_addish("timeout_auth_queries_event", timeout_auth_queries_event, NULL, 3);
+	auth_heap = rb_bh_create(sizeof(struct AuthRequest), AUTH_HEAP_SIZE, "auth_heap");
 
 }
 
@@ -190,12 +190,12 @@ init_auth(void)
 static struct AuthRequest *
 make_auth_request(struct Client *client)
 {
-	struct AuthRequest *request = ircd_bh_alloc(auth_heap);
+	struct AuthRequest *request = rb_bh_alloc(auth_heap);
 	client->localClient->auth_request = request;
 	request->client = client;
 	request->dns_query = 0;
 	request->reqid = 0;
-	request->timeout = ircd_current_time() + ConfigFileEntry.connect_timeout;
+	request->timeout = rb_current_time() + ConfigFileEntry.connect_timeout;
 	return request;
 }
 
@@ -205,7 +205,7 @@ make_auth_request(struct Client *client)
 static void
 free_auth_request(struct AuthRequest *request)
 {
-	ircd_bh_free(auth_heap, request);
+	rb_bh_free(auth_heap, request);
 }
 
 /*
@@ -225,7 +225,7 @@ release_auth_client(struct AuthRequest *auth)
 		authtable[auth->reqid] = NULL;
 
 	client->localClient->auth_request = NULL;
-	ircd_dlinkDelete(&auth->node, &auth_poll_list);
+	rb_dlinkDelete(&auth->node, &auth_poll_list);
 	free_auth_request(auth);
 
 	/*
@@ -234,7 +234,7 @@ release_auth_client(struct AuthRequest *auth)
 	 *     -- adrian
 	 */
 	client->localClient->allow_read = MAX_FLOOD;
-	ircd_dlinkAddTail(client, &client->node, &global_client_list);
+	rb_dlinkAddTail(client, &client->node, &global_client_list);
 	read_packet(client->localClient->F, client);
 }
 
@@ -254,7 +254,7 @@ auth_dns_callback(const char *res, int status, int aftype, void *data)
 	/* The resolver won't return us anything > HOSTLEN */
 	if(status == 1)
 	{
-		ircd_strlcpy(auth->client->host, res, sizeof(auth->client->host));
+		rb_strlcpy(auth->client->host, res, sizeof(auth->client->host));
 		sendheader(auth->client, REPORT_FIN_DNS);
 	}
 	else
@@ -323,15 +323,15 @@ start_auth_query(struct AuthRequest *auth)
 	 */
 	memset(&localaddr, 0, locallen);
 
-	if(getsockname(ircd_get_fd(auth->client->localClient->F), (struct sockaddr *) &localaddr, &locallen) ||
-	   getpeername(ircd_get_fd(auth->client->localClient->F), (struct sockaddr *) &remoteaddr, &remotelen))
+	if(getsockname(rb_get_fd(auth->client->localClient->F), (struct sockaddr *) &localaddr, &locallen) ||
+	   getpeername(rb_get_fd(auth->client->localClient->F), (struct sockaddr *) &remoteaddr, &remotelen))
 	{
 		auth_error(auth);
 		release_auth_client(auth);
 		return;
 	}
 
-	ircd_inet_ntop_sock((struct sockaddr *) &localaddr, myip, sizeof(myip));
+	rb_inet_ntop_sock((struct sockaddr *) &localaddr, myip, sizeof(myip));
 
 #ifdef IPV6
 	if(GET_SS_FAMILY(&localaddr) == AF_INET6)
@@ -350,7 +350,7 @@ start_auth_query(struct AuthRequest *auth)
 	auth->reqid = assign_auth_id();
 	authtable[auth->reqid] = auth;
 
-	ircd_helper_write(ident_helper, "%x %s %s %u %u", auth->reqid, myip, 
+	rb_helper_write(ident_helper, "%x %s %s %u %u", auth->reqid, myip, 
 		    auth->client->sockhost, (unsigned int)rport, (unsigned int)lport); 
 
 	return;
@@ -378,7 +378,7 @@ start_auth(struct Client *client)
 
 	sendheader(client, REPORT_DO_DNS);
 
-	ircd_dlinkAdd(auth, &auth->node, &auth_poll_list);
+	rb_dlinkAdd(auth, &auth->node, &auth_poll_list);
 
 	/* Note that the order of things here are done for a good reason
 	 * if you try to do start_auth_query before lookup_ip there is a 
@@ -413,7 +413,7 @@ timeout_auth_queries_event(void *notused)
 	{
 		auth = ptr->data;
 
-		if(auth->timeout < ircd_current_time())
+		if(auth->timeout < rb_current_time())
 		{
 			if(IsAuth(auth))
 			{
@@ -427,7 +427,7 @@ timeout_auth_queries_event(void *notused)
 				sendheader(auth->client, REPORT_FAIL_DNS);
 			}
 
-			auth->client->localClient->lasttime = ircd_current_time();
+			auth->client->localClient->lasttime = rb_current_time();
 			release_auth_client(auth);
 		}
 	}
@@ -453,7 +453,7 @@ delete_auth_queries(struct Client *target_p)
 	if(auth->reqid > 0)
 		authtable[auth->reqid] = NULL;
 
-	ircd_dlinkDelete(&auth->node, &auth_poll_list);
+	rb_dlinkDelete(&auth->node, &auth_poll_list);
 	free_auth_request(auth);
 }
 
@@ -462,13 +462,13 @@ static char authBuf[READBUF_SIZE];
 
 
 static void
-read_auth_reply(ircd_helper *helper)
+read_auth_reply(rb_helper *helper)
 {
 	int length;
 	char *q, *p;
 	struct AuthRequest *auth;
 
-	while((length = ircd_helper_read(helper, authBuf, sizeof(authBuf))) > 0)
+	while((length = rb_helper_read(helper, authBuf, sizeof(authBuf))) > 0)
 	{
 		q = strchr(authBuf, ' ');
 
@@ -496,7 +496,7 @@ read_auth_reply(ircd_helper *helper)
 			continue;
 		}
 
-		ircd_strlcpy(auth->client->username, q, sizeof(auth->client->username));
+		rb_strlcpy(auth->client->username, q, sizeof(auth->client->username));
 		ClearAuth(auth);
 		ServerStats.is_asuc++;
 		sendheader(auth->client, REPORT_FIN_ID);
@@ -510,7 +510,7 @@ read_auth_reply(ircd_helper *helper)
 void
 change_ident_timeout(int timeout)
 {
-	ircd_helper_write(ident_helper, "T %d", timeout);
+	rb_helper_write(ident_helper, "T %d", timeout);
 }
 
 

@@ -75,7 +75,7 @@ static void expire_pending_glines(void *unused);
 static int
 modinit(void)
 {
-	ircd_event_addish("expire_pending_glines", expire_pending_glines, NULL, 
+	rb_event_addish("expire_pending_glines", expire_pending_glines, NULL, 
 			CLEANUP_GLINES_TIME);
 	return 0;
 }
@@ -83,7 +83,7 @@ modinit(void)
 static void
 moddeinit(void)
 {
-	ircd_event_delete(expire_pending_glines, NULL);
+	rb_event_delete(expire_pending_glines, NULL);
 }
 
 /* mo_gline()
@@ -629,7 +629,7 @@ set_local_gline(struct Client *source_p, const char *user,
 	char *my_reason;
 	char *oper_reason;
 
-	current_date = smalldate(ircd_current_time());
+	current_date = smalldate(rb_current_time());
 
 	my_reason = LOCAL_COPY(reason);
 
@@ -646,17 +646,17 @@ set_local_gline(struct Client *source_p, const char *user,
 		oper_reason++;
 
 		if(!EmptyString(oper_reason))
-			aconf->spasswd = ircd_strdup(oper_reason);
+			aconf->spasswd = rb_strdup(oper_reason);
 	}
 
-	ircd_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
+	rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
 
-	aconf->passwd = ircd_strdup(buffer);
-	aconf->user = ircd_strdup(user);
-	aconf->host = ircd_strdup(host);
-	aconf->hold = ircd_current_time() + ConfigFileEntry.gline_time;
+	aconf->passwd = rb_strdup(buffer);
+	aconf->user = rb_strdup(user);
+	aconf->host = rb_strdup(host);
+	aconf->hold = rb_current_time() + ConfigFileEntry.gline_time;
 
-	ircd_dlinkAddTailAlloc(aconf, &glines);
+	rb_dlinkAddTailAlloc(aconf, &glines);
 	add_conf_by_address(aconf->host, CONF_GLINE, aconf->user, aconf);
 
 	sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -737,16 +737,16 @@ majority_gline(struct Client *source_p, const char *user,
 			}
 			else
 			{
-				ircd_strlcpy(pending->oper_nick2, source_p->name,
+				rb_strlcpy(pending->oper_nick2, source_p->name,
 					sizeof(pending->oper_nick2));
-				ircd_strlcpy(pending->oper_user2, source_p->username,
+				rb_strlcpy(pending->oper_user2, source_p->username,
 					sizeof(pending->oper_user2));
-				ircd_strlcpy(pending->oper_host2, source_p->host,
+				rb_strlcpy(pending->oper_host2, source_p->host,
 					sizeof(pending->oper_host2));
-				pending->reason2 = ircd_strdup(reason);
+				pending->reason2 = rb_strdup(reason);
 				pending->oper_server2 = find_or_add(source_p->servptr->name);
-				pending->last_gline_time = ircd_current_time();
-				pending->time_request2 = ircd_current_time();
+				pending->last_gline_time = rb_current_time();
+				pending->time_request2 = rb_current_time();
 				return NO;
 			}
 		}
@@ -754,26 +754,26 @@ majority_gline(struct Client *source_p, const char *user,
 
 	/* no pending gline, create a new one */
 	pending = (struct gline_pending *) 
-			    ircd_malloc(sizeof(struct gline_pending));
+			    rb_malloc(sizeof(struct gline_pending));
 
-	ircd_strlcpy(pending->oper_nick1, source_p->name,
+	rb_strlcpy(pending->oper_nick1, source_p->name,
 		sizeof(pending->oper_nick1));
-	ircd_strlcpy(pending->oper_user1, source_p->username,
+	rb_strlcpy(pending->oper_user1, source_p->username,
 		sizeof(pending->oper_user1));
-	ircd_strlcpy(pending->oper_host1, source_p->host,
+	rb_strlcpy(pending->oper_host1, source_p->host,
 		sizeof(pending->oper_host1));
 
 	pending->oper_server1 = find_or_add(source_p->servptr->name);
 
-	ircd_strlcpy(pending->user, user, sizeof(pending->user));
-	ircd_strlcpy(pending->host, host, sizeof(pending->host));
-	pending->reason1 = ircd_strdup(reason);
+	rb_strlcpy(pending->user, user, sizeof(pending->user));
+	rb_strlcpy(pending->host, host, sizeof(pending->host));
+	pending->reason1 = rb_strdup(reason);
 	pending->reason2 = NULL;
 
-	pending->last_gline_time = ircd_current_time();
-	pending->time_request1 = ircd_current_time();
+	pending->last_gline_time = rb_current_time();
+	pending->time_request1 = rb_current_time();
 
-	ircd_dlinkAddAlloc(pending, &pending_glines);
+	rb_dlinkAddAlloc(pending, &pending_glines);
 
 	return NO;
 }
@@ -814,7 +814,7 @@ remove_temp_gline(const char *user, const char *host)
 						(struct sockaddr *)&caddr, bits))
 			continue;
 
-		ircd_dlinkDestroy(ptr, &glines);
+		rb_dlinkDestroy(ptr, &glines);
 		delete_one_address_conf(aconf->host, aconf);
 		return YES;
 	}
@@ -844,13 +844,13 @@ expire_pending_glines(void *unused)
 		glp_ptr = pending_node->data;
 
 		if(((glp_ptr->last_gline_time + GLINE_PENDING_EXPIRE) <=
-		    ircd_current_time()) || find_is_glined(glp_ptr->host, glp_ptr->user))
+		    rb_current_time()) || find_is_glined(glp_ptr->host, glp_ptr->user))
 
 		{
-			ircd_free(glp_ptr->reason1);
-			ircd_free(glp_ptr->reason2);
-			ircd_free(glp_ptr);
-			ircd_dlinkDestroy(pending_node, &pending_glines);
+			rb_free(glp_ptr->reason1);
+			rb_free(glp_ptr->reason2);
+			rb_free(glp_ptr);
+			rb_dlinkDestroy(pending_node, &pending_glines);
 		}
 	}
 }

@@ -122,7 +122,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 		*s = '\0';
 
 	/* copy the nick and terminate it */
-	ircd_strlcpy(nick, parv[1], sizeof(nick));
+	rb_strlcpy(nick, parv[1], sizeof(nick));
 
 	/* check the nickname is ok */
 	if(!clean_nick(nick, 1))
@@ -189,7 +189,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		flood_endgrace(source_p);
 
 	/* terminate nick to NICKLEN, we dont want clean_nick() to error! */
-	ircd_strlcpy(nick, parv[1], sizeof(nick));
+	rb_strlcpy(nick, parv[1], sizeof(nick));
 
 	/* check the nickname is ok */
 	if(!clean_nick(nick, 1))
@@ -634,7 +634,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	char buf[USERLEN + 1];
 
 	/* This had to be copied here to avoid problems.. */
-	source_p->tsinfo = ircd_current_time();
+	source_p->tsinfo = rb_current_time();
 	if(source_p->name)
 		del_from_hash(HASH_CLIENT, source_p->name, source_p);
 
@@ -644,11 +644,11 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	add_to_hash(HASH_CLIENT, nick, source_p);
 
 	/* fd_desc is long enough */
-	ircd_note(client_p->localClient->F, "Nick: %s", nick);
+	rb_note(client_p->localClient->F, "Nick: %s", nick);
 
 	if(!EmptyString(source_p->info))
 	{
-		ircd_strlcpy(buf, source_p->username, sizeof(buf));
+		rb_strlcpy(buf, source_p->username, sizeof(buf));
 
 		/* got user, heres nick. */
 		register_local_user(client_p, source_p, buf);
@@ -666,7 +666,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick,
 
 	if (dosend)
 	{
-		if((source_p->localClient->last_nick_change + ConfigFileEntry.max_nick_time) < ircd_current_time())
+		if((source_p->localClient->last_nick_change + ConfigFileEntry.max_nick_time) < rb_current_time())
 			source_p->localClient->number_of_nick_changes = 0;
 
 		if(ConfigFileEntry.anti_nick_flood && !IsOper(source_p) &&
@@ -678,7 +678,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick,
 			return;
 		}
 
-		source_p->localClient->last_nick_change = ircd_current_time();
+		source_p->localClient->last_nick_change = rb_current_time();
 		source_p->localClient->number_of_nick_changes++;
 	}
 
@@ -688,10 +688,10 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick,
 	if(!samenick)
 	{
 		/* force the TS to increase -- jilles */
-		if (source_p->tsinfo >= ircd_current_time())
+		if (source_p->tsinfo >= rb_current_time())
 			source_p->tsinfo++;
 		else
-			source_p->tsinfo = ircd_current_time();
+			source_p->tsinfo = rb_current_time();
 		monitor_signoff(source_p);
 		/* we only do bancache for local users -- jilles */
 		if (source_p->user)
@@ -737,12 +737,12 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick,
 	{
 		target_p = ptr->data;
 
-		ircd_dlinkFindDestroy(source_p, &target_p->localClient->allow_list);
-		ircd_dlinkDestroy(ptr, &source_p->on_allow_list);
+		rb_dlinkFindDestroy(source_p, &target_p->localClient->allow_list);
+		rb_dlinkDestroy(ptr, &source_p->on_allow_list);
 	}
 
 	/* fd_desc is long enough */
-	ircd_note(client_p->localClient->F, "Nick: %s", nick);
+	rb_note(client_p->localClient->F, "Nick: %s", nick);
 
 	return;
 }
@@ -760,7 +760,7 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 	/* client changing their nick - dont reset ts if its same */
 	if(!samenick)
 	{
-		source_p->tsinfo = newts ? newts : ircd_current_time();
+		source_p->tsinfo = newts ? newts : rb_current_time();
 		monitor_signoff(source_p);
 	}
 
@@ -999,19 +999,19 @@ register_client(struct Client *client_p, struct Client *server,
 
 	strcpy(source_p->user->name, nick);
 	source_p->name = source_p->user->name;
-	ircd_strlcpy(source_p->username, parv[5], sizeof(source_p->username));
-	ircd_strlcpy(source_p->host, parv[6], sizeof(source_p->host));
+	rb_strlcpy(source_p->username, parv[5], sizeof(source_p->username));
+	rb_strlcpy(source_p->host, parv[6], sizeof(source_p->host));
 	
 	if(parc == 10)
 	{
-		ircd_strlcpy(source_p->info, parv[9], sizeof(source_p->info));
-		ircd_strlcpy(source_p->sockhost, parv[7], sizeof(source_p->sockhost));
-		ircd_strlcpy(source_p->id, parv[8], sizeof(source_p->id));
+		rb_strlcpy(source_p->info, parv[9], sizeof(source_p->info));
+		rb_strlcpy(source_p->sockhost, parv[7], sizeof(source_p->sockhost));
+		rb_strlcpy(source_p->id, parv[8], sizeof(source_p->id));
 		add_to_hash(HASH_ID, source_p->id, source_p);
 	}
 	else
 	{
-		ircd_strlcpy(source_p->info, parv[8], sizeof(source_p->info));
+		rb_strlcpy(source_p->info, parv[8], sizeof(source_p->info));
 
 		if((server = find_server(NULL, parv[7])) == NULL)
 		{
@@ -1026,11 +1026,11 @@ register_client(struct Client *client_p, struct Client *server,
 
  	}
  
-	ircd_dlinkAddTail(source_p, &source_p->node, &global_client_list);
+	rb_dlinkAddTail(source_p, &source_p->node, &global_client_list);
 
 	/* server is guaranteed to exist at this point */
 	source_p->servptr = server;
-	ircd_dlinkAdd(source_p, &source_p->lnode, &source_p->servptr->serv->users);
+	rb_dlinkAdd(source_p, &source_p->lnode, &source_p->servptr->serv->users);
 
 
 	/* remove any nd entries for this nick */

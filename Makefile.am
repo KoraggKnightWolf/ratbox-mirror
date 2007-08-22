@@ -7,16 +7,16 @@
 AUTOMAKE_OPTIONS = foreign subdir-objects 
 
 prefix		= @prefix@
-libratboxdir 	= @libdir@
+libcoredir 	= @libdir@
 modulesdir	= @moduledir@/autoload
 coredir		= @moduledir@
 servicesdir	= @moduledir@/autoload
 
-SUBDIRS = libircd libltdl adns tools doc help @SQLITE_SUBDIR@ bandb @SERVLINK@ 
+SUBDIRS = libratbox libltdl adns tools doc help @SQLITE_SUBDIR@ bandb @SERVLINK@ 
 
 AM_YFLAGS = -d
 
-INCLUDES = -Ilibircd/include -Ilibltdl -Iadns
+INCLUDES = -Ilibratbox/include -Ilibltdl -Iadns
 src/version.c: src/version.c.SH
 	$(SHELL) -c "(cd src; $(SHELL) ./version.c.SH)"
 
@@ -30,22 +30,22 @@ endif
 
 DLOPEN=$(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_LTLIBRARIES) ;do echo -dlpreopen $$x ;done)
 if !STATIC_MODULES
-ircd_LDADD = libircd/src/libircd.la libratbox.la $(LIBLTDL)
+ircd_LDADD = libratbox/src/libratbox.la libcore.la $(LIBLTDL)
 else
-ircd_LDADD = libircd/src/libircd.la libratbox.la $(LIBLTDL) $(DLOPEN) 
+ircd_LDADD = libratbox/src/libratbox.la libcore.la $(LIBLTDL) $(DLOPEN) 
 endif
 
 ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
-resolver_LDADD = adns/libadns.a libircd/src/libircd.la
-ident_LDADD = libircd/src/libircd.la
+resolver_LDADD = adns/libadns.a libratbox/src/libratbox.la
+ident_LDADD = libratbox/src/libratbox.la
 
 ircd_SOURCES = src/main.c
 resolver_SOURCES = src/resolver.c
 ident_SOURCES = src/ident.c
 
 
-libratbox_la_SOURCES =                     \
+libcore_la_SOURCES =                     \
   src/dns.c                        \
   src/bandbi.c			\
   src/cache.c                       \
@@ -83,15 +83,15 @@ libratbox_la_SOURCES =                     \
   src/ircd_parser.y			\
   src/ircd_lexer.l			
 
-libratbox_LTLIBRARIES = libratbox.la
-libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
+libcore_LTLIBRARIES = libcore.la
+libcore_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
 
 if MINGW
-libratbox_la_DEPENDENCIES = $(LIBLTDL) libircd/src/libircd.la
-libratbox_la_LIBADD = libircd/src/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
+libcore_la_DEPENDENCIES = $(LIBLTDL) libratbox/src/libratbox.la
+libcore_la_LIBADD = libratbox/src/libratbox.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 else
-libratbox_la_DEPENDENCIES = libircd/src/libircd.la
-libratbox_la_LIBADD = libircd/src/libircd.la @SSL_LIBS@ @CRYPT_LIB@
+libcore_la_DEPENDENCIES = libratbox/src/libratbox.la
+libcore_la_LIBADD = libratbox/src/libratbox.la @SSL_LIBS@ @CRYPT_LIB@
 endif
 
 
@@ -102,7 +102,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 if !STATIC_MODULES
 
 if MINGW
-MODULE_LIBS = libircd/src/libircd.la libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
+MODULE_LIBS = libratbox/src/libratbox.la libcore.la @SSL_LIBS@ @CRYPT_LIB@ 
 else
 MODULE_LIBS = @SSL_LIBS@ @CRYPT_LIB@
 endif # MINGW
@@ -391,7 +391,7 @@ endif
 
 bin_PROGRAMS = ircd resolver ident
 
-src: $(libratbox_LTLIBRARIES) ircd
+src: $(libcore_LTLIBRARIES) ircd
 
 modules: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 
@@ -400,7 +400,7 @@ modules_core: $(core_LTLIBRARIES)
 .o.so: 
 	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(MODULE_FLAGS) $(MODULE_LIBS) -avoid-version -shared $< -o $@
 
-install-exec-hook: install-libratboxLTLIBRARIES move-old-modules
+install-exec-hook: install-libcoreLTLIBRARIES move-old-modules
 
 move-old-modules:
 # move the old module directory out of the way, stale modules cause massive

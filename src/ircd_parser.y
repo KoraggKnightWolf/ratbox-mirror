@@ -5,7 +5,7 @@
 
 %{
 
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "stdinc.h"
 #include "newconf.h"
 
@@ -91,7 +91,7 @@ free_cur_list(conf_parm_t* list)
 	{
 		case CF_STRING:
 		case CF_QSTRING:
-			ircd_free(list->v.string);
+			rb_free(list->v.string);
 			break;
 		case CF_LIST:
 			free_cur_list(list->v.list);
@@ -112,7 +112,7 @@ add_cur_list_cpt(conf_parm_t *new)
 	
 	if (cur_list == NULL)
 	{
-		cur_list = ircd_malloc(sizeof(conf_parm_t));
+		cur_list = rb_malloc(sizeof(conf_parm_t));
 		cur_list->v.list = new;
 	}
 	else
@@ -128,7 +128,7 @@ add_cur_list(int type, char *str, int number)
 {
 	conf_parm_t *new;
 
-	new = ircd_malloc(sizeof(conf_parm_t));
+	new = rb_malloc(sizeof(conf_parm_t));
 	new->next = NULL;
 	new->type = type;
 
@@ -141,7 +141,7 @@ add_cur_list(int type, char *str, int number)
 		break;
 	case CF_STRING:
 	case CF_QSTRING:
-		new->v.string = ircd_strdup(str);
+		new->v.string = rb_strdup(str);
 		break;
 	}
 
@@ -240,19 +240,19 @@ single: oneitem
 
 oneitem: qstring
 	{
-		$$ = ircd_malloc(sizeof(conf_parm_t));
+		$$ = rb_malloc(sizeof(conf_parm_t));
 		$$->type = CF_QSTRING;
-		$$->v.string = ircd_strdup($1);
+		$$->v.string = rb_strdup($1);
 	}
 	| timespec
 	{
-		$$ = ircd_malloc(sizeof(conf_parm_t));
+		$$ = rb_malloc(sizeof(conf_parm_t));
 		$$->type = CF_TIME;
 		$$->v.number = $1;
 	}
 	| number
 	{
-		$$ = ircd_malloc(sizeof(conf_parm_t));
+		$$ = rb_malloc(sizeof(conf_parm_t));
 		$$->type = CF_INT;
 		$$->v.number = $1;
 	}
@@ -263,7 +263,7 @@ oneitem: qstring
 		 
 		int val = conf_get_yesno_value($1);
 
-		$$ = ircd_malloc(sizeof(conf_parm_t));
+		$$ = rb_malloc(sizeof(conf_parm_t));
 
 		if (val != -1)
 		{
@@ -273,7 +273,7 @@ oneitem: qstring
 		else
 		{
 			$$->type = CF_STRING;
-			$$->v.string = ircd_strdup($1);
+			$$->v.string = rb_strdup($1);
 		}
 	}
 	;

@@ -181,31 +181,31 @@ show_lusers(struct Client *source_p)
 {
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSERCLIENT, form_str(RPL_LUSERCLIENT),
 			   (Count.total - Count.invisi),
-			   Count.invisi, ircd_dlink_list_length(&global_serv_list));
+			   Count.invisi, rb_dlink_list_length(&global_serv_list));
 
 	if(Count.oper > 0)
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSEROP, 
 				   form_str(RPL_LUSEROP), Count.oper);
 
-	if(ircd_dlink_list_length(&unknown_list) > 0)
+	if(rb_dlink_list_length(&unknown_list) > 0)
 		sendto_one_numeric(source_p, HOLD_QUEUE,  RPL_LUSERUNKNOWN, 
 				   form_str(RPL_LUSERUNKNOWN),
-				   ircd_dlink_list_length(&unknown_list));
+				   rb_dlink_list_length(&unknown_list));
 
-	if(ircd_dlink_list_length(&global_channel_list) > 0)
+	if(rb_dlink_list_length(&global_channel_list) > 0)
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSERCHANNELS, 
 				   form_str(RPL_LUSERCHANNELS),
-				   ircd_dlink_list_length(&global_channel_list));
+				   rb_dlink_list_length(&global_channel_list));
 
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSERME, form_str(RPL_LUSERME),
-			   ircd_dlink_list_length(&lclient_list),
-			   ircd_dlink_list_length(&serv_list));
+			   rb_dlink_list_length(&lclient_list),
+			   rb_dlink_list_length(&serv_list));
 
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LOCALUSERS, 
 			   form_str(RPL_LOCALUSERS),
-			   ircd_dlink_list_length(&lclient_list),
+			   rb_dlink_list_length(&lclient_list),
 			   Count.max_loc,
-			   ircd_dlink_list_length(&lclient_list),
+			   rb_dlink_list_length(&lclient_list),
 			   Count.max_loc);
 
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_GLOBALUSERS, form_str(RPL_GLOBALUSERS),
@@ -217,13 +217,13 @@ show_lusers(struct Client *source_p)
 			   MaxConnectionCount, MaxClientCount, 
 			   Count.totalrestartcount);
 
-	if(ircd_dlink_list_length(&lclient_list) > (unsigned long)MaxClientCount)
-		MaxClientCount = ircd_dlink_list_length(&lclient_list);
+	if(rb_dlink_list_length(&lclient_list) > (unsigned long)MaxClientCount)
+		MaxClientCount = rb_dlink_list_length(&lclient_list);
 
-	if((ircd_dlink_list_length(&lclient_list) + ircd_dlink_list_length(&serv_list)) >
+	if((rb_dlink_list_length(&lclient_list) + rb_dlink_list_length(&serv_list)) >
 	   (unsigned long)MaxConnectionCount)
-		MaxConnectionCount = ircd_dlink_list_length(&lclient_list) + 
-					ircd_dlink_list_length(&serv_list);
+		MaxConnectionCount = rb_dlink_list_length(&lclient_list) + 
+					rb_dlink_list_length(&serv_list);
 	send_pop_queue(source_p);
 
 	return 0;
@@ -241,13 +241,13 @@ show_isupport(struct Client *source_p)
 {
 	char isupportbuffer[512];
 
-	ircd_sprintf(isupportbuffer, FEATURES, FEATURESVALUES);
+	rb_sprintf(isupportbuffer, FEATURES, FEATURESVALUES);
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
 
-	ircd_sprintf(isupportbuffer, FEATURES2, FEATURES2VALUES);
+	rb_sprintf(isupportbuffer, FEATURES2, FEATURES2VALUES);
 	sendto_one_numeric(source_p, HOLD_QUEUE,  RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
 
-	ircd_sprintf(isupportbuffer, FEATURES3, FEATURES3VALUES);
+	rb_sprintf(isupportbuffer, FEATURES3, FEATURES3VALUES);
 	sendto_one_numeric(source_p, POP_QUEUE,  RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
 
 	return;
@@ -318,7 +318,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(source_p->flags & FLAGS_CLICAP)
 		return -1;
 
-	client_p->localClient->last = ircd_current_time();
+	client_p->localClient->last = rb_current_time();
 	/* Straight up the maximum rate of flooding... */
 	source_p->localClient->allow_read = MAX_FLOOD_BURST;
 
@@ -350,11 +350,11 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 			   ":%s NOTICE %s :*** Notice -- You have an illegal character in your hostname",
 			   me.name, source_p->name);
 
-		ircd_strlcpy(source_p->host, source_p->sockhost, sizeof(source_p->host));
+		rb_strlcpy(source_p->host, source_p->sockhost, sizeof(source_p->host));
 
 #ifdef IPV6
 		if(ConfigFileEntry.dot_in_ip6_addr == 1)
-			ircd_strlcat(source_p->host, ".", sizeof(source_p->host));
+			rb_strlcat(source_p->host, ".", sizeof(source_p->host));
 #endif
 	}
  
@@ -425,7 +425,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(source_p->localClient->passwd)
 	{
 		memset(source_p->localClient->passwd, 0, strlen(source_p->localClient->passwd));
-		ircd_free(source_p->localClient->passwd);
+		rb_free(source_p->localClient->passwd);
 		source_p->localClient->passwd = NULL;
 	}
 
@@ -441,9 +441,9 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	 *   -Taner
 	 */
 	/* Except "F:" clients */
-	if(((ircd_dlink_list_length(&lclient_list) + 1) >= 
+	if(((rb_dlink_list_length(&lclient_list) + 1) >= 
 	   ((unsigned long)GlobalSetOptions.maxclients + MAX_BUFFER) ||
-	   (ircd_dlink_list_length(&lclient_list) + 1) >= 
+	   (rb_dlink_list_length(&lclient_list) + 1) >= 
 	    ((unsigned long)GlobalSetOptions.maxclients - 5)) && !(IsExemptLimits(source_p)))
 	{
 		sendto_realops_flags(UMODE_FULL, L_ALL,
@@ -462,7 +462,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 				     "Invalid username: %s (%s@%s)",
 				     source_p->name, source_p->username, source_p->host);
 		ServerStats.is_ref++;
-		ircd_sprintf(tmpstr2, "Invalid username [%s]", source_p->username);
+		rb_sprintf(tmpstr2, "Invalid username [%s]", source_p->username);
 		exit_client(client_p, source_p, &me, tmpstr2);
 		return (CLIENT_EXITED);
 	}
@@ -482,7 +482,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(IsAnyDead(client_p))
 		return CLIENT_EXITED;
 
-	ircd_inet_ntop_sock((struct sockaddr *)&source_p->localClient->ip, ipaddr, sizeof(ipaddr));
+	rb_inet_ntop_sock((struct sockaddr *)&source_p->localClient->ip, ipaddr, sizeof(ipaddr));
 
 	sendto_realops_flags(UMODE_CCONN, L_ALL,
 			     "Client connecting: %s (%s@%s) [%s] {%s} [%s]",
@@ -515,12 +515,12 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	}
 
 	s_assert(!IsClient(source_p));
-	ircd_dlinkMoveNode(&source_p->localClient->tnode, &unknown_list, &lclient_list);
+	rb_dlinkMoveNode(&source_p->localClient->tnode, &unknown_list, &lclient_list);
 	SetClient(source_p);
 
 	source_p->servptr = &me;
 
-	ircd_dlinkAdd(source_p, &source_p->lnode, &source_p->servptr->serv->users);
+	rb_dlinkAdd(source_p, &source_p->lnode, &source_p->servptr->serv->users);
 	/* Increment our total user count here */
 	if(++Count.total > Count.max_tot)
 		Count.max_tot = Count.total;
@@ -530,9 +530,9 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 
 	s_assert(source_p->localClient != NULL);
 
-	if(ircd_dlink_list_length(&lclient_list) > (unsigned long)Count.max_loc)
+	if(rb_dlink_list_length(&lclient_list) > (unsigned long)Count.max_loc)
 	{
-		Count.max_loc = ircd_dlink_list_length(&lclient_list);
+		Count.max_loc = rb_dlink_list_length(&lclient_list);
 		if(!(Count.max_loc % 10))
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "New Max Local Clients: %d", Count.max_loc);
@@ -805,10 +805,10 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 						source_p->umodes &= ~ConfigFileEntry.oper_only_umodes;
 						source_p->operflags &= ~OPER_FLAGS;
 
-						ircd_free(source_p->localClient->opername);
+						rb_free(source_p->localClient->opername);
 						source_p->localClient->opername = NULL;
 
-						ircd_dlinkFindDestroy(source_p, &oper_list);
+						rb_dlinkFindDestroy(source_p, &oper_list);
 					} 
 				}
 				break;

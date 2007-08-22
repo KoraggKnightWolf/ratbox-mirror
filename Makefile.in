@@ -21,7 +21,7 @@
 # on each other now..
 
 
-SOURCES = $(libratbox_la_SOURCES) $(modules_core_m_die_la_SOURCES) $(modules_core_m_error_la_SOURCES) $(modules_core_m_join_la_SOURCES) $(modules_core_m_kick_la_SOURCES) $(modules_core_m_kill_la_SOURCES) $(modules_core_m_message_la_SOURCES) $(modules_core_m_mode_la_SOURCES) $(modules_core_m_nick_la_SOURCES) $(modules_core_m_part_la_SOURCES) $(modules_core_m_quit_la_SOURCES) $(modules_core_m_server_la_SOURCES) $(modules_core_m_squit_la_SOURCES) $(modules_m_accept_la_SOURCES) $(modules_m_admin_la_SOURCES) $(modules_m_away_la_SOURCES) $(modules_m_cap_la_SOURCES) $(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) $(modules_m_cmessage_la_SOURCES) $(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) $(modules_m_encap_la_SOURCES) $(modules_m_gline_la_SOURCES) $(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) $(modules_m_invite_la_SOURCES) $(modules_m_ison_la_SOURCES) $(modules_m_kline_la_SOURCES) $(modules_m_knock_la_SOURCES) $(modules_m_links_la_SOURCES) $(modules_m_list_la_SOURCES) $(modules_m_locops_la_SOURCES) $(modules_m_lusers_la_SOURCES) $(modules_m_map_la_SOURCES) $(modules_m_monitor_la_SOURCES) $(modules_m_motd_la_SOURCES) $(modules_m_names_la_SOURCES) $(modules_m_oper_la_SOURCES) $(modules_m_operspy_la_SOURCES) $(modules_m_pass_la_SOURCES) $(modules_m_ping_la_SOURCES) $(modules_m_pong_la_SOURCES) $(modules_m_post_la_SOURCES) $(modules_m_rehash_la_SOURCES) $(modules_m_restart_la_SOURCES) $(modules_m_resv_la_SOURCES) $(modules_m_services_la_SOURCES) $(modules_m_set_la_SOURCES) $(modules_m_stats_la_SOURCES) $(modules_m_svinfo_la_SOURCES) $(modules_m_tb_la_SOURCES) $(modules_m_testline_la_SOURCES) $(modules_m_testmask_la_SOURCES) $(modules_m_time_la_SOURCES) $(modules_m_topic_la_SOURCES) $(modules_m_trace_la_SOURCES) $(modules_m_unreject_la_SOURCES) $(modules_m_user_la_SOURCES) $(modules_m_userhost_la_SOURCES) $(modules_m_version_la_SOURCES) $(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) $(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) $(modules_m_xline_la_SOURCES) $(ident_SOURCES) $(ircd_SOURCES) $(resolver_SOURCES)
+SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) $(modules_core_m_error_la_SOURCES) $(modules_core_m_join_la_SOURCES) $(modules_core_m_kick_la_SOURCES) $(modules_core_m_kill_la_SOURCES) $(modules_core_m_message_la_SOURCES) $(modules_core_m_mode_la_SOURCES) $(modules_core_m_nick_la_SOURCES) $(modules_core_m_part_la_SOURCES) $(modules_core_m_quit_la_SOURCES) $(modules_core_m_server_la_SOURCES) $(modules_core_m_squit_la_SOURCES) $(modules_m_accept_la_SOURCES) $(modules_m_admin_la_SOURCES) $(modules_m_away_la_SOURCES) $(modules_m_cap_la_SOURCES) $(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) $(modules_m_cmessage_la_SOURCES) $(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) $(modules_m_encap_la_SOURCES) $(modules_m_gline_la_SOURCES) $(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) $(modules_m_invite_la_SOURCES) $(modules_m_ison_la_SOURCES) $(modules_m_kline_la_SOURCES) $(modules_m_knock_la_SOURCES) $(modules_m_links_la_SOURCES) $(modules_m_list_la_SOURCES) $(modules_m_locops_la_SOURCES) $(modules_m_lusers_la_SOURCES) $(modules_m_map_la_SOURCES) $(modules_m_monitor_la_SOURCES) $(modules_m_motd_la_SOURCES) $(modules_m_names_la_SOURCES) $(modules_m_oper_la_SOURCES) $(modules_m_operspy_la_SOURCES) $(modules_m_pass_la_SOURCES) $(modules_m_ping_la_SOURCES) $(modules_m_pong_la_SOURCES) $(modules_m_post_la_SOURCES) $(modules_m_rehash_la_SOURCES) $(modules_m_restart_la_SOURCES) $(modules_m_resv_la_SOURCES) $(modules_m_services_la_SOURCES) $(modules_m_set_la_SOURCES) $(modules_m_stats_la_SOURCES) $(modules_m_svinfo_la_SOURCES) $(modules_m_tb_la_SOURCES) $(modules_m_testline_la_SOURCES) $(modules_m_testmask_la_SOURCES) $(modules_m_time_la_SOURCES) $(modules_m_topic_la_SOURCES) $(modules_m_trace_la_SOURCES) $(modules_m_unreject_la_SOURCES) $(modules_m_user_la_SOURCES) $(modules_m_userhost_la_SOURCES) $(modules_m_version_la_SOURCES) $(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) $(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) $(modules_m_xline_la_SOURCES) $(ident_SOURCES) $(ircd_SOURCES) $(resolver_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -63,16 +63,16 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/setup.h
 CONFIG_CLEAN_FILES = doc/Makefile help/Makefile
-am__installdirs = "$(DESTDIR)$(coredir)" "$(DESTDIR)$(libratboxdir)" "$(DESTDIR)$(modulesdir)" "$(DESTDIR)$(servicesdir)" "$(DESTDIR)$(bindir)"
+am__installdirs = "$(DESTDIR)$(coredir)" "$(DESTDIR)$(libcoredir)" "$(DESTDIR)$(modulesdir)" "$(DESTDIR)$(servicesdir)" "$(DESTDIR)$(bindir)"
 coreLTLIBRARIES_INSTALL = $(INSTALL)
-libratboxLTLIBRARIES_INSTALL = $(INSTALL)
+libcoreLTLIBRARIES_INSTALL = $(INSTALL)
 modulesLTLIBRARIES_INSTALL = $(INSTALL)
 servicesLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(core_LTLIBRARIES) $(libratbox_LTLIBRARIES) \
+LTLIBRARIES = $(core_LTLIBRARIES) $(libcore_LTLIBRARIES) \
 	$(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 am__dirstamp = $(am__leading_dot)dirstamp
-am_libratbox_la_OBJECTS = src/dns.lo src/bandbi.lo src/cache.lo \
+am_libcore_la_OBJECTS = src/dns.lo src/bandbi.lo src/cache.lo \
 	src/channel.lo src/class.lo src/client.lo src/getopt.lo \
 	src/hash.lo src/hook.lo src/hostmask.lo src/ircd.lo \
 	src/ircd_signal.lo src/listener.lo src/match.lo src/modules.lo \
@@ -82,10 +82,10 @@ am_libratbox_la_OBJECTS = src/dns.lo src/bandbi.lo src/cache.lo \
 	src/s_log.lo src/s_serv.lo src/s_user.lo src/scache.lo \
 	src/send.lo src/whowas.lo src/version.lo src/ircd_parser.lo \
 	src/ircd_lexer.lo
-libratbox_la_OBJECTS = $(am_libratbox_la_OBJECTS)
+libcore_la_OBJECTS = $(am_libcore_la_OBJECTS)
 @MINGW_TRUE@@STATIC_MODULES_FALSE@am__DEPENDENCIES_2 =  \
-@MINGW_TRUE@@STATIC_MODULES_FALSE@	libircd/src/libircd.la \
-@MINGW_TRUE@@STATIC_MODULES_FALSE@	libratbox.la
+@MINGW_TRUE@@STATIC_MODULES_FALSE@	libratbox/src/libratbox.la \
+@MINGW_TRUE@@STATIC_MODULES_FALSE@	libcore.la
 modules_core_m_die_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_core_m_die_la_OBJECTS = modules/core/m_die.lo
 modules_core_m_die_la_OBJECTS = $(am_modules_core_m_die_la_OBJECTS)
@@ -292,7 +292,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_ident_OBJECTS = src/ident.$(OBJEXT)
 ident_OBJECTS = $(am_ident_OBJECTS)
-ident_DEPENDENCIES = libircd/src/libircd.la
+ident_DEPENDENCIES = libratbox/src/libratbox.la
 am_ircd_OBJECTS = src/main.$(OBJEXT)
 ircd_OBJECTS = $(am_ircd_OBJECTS)
 am__DEPENDENCIES_3 = modules/m_accept.la modules/m_admin.la \
@@ -323,14 +323,14 @@ am__DEPENDENCIES_4 = modules/core/m_die.la modules/core/m_error.la \
 am__DEPENDENCIES_6 = $(shell for x in $(am__DEPENDENCIES_3) \
 	$(am__DEPENDENCIES_4) $(am__DEPENDENCIES_5) ;do echo $$x \
 	;done)
-@STATIC_MODULES_FALSE@ircd_DEPENDENCIES = libircd/src/libircd.la \
-@STATIC_MODULES_FALSE@	libratbox.la $(am__DEPENDENCIES_1)
-@STATIC_MODULES_TRUE@ircd_DEPENDENCIES = libircd/src/libircd.la \
-@STATIC_MODULES_TRUE@	libratbox.la $(am__DEPENDENCIES_1) \
+@STATIC_MODULES_FALSE@ircd_DEPENDENCIES = libratbox/src/libratbox.la \
+@STATIC_MODULES_FALSE@	libcore.la $(am__DEPENDENCIES_1)
+@STATIC_MODULES_TRUE@ircd_DEPENDENCIES = libratbox/src/libratbox.la \
+@STATIC_MODULES_TRUE@	libcore.la $(am__DEPENDENCIES_1) \
 @STATIC_MODULES_TRUE@	$(am__DEPENDENCIES_6)
 am_resolver_OBJECTS = src/resolver.$(OBJEXT)
 resolver_OBJECTS = $(am_resolver_OBJECTS)
-resolver_DEPENDENCIES = adns/libadns.a libircd/src/libircd.la
+resolver_DEPENDENCIES = adns/libadns.a libratbox/src/libratbox.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -436,7 +436,7 @@ LTLEXCOMPILE = $(LIBTOOL) --mode=compile $(LEX) $(LFLAGS) $(AM_LFLAGS)
 YACCCOMPILE = $(YACC) $(YFLAGS) $(AM_YFLAGS)
 LTYACCCOMPILE = $(LIBTOOL) --mode=compile $(YACC) $(YFLAGS) \
 	$(AM_YFLAGS)
-SOURCES = $(libratbox_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
+SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_core_m_error_la_SOURCES) \
 	$(modules_core_m_join_la_SOURCES) \
 	$(modules_core_m_kick_la_SOURCES) \
@@ -478,8 +478,7 @@ SOURCES = $(libratbox_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) \
 	$(modules_m_xline_la_SOURCES) $(ident_SOURCES) $(ircd_SOURCES) \
 	$(resolver_SOURCES)
-DIST_SOURCES = $(libratbox_la_SOURCES) \
-	$(modules_core_m_die_la_SOURCES) \
+DIST_SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_core_m_error_la_SOURCES) \
 	$(modules_core_m_join_la_SOURCES) \
 	$(modules_core_m_kick_la_SOURCES) \
@@ -693,24 +692,24 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign subdir-objects 
-libratboxdir = @libdir@
+libcoredir = @libdir@
 modulesdir = @moduledir@/autoload
 coredir = @moduledir@
 servicesdir = @moduledir@/autoload
-SUBDIRS = libircd libltdl adns tools doc help @SQLITE_SUBDIR@ bandb @SERVLINK@ 
+SUBDIRS = libratbox libltdl adns tools doc help @SQLITE_SUBDIR@ bandb @SERVLINK@ 
 AM_YFLAGS = -d
-INCLUDES = -Ilibircd/include -Ilibltdl -Iadns
+INCLUDES = -Ilibratbox/include -Ilibltdl -Iadns
 @MINGW_TRUE@EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
 DLOPEN = $(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_LTLIBRARIES) ;do echo -dlpreopen $$x ;done)
-@STATIC_MODULES_FALSE@ircd_LDADD = libircd/src/libircd.la libratbox.la $(LIBLTDL)
-@STATIC_MODULES_TRUE@ircd_LDADD = libircd/src/libircd.la libratbox.la $(LIBLTDL) $(DLOPEN) 
+@STATIC_MODULES_FALSE@ircd_LDADD = libratbox/src/libratbox.la libcore.la $(LIBLTDL)
+@STATIC_MODULES_TRUE@ircd_LDADD = libratbox/src/libratbox.la libcore.la $(LIBLTDL) $(DLOPEN) 
 ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
-resolver_LDADD = adns/libadns.a libircd/src/libircd.la
-ident_LDADD = libircd/src/libircd.la
+resolver_LDADD = adns/libadns.a libratbox/src/libratbox.la
+ident_LDADD = libratbox/src/libratbox.la
 ircd_SOURCES = src/main.c
 resolver_SOURCES = src/resolver.c
 ident_SOURCES = src/ident.c
-libratbox_la_SOURCES = \
+libcore_la_SOURCES = \
   src/dns.c                        \
   src/bandbi.c			\
   src/cache.c                       \
@@ -748,17 +747,17 @@ libratbox_la_SOURCES = \
   src/ircd_parser.y			\
   src/ircd_lexer.l			
 
-libratbox_LTLIBRARIES = libratbox.la
-libratbox_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
-@MINGW_FALSE@libratbox_la_DEPENDENCIES = libircd/src/libircd.la
-@MINGW_TRUE@libratbox_la_DEPENDENCIES = $(LIBLTDL) libircd/src/libircd.la
-@MINGW_FALSE@libratbox_la_LIBADD = libircd/src/libircd.la @SSL_LIBS@ @CRYPT_LIB@
-@MINGW_TRUE@libratbox_la_LIBADD = libircd/src/libircd.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
+libcore_LTLIBRARIES = libcore.la
+libcore_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
+@MINGW_FALSE@libcore_la_DEPENDENCIES = libratbox/src/libratbox.la
+@MINGW_TRUE@libcore_la_DEPENDENCIES = $(LIBLTDL) libratbox/src/libratbox.la
+@MINGW_FALSE@libcore_la_LIBADD = libratbox/src/libratbox.la @SSL_LIBS@ @CRYPT_LIB@
+@MINGW_TRUE@libcore_la_LIBADD = libratbox/src/libratbox.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
 
 # now the modules..
 MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version 
 @MINGW_FALSE@@STATIC_MODULES_FALSE@MODULE_LIBS = @SSL_LIBS@ @CRYPT_LIB@
-@MINGW_TRUE@@STATIC_MODULES_FALSE@MODULE_LIBS = libircd/src/libircd.la libratbox.la @SSL_LIBS@ @CRYPT_LIB@ 
+@MINGW_TRUE@@STATIC_MODULES_FALSE@MODULE_LIBS = libratbox/src/libratbox.la libcore.la @SSL_LIBS@ @CRYPT_LIB@ 
 modules_m_accept_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_admin_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_away_la_LDFLAGS = -module $(MODULE_FLAGS)  
@@ -1108,28 +1107,28 @@ clean-coreLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-install-libratboxLTLIBRARIES: $(libratbox_LTLIBRARIES)
+install-libcoreLTLIBRARIES: $(libcore_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	test -z "$(libratboxdir)" || $(mkdir_p) "$(DESTDIR)$(libratboxdir)"
-	@list='$(libratbox_LTLIBRARIES)'; for p in $$list; do \
+	test -z "$(libcoredir)" || $(mkdir_p) "$(DESTDIR)$(libcoredir)"
+	@list='$(libcore_LTLIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
 	    f="`echo $$p | sed -e 's|^.*/||'`"; \
-	    echo " $(LIBTOOL) --mode=install $(libratboxLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libratboxdir)/$$f'"; \
-	    $(LIBTOOL) --mode=install $(libratboxLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libratboxdir)/$$f"; \
+	    echo " $(LIBTOOL) --mode=install $(libcoreLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libcoredir)/$$f'"; \
+	    $(LIBTOOL) --mode=install $(libcoreLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libcoredir)/$$f"; \
 	  else :; fi; \
 	done
 
-uninstall-libratboxLTLIBRARIES:
+uninstall-libcoreLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@list='$(libratbox_LTLIBRARIES)'; for p in $$list; do \
+	@list='$(libcore_LTLIBRARIES)'; for p in $$list; do \
 	    p="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libratboxdir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libratboxdir)/$$p"; \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libcoredir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libcoredir)/$$p"; \
 	done
 
-clean-libratboxLTLIBRARIES:
-	-test -z "$(libratbox_LTLIBRARIES)" || rm -f $(libratbox_LTLIBRARIES)
-	@list='$(libratbox_LTLIBRARIES)'; for p in $$list; do \
+clean-libcoreLTLIBRARIES:
+	-test -z "$(libcore_LTLIBRARIES)" || rm -f $(libcore_LTLIBRARIES)
+	@list='$(libcore_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
@@ -1236,8 +1235,8 @@ src/ircd_parser.h: src/ircd_parser.c
 	else :; fi
 src/ircd_parser.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ircd_lexer.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-libratbox.la: $(libratbox_la_OBJECTS) $(libratbox_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libratboxdir) $(libratbox_la_LDFLAGS) $(libratbox_la_OBJECTS) $(libratbox_la_LIBADD) $(LIBS)
+libcore.la: $(libcore_la_OBJECTS) $(libcore_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libcoredir) $(libcore_la_LDFLAGS) $(libcore_la_OBJECTS) $(libcore_la_LIBADD) $(LIBS)
 modules/core/$(am__dirstamp):
 	@$(mkdir_p) modules/core
 	@: > modules/core/$(am__dirstamp)
@@ -4708,7 +4707,7 @@ check: check-recursive
 all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(coredir)" "$(DESTDIR)$(libratboxdir)" "$(DESTDIR)$(modulesdir)" "$(DESTDIR)$(servicesdir)" "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(coredir)" "$(DESTDIR)$(libcoredir)" "$(DESTDIR)$(modulesdir)" "$(DESTDIR)$(servicesdir)" "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -4747,7 +4746,7 @@ maintainer-clean-generic:
 clean: clean-recursive
 
 clean-am: clean-binPROGRAMS clean-coreLTLIBRARIES clean-generic \
-	clean-libratboxLTLIBRARIES clean-libtool \
+	clean-libcoreLTLIBRARIES clean-libtool \
 	clean-modulesLTLIBRARIES clean-servicesLTLIBRARIES \
 	mostlyclean-am
 
@@ -4768,7 +4767,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-coreLTLIBRARIES install-libratboxLTLIBRARIES \
+install-data-am: install-coreLTLIBRARIES install-libcoreLTLIBRARIES \
 	install-modulesLTLIBRARIES install-servicesLTLIBRARIES
 
 install-exec-am: install-binPROGRAMS
@@ -4802,14 +4801,14 @@ ps: ps-recursive
 ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-coreLTLIBRARIES \
-	uninstall-info-am uninstall-libratboxLTLIBRARIES \
+	uninstall-info-am uninstall-libcoreLTLIBRARIES \
 	uninstall-modulesLTLIBRARIES uninstall-servicesLTLIBRARIES
 
 uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am am--refresh check \
 	check-am clean clean-binPROGRAMS clean-coreLTLIBRARIES \
-	clean-generic clean-libratboxLTLIBRARIES clean-libtool \
+	clean-generic clean-libcoreLTLIBRARIES clean-libtool \
 	clean-modulesLTLIBRARIES clean-recursive \
 	clean-servicesLTLIBRARIES ctags ctags-recursive dist dist-all \
 	dist-bzip2 dist-gzip dist-shar dist-tarZ dist-zip distcheck \
@@ -4819,7 +4818,7 @@ uninstall-info: uninstall-info-recursive
 	html-am info info-am install install-am install-binPROGRAMS \
 	install-coreLTLIBRARIES install-data install-data-am \
 	install-exec install-exec-am install-info install-info-am \
-	install-libratboxLTLIBRARIES install-man \
+	install-libcoreLTLIBRARIES install-man \
 	install-modulesLTLIBRARIES install-servicesLTLIBRARIES \
 	install-strip installcheck installcheck-am installdirs \
 	installdirs-am maintainer-clean maintainer-clean-generic \
@@ -4827,7 +4826,7 @@ uninstall-info: uninstall-info-recursive
 	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
 	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-coreLTLIBRARIES \
-	uninstall-info-am uninstall-libratboxLTLIBRARIES \
+	uninstall-info-am uninstall-libcoreLTLIBRARIES \
 	uninstall-modulesLTLIBRARIES uninstall-servicesLTLIBRARIES
 
 src/version.c: src/version.c.SH
@@ -4836,7 +4835,7 @@ src/version.c: src/version.c.SH
 src/version.lo: src/version.c include/patchlevel.h include/serno.h
 	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-src: $(libratbox_LTLIBRARIES) ircd
+src: $(libcore_LTLIBRARIES) ircd
 
 modules: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 
@@ -4845,7 +4844,7 @@ modules_core: $(core_LTLIBRARIES)
 .o.so: 
 	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(MODULE_FLAGS) $(MODULE_LIBS) -avoid-version -shared $< -o $@
 
-install-exec-hook: install-libratboxLTLIBRARIES move-old-modules
+install-exec-hook: install-libcoreLTLIBRARIES move-old-modules
 
 move-old-modules:
 # move the old module directory out of the way, stale modules cause massive

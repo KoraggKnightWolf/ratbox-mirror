@@ -121,7 +121,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(match(target_server, me.name) == 0)
 			return 0;
 	}
-	else if(ircd_dlink_list_length(&cluster_conf_list) > 0)
+	else if(rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "RESV",
 				(temp_time > 0) ? SHARED_TRESV : SHARED_PRESV,
 				"%d %s 0 :%s",
@@ -233,8 +233,8 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf = make_conf();
 		aconf->status = CONF_RESV_CHANNEL;
 		aconf->port = 0;
-		aconf->host = ircd_strdup(name);
-		aconf->passwd = ircd_strdup(reason);
+		aconf->host = rb_strdup(name);
+		aconf->passwd = rb_strdup(reason);
 		aconf->info.oper = operhash_add(oper);
 		add_to_hash(HASH_RESV, aconf->host, aconf);
 
@@ -243,12 +243,12 @@ parse_resv(struct Client *source_p, const char *name,
 		if(temp_time > 0)
 		{
 			aconf->flags |= CONF_FLAGS_TEMPORARY;
-			aconf->hold = ircd_current_time() + temp_time;
+			aconf->hold = rb_current_time() + temp_time;
 		}
 		else
 		{
 			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL);
-			aconf->hold = ircd_current_time();
+			aconf->hold = rb_current_time();
 		}
 	}
 	else if(clean_resv_nick(name))
@@ -287,22 +287,22 @@ parse_resv(struct Client *source_p, const char *name,
 		aconf = make_conf();
 		aconf->status = CONF_RESV_NICK;
 		aconf->port = 0;
-		aconf->host = ircd_strdup(name);
-		aconf->passwd = ircd_strdup(reason);
+		aconf->host = rb_strdup(name);
+		aconf->passwd = rb_strdup(reason);
 		aconf->info.oper = operhash_add(oper);
-		ircd_dlinkAddAlloc(aconf, &resv_conf_list);
+		rb_dlinkAddAlloc(aconf, &resv_conf_list);
 
 		notify_resv(source_p, aconf->host, aconf->passwd, temp_time);
 
 		if(temp_time > 0)
 		{
 			aconf->flags |= CONF_FLAGS_TEMPORARY;
-			aconf->hold = ircd_current_time() + temp_time;
+			aconf->hold = rb_current_time() + temp_time;
 		}
 		else
 		{
 			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL);
-			aconf->hold = ircd_current_time();
+			aconf->hold = rb_current_time();
 		}
 			
 	}
@@ -336,7 +336,7 @@ mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
-	else if(ircd_dlink_list_length(&cluster_conf_list) > 0)
+	else if(rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "UNRESV", SHARED_UNRESV, 
 				"%s", parv[1]);
 
@@ -411,7 +411,7 @@ remove_resv(struct Client *source_p, const char *name)
 			bandb_del(BANDB_RESV, aconf->host, NULL);
 
 		/* already have ptr from the loop above.. */
-		ircd_dlinkDestroy(ptr, &resv_conf_list);
+		rb_dlinkDestroy(ptr, &resv_conf_list);
 		free_conf(aconf);
 	}
 

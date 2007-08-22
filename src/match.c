@@ -20,7 +20,7 @@
  *
  */
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "ircd.h"
 #include "match.h"
 #include "s_conf.h"
@@ -286,8 +286,8 @@ match_ips(const char *s1, const char *s2)
 	void *ipptr, *maskptr;
 	int cidrlen, aftype;
 
-	ircd_strlcpy(mask, s1, sizeof(mask));
-	ircd_strlcpy(address, s2, sizeof(address));
+	rb_strlcpy(mask, s1, sizeof(mask));
+	rb_strlcpy(address, s2, sizeof(address));
 
 	len = strrchr(mask, '/');
 	if(len == NULL)
@@ -317,8 +317,8 @@ match_ips(const char *s1, const char *s2)
 	else
 		return 0;
 
-	ircd_inet_pton(aftype, address, ipptr);
-	ircd_inet_pton(aftype, mask, maskptr);
+	rb_inet_pton(aftype, address, ipptr);
+	rb_inet_pton(aftype, mask, maskptr);
 	if(comp_with_mask(ipptr, maskptr, cidrlen))
 		return 1;
 	else
@@ -344,8 +344,8 @@ match_cidr(const char *s1, const char *s2)
 	void *ipptr, *maskptr;
 	int cidrlen, aftype;
 
-	ircd_strlcpy(mask, s1, sizeof(mask));
-	ircd_strlcpy(address, s2, sizeof(address));
+	rb_strlcpy(mask, s1, sizeof(mask));
+	rb_strlcpy(address, s2, sizeof(address));
 
 	ipmask = strrchr(mask, '@');
 	if(ipmask == NULL)
@@ -387,8 +387,8 @@ match_cidr(const char *s1, const char *s2)
 	else
 		return 0;
 
-	ircd_inet_pton(aftype, ip, ipptr);
-	ircd_inet_pton(aftype, ipmask, maskptr);
+	rb_inet_pton(aftype, ip, ipptr);
+	rb_inet_pton(aftype, ipmask, maskptr);
 	if(comp_with_mask(ipptr, maskptr, cidrlen) && match(mask, address))
 		return 1;
 	else

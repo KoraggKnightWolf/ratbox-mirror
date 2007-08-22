@@ -56,7 +56,7 @@ struct reject_data
 struct delay_data
 {
 	dlink_node node;
-	ircd_fde_t *F;
+	rb_fde_t *F;
 };
 
 
@@ -110,9 +110,9 @@ reject_exit(void *unused)
 	{
 		ddata = ptr->data;
 
-		ircd_write(ddata->F, errbuf, strlen(errbuf));		
-		ircd_close(ddata->F);
-		ircd_free(ddata);
+		rb_write(ddata->F, errbuf, strlen(errbuf));		
+		rb_close(ddata->F);
+		rb_free(ddata);
 	}
 
 	delay_exit.head = delay_exit.tail = NULL;
@@ -131,11 +131,11 @@ reject_expires(void *unused)
 		pnode = ptr->data;
 		rdata = pnode->data;		
 
-		if(rdata->time + ConfigFileEntry.reject_duration > ircd_current_time())
+		if(rdata->time + ConfigFileEntry.reject_duration > rb_current_time())
 			continue;
 
-		ircd_dlinkDelete(ptr, &reject_list);
-		ircd_free(rdata);
+		rb_dlinkDelete(ptr, &reject_list);
+		rb_free(rdata);
 		patricia_remove(reject_tree, pnode);
 	}
 }
@@ -147,9 +147,9 @@ init_reject(void)
 	dline_tree = New_Patricia(PATRICIA_BITS);
 	eline_tree = New_Patricia(PATRICIA_BITS);
 	throttle_tree = New_Patricia(PATRICIA_BITS);
-	ircd_event_add("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
-	ircd_event_add("reject_expires", reject_expires, NULL, 60);
-	ircd_event_add("throttle_expires", throttle_expires, NULL, 10);
+	rb_event_add("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
+	rb_event_add("reject_expires", reject_expires, NULL, 60);
+	rb_event_add("throttle_expires", throttle_expires, NULL, 10);
 }
 
 
@@ -166,7 +166,7 @@ add_reject(struct Client *client_p)
 	if((pnode = match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
 	{
 		rdata = pnode->data;
-		rdata->time = ircd_current_time();
+		rdata->time = rb_current_time();
 		rdata->count++;
 	}
 	else
@@ -177,15 +177,15 @@ add_reject(struct Client *client_p)
 			bitlen = 128;
 #endif
 		pnode = make_and_lookup_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);
-		pnode->data = rdata = ircd_malloc(sizeof(struct reject_data));
-		ircd_dlinkAddTail(pnode, &rdata->rnode, &reject_list);
-		rdata->time = ircd_current_time();
+		pnode->data = rdata = rb_malloc(sizeof(struct reject_data));
+		rb_dlinkAddTail(pnode, &rdata->rnode, &reject_list);
+		rdata->time = rb_current_time();
 		rdata->count = 1;
 	}
 }
 
 int
-check_reject(ircd_fde_t *F, struct sockaddr *addr)
+check_reject(rb_fde_t *F, struct sockaddr *addr)
 {
 	patricia_node_t *pnode;
 	struct reject_data *rdata;
@@ -199,14 +199,14 @@ check_reject(ircd_fde_t *F, struct sockaddr *addr)
 	{
 		rdata = pnode->data;
 
-		rdata->time = ircd_current_time();
+		rdata->time = rb_current_time();
 		if(rdata->count > (unsigned long)ConfigFileEntry.reject_after_count)
 		{
-			ddata = ircd_malloc(sizeof(struct delay_data));
+			ddata = rb_malloc(sizeof(struct delay_data));
 			ServerStats.is_rej++;
-			ircd_setselect(F, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
+			rb_setselect(F, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
 			ddata->F = F;
-			ircd_dlinkAdd(ddata, &ddata->node, &delay_exit);
+			rb_dlinkAdd(ddata, &ddata->node, &delay_exit);
 			return 1;
 		}
 	}	
@@ -225,8 +225,8 @@ flush_reject(void)
 	{
 		pnode = ptr->data;
 		rdata = pnode->data;
-		ircd_dlinkDelete(ptr, &reject_list);
-		ircd_free(rdata);
+		rb_dlinkDelete(ptr, &reject_list);
+		rb_free(rdata);
 		patricia_remove(reject_tree, pnode);
 	}
 }
@@ -243,8 +243,8 @@ remove_reject(const char *ip)
 	if((pnode = match_string(reject_tree, ip)) != NULL)
 	{
 		struct reject_data *rdata = pnode->data;
-		ircd_dlinkDelete(&rdata->rnode, &reject_list);
-		ircd_free(rdata);
+		rb_dlinkDelete(&rdata->rnode, &reject_list);
+		rb_free(rdata);
 		patricia_remove(reject_tree, pnode);
 		return 1;
 	}
@@ -390,7 +390,7 @@ throttle_add(struct sockaddr *addr)
 			return 1;			
 
 		/* Stop penalizing them after they've been throttled */
-		t->last = ircd_current_time();
+		t->last = rb_current_time();
 		t->count++;
 
 	} else {
@@ -399,12 +399,12 @@ throttle_add(struct sockaddr *addr)
 		if(GET_SS_FAMILY(addr) == AF_INET6)
 			bitlen = 128;
 #endif
-		t = ircd_malloc(sizeof(throttle_t));	
-		t->last = ircd_current_time();
+		t = rb_malloc(sizeof(throttle_t));	
+		t->last = rb_current_time();
 		t->count = 1;
 		pnode = make_and_lookup_ip(throttle_tree, addr, bitlen);
 		pnode->data = t;
-		ircd_dlinkAdd(pnode, &t->node, &throttle_list); 
+		rb_dlinkAdd(pnode, &t->node, &throttle_list); 
 	}	
 	return 0;
 }
@@ -421,11 +421,11 @@ throttle_expires(void *unused)
 		pnode = ptr->data;
 		t = pnode->data;		
 
-		if(t->last + ConfigFileEntry.throttle_duration > ircd_current_time())
+		if(t->last + ConfigFileEntry.throttle_duration > rb_current_time())
 			continue;
 
-		ircd_dlinkDelete(ptr, &throttle_list);
-		ircd_free(t);
+		rb_dlinkDelete(ptr, &throttle_list);
+		rb_free(t);
 		patricia_remove(throttle_tree, pnode);
 	}
 }

@@ -59,7 +59,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 
 
 #define MAXFD_POLL 2

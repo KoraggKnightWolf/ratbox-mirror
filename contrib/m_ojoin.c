@@ -20,7 +20,7 @@
  */
 
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "channel.h"
 #include "client.h"
@@ -138,7 +138,7 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 			   source_p->name, chptr->chname, chptr->topic_info, chptr->topic_time);
 	}
 
-	source_p->localClient->last_join_time = ircd_currenttime;
+	source_p->localClient->last_join_time = rb_currenttime;
 	channel_member_names(chptr, source_p, 1);
 
 	return 0;

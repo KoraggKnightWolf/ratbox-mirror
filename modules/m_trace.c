@@ -337,7 +337,7 @@ count_downlinks(struct Client *server_p, int *pservcount, int *pusercount)
 	dlink_node *ptr;
 
 	(*pservcount)++;
-	*pusercount += ircd_dlink_list_length(&server_p->serv->users);
+	*pusercount += rb_dlink_list_length(&server_p->serv->users);
 	DLINK_FOREACH(ptr, server_p->serv->servers.head)
 	{
 		count_downlinks(ptr->data, pservcount, pusercount);
@@ -365,7 +365,7 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 	if(!MyConnect(target_p))
 		return 0;
 
-	ircd_inet_ntop_sock((struct sockaddr *)&target_p->localClient->ip, ip, sizeof(ip));
+	rb_inet_ntop_sock((struct sockaddr *)&target_p->localClient->ip, ip, sizeof(ip));
 	class_name = get_client_class(target_p);
 
 	if(IsAnyServer(target_p))
@@ -397,7 +397,7 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACEUNKNOWN,
 				   form_str(RPL_TRACEUNKNOWN),
 				   class_name, name, ip,
-				   ircd_current_time() - target_p->localClient->firsttime);
+				   rb_current_time() - target_p->localClient->firsttime);
 		cnt++;
 		break;
 
@@ -416,8 +416,8 @@ report_this_status(struct Client *source_p, struct Client *target_p,
 			sendto_one_numeric(source_p, POP_QUEUE, tnumeric, form_str(tnumeric),
 					class_name, name,
 					show_ip(source_p, target_p) ? ip : empty_sockhost,
-					ircd_current_time() - target_p->localClient->lasttime,
-					ircd_current_time() - target_p->localClient->last);
+					rb_current_time() - target_p->localClient->lasttime,
+					rb_current_time() - target_p->localClient->last);
 			cnt++;
 		}
 		break;
@@ -433,7 +433,7 @@ report_this_status(struct Client *source_p, struct Client *target_p,
                        sendto_one_numeric(source_p, POP_QUEUE, RPL_TRACESERVER, form_str(RPL_TRACESERVER),
                                   class_name, servcount, usercount, name,
                                   *(target_p->serv->by) ? target_p->serv->by : "*", "*",
-                                  me.name, ircd_current_time() - target_p->localClient->lasttime);
+                                  me.name, rb_current_time() - target_p->localClient->lasttime);
                        cnt++;
 
                }
@@ -761,10 +761,10 @@ mo_masktrace(struct Client *client_p, struct Client *source_p, int parc, const c
 			
 	if(operspy) {
 		char buf[512];
-		ircd_strlcpy(buf, mask, sizeof(buf));
+		rb_strlcpy(buf, mask, sizeof(buf));
 		if(!EmptyString(gecos)) {
-			ircd_strlcat(buf, " ", sizeof(buf));
-			ircd_strlcat(buf, gecos, sizeof(buf));
+			rb_strlcat(buf, " ", sizeof(buf));
+			rb_strlcat(buf, gecos, sizeof(buf));
 		}		
 
 		report_operspy(source_p, "MASKTRACE", buf);	

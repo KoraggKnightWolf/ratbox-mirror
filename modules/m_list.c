@@ -64,7 +64,7 @@ m_list(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	if (parc < 2 || !IsChannelName(parv[1]))
 	{
 		/* pace this due to the sheer traffic involved */
-		if(((last_used + ConfigFileEntry.pace_wait) > ircd_current_time()))
+		if(((last_used + ConfigFileEntry.pace_wait) > rb_current_time()))
 		{
 			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
 					me.name, source_p->name, "LIST");
@@ -72,7 +72,7 @@ m_list(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			return 0;
 		}
 		else
-			last_used = ircd_current_time();
+			last_used = rb_current_time();
 	}
 
 	/* If no arg, do all channels *whee*, else just one channel */
@@ -129,7 +129,7 @@ list_all_channels(struct Client *source_p)
 		chptr = ptr->data;
 
 		/* if theyre overflowing their sendq, stop. --fl */
-		if(ircd_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
+		if(rb_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYMATCHES),
 				   me.name, source_p->name, "LIST");
@@ -140,7 +140,7 @@ list_all_channels(struct Client *source_p)
 			continue;
 		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LIST), 
 			   me.name, source_p->name, chptr->chname, 
-			   ircd_dlink_list_length(&chptr->members), 
+			   rb_dlink_list_length(&chptr->members), 
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 
 		if(count++ >= 10) 
@@ -205,15 +205,15 @@ list_limit_channels(struct Client *source_p, const char *param)
 		chptr = ptr->data;
 
 		/* if theyre overflowing their sendq, stop. --fl */
-		if(ircd_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
+		if(rb_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYMATCHES),
 				   me.name, source_p->name, "LIST");
 			break;
 		}
 
-		if((int)ircd_dlink_list_length(&chptr->members) >= max ||
-		   (int)ircd_dlink_list_length(&chptr->members) <= min)
+		if((int)rb_dlink_list_length(&chptr->members) >= max ||
+		   (int)rb_dlink_list_length(&chptr->members) <= min)
 			continue;
 
 		if(SecretChannel(chptr) && !IsMember(source_p, chptr))
@@ -221,7 +221,7 @@ list_limit_channels(struct Client *source_p, const char *param)
 
 		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LIST), 
 			   me.name, source_p->name, chptr->chname, 
-			   ircd_dlink_list_length(&chptr->members), 
+			   rb_dlink_list_length(&chptr->members), 
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 
 		if(count++ >= 10) 
@@ -275,7 +275,7 @@ list_named_channel(struct Client *source_p, const char *name)
 	if(ShowChannel(source_p, chptr))
 		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LIST),
 			   me.name, source_p->name, chptr->chname, 
-			   ircd_dlink_list_length(&chptr->members),
+			   rb_dlink_list_length(&chptr->members),
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 
 	sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTEND), me.name, source_p->name);

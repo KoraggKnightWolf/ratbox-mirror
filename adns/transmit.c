@@ -29,7 +29,7 @@
  */
 
 #include <errno.h>
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 
 #include "internal.h"
 #include "tvarith.h"
@@ -164,7 +164,7 @@ adns_status adns__mkquery_frdgram(adns_state ads, vbuf *vb, int *id_r,
 
 void adns__querysend_tcp(adns_query qu, struct timeval now) {
   byte length[2];
-  struct ircd_iovec iov[2];
+  struct rb_iovec iov[2];
   int wr, r;
   adns_state ads;
 
@@ -191,7 +191,7 @@ void adns__querysend_tcp(adns_query qu, struct timeval now) {
     iov[1].iov_base= (void *)qu->query_dgram;
     iov[1].iov_len= qu->query_dglen;
     adns__sigpipe_protect(qu->ads);
-    wr= ircd_writev(ircd_get_fde(qu->ads->tcpsocket),iov,2);
+    wr= rb_writev(rb_get_fde(qu->ads->tcpsocket),iov,2);
     adns__sigpipe_unprotect(qu->ads);
     if (wr < 0) {
       if (!(errno == EAGAIN || errno == EINTR || errno == ENOSPC ||

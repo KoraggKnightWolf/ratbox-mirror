@@ -32,7 +32,7 @@
 
 /* List of ircd includes from ../include/ */
 #include "stdinc.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "struct.h"
 #include "client.h"
 #include "common.h"
@@ -355,7 +355,7 @@ set_flags_to_string(struct Client *client_p)
 	static char setflags[BUFSIZE + 1];
 	int i;
 
-	/* Clear it to begin with, we'll be doing a lot of ircd_sprintf's */
+	/* Clear it to begin with, we'll be doing a lot of rb_sprintf's */
 	setflags[0] = '\0';
 
 	/* Unlike unset_flags_to_string(), we don't have to care about oper
@@ -366,7 +366,7 @@ set_flags_to_string(struct Client *client_p)
 	{
 		if(client_p->umodes & flag_table[i].mode)
 		{
-			ircd_sprintf(setflags, "%s %s", setflags, flag_table[i].name);
+			rb_sprintf(setflags, "%s %s", setflags, flag_table[i].name);
 		}
 	}
 
@@ -379,7 +379,7 @@ set_flags_to_string(struct Client *client_p)
 		 */
 		if(client_p->umodes & UMODE_NCHANGE)
 		{
-			ircd_sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
+			rb_sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
 		}
 #if 0
 	}
@@ -396,7 +396,7 @@ unset_flags_to_string(struct Client *client_p)
 	static char setflags[BUFSIZE + 1];
 	int i, isoper;
 
-	/* Clear it to begin with, we'll be doing a lot of ircd_sprintf's */
+	/* Clear it to begin with, we'll be doing a lot of rb_sprintf's */
 	setflags[0] = '\0';
 
 	if(IsOper(client_p))
@@ -410,7 +410,7 @@ unset_flags_to_string(struct Client *client_p)
 		{
 			if(!isoper && flag_table[i].oper)
 				continue;
-			ircd_sprintf(setflags, "%s %s", setflags, flag_table[i].name);
+			rb_sprintf(setflags, "%s %s", setflags, flag_table[i].name);
 		}
 	}
 
@@ -418,7 +418,7 @@ unset_flags_to_string(struct Client *client_p)
 	{
 		if(!(client_p->umodes & UMODE_NCHANGE))
 		{
-			ircd_sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
+			rb_sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
 		}
 	}
 

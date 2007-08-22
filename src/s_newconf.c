@@ -43,7 +43,7 @@
 #include "hostmask.h"
 #include "newconf.h"
 #include "hash.h"
-#include "ircd_lib.h"
+#include "ratbox_lib.h"
 #include "match.h"
 #include "patricia.h"
 #include "ircd.h"
@@ -64,7 +64,7 @@ dlink_list tgchange_list;
 
 patricia_tree_t *tgchange_tree;
 
-static ircd_bh *nd_heap = NULL;
+static rb_bh *nd_heap = NULL;
 
 static void expire_temp_rxlines(void *unused);
 static void expire_nd_entries(void *unused);
@@ -74,10 +74,10 @@ void
 init_s_newconf(void)
 {
 	tgchange_tree = New_Patricia(PATRICIA_BITS);
-	nd_heap = ircd_bh_create(sizeof(struct nd_entry), ND_HEAP_SIZE, "nd_heap");
-	ircd_event_addish("expire_nd_entries", expire_nd_entries, NULL, 30);
-	ircd_event_addish("expire_temp_rxlines", expire_temp_rxlines, NULL, 60);
-	ircd_event_addish("expire_glines", expire_glines, NULL, CLEANUP_GLINES_TIME);
+	nd_heap = rb_bh_create(sizeof(struct nd_entry), ND_HEAP_SIZE, "nd_heap");
+	rb_event_addish("expire_nd_entries", expire_nd_entries, NULL, 30);
+	rb_event_addish("expire_temp_rxlines", expire_temp_rxlines, NULL, 60);
+	rb_event_addish("expire_glines", expire_glines, NULL, CLEANUP_GLINES_TIME);
 }
 
 void
@@ -90,26 +90,26 @@ clear_s_newconf(void)
 	DLINK_FOREACH_SAFE(ptr, next_ptr, shared_conf_list.head)
 	{
 		/* ptr here is ptr->data->node */
-		ircd_dlinkDelete(ptr, &shared_conf_list);
+		rb_dlinkDelete(ptr, &shared_conf_list);
 		free_remote_conf(ptr->data);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, cluster_conf_list.head)
 	{
-		ircd_dlinkDelete(ptr, &cluster_conf_list);
+		rb_dlinkDelete(ptr, &cluster_conf_list);
 		free_remote_conf(ptr->data);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, hubleaf_conf_list.head)
 	{
-		ircd_dlinkDelete(ptr, &hubleaf_conf_list);
+		rb_dlinkDelete(ptr, &hubleaf_conf_list);
 		free_remote_conf(ptr->data);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, oper_conf_list.head)
 	{
 		free_oper_conf(ptr->data);
-		ircd_dlinkDestroy(ptr, &oper_conf_list);
+		rb_dlinkDestroy(ptr, &oper_conf_list);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, server_conf_list.head)
@@ -118,7 +118,7 @@ clear_s_newconf(void)
 
 		if(!server_p->servers)
 		{
-			ircd_dlinkDelete(ptr, &server_conf_list);
+			rb_dlinkDelete(ptr, &server_conf_list);
 			free_server_conf(ptr->data);
 		}
 		else
@@ -140,7 +140,7 @@ clear_s_newconf_bans(void)
 			continue;
 
 		free_conf(aconf);
-		ircd_dlinkDestroy(ptr, &xline_conf_list);
+		rb_dlinkDestroy(ptr, &xline_conf_list);
 	}
 
 	DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
@@ -152,7 +152,7 @@ clear_s_newconf_bans(void)
 			continue;
 
 		free_conf(aconf);
-		ircd_dlinkDestroy(ptr, &resv_conf_list);
+		rb_dlinkDestroy(ptr, &resv_conf_list);
 	}
 
 	clear_resv_hash();
@@ -161,7 +161,7 @@ clear_s_newconf_bans(void)
 struct remote_conf *
 make_remote_conf(void)
 {
-	struct remote_conf *remote_p = ircd_malloc(sizeof(struct remote_conf));
+	struct remote_conf *remote_p = rb_malloc(sizeof(struct remote_conf));
 	return remote_p;
 }
 
@@ -172,10 +172,10 @@ free_remote_conf(struct remote_conf *remote_p)
 	if(remote_p == NULL)
 		return;
 
-	ircd_free(remote_p->username);
-	ircd_free(remote_p->host);
-	ircd_free(remote_p->server);
-	ircd_free(remote_p);
+	rb_free(remote_p->username);
+	rb_free(remote_p->host);
+	rb_free(remote_p->server);
+	rb_free(remote_p);
 }
 
 int
@@ -213,7 +213,7 @@ cluster_generic(struct Client *source_p, const char *command,
 	dlink_node *ptr;
 
 	va_start(args, format);
-	ircd_vsnprintf(buffer, sizeof(buffer), format, args);
+	rb_vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
 	DLINK_FOREACH(ptr, cluster_conf_list.head)
@@ -240,18 +240,18 @@ expire_glines(void *unused)
 		aconf = ptr->data;
 
 		/* if gline_time changes, these could end up out of order */
-		if(aconf->hold > ircd_current_time())
+		if(aconf->hold > rb_current_time())
 			continue;
 
 		delete_one_address_conf(aconf->host, aconf);
-		ircd_dlinkDestroy(ptr, &glines);
+		rb_dlinkDestroy(ptr, &glines);
 	}
 }
 
 struct oper_conf *
 make_oper_conf(void)
 {
-	struct oper_conf *oper_p = ircd_malloc(sizeof(struct oper_conf));
+	struct oper_conf *oper_p = rb_malloc(sizeof(struct oper_conf));
 	return oper_p;
 }
 
@@ -262,24 +262,24 @@ free_oper_conf(struct oper_conf *oper_p)
 	if(oper_p == NULL)
 		return;
 
-	ircd_free(oper_p->username);
-	ircd_free(oper_p->host);
-	ircd_free(oper_p->name);
+	rb_free(oper_p->username);
+	rb_free(oper_p->host);
+	rb_free(oper_p->name);
 
 	if(oper_p->passwd)
 	{
 		memset(oper_p->passwd, 0, strlen(oper_p->passwd));
-		ircd_free(oper_p->passwd);
+		rb_free(oper_p->passwd);
 	}
 
 #ifdef HAVE_LIBCRYPTO
-	ircd_free(oper_p->rsa_pubkey_file);
+	rb_free(oper_p->rsa_pubkey_file);
 
 	if(oper_p->rsa_pubkey)
 		RSA_free(oper_p->rsa_pubkey);
 #endif
 
-	ircd_free(oper_p);
+	rb_free(oper_p);
 }
 
 struct oper_conf *
@@ -301,7 +301,7 @@ find_oper_conf(const char *username, const char *host, const char *locip, const 
 		if(irccmp(oper_p->name, name) || !match(oper_p->username, username))
 			continue;
 
-		ircd_strlcpy(addr, oper_p->host, sizeof(addr));
+		rb_strlcpy(addr, oper_p->host, sizeof(addr));
 
 		if(parse_netmask(addr, (struct sockaddr *)&ip, &bits) != HM_HOST)
 		{
@@ -372,7 +372,7 @@ get_oper_privs(int flags)
 struct server_conf *
 make_server_conf(void)
 {
-	struct server_conf *server_p = ircd_malloc(sizeof(struct server_conf));
+	struct server_conf *server_p = rb_malloc(sizeof(struct server_conf));
 	GET_SS_FAMILY(&server_p->ipnum) = AF_INET;
 	return server_p;
 }
@@ -387,21 +387,21 @@ free_server_conf(struct server_conf *server_p)
 	if(!EmptyString(server_p->passwd))
 	{
 		memset(server_p->passwd, 0, strlen(server_p->passwd));
-		ircd_free(server_p->passwd);
+		rb_free(server_p->passwd);
 	}
 
 	if(!EmptyString(server_p->spasswd))
 	{
 		memset(server_p->spasswd, 0, strlen(server_p->spasswd));
-		ircd_free(server_p->spasswd);
+		rb_free(server_p->spasswd);
 	}
 
 	cancel_lookup(server_p->dns_query);
 
-	ircd_free(server_p->name);
-	ircd_free(server_p->host);
-	ircd_free(server_p->class_name);
-	ircd_free(server_p);
+	rb_free(server_p->name);
+	rb_free(server_p->host);
+	rb_free(server_p->class_name);
+	rb_free(server_p);
 }
 
 /*
@@ -420,7 +420,7 @@ conf_dns_callback(const char *result, int status, int aftype, void *data)
 	struct server_conf *server_p = data;
 
 	if(status == 1)
-		ircd_inet_pton_sock(result, (struct sockaddr *)&server_p->ipnum);
+		rb_inet_pton_sock(result, (struct sockaddr *)&server_p->ipnum);
 
 	server_p->dns_query = 0;
 }
@@ -439,14 +439,14 @@ add_server_conf(struct server_conf *server_p)
 		conf_report_error("Warning connect::class invalid for %s",
 				server_p->name);
 
-		ircd_free(server_p->class_name);
-		server_p->class_name = ircd_strdup("default");
+		rb_free(server_p->class_name);
+		server_p->class_name = rb_strdup("default");
 	}
 
 	if(strpbrk(server_p->host, "?*") != NULL)
 		return;
 
-	if(ircd_inet_pton_sock(server_p->host, (struct sockaddr *)&server_p->ipnum) > 0)
+	if(rb_inet_pton_sock(server_p->host, (struct sockaddr *)&server_p->ipnum) > 0)
 		return;
 
 	server_p->dns_query = lookup_hostname(server_p->host, GET_SS_FAMILY(&server_p->ipnum), conf_dns_callback, server_p);
@@ -509,7 +509,7 @@ detach_server_conf(struct Client *client_p)
 		if(MaxUsers(server_p->class) < 0 && CurrUsers(server_p->class) <= 0)
 			free_class(server_p->class);
 
-		ircd_dlinkDelete(&server_p->node, &server_conf_list);
+		rb_dlinkDelete(&server_p->node, &server_conf_list);
 		free_server_conf(server_p);
 	}
 }
@@ -701,7 +701,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_current_time())
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -709,7 +709,7 @@ expire_temp_rxlines(void *unused)
 						aconf->host);
 
 			free_conf(aconf);
-			ircd_dlinkDestroy(ptr, &resvTable[i]);
+			rb_dlinkDestroy(ptr, &resvTable[i]);
 		}
 	}
 	HASH_WALK_END
@@ -718,14 +718,14 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_current_time())
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 						"Temporary RESV for [%s] expired",
 						aconf->host);
 			free_conf(aconf);
-			ircd_dlinkDestroy(ptr, &resv_conf_list);
+			rb_dlinkDestroy(ptr, &resv_conf_list);
 		}
 	}
 
@@ -733,14 +733,14 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= ircd_current_time())
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 						"Temporary X-line for [%s] expired",
 						aconf->host);
 			free_conf(aconf);
-			ircd_dlinkDestroy(ptr, &xline_conf_list);
+			rb_dlinkDestroy(ptr, &xline_conf_list);
 		}
 	}
 }
@@ -748,7 +748,7 @@ expire_temp_rxlines(void *unused)
 unsigned long
 get_nd_count(void)
 {
-	return(ircd_dlink_list_length(&nd_list));
+	return(rb_dlink_list_length(&nd_list));
 }
 
 
@@ -760,22 +760,22 @@ add_nd_entry(const char *name)
 	if(hash_find_nd(name) != NULL)
 		return;
 
-	nd = ircd_bh_alloc(nd_heap);
+	nd = rb_bh_alloc(nd_heap);
 	
-	ircd_strlcpy(nd->name, name, sizeof(nd->name));
-	nd->expire = ircd_current_time() + ConfigFileEntry.nick_delay;
+	rb_strlcpy(nd->name, name, sizeof(nd->name));
+	nd->expire = rb_current_time() + ConfigFileEntry.nick_delay;
 
 	/* this list is ordered */
-	ircd_dlinkAddTail(nd, &nd->lnode, &nd_list);
+	rb_dlinkAddTail(nd, &nd->lnode, &nd_list);
 	add_to_nd_hash(name, nd);
 }
 
 void
 free_nd_entry(struct nd_entry *nd)
 {
-	ircd_dlinkDelete(&nd->lnode, &nd_list);
-	ircd_dlinkDelete(&nd->hnode, &ndTable[nd->hashv]);
-	ircd_bh_free(nd_heap, nd);
+	rb_dlinkDelete(&nd->lnode, &nd_list);
+	rb_dlinkDelete(&nd->hnode, &ndTable[nd->hashv]);
+	rb_bh_free(nd_heap, nd);
 }
 
 void
@@ -792,7 +792,7 @@ expire_nd_entries(void *unused)
 		/* this list is ordered - we can stop when we hit the first
 		 * entry that doesnt expire..
 		 */
-		if(nd->expire > ircd_current_time())
+		if(nd->expire > rb_current_time())
 			return;
 
 		free_nd_entry(nd);
@@ -808,16 +808,16 @@ add_tgchange(const char *host)
 	if(find_tgchange(host))
 		return;
 
-	target = ircd_malloc(sizeof(tgchange));
+	target = rb_malloc(sizeof(tgchange));
 	pnode = make_and_lookup(tgchange_tree, host);
 
 	pnode->data = target;
 	target->pnode = pnode;
 
-	target->ip = ircd_strdup(host);
-	target->expiry = ircd_current_time() + (60*60*12);
+	target->ip = rb_strdup(host);
+	target->expiry = rb_current_time() + (60*60*12);
 
-	ircd_dlinkAdd(target, &target->node, &tgchange_list);
+	rb_dlinkAdd(target, &target->node, &tgchange_list);
 }
 
 tgchange *
