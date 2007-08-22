@@ -47,7 +47,7 @@
 struct cachefile *user_motd = NULL;
 struct cachefile *oper_motd = NULL;
 struct cacheline *emptyline = NULL;
-dlink_list links_cache_list;
+rb_dlink_list links_cache_list;
 char user_motd_changed[MAX_DATE_STRING];
 
 /* init_cache()
@@ -118,20 +118,20 @@ void
 cache_links(void *unused)
 {
 	struct Client *target_p;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 	char *links_line;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, links_cache_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, links_cache_list.head)
 	{
 		rb_free(ptr->data);
-		rb_free_dlink_node(ptr);
+		rb_free_rb_dlink_node(ptr);
 	}
 
 	links_cache_list.head = links_cache_list.tail = NULL;
 	links_cache_list.length = 0;
 
-	DLINK_FOREACH(ptr, global_serv_list.head)
+	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
 		target_p = ptr->data;
 
@@ -160,13 +160,13 @@ cache_links(void *unused)
 void
 free_cachefile(struct cachefile *cacheptr)
 {
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 
 	if(cacheptr == NULL)
 		return;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, cacheptr->contents.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, cacheptr->contents.head)
 	{
 		if(ptr->data != emptyline)
 			rb_free(ptr->data);
@@ -252,11 +252,11 @@ void
 send_user_motd(struct Client *source_p)
 {
 	struct cacheline *lineptr;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	const char *myname = get_id(&me, source_p);
 	const char *nick = get_id(source_p, source_p);
 
-	if(user_motd == NULL || rb_dlink_list_length(&user_motd->contents) == 0)
+	if(user_motd == NULL || rb_rb_dlink_list_length(&user_motd->contents) == 0)
 	{
 		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOMOTD), myname, nick);
 		return;
@@ -264,7 +264,7 @@ send_user_motd(struct Client *source_p)
 
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MOTDSTART), myname, nick, me.name);
 
-	DLINK_FOREACH(ptr, user_motd->contents.head)
+	RB_DLINK_FOREACH(ptr, user_motd->contents.head)
 	{
 		lineptr = ptr->data;
 		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MOTD), myname, nick, lineptr->data);

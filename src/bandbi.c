@@ -51,7 +51,7 @@ static char bandb_add_letter[LAST_BANDB_TYPE] =
 	'K', 'D', 'X', 'R'
 };
 
-dlink_list bandb_pending;
+rb_dlink_list bandb_pending;
 
 static rb_helper *bandb_helper;
 static void fork_bandb(void);
@@ -301,9 +301,9 @@ bandb_check_resv_nick(struct ConfItem *aconf)
 static void
 bandb_handle_clear(void)
 {
-	dlink_node *ptr, *next_ptr;
+	rb_dlink_node *ptr, *next_ptr;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, bandb_pending.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, bandb_pending.head)
 	{
 		free_conf(ptr->data);
 		rb_dlinkDestroy(ptr, &bandb_pending);
@@ -314,12 +314,12 @@ static void
 bandb_handle_finish(void)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr, *next_ptr;
+	rb_dlink_node *ptr, *next_ptr;
 
 	clear_out_address_conf_bans();
 	clear_s_newconf_bans();
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, bandb_pending.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, bandb_pending.head)
 	{
 		aconf = ptr->data;
 

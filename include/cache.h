@@ -17,14 +17,14 @@ struct Client;
 struct cachefile
 {
 	char name[CACHEFILELEN];
-	dlink_list contents;
+	rb_dlink_list contents;
 	int flags;
 };
 
 struct cacheline
 {
 	char data[CACHELINELEN];
-	dlink_node linenode;
+	rb_dlink_node linenode;
 };
 
 extern struct cachefile *user_motd;
@@ -32,7 +32,7 @@ extern struct cachefile *oper_motd;
 extern struct cacheline *emptyline;
 
 extern char user_motd_changed[MAX_DATE_STRING];
-extern dlink_list links_cache_list;
+extern rb_dlink_list links_cache_list;
 
 void init_cache(void);
 struct cachefile *cache_file(const char *, const char *, int);

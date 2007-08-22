@@ -321,7 +321,7 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 			             get_oper_name(source_p), host);
 
 	} else {
-		dlink_list *list;
+		rb_dlink_list *list;
 		list = &temp_dlines[aconf->port];
 		rb_dlinkFindDestroy(aconf, list);
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Un-dlined [%s] from temporary D-lines",
@@ -367,10 +367,10 @@ check_dlines(void)
 {
 	struct Client *client_p;
 	struct ConfItem *aconf;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 	{
 		client_p = ptr->data;
 
@@ -392,7 +392,7 @@ check_dlines(void)
 	}
 
 	/* dlines need to be checked against unknowns too */
-	DLINK_FOREACH_SAFE(ptr, next_ptr, unknown_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, unknown_list.head)
 	{
 		client_p = ptr->data;
 

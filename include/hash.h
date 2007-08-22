@@ -27,8 +27,8 @@
 #ifndef INCLUDED_hash_h
 #define INCLUDED_hash_h
 
-extern dlink_list resvTable[];
-extern dlink_list ndTable[];
+extern rb_dlink_list resvTable[];
+extern rb_dlink_list ndTable[];
 
 /* Magic value for FNV hash functions */
 #define FNV1_32_INIT 0x811c9dc5UL
@@ -50,8 +50,8 @@ extern dlink_list ndTable[];
 #define R_MAX 1024 /* 2^10 */
 
 
-#define HASH_WALK(i, max, ptr, table) for (i = 0; i < max; i++) { DLINK_FOREACH(ptr, table[i].head)
-#define HASH_WALK_SAFE(i, max, ptr, nptr, table) for (i = 0; i < max; i++) { DLINK_FOREACH_SAFE(ptr, nptr, table[i].head)
+#define HASH_WALK(i, max, ptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH(ptr, table[i].head)
+#define HASH_WALK_SAFE(i, max, ptr, nptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH_SAFE(ptr, nptr, table[i].head)
 #define HASH_WALK_END }
 
 typedef enum
@@ -89,7 +89,7 @@ struct Client *find_id(const char *name);
 struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
 struct Channel *find_channel(const char *name);
 
-dlink_node *find_hostname(const char *);
+rb_dlink_node *find_hostname(const char *);
 
 struct ConfItem *hash_find_resv(const char *name);
 void clear_resv_hash(void);

@@ -40,7 +40,7 @@
 #include "reject.h"
 #include "s_log.h"
 
-static dlink_list listener_list;
+static rb_dlink_list listener_list;
 static int accept_precallback(rb_fde_t *F, struct sockaddr *addr, socklen_t addrlen, void *data);
 static void accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, socklen_t addrlen, void *data);
 
@@ -105,9 +105,9 @@ void
 show_ports(struct Client *source_p)
 {
 	struct Listener *listener;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	
-	DLINK_FOREACH(ptr, listener_list.head)
+	RB_DLINK_FOREACH(ptr, listener_list.head)
 	{
 		listener = ptr->data;
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSPLINE, 
@@ -238,9 +238,9 @@ find_listener(struct irc_sockaddr_storage *addr)
 {
 	struct Listener *listener = NULL;
 	struct Listener *last_closed = NULL;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, listener_list.head)
+	RB_DLINK_FOREACH(ptr, listener_list.head)
 	{
 		listener = ptr->data;
 		if(GET_SS_FAMILY(addr) != GET_SS_FAMILY(&listener->addr))
@@ -392,9 +392,9 @@ void
 close_listeners()
 {
 	struct Listener *listener;
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 
-	DLINK_FOREACH_SAFE(ptr, next, listener_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, listener_list.head)
 	{
 		listener = ptr->data;
 		close_listener(listener);

@@ -72,7 +72,7 @@ DECLARE_MODULE_AV1(stats, NULL, NULL, stats_clist, stats_hlist, NULL, "$Revision
 
 static const char *Lformat = "%s %u %u %u %u %u :%u %u %s";
 
-static void stats_l_list(struct Client *s, const char *, int, int, dlink_list *, char);
+static void stats_l_list(struct Client *s, const char *, int, int, rb_dlink_list *, char);
 static void stats_l_client(struct Client *source_p, struct Client *target_p,
 				char statchar);
 
@@ -258,7 +258,7 @@ static void
 stats_delay(struct Client *source_p)
 {
 	struct nd_entry *nd;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int i;
 
 	HASH_WALK(i, U_MAX, ptr, ndTable)
@@ -282,7 +282,7 @@ stats_connect(struct Client *source_p)
 	static char buf[5];
 	struct server_conf *server_p;
 	char *s;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if((ConfigFileEntry.stats_c_oper_only || 
 	    (ConfigServerHide.flatten_links && !IsExemptShide(source_p))) &&
@@ -293,7 +293,7 @@ stats_connect(struct Client *source_p)
 		return;
 	}
 
-	DLINK_FOREACH(ptr, server_conf_list.head)
+	RB_DLINK_FOREACH(ptr, server_conf_list.head)
 	{
 		server_p = ptr->data;
 
@@ -393,12 +393,12 @@ stats_pending_glines (struct Client *source_p)
 {
 	if(ConfigFileEntry.glines)
 	{
-		dlink_node *pending_node;
+		rb_dlink_node *pending_node;
 		struct gline_pending *glp_ptr;
 		char timebuffer[MAX_DATE_STRING];
 		struct tm *tmptr;
 
-		DLINK_FOREACH (pending_node, pending_glines.head)
+		RB_DLINK_FOREACH (pending_node, pending_glines.head)
 		{
 			glp_ptr = pending_node->data;
 
@@ -425,7 +425,7 @@ stats_pending_glines (struct Client *source_p)
 			}
 		}
 
-		if(rb_dlink_list_length (&pending_glines) > 0)
+		if(rb_rb_dlink_list_length (&pending_glines) > 0)
 			sendto_one_notice(source_p, POP_QUEUE, ":End of Pending G-lines");
 	}
 	else
@@ -444,10 +444,10 @@ stats_glines (struct Client *source_p)
 {
 	if(ConfigFileEntry.glines)
 	{
-		dlink_node *gline_node;
+		rb_dlink_node *gline_node;
 		struct ConfItem *kill_ptr;
 
-		DLINK_FOREACH_PREV (gline_node, glines.tail)
+		RB_DLINK_FOREACH_PREV (gline_node, glines.tail)
 		{
 			kill_ptr = gline_node->data;
 
@@ -469,7 +469,7 @@ static void
 stats_hubleaf(struct Client *source_p)
 {
 	struct remote_conf *hub_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if((ConfigFileEntry.stats_h_oper_only || 
 	    (ConfigServerHide.flatten_links && !IsExemptShide(source_p))) &&
@@ -480,7 +480,7 @@ stats_hubleaf(struct Client *source_p)
 		return;
 	}
 
-	DLINK_FOREACH(ptr, hubleaf_conf_list.head)
+	RB_DLINK_FOREACH(ptr, hubleaf_conf_list.head)
 	{
 		hub_p = ptr->data;
 
@@ -597,13 +597,13 @@ stats_tklines(struct Client *source_p)
 	else
 	{
 		struct ConfItem *aconf;
-		dlink_node *ptr;
+		rb_dlink_node *ptr;
 		int i;
 		char *user, *host, *pass, *oper_reason;
 
 		for(i = 0; i < LAST_TEMP_TYPE; i++)
 		{
-			DLINK_FOREACH(ptr, temp_klines[i].head)
+			RB_DLINK_FOREACH(ptr, temp_klines[i].head)
 			{
 				aconf = ptr->data;
 
@@ -711,7 +711,7 @@ static void
 stats_oper(struct Client *source_p)
 {
 	struct oper_conf *oper_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if(!IsOper(source_p) && ConfigFileEntry.stats_o_oper_only)
 	{
@@ -720,7 +720,7 @@ stats_oper(struct Client *source_p)
 		return;
 	}
 
-	DLINK_FOREACH(ptr, oper_conf_list.head)
+	RB_DLINK_FOREACH(ptr, oper_conf_list.head)
 	{
 		oper_p = ptr->data;
 		
@@ -742,10 +742,10 @@ static void
 stats_operedup (struct Client *source_p)
 {
 	struct Client *target_p;
-	dlink_node *oper_ptr;
+	rb_dlink_node *oper_ptr;
 	unsigned int count = 0;
 
-	DLINK_FOREACH (oper_ptr, oper_list.head)
+	RB_DLINK_FOREACH (oper_ptr, oper_list.head)
 	{
 		target_p = oper_ptr->data;
 
@@ -793,10 +793,10 @@ static void
 stats_tresv(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int i;
 
-	DLINK_FOREACH(ptr, resv_conf_list.head)
+	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
 	{
 		aconf = ptr->data;
 		if(aconf->flags & CONF_FLAGS_TEMPORARY)
@@ -821,10 +821,10 @@ static void
 stats_resv(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int i;
 
-	DLINK_FOREACH(ptr, resv_conf_list.head)
+	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
 	{
 		aconf = ptr->data;
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
@@ -907,11 +907,11 @@ stats_tstats(struct Client *source_p)
 {
 	struct Client *target_p;
 	struct ServerStatistics sp;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	memcpy(&sp, &ServerStats, sizeof(struct ServerStatistics));
 
-	DLINK_FOREACH(ptr, serv_list.head)
+	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 
@@ -933,7 +933,7 @@ stats_tstats(struct Client *source_p)
 		}
 	}
 
-	DLINK_FOREACH(ptr, lclient_list.head)
+	RB_DLINK_FOREACH(ptr, lclient_list.head)
 	{
 		target_p = ptr->data;
 
@@ -961,7 +961,7 @@ stats_tstats(struct Client *source_p)
 				sp.is_ac, sp.is_ref);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 				"T :rejected %u delaying %lu", 
-				sp.is_rej, rb_dlink_list_length(&delay_exit));
+				sp.is_rej, rb_rb_dlink_list_length(&delay_exit));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 				"T :nicks being delayed %lu", get_nd_count());
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
@@ -1037,12 +1037,12 @@ static void
 stats_shared (struct Client *source_p)
 {
 	struct remote_conf *shared_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	char buf[15];
 	char *p;
 	int i;
 
-	DLINK_FOREACH(ptr, shared_conf_list.head)
+	RB_DLINK_FOREACH(ptr, shared_conf_list.head)
 	{
 		shared_p = ptr->data;
 
@@ -1064,7 +1064,7 @@ stats_shared (struct Client *source_p)
 					shared_p->host, buf);
 	}
 
-	DLINK_FOREACH(ptr, cluster_conf_list.head)
+	RB_DLINK_FOREACH(ptr, cluster_conf_list.head)
 	{
 		shared_p = ptr->data;
 
@@ -1096,7 +1096,7 @@ static void
 stats_servers (struct Client *source_p)
 {
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	time_t seconds;
 	int days, hours, minutes;
 	int j = 0;
@@ -1109,7 +1109,7 @@ stats_servers (struct Client *source_p)
 		return;
 	}
 
-	DLINK_FOREACH (ptr, serv_list.head)
+	RB_DLINK_FOREACH (ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 
@@ -1142,9 +1142,9 @@ static void
 stats_tgecos(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, xline_conf_list.head)
+	RB_DLINK_FOREACH(ptr, xline_conf_list.head)
 	{
 		aconf = ptr->data;
 
@@ -1160,9 +1160,9 @@ static void
 stats_gecos(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, xline_conf_list.head)
+	RB_DLINK_FOREACH(ptr, xline_conf_list.head)
 	{
 		aconf = ptr->data;
 
@@ -1178,7 +1178,7 @@ static void
 stats_class(struct Client *source_p)
 {
 	struct Class *cltmp;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if(ConfigFileEntry.stats_y_oper_only && !IsOper(source_p)) 
 	{
@@ -1187,7 +1187,7 @@ stats_class(struct Client *source_p)
 		return;
 	}
 
-	DLINK_FOREACH(ptr, class_list.head)
+	RB_DLINK_FOREACH(ptr, class_list.head)
 	{
 		cltmp = ptr->data;
 
@@ -1229,8 +1229,8 @@ stats_memory (struct Client *source_p)
 	struct Client *target_p;
 	struct Channel *chptr;
 	struct Ban *actualBan;
-	dlink_node *dlink;
-	dlink_node *ptr;
+	rb_dlink_node *dlink;
+	rb_dlink_node *ptr;
 	int channel_count = 0;
 	int local_client_conf_count = 0;	/* local client conf links */
 	int users_counted = 0;	/* user structs */
@@ -1283,7 +1283,7 @@ stats_memory (struct Client *source_p)
 	count_whowas_memory(&wwu, &wwm);
 
 
-	DLINK_FOREACH(ptr, global_client_list.head)
+	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		target_p = ptr->data;
 		if(MyConnect(target_p))
@@ -1295,8 +1295,8 @@ stats_memory (struct Client *source_p)
 		{
 			users_counted++;
 			if(MyConnect(target_p))
-				users_invited_count += rb_dlink_list_length(&target_p->localClient->invited);
-			user_channels += rb_dlink_list_length(&target_p->user->channel);
+				users_invited_count += rb_rb_dlink_list_length(&target_p->localClient->invited);
+			user_channels += rb_rb_dlink_list_length(&target_p->user->channel);
 			if(target_p->user->away)
 			{
 				aways_counted++;
@@ -1306,43 +1306,43 @@ stats_memory (struct Client *source_p)
 	}
 
 	/* Count up all channels, ban lists, except lists, Invex lists */
-	DLINK_FOREACH(ptr, global_channel_list.head)
+	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
 		chptr = ptr->data;
 		channel_count++;
 		channel_memory += (strlen(chptr->chname) + sizeof(struct Channel));
 
-		channel_users += rb_dlink_list_length(&chptr->members);
-		channel_invites += rb_dlink_list_length(&chptr->invites);
+		channel_users += rb_rb_dlink_list_length(&chptr->members);
+		channel_invites += rb_rb_dlink_list_length(&chptr->invites);
 
-		DLINK_FOREACH(dlink, chptr->banlist.head)
+		RB_DLINK_FOREACH(dlink, chptr->banlist.head)
 		{
 			actualBan = dlink->data;
 			channel_bans++;
 
-			channel_ban_memory += sizeof(dlink_node) + sizeof(struct Ban);
+			channel_ban_memory += sizeof(rb_dlink_node) + sizeof(struct Ban);
 		}
 
-		DLINK_FOREACH(dlink, chptr->exceptlist.head)
+		RB_DLINK_FOREACH(dlink, chptr->exceptlist.head)
 		{
 			actualBan = dlink->data;
 			channel_except++;
 
-			channel_except_memory += (sizeof(dlink_node) + sizeof(struct Ban));
+			channel_except_memory += (sizeof(rb_dlink_node) + sizeof(struct Ban));
 		}
 
-		DLINK_FOREACH(dlink, chptr->invexlist.head)
+		RB_DLINK_FOREACH(dlink, chptr->invexlist.head)
 		{
 			actualBan = dlink->data;
 			channel_invex++;
 
-			channel_invex_memory += (sizeof(dlink_node) + sizeof(struct Ban));
+			channel_invex_memory += (sizeof(rb_dlink_node) + sizeof(struct Ban));
 		}
 	}
 
 	/* count up all classes */
 
-	class_count = rb_dlink_list_length(&class_list) + 1;
+	class_count = rb_rb_dlink_list_length(&class_list) + 1;
 
 	rb_count_rb_linebuf_memory(&rb_linebuf_count, &rb_linebuf_memory_used);
 
@@ -1351,18 +1351,18 @@ stats_memory (struct Client *source_p)
 			   users_counted,
 			   (unsigned long) users_counted * sizeof(struct User),
 			   users_invited_count, 
-			   (unsigned long) users_invited_count * sizeof(dlink_node));
+			   (unsigned long) users_invited_count * sizeof(rb_dlink_node));
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :User channels %u(%lu) Aways %u(%d)",
 			   user_channels,
-			   (unsigned long) user_channels * sizeof(dlink_node),
+			   (unsigned long) user_channels * sizeof(rb_dlink_node),
 			   aways_counted, (int) away_memory);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :Attached confs %u(%lu)",
 			   local_client_conf_count,
-			   (unsigned long) local_client_conf_count * sizeof(dlink_node));
+			   (unsigned long) local_client_conf_count * sizeof(rb_dlink_node));
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :Conflines %u(%d)", conf_count, (int) conf_memory);
@@ -1391,13 +1391,13 @@ stats_memory (struct Client *source_p)
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :Channel members %u(%lu) invite %u(%lu)",
 			   channel_users,
-			   (unsigned long) channel_users * sizeof(dlink_node),
+			   (unsigned long) channel_users * sizeof(rb_dlink_node),
 			   channel_invites, 
-			   (unsigned long) channel_invites * sizeof(dlink_node));
+			   (unsigned long) channel_invites * sizeof(rb_dlink_node));
 
 	total_channel_memory = channel_memory +
 		channel_ban_memory +
-		channel_users * sizeof(dlink_node) + channel_invites * sizeof(dlink_node);
+		channel_users * sizeof(rb_dlink_node) + channel_invites * sizeof(rb_dlink_node);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :Whowas users %ld(%ld)",
@@ -1411,8 +1411,8 @@ stats_memory (struct Client *source_p)
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :Hash: client %u(%ld) chan %u(%ld)",
-			   U_MAX, (long)(U_MAX * sizeof(dlink_list)), 
-			   CH_MAX, (long)(CH_MAX * sizeof(dlink_list)));
+			   U_MAX, (long)(U_MAX * sizeof(rb_dlink_list)), 
+			   CH_MAX, (long)(CH_MAX * sizeof(rb_dlink_list)));
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :linebuf %ld(%ld)",
@@ -1426,7 +1426,7 @@ stats_memory (struct Client *source_p)
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "z :hostname hash %d(%ld)",
-			   HOST_MAX, (long)HOST_MAX * sizeof(dlink_list));
+			   HOST_MAX, (long)HOST_MAX * sizeof(rb_dlink_list));
 
 	total_memory = totww + total_channel_memory + conf_memory +
 		class_count * sizeof(struct Class);
@@ -1461,11 +1461,11 @@ stats_memory (struct Client *source_p)
 static void
 stats_ziplinks (struct Client *source_p)
 {
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	struct Client *target_p;
 	int sent_data = 0;
 
-	DLINK_FOREACH (ptr, serv_list.head)
+	RB_DLINK_FOREACH (ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 		if(IsCapable (target_p, CAP_ZIP))
@@ -1499,7 +1499,7 @@ stats_servlinks (struct Client *source_p)
 	static char Sformat[] = ":%s %d %s %s %u %u %u %u %u :%u %u %s";
 	long uptime, sendK, receiveK;
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int j = 0;
 
 	if(ConfigServerHide.flatten_links && !IsOper (source_p) &&
@@ -1512,7 +1512,7 @@ stats_servlinks (struct Client *source_p)
 
 	sendK = receiveK = 0;
 
-	DLINK_FOREACH (ptr, serv_list.head)
+	RB_DLINK_FOREACH (ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 
@@ -1646,16 +1646,16 @@ stats_ltrace(struct Client *source_p, int parc, const char *parv[])
 
 static void
 stats_l_list(struct Client *source_p, const char *name, int doall, int wilds,
-	     dlink_list * list, char statchar)
+	     rb_dlink_list * list, char statchar)
 {
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	struct Client *target_p;
 
 	/* send information about connections which match.  note, we
 	 * dont need tests for IsInvisible(), because non-opers will
 	 * never get here for normal clients --fl
 	 */
-	DLINK_FOREACH(ptr, list->head)
+	RB_DLINK_FOREACH(ptr, list->head)
 	{
 		target_p = ptr->data;
 

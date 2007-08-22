@@ -285,7 +285,7 @@ extern struct admin_info AdminInfo;	/* defined in ircd.c */
 /* End GLOBAL section */
 
 #ifdef ENABLE_SERVICES
-extern dlink_list service_list;
+extern rb_dlink_list service_list;
 #endif
 
 typedef enum temp_list
@@ -297,8 +297,8 @@ typedef enum temp_list
 	LAST_TEMP_TYPE
 } temp_list;
 
-extern dlink_list temp_klines[LAST_TEMP_TYPE];
-extern dlink_list temp_dlines[LAST_TEMP_TYPE];
+extern rb_dlink_list temp_klines[LAST_TEMP_TYPE];
+extern rb_dlink_list temp_dlines[LAST_TEMP_TYPE];
 
 void init_s_conf(void);
 
@@ -328,7 +328,7 @@ int conf_fgets(char *, int, FILE *);
 void add_temp_kline(struct ConfItem *);
 void add_temp_dline(struct ConfItem *);
 void report_temp_klines(struct Client *);
-void show_temp_klines(struct Client *, dlink_list *);
+void show_temp_klines(struct Client *, rb_dlink_list *);
 
 int rehash(int);
 void rehash_bans(int);

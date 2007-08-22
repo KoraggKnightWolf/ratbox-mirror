@@ -55,7 +55,7 @@ static int
 mo_restart(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	char buf[BUFSIZE];
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	struct Client *target_p;
 
 	if(!IsOperDie(source_p))
@@ -78,7 +78,7 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 		return 0;
 	}
 
-	DLINK_FOREACH(ptr, lclient_list.head)
+	RB_DLINK_FOREACH(ptr, lclient_list.head)
 	{
 		target_p = ptr->data;
 
@@ -87,7 +87,7 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 			   me.name, target_p->name, get_client_name(source_p, HIDE_IP));
 	}
 
-	DLINK_FOREACH(ptr, serv_list.head)
+	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 

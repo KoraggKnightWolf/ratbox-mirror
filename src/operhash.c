@@ -42,21 +42,21 @@
 
 #define hash_opername(x) fnv_hash_upper_len((const unsigned char *)(x), OPERHASH_MAX_BITS, 30)
 
-static dlink_list operhash_table[OPERHASH_MAX];
+static rb_dlink_list operhash_table[OPERHASH_MAX];
 
 const char *
 operhash_add(const char *name)
 {
 	struct operhash_entry *ohash;
 	unsigned int hashv;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if(EmptyString(name))
 		return NULL;
 
 	hashv = hash_opername(name);
 
-	DLINK_FOREACH(ptr, operhash_table[hashv].head)
+	RB_DLINK_FOREACH(ptr, operhash_table[hashv].head)
 	{
 		ohash = ptr->data;
 
@@ -81,14 +81,14 @@ operhash_find(const char *name)
 {
 	struct operhash_entry *ohash;
 	unsigned int hashv;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if(EmptyString(name))
 		return NULL;
 
 	hashv = hash_opername(name);
 
-	DLINK_FOREACH(ptr, operhash_table[hashv].head)
+	RB_DLINK_FOREACH(ptr, operhash_table[hashv].head)
 	{
 		ohash = ptr->data;
 
@@ -104,14 +104,14 @@ operhash_delete(const char *name)
 {
 	struct operhash_entry *ohash;
 	unsigned int hashv;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if(EmptyString(name))
 		return;
 
 	hashv = hash_opername(name);
 
-	DLINK_FOREACH(ptr, operhash_table[hashv].head)
+	RB_DLINK_FOREACH(ptr, operhash_table[hashv].head)
 	{
 		ohash = ptr->data;
 

@@ -238,7 +238,7 @@ quote_max(struct Client *source_p, int newval)
 				     "%s!%s@%s set new MAXCLIENTS to %d (%lu current)",
 				     source_p->name, source_p->username, source_p->host,
 				     GlobalSetOptions.maxclients, 
-				     rb_dlink_list_length(&lclient_list));
+				     rb_rb_dlink_list_length(&lclient_list));
 
 		return;
 	}
@@ -246,7 +246,7 @@ quote_max(struct Client *source_p, int newval)
 	{
 		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Current Maxclients = %d (%lu)",
 			   me.name, source_p->name, GlobalSetOptions.maxclients,
-			   rb_dlink_list_length(&lclient_list));
+			   rb_rb_dlink_list_length(&lclient_list));
 	}
 }
 

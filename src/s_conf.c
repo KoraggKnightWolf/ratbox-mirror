@@ -60,11 +60,11 @@ extern char linebuf[];
 
 static rb_bh *confitem_heap = NULL;
 
-dlink_list temp_klines[LAST_TEMP_TYPE];
-dlink_list temp_dlines[LAST_TEMP_TYPE];
+rb_dlink_list temp_klines[LAST_TEMP_TYPE];
+rb_dlink_list temp_dlines[LAST_TEMP_TYPE];
 
 #ifdef ENABLE_SERVICES
-dlink_list service_list;
+rb_dlink_list service_list;
 #endif
 
 /* internally defined functions */
@@ -461,7 +461,7 @@ static int
 attach_iline(struct Client *client_p, struct ConfItem *aconf)
 {
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int local_count = 0;
 	int global_count = 0;
 	int ident_count = 0;
@@ -475,7 +475,7 @@ attach_iline(struct Client *client_p, struct ConfItem *aconf)
 
 
 	/* find_hostname() returns the head of the list to search */
-	DLINK_FOREACH(ptr, find_hostname(client_p->host))
+	RB_DLINK_FOREACH(ptr, find_hostname(client_p->host))
 	{
 		target_p = ptr->data;
 
@@ -887,11 +887,11 @@ add_temp_dline(struct ConfItem *aconf)
 static void
 expire_temp_kd(void *list)
 {
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 	struct ConfItem *aconf;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, ((dlink_list *) list)->head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, ((rb_dlink_list *) list)->head)
 	{
 		aconf = ptr->data;
 
@@ -914,9 +914,9 @@ static void
 reorganise_temp_kd(void *list)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr, *next_ptr;
+	rb_dlink_node *ptr, *next_ptr;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, ((dlink_list *) list)->head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, ((rb_dlink_list *) list)->head)
 	{
 		aconf = ptr->data;
 
@@ -1082,16 +1082,16 @@ static void
 clear_out_old_conf(void)
 {
 	struct Class *cltmp;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 #ifdef ENABLE_SERVICES
-	dlink_node *next_ptr;
+	rb_dlink_node *next_ptr;
 #endif
 
 	/*
 	 * don't delete the class table, rather mark all entries
 	 * for deletion. The table is cleaned up by check_class. - avalon
 	 */
-	DLINK_FOREACH(ptr, class_list.head)
+	RB_DLINK_FOREACH(ptr, class_list.head)
 	{
 		cltmp = ptr->data;
 		MaxUsers(cltmp) = -1;
@@ -1136,7 +1136,7 @@ clear_out_old_conf(void)
 	ConfigFileEntry.servlink_path = NULL;
 
 #ifdef ENABLE_SERVICES
-	DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
 	{
 		rb_free(ptr->data);
 		rb_dlinkDestroy(ptr, &service_list);

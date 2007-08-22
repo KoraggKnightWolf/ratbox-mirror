@@ -30,7 +30,7 @@
 #define DELAYED_EXIT_TIME	10
 
 extern struct _patricia_tree_t *dline_tree;
-extern dlink_list delay_exit;
+extern rb_dlink_list delay_exit;
 
 void init_reject(void);
 int check_reject(rb_fde_t *F, struct sockaddr *addr);

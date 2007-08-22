@@ -129,9 +129,9 @@ void
 clear_monitor(struct Client *client_p)
 {
 	struct monitor *monptr;
-	dlink_node *ptr, *next_ptr;
+	rb_dlink_node *ptr, *next_ptr;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->monitor_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->monitor_list.head)
 	{
 		monptr = ptr->data;
 
@@ -139,7 +139,7 @@ clear_monitor(struct Client *client_p)
 		 * cleaned up periodically by cleanup_monitor() --anfl
 		 */
 		rb_dlinkFindDestroy(client_p, &monptr->users);
-		rb_free_dlink_node(ptr);
+		rb_free_rb_dlink_node(ptr);
 	}
 
 	client_p->localClient->monitor_list.head = client_p->localClient->monitor_list.tail = NULL;

@@ -103,7 +103,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 	const char *tname;
 	int doall = 0;
 	int cnt = 0, wilds, dow;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if(parc > 1)
 	{
@@ -137,7 +137,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 			if(ac2ptr == NULL)
 			{
-				DLINK_FOREACH(ptr, global_client_list.head)
+				RB_DLINK_FOREACH(ptr, global_client_list.head)
 				{
 					ac2ptr = ptr->data;
 
@@ -223,7 +223,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 				report_this_status(source_p, source_p, 0);
 		}
 
-		DLINK_FOREACH(ptr, oper_list.head)
+		RB_DLINK_FOREACH(ptr, oper_list.head)
 		{
 			target_p = ptr->data;
 
@@ -233,7 +233,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 			report_this_status(source_p, target_p, 0);
 		}
 
-		DLINK_FOREACH(ptr, serv_list.head)
+		RB_DLINK_FOREACH(ptr, serv_list.head)
 		{
 			target_p = ptr->data;
 
@@ -251,7 +251,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* source_p is opered */
 
 	/* report all direct connections */
-	DLINK_FOREACH(ptr, lclient_list.head)
+	RB_DLINK_FOREACH(ptr, lclient_list.head)
 	{
 		target_p = ptr->data;
 
@@ -265,7 +265,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 		cnt = report_this_status(source_p, target_p, dow);
 	}
 
-	DLINK_FOREACH(ptr, serv_list.head)
+	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 
@@ -277,7 +277,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(MyConnect(source_p))
 	{
-		DLINK_FOREACH(ptr, unknown_list.head)
+		RB_DLINK_FOREACH(ptr, unknown_list.head)
 		{
 			target_p = ptr->data;
 
@@ -307,7 +307,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(doall)
 	{
-		DLINK_FOREACH(ptr, class_list.head)
+		RB_DLINK_FOREACH(ptr, class_list.head)
 		{
 			cltmp = ptr->data;
 
@@ -334,11 +334,11 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 static void
 count_downlinks(struct Client *server_p, int *pservcount, int *pusercount)
 {
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	(*pservcount)++;
-	*pusercount += rb_dlink_list_length(&server_p->serv->users);
-	DLINK_FOREACH(ptr, server_p->serv->servers.head)
+	*pusercount += rb_rb_dlink_list_length(&server_p->serv->users);
+	RB_DLINK_FOREACH(ptr, server_p->serv->servers.head)
 	{
 		count_downlinks(ptr->data, pservcount, pusercount);
 	}
@@ -535,10 +535,10 @@ static void
 do_etrace(struct Client *source_p, int ipv4, int ipv6)
 {
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	/* report all direct connections */
-	DLINK_FOREACH(ptr, lclient_list.head)
+	RB_DLINK_FOREACH(ptr, lclient_list.head)
 	{
 		target_p = ptr->data;
 
@@ -563,9 +563,9 @@ do_etrace(struct Client *source_p, int ipv4, int ipv6)
 static void
 do_etrace_full(struct Client *source_p)
 {
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, lclient_list.head)
+	RB_DLINK_FOREACH(ptr, lclient_list.head)
 	{
 		do_single_etrace(source_p, ptr->data);
 	}
@@ -611,7 +611,7 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 	struct membership *msptr;
 	const char *sockhost;
 	const char *name;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int operspy = 0;
 
 	name = parv[1];
@@ -646,7 +646,7 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 		return 0;
 	}
 
-	DLINK_FOREACH(ptr, chptr->members.head)
+	RB_DLINK_FOREACH(ptr, chptr->members.head)
 	{
 		msptr = ptr->data;
 		target_p = msptr->client_p;
@@ -672,13 +672,13 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 }
 
 static void
-match_masktrace(struct Client *source_p, dlink_list *list, const char *username, const char *hostname, const char *name, const char *gecos)
+match_masktrace(struct Client *source_p, rb_dlink_list *list, const char *username, const char *hostname, const char *name, const char *gecos)
 {
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	const char *sockhost;	
 	
-	DLINK_FOREACH(ptr, list->head)
+	RB_DLINK_FOREACH(ptr, list->head)
 	{
 		target_p = ptr->data;
 		if(!IsClient(target_p))

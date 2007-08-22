@@ -53,18 +53,18 @@ struct topic_info
 /* channel structure */
 struct Channel
 {
-	dlink_node node;
+	rb_dlink_node node;
 	struct Mode mode;
 	struct topic_info *topic;
 	time_t last_knock;	/* don't allow knock to flood */
 
-	dlink_list members;	/* channel members */
-	dlink_list locmembers;	/* local channel members */
+	rb_dlink_list members;	/* channel members */
+	rb_dlink_list locmembers;	/* local channel members */
 
-	dlink_list invites;
-	dlink_list banlist;
-	dlink_list exceptlist;
-	dlink_list invexlist;
+	rb_dlink_list invites;
+	rb_dlink_list banlist;
+	rb_dlink_list exceptlist;
+	rb_dlink_list invexlist;
 
 	time_t first_received_message_time;	/* channel flood control */
 	int received_number_of_privmsgs;
@@ -77,9 +77,9 @@ struct Channel
 
 struct membership
 {
-	dlink_node channode;
-	dlink_node locchannode;
-	dlink_node usernode;
+	rb_dlink_node channode;
+	rb_dlink_node locchannode;
+	rb_dlink_node usernode;
 
 	struct Channel *chptr;
 	struct Client *client_p;
@@ -94,7 +94,7 @@ struct Ban
 	char *banstr;
 	char *who;
 	time_t when;
-	dlink_node node;
+	rb_dlink_node node;
 };
 
 struct ChModeChange
@@ -168,7 +168,7 @@ struct ChCapCombo
 
 #define IsChannelName(name) ((name) && (*(name) == '#' || *(name) == '&'))
 
-extern dlink_list global_channel_list;
+extern rb_dlink_list global_channel_list;
 void init_channels(void);
 
 struct Channel *allocate_channel(const char *chname);
@@ -191,7 +191,7 @@ void remove_user_from_channel(struct membership *);
 void remove_user_from_channels(struct Client *);
 void invalidate_bancache_user(struct Client *);
 
-void free_channel_list(dlink_list *);
+void free_channel_list(rb_dlink_list *);
 
 int check_channel_name(const char *name);
 

@@ -58,14 +58,14 @@
 FILE *conf_fbfile_in;
 char conffilebuf[512];
 extern int conf_parse_failure;
-static dlink_list conflist;
+static rb_dlink_list conflist;
 static conf_t *curconf;
 
 extern char *current_file;
 
 typedef struct _valid_entry
 {
-	dlink_node node;
+	rb_dlink_node node;
 	char *name;
 	int type;
 } valid_entry_t;
@@ -74,15 +74,15 @@ typedef struct _valid_entry
 typedef struct _valid_block
 {
 	char *name;
-	dlink_list valid_entries;
-	dlink_node node;
+	rb_dlink_list valid_entries;
+	rb_dlink_node node;
 	int needsub;
 } valid_block_t;
 
 
 struct topconf
 {
-	dlink_node node;
+	rb_dlink_node node;
 	char *tc_name;
 	void (*start_func) (conf_t *);
 	void (*end_func) (conf_t *);
@@ -90,8 +90,8 @@ struct topconf
 	struct conf_items *itemtable;
 };
 
-static dlink_list toplist;
-static dlink_list valid_blocks;
+static rb_dlink_list toplist;
+static rb_dlink_list valid_blocks;
 
 static const char *
 conf_strtype(int type)
@@ -282,12 +282,12 @@ find_umode(struct mode_table *tab, const char *name)
 static void
 set_modes_from_table(int *modes, const char *whatis, struct mode_table *tab, confentry_t * entry)
 {
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	confentry_t *sub;
 	const char *umode;
 	int dir, mode;
 
-	DLINK_FOREACH(ptr, entry->flist.head)
+	RB_DLINK_FOREACH(ptr, entry->flist.head)
 	{
 		sub = ptr->data;
 		dir = 1;
@@ -367,18 +367,18 @@ add_entry(conf_t * conf, const char *name, void *value, int type)
 	 * to use rb_dlinkAddAlloc as the block heap isn't ready
 	 * yet 
 	 */
-	rb_dlinkAdd(entry, rb_malloc(sizeof(dlink_node)), &entry->flist);
+	rb_dlinkAdd(entry, rb_malloc(sizeof(rb_dlink_node)), &entry->flist);
 
 }
 
 static void
 del_entry(conf_t * conf, confentry_t * entry)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 	confentry_t *xentry;
 	if(entry->type & CF_FLIST)
 	{
-		DLINK_FOREACH_SAFE(ptr, next, entry->flist.head)
+		RB_DLINK_FOREACH_SAFE(ptr, next, entry->flist.head)
 		{
 			xentry = ptr->data;
 			switch (CF_TYPE(xentry->type))
@@ -418,8 +418,8 @@ del_entry(conf_t * conf, confentry_t * entry)
 static void
 del_conf(conf_t * conf)
 {
-	dlink_node *ptr, *next;
-	DLINK_FOREACH_SAFE(ptr, next, conf->entries.head)
+	rb_dlink_node *ptr, *next;
+	RB_DLINK_FOREACH_SAFE(ptr, next, conf->entries.head)
 	{
 		confentry_t *entry = ptr->data;
 		del_entry(conf, entry);
@@ -435,9 +435,9 @@ del_conf(conf_t * conf)
 void
 delete_all_conf(void)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 
-	DLINK_FOREACH_SAFE(ptr, next, conflist.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, conflist.head)
 	{
 		conf_t *conf = ptr->data;
 		del_conf(conf);
@@ -681,8 +681,8 @@ static valid_block_t *
 find_valid_block(const char *name)
 {
 	valid_block_t *t;
-	dlink_node *ptr;
-	DLINK_FOREACH(ptr, valid_blocks.head)
+	rb_dlink_node *ptr;
+	RB_DLINK_FOREACH(ptr, valid_blocks.head)
 	{
 		t = ptr->data;
 		if(!strcasecmp(t->name, name))
@@ -708,9 +708,9 @@ add_valid_entry(const char *bname, const char *entryname, int type)
 static int
 check_valid_block(const char *name)
 {
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	valid_block_t *t;
-	DLINK_FOREACH(ptr, valid_blocks.head)
+	RB_DLINK_FOREACH(ptr, valid_blocks.head)
 	{
 		t = ptr->data;
 		if(!strcasecmp(t->name, name))
@@ -724,8 +724,8 @@ check_valid_block(const char *name)
 int
 check_valid_blocks(void)
 {
-	dlink_node *ptr;
-	DLINK_FOREACH(ptr, conflist.head)
+	rb_dlink_node *ptr;
+	RB_DLINK_FOREACH(ptr, conflist.head)
 	{
 		conf_t *conf = ptr->data;
 		if(!check_valid_block(conf->confname))
@@ -742,8 +742,8 @@ check_valid_blocks(void)
 static int
 check_valid_entry(valid_block_t * vt, conf_t * conf, confentry_t * entry)
 {
-	dlink_node *ptr, *xptr;
-	DLINK_FOREACH(ptr, vt->valid_entries.head)
+	rb_dlink_node *ptr, *xptr;
+	RB_DLINK_FOREACH(ptr, vt->valid_entries.head)
 	{
 		valid_entry_t *ve = ptr->data;
 		if(!strcasecmp(ve->name, entry->entryname))
@@ -757,7 +757,7 @@ check_valid_entry(valid_block_t * vt, conf_t * conf, confentry_t * entry)
 
 			if(entry->type & CF_FLIST)
 			{
-				DLINK_FOREACH(xptr, entry->flist.head)
+				RB_DLINK_FOREACH(xptr, entry->flist.head)
 				{
 					confentry_t *xentry = xptr->data;
 					if(CF_TYPE(xentry->type) != CF_TYPE(ve->type))
@@ -798,12 +798,12 @@ check_valid_entry(valid_block_t * vt, conf_t * conf, confentry_t * entry)
 int
 check_valid_entries(void)
 {
-	dlink_node *ptr, *xptr;
+	rb_dlink_node *ptr, *xptr;
 	conf_t *conf;
 	confentry_t *entry;
 	valid_block_t *vt;
 	int ret = 0;
-	DLINK_FOREACH(ptr, conflist.head)
+	RB_DLINK_FOREACH(ptr, conflist.head)
 	{
 		conf = ptr->data;
 		vt = find_valid_block(conf->confname);
@@ -828,7 +828,7 @@ check_valid_entries(void)
 			/* ret++; treat this as a warning as well */
 			continue;
 		}
-		DLINK_FOREACH(xptr, conf->entries.head)
+		RB_DLINK_FOREACH(xptr, conf->entries.head)
 		{
 			entry = xptr->data;
 			if(entry->entryname == NULL)
@@ -1071,13 +1071,13 @@ conf_set_class_sendq(confentry_t * entry, conf_t * conf, struct conf_items *item
 
 static struct ConfItem *t_aconf;
 static char *t_aconf_class;
-static dlink_list t_aconf_list;
+static rb_dlink_list t_aconf_list;
 
 
 static void
 conf_set_auth_end(conf_t * conf)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 	struct ConfItem *tmp_conf;
 	if(EmptyString(t_aconf->info.name))
 		t_aconf->info.name = rb_strdup("NOMATCH");
@@ -1093,7 +1093,7 @@ conf_set_auth_end(conf_t * conf)
 	conf_add_class_to_conf(t_aconf, t_aconf_class);
 	add_conf_by_address(t_aconf->host, CONF_CLIENT, t_aconf->user, t_aconf);
 
-	DLINK_FOREACH_SAFE(ptr, next, t_aconf_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, t_aconf_list.head)
 	{
 		tmp_conf = ptr->data;
 
@@ -1117,10 +1117,10 @@ conf_set_auth_end(conf_t * conf)
 static void
 conf_set_auth_start(conf_t * conf)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 	rb_free(t_aconf_class);
 	t_aconf_class = NULL;
-	DLINK_FOREACH_SAFE(ptr, next, t_aconf_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, t_aconf_list.head)
 	{
 		free_conf(ptr->data);
 		rb_dlinkDestroy(ptr, &t_aconf_list);
@@ -1262,18 +1262,18 @@ conf_set_auth_class(confentry_t * entry, conf_t * conf, struct conf_items *item)
 }
 
 static struct oper_conf *t_oper;
-static dlink_list t_oper_list;
+static rb_dlink_list t_oper_list;
 
 static void
 conf_set_start_operator(conf_t * conf)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 	if(t_oper != NULL)
 	{
 		free_oper_conf(t_oper);
 		t_oper = NULL;
 	}
-	DLINK_FOREACH_SAFE(ptr, next, t_oper_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, t_oper_list.head)
 	{
 		free_oper_conf(ptr->data);
 		rb_dlinkDestroy(ptr, &t_oper_list);
@@ -1289,7 +1289,7 @@ static void
 conf_set_end_operator(conf_t * conf)
 {
 	struct oper_conf *tmp_oper;
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 
 	if(EmptyString(t_oper->name))
 	{
@@ -1308,7 +1308,7 @@ conf_set_end_operator(conf_t * conf)
 		return;
 	}
 
-	DLINK_FOREACH_SAFE(ptr, next, t_oper_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, t_oper_list.head)
 	{
 		tmp_oper = ptr->data;
 		tmp_oper->name = rb_strdup(t_oper->name);
@@ -1752,15 +1752,15 @@ conf_set_connect_hub_mask(confentry_t * entry, conf_t * conf, struct conf_items 
 
 
 
-static dlink_list t_shared_list;
-static dlink_list t_cluster_list;
+static rb_dlink_list t_shared_list;
+static rb_dlink_list t_cluster_list;
 static struct remote_conf *t_shared;
 
 static void
 conf_set_cluster_cleanup(conf_t * conf)
 {
-	dlink_node *ptr, *next;
-	DLINK_FOREACH_SAFE(ptr, next, t_cluster_list.head)
+	rb_dlink_node *ptr, *next;
+	RB_DLINK_FOREACH_SAFE(ptr, next, t_cluster_list.head)
 	{
 		free_remote_conf(ptr->data);
 		rb_dlinkDestroy(ptr, &t_cluster_list);
@@ -1788,14 +1788,14 @@ static void
 conf_set_cluster_flags(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	int flags = 0;
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 
 	if(t_shared != NULL)
 		free_remote_conf(t_shared);
 
 	set_modes_from_table(&flags, "flag", cluster_table, entry);
 
-	DLINK_FOREACH_SAFE(ptr, next, t_cluster_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, t_cluster_list.head)
 	{
 		t_shared = ptr->data;
 		t_shared->flags = flags;
@@ -1809,9 +1809,9 @@ conf_set_cluster_flags(confentry_t * entry, conf_t * conf, struct conf_items *it
 static void
 conf_set_shared_cleanup(conf_t * conf)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 
-	DLINK_FOREACH_SAFE(ptr, next, t_shared_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, t_shared_list.head)
 	{
 		free_remote_conf(ptr->data);
 		rb_dlinkDestroy(ptr, &t_shared_list);
@@ -1827,12 +1827,12 @@ conf_set_shared_cleanup(conf_t * conf)
 static void
 conf_set_shared_oper(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	confentry_t *xentry;
 	char *username, *p;
 	int len;
 
-	len = rb_dlink_list_length(&entry->flist);
+	len = rb_rb_dlink_list_length(&entry->flist);
 
 	if(len > 2)
 	{
@@ -1882,7 +1882,7 @@ conf_set_shared_oper(confentry_t * entry, conf_t * conf, struct conf_items *item
 
 	rb_dlinkAddAlloc(t_shared, &t_shared_list);
 	t_shared = NULL;
-	DLINK_FOREACH(ptr, entry->flist.head)
+	RB_DLINK_FOREACH(ptr, entry->flist.head)
 	{
 		xentry = ptr->data;
 		t_shared = make_remote_conf();
@@ -1895,14 +1895,14 @@ static void
 conf_set_shared_flags(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	int flags = 0;
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 
 	if(t_shared != NULL)
 		free_remote_conf(t_shared);
 
 	set_modes_from_table(&flags, "flag", shared_table, entry);
 
-	DLINK_FOREACH_SAFE(ptr, next, t_shared_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, t_shared_list.head)
 	{
 		t_shared = ptr->data;
 		t_shared->flags = flags;
@@ -1917,9 +1917,9 @@ static void
 conf_set_service_start(conf_t * conf)
 {
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, global_serv_list.head)
+	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
 		target_p = ptr->data;
 		target_p->flags &= ~FLAGS_SERVICE;
@@ -1982,16 +1982,16 @@ static void
 register_top_confs(void)
 {
 	CONF_CB *func;
-	dlink_node *ptr, *xptr, *yptr;
+	rb_dlink_node *ptr, *xptr, *yptr;
 	struct topconf *top;
 	conf_t *conf;
 	confentry_t *entry;
 	struct conf_items *tab;
 
-	DLINK_FOREACH(ptr, toplist.head)
+	RB_DLINK_FOREACH(ptr, toplist.head)
 	{
 		top = ptr->data;
-		DLINK_FOREACH(xptr, conflist.head)
+		RB_DLINK_FOREACH(xptr, conflist.head)
 		{
 			conf = xptr->data;
 			if(strcasecmp(conf->confname, top->tc_name))
@@ -1999,7 +1999,7 @@ register_top_confs(void)
 
 			if(top->start_func != NULL)
 				top->start_func(conf);
-			DLINK_FOREACH(yptr, conf->entries.head)
+			RB_DLINK_FOREACH(yptr, conf->entries.head)
 			{
 				entry = yptr->data;
 				tab = find_item(entry->entryname, top->itemtable);

@@ -39,7 +39,7 @@ struct Client;
 
 struct AuthRequest
 {
-	dlink_node node;
+	rb_dlink_node node;
 	struct Client *client;	/* pointer to client struct for request */
 	uint16_t dns_query; /* DNS Query */
 	uint16_t reqid;

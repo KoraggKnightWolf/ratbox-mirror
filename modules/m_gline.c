@@ -549,9 +549,9 @@ static struct ConfItem *
 find_is_glined(const char *host, const char *user)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, glines.head)
+	RB_DLINK_FOREACH(ptr, glines.head)
 	{
 		aconf = ptr->data;
 		if((!user || irccmp(aconf->user, user) == 0) &&
@@ -573,10 +573,10 @@ check_glines(void)
 {
 	struct Client *client_p;
 	struct ConfItem *aconf;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 	{
 		client_p = ptr->data;
 
@@ -681,7 +681,7 @@ static int
 majority_gline(struct Client *source_p, const char *user,
 	       const char *host, const char *reason)
 {
-	dlink_node *pending_node;
+	rb_dlink_node *pending_node;
 	struct gline_pending *pending;
 
 	/* to avoid desync.. --fl */
@@ -691,7 +691,7 @@ majority_gline(struct Client *source_p, const char *user,
 	if(find_is_glined(host, user))
 		return NO;
 
-	DLINK_FOREACH(pending_node, pending_glines.head)
+	RB_DLINK_FOREACH(pending_node, pending_glines.head)
 	{
 		pending = pending_node->data;
 
@@ -788,14 +788,14 @@ static int
 remove_temp_gline(const char *user, const char *host)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	struct irc_sockaddr_storage addr, caddr;
 	int bits, cbits;
 	int mtype, gtype;
 
 	mtype = parse_netmask(host, (struct sockaddr *)&addr, &bits);
 
-	DLINK_FOREACH(ptr, glines.head)
+	RB_DLINK_FOREACH(ptr, glines.head)
 	{
 		aconf = ptr->data;
 
@@ -835,11 +835,11 @@ remove_temp_gline(const char *user, const char *host)
 static void
 expire_pending_glines(void *unused)
 {
-	dlink_node *pending_node;
-	dlink_node *next_node;
+	rb_dlink_node *pending_node;
+	rb_dlink_node *next_node;
 	struct gline_pending *glp_ptr;
 
-	DLINK_FOREACH_SAFE(pending_node, next_node, pending_glines.head)
+	RB_DLINK_FOREACH_SAFE(pending_node, next_node, pending_glines.head)
 	{
 		glp_ptr = pending_node->data;
 

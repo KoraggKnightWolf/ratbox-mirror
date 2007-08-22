@@ -79,7 +79,7 @@ ReportType;
 
 #define sendheader(c, r) sendto_one(c, POP_QUEUE, HeaderMessages[(r)])
 
-static dlink_list auth_poll_list;
+static rb_dlink_list auth_poll_list;
 static rb_bh *auth_heap;
 static void read_auth_reply(rb_helper *);
 static EVH timeout_auth_queries_event;
@@ -405,11 +405,11 @@ start_auth(struct Client *client)
 static void
 timeout_auth_queries_event(void *notused)
 {
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 	struct AuthRequest *auth;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, auth_poll_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, auth_poll_list.head)
 	{
 		auth = ptr->data;
 

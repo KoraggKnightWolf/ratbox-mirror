@@ -41,14 +41,14 @@
 
 struct ConfItem;
 
-extern dlink_list cluster_conf_list;
-extern dlink_list shared_conf_list;
-extern dlink_list oper_conf_list;
-extern dlink_list hubleaf_conf_list;
-extern dlink_list server_conf_list;
-extern dlink_list xline_conf_list;
-extern dlink_list resv_conf_list;
-extern dlink_list tgchange_list;
+extern rb_dlink_list cluster_conf_list;
+extern rb_dlink_list shared_conf_list;
+extern rb_dlink_list oper_conf_list;
+extern rb_dlink_list hubleaf_conf_list;
+extern rb_dlink_list server_conf_list;
+extern rb_dlink_list xline_conf_list;
+extern rb_dlink_list resv_conf_list;
+extern rb_dlink_list tgchange_list;
 
 extern struct _patricia_tree_t *tgchange_tree;
 
@@ -64,7 +64,7 @@ typedef struct
 	char *ip;
 	time_t expiry;
 	struct _patricia_node_t *pnode;
-	dlink_node node;
+	rb_dlink_node node;
 } tgchange;
 
 void add_tgchange(const char *host);
@@ -77,7 +77,7 @@ struct remote_conf
 	char *host;
 	char *server;
 	int flags;
-	dlink_node node;
+	rb_dlink_node node;
 };
 
 /* flags used in shared/cluster */
@@ -196,7 +196,7 @@ struct server_conf
 	char *class_name;
 	struct Class *class;
 	uint16_t dns_query;
-	dlink_node node;
+	rb_dlink_node node;
 
 };
 
@@ -241,8 +241,8 @@ struct nd_entry
 	time_t expire;
 	unsigned int hashv;
 
-	dlink_node hnode;	/* node in hash */
-	dlink_node lnode;	/* node in ll */
+	rb_dlink_node hnode;	/* node in hash */
+	rb_dlink_node lnode;	/* node in ll */
 };
 
 void add_nd_entry(const char *name);

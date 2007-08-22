@@ -155,10 +155,10 @@ parse_client_queued(struct Client *client_p)
 void
 flood_recalc(void *unused)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 	struct Client *client_p;
 
-	DLINK_FOREACH_SAFE(ptr, next, lclient_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, lclient_list.head)
 	{
 		client_p = ptr->data;
 
@@ -186,7 +186,7 @@ flood_recalc(void *unused)
 
 	}
 
-	DLINK_FOREACH_SAFE(ptr, next, unknown_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, unknown_list.head)
 	{
 		client_p = ptr->data;
 

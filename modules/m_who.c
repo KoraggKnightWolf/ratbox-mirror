@@ -72,7 +72,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	struct Client *target_p;
 	struct membership *msptr;
 	char *mask;
-	dlink_node *lp;
+	rb_dlink_node *lp;
 	struct Channel *chptr = NULL;
 	int server_oper = parc > 2 ? (*parv[2] == 'o') : 0;	/* Show OPERS only */
 	int member;
@@ -140,7 +140,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 		int isinvis = 0;
 
 		isinvis = IsInvisible(target_p);
-		DLINK_FOREACH(lp, target_p->user->channel.head)
+		RB_DLINK_FOREACH(lp, target_p->user->channel.head)
 		{
 			msptr = lp->data;
 			chptr = msptr->chptr;
@@ -217,9 +217,9 @@ who_common_channel(struct Client *source_p, struct Channel *chptr,
 {
 	struct membership *msptr;
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, chptr->members.head)
+	RB_DLINK_FOREACH(ptr, chptr->members.head)
 	{
 		msptr = ptr->data;
 		target_p = msptr->client_p;
@@ -263,7 +263,7 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 {
 	struct membership *msptr;
 	struct Client *target_p;
-	dlink_node *lp, *ptr;
+	rb_dlink_node *lp, *ptr;
 	int maxmatches = 500;
 
 	/* first, list all matching INvisible clients on common channels
@@ -271,7 +271,7 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 	 */
 	if(!operspy)
 	{
-		DLINK_FOREACH(lp, source_p->user->channel.head)
+		RB_DLINK_FOREACH(lp, source_p->user->channel.head)
 		{
 			msptr = lp->data;
 			who_common_channel(source_p, msptr->chptr, mask, server_oper, &maxmatches);
@@ -285,7 +285,7 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 	 * if this is an operspy who, list all matching clients, no need
 	 * to clear marks
 	 */
-	DLINK_FOREACH(ptr, global_client_list.head)
+	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		target_p = ptr->data;
 		if(!IsClient(target_p))
@@ -337,10 +337,10 @@ do_who_on_channel(struct Client *source_p, struct Channel *chptr,
 {
 	struct Client *target_p;
 	struct membership *msptr;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int combine = IsCapable(source_p, CLICAP_MULTI_PREFIX);
 
-	DLINK_FOREACH(ptr, chptr->members.head)
+	RB_DLINK_FOREACH(ptr, chptr->members.head)
 	{
 		msptr = ptr->data;
 		target_p = msptr->client_p;

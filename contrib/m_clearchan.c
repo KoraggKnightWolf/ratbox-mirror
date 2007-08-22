@@ -60,8 +60,8 @@ mo_clearchan(struct Client *client_p, struct Client *source_p, int parc, const c
 	struct Channel *chptr;
 	struct membership *msptr;
 	struct Client *target_p;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 
 	/* admins only */
 	if(!IsOperAdmin(source_p))
@@ -86,7 +86,7 @@ mo_clearchan(struct Client *client_p, struct Client *source_p, int parc, const c
 	}
 
 	/* quickly make everyone a peon.. */
-	DLINK_FOREACH(ptr, chptr->members.head)
+	RB_DLINK_FOREACH(ptr, chptr->members.head)
 	{
 		msptr = ptr->data;
 		msptr->flags &= ~CHFL_CHANOP | CHFL_VOICE;
@@ -126,7 +126,7 @@ mo_clearchan(struct Client *client_p, struct Client *source_p, int parc, const c
 	chptr->mode.mode = MODE_SECRET | MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS;
 	chptr->mode.key[0] = '\0';
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->members.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->members.head)
 	{
 		msptr = ptr->data;
 		target_p = msptr->client_p;

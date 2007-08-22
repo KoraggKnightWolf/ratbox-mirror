@@ -39,23 +39,23 @@
 static patricia_tree_t *reject_tree;
 patricia_tree_t *dline_tree;
 static patricia_tree_t *eline_tree;
-dlink_list delay_exit;
-static dlink_list reject_list;
-static dlink_list throttle_list;
+rb_dlink_list delay_exit;
+static rb_dlink_list reject_list;
+static rb_dlink_list throttle_list;
 static patricia_tree_t *throttle_tree;
 static void throttle_expires(void *unused);
 
 
 struct reject_data
 {
-	dlink_node rnode;
+	rb_dlink_node rnode;
 	time_t time;
 	unsigned int count;
 };
 
 struct delay_data
 {
-	dlink_node node;
+	rb_dlink_node node;
 	rb_fde_t *F;
 };
 
@@ -102,11 +102,11 @@ add_eline(struct ConfItem *aconf)
 static void
 reject_exit(void *unused)
 {
-	dlink_node *ptr, *ptr_next;
+	rb_dlink_node *ptr, *ptr_next;
 	struct delay_data *ddata;
 	static const char *errbuf = "ERROR :Closing Link: (*** Banned (cache))\r\n";
 	
-	DLINK_FOREACH_SAFE(ptr, ptr_next, delay_exit.head)
+	RB_DLINK_FOREACH_SAFE(ptr, ptr_next, delay_exit.head)
 	{
 		ddata = ptr->data;
 
@@ -122,11 +122,11 @@ reject_exit(void *unused)
 static void
 reject_expires(void *unused)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 	patricia_node_t *pnode;
 	struct reject_data *rdata;
 	
-	DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
 	{
 		pnode = ptr->data;
 		rdata = pnode->data;		
@@ -217,11 +217,11 @@ check_reject(rb_fde_t *F, struct sockaddr *addr)
 void 
 flush_reject(void)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 	patricia_node_t *pnode;
 	struct reject_data *rdata;
 	
-	DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
 	{
 		pnode = ptr->data;
 		rdata = pnode->data;
@@ -370,7 +370,7 @@ report_elines(struct Client *source_p)
 
 typedef struct _throttle
 {
-	dlink_node node;
+	rb_dlink_node node;
 	time_t last;
 	int count;
 } throttle_t;
@@ -412,11 +412,11 @@ throttle_add(struct sockaddr *addr)
 static void
 throttle_expires(void *unused)
 {
-	dlink_node *ptr, *next;
+	rb_dlink_node *ptr, *next;
 	patricia_node_t *pnode;
 	throttle_t *t;
 	
-	DLINK_FOREACH_SAFE(ptr, next, throttle_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next, throttle_list.head)
 	{
 		pnode = ptr->data;
 		t = pnode->data;		

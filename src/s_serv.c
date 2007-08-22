@@ -185,10 +185,10 @@ slink_zipstats(unsigned int rpl, unsigned int len, unsigned char *data, struct C
 void
 collect_zipstats(void *unused)
 {
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	struct Client *target_p;
 
-	DLINK_FOREACH(ptr, serv_list.head)
+	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 		if(IsCapable(target_p, CAP_ZIP))
@@ -231,7 +231,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 {
 	struct Client *target_p;
 	int wilds;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	const char *old;
 	char *new;
 
@@ -284,7 +284,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		{
 			target_p = NULL;
 
-			DLINK_FOREACH(ptr, global_client_list.head)
+			RB_DLINK_FOREACH(ptr, global_client_list.head)
 			{
 				if(match(new, ((struct Client *) (ptr->data))->name))
 				{
@@ -336,12 +336,12 @@ try_connections(void *unused)
 	struct server_conf *server_p = NULL;
 	struct server_conf *tmp_p;
 	struct Class *cltmp;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int connecting = FALSE;
 	int confrq;
 	time_t next = 0;
 
-	DLINK_FOREACH(ptr, server_conf_list.head)
+	RB_DLINK_FOREACH(ptr, server_conf_list.head)
 	{
 		tmp_p = ptr->data;
 

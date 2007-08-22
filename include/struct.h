@@ -32,7 +32,7 @@
 
 struct User
 {
-	dlink_list channel;	/* chain of channel pointer blocks */
+	rb_dlink_list channel;	/* chain of channel pointer blocks */
 	char *away;		/* pointer to away message */
 	char name[NICKLEN];
 #ifdef ENABLE_SERVICES
@@ -45,8 +45,8 @@ struct Server
 {
 	const char *name;
 	char by[NICKLEN];
-	dlink_list servers;
-	dlink_list users;
+	rb_dlink_list servers;
+	rb_dlink_list users;
 	int caps;		/* capabilities bit-field */
 	char *fullcaps;
 };
@@ -85,8 +85,8 @@ struct servlink_data
 
 struct Client
 {
-	dlink_node node;
-	dlink_node lnode;
+	rb_dlink_node node;
+	rb_dlink_node lnode;
 	struct User *user;	/* ...defined, if this is a User */
 	struct Server *serv;	/* ...defined, if this is a server */
 	struct Client *servptr;	/* Points to server this Client is on */
@@ -128,7 +128,7 @@ struct Client
 	/* list of who has this client on their allow list, its counterpart
 	 * is in LocalUser
 	 */
-	dlink_list on_allow_list;
+	rb_dlink_list on_allow_list;
 
 
 	struct LocalUser *localClient;
@@ -136,7 +136,7 @@ struct Client
 
 struct LocalUser
 {
-	dlink_node tnode;	/* This is the node for the local list type the client is on*/
+	rb_dlink_node tnode;	/* This is the node for the local list type the client is on*/
 	/*
 	 * The following fields are allocated only for local clients
 	 * (directly connected to *this* server with a socket.
@@ -197,12 +197,12 @@ struct LocalUser
 	time_t chal_time;
 	
 	/* clients allowed to talk through +g */
-	dlink_list allow_list;
+	rb_dlink_list allow_list;
 
 	/* nicknames theyre monitoring */
-	dlink_list monitor_list;
+	rb_dlink_list monitor_list;
 
-	dlink_list invited;	/* chain of invite pointer blocks */
+	rb_dlink_list invited;	/* chain of invite pointer blocks */
 
 	/*
 	 * Anti-flood stuff. We track how many messages were parsed and how

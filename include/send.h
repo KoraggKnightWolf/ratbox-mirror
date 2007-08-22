@@ -29,7 +29,7 @@
 
 struct Client;
 struct Channel;
-struct dlink_list;
+struct rb_dlink_list;
 struct monitor;
 
 /* The nasty global also used in s_serv.c for server bursts */

@@ -47,11 +47,11 @@ extern int yyparse(void);
 
 typedef struct _confentry 
 {
-	dlink_node node;
+	rb_dlink_node node;
 	char *entryname;
 	long number;
 	char *string;
-	dlink_list flist;
+	rb_dlink_list flist;
 	unsigned int line;
 	char *filename;
 	int type;
@@ -59,10 +59,10 @@ typedef struct _confentry
 
 typedef struct _conf
 {
-	dlink_node node;
+	rb_dlink_node node;
 	char *confname;
 	char *subname;
-	dlink_list entries;
+	rb_dlink_list entries;
 	char *filename;
 	unsigned int line;
 } conf_t;

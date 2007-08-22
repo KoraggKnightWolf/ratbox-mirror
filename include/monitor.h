@@ -16,7 +16,7 @@ struct monitor
 {
 	struct monitor *hnext;
 	char name[NICKLEN];
-	dlink_list users;
+	rb_dlink_list users;
 };
 
 extern struct rb_bh *monitor_heap;

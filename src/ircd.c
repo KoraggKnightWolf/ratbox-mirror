@@ -83,14 +83,14 @@ int maxconnections;
 struct Client me;		/* That's me */
 struct LocalUser meLocalUser;	/* That's also part of me */
 
-dlink_list global_client_list;
+rb_dlink_list global_client_list;
 
 /* unknown/client pointer lists */
-dlink_list unknown_list;	/* unknown clients ON this server only */
-dlink_list lclient_list;	/* local clients only ON this server */
-dlink_list serv_list;		/* local servers to this server ONLY */
-dlink_list global_serv_list;	/* global servers on the network */
-dlink_list oper_list;		/* our opers, duplicated in lclient_list */
+rb_dlink_list unknown_list;	/* unknown clients ON this server only */
+rb_dlink_list lclient_list;	/* local clients only ON this server */
+rb_dlink_list serv_list;		/* local servers to this server ONLY */
+rb_dlink_list global_serv_list;	/* global servers on the network */
+rb_dlink_list oper_list;		/* our opers, duplicated in lclient_list */
 
 static unsigned long initialVMTop = 0;	/* top of virtual memory at init */
 const char *logFileName = LPATH;
@@ -122,9 +122,9 @@ void
 ircd_shutdown(const char *reason)
 {
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, lclient_list.head)
+	RB_DLINK_FOREACH(ptr, lclient_list.head)
 	{
 		target_p = ptr->data;
 
@@ -133,7 +133,7 @@ ircd_shutdown(const char *reason)
 			me.name, target_p->name, reason);
 	}
 
-	DLINK_FOREACH(ptr, serv_list.head)
+	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 

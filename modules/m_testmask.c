@@ -68,7 +68,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	char *name, *username, *hostname;
 	const char *sockhost;
 	char *gecos = NULL;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	name = LOCAL_COPY(parv[1]);
 	collapse(name);
@@ -105,7 +105,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 		collapse_esc(gecos);
 	}
 
-	DLINK_FOREACH(ptr, global_client_list.head)
+	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		target_p = ptr->data;
 

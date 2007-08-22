@@ -233,7 +233,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	int hop;
 	int hlined = 0;
 	int llined = 0;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	name = parv[1];
 	hop = atoi(parv[2]);
@@ -304,7 +304,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	 * leaf. If so, close the link.
 	 *
 	 */
-	DLINK_FOREACH(ptr, hubleaf_conf_list.head)
+	RB_DLINK_FOREACH(ptr, hubleaf_conf_list.head)
 	{
 		hub_p = ptr->data;
 
@@ -408,7 +408,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	struct Client *target_p;
 	struct remote_conf *hub_p;
 	hook_data_client hdata;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int hop;
 	int hlined = 0;
 	int llined = 0;
@@ -467,7 +467,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	 * H: allows it to introduce a server matching that mask
 	 * L: disallows it introducing a server matching that mask
 	 */
-	DLINK_FOREACH(ptr, hubleaf_conf_list.head)
+	RB_DLINK_FOREACH(ptr, hubleaf_conf_list.head)
 	{
 		hub_p = ptr->data;
 
@@ -630,9 +630,9 @@ struct Client *
 server_exists(const char *servername)
 {
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, global_serv_list.head)
+	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
 		target_p = ptr->data;
 
@@ -648,7 +648,7 @@ check_server(const char *name, struct Client *client_p)
 {
 	struct server_conf *server_p = NULL;
 	struct server_conf *tmp_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int error = -1;
 
 	s_assert(NULL != client_p);
@@ -661,7 +661,7 @@ check_server(const char *name, struct Client *client_p)
 	if(strlen(name) > HOSTLEN)
 		return -4;
 
-	DLINK_FOREACH(ptr, server_conf_list.head)
+	RB_DLINK_FOREACH(ptr, server_conf_list.head)
 	{
 		tmp_p = ptr->data;
 
@@ -887,13 +887,13 @@ start_io(struct Client *server)
  * side effects - client is sent a list of +b, or +e, or +I modes
  */
 static void
-burst_modes_TS5(struct Client *client_p, char *chname, dlink_list *list, char flag)
+burst_modes_TS5(struct Client *client_p, char *chname, rb_dlink_list *list, char flag)
 {
 	char buf[BUFSIZE];
 	char mbuf[MODEBUFLEN];
 	char pbuf[BUFSIZE];
 	struct Ban *banptr;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	int tlen;
 	int mlen;
 	int cur_len;
@@ -907,7 +907,7 @@ burst_modes_TS5(struct Client *client_p, char *chname, dlink_list *list, char fl
 	mp = mbuf;
 	pp = pbuf;
 
-	DLINK_FOREACH(ptr, list->head)
+	RB_DLINK_FOREACH(ptr, list->head)
 	{
 		banptr = ptr->data;
 		tlen = strlen(banptr->banstr) + 3;
@@ -945,10 +945,10 @@ burst_modes_TS5(struct Client *client_p, char *chname, dlink_list *list, char fl
  */
 static void
 burst_modes_TS6(struct Client *client_p, struct Channel *chptr, 
-		dlink_list *list, char flag)
+		rb_dlink_list *list, char flag)
 {
 	char buf[BUFSIZE];
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	struct Ban *banptr;
 	char *t;
 	int tlen;
@@ -959,7 +959,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr,
 				    me.id, (long) chptr->channelts, chptr->chname, flag);
 	t = buf + mlen;
 
-	DLINK_FOREACH(ptr, list->head)
+	RB_DLINK_FOREACH(ptr, list->head)
 	{
 		banptr = ptr->data;
 
@@ -1012,15 +1012,15 @@ burst_TS5(struct Client *client_p)
 	struct membership *msptr;
 	hook_data_client hclientinfo;
 	hook_data_channel hchaninfo;
-	dlink_node *ptr;
-	dlink_node *uptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *uptr;
 	char *t;
 	int tlen, mlen;
 	int cur_len = 0;
 
 	hclientinfo.client = hchaninfo.client = client_p;
 
-	DLINK_FOREACH(ptr, global_client_list.head)
+	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		target_p = ptr->data;
 
@@ -1048,12 +1048,12 @@ burst_TS5(struct Client *client_p)
 		call_hook(h_burst_client, &hclientinfo);
 	}
 
-	DLINK_FOREACH(ptr, global_channel_list.head)
+	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
 		chptr = ptr->data;
 
-		s_assert(rb_dlink_list_length(&chptr->members) > 0);
-		if(rb_dlink_list_length(&chptr->members) <= 0)
+		s_assert(rb_rb_dlink_list_length(&chptr->members) > 0);
+		if(rb_rb_dlink_list_length(&chptr->members) <= 0)
 			continue;
 
 		if(*chptr->chname != '#')
@@ -1065,7 +1065,7 @@ burst_TS5(struct Client *client_p)
 
 		t = buf + mlen;
 
-		DLINK_FOREACH(uptr, chptr->members.head)
+		RB_DLINK_FOREACH(uptr, chptr->members.head)
 		{
 			msptr = uptr->data;
 
@@ -1137,15 +1137,15 @@ burst_TS6(struct Client *client_p)
 	struct membership *msptr;
 	hook_data_client hclientinfo;
 	hook_data_channel hchaninfo;
-	dlink_node *ptr;
-	dlink_node *uptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *uptr;
 	char *t;
 	int tlen, mlen;
 	int cur_len = 0;
 
 	hclientinfo.client = hchaninfo.client = client_p;
 
-	DLINK_FOREACH(ptr, global_client_list.head)
+	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		target_p = ptr->data;
 
@@ -1185,12 +1185,12 @@ burst_TS6(struct Client *client_p)
 		call_hook(h_burst_client, &hclientinfo);
 	}
 
-	DLINK_FOREACH(ptr, global_channel_list.head)
+	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
 		chptr = ptr->data;
 
-		s_assert(rb_dlink_list_length(&chptr->members) > 0);
-		if(rb_dlink_list_length(&chptr->members) <= 0)
+		s_assert(rb_rb_dlink_list_length(&chptr->members) > 0);
+		if(rb_rb_dlink_list_length(&chptr->members) <= 0)
 			continue;
 
 		if(*chptr->chname != '#')
@@ -1202,7 +1202,7 @@ burst_TS6(struct Client *client_p)
 
 		t = buf + mlen;
 
-		DLINK_FOREACH(uptr, chptr->members.head)
+		RB_DLINK_FOREACH(uptr, chptr->members.head)
 		{
 			msptr = uptr->data;
 
@@ -1231,15 +1231,15 @@ burst_TS6(struct Client *client_p)
 		*(t-1) = '\0';
 		sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 
-		if(rb_dlink_list_length(&chptr->banlist) > 0)
+		if(rb_rb_dlink_list_length(&chptr->banlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->banlist, 'b');
 
 		if(IsCapable(client_p, CAP_EX) &&
-		   rb_dlink_list_length(&chptr->exceptlist) > 0)
+		   rb_rb_dlink_list_length(&chptr->exceptlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->exceptlist, 'e');
 
 		if(IsCapable(client_p, CAP_IE) &&
-		   rb_dlink_list_length(&chptr->invexlist) > 0)
+		   rb_rb_dlink_list_length(&chptr->invexlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->invexlist, 'I');
 
 		if(IsCapable(client_p, CAP_TB) && chptr->topic != NULL)
@@ -1272,7 +1272,7 @@ server_estab(struct Client *client_p)
 	struct server_conf *server_p;
 	hook_data_client hdata;
 	const char *host;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	s_assert(NULL != client_p);
 	if(client_p == NULL)
@@ -1444,7 +1444,7 @@ server_estab(struct Client *client_p)
 	 ** need to send different names to different servers
 	 ** (domain name matching) Send new server to other servers.
 	 */
-	DLINK_FOREACH(ptr, serv_list.head)
+	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 
@@ -1493,7 +1493,7 @@ server_estab(struct Client *client_p)
 	 **    see previous *WARNING*!!! (Also, original inpath
 	 **    is destroyed...)
 	 */
-	DLINK_FOREACH(ptr, global_serv_list.head)
+	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
 		target_p = ptr->data;
 

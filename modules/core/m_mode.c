@@ -78,7 +78,7 @@ static void set_channel_mode(struct Client *, struct Client *,
 			     int, const char **);
 
 static int add_id(struct Client *source_p, struct Channel *chptr, 
-		  const char *banid, dlink_list *list, long mode_type);
+		  const char *banid, rb_dlink_list *list, long mode_type);
 
 static struct ChModeChange mode_changes[BUFSIZE];
 static int mode_count;
@@ -247,7 +247,7 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 	static char modebuf[BUFSIZE];
 	static char parabuf[BUFSIZE];
 	struct Channel *chptr;
-	dlink_list *banlist;
+	rb_dlink_list *banlist;
 	const char *s;
 	char *t;
 	char *mbuf;
@@ -395,26 +395,26 @@ nextban:
  */
 static int
 add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
-       dlink_list *list, long mode_type)
+       rb_dlink_list *list, long mode_type)
 {
 	struct Ban *actualBan;
 	static char who[BANLEN];
 	char *realban = LOCAL_COPY(banid);
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	/* dont let local clients overflow the banlist, or set redundant
 	 * bans
 	 */
 	if(MyClient(source_p))
 	{
-		if((rb_dlink_list_length(&chptr->banlist) + rb_dlink_list_length(&chptr->exceptlist) + rb_dlink_list_length(&chptr->invexlist)) >= (unsigned long)ConfigChannel.max_bans)
+		if((rb_rb_dlink_list_length(&chptr->banlist) + rb_rb_dlink_list_length(&chptr->exceptlist) + rb_rb_dlink_list_length(&chptr->invexlist)) >= (unsigned long)ConfigChannel.max_bans)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_BANLISTFULL),
 				   me.name, source_p->name, chptr->chname, realban);
 			return 0;
 		}
 
-		DLINK_FOREACH(ptr, list->head)
+		RB_DLINK_FOREACH(ptr, list->head)
 		{
 			actualBan = ptr->data;
 			if(match(actualBan->banstr, realban))
@@ -424,7 +424,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 	/* dont let remotes set duplicates */
 	else
 	{
-		DLINK_FOREACH(ptr, list->head)
+		RB_DLINK_FOREACH(ptr, list->head)
 		{
 			actualBan = ptr->data;
 			if(!irccmp(actualBan->banstr, realban))
@@ -458,16 +458,16 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
  * side effects - given id is removed from the appropriate list
  */
 static int
-del_id(struct Channel *chptr, const char *banid, dlink_list *list,
+del_id(struct Channel *chptr, const char *banid, rb_dlink_list *list,
        long mode_type)
 {
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	struct Ban *banptr;
 
 	if(EmptyString(banid))
 		return 0;
 
-	DLINK_FOREACH(ptr, list->head)
+	RB_DLINK_FOREACH(ptr, list->head)
 	{
 		banptr = ptr->data;
 
@@ -735,8 +735,8 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 {
 	const char *mask;
 	const char *raw_mask;
-	dlink_list *list;
-	dlink_node *ptr;
+	rb_dlink_list *list;
+	rb_dlink_node *ptr;
 	struct Ban *banptr;
 	int errorval;
 	int rpl_list;
@@ -814,7 +814,7 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 			return;
 		}
 
-		DLINK_FOREACH(ptr, list->head)
+		RB_DLINK_FOREACH(ptr, list->head)
 		{
 			banptr = ptr->data;
 			sendto_one(source_p, POP_QUEUE, form_str(rpl_list),
@@ -1469,7 +1469,7 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 	}
 
 	/* only propagate modes originating locally, or if we're hubbing */
-	if(MyClient(source_p) || rb_dlink_list_length(&serv_list) > 1)
+	if(MyClient(source_p) || rb_rb_dlink_list_length(&serv_list) > 1)
 		send_cap_mode_changes(client_p, source_p, chptr, mode_changes, mode_count);
 }
 

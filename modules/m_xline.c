@@ -136,7 +136,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(!match(target_server, me.name))
 			return 0;
 	}
-	else if(rb_dlink_list_length(&cluster_conf_list) > 0)
+	else if(rb_rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "XLINE",
 				(temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE,
 				"%d %s 2 :%s",
@@ -261,10 +261,10 @@ check_xlines(void)
 {
 	struct Client *client_p;
 	struct ConfItem *aconf;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 	{
 		client_p = ptr->data;
 
@@ -367,7 +367,7 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
-	else if(rb_dlink_list_length(&cluster_conf_list))
+	else if(rb_rb_dlink_list_length(&cluster_conf_list))
 		cluster_generic(source_p, "UNXLINE", SHARED_UNXLINE, 
 				"%s", parv[1]);
 
@@ -398,9 +398,9 @@ static void
 remove_xline(struct Client *source_p, const char *name)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
-	DLINK_FOREACH(ptr, xline_conf_list.head)
+	RB_DLINK_FOREACH(ptr, xline_conf_list.head)
 	{
 		aconf = ptr->data;
 

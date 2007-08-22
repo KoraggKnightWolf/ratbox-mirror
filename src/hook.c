@@ -188,12 +188,12 @@ void
 call_hook(int id, void *arg)
 {
 	hookfn fn;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	/* The ID we were passed is the position in the hook table of this
 	 * hook
 	 */
-	DLINK_FOREACH(ptr, hooks[id].hooks.head)
+	RB_DLINK_FOREACH(ptr, hooks[id].hooks.head)
 	{
 		fn = ptr->data;
 		fn(arg);

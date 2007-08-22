@@ -114,12 +114,12 @@ static void
 rehash_glines(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr, *next_ptr;
+	rb_dlink_node *ptr, *next_ptr;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is clearing G-lines",
 				get_oper_name(source_p));
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, glines.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, glines.head)
 	{
 		aconf = ptr->data;
 
@@ -132,13 +132,13 @@ static void
 rehash_pglines(struct Client *source_p)
 {
 	struct gline_pending *glp_ptr;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is clearing pending glines",
 				get_oper_name(source_p));
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, pending_glines.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, pending_glines.head)
 	{
 		glp_ptr = ptr->data;
 
@@ -153,7 +153,7 @@ static void
 rehash_tklines(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr, *next_ptr;
+	rb_dlink_node *ptr, *next_ptr;
 	int i;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is clearing temp klines",
@@ -161,7 +161,7 @@ rehash_tklines(struct Client *source_p)
 
 	for(i = 0; i < LAST_TEMP_TYPE; i++)
 	{
-		DLINK_FOREACH_SAFE(ptr, next_ptr, temp_klines[i].head)
+		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, temp_klines[i].head)
 		{
 			aconf = ptr->data;
 
@@ -175,7 +175,7 @@ static void
 rehash_tdlines(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr, *next_ptr;
+	rb_dlink_node *ptr, *next_ptr;
 	int i;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is clearing temp dlines",
@@ -183,7 +183,7 @@ rehash_tdlines(struct Client *source_p)
 
 	for(i = 0; i < LAST_TEMP_TYPE; i++)
 	{
-		DLINK_FOREACH_SAFE(ptr, next_ptr, temp_dlines[i].head)
+		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, temp_dlines[i].head)
 		{
 			aconf = ptr->data;
 
@@ -197,13 +197,13 @@ static void
 rehash_txlines(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is clearing temp xlines",
 				get_oper_name(source_p));
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, xline_conf_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, xline_conf_list.head)
 	{
 		aconf = ptr->data;
 
@@ -219,8 +219,8 @@ static void
 rehash_tresvs(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 	int i;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is clearing temp resvs",
@@ -238,7 +238,7 @@ rehash_tresvs(struct Client *source_p)
 	}
 	HASH_WALK_END
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
 	{
 		aconf = ptr->data;
 

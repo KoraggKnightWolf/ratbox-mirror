@@ -63,7 +63,7 @@ static void set_final_mode(struct Client *, struct Channel *,
 			struct Mode *, struct Mode *);
 static void remove_our_modes(struct Channel *chptr);
 static void remove_ban_list(struct Channel *chptr, struct Client *source_p,
-			    dlink_list *list, char c, int cap, int mems);
+			    rb_dlink_list *list, char c, int cap, int mems);
 
 /*
  * m_join
@@ -178,7 +178,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			if(IsMember(source_p, chptr))
 				continue;
 		
-			if(rb_dlink_list_length(&chptr->members) == 0)
+			if(rb_rb_dlink_list_length(&chptr->members) == 0)
 				flags = CHFL_CHANOP;
 			else
 				flags = 0;
@@ -196,10 +196,10 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			flags = CHFL_CHANOP;
 		}
 
-		if((rb_dlink_list_length(&source_p->user->channel) >= 
+		if((rb_rb_dlink_list_length(&source_p->user->channel) >= 
 					(unsigned long)ConfigChannel.max_chans_per_user) &&
 		   (!IsOper(source_p) || 
-		    (rb_dlink_list_length(&source_p->user->channel) >=
+		    (rb_rb_dlink_list_length(&source_p->user->channel) >=
 				 (unsigned long)ConfigChannel.max_chans_per_user * 3)))
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYCHANNELS),
@@ -803,15 +803,15 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	 */
 	if(!keep_our_modes && source_p->id[0] != '\0')
 	{
-		if(rb_dlink_list_length(&chptr->banlist) > 0)
+		if(rb_rb_dlink_list_length(&chptr->banlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->banlist,
 					'b', NOCAPS, ALL_MEMBERS);
 
-		if(rb_dlink_list_length(&chptr->exceptlist) > 0)
+		if(rb_rb_dlink_list_length(&chptr->exceptlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->exceptlist,
 					'e', CAP_EX, ONLY_CHANOPS);
 
-		if(rb_dlink_list_length(&chptr->invexlist) > 0)
+		if(rb_rb_dlink_list_length(&chptr->invexlist) > 0)
 			remove_ban_list(chptr, source_p, &chptr->invexlist,
 					'I', CAP_IE, ONLY_CHANOPS);
 
@@ -838,7 +838,7 @@ do_join_0(struct Client *client_p, struct Client *source_p)
 {
 	struct membership *msptr;
 	struct Channel *chptr = NULL;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	/* Finish the flood grace period... */
 	if(MyClient(source_p) && !IsFloodDone(source_p))
@@ -899,8 +899,8 @@ check_channel_name_loc(struct Client *source_p, const char *name)
 static int
 can_join(struct Client *source_p, struct Channel *chptr, char *key)
 {
-	dlink_node *lp;
-	dlink_node *ptr;
+	rb_dlink_node *lp;
+	rb_dlink_node *ptr;
 	struct Ban *invex = NULL;
 	char src_host[NICKLEN + USERLEN + HOSTLEN + 6];
 	char src_iphost[NICKLEN + USERLEN + HOSTLEN + 6];
@@ -917,7 +917,7 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 
 	if(chptr->mode.mode & MODE_INVITEONLY)
 	{
-		DLINK_FOREACH(lp, source_p->localClient->invited.head)
+		RB_DLINK_FOREACH(lp, source_p->localClient->invited.head)
 		{
 			if(lp->data == chptr)
 				break;
@@ -926,7 +926,7 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 		{
 			if(!ConfigChannel.use_invex)
 				return (ERR_INVITEONLYCHAN);
-			DLINK_FOREACH(ptr, chptr->invexlist.head)
+			RB_DLINK_FOREACH(ptr, chptr->invexlist.head)
 			{
 				invex = ptr->data;
 				if(match(invex->banstr, src_host)
@@ -943,7 +943,7 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 		return (ERR_BADCHANNELKEY);
 
 	if(chptr->mode.limit && 
-	   rb_dlink_list_length(&chptr->members) >= (unsigned long)chptr->mode.limit)
+	   rb_rb_dlink_list_length(&chptr->members) >= (unsigned long)chptr->mode.limit)
 		return (ERR_CHANNELISFULL);
 
 #ifdef ENABLE_SERVICES
@@ -1081,7 +1081,7 @@ static void
 remove_our_modes(struct Channel *chptr)
 {
 	struct membership *msptr;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	char lmodebuf[MODEBUFLEN];
 	const char *lpara[MAXMODEPARAMS];
 	char *mbuf;
@@ -1094,7 +1094,7 @@ remove_our_modes(struct Channel *chptr)
 	for(i = 0; i < MAXMODEPARAMS; i++)
 		lpara[i] = NULL;
 
-	DLINK_FOREACH(ptr, chptr->members.head)
+	RB_DLINK_FOREACH(ptr, chptr->members.head)
 	{
 		msptr = ptr->data;
 
@@ -1178,13 +1178,13 @@ remove_our_modes(struct Channel *chptr)
  */
 static void
 remove_ban_list(struct Channel *chptr, struct Client *source_p,
-		dlink_list *list, char c, int cap, int mems)
+		rb_dlink_list *list, char c, int cap, int mems)
 {
 	static char lmodebuf[BUFSIZE];
 	static char lparabuf[BUFSIZE];
 	struct Ban *banptr;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 	char *mbuf, *pbuf;
 	int count = 0;
 	int cur_len, mlen, plen;
@@ -1195,7 +1195,7 @@ remove_ban_list(struct Channel *chptr, struct Client *source_p,
 				    source_p->name, chptr->chname);
 	mbuf = lmodebuf + mlen;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, list->head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, list->head)
 	{
 		banptr = ptr->data;
 

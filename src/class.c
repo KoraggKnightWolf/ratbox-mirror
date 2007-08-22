@@ -40,7 +40,7 @@
 #define BAD_PING                -2
 #define BAD_CLIENT_CLASS        -3
 
-dlink_list class_list;
+rb_dlink_list class_list;
 struct Class *default_class;
 
 struct Class *
@@ -207,12 +207,12 @@ struct Class *
 find_class(const char *classname)
 {
 	struct Class *cltmp;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if(classname == NULL)
 		return default_class;
 
-	DLINK_FOREACH(ptr, class_list.head)
+	RB_DLINK_FOREACH(ptr, class_list.head)
 	{
 		cltmp = ptr->data;
 
@@ -234,10 +234,10 @@ void
 check_class()
 {
 	struct Class *cltmp;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, class_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, class_list.head)
 	{
 		cltmp = ptr->data;
 

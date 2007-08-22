@@ -61,7 +61,7 @@ gline_pending_t;
 #define GLINE_PENDING_EXPIRE 600
 #define CLEANUP_GLINES_TIME  300
 
-extern dlink_list pending_glines;
-extern dlink_list glines;
+extern rb_dlink_list pending_glines;
+extern rb_dlink_list glines;
 
 #endif

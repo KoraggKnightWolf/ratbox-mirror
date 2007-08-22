@@ -42,7 +42,7 @@
 #include "s_log.h"
 
 struct config_channel_entry ConfigChannel;
-dlink_list global_channel_list;
+rb_dlink_list global_channel_list;
 static rb_bh *channel_heap;
 static rb_bh *ban_heap;
 static rb_bh *topic_heap;
@@ -124,7 +124,7 @@ struct membership *
 find_channel_membership(struct Channel *chptr, struct Client *client_p)
 {
 	struct membership *msptr;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if(!IsClient(client_p))
 		return NULL;
@@ -132,9 +132,9 @@ find_channel_membership(struct Channel *chptr, struct Client *client_p)
 	/* Pick the most efficient list to use to be nice to things like
 	 * CHANSERV which could be in a large number of channels
 	 */
-	if(rb_dlink_list_length(&chptr->members) < rb_dlink_list_length(&client_p->user->channel))
+	if(rb_rb_dlink_list_length(&chptr->members) < rb_rb_dlink_list_length(&client_p->user->channel))
 	{
-		DLINK_FOREACH(ptr, chptr->members.head)
+		RB_DLINK_FOREACH(ptr, chptr->members.head)
 		{
 			msptr = ptr->data;
 
@@ -144,7 +144,7 @@ find_channel_membership(struct Channel *chptr, struct Client *client_p)
 	}
 	else
 	{
-		DLINK_FOREACH(ptr, client_p->user->channel.head)
+		RB_DLINK_FOREACH(ptr, client_p->user->channel.head)
 		{
 			msptr = ptr->data;
 
@@ -236,7 +236,7 @@ remove_user_from_channel(struct membership *msptr)
 	if(client_p->servptr == &me)
 		rb_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-	if(rb_dlink_list_length(&chptr->members) <= 0)
+	if(rb_rb_dlink_list_length(&chptr->members) <= 0)
 		destroy_channel(chptr);
 
 	rb_bh_free(member_heap, msptr);
@@ -255,13 +255,13 @@ remove_user_from_channels(struct Client *client_p)
 {
 	struct Channel *chptr;
 	struct membership *msptr;
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 
 	if(client_p == NULL)
 		return;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->user->channel.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->user->channel.head)
 	{
 		msptr = ptr->data;
 		chptr = msptr->chptr;
@@ -271,7 +271,7 @@ remove_user_from_channels(struct Client *client_p)
 		if(client_p->servptr == &me)
 			rb_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-		if(rb_dlink_list_length(&chptr->members) <= 0)
+		if(rb_rb_dlink_list_length(&chptr->members) <= 0)
 			destroy_channel(chptr);
 
 		rb_bh_free(member_heap, msptr);
@@ -292,12 +292,12 @@ void
 invalidate_bancache_user(struct Client *client_p)
 {
 	struct membership *msptr;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 
 	if(client_p == NULL)
 		return;
 
-	DLINK_FOREACH(ptr, client_p->user->channel.head)
+	RB_DLINK_FOREACH(ptr, client_p->user->channel.head)
 	{
 		msptr = ptr->data;
 		msptr->bants = 0;
@@ -334,13 +334,13 @@ check_channel_name(const char *name)
  * side effects - list of b/e/I modes is cleared
  */
 void
-free_channel_list(dlink_list *list)
+free_channel_list(rb_dlink_list *list)
 {
-	dlink_node *ptr;
-	dlink_node *next_ptr;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
 	struct Ban *actualBan;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, list->head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, list->head)
 	{
 		actualBan = ptr->data;
 		free_ban(actualBan);
@@ -359,9 +359,9 @@ free_channel_list(dlink_list *list)
 void
 destroy_channel(struct Channel *chptr)
 {
-	dlink_node *ptr, *next_ptr;
+	rb_dlink_node *ptr, *next_ptr;
 
-	DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->invites.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->invites.head)
 	{
 		del_invite(chptr, ptr->data);
 	}
@@ -406,7 +406,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 {
 	struct membership *msptr;
 	struct Client *target_p;
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	char lbuf[BUFSIZE];
 	char *t;
 	int mlen;
@@ -426,7 +426,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 
 		t = lbuf + cur_len;
 
-		DLINK_FOREACH(ptr, chptr->members.head)
+		RB_DLINK_FOREACH(ptr, chptr->members.head)
 		{
 			msptr = ptr->data;
 			target_p = msptr->client_p;
@@ -497,7 +497,7 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 {
 	char src_host[NICKLEN + USERLEN + HOSTLEN + 6];
 	char src_iphost[NICKLEN + USERLEN + HOSTLEN + 6];
-	dlink_node *ptr;
+	rb_dlink_node *ptr;
 	struct Ban *actualBan = NULL;
 	struct Ban *actualExcept = NULL;
 
@@ -516,7 +516,7 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 		s2 = src_iphost;
 	}
 
-	DLINK_FOREACH(ptr, chptr->banlist.head)
+	RB_DLINK_FOREACH(ptr, chptr->banlist.head)
 	{
 		actualBan = ptr->data;
 		if(match(actualBan->banstr, s) ||
@@ -529,7 +529,7 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 
 	if((actualBan != NULL) && ConfigChannel.use_except)
 	{
-		DLINK_FOREACH(ptr, chptr->exceptlist.head)
+		RB_DLINK_FOREACH(ptr, chptr->exceptlist.head)
 		{
 			actualExcept = ptr->data;
 
