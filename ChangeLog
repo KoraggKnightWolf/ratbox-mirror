@@ -1,3 +1,37 @@
+androsyn    2007/08/23 15:15:35 UTC	(20070823_0-24260)
+  Log:
+  change stupid rb_rb_dlink stuff to rb_dlink
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_olist.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_accept.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_invite.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_knock.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_list.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_locops.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_lusers.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_map.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2007/08/22 19:15:08 UTC	(20070822_1-24250)
   Log:
   match the libratbox rename of dlink_* to rb_dlink_
