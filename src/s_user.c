@@ -181,31 +181,31 @@ show_lusers(struct Client *source_p)
 {
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSERCLIENT, form_str(RPL_LUSERCLIENT),
 			   (Count.total - Count.invisi),
-			   Count.invisi, rb_rb_dlink_list_length(&global_serv_list));
+			   Count.invisi, rb_dlink_list_length(&global_serv_list));
 
 	if(Count.oper > 0)
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSEROP, 
 				   form_str(RPL_LUSEROP), Count.oper);
 
-	if(rb_rb_dlink_list_length(&unknown_list) > 0)
+	if(rb_dlink_list_length(&unknown_list) > 0)
 		sendto_one_numeric(source_p, HOLD_QUEUE,  RPL_LUSERUNKNOWN, 
 				   form_str(RPL_LUSERUNKNOWN),
-				   rb_rb_dlink_list_length(&unknown_list));
+				   rb_dlink_list_length(&unknown_list));
 
-	if(rb_rb_dlink_list_length(&global_channel_list) > 0)
+	if(rb_dlink_list_length(&global_channel_list) > 0)
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSERCHANNELS, 
 				   form_str(RPL_LUSERCHANNELS),
-				   rb_rb_dlink_list_length(&global_channel_list));
+				   rb_dlink_list_length(&global_channel_list));
 
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSERME, form_str(RPL_LUSERME),
-			   rb_rb_dlink_list_length(&lclient_list),
-			   rb_rb_dlink_list_length(&serv_list));
+			   rb_dlink_list_length(&lclient_list),
+			   rb_dlink_list_length(&serv_list));
 
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LOCALUSERS, 
 			   form_str(RPL_LOCALUSERS),
-			   rb_rb_dlink_list_length(&lclient_list),
+			   rb_dlink_list_length(&lclient_list),
 			   Count.max_loc,
-			   rb_rb_dlink_list_length(&lclient_list),
+			   rb_dlink_list_length(&lclient_list),
 			   Count.max_loc);
 
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_GLOBALUSERS, form_str(RPL_GLOBALUSERS),
@@ -217,13 +217,13 @@ show_lusers(struct Client *source_p)
 			   MaxConnectionCount, MaxClientCount, 
 			   Count.totalrestartcount);
 
-	if(rb_rb_dlink_list_length(&lclient_list) > (unsigned long)MaxClientCount)
-		MaxClientCount = rb_rb_dlink_list_length(&lclient_list);
+	if(rb_dlink_list_length(&lclient_list) > (unsigned long)MaxClientCount)
+		MaxClientCount = rb_dlink_list_length(&lclient_list);
 
-	if((rb_rb_dlink_list_length(&lclient_list) + rb_rb_dlink_list_length(&serv_list)) >
+	if((rb_dlink_list_length(&lclient_list) + rb_dlink_list_length(&serv_list)) >
 	   (unsigned long)MaxConnectionCount)
-		MaxConnectionCount = rb_rb_dlink_list_length(&lclient_list) + 
-					rb_rb_dlink_list_length(&serv_list);
+		MaxConnectionCount = rb_dlink_list_length(&lclient_list) + 
+					rb_dlink_list_length(&serv_list);
 	send_pop_queue(source_p);
 
 	return 0;
@@ -441,9 +441,9 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	 *   -Taner
 	 */
 	/* Except "F:" clients */
-	if(((rb_rb_dlink_list_length(&lclient_list) + 1) >= 
+	if(((rb_dlink_list_length(&lclient_list) + 1) >= 
 	   ((unsigned long)GlobalSetOptions.maxclients + MAX_BUFFER) ||
-	   (rb_rb_dlink_list_length(&lclient_list) + 1) >= 
+	   (rb_dlink_list_length(&lclient_list) + 1) >= 
 	    ((unsigned long)GlobalSetOptions.maxclients - 5)) && !(IsExemptLimits(source_p)))
 	{
 		sendto_realops_flags(UMODE_FULL, L_ALL,
@@ -530,9 +530,9 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 
 	s_assert(source_p->localClient != NULL);
 
-	if(rb_rb_dlink_list_length(&lclient_list) > (unsigned long)Count.max_loc)
+	if(rb_dlink_list_length(&lclient_list) > (unsigned long)Count.max_loc)
 	{
-		Count.max_loc = rb_rb_dlink_list_length(&lclient_list);
+		Count.max_loc = rb_dlink_list_length(&lclient_list);
 		if(!(Count.max_loc % 10))
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "New Max Local Clients: %d", Count.max_loc);

@@ -102,7 +102,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 		if(EmptyString(name) || strlen(name) > NICKLEN-1)
 			continue;
 
-		if((int)rb_rb_dlink_list_length(&client_p->localClient->monitor_list) >=
+		if((int)rb_dlink_list_length(&client_p->localClient->monitor_list) >=
 			ConfigFileEntry.max_monitor)
 		{
 			char buf[100];
@@ -187,7 +187,7 @@ del_monitor(struct Client *client_p, const char *nicks)
 	char *tmp;
 	char *p;
 
-	if(!rb_rb_dlink_list_length(&client_p->localClient->monitor_list))
+	if(!rb_dlink_list_length(&client_p->localClient->monitor_list))
 		return;
 
 	tmp = LOCAL_COPY(nicks);
@@ -215,7 +215,7 @@ list_monitor(struct Client *client_p)
 	rb_dlink_node *ptr;
 	int mlen, arglen, cur_len;
 
-	if(!rb_rb_dlink_list_length(&client_p->localClient->monitor_list))
+	if(!rb_dlink_list_length(&client_p->localClient->monitor_list))
 	{
 		sendto_one(client_p, POP_QUEUE, form_str(RPL_ENDOFMONLIST),
 				me.name, client_p->name);
@@ -336,7 +336,7 @@ static void cleanup_monitor(void *unused)
 		{
 			next_ptr = ptr->hnext;
 
-			if(!rb_rb_dlink_list_length(&ptr->users))
+			if(!rb_dlink_list_length(&ptr->users))
 			{
 				if(last_ptr)
 					last_ptr->hnext = next_ptr;

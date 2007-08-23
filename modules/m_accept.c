@@ -99,7 +99,7 @@ m_accept(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 
 	/* get the number of accepts they have */
-	accept_num = rb_rb_dlink_list_length(&source_p->localClient->allow_list);
+	accept_num = rb_dlink_list_length(&source_p->localClient->allow_list);
 
 	/* parse the add list */
 	for (nick = strtok_r(addbuf, ",", &p); nick; nick = strtok_r(NULL, ",", &p), accept_num++)

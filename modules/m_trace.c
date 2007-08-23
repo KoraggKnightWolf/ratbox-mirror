@@ -337,7 +337,7 @@ count_downlinks(struct Client *server_p, int *pservcount, int *pusercount)
 	rb_dlink_node *ptr;
 
 	(*pservcount)++;
-	*pusercount += rb_rb_dlink_list_length(&server_p->serv->users);
+	*pusercount += rb_dlink_list_length(&server_p->serv->users);
 	RB_DLINK_FOREACH(ptr, server_p->serv->servers.head)
 	{
 		count_downlinks(ptr->data, pservcount, pusercount);

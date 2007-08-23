@@ -407,7 +407,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 	 */
 	if(MyClient(source_p))
 	{
-		if((rb_rb_dlink_list_length(&chptr->banlist) + rb_rb_dlink_list_length(&chptr->exceptlist) + rb_rb_dlink_list_length(&chptr->invexlist)) >= (unsigned long)ConfigChannel.max_bans)
+		if((rb_dlink_list_length(&chptr->banlist) + rb_dlink_list_length(&chptr->exceptlist) + rb_dlink_list_length(&chptr->invexlist)) >= (unsigned long)ConfigChannel.max_bans)
 		{
 			sendto_one(source_p, POP_QUEUE, form_str(ERR_BANLISTFULL),
 				   me.name, source_p->name, chptr->chname, realban);
@@ -1469,7 +1469,7 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 	}
 
 	/* only propagate modes originating locally, or if we're hubbing */
-	if(MyClient(source_p) || rb_rb_dlink_list_length(&serv_list) > 1)
+	if(MyClient(source_p) || rb_dlink_list_length(&serv_list) > 1)
 		send_cap_mode_changes(client_p, source_p, chptr, mode_changes, mode_count);
 }
 

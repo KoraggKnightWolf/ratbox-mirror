@@ -169,7 +169,7 @@ send_oper_motd(struct Client *source_p)
 	struct cacheline *lineptr;
 	rb_dlink_node *ptr;
 
-	if(oper_motd == NULL || rb_rb_dlink_list_length(&oper_motd->contents) == 0)
+	if(oper_motd == NULL || rb_dlink_list_length(&oper_motd->contents) == 0)
 		return;
 
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_OMOTDSTART), 

@@ -113,14 +113,14 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 	}
 
 	rb_snprintf(buf + USER_COL, BUFSIZE - USER_COL,
-		 " | Users: %5lu (%4.1f%%)", rb_rb_dlink_list_length(&root_p->serv->users),
-		 100 * (float) rb_rb_dlink_list_length(&root_p->serv->users) / (float) Count.total);
+		 " | Users: %5lu (%4.1f%%)", rb_dlink_list_length(&root_p->serv->users),
+		 100 * (float) rb_dlink_list_length(&root_p->serv->users) / (float) Count.total);
 
 	sendto_one(client_p, HOLD_QUEUE, form_str(RPL_MAP), me.name, client_p->name, buf);
 
 	if(root_p->serv->servers.head != NULL)
 	{
-		cnt += rb_rb_dlink_list_length(&root_p->serv->servers);
+		cnt += rb_dlink_list_length(&root_p->serv->servers);
 
 		if(cnt)
 		{

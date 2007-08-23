@@ -1651,7 +1651,7 @@ free_user(struct User *user, struct Client *client_p)
 				     client_p->host,
 				     (unsigned long) user,
 				     (unsigned long) user->channel.head, 
-				     rb_rb_dlink_list_length(&user->channel));
+				     rb_dlink_list_length(&user->channel));
 		s_assert(!user->channel.head);
 	}
 

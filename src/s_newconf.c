@@ -748,7 +748,7 @@ expire_temp_rxlines(void *unused)
 unsigned long
 get_nd_count(void)
 {
-	return(rb_rb_dlink_list_length(&nd_list));
+	return(rb_dlink_list_length(&nd_list));
 }
 
 

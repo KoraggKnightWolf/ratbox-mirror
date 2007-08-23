@@ -121,7 +121,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(match(target_server, me.name) == 0)
 			return 0;
 	}
-	else if(rb_rb_dlink_list_length(&cluster_conf_list) > 0)
+	else if(rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "RESV",
 				(temp_time > 0) ? SHARED_TRESV : SHARED_PRESV,
 				"%d %s 0 :%s",
@@ -336,7 +336,7 @@ mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
-	else if(rb_rb_dlink_list_length(&cluster_conf_list) > 0)
+	else if(rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "UNRESV", SHARED_UNRESV, 
 				"%s", parv[1]);
 

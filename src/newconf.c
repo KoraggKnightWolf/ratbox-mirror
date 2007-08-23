@@ -1832,7 +1832,7 @@ conf_set_shared_oper(confentry_t * entry, conf_t * conf, struct conf_items *item
 	char *username, *p;
 	int len;
 
-	len = rb_rb_dlink_list_length(&entry->flist);
+	len = rb_dlink_list_length(&entry->flist);
 
 	if(len > 2)
 	{

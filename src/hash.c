@@ -696,13 +696,13 @@ count_hash(struct Client *source_p, rb_dlink_list *table, int length, const char
 	
 	for(i = 0; i < length; i++)
 	{
-		if(rb_rb_dlink_list_length(&table[i]) >= 10)
+		if(rb_dlink_list_length(&table[i]) >= 10)
 			counts[10]++;
 		else
-			counts[rb_rb_dlink_list_length(&table[i])]++;
+			counts[rb_dlink_list_length(&table[i])]++;
 
-		if(rb_rb_dlink_list_length(&table[i]) > deepest)
-			deepest = rb_rb_dlink_list_length(&table[i]);
+		if(rb_dlink_list_length(&table[i]) > deepest)
+			deepest = rb_dlink_list_length(&table[i]);
 	}
 
 	output_hash(source_p, name, length, counts, deepest);

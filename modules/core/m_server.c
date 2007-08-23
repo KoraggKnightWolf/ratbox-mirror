@@ -1052,8 +1052,8 @@ burst_TS5(struct Client *client_p)
 	{
 		chptr = ptr->data;
 
-		s_assert(rb_rb_dlink_list_length(&chptr->members) > 0);
-		if(rb_rb_dlink_list_length(&chptr->members) <= 0)
+		s_assert(rb_dlink_list_length(&chptr->members) > 0);
+		if(rb_dlink_list_length(&chptr->members) <= 0)
 			continue;
 
 		if(*chptr->chname != '#')
@@ -1189,8 +1189,8 @@ burst_TS6(struct Client *client_p)
 	{
 		chptr = ptr->data;
 
-		s_assert(rb_rb_dlink_list_length(&chptr->members) > 0);
-		if(rb_rb_dlink_list_length(&chptr->members) <= 0)
+		s_assert(rb_dlink_list_length(&chptr->members) > 0);
+		if(rb_dlink_list_length(&chptr->members) <= 0)
 			continue;
 
 		if(*chptr->chname != '#')
@@ -1231,15 +1231,15 @@ burst_TS6(struct Client *client_p)
 		*(t-1) = '\0';
 		sendto_one_buffer(client_p, HOLD_QUEUE, buf);
 
-		if(rb_rb_dlink_list_length(&chptr->banlist) > 0)
+		if(rb_dlink_list_length(&chptr->banlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->banlist, 'b');
 
 		if(IsCapable(client_p, CAP_EX) &&
-		   rb_rb_dlink_list_length(&chptr->exceptlist) > 0)
+		   rb_dlink_list_length(&chptr->exceptlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->exceptlist, 'e');
 
 		if(IsCapable(client_p, CAP_IE) &&
-		   rb_rb_dlink_list_length(&chptr->invexlist) > 0)
+		   rb_dlink_list_length(&chptr->invexlist) > 0)
 			burst_modes_TS6(client_p, chptr, &chptr->invexlist, 'I');
 
 		if(IsCapable(client_p, CAP_TB) && chptr->topic != NULL)

@@ -132,7 +132,7 @@ find_channel_membership(struct Channel *chptr, struct Client *client_p)
 	/* Pick the most efficient list to use to be nice to things like
 	 * CHANSERV which could be in a large number of channels
 	 */
-	if(rb_rb_dlink_list_length(&chptr->members) < rb_rb_dlink_list_length(&client_p->user->channel))
+	if(rb_dlink_list_length(&chptr->members) < rb_dlink_list_length(&client_p->user->channel))
 	{
 		RB_DLINK_FOREACH(ptr, chptr->members.head)
 		{
@@ -236,7 +236,7 @@ remove_user_from_channel(struct membership *msptr)
 	if(client_p->servptr == &me)
 		rb_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-	if(rb_rb_dlink_list_length(&chptr->members) <= 0)
+	if(rb_dlink_list_length(&chptr->members) <= 0)
 		destroy_channel(chptr);
 
 	rb_bh_free(member_heap, msptr);
@@ -271,7 +271,7 @@ remove_user_from_channels(struct Client *client_p)
 		if(client_p->servptr == &me)
 			rb_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-		if(rb_rb_dlink_list_length(&chptr->members) <= 0)
+		if(rb_dlink_list_length(&chptr->members) <= 0)
 			destroy_channel(chptr);
 
 		rb_bh_free(member_heap, msptr);
