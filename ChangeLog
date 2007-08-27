@@ -1,3 +1,17 @@
+androsyn    2007/08/27 04:01:49 UTC	(20070827_0-24274)
+  Log:
+  make some IRCD_ to RB_ changes to match libratbox as well as renaming of ignoreErrno to rb_ignore_errno
+
+  Modified:
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2007/08/23 15:15:35 UTC	(20070823_0-24260)
   Log:
   change stupid rb_rb_dlink stuff to rb_dlink
