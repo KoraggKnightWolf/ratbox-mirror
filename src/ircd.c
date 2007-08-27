@@ -623,17 +623,12 @@ ratbox_main(int argc, char *argv[])
 
 	if(ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
 	{
-		rb_init_prng(ConfigFileEntry.egdpool_path, IRCD_PRNG_EGD);
+		rb_init_prng(ConfigFileEntry.egdpool_path, RB_PRNG_EGD);
 	} else
-	rb_init_prng(NULL, IRCD_PRNG_DEFAULT);
+	rb_init_prng(NULL, RB_PRNG_DEFAULT);
 	
 	init_main_logfile();
 	init_patricia();
-
-
-
-
-
 	init_hash();
 	clear_scache_hash_table();	/* server cache name table */
 	init_host_hash();

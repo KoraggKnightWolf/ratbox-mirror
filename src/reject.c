@@ -204,7 +204,7 @@ check_reject(rb_fde_t *F, struct sockaddr *addr)
 		{
 			ddata = rb_malloc(sizeof(struct delay_data));
 			ServerStats.is_rej++;
-			rb_setselect(F, IRCD_SELECT_WRITE | IRCD_SELECT_READ, NULL, NULL);
+			rb_setselect(F, RB_SELECT_WRITE | RB_SELECT_READ, NULL, NULL);
 			ddata->F = F;
 			rb_dlinkAdd(ddata, &ddata->node, &delay_exit);
 			return 1;

@@ -243,7 +243,7 @@ read_ctrl_packet(rb_fde_t *F, void *data)
 
 		if(length <= 0)
 		{
-			if((length == -1) && ignoreErrno(errno))
+			if((length == -1) && rb_ignore_errno(errno))
 				goto nodata;
 			error_exit_client(server, length);
 			return;
@@ -268,7 +268,7 @@ read_ctrl_packet(rb_fde_t *F, void *data)
 		length = rb_read(F, len, (2 - reply->gotdatalen));
 		if(length <= 0)
 		{
-			if((length == -1) && ignoreErrno(errno))
+			if((length == -1) && rb_ignore_errno(errno))
 				goto nodata;
 			error_exit_client(server, length);
 			return;
@@ -299,7 +299,7 @@ read_ctrl_packet(rb_fde_t *F, void *data)
 			      (reply->datalen - reply->readdata));
 		if(length <= 0)
 		{
-			if((length == -1) && ignoreErrno(errno))
+			if((length == -1) && rb_ignore_errno(errno))
 				goto nodata;
 			error_exit_client(server, length);
 			return;
@@ -330,8 +330,8 @@ read_ctrl_packet(rb_fde_t *F, void *data)
 		return;
 
       nodata:
-	/* If we get here, we need to register for another IRCD_SELECT_READ */
-	rb_setselect(F, IRCD_SELECT_READ, read_ctrl_packet, server);
+	/* If we get here, we need to register for another RB_SELECT_READ */
+	rb_setselect(F, RB_SELECT_READ, read_ctrl_packet, server);
 }
 
 /*
@@ -365,10 +365,10 @@ read_packet(rb_fde_t *F, void *data)
 
 		if(length < 0)
 		{
-			if(ignoreErrno(errno))
+			if(rb_ignore_errno(errno))
 			{
 				rb_setselect(client_p->localClient->F, 
-						IRCD_SELECT_READ, read_packet, client_p);
+						RB_SELECT_READ, read_packet, client_p);
 			} else
 				error_exit_client(client_p, length);
 			return;

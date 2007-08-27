@@ -675,12 +675,12 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 	rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
 	
 	/* Check the status */
-	if(status != IRCD_OK)
+	if(status != RB_OK)
 	{
-		/* IRCD_ERR_TIMEOUT wont have an errno associated with it,
+		/* RB_ERR_TIMEOUT wont have an errno associated with it,
 		 * the others will.. --fl
 		 */
-		if(status == IRCD_ERR_TIMEOUT) 
+		if(status == RB_ERR_TIMEOUT) 
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL, "Error connecting to %s[255.255.255.255]: %s",
 					client_p->name, rb_errstr(status));
@@ -699,7 +699,7 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 		return;
 	}
 
-	/* IRCD_OK, so continue the connection procedure */
+	/* RB_OK, so continue the connection procedure */
 	/* Get the C/N lines */
 	if((server_p = client_p->localClient->att_sconf) == NULL)
 	{

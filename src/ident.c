@@ -154,10 +154,10 @@ read_auth(rb_fde_t *F, void *data)
 
 	len = rb_read(F, buf, sizeof(buf));
 
-	if(len < 0 && ignoreErrno(errno))
+	if(len < 0 && rb_ignore_errno(errno))
 	{
 		rb_settimeout(F, 30, read_auth_timeout, auth);
-		rb_setselect(F, IRCD_SELECT_READ, read_auth, auth);
+		rb_setselect(F, RB_SELECT_READ, read_auth, auth);
 		return;
 	} else {
 		buf[len] = '\0';
@@ -190,7 +190,7 @@ connect_callback(rb_fde_t *F, int status, void *data)
 {
 	struct auth_request *auth = data;
 
-	if(status == IRCD_OK)
+	if(status == RB_OK)
 	{
 		/* one shot at the send, socket buffers should be able to handle it
 		 * if not, oh well, you lose

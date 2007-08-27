@@ -211,7 +211,7 @@ send_queued_write(rb_fde_t *F, void *data)
 			}
 		}
 
-		if(retlen == 0 || (retlen < 0 && !ignoreErrno(errno)))
+		if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 		{
 			dead_link(to, 0);
 			return;
@@ -219,7 +219,7 @@ send_queued_write(rb_fde_t *F, void *data)
 	}
 
 	if(rb_linebuf_len(&to->localClient->buf_sendq))
-		rb_setselect(F, IRCD_SELECT_WRITE,
+		rb_setselect(F, RB_SELECT_WRITE,
 			       send_queued_write, to);
 }
 
@@ -252,7 +252,7 @@ send_queued_slink_write(rb_fde_t *F, void *data)
 		if(retlen < 0)
 		{
 			/* If we have a fatal error */
-			if(!ignoreErrno(errno))
+			if(!rb_ignore_errno(errno))
 			{
 				dead_link(to, 0);
 				return;
@@ -283,7 +283,7 @@ send_queued_slink_write(rb_fde_t *F, void *data)
 	/* if we have any more data, dns.hedule a write */
 	if(to->localClient->slink->slinkq_len)
 		rb_setselect(to->localClient->slink->ctrlfd,
-			       IRCD_SELECT_WRITE, send_queued_slink_write, to);
+			       RB_SELECT_WRITE, send_queued_slink_write, to);
 }
 
 /* sendto_one_buffer()

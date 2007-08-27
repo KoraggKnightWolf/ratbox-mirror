@@ -76,9 +76,9 @@ dns_select(void)
 	{
 		fd = pollfds[i].fd;
 		if(pollfds[i].events & ADNS_POLLIN)
-			rb_setselect(rb_get_fde(fd), IRCD_SELECT_READ, dns_readable, NULL);
+			rb_setselect(rb_get_fde(fd), RB_SELECT_READ, dns_readable, NULL);
 		if(pollfds[i].events & ADNS_POLLOUT)
-			rb_setselect(rb_get_fde(fd), IRCD_SELECT_WRITE,
+			rb_setselect(rb_get_fde(fd), RB_SELECT_WRITE,
 				       dns_writeable, NULL);
 	}
 }
