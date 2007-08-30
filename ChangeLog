@@ -1,3 +1,12 @@
+androsyn    2007/08/30 20:37:02 UTC	(20070830_0-24306)
+  Log:
+  make bandb compile and use rb_snprintf.  add a missing ctype.h to ident.c as well
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Modified) 
+
+
 androsyn    2007/08/27 04:01:49 UTC	(20070827_0-24274)
   Log:
   make some IRCD_ to RB_ changes to match libratbox as well as renaming of ignoreErrno to rb_ignore_errno
