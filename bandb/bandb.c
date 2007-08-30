@@ -30,7 +30,8 @@
  * $Id$
  */
 #include "setup.h"
-#include "ratbox_lib.h"
+#include <ratbox_lib.h>
+#include <stdio.h>
 #include "rsdb.h"
 #include "common.h"
 
@@ -132,12 +133,12 @@ list_bans(void)
 		for(j = 0; j < table.row_count; j++)
 		{
 			if(i == BANDB_KLINE)
-				snprintf(buf, sizeof(buf), "%c %s %s %s :%s",
+				rb_snprintf(buf, sizeof(buf), "%c %s %s %s :%s",
 					bandb_letter[i], table.row[j][0],
 					table.row[j][1], table.row[j][2],
 					table.row[j][3]);
 			else
-				snprintf(buf, sizeof(buf), "%c %s %s :%s",
+				rb_snprintf(buf, sizeof(buf), "%c %s %s :%s",
 					bandb_letter[i], table.row[j][0], 
 					table.row[j][2], table.row[j][3]);
 

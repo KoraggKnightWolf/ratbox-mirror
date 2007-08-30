@@ -14,6 +14,8 @@
  */
 
 #include "setup.h"
+#include <stdio.h>
+#include <ctype.h>
 #include "ratbox_lib.h"
 #include "common.h"
 #define USERLEN 10
