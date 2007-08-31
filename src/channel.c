@@ -47,6 +47,7 @@ static rb_bh *channel_heap;
 static rb_bh *ban_heap;
 static rb_bh *topic_heap;
 static rb_bh *member_heap;
+struct ev_entry *checksplit_ev;
 
 static int channel_capabs[] = { CAP_EX, CAP_IE, 
 #ifdef ENABLE_SERVICES
@@ -711,7 +712,7 @@ check_splitmode(void *unused)
 				splitmode = 1;
 				sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Network split, activating splitmode");
-				rb_event_addish("check_splitmode", check_splitmode, NULL, 5);
+				checksplit_ev = rb_event_addish("check_splitmode", check_splitmode, NULL, 5);
 			}
 		}
 		/* in splitmode, check whether its finished */
@@ -722,7 +723,7 @@ check_splitmode(void *unused)
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Network rejoined, deactivating splitmode");
 
-			rb_event_delete(check_splitmode, NULL);
+			rb_event_delete(checksplit_ev);
 		}
 	}
 }

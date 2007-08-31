@@ -232,7 +232,7 @@ main(int argc, char *argv[])
 
 	rsdb_init();
 	check_schema();
-	rb_helper_loop(bandb_helper, 1000);
+	rb_helper_loop(bandb_helper, 0);
 
 	return 0;
 }

@@ -71,11 +71,12 @@ static int invalid_gline(struct Client *, const char *, char *);
 
 static int remove_temp_gline(const char *, const char *);
 static void expire_pending_glines(void *unused);
+static struct ev_entry *pending_gline_ev;
 
 static int
 modinit(void)
 {
-	rb_event_addish("expire_pending_glines", expire_pending_glines, NULL, 
+	pending_gline_ev = rb_event_addish("expire_pending_glines", expire_pending_glines, NULL, 
 			CLEANUP_GLINES_TIME);
 	return 0;
 }
@@ -83,7 +84,7 @@ modinit(void)
 static void
 moddeinit(void)
 {
-	rb_event_delete(expire_pending_glines, NULL);
+	rb_event_delete(pending_gline_ev);
 }
 
 /* mo_gline()

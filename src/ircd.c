@@ -736,6 +736,6 @@ ratbox_main(int argc, char *argv[])
 	if(splitmode)
 		rb_event_add("check_splitmode", check_splitmode, NULL, 5);
 
-	rb_lib_loop(250); /* we'll never return from here */
+	rb_lib_loop(0); /* we'll never return from here */
 	return 0;
 }

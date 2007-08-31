@@ -1461,7 +1461,7 @@ conf_set_listen_sslport(confentry_t * entry, conf_t * conf, struct conf_items *i
 	conf_set_listen_port_both(entry, conf, item, 1);
 }
 
-
+static struct ev_entry *cache_links_ev;
 static void
 conf_set_serverhide_links_delay(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
@@ -1469,11 +1469,11 @@ conf_set_serverhide_links_delay(confentry_t * entry, conf_t * conf, struct conf_
 
 	if((val > 0) && ConfigServerHide.links_disabled == 1)
 	{
-		rb_event_addish("cache_links", cache_links, NULL, val);
+		cache_links_ev = rb_event_addish("cache_links", cache_links, NULL, val);
 		ConfigServerHide.links_disabled = 0;
 	}
 	else if(val != ConfigServerHide.links_delay)
-		rb_event_update("cache_links", val);
+		rb_event_update(cache_links_ev, val);
 
 	ConfigServerHide.links_delay = val;
 }
@@ -2046,7 +2046,7 @@ load_conf_settings(void)
 
 	if(!split_users || !split_servers || (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
 	{
-		rb_event_delete(check_splitmode, NULL);
+		rb_event_delete(cache_links_ev);
 		splitmode = 0;
 		splitchecking = 0;
 	}

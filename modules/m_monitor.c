@@ -58,11 +58,11 @@ struct Message monitor_msgtab = {
 mapi_clist_av1 monitor_clist[] = { &monitor_msgtab, NULL };
 DECLARE_MODULE_AV1(monitor, modinit, moddeinit, monitor_clist, NULL, NULL, "$Revision$");
 
-
+static struct ev_entry *cleanup_monitor_ev;
 static int
 modinit(void)
 {
-	rb_event_addish("cleanup_monitor", cleanup_monitor, NULL, 3600);
+	cleanup_monitor_ev = rb_event_addish("cleanup_monitor", cleanup_monitor, NULL, 3600);
 	return 0;
 
 }
@@ -70,7 +70,7 @@ modinit(void)
 static void
 moddeinit(void)
 {
-	rb_event_delete(cleanup_monitor, NULL);
+	rb_event_delete(cleanup_monitor_ev);
 }
 
 static void

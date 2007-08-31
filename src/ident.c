@@ -315,7 +315,7 @@ int main(int argc, char **argv)
 	
 	authheap = rb_bh_create(sizeof(struct auth_request), 2048, "auth_heap");
 
-	rb_helper_loop(ident_helper, 1000);
+	rb_helper_loop(ident_helper, 0);
 	return 0;
 }
 

@@ -44,11 +44,11 @@ static int m_privmsg(struct Client *, struct Client *, int, const char **);
 static int m_notice(struct Client *, struct Client *, int, const char **);
 
 static void expire_tgchange(void *unused);
-
+struct ev_entry *tgchange_ev;
 static int
 modinit(void)
 {
-	rb_event_addish("expire_tgchange", expire_tgchange, NULL, 300);
+	tgchange_ev = rb_event_addish("expire_tgchange", expire_tgchange, NULL, 300);
 	expire_tgchange(NULL);
 	return 0;
 }
@@ -56,7 +56,7 @@ modinit(void)
 static void
 moddeinit(void)
 {
-	rb_event_delete(expire_tgchange, NULL);
+	rb_event_delete(tgchange_ev);
 }
 
 struct Message privmsg_msgtab = {
