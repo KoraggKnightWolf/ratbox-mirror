@@ -229,10 +229,6 @@ AC_C_BIGENDIAN
 dnl Check for stdarg.h - if we can't find it, halt configure
 AC_CHECK_HEADER(stdarg.h, , [AC_MSG_ERROR([** stdarg.h could not be found - ircd-ratbox will not compile without it **])])
 
-AC_CHECK_FUNCS([strlcat strlcpy])
-
-AX_CREATE_STDINT_H([include/_stdint.h])
-
 AC_CHECK_TYPE([in_port_t], [],
 [AC_DEFINE(in_port_t, [u_int16_t], [If system does not define in_port_t, define it to what it should be.])],
 [[#include <sys/types.h>
@@ -243,11 +239,6 @@ AC_CHECK_TYPE([sa_family_t], [],
 [[#include <sys/types.h>
 #include <sys/socket.h>]])
 
-AC_CHECK_TYPES([uintptr_t])
-
-
-dnl check for various functions...
-AC_CHECK_FUNCS([socketpair vsnprintf mmap gettimeofday writev sendmsg asctime_r gmtime_r strtok_r usleep])
 
 AC_SEARCH_LIBS(nanosleep, rt posix4, AC_DEFINE(HAVE_NANOSLEEP, 1, [Define if you have nanosleep]))
 

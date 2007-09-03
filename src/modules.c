@@ -165,14 +165,14 @@ load_static_modules(void)
 			if(tmpptr == NULL) 
 				abort();
 
-			mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, "_mheader");
+			mapi_version = (int *) (rb_uintptr_t) lt_dlsym(tmpptr, "_mheader");
 
 			if(mapi_version == NULL)
 			{
 				char buf[512];
 				rb_strlcpy(buf, basename, sizeof(buf));
 				rb_strlcat(buf, "_LTX__mheader", sizeof(buf));
-				mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, buf);
+				mapi_version = (int *) (rb_uintptr_t) lt_dlsym(tmpptr, buf);
 			}
 
 			if(mapi_version == NULL || MAPI_MAGIC(*mapi_version) != MAPI_MAGIC_HDR)		
@@ -849,9 +849,9 @@ load_a_module(const char *path, int warn, int core)
 	 * as a single int in order to determine the API version.
 	 *      -larne.
 	 */
-	mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, "_mheader");
+	mapi_version = (int *) (rb_uintptr_t) lt_dlsym(tmpptr, "_mheader");
 	if((mapi_version == NULL
-	    && (mapi_version = (int *) (uintptr_t) lt_dlsym(tmpptr, "__mheader")) == NULL)
+	    && (mapi_version = (int *) (rb_uintptr_t) lt_dlsym(tmpptr, "__mheader")) == NULL)
 	   || MAPI_MAGIC(*mapi_version) != MAPI_MAGIC_HDR)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,

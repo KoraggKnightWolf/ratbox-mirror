@@ -91,8 +91,8 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	 * this code has a side effect of losing keys, but..
 	 */
 	chanlist = LOCAL_COPY(parv[1]);
-	for(name = strtok_r(chanlist, ",", &p); name;
-	    name = strtok_r(NULL, ",", &p))
+	for(name = rb_strtok_r(chanlist, ",", &p); name;
+	    name = rb_strtok_r(NULL, ",", &p))
 	{
 		/* check the length and name of channel is ok */
 		if(!check_channel_name_loc(source_p, name) || (strlen(name) > LOC_CHANNELLEN))
@@ -156,11 +156,11 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	if(parc > 2)
 	{
 		mykey = LOCAL_COPY(parv[2]);
-		key = strtok_r(mykey, ",", &p2);
+		key = rb_strtok_r(mykey, ",", &p2);
 	}
 
-	for(name = strtok_r(jbuf, ",", &p); name;
-	    key = (key) ? strtok_r(NULL, ",", &p2) : NULL, name = strtok_r(NULL, ",", &p))
+	for(name = rb_strtok_r(jbuf, ",", &p); name;
+	    key = (key) ? rb_strtok_r(NULL, ",", &p2) : NULL, name = rb_strtok_r(NULL, ",", &p))
 	{
 		/* JOIN 0 simply parts all channels the user is in */
 		if(*name == '0' && !atoi(name))

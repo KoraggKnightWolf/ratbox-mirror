@@ -504,10 +504,10 @@ mangle_wildcard_to_cidr(const char *text)
 
 	q = LOCAL_COPY(text);
 	
-	n1 = strtok_r(q, dot, &p);
-	n2 = strtok_r(NULL, dot, &p);
-	n3 = strtok_r(NULL, dot, &p);
-	n4 = strtok_r(NULL, dot, &p);
+	n1 = rb_strtok_r(q, dot, &p);
+	n2 = rb_strtok_r(NULL, dot, &p);
+	n3 = rb_strtok_r(NULL, dot, &p);
+	n4 = rb_strtok_r(NULL, dot, &p);
 	
 	if(n1 == NULL)
 		return NULL;
