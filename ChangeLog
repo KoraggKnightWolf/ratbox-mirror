@@ -1,3 +1,26 @@
+androsyn    2007/09/03 02:57:41 UTC	(20070903_0-24328)
+  Log:
+  - change places where strtok_r was used to rb_strtok_r
+  - remove some unneeded autoconf checks that are now in libratbox
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/acinclude.m4 (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_part.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_accept.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_capab.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_ison.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2007/08/31 01:41:49 UTC	(20070831_0-24310)
   Log:
   update ircd to deal with the libratbox event changes
