@@ -33,7 +33,7 @@
 #define MAXMODEPARAMS   4
 #define MAXMODEPARAMSSERV 10
 
-struct ev_entry *checksplit_ev;
+extern struct ev_entry *checksplit_ev;
 struct Client;
 
 /* mode structure for channels */
