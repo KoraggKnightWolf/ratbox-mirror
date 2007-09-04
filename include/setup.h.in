@@ -48,12 +48,6 @@
    */
 #undef HAVE_ALLOCA_H
 
-/* Define to 1 if you have the <arpa/inet.h> header file. */
-#undef HAVE_ARPA_INET_H
-
-/* Define to 1 if you have the <crypt.h> header file. */
-#undef HAVE_CRYPT_H
-
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
 #undef HAVE_DIRENT_H
@@ -63,9 +57,6 @@
 
 /* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
-
-/* Define to 1 if you have the `fork' function. */
-#undef HAVE_FORK
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -79,20 +70,8 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define if you have nanosleep */
-#undef HAVE_NANOSLEEP
-
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 #undef HAVE_NDIR_H
-
-/* Define to 1 if you have the <netdb.h> header file. */
-#undef HAVE_NETDB_H
-
-/* Define to 1 if you have the <netinet/in.h> header file. */
-#undef HAVE_NETINET_IN_H
-
-/* Define to 1 if you have the <netinet/tcp.h> header file. */
-#undef HAVE_NETINET_TCP_H
 
 /* Define to 1 if sqlite3 is available. */
 #undef HAVE_SQLITE3
@@ -116,9 +95,6 @@
    */
 #undef HAVE_SYS_DIR_H
 
-/* Define to 1 if you have the <sys/epoll.h> header file. */
-#undef HAVE_SYS_EPOLL_H
-
 /* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
    */
 #undef HAVE_SYS_NDIR_H
@@ -129,41 +105,17 @@
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #undef HAVE_SYS_RESOURCE_H
 
-/* Define to 1 if you have the <sys/socket.h> header file. */
-#undef HAVE_SYS_SOCKET_H
-
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
-/* Define to 1 if you have the <sys/syslog.h> header file. */
-#undef HAVE_SYS_SYSLOG_H
-
-/* Define to 1 if you have the <sys/time.h> header file. */
-#undef HAVE_SYS_TIME_H
-
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
-
-/* Define to 1 if you have the <sys/uio.h> header file. */
-#undef HAVE_SYS_UIO_H
 
 /* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
 #undef HAVE_SYS_WAIT_H
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
-
-/* Define to 1 if you have the `vfork' function. */
-#undef HAVE_VFORK
-
-/* Define to 1 if you have the <vfork.h> header file. */
-#undef HAVE_VFORK_H
-
-/* Define to 1 if `fork' works. */
-#undef HAVE_WORKING_FORK
-
-/* Define to 1 if `vfork' works. */
-#undef HAVE_WORKING_VFORK
 
 /* Prefix where help file are installed. */
 #undef HELP_DIR
@@ -197,9 +149,6 @@
 
 /* Size of the nick delay heap. */
 #undef ND_HEAP_SIZE
-
-/* Define if your system needs crypt. */
-#undef NEED_CRYPT
 
 /* Nickname length */
 #undef NICKLEN
@@ -291,23 +240,8 @@
 # undef _GNU_SOURCE
 #endif
 
-/* If system does not define in_port_t, define it to what it should be. */
-#undef in_port_t
-
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
 #ifndef __cplusplus
 #undef inline
 #endif
-
-/* Define to `int' if <sys/types.h> does not define. */
-#undef pid_t
-
-/* If system does not define sa_family_t, define it here. */
-#undef sa_family_t
-
-/* If we don't have a real socklen_t, unsigned int is good enough. */
-#undef socklen_t
-
-/* Define as `fork' if `vfork' does not work. */
-#undef vfork

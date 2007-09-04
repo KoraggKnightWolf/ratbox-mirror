@@ -121,9 +121,9 @@ AC_HEADER_STDC
 
 AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
-AC_HEADER_TIME
 
-AC_CHECK_HEADERS([netdb.h crypt.h sys/time.h sys/types.h sys/socket.h netinet/in.h netinet/tcp.h arpa/inet.h sys/resource.h sys/param.h errno.h sys/syslog.h stddef.h  sys/epoll.h sys/uio.h])
+AC_CHECK_HEADERS([sys/types.h sys/resource.h sys/param.h sys/stat.h errno.h stddef.h ])
+AC_HEADER_TIME
 
 
 dnl Networking Functions
@@ -144,21 +144,6 @@ member.])],,[[
 #include <winsock2.h>
 #endif
 ]])
-
-AC_CHECK_TYPE(socklen_t, ,
-[AC_DEFINE([socklen_t], [unsigned int],
-[If we don't have a real socklen_t, unsigned int is good enough.])],
-[
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
-#ifdef HAVE_WINSOCK2_H
-#include <winsock2.h>
-#endif
-])
 
 AC_ARG_ENABLE(ipv6,
 AC_HELP_STRING([--enable-ipv6],[Enable IPv6 support]),[ipv6=$enableval],[ipv6=no])
@@ -190,25 +175,6 @@ AC_COMPILE_IFELSE(
 have_v6="no"])
 fi
 
-save_LIBS=$LIBS
-AC_SEARCH_LIBS(crypt, [crypt descrypt],,)
-LIBS=$save_LIBS
-
-CRYPT_LIB=$ac_cv_search_crypt
-
-if test "$CRYPT_LIB" = "none required"; then
-	unset CRYPT_LIB
-elif test "$CRYPT_LIB" = no; then
-	need_crypt=yes;
-	AC_DEFINE(NEED_CRYPT, 1, [Define if your system needs crypt.])
-	unset CRYPT_LIB
-fi
-
-AM_CONDITIONAL([NEED_CRYPT], [test x"$need_crypt" == "xyes"])
-
-
-AC_SUBST(CRYPT_LIB)
-
 dnl See whether we can include both string.h and strings.h.
 AC_CACHE_CHECK([whether string.h and strings.h may both be included],
 gcc_cv_header_string,
@@ -229,21 +195,7 @@ AC_C_BIGENDIAN
 dnl Check for stdarg.h - if we can't find it, halt configure
 AC_CHECK_HEADER(stdarg.h, , [AC_MSG_ERROR([** stdarg.h could not be found - ircd-ratbox will not compile without it **])])
 
-AC_CHECK_TYPE([in_port_t], [],
-[AC_DEFINE(in_port_t, [u_int16_t], [If system does not define in_port_t, define it to what it should be.])],
-[[#include <sys/types.h>
-#include <netinet/in.h>]])
-
-AC_CHECK_TYPE([sa_family_t], [],
-[AC_DEFINE(sa_family_t, [u_int16_t], [If system does not define sa_family_t, define it here.])],
-[[#include <sys/types.h>
-#include <sys/socket.h>]])
-
-
-AC_SEARCH_LIBS(nanosleep, rt posix4, AC_DEFINE(HAVE_NANOSLEEP, 1, [Define if you have nanosleep]))
-
 AC_FUNC_ALLOCA
-AC_FUNC_VFORK
 
 dnl Specialized functions checks
 dnl ============================

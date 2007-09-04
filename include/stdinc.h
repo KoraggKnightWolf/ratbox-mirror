@@ -55,6 +55,7 @@ char *alloca ();
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
+
 #ifdef STRING_WITH_STRINGS
 # include <string.h>
 # include <strings.h>
@@ -87,18 +88,6 @@ char *alloca ();
 
 #include <limits.h>
 
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
-
-
 #if HAVE_DIRENT_H
 # include <dirent.h>
 # define NAMLEN(dirent) strlen((dirent)->d_name)
@@ -116,10 +105,6 @@ char *alloca ();
 # endif
 #endif
 
-#ifdef HAVE_NETDB_H
-#include <netdb.h>
-#endif
-
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -130,10 +115,6 @@ char *alloca ();
 #include <sys/resource.h>
 #endif
 
-
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
 #include <sys/stat.h>
 
 #if HAVE_SYS_WAIT_H
@@ -149,30 +130,12 @@ char *alloca ();
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
-#ifdef HAVE_NETINET_IN_H
-#include <netinet/in.h>
-#endif
-#ifdef HAVE_NETINET_TCP_H
-#include <netinet/tcp.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif
 
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #else
 extern int errno;
 #endif
-
-#ifdef HAVE_SYS_UIO_H
-#include <sys/uio.h>
-#endif
-
-#ifdef  HAVE_VFORK_H
-#include <vfork.h>
-#endif
-
 
 #if defined(__INTEL_COMPILER) || defined(__GNUC__)
 # ifdef __unused
@@ -233,30 +196,6 @@ xc_strlcpy(char *dest, const char *src, size_t size)
 # define INADDR_NONE ((in_addr_t) 0xffffffff)
 #endif
 
-#ifdef HAVE_WRITEV
-#ifndef UIO_MAXIOV
-# if defined(__FreeBSD__) || defined(__APPLE__) || defined(__NetBSD__)
-/* FreeBSD 4.7 defines it in sys/uio.h only if _KERNEL is specified */ 
-#  define UIO_MAXIOV 1024
-# elif defined(__sgi)
-/* IRIX 6.5 has sysconf(_SC_IOV_MAX) which might return 512 or bigger */
-#  define UIO_MAXIOV 512
-# elif defined(__sun)
-/* Solaris (and SunOS?) defines IOV_MAX instead */
-#  ifndef IOV_MAX  
-#   define UIO_MAXIOV 16
-#  else
-#   define UIO_MAXIOV IOV_MAX
-#  endif
-# elif defined(IOV_MAX)
-#  define UIO_MAXIOV IOV_MAX
-# else
-#  error UIO_MAXIOV nor IOV_MAX are defined
-# endif
-#endif
-#endif
-
-#include "_stdint.h"
 #include "ircd_defs.h"
 #include "ratbox_lib.h"
 #include "common.h"
