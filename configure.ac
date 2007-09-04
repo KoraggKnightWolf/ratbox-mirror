@@ -5,8 +5,8 @@ dnl TODO: clean up all the OpenSSL and shared module checking stuff;
 dnl the most major changes have already been made and it looks like
 dnl said functions need to be just about as complex as they already are.
 
-AC_PREREQ(2.57)
-AUTOMAKE_OPTIONS = 1.8
+AC_PREREQ(2.60)
+AUTOMAKE_OPTIONS = 1.10
 dnl Sneaky way to get an Id tag into the configure script
 AC_COPYRIGHT([$Id$])
 AC_INIT([ircd-ratbox],[devel])
