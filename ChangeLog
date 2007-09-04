@@ -1,3 +1,11 @@
+androsyn    2007/09/04 18:05:58 UTC	(20070904_6-24358)
+  Log:
+  get rid of the tools.h include in operhash.c
+
+  Modified:
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 androsyn    2007/09/04 17:58:10 UTC	(20070904_5-24356)
   Log:
   get rid of crypt lib stuff in tools and use rb_crypt
