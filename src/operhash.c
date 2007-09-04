@@ -30,9 +30,9 @@
  *
  * $Id$
  */
+#include <ratbox_lib.h>
 #include "stdinc.h"
 #include "struct.h"
-#include "tools.h"
 #include "match.h"
 #include "hash.h"
 #include "operhash.h"
