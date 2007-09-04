@@ -32,23 +32,8 @@
 #ifndef ADNS_INTERNAL_H_INCLUDED
 #define ADNS_INTERNAL_H_INCLUDED
 
-#include "setup.h"
-#include "config.h"
-#ifdef __GNUC__
-#define INLINE __inline__
-#else
-#define INLINE
-#endif
+#include <ratbox_lib.h>
 typedef unsigned char byte;
-
-#include <stdarg.h>
-#include <assert.h>
-#include <unistd.h>
-#include <signal.h>
-#include <errno.h>
-#include <string.h>
-
-#include <sys/time.h>
 
 #include "adns.h"
 #include "dlist.h"

@@ -28,8 +28,7 @@
  *  $Id$
  */
 
-#include <errno.h>
-#include "ratbox_lib.h"
+#include <ratbox_lib.h>
 
 #include "internal.h"
 #include "tvarith.h"

@@ -29,15 +29,13 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "ratbox_lib.h"
+#include <ratbox_lib.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #include "internal.h"
 #include "tvarith.h"
-#include "ratbox_lib.h"
 /* TCP connection management. */
 
 static void tcp_close(adns_state ads) {
@@ -333,7 +331,7 @@ int adns__pollfds(adns_state ads, struct adns_pollfd pollfds_buf[MAX_POLLFDS]) {
 }
 int adns_processreadable(adns_state ads, int fd, const struct timeval *now) {
   int want, dgramlen, r, serv, old_skip;
-  int udpaddrlen;
+  rb_socklen_t udpaddrlen;
   byte udpbuf[DNS_MAXUDP];
   struct sockaddr_in udpaddr;
   

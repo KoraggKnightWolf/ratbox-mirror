@@ -28,16 +28,7 @@
  *  $Id$
  */
 
-#include <stdlib.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <limits.h>
-#include "ratbox_lib.h"
-#include "stdinc.h"
-#ifdef WIN32
-#include <iphlpapi.h>
-#endif
-
+#include <ratbox_lib.h>
 #include "internal.h"
 
 static void readconfig(adns_state ads, const char *filename, int warnmissing);

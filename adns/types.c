@@ -27,7 +27,7 @@
  *  $Id$
  */
 
-#include "ratbox_lib.h"
+#include <ratbox_lib.h>
 #include "internal.h"
 
 #define R_NOMEM           return adns_s_nomemory

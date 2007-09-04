@@ -56,11 +56,7 @@
 
 #ifndef ADNS_H_INCLUDED
 #define ADNS_H_INCLUDED
-#include <stdio.h>
-#include <stdarg.h>
-
-#include "ratbox_lib.h"
-
+#include <ratbox_lib.h>
 
 #define MAXFD_POLL 2
 struct adns_pollfd { int fd; short events; short revents; };

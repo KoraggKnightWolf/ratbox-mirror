@@ -26,7 +26,7 @@
  *
  *  $Id$
  */
-
+#include <ratbox_lib.h>
 #include "internal.h"
 
 int vbuf__append_quoted1035(vbuf *vb, const byte *buf, int len) {

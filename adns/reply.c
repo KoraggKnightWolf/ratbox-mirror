@@ -27,7 +27,7 @@
  *  $Id$
  */
 
-#include <stdlib.h>
+#include <ratbox_lib.h>
 
 #include "internal.h"
     
