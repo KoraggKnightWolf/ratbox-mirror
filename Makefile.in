@@ -83,6 +83,7 @@ am_libcore_la_OBJECTS = src/dns.lo src/bandbi.lo src/cache.lo \
 	src/send.lo src/whowas.lo src/version.lo src/ircd_parser.lo \
 	src/ircd_lexer.lo
 libcore_la_OBJECTS = $(am_libcore_la_OBJECTS)
+@MINGW_FALSE@@STATIC_MODULES_FALSE@am__DEPENDENCIES_2 = libcore.la
 @MINGW_TRUE@@STATIC_MODULES_FALSE@am__DEPENDENCIES_2 =  \
 @MINGW_TRUE@@STATIC_MODULES_FALSE@	libratbox/src/libratbox.la \
 @MINGW_TRUE@@STATIC_MODULES_FALSE@	libcore.la
@@ -748,12 +749,12 @@ libcore_LTLIBRARIES = libcore.la
 libcore_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version 
 @MINGW_FALSE@libcore_la_DEPENDENCIES = libratbox/src/libratbox.la
 @MINGW_TRUE@libcore_la_DEPENDENCIES = $(LIBLTDL) libratbox/src/libratbox.la
-@MINGW_FALSE@libcore_la_LIBADD = libratbox/src/libratbox.la @SSL_LIBS@
+@MINGW_FALSE@libcore_la_LIBADD = libratbox/src/libratbox.la $(LIBLTDL) @SSL_LIBS@
 @MINGW_TRUE@libcore_la_LIBADD = libratbox/src/libratbox.la $(LIBLTDL) @SSL_LIBS@
 
 # now the modules..
 MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version 
-@MINGW_FALSE@@STATIC_MODULES_FALSE@MODULE_LIBS = @SSL_LIBS@
+@MINGW_FALSE@@STATIC_MODULES_FALSE@MODULE_LIBS = libcore.la @SSL_LIBS@
 @MINGW_TRUE@@STATIC_MODULES_FALSE@MODULE_LIBS = libratbox/src/libratbox.la libcore.la @SSL_LIBS@ 
 modules_m_accept_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_admin_la_LDFLAGS = -module $(MODULE_FLAGS)  
