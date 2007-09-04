@@ -56,7 +56,7 @@
 
 
 FILE *conf_fbfile_in;
-char conffilebuf[512];
+char conffilebuf[IRCD_BUFSIZE+1];
 extern int conf_parse_failure;
 static rb_dlink_list conflist;
 static conf_t *curconf;
