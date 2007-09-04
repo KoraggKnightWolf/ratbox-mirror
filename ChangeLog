@@ -1,3 +1,21 @@
+androsyn    2007/09/04 17:01:18 UTC	(20070904_4-24344)
+  Log:
+  some more header cleanups, this time in adns
+
+  Modified:
+	ircd-ratbox/trunk/adns/adns.h (File Modified) 
+	ircd-ratbox/trunk/adns/check.c (File Modified) 
+	ircd-ratbox/trunk/adns/event.c (File Modified) 
+	ircd-ratbox/trunk/adns/general.c (File Modified) 
+	ircd-ratbox/trunk/adns/internal.h (File Modified) 
+	ircd-ratbox/trunk/adns/parse.c (File Modified) 
+	ircd-ratbox/trunk/adns/query.c (File Modified) 
+	ircd-ratbox/trunk/adns/reply.c (File Modified) 
+	ircd-ratbox/trunk/adns/setup.c (File Modified) 
+	ircd-ratbox/trunk/adns/transmit.c (File Modified) 
+	ircd-ratbox/trunk/adns/types.c (File Modified) 
+
+
 androsyn    2007/09/04 16:37:19 UTC	(20070904_3-24338)
   Log:
   check to see if INADDR_LOOPBACK is defined, if not, define it 
