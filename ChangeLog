@@ -1,3 +1,13 @@
+androsyn    2007/09/04 17:58:10 UTC	(20070904_5-24356)
+  Log:
+  get rid of crypt lib stuff in tools and use rb_crypt
+
+  Modified:
+	ircd-ratbox/trunk/tools/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/mkpasswd.c (File Modified) 
+
+
 androsyn    2007/09/04 17:01:18 UTC	(20070904_4-24344)
   Log:
   some more header cleanups, this time in adns
