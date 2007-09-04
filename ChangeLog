@@ -1,3 +1,25 @@
+androsyn    2007/09/04 22:06:44 UTC	(20070904_14-24378)
+  Log:
+  Rerun libtoolize and get newer versions of libtool and libltdl and friends
+
+  Modified:
+	ircd-ratbox/trunk/config.guess (File Modified) 
+	ircd-ratbox/trunk/config.sub (File Modified) 
+	ircd-ratbox/trunk/libltdl/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libltdl/aclocal.m4 (File Modified) 
+	ircd-ratbox/trunk/libltdl/config.guess (File Modified) 
+	ircd-ratbox/trunk/libltdl/config.sub (File Modified) 
+	ircd-ratbox/trunk/libltdl/configure (File Modified) 
+	ircd-ratbox/trunk/libltdl/configure.ac (File Modified) 
+	ircd-ratbox/trunk/libltdl/install-sh (File Modified) 
+	ircd-ratbox/trunk/libltdl/ltdl.c (File Modified) 
+	ircd-ratbox/trunk/libltdl/ltdl.h (File Modified) 
+	ircd-ratbox/trunk/libltdl/ltmain.sh (File Modified) 
+	ircd-ratbox/trunk/libltdl/missing (File Modified) 
+	ircd-ratbox/trunk/ltmain.sh (File Modified) 
+
+
 androsyn    2007/09/04 22:03:43 UTC	(20070904_13-24376)
   Log:
   use rb_crypt instead of crypt
