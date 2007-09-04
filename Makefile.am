@@ -88,10 +88,10 @@ libcore_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version
 
 if MINGW
 libcore_la_DEPENDENCIES = $(LIBLTDL) libratbox/src/libratbox.la
-libcore_la_LIBADD = libratbox/src/libratbox.la $(LIBLTDL) @SSL_LIBS@ @CRYPT_LIB@
+libcore_la_LIBADD = libratbox/src/libratbox.la $(LIBLTDL) @SSL_LIBS@
 else
 libcore_la_DEPENDENCIES = libratbox/src/libratbox.la
-libcore_la_LIBADD = libratbox/src/libratbox.la @SSL_LIBS@ @CRYPT_LIB@
+libcore_la_LIBADD = libratbox/src/libratbox.la @SSL_LIBS@
 endif
 
 
@@ -102,9 +102,9 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 if !STATIC_MODULES
 
 if MINGW
-MODULE_LIBS = libratbox/src/libratbox.la libcore.la @SSL_LIBS@ @CRYPT_LIB@ 
+MODULE_LIBS = libratbox/src/libratbox.la libcore.la @SSL_LIBS@ 
 else
-MODULE_LIBS = @SSL_LIBS@ @CRYPT_LIB@
+MODULE_LIBS = @SSL_LIBS@
 endif # MINGW
 
 endif # !STATIC_MODULES
