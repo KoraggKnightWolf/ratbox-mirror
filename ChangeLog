@@ -1,3 +1,12 @@
+androsyn    2007/09/04 18:23:23 UTC	(20070904_10-24366)
+  Log:
+  more duplicate global variables
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2007/09/04 18:18:34 UTC	(20070904_9-24364)
   Log:
   make conffilebuf defined only in one place
