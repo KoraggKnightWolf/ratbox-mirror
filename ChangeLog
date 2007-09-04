@@ -1,3 +1,16 @@
+androsyn    2007/09/04 22:03:43 UTC	(20070904_13-24376)
+  Log:
+  use rb_crypt instead of crypt
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2007/09/04 19:28:36 UTC	(20070904_12-24370)
   Log:
   Rebuild Makefile.in against automake 1.10
