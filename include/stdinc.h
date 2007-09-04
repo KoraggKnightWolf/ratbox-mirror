@@ -131,6 +131,14 @@ char *alloca ();
 #include <sys/param.h>
 #endif
 
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
+
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #else
