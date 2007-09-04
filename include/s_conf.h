@@ -37,12 +37,6 @@ struct Client;
 struct DNSReply;
 struct hostent;
 
-/* used by new parser */
-/* yacc/lex love globals!!! */
-
-extern FILE *conf_fbfile_in;
-extern char conf_line_in[256];
-
 struct ConfItem
 {
 	unsigned int status;	/* If CONF_ILLEGAL, delete when no clients */

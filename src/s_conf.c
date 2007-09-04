@@ -74,7 +74,6 @@ static void clear_out_old_conf(void);
 static void expire_temp_kd(void *list);
 static void reorganise_temp_kd(void *list);
 
-FILE *conf_fbfile_in;
 extern char yytext[];
 
 static int verify_access(struct Client *client_p, const char *username);
@@ -1043,7 +1042,6 @@ read_conf_files(int cold)
 {
 	const char *filename;
 	int r;
-	conf_fbfile_in = NULL;
 
 	filename = ConfigFileEntry.configfile;
 
