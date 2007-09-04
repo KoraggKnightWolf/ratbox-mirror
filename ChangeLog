@@ -1,3 +1,11 @@
+androsyn    2007/09/04 18:13:34 UTC	(20070904_8-24362)
+  Log:
+  make checksplit_ev extern
+
+  Modified:
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+
+
 androsyn    2007/09/04 18:12:33 UTC	(20070904_7-24360)
   Log:
   get rid of the rest of the CRYPT_LIBS
