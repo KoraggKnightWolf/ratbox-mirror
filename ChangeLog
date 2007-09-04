@@ -1,3 +1,17 @@
+androsyn    2007/09/04 18:12:33 UTC	(20070904_7-24360)
+  Log:
+  get rid of the rest of the CRYPT_LIBS
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/adns/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/servlink/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/sqlite3/Makefile.in (File Modified) 
+
+
 androsyn    2007/09/04 18:05:58 UTC	(20070904_6-24358)
   Log:
   get rid of the tools.h include in operhash.c
