@@ -409,7 +409,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		if(EmptyString(source_p->localClient->passwd))
 			encr = "";
 		else if(IsConfEncrypted(aconf))
-			encr = crypt(source_p->localClient->passwd, aconf->passwd);
+			encr = rb_crypt(source_p->localClient->passwd, aconf->passwd);
 		else
 			encr = source_p->localClient->passwd;
 

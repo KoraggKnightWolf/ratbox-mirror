@@ -60,10 +60,6 @@ static int oper_up(struct Client *source_p, struct oper_conf *oper_p);
 static int match_oper_password(const char *password, struct oper_conf *oper_p);
 static void send_oper_motd(struct Client *source_p);
 
-#ifndef HAVE_CRYPT_H
-extern char *crypt();
-#endif
-
 struct Message oper_msgtab = {
 	"OPER", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, {m_oper, 3}, mg_ignore, mg_ignore, mg_ignore, {m_oper, 3}}
@@ -213,7 +209,7 @@ match_oper_password(const char *password, struct oper_conf *oper_p)
 		 * the proper encrypted hash for comparison.
 		 */
 		if(!EmptyString(password))
-			encr = crypt(password, oper_p->passwd);
+			encr = rb_crypt(password, oper_p->passwd);
 		else
 			encr = "";
 	}

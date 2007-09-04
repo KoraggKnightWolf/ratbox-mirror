@@ -297,8 +297,8 @@ start_auth_query(struct AuthRequest *auth)
 {
 	struct irc_sockaddr_storage localaddr;
 	struct irc_sockaddr_storage remoteaddr;
-	socklen_t locallen = sizeof(struct irc_sockaddr_storage);
-	socklen_t remotelen = sizeof(struct irc_sockaddr_storage);
+	rb_socklen_t locallen = sizeof(struct irc_sockaddr_storage);
+	rb_socklen_t remotelen = sizeof(struct irc_sockaddr_storage);
 	char myip[HOSTIPLEN + 1];
 	int lport, rport;
 

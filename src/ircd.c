@@ -514,14 +514,16 @@ ratbox_main(int argc, char *argv[])
 	init_sys();
 
 
+
+	myargv = argv;
+	parseargs(&argc, &argv, myopts);
+
 	if(chdir(basedir))
 	{
 		fprintf(stderr, "Unable to chdir to %s: %s\n", basedir, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
-	myargv = argv;
-	parseargs(&argc, &argv, myopts);
 	add_all_conf_settings();
 
 	r = read_config_file(configfile);

@@ -41,8 +41,8 @@
 #include "s_log.h"
 
 static rb_dlink_list listener_list;
-static int accept_precallback(rb_fde_t *F, struct sockaddr *addr, socklen_t addrlen, void *data);
-static void accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, socklen_t addrlen, void *data);
+static int accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, void *data);
+static void accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t addrlen, void *data);
 
 
 
@@ -453,7 +453,7 @@ static time_t last_oper_notice = 0;
 static const char *toofast = "ERROR :Reconnecting too fast, throttled.\r\n";
 
 static int
-accept_precallback(rb_fde_t *F, struct sockaddr *addr, socklen_t addrlen, void *data)
+accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, void *data)
 {
 	struct Listener *listener = (struct Listener *)data;
 	char buf[BUFSIZE];
@@ -526,7 +526,7 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, socklen_t addrlen, void *
 }
 
 static void
-accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, socklen_t addrlen, void *data)
+accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t addrlen, void *data)
 {
 	struct Listener *listener = data;
 
