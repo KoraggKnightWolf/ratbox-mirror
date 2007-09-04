@@ -92,7 +92,6 @@ CFLAGS = @CFLAGS@
 CP = @CP@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
-CRYPT_LIB = @CRYPT_LIB@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -140,8 +139,6 @@ MINGW_FALSE = @MINGW_FALSE@
 MINGW_TRUE = @MINGW_TRUE@
 MODULE_DIR = @MODULE_DIR@
 MV = @MV@
-NEED_CRYPT_FALSE = @NEED_CRYPT_FALSE@
-NEED_CRYPT_TRUE = @NEED_CRYPT_TRUE@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -225,7 +222,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = $(DEFAULT_INCLUDES) -I../libratbox/include -I.
 mkpasswd_SOURCES = mkpasswd.c
-mkpasswd_LDADD = @CRYPT_LIB@ ../libratbox/src/libratbox.la
+mkpasswd_LDADD = ../libratbox/src/libratbox.la
 all: all-am
 
 .SUFFIXES:

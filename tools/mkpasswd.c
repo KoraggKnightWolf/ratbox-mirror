@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
     plaintext = getpass("plaintext: ");
   }
 
-  printf("%s\n", crypt(plaintext, salt));
+  printf("%s\n", rb_crypt(plaintext, salt));
   return 0;
 }
 
