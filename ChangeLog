@@ -1,3 +1,11 @@
+androsyn    2007/09/04 16:32:44 UTC	(20070904_2-24336)
+  Log:
+  change socklen_t to int
+
+  Modified:
+	ircd-ratbox/trunk/adns/event.c (File Modified) 
+
+
 androsyn    2007/09/04 16:31:38 UTC	(20070904_1-24334)
   Log:
   add back checks for netinet/in.h and arpa/inet.h
