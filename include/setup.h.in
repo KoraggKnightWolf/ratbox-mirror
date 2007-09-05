@@ -189,6 +189,9 @@
 /* Defined to mark profiling is enabled */
 #undef RATBOX_PROFILE
 
+/* Extension that shared libs use */
+#undef SHLIBEXT
+
 /* Define to 1 if sockaddr has a 'sa_len' member. */
 #undef SOCKADDR_IN_HAS_LEN
 

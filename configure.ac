@@ -22,7 +22,6 @@ AM_PROG_LEX
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_EGREP
-
 if test "$enable_static" = "yes"; then
 	AM_DISABLE_SHARED
 	AM_ENABLE_STATIC	
@@ -56,13 +55,13 @@ AC_PATH_PROG(RM, rm)
 AC_PATH_PROG(CP, cp)
 AC_PATH_PROG(MV, mv)
 AC_PATH_PROG(LN, ln)
-AC_PATH_PROG(SED, sed)
 AC_PATH_PROG(AR, ar)
 AC_PATH_PROG(LD, ld)
 AC_PATH_PROG(RANLIB, ranlib)
 AC_PATH_PROG(TOUCH, touch)
 #AC_PATH_PROG(LEX, flex, [no])
 AC_PROG_YACC
+AC_PROG_SED
 AC_LANG(C)
 
 AM_CONDITIONAL([STATIC_MODULES], test "$enable_static" = "yes")
@@ -596,7 +595,16 @@ dnl a custom prefix with a trailing slash
 	
 fi
 
+dnl lets see what libtool thinks our suffix is...
+AC_MSG_CHECKING([for shared library suffix])
+SHLIBEXT=$shrext_cmds
+AC_MSG_RESULT($SHLIBEXT)
+AC_SUBST(SHLIBEXT,$SHLIBEXT)
+AC_DEFINE_UNQUOTED(SHLIBEXT,"$SHLIBEXT", [Extension that shared libs use])
+                   
+
 AC_SUBST(IRCD_PREFIX)
+
 
 AC_CONFIG_FILES(		\
 	Makefile		\

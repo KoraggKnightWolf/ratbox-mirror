@@ -350,62 +350,6 @@ findmodule_byname(const char *name)
 	}
 	return -1;
 }
-
-static char found_suffix[4];
-static int suffix_len = 0;
-
-static
-void find_module_suffix(void)
-{
-	struct dirent *ldirent;
-	char module_dir[PATH_MAX + 1];
-	DIR *dir;
-	int len;
-	if(strlen(found_suffix) > 0)
-		return;
-
-        /* default to libtool suffix */
-        strcpy(found_suffix, ".la");
-        suffix_len = strlen(found_suffix);
-
-	dir = opendir(AUTOMODPATH);
-	if(dir == NULL)
-	{
-		rb_strlcpy(module_dir, ConfigFileEntry.dpath, sizeof(module_dir));
-		rb_strlcat(module_dir, "/modules/autoload", sizeof(module_dir));
-		dir = opendir(module_dir);
- 	}
-
-	if(dir == NULL)
-	{
-        	if((dir = opendir(MODPATH)) == NULL)   
-        	{
-        		ilog(L_MAIN, "Could not determine module suffix from %s: %s", MODPATH, strerror(errno));
-			abort();
-		}
-	} 
-
-      
-	
-	while ((ldirent = readdir(dir)) != NULL)
-	{
-		len = strlen(ldirent->d_name);
-		if((len > 3) && !strcmp(ldirent->d_name+len-3, ".so"))
-			strcpy(found_suffix, ".so");
-		else
-		if((len > 3) && !strcmp(ldirent->d_name+len-3, ".sl"))
-			strcpy(found_suffix, ".sl");
-		else
-		if((len > 4) && !strcmp(ldirent->d_name+len-4, ".dll"))
-			strcpy(found_suffix, ".dll");
-				
-		if((suffix_len = strlen(found_suffix)) > 0)
-			return;
-	}
-	ilog(L_MAIN, "Cound not determine module suffix at all...");
-	abort();
-}
-
 /* load_all_modules()
  *
  * input        -
@@ -415,15 +359,16 @@ void find_module_suffix(void)
 void
 load_all_modules(int warn)
 {
+	static const char *shext = SHLIBEXT;
 	DIR *system_module_dir = NULL;
 	struct dirent *ldirent = NULL;
 	char module_fq_name[PATH_MAX + 1];
 	char module_dir_name[PATH_MAX + 1];
 	int len;
+	int ext_len = strlen(SHLIBEXT);
 	modules_init();
 
 
-	find_module_suffix();
 	max_mods = MODS_INCREMENT;
 	rb_strlcpy(module_dir_name, AUTOMODPATH, sizeof(module_dir_name));
 	system_module_dir = opendir(module_dir_name);
@@ -445,7 +390,7 @@ load_all_modules(int warn)
 	{
 		len = strlen(ldirent->d_name);
 
-		if((len > suffix_len) && !strcmp(ldirent->d_name+len-suffix_len, found_suffix))
+		if((len > ext_len) && !strcmp(ldirent->d_name+len-ext_len, shext))
 		{
 			(void) rb_snprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", module_dir_name, ldirent->d_name);
 			(void) load_a_module(module_fq_name, warn, 0);
@@ -468,7 +413,6 @@ load_core_modules(int warn)
 	DIR *core_dir;
 	int i;
 
-	find_module_suffix();
 	core_dir  = opendir(MODPATH);
 	if(core_dir == NULL)
 	{
@@ -490,13 +434,13 @@ load_core_modules(int warn)
 	{
 
 		rb_snprintf(module_name, sizeof(module_name), "%s/%s%s", dir_name,
-			    core_module_table[i], found_suffix);
+			    core_module_table[i], SHLIBEXT);
 
 		if(load_a_module(module_name, warn, 1) == -1)
 		{
 			ilog(L_MAIN,
 			"Error loading core module %s%s: terminating ircd",
-			     core_module_table[i], found_suffix);
+			     core_module_table[i], SHLIBEXT);
 			exit(0);
 		}
 	}

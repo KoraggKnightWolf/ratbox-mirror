@@ -718,6 +718,7 @@ SEDOBJ = @SEDOBJ@
 SERVLINK = @SERVLINK@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SHLIBEXT = @SHLIBEXT@
 SQLITE_INCLUDES = @SQLITE_INCLUDES@
 SQLITE_LD = @SQLITE_LD@
 SQLITE_SUBDIR = @SQLITE_SUBDIR@
@@ -1120,7 +1121,7 @@ modules_core_m_squit_la_LIBADD = $(MODULE_LIBS)
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .l .lo .o .obj .so .y
+.SUFFIXES: .c .l .lo .o .obj .y
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -2425,9 +2426,6 @@ src: $(libcore_LTLIBRARIES) ircd
 modules: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 
 modules_core: $(core_LTLIBRARIES)
-
-.o.so: 
-	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(MODULE_FLAGS) $(MODULE_LIBS) -avoid-version -shared $< -o $@
 
 install-exec-hook: install-libcoreLTLIBRARIES move-old-modules
 

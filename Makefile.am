@@ -397,9 +397,6 @@ modules: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 
 modules_core: $(core_LTLIBRARIES)
 
-.o.so: 
-	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(MODULE_FLAGS) $(MODULE_LIBS) -avoid-version -shared $< -o $@
-
 install-exec-hook: install-libcoreLTLIBRARIES move-old-modules
 
 move-old-modules:
