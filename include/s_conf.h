@@ -226,6 +226,7 @@ struct config_channel_entry
 	int no_oper_resvs;
 	int burst_topicwho;
 	int invite_ops_only;
+	int topiclen;
 };
 
 struct config_server_hide

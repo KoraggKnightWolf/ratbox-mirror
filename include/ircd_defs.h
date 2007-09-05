@@ -106,7 +106,8 @@
 #define MAX_DATE_STRING 32	/* maximum string length for a date string */
 
 #define HELPLEN         400
-
+#define DEFAULT_TOPICLEN	160	/* Default topiclen */
+#define MAX_TOPICLEN		390	/* Max topiclen */
 /* 
  * message return values 
  */

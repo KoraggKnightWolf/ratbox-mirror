@@ -734,7 +734,6 @@ set_default_conf(void)
 	ConfigFileEntry.use_whois_actually = YES;
 	ConfigFileEntry.burst_away = NO;
 	ConfigFileEntry.hide_spoof_ips = YES;
-
 #ifdef HAVE_LIBZ
 	ConfigFileEntry.compression_level = 4;
 #endif
@@ -757,6 +756,7 @@ set_default_conf(void)
 	ConfigChannel.default_split_server_count = 10;
 	ConfigChannel.no_join_on_split = NO;
 	ConfigChannel.no_create_on_split = YES;
+	ConfigChannel.topiclen = DEFAULT_TOPICLEN;
 
 	ConfigServerHide.flatten_links = 0;
 	ConfigServerHide.links_delay = 300;

@@ -759,6 +759,7 @@ free_topic(struct Channel *chptr)
 	/* This is safe for now - If you change allocate_topic you
 	 * MUST change this as well
 	 */
+	rb_free(chptr->topic->topic);
 	rb_bh_free(topic_heap, chptr->topic);
 	chptr->topic = NULL;
 }
@@ -775,9 +776,12 @@ set_channel_topic(struct Channel *chptr, const char *topic,
 {
 	if(strlen(topic) > 0)
 	{
-		if(chptr->topic == NULL)
+		if(chptr->topic == NULL) 
 			allocate_topic(chptr);
-		rb_strlcpy(chptr->topic->topic, topic, sizeof(chptr->topic->topic));
+		else
+			rb_free(chptr->topic->topic);
+
+		chptr->topic->topic = rb_strndup(topic, ConfigChannel.topiclen + 1); /* the + 1 for the \0 */
 		rb_strlcpy(chptr->topic->topic_info, topic_info, sizeof(chptr->topic->topic_info));
 		chptr->topic->topic_time = topicts;
 	} 

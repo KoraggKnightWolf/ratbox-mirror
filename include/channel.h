@@ -46,7 +46,7 @@ struct Mode
 
 struct topic_info
 {
-	char topic[TOPICLEN+1];
+	char *topic;
 	char topic_info[USERHOST_REPLYLEN];
 	time_t topic_time;
 };
