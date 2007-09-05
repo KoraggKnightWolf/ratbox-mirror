@@ -2247,6 +2247,7 @@ static struct conf_items conf_general_table[] =
 	{ "ts_warn_delta",	CF_TIME,  NULL, 0, &ConfigFileEntry.ts_warn_delta	},
 	{ "use_whois_actually", CF_YESNO, NULL, 0, &ConfigFileEntry.use_whois_actually	},
 	{ "warn_no_nline",	CF_YESNO, NULL, 0, &ConfigFileEntry.warn_no_nline	},
+	{ "kill_chase_time",	CF_TIME,  NULL, 0, &ConfigFileEntry.kill_chase_time	},
 #ifdef IPV6
 	{ "fallback_to_ip6_int", CF_YESNO, NULL, 0, &ConfigFileEntry.fallback_to_ip6_int },
 #endif

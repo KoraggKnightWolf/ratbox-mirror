@@ -735,7 +735,7 @@ set_default_conf(void)
 	ConfigFileEntry.use_whois_actually = YES;
 	ConfigFileEntry.burst_away = NO;
 	ConfigFileEntry.hide_spoof_ips = YES;
-
+	ConfigFileEntry.kill_chase_time = 90;
 #ifdef HAVE_LIBZ
 	ConfigFileEntry.compression_level = 4;
 #endif

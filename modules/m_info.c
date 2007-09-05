@@ -196,12 +196,6 @@ static struct InfoStruct info_table[] = {
 		"Anti SpamBot Parameter"
 	},
 	{
-		"KILLCHASETIMELIMIT", 
-		OUTPUT_DECIMAL_RAW, 
-		{ (void *)KILLCHASETIMELIMIT },
-		"Nick Change Tracker for KILL"
-	},
-	{
 		"LPATH", 
 		OUTPUT_STRING_PTR,
 		{ LPATH },
@@ -489,6 +483,12 @@ static struct InfoStruct info_table[] = {
 		OUTPUT_BOOLEAN_YN,
 		{ &ServerInfo.hub }, 
 		"Server is a hub"
+	},
+	{
+		"kill_chase_time",
+		OUTPUT_DECIMAL,
+		{ &ConfigFileEntry.kill_chase_time }, 
+		"Nick Change Tracker for KILL"
 	},
 	{
 		"kline_delay",

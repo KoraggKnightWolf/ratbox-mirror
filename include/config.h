@@ -79,12 +79,6 @@
 #define HANGONRETRYDELAY 60	/* Recommended value: 30-60 seconds */
 #define HANGONGOODLINK 3600	/* Recommended value: 30-60 minutes */
 
-/* KILLCHASETIMELIMIT -
- * Max time from the nickname change that still causes KILL
- * automatically to switch for the current nick of that user. (seconds)
- */
-#define KILLCHASETIMELIMIT 90	/* Recommended value: 90 */
-
 /* RATBOX_SOMAXCONN
  * Use SOMAXCONN if OS has it, otherwise use this value for the 
  * listen(); backlog.  5 for AIX/SUNOS, 25 for other OSs.
