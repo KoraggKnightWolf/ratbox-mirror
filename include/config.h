@@ -60,7 +60,6 @@
 #define SLPATH   BINPATH "/servlink"	/* servlink executable */
 #define CPATH    ETCPATH "/ircd.conf"	/* ircd.conf file */
 #define DBPATH   ETCPATH "/ban.db"
-#define RPATH    ETCPATH "/ircd.rsa"	/* ircd rsa private keyfile */
 #define MPATH    ETCPATH "/ircd.motd"	/* MOTD file */
 #define LPATH    LOGPATH "/ircd.log"	/* ircd logfile */
 #define PPATH    ETCPATH "/ircd.pid"	/* pid file */
