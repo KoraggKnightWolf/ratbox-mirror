@@ -1,3 +1,21 @@
+androsyn    2007/09/05 19:00:42 UTC	(20070905_6-24398)
+  Log:
+  make topiclen configurable from the config file
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+	ircd-ratbox/trunk/include/ircd_defs.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/supported.h (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2007/09/05 18:59:23 UTC	(20070905_5-24396)
   Log:
   remove this very old and stale struct exit_client_hook stuff..
