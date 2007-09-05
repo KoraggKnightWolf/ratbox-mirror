@@ -1,3 +1,12 @@
+androsyn    2007/09/05 17:04:06 UTC	(20070905_2-24390)
+  Log:
+  get rid of some unused path defines
+
+  Modified:
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+
+
 androsyn    2007/09/05 17:01:26 UTC	(20070905_1-24388)
   Log:
   replace TS6_ONLY/TS_MIN defines with serverinfo::ts_min
