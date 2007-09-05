@@ -1,3 +1,18 @@
+androsyn    2007/09/05 17:01:26 UTC	(20070905_1-24388)
+  Log:
+  replace TS6_ONLY/TS_MIN defines with serverinfo::ts_min
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_svinfo.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2007/09/05 15:32:44 UTC	(20070905_0-24386)
   Log:
   use libtools idea of what the shared library extension should be when loading modules
