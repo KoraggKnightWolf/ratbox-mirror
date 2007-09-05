@@ -1369,7 +1369,7 @@ server_estab(struct Client *client_p)
 		SetServlink(client_p);
 	}
 
-	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, rb_current_time());
+	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, ServerInfo.ts_min, rb_current_time());
 
 	client_p->servptr = &me;
 

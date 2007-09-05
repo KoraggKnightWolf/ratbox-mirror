@@ -923,6 +923,25 @@ conf_set_serverinfo_name(confentry_t * entry, conf_t * conf, struct conf_items *
 	}
 }
 
+static void
+conf_set_serverinfo_ts_min(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	if(entry->number > 6)
+	{
+		conf_report_warning_nl("Ignoring serverinfo::ts_min > 6 at %s:%d, defaulting to 3", entry->filename, entry->line);
+		ServerInfo.ts_min = 3;
+		return;
+	}
+	if(entry->number < 3)
+	{
+		conf_report_warning_nl("Ignoring serverinfo::ts_min < 3 at %s:%d, defaulting to 3", entry->filename, entry->line);
+		ServerInfo.ts_min = 3;
+		return;
+	}
+	ServerInfo.ts_min = entry->number;
+	
+
+}
 
 static void
 conf_set_serverinfo_network_name(confentry_t * entry, conf_t * conf, struct conf_items *item)
@@ -2068,6 +2087,7 @@ static struct conf_items conf_serverinfo_table[] =
         { "network_desc",       CF_QSTRING, NULL, 0, &ServerInfo.network_desc   },
         { "hub",                CF_YESNO,   NULL, 0, &ServerInfo.hub            },
         { "use_ts6",            CF_YESNO,   NULL, 0, &ServerInfo.use_ts6        },
+        { "ts_min",		CF_INT,     conf_set_serverinfo_ts_min, 0, NULL },
         { "default_max_clients",CF_INT,     NULL, 0, &ServerInfo.default_max_clients },
 
         { "network_name",       CF_QSTRING, conf_set_serverinfo_network_name,   0, NULL },
