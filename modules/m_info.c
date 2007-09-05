@@ -94,8 +94,8 @@ struct InfoStruct
 #define RATBOX_SOMAXCONN SOMAXCONN
 #endif
 
-#if !defined(CPATH) || !defined(DPATH) || !defined(DLPATH) || !defined(HPATH) || \
-    !defined(UHPATH) || !defined(KPATH) || !defined(LPATH) || !defined(MPATH) || \
+#if !defined(CPATH) || !defined(DPATH) || !defined(HPATH) || \
+    !defined(UHPATH) || !defined(LPATH) || !defined(MPATH) || \
     !defined(OPATH) || !defined(SPATH) 
 static const char *none = "NONE"; /* because we don't need a bunch of NONEs in the executables */
 #endif
@@ -108,10 +108,6 @@ static const char *none = "NONE"; /* because we don't need a bunch of NONEs in t
 #define DPATH none
 #endif
 
-#ifndef DLPATH
-#define DLPATH none
-#endif
-
 #ifndef HPATH 
 #define HPATH none
 #endif
@@ -120,9 +116,6 @@ static const char *none = "NONE"; /* because we don't need a bunch of NONEs in t
 #define UHPATH none
 #endif
 
-#ifndef KPATH
-#define KPATH none
-#endif
 #ifndef LPATH
 #define LPATH none
 #endif
@@ -152,12 +145,6 @@ static struct InfoStruct info_table[] = {
 		{ DPATH },
 		"Directory Containing Configuration Files"
 	},
-	{
-		"DLPATH", 
-		OUTPUT_STRING_PTR,
-		{ DLPATH },
-		"Path to D-line File"
-	},
 	{	
 		"ENABLE_SERVICES", 
 		OUTPUT_BOOLEAN_RAW,
@@ -167,12 +154,6 @@ static struct InfoStruct info_table[] = {
 		{ (void *)0 },
 #endif
 		"ratbox-services compatibility code",
-	},
-	{
-		"RESVPATH",
-		OUTPUT_STRING_PTR,
-		{ RESVPATH }, 
-		"Path to resv file"
 	},
 	{
 		"HPATH",
@@ -219,12 +200,6 @@ static struct InfoStruct info_table[] = {
 		OUTPUT_DECIMAL_RAW, 
 		{ (void *)KILLCHASETIMELIMIT },
 		"Nick Change Tracker for KILL"
-	},
-	{
-		"KPATH", 
-		OUTPUT_STRING_PTR,
-		{ KPATH },
-		"Path to K-line File"
 	},
 	{
 		"LPATH", 

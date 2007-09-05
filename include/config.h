@@ -60,16 +60,11 @@
 #define SLPATH   BINPATH "/servlink"	/* servlink executable */
 #define CPATH    ETCPATH "/ircd.conf"	/* ircd.conf file */
 #define DBPATH   ETCPATH "/ban.db"
-#define KPATH    ETCPATH "/kline.conf"	/* kline file */
-#define DLPATH   ETCPATH "/dline.conf"	/* dline file */
-#define XPATH	 ETCPATH "/xline.conf"	/* xline file */
-#define RESVPATH ETCPATH "/resv.conf"	/* resv file */
 #define RPATH    ETCPATH "/ircd.rsa"	/* ircd rsa private keyfile */
 #define MPATH    ETCPATH "/ircd.motd"	/* MOTD file */
 #define LPATH    LOGPATH "/ircd.log"	/* ircd logfile */
 #define PPATH    ETCPATH "/ircd.pid"	/* pid file */
 #define OPATH    ETCPATH "/opers.motd"	/* oper MOTD file */
-#define TRANSPATH ETCPATH "/transaction.log" /* transaction log */
 
 /* HANGONGOODLINK and HANGONGOODLINK
  * Often net breaks for a short time and it's useful to try to
