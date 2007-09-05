@@ -695,7 +695,7 @@ find_chasing(struct Client *source_p, const char *user, int *chasing)
 	if(who || IsDigit(*user))
 		return who;
 
-	if(!(who = get_history(user, ConfigFileEntry.kill_chase_time)))
+	if(!(who = get_history(user, (long) KILLCHASETIMELIMIT)))
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHNICK,
 				   form_str(ERR_NOSUCHNICK), user);

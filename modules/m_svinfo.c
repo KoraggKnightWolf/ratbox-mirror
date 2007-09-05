@@ -62,7 +62,7 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 	if(source_p != client_p)
 		return 0;
 
-	if(TS_CURRENT < atoi(parv[2]) || atoi(parv[1]) < ServerInfo.ts_min)
+	if(TS_CURRENT < atoi(parv[2]) || atoi(parv[1]) < TS_MIN)
 	{
 		/* TS version is too low on one of the sides, drop the link */
 		sendto_realops_flags(UMODE_ALL, L_ALL,

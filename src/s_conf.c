@@ -668,7 +668,6 @@ set_default_conf(void)
 #endif
 	ServerInfo.use_ts6 = YES;
 	ServerInfo.default_max_clients = MAXCONNECTIONS;
-	ServerInfo.ts_min = 3;
 
 	/* Don't reset hub, as that will break lazylinks */
 	/* ServerInfo.hub = NO; */
@@ -735,7 +734,7 @@ set_default_conf(void)
 	ConfigFileEntry.use_whois_actually = YES;
 	ConfigFileEntry.burst_away = NO;
 	ConfigFileEntry.hide_spoof_ips = YES;
-	ConfigFileEntry.kill_chase_time = 90;
+
 #ifdef HAVE_LIBZ
 	ConfigFileEntry.compression_level = 4;
 #endif

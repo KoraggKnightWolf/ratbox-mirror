@@ -204,7 +204,6 @@ struct config_file_entry
 	int throttle_duration;
 	int target_change;
 	int hide_spoof_ips;
-	time_t kill_chase_time;
 #ifdef IPV6
 	int fallback_to_ip6_int;
 #endif
@@ -247,7 +246,6 @@ struct server_info
 	char *network_desc;
 	int hub;
 	int use_ts6;
-	int ts_min;
 	int default_max_clients;
 	struct sockaddr_in ip;
 #ifdef IPV6

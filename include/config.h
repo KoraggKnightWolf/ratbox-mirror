@@ -66,6 +66,14 @@
 #define PPATH    ETCPATH "/ircd.pid"	/* pid file */
 #define OPATH    ETCPATH "/opers.motd"	/* oper MOTD file */
 
+/* TS6_ONLY
+ *
+ * If this is defined only TS6 servers may link to the network.  See
+ * doc/TS6.txt for more information.  If your network has old servers
+ * (hyb7.0, ircd-ratbox-1.x, +CSr) or hybserv you should NOT define this.
+ */
+#undef TS6_ONLY
+
 /* HANGONGOODLINK and HANGONGOODLINK
  * Often net breaks for a short time and it's useful to try to
  * establishing the same connection again faster than CONNECTFREQUENCY
@@ -78,6 +86,12 @@
  */
 #define HANGONRETRYDELAY 60	/* Recommended value: 30-60 seconds */
 #define HANGONGOODLINK 3600	/* Recommended value: 30-60 minutes */
+
+/* KILLCHASETIMELIMIT -
+ * Max time from the nickname change that still causes KILL
+ * automatically to switch for the current nick of that user. (seconds)
+ */
+#define KILLCHASETIMELIMIT 90	/* Recommended value: 90 */
 
 /* RATBOX_SOMAXCONN
  * Use SOMAXCONN if OS has it, otherwise use this value for the 
