@@ -1,3 +1,14 @@
+jilles      2007/09/13 22:08:32 UTC	(20070913_0-24408)
+  Log:
+  Don't say that services cannot be killed in ERR_ISCHANSERVICE
+  message (given when trying to kick or deop them), as that's
+  not the case.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 androsyn    2007/09/05 19:08:21 UTC	(20070905_7-24400)
   Log:
   nothing uses RPATH so get rid of it
