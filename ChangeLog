@@ -1,3 +1,11 @@
+androsyn    2007/10/10 21:33:57 UTC	(20071010_0-24413)
+  Log:
+  fix port = 6667, 6668 type stuff
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 jilles      2007/09/13 22:08:32 UTC	(20070913_0-24408)
   Log:
   Don't say that services cannot be killed in ERR_ISCHANSERVICE
