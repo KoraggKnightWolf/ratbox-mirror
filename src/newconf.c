@@ -1431,21 +1431,28 @@ conf_set_listen_address(confentry_t * entry, conf_t * conf, struct conf_items *i
 static void
 conf_set_listen_port_both(confentry_t * entry, conf_t * conf, struct conf_items *item, int ssl)
 {
-	if(listener_address == NULL)
+	rb_dlink_node *ptr;
+	confentry_t *xentry;
+
+	RB_DLINK_FOREACH(ptr, entry->flist.head)
 	{
-		add_listener(entry->number, listener_address, AF_INET, ssl);
+		xentry = ptr->data;
+		if(listener_address == NULL)
+		{
+			add_listener(xentry->number, listener_address, AF_INET, ssl);
 #ifdef IPV6
-		add_listener(entry->number, listener_address, AF_INET6, ssl);
+			add_listener(xentry->number, listener_address, AF_INET6, ssl);
 #endif
-	}
-	else
-	{
-		int family = AF_INET;
+		}
+		else
+		{
+			int family = AF_INET;
 #ifdef IPV6
-		if(strchr(listener_address, ':') != NULL)
-			family = AF_INET6;
+			if(strchr(listener_address, ':') != NULL)
+				family = AF_INET6;
 #endif
-		add_listener(entry->number, listener_address, family, ssl);
+			add_listener(xentry->number, listener_address, family, ssl);
+		}
 	}
 }
 
