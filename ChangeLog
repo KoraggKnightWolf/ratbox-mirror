@@ -1,3 +1,14 @@
+androsyn    2007/10/20 21:38:01 UTC	(20071020_0-24418)
+  Log:
+  initial first pass at server<->server ssl connections..eventually this should move out of process...
+
+  Modified:
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2007/10/10 21:33:57 UTC	(20071010_0-24413)
   Log:
   fix port = 6667, 6668 type stuff
