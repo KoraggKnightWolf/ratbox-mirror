@@ -184,6 +184,7 @@ static struct mode_table connect_table[] = {
 	{ "autoconn",	SERVER_AUTOCONN		},
 	{ "compressed",	SERVER_COMPRESSED	},
 	{ "encrypted",	SERVER_ENCRYPTED	},
+	{ "ssl",	SERVER_SSL		},
 	{ "topicburst",	SERVER_TB		},
 	{ NULL,		0			},
 };

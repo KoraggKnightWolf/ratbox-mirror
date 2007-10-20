@@ -67,6 +67,18 @@ static int set_server_gecos(struct Client *, const char *);
 static int check_server(const char *name, struct Client *client_p);
 static int server_estab(struct Client *client_p);
 
+
+/* enums for check_server */
+enum 
+{
+	NO_NLINE = -1,
+	INVALID_PASS = -2,
+	INVALID_HOST = -3,
+	INVALID_SERVERNAME = -4,
+	NEED_SSL = -5,
+};
+
+
 /*
  * mr_server - SERVER message handler
  *      parv[0] = sender prefix
@@ -105,7 +117,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	 * check for us... -A1kmm. */
 	switch (check_server(name, client_p))
 	{
-	case -1:
+	case NO_NLINE:
 		if(ConfigFileEntry.warn_no_nline)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -122,7 +134,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		/* NOT REACHED */
 		break;
 
-	case -2:
+	case INVALID_PASS:
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				"Unauthorised server connection attempt from [@255.255.255.255]: "
 				"Bad password for server %s", 
@@ -133,10 +145,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 		exit_client(client_p, client_p, client_p, "Invalid password.");
 		return 0;
-		/* NOT REACHED */
-		break;
-
-	case -3:
+	case INVALID_HOST:
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Unauthorised server connection attempt from [@255.255.255.255]: "
 				     "Invalid host for server %s", 
@@ -147,11 +156,8 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 		exit_client(client_p, client_p, client_p, "Invalid host.");
 		return 0;
-		/* NOT REACHED */
-		break;
-
 		/* servername is > HOSTLEN */
-	case -4:
+	case INVALID_SERVERNAME:
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Invalid servername %s from [@255.255.255.255]",
 				     client_p->name);
@@ -160,7 +166,16 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 		exit_client(client_p, client_p, client_p, "Invalid servername.");
 		return 0;
-		/* NOT REACHED */
+	case NEED_SSL:
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "Connection from servername %s requires SSL/TLS but is plaintext",
+				     name);
+		ilog(L_SERVER, "Access denied, requires SSL/TLS but is plaintext from %s", 
+		     log_client_name(client_p, SHOW_IP));
+
+		exit_client(client_p, client_p, client_p, "Access denied, requires SSL/TLS but is plaintext");
+		return 0;
+	default:
 		break;
 	}
 
@@ -643,23 +658,24 @@ server_exists(const char *servername)
 	return NULL;
 }
 
+
 static int
 check_server(const char *name, struct Client *client_p)
 {
 	struct server_conf *server_p = NULL;
 	struct server_conf *tmp_p;
 	rb_dlink_node *ptr;
-	int error = -1;
+	int error = NO_NLINE;
 
 	s_assert(NULL != client_p);
 	if(client_p == NULL)
 		return error;
 
 	if(!(client_p->localClient->passwd))
-		return -2;
+		return INVALID_PASS;
 
 	if(strlen(name) > HOSTLEN)
-		return -4;
+		return INVALID_SERVERNAME;
 
 	RB_DLINK_FOREACH(ptr, server_conf_list.head)
 	{
@@ -671,14 +687,14 @@ check_server(const char *name, struct Client *client_p)
 		if(!match(name, tmp_p->name))
 			continue;
 
-		error = -3;
+		error = INVALID_HOST;
 
 		/* XXX: Fix me for IPv6 */
 		/* XXX sockhost is the IPv4 ip as a string */
 		if(match(tmp_p->host, client_p->host) ||
 		   match(tmp_p->host, client_p->sockhost))
 		{
-			error = -2;
+			error = INVALID_PASS;
 
 			if(ServerConfEncrypted(tmp_p))
 			{
@@ -699,6 +715,11 @@ check_server(const char *name, struct Client *client_p)
 
 	if(server_p == NULL)
 		return error;
+
+	if(ServerConfSSL(server_p) && !rb_fd_ssl(client_p->localClient->F))
+	{
+		return NEED_SSL;
+	}
 
 	attach_server_conf(client_p, server_p);
 

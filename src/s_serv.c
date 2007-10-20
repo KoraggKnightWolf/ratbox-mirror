@@ -629,16 +629,28 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 #endif
 	else
 	{
-		rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
-				 NULL, 0, serv_connect_callback, 
-				 client_p, ConfigFileEntry.connect_timeout);
+		if(ServerConfSSL(server_p))
+			rb_connect_tcp_ssl(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
+					 NULL, 0, serv_connect_callback, 
+					 client_p, ConfigFileEntry.connect_timeout);
+		else
+			rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
+					 NULL, 0, serv_connect_callback, 
+					 client_p, ConfigFileEntry.connect_timeout);
+
 		 return 1;
 	}
 
-	rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
-			 (struct sockaddr *) &myipnum,
-			 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
-			 ConfigFileEntry.connect_timeout);
+	if(ServerConfSSL(server_p))
+		rb_connect_tcp_ssl(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
+				 (struct sockaddr *) &myipnum,
+				 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
+				 ConfigFileEntry.connect_timeout);
+	else
+		rb_connect_tcp_ssl(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
+				 (struct sockaddr *) &myipnum,
+				 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
+				 ConfigFileEntry.connect_timeout);
 
 	return 1;
 }
