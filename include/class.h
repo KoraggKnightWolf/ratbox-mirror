@@ -29,7 +29,6 @@
 
 struct ConfItem;
 struct Client;
-struct _patricia_tree_t;
 
 struct Class
 {
@@ -43,7 +42,7 @@ struct Class
 	int con_freq;
 	int ping_freq;
 	int total;
-	struct _patricia_tree_t *ip_limits;
+	rb_patricia_tree_t *ip_limits;
 	int cidr_bitlen;
 	int cidr_amount;
 

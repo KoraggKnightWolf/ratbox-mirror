@@ -52,7 +52,6 @@
 #include "modules.h"
 #include "ircd_getopt.h"
 #include "newconf.h"
-#include "patricia.h"
 #include "reject.h"
 #include "s_conf.h"
 #include "s_newconf.h"
@@ -630,7 +629,6 @@ ratbox_main(int argc, char *argv[])
 	rb_init_prng(NULL, RB_PRNG_DEFAULT);
 	
 	init_main_logfile();
-	init_patricia();
 	init_hash();
 	clear_scache_hash_table();	/* server cache name table */
 	init_host_hash();
