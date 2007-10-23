@@ -80,10 +80,10 @@ am_libcore_la_OBJECTS = src/dns.lo src/bandbi.lo src/cache.lo \
 	src/hash.lo src/hook.lo src/hostmask.lo src/ircd.lo \
 	src/ircd_signal.lo src/listener.lo src/match.lo src/modules.lo \
 	src/monitor.lo src/newconf.lo src/numeric.lo src/operhash.lo \
-	src/packet.lo src/parse.lo src/patricia.lo src/reject.lo \
-	src/restart.lo src/s_auth.lo src/s_conf.lo src/s_newconf.lo \
-	src/s_log.lo src/s_serv.lo src/s_user.lo src/scache.lo \
-	src/send.lo src/whowas.lo src/version.lo src/ircd_parser.lo \
+	src/packet.lo src/parse.lo src/reject.lo src/restart.lo \
+	src/s_auth.lo src/s_conf.lo src/s_newconf.lo src/s_log.lo \
+	src/s_serv.lo src/s_user.lo src/scache.lo src/send.lo \
+	src/whowas.lo src/version.lo src/ircd_parser.lo \
 	src/ircd_lexer.lo
 libcore_la_OBJECTS = $(am_libcore_la_OBJECTS)
 libcore_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -827,7 +827,6 @@ libcore_la_SOURCES = \
   src/operhash.c		\
   src/packet.c                      \
   src/parse.c                       \
-  src/patricia.c                    \
   src/reject.c                      \
   src/restart.c                     \
   src/s_auth.c                      \
@@ -1311,7 +1310,6 @@ src/numeric.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/operhash.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/packet.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/parse.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/patricia.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/reject.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/restart.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/s_auth.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -1827,8 +1825,6 @@ mostlyclean-compile:
 	-rm -f src/packet.lo
 	-rm -f src/parse.$(OBJEXT)
 	-rm -f src/parse.lo
-	-rm -f src/patricia.$(OBJEXT)
-	-rm -f src/patricia.lo
 	-rm -f src/reject.$(OBJEXT)
 	-rm -f src/reject.lo
 	-rm -f src/resolver.$(OBJEXT)
@@ -1948,7 +1944,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/operhash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/parse.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/patricia.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reject.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/resolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/restart.Plo@am__quote@

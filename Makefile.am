@@ -67,7 +67,6 @@ libcore_la_SOURCES =                     \
   src/operhash.c		\
   src/packet.c                      \
   src/parse.c                       \
-  src/patricia.c                    \
   src/reject.c                      \
   src/restart.c                     \
   src/s_auth.c                      \
