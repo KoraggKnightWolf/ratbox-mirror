@@ -50,7 +50,7 @@ extern rb_dlink_list xline_conf_list;
 extern rb_dlink_list resv_conf_list;
 extern rb_dlink_list tgchange_list;
 
-extern struct _patricia_tree_t *tgchange_tree;
+extern rb_patricia_tree_t *tgchange_tree;
 
 void init_s_newconf(void);
 void clear_s_newconf(void);
@@ -63,7 +63,7 @@ typedef struct
 {
 	char *ip;
 	time_t expiry;
-	struct _patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	rb_dlink_node node;
 } tgchange;
 

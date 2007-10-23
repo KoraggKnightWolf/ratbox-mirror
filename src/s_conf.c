@@ -45,7 +45,6 @@
 #include "s_log.h"
 #include "send.h"
 #include "s_gline.h"
-#include "patricia.h"
 #include "reject.h"
 #include "cache.h"
 #include "dns.h"
@@ -396,13 +395,13 @@ verify_access(struct Client *client_p, const char *username)
 static int
 add_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 {
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 
 	/* If the limits are 0 don't do anything.. */
 	if(ConfCidrAmount(aconf) == 0 || ConfCidrBitlen(aconf) == 0)
 		return -1;
 
-	pnode = match_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip);
+	pnode = rb_match_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip);
 
 	if(pnode == NULL)
 		pnode = make_and_lookup_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip, ConfCidrBitlen(aconf));
@@ -417,7 +416,7 @@ add_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 			/* This should only happen if the limits are set to 0 */
 			if((unsigned long) pnode->data == 0)
 			{
-				patricia_remove(ConfIpLimits(aconf), pnode);
+				rb_patricia_remove(ConfIpLimits(aconf), pnode);
 			}
 			return (0);
 		}
@@ -430,20 +429,20 @@ add_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 static void
 remove_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 {
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 
 	/* If the limits are 0 don't do anything.. */
 	if(ConfCidrAmount(aconf) == 0 || ConfCidrBitlen(aconf) == 0)
 		return;
 
-	pnode = match_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip);
+	pnode = rb_match_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip);
 	if(pnode == NULL)
 		return;
 
 	pnode->data--;
 	if(((unsigned long) pnode->data) == 0)
 	{
-		patricia_remove(ConfIpLimits(aconf), pnode);
+		rb_patricia_remove(ConfIpLimits(aconf), pnode);
 	}
 
 }

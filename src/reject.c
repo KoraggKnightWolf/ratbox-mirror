@@ -25,7 +25,6 @@
 
 #include "stdinc.h"
 #include "struct.h"
-#include "patricia.h"
 #include "client.h"
 #include "s_conf.h"
 #include "reject.h"
@@ -36,13 +35,13 @@
 #include "parse.h"
 #include "hostmask.h"
 
-static patricia_tree_t *reject_tree;
-patricia_tree_t *dline_tree;
-static patricia_tree_t *eline_tree;
+static rb_patricia_tree_t *reject_tree;
+rb_patricia_tree_t *dline_tree;
+static rb_patricia_tree_t *eline_tree;
 rb_dlink_list delay_exit;
 static rb_dlink_list reject_list;
 static rb_dlink_list throttle_list;
-static patricia_tree_t *throttle_tree;
+static rb_patricia_tree_t *throttle_tree;
 static void throttle_expires(void *unused);
 
 
@@ -60,10 +59,10 @@ struct delay_data
 };
 
 
-static patricia_node_t *
-add_ipline(struct ConfItem *aconf, patricia_tree_t *tree, struct sockaddr *addr, int cidr)
+static rb_patricia_node_t *
+add_ipline(struct ConfItem *aconf, rb_patricia_tree_t *tree, struct sockaddr *addr, int cidr)
 {
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	pnode = make_and_lookup_ip(tree, addr, cidr);
 	if(pnode == NULL)
 		return NULL;
@@ -123,7 +122,7 @@ static void
 reject_expires(void *unused)
 {
 	rb_dlink_node *ptr, *next;
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	struct reject_data *rdata;
 	
 	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
@@ -136,17 +135,17 @@ reject_expires(void *unused)
 
 		rb_dlinkDelete(ptr, &reject_list);
 		rb_free(rdata);
-		patricia_remove(reject_tree, pnode);
+		rb_patricia_remove(reject_tree, pnode);
 	}
 }
 
 void
 init_reject(void)
 {
-	reject_tree = New_Patricia(PATRICIA_BITS);
-	dline_tree = New_Patricia(PATRICIA_BITS);
-	eline_tree = New_Patricia(PATRICIA_BITS);
-	throttle_tree = New_Patricia(PATRICIA_BITS);
+	reject_tree = rb_new_patricia(PATRICIA_BITS);
+	dline_tree = rb_new_patricia(PATRICIA_BITS);
+	eline_tree = rb_new_patricia(PATRICIA_BITS);
+	throttle_tree = rb_new_patricia(PATRICIA_BITS);
 	rb_event_add("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
 	rb_event_add("reject_expires", reject_expires, NULL, 60);
 	rb_event_add("throttle_expires", throttle_expires, NULL, 10);
@@ -156,14 +155,14 @@ init_reject(void)
 void
 add_reject(struct Client *client_p)
 {
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	struct reject_data *rdata;
 
 	/* Reject is disabled */
 	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return;
 
-	if((pnode = match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
+	if((pnode = rb_match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
 	{
 		rdata = pnode->data;
 		rdata->time = rb_current_time();
@@ -187,14 +186,14 @@ add_reject(struct Client *client_p)
 int
 check_reject(rb_fde_t *F, struct sockaddr *addr)
 {
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	struct reject_data *rdata;
 	struct delay_data *ddata;
 	/* Reject is disabled */
 	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return 0;
 		
-	pnode = match_ip(reject_tree, addr);
+	pnode = rb_match_ip(reject_tree, addr);
 	if(pnode != NULL)
 	{
 		rdata = pnode->data;
@@ -218,7 +217,7 @@ void
 flush_reject(void)
 {
 	rb_dlink_node *ptr, *next;
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	struct reject_data *rdata;
 	
 	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
@@ -227,34 +226,34 @@ flush_reject(void)
 		rdata = pnode->data;
 		rb_dlinkDelete(ptr, &reject_list);
 		rb_free(rdata);
-		patricia_remove(reject_tree, pnode);
+		rb_patricia_remove(reject_tree, pnode);
 	}
 }
 
 int 
 remove_reject(const char *ip)
 {
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	
 	/* Reject is disabled */
 	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return -1;
 
-	if((pnode = match_string(reject_tree, ip)) != NULL)
+	if((pnode = rb_match_string(reject_tree, ip)) != NULL)
 	{
 		struct reject_data *rdata = pnode->data;
 		rb_dlinkDelete(&rdata->rnode, &reject_list);
 		rb_free(rdata);
-		patricia_remove(reject_tree, pnode);
+		rb_patricia_remove(reject_tree, pnode);
 		return 1;
 	}
 	return 0;
 }
 
 static void
-delete_ipline(struct ConfItem *aconf, patricia_tree_t *t)
+delete_ipline(struct ConfItem *aconf, rb_patricia_tree_t *t)
 {
-	patricia_remove(t, aconf->pnode);
+	rb_patricia_remove(t, aconf->pnode);
 	if(!aconf->clients)
 	{
 		free_conf(aconf);
@@ -262,20 +261,20 @@ delete_ipline(struct ConfItem *aconf, patricia_tree_t *t)
 }
 
 static struct ConfItem *
-find_ipline(patricia_tree_t *t, struct sockaddr *addr)
+find_ipline(rb_patricia_tree_t *t, struct sockaddr *addr)
 {
-	patricia_node_t *pnode;
-	pnode = match_ip(t, addr);
+	rb_patricia_node_t *pnode;
+	pnode = rb_match_ip(t, addr);
 	if(pnode != NULL)
 		return (struct ConfItem *) pnode->data;
 	return NULL;
 }
 
 static struct ConfItem *
-find_ipline_exact(patricia_tree_t *t, struct sockaddr *addr, unsigned int bitlen)
+find_ipline_exact(rb_patricia_tree_t *t, struct sockaddr *addr, unsigned int bitlen)
 {
-	patricia_node_t *pnode;
-	pnode = match_ip_exact(t, addr, bitlen);
+	rb_patricia_node_t *pnode;
+	pnode = rb_match_ip_exact(t, addr, bitlen);
 	if(pnode != NULL)
 		return (struct ConfItem *) pnode->data;
 	return NULL;
@@ -309,14 +308,14 @@ remove_dline(struct ConfItem *aconf)
 void
 report_dlines(struct Client *source_p)
 {
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	struct ConfItem *aconf;
 	char *host, *pass, *user, *oper_reason;
-	PATRICIA_WALK(dline_tree->head, pnode)
+	RB_PATRICIA_WALK(dline_tree->head, pnode)
 	{
 		aconf = pnode->data;
 		if(aconf->flags & CONF_FLAGS_TEMPORARY)
-			PATRICIA_WALK_BREAK;
+			RB_PATRICIA_WALK_BREAK;
 		get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDLINE,
                             		     form_str (RPL_STATSDLINE),
@@ -324,20 +323,20 @@ report_dlines(struct Client *source_p)
                                              oper_reason ? "|" : "",
                                              oper_reason ? oper_reason : "");
 	}
-	PATRICIA_WALK_END;
+	RB_PATRICIA_WALK_END;
 }
 
 void
 report_tdlines(struct Client *source_p)
 {
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	struct ConfItem *aconf;
 	char *host, *pass, *user, *oper_reason;
-	PATRICIA_WALK(dline_tree->head, pnode)
+	RB_PATRICIA_WALK(dline_tree->head, pnode)
 	{
 		aconf = pnode->data;
 		if(!(aconf->flags & CONF_FLAGS_TEMPORARY))
-			PATRICIA_WALK_BREAK;
+			RB_PATRICIA_WALK_BREAK;
 		get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDLINE,
                             		     form_str (RPL_STATSDLINE),
@@ -345,17 +344,17 @@ report_tdlines(struct Client *source_p)
                                              oper_reason ? "|" : "",
                                              oper_reason ? oper_reason : "");
 	}
-	PATRICIA_WALK_END;
+	RB_PATRICIA_WALK_END;
 }
 
 void
 report_elines(struct Client *source_p)
 {
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	struct ConfItem *aconf;
 	int port;
 	char *name, *host, *pass, *user, *classname;
-	PATRICIA_WALK(eline_tree->head, pnode)
+	RB_PATRICIA_WALK(eline_tree->head, pnode)
 	{
 		aconf = pnode->data;
 		get_printable_conf(aconf, &name, &host, &pass, &user, &port, &classname);
@@ -364,7 +363,7 @@ report_elines(struct Client *source_p)
                                              'e', host, pass,
                                              "", "");
 	}
-	PATRICIA_WALK_END;
+	RB_PATRICIA_WALK_END;
 }
 
 
@@ -380,9 +379,9 @@ int
 throttle_add(struct sockaddr *addr)
 {
 	throttle_t *t;
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 
-	if((pnode = match_ip(throttle_tree, addr)) != NULL)
+	if((pnode = rb_match_ip(throttle_tree, addr)) != NULL)
 	{
 		t = pnode->data;
 
@@ -413,7 +412,7 @@ static void
 throttle_expires(void *unused)
 {
 	rb_dlink_node *ptr, *next;
-	patricia_node_t *pnode;
+	rb_patricia_node_t *pnode;
 	throttle_t *t;
 	
 	RB_DLINK_FOREACH_SAFE(ptr, next, throttle_list.head)
@@ -426,7 +425,7 @@ throttle_expires(void *unused)
 
 		rb_dlinkDelete(ptr, &throttle_list);
 		rb_free(t);
-		patricia_remove(throttle_tree, pnode);
+		rb_patricia_remove(throttle_tree, pnode);
 	}
 }
 
