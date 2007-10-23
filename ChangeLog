@@ -1,3 +1,18 @@
+androsyn    2007/10/23 20:43:01 UTC	(20071023_1-24430)
+  Log:
+  make the ircd use the libratbox patricia_tree
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/src/class.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 androsyn    2007/10/23 20:29:55 UTC	(20071023_0-24428)
   Log:
   remove patricia from ircd tree as its now in libratbox
