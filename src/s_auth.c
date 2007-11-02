@@ -295,10 +295,8 @@ auth_error(struct AuthRequest *auth)
 static void
 start_auth_query(struct AuthRequest *auth)
 {
-	struct irc_sockaddr_storage localaddr;
-	struct irc_sockaddr_storage remoteaddr;
-	rb_socklen_t locallen = sizeof(struct irc_sockaddr_storage);
-	rb_socklen_t remotelen = sizeof(struct irc_sockaddr_storage);
+	struct irc_sockaddr_storage *localaddr;
+	struct irc_sockaddr_storage *remoteaddr;
 	char myip[HOSTIPLEN + 1];
 	int lport, rport;
 
@@ -314,24 +312,9 @@ start_auth_query(struct AuthRequest *auth)
 		return;
 	}
 	
-	/* 
-	 * get the local address of the client and bind to that to
-	 * make the auth request.  This used to be done only for
-	 * ifdef VIRTUAL_HOST, but needs to be done for all clients
-	 * since the ident request must originate from that same address--
-	 * and machines with multiple IP addresses are common now
-	 */
-	memset(&localaddr, 0, locallen);
+	localaddr = auth->client->localClient->lip;
+	remoteaddr = &auth->client->localClient->ip;
 
-	if(getsockname(rb_get_fd(auth->client->localClient->F), (struct sockaddr *) &localaddr, &locallen) ||
-	   getpeername(rb_get_fd(auth->client->localClient->F), (struct sockaddr *) &remoteaddr, &remotelen))
-	{
-		auth_error(auth);
-		release_auth_client(auth);
-		return;
-	}
-
-	rb_inet_ntop_sock((struct sockaddr *) &localaddr, myip, sizeof(myip));
 
 #ifdef IPV6
 	if(GET_SS_FAMILY(&localaddr) == AF_INET6)
@@ -341,11 +324,11 @@ start_auth_query(struct AuthRequest *auth)
 		lport = ntohs(((struct sockaddr_in *) &localaddr)->sin_port);
 
 #ifdef IPV6
-	if(GET_SS_FAMILY(&localaddr) == AF_INET6)
-		rport = ntohs(((struct sockaddr_in6 *) &remoteaddr)->sin6_port);
+	if(GET_SS_FAMILY(remoteaddr) == AF_INET6)
+		rport = ntohs(((struct sockaddr_in6 *) remoteaddr)->sin6_port);
 	else
 #endif
-		rport = ntohs(((struct sockaddr_in *) &remoteaddr)->sin_port);
+		rport = ntohs(((struct sockaddr_in *) remoteaddr)->sin_port);
 
 	auth->reqid = assign_auth_id();
 	authtable[auth->reqid] = auth;

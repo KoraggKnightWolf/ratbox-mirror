@@ -39,6 +39,7 @@
 #include "s_auth.h"
 #include "reject.h"
 #include "s_log.h"
+#include "sslproc.h"
 
 static rb_dlink_list listener_list;
 static int accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, void *data);
@@ -213,7 +214,7 @@ inetport(struct Listener *listener)
 	}
 
 	
-	if(listener->ssl)
+	if(listener->ssl && !ServerInfo.ssl_use_ssld)
 		ret = rb_ssl_listen(F, RATBOX_SOMAXCONN);
 	else
 		ret = rb_listen(F, RATBOX_SOMAXCONN);
@@ -410,11 +411,10 @@ close_listeners()
  * any client list yet.
  */
 static void
-add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai)
+add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, struct sockaddr *lai)
 {
 	struct Client *new_client;
 	s_assert(NULL != listener);
-
 	/* 
 	 * get the client socket name from the socket
 	 * the client has already been checked out in accept_connection
@@ -422,6 +422,8 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai)
 	new_client = make_client(NULL);
 
 	memcpy(&new_client->localClient->ip, sai, sizeof(struct irc_sockaddr_storage));
+	new_client->localClient->lip = rb_malloc(sizeof(struct irc_sockaddr_storage));
+	memcpy(&new_client->localClient->lip, lai, sizeof(struct irc_sockaddr_storage));
 
 	/* 
 	 * copy address to 'sockhost' as a string, copy it to host too
@@ -526,11 +528,32 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 }
 
 static void
+accept_ssld(rb_fde_t *F, struct sockaddr *addr, struct sockaddr *laddr, struct Listener *listener)
+{
+	rb_fde_t *xF[2];
+	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF[0], &xF[1], "Incoming ssld Connection");
+	start_ssld_accept(F, xF[1]); /* this will close F for us */
+	add_connection(listener, xF[0], addr, laddr);
+}
+
+static void
 accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t addrlen, void *data)
 {
 	struct Listener *listener = data;
-
+	struct irc_sockaddr_storage lip;
+	unsigned int locallen = sizeof(struct irc_sockaddr_storage);
+	
 	ServerStats.is_ac++;
-	add_connection(listener, F, addr);
+	if(getsockname(rb_get_fd(F), (struct sockaddr *) &lip, &locallen) < 0)
+	{
+		/* this shouldn't fail so... */
+		/* XXX add logging of this */
+		rb_close(F);
+	}
+	if(listener->ssl && ServerInfo.ssl_use_ssld)
+		accept_ssld(F, addr, (struct sockaddr *)&lip, listener);
+	else
+		add_connection(listener, F, addr, (struct sockaddr *)&lip);
 }
+
 

@@ -40,10 +40,12 @@ ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 resolver_LDADD = adns/libadns.a libratbox/src/libratbox.la
 ident_LDADD = libratbox/src/libratbox.la
 
+ssld_LDADD = libratbox/src/libratbox.la
+
 ircd_SOURCES = src/main.c
 resolver_SOURCES = src/resolver.c
 ident_SOURCES = src/ident.c
-
+ssld_SOURCES = src/ssld.c
 
 libcore_la_SOURCES =                     \
   src/dns.c                        \
@@ -77,6 +79,7 @@ libcore_la_SOURCES =                     \
   src/s_user.c                      \
   src/scache.c                      \
   src/send.c                        \
+  src/sslproc.c			    \
   src/whowas.c			    \
   src/version.c			\
   src/ircd_parser.y			\
@@ -388,7 +391,7 @@ endif
 
 
 
-bin_PROGRAMS = ircd resolver ident
+bin_PROGRAMS = ircd resolver ident ssld
 
 src: $(libcore_LTLIBRARIES) ircd
 

@@ -59,7 +59,7 @@
 #include "monitor.h"
 #include "dns.h"
 #include "bandbi.h"
-
+#include "sslproc.h"
 /*
  * Try and find the correct name to use with getrlimit() for setting the max.
  * number of files allowed to be open by this process.
@@ -649,9 +649,9 @@ ratbox_main(int argc, char *argv[])
 #endif
 	init_resolver();	/* Needs to be setup before the io loop */
 	init_bandb();
-
 	load_conf_settings();
 
+	start_ssldaemon(1, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 		
 //	read_conf_files(YES);	/* cold start init conf files */
 	rehash_bans(0);

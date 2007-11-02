@@ -39,7 +39,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = ircd$(EXEEXT) resolver$(EXEEXT) ident$(EXEEXT)
+bin_PROGRAMS = ircd$(EXEEXT) resolver$(EXEEXT) ident$(EXEEXT) \
+	ssld$(EXEEXT)
 subdir = .
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure \
@@ -83,7 +84,7 @@ am_libcore_la_OBJECTS = src/dns.lo src/bandbi.lo src/cache.lo \
 	src/packet.lo src/parse.lo src/reject.lo src/restart.lo \
 	src/s_auth.lo src/s_conf.lo src/s_newconf.lo src/s_log.lo \
 	src/s_serv.lo src/s_user.lo src/scache.lo src/send.lo \
-	src/whowas.lo src/version.lo src/ircd_parser.lo \
+	src/sslproc.lo src/whowas.lo src/version.lo src/ircd_parser.lo \
 	src/ircd_lexer.lo
 libcore_la_OBJECTS = $(am_libcore_la_OBJECTS)
 libcore_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -514,6 +515,9 @@ ircd_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 am_resolver_OBJECTS = src/resolver.$(OBJEXT)
 resolver_OBJECTS = $(am_resolver_OBJECTS)
 resolver_DEPENDENCIES = adns/libadns.a libratbox/src/libratbox.la
+am_ssld_OBJECTS = src/ssld.$(OBJEXT)
+ssld_OBJECTS = $(am_ssld_OBJECTS)
+ssld_DEPENDENCIES = libratbox/src/libratbox.la
 DEFAULT_INCLUDES = -I. -I$(top_builddir)/include@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -576,7 +580,7 @@ SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) \
 	$(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) \
 	$(modules_m_xline_la_SOURCES) $(ident_SOURCES) $(ircd_SOURCES) \
-	$(resolver_SOURCES)
+	$(resolver_SOURCES) $(ssld_SOURCES)
 DIST_SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_core_m_error_la_SOURCES) \
 	$(modules_core_m_join_la_SOURCES) \
@@ -619,7 +623,7 @@ DIST_SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) \
 	$(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) \
 	$(modules_m_xline_la_SOURCES) $(ident_SOURCES) $(ircd_SOURCES) \
-	$(resolver_SOURCES)
+	$(resolver_SOURCES) $(ssld_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -802,9 +806,11 @@ DLOPEN = $(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_
 ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 resolver_LDADD = adns/libadns.a libratbox/src/libratbox.la
 ident_LDADD = libratbox/src/libratbox.la
+ssld_LDADD = libratbox/src/libratbox.la
 ircd_SOURCES = src/main.c
 resolver_SOURCES = src/resolver.c
 ident_SOURCES = src/ident.c
+ssld_SOURCES = src/ssld.c
 libcore_la_SOURCES = \
   src/dns.c                        \
   src/bandbi.c			\
@@ -837,6 +843,7 @@ libcore_la_SOURCES = \
   src/s_user.c                      \
   src/scache.c                      \
   src/send.c                        \
+  src/sslproc.c			    \
   src/whowas.c			    \
   src/version.c			\
   src/ircd_parser.y			\
@@ -1320,6 +1327,7 @@ src/s_serv.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/s_user.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/scache.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/send.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/sslproc.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/whowas.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/version.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/ircd_parser.h: src/ircd_parser.c
@@ -1644,6 +1652,10 @@ src/resolver.$(OBJEXT): src/$(am__dirstamp) \
 resolver$(EXEEXT): $(resolver_OBJECTS) $(resolver_DEPENDENCIES) 
 	@rm -f resolver$(EXEEXT)
 	$(LINK) $(resolver_OBJECTS) $(resolver_LDADD) $(LIBS)
+src/ssld.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+ssld$(EXEEXT): $(ssld_OBJECTS) $(ssld_DEPENDENCIES) 
+	@rm -f ssld$(EXEEXT)
+	$(LINK) $(ssld_OBJECTS) $(ssld_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1846,6 +1858,9 @@ mostlyclean-compile:
 	-rm -f src/scache.lo
 	-rm -f src/send.$(OBJEXT)
 	-rm -f src/send.lo
+	-rm -f src/ssld.$(OBJEXT)
+	-rm -f src/sslproc.$(OBJEXT)
+	-rm -f src/sslproc.lo
 	-rm -f src/version.$(OBJEXT)
 	-rm -f src/version.lo
 	-rm -f src/whowas.$(OBJEXT)
@@ -1955,6 +1970,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/s_user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/scache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/send.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ssld.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/sslproc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/whowas.Plo@am__quote@
 

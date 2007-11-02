@@ -221,6 +221,7 @@ struct LocalUser
 	void *targets[10];		/* targets were aware of */
 	uint8_t targinfo[2];	/* cyclic array, no in use */
 	time_t target_last;		/* last time we cleared a slot */
+	struct irc_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
 };
 
 
