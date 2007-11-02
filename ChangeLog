@@ -1,3 +1,11 @@
+androsyn    2007/11/02 18:44:51 UTC	(20071102_3-24445)
+  Log:
+  doing & on a pointer is kinda pointless
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2007/11/02 17:43:14 UTC	(20071102_2-24443)
   Log:
   forgot to add ssld.c
