@@ -1,3 +1,11 @@
+androsyn    2007/11/02 17:43:14 UTC	(20071102_2-24443)
+  Log:
+  forgot to add ssld.c
+
+  Modified:
+	ircd-ratbox/trunk/src/ssld.c (File Added) 
+
+
 androsyn    2007/11/02 17:42:30 UTC	(20071102_1-24441)
   Log:
   First pass at ssld helper.  It still spews a fair bit of debugging but it in fact accepts connections...
