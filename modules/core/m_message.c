@@ -36,7 +36,6 @@
 #include "match.h"
 #include "hash.h"
 #include "send.h"
-#include "patricia.h"
 #include "s_newconf.h"
 
 static int m_message(int, const char *, struct Client *, struct Client *, int, const char **);
@@ -517,7 +516,7 @@ expire_tgchange(void *unused)
 		if(target->expiry < rb_current_time())
 		{
 			rb_dlinkDelete(ptr, &tgchange_list);
-			patricia_remove(tgchange_tree, target->pnode);
+			rb_patricia_remove(tgchange_tree, target->pnode);
 			rb_free(target->ip);
 			rb_free(target);
 		}
