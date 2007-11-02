@@ -1,3 +1,11 @@
+androsyn    2007/11/02 15:21:03 UTC	(20071102_0-24437)
+  Log:
+  make m_message.c use the rb_patricia stuff
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_message.c (File Modified) 
+
+
 androsyn    2007/10/23 20:44:26 UTC	(20071023_2-24432)
   Log:
   forgot these patricia changes too
