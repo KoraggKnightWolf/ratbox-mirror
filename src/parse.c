@@ -129,7 +129,6 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 	struct Message *mptr;
 
 	s_assert(MyConnect(client_p));
-	s_assert(client_p->localClient->fd >= 0);
 	if(IsAnyDead(client_p))
 		return;
 
