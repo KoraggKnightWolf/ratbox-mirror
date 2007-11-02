@@ -423,7 +423,7 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 
 	memcpy(&new_client->localClient->ip, sai, sizeof(struct irc_sockaddr_storage));
 	new_client->localClient->lip = rb_malloc(sizeof(struct irc_sockaddr_storage));
-	memcpy(&new_client->localClient->lip, lai, sizeof(struct irc_sockaddr_storage));
+	memcpy(new_client->localClient->lip, lai, sizeof(struct irc_sockaddr_storage));
 
 	/* 
 	 * copy address to 'sockhost' as a string, copy it to host too
