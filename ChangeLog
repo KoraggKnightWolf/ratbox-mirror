@@ -1,3 +1,11 @@
+androsyn    2007/11/02 18:45:13 UTC	(20071102_4-24447)
+  Log:
+  get rid of a bogus assert
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2007/11/02 18:44:51 UTC	(20071102_3-24445)
   Log:
   doing & on a pointer is kinda pointless
