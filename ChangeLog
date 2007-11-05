@@ -1,3 +1,12 @@
+androsyn    2007/11/05 16:46:20 UTC	(20071105_0-24449)
+  Log:
+  actually process adns timeouts.  also make dns a bit more aggressive with retry timeouts, but use less retries
+
+  Modified:
+	ircd-ratbox/trunk/adns/internal.h (File Modified) 
+	ircd-ratbox/trunk/src/resolver.c (File Modified) 
+
+
 androsyn    2007/11/02 18:45:13 UTC	(20071102_4-24447)
   Log:
   get rid of a bogus assert
