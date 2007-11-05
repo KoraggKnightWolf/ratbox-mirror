@@ -25035,7 +25035,7 @@ _ACEOF
 
 
 
-ac_config_files="$ac_config_files Makefile bandb/Makefile adns/Makefile servlink/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile sqlite3/Makefile"
+ac_config_files="$ac_config_files Makefile bandb/Makefile adns/Makefile ssld/Makefile servlink/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile sqlite3/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -25669,6 +25669,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "bandb/Makefile") CONFIG_FILES="$CONFIG_FILES bandb/Makefile" ;;
     "adns/Makefile") CONFIG_FILES="$CONFIG_FILES adns/Makefile" ;;
+    "ssld/Makefile") CONFIG_FILES="$CONFIG_FILES ssld/Makefile" ;;
     "servlink/Makefile") CONFIG_FILES="$CONFIG_FILES servlink/Makefile" ;;
     "contrib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/Makefile" ;;
     "tools/Makefile") CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;

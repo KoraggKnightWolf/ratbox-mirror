@@ -12,7 +12,7 @@ modulesdir	= @moduledir@/autoload
 coredir		= @moduledir@
 servicesdir	= @moduledir@/autoload
 
-SUBDIRS = libratbox libltdl adns tools doc help @SQLITE_SUBDIR@ bandb @SERVLINK@ 
+SUBDIRS = libratbox libltdl adns tools doc help @SQLITE_SUBDIR@ bandb ssld @SERVLINK@ 
 
 AM_YFLAGS = -d
 
@@ -40,12 +40,9 @@ ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 resolver_LDADD = adns/libadns.a libratbox/src/libratbox.la
 ident_LDADD = libratbox/src/libratbox.la
 
-ssld_LDADD = libratbox/src/libratbox.la
-
 ircd_SOURCES = src/main.c
 resolver_SOURCES = src/resolver.c
 ident_SOURCES = src/ident.c
-ssld_SOURCES = src/ssld.c
 
 libcore_la_SOURCES =                     \
   src/dns.c                        \
@@ -391,7 +388,7 @@ endif
 
 
 
-bin_PROGRAMS = ircd resolver ident ssld
+bin_PROGRAMS = ircd resolver ident
 
 src: $(libcore_LTLIBRARIES) ircd
 

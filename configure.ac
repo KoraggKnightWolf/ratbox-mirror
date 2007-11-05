@@ -599,6 +599,7 @@ AC_CONFIG_FILES(		\
 	Makefile		\
 	bandb/Makefile		\
 	adns/Makefile		\
+	ssld/Makefile		\
 	servlink/Makefile	\
 	contrib/Makefile	\
 	tools/Makefile		\
