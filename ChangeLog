@@ -1,3 +1,19 @@
+androsyn    2007/11/05 18:50:06 UTC	(20071105_2-24455)
+  Log:
+  move ssld into its own dir
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/src/ssld.c (File Deleted) 
+	ircd-ratbox/trunk/ssld/ (File Added) 
+	ircd-ratbox/trunk/ssld/Makefile.am (File Added) 
+	ircd-ratbox/trunk/ssld/Makefile.in (File Added) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Added) 
+
+
 androsyn    2007/11/05 17:22:00 UTC	(20071105_1-24453)
   Log:
   Remove some debugging from ssld.
