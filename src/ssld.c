@@ -19,6 +19,7 @@ typedef struct _ssl_ctl
         rb_dlink_node node;
         int cli_count;
         rb_fde_t *F;  
+        rb_fde_t *F_pipe;
         rb_dlink_list readq;
         rb_dlink_list writeq;
 } ssl_ctl_t;
@@ -41,7 +42,6 @@ typedef struct _conn
 static void
 close_conn(conn_t * conn)
 {
-        fprintf(stderr, "Plain in: %ld Plain out: %ld SSL in: %ld SSL out: %ld\n", conn->plain_in, conn->plain_out, conn->ssl_in, conn->ssl_out);
         rb_rawbuf_flush(conn->sslbuf_out, conn->ssl_fd);
         rb_rawbuf_flush(conn->plainbuf_out, conn->plain_fd);
         rb_close(conn->ssl_fd); 
@@ -69,26 +69,21 @@ conn_ssl_write_sendq(rb_fde_t *fd, void *data)
 {
         conn_t *conn = data;
         int retlen;
-        fprintf(stderr, "called conn_ssl_write_sendq\n");
         while ((retlen = rb_rawbuf_flush(conn->sslbuf_out, fd)) > 0)
         {
                 conn->ssl_out += retlen;
         }
         if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
         {
-                fprintf(stderr, "Closing in conn_ssl_write_sendq\n");
                 close_conn(data);
                 return;
         }
-        fprintf(stderr, "Setting up handler stuff: %d %d\n", rb_rawbuf_length(conn->sslbuf_out), rb_get_fd(fd));
         if(rb_rawbuf_length(conn->sslbuf_out) > 0) {
                 rb_setselect(conn->ssl_fd, RB_SELECT_WRITE, conn_ssl_write_sendq, conn);
         }
         else {
-                fprintf(stderr, "Setting null handler\n");
                 rb_setselect(conn->ssl_fd, RB_SELECT_WRITE, NULL, NULL);
         }
-        fprintf(stderr, "Returned from setting handlers\n");
 }
  
 static void
@@ -158,7 +153,6 @@ conn_plain_write_sendq(rb_fde_t *fd, void *data)
 {
         conn_t *conn = data;
         int retlen;
-        fprintf(stderr, "called conn_plain_write_sendq\n");
         while ((retlen = rb_rawbuf_flush(conn->plainbuf_out, fd)) > 0)
         {
                 conn->plain_out += retlen;
@@ -168,13 +162,11 @@ conn_plain_write_sendq(rb_fde_t *fd, void *data)
                 close_conn(data);
                 return;
         }
-        fprintf(stderr, "Setting up plain handler stuff: %d FD: %d\n", rb_rawbuf_length(conn->sslbuf_out), rb_get_fd(fd));
 
         if(rb_rawbuf_length(conn->plainbuf_out) > 0)
                 rb_setselect(conn->plain_fd, RB_SELECT_WRITE, conn_plain_write_sendq, conn);
         else
                 rb_setselect(conn->plain_fd, RB_SELECT_WRITE, NULL, NULL);
-        fprintf(stderr, "Returned from setting plain handler stuff\n");
 }
 
 
@@ -222,7 +214,6 @@ static void
 ssl_process_accept(ssl_ctl_buf_t *ctlb)
 {
 	conn_t *conn;
-	fprintf(stderr, "ssl_process_accept: Got ctlb->F: %d %d\n", rb_get_fd(ctlb->F[0]), rb_get_fd(ctlb->F[1]));
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
 	rb_ssl_start_accepted(ctlb->F[0], ssl_process_accept_cb, conn);
 	return;
@@ -231,7 +222,7 @@ ssl_process_accept(ssl_ctl_buf_t *ctlb)
 static void
 ssl_process_connect(ssl_ctl_buf_t *ctlb)
 {
-	fprintf(stderr, "Got ctlb->F: %d %d\n", rb_get_fd(ctlb->F[0]), rb_get_fd(ctlb->F[1]));
+	/* XXX write me */
 	return;
 }
 
@@ -292,14 +283,9 @@ ssl_read_ctl(rb_fde_t *F, void *data)
 
         if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
         {
-        	fprintf(stderr, "uhh..what: %s\n", strerror(errno));
-        	
-                /* deal with helper dying */
-                return;
+		exit(0);        	
         }
-        fprintf(stderr, "here\n");
         ssl_process_cmd_recv(ctl);
-        fprintf(stderr, "doing setselect\n");
         rb_setselect(ctl->F, RB_SELECT_READ, ssl_read_ctl, ctl);
 }
 
@@ -314,7 +300,7 @@ ssl_write_ctl(rb_fde_t *F, void *data)
         RB_DLINK_FOREACH_SAFE(ptr, next, ctl->writeq.head)
         {
                 ctl_buf = ptr->data;
-                /* in theory unix sock_dgram shouldn't ever short write this.. */
+
                 retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds,  ctl_buf->buf, strlen(ctl_buf->buf));
                 if(retlen > 0)
                 {
@@ -351,32 +337,48 @@ ssl_cmd_write_queue(ssl_ctl_t *ctl, rb_fde_t **F, int count, const char *buf)
 }
 #endif
 
+static void
+read_pipe_ctl(rb_fde_t *F, void *data)
+{
+	char buf[512];
+	int retlen;
+	while((retlen = rb_read(F, buf, sizeof(buf))) > 0)
+	{
+		;; /* we don't do anything with the pipe really, just care if the other process dies.. */
+	}
+	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
+		exit(0);
+	rb_setselect(F, RB_SELECT_READ, read_pipe_ctl, NULL); 
+	
+}
 
 int main(int argc, char **argv)
 {
 	ssl_ctl_t *ctl;
-	const char *s_ctlfd;	
-	const char *ssl_cert;
-	const char *ssl_private_key;
-	const char *ssl_dh_params;
-	int ctlfd, x;
-	int maxfd;
+	const char *s_ctlfd, *s_pipe;
+	const char *ssl_cert, *ssl_private_key, *ssl_dh_params;
+	int ctlfd, pipefd, x, maxfd;
+
 	maxfd = maxconn();
 	s_ctlfd = getenv("CTL_FD");
-	if(s_ctlfd == NULL)
-	{
-		/* xxx fail */
-	}
-	ctlfd = atoi(s_ctlfd);
+	s_pipe = getenv("CTL_PIPE");
 
+	if(s_ctlfd == NULL || s_pipe == NULL)
+	{
+		fprintf(stderr, "You aren't supposed to run me directly\n");
+		exit(1);
+	 	/* xxx fail */
+	}
+	
+	ctlfd = atoi(s_ctlfd);
+	pipefd = atoi(s_pipe);
 	ssl_cert = getenv("SSL_CERT");
 	ssl_private_key = getenv("SSL_PRIVATE_KEY");
 	ssl_dh_params = getenv("SSL_DH_PARAMS");
-	
-	fprintf(stderr, "SSLD got CTL_FD: %d\n", ctlfd);	
+		
 	for(x = 0; x < maxfd; x++)
 	{
-		if(x != ctlfd && x > 2)
+		if(x != ctlfd && x != pipefd && x > 2)
 			close(x);
 	}
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 1024, 4096);
@@ -384,6 +386,8 @@ int main(int argc, char **argv)
 	rb_setup_ssl_server(ssl_cert, ssl_private_key, ssl_dh_params);
 	ctl = rb_malloc(sizeof(ssl_ctl_t));
 	ctl->F = rb_open(ctlfd, RB_FD_SOCKET, "ircd control socket");
+	ctl->F_pipe = rb_open(pipefd, RB_FD_PIPE, "ircd pipe");	
+	read_pipe_ctl(ctl->F_pipe, NULL);
 	ssl_read_ctl(ctl->F, ctl);
 	ssld_main_loop();	
 	return 0;

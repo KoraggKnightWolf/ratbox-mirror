@@ -66,6 +66,7 @@ int
 start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
 {
 	rb_fde_t *F1, *F2;
+	rb_fde_t *P1, *P2;
 	char fullpath[PATH_MAX + 1];
 	char fdarg[6];
 	const char *parv[2];
@@ -99,6 +100,9 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		rb_socketpair(AF_UNIX, SOCK_DGRAM, 0, &F1, &F2, "SSL/TLS handle passing socket");
 		rb_snprintf(fdarg, sizeof(fdarg), "%d", rb_get_fd(F2));
 		setenv("CTL_FD", fdarg, 1);
+		rb_pipe(&P1, &P2, "SSL/TLS pipe");
+		rb_snprintf(fdarg, sizeof(fdarg), "%d", rb_get_fd(P1));
+		setenv("CTL_PIPE", fdarg, 1);
 		setenv("SSL_CERT", ssl_cert, 1);
 		setenv("SSL_PRIVATE_KEY", ssl_private_key, 1);
 		if(ssl_dh_params != NULL)
@@ -115,6 +119,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		}
 		started++;
 		rb_close(F2);
+		rb_close(P1);
 		allocate_ssl_daemon(F1, pid);
 	}
 	return started;	
