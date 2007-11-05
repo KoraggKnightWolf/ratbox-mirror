@@ -440,6 +440,12 @@ resolve_ip(char **parv)
 	
 }
 
+static void
+timeout_adns(void *ptr)
+{
+	adns_processtimeouts(dns_state, rb_current_time_tv());
+	process_adns_incoming();
+}
 
 int main(int argc, char **argv)
 {
@@ -454,6 +460,8 @@ int main(int argc, char **argv)
 	}
 
 	adns_init(&dns_state, adns_if_noautosys, 0);
+	rb_set_time();
+	rb_event_add("timeout_adns", timeout_adns, NULL, 1);
 	setup_signals();
 	read_io();	
 	return 1;
