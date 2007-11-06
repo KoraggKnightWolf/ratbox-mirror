@@ -1464,7 +1464,7 @@ stats_ziplinks (struct Client *source_p)
 	rb_dlink_node *ptr;
 	struct Client *target_p;
 	int sent_data = 0;
-
+#if 0
 	RB_DLINK_FOREACH (ptr, serv_list.head)
 	{
 		target_p = ptr->data;
@@ -1491,6 +1491,7 @@ stats_ziplinks (struct Client *source_p)
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "Z :%u ziplink(s)", sent_data);
+#endif
 }
 
 static void

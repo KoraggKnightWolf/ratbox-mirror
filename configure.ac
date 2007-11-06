@@ -360,11 +360,6 @@ AC_CHECK_HEADER(zlib.h, [
 
 fi
 
-if test "$zlib" = "yes"; then
-	SERVLINK=servlink
-	AC_SUBST(SERVLINK)
-fi
-
 dnl **********************************************************************
 dnl Check for --with-confdir
 dnl **********************************************************************
@@ -600,7 +595,6 @@ AC_CONFIG_FILES(		\
 	bandb/Makefile		\
 	adns/Makefile		\
 	ssld/Makefile		\
-	servlink/Makefile	\
 	contrib/Makefile	\
 	tools/Makefile		\
 	doc/Makefile		\

@@ -44,6 +44,7 @@
 #include "packet.h"
 #include "s_user.h"
 #include "reject.h"
+#include "sslproc.h"
 
 static int mr_server(struct Client *, struct Client *, int, const char **);
 static int ms_server(struct Client *, struct Client *, int, const char **);
@@ -757,150 +758,6 @@ check_server(const char *name, struct Client *client_p)
 	return 0;
 }
 
-
-/*
- * fork_server
- *
- * inputs       - struct Client *server
- * output       - success: 0 / failure: -1
- * side effect  - fork, and exec SERVLINK to handle this connection
- */
-static int
-fork_server(struct Client *server)
-{
-	rb_fde_t *ctrl_fds[2];
-	rb_fde_t *data_fds[2];
-	char maxfd[6];
-	char fd_str[4][6];
-	char *kid_argv[3];
-	char slink[] = "-ircd servlink";
-	char servname[HOSTLEN+1];
-
-	/* ctrl */
-	if(rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &ctrl_fds[0], &ctrl_fds[1],  "slink control fds") < 0)
-		goto fork_error;
-
-	/* data */
-	if(rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &data_fds[0], &data_fds[1], "slink data fds") < 0)
-		goto fork_error;
-
-	rb_snprintf(fd_str[0], sizeof(fd_str[0]), "%d", rb_get_fd(ctrl_fds[1]));
-	rb_snprintf(fd_str[1], sizeof(fd_str[1]), "%d", rb_get_fd(data_fds[1]));
-	rb_snprintf(fd_str[2], sizeof(fd_str[2]), "%d", rb_get_fd(server->localClient->F));
-	rb_snprintf(maxfd, sizeof(maxfd), "%d", maxconnections);
-	rb_snprintf(servname, sizeof(servname), "(%s)", server->name);
-
-	setenv("MAXFD", maxfd, 1);	  
-	setenv("CTRLFD", fd_str[0], 1);
-	setenv("DATAFD", fd_str[1], 1);
-	setenv("NETFD", fd_str[2], 1);
-	
-        kid_argv[0] = slink;
-        kid_argv[1] = servname; 
-        kid_argv[2] = NULL;
-		
-	if(rb_spawn_process(ConfigFileEntry.servlink_path, (const char **)kid_argv) > 0)
-	{
-		rb_close(server->localClient->F);
-
-		/* close the childs end of the pipes */
-		rb_close(ctrl_fds[1]);
-		rb_close(data_fds[1]);
-		
-		s_assert(server->localClient);
-		server->localClient->slink->ctrlfd = ctrl_fds[0];
-		server->localClient->F = data_fds[0];
-
-		read_ctrl_packet(server->localClient->slink->ctrlfd, server);
-		read_packet(server->localClient->F, server);
-		return 0;
-	}
-
-
-      fork_error:
-	/* this is ugly, but nicer than repeating
-	 * about 50 close() statements everywhre... */
-	rb_close(data_fds[0]);
-	rb_close(data_fds[1]);
-	rb_close(ctrl_fds[0]);
-	rb_close(ctrl_fds[1]);
-	return -1;
-}
-
-static void
-start_io(struct Client *server)
-{
-	unsigned char *iobuf;
-	int c = 0;
-	int linecount = 0;
-	int linelen;
-
-	iobuf = rb_malloc(256);
-
-	if(IsCapable(server, CAP_ZIP))
-	{
-		/* ziplink */
-		iobuf[c++] = SLINKCMD_SET_ZIP_OUT_LEVEL;
-		iobuf[c++] = 0;	/* |          */
-		iobuf[c++] = 1;	/* \ len is 1 */
-		iobuf[c++] = ConfigFileEntry.compression_level;
-		iobuf[c++] = SLINKCMD_START_ZIP_IN;
-		iobuf[c++] = SLINKCMD_START_ZIP_OUT;
-	}
-
-	while (MyConnect(server))
-	{
-		linecount++;
-
-		iobuf = rb_realloc(iobuf, (c + READBUF_SIZE + 64));
-
-		/* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
-		linelen = rb_linebuf_get(&server->localClient->buf_recvq, (char *) (iobuf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL, LINEBUF_RAW);	/* include partial lines */
-
-		if(linelen)
-		{
-			iobuf[c++] = SLINKCMD_INJECT_RECVQ;
-			iobuf[c++] = (linelen >> 8);
-			iobuf[c++] = (linelen & 0xff);
-			c += linelen;
-		}
-		else
-			break;
-	}
-
-	while (MyConnect(server))
-	{
-		linecount++;
-
-		iobuf = rb_realloc(iobuf, (c + BUF_DATA_SIZE + 64));
-
-		/* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
-		linelen = rb_linebuf_get(&server->localClient->buf_sendq, 
-				      (char *) (iobuf + c + 3), READBUF_SIZE, 
-				      LINEBUF_PARTIAL, LINEBUF_PARSED);	/* include partial lines */
-
-		if(linelen)
-		{
-			iobuf[c++] = SLINKCMD_INJECT_SENDQ;
-			iobuf[c++] = (linelen >> 8);
-			iobuf[c++] = (linelen & 0xff);
-			c += linelen;
-		}
-		else
-			break;
-	}
-
-	/* start io */
-	iobuf[c++] = SLINKCMD_INIT;
-
-	server->localClient->slink->slinkq = iobuf;
-	server->localClient->slink->slinkq_ofs = 0;
-	server->localClient->slink->slinkq_len = c;
-
-	/* schedule a write */
-	send_queued_slink_write(server->localClient->slink->ctrlfd, server);
-}
-
 /* burst_modes_TS5()
  *
  * input	- client to burst to, channel name, list to burst, mode flag
@@ -1374,20 +1231,7 @@ server_estab(struct Client *client_p)
 	/* Hand the server off to servlink now */
 	if(IsCapable(client_p, CAP_ZIP))
 	{
-		client_p->localClient->slink = rb_malloc(sizeof(struct servlink_data));
-		
-		if(fork_server(client_p) < 0)
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "Warning: fork failed for server %s -- check servlink_path (%s)",
-					     client_p->name,
-					     ConfigFileEntry.servlink_path);
-			ilog(L_SERVER, "Fork failed for server %s -- check servlink_path (%s)", client_p->name, 
-			               ConfigFileEntry.servlink_path);
-			return exit_client(client_p, client_p, client_p, "Fork failed");
-		}
-		start_io(client_p);
-		SetServlink(client_p);
+		start_zlib_session(client_p);
 	}
 
 	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, rb_current_time());
@@ -1449,16 +1293,7 @@ server_estab(struct Client *client_p)
 	hdata.target = client_p;
 	call_hook(h_server_introduced, &hdata);
 
-	if(HasServlink(client_p))
-	{
-		/* we won't overflow FD_DESC_SZ here, as it can hold
-		 * client_p->name + 64
-		 */
-		rb_note(client_p->localClient->F, "slink data: %s", client_p->name);
-		rb_note(client_p->localClient->slink->ctrlfd, "slink ctrl: %s", client_p->name);
-	}
-	else
-		rb_note(client_p->localClient->F, "Server: %s", client_p->name);
+	rb_note(client_p->localClient->F, "Server: %s", client_p->name);
 
 	/*
 	 ** Old sendto_serv_but_one() call removed because we now

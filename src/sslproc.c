@@ -1,9 +1,10 @@
 #include <ratbox_lib.h>
 #include "stdinc.h"
-#include "sslproc.h"
 #include "s_conf.h"
 #include "s_log.h"
 #include "listener.h"
+#include "struct.h"
+#include "sslproc.h"
 
 /* 
 
@@ -21,10 +22,12 @@ C - start ssl connect on fd
  */
 
 #define MAXPASSFD 4
+#define READSIZE 1024
 typedef struct _ssl_ctl_buf
 {
 	rb_dlink_node node;
-	char buf[512];
+	char *buf;
+	size_t buflen;
 	rb_fde_t *F[MAXPASSFD];
 	int nfds;
 } ssl_ctl_buf_t;
@@ -98,6 +101,8 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 	for(i = 0; i < count; i++)
 	{
 		rb_socketpair(AF_UNIX, SOCK_DGRAM, 0, &F1, &F2, "SSL/TLS handle passing socket");
+		rb_set_buffers(F1, READBUF_SIZE);
+		rb_set_buffers(F2, READBUF_SIZE);
 		rb_snprintf(fdarg, sizeof(fdarg), "%d", rb_get_fd(F2));
 		setenv("CTL_FD", fdarg, 1);
 		rb_pipe(&P1, &P2, "SSL/TLS pipe");
@@ -171,10 +176,13 @@ ssl_read_ctl(rb_fde_t *F, void *data)
 	do
 	{
 		ctl_buf = rb_malloc(sizeof(ssl_ctl_buf_t));
-
-		retlen = rb_recv_fd_buf(ctl->F, ctl_buf->buf, sizeof(ctl_buf->buf), ctl_buf->F, 4);
-		if(retlen <= 0)
+		ctl_buf->buf = rb_malloc(READSIZE);
+		retlen = rb_recv_fd_buf(ctl->F, ctl_buf->buf, READSIZE, ctl_buf->F, 4);
+		ctl_buf->buflen = retlen;
+		if(retlen <= 0) {
+			rb_free(ctl_buf->buf);
 			rb_free(ctl_buf);
+		}
 		else
 			rb_dlinkAddTail(ctl_buf, &ctl_buf->node, &ctl->readq);
 	} while(retlen > 0);	
@@ -219,13 +227,13 @@ ssl_write_ctl(rb_fde_t *F, void *data)
 	{
 		ctl_buf = ptr->data;
 		/* in theory unix sock_dgram shouldn't ever short write this.. */
-		retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds,  ctl_buf->buf, strlen(ctl_buf->buf));
+		retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds,  ctl_buf->buf, ctl_buf->buflen);
 		if(retlen > 0)
 		{
 			rb_dlinkDelete(ptr, &ctl->writeq);
 			for(x = 0; x < ctl_buf->nfds; x++)
 				rb_close(ctl_buf->F[x]);
-//			rb_free(ctl_buf->buf);
+			rb_free(ctl_buf->buf);
 			rb_free(ctl_buf);
 			
 		}
@@ -239,13 +247,15 @@ ssl_write_ctl(rb_fde_t *F, void *data)
 }
 
 static void
-ssl_cmd_write_queue(ssl_ctl_t *ctl, rb_fde_t **F, int count, const char *buf)
+ssl_cmd_write_queue(ssl_ctl_t *ctl, rb_fde_t **F, int count, const void *buf, size_t buflen)
 {
 	ssl_ctl_buf_t *ctl_buf;
-	int x;	
+	int x; 
 	ctl_buf = rb_malloc(sizeof(ssl_ctl_buf_t));
-	rb_strlcpy(ctl_buf->buf, buf, sizeof(ctl_buf->buf));
-
+	ctl_buf->buf = rb_malloc(buflen);
+	memcpy(ctl_buf->buf, buf, buflen);
+	ctl_buf->buflen = buflen;
+	
 	for(x = 0; x < count && x < MAXPASSFD; x++)
 	{
 		ctl_buf->F[x] = F[x];	
@@ -261,11 +271,11 @@ void
 start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF)
 {
 	rb_fde_t *F[2];
-	static const char *cmd = "A\r\n";
+	static const char *cmd = "A";
 	F[0] = sslF;
 	F[1] = plainF;
 	
-	ssl_cmd_write_queue(which_ssld(), F, 2, cmd);
+	ssl_cmd_write_queue(which_ssld(), F, 2, cmd, strlen(cmd));
 	return; 
 }
 
@@ -273,15 +283,45 @@ void
 start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF)
 {
 	rb_fde_t *F[2];
-	static const char *cmd = "C\r\n";
+	static const char *cmd = "C";
 	F[0] = sslF;
 	F[1] = plainF;
 	
-	ssl_cmd_write_queue(which_ssld(), F, 2, cmd);
+	ssl_cmd_write_queue(which_ssld(), F, 2, cmd, strlen(cmd));
 	return; 
 }
 
 
+/* for zlib sessions we basically end up with the following 
+ * Z[RECVQ]
+ */
+void
+start_zlib_session(struct Client *server)
+{
+	rb_fde_t *F[2];
+	rb_fde_t *xF1, *xF2;
+	char *buf;
+	size_t len;
 
+	len = rb_linebuf_len(&server->localClient->buf_recvq);
+	len += sizeof(char);
+	fprintf(stderr, "here\n");	
+	if(len > READBUF_SIZE)
+	{
+		/* XXX deal with this */
+		
+	}
+	buf = rb_malloc(len);
+	*buf = 'Z';
+	rb_linebuf_get(&server->localClient->buf_recvq, (char *)(buf+sizeof(char)), len - sizeof(char), LINEBUF_PARTIAL, LINEBUF_RAW); 
+	
+	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs");
+	
+	F[0] = server->localClient->F; 
+	F[1] = xF1;
+	server->localClient->F = xF2;
+	ssl_cmd_write_queue(which_ssld(), F, 2, buf, len);
+	rb_free(buf);
+}
 
 

@@ -193,7 +193,6 @@ free_local_client(struct Client *client_p)
 
 	rb_free(client_p->localClient->fullcaps);
 	rb_free(client_p->localClient->opername);
-	rb_free(client_p->localClient->slink);
 
 	rb_bh_free(lclient_heap, client_p->localClient);
 	client_p->localClient = NULL;
@@ -1284,12 +1283,6 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 			   source_p->name, comment);
 	}
 	
-	if(source_p->localClient->slink != NULL && source_p->localClient->slink->ctrlfd != NULL)
-	{
-		rb_close(source_p->localClient->slink->ctrlfd);
-		source_p->localClient->slink->ctrlfd = NULL;
-	}
-
 	if(source_p->servptr && source_p->servptr->serv)
 		rb_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
 	else
@@ -1809,18 +1802,6 @@ close_connection(struct Client *client_p)
 
 		rb_close(client_p->localClient->F);
 		client_p->localClient->F = NULL;
-	}
-
-	if(HasServlink(client_p))
-	{
-		if(client_p->localClient->F != NULL)
-		{
-			if(client_p->localClient->slink != NULL && client_p->localClient->slink->ctrlfd != NULL)
-			{
-				rb_close(client_p->localClient->slink->ctrlfd);
-				client_p->localClient->slink->ctrlfd = NULL;
-			}
-		}
 	}
 
 	rb_linebuf_donebuf(&client_p->localClient->buf_sendq);

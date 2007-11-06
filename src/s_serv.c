@@ -60,8 +60,6 @@ int refresh_user_links = 0;
 
 static char buf[BUFSIZE];
 
-static SlinkRplHnd slink_error;
-static SlinkRplHnd slink_zipstats;
 /*
  * list of recognized server capabilities.  "TS" is not on the list
  * because all servers that we talk to already do TS, and the kludged
@@ -87,124 +85,7 @@ struct Capability captab[] = {
 	{0, 0}
 };
 
-struct SlinkRplDef slinkrpltab[] = {
-	{SLINKRPL_ERROR, slink_error, SLINKRPL_FLAG_DATA},
-	{SLINKRPL_ZIPSTATS, slink_zipstats, SLINKRPL_FLAG_DATA},
-	{0, 0, 0},
-};
-
 static CNCB serv_connect_callback;
-
-void
-slink_error(unsigned int rpl, unsigned int len, unsigned char *data, struct Client *server_p)
-{
-	s_assert(rpl == SLINKRPL_ERROR);
-
-	s_assert(len < 256);
-	data[len - 1] = '\0';
-
-	sendto_realops_flags(UMODE_ALL, L_ALL, "SlinkError for %s: %s", server_p->name, data);
-	ilog(L_SERVER, "SlinkError for %s: %s", server_p->name, data);
-	exit_client(server_p, server_p, &me, "servlink error -- terminating link");
-}
-
-void
-slink_zipstats(unsigned int rpl, unsigned int len, unsigned char *data, struct Client *server_p)
-{
-	struct ZipStats zipstats;
-	uint32_t in = 0, in_wire = 0, out = 0, out_wire = 0;
-	int i = 0;
-
-	s_assert(rpl == SLINKRPL_ZIPSTATS);
-	s_assert(len == 16);
-	s_assert(IsCapable(server_p, CAP_ZIP));
-
-	/* Yes, it needs to be done this way, no we cannot let the compiler
-	 * work with the pointer to the structure.  This works around a GCC
-	 * bug on SPARC that affects all versions at the time of this writing.
-	 * I will feed you to the creatures living in RMS's beard if you do
-	 * not leave this as is, without being sure that you are not causing
-	 * regression for most of our installed SPARC base.
-	 * -jmallett, 04/27/2002
-	 */
-	memcpy(&zipstats, &server_p->localClient->slink->zipstats, sizeof(struct ZipStats));
-
-	in |= (data[i++] << 24);
-	in |= (data[i++] << 16);
-	in |= (data[i++] << 8);
-	in |= (data[i++]);
-
-	in_wire |= (data[i++] << 24);
-	in_wire |= (data[i++] << 16);
-	in_wire |= (data[i++] << 8);
-	in_wire |= (data[i++]);
-
-	out |= (data[i++] << 24);
-	out |= (data[i++] << 16);
-	out |= (data[i++] << 8);
-	out |= (data[i++]);
-
-	out_wire |= (data[i++] << 24);
-	out_wire |= (data[i++] << 16);
-	out_wire |= (data[i++] << 8);
-	out_wire |= (data[i++]);
-
-	zipstats.in += in;
-	zipstats.inK += zipstats.in >> 10;
-	zipstats.in &= 0x03ff;
-
-	zipstats.in_wire += in_wire;
-	zipstats.inK_wire += zipstats.in_wire >> 10;
-	zipstats.in_wire &= 0x03ff;
-
-	zipstats.out += out;
-	zipstats.outK += zipstats.out >> 10;
-	zipstats.out &= 0x03ff;
-
-	zipstats.out_wire += out_wire;
-	zipstats.outK_wire += zipstats.out_wire >> 10;
-	zipstats.out_wire &= 0x03ff;
-
-	if(zipstats.inK > 0)
-		zipstats.in_ratio =
-			(((double) (zipstats.inK - zipstats.inK_wire) /
-			  (double) zipstats.inK) * 100.00);
-	else
-		zipstats.in_ratio = 0;
-
-	if(zipstats.outK > 0)
-		zipstats.out_ratio =
-			(((double) (zipstats.outK - zipstats.outK_wire) /
-			  (double) zipstats.outK) * 100.00);
-	else
-		zipstats.out_ratio = 0;
-
-	memcpy(&server_p->localClient->slink->zipstats, &zipstats, sizeof(struct ZipStats));
-}
-
-void
-collect_zipstats(void *unused)
-{
-	rb_dlink_node *ptr;
-	struct Client *target_p;
-
-	RB_DLINK_FOREACH(ptr, serv_list.head)
-	{
-		target_p = ptr->data;
-		if(IsCapable(target_p, CAP_ZIP))
-		{
-			/* only bother if we haven't already got something queued... */
-			if(!target_p->localClient->slink->slinkq)
-			{
-				target_p->localClient->slink->slinkq = rb_malloc(1);	/* sigh.. */
-				target_p->localClient->slink->slinkq[0] = SLINKCMD_ZIPSTATS;
-				target_p->localClient->slink->slinkq_ofs = 0;
-				target_p->localClient->slink->slinkq_len = 1;
-				send_queued_slink_write(target_p->localClient->slink->ctrlfd, target_p);
-			}
-		}
-	}
-}
 
 /*
  * hunt_server - Do the basic thing in delivering the message (command)

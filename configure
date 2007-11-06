@@ -901,7 +901,6 @@ SQLITE_INCLUDES
 BUILD_SQLITE_TRUE
 BUILD_SQLITE_FALSE
 ZLIB_LD
-SERVLINK
 ETC_DIR
 confdir
 LOG_DIR
@@ -6863,7 +6862,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6866 "configure"' > conftest.$ac_ext
+  echo '#line 6865 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9369,11 +9368,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9372: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9371: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9376: \$? = $ac_status" >&5
+   echo "$as_me:9375: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9659,11 +9658,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9662: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9661: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9666: \$? = $ac_status" >&5
+   echo "$as_me:9665: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9763,11 +9762,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9766: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9765: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9770: \$? = $ac_status" >&5
+   echo "$as_me:9769: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12125,7 +12124,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12128 "configure"
+#line 12127 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12225,7 +12224,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12228 "configure"
+#line 12227 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14645,11 +14644,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14648: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14647: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14652: \$? = $ac_status" >&5
+   echo "$as_me:14651: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14749,11 +14748,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14752: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14751: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14756: \$? = $ac_status" >&5
+   echo "$as_me:14755: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16326,11 +16325,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16329: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16328: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16333: \$? = $ac_status" >&5
+   echo "$as_me:16332: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -16430,11 +16429,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16433: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:16432: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16437: \$? = $ac_status" >&5
+   echo "$as_me:16436: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18630,11 +18629,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18633: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18632: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18637: \$? = $ac_status" >&5
+   echo "$as_me:18636: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18920,11 +18919,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18923: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18922: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18927: \$? = $ac_status" >&5
+   echo "$as_me:18926: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -19024,11 +19023,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:19027: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:19026: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:19031: \$? = $ac_status" >&5
+   echo "$as_me:19030: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -24417,11 +24416,6 @@ fi
 
 fi
 
-if test "$zlib" = "yes"; then
-	SERVLINK=servlink
-
-fi
-
 
 { echo "$as_me:$LINENO: checking whether to modify confdir" >&5
 echo $ECHO_N "checking whether to modify confdir... $ECHO_C" >&6; }
@@ -25035,7 +25029,7 @@ _ACEOF
 
 
 
-ac_config_files="$ac_config_files Makefile bandb/Makefile adns/Makefile ssld/Makefile servlink/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile sqlite3/Makefile"
+ac_config_files="$ac_config_files Makefile bandb/Makefile adns/Makefile ssld/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile sqlite3/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -25670,7 +25664,6 @@ do
     "bandb/Makefile") CONFIG_FILES="$CONFIG_FILES bandb/Makefile" ;;
     "adns/Makefile") CONFIG_FILES="$CONFIG_FILES adns/Makefile" ;;
     "ssld/Makefile") CONFIG_FILES="$CONFIG_FILES ssld/Makefile" ;;
-    "servlink/Makefile") CONFIG_FILES="$CONFIG_FILES servlink/Makefile" ;;
     "contrib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/Makefile" ;;
     "tools/Makefile") CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
@@ -25911,7 +25904,6 @@ SQLITE_INCLUDES!$SQLITE_INCLUDES$ac_delim
 BUILD_SQLITE_TRUE!$BUILD_SQLITE_TRUE$ac_delim
 BUILD_SQLITE_FALSE!$BUILD_SQLITE_FALSE$ac_delim
 ZLIB_LD!$ZLIB_LD$ac_delim
-SERVLINK!$SERVLINK$ac_delim
 ETC_DIR!$ETC_DIR$ac_delim
 confdir!$confdir$ac_delim
 LOG_DIR!$LOG_DIR$ac_delim
@@ -25933,7 +25925,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 55; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 54; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

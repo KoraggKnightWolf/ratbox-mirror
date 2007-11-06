@@ -65,24 +65,6 @@ struct ZipStats
 	double out_ratio;
 };
 
-struct servlink_data
-{
-	int command;
-	int datalen;
-	int gotdatalen;
-	int readdata;
-	unsigned char *data;
-	unsigned char *slinkq;	/* sendq for control data */
-	int slinkq_ofs;		/* ofset into slinkq */
-	int slinkq_len;		/* length remaining after slinkq_ofs */
-	rb_fde_t *ctrlfd;		/* For servers:
-				   control fd used for sending commands
-				   to servlink */
-
-	struct ZipStats zipstats;
-};
-
-
 struct Client
 {
 	rb_dlink_node node;
@@ -188,8 +170,6 @@ struct LocalUser
 
 	int caps;		/* capabilities bit-field */
 	rb_fde_t *F;
-
-	struct servlink_data *slink;	/* slink reply being parsed */
 
 	time_t last;
 

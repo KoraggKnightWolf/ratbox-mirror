@@ -97,29 +97,6 @@ struct Capability
 #define SLINKCMD_INIT                        6
 #define SLINKCMD_ZIPSTATS                    7
 
-#ifndef HAVE_SOCKETPAIR
-#define LAST_SLINK_FD   7
-#else
-#define LAST_SLINK_FD   5
-#endif
-
-#define SLINKRPL_FLAG_DATA      0x0001	/* reply has data following */
-#define SLINKRPL_ERROR          1
-#define SLINKRPL_ZIPSTATS       2
-
-#define MAX_SLINKRPL            2
-
-typedef void SlinkRplHnd(unsigned int replyid, unsigned int datalen,
-			 unsigned char *data, struct Client *client_p);
-struct SlinkRplDef
-{
-	unsigned int replyid;
-	SlinkRplHnd *handler;
-	unsigned int flags;
-};
-
-extern struct SlinkRplDef slinkrpltab[];
-
 /*
  * Globals
  *
@@ -149,8 +126,6 @@ int hunt_server(struct Client *client_pt,
 void send_capabilities(struct Client *, int);
 const char *show_capabilities(struct Client *client);
 void try_connections(void *unused);
-void start_collect_zipstats(void);
-void collect_zipstats(void *unused);
 
 int serv_connect(struct server_conf *, struct Client *);
 

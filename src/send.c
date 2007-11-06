@@ -223,69 +223,6 @@ send_queued_write(rb_fde_t *F, void *data)
 			       send_queued_write, to);
 }
 
-/* send_queued_slink_write()
- *
- * inputs	- fd to have queue sent, client we're sending to
- * outputs	- contents of queue
- * side effects - write is dns.heduled if queue isnt emptied
- */
-void
-send_queued_slink_write(rb_fde_t *F, void *data)
-{
-	struct Client *to = data;
-	int retlen;
-
-	/*
-	 ** Once socket is marked dead, we cannot start writing to it,
-	 ** even if the error is removed...
-	 */
-	if(IsIOError(to) || to->localClient->slink == NULL)
-		return;
-
-	/* Next, lets try to write some data */
-	if(to->localClient->slink->slinkq)
-	{
-		retlen = rb_write(to->localClient->slink->ctrlfd,
-			      to->localClient->slink->slinkq + to->localClient->slink->slinkq_ofs,
-			      to->localClient->slink->slinkq_len);
-
-		if(retlen < 0)
-		{
-			/* If we have a fatal error */
-			if(!rb_ignore_errno(errno))
-			{
-				dead_link(to, 0);
-				return;
-			}
-		}
-		/* 0 bytes is an EOF .. */
-		else if(retlen == 0)
-		{
-			dead_link(to, 0);
-			return;
-		}
-		else
-		{
-			to->localClient->slink->slinkq_len -= retlen;
-
-			s_assert(to->localClient->slink->slinkq_len >= 0);
-			if(to->localClient->slink->slinkq_len)
-				to->localClient->slink->slinkq_ofs += retlen;
-			else
-			{
-				to->localClient->slink->slinkq_ofs = 0;
-				rb_free(to->localClient->slink->slinkq);
-				to->localClient->slink->slinkq = NULL;
-			}
-		}
-	}
-
-	/* if we have any more data, dns.hedule a write */
-	if(to->localClient->slink->slinkq_len)
-		rb_setselect(to->localClient->slink->ctrlfd,
-			       RB_SELECT_WRITE, send_queued_slink_write, to);
-}
-
 /* sendto_one_buffer()
  *
  * inputs	- client to send to, buffer

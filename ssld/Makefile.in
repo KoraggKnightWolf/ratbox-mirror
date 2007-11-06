@@ -138,7 +138,6 @@ RESOLVER = @RESOLVER@
 RM = @RM@
 SED = @SED@
 SEDOBJ = @SEDOBJ@
-SERVLINK = @SERVLINK@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SHLIBEXT = @SHLIBEXT@
@@ -212,7 +211,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I../include -I../libratbox/include 
 ssld_SOURCES = ssld.c
-ssld_LDADD = ../libratbox/src/libratbox.la
+ssld_LDADD = ../libratbox/src/libratbox.la @ZLIB_LD@
 all: all-am
 
 .SUFFIXES:
