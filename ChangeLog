@@ -1,3 +1,18 @@
+androsyn    2007/11/06 20:12:46 UTC	(20071106_3-24465)
+  Log:
+  make the ssld load balancing be a bit more useful. i suspect ssld will need renamed at some point though...
+
+  Modified:
+	ircd-ratbox/trunk/include/sslproc.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/06 18:08:16 UTC	(20071106_2-24463)
   Log:
   Deal with passing zlib compression levels
