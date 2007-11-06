@@ -116,6 +116,8 @@ struct Client
 	struct LocalUser *localClient;
 };
 
+struct _ssl_ctl;
+
 struct LocalUser
 {
 	rb_dlink_node tnode;	/* This is the node for the local list type the client is on*/
@@ -202,6 +204,7 @@ struct LocalUser
 	uint8_t targinfo[2];	/* cyclic array, no in use */
 	time_t target_last;		/* last time we cleared a slot */
 	struct irc_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
+	struct _ssl_ctl *ssl_ctl;		/* which ssl daemon we're associate with */
 };
 
 

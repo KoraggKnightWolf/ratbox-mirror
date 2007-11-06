@@ -180,9 +180,10 @@ free_local_client(struct Client *client_p)
 			free_listener(client_p->localClient->listener);
 		client_p->localClient->listener = 0;
 	}
-
+	
 	if(client_p->localClient->F != NULL)
 		rb_close(client_p->localClient->F);
+
 
 	if(client_p->localClient->passwd)
 	{
@@ -193,6 +194,9 @@ free_local_client(struct Client *client_p)
 
 	rb_free(client_p->localClient->fullcaps);
 	rb_free(client_p->localClient->opername);
+
+	ssld_decrement_clicount(client_p->localClient->ssl_ctl);
+
 
 	rb_bh_free(lclient_heap, client_p->localClient);
 	client_p->localClient = NULL;

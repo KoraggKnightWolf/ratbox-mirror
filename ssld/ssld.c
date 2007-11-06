@@ -1,3 +1,27 @@
+/*
+ *  ssld.c: The ircd-ratbox ssl/zlib helper daemon thingy
+ *  Copyright (C) 2007 Aaron Sethman <androsyn@ratbox.org>
+ *  Copyright (C) 2007 ircd-ratbox development team
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ *  USA
+ *
+ *  $Id: dns.c 24244 2007-08-22 19:04:55Z androsyn $
+ */
+
+
 #include "stdinc.h"
 
 #ifdef HAVE_LIBZ
@@ -14,7 +38,6 @@ static void conn_plain_write_sendq(rb_fde_t *, void *data);
 
 static char inbuf[READBUF_SIZE];
 static char outbuf[READBUF_SIZE];
-
 
 typedef struct _mod_ctl_buf
 {
@@ -41,6 +64,8 @@ typedef struct _conn
         rb_dlink_node node;
         rawbuf_head_t *modbuf_out;
         rawbuf_head_t *plainbuf_out;
+
+	rb_uint16_t id;
 
         rb_fde_t *mod_fd;
         rb_fde_t *plain_fd;
@@ -336,16 +361,20 @@ zlib_process(mod_ctl_buf_t *ctlb)
 	conn_t *conn;
 	void *leftover;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
-	conn->is_ssl = 0;
-	conn->is_zlib = 1;
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
 
 	if(rb_get_type(conn->plain_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
 
+
+	conn->is_ssl = 0;
+	conn->is_zlib = 1;
+
 	id = (rb_uint16_t *)&ctlb->buf[1];
 	level = (rb_uint8_t *)&ctlb->buf[3];
+
+	conn->id = *id;
 
 	conn->instream.total_in = 0;
 	conn->instream.total_out = 0;
@@ -377,7 +406,25 @@ zlib_process(mod_ctl_buf_t *ctlb)
 }
 #endif
 
+static void
+ssl_new_keys(mod_ctl_buf_t *ctl_buf)
+{
+	char *buf;
+	char *cert, *key, *dhparam;
+	buf = &ctl_buf->buf[2];
+	cert = buf;
+	buf += strlen(cert) + 1;
+	key = buf;
+	buf += strlen(key) + 1;
+	dhparam = buf;
+	if(strlen(dhparam) == 0)
+		dhparam = NULL; 
 
+	if(!rb_setup_ssl_server(cert, key, dhparam))
+	{
+		/* XXX handle errors */
+	}
+}
 
 static void
 mod_process_cmd_recv(mod_ctl_t *ctl)
@@ -399,6 +446,12 @@ mod_process_cmd_recv(mod_ctl_t *ctl)
 			case 'C':
 			{
 				ssl_process_connect(ctl_buf);
+				break;
+			}
+
+			case 'K':
+			{
+				ssl_new_keys(ctl_buf);
 				break;
 			}
 #ifdef HAVE_LIBZ
@@ -516,7 +569,6 @@ int main(int argc, char **argv)
 {
 	mod_ctl_t *ctl;
 	const char *s_ctlfd, *s_pipe;
-	const char *ssl_cert, *ssl_private_key, *ssl_dh_params;
 	int ctlfd, pipefd, x, maxfd;
 
 	maxfd = maxconn();
@@ -532,9 +584,6 @@ int main(int argc, char **argv)
 	
 	ctlfd = atoi(s_ctlfd);
 	pipefd = atoi(s_pipe);
-	ssl_cert = getenv("SSL_CERT");
-	ssl_private_key = getenv("SSL_PRIVATE_KEY");
-	ssl_dh_params = getenv("SSL_DH_PARAMS");
 		
 	for(x = 0; x < maxfd; x++)
 	{
@@ -543,7 +592,7 @@ int main(int argc, char **argv)
 	}
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 1024, 4096);
 	rb_init_rawbuffers(1024);
-	rb_setup_ssl_server(ssl_cert, ssl_private_key, ssl_dh_params);
+
 	ctl = rb_malloc(sizeof(mod_ctl_t));
 	ctl->F = rb_open(ctlfd, RB_FD_SOCKET, "ircd control socket");
 	ctl->F_pipe = rb_open(pipefd, RB_FD_PIPE, "ircd pipe");	

@@ -651,7 +651,7 @@ ratbox_main(int argc, char *argv[])
 	init_bandb();
 	load_conf_settings();
 
-	start_ssldaemon(1, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
+	start_ssldaemon(2, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 		
 //	read_conf_files(YES);	/* cold start init conf files */
 	rehash_bans(0);

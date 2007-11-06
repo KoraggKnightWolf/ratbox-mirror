@@ -411,7 +411,7 @@ close_listeners()
  * any client list yet.
  */
 static void
-add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, struct sockaddr *lai)
+add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, struct sockaddr *lai, void *ssl_ctl)
 {
 	struct Client *new_client;
 	s_assert(NULL != listener);
@@ -445,6 +445,7 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 	new_client->localClient->F = F;
 
 	new_client->localClient->listener = listener;
+	new_client->localClient->ssl_ctl = ssl_ctl;
 	++listener->ref_count;
 
 	start_auth(new_client);
@@ -530,10 +531,11 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 static void
 accept_ssld(rb_fde_t *F, struct sockaddr *addr, struct sockaddr *laddr, struct Listener *listener)
 {
+	ssl_ctl_t *ctl;
 	rb_fde_t *xF[2];
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF[0], &xF[1], "Incoming ssld Connection");
-	start_ssld_accept(F, xF[1]); /* this will close F for us */
-	add_connection(listener, xF[0], addr, laddr);
+	ctl = start_ssld_accept(F, xF[1]); /* this will close F for us */
+	add_connection(listener, xF[0], addr, laddr, ctl);
 }
 
 static void
@@ -553,7 +555,7 @@ accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t add
 	if(listener->ssl && ServerInfo.ssl_use_ssld)
 		accept_ssld(F, addr, (struct sockaddr *)&lip, listener);
 	else
-		add_connection(listener, F, addr, (struct sockaddr *)&lip);
+		add_connection(listener, F, addr, (struct sockaddr *)&lip, NULL);
 }
 
 

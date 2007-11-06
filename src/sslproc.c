@@ -1,3 +1,26 @@
+/*
+ *  sslproc.c: An interface to ssld
+ *  Copyright (C) 2007 Aaron Sethman <androsyn@ratbox.org>
+ *  Copyright (C) 2007 ircd-ratbox development team
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ *  USA
+ *
+ *  $Id: dns.c 24244 2007-08-22 19:04:55Z androsyn $
+ */
+
 #include <ratbox_lib.h>
 #include "stdinc.h"
 #include "s_conf.h"
@@ -5,6 +28,8 @@
 #include "listener.h"
 #include "struct.h"
 #include "sslproc.h"
+
+
 
 /* 
 
@@ -33,7 +58,7 @@ typedef struct _ssl_ctl_buf
 } ssl_ctl_buf_t;
 
 
-typedef struct _ssl_ctl
+struct _ssl_ctl
 {
 	rb_dlink_node node;
 	int cli_count;
@@ -41,9 +66,9 @@ typedef struct _ssl_ctl
 	int pid;
 	rb_dlink_list readq;
 	rb_dlink_list writeq;
-} ssl_ctl_t;
+};
 
-
+static void send_new_ssl_certs_one(ssl_ctl_t *ctl, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params);
 
 static rb_dlink_list ssl_daemons;
 
@@ -100,6 +125,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 
 	for(i = 0; i < count; i++)
 	{
+		ssl_ctl_t *ctl;
 		rb_socketpair(AF_UNIX, SOCK_DGRAM, 0, &F1, &F2, "SSL/TLS handle passing socket");
 		rb_set_buffers(F1, READBUF_SIZE);
 		rb_set_buffers(F2, READBUF_SIZE);
@@ -108,11 +134,6 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		rb_pipe(&P1, &P2, "SSL/TLS pipe");
 		rb_snprintf(fdarg, sizeof(fdarg), "%d", rb_get_fd(P1));
 		setenv("CTL_PIPE", fdarg, 1);
-		setenv("SSL_CERT", ssl_cert, 1);
-		setenv("SSL_PRIVATE_KEY", ssl_private_key, 1);
-		if(ssl_dh_params != NULL)
-			setenv("SSL_DH_PARAMS", ssl_dh_params, 1);
-
 		
 		pid = rb_spawn_process(fullpath, (const char **)parv);
 		if(pid == -1)
@@ -125,10 +146,14 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		started++;
 		rb_close(F2);
 		rb_close(P1);
-		allocate_ssl_daemon(F1, pid);
+		ctl = allocate_ssl_daemon(F1, pid);
+		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
+		
 	}
 	return started;	
 }
+
+
 
 
 static void
@@ -267,30 +292,63 @@ ssl_cmd_write_queue(ssl_ctl_t *ctl, rb_fde_t **F, int count, const void *buf, si
 }
 
 
-void 
+static void
+send_new_ssl_certs_one(ssl_ctl_t *ctl, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
+{
+	static char buf[READBUF_SIZE];	
+	static char nul = '\0';
+	int len;
+	len = rb_snprintf(buf, sizeof(buf), "K%c%s%c%s%c%s%c", nul, ssl_cert, nul, ssl_private_key, nul, ssl_dh_params, nul);
+	ssl_cmd_write_queue(ctl, NULL, 0, buf, len);
+}
+
+void
+send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
+{
+	rb_dlink_node *ptr;
+	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
+	{
+		ssl_ctl_t *ctl = ptr->data;
+		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params);	
+	}
+}
+
+
+ssl_ctl_t * 
 start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF)
 {
 	rb_fde_t *F[2];
+	ssl_ctl_t *ctl;
 	static const char *cmd = "A";
 	F[0] = sslF;
 	F[1] = plainF;
 	
-	ssl_cmd_write_queue(which_ssld(), F, 2, cmd, strlen(cmd));
-	return; 
+	ctl = which_ssld();
+	ctl->cli_count++;
+	ssl_cmd_write_queue(ctl, F, 2, cmd, strlen(cmd));
+	return ctl;
 }
 
-void 
+ssl_ctl_t *
 start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF)
 {
 	rb_fde_t *F[2];
+	ssl_ctl_t *ctl;
 	static const char *cmd = "C";
 	F[0] = sslF;
 	F[1] = plainF;
-	
-	ssl_cmd_write_queue(which_ssld(), F, 2, cmd, strlen(cmd));
-	return; 
+	ctl = which_ssld();
+	ctl->cli_count++;
+	ssl_cmd_write_queue(ctl, F, 2, cmd, strlen(cmd));
+	return ctl; 
 }
 
+void 
+ssld_decrement_clicount(ssl_ctl_t *ctl)
+{
+	if(ctl != NULL)
+		ctl->cli_count--;
+}
 
 /* 
  * what we end up sending to the ssld process for ziplinks is the following
@@ -339,8 +397,9 @@ start_zlib_session(struct Client *server)
 	level = (rb_uint8_t *)&buf[3];
 	*id = rb_get_fd(server->localClient->F);
 	*level = ConfigFileEntry.compression_level;
-	ssl_cmd_write_queue(which_ssld(), F, 2, buf, len);
+	server->localClient->ssl_ctl = which_ssld();
+	server->localClient->ssl_ctl->cli_count++;
+	ssl_cmd_write_queue(server->localClient->ssl_ctl, F, 2, buf, len);
 	rb_free(buf);
 }
-
 
