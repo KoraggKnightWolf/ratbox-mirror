@@ -292,20 +292,27 @@ start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF)
 }
 
 
-/* for zlib sessions we basically end up with the following 
- * Z[RECVQ]
+/* 
+ * what we end up sending to the ssld process for ziplinks is the following
+ * Z[ourfd][RECVQ]
+ * Z = ziplinks command
+ * ourfd = Our end of the socketpair
+ * recvq = any data we read prior to starting ziplinks
  */
 void
 start_zlib_session(struct Client *server)
 {
 	rb_fde_t *F[2];
 	rb_fde_t *xF1, *xF2;
-	char *buf;
+	rb_uint8_t *buf;
+	rb_uint16_t *id;
+	size_t hdr = sizeof(rb_uint8_t) + sizeof(rb_uint16_t);
 	size_t len;
 
 	len = rb_linebuf_len(&server->localClient->buf_recvq);
-	len += sizeof(char);
-	fprintf(stderr, "here\n");	
+	fprintf(stderr, "len now: %d\n", len);
+	len += hdr;	
+	fprintf(stderr, "here %d\n", len);	
 	if(len > READBUF_SIZE)
 	{
 		/* XXX deal with this */
@@ -313,13 +320,16 @@ start_zlib_session(struct Client *server)
 	}
 	buf = rb_malloc(len);
 	*buf = 'Z';
-	rb_linebuf_get(&server->localClient->buf_recvq, (char *)(buf+sizeof(char)), len - sizeof(char), LINEBUF_PARTIAL, LINEBUF_RAW); 
+	rb_linebuf_get(&server->localClient->buf_recvq, (char *)(buf+hdr), len - hdr, LINEBUF_PARTIAL, LINEBUF_RAW); 
 	
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs");
 	
 	F[0] = server->localClient->F; 
 	F[1] = xF1;
 	server->localClient->F = xF2;
+	id = (int *)&buf[1];
+	*id = rb_get_fd(server->localClient->F);
+	fprintf(stderr, "Sending ID: %d\n", *id);
 	ssl_cmd_write_queue(which_ssld(), F, 2, buf, len);
 	rb_free(buf);
 }

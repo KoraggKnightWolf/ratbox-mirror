@@ -1,6 +1,8 @@
 #include "stdinc.h"
 
+#ifdef HAVE_LIBZ
 #include <zlib.h>
+#endif
 
 #define MAXPASSFD 4
 #ifndef READBUF_SIZE
@@ -47,7 +49,7 @@ typedef struct _conn
         unsigned long plain_in;
         unsigned long plain_out;
 	rb_uint8_t is_ssl;
-#ifdef HAVE_ZLIB
+#ifdef HAVE_LIBZ
 	rb_uint8_t is_zlib;
 	z_stream	instream;
 	z_stream outstream;
@@ -116,7 +118,7 @@ conn_plain_write(conn_t * conn, void *data, size_t len)
         rb_rawbuf_append(conn->plainbuf_out, data, len);
 } 
 
-#ifdef HAVE_ZLIB
+#ifdef HAVE_LIBZ
 static void
 common_zlib_deflate(conn_t *conn, void *buf, size_t len)
 {
@@ -195,7 +197,7 @@ conn_plain_read_cb(rb_fde_t *fd, void *data)
         while ((length = rb_read(conn->plain_fd, inbuf, sizeof(inbuf))) > 0)
         {
                 conn->plain_in += length;
-#ifdef HAVE_ZLIB
+#ifdef HAVE_LIBZ
                 if(conn->is_zlib)
                 	common_zlib_deflate(conn, inbuf, length);
 		else
@@ -223,7 +225,7 @@ conn_mod_read_cb(rb_fde_t *fd, void *data)
         while ((length = rb_read(conn->mod_fd, inbuf, sizeof(inbuf))) > 0)
         {
         	conn->mod_in += length;
-#ifdef HAVE_ZLIB
+#ifdef HAVE_LIBZ
         	if(conn->is_zlib)
 	        	common_zlib_inflate(conn, inbuf, length);
 		else
@@ -308,6 +310,12 @@ ssl_process_accept(mod_ctl_buf_t *ctlb)
 	conn_t *conn;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
 	conn->is_ssl = 1;
+	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
+		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
+
+	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
+		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
+
 	rb_ssl_start_accepted(ctlb->F[0], ssl_process_accept_cb, conn);
 	return;
 }
@@ -318,15 +326,22 @@ ssl_process_connect(mod_ctl_buf_t *ctlb)
 	/* XXX write me */
 	return;
 }
-#ifdef HAVE_ZLIB
+#ifdef HAVE_LIBZ
 static void
 zlib_process(mod_ctl_buf_t *ctlb)
 {
+	rb_uint16_t *id;
+	size_t hdr = sizeof(rb_uint8_t) + sizeof(rb_uint16_t);
 	conn_t *conn;
 	void *leftover;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
 	conn->is_ssl = 0;
 	conn->is_zlib = 1;
+	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
+		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
+
+	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
+		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
 	
 	conn->instream.total_in = 0;
 	conn->instream.total_out = 0;
@@ -342,11 +357,14 @@ zlib_process(mod_ctl_buf_t *ctlb)
 	conn->outstream.data_type = Z_ASCII;
 	
 	deflateInit(&conn->outstream, Z_DEFAULT_COMPRESSION);
+
+	id = (rb_uint16_t *)&ctlb->buf[1];
+	fprintf(stderr, "Got id: %d buflen: %d\n", *id, ctlb->buflen);
 	
-	if(ctlb->buflen > 1)
+	if(ctlb->buflen > hdr)
 	{	
-		leftover = ctlb->buf + sizeof(char);
-		common_zlib_inflate(conn, leftover, ctlb->buflen - sizeof(char));
+		leftover = ctlb->buf + hdr;
+		common_zlib_inflate(conn, leftover, ctlb->buflen - hdr);
 	}
         conn_mod_read_cb(conn->mod_fd, conn);
 	conn_plain_read_cb(conn->plain_fd, conn);
@@ -378,7 +396,7 @@ mod_process_cmd_recv(mod_ctl_t *ctl)
 				ssl_process_connect(ctl_buf);
 				break;
 			}
-#ifdef HAVE_ZLIB
+#ifdef HAVE_LIBZ
 			case 'Z':
 			{
 				/* just zlib only */
