@@ -315,22 +315,28 @@ send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char
 
 
 ssl_ctl_t * 
-start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF)
+start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
 {
 	rb_fde_t *F[2];
 	ssl_ctl_t *ctl;
-	static const char *cmd = "A";
+	rb_uint16_t *id;
+	char buf[3];
 	F[0] = sslF;
 	F[1] = plainF;
+
+	id = (rb_uint16_t *)&buf[1];
+
+	buf[0] = 'A';
+	*id = xid;
 	
 	ctl = which_ssld();
 	ctl->cli_count++;
-	ssl_cmd_write_queue(ctl, F, 2, cmd, strlen(cmd));
+	ssl_cmd_write_queue(ctl, F, 2, buf, sizeof(buf));
 	return ctl;
 }
 
 ssl_ctl_t *
-start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF)
+start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
 {
 	rb_fde_t *F[2];
 	ssl_ctl_t *ctl;
@@ -369,15 +375,27 @@ start_zlib_session(struct Client *server)
 	size_t len;
 
 	len = rb_linebuf_len(&server->localClient->buf_recvq);
-	fprintf(stderr, "len now: %d\n", len);
 	len += hdr;	
-	fprintf(stderr, "here %d\n", len);	
+	buf = rb_malloc(len);
+	id = (rb_uint16_t *)&buf[1];
+	level = (rb_uint8_t *)&buf[3];
+	*id = rb_get_fd(server->localClient->F);
+	*level = ConfigFileEntry.compression_level;
+
+	if(server->localClient->ssl_ctl != NULL)
+	{
+		*buf = 'Y'; 	
+		rb_linebuf_get(&server->localClient->buf_recvq, (char *)(buf+hdr), len - hdr, LINEBUF_PARTIAL, LINEBUF_RAW);		
+		ssl_cmd_write_queue(server->localClient->ssl_ctl, NULL, 0, buf, len);
+		rb_free(buf);
+		return;
+	} 
+	
 	if(len > READBUF_SIZE)
 	{
 		/* XXX deal with this */
 		
 	}
-	buf = rb_malloc(len);
 	*buf = 'Z';
 	rb_linebuf_get(&server->localClient->buf_recvq, (char *)(buf+hdr), len - hdr, LINEBUF_PARTIAL, LINEBUF_RAW); 
 	
@@ -393,10 +411,6 @@ start_zlib_session(struct Client *server)
 	 */
 	
 
-	id = (rb_uint16_t *)&buf[1];
-	level = (rb_uint8_t *)&buf[3];
-	*id = rb_get_fd(server->localClient->F);
-	*level = ConfigFileEntry.compression_level;
 	server->localClient->ssl_ctl = which_ssld();
 	server->localClient->ssl_ctl->cli_count++;
 	ssl_cmd_write_queue(server->localClient->ssl_ctl, F, 2, buf, len);

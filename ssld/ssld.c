@@ -48,6 +48,7 @@ typedef struct _mod_ctl_buf
         int nfds;
 } mod_ctl_buf_t; 
 
+static rb_dlink_list conn_list;
 
 typedef struct _mod_ctl
 {
@@ -91,6 +92,7 @@ close_conn(conn_t * conn)
 
         rb_free_rawbuffer(conn->modbuf_out);
         rb_free_rawbuffer(conn->plainbuf_out);
+        rb_dlinkDelete(&conn->node, &conn_list);
         memset(conn, 0, sizeof(conn_t));
         rb_free(conn);
 }
@@ -103,9 +105,23 @@ make_conn(rb_fde_t *mod_fd, rb_fde_t *plain_fd)
         conn->plainbuf_out = rb_new_rawbuffer();
         conn->mod_fd = mod_fd;
         conn->plain_fd = plain_fd;
+        rb_dlinkAdd(conn, &conn->node, &conn_list);
         return conn;
 }
 
+static conn_t *
+conn_find_by_id(rb_uint16_t id)
+{
+	rb_dlink_node *ptr;
+	conn_t *conn;
+	RB_DLINK_FOREACH(ptr, conn_list.head)
+	{
+		conn = ptr->data;
+		if(conn->id == id)
+			return conn;	
+	}	
+	return NULL;
+}
 
 
 
@@ -333,7 +349,11 @@ static void
 ssl_process_accept(mod_ctl_buf_t *ctlb)
 {
 	conn_t *conn;
+	rb_uint16_t *id;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
+	
+	id = (rb_uint16_t *)&ctlb->buf[1];
+	conn->id = *id;
 	conn->is_ssl = 1;
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
@@ -351,7 +371,56 @@ ssl_process_connect(mod_ctl_buf_t *ctlb)
 	/* XXX write me */
 	return;
 }
+
 #ifdef HAVE_LIBZ
+
+/* starts zlib for an already established connection */
+static void
+zlib_process_ssl(mod_ctl_buf_t *ctlb)
+{
+	rb_uint16_t *id;
+	rb_uint8_t *level;
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
+	conn_t *conn;
+	void *leftover;
+	id = (rb_uint16_t *)&ctlb->buf[1];
+	level = (rb_uint8_t *)&ctlb->buf[3];
+
+	conn = conn_find_by_id(*id);
+	if(conn == NULL)
+	{
+		return;
+	}
+	conn->is_zlib = 1;
+
+	conn->instream.total_in = 0;
+	conn->instream.total_out = 0;
+	conn->instream.zalloc = (alloc_func) 0;
+	conn->instream.zfree = (free_func) 0;
+	conn->instream.data_type = Z_ASCII;
+	inflateInit(&conn->instream);
+
+	conn->outstream.total_in = 0;
+	conn->outstream.total_out = 0;
+	conn->outstream.zalloc = (alloc_func) 0;
+	conn->outstream.zfree = (free_func) 0;
+	conn->outstream.data_type = Z_ASCII;
+
+	if(*level > 9)
+		*level = Z_DEFAULT_COMPRESSION;	
+
+	deflateInit(&conn->outstream, *level);
+
+	if(ctlb->buflen > hdr)
+	{	
+		leftover = ctlb->buf + hdr;
+		common_zlib_inflate(conn, leftover, ctlb->buflen - hdr);
+	}
+        conn_mod_read_cb(conn->mod_fd, conn);
+	conn_plain_read_cb(conn->plain_fd, conn);
+	return;
+}
+
 static void
 zlib_process(mod_ctl_buf_t *ctlb)
 {
@@ -455,6 +524,11 @@ mod_process_cmd_recv(mod_ctl_t *ctl)
 				break;
 			}
 #ifdef HAVE_LIBZ
+			case 'Y':
+			{
+				zlib_process_ssl(ctl_buf);
+				break;
+			}
 			case 'Z':
 			{
 				/* just zlib only */
