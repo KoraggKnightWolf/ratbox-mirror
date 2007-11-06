@@ -1,3 +1,12 @@
+androsyn    2007/11/06 18:08:16 UTC	(20071106_2-24463)
+  Log:
+  Deal with passing zlib compression levels
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/06 17:27:30 UTC	(20071106_1-24461)
   Log:
   add some basic connection id stuff for ziplinks
