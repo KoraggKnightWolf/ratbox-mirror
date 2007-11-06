@@ -306,7 +306,8 @@ start_zlib_session(struct Client *server)
 	rb_fde_t *xF1, *xF2;
 	rb_uint8_t *buf;
 	rb_uint16_t *id;
-	size_t hdr = sizeof(rb_uint8_t) + sizeof(rb_uint16_t);
+	rb_uint8_t *level;
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
 	size_t len;
 
 	len = rb_linebuf_len(&server->localClient->buf_recvq);
@@ -327,9 +328,17 @@ start_zlib_session(struct Client *server)
 	F[0] = server->localClient->F; 
 	F[1] = xF1;
 	server->localClient->F = xF2;
-	id = (int *)&buf[1];
+	/* buf stuff is this: 
+	 buf[0] = Z
+	 buf[1-2] = id
+	 buf[3] = level
+	 */
+	
+
+	id = (rb_uint16_t *)&buf[1];
+	level = (rb_uint8_t *)&buf[3];
 	*id = rb_get_fd(server->localClient->F);
-	fprintf(stderr, "Sending ID: %d\n", *id);
+	*level = ConfigFileEntry.compression_level;
 	ssl_cmd_write_queue(which_ssld(), F, 2, buf, len);
 	rb_free(buf);
 }

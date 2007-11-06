@@ -331,7 +331,8 @@ static void
 zlib_process(mod_ctl_buf_t *ctlb)
 {
 	rb_uint16_t *id;
-	size_t hdr = sizeof(rb_uint8_t) + sizeof(rb_uint16_t);
+	rb_uint8_t *level;
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
 	conn_t *conn;
 	void *leftover;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
@@ -340,9 +341,12 @@ zlib_process(mod_ctl_buf_t *ctlb)
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
 
-	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
+	if(rb_get_type(conn->plain_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
-	
+
+	id = (rb_uint16_t *)&ctlb->buf[1];
+	level = (rb_uint8_t *)&ctlb->buf[3];
+
 	conn->instream.total_in = 0;
 	conn->instream.total_out = 0;
 	conn->instream.zalloc = (alloc_func) 0;
@@ -355,11 +359,12 @@ zlib_process(mod_ctl_buf_t *ctlb)
 	conn->outstream.zalloc = (alloc_func) 0;
 	conn->outstream.zfree = (free_func) 0;
 	conn->outstream.data_type = Z_ASCII;
-	
-	deflateInit(&conn->outstream, Z_DEFAULT_COMPRESSION);
 
-	id = (rb_uint16_t *)&ctlb->buf[1];
-	fprintf(stderr, "Got id: %d buflen: %d\n", *id, ctlb->buflen);
+	if(*level > 9)
+		*level = Z_DEFAULT_COMPRESSION;	
+
+	deflateInit(&conn->outstream, *level);
+
 	
 	if(ctlb->buflen > hdr)
 	{	
