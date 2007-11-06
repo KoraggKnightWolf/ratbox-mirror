@@ -1,3 +1,14 @@
+androsyn    2007/11/06 21:11:42 UTC	(20071106_5-24469)
+  Log:
+  deal with turning on ziplinks on ssl enabled servers
+
+  Modified:
+	ircd-ratbox/trunk/include/sslproc.h (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/06 20:25:52 UTC	(20071106_4-24467)
   Log:
   undo that bit of the last commit
