@@ -51,6 +51,7 @@
 #include "reject.h"
 #include "channel.h"
 #include "hash.h"
+#include "sslproc.h"
 
 #define CF_TYPE(x) ((x) & CF_MTYPE)
 
@@ -2058,7 +2059,7 @@ load_conf_settings(void)
 	if(ConfigChannel.topiclen > MAX_TOPICLEN || ConfigChannel.topiclen < 0)
 		ConfigChannel.topiclen = DEFAULT_TOPICLEN;
 
-	send_new_ssl_certs(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params)
+	send_new_ssl_certs(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 		
 	if(!split_users || !split_servers || (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
 	{
