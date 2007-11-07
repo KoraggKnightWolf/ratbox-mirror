@@ -1,3 +1,12 @@
+jilles      2007/11/07 20:52:04 UTC	(20071107_1-24475)
+  Log:
+  Unbreak compile.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/11/07 02:25:56 UTC	(20071107_0-24471)
   Log:
   Add ssld_count, set Id props on some of the newer files
