@@ -2049,12 +2049,17 @@ load_conf_settings(void)
 	if(ServerInfo.network_desc == NULL)
 		ServerInfo.network_desc = rb_strdup(NETWORK_DESC_DEFAULT);
 
+	if(ServerInfo.ssld_count < 1)
+		ServerInfo.ssld_count = 1;
+
 	if((ConfigFileEntry.client_flood < CLIENT_FLOOD_MIN) || (ConfigFileEntry.client_flood > CLIENT_FLOOD_MAX))
 		ConfigFileEntry.client_flood = CLIENT_FLOOD_MAX;
 
 	if(ConfigChannel.topiclen > MAX_TOPICLEN || ConfigChannel.topiclen < 0)
 		ConfigChannel.topiclen = DEFAULT_TOPICLEN;
-	
+
+	send_new_ssl_certs(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params)
+		
 	if(!split_users || !split_servers || (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
 	{
 		rb_event_delete(cache_links_ev);
@@ -2091,6 +2096,7 @@ static struct conf_items conf_serverinfo_table[] =
         { "ssl_cert",           CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },   
         { "ssl_dh_params",      CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
         { "ssl_use_ssld",	CF_YESNO,   NULL, 0, &ServerInfo.ssl_use_ssld },
+        { "ssld_count",		CF_INT,	    NULL, 0 &ServerInfo.ssld_count },
         { "\0", 0, NULL, 0, NULL }
 };
 

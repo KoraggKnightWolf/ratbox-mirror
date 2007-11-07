@@ -667,7 +667,8 @@ set_default_conf(void)
 #endif
 	ServerInfo.use_ts6 = YES;
 	ServerInfo.default_max_clients = MAXCONNECTIONS;
-
+	ServerInfo.ssld_count = 1;
+	
 	/* Don't reset hub, as that will break lazylinks */
 	/* ServerInfo.hub = NO; */
 	AdminInfo.name = NULL;

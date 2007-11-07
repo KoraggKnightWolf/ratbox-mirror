@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am 24244 2007-08-22 19:04:55Z androsyn $
+# $Id$
 #
 bin_PROGRAMS = ssld
 
