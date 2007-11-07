@@ -1,3 +1,20 @@
+androsyn    2007/11/07 02:25:56 UTC	(20071107_0-24471)
+  Log:
+  Add ssld_count, set Id props on some of the newer files
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/sslproc.h (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) (Property Modified)
+	ircd-ratbox/trunk/ssld/Makefile.am (File Modified) (Property Modified)
+	ircd-ratbox/trunk/ssld/Makefile.in  (Property Modified)
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) (Property Modified)
+
+
 androsyn    2007/11/06 21:11:42 UTC	(20071106_5-24469)
   Log:
   deal with turning on ziplinks on ssl enabled servers
