@@ -1,3 +1,12 @@
+androsyn    2007/11/08 16:21:11 UTC	(20071108_0-24479)
+  Log:
+  update things to deal with the rb_lib_init change
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 jilles      2007/11/07 20:52:04 UTC	(20071107_1-24475)
   Log:
   Unbreak compile.
