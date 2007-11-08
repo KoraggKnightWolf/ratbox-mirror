@@ -664,7 +664,7 @@ int main(int argc, char **argv)
 		if(x != ctlfd && x != pipefd && x > 2)
 			close(x);
 	}
-	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 1024, 4096);
+	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);
 
 	ctl = rb_malloc(sizeof(mod_ctl_t));

@@ -561,7 +561,8 @@ ratbox_main(int argc, char *argv[])
 	}
 
 	/* This must be after we daemonize.. */
-	rb_lib_init(ilogcb, restartcb, diecb, 1, maxconnections, LINEBUF_HEAP_SIZE, DNODE_HEAP_SIZE, FD_HEAP_SIZE);
+	rb_lib_init(ilogcb, restartcb, diecb, 1, maxconnections, DNODE_HEAP_SIZE, FD_HEAP_SIZE);
+	rb_linebuf_init(LINEBUF_HEAP_SIZE);
 
 	set_default_conf();
 	rb_set_time();
