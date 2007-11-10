@@ -402,8 +402,6 @@ close_listeners()
 	}
 }
 
-#define DLINE_WARNING "ERROR :You have been D-lined.\r\n"
-
 /*
  * add_connection - creates a client which has just connected to us on 
  * the given fd. The sockhost field is initialized with the ip# of the host.
