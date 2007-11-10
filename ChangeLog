@@ -1,3 +1,11 @@
+androsyn    2007/11/10 22:02:13 UTC	(20071110_0-24481)
+  Log:
+  remove unused #define
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2007/11/08 16:21:11 UTC	(20071108_0-24479)
   Log:
   update things to deal with the rb_lib_init change
