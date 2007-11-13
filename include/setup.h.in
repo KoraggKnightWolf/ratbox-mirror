@@ -218,9 +218,6 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
 
-/* Maximum topic length (<=390) */
-#undef TOPICLEN
-
 /* Size of the topic heap. */
 #undef TOPIC_HEAP_SIZE
 

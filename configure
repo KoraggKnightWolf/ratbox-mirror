@@ -24970,11 +24970,6 @@ fi
 
 
 cat >>confdefs.h <<_ACEOF
-#define TOPICLEN ${TOPICLEN}
-_ACEOF
-
-
-cat >>confdefs.h <<_ACEOF
 #define NICKLEN (${NICKLEN}+1)
 _ACEOF
 
@@ -26730,6 +26725,5 @@ echo "ratbox-services compatibility .. $ratbox_services"
 echo
 echo "Configured limits:"
 echo "NICKLEN ................. $NICKLEN"
-echo "TOPICLEN ................ $TOPICLEN"
 echo
 

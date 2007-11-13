@@ -553,7 +553,6 @@ AC_HELP_STRING([--with-nicklen=LENGTH],[Set the nick length to LENGTH (default 9
   fi
 ], [NICKLEN=9])
 
-AC_DEFINE_UNQUOTED(TOPICLEN, ${TOPICLEN}, [Maximum topic length (<=390)])
 AC_DEFINE_UNQUOTED(NICKLEN, (${NICKLEN}+1), [Nickname length])
 AC_DEFINE_UNQUOTED(RATBOX_CONFIGURE_OPTS, "$ac_configure_args", [configure arguments])
 
@@ -631,6 +630,5 @@ echo "ratbox-services compatibility .. $ratbox_services"
 echo
 echo "Configured limits:"
 echo "NICKLEN ................. $NICKLEN"
-echo "TOPICLEN ................ $TOPICLEN"
 echo
 
