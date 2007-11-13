@@ -1,3 +1,11 @@
+androsyn    2007/11/13 00:49:45 UTC	(20071113_6-24495)
+  Log:
+  add acinclude.m4
+
+  Modified:
+	ircd-ratbox/trunk/libltdl/acinclude.m4 (File Added) 
+
+
 androsyn    2007/11/13 00:41:51 UTC	(20071113_5-24493)
   Log:
   get rid of the remains of the topiclen autoconf stuff
