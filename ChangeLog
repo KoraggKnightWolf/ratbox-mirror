@@ -1,3 +1,11 @@
+androsyn    2007/11/13 17:27:44 UTC	(20071113_10-24503)
+  Log:
+  make conn_find_by_id use a simple hash table
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/13 16:56:28 UTC	(20071113_9-24501)
   Log:
   make delay on server_estab_pop to be one second as 0 seems to be a little too fast in some cases
