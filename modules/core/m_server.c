@@ -1135,6 +1135,12 @@ burst_TS6(struct Client *client_p)
 	call_hook(h_burst_finished, &hclientinfo);
 }
 
+static void
+server_estab_pop(void *data)
+{
+	struct Client *client_p = data;
+	send_pop_queue(client_p);
+}
 
 /*
  * server_estab
@@ -1149,6 +1155,7 @@ server_estab(struct Client *client_p)
 	struct Client *target_p;
 	struct server_conf *server_p;
 	hook_data_client hdata;
+	int zip = 0;
 	const char *host;
 	rb_dlink_node *ptr;
 
@@ -1231,10 +1238,11 @@ server_estab(struct Client *client_p)
 	/* Hand the server off to servlink now */
 	if(IsCapable(client_p, CAP_ZIP))
 	{
+		zip = 1;
 		start_zlib_session(client_p);
 	}
 
-	sendto_one(client_p, POP_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, rb_current_time());
+	sendto_one(client_p, HOLD_QUEUE, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, rb_current_time());
 
 	client_p->servptr = &me;
 
@@ -1309,24 +1317,24 @@ server_estab(struct Client *client_p)
 
 		if(has_id(target_p) && has_id(client_p))
 		{
-			sendto_one(target_p, POP_QUEUE, ":%s SID %s 2 %s :%s%s",
+			sendto_one(target_p, HOLD_QUEUE, ":%s SID %s 2 %s :%s%s",
 				   me.id, client_p->name, client_p->id,
 				   IsHidden(client_p) ? "(H) " : "", client_p->info);
 
 			if(IsCapable(target_p, CAP_ENCAP) &&
 			   !EmptyString(client_p->serv->fullcaps))
-				sendto_one(target_p, POP_QUEUE, ":%s ENCAP * GCAP :%s",
+				sendto_one(target_p, HOLD_QUEUE, ":%s ENCAP * GCAP :%s",
 					client_p->id, client_p->serv->fullcaps);
 		}
 		else
 		{
-			sendto_one(target_p, POP_QUEUE, ":%s SERVER %s 2 :%s%s",
+			sendto_one(target_p, HOLD_QUEUE, ":%s SERVER %s 2 :%s%s",
 				   me.name, client_p->name,
 				   IsHidden(client_p) ? "(H) " : "", client_p->info);
 
 			if(IsCapable(target_p, CAP_ENCAP) &&
 			   !EmptyString(client_p->serv->fullcaps))
-				sendto_one(target_p, POP_QUEUE, ":%s ENCAP * GCAP :%s",
+				sendto_one(target_p, HOLD_QUEUE, ":%s ENCAP * GCAP :%s",
 					client_p->name, client_p->serv->fullcaps);
 		}
 	}
@@ -1359,19 +1367,19 @@ server_estab(struct Client *client_p)
 
 		/* presumption, if target has an id, so does its uplink */
 		if(has_id(client_p) && has_id(target_p))
-			sendto_one(client_p, POP_QUEUE, ":%s SID %s %d %s :%s%s",
+			sendto_one(client_p, HOLD_QUEUE, ":%s SID %s %d %s :%s%s",
 				   target_p->servptr->id, target_p->name,
 				   target_p->hopcount + 1, target_p->id,
 				   IsHidden(target_p) ? "(H) " : "", target_p->info);
 		else
-			sendto_one(client_p, POP_QUEUE, ":%s SERVER %s %d :%s%s",
+			sendto_one(client_p, HOLD_QUEUE, ":%s SERVER %s %d :%s%s",
 				   target_p->servptr->name,
 				   target_p->name, target_p->hopcount + 1,
 				   IsHidden(target_p) ? "(H) " : "", target_p->info);
 
 		if(IsCapable(client_p, CAP_ENCAP) && 
 		   !EmptyString(target_p->serv->fullcaps))
-			sendto_one(client_p, POP_QUEUE, ":%s ENCAP * GCAP :%s",
+			sendto_one(client_p, HOLD_QUEUE, ":%s ENCAP * GCAP :%s",
 					get_id(target_p, client_p),
 					target_p->serv->fullcaps);
 	}
@@ -1382,8 +1390,11 @@ server_estab(struct Client *client_p)
 		burst_TS5(client_p);
 
 	/* Always send a PING after connect burst is done */
-	sendto_one(client_p, POP_QUEUE, "PING :%s", get_id(&me, client_p));
-
+	sendto_one(client_p, HOLD_QUEUE, "PING :%s", get_id(&me, client_p));
+	if(zip)
+		rb_event_addonce("server_estab_pop", server_estab_pop, client_p, 0);	
+	else
+		send_pop_queue(client_p);
 	return 0;
 }
 
