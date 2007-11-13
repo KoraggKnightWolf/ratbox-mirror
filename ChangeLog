@@ -1,3 +1,11 @@
+androsyn    2007/11/13 20:59:25 UTC	(20071113_11-24507)
+  Log:
+  fix identd checking
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2007/11/13 17:27:44 UTC	(20071113_10-24503)
   Log:
   make conn_find_by_id use a simple hash table
