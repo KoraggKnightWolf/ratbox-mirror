@@ -1,3 +1,12 @@
+androsyn    2007/11/13 00:28:13 UTC	(20071113_0-24483)
+  Log:
+  fix ssld_count and make client.c compile
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2007/11/10 22:02:13 UTC	(20071110_0-24481)
   Log:
   remove unused #define
