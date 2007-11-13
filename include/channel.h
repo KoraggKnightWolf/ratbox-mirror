@@ -71,7 +71,7 @@ struct Channel
 	int received_number_of_privmsgs;
 	int flood_noticed;
 
-	unsigned long bants;
+	time_t bants;
 	time_t channelts;
 	char *chname;
 };
@@ -84,9 +84,9 @@ struct membership
 
 	struct Channel *chptr;
 	struct Client *client_p;
-	unsigned int flags;
+	rb_uint8_t flags;
 
-	unsigned long bants;
+	time_t bants;
 };
 
 #define BANLEN NICKLEN+USERLEN+HOSTLEN+6

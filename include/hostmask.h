@@ -97,7 +97,7 @@ struct AddressRec
 	int type;
 
 	/* Higher precedences overrule lower ones... */
-	unsigned long precedence;
+	rb_uint32_t precedence;
 
 	/* Only checked if !(type & 1)... */
 	const char *username;
