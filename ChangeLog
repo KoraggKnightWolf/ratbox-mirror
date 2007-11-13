@@ -1,3 +1,11 @@
+androsyn    2007/11/13 01:06:49 UTC	(20071113_7-24497)
+  Log:
+  change bants to rb_uint32_t
+
+  Modified:
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+
+
 androsyn    2007/11/13 00:49:45 UTC	(20071113_6-24495)
   Log:
   add acinclude.m4
