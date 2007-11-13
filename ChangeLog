@@ -1,3 +1,14 @@
+androsyn    2007/11/13 00:30:31 UTC	(20071113_3-24489)
+  Log:
+  change some type sizes in some various structs
+
+  Modified:
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+	ircd-ratbox/trunk/include/hostmask.h (File Modified) 
+	ircd-ratbox/trunk/include/send.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+
+
 androsyn    2007/11/13 00:29:44 UTC	(20071113_2-24487)
   Log:
   move up an #if 0 for now until the stats Z code is fixed
