@@ -35,14 +35,17 @@
 
 static void conn_mod_write_sendq(rb_fde_t *, void *data);
 static void conn_plain_write_sendq(rb_fde_t *, void *data);
+static void mod_write_ctl(rb_fde_t *, void *data);
 
 static char inbuf[READBUF_SIZE];
 static char outbuf[READBUF_SIZE];
 
+
+
 typedef struct _mod_ctl_buf
 {
         rb_dlink_node node;
-        char buf[READBUF_SIZE];
+        char *buf;
         size_t buflen;
         rb_fde_t *F[MAXPASSFD];
         int nfds;
@@ -57,6 +60,9 @@ typedef struct _mod_ctl
         rb_dlink_list readq;
         rb_dlink_list writeq;
 } mod_ctl_t;
+
+mod_ctl_t *g_ctl;
+
 
 typedef struct _conn
 {
@@ -85,6 +91,7 @@ typedef struct _conn
 #define connid_hash(x)	(&connid_hash_table[(x % CONN_HASH_SIZE)])
 
 static rb_dlink_list connid_hash_table[CONN_HASH_SIZE];
+
 
 
 static conn_t *
@@ -161,7 +168,7 @@ conn_mod_write_sendq(rb_fde_t *fd, void *data)
                 rb_setselect(conn->mod_fd, RB_SELECT_WRITE, NULL, NULL);
         }
 }
- 
+
 static void
 conn_mod_write(conn_t * conn, void *data, size_t len)
 {
@@ -173,6 +180,20 @@ conn_plain_write(conn_t * conn, void *data, size_t len)
 {
         rb_rawbuf_append(conn->plainbuf_out, data, len);
 } 
+
+static void
+mod_cmd_write_queue(mod_ctl_t *ctl, void *data, size_t len)
+{
+	mod_ctl_buf_t *ctl_buf;
+	ctl_buf = rb_malloc(sizeof(mod_ctl_buf_t));
+	ctl_buf->buf = rb_malloc(len);
+	ctl_buf->buflen = len;
+	memcpy(ctl_buf->buf, data, len);
+	ctl_buf->nfds = 0;
+	rb_dlinkAddTail(ctl_buf, &ctl_buf->node, &ctl->writeq); 
+	mod_write_ctl(ctl->F, ctl);
+}
+
 
 #ifdef HAVE_LIBZ
 static void
@@ -361,7 +382,7 @@ ssl_process_accept_cb(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen
 }
 
 static void
-ssl_process_accept(mod_ctl_buf_t *ctlb)
+ssl_process_accept(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 {
 	conn_t *conn;
 	rb_uint16_t *id;
@@ -382,17 +403,42 @@ ssl_process_accept(mod_ctl_buf_t *ctlb)
 }
 
 static void
-ssl_process_connect(mod_ctl_buf_t *ctlb)
+ssl_process_connect(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 {
 	/* XXX write me */
 	return;
 }
 
 #ifdef HAVE_LIBZ
+static void
+zlib_process_stats(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
+{
+	char outstat[512];
+	conn_t *conn;
+	const char *odata;
+	rb_uint16_t *id;
+	id = (rb_uint16_t *)&ctlb->buf[1];
+	odata = &ctlb->buf[3];
+	conn = conn_find_by_id(*id);
+	if(conn->is_zlib)
+	{
+		rb_snprintf(outstat, sizeof(outstat), "S %s %ld %ld %ld %ld", odata, 
+			conn->instream.total_out, conn->instream.total_in,
+			conn->outstream.total_in, conn->outstream.total_out);
+		conn->instream.total_out = 0;
+		conn->instream.total_in = 0;
+		conn->outstream.total_out = 0;
+		conn->outstream.total_in = 0;
+	}
+	else
+		rb_snprintf(outstat, sizeof(outstat), "S %s -1 -1 -1 -1", odata);
+	
+	mod_cmd_write_queue(ctl, outstat, strlen(outstat)+1); /* +1 is so we send the \0 as well */
+}
 
 /* starts zlib for an already established connection */
 static void
-zlib_process_ssl(mod_ctl_buf_t *ctlb)
+zlib_process_ssl(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 {
 	rb_uint16_t *id;
 	rb_uint8_t *level;
@@ -438,7 +484,7 @@ zlib_process_ssl(mod_ctl_buf_t *ctlb)
 }
 
 static void
-zlib_process(mod_ctl_buf_t *ctlb)
+zlib_process(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 {
 	rb_uint16_t *id;
 	rb_uint8_t *level;
@@ -492,7 +538,7 @@ zlib_process(mod_ctl_buf_t *ctlb)
 #endif
 
 static void
-ssl_new_keys(mod_ctl_buf_t *ctl_buf)
+ssl_new_keys(mod_ctl_t *ctl, mod_ctl_buf_t *ctl_buf)
 {
 	char *buf;
 	char *cert, *key, *dhparam;
@@ -515,7 +561,7 @@ static void
 mod_process_cmd_recv(mod_ctl_t *ctl)
 {
         rb_dlink_node *ptr, *next;      
-        mod_ctl_buf_t *ctl_buf;                 
+        mod_ctl_buf_t *ctl_buf;
 
         RB_DLINK_FOREACH_SAFE(ptr, next, ctl->readq.head)
         {
@@ -525,30 +571,35 @@ mod_process_cmd_recv(mod_ctl_t *ctl)
                 {
                         case 'A':
                         {
-				ssl_process_accept(ctl_buf);
+				ssl_process_accept(ctl, ctl_buf);
                                 break;
                         }
 			case 'C':
 			{
-				ssl_process_connect(ctl_buf);
+				ssl_process_connect(ctl, ctl_buf);
 				break;
 			}
 
 			case 'K':
 			{
-				ssl_new_keys(ctl_buf);
+				ssl_new_keys(ctl, ctl_buf);
 				break;
 			}
 #ifdef HAVE_LIBZ
+			case 'S':
+			{
+				zlib_process_stats(ctl, ctl_buf);
+				break;
+			}
 			case 'Y':
 			{
-				zlib_process_ssl(ctl_buf);
+				zlib_process_ssl(ctl, ctl_buf);
 				break;
 			}
 			case 'Z':
 			{
 				/* just zlib only */
-				zlib_process(ctl_buf);
+				zlib_process(ctl, ctl_buf);
 				break;
 			}	
 #endif
@@ -557,7 +608,7 @@ mod_process_cmd_recv(mod_ctl_t *ctl)
                                 /* Log unknown commands */
                 }                               
                 rb_dlinkDelete(ptr, &ctl->readq);
-//                rb_free(ctl_buf->buf);
+                rb_free(ctl_buf->buf);
                 rb_free(ctl_buf);
         }
 
@@ -575,10 +626,13 @@ mod_read_ctl(rb_fde_t *F, void *data)
         do
         {
                 ctl_buf = rb_malloc(sizeof(mod_ctl_buf_t));
-
-                retlen = rb_recv_fd_buf(ctl->F, ctl_buf->buf, sizeof(ctl_buf->buf), ctl_buf->F, MAXPASSFD);
-                if(retlen <= 0) 
+                ctl_buf->buf = rb_malloc(READBUF_SIZE);
+                ctl_buf->buflen = READBUF_SIZE;
+                retlen = rb_recv_fd_buf(ctl->F, ctl_buf->buf, ctl_buf->buflen, ctl_buf->F, MAXPASSFD);
+                if(retlen <= 0) {
+                        rb_free(ctl_buf->buf);
                         rb_free(ctl_buf);
+		}
                 else {
                 	ctl_buf->buflen = retlen;
                         rb_dlinkAddTail(ctl_buf, &ctl_buf->node, &ctl->readq);
@@ -604,8 +658,8 @@ mod_write_ctl(rb_fde_t *F, void *data)
         RB_DLINK_FOREACH_SAFE(ptr, next, ctl->writeq.head)
         {
                 ctl_buf = ptr->data;
-
-                retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds,  ctl_buf->buf, ctl_buf->buflen);
+                fprintf(stderr, "Writing: ctl_buf->F: %lx nfd: %d %s\n", (unsigned long)ctl_buf->F, ctl_buf->nfds, ctl_buf->buf);
+                retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds, ctl_buf->buf, ctl_buf->buflen);
                 if(retlen > 0)
                 {
                         rb_dlinkDelete(ptr, &ctl->writeq);
@@ -623,23 +677,7 @@ mod_write_ctl(rb_fde_t *F, void *data)
                 }
         }
 }
-#if 0
-static void
-mod_cmd_write_queue(mod_ctl_t *ctl, rb_fde_t **F, int count, const char *buf)
-{
-        mod_ctl_buf_t *ctl_buf;
-        int x;  
-        ctl_buf = rb_malloc(sizeof(mod_ctl_buf_t));
-        rb_strlcpy(ctl_buf->buf, buf, sizeof(ctl_buf->buf));
 
-        for(x = 0; x < count && x < MAXPASSFD; x++)
-        {
-                ctl_buf->F[x] = F[x];
-        }
-        rb_dlinkAddTail(ctl_buf, &ctl_buf->node, &ctl->readq);
-
-}
-#endif
 
 static void
 read_pipe_ctl(rb_fde_t *F, void *data)
@@ -657,10 +695,9 @@ read_pipe_ctl(rb_fde_t *F, void *data)
 
 int main(int argc, char **argv)
 {
-	mod_ctl_t *ctl;
 	const char *s_ctlfd, *s_pipe;
 	int ctlfd, pipefd, x, maxfd;
-
+	mod_ctl_t *ctl;
 	maxfd = maxconn();
 	s_ctlfd = getenv("CTL_FD");
 	s_pipe = getenv("CTL_PIPE");

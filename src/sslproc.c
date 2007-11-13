@@ -28,8 +28,14 @@
 #include "listener.h"
 #include "struct.h"
 #include "sslproc.h"
+#include "s_serv.h"
+#include "ircd.h"
+#include "hash.h"
 
+#define ZIPSTATS_TIME           60
 
+static void collect_zipstats(void *unused);
+static void ssl_read_ctl(rb_fde_t *F, void *data);
 
 /* 
 
@@ -102,7 +108,6 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 	pid_t pid;
 	int started = 0, i;
 
-	
 	if(ssld_path == NULL)
 	{
 		rb_snprintf(fullpath, sizeof(fullpath), "%s/ssld", BINPATH);
@@ -148,12 +153,55 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		rb_close(P1);
 		ctl = allocate_ssl_daemon(F1, pid);
 		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
-		
+		ssl_read_ctl(ctl->F, ctl);
 	}
+	rb_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
 	return started;	
 }
 
+static void
+ssl_process_zipstats(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
+{
+	struct Client *server;
+	struct ZipStats *zips;
+	int parc;
+	char *parv[6];
+	parc = rb_string_to_array(ctl_buf->buf, parv, 6);		
+	server = find_server(NULL, parv[1]);
+	if(server == NULL || server->localClient == NULL || !IsCapable(server, CAP_ZIP))
+		return;
+	if(server->localClient->zipstats == NULL)
+		server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
+	
+	zips = server->localClient->zipstats;
 
+	zips->in += strtoul(parv[2], NULL, 10);
+	zips->in_wire += strtoul(parv[3], NULL, 10);
+	zips->out += strtoul(parv[4], NULL, 10);
+	zips->out_wire += strtoul(parv[5], NULL, 10);
+	
+	zips->inK += zips->in >> 10;
+	zips->in &= 0x03ff;
+	
+	zips->inK_wire += zips->in_wire >> 10;
+	zips->in_wire &= 0x03ff;
+	
+	zips->outK += zips->out >> 10;
+	zips->out &= 0x03ff;
+	
+	zips->outK_wire += zips->out_wire >> 10;
+	zips->out_wire &= 0x03ff;
+	
+	if(zips->inK > 0)
+		zips->in_ratio = (((double) (zips->inK - zips->inK_wire) / (double) zips->inK) * 100.00);
+	else
+		zips->in_ratio = 0;
+		
+	if(zips->outK > 0)
+		zips->out_ratio = (((double) (zips->outK - zips->outK_wire) / (double) zips->outK) * 100.00);
+	else
+		zips->out_ratio = 0;
+}
 
 
 static void
@@ -161,12 +209,19 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 {
 	rb_dlink_node *ptr, *next;	
 	ssl_ctl_buf_t *ctl_buf;
-	int parc;
-	char *parv[16];
 	RB_DLINK_FOREACH_SAFE(ptr, next, ctl->readq.head)
 	{
 		ctl_buf = ptr->data;		
-		parc = rb_string_to_array(ctl_buf->buf, parv, 15);
+
+		switch(*ctl_buf->buf)
+		{
+		
+			case 'S':
+				ssl_process_zipstats(ctl, ctl_buf);
+				break;
+		}
+#if 0
+
 		if(parc != 5)
 		{
 			/* xxx fail */
@@ -184,6 +239,7 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 				break;
 				/* Log unknown commands */
 		}				
+#endif
 		rb_dlinkDelete(ptr, &ctl->readq);
 		rb_free(ctl_buf->buf);
 		rb_free(ctl_buf);
@@ -197,7 +253,6 @@ ssl_read_ctl(rb_fde_t *F, void *data)
 	ssl_ctl_buf_t *ctl_buf;
 	ssl_ctl_t *ctl = data;
 	int retlen;
-
 	do
 	{
 		ctl_buf = rb_malloc(sizeof(ssl_ctl_buf_t));
@@ -211,8 +266,8 @@ ssl_read_ctl(rb_fde_t *F, void *data)
 		else
 			rb_dlinkAddTail(ctl_buf, &ctl_buf->node, &ctl->readq);
 	} while(retlen > 0);	
-
-	if(retlen == 0 || (retlen < 0 || !rb_ignore_errno(errno)))
+	
+	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 	{
 		/* deal with helper dying */
 		return;
@@ -288,7 +343,6 @@ ssl_cmd_write_queue(ssl_ctl_t *ctl, rb_fde_t **F, int count, const void *buf, si
 	ctl_buf->nfds = count;
 	rb_dlinkAddTail(ctl_buf, &ctl_buf->node, &ctl->writeq);
 	ssl_write_ctl(ctl->F, ctl);
-	
 }
 
 
@@ -381,6 +435,7 @@ start_zlib_session(struct Client *server)
 	level = (rb_uint8_t *)&buf[3];
 	*id = rb_get_fd(server->localClient->F);
 	*level = ConfigFileEntry.compression_level;
+	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
 
 	if(server->localClient->ssl_ctl != NULL)
 	{
@@ -415,5 +470,31 @@ start_zlib_session(struct Client *server)
 	server->localClient->ssl_ctl->cli_count++;
 	ssl_cmd_write_queue(server->localClient->ssl_ctl, F, 2, buf, len);
 	rb_free(buf);
+}
+
+static void
+collect_zipstats(void *unused)
+{
+	rb_dlink_node *ptr;
+	struct Client *target_p;
+	char buf[1+2+HOSTLEN]; /* S[id]HOSTLEN\0 */
+	char *odata;
+	size_t len;
+	rb_uint16_t *id;
+	*buf = 'S';
+	id = (rb_uint16_t *)&buf[1];
+	odata = &buf[3];
+	RB_DLINK_FOREACH(ptr, serv_list.head)
+	{
+		target_p = ptr->data;
+		if(IsCapable(target_p, CAP_ZIP))
+		{
+			len = 3;
+			*id = rb_get_fd(target_p->localClient->F);
+			rb_strlcpy(odata, target_p->name, (sizeof(buf)-3));
+			len += strlen(odata) + 1; /* Get the \0 as well */
+			ssl_cmd_write_queue(target_p->localClient->ssl_ctl, NULL, 0, buf, len); 
+		}
+	}
 }
 
