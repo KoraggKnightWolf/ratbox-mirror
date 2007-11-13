@@ -1,3 +1,15 @@
+androsyn    2007/11/13 21:00:09 UTC	(20071113_12-24509)
+  Log:
+  make ziplink stats work again
+
+  Modified:
+	ircd-ratbox/trunk/include/s_serv.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/13 20:59:25 UTC	(20071113_11-24507)
   Log:
   fix identd checking
