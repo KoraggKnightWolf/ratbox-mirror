@@ -1461,10 +1461,10 @@ stats_memory (struct Client *source_p)
 static void
 stats_ziplinks (struct Client *source_p)
 {
+#if 0
 	rb_dlink_node *ptr;
 	struct Client *target_p;
 	int sent_data = 0;
-#if 0
 	RB_DLINK_FOREACH (ptr, serv_list.head)
 	{
 		target_p = ptr->data;
