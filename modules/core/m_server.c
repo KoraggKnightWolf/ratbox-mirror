@@ -1392,7 +1392,7 @@ server_estab(struct Client *client_p)
 	/* Always send a PING after connect burst is done */
 	sendto_one(client_p, HOLD_QUEUE, "PING :%s", get_id(&me, client_p));
 	if(zip)
-		rb_event_addonce("server_estab_pop", server_estab_pop, client_p, 0);	
+		rb_event_addonce("server_estab_pop", server_estab_pop, client_p, 1);	
 	else
 		send_pop_queue(client_p);
 	return 0;
