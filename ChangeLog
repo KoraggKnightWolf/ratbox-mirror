@@ -1,3 +1,11 @@
+androsyn    2007/11/13 00:28:58 UTC	(20071113_1-24485)
+  Log:
+  reduce down some rb_helper_child parameters for bandb
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+
+
 androsyn    2007/11/13 00:28:13 UTC	(20071113_0-24483)
   Log:
   fix ssld_count and make client.c compile
