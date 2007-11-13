@@ -71,7 +71,7 @@ struct Channel
 	int received_number_of_privmsgs;
 	int flood_noticed;
 
-	time_t bants;
+	rb_uint32_t bants;
 	time_t channelts;
 	char *chname;
 };
