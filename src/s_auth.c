@@ -318,10 +318,10 @@ start_auth_query(struct AuthRequest *auth)
 
 #ifdef IPV6
 	if(GET_SS_FAMILY(&localaddr) == AF_INET6)
-		lport = ntohs(((struct sockaddr_in6 *) &localaddr)->sin6_port);
+		lport = ntohs(((struct sockaddr_in6 *) localaddr)->sin6_port);
 	else
 #endif
-		lport = ntohs(((struct sockaddr_in *) &localaddr)->sin_port);
+		lport = ntohs(((struct sockaddr_in *) localaddr)->sin_port);
 
 #ifdef IPV6
 	if(GET_SS_FAMILY(remoteaddr) == AF_INET6)
@@ -329,6 +329,8 @@ start_auth_query(struct AuthRequest *auth)
 	else
 #endif
 		rport = ntohs(((struct sockaddr_in *) remoteaddr)->sin_port);
+
+	rb_inet_ntop_sock((struct sockaddr *)localaddr, myip, sizeof(myip));
 
 	auth->reqid = assign_auth_id();
 	authtable[auth->reqid] = auth;
