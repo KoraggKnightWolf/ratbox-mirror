@@ -48,8 +48,6 @@ typedef struct _mod_ctl_buf
         int nfds;
 } mod_ctl_buf_t; 
 
-static rb_dlink_list conn_list;
-
 typedef struct _mod_ctl
 {
         rb_dlink_node node;
@@ -63,6 +61,7 @@ typedef struct _mod_ctl
 typedef struct _conn
 {
         rb_dlink_node node;
+        rb_dlink_node hash_node;
         rawbuf_head_t *modbuf_out;
         rawbuf_head_t *plainbuf_out;
 
@@ -82,6 +81,35 @@ typedef struct _conn
 #endif
 } conn_t;
 
+#define CONN_HASH_SIZE 2000
+#define connid_hash(x)	(&connid_hash_table[(x % CONN_HASH_SIZE)])
+
+static rb_dlink_list connid_hash_table[CONN_HASH_SIZE];
+
+
+static conn_t *
+conn_find_by_id(rb_uint16_t id)
+{
+	rb_dlink_node *ptr;
+	conn_t *conn;
+	
+	RB_DLINK_FOREACH(ptr, (connid_hash(id))->head)
+	{
+		conn = ptr->data;
+		if(conn->id == id)
+			return conn;	
+	}	
+	return NULL;
+}
+
+static void
+conn_add_id_hash(conn_t *conn, rb_uint16_t id)
+{
+	conn->id = id;
+	rb_dlinkAdd(conn, &conn->node, connid_hash(id));
+}
+
+
 static void
 close_conn(conn_t * conn)
 {
@@ -92,7 +120,8 @@ close_conn(conn_t * conn)
 
         rb_free_rawbuffer(conn->modbuf_out);
         rb_free_rawbuffer(conn->plainbuf_out);
-        rb_dlinkDelete(&conn->node, &conn_list);
+        if(conn->id != 0)
+	        rb_dlinkDelete(&conn->node, connid_hash(conn->id));
         memset(conn, 0, sizeof(conn_t));
         rb_free(conn);
 }
@@ -105,23 +134,9 @@ make_conn(rb_fde_t *mod_fd, rb_fde_t *plain_fd)
         conn->plainbuf_out = rb_new_rawbuffer();
         conn->mod_fd = mod_fd;
         conn->plain_fd = plain_fd;
-        rb_dlinkAdd(conn, &conn->node, &conn_list);
         return conn;
 }
 
-static conn_t *
-conn_find_by_id(rb_uint16_t id)
-{
-	rb_dlink_node *ptr;
-	conn_t *conn;
-	RB_DLINK_FOREACH(ptr, conn_list.head)
-	{
-		conn = ptr->data;
-		if(conn->id == id)
-			return conn;	
-	}	
-	return NULL;
-}
 
 
 
@@ -353,8 +368,9 @@ ssl_process_accept(mod_ctl_buf_t *ctlb)
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
 	
 	id = (rb_uint16_t *)&ctlb->buf[1];
-	conn->id = *id;
+	conn_add_id_hash(conn, *id);
 	conn->is_ssl = 1;
+	
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
 
@@ -443,7 +459,7 @@ zlib_process(mod_ctl_buf_t *ctlb)
 	id = (rb_uint16_t *)&ctlb->buf[1];
 	level = (rb_uint8_t *)&ctlb->buf[3];
 
-	conn->id = *id;
+	conn_add_id_hash(conn, *id);
 
 	conn->instream.total_in = 0;
 	conn->instream.total_out = 0;
