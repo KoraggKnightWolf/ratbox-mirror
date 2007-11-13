@@ -51,6 +51,7 @@
 #include "hook.h"
 #include "monitor.h"
 #include "parse.h"
+#include "sslproc.h"
 
 #define DEBUG_EXITED_CLIENTS
 

@@ -2097,7 +2097,7 @@ static struct conf_items conf_serverinfo_table[] =
         { "ssl_cert",           CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },   
         { "ssl_dh_params",      CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
         { "ssl_use_ssld",	CF_YESNO,   NULL, 0, &ServerInfo.ssl_use_ssld },
-        { "ssld_count",		CF_INT,	    NULL, 0 &ServerInfo.ssld_count },
+        { "ssld_count",		CF_INT,	    NULL, 0, &ServerInfo.ssld_count },
         { "\0", 0, NULL, 0, NULL }
 };
 
