@@ -1,3 +1,15 @@
+androsyn    2007/11/13 16:45:54 UTC	(20071113_8-24499)
+  Log:
+  Hold up the burst in server_estab until either the bottom of the function and we're done. 
+  If the server has ziplinks enabled, set an event to pop the queue, otherwise pop it right away.  
+  Its ugly, but it eliminates the race condition between ssld and the ircd as sometimes the command to enable ziplinks
+  gets there after we've sent additional uncompressed data, making the other server get inflate errors.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2007/11/13 01:06:49 UTC	(20071113_7-24497)
   Log:
   change bants to rb_uint32_t
