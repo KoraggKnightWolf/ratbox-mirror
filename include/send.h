@@ -32,9 +32,6 @@ struct Channel;
 struct rb_dlink_list;
 struct monitor;
 
-/* The nasty global also used in s_serv.c for server bursts */
-extern rb_uint32_t current_serial;
-
 void send_queued_write(rb_fde_t *, void *data);
 void send_queued_slink_write(rb_fde_t *, void *data);
 

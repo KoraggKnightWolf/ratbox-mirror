@@ -43,7 +43,7 @@
 
 #define LOG_BUFSIZE 2048
 
-unsigned long current_serial = 0L;
+rb_uint32_t current_serial = 0L;
 
 /* send_linebuf()
  *
