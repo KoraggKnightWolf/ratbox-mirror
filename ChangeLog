@@ -1,3 +1,11 @@
+androsyn    2007/11/13 16:56:28 UTC	(20071113_9-24501)
+  Log:
+  make delay on server_estab_pop to be one second as 0 seems to be a little too fast in some cases
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2007/11/13 16:45:54 UTC	(20071113_8-24499)
   Log:
   Hold up the burst in server_estab until either the bottom of the function and we're done. 
