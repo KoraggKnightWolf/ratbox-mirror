@@ -1,3 +1,13 @@
+androsyn    2007/11/14 16:07:11 UTC	(20071114_1-24513)
+  Log:
+  automake wants ylwrap
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ylwrap (File Added) 
+
+
 androsyn    2007/11/14 05:11:46 UTC	(20071114_0-24511)
   Log:
   remove debugging fprintf
