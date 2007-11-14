@@ -1,3 +1,11 @@
+androsyn    2007/11/14 05:11:46 UTC	(20071114_0-24511)
+  Log:
+  remove debugging fprintf
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/13 21:00:09 UTC	(20071113_12-24509)
   Log:
   make ziplink stats work again
