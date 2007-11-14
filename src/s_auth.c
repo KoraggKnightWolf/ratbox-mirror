@@ -101,7 +101,7 @@ assign_auth_id(void)
 
 static char *ident_path;
 static rb_helper *ident_helper;
-static void ident_restart_cb(rb_helper *helper);
+static void ident_restart(rb_helper *helper);
 
 static void
 fork_ident(void)
@@ -123,6 +123,8 @@ fork_ident(void)
 	                rb_snprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
 	                if(access(fullpath, X_OK) == -1)
 	                {
+	                	sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to execute ident in %s/bin or %s", 
+						     ConfigFileEntry.dpath, BINPATH);
 	                        ilog(L_MAIN, "Unable to execute ident in %s/bin or %s", ConfigFileEntry.dpath, BINPATH);
 	                        return;   
         	        }
@@ -133,35 +135,30 @@ fork_ident(void)
 	rb_snprintf(timeout, sizeof(timeout), "%d", GlobalSetOptions.ident_timeout);
 	setenv("IDENT_TIMEOUT", timeout, 1);
 	
-	ident_helper = rb_helper_start("ident", ident_path, read_auth_reply, ident_restart_cb);
+	ident_helper = rb_helper_start("ident", ident_path, read_auth_reply, ident_restart);
 	setenv("IDENT_TIMEOUT", "", 1);
         if(ident_helper == NULL)
 	{
 		ilog(L_MAIN, "ident - rb_helper_start failed: %s", strerror(errno));
 		return;
 	}
+	ilog(L_MAIN, "ident helper daemon started");
+	sendto_realops_flags(UMODE_ALL, L_ALL, "ident helper daemon started");
         rb_helper_run(ident_helper);
 	return;
 }
 
-static void ident_restart_cb(rb_helper *helper)
+static void ident_restart(rb_helper *helper)
 {
+	ilog(L_MAIN, "ident - ident_restart called, helper died?");
+	sendto_realops_flags(UMODE_ALL, L_ALL, "ident - ident_restart called, helper died?");
 	if(helper != NULL)
 	{
 		rb_helper_close(helper);
 		ident_helper = NULL;
-	
 	}
 	fork_ident();
 }
-
-
-void
-restart_ident(void)
-{
-	ident_restart_cb(ident_helper);
-}
-
 
 /*
  * init_auth()
