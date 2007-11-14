@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = adns
+subdir = resolver/adns
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	COPYING
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -140,7 +140,6 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PICFLAGS = @PICFLAGS@
 RANLIB = @RANLIB@
-RESOLVER = @RESOLVER@
 RM = @RM@
 SED = @SED@
 SEDOBJ = @SEDOBJ@
@@ -215,7 +214,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-libadns_a_CFLAGS = -I../libratbox/include -I.
+libadns_a_CFLAGS = -I../../libratbox/include -I.
 libadns_a_SOURCES = check.c event.c general.c parse.c query.c reply.c setup.c transmit.c types.c
 noinst_LIBRARIES = libadns.a
 all: all-am
@@ -231,9 +230,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  adns/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  resolver/adns/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  adns/Makefile
+	  $(AUTOMAKE) --gnu  resolver/adns/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

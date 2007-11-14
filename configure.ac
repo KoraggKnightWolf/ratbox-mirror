@@ -71,8 +71,6 @@ LIBTOOL="$LIBTOOL --silent"
 
 AC_CONFIG_SUBDIRS(libltdl libratbox)
 
-RESOLVER="adns resolver"
-
 case "$host_os" in
 *cygwin*)
      AC_DEFINE_UNQUOTED(CYGWIN,1,[This is a Cygwin system])
@@ -93,11 +91,6 @@ case "$host_os" in
 esac
 
 AM_CONDITIONAL([MINGW], [test "$is_mingw" = "yes"])
-
-
-AC_SUBST(RESOLVER)
-
-
 
 if test "$LEX" != flex; then
   LEX="$SHELL $missing_dir/missing flex"
@@ -592,8 +585,10 @@ AC_SUBST(IRCD_PREFIX)
 AC_CONFIG_FILES(		\
 	Makefile		\
 	bandb/Makefile		\
-	adns/Makefile		\
 	ssld/Makefile		\
+	ident/Makefile		\
+	resolver/adns/Makefile	\
+	resolver/Makefile	\
 	contrib/Makefile	\
 	tools/Makefile		\
 	doc/Makefile		\

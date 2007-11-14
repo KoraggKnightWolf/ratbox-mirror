@@ -39,7 +39,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = ircd$(EXEEXT) resolver$(EXEEXT) ident$(EXEEXT)
+bin_PROGRAMS = ircd$(EXEEXT)
 subdir = .
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure \
@@ -494,9 +494,6 @@ modules_m_xline_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(modules_m_xline_la_LDFLAGS) $(LDFLAGS) -o $@
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_ident_OBJECTS = src/ident.$(OBJEXT)
-ident_OBJECTS = $(am_ident_OBJECTS)
-ident_DEPENDENCIES = libratbox/src/libratbox.la
 am_ircd_OBJECTS = src/main.$(OBJEXT)
 ircd_OBJECTS = $(am_ircd_OBJECTS)
 am__DEPENDENCIES_3 = $(shell for x in $(modules_LTLIBRARIES) \
@@ -510,9 +507,6 @@ am__DEPENDENCIES_3 = $(shell for x in $(modules_LTLIBRARIES) \
 ircd_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(ircd_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am_resolver_OBJECTS = src/resolver.$(OBJEXT)
-resolver_OBJECTS = $(am_resolver_OBJECTS)
-resolver_DEPENDENCIES = adns/libadns.a libratbox/src/libratbox.la
 DEFAULT_INCLUDES = -I. -I$(top_builddir)/include@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -574,8 +568,7 @@ SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_m_version_la_SOURCES) \
 	$(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) \
 	$(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) \
-	$(modules_m_xline_la_SOURCES) $(ident_SOURCES) $(ircd_SOURCES) \
-	$(resolver_SOURCES)
+	$(modules_m_xline_la_SOURCES) $(ircd_SOURCES)
 DIST_SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_core_m_error_la_SOURCES) \
 	$(modules_core_m_join_la_SOURCES) \
@@ -617,8 +610,7 @@ DIST_SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_m_version_la_SOURCES) \
 	$(modules_m_wallops_la_SOURCES) $(modules_m_who_la_SOURCES) \
 	$(modules_m_whois_la_SOURCES) $(modules_m_whowas_la_SOURCES) \
-	$(modules_m_xline_la_SOURCES) $(ident_SOURCES) $(ircd_SOURCES) \
-	$(resolver_SOURCES)
+	$(modules_m_xline_la_SOURCES) $(ircd_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -710,7 +702,6 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PICFLAGS = @PICFLAGS@
 RANLIB = @RANLIB@
-RESOLVER = @RESOLVER@
 RM = @RM@
 SED = @SED@
 SEDOBJ = @SEDOBJ@
@@ -790,19 +781,15 @@ libcoredir = @libdir@
 modulesdir = @moduledir@/autoload
 coredir = @moduledir@
 servicesdir = @moduledir@/autoload
-SUBDIRS = libratbox libltdl adns tools doc help @SQLITE_SUBDIR@ bandb ssld 
+SUBDIRS = libratbox libltdl tools doc help @SQLITE_SUBDIR@ bandb ssld resolver
 AM_YFLAGS = -d
-INCLUDES = -Ilibratbox/include -Ilibltdl -Iadns
+INCLUDES = -Ilibratbox/include -Ilibltdl
 @MINGW_TRUE@EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
 DLOPEN = $(shell for x in $(modules_LTLIBRARIES) $(core_LTLIBRARIES) $(services_LTLIBRARIES) ;do echo -dlpreopen $$x ;done)
 @STATIC_MODULES_FALSE@ircd_LDADD = libratbox/src/libratbox.la libcore.la $(LIBLTDL)
 @STATIC_MODULES_TRUE@ircd_LDADD = libratbox/src/libratbox.la libcore.la $(LIBLTDL) $(DLOPEN) 
 ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
-resolver_LDADD = adns/libadns.a libratbox/src/libratbox.la
-ident_LDADD = libratbox/src/libratbox.la
 ircd_SOURCES = src/main.c
-resolver_SOURCES = src/resolver.c
-ident_SOURCES = src/ident.c
 libcore_la_SOURCES = \
   src/dns.c                        \
   src/bandbi.c			\
@@ -1631,19 +1618,10 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-src/ident.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-ident$(EXEEXT): $(ident_OBJECTS) $(ident_DEPENDENCIES) 
-	@rm -f ident$(EXEEXT)
-	$(LINK) $(ident_OBJECTS) $(ident_LDADD) $(LIBS)
 src/main.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 ircd$(EXEEXT): $(ircd_OBJECTS) $(ircd_DEPENDENCIES) 
 	@rm -f ircd$(EXEEXT)
 	$(ircd_LINK) $(ircd_OBJECTS) $(ircd_LDADD) $(LIBS)
-src/resolver.$(OBJEXT): src/$(am__dirstamp) \
-	src/$(DEPDIR)/$(am__dirstamp)
-resolver$(EXEEXT): $(resolver_OBJECTS) $(resolver_DEPENDENCIES) 
-	@rm -f resolver$(EXEEXT)
-	$(LINK) $(resolver_OBJECTS) $(resolver_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1797,7 +1775,6 @@ mostlyclean-compile:
 	-rm -f src/hook.lo
 	-rm -f src/hostmask.$(OBJEXT)
 	-rm -f src/hostmask.lo
-	-rm -f src/ident.$(OBJEXT)
 	-rm -f src/ircd.$(OBJEXT)
 	-rm -f src/ircd.lo
 	-rm -f src/ircd_lexer.$(OBJEXT)
@@ -1827,7 +1804,6 @@ mostlyclean-compile:
 	-rm -f src/parse.lo
 	-rm -f src/reject.$(OBJEXT)
 	-rm -f src/reject.lo
-	-rm -f src/resolver.$(OBJEXT)
 	-rm -f src/restart.$(OBJEXT)
 	-rm -f src/restart.lo
 	-rm -f src/s_auth.$(OBJEXT)
@@ -1931,7 +1907,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hook.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hostmask.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ident.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd_lexer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ircd_parser.Plo@am__quote@
@@ -1947,7 +1922,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/parse.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/reject.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/resolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/restart.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/s_auth.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/s_conf.Plo@am__quote@
