@@ -1,3 +1,56 @@
+androsyn    2007/11/14 16:49:56 UTC	(20071114_3-24517)
+  Log:
+  Shuffle around some files:
+  
+  - resolver moves into its own directory
+  - ident also moves into its own directory
+  - adns is moved into a subdirectory of resolver/
+  - tweak makefiles and configure to deal with the above
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/adns/ (File Deleted) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ident/ (File Added) 
+	ircd-ratbox/trunk/ident/Makefile.am (File Added) 
+	ircd-ratbox/trunk/ident/Makefile.in (File Added) 
+	ircd-ratbox/trunk/ident/ident.c (File Added) 
+	ircd-ratbox/trunk/resolver/ (File Added) 
+	ircd-ratbox/trunk/resolver/adns/ (File Added) 
+	ircd-ratbox/trunk/resolver/adns/COPYING  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/GPL-vs-LGPL  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/Makefile.am (File Modified) (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/Makefile.in (File Modified) (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/README  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/README.ircd  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/adns.h  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/check.c  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/dlist.h  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/event.c  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/general.c  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/internal.h  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/parse.c  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/query.c  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/reply.c  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/setup.c  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/transmit.c  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/tvarith.h  (Property Modified)
+	ircd-ratbox/trunk/resolver/adns/types.c  (Property Modified)
+	ircd-ratbox/trunk/resolver/resolver.c (File Added) 
+	ircd-ratbox/trunk/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/ident.c (File Deleted) 
+	ircd-ratbox/trunk/src/resolver.c (File Deleted) 
+	ircd-ratbox/trunk/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2007/11/14 16:34:45 UTC	(20071114_2-24515)
   Log:
   notify opers and log when the ident helper is started or restarted
