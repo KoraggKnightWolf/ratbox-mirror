@@ -658,7 +658,6 @@ mod_write_ctl(rb_fde_t *F, void *data)
         RB_DLINK_FOREACH_SAFE(ptr, next, ctl->writeq.head)
         {
                 ctl_buf = ptr->data;
-                fprintf(stderr, "Writing: ctl_buf->F: %lx nfd: %d %s\n", (unsigned long)ctl_buf->F, ctl_buf->nfds, ctl_buf->buf);
                 retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds, ctl_buf->buf, ctl_buf->buflen);
                 if(retlen > 0)
                 {
