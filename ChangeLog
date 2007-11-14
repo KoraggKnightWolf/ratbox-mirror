@@ -1,3 +1,11 @@
+androsyn    2007/11/14 16:34:45 UTC	(20071114_2-24515)
+  Log:
+  notify opers and log when the ident helper is started or restarted
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2007/11/14 16:07:11 UTC	(20071114_1-24513)
   Log:
   automake wants ylwrap
