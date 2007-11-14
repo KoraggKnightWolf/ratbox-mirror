@@ -89,7 +89,6 @@ libcore_la_OBJECTS = $(am_libcore_la_OBJECTS)
 libcore_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libcore_la_LDFLAGS) $(LDFLAGS) -o $@
-@MINGW_FALSE@@STATIC_MODULES_FALSE@am__DEPENDENCIES_2 = libcore.la
 @MINGW_TRUE@@STATIC_MODULES_FALSE@am__DEPENDENCIES_2 =  \
 @MINGW_TRUE@@STATIC_MODULES_FALSE@	libratbox/src/libratbox.la \
 @MINGW_TRUE@@STATIC_MODULES_FALSE@	libcore.la
@@ -851,7 +850,7 @@ libcore_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version
 
 # now the modules..
 MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version 
-@MINGW_FALSE@@STATIC_MODULES_FALSE@MODULE_LIBS = libcore.la @SSL_LIBS@
+@MINGW_FALSE@@STATIC_MODULES_FALSE@MODULE_LIBS = @SSL_LIBS@
 @MINGW_TRUE@@STATIC_MODULES_FALSE@MODULE_LIBS = libratbox/src/libratbox.la libcore.la @SSL_LIBS@ 
 modules_m_accept_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_admin_la_LDFLAGS = -module $(MODULE_FLAGS)  

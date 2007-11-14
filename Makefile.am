@@ -103,7 +103,7 @@ if !STATIC_MODULES
 if MINGW
 MODULE_LIBS = libratbox/src/libratbox.la libcore.la @SSL_LIBS@ 
 else
-MODULE_LIBS = libcore.la @SSL_LIBS@
+MODULE_LIBS = @SSL_LIBS@
 endif # MINGW
 
 endif # !STATIC_MODULES
