@@ -1,3 +1,11 @@
+androsyn    2007/11/15 16:00:25 UTC	(20071115_1-24521)
+  Log:
+  add a bit more logging regarding the resolver starting/restart
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 androsyn    2007/11/15 03:56:13 UTC	(20071115_0-24519)
   Log:
   oops forgot to commit the makefiles
