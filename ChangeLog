@@ -1,3 +1,11 @@
+androsyn    2007/11/15 20:56:47 UTC	(20071115_6-24533)
+  Log:
+  run ssld.c through indent..this thing kinda needs it
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/15 20:55:16 UTC	(20071115_5-24531)
   Log:
   oops..fix an ifdef
