@@ -200,6 +200,8 @@ start_resolver(void)
 			if(access(fullpath, X_OK) == -1)
 			{
 				ilog(L_MAIN, "Unable to execute resolver in %s or %s/bin", BINPATH, ConfigFileEntry.dpath);
+				sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to execute resolver in %s or %s/bin", 
+						     BINPATH, ConfigFileEntry.dpath);
 				return 1;
 			}
 		
@@ -212,10 +214,12 @@ start_resolver(void)
 
 	if(dns_helper == NULL)
 	{
-		ilog(L_MAIN, "rb_helper_start failed: %s", strerror(errno));
+		ilog(L_MAIN, "Unable to start resolver helper: %s", strerror(errno));
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to start resolver helper: %s",  strerror(errno));
 		return 1;
 	}
-
+	ilog(L_MAIN, "resolver helper started");
+	sendto_realops_flags(UMODE_ALL, L_ALL, "resolver helper started");
 	rb_helper_run(dns_helper);
 	return 0;
 }
@@ -257,7 +261,7 @@ init_resolver(void)
 {
 	if(start_resolver())
 	{
-		ilog(L_MAIN, "Unable to fork resolver: %s", strerror(errno));		
+		ilog(L_MAIN, "Unable to start resolver helper: %s", strerror(errno));		
 		exit(0);
 	}
 }
@@ -266,6 +270,8 @@ init_resolver(void)
 static void 
 restart_resolver_cb(rb_helper *helper)
 {
+	ilog(L_MAIN, "resolver - restart_resolver_cb called, resolver helper died?");
+	sendto_realops_flags(UMODE_ALL, L_ALL, "resolver - restart_resolver_cb called, resolver helper died?");
 	if(helper != NULL) 
 	{
 		rb_helper_close(helper);	
