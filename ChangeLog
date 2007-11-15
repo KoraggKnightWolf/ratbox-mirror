@@ -1,3 +1,14 @@
+androsyn    2007/11/15 19:46:22 UTC	(20071115_3-24527)
+  Log:
+  make outbound ssl connections work through ssld as well
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/15 18:35:11 UTC	(20071115_2-24523)
   Log:
   add a free_monitor function and make monitor_heap static
