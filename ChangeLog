@@ -1,3 +1,13 @@
+androsyn    2007/11/15 18:35:11 UTC	(20071115_2-24523)
+  Log:
+  add a free_monitor function and make monitor_heap static
+
+  Modified:
+	ircd-ratbox/trunk/include/monitor.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2007/11/15 16:00:25 UTC	(20071115_1-24521)
   Log:
   add a bit more logging regarding the resolver starting/restart
