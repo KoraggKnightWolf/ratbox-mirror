@@ -40,8 +40,6 @@ static void mod_write_ctl(rb_fde_t *, void *data);
 static char inbuf[READBUF_SIZE];
 static char outbuf[READBUF_SIZE];
 
-
-
 typedef struct _mod_ctl_buf
 {
         rb_dlink_node node;
@@ -154,7 +152,7 @@ conn_mod_write_sendq(rb_fde_t *fd, void *data)
         int retlen;
         while ((retlen = rb_rawbuf_flush(conn->modbuf_out, fd)) > 0)
         {
-                conn->mod_out += retlen;
+		conn->mod_out += retlen;
         }
         if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
         {
@@ -200,7 +198,6 @@ static void
 common_zlib_deflate(conn_t *conn, void *buf, size_t len)
 {
 	int ret, have;
-	conn->mod_in += len;
 	conn->outstream.next_in = buf;
 	conn->outstream.avail_in = len;
 	conn->outstream.next_out = (Bytef *)outbuf;
@@ -227,7 +224,6 @@ static void
 common_zlib_inflate(conn_t *conn, void *buf, size_t len)
 {
 	int ret, have;
-	conn->mod_in += len;
 	conn->instream.next_in = buf;
 	conn->instream.avail_in = len;
 	conn->instream.next_out = (Bytef *)outbuf;
@@ -325,7 +321,7 @@ conn_plain_write_sendq(rb_fde_t *fd, void *data)
         int retlen;
         while ((retlen = rb_rawbuf_flush(conn->plainbuf_out, fd)) > 0)
         {
-                conn->plain_out += retlen;
+        	conn->plain_out += retlen;
         }
         if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
         {  
@@ -437,9 +433,8 @@ ssl_process_connect(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 	rb_ssl_start_connected(ctlb->F[0], ssl_process_connect_cb, conn, 10);
 }
 
-#ifdef HAVE_LIBZ
 static void
-zlib_process_stats(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
+process_stats(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 {
 	char outstat[512];
 	conn_t *conn;
@@ -448,22 +443,18 @@ zlib_process_stats(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 	id = (rb_uint16_t *)&ctlb->buf[1];
 	odata = &ctlb->buf[3];
 	conn = conn_find_by_id(*id);
-	if(conn->is_zlib)
-	{
-		rb_snprintf(outstat, sizeof(outstat), "S %s %ld %ld %ld %ld", odata, 
-			conn->instream.total_out, conn->instream.total_in,
-			conn->outstream.total_in, conn->outstream.total_out);
-		conn->instream.total_out = 0;
-		conn->instream.total_in = 0;
-		conn->outstream.total_out = 0;
-		conn->outstream.total_in = 0;
-	}
-	else
-		rb_snprintf(outstat, sizeof(outstat), "S %s -1 -1 -1 -1", odata);
-	
+
+	if(conn == NULL)
+		return;
+
+	rb_snprintf(outstat, sizeof(outstat), "S %s %ld %ld %ld %ld", odata, 
+		conn->plain_out, conn->mod_in,
+		conn->mod_out, conn->plain_in);
+
 	mod_cmd_write_queue(ctl, outstat, strlen(outstat)+1); /* +1 is so we send the \0 as well */
 }
 
+#ifdef HAVE_ZLIB
 /* starts zlib for an already established connection */
 static void
 zlib_process_ssl(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
@@ -613,12 +604,12 @@ mod_process_cmd_recv(mod_ctl_t *ctl)
 				ssl_new_keys(ctl, ctl_buf);
 				break;
 			}
-#ifdef HAVE_LIBZ
 			case 'S':
 			{
-				zlib_process_stats(ctl, ctl_buf);
+				process_stats(ctl, ctl_buf);
 				break;
 			}
+#ifdef HAVE_LIBZ
 			case 'Y':
 			{
 				zlib_process_ssl(ctl, ctl_buf);
