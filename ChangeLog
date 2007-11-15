@@ -1,3 +1,12 @@
+androsyn    2007/11/15 03:56:13 UTC	(20071115_0-24519)
+  Log:
+  oops forgot to commit the makefiles
+
+  Modified:
+	ircd-ratbox/trunk/resolver/Makefile.am (File Added) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Added) 
+
+
 androsyn    2007/11/14 16:49:56 UTC	(20071114_3-24517)
   Log:
   Shuffle around some files:
