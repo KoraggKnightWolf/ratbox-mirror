@@ -49,6 +49,7 @@
 #include "channel.h"		/* chcap_usage_counts stuff... */
 #include "hook.h"
 #include "parse.h"
+#include "sslproc.h"
 
 extern char *crypt();
 
@@ -86,6 +87,7 @@ struct Capability captab[] = {
 };
 
 static CNCB serv_connect_callback;
+static CNCB serv_connect_ssl_callback;
 
 /*
  * hunt_server - Do the basic thing in delivering the message (command)
@@ -511,9 +513,11 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	else
 	{
 		if(ServerConfSSL(server_p))
-			rb_connect_tcp_ssl(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
-					 NULL, 0, serv_connect_callback, 
+		{
+			rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
+					 NULL, 0, serv_connect_ssl_callback, 
 					 client_p, ConfigFileEntry.connect_timeout);
+		}
 		else
 			rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 					 NULL, 0, serv_connect_callback, 
@@ -521,19 +525,43 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 
 		 return 1;
 	}
-
 	if(ServerConfSSL(server_p))
-		rb_connect_tcp_ssl(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
+		rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 				 (struct sockaddr *) &myipnum,
 				 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
 				 ConfigFileEntry.connect_timeout);
 	else
 		rb_connect_tcp_ssl(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 				 (struct sockaddr *) &myipnum,
-				 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
+				 GET_SS_LEN(&myipnum), serv_connect_ssl_callback, client_p,
 				 ConfigFileEntry.connect_timeout);
 
 	return 1;
+}
+
+static void
+serv_connect_ev(void *data)
+{
+	struct Client *client_p = data;
+	serv_connect_callback(client_p->localClient->F, RB_OK, client_p);
+}
+
+static void
+serv_connect_ssl_callback(rb_fde_t *F, int status, void *data)
+{
+	struct Client *client_p = data;
+	rb_fde_t *xF[2];
+	if(status != RB_OK)
+	{
+		/* XXX deal with failure */
+		return;
+	}
+	rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
+	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF[0], &xF[1], "Outgoing ssld connection");
+	client_p->localClient->ssl_ctl = start_ssld_connect(F, xF[1], rb_get_fd(xF[0]));
+	client_p->localClient->F = xF[0];
+	
+	rb_event_addonce("serv_connect_ev", serv_connect_ev, client_p, 1);		
 }
 
 /*
@@ -565,7 +593,8 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 		return;
 	}
 
-	rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
+	if(client_p->localClient->ssl_ctl == NULL)
+		rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
 	
 	/* Check the status */
 	if(status != RB_OK)
@@ -590,8 +619,8 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 		}
 		exit_client(client_p, client_p, &me, rb_errstr(status));
 		return;
-	}
-
+	} 
+	
 	/* RB_OK, so continue the connection procedure */
 	/* Get the C/N lines */
 	if((server_p = client_p->localClient->att_sconf) == NULL)

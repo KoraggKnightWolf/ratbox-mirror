@@ -382,6 +382,21 @@ ssl_process_accept_cb(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen
 }
 
 static void
+ssl_process_connect_cb(rb_fde_t *F, int status, void *data)
+{
+	conn_t *conn = data;
+	if(status == RB_OK)
+	{
+		conn_mod_read_cb(conn->mod_fd, conn);
+		conn_plain_read_cb(conn->plain_fd, conn);
+		return;
+	}
+	close_conn(conn);
+	return;
+}
+
+
+static void
 ssl_process_accept(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 {
 	conn_t *conn;
@@ -398,15 +413,28 @@ ssl_process_accept(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
 
-	rb_ssl_start_accepted(ctlb->F[0], ssl_process_accept_cb, conn);
-	return;
+	rb_ssl_start_accepted(ctlb->F[0], ssl_process_accept_cb, conn, 10);
 }
 
 static void
 ssl_process_connect(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 {
-	/* XXX write me */
-	return;
+	conn_t *conn;
+	rb_uint16_t *id;
+	conn = make_conn(ctlb->F[0], ctlb->F[1]);
+	id = (rb_uint16_t *)&ctlb->buf[1];
+
+	conn_add_id_hash(conn, *id);
+	conn->is_ssl = 1;
+
+	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
+		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
+
+	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
+		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
+
+	
+	rb_ssl_start_connected(ctlb->F[0], ssl_process_connect_cb, conn, 10);
 }
 
 #ifdef HAVE_LIBZ

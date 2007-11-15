@@ -717,7 +717,7 @@ check_server(const char *name, struct Client *client_p)
 	if(server_p == NULL)
 		return error;
 
-	if(ServerConfSSL(server_p) && !rb_fd_ssl(client_p->localClient->F))
+	if(ServerConfSSL(server_p) && client_p->localClient->ssl_ctl == NULL)
 	{
 		return NEED_SSL;
 	}

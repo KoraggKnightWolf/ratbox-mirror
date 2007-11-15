@@ -394,12 +394,19 @@ start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
 {
 	rb_fde_t *F[2];
 	ssl_ctl_t *ctl;
-	static const char *cmd = "C";
+	rb_uint16_t *id;
+	char buf[3];
 	F[0] = sslF;
 	F[1] = plainF;
+
+	id = (rb_uint16_t *)&buf[1];
+
+	buf[0] = 'C';
+	*id = xid;
+	
 	ctl = which_ssld();
 	ctl->cli_count++;
-	ssl_cmd_write_queue(ctl, F, 2, cmd, strlen(cmd));
+	ssl_cmd_write_queue(ctl, F, 2, buf, sizeof(buf));
 	return ctl; 
 }
 
