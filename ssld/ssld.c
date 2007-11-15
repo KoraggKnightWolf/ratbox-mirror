@@ -454,7 +454,7 @@ process_stats(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
 	mod_cmd_write_queue(ctl, outstat, strlen(outstat)+1); /* +1 is so we send the \0 as well */
 }
 
-#ifdef HAVE_ZLIB
+#ifdef HAVE_LIBZ
 /* starts zlib for an already established connection */
 static void
 zlib_process_ssl(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
