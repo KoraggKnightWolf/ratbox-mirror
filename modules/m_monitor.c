@@ -342,8 +342,8 @@ static void cleanup_monitor(void *unused)
 					last_ptr->hnext = next_ptr;
 				else
 					monitorTable[i] = next_ptr;
-
-				rb_bh_free(monitor_heap, ptr);
+					
+				free_monitor(ptr);
 			}
 			else
 				last_ptr = ptr;

@@ -41,7 +41,7 @@
 #include "send.h"
 
 struct monitor *monitorTable[MONITOR_HASH_SIZE];
-rb_bh *monitor_heap;
+static rb_bh *monitor_heap;
 
 void
 init_monitor(void)
@@ -81,6 +81,13 @@ find_monitor(const char *name, int add)
 
 	return NULL;
 }
+
+void
+free_monitor(struct monitor *monptr)
+{
+	rb_bh_free(monitor_heap, monptr);
+}
+
 
 /* monitor_signon()
  *

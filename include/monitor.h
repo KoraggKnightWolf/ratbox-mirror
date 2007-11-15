@@ -19,7 +19,6 @@ struct monitor
 	rb_dlink_list users;
 };
 
-extern struct rb_bh *monitor_heap;
 extern struct monitor *monitorTable[];
 
 #define MONITOR_HASH_SIZE 65536
@@ -27,6 +26,8 @@ extern struct monitor *monitorTable[];
 
 void init_monitor(void);
 struct monitor *find_monitor(const char *name, int add);
+void free_monitor(struct monitor *);
+
 void clear_monitor(struct Client *);
 
 void monitor_signon(struct Client *);
