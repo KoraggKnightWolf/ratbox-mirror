@@ -62,7 +62,7 @@ struct Message sid_msgtab = {
 mapi_clist_av1 server_clist[] = { &server_msgtab, &sid_msgtab, NULL };
 DECLARE_MODULE_AV1(server, NULL, NULL, server_clist, NULL, NULL, "$Revision$");
 
-struct Client *server_exists(const char *);
+static struct Client *server_exists(const char *);
 static int set_server_gecos(struct Client *, const char *);
 
 static int check_server(const char *name, struct Client *client_p);
@@ -642,7 +642,7 @@ set_server_gecos(struct Client *client_p, const char *info)
  * inputs	- servername
  * output	- 1 if server exists, 0 if doesnt exist
  */
-struct Client *
+static struct Client *
 server_exists(const char *servername)
 {
 	struct Client *target_p;
