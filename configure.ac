@@ -161,6 +161,7 @@ AC_COMPILE_IFELSE(
 	else
 		have_v6=yes
 		AC_MSG_RESULT(yes)
+		AC_DEFINE(IPV6, 1, [Define if IPv6 support is present and available.])
 	fi
 ],
 [AC_MSG_RESULT(no)
