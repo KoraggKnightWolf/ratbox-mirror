@@ -1,3 +1,13 @@
+jilles      2007/11/17 22:16:00 UTC	(20071117_1-24545)
+  Log:
+  Allow /testline on channel names (shows if it is resv'ed or not).
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/testline (File Modified) 
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+
+
 jilles      2007/11/17 14:30:28 UTC	(20071117_0-24539)
   Log:
   Fix compile with ipv6.
