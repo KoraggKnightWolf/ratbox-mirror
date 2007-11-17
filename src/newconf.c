@@ -1709,7 +1709,7 @@ conf_set_connect_aftype(confentry_t * entry, conf_t * conf, struct conf_items *i
 	if(!strcasecmp(aft, "ipv4"))
 		GET_SS_FAMILY(&t_server->ipnum) = AF_INET;
 #ifdef IPV6
-	else if(!strcasecmp(aftp, "ipv6"))
+	else if(!strcasecmp(aft, "ipv6"))
 		GET_SS_FAMILY(&t_server->ipnum) = AF_INET6;
 #endif
 	else
