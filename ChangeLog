@@ -1,3 +1,11 @@
+androsyn    2007/11/19 17:46:35 UTC	(20071119_1-24555)
+  Log:
+  make adns/types.c assert use rb_inet_ntop
+
+  Modified:
+	ircd-ratbox/trunk/resolver/adns/types.c (File Modified) 
+
+
 androsyn    2007/11/19 17:38:36 UTC	(20071119_0-24553)
   Log:
   have the ircd use the RB_IPV6 define from libratbox
