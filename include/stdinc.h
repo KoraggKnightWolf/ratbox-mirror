@@ -208,6 +208,6 @@ xc_strlcpy(char *dest, const char *src, size_t size)
 # define INADDR_LOOPBACK ((in_addr_t) 0x7f000001)
 #endif
 
-#include "ircd_defs.h"
 #include "ratbox_lib.h"
+#include "ircd_defs.h"
 #include "common.h"
