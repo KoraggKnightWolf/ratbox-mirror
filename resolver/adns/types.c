@@ -283,7 +283,7 @@ static adns_status cs_in6addr(vbuf *vb, const void *datap) {
 #endif
   char ia[IP6STRLEN];
 
-  assert(inet_ntop(AF_INET6, &rr, ia, IP6STRLEN) != NULL);
+  assert(rb_inet_ntop(AF_INET6, &rr, ia, IP6STRLEN) != NULL);
   CSP_ADDSTR(ia);
   return adns_s_ok;
 }
