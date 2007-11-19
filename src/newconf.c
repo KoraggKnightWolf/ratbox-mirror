@@ -1428,12 +1428,13 @@ conf_set_oper_umodes(confentry_t * entry, conf_t * conf, struct conf_items *item
 
 
 static char *listener_address;
-
+static int listener_aftype = -1;
 static void
 conf_set_listen_init(conf_t * conf)
 {
 	rb_free(listener_address);
 	listener_address = NULL;
+	listener_aftype = -1;
 }
 
 static void
@@ -1443,29 +1444,50 @@ conf_set_listen_address(confentry_t * entry, conf_t * conf, struct conf_items *i
 	listener_address = rb_strdup(entry->string);
 }
 
+static void
+conf_set_listen_aftype(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	char *aft = entry->string;
+
+	if(!strcasecmp(aft, "ipv4"))
+		listener_aftype = AF_INET;
+#ifdef RB_IPV6
+	else if(!strcasecmp(aft, "ipv6"))
+		listener_aftype = AF_INET6;
+#endif
+	else
+		conf_report_warning_nl("listen::aftype '%s' at %s:%d is unknown", aft, entry->filename, entry->line);
+}
+
+
 
 static void
 conf_set_listen_port_both(confentry_t * entry, conf_t * conf, struct conf_items *item, int ssl)
 {
 	rb_dlink_node *ptr;
 	confentry_t *xentry;
+	int family = AF_INET;
 
 	RB_DLINK_FOREACH(ptr, entry->flist.head)
 	{
 		xentry = ptr->data;
 		if(listener_address == NULL)
 		{
-			add_listener(xentry->number, listener_address, AF_INET, ssl);
 #ifdef RB_IPV6
-			add_listener(xentry->number, listener_address, AF_INET6, ssl);
+			if(listener_aftype > 0)
+				family = listener_aftype;
+			else
+				family = AF_INET;
 #endif
+			add_listener(xentry->number, listener_address, family, ssl);
 		}
 		else
 		{
-			int family = AF_INET;
 #ifdef RB_IPV6
-			if(strchr(listener_address, ':') != NULL)
+			if(listener_aftype <= 0 && strchr(listener_address, ':') != NULL)
 				family = AF_INET6;
+			else
+				family = listener_aftype;			
 #endif
 			add_listener(xentry->number, listener_address, family, ssl);
 		}
@@ -2171,6 +2193,7 @@ static struct conf_items conf_listen_table[] =
 	{ "ip",	     CF_QSTRING, conf_set_listen_address, 0, NULL },
 	{ "port",    CF_INT | CF_FLIST, conf_set_listen_port,    0, NULL},
 	{ "sslport", CF_INT | CF_FLIST, conf_set_listen_sslport, 0, NULL},
+	{ "aftype",  CF_QSTRING, conf_set_listen_aftype,	0, NULL},
 	{ "\0", 	0, 	NULL, 0, NULL}
 };
 
