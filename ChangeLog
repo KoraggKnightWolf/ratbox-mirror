@@ -1,3 +1,15 @@
+androsyn    2007/11/19 17:53:14 UTC	(20071119_2-24557)
+  Log:
+  change cidr_bitlen to cidr_ipv4_bitlen and cidr_ipv6_bitlen
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/include/class.h (File Modified) 
+	ircd-ratbox/trunk/src/class.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2007/11/19 17:46:35 UTC	(20071119_1-24555)
   Log:
   make adns/types.c assert use rb_inet_ntop
