@@ -38,8 +38,8 @@ int ident_timeout;
 
 struct auth_request
 {
-	struct irc_sockaddr_storage bindaddr;
-	struct irc_sockaddr_storage destaddr;
+	struct rb_sockaddr_storage bindaddr;
+	struct rb_sockaddr_storage destaddr;
 	int srcport;
 	int dstport;
 	char reqid[REQIDLEN];
@@ -222,7 +222,7 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	rb_inet_pton_sock(bindaddr, (struct sockaddr *)&auth->bindaddr);
 	rb_inet_pton_sock(destaddr, (struct sockaddr *)&auth->destaddr);
 
-#ifdef IPV6
+#ifdef RB_IPV6
 	if(((struct sockaddr *)&auth->destaddr)->sa_family == AF_INET6)
 		((struct sockaddr_in6 *)&auth->destaddr)->sin6_port = htons(113);
 	else

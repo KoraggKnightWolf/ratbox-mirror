@@ -158,7 +158,7 @@ struct LocalUser
 	struct ConfItem *att_conf;	/* attached conf */
 	struct server_conf *att_sconf;
 
-	struct irc_sockaddr_storage ip;
+	struct rb_sockaddr_storage ip;
 	time_t last_nick_change;
 	rb_uint16_t number_of_nick_changes;
 
@@ -203,7 +203,7 @@ struct LocalUser
 	void *targets[10];		/* targets were aware of */
 	rb_uint8_t targinfo[2];	/* cyclic array, no in use */
 	time_t target_last;		/* last time we cleared a slot */
-	struct irc_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
+	struct rb_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
 	struct _ssl_ctl *ssl_ctl;		/* which ssl daemon we're associate with */
 	struct ZipStats *zipstats;		/* zipstats */
 };

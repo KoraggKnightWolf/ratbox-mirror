@@ -37,7 +37,7 @@ struct Listener
 	int ref_count;		/* number of connection references */
 	int active;		/* current state of listener */
 	int ssl;		/* ssl listener */
-	struct irc_sockaddr_storage addr;
+	struct rb_sockaddr_storage addr;
 	char vhost[HOSTLEN + 1];	/* virtual name of listener */
 };
 

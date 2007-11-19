@@ -137,36 +137,10 @@ member.])],,[[
 #endif
 ]])
 
+
+dnl this gets passed on to the libratbox configure
 AC_ARG_ENABLE(ipv6,
 AC_HELP_STRING([--enable-ipv6],[Enable IPv6 support]),[ipv6=$enableval],[ipv6=no])
-
-if test $ipv6 != yes; then
-	have_v6="no"
-else
-AC_MSG_CHECKING([for core IPv6 support])
-
-AC_COMPILE_IFELSE(
-[AC_LANG_PROGRAM(
-	[[#define IN_AUTOCONF
-	#include <sys/types.h>
-	#include <sys/socket.h>
-	#include <netinet/in.h>]],
-	[[struct sockaddr_in6 s; 
-	  s.sin6_family = 0;]]
-	)],
-[
-	if test "$CYGWIN" = "yes"; then
-		AC_MSG_RESULT([no, Cygwin's IPv6 is incomplete])
-		have_v6=no
-	else
-		have_v6=yes
-		AC_MSG_RESULT(yes)
-		AC_DEFINE(IPV6, 1, [Define if IPv6 support is present and available.])
-	fi
-],
-[AC_MSG_RESULT(no)
-have_v6="no"])
-fi
 
 dnl See whether we can include both string.h and strings.h.
 AC_CACHE_CHECK([whether string.h and strings.h may both be included],

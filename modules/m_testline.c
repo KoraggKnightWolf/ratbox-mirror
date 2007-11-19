@@ -65,7 +65,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 {
 	struct ConfItem *aconf;
 	struct ConfItem *resv_p;
-	struct irc_sockaddr_storage ip;
+	struct rb_sockaddr_storage ip;
 	const char *name = NULL;
 	const char *username = NULL;
 	const char *host = NULL;
@@ -122,7 +122,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	/* parses as an IP, check for a dline */
 	if((type = parse_netmask(host, (struct sockaddr *)&ip, &host_mask)) != HM_HOST)
 	{
-#ifdef IPV6
+#ifdef RB_IPV6
 		if(type == HM_IPV6)
 			aconf = find_dline((struct sockaddr *)&ip);
 		else
@@ -146,7 +146,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	if((aconf = find_address_conf(host, NULL, username ? username : "dummy",
 				(type != HM_HOST) ? (struct sockaddr *)&ip : NULL,
 				(type != HM_HOST) ? (
-#ifdef IPV6
+#ifdef RB_IPV6
 				 (type == HM_IPV6) ? AF_INET6 : 
 #endif
 				  AF_INET) : 0)))

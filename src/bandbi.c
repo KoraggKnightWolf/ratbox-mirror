@@ -204,7 +204,7 @@ bandb_handle_ban(char *parv[], int parc)
 static int
 bandb_check_kline(struct ConfItem *aconf)
 {
-	struct irc_sockaddr_storage daddr;
+	struct rb_sockaddr_storage daddr;
 	struct ConfItem *kconf = NULL;
 	int aftype;
 	const char *p;
@@ -213,7 +213,7 @@ bandb_check_kline(struct ConfItem *aconf)
 
 	if(aftype != HM_HOST)
 	{
-#ifdef IPV6
+#ifdef RB_IPV6
 		if(aftype == HM_IPV6)
 			aftype = AF_INET6;
 		else
@@ -246,7 +246,7 @@ bandb_check_kline(struct ConfItem *aconf)
 static int
 bandb_check_dline(struct ConfItem *aconf)
 {
-	struct irc_sockaddr_storage daddr;
+	struct rb_sockaddr_storage daddr;
 /* 	struct ConfItem *dconf; */
 	int bits;
 

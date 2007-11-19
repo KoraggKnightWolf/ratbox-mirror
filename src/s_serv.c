@@ -396,7 +396,7 @@ int
 serv_connect(struct server_conf *server_p, struct Client *by)
 {
 	struct Client *client_p;
-	struct irc_sockaddr_storage myipnum; 
+	struct rb_sockaddr_storage myipnum; 
 	rb_fde_t *F;
 
 	s_assert(server_p != NULL);
@@ -443,7 +443,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	client_p->localClient->F = F;
 
 	/* shove the port number into the sockaddr */
-#ifdef IPV6
+#ifdef RB_IPV6
 	if(GET_SS_FAMILY(&server_p->ipnum) == AF_INET6)
 		((struct sockaddr_in6 *)&server_p->ipnum)->sin6_port = htons(server_p->port);
 	else
@@ -501,7 +501,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 		SET_SS_LEN(&myipnum, sizeof(struct sockaddr_in));
 	}
 	
-#ifdef IPV6
+#ifdef RB_IPV6
 	else if((GET_SS_FAMILY(&server_p->ipnum) == AF_INET6) && ServerInfo.specific_ipv6_vhost)
 	{
 		memcpy(&myipnum, &ServerInfo.ip6, sizeof(myipnum));

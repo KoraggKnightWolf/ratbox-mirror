@@ -48,12 +48,12 @@ struct dns_request
 	int revfwd;
 	adns_query query;
 	union {
-#ifdef IPV6
+#ifdef RB_IPV6
 		struct sockaddr_in6 in6;
 #endif
 		struct sockaddr_in in;
 	} sins;
-#ifdef IPV6
+#ifdef RB_IPV6
 	int fallback;
 #endif
 };
@@ -220,7 +220,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 			{
 				switch(reply->type)
 				{
-#ifdef IPV6
+#ifdef RB_IPV6
 					case adns_r_addr6:
 					{
 						char tmpres[65];
@@ -262,7 +262,7 @@ static void send_answer(struct dns_request *req, adns_answer *reply)
 	} 
 	else
 	{
-#ifdef IPV6
+#ifdef RB_IPV6
 		if(req->revfwd == REQREV && req->reqtype == REVIPV6FALLBACK && req->fallback == 0)
 		{
 			req->fallback = 1;
@@ -357,7 +357,7 @@ resolve_host(char **parv)
 	req->reqtype = FWDHOST; 
 	switch(*iptype)
 	{
-#ifdef IPV6
+#ifdef RB_IPV6
 		case '5': /* I'm not sure why somebody would pass a 5 here, but okay */
 		case '6':
 			flags = adns_r_addr6;
@@ -406,7 +406,7 @@ resolve_ip(char **parv)
 			req->sins.in.sin_family = AF_INET;
 
 			break;
-#ifdef IPV6
+#ifdef RB_IPV6
 		case '5': /* This is the case of having to fall back to "ip6.int" */
 			req->reqtype = REVIPV6FALLBACK;
 			flags = adns_r_ptr_ip6;

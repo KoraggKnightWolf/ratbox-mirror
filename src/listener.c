@@ -48,13 +48,13 @@ static void accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_s
 
 
 static struct Listener *
-make_listener(struct irc_sockaddr_storage *addr)
+make_listener(struct rb_sockaddr_storage *addr)
 {
 	struct Listener *listener = rb_malloc(sizeof(struct Listener));
 	s_assert(0 != listener);
 	listener->name = ServerInfo.name; /* me.name may not be valid yet -- jilles */
 	listener->F = NULL;
-	memcpy(&listener->addr, addr, sizeof(struct irc_sockaddr_storage));
+	memcpy(&listener->addr, addr, sizeof(struct rb_sockaddr_storage));
 	return listener;
 }
 
@@ -85,7 +85,7 @@ get_listener_name(struct Listener *listener)
 	if(listener == NULL)
 		return NULL;
 
-#ifdef IPV6
+#ifdef RB_IPV6
 	if(GET_SS_FAMILY(&listener->addr) == AF_INET6)
 		port = ntohs(((const struct sockaddr_in6 *)&listener->addr)->sin6_port);
 	else
@@ -113,7 +113,7 @@ show_ports(struct Client *source_p)
 		listener = ptr->data;
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSPLINE, 
 				   form_str(RPL_STATSPLINE), 'P',
-#ifdef IPV6
+#ifdef RB_IPV6
 			   ntohs(GET_SS_FAMILY(&listener->addr) == AF_INET ? ((struct sockaddr_in *)&listener->addr)->sin_port :
 				 ((struct sockaddr_in6 *)&listener->addr)->sin6_port),
 #else
@@ -150,7 +150,7 @@ inetport(struct Listener *listener)
 	
 	F = rb_socket(GET_SS_FAMILY(&listener->addr), SOCK_STREAM, 0, "Listener socket");
 
-#ifdef IPV6
+#ifdef RB_IPV6
 	if(GET_SS_FAMILY(&listener->addr) == AF_INET6)
 	{
 		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)&listener->addr;
@@ -235,7 +235,7 @@ inetport(struct Listener *listener)
 }
 
 static struct Listener *
-find_listener(struct irc_sockaddr_storage *addr)
+find_listener(struct rb_sockaddr_storage *addr)
 {
 	struct Listener *listener = NULL;
 	struct Listener *last_closed = NULL;
@@ -263,7 +263,7 @@ find_listener(struct irc_sockaddr_storage *addr)
 				}
 				break;
 			}
-#ifdef IPV6
+#ifdef RB_IPV6
 			case AF_INET6:
 			{
 				struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)addr;
@@ -298,7 +298,7 @@ void
 add_listener(int port, const char *vhost_ip, int family, int ssl)
 {
 	struct Listener *listener;
-	struct irc_sockaddr_storage vaddr;
+	struct rb_sockaddr_storage vaddr;
 
 	/*
 	 * if no port in conf line, don't bother
@@ -320,7 +320,7 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 			case AF_INET:
 				((struct sockaddr_in *)&vaddr)->sin_addr.s_addr = INADDR_ANY;
 				break;
-#ifdef IPV6
+#ifdef RB_IPV6
 			case AF_INET6:
 				memcpy(&((struct sockaddr_in6 *)&vaddr)->sin6_addr, &in6addr_any, sizeof(struct in6_addr));
 				break;
@@ -335,7 +335,7 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 			SET_SS_LEN(&vaddr, sizeof(struct sockaddr_in));
 			((struct sockaddr_in *)&vaddr)->sin_port = htons(port);
 			break;
-#ifdef IPV6
+#ifdef RB_IPV6
 		case AF_INET6:
 			SET_SS_LEN(&vaddr, sizeof(struct sockaddr_in6));
 			((struct sockaddr_in6 *)&vaddr)->sin6_port = htons(port);
@@ -419,9 +419,9 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 	 */
 	new_client = make_client(NULL);
 
-	memcpy(&new_client->localClient->ip, sai, sizeof(struct irc_sockaddr_storage));
-	new_client->localClient->lip = rb_malloc(sizeof(struct irc_sockaddr_storage));
-	memcpy(new_client->localClient->lip, lai, sizeof(struct irc_sockaddr_storage));
+	memcpy(&new_client->localClient->ip, sai, sizeof(struct rb_sockaddr_storage));
+	new_client->localClient->lip = rb_malloc(sizeof(struct rb_sockaddr_storage));
+	memcpy(new_client->localClient->lip, lai, sizeof(struct rb_sockaddr_storage));
 
 	/* 
 	 * copy address to 'sockhost' as a string, copy it to host too
@@ -433,7 +433,7 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 
 	rb_strlcpy(new_client->host, new_client->sockhost, sizeof(new_client->host));
 
-#ifdef IPV6
+#ifdef RB_IPV6
 	if(GET_SS_FAMILY(&new_client->localClient->ip) == AF_INET6 && ConfigFileEntry.dot_in_ip6_addr == 1)
 	{
 		rb_strlcat(new_client->host, ".", sizeof(new_client->host));
@@ -540,8 +540,8 @@ static void
 accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t addrlen, void *data)
 {
 	struct Listener *listener = data;
-	struct irc_sockaddr_storage lip;
-	unsigned int locallen = sizeof(struct irc_sockaddr_storage);
+	struct rb_sockaddr_storage lip;
+	unsigned int locallen = sizeof(struct rb_sockaddr_storage);
 	
 	ServerStats.is_ac++;
 	if(getsockname(rb_get_fd(F), (struct sockaddr *) &lip, &locallen) < 0)

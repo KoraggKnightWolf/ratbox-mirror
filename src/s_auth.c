@@ -292,8 +292,8 @@ auth_error(struct AuthRequest *auth)
 static void
 start_auth_query(struct AuthRequest *auth)
 {
-	struct irc_sockaddr_storage *localaddr;
-	struct irc_sockaddr_storage *remoteaddr;
+	struct rb_sockaddr_storage *localaddr;
+	struct rb_sockaddr_storage *remoteaddr;
 	char myip[HOSTIPLEN + 1];
 	int lport, rport;
 
@@ -313,14 +313,14 @@ start_auth_query(struct AuthRequest *auth)
 	remoteaddr = &auth->client->localClient->ip;
 
 
-#ifdef IPV6
+#ifdef RB_IPV6
 	if(GET_SS_FAMILY(&localaddr) == AF_INET6)
 		lport = ntohs(((struct sockaddr_in6 *) localaddr)->sin6_port);
 	else
 #endif
 		lport = ntohs(((struct sockaddr_in *) localaddr)->sin_port);
 
-#ifdef IPV6
+#ifdef RB_IPV6
 	if(GET_SS_FAMILY(remoteaddr) == AF_INET6)
 		rport = ntohs(((struct sockaddr_in6 *) remoteaddr)->sin6_port);
 	else

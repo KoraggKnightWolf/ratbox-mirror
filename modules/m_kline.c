@@ -705,14 +705,14 @@ static int
 already_placed_kline(struct Client *source_p, const char *luser, const char *lhost, int tkline)
 {
 	const char *reason;
-	struct irc_sockaddr_storage iphost, *piphost;
+	struct rb_sockaddr_storage iphost, *piphost;
 	struct ConfItem *aconf;
 	int t;
 	if(ConfigFileEntry.non_redundant_klines)
 	{
 		if((t = parse_netmask(lhost, (struct sockaddr *)&iphost, NULL)) != HM_HOST)
 		{
-#ifdef IPV6
+#ifdef RB_IPV6
 			if(t == HM_IPV6)
 				t = AF_INET6;
 			else

@@ -270,7 +270,7 @@ typedef struct {
   union {
     struct sockaddr sa;
     struct sockaddr_in inet;
-#ifdef IPV6
+#ifdef RB_IPV6
     struct sockaddr_in6 inet6;
 #endif
   } addr;
@@ -325,7 +325,7 @@ typedef struct {
     adns_rr_intstr *(*manyistr);      /* txt (list of strings ends with i=-1, str=0) */
     adns_rr_addr *addr;               /* addr */
     struct in_addr *inaddr;           /* a */
-#ifdef IPV6
+#ifdef RB_IPV6
     struct in6_addr * in6addr;	      /* aaaa for IPv6 */
 #endif
     adns_rr_hostaddr *hostaddr;       /* ns */

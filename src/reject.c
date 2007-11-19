@@ -74,7 +74,7 @@ add_ipline(struct ConfItem *aconf, rb_patricia_tree_t *tree, struct sockaddr *ad
 int 
 add_dline(struct ConfItem *aconf)
 {
-	struct irc_sockaddr_storage st;
+	struct rb_sockaddr_storage st;
 	int bitlen;
 	if(parse_netmask(aconf->host, (struct sockaddr *)&st, &bitlen) == HM_HOST)
 		return 0;
@@ -87,7 +87,7 @@ add_dline(struct ConfItem *aconf)
 int
 add_eline(struct ConfItem *aconf)
 {
-	struct irc_sockaddr_storage st;
+	struct rb_sockaddr_storage st;
 	int bitlen;
 	if(parse_netmask(aconf->host, (struct sockaddr *)&st, &bitlen) == HM_HOST)
 		return 0;
@@ -171,7 +171,7 @@ add_reject(struct Client *client_p)
 	else
 	{
 		int bitlen = 32;
-#ifdef IPV6
+#ifdef RB_IPV6
 		if(GET_SS_FAMILY(&client_p->localClient->ip) == AF_INET6)
 			bitlen = 128;
 #endif
@@ -394,7 +394,7 @@ throttle_add(struct sockaddr *addr)
 
 	} else {
 		int bitlen = 32;
-#ifdef IPV6
+#ifdef RB_IPV6
 		if(GET_SS_FAMILY(addr) == AF_INET6)
 			bitlen = 128;
 #endif

@@ -45,7 +45,7 @@ struct AuthRequest
 	uint16_t reqid;
 	unsigned int flags;	/* current state of request */
 	time_t timeout;		/* time when query expires */
-#ifdef IPV6
+#ifdef RB_IPV6
 	int ip6_int;
 #endif
 };

@@ -239,7 +239,7 @@ static adns_status pa_inaddr(const parseinfo *pai, int cbyte, int max, void *dat
   return adns_s_ok;
 }
 
-#ifdef IPV6
+#ifdef RB_IPV6
 static adns_status pa_in6addr(const parseinfo *pai, int cbyte, int max, void *datap) {
   struct in6_addr *storeto= datap;
   
@@ -275,7 +275,7 @@ static int di_inaddr(adns_state ads, const void *datap_a, const void *datap_b) {
 }
 
 
-#ifdef IPV6
+#ifdef RB_IPV6
 static adns_status cs_in6addr(vbuf *vb, const void *datap) {
 #ifndef NDEBUG
   const struct in6_addr *rrp= datap;
@@ -312,7 +312,7 @@ static adns_status pa_addr(const parseinfo *pai, int cbyte, int max, void *datap
   memcpy(&storeto->addr.inet.sin_addr,dgram+cbyte,4);
   return adns_s_ok;
 }
-#ifdef IPV6
+#ifdef RB_IPV6
 static adns_status pa_addr6(const parseinfo *pai, int cbyte, int max, void *datap) {
   adns_rr_addr *storeto= datap;
   const byte *dgram= pai->dgram;
@@ -348,7 +348,7 @@ static adns_status csp_addr(vbuf *vb, const adns_rr_addr *rrp) {
     rb_inet_ntop(AF_INET, &rrp->addr.inet.sin_addr.s_addr, ia, sizeof(ia));
     CSP_ADDSTR(ia);
     break;
-#ifdef IPV6
+#ifdef RB_IPV6
   case AF_INET6:
     {
        char ip[IP6STRLEN];
@@ -371,7 +371,7 @@ static adns_status cs_addr(vbuf *vb, const void *datap) {
 
   return csp_addr(vb,rrp);
 }
-#ifdef IPV6
+#ifdef RB_IPV6
 static adns_status cs_addr6(vbuf *vb, const void *datap) {
   const adns_rr_addr *rrp= datap;
 
@@ -758,7 +758,7 @@ static void icb_ptr(adns_query parent, adns_query child) {
 
   adns__query_fail(parent,adns_s_inconsistent);
 }
-#ifdef IPV6
+#ifdef RB_IPV6
 
 static adns_status pa_ptr6_all(const parseinfo *pai, int dmstart, int max, void *datap, const char **expectdomain)
 {
@@ -1144,19 +1144,19 @@ DEEP_TYPE(hinfo,  "HINFO", 0,     intstrpair, pa_hinfo,   0,          cs_hinfo  
 DEEP_TYPE(mx_raw, "MX",   "raw",  intstr,     pa_mx_raw,  di_mx_raw,  cs_inthost    ),
 DEEP_TYPE(txt,    "TXT",   0,     manyistr,   pa_txt,     0,          cs_txt        ),
 DEEP_TYPE(rp_raw, "RP",   "raw",  strpair,    pa_rp,      0,          cs_rp         ),
-#ifdef IPV6
+#ifdef RB_IPV6
 FLAT_TYPE(aaaa,	  "AAAA",  0,	  in6addr,    pa_in6addr, 0, 	      cs_in6addr    ),
 #endif
 FLAT_TYPE(addr,   "A",  "addr",   addr,       pa_addr,    di_addr,    cs_addr       ),
 DEEP_TYPE(ns,     "NS", "+addr",  hostaddr,   pa_hostaddr,di_hostaddr,cs_hostaddr   ),
 DEEP_TYPE(ptr,    "PTR","checked",str,        pa_ptr,     0,          cs_domain     ),
 DEEP_TYPE(mx,     "MX", "+addr",  inthostaddr,pa_mx,      di_mx,      cs_inthostaddr),
-#ifdef IPV6
+#ifdef RB_IPV6
 FLAT_TYPE(addr6,  "AAAA","addr6", addr,       pa_addr6,   0,	      cs_addr6	    ),
 #endif
 DEEP_TYPE(soa,    "SOA","822",    soa,        pa_soa,     0,          cs_soa        ),
 DEEP_TYPE(rp,     "RP", "822",    strpair,    pa_rp,      0,          cs_rp         ),
-#ifdef IPV6
+#ifdef RB_IPV6
 DEEP_TYPE(ptr_ip6,"PTR","checked",str,        pa_ptr6,	  0,	      cs_domain	    ),
 DEEP_TYPE(ptr_ip6_old,"PTR","checked",str,    pa_ptr6_old,0,	      cs_domain	    ),
 #endif

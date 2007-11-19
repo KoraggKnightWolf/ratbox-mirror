@@ -733,7 +733,7 @@ check_server(const char *name, struct Client *client_p)
 	if(!ServerConfTb(server_p))
 		ClearCap(client_p, CAP_TB);
 
-#ifdef IPV6
+#ifdef RB_IPV6
 	if(GET_SS_FAMILY(&client_p->localClient->ip) == AF_INET6)
 	{
 		if(IN6_IS_ADDR_UNSPECIFIED(&((struct sockaddr_in6 *)&server_p->ipnum)->sin6_addr))

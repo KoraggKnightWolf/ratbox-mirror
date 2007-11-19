@@ -203,7 +203,7 @@ struct config_file_entry
 	int throttle_duration;
 	int target_change;
 	int hide_spoof_ips;
-#ifdef IPV6
+#ifdef RB_IPV6
 	int fallback_to_ip6_int;
 #endif
 };
@@ -248,11 +248,11 @@ struct server_info
 	int use_ts6;
 	int default_max_clients;
 	struct sockaddr_in ip;
-#ifdef IPV6
+#ifdef RB_IPV6
 	struct sockaddr_in6 ip6;
 #endif
 	int specific_ipv4_vhost;
-#ifdef IPV6
+#ifdef RB_IPV6
 	int specific_ipv6_vhost;
 #endif
 	char *ssl_private_key;

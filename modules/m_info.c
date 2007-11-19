@@ -176,7 +176,7 @@ static struct InfoStruct info_table[] = {
 	{	
 		"IPV6", 
 		OUTPUT_BOOLEAN_RAW,
-#ifdef IPV6
+#ifdef RB_IPV6
 		{ (void *)1 }, 
 #else
 		{ (void *)0 },

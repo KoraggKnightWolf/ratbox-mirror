@@ -30,7 +30,7 @@ enum
 {
 	HM_HOST,
 	HM_IPV4
-#ifdef IPV6
+#ifdef RB_IPV6
 		, HM_IPV6
 #endif
 };
@@ -55,7 +55,7 @@ struct ConfItem *find_address_conf(const char *host, const char *sockhost,
 			 (struct sockaddr *)&(x)->localClient->ip, CONF_GLINE,\
 			 GET_SS_FAMILY(&(x)->localClient->ip), (x)->username))
 
-#ifdef IPV6
+#ifdef RB_IPV6
 int match_ipv6(struct sockaddr *, struct sockaddr *, int);
 #endif
 int match_ipv4(struct sockaddr *, struct sockaddr *, int);
@@ -83,7 +83,7 @@ struct AddressRec
 		struct
 		{
 			/* Pointer into ConfItem... -A1kmm */
-			struct irc_sockaddr_storage addr;
+			struct rb_sockaddr_storage addr;
 			int bits;
 		}
 		ipa;

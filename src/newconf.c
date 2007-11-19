@@ -954,7 +954,7 @@ conf_set_serverinfo_vhost(confentry_t * entry, conf_t * conf, struct conf_items 
 static void
 conf_set_serverinfo_vhost6(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-#ifdef IPV6
+#ifdef RB_IPV6
 	if(rb_inet_pton(AF_INET6, (char *) entry->string, &ServerInfo.ip6.sin6_addr) <= 0)
 	{
 		conf_report_error_nl("Invalid netmask for server IPv6 vhost (%s)", entry->string);
@@ -1015,7 +1015,7 @@ static void
 conf_set_class_cidr_bitlen(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	int maxsize = 32;
-#ifdef IPV6
+#ifdef RB_IPV6
 	maxsize = 128;
 #endif
 	t_class->cidr_bitlen = entry->number;
@@ -1442,14 +1442,14 @@ conf_set_listen_port_both(confentry_t * entry, conf_t * conf, struct conf_items 
 		if(listener_address == NULL)
 		{
 			add_listener(xentry->number, listener_address, AF_INET, ssl);
-#ifdef IPV6
+#ifdef RB_IPV6
 			add_listener(xentry->number, listener_address, AF_INET6, ssl);
 #endif
 		}
 		else
 		{
 			int family = AF_INET;
-#ifdef IPV6
+#ifdef RB_IPV6
 			if(strchr(listener_address, ':') != NULL)
 				family = AF_INET6;
 #endif
@@ -1708,7 +1708,7 @@ conf_set_connect_aftype(confentry_t * entry, conf_t * conf, struct conf_items *i
 
 	if(!strcasecmp(aft, "ipv4"))
 		GET_SS_FAMILY(&t_server->ipnum) = AF_INET;
-#ifdef IPV6
+#ifdef RB_IPV6
 	else if(!strcasecmp(aft, "ipv6"))
 		GET_SS_FAMILY(&t_server->ipnum) = AF_INET6;
 #endif
@@ -2246,7 +2246,7 @@ static struct conf_items conf_general_table[] =
 	{ "ts_warn_delta",	CF_TIME,  NULL, 0, &ConfigFileEntry.ts_warn_delta	},
 	{ "use_whois_actually", CF_YESNO, NULL, 0, &ConfigFileEntry.use_whois_actually	},
 	{ "warn_no_nline",	CF_YESNO, NULL, 0, &ConfigFileEntry.warn_no_nline	},
-#ifdef IPV6
+#ifdef RB_IPV6
 	{ "fallback_to_ip6_int", CF_YESNO, NULL, 0, &ConfigFileEntry.fallback_to_ip6_int },
 #endif
 	{ "\0", 		0, 	  NULL, 0, NULL }

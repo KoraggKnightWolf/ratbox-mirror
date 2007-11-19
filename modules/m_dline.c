@@ -147,11 +147,11 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 
 	if(ConfigFileEntry.non_redundant_klines)
 	{
-		struct irc_sockaddr_storage daddr;
+		struct rb_sockaddr_storage daddr;
 		const char *creason;
 		int t = AF_INET, ty, b;
 		ty = parse_netmask(dlhost, (struct sockaddr *)&daddr, &b);
-#ifdef IPV6
+#ifdef RB_IPV6
 		if(ty == HM_IPV6)
 			t = AF_INET6;
 		else
@@ -276,7 +276,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 static int
 mo_undline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	struct irc_sockaddr_storage daddr;
+	struct rb_sockaddr_storage daddr;
 	struct ConfItem *aconf;
 	int b, ty;
 	const char *cidr = parv[1];

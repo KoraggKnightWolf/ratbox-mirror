@@ -261,7 +261,7 @@ int adns_submit(adns_state ads,
   adns__consistency(ads,0,cc_entex);
   return r;
 }
-#ifdef IPV6
+#ifdef RB_IPV6
 int adns_submit_reverse_ip6(adns_state ads,
 			    const struct sockaddr *addr,
 			    const char *zone,
@@ -340,7 +340,7 @@ int adns_submit_reverse(adns_state ads,
 			void *context,
 			adns_query *query_r) {
   if (type != adns_r_ptr && type != adns_r_ptr_raw && type != adns_r_ptr_ip6 && type != adns_r_ptr_ip6_old) return EINVAL;
-#ifdef IPV6
+#ifdef RB_IPV6
   if(addr->sa_family == AF_INET6) 
           return adns_submit_reverse_ip6(ads,addr, type == adns_r_ptr_ip6 ? "ip6.arpa" : "ip6.int", 
                                          type,flags,context,query_r);
