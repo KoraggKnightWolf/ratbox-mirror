@@ -1,3 +1,43 @@
+androsyn    2007/11/19 17:38:36 UTC	(20071119_0-24553)
+  Log:
+  have the ircd use the RB_IPV6 define from libratbox
+
+  Modified:
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/ident/ident.c (File Modified) 
+	ircd-ratbox/trunk/include/hostmask.h (File Modified) 
+	ircd-ratbox/trunk/include/ircd_defs.h (File Modified) 
+	ircd-ratbox/trunk/include/listener.h (File Modified) 
+	ircd-ratbox/trunk/include/s_auth.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_gline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_version.c (File Modified) 
+	ircd-ratbox/trunk/resolver/adns/adns.h (File Modified) 
+	ircd-ratbox/trunk/resolver/adns/query.c (File Modified) 
+	ircd-ratbox/trunk/resolver/adns/types.c (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 jilles      2007/11/17 22:16:00 UTC	(20071117_1-24545)
   Log:
   Allow /testline on channel names (shows if it is resv'ed or not).
