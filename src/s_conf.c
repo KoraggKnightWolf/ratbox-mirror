@@ -396,15 +396,20 @@ static int
 add_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 {
 	rb_patricia_node_t *pnode;
-
+	int bitlen;
 	/* If the limits are 0 don't do anything.. */
-	if(ConfCidrAmount(aconf) == 0 || ConfCidrBitlen(aconf) == 0)
+	if(ConfCidrAmount(aconf) == 0 || (ConfCidrIpv4Bitlen(aconf) == 0 && ConfCidrIpv6Bitlen(aconf) == 0))
 		return -1;
 
 	pnode = rb_match_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip);
 
+	if(GET_SS_FAMILY(&client_p->localClient->ip) == AF_INET)
+		bitlen = ConfCidrIpv4Bitlen(aconf);
+	else
+		bitlen = ConfCidrIpv6Bitlen(aconf);
+		
 	if(pnode == NULL)
-		pnode = make_and_lookup_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip, ConfCidrBitlen(aconf));
+		pnode = make_and_lookup_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip, bitlen);
 
 	s_assert(pnode != NULL);
 
@@ -432,7 +437,7 @@ remove_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 	rb_patricia_node_t *pnode;
 
 	/* If the limits are 0 don't do anything.. */
-	if(ConfCidrAmount(aconf) == 0 || ConfCidrBitlen(aconf) == 0)
+	if(ConfCidrAmount(aconf) == 0 || (ConfCidrIpv4Bitlen(aconf) == 0 && ConfCidrIpv6Bitlen(aconf) == 0))
 		return;
 
 	pnode = rb_match_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip);

@@ -1012,21 +1012,35 @@ conf_set_class_ping_time(confentry_t * entry, conf_t * conf, struct conf_items *
 }
 
 static void
-conf_set_class_cidr_bitlen(confentry_t * entry, conf_t * conf, struct conf_items *item)
+conf_set_class_cidr_ipv4_bitlen(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	int maxsize = 32;
-#ifdef RB_IPV6
-	maxsize = 128;
-#endif
-	t_class->cidr_bitlen = entry->number;
-	if(t_class->cidr_bitlen > maxsize)
+	t_class->cidr_ipv4_bitlen = entry->number;
+	if(t_class->cidr_ipv4_bitlen > maxsize)
 	{
-		conf_report_warning_nl("class::cidr_bitlen argument exceeds maxsize (%d > %d) - truncating to %d.",
-				       t_class->cidr_bitlen, maxsize, maxsize);
-		t_class->cidr_bitlen = 32;
+		conf_report_warning_nl("class::cidr_ipv4_bitlen argument exceeds maxsize (%d > %d) - truncating to %d.",
+				       t_class->cidr_ipv4_bitlen, maxsize, maxsize);
+		t_class->cidr_ipv4_bitlen = 32;
 	}
 	return;
 }
+
+#ifdef RB_IPV6
+static void
+conf_set_class_cidr_ipv6_bitlen(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	int maxsize = 128;
+	t_class->cidr_ipv6_bitlen = entry->number;
+	if(t_class->cidr_ipv6_bitlen > maxsize)
+	{
+		conf_report_warning_nl("class::cidr_ipv6_bitlen argument exceeds maxsize (%d > %d) - truncating to %d.",
+				       t_class->cidr_ipv6_bitlen, maxsize, maxsize);
+		t_class->cidr_ipv6_bitlen = 128;
+	}
+	return;
+}
+#endif
+
 
 static void
 conf_set_class_number_per_cidr(confentry_t * entry, conf_t * conf, struct conf_items *item)
@@ -2127,7 +2141,8 @@ static struct conf_items conf_log_table[] =
 static struct conf_items conf_class_table[] =
 {
 	{ "ping_time", 		CF_TIME, conf_set_class_ping_time,			0, NULL },
-	{ "cidr_bitlen",	CF_INT,  conf_set_class_cidr_bitlen,		0, NULL },
+	{ "cidr_ipv4_bitlen",	CF_INT,  conf_set_class_cidr_ipv4_bitlen,		0, NULL },
+	{ "cidr_ipv6_bitlen",	CF_INT,  conf_set_class_cidr_ipv6_bitlen,		0, NULL },
 	{ "number_per_cidr",	CF_INT,  conf_set_class_number_per_cidr,		0, NULL },
 	{ "number_per_ip",	CF_INT,  conf_set_class_number_per_ip,		0, NULL },
 	{ "number_per_ip_global",CF_INT, conf_set_class_number_per_ip_global,	0, NULL },
