@@ -1,3 +1,11 @@
+androsyn    2007/11/24 18:25:02 UTC	(20071124_6-24575)
+  Log:
+  make the RPL_WHOISSECURE stuff use target_p->localClient->is_ssl
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+
+
 androsyn    2007/11/24 18:11:40 UTC	(20071124_5-24573)
   Log:
   - fix show_capabilities not to be so braindead and use the snprintf_append functions
