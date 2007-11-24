@@ -444,6 +444,9 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 
 	new_client->localClient->listener = listener;
 	new_client->localClient->ssl_ctl = ssl_ctl;
+	if(ssl_ctl != NULL || rb_fd_ssl(F))
+		new_client->localClient->is_ssl = 1;
+
 	++listener->ref_count;
 
 	start_auth(new_client);
