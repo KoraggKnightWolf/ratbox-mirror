@@ -398,11 +398,12 @@ static void
 ssl_process_accept(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	conn_t *conn;
-	rb_uint16_t *id;
+	rb_uint16_t id;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
 
-	id = (rb_uint16_t *) & ctlb->buf[1];
-	conn_add_id_hash(conn, *id);
+	memcpy(&id, &ctlb->buf[1], sizeof(id));
+
+	conn_add_id_hash(conn, id);
 	conn->is_ssl = 1;
 
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
@@ -418,11 +419,11 @@ static void
 ssl_process_connect(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	conn_t *conn;
-	rb_uint16_t *id;
+	rb_uint16_t id;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
-	id = (rb_uint16_t *) & ctlb->buf[1];
 
-	conn_add_id_hash(conn, *id);
+
+	conn_add_id_hash(conn, id);
 	conn->is_ssl = 1;
 
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
@@ -441,10 +442,12 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	char outstat[512];
 	conn_t *conn;
 	const char *odata;
-	rb_uint16_t *id;
-	id = (rb_uint16_t *) & ctlb->buf[1];
+	rb_uint16_t id;
+
+	memcpy(&id, &ctlb->buf[1], sizeof(id));
+
 	odata = &ctlb->buf[3];
-	conn = conn_find_by_id(*id);
+	conn = conn_find_by_id(id);
 
 	if(conn == NULL)
 		return;
@@ -460,15 +463,16 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 static void
 zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
-	rb_uint16_t *id;
-	rb_uint8_t *level;
+	rb_uint16_t id;
+	rb_uint8_t level;
 	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
 	conn_t *conn;
 	void *leftover;
-	id = (rb_uint16_t *) & ctlb->buf[1];
-	level = (rb_uint8_t *) & ctlb->buf[3];
 
-	conn = conn_find_by_id(*id);
+	memcpy(&id, &ctlb->buf[1], sizeof(id));
+	level = (rb_uint8_t) ctlb->buf[3];
+
+	conn = conn_find_by_id(id);
 	if(conn == NULL)
 	{
 		return;
@@ -488,10 +492,10 @@ zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	conn->outstream.zfree = (free_func) 0;
 	conn->outstream.data_type = Z_ASCII;
 
-	if(*level > 9)
-		*level = Z_DEFAULT_COMPRESSION;
+	if(level > 9)
+		level = Z_DEFAULT_COMPRESSION;
 
-	deflateInit(&conn->outstream, *level);
+	deflateInit(&conn->outstream, level);
 
 	if(ctlb->buflen > hdr)
 	{
@@ -506,8 +510,8 @@ zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 static void
 zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
-	rb_uint16_t *id;
-	rb_uint8_t *level;
+	rb_uint16_t id;
+	rb_uint8_t level;
 	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
 	conn_t *conn;
 	void *leftover;
@@ -522,10 +526,10 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	conn->is_ssl = 0;
 	conn->is_zlib = 1;
 
-	id = (rb_uint16_t *) & ctlb->buf[1];
-	level = (rb_uint8_t *) & ctlb->buf[3];
+	memcpy(&id, &ctlb->buf[1], sizeof(id));
+	level = (rb_uint8_t)ctlb->buf[3];
 
-	conn_add_id_hash(conn, *id);
+	conn_add_id_hash(conn, id);
 
 	conn->instream.total_in = 0;
 	conn->instream.total_out = 0;
@@ -540,11 +544,10 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	conn->outstream.zfree = (free_func) 0;
 	conn->outstream.data_type = Z_ASCII;
 
-	if(*level > 9)
-		*level = Z_DEFAULT_COMPRESSION;
+	if(level > 9)
+		level = Z_DEFAULT_COMPRESSION;
 
-	deflateInit(&conn->outstream, *level);
-
+	deflateInit(&conn->outstream, level);
 
 	if(ctlb->buflen > hdr)
 	{

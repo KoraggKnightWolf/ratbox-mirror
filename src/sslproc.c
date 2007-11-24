@@ -450,15 +450,15 @@ start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
 {
 	rb_fde_t *F[2];
 	ssl_ctl_t *ctl;
-	rb_uint16_t *id;
+	rb_uint16_t id;
 	char buf[3];
 	F[0] = sslF;
 	F[1] = plainF;
 
-	id = (rb_uint16_t *)&buf[1];
+	id = xid;
+	memcpy(&buf[1], &id, sizeof(id));
 
 	buf[0] = 'A';
-	*id = xid;
 	
 	ctl = which_ssld();
 	ctl->cli_count++;
@@ -471,15 +471,15 @@ start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
 {
 	rb_fde_t *F[2];
 	ssl_ctl_t *ctl;
-	rb_uint16_t *id;
+	rb_uint16_t id;
 	char buf[3];
 	F[0] = sslF;
 	F[1] = plainF;
 
-	id = (rb_uint16_t *)&buf[1];
+	id = xid;
+	memcpy(&buf[1], &id, sizeof(id));
 
 	buf[0] = 'C';
-	*id = xid;
 	
 	ctl = which_ssld();
 	ctl->cli_count++;
@@ -513,18 +513,21 @@ start_zlib_session(struct Client *server)
 	rb_fde_t *F[2];
 	rb_fde_t *xF1, *xF2;
 	rb_uint8_t *buf;
-	rb_uint16_t *id;
-	rb_uint8_t *level;
+	rb_uint16_t id;
+	rb_uint8_t level;
 	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
 	size_t len;
 
 	len = rb_linebuf_len(&server->localClient->buf_recvq);
 	len += hdr;	
 	buf = rb_malloc(len);
-	id = (rb_uint16_t *)&buf[1];
-	level = (rb_uint8_t *)&buf[3];
-	*id = rb_get_fd(server->localClient->F);
-	*level = ConfigFileEntry.compression_level;
+
+	id = rb_get_fd(server->localClient->F);
+	level = ConfigFileEntry.compression_level;
+
+	memcpy(&buf[1], &id, sizeof(id));
+	buf[2] = level;
+
 	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
 
 	if(server->localClient->ssl_ctl != NULL)
@@ -571,17 +574,19 @@ collect_zipstats(void *unused)
 	char buf[1+2+HOSTLEN]; /* S[id]HOSTLEN\0 */
 	char *odata;
 	size_t len;
-	rb_uint16_t *id;
+	rb_uint16_t id;
 	*buf = 'S';
-	id = (rb_uint16_t *)&buf[1];
+
 	odata = &buf[3];
+
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 		if(IsCapable(target_p, CAP_ZIP))
 		{
 			len = 3;
-			*id = rb_get_fd(target_p->localClient->F);
+			id = rb_get_fd(target_p->localClient->F);
+			memcpy(&buf[1], &id, sizeof(id));
 			rb_strlcpy(odata, target_p->name, (sizeof(buf)-3));
 			len += strlen(odata) + 1; /* Get the \0 as well */
 			ssl_cmd_write_queue(target_p->localClient->ssl_ctl, NULL, 0, buf, len); 
