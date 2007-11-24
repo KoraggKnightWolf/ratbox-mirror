@@ -1,3 +1,11 @@
+androsyn    2007/11/24 17:49:08 UTC	(20071124_2-24567)
+  Log:
+  only do dot_in_ip6_addr when the address is AF_INET6.  Also change illegal character in hostname to invalid hostname
+
+  Modified:
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 jilles      2007/11/24 17:25:28 UTC	(20071124_1-24565)
   Log:
   Add a line in whois if the client is using SSL.
