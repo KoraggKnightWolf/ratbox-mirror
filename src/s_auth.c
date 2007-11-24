@@ -162,9 +162,9 @@ static void ident_restart(rb_helper *helper)
 
 void restart_ident(void)
 {
-	if(helper != NULL)
+	if(ident_helper != NULL)
 	{
-		rb_helper_close(helper);
+		rb_helper_close(ident_helper);
 		ident_helper = NULL;
 	}
 	fork_ident();
