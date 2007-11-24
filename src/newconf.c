@@ -2193,7 +2193,7 @@ static struct conf_items conf_listen_table[] =
 	{ "ip",	     CF_QSTRING, conf_set_listen_address, 0, NULL },
 	{ "port",    CF_INT | CF_FLIST, conf_set_listen_port,    0, NULL},
 	{ "sslport", CF_INT | CF_FLIST, conf_set_listen_sslport, 0, NULL},
-	{ "aftype",  CF_QSTRING, conf_set_listen_aftype,	0, NULL},
+	{ "aftype",  CF_STRING, conf_set_listen_aftype,	0, NULL},
 	{ "\0", 	0, 	NULL, 0, NULL}
 };
 
