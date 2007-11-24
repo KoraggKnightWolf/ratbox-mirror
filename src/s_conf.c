@@ -609,17 +609,41 @@ attach_conf(struct Client *client_p, struct ConfItem *aconf)
  * as a result of an operator issuing this command, else assume it has been
  * called as a result of the server receiving a HUP signal.
  */
-int
+void
 rehash(int sig)
 {
+	const char *filename;
+	int r;
 	if(sig != 0)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Got signal SIGHUP, reloading ircd conf. file");
 	}
 
-	/* don't close listeners until we know we can go ahead with the rehash */
-	read_conf_files(NO);
+	filename = ConfigFileEntry.configfile;
+
+	r = read_config_file(filename);
+	
+	if(r > 0)
+	{
+		ilog(L_MAIN, "Config file %s has %d error(s) - aborting rehash", filename, r);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Config file %s has %d error(s) aborting rehash", filename, r);
+		return;
+	}
+
+	r = check_valid_entries();
+	
+	if(r > 0)
+	{
+		ilog(L_MAIN, "Config file %s reports %d error(s) on second pass - aborting rehash", filename, r);
+		sendto_realops_flags(UMODE_ALL, L_ALL, 
+			"Config file %s reports %d error(s) on second pass - aborting rehash",
+			filename, r);
+		return;
+	}
+	
+	clear_out_old_conf();
+	load_conf_settings();
 
 	if(ServerInfo.description != NULL)
 		rb_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
@@ -627,7 +651,7 @@ rehash(int sig)
 		rb_strlcpy(me.info, "unknown", sizeof(me.info));
 
 	open_logfiles();
-	return (0);
+	return;
 }
 
 void
@@ -1033,45 +1057,6 @@ get_printable_kline(struct Client *source_p, struct ConfItem *aconf,
 		*oper_reason = NULL;
 	else
 		*oper_reason = aconf->spasswd;
-}
-
-/*
- * read_conf_files
- *
- * inputs       - cold start YES or NO
- * output       - none
- * side effects - read all conf files needed, ircd.conf kline.conf etc.
- */
-void
-read_conf_files(int cold)
-{
-	const char *filename;
-	int r;
-
-	filename = ConfigFileEntry.configfile;
-
-	r = read_config_file(filename);
-	
-	if(r > 0)
-	{
-		ilog(L_MAIN, "Config file %s has %d error(s) - aborting rehash", filename, r);
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Config file %s has %d error(s) aborting rehash", filename, r);
-		return;
-	}
-
-	r = check_valid_entries();
-	
-	if(r > 0)
-	{
-		ilog(L_MAIN, "Config file %s reports %d error(s) on second pass - aborting rehash", filename, r);
-		sendto_realops_flags(UMODE_ALL, L_ALL, 
-			"Config file %s reports %d error(s) on second pass - aborting rehash",
-			filename, r);
-		return;
-	}
-	
-	clear_out_old_conf();
-	load_conf_settings();
 }
 
 /*

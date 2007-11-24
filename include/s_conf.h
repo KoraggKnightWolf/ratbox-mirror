@@ -301,8 +301,6 @@ void init_s_conf(void);
 struct ConfItem *make_conf(void);
 void free_conf(struct ConfItem *);
 
-void read_conf_files(int cold);
-
 int attach_conf(struct Client *, struct ConfItem *);
 int check_client(struct Client *client_p, struct Client *source_p, const char *);
 
@@ -326,7 +324,7 @@ void add_temp_dline(struct ConfItem *);
 void report_temp_klines(struct Client *);
 void show_temp_klines(struct Client *, rb_dlink_list *);
 
-int rehash(int);
+void rehash(int);
 void rehash_bans(int);
 
 int conf_add_server(struct ConfItem *, int);

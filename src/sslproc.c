@@ -603,6 +603,21 @@ cleanup_dead_ssl(void *unused)
 	}
 }
 
+int
+get_ssld_count(void)
+{
+	rb_dlink_node *ptr;
+	ssl_ctl_t *ctl;
+	int count = 0;
+	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
+	{
+		ctl = ptr->data;
+		if(!ctl->dead)
+			count++;
+	}
+	return count;
+}
+
 void init_ssld(void)
 {
 	rb_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);

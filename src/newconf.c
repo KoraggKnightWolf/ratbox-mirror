@@ -2096,7 +2096,14 @@ load_conf_settings(void)
 		ConfigChannel.topiclen = DEFAULT_TOPICLEN;
 
 	send_new_ssl_certs(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
-		
+
+	if(ServerInfo.ssld_count > get_ssld_count())
+	{
+		int start = ServerInfo.ssld_count - get_ssld_count();
+		/* start up additional ssld if needed */
+		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);			
+				
+	}		
 	if(!split_users || !split_servers || (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
 	{
 		rb_event_delete(cache_links_ev);
