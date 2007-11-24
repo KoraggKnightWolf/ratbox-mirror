@@ -1,3 +1,19 @@
+jilles      2007/11/24 17:25:28 UTC	(20071124_1-24565)
+  Log:
+  Add a line in whois if the client is using SSL.
+  The numeric is unreal's, 671, because the other
+  numerics I've seen for this purpose have other
+  purposes too.
+  This extra line only appears for local clients
+  (i.e. it is necessary to /wii).
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/numeric.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 androsyn    2007/11/24 16:16:17 UTC	(20071124_0-24563)
   Log:
   make listen aftype agree with connect aftype about not needing quotes
