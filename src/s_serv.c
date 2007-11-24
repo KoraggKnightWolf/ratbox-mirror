@@ -341,30 +341,24 @@ show_capabilities(struct Client *target_p)
 {
 	static char msgbuf[BUFSIZE];
 	struct Capability *cap;
-	char *t;
-	int tl;
 
-	t = msgbuf;
-	tl = rb_sprintf(msgbuf, "TS ");
-	t += tl;
+	if(has_id(target_p))
+		rb_strlcpy(msgbuf, "TS6 ", sizeof(msgbuf));
+	else
+		rb_strlcpy(msgbuf, "TS ", sizeof(msgbuf));
 
 	if(!IsServer(target_p) || !target_p->serv->caps)	/* short circuit if no caps */
-	{
-		msgbuf[2] = '\0';
 		return msgbuf;
-	}
 
 	for (cap = captab; cap->cap; ++cap)
 	{
 		if(cap->cap & target_p->serv->caps)
-		{
-			tl = rb_sprintf(t, "%s ", cap->name);
-			t += tl;
-		}
+			rb_snprintf_append(msgbuf, sizeof(msgbuf), "%s ", cap->name);
 	}
 
-	t--;
-	*t = '\0';
+
+	if(target_p->localClient->is_ssl)
+		rb_strlcat(msgbuf, "SSL", sizeof(msgbuf));
 
 	return msgbuf;
 }
