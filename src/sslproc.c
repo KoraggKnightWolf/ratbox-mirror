@@ -490,13 +490,14 @@ start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
 void 
 ssld_decrement_clicount(ssl_ctl_t *ctl)
 {
-	if(ctl != NULL)
-		ctl->cli_count--;
+	if(ctl == NULL)
+		return;
+
+	ctl->cli_count--;
 	if(ctl->dead && !ctl->cli_count)
 	{
 		free_ssl_daemon(ctl);
 	}
-		
 }
 
 /* 
