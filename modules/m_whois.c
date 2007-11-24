@@ -329,11 +329,11 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 
 	if(MyClient(target_p))
 	{
-		if(target_p->localClient->ssl_ctl ||
-				rb_fd_ssl(target_p->localClient->F))
+		if(target_p->localClient->is_ssl)
 			sendto_one_numeric(source_p, HOLD_QUEUE, RPL_WHOISSECURE,
 					form_str(RPL_WHOISSECURE),
 					target_p->name);
+
 		if(ConfigFileEntry.use_whois_actually && show_ip(source_p, target_p))
 			sendto_one_numeric(source_p, HOLD_QUEUE, RPL_WHOISACTUALLY,
 					   form_str(RPL_WHOISACTUALLY),
