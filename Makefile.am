@@ -12,7 +12,7 @@ modulesdir	= @moduledir@/autoload
 coredir		= @moduledir@
 servicesdir	= @moduledir@/autoload
 
-SUBDIRS = libratbox libltdl tools doc help @SQLITE_SUBDIR@ bandb ssld resolver
+SUBDIRS = libratbox libltdl tools doc help @SQLITE_SUBDIR@ bandb ssld resolver ident
 
 AM_YFLAGS = -d
 
