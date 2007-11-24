@@ -290,6 +290,8 @@ const char *form_str(int);
 
 #define ERR_HELPNOTFOUND     524
 
+#define RPL_WHOISSECURE      671
+
 #define RPL_MODLIST          702
 #define RPL_ENDOFMODLIST     703
 
