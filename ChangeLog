@@ -1,3 +1,11 @@
+androsyn    2007/11/24 20:20:28 UTC	(20071124_8-24579)
+  Log:
+  add restart_ident
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2007/11/24 20:17:10 UTC	(20071124_7-24577)
   Log:
   add ident to Makefile.am
