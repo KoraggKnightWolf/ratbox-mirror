@@ -160,6 +160,17 @@ static void ident_restart(rb_helper *helper)
 	fork_ident();
 }
 
+void restart_ident(void)
+{
+	if(helper != NULL)
+	{
+		rb_helper_close(helper);
+		ident_helper = NULL;
+	}
+	fork_ident();
+}
+
+
 /*
  * init_auth()
  *
