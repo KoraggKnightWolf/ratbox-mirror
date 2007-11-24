@@ -86,14 +86,6 @@ struct Capability
 #define NotCapable(x, cap)	(((x)->localClient->caps & (cap)) == 0)
 #define ClearCap(x, cap)        ((x)->localClient->caps &= ~(cap))
 
-#define SLINKCMD_SET_ZIP_OUT_LEVEL           1	/* data */
-#define SLINKCMD_START_ZIP_OUT               2
-#define SLINKCMD_START_ZIP_IN                3
-#define SLINKCMD_INJECT_RECVQ                4	/* data */
-#define SLINKCMD_INJECT_SENDQ                5	/* data */
-#define SLINKCMD_INIT                        6
-#define SLINKCMD_ZIPSTATS                    7
-
 /*
  * Globals
  *
