@@ -31,6 +31,9 @@
 #include "s_serv.h"
 #include "ircd.h"
 #include "hash.h"
+#include "client.h"
+#include "send.h"
+
 
 #define ZIPSTATS_TIME           60
 
@@ -69,9 +72,10 @@ struct _ssl_ctl
 	rb_dlink_node node;
 	int cli_count;
 	rb_fde_t *F;
-	int pid;
+	pid_t pid;
 	rb_dlink_list readq;
 	rb_dlink_list writeq;
+	rb_uint8_t dead;
 };
 
 static void send_new_ssl_certs_one(ssl_ctl_t *ctl, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params);
@@ -94,7 +98,66 @@ allocate_ssl_daemon(rb_fde_t *F, int pid)
 	return ctl;
 }
 
+static void
+free_ssl_daemon(ssl_ctl_t *ctl)
+{
+	rb_dlink_node *ptr;
+	ssl_ctl_buf_t *ctl_buf;
+	int x;
+
+	if(ctl->cli_count)
+		return;
+	
+	RB_DLINK_FOREACH(ptr, ctl->readq.head)
+	{
+		ctl_buf = ptr->data;
+		for(x = 0; x < ctl_buf->nfds; x++)
+			rb_close(ctl_buf->F[x]);	
+
+		rb_free(ctl_buf->buf);
+		rb_free(ctl_buf);	
+	}
+
+	RB_DLINK_FOREACH(ptr, ctl->writeq.head)
+	{
+		ctl_buf = ptr->data;
+		for(x = 0; x < ctl_buf->nfds; x++)
+			rb_close(ctl_buf->F[x]);
+
+		rb_free(ctl_buf->buf);
+		rb_free(ctl_buf);
+	}
+	rb_close(ctl->F);
+	rb_dlinkDelete(&ctl->node, &ssl_daemons);
+	rb_free(ctl);
+}
+
 static char *ssld_path;
+
+static void
+ssl_dead(ssl_ctl_t *ctl)
+{
+	ctl->dead = 1;
+	kill(ctl->pid, SIGKILL); /* make sure the process is really gone */
+	ilog(L_MAIN, "ssld helper died - attempting to restart");
+	sendto_realops_flags(UMODE_ALL, L_ALL, "ssld helper died - attempting to restart");
+	free_ssl_daemon(ctl);
+	start_ssldaemon(1, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
+}
+
+static void
+ssl_do_pipe(rb_fde_t *F, void *data)
+{
+	int retlen;
+	ssl_ctl_t *ctl = data;
+	retlen = rb_write(F, "0", 1);
+	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
+	{
+		ssl_dead(ctl);
+		return;
+	}
+	rb_setselect(F, RB_SELECT_READ, ssl_do_pipe, data);
+}
 
 int
 start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
@@ -140,7 +203,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		rb_snprintf(fdarg, sizeof(fdarg), "%d", rb_get_fd(P1));
 		setenv("CTL_PIPE", fdarg, 1);
 		
-		pid = rb_spawn_process(fullpath, (const char **)parv);
+		pid = rb_spawn_process(ssld_path, (const char **)parv);
 		if(pid == -1)
 		{
 			ilog(L_MAIN, "Unable to create ssld: %s\n", strerror(errno));
@@ -154,8 +217,8 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		ctl = allocate_ssl_daemon(F1, pid);
 		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
 		ssl_read_ctl(ctl->F, ctl);
+		ssl_do_pipe(P2, ctl);
 	}
-	rb_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
 	return started;	
 }
 
@@ -247,12 +310,16 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 
 }
 
+
 static void
 ssl_read_ctl(rb_fde_t *F, void *data)
 {
 	ssl_ctl_buf_t *ctl_buf;
 	ssl_ctl_t *ctl = data;
 	int retlen;
+
+	if(ctl->dead)
+		return;
 	do
 	{
 		ctl_buf = rb_malloc(sizeof(ssl_ctl_buf_t));
@@ -285,6 +352,8 @@ which_ssld(void)
 	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
 	{
 		ctl = ptr->data;
+		if(ctl->dead)
+			continue;
 		if(lowest == NULL) {
 			lowest = ctl;
 			continue;
@@ -302,6 +371,9 @@ ssl_write_ctl(rb_fde_t *F, void *data)
 	ssl_ctl_buf_t *ctl_buf;
 	rb_dlink_node *ptr, *next;
 	int retlen, x;
+
+	if(ctl->dead)
+		return;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, ctl->writeq.head)
 	{
@@ -331,11 +403,16 @@ ssl_cmd_write_queue(ssl_ctl_t *ctl, rb_fde_t **F, int count, const void *buf, si
 {
 	ssl_ctl_buf_t *ctl_buf;
 	int x; 
+
+	/* don't bother */
+	if(ctl->dead)
+		return;
+		
 	ctl_buf = rb_malloc(sizeof(ssl_ctl_buf_t));
 	ctl_buf->buf = rb_malloc(buflen);
 	memcpy(ctl_buf->buf, buf, buflen);
 	ctl_buf->buflen = buflen;
-	
+		
 	for(x = 0; x < count && x < MAXPASSFD; x++)
 	{
 		ctl_buf->F[x] = F[x];	
@@ -415,6 +492,11 @@ ssld_decrement_clicount(ssl_ctl_t *ctl)
 {
 	if(ctl != NULL)
 		ctl->cli_count--;
+	if(ctl->dead && !ctl->cli_count)
+	{
+		free_ssl_daemon(ctl);
+	}
+		
 }
 
 /* 
@@ -504,5 +586,26 @@ collect_zipstats(void *unused)
 			ssl_cmd_write_queue(target_p->localClient->ssl_ctl, NULL, 0, buf, len); 
 		}
 	}
+}
+
+static void
+cleanup_dead_ssl(void *unused)
+{
+	rb_dlink_node *ptr, *next;
+	ssl_ctl_t *ctl;
+	RB_DLINK_FOREACH_SAFE(ptr, next, ssl_daemons.head)
+	{
+		ctl = ptr->data;
+		if(ctl->dead && !ctl->cli_count)
+		{
+			free_ssl_daemon(ctl);			
+		}
+	}
+}
+
+void init_ssld(void)
+{
+	rb_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
+	rb_event_addish("cleanup_dead_ssld", cleanup_dead_ssl, NULL, 1200);
 }
 

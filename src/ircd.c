@@ -651,7 +651,7 @@ ratbox_main(int argc, char *argv[])
 	init_resolver();	/* Needs to be setup before the io loop */
 	init_bandb();
 	load_conf_settings();
-
+	init_ssld();
 	start_ssldaemon(ServerInfo.ssld_count, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 		
 //	read_conf_files(YES);	/* cold start init conf files */
