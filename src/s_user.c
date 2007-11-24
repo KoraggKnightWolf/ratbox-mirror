@@ -347,13 +347,13 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(!valid_hostname(source_p->host))
 	{
 		sendto_one(source_p, POP_QUEUE, 
-			   ":%s NOTICE %s :*** Notice -- You have an illegal character in your hostname",
+			   ":%s NOTICE %s :*** Notice -- You have an invalid hostname",
 			   me.name, source_p->name);
 
 		rb_strlcpy(source_p->host, source_p->sockhost, sizeof(source_p->host));
 
 #ifdef RB_IPV6
-		if(ConfigFileEntry.dot_in_ip6_addr == 1)
+		if(ConfigFileEntry.dot_in_ip6_addr == 1 && (GET_SS_FAMILY(&source_p->localClient->ip) == AF_INET6))
 			rb_strlcat(source_p->host, ".", sizeof(source_p->host));
 #endif
 	}
