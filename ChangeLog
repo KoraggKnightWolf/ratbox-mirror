@@ -1,3 +1,12 @@
+androsyn    2007/11/24 20:17:10 UTC	(20071124_7-24577)
+  Log:
+  add ident to Makefile.am
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 androsyn    2007/11/24 18:25:02 UTC	(20071124_6-24575)
   Log:
   make the RPL_WHOISSECURE stuff use target_p->localClient->is_ssl
