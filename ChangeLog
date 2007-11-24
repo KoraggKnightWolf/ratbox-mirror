@@ -1,3 +1,11 @@
+androsyn    2007/11/24 18:05:50 UTC	(20071124_3-24569)
+  Log:
+  remove old SLINK defins
+
+  Modified:
+	ircd-ratbox/trunk/include/s_serv.h (File Modified) 
+
+
 androsyn    2007/11/24 17:49:08 UTC	(20071124_2-24567)
   Log:
   only do dot_in_ip6_addr when the address is AF_INET6.  Also change illegal character in hostname to invalid hostname
