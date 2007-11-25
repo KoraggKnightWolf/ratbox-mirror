@@ -1,3 +1,11 @@
+androsyn    2007/11/25 03:16:17 UTC	(20071125_2-24595)
+  Log:
+  send the correct id for ziplinks
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2007/11/25 02:23:23 UTC	(20071125_1-24593)
   Log:
   properly flush the recvq for zlib
