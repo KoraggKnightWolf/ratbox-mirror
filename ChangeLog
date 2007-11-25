@@ -1,3 +1,11 @@
+androsyn    2007/11/25 03:40:33 UTC	(20071125_5-24601)
+  Log:
+  make zipstats sane
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/25 03:34:10 UTC	(20071125_4-24599)
   Log:
   don't set is_ssl for ziplinks, thats dumb
