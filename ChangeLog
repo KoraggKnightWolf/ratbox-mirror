@@ -1,3 +1,11 @@
+androsyn    2007/11/25 00:35:46 UTC	(20071125_0-24591)
+  Log:
+  change buf[2] to buf[3] so that zip stats work again
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2007/11/24 23:59:30 UTC	(20071124_13-24589)
   Log:
   deal with sparc's malfucntions with unaligned pointer access
