@@ -1,3 +1,11 @@
+androsyn    2007/11/25 03:30:18 UTC	(20071125_3-24597)
+  Log:
+  zero stats after collecting them
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/25 03:16:17 UTC	(20071125_2-24595)
   Log:
   send the correct id for ziplinks
