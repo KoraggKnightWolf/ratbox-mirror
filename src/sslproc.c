@@ -566,7 +566,6 @@ start_zlib_session(struct Client *server)
 
 	server->localClient->ssl_ctl = which_ssld();
 	server->localClient->ssl_ctl->cli_count++;
-	server->localClient->is_ssl = 1;
 	ssl_cmd_write_queue(server->localClient->ssl_ctl, F, 2, buf, len);
 	rb_free(buf);
 }
