@@ -524,10 +524,8 @@ start_zlib_session(struct Client *server)
 	len += hdr;	
 	buf = rb_malloc(len);
 
-	id = rb_get_fd(server->localClient->F);
 	level = ConfigFileEntry.compression_level;
 
-	memcpy(&buf[1], &id, sizeof(id));
 	buf[3] = level;
 
 	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
@@ -562,12 +560,9 @@ start_zlib_session(struct Client *server)
 	F[0] = server->localClient->F; 
 	F[1] = xF1;
 	server->localClient->F = xF2;
-	/* buf stuff is this: 
-	 buf[0] = Z
-	 buf[1-2] = id
-	 buf[3] = level
-	 */
-	
+
+	id = rb_get_fd(server->localClient->F);
+	memcpy(&buf[1], &id, sizeof(id));
 
 	server->localClient->ssl_ctl = which_ssld();
 	server->localClient->ssl_ctl->cli_count++;
