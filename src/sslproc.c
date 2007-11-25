@@ -526,7 +526,7 @@ start_zlib_session(struct Client *server)
 	level = ConfigFileEntry.compression_level;
 
 	memcpy(&buf[1], &id, sizeof(id));
-	buf[2] = level;
+	buf[3] = level;
 
 	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
 
