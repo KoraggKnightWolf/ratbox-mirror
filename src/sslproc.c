@@ -510,6 +510,7 @@ ssld_decrement_clicount(ssl_ctl_t *ctl)
 void
 start_zlib_session(struct Client *server)
 {
+	void *xbuf;
 	rb_fde_t *F[2];
 	rb_fde_t *xF1, *xF2;
 	rb_uint8_t *buf;
@@ -517,7 +518,8 @@ start_zlib_session(struct Client *server)
 	rb_uint8_t level;
 	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
 	size_t len;
-
+	int cpylen, left;
+	
 	len = rb_linebuf_len(&server->localClient->buf_recvq);
 	len += hdr;	
 	buf = rb_malloc(len);
@@ -545,8 +547,16 @@ start_zlib_session(struct Client *server)
 		
 	}
 	*buf = 'Z';
-	rb_linebuf_get(&server->localClient->buf_recvq, (char *)(buf+hdr), len - hdr, LINEBUF_PARTIAL, LINEBUF_RAW); 
+	xbuf = buf + hdr;
+	left = len - hdr;
+	do
+	{
+		cpylen = rb_linebuf_get(&server->localClient->buf_recvq, xbuf, left, LINEBUF_PARTIAL, LINEBUF_RAW);
+		left -= cpylen;
+		xbuf += cpylen;
+	} while(cpylen > 0);
 	
+		
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs");
 	
 	F[0] = server->localClient->F; 
