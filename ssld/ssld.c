@@ -454,7 +454,10 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 
 	rb_snprintf(outstat, sizeof(outstat), "S %s %ld %ld %ld %ld", odata,
 		    conn->plain_out, conn->mod_in, conn->mod_out, conn->plain_in);
-
+	conn->plain_out = 0;
+	conn->plain_in = 0;
+	conn->mod_in = 0;
+	conn->mod_out = 0;
 	mod_cmd_write_queue(ctl, outstat, strlen(outstat) + 1);	/* +1 is so we send the \0 as well */
 }
 
