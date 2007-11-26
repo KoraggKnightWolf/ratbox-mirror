@@ -1096,13 +1096,19 @@ send_conf_options(struct Client *source_p)
 		}
 	}			/* forloop */
 
-
-	sendto_one(source_p, POP_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+	sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   "io_type",
 					   rb_get_iotype(),
 					   "Method of Multiplexed I/O");
+	sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]", 
+					   get_id(&me, source_p), RPL_INFO,
+					   get_id(source_p, source_p),
+					   "libratbox",
+					   rb_lib_version(),
+					   "Version of libratbox the ircd is using");
+	
 	/* Don't send oper_only_umodes...it's a bit mask, we will have to decode it
 	 ** in order for it to show up properly to opers who issue INFO
 	 */
