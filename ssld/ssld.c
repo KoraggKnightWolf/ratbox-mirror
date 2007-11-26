@@ -36,6 +36,8 @@
 static void conn_mod_write_sendq(rb_fde_t *, void *data);
 static void conn_plain_write_sendq(rb_fde_t *, void *data);
 static void mod_write_ctl(rb_fde_t *, void *data);
+static void conn_plain_read_cb(rb_fde_t * fd, void *data);
+
 
 static char inbuf[READBUF_SIZE];
 static char outbuf[READBUF_SIZE];
@@ -78,6 +80,7 @@ typedef struct _conn
 	unsigned long plain_in;
 	unsigned long plain_out;
 	rb_uint8_t is_ssl;
+	rb_uint8_t corked;
 #ifdef HAVE_LIBZ
 	rb_uint8_t is_zlib;
 	z_stream instream;
@@ -167,6 +170,13 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 	{
 		rb_setselect(conn->mod_fd, RB_SELECT_WRITE, NULL, NULL);
 	}
+	
+	if(conn->corked && rb_rawbuf_length(conn->modbuf_out) == 0)
+	{
+		conn->corked = 0;
+		conn_plain_read_cb(conn->plain_fd, conn);
+	}
+
 }
 
 static void
@@ -261,6 +271,23 @@ common_zlib_inflate(conn_t * conn, void *buf, size_t len)
 }
 #endif
 
+static int
+plain_check_cork(conn_t *conn)
+{
+	if(rb_rawbuf_length(conn->modbuf_out) >= 4096)
+	{
+		/* if we have over 4k pending outbound, don't read until 
+		 * we've cleared the queue */
+		conn->corked = 1;
+		rb_setselect(conn->plain_fd, RB_SELECT_READ, NULL, NULL);
+		/* try to write */
+		conn_mod_write_sendq(conn->mod_fd, conn);
+		return 1;
+	}
+	return 0;	
+}
+
+
 static void
 conn_plain_read_cb(rb_fde_t * fd, void *data)
 {
@@ -269,15 +296,22 @@ conn_plain_read_cb(rb_fde_t * fd, void *data)
 	if(conn == NULL)
 		return;
 
+	if(plain_check_cork(conn))
+		return;
+	
 	while ((length = rb_read(conn->plain_fd, inbuf, sizeof(inbuf))) > 0)
 	{
 		conn->plain_in += length;
+		
+
 #ifdef HAVE_LIBZ
 		if(conn->is_zlib)
 			common_zlib_deflate(conn, inbuf, length);
 		else
 #endif
 			conn_mod_write(conn, inbuf, length);
+		if(plain_check_cork(conn))
+			return;
 	}
 	if(length == 0 || (length < 0 && !rb_ignore_errno(errno)))
 	{
