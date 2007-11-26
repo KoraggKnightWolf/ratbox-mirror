@@ -40,7 +40,6 @@
 #include "ircd.h"
 #include "hostmask.h"
 #include "numeric.h"
-#include "commio.h"
 #include "s_conf.h"
 #include "s_newconf.h"
 #include "s_log.h"
@@ -105,7 +104,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		return 0;
 	}
 
-	if(!IsPerson(target_p))
+	if(!IsClient(target_p))
 		return 0;
 
 	/* select our modes from parv[2] if they exist... (chanop) */
@@ -158,10 +157,10 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		if(chptr->topic != NULL)
 		{
 			sendto_one(target_p, POP_QUEUE, form_str(RPL_TOPIC), me.name,
-				   target_p->name, chptr->chname, chptr->topic);
+				   target_p->name, chptr->chname, chptr->topic->topic);
 			sendto_one(target_p, POP_QUEUE, form_str(RPL_TOPICWHOTIME),
 				   me.name, source_p->name, chptr->chname,
-				   chptr->topic_info, chptr->topic_time);
+				   chptr->topic->topic_info, chptr->topic->topic_time);
 		}
 
 		channel_member_names(chptr, target_p, 1);
@@ -209,7 +208,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s MODE %s +nt", me.name, chptr->chname);
 
-		target_p->localClient->last_join_time = rb_currenttime;
+		target_p->localClient->last_join_time = rb_current_time();
 		channel_member_names(chptr, target_p, 1);
 
 		/* we do this to let the oper know that a channel was created, this will be

@@ -81,8 +81,8 @@ mo_okick(struct Client *client_p, struct Client *source_p, int parc, const char 
 		flood_endgrace(source_p);
 
 	comment = (EmptyString(LOCAL_COPY(parv[3]))) ? LOCAL_COPY(parv[2]) : LOCAL_COPY(parv[3]);
-	if(strlen(comment) > (size_t) TOPICLEN)
-		comment[TOPICLEN] = '\0';
+	if(strlen(comment) > (size_t) REASONLEN)
+		comment[REASONLEN] = '\0';
 
 	*buf = '\0';
 	if((p = strchr(parv[1], ',')))

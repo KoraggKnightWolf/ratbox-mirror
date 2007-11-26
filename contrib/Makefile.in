@@ -186,7 +186,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = -I../include -I../libircd/include $(INCLTDL)
+INCLUDES = -I../include -I../libratbox/include $(INCLTDL)
 SRCS = \
 example_module.c        \
 m_42.c  	\

@@ -1,4 +1,4 @@
-INCLUDES = -I../include -I../libircd/include $(INCLTDL)
+INCLUDES = -I../include -I../libratbox/include $(INCLTDL)
 
 SRCS = \
 example_module.c        \
