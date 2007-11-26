@@ -1,3 +1,11 @@
+androsyn    2007/11/26 21:27:27 UTC	(20071126_2-24619)
+  Log:
+  add code to stop reading from the ircd if we get over 4k queued out to the write so that sendq stuff works correctly inside the ircd still
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/26 20:40:04 UTC	(20071126_1-24617)
   Log:
   add libratbox revision to /info output
