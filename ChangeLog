@@ -1,3 +1,11 @@
+androsyn    2007/11/26 20:40:04 UTC	(20071126_1-24617)
+  Log:
+  add libratbox revision to /info output
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+
+
 androsyn    2007/11/26 16:25:07 UTC	(20071126_0-24603)
   Log:
   make contrib compile again
