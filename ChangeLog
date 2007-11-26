@@ -1,3 +1,17 @@
+androsyn    2007/11/26 16:25:07 UTC	(20071126_0-24603)
+  Log:
+  make contrib compile again
+
+  Modified:
+	ircd-ratbox/trunk/contrib/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/contrib/m_force.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_mkpasswd.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_ojoin.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_okick.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_olist.c (File Modified) 
+
+
 androsyn    2007/11/25 03:40:33 UTC	(20071125_5-24601)
   Log:
   make zipstats sane
