@@ -88,7 +88,7 @@ typedef struct _conn
 #define FLAG_SSL	0x01
 #define FLAG_ZIP	0x02
 #define FLAG_CORK	0x04
-#define FLAG_DEAD	0x08 
+#define FLAG_DEAD	0x08
 
 
 #define IsSSL(x) ((x)->flags & FLAG_SSL)
@@ -136,7 +136,7 @@ conn_add_id_hash(conn_t * conn, rb_uint16_t id)
 }
 
 static void
-free_conn(conn_t *conn)
+free_conn(conn_t * conn)
 {
 	rb_free_rawbuffer(conn->modbuf_out);
 	rb_free_rawbuffer(conn->plainbuf_out);
@@ -150,7 +150,7 @@ clean_dead_conns(void *unused)
 	rb_dlink_node *ptr;
 	RB_DLINK_FOREACH(ptr, dead_list.head)
 	{
-		conn = ptr->data;		
+		conn = ptr->data;
 		free_conn(conn);
 	}
 	dead_list.tail = dead_list.head = NULL;
@@ -168,7 +168,7 @@ close_conn(conn_t * conn)
 
 	if(conn->id != 0)
 		rb_dlinkDelete(&conn->node, connid_hash(conn->id));
-	rb_dlinkAdd(conn, &conn->node, &dead_list);	
+	rb_dlinkAdd(conn, &conn->node, &dead_list);
 }
 
 static conn_t *
@@ -192,23 +192,18 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 		return;
 
 	while ((retlen = rb_rawbuf_flush(conn->modbuf_out, fd)) > 0)
-	{
 		conn->mod_out += retlen;
-	}
+
 	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 	{
 		close_conn(data);
 		return;
 	}
 	if(rb_rawbuf_length(conn->modbuf_out) > 0)
-	{
 		rb_setselect(conn->mod_fd, RB_SELECT_WRITE, conn_mod_write_sendq, conn);
-	}
 	else
-	{
 		rb_setselect(conn->mod_fd, RB_SELECT_WRITE, NULL, NULL);
-	}
-	
+
 	if(IsCork(conn) && rb_rawbuf_length(conn->modbuf_out) == 0)
 	{
 		ClearCork(conn);
@@ -220,7 +215,7 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 static void
 conn_mod_write(conn_t * conn, void *data, size_t len)
 {
-	if(IsDead(conn)) /* no point in queueing to a dead man */
+	if(IsDead(conn))	/* no point in queueing to a dead man */
 		return;
 	rb_rawbuf_append(conn->modbuf_out, data, len);
 }
@@ -228,7 +223,7 @@ conn_mod_write(conn_t * conn, void *data, size_t len)
 static void
 conn_plain_write(conn_t * conn, void *data, size_t len)
 {
-	if(IsDead(conn)) /* again no point in queueing to dead men */
+	if(IsDead(conn))	/* again no point in queueing to dead men */
 		return;
 	rb_rawbuf_append(conn->plainbuf_out, data, len);
 }
@@ -314,7 +309,7 @@ common_zlib_inflate(conn_t * conn, void *buf, size_t len)
 #endif
 
 static int
-plain_check_cork(conn_t *conn)
+plain_check_cork(conn_t * conn)
 {
 	if(rb_rawbuf_length(conn->modbuf_out) >= 4096)
 	{
@@ -326,7 +321,7 @@ plain_check_cork(conn_t *conn)
 		conn_mod_write_sendq(conn->mod_fd, conn);
 		return 1;
 	}
-	return 0;	
+	return 0;
 }
 
 
@@ -343,11 +338,11 @@ conn_plain_read_cb(rb_fde_t * fd, void *data)
 
 	if(plain_check_cork(conn))
 		return;
-	
+
 	while ((length = rb_read(conn->plain_fd, inbuf, sizeof(inbuf))) > 0)
 	{
 		conn->plain_in += length;
-		
+
 
 #ifdef HAVE_LIBZ
 		if(IsZip(conn))
@@ -378,7 +373,7 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 		return;
 	if(IsDead(conn))
 		return;
-		
+
 	while ((length = rb_read(conn->mod_fd, inbuf, sizeof(inbuf))) > 0)
 	{
 		conn->mod_in += length;
@@ -612,7 +607,7 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	SetZip(conn);
 
 	memcpy(&id, &ctlb->buf[1], sizeof(id));
-	level = (rb_uint8_t)ctlb->buf[3];
+	level = (rb_uint8_t) ctlb->buf[3];
 
 	conn_add_id_hash(conn, id);
 
