@@ -176,7 +176,7 @@ send_queued(struct Client *to)
 			     to->localClient->buf_sendq.writeofs;
 #endif
 	/* try to flush later when the write event resets this */
-	if(to->localClient->flush_count > 0)
+	if(to->localClient->flush > 0)
 		return;
 
 	if(rb_linebuf_len(&to->localClient->buf_sendq))
@@ -224,7 +224,7 @@ send_queued(struct Client *to)
 			       send_queued_write, to);
 	}
 	else
-		to->localClient->flush_count = 0;
+		to->localClient->flush = 0;
 
 }
 
@@ -238,7 +238,7 @@ static void
 send_queued_write(rb_fde_t *F, void *data)
 {
 	struct Client *to = data;
-	to->localClient->flush_count = 0;
+	to->localClient->flush = 0;
 	send_queued(to);
 }
 
