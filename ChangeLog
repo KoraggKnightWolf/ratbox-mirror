@@ -1,3 +1,11 @@
+androsyn    2007/11/27 20:29:36 UTC	(20071127_3-24627)
+  Log:
+  replace is_ssl/is_zlib/corked with a bitmask and also add a dead flag
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/27 01:53:15 UTC	(20071127_2-24625)
   Log:
   oops didn't finish the rename of flush_count to flush
