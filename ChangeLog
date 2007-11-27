@@ -1,3 +1,11 @@
+androsyn    2007/11/27 21:00:11 UTC	(20071127_4-24629)
+  Log:
+  minor style cleanups
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/11/27 20:29:36 UTC	(20071127_3-24627)
   Log:
   replace is_ssl/is_zlib/corked with a bitmask and also add a dead flag
