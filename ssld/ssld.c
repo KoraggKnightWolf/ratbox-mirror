@@ -67,7 +67,6 @@ mod_ctl_t *g_ctl;
 typedef struct _conn
 {
 	rb_dlink_node node;
-	rb_dlink_node hash_node;
 	rawbuf_head_t *modbuf_out;
 	rawbuf_head_t *plainbuf_out;
 
@@ -79,21 +78,40 @@ typedef struct _conn
 	unsigned long mod_in;
 	unsigned long plain_in;
 	unsigned long plain_out;
-	rb_uint8_t is_ssl;
-	rb_uint8_t corked;
+	rb_uint8_t flags;
 #ifdef HAVE_LIBZ
-	rb_uint8_t is_zlib;
 	z_stream instream;
 	z_stream outstream;
 #endif
 } conn_t;
 
+#define FLAG_SSL	0x01
+#define FLAG_ZIP	0x02
+#define FLAG_CORK	0x04
+#define FLAG_DEAD	0x08 
+
+
+#define IsSSL(x) ((x)->flags & FLAG_SSL)
+#define IsZip(x) ((x)->flags & FLAG_ZIP)
+#define IsCork(x) ((x)->flags & FLAG_CORK)
+#define IsDead(x) ((x)->flags & FLAG_DEAD)
+
+#define SetSSL(x) ((x)->flags |= FLAG_SSL)
+#define SetZip(x) ((x)->flags |= FLAG_ZIP)
+#define SetCork(x) ((x)->flags |= FLAG_CORK)
+#define SetDead(x) ((x)->flags |= FLAG_DEAD)
+
+#define ClearSSL(x) ((x)->flags &= ~FLAG_SSL)
+#define ClearZip(x) ((x)->flags &= ~FLAG_ZIP)
+#define ClearCork(x) ((x)->flags &= ~FLAG_CORK)
+#define ClearDead(x) ((x)->flags &= ~FLAG_DEAD)
+
+
 #define CONN_HASH_SIZE 2000
 #define connid_hash(x)	(&connid_hash_table[(x % CONN_HASH_SIZE)])
 
 static rb_dlink_list connid_hash_table[CONN_HASH_SIZE];
-
-
+static rb_dlink_list dead_list;
 
 static conn_t *
 conn_find_by_id(rb_uint16_t id)
@@ -104,7 +122,7 @@ conn_find_by_id(rb_uint16_t id)
 	RB_DLINK_FOREACH(ptr, (connid_hash(id))->head)
 	{
 		conn = ptr->data;
-		if(conn->id == id)
+		if(conn->id == id && !IsDead(conn))
 			return conn;
 	}
 	return NULL;
@@ -117,6 +135,27 @@ conn_add_id_hash(conn_t * conn, rb_uint16_t id)
 	rb_dlinkAdd(conn, &conn->node, connid_hash(id));
 }
 
+static void
+free_conn(conn_t *conn)
+{
+	rb_free_rawbuffer(conn->modbuf_out);
+	rb_free_rawbuffer(conn->plainbuf_out);
+	rb_free(conn);
+}
+
+static void
+clean_dead_conns(void *unused)
+{
+	conn_t *conn;
+	rb_dlink_node *ptr;
+	RB_DLINK_FOREACH(ptr, dead_list.head)
+	{
+		conn = ptr->data;		
+		free_conn(conn);
+	}
+	dead_list.tail = dead_list.head = NULL;
+}
+
 
 static void
 close_conn(conn_t * conn)
@@ -125,13 +164,11 @@ close_conn(conn_t * conn)
 	rb_rawbuf_flush(conn->plainbuf_out, conn->plain_fd);
 	rb_close(conn->mod_fd);
 	rb_close(conn->plain_fd);
+	SetDead(conn);
 
-	rb_free_rawbuffer(conn->modbuf_out);
-	rb_free_rawbuffer(conn->plainbuf_out);
 	if(conn->id != 0)
 		rb_dlinkDelete(&conn->node, connid_hash(conn->id));
-	memset(conn, 0, sizeof(conn_t));
-	rb_free(conn);
+	rb_dlinkAdd(conn, &conn->node, &dead_list);	
 }
 
 static conn_t *
@@ -145,14 +182,15 @@ make_conn(rb_fde_t * mod_fd, rb_fde_t * plain_fd)
 	return conn;
 }
 
-
-
-
 static void
 conn_mod_write_sendq(rb_fde_t * fd, void *data)
 {
 	conn_t *conn = data;
 	int retlen;
+
+	if(IsDead(conn))
+		return;
+
 	while ((retlen = rb_rawbuf_flush(conn->modbuf_out, fd)) > 0)
 	{
 		conn->mod_out += retlen;
@@ -171,9 +209,9 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 		rb_setselect(conn->mod_fd, RB_SELECT_WRITE, NULL, NULL);
 	}
 	
-	if(conn->corked && rb_rawbuf_length(conn->modbuf_out) == 0)
+	if(IsCork(conn) && rb_rawbuf_length(conn->modbuf_out) == 0)
 	{
-		conn->corked = 0;
+		ClearCork(conn);
 		conn_plain_read_cb(conn->plain_fd, conn);
 	}
 
@@ -182,12 +220,16 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 static void
 conn_mod_write(conn_t * conn, void *data, size_t len)
 {
+	if(IsDead(conn)) /* no point in queueing to a dead man */
+		return;
 	rb_rawbuf_append(conn->modbuf_out, data, len);
 }
 
 static void
 conn_plain_write(conn_t * conn, void *data, size_t len)
 {
+	if(IsDead(conn)) /* again no point in queueing to dead men */
+		return;
 	rb_rawbuf_append(conn->plainbuf_out, data, len);
 }
 
@@ -278,7 +320,7 @@ plain_check_cork(conn_t *conn)
 	{
 		/* if we have over 4k pending outbound, don't read until 
 		 * we've cleared the queue */
-		conn->corked = 1;
+		SetCork(conn);
 		rb_setselect(conn->plain_fd, RB_SELECT_READ, NULL, NULL);
 		/* try to write */
 		conn_mod_write_sendq(conn->mod_fd, conn);
@@ -296,6 +338,9 @@ conn_plain_read_cb(rb_fde_t * fd, void *data)
 	if(conn == NULL)
 		return;
 
+	if(IsDead(conn))
+		return;
+
 	if(plain_check_cork(conn))
 		return;
 	
@@ -305,7 +350,7 @@ conn_plain_read_cb(rb_fde_t * fd, void *data)
 		
 
 #ifdef HAVE_LIBZ
-		if(conn->is_zlib)
+		if(IsZip(conn))
 			common_zlib_deflate(conn, inbuf, length);
 		else
 #endif
@@ -331,11 +376,14 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 	int length;
 	if(conn == NULL)
 		return;
+	if(IsDead(conn))
+		return;
+		
 	while ((length = rb_read(conn->mod_fd, inbuf, sizeof(inbuf))) > 0)
 	{
 		conn->mod_in += length;
 #ifdef HAVE_LIBZ
-		if(conn->is_zlib)
+		if(IsZip(conn))
 			common_zlib_inflate(conn, inbuf, length);
 		else
 #endif
@@ -355,6 +403,10 @@ conn_plain_write_sendq(rb_fde_t * fd, void *data)
 {
 	conn_t *conn = data;
 	int retlen;
+
+	if(IsDead(conn))
+		return;
+
 	while ((retlen = rb_rawbuf_flush(conn->plainbuf_out, fd)) > 0)
 	{
 		conn->plain_out += retlen;
@@ -380,8 +432,6 @@ mod_main_loop(void)
 		rb_select(1000);
 		rb_event_run();
 	}
-
-
 }
 
 
@@ -438,7 +488,7 @@ ssl_process_accept(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	memcpy(&id, &ctlb->buf[1], sizeof(id));
 
 	conn_add_id_hash(conn, id);
-	conn->is_ssl = 1;
+	SetSSL(conn);
 
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
@@ -458,7 +508,7 @@ ssl_process_connect(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 
 
 	conn_add_id_hash(conn, id);
-	conn->is_ssl = 1;
+	SetSSL(conn);
 
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
@@ -514,7 +564,7 @@ zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	{
 		return;
 	}
-	conn->is_zlib = 1;
+	SetZip(conn);
 
 	conn->instream.total_in = 0;
 	conn->instream.total_out = 0;
@@ -559,9 +609,7 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	if(rb_get_type(conn->plain_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
 
-
-	conn->is_ssl = 0;
-	conn->is_zlib = 1;
+	SetZip(conn);
 
 	memcpy(&id, &ctlb->buf[1], sizeof(id));
 	level = (rb_uint8_t)ctlb->buf[3];
@@ -790,6 +838,7 @@ main(int argc, char **argv)
 	ctl = rb_malloc(sizeof(mod_ctl_t));
 	ctl->F = rb_open(ctlfd, RB_FD_SOCKET, "ircd control socket");
 	ctl->F_pipe = rb_open(pipefd, RB_FD_PIPE, "ircd pipe");
+	rb_event_addish("clean_dead_conns", clean_dead_conns, NULL, 10);
 	read_pipe_ctl(ctl->F_pipe, NULL);
 	mod_read_ctl(ctl->F, ctl);
 	mod_main_loop();
