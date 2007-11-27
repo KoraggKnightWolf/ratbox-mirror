@@ -1,3 +1,17 @@
+androsyn    2007/11/27 01:07:23 UTC	(20071127_1-24623)
+  Log:
+  In situations where there is a lot of messages being sent towards, if we get EAGAIN, we currently would keep trying to do
+  the send when we get another message.  So to deal with this, we add a flush variable to localClient to mark when we should be sending.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/send.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2007/11/27 00:13:24 UTC	(20071127_0-24621)
   Log:
   replace fds 0-2 with /dev/null when daemonizing
