@@ -1,3 +1,11 @@
+androsyn    2007/11/27 21:28:51 UTC	(20071127_5-24631)
+  Log:
+  keep track of the pipe fd and close it upon freeing an ssld so we don't leak pipes
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2007/11/27 21:00:11 UTC	(20071127_4-24629)
   Log:
   minor style cleanups
