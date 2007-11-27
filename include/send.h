@@ -32,9 +32,6 @@ struct Channel;
 struct rb_dlink_list;
 struct monitor;
 
-void send_queued_write(rb_fde_t *, void *data);
-void send_queued_slink_write(rb_fde_t *, void *data);
-
 #define POP_QUEUE 0
 #define HOLD_QUEUE 1
 void send_pop_queue(struct Client *);

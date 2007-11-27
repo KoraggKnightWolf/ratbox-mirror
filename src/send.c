@@ -44,6 +44,9 @@
 #define LOG_BUFSIZE 2048
 
 rb_uint32_t current_serial = 0L;
+static void send_queued_write(rb_fde_t *F, void *data);
+static void send_queued(struct Client *to);
+
 
 /* send_linebuf()
  *
@@ -99,7 +102,7 @@ send_linebuf(struct Client *to, buf_head_t *linebuf, int queue)
 	me.localClient->sendM += 1;
 
 	if(rb_linebuf_len(&to->localClient->buf_sendq) > 0 && queue == 0)
-		send_queued_write(to->localClient->F, to);
+		send_queued(to);
 	return 0;
 }
 
@@ -111,7 +114,7 @@ send_pop_queue(struct Client *to)
 	if(!MyConnect(to) || IsIOError(to))
 		return;
 	if(rb_linebuf_len(&to->localClient->buf_sendq) > 0)
-		send_queued_write(to->localClient->F, to);
+		send_queued(to);
 }
 
 /* send_rb_linebuf_remote()
@@ -155,16 +158,9 @@ send_rb_linebuf_remote(struct Client *to, struct Client *from, buf_head_t *lineb
 	return;
 }
 
-/* send_queued_write()
- *
- * inputs	- fd to have queue sent, client we're sending to
- * outputs	- contents of queue
- * side effects - write is dns.heduled if queue isnt emptied
- */
-void
-send_queued_write(rb_fde_t *F, void *data)
+static void
+send_queued(struct Client *to)
 {
-	struct Client *to = data;
 	int retlen;
 #ifdef USE_IODEBUG_HOOKS
 	hook_data_int hd;
@@ -179,6 +175,9 @@ send_queued_write(rb_fde_t *F, void *data)
 		hd.arg1 = ((buf_line_t *) to->localClient->buf_sendq.list.head->data)->buf +
 			     to->localClient->buf_sendq.writeofs;
 #endif
+	/* try to flush later when the write event resets this */
+	if(to->localClient->flush_count > 0)
+		return;
 
 	if(rb_linebuf_len(&to->localClient->buf_sendq))
 	{
@@ -196,6 +195,7 @@ send_queued_write(rb_fde_t *F, void *data)
 					 data)->buf + to->localClient->buf_sendq.writeofs;
 #endif
      
+			to->localClient->flush = 0;
 
 			to->localClient->sendB += retlen;
 			me.localClient->sendB += retlen;
@@ -217,10 +217,29 @@ send_queued_write(rb_fde_t *F, void *data)
 			return;
 		}
 	}
-
 	if(rb_linebuf_len(&to->localClient->buf_sendq))
-		rb_setselect(F, RB_SELECT_WRITE,
+	{
+		to->localClient->flush = 1;
+		rb_setselect(to->localClient->F, RB_SELECT_WRITE,
 			       send_queued_write, to);
+	}
+	else
+		to->localClient->flush_count = 0;
+
+}
+
+/* send_queued_write()
+ *
+ * inputs	- fd to have queue sent, client we're sending to
+ * outputs	- contents of queue
+ * side effects - write is scheduled if queue isnt emptied
+ */
+static void
+send_queued_write(rb_fde_t *F, void *data)
+{
+	struct Client *to = data;
+	to->localClient->flush_count = 0;
+	send_queued(to);
 }
 
 /* sendto_one_buffer()

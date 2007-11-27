@@ -1803,7 +1803,7 @@ close_connection(struct Client *client_p)
 	{
 		/* attempt to flush any pending linebufs. Evil, but .. -- adrian */
 		if(!IsIOError(client_p))
-			send_queued_write(client_p->localClient->F, client_p);
+			send_pop_queue(client_p);
 
 		rb_close(client_p->localClient->F);
 		client_p->localClient->F = NULL;

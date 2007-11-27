@@ -206,6 +206,7 @@ struct LocalUser
 	struct rb_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
 	struct _ssl_ctl *ssl_ctl;		/* which ssl daemon we're associate with */
 	rb_uint8_t is_ssl;
+	rb_uint8_t flush;
 	struct ZipStats *zipstats;		/* zipstats */
 };
 
