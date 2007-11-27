@@ -230,7 +230,7 @@ static int
 make_daemon(void)
 {
 #ifndef _WIN32
-	int pid;
+	int pid, fd;
 
 	if((pid = fork()) < 0)
 	{
@@ -244,9 +244,13 @@ make_daemon(void)
 	}
 
 	setsid();
-	/*  fclose(stdin);
-	   fclose(stdout);
-	   fclose(stderr); */
+
+	fd = open("/dev/null", O_RDWR);
+	/* dup2 should close the target fd if its open */
+	dup2(fd, 0);
+	dup2(fd, 1);
+	dup2(fd, 2);
+	close(fd);
 #endif
 	return 0;
 }
