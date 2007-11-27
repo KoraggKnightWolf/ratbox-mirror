@@ -1,3 +1,11 @@
+androsyn    2007/11/27 00:13:24 UTC	(20071127_0-24621)
+  Log:
+  replace fds 0-2 with /dev/null when daemonizing
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2007/11/26 21:27:27 UTC	(20071126_2-24619)
   Log:
   add code to stop reading from the ircd if we get over 4k queued out to the write so that sendq stuff works correctly inside the ircd still
