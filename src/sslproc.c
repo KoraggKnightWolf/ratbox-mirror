@@ -72,6 +72,7 @@ struct _ssl_ctl
 	rb_dlink_node node;
 	int cli_count;
 	rb_fde_t *F;
+	rb_fde_t *P;
 	pid_t pid;
 	rb_dlink_list readq;
 	rb_dlink_list writeq;
@@ -93,6 +94,7 @@ allocate_ssl_daemon(rb_fde_t *F, int pid)
 		return NULL;
 	ctl = rb_malloc(sizeof(ssl_ctl_t));	
 	ctl->F = F;
+	ctl->P = P;
 	ctl->pid = pid;
 	rb_dlinkAdd(ctl, &ctl->node, &ssl_daemons);
 	return ctl;
@@ -128,6 +130,7 @@ free_ssl_daemon(ssl_ctl_t *ctl)
 		rb_free(ctl_buf);
 	}
 	rb_close(ctl->F);
+	rb_close(ctl->P);
 	rb_dlinkDelete(&ctl->node, &ssl_daemons);
 	rb_free(ctl);
 }
@@ -209,12 +212,14 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 			ilog(L_MAIN, "Unable to create ssld: %s\n", strerror(errno));
 			rb_close(F1);
 			rb_close(F2);
+			rb_close(P1);
+			rb_close(P2);
 			return started;
 		}
 		started++;
 		rb_close(F2);
 		rb_close(P1);
-		ctl = allocate_ssl_daemon(F1, pid);
+		ctl = allocate_ssl_daemon(F1, P2, pid);
 		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
 		ssl_read_ctl(ctl->F, ctl);
 		ssl_do_pipe(P2, ctl);
