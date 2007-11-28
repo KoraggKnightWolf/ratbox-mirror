@@ -61,9 +61,6 @@ typedef struct _mod_ctl
 	rb_dlink_list writeq;
 } mod_ctl_t;
 
-mod_ctl_t *g_ctl;
-
-
 typedef struct _conn
 {
 	rb_dlink_node node;

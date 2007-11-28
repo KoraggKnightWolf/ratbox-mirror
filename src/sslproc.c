@@ -86,7 +86,7 @@ static rb_dlink_list ssl_daemons;
 
 
 static ssl_ctl_t *
-allocate_ssl_daemon(rb_fde_t *F, int pid)
+allocate_ssl_daemon(rb_fde_t *F, rb_fde_t *P, int pid)
 {
 	ssl_ctl_t *ctl;
 	
@@ -287,27 +287,11 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 			case 'S':
 				ssl_process_zipstats(ctl, ctl_buf);
 				break;
-		}
-#if 0
-
-		if(parc != 5)
-		{
-			/* xxx fail */
-		}
-		/*	N remote_ipaddress local_ipaddress remoteport local_port listenerid */
-
-		switch(parv[0][0])
-		{
-			case 'N':
-			{
-//				ssl_process_incoming_conn(parv, parc, ctl_buf->F);
-				break;
-			}
 			default:
+				ilog(L_MAIN, "Received invalid command from ssld: %s", ctl_buf->buf);
+				sendto_realops_flags(UMODE_ALL, L_ALL, "Received invalid command from ssld");
 				break;
-				/* Log unknown commands */
-		}				
-#endif
+		}
 		rb_dlinkDelete(ptr, &ctl->readq);
 		rb_free(ctl_buf->buf);
 		rb_free(ctl_buf);
@@ -341,7 +325,7 @@ ssl_read_ctl(rb_fde_t *F, void *data)
 	
 	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 	{
-		/* deal with helper dying */
+		ssl_dead(ctl);
 		return;
 	} 
 	ssl_process_cmd_recv(ctl);
@@ -396,7 +380,8 @@ ssl_write_ctl(rb_fde_t *F, void *data)
 		}
 		if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 		{
-			/* deal with failure here */
+			ssl_dead(ctl);
+			return;
 		} else  {
 			rb_setselect(ctl->F, RB_SELECT_WRITE, ssl_write_ctl, ctl);
 		}
@@ -546,9 +531,13 @@ start_zlib_session(struct Client *server)
 	
 	if(len > READBUF_SIZE)
 	{
-		/* XXX deal with this */
-		
+		rb_free(buf);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld - attempted to pass message of %ld len, max len %d, giving up", (long)len, READBUF_SIZE);
+		ilog(L_MAIN, "ssld - ttempted to pass message of %ld len, max len %d, giving up", (long)len, READBUF_SIZE);
+		exit_client(server, server, server, "ssld readbuf exceeded");
+		return;
 	}
+	
 	*buf = 'Z';
 	xbuf = buf + hdr;
 	left = len - hdr;
