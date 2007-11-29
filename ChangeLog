@@ -1,3 +1,12 @@
+androsyn    2007/11/29 17:12:25 UTC	(20071129_2-24643)
+  Log:
+  add support for glibc 2.7's sha256 and sha512 passwords
+
+  Modified:
+	ircd-ratbox/trunk/tools/README.mkpasswd (File Modified) 
+	ircd-ratbox/trunk/tools/mkpasswd.c (File Modified) 
+
+
 androsyn    2007/11/29 16:52:14 UTC	(20071129_1-24641)
   Log:
   Add -Wcast-align to warn about possible alignment breakage that can occur on platforms like sparc.
