@@ -222,7 +222,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	 * C:line in client_p->name
 	 */
 
-	client_p->name = find_or_add(name);
+	client_p->name = scache_add(name);
 	set_server_gecos(client_p, info);
 	client_p->hopcount = hop;
 	server_estab(client_p);
@@ -386,7 +386,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	target_p = make_client(client_p);
 	make_server(target_p);
 	target_p->hopcount = hop;
-	target_p->name = find_or_add(name);
+	target_p->name = scache_add(name);
 
 	set_server_gecos(target_p, info);
 
@@ -525,7 +525,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	target_p = make_client(client_p);
 	make_server(target_p);
 
-	target_p->name = find_or_add(parv[1]);
+	target_p->name = scache_add(parv[1]);
 
 	target_p->hopcount = atoi(parv[2]);
 	strcpy(target_p->id, parv[3]);
@@ -1275,7 +1275,7 @@ server_estab(struct Client *client_p)
 	}
 
 	/* add it to scache */
-	find_or_add(client_p->name);
+	scache_add(client_p->name);
 	client_p->localClient->firsttime = rb_current_time();
 	/* fixing eob timings.. -gnp */
 

@@ -635,7 +635,6 @@ ratbox_main(int argc, char *argv[])
 	
 	init_main_logfile();
 	init_hash();
-	clear_scache_hash_table();	/* server cache name table */
 	init_host_hash();
 	clear_hash_parse();
 	init_client();

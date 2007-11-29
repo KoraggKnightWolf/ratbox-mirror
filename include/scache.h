@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
  *  Copyright (C) 1996-2002 Hybrid Development Team
- *  Copyright (C) 2002-2005 ircd-ratbox development team
+ *  Copyright (C) 2002-2007 ircd-ratbox development team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 #ifndef INCLUDED_scache_h
 #define INCLUDED_scache_h
 
-void clear_scache_hash_table(void);
-const char *find_or_add(const char *name);
+const char *scache_add(const char *name);
 void count_scache(size_t *, size_t *);
-
 #endif

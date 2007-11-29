@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
  *  Copyright (C) 1996-2002 Hybrid Development Team
- *  Copyright (C) 2002-2005 ircd-ratbox development team
+ *  Copyright (C) 2002-2007 ircd-ratbox development team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,121 +23,76 @@
  *
  *  $Id$
  */
-
 #include "stdinc.h"
 #include "ratbox_lib.h"
 #include "match.h"
 #include "ircd.h"
 #include "numeric.h"
 #include "send.h"
+#include "hash.h"
 #include "scache.h"
 
-
 /*
- * ircd used to store full servernames in anUser as well as in the 
- * whowas info.  there can be some 40k such structures alive at any
- * given time, while the number of unique server names a server sees
- * in its lifetime is at most a few hundred.  by tokenizing server
- * names internally, the server can easily save 2 or 3 megs of RAM.  
- * -orabidoo
+ * this code intentionally leaks a little bit of memory, unless you're on a network
+ * where you've got somebody screwing around and bursting a *lot* of servers, it shouldn't
+ * be an issue...
  */
 
-/* 
- * Yes, this does leak a slight bit a memory, but how many server names
- * is the ircd going to see in its lifetime.  Consider that 256*HOSTLEN
- * is a rather small amount of memory vs having to have a copy of this
- * in whowas, struct Client, etc, etc.  Think really hard about what 
- * this code does, before you think you can go and remove it. It makes 
- * more sense than you probably realize, really.
- * -AndroSyn
- */
-#define SCACHE_HASH_SIZE 257
 
-typedef struct scache_entry
+#define SCACHE_MAX_BITS (32-8)
+#define SCACHE_MAX 256
+
+#define hash_server(x)	fnv_hash_upper_len((const unsigned char *)(x), SCACHE_MAX_BITS, 30)
+
+static rb_dlink_list scache_hash[SCACHE_MAX];
+
+struct scache_entry
 {
-	char *name;
-	struct scache_entry *next;
-}
-SCACHE;
+	rb_dlink_node node;
+	char *server_name;
+};
 
-static SCACHE *scache_hash[SCACHE_HASH_SIZE];
-
-void
-clear_scache_hash_table(void)
-{
-	memset(scache_hash, 0, sizeof(scache_hash));
-}
-
-static int
-sc_hash(const char *string)
-{
-	int hash_value;
-
-	hash_value = 0;
-	while (*string)
-	{
-		hash_value += ToLower(*string++);
-	}
-
-	return hash_value % SCACHE_HASH_SIZE;
-}
-
-/*
- * this takes a server name, and returns a pointer to the same string
- * (up to case) in the server name token list, adding it to the list if
- * it's not there.  care must be taken not to call this with
- * user-supplied arguments that haven't been verified to be a valid,
- * existing, servername.  use the hash in list.c for those.  -orabidoo
- */
 
 const char *
-find_or_add(const char *name)
+scache_add(const char *name)
 {
-	int hash_index;
-	SCACHE *ptr;
+	struct scache_entry *sc;
+	unsigned int hashv;
+	rb_dlink_node *ptr;
 
-	ptr = scache_hash[hash_index = sc_hash(name)];
-	for (; ptr; ptr = ptr->next)
+	if(EmptyString(name))
+		return NULL;
+
+	hashv = hash_server(name);
+
+	RB_DLINK_FOREACH(ptr, scache_hash[hashv].head)
 	{
-		if(!irccmp(ptr->name, name))
-			return (ptr->name);
+		sc = ptr->data;
+		if(!irccmp(sc->server_name, name))
+			return sc->server_name;
 	}
 
-	ptr = rb_malloc(sizeof(SCACHE));
-
-	ptr->name = rb_strdup(name);
-
-	ptr->next = scache_hash[hash_index];
-	scache_hash[hash_index] = ptr;
-	return ptr->name;
+	sc = rb_malloc(sizeof(struct scache_entry));
+	sc->server_name = rb_strdup(name);
+	rb_dlinkAdd(sc, &sc->node, &scache_hash[hashv]);
+	return sc->server_name;
 }
 
-/*
- * count_scache
- * inputs	- pointer to where to leave number of servers cached
- *		- pointer to where to leave total memory usage
- * output	- NONE
- * side effects	-
- */
-void
-count_scache(size_t * number_servers_cached, size_t * mem_servers_cached)
+void count_scache(size_t *number, size_t *mem)
 {
-	SCACHE *scache_ptr;
 	int i;
+	rb_dlink_node *ptr;
+	struct scache_entry *sc;
+	
+	*number = 0;
+	*mem = 0;
 
-	*number_servers_cached = 0;
-	*mem_servers_cached = 0;
-
-	for (i = 0; i < SCACHE_HASH_SIZE; i++)
+	HASH_WALK(i, SCACHE_MAX, ptr, scache_hash)
 	{
-		scache_ptr = scache_hash[i];
-		while (scache_ptr)
-		{
-			*number_servers_cached = *number_servers_cached + 1;
-			*mem_servers_cached = *mem_servers_cached +
-				(strlen(scache_ptr->name) + sizeof(SCACHE *));
-
-			scache_ptr = scache_ptr->next;
-		}
+		sc = ptr->data;
+		(*number)++;
+		*mem += strlen(sc->server_name) + sizeof(struct scache_entry);
 	}
+	HASH_WALK_END;
 }
+

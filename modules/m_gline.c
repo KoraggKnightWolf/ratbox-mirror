@@ -745,7 +745,7 @@ majority_gline(struct Client *source_p, const char *user,
 				rb_strlcpy(pending->oper_host2, source_p->host,
 					sizeof(pending->oper_host2));
 				pending->reason2 = rb_strdup(reason);
-				pending->oper_server2 = find_or_add(source_p->servptr->name);
+				pending->oper_server2 = scache_add(source_p->servptr->name);
 				pending->last_gline_time = rb_current_time();
 				pending->time_request2 = rb_current_time();
 				return NO;
@@ -764,7 +764,7 @@ majority_gline(struct Client *source_p, const char *user,
 	rb_strlcpy(pending->oper_host1, source_p->host,
 		sizeof(pending->oper_host1));
 
-	pending->oper_server1 = find_or_add(source_p->servptr->name);
+	pending->oper_server1 = scache_add(source_p->servptr->name);
 
 	rb_strlcpy(pending->user, user, sizeof(pending->user));
 	rb_strlcpy(pending->host, host, sizeof(pending->host));

@@ -431,7 +431,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	client_p = make_client(NULL);
 
 	/* Copy in the server, hostname, fd */
-	client_p->name = find_or_add(server_p->name);
+	client_p->name = scache_add(server_p->name);
 	rb_strlcpy(client_p->host, server_p->host, sizeof(client_p->host));
 	rb_strlcpy(client_p->sockhost, buf, sizeof(client_p->sockhost));
 	client_p->localClient->F = F;
