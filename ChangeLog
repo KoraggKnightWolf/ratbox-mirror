@@ -1,3 +1,16 @@
+androsyn    2007/11/29 16:02:34 UTC	(20071129_0-24639)
+  Log:
+  modify scache to be a bit more modern.  it ends up being quite similiar to the operhash
+
+  Modified:
+	ircd-ratbox/trunk/include/scache.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_gline.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/scache.c (File Modified) 
+
+
 androsyn    2007/11/28 01:48:24 UTC	(20071128_1-24635)
   Log:
   fix some logic problems with aftype defaults in listen blocks
