@@ -126,9 +126,6 @@
 /* Prefix where help file are installed. */
 #undef HELP_DIR
 
-/* Define if IPv6 support is present and available. */
-#undef IPV6
-
 /* Prefix where the ircd is installed. */
 #undef IRCD_PREFIX
 
