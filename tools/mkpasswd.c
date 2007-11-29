@@ -19,15 +19,16 @@
 #include <fcntl.h>
 #include "ratbox_lib.h"
 
-#define FLAG_MD5     0x00000001
-#define FLAG_DES     0x00000002
-#define FLAG_SALT    0x00000004
-#define FLAG_PASS    0x00000008
-#define FLAG_LENGTH  0x00000010
+#define FLAG_MD5      0x00000001
+#define FLAG_DES      0x00000002
+#define FLAG_SALT     0x00000004
+#define FLAG_PASS     0x00000008
+#define FLAG_LENGTH   0x00000010
 #define FLAG_BLOWFISH 0x00000020
-#define FLAG_ROUNDS  0x00000040
-#define FLAG_EXT     0x00000080
-
+#define FLAG_ROUNDS   0x00000040
+#define FLAG_EXT      0x00000080
+#define FLAG_SHA256   0x00000100
+#define FLAG_SHA512   0x00000200
 
 
 static char *make_des_salt(void);
@@ -35,6 +36,10 @@ static char *make_ext_salt(int);
 static char *make_ext_salt_para(int, char *);
 static char *make_md5_salt(int);
 static char *make_md5_salt_para(char *);
+static char *make_sha256_salt(int);
+static char *make_sha256_salt_para(char *);
+static char *make_sha512_salt(int);
+static char *make_sha512_salt_para(char *);
 static char *make_bf_salt(int, int);
 static char *make_bf_salt_para(int, char *);
 static char *int_to_base64(int);
@@ -104,7 +109,7 @@ int main(int argc, char *argv[])
                   ** parameter.
                   */
 
-  while( (c=getopt(argc, argv, "mdber:h?l:s:p:")) != -1)
+  while( (c=getopt(argc, argv, "xymdber:h?l:s:p:")) != -1)
   {
     switch(c)
     {
@@ -138,6 +143,12 @@ int main(int argc, char *argv[])
         flag |= FLAG_PASS;
         plaintext = optarg;
         break;
+      case 'x':
+        flag |= FLAG_SHA256;
+        break;
+      case 'y':
+        flag |= FLAG_SHA512;
+        break;
       case 'h':
         full_usage();
         /* NOT REACHED */
@@ -169,6 +180,24 @@ int main(int argc, char *argv[])
       salt = make_bf_salt_para(rounds, saltpara);
     else
       salt = make_bf_salt(rounds, length);
+  }
+  else if (flag & FLAG_SHA256)
+  {
+    if (length == 0)
+      length = 16;
+    if (flag & FLAG_SALT)
+      salt = make_sha256_salt_para(saltpara);
+    else
+      salt = make_sha256_salt(length);  
+  }
+  else if (flag & FLAG_SHA512)
+  {
+    if (length == 0)
+      length = 16;
+    if (flag & FLAG_SALT)
+      salt = make_sha512_salt_para(saltpara);
+    else
+      salt = make_sha512_salt(length);  
   }
   else if (flag & FLAG_EXT)
   {
@@ -302,6 +331,77 @@ char *make_md5_salt(int length)
   return salt;
 }
 
+char *make_sha256_salt_para(char *saltpara)
+{
+  static char salt[21];
+  if (saltpara && (strlen(saltpara) <= 16))
+  {
+    /* sprintf used because of portability requirements, the length
+    ** is checked above, so it should not be too much of a concern
+    */
+    sprintf(salt, "$5$%s$", saltpara);
+    return salt;
+  }
+  printf("Invalid Salt, please use up to 16 random alphanumeric characters\n");
+  exit(1);
+
+  /* NOT REACHED */
+  return NULL;
+}
+
+char *make_sha512_salt_para(char *saltpara)
+{
+  static char salt[21];
+  if (saltpara && (strlen(saltpara) <= 16))
+  {
+    /* sprintf used because of portability requirements, the length
+    ** is checked above, so it should not be too much of a concern
+    */
+    sprintf(salt, "$6$%s$", saltpara);
+    return salt;
+  }
+  printf("Invalid Salt, please use up to 16 random alphanumeric characters\n");
+  exit(1);
+
+  /* NOT REACHED */
+  return NULL;
+}
+
+
+char *make_sha256_salt(int length)
+{
+  static char salt[21];
+  if (length > 16)
+  {
+    printf("SHA256 salt length too long\n");
+    exit(0);
+  }
+  salt[0] = '$';
+  salt[1] = '5';
+  salt[2] = '$';
+  generate_random_salt(&salt[3], length);
+  salt[length+3] = '$';
+  salt[length+4] = '\0';
+  return salt;
+}
+
+char *make_sha512_salt(int length)
+{
+  static char salt[21];
+  if (length > 16)
+  {
+    printf("SHA512 salt length too long\n");
+    exit(0);
+  }
+  salt[0] = '$';
+  salt[1] = '6';
+  salt[2] = '$';
+  generate_random_salt(&salt[3], length);
+  salt[length+3] = '$';
+  salt[length+4] = '\0';
+  return salt;
+}
+
 char *make_bf_salt_para(int rounds, char *saltpara)
 {
   static char salt[31];
@@ -376,6 +476,8 @@ char *generate_random_salt(char *salt, int length)
 void full_usage()
 {
   printf("mkpasswd [-m|-d|-b|-e] [-l saltlength] [-r rounds] [-s salt] [-p plaintext]\n");
+  printf("-x Generate a SHA256 password\n");
+  printf("-y Generate a SHA256 password\n");
   printf("-m Generate an MD5 password\n");
   printf("-d Generate a DES password\n");
   printf("-b Generate a BlowFish password\n");

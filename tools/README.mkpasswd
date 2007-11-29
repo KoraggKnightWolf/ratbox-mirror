@@ -4,10 +4,13 @@ $Id$
 This is documentation for the updated mkpasswd.c included with a number
 of ircd, irc services, and non-IRC related programs
 
-This version of mkpasswd can create DES, Extended DES, BlowFish, and MD5
-passwords, with either randomly generated or user provided salts.  
+This version of mkpasswd can create DES, Extended DES, BlowFish, MD5,
+SHA256 and SHA512 passwords, with either randomly generated or user provided 
+salts.  
 
 Options:
+-x Generate a SHA256 password
+-y Generate a SHA512 password
 -m Generate an MD5 password
 -d Generate a DES password
 -b Generate a BlowFish password
@@ -44,6 +47,7 @@ The maximum length of an MD5 salt is limited to your systems crypt()
 
 Supported Platforms (Known and tested):
 Linux glibc (DES and MD5)
+Linux glibc >= 2.7 (SHA256 and SHA512)
 FreeBSD 3.x (DES (MD5 maybe))
 FreeBSD 4.x (DES, MD5, BlowFish, Extended DES)
 Solaris 2.5-2.6 (DES only)
