@@ -1,3 +1,14 @@
+androsyn    2007/11/29 16:52:14 UTC	(20071129_1-24641)
+  Log:
+  Add -Wcast-align to warn about possible alignment breakage that can occur on platforms like sparc.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+
+
 androsyn    2007/11/29 16:02:34 UTC	(20071129_0-24639)
   Log:
   modify scache to be a bit more modern.  it ends up being quite similiar to the operhash
