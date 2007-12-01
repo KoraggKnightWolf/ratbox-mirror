@@ -700,7 +700,7 @@ majority_gline(struct Client *source_p, const char *user,
 		   (irccmp(pending->host, host) == 0))
 		{
 			/* check oper or server hasnt already voted */
-			if(((irccmp(pending->oper_user1, source_p->username) == 0) ||
+			if(((irccmp(pending->oper_user1, source_p->username) == 0) &&
 			    (irccmp(pending->oper_host1, source_p->host) == 0)))
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL, "oper has already voted");
@@ -715,7 +715,7 @@ majority_gline(struct Client *source_p, const char *user,
 			if(pending->oper_user2[0] != '\0')
 			{
 				/* if two other opers on two different servers have voted yes */
-				if(((irccmp(pending->oper_user2, source_p->username) == 0) ||
+				if(((irccmp(pending->oper_user2, source_p->username) == 0) &&
 				    (irccmp(pending->oper_host2, source_p->host) == 0)))
 				{
 					sendto_realops_flags(UMODE_ALL, L_ALL,
