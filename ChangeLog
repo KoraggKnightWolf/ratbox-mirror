@@ -1,3 +1,12 @@
+androsyn    2007/12/01 00:20:05 UTC	(20071201_0-24645)
+  Log:
+  the || in majority_gline should be && as you end up match all opers with the same hostname even if they are on different servers
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_gline.c (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2007/11/29 17:12:25 UTC	(20071129_2-24643)
   Log:
   add support for glibc 2.7's sha256 and sha512 passwords
