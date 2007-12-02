@@ -47,9 +47,6 @@ struct Whowas *WHOWASHASH[WW_MAX];
 
 static int whowas_next = 0;
 
-
-static rb_dlink_list whowas_list;
-
 uint32_t
 hash_whowas_name(const char *name)
 {

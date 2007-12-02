@@ -282,7 +282,6 @@ int
 register_local_user(struct Client *client_p, struct Client *source_p, const char *username)
 {
 	struct ConfItem *aconf;
-	struct User *user = source_p->user;
 	char tmpstr2[IRCD_BUFSIZE];
 	char ipaddr[HOSTIPLEN];
 	char myusername[USERLEN+1];
@@ -544,7 +543,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 
 	monitor_signon(source_p);
 	user_welcome(source_p);
-	introduce_client(client_p, source_p, user, source_p->name);
+	introduce_client(client_p, source_p);
 	return 0;
 }
 
@@ -558,7 +557,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
  *		  from a remote connect.
  */
 void
-introduce_client(struct Client *client_p, struct Client *source_p, struct User *user, const char *nick)
+introduce_client(struct Client *client_p, struct Client *source_p)
 {
 	static char ubuf[12];
 
@@ -580,7 +579,7 @@ introduce_client(struct Client *client_p, struct Client *source_p, struct User *
 	{
 		sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
 			      ":%s UID %s %d %ld %s %s %s %s %s :%s",
-			      source_p->servptr->id, nick,
+			      source_p->servptr->id, source_p->name,
 			      source_p->hopcount + 1,
 			      (long) source_p->tsinfo, ubuf,
 			      source_p->username, source_p->host,
@@ -589,7 +588,7 @@ introduce_client(struct Client *client_p, struct Client *source_p, struct User *
 
 		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
 			      "NICK %s %d %ld %s %s %s %s :%s",
-			      nick, source_p->hopcount + 1,
+			      source_p->name, source_p->hopcount + 1,
 			      (long) source_p->tsinfo,
 			      ubuf, source_p->username, source_p->host,
 			      source_p->servptr->name, source_p->info);
@@ -597,7 +596,7 @@ introduce_client(struct Client *client_p, struct Client *source_p, struct User *
 	else
 		sendto_server(client_p, NULL, NOCAPS, NOCAPS,
 			      "NICK %s %d %ld %s %s %s %s :%s",
-			      nick, source_p->hopcount + 1,
+			      source_p->name, source_p->hopcount + 1,
 			      (long) source_p->tsinfo,
 			      ubuf, source_p->username, source_p->host,
 			      source_p->servptr->name, source_p->info);

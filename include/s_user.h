@@ -41,8 +41,7 @@ void send_umode_out(struct Client *, struct Client *, int);
 int show_lusers(struct Client *source_p);
 int register_local_user(struct Client *, struct Client *, const char *);
 
-void introduce_client(struct Client *client_p, struct Client *source_p, 
-			    struct User *user, const char *nick);
+void introduce_client(struct Client *client_p, struct Client *source_p);
 
 extern int user_modes_from_c_to_bitmask[];
 void show_isupport(struct Client *);
