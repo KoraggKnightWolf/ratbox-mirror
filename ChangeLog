@@ -1,3 +1,14 @@
+androsyn    2007/12/02 02:56:04 UTC	(20071202_0-24650)
+  Log:
+  only pass client_p and source_p to introduce_client, as passing struct User and nick was just pointless
+
+  Modified:
+	ircd-ratbox/trunk/include/s_user.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2007/12/01 00:20:05 UTC	(20071201_0-24645)
   Log:
   the || in majority_gline should be && as you end up match all opers with the same hostname even if they are on different servers
