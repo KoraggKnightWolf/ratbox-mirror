@@ -40,21 +40,6 @@
 static void collect_zipstats(void *unused);
 static void ssl_read_ctl(rb_fde_t *F, void *data);
 
-/* 
-
-Spawns new process.
-ircd binds to port, and passes fds to all children. 
-child listeners do the accept
-child creates a new socketpair and hands it back to the ircd
-
-
-COMMANDS: 
-# L - associated FD should be used to accept connections
-A - start ssl accept on fd
-C - start ssl connect on fd
-	
- */
-
 #define MAXPASSFD 4
 #define READSIZE 1024
 typedef struct _ssl_ctl_buf
