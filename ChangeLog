@@ -1,3 +1,11 @@
+androsyn    2007/12/03 20:10:19 UTC	(20071203_1-24667)
+  Log:
+  remove some no longer applicable comments
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2007/12/03 19:53:48 UTC	(20071203_0-24665)
   Log:
   move is_ssl and flush into localflags, remove the old servlink flags. some other flags should be moved to localflags
