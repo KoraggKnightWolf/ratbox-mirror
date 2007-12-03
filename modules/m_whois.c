@@ -329,7 +329,7 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 
 	if(MyClient(target_p))
 	{
-		if(target_p->localClient->is_ssl)
+		if(IsSSL(target_p))
 			sendto_one_numeric(source_p, HOLD_QUEUE, RPL_WHOISSECURE,
 					form_str(RPL_WHOISSECURE),
 					target_p->name);

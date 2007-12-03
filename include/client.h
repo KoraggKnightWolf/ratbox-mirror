@@ -124,34 +124,38 @@ struct LocalUser;
 
 /* housekeeping flags */
 
-#define FLAGS_PINGSENT     	0x00000001	/* Unreplied ping sent */
-#define FLAGS_DEAD	   	0x00000002	/* Local socket is dead--Exiting soon */
-#define FLAGS_KILLED       	0x00000004	/* Prevents "QUIT" from being sent for this */
-#define FLAGS_CLOSING      	0x00000008	/* set when closing to suppress errors */
-#define FLAGS_GOTID        	0x00000010	/* successful ident lookup achieved */
-#define FLAGS_NEEDID       	0x00000020	/* I-lines say must use ident return */
-#define FLAGS_NORMALEX     	0x00000040	/* Client exited normally */
-#define FLAGS_SERVLINK     	0x00000100	/* servlink has servlink process */
-#define FLAGS_MARK	   	0x00000200	/* marked client */
-#define FLAGS_HIDDEN       	0x00000400	/* hidden server */
-#define FLAGS_EOB          	0x00000800	/* EOB */
-#define FLAGS_MYCONNECT	   	0x00001000	/* MyConnect */
-#define FLAGS_IOERROR      	0x00002000	/* IO error */
-#define FLAGS_SERVICE	   	0x00004000
-#define FLAGS_TGCHANGE     	0x00008000	/* we're allowed to clear something */
-#define FLAGS_EXEMPTRESV	0x00010000
-#define FLAGS_EXEMPTGLINE       0x00020000
-#define FLAGS_EXEMPTKLINE       0x00040000
-#define FLAGS_EXEMPTFLOOD       0x00080000
-#define FLAGS_NOLIMIT           0x00100000
-#define FLAGS_IDLE_LINED        0x00200000
-#define FLAGS_CLICAP		0x00400000
-#define FLAGS_PING_COOKIE       0x00800000
-#define FLAGS_IP_SPOOFING       0x01000000
-#define FLAGS_FLOODDONE         0x02000000
-#define FLAGS_EXEMPTSPAMBOT	0x04000000
-#define FLAGS_EXEMPTSHIDE	0x08000000
-#define FLAGS_EXEMPTJUPE	0x10000000
+#define FLAGS_PINGSENT		0x00000001	/* Unreplied ping sent */
+#define FLAGS_DEAD		0x00000002	/* Local socket is dead--Exiting soon */
+#define FLAGS_KILLED		0x00000004	/* Prevents "QUIT" from being sent for this */
+#define FLAGS_CLOSING		0x00000008	/* set when closing to suppress errors */
+#define FLAGS_GOTID		0x00000010	/* successful ident lookup achieved */
+#define FLAGS_NEEDID		0x00000020	/* I-lines say must use ident return */
+#define FLAGS_NORMALEX		0x00000040	/* Client exited normally */
+#define FLAGS_MARK		0x00000080	/* marked client */
+#define FLAGS_HIDDEN		0x00000100	/* hidden server */
+#define FLAGS_EOB		0x00000200	/* EOB */
+#define FLAGS_MYCONNECT		0x00000400	/* MyConnect */
+#define FLAGS_IOERROR      	0x00000800	/* IO error */
+#define FLAGS_SERVICE	   	0x00001000
+#define FLAGS_TGCHANGE     	0x00002000	/* we're allowed to clear something */
+#define FLAGS_EXEMPTRESV	0x00004000
+#define FLAGS_EXEMPTGLINE       0x00008000
+#define FLAGS_EXEMPTKLINE       0x00010000
+#define FLAGS_EXEMPTFLOOD       0x00020000
+#define FLAGS_NOLIMIT           0x00040000
+#define FLAGS_IDLE_LINED        0x00080000
+#define FLAGS_CLICAP		0x00100000
+#define FLAGS_PING_COOKIE       0x00200000
+#define FLAGS_IP_SPOOFING       0x00400000
+#define FLAGS_FLOODDONE         0x00800000
+#define FLAGS_EXEMPTSPAMBOT	0x01000000
+#define FLAGS_EXEMPTSHIDE	0x02000000
+#define FLAGS_EXEMPTJUPE	0x04000000
+
+/* flags for local clients, this needs stuff moved from above to here at some point */
+#define LFLAGS_SSL		0x00000001
+#define LFLAGS_FLUSH		0x00000002
+
 
 /* umodes, settable flags */
 
@@ -202,8 +206,6 @@ struct LocalUser;
 /*
  * flags macros.
  */
-#define HasServlink(x)          ((x)->flags &  FLAGS_SERVLINK)
-#define SetServlink(x)          ((x)->flags |= FLAGS_SERVLINK)
 #define MyConnect(x)		((x)->flags & FLAGS_MYCONNECT)
 #define SetMyConnect(x)		((x)->flags |= FLAGS_MYCONNECT)
 #define ClearMyConnect(x)	((x)->flags &= ~FLAGS_MYCONNECT)
@@ -228,6 +230,17 @@ struct LocalUser;
 #define IsTGChange(x)		((x)->flags & FLAGS_TGCHANGE)
 #define SetTGChange(x)		((x)->flags |= FLAGS_TGCHANGE)
 #define ClearTGChange(x)	((x)->flags &= ~FLAGS_TGCHANGE)
+
+/* local flags */
+
+#define IsSSL(x)		((x)->localClient->localflags & LFLAGS_SSL)
+#define SetSSL(x)		((x)->localClient->localflags |= LFLAGS_SSL)
+#define ClearSSL(x)		((x)->localClient->localflags &= ~LFLAGS_SSL)
+
+#define IsFlush(x)		((x)->localClient->localflags & LFLAGS_FLUSH)
+#define SetFlush(x)		((x)->localClient->localflags |= LFLAGS_FLUSH)
+#define ClearFlush(x)		((x)->localClient->localflags &= ~LFLAGS_FLUSH)
+
 
 /* oper flags */
 #define MyOper(x)               (MyConnect(x) && IsOper(x))

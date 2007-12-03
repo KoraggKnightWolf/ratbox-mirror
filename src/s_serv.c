@@ -357,7 +357,7 @@ show_capabilities(struct Client *target_p)
 	}
 
 
-	if(target_p->localClient->is_ssl)
+	if(IsSSL(target_p))
 		rb_strlcat(msgbuf, "SSL", sizeof(msgbuf));
 
 	return msgbuf;
@@ -553,7 +553,7 @@ serv_connect_ssl_callback(rb_fde_t *F, int status, void *data)
 	rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF[0], &xF[1], "Outgoing ssld connection");
 	client_p->localClient->ssl_ctl = start_ssld_connect(F, xF[1], rb_get_fd(xF[0]));
-	client_p->localClient->is_ssl = 1;
+	SetSSL(client_p);
 	client_p->localClient->F = xF[0];
 	
 	rb_event_addonce("serv_connect_ev", serv_connect_ev, client_p, 1);		
