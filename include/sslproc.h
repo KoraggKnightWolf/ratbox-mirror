@@ -18,8 +18,11 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  *  USA
  *
- *  $Id: dns.c 24244 2007-08-22 19:04:55Z androsyn $
+ *  $Id$
  */
+
+#ifndef INCLUDED_sslproc_h
+#define INCLUDED_sslproc_h
 
 struct _ssl_ctl;
 typedef struct _ssl_ctl ssl_ctl_t;
@@ -32,3 +35,6 @@ void start_zlib_session(struct Client *server);
 void send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params);
 void ssld_decrement_clicount(ssl_ctl_t *ctl);
 int get_ssld_count(void);
+
+#endif
+
