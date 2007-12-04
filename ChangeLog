@@ -1,3 +1,11 @@
+androsyn    2007/12/04 19:00:36 UTC	(20071204_0-24669)
+  Log:
+  add Id propset for sslproc.h and add #ifndef to protect against double #includes of sslproc.h
+
+  Modified:
+	ircd-ratbox/trunk/include/sslproc.h (File Modified) (Property Modified)
+
+
 androsyn    2007/12/03 20:10:19 UTC	(20071203_1-24667)
   Log:
   remove some no longer applicable comments
