@@ -1,3 +1,11 @@
+androsyn    2007/12/05 17:02:09 UTC	(20071205_0-24671)
+  Log:
+  deal with a few more failure cases
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/12/04 19:00:36 UTC	(20071204_0-24669)
   Log:
   add Id propset for sslproc.h and add #ifndef to protect against double #includes of sslproc.h
