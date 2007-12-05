@@ -252,15 +252,21 @@ common_zlib_deflate(conn_t * conn, void *buf, size_t len)
 	ret = deflate(&conn->outstream, Z_SYNC_FLUSH);
 	if(ret != Z_OK)
 	{
-		/* XXX deflate error */
+		/* deflate error */
+		close_conn(conn);
+		return;
 	}
 	if(conn->outstream.avail_out == 0)
 	{
-		/* XXX deal with avail_out being empty */
+		/* avail_out empty */
+		close_conn(conn);
+		return;
 	}
 	if(conn->outstream.avail_in != 0)
 	{
-		/* XXX deal with avail_in not being empty */
+		/* avail_in isn't empty...*/
+		close_conn(conn);
+		return;
 	}
 	have = sizeof(outbuf) - conn->outstream.avail_out;
 	conn_mod_write(conn, outbuf, have);
@@ -744,9 +750,8 @@ mod_read_ctl(rb_fde_t * F, void *data)
 	while (retlen > 0);
 
 	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
-	{
 		exit(0);
-	}
+
 	mod_process_cmd_recv(ctl);
 	rb_setselect(ctl->F, RB_SELECT_READ, mod_read_ctl, ctl);
 }
@@ -774,13 +779,9 @@ mod_write_ctl(rb_fde_t * F, void *data)
 
 		}
 		if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
-		{
-			/* deal with failure here */
-		}
-		else
-		{
-			rb_setselect(ctl->F, RB_SELECT_WRITE, mod_write_ctl, ctl);
-		}
+			exit(0);			
+		
+		rb_setselect(ctl->F, RB_SELECT_WRITE, mod_write_ctl, ctl);
 	}
 }
 
@@ -813,7 +814,6 @@ main(int argc, char **argv)
 	{
 		fprintf(stderr, "You aren't supposed to run me directly\n");
 		exit(1);
-		/* xxx fail */
 	}
 
 	ctlfd = atoi(s_ctlfd);
