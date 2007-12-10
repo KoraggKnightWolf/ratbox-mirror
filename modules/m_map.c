@@ -91,6 +91,7 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 {
 	int cnt = 0, i = 0, len;
 	struct Client *server_p;
+	char scratch[128];
 	rb_dlink_node *ptr;
 	*pbuf = '\0';
 
@@ -111,10 +112,11 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 			buf[i] = '-';
 		}
 	}
+	sprintf(scratch, "%4.1f%%", (float)100 * (float) rb_dlink_list_length(&root_p->serv->users) / (float) Count.total);
 
 	rb_snprintf(buf + USER_COL, BUFSIZE - USER_COL,
-		 " | Users: %5lu (%4.1f%%)", rb_dlink_list_length(&root_p->serv->users),
-		 100 * (float) rb_dlink_list_length(&root_p->serv->users) / (float) Count.total);
+		 " | Users: %5lu (%s)", rb_dlink_list_length(&root_p->serv->users),
+		scratch);
 
 	sendto_one(client_p, HOLD_QUEUE, form_str(RPL_MAP), me.name, client_p->name, buf);
 

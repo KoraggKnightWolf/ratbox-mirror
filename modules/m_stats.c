@@ -1493,6 +1493,7 @@ stats_servlinks (struct Client *source_p)
 	static char Sformat[] = ":%s %d %s %s %u %u %u %u %u :%u %u %s";
 	long uptime, sendK, receiveK;
 	struct Client *target_p;
+	char buf[128];
 	rb_dlink_node *ptr;
 	int j = 0;
 
@@ -1540,16 +1541,18 @@ stats_servlinks (struct Client *source_p)
 
 	uptime = (rb_current_time() - startup_time);
 
+	sprintf(buf, "%4.1f", (float) ((float) me.localClient->sendK / (float) uptime));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "? :Server send: %7.2f %s (%4.1f K/s)",
+			   "? :Server send: %7.2f %s (%s K/s)",
 			   _GMKv (me.localClient->sendK), 
 			   _GMKs (me.localClient->sendK),
-			   (float) ((float) me.localClient->sendK / (float) uptime));
+			   buf);
+	sprintf(buf, "%4.1f", (float) ((float) me.localClient->receiveK / (float) uptime));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "? :Server recv: %7.2f %s (%4.1f K/s)",
+			   "? :Server recv: %7.2f %s (%s K/s)",
 			   _GMKv (me.localClient->receiveK),
 			   _GMKs (me.localClient->receiveK),
-			   (float) ((float) me.localClient->receiveK / (float) uptime));
+			   buf);
 }
 
 static void

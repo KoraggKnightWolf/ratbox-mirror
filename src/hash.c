@@ -654,15 +654,18 @@ static void
 output_hash(struct Client *source_p, const char *name, int length, int *counts, int deepest)
 {
 	unsigned long total = 0;
+	char buf[128];
 	int i;
 
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG,
 			"B :%s Hash Statistics", name);
 
+	/* rb_snprintf which sendto_one_* uses doesn't support float formats */
+	sprintf(buf, "%.3f%%", (float) ((counts[0]*100) / (float) length));
+
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG,
-			"B :Size: %d Empty: %d (%.3f%%)",
-			length, counts[0], 
-			(float) ((counts[0]*100) / (float) length));
+			"B :Size: %d Empty: %d (%s)",
+			length, counts[0], buf);
 
 	for(i = 1; i < 11; i++)
 	{
@@ -670,12 +673,14 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 	}
 
 	/* dont want to divide by 0! --fl */
-	if(counts[0] != length)
+	if(counts[0] != length) 
+	{
+		sprintf(buf, "%.3f%%/%.3f%%", (float) (total / (length - counts[0])), 
+			(float) (total / length), deepest)
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG,
-				"B :Average depth: %.3f/%.3f Highest depth: %d",
-				(float) (total / (length - counts[0])),
-				(float) (total / length), deepest);
-
+				"B :Average depth: %s Highest depth: %d",
+				buf);
+	}
 	for(i = 0; i < 11; i++)
 	{
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG,
