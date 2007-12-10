@@ -1,3 +1,13 @@
+androsyn    2007/12/10 19:30:20 UTC	(20071210_0-24681)
+  Log:
+  use sprintf for the few times we need to convert floats to strings as rb_snprintf doesn't deal with them anymore
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_map.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2007/12/07 20:37:42 UTC	(20071207_0-24673)
   Log:
   briefly document some of the ssl options
