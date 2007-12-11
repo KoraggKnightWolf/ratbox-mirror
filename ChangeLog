@@ -1,3 +1,13 @@
+androsyn    2007/12/11 17:39:42 UTC	(20071211_3-24689)
+  Log:
+  minor tweak the the openssl detection stuff
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2007/12/11 17:25:14 UTC	(20071211_2-24687)
   Log:
   make openssl detection work a bit better
