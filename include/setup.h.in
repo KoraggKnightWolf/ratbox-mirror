@@ -64,9 +64,6 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `crypto' library (-lcrypto). */
-#undef HAVE_LIBCRYPTO
-
 /* Define to 1 if zlib (-lz) is available. */
 #undef HAVE_LIBZ
 
@@ -223,6 +220,9 @@
 
 /* Size of the user heap. */
 #undef USER_HEAP_SIZE
+
+/* Define to enable CHALLENGE support, requires OpenSSL */
+#undef USE_CHALLENGE
 
 /* Define this to enable IO Debug hooks. */
 #undef USE_IODEBUG_HOOKS

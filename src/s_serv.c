@@ -26,7 +26,7 @@
 
 #include "stdinc.h"
 
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 #include <openssl/rsa.h>
 #endif
 

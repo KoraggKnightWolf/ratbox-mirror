@@ -27,7 +27,7 @@
 
 #include "ratbox_lib.h"
 #include "stdinc.h"
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 #endif
@@ -1314,7 +1314,7 @@ conf_set_end_operator(conf_t * conf)
 	}
 
 	if(EmptyString(t_oper->passwd)
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 	   && EmptyString(t_oper->rsa_pubkey_file))
 #else
 		)
@@ -1335,7 +1335,7 @@ conf_set_end_operator(conf_t * conf)
 		/* maybe an rsa key */
 		if(!EmptyString(t_oper->passwd))
 			tmp_oper->passwd = rb_strdup(t_oper->passwd);
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 		if(t_oper->rsa_pubkey_file != NULL)
 		{
 			BIO *file;
@@ -1412,7 +1412,7 @@ conf_set_oper_password(confentry_t * entry, conf_t * conf, struct conf_items *it
 static void
 conf_set_oper_rsa_public_key_file(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 	rb_free(t_oper->rsa_pubkey_file);
 	t_oper->rsa_pubkey_file = rb_strdup(entry->string);
 #else

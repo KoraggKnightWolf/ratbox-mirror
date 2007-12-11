@@ -271,7 +271,7 @@ free_oper_conf(struct oper_conf *oper_p)
 		rb_free(oper_p->passwd);
 	}
 
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 	rb_free(oper_p->rsa_pubkey_file);
 
 	if(oper_p->rsa_pubkey)

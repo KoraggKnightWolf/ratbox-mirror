@@ -250,9 +250,9 @@ static struct InfoStruct info_table[] = {
 		"Anti SpamBot Parameter"
 	},
 	{
-		"HAVE_LIBCRYPTO", 
+		"USE_CHALLENGE", 
 		OUTPUT_BOOLEAN_RAW,
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 		{ (void *)1 },
 #else
 		{ (void *)0 },

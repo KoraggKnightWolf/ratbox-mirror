@@ -23640,10 +23640,11 @@ save_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $SSL_INCLUDES"
 save_LIBS="$LIBS"
 LIBS="$LIBS $SSL_LIBS"
+
+
+
 if test "$cf_enable_openssl" != no; then
-		{ echo "$as_me:$LINENO: checking for OpenSSL 0.9.6 or above" >&5
-echo $ECHO_N "checking for OpenSSL 0.9.6 or above... $ECHO_C" >&6; }
-	if test "$cross_compiling" = yes; then
+		if test "$cross_compiling" = yes; then
   cf_openssl_version_ok=no
 else
   cat >conftest.$ac_ext <<_ACEOF
@@ -23696,14 +23697,11 @@ rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext conftest.$a
 fi
 
 
+fi
 
-	if test "$cf_openssl_version_ok" = yes; then
-		{ echo "$as_me:$LINENO: result: found" >&5
-echo "${ECHO_T}found" >&6; }
-
-				CPPFLAGS="$CPPFLAGS $SSL_LIBS"
-
-{ echo "$as_me:$LINENO: checking for RSA_free in -lcrypto" >&5
+if test "$cf_openssl_version_ok" = yes; then
+	CPPFLAGS="$CPPFLAGS $SSL_LIBS"
+	{ echo "$as_me:$LINENO: checking for RSA_free in -lcrypto" >&5
 echo $ECHO_N "checking for RSA_free in -lcrypto... $ECHO_C" >&6; }
 if test "${ac_cv_lib_crypto_RSA_free+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -23765,20 +23763,20 @@ fi
 { echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_RSA_free" >&5
 echo "${ECHO_T}$ac_cv_lib_crypto_RSA_free" >&6; }
 if test $ac_cv_lib_crypto_RSA_free = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBCRYPTO 1
-_ACEOF
-
-  LIBS="-lcrypto $LIBS"
+  SSL_LIBS="$SSL_LIBS -lcrypto" SSL_SRCS_ENABLE='$(SSL_SRCS)'
+else
+  cf_enable_openssl=no
 
 fi
 
-		SSL_LIBS="$SSL_LIBS -lcrypto"
-		SSL_SRCS_ENABLE='$(SSL_SRCS)'
-	else
-	        { echo "$as_me:$LINENO: result: no - OpenSSL support disabled" >&5
-echo "${ECHO_T}no - OpenSSL support disabled" >&6; }
-	fi
+fi
+
+if test "$cf_enable_openssl" = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_CHALLENGE 1
+_ACEOF
+
 fi
 
 CPPFLAGS="$save_CPPFLAGS"

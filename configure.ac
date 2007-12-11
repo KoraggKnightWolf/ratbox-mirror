@@ -234,9 +234,11 @@ save_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $SSL_INCLUDES"
 save_LIBS="$LIBS"
 LIBS="$LIBS $SSL_LIBS"
+
+
+
 if test "$cf_enable_openssl" != no; then
 	dnl Check OpenSSL version (must be 0.9.6 or above!)
-	AC_MSG_CHECKING(for OpenSSL 0.9.6 or above)
 	AC_RUN_IFELSE(
 		AC_LANG_PROGRAM(
 	    	[#include <openssl/opensslv.h>
@@ -246,18 +248,18 @@ if test "$cf_enable_openssl" != no; then
 	cf_openssl_version_ok=yes,
 	cf_openssl_version_ok=no,
 	cf_openssl_version_ok=no)
+fi
 
-	if test "$cf_openssl_version_ok" = yes; then
-		AC_MSG_RESULT(found)
+if test "$cf_openssl_version_ok" = yes; then
+	CPPFLAGS="$CPPFLAGS $SSL_LIBS"
+	AC_CHECK_LIB(crypto, RSA_free, 
+		[SSL_LIBS="$SSL_LIBS -lcrypto" SSL_SRCS_ENABLE='$(SSL_SRCS)'], 
+		[cf_enable_openssl=no] 
+	)
+fi
 
-		dnl Do all the HAVE_LIBCRYPTO magic -- and check for ciphers
-		CPPFLAGS="$CPPFLAGS $SSL_LIBS"
-		AC_CHECK_LIB(crypto, RSA_free)
-		SSL_LIBS="$SSL_LIBS -lcrypto"
-		SSL_SRCS_ENABLE='$(SSL_SRCS)'
-	else
-	        AC_MSG_RESULT(no - OpenSSL support disabled)
-	fi
+if test "$cf_enable_openssl" = yes; then
+	AC_DEFINE(USE_CHALLENGE, 1, [Define to enable CHALLENGE support, requires OpenSSL])
 fi
 
 CPPFLAGS="$save_CPPFLAGS"

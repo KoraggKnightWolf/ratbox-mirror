@@ -26,7 +26,7 @@
 
 #include "stdinc.h"
 
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 #include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/rsa.h>
@@ -274,7 +274,7 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 }
 
 
-#ifndef HAVE_LIBCRYPTO
+#ifndef USE_CHALLENGE
 static int
 m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
@@ -495,4 +495,4 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 	return (-1);
 }
 
-#endif /* HAVE_LIBCRYPTO */
+#endif /* USE_CHALLENGE */
