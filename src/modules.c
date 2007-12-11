@@ -876,11 +876,11 @@ load_a_module(const char *path, int warn, int core)
 	if(warn == 1)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Module %s [version: %s; MAPI version: %d] loaded at 0x%lx",
+				     "Module %s [version: %s; MAPI version: %d] loaded at 0x%p",
 				     mod_basename, ver, MAPI_VERSION(*mapi_version),
-				     (unsigned long) tmpptr);
-		ilog(L_MAIN, "Module %s [version: %s; MAPI version: %d] loaded at 0x%lx",
-		     mod_basename, ver, MAPI_VERSION(*mapi_version), (unsigned long) tmpptr);
+				     tmpptr);
+		ilog(L_MAIN, "Module %s [version: %s; MAPI version: %d] loaded at 0x%p",
+		     mod_basename, ver, MAPI_VERSION(*mapi_version), tmpptr);
 	}
 	rb_free(mod_basename);
 	return 0;
