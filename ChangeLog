@@ -1,3 +1,11 @@
+androsyn    2007/12/11 03:28:05 UTC	(20071211_0-24683)
+  Log:
+  fix a thinko
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2007/12/10 19:30:20 UTC	(20071210_0-24681)
   Log:
   use sprintf for the few times we need to convert floats to strings as rb_snprintf doesn't deal with them anymore
