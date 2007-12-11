@@ -23647,7 +23647,7 @@ if test "$cf_enable_openssl" != no; then
 		{ echo "$as_me:$LINENO: checking for OpenSSL 0.9.7 or above" >&5
 echo $ECHO_N "checking for OpenSSL 0.9.7 or above... $ECHO_C" >&6; }
 	if test "$cross_compiling" = yes; then
-  cf_openssl_version_ok=no
+  cf_enable_openssl=no
 else
   cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -23686,30 +23686,31 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  cf_openssl_version_ok=yes
+  cf_enable_openssl=yes
 else
   echo "$as_me: program exited with status $ac_status" >&5
 echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 ( exit $ac_status )
-cf_openssl_version_ok=no
+cf_enable_openssl=no
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
 fi
 
 
 
-	if test "$cf_openssl_version_ok" = yes; then
+	if test "$cf_enable_openssl" = yes; then
 		{ echo "$as_me:$LINENO: result: found" >&5
 echo "${ECHO_T}found" >&6; }
 	else
+		cf_enable_openssl=no
 		{ echo "$as_me:$LINENO: result: not found - OpenSSL support disabled" >&5
 echo "${ECHO_T}not found - OpenSSL support disabled" >&6; }
 	fi
 fi
 
-if test "$cf_openssl_version_ok" = yes; then
+if test "$cf_openssl_version_ok" != no; then
 	CPPFLAGS="$CPPFLAGS $SSL_LIBS"
 	{ echo "$as_me:$LINENO: checking for RSA_free in -lcrypto" >&5
 echo $ECHO_N "checking for RSA_free in -lcrypto... $ECHO_C" >&6; }
@@ -23781,7 +23782,7 @@ fi
 
 fi
 
-if test "$cf_enable_openssl" = yes; then
+if test "$cf_enable_openssl" != no; then
 
 cat >>confdefs.h <<\_ACEOF
 #define USE_CHALLENGE 1

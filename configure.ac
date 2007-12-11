@@ -246,18 +246,19 @@ if test "$cf_enable_openssl" != no; then
 		#include <stdlib.h>],
 		[[if (OPENSSL_VERSION_NUMBER >= 0x00907000)
 		exit(0); else exit(1);]]),
-	cf_openssl_version_ok=yes,
-	cf_openssl_version_ok=no,
-	cf_openssl_version_ok=no)
+	cf_enable_openssl=yes,
+	cf_enable_openssl=no,
+	cf_enable_openssl=no)
 
-	if test "$cf_openssl_version_ok" = yes; then
+	if test "$cf_enable_openssl" = yes; then
 		AC_MSG_RESULT(found)
 	else
+		cf_enable_openssl=no
 		AC_MSG_RESULT(not found - OpenSSL support disabled)
 	fi
 fi
 
-if test "$cf_openssl_version_ok" = yes; then
+if test "$cf_openssl_version_ok" != no; then
 	CPPFLAGS="$CPPFLAGS $SSL_LIBS"
 	AC_CHECK_LIB(crypto, RSA_free, 
 		[SSL_LIBS="$SSL_LIBS -lcrypto" SSL_SRCS_ENABLE='$(SSL_SRCS)'], 
@@ -265,7 +266,7 @@ if test "$cf_openssl_version_ok" = yes; then
 	)
 fi
 
-if test "$cf_enable_openssl" = yes; then
+if test "$cf_enable_openssl" != no; then
 	AC_DEFINE(USE_CHALLENGE, 1, [Define to enable CHALLENGE support, requires OpenSSL])
 fi
 
