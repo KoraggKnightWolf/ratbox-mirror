@@ -676,10 +676,10 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 	if(counts[0] != length) 
 	{
 		sprintf(buf, "%.3f%%/%.3f%%", (float) (total / (length - counts[0])), 
-			(float) (total / length), deepest)
+			(float) (total / length));
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG,
 				"B :Average depth: %s Highest depth: %d",
-				buf);
+				buf, deepest);
 	}
 	for(i = 0; i < 11; i++)
 	{
