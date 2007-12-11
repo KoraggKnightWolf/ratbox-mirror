@@ -1,3 +1,12 @@
+androsyn    2007/12/11 03:41:28 UTC	(20071211_1-24685)
+  Log:
+  replace %lx with %p to print pointer types
+
+  Modified:
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2007/12/11 03:28:05 UTC	(20071211_0-24683)
   Log:
   fix a thinko
