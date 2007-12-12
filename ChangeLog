@@ -1,3 +1,12 @@
+androsyn    2007/12/12 20:40:49 UTC	(20071212_0-24695)
+  Log:
+  oops forgot to change a few HAVE_LIBCRYPTOs to USE_CHALLENGE
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+
+
 androsyn    2007/12/11 17:52:57 UTC	(20071211_4-24691)
   Log:
   another small tweak
