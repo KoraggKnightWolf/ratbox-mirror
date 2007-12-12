@@ -35,7 +35,7 @@
 #ifndef INCLUDED_s_newconf_h
 #define INCLUDED_s_newconf_h
 
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 #include <openssl/rsa.h>
 #endif
 
@@ -111,7 +111,7 @@ struct oper_conf
 	int flags;
 	int umodes;
 
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 	char *rsa_pubkey_file;
 	RSA *rsa_pubkey;
 #endif

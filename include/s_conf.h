@@ -27,7 +27,7 @@
 #ifndef INCLUDED_s_conf_h
 #define INCLUDED_s_conf_h
 
-#ifdef HAVE_LIBCRYPTO
+#ifdef USE_CHALLENGE
 #include <openssl/rsa.h>
 #endif
 
