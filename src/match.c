@@ -236,16 +236,21 @@ match_esc(const char *mask, const char *name)
 int
 comp_with_mask(void *addr, void *dest, unsigned int mask)
 {
-	if(memcmp(addr, dest, mask / 8) == 0)
-	{
-		int n = mask / 8;
-		int m = ((-1) << (8 - (mask % 8)));
-		if(mask % 8 == 0 || (((u_char *) addr)[n] & m) == (((u_char *) dest)[n] & m))
-		{
-			return (1);
-		}
-	}
-	return (0);
+	int n = mask / 8;
+	int m;
+	unsigned char *s = addr;
+	unsigned char *d = dest;
+	do {
+		if(*(d++) != *(s++))
+			return 0;   
+        } while(--n);
+
+	if(!(mask % 8))
+		return 1;
+	m = ((-1) << (8 - (mask % 8)));
+	if((*d & m) == (*s & m))
+		return 1;
+	return 0;
 }
 
 int
