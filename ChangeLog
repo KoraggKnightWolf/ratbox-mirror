@@ -1,3 +1,11 @@
+androsyn    2007/12/13 02:29:36 UTC	(20071213_0-24697)
+  Log:
+  replace comp_with_mask with a faster version
+
+  Modified:
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 androsyn    2007/12/12 20:40:49 UTC	(20071212_0-24695)
   Log:
   oops forgot to change a few HAVE_LIBCRYPTOs to USE_CHALLENGE
