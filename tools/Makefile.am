@@ -11,3 +11,5 @@ mkpasswd_LDADD = ../libratbox/src/libratbox.la
 
 
 
+install-exec-hook:
+	$(CP) bantool.pl $(DESTDIR)$(bindir)
