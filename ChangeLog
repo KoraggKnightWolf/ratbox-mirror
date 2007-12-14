@@ -1,3 +1,12 @@
+androsyn    2007/12/14 18:13:30 UTC	(20071214_1-24701)
+  Log:
+  install bantool.pl in bin
+
+  Modified:
+	ircd-ratbox/trunk/tools/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2007/12/14 18:08:14 UTC	(20071214_0-24699)
   Log:
   move bantool.pl from contrib to tools
