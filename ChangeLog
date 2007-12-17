@@ -1,3 +1,11 @@
+androsyn    2007/12/17 19:57:35 UTC	(20071217_9-24723)
+  Log:
+  remove event.h from m_force.c
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_force.c (File Modified) 
+
+
 androsyn    2007/12/17 18:37:43 UTC	(20071217_8-24719)
   Log:
   If the id passed to ssld was zero, we would fail to remove it from the connid hash.
