@@ -1,3 +1,14 @@
+androsyn    2007/12/17 18:37:43 UTC	(20071217_8-24719)
+  Log:
+  If the id passed to ssld was zero, we would fail to remove it from the connid hash.
+  Make id's signed integers and treat negative ids as invalid. 
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/12/17 16:57:45 UTC	(20071217_7-24717)
   Log:
   Add adminwall
