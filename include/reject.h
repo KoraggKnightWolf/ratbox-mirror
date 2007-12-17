@@ -29,9 +29,6 @@
 /* amount of time to delay a rejected clients exit */
 #define DELAYED_EXIT_TIME	10
 
-extern rb_patricia_tree_t *dline_tree;
-extern rb_dlink_list delay_exit;
-
 void init_reject(void);
 int check_reject(rb_fde_t *F, struct sockaddr *addr);
 void add_reject(struct Client *);
@@ -45,6 +42,7 @@ int add_eline(struct ConfItem *aconf);
 void report_dlines(struct Client *);
 void report_tdlines(struct Client *);
 void report_elines(struct Client *);
+unsigned long delay_exit_length(void);
 
 int throttle_add(struct sockaddr *addr);
 

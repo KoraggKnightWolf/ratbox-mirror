@@ -36,9 +36,9 @@
 #include "hostmask.h"
 
 static rb_patricia_tree_t *reject_tree;
-rb_patricia_tree_t *dline_tree;
+static rb_patricia_tree_t *dline_tree;
 static rb_patricia_tree_t *eline_tree;
-rb_dlink_list delay_exit;
+static rb_dlink_list delay_exit;
 static rb_dlink_list reject_list;
 static rb_dlink_list throttle_list;
 static rb_patricia_tree_t *throttle_tree;
@@ -97,6 +97,11 @@ add_eline(struct ConfItem *aconf)
 	return 0;
 }
 
+unsigned long
+delay_exit_length(void)
+{
+	return rb_dlink_list_length(&delay_exit);
+}
 
 static void
 reject_exit(void *unused)
