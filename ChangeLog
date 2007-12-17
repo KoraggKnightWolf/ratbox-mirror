@@ -1,3 +1,11 @@
+androsyn    2007/12/17 02:48:04 UTC	(20071217_3-24709)
+  Log:
+  add a flag in stats C for SSL connections
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2007/12/17 02:16:59 UTC	(20071217_2-24707)
   Log:
   stop exporting delay_exit and dline_tree.
