@@ -144,8 +144,8 @@ static void
 clean_dead_conns(void *unused)
 {
 	conn_t *conn;
-	rb_dlink_node *ptr;
-	RB_DLINK_FOREACH(ptr, dead_list.head)
+	rb_dlink_node *ptr, *next;
+	RB_DLINK_FOREACH_SAFE(ptr, next, dead_list.head)
 	{
 		conn = ptr->data;
 		free_conn(conn);
