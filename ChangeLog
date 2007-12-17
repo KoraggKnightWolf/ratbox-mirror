@@ -1,3 +1,11 @@
+androsyn    2007/12/17 01:34:37 UTC	(20071217_1-24705)
+  Log:
+  fix some brain damage with ssl connects
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2007/12/17 01:22:26 UTC	(20071217_0-24703)
   Log:
   process ssld's dead list with RB_DLINK_FOREACH_SAFE
