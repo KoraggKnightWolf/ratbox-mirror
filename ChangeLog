@@ -1,3 +1,11 @@
+androsyn    2007/12/17 01:22:26 UTC	(20071217_0-24703)
+  Log:
+  process ssld's dead list with RB_DLINK_FOREACH_SAFE
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/12/14 18:13:30 UTC	(20071214_1-24701)
   Log:
   install bantool.pl in bin
