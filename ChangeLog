@@ -1,3 +1,14 @@
+androsyn    2007/12/17 16:57:45 UTC	(20071217_7-24717)
+  Log:
+  Add adminwall
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/m_adminwall.c (File Added) 
+
+
 androsyn    2007/12/17 15:57:07 UTC	(20071217_6-24715)
   Log:
   make the ircd accept non-ssl connections again..oops
