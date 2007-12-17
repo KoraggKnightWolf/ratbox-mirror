@@ -105,6 +105,7 @@ endif # !STATIC_MODULES
 
 modules_m_accept_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_admin_la_LDFLAGS =  -module $(MODULE_FLAGS)  
+modules_m_adminwall_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_away_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_capab_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 modules_m_cap_la_LDFLAGS =  -module $(MODULE_FLAGS)  
@@ -158,6 +159,7 @@ modules_m_xline_la_LDFLAGS =  -module $(MODULE_FLAGS)
 
 modules_m_accept_la_SOURCES =	modules/m_accept.c
 modules_m_admin_la_SOURCES =	modules/m_admin.c
+modules_m_adminwall_la_SOURCES= modules/m_adminwall.c
 modules_m_away_la_SOURCES =	modules/m_away.c
 modules_m_capab_la_SOURCES =	modules/m_capab.c
 modules_m_cap_la_SOURCES =	modules/m_cap.c
@@ -212,6 +214,7 @@ modules_m_xline_la_SOURCES =	modules/m_xline.c
 modules_LTLIBRARIES =   \
 modules/m_accept.la	\
 modules/m_admin.la	\
+modules/m_adminwall.la	\
 modules/m_away.la	\
 modules/m_capab.la	\
 modules/m_cap.la	\
@@ -266,6 +269,7 @@ modules/m_xline.la
 
 modules_m_accept_la_LIBADD = $(MODULE_LIBS)     
 modules_m_admin_la_LIBADD = $(MODULE_LIBS)     
+modules_m_adminwall_la_LIBADD = $(MODULE_LIBS)     
 modules_m_away_la_LIBADD = $(MODULE_LIBS)     
 modules_m_capab_la_LIBADD = $(MODULE_LIBS)     
 modules_m_cap_la_LIBADD = $(MODULE_LIBS)     

@@ -181,6 +181,12 @@ modules_m_admin_la_OBJECTS = $(am_modules_m_admin_la_OBJECTS)
 modules_m_admin_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(modules_m_admin_la_LDFLAGS) $(LDFLAGS) -o $@
+modules_m_adminwall_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_modules_m_adminwall_la_OBJECTS = modules/m_adminwall.lo
+modules_m_adminwall_la_OBJECTS = $(am_modules_m_adminwall_la_OBJECTS)
+modules_m_adminwall_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(modules_m_adminwall_la_LDFLAGS) $(LDFLAGS) -o $@
 modules_m_away_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_modules_m_away_la_OBJECTS = modules/m_away.lo
 modules_m_away_la_OBJECTS = $(am_modules_m_away_la_OBJECTS)
@@ -541,9 +547,9 @@ SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_core_m_server_la_SOURCES) \
 	$(modules_core_m_squit_la_SOURCES) \
 	$(modules_m_accept_la_SOURCES) $(modules_m_admin_la_SOURCES) \
-	$(modules_m_away_la_SOURCES) $(modules_m_cap_la_SOURCES) \
-	$(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) \
-	$(modules_m_cmessage_la_SOURCES) \
+	$(modules_m_adminwall_la_SOURCES) $(modules_m_away_la_SOURCES) \
+	$(modules_m_cap_la_SOURCES) $(modules_m_capab_la_SOURCES) \
+	$(modules_m_close_la_SOURCES) $(modules_m_cmessage_la_SOURCES) \
 	$(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) \
 	$(modules_m_encap_la_SOURCES) $(modules_m_gline_la_SOURCES) \
 	$(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) \
@@ -582,9 +588,9 @@ DIST_SOURCES = $(libcore_la_SOURCES) $(modules_core_m_die_la_SOURCES) \
 	$(modules_core_m_server_la_SOURCES) \
 	$(modules_core_m_squit_la_SOURCES) \
 	$(modules_m_accept_la_SOURCES) $(modules_m_admin_la_SOURCES) \
-	$(modules_m_away_la_SOURCES) $(modules_m_cap_la_SOURCES) \
-	$(modules_m_capab_la_SOURCES) $(modules_m_close_la_SOURCES) \
-	$(modules_m_cmessage_la_SOURCES) \
+	$(modules_m_adminwall_la_SOURCES) $(modules_m_away_la_SOURCES) \
+	$(modules_m_cap_la_SOURCES) $(modules_m_capab_la_SOURCES) \
+	$(modules_m_close_la_SOURCES) $(modules_m_cmessage_la_SOURCES) \
 	$(modules_m_connect_la_SOURCES) $(modules_m_dline_la_SOURCES) \
 	$(modules_m_encap_la_SOURCES) $(modules_m_gline_la_SOURCES) \
 	$(modules_m_help_la_SOURCES) $(modules_m_info_la_SOURCES) \
@@ -841,6 +847,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 @MINGW_TRUE@@STATIC_MODULES_FALSE@MODULE_LIBS = libratbox/src/libratbox.la libcore.la @SSL_LIBS@ 
 modules_m_accept_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_admin_la_LDFLAGS = -module $(MODULE_FLAGS)  
+modules_m_adminwall_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_away_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_capab_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_cap_la_LDFLAGS = -module $(MODULE_FLAGS)  
@@ -893,6 +900,7 @@ modules_m_whowas_la_LDFLAGS = -module $(MODULE_FLAGS)
 modules_m_xline_la_LDFLAGS = -module $(MODULE_FLAGS)  
 modules_m_accept_la_SOURCES = modules/m_accept.c
 modules_m_admin_la_SOURCES = modules/m_admin.c
+modules_m_adminwall_la_SOURCES = modules/m_adminwall.c
 modules_m_away_la_SOURCES = modules/m_away.c
 modules_m_capab_la_SOURCES = modules/m_capab.c
 modules_m_cap_la_SOURCES = modules/m_cap.c
@@ -946,6 +954,7 @@ modules_m_xline_la_SOURCES = modules/m_xline.c
 modules_LTLIBRARIES = \
 modules/m_accept.la	\
 modules/m_admin.la	\
+modules/m_adminwall.la	\
 modules/m_away.la	\
 modules/m_capab.la	\
 modules/m_cap.la	\
@@ -999,6 +1008,7 @@ modules/m_xline.la
 
 modules_m_accept_la_LIBADD = $(MODULE_LIBS)     
 modules_m_admin_la_LIBADD = $(MODULE_LIBS)     
+modules_m_adminwall_la_LIBADD = $(MODULE_LIBS)     
 modules_m_away_la_LIBADD = $(MODULE_LIBS)     
 modules_m_capab_la_LIBADD = $(MODULE_LIBS)     
 modules_m_cap_la_LIBADD = $(MODULE_LIBS)     
@@ -1386,6 +1396,10 @@ modules/m_admin.lo: modules/$(am__dirstamp) \
 	modules/$(DEPDIR)/$(am__dirstamp)
 modules/m_admin.la: $(modules_m_admin_la_OBJECTS) $(modules_m_admin_la_DEPENDENCIES) modules/$(am__dirstamp)
 	$(modules_m_admin_la_LINK) -rpath $(modulesdir) $(modules_m_admin_la_OBJECTS) $(modules_m_admin_la_LIBADD) $(LIBS)
+modules/m_adminwall.lo: modules/$(am__dirstamp) \
+	modules/$(DEPDIR)/$(am__dirstamp)
+modules/m_adminwall.la: $(modules_m_adminwall_la_OBJECTS) $(modules_m_adminwall_la_DEPENDENCIES) modules/$(am__dirstamp)
+	$(modules_m_adminwall_la_LINK) -rpath $(modulesdir) $(modules_m_adminwall_la_OBJECTS) $(modules_m_adminwall_la_LIBADD) $(LIBS)
 modules/m_away.lo: modules/$(am__dirstamp) \
 	modules/$(DEPDIR)/$(am__dirstamp)
 modules/m_away.la: $(modules_m_away_la_OBJECTS) $(modules_m_away_la_DEPENDENCIES) modules/$(am__dirstamp)
@@ -1653,6 +1667,8 @@ mostlyclean-compile:
 	-rm -f modules/m_accept.lo
 	-rm -f modules/m_admin.$(OBJEXT)
 	-rm -f modules/m_admin.lo
+	-rm -f modules/m_adminwall.$(OBJEXT)
+	-rm -f modules/m_adminwall.lo
 	-rm -f modules/m_away.$(OBJEXT)
 	-rm -f modules/m_away.lo
 	-rm -f modules/m_cap.$(OBJEXT)
@@ -1834,6 +1850,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_accept.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_admin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_adminwall.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_away.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_cap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@modules/$(DEPDIR)/m_capab.Plo@am__quote@
