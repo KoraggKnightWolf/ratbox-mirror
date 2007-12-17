@@ -1,3 +1,29 @@
+androsyn    2007/12/17 05:09:46 UTC	(20071217_5-24713)
+  Log:
+  convert a bunch of %s NOTICE %s type sendto_one notices to sendto_one_notices
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_die.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_squit.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_connect.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_gline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_restart.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_unreject.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2007/12/17 04:02:04 UTC	(20071217_4-24711)
   Log:
   unconditonally use ssld
