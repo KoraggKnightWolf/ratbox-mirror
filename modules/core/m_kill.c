@@ -97,8 +97,8 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 					   form_str(ERR_NOSUCHNICK), user);
 			return 0;
 		}
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :KILL changed from %s to %s",
-			   me.name, parv[0], user, target_p->name);
+		sendto_one_notice(source_p, POP_QUEUE, ":KILL changed from %s to %s",
+				  user, target_p->name);
 	}
 	if(IsServer(target_p) || IsMe(target_p))
 	{
@@ -108,8 +108,7 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(!MyConnect(target_p) && (!IsOperGlobalKill(source_p)))
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Nick %s isnt on your server",
-			   me.name, parv[0], target_p->name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Nick %s isnt on your server", target_p->name);
 		return 0;
 	}
 

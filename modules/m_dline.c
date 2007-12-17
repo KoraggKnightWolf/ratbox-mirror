@@ -103,8 +103,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 
 	if(!parse_netmask(dlhost, NULL, &bits))
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid D-Line",
-			   me.name, source_p->name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Invalid D-Line");
 		return 0;
 	}
 
@@ -117,9 +116,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 
 		if(!valid_comment(reason))
 		{
-			sendto_one(source_p, POP_QUEUE, 
-				   ":%s NOTICE %s :Invalid character '\"' in comment",
-				   me.name, source_p->name);
+			sendto_one_notice(source_p, POP_QUEUE, ":Invalid character '\"' in comment");
 			return 0;
 		}
 	}
@@ -128,9 +125,8 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	{
 		if(bits < 8)
 		{
-			sendto_one(source_p, POP_QUEUE, 
-				   ":%s NOTICE %s :For safety, bitmasks less than 8 require conf access.",
-				   me.name, parv[0]);
+			sendto_one_notice(source_p, POP_QUEUE, 
+					  ":For safety, bitmasks less than 8 require conf access.");
 			return 0;
 		}
 	}
@@ -138,9 +134,8 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	{
 		if(bits < 16)
 		{
-			sendto_one(source_p, POP_QUEUE, 
-				   ":%s NOTICE %s :Dline bitmasks less than 16 are for admins only.",
-				   me.name, parv[0]);
+			sendto_one_notice(source_p, POP_QUEUE, 
+					  ":Dline bitmasks less than 16 are for admins only.");
 			return 0;
 		}
 	}
@@ -166,13 +161,13 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 			{
 				creason = aconf->passwd ? aconf->passwd : "<No Reason>";
 				if(IsConfExemptKline(aconf))
-					sendto_one(source_p, POP_QUEUE, 
-						   ":%s NOTICE %s :[%s] is (E)d-lined by [%s] - %s",
-						   me.name, parv[0], dlhost, aconf->host, creason);
+					sendto_one_notice(source_p, POP_QUEUE, 
+							  ":[%s] is (E)d-lined by [%s] - %s",
+							  dlhost, aconf->host, creason);
 				else
-					sendto_one(source_p, POP_QUEUE, 
-						   ":%s NOTICE %s :[%s] already D-lined by [%s] - %s",
-						   me.name, parv[0], dlhost, aconf->host, creason);
+					sendto_one_notice(source_p, POP_QUEUE, 
+							  ":[%s] already D-lined by [%s] - %s",
+							  dlhost, aconf->host, creason);
 				return 0;
 			}
 		}
@@ -228,8 +223,8 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 				aconf->host, reason, oper_reason);
 		}
 
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Added temporary %d min. D-Line for [%s]",
-			   me.name, source_p->name, tdline_time / 60, aconf->host);
+		sendto_one_notice(source_p, POP_QUEUE, ":Added temporary %d min. D-Line for [%s]",
+				  tdline_time / 60, aconf->host);
 	}
 	else
 	{
@@ -257,9 +252,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 				reason, oper_reason);
 		}
 
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :Added D-Line [%s]", me.name,
-			   source_p->name, aconf->host);
+		sendto_one_notice(source_p, POP_QUEUE, ":Added D-Line [%s]", aconf->host);
 
 		bandb_add(BANDB_DLINE, source_p, aconf->host, NULL,
 				reason, EmptyString(oper_reason) ? NULL : oper_reason);
@@ -290,8 +283,7 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if((ty = parse_netmask(cidr, (struct sockaddr *)&daddr, &b)) == HM_HOST)
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid D-Line",
-			   me.name, source_p->name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Invalid D-Line");
 		return 0;
 	}
 
@@ -299,13 +291,13 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(aconf == NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :No D-Line for %s",  me.name, source_p->name, cidr);
+		sendto_one_notice(source_p, POP_QUEUE, ":No D-Line for %s", cidr);
 		return 0;
 	}
 
 	if(IsConfPermanent(aconf))
 	{
-		sendto_one(source_p, POP_QUEUE, "%s NOTICE %s :Cannot remove permanent D-Line %s", me.name, source_p->name, cidr);
+		sendto_one_notice(source_p, POP_QUEUE, ":Cannot remove permanent D-Line %s", cidr);
 		return 0;
 	}	
 
@@ -316,7 +308,7 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		bandb_del(BANDB_DLINE, host, NULL);
 		
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :D-Line for [%s] is removed", me.name, source_p->name, host);
+		sendto_one_notice(source_p, POP_QUEUE, ":D-Line for [%s] is removed", host);
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s has removed the D-Line for: [%s]", 
 			             get_oper_name(source_p), host);
 
@@ -324,8 +316,7 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		rb_dlink_list *list;
 		list = &temp_dlines[aconf->port];
 		rb_dlinkFindDestroy(aconf, list);
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Un-dlined [%s] from temporary D-lines",
-			   me.name, parv[0], host);
+		sendto_one_notice(source_p, POP_QUEUE, ":Un-dlined [%s] from temporary D-lines", host);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s has removed the temporary D-Line for: [%s]",
 				     get_oper_name(source_p), host);

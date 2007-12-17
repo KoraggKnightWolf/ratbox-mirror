@@ -266,8 +266,7 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 		--Count.invisi;
 	send_umode_out(source_p, source_p, old);
 	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_YOUREOPER), me.name, source_p->name);
-	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :*** Oper privs are %s", me.name,
-		   source_p->name, get_oper_privs(oper_p->flags));
+	sendto_one_notice(source_p, POP_QUEUE, ":*** Oper privs are %s", get_oper_privs(oper_p->flags));
 	send_oper_motd(source_p);
 
 	return (1);
@@ -278,8 +277,7 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 static int
 m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Challenge not implemented ",
-		   me.name, source_p->name);
+	sendto_one_notice(source_p, POP_QUEUE, ":Challenge not implemented");
 	return 0;
 }
 
@@ -418,8 +416,8 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(!oper_p->rsa_pubkey)
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :I'm sorry, PK authentication "
-			   "is not enabled for your oper{} block.", me.name, parv[0]);
+		sendto_one_notice(source_p, POP_QUEUE, ":I'm sorry, PK authentication "
+				  "is not enabled for your oper{} block.");
 		return 0;
 	}
 

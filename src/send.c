@@ -337,6 +337,22 @@ sendto_one_prefix(struct Client *target_p, struct Client *source_p,
 	rb_linebuf_donebuf(&linebuf);
 }
 
+/*
+ * sendto_one_notice_local()
+ * inputs	- client to send to, va_args
+ * outputs	- client has a NOTICE put into its queue
+ * side effects - fast path for local clients 
+ */
+static void
+sendto_one_notice_local(struct Client *target_p, int queue, const char *pattern, va_list *ap)
+{
+	buf_head_t linebuf;
+	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_putmsg(&linebuf, pattern, ap, ":%s NOTICE %s ", me.name, target_p->name);
+	send_linebuf(target_p, &linebuf, queue);
+	rb_linebuf_donebuf(&linebuf);
+}
+
 /* sendto_one_notice()
  *
  * inputs	- client to send to, va_args
@@ -350,11 +366,17 @@ sendto_one_notice(struct Client *target_p, int queue, const char *pattern, ...)
 	va_list args;
 	buf_head_t linebuf;
 
-	/* send remote if to->from non NULL */
-	if(target_p->from != NULL)
-		dest_p = target_p->from;
-	else
-		dest_p = target_p;
+	if(MyConnect(target_p))
+	{
+		if(IsIOError(target_p))
+			return;
+		va_start(args, pattern);
+		sendto_one_notice_local(target_p, queue, pattern, &args);
+		va_end(args);
+		return;
+	}
+
+	dest_p = target_p->from;
 
 	if(IsIOError(dest_p))
 		return;

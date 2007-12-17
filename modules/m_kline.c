@@ -341,7 +341,7 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	}
 	else
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid parameters", me.name, source_p->name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Invalid parameters");
 		return 0;
 	}
 
@@ -819,9 +819,9 @@ remove_temp_kline(struct Client *source_p, const char *user, const char *host)
 			rb_dlinkDestroy(ptr, &temp_klines[i]);
 			delete_one_address_conf(aconf->host, aconf);
 
-			sendto_one(source_p, POP_QUEUE, 
-				   ":%s NOTICE %s :Un-klined [%s@%s] from temporary k-lines",
-				   me.name, source_p->name, user, host);
+			sendto_one_notice(source_p, POP_QUEUE, 
+					  ":Un-klined [%s@%s] from temporary k-lines",
+					  user, host);
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "%s has removed the temporary K-Line for: [%s@%s]",
 					     get_oper_name(source_p), user, host);

@@ -67,14 +67,12 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(parc < 2 || EmptyString(parv[1]))
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Need server name /restart %s",
-			   me.name, source_p->name, me.name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Need server name /restart %s", me.name);
 		return 0;
 	}
 	else if(irccmp(parv[1], me.name))
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Mismatch on /restart %s",
-			   me.name, source_p->name, me.name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Mismatch on /restart %s", me.name);
 		return 0;
 	}
 
@@ -82,9 +80,7 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		target_p = ptr->data;
 
-		sendto_one(target_p, POP_QUEUE,
-			   ":%s NOTICE %s :Server Restarting. %s",
-			   me.name, target_p->name, get_client_name(source_p, HIDE_IP));
+		sendto_one_notice(target_p, POP_QUEUE, ":Server Restarting. %s", get_client_name(source_p, HIDE_IP));
 	}
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)

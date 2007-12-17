@@ -83,8 +83,8 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if((target_p = find_server(source_p, parv[1])))
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Connect: Server %s already exists from %s.",
-			   me.name, parv[0], parv[1], target_p->from->name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Connect: Server %s already exists from %s.",
+				  parv[1], target_p->from->name);
 		return 0;
 	}
 
@@ -93,9 +93,8 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 */
 	if((server_p = find_server_conf(parv[1])) == NULL)
 	{
-		sendto_one(source_p, POP_QUEUE,
-			   "NOTICE %s :Connect: Host %s not listed in ircd.conf",
-			   parv[0], parv[1]);
+		sendto_one_notice(source_p, POP_QUEUE,
+			   	  ":Connect: Host %s not listed in ircd.conf", parv[1]);
 		return 0;
 	}
 
@@ -117,14 +116,13 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		if((port = atoi(parv[2])) <= 0)
 		{
-			sendto_one(source_p, POP_QUEUE, "NOTICE %s :Connect: Illegal port number", parv[0]);
+			sendto_one_notice(source_p, POP_QUEUE, ":Connect: Illegal port number");
 			return 0;
 		}
 	}
 	else if(port <= 0 && (port = PORTNUM) <= 0)
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Connect: missing port number",
-			   me.name, parv[0]);
+		sendto_one_notice(source_p, POP_QUEUE, ":Connect: missing port number");
 		return 0;
 	}
 	/*
@@ -140,13 +138,13 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 */
 	if(serv_connect(server_p, source_p))
 	{
-			sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :*** Connecting to %s.%d",
-				   me.name, parv[0], server_p->name, server_p->port);
+			sendto_one_notice(source_p, POP_QUEUE, ":*** Connecting to %s.%d",
+					  server_p->name, server_p->port);
 	}
 	else
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :*** Couldn't connect to %s.%d",
-			   me.name, parv[0], server_p->name, server_p->port);
+		sendto_one_notice(source_p, POP_QUEUE, ":*** Couldn't connect to %s.%d",
+				  server_p->name, server_p->port);
 
 	}
 

@@ -506,9 +506,7 @@ mo_modload(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(findmodule_byname(m_bn) != -1)
 	{
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :Module %s is already loaded",
-			   me.name, source_p->name, m_bn);
+		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is already loaded", m_bn);
 		rb_free(m_bn);
 		return 0;
 	}
@@ -539,25 +537,22 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if((modindex = findmodule_byname(m_bn)) == -1)
 	{
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
+		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is not loaded", m_bn);
 		rb_free(m_bn);
 		return 0;
 	}
 
 	if(modlist[modindex]->core == 1)
 	{
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :Module %s is a core module and may not be unloaded",
-			   me.name, source_p->name, m_bn);
+		sendto_one_notice(source_p, POP_QUEUE, 
+				  ":Module %s is a core module and may not be unloaded", m_bn);
 		rb_free(m_bn);
 		return 0;
 	}
 
 	if(unload_one_module(m_bn, 1) == -1)
 	{
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
+		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is not loaded", m_bn);
 	}
 	rb_free(m_bn);
 	return 0;
@@ -582,8 +577,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if((modindex = findmodule_byname(m_bn)) == -1)
 	{
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
+		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is not loaded", m_bn);
 		rb_free(m_bn);
 		return 0;
 	}
@@ -592,8 +586,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(unload_one_module(m_bn, 1) == -1)
 	{
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :Module %s is not loaded", me.name, source_p->name, m_bn);
+		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is not loaded", m_bn);
 		rb_free(m_bn);
 		return 0;
 	}
@@ -624,7 +617,7 @@ mo_modrestart(struct Client *client_p, struct Client *source_p, int parc, const 
 		return 0;
 	}
 
-	sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Reloading all modules", me.name, parv[0]);
+	sendto_one_notice(source_p, POP_QUEUE, ":Reloading all modules");
 
 	modnum = num_mods;
 	while (num_mods)

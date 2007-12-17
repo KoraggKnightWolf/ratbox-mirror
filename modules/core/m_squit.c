@@ -209,8 +209,7 @@ find_squit(struct Client *client_p, struct Client *source_p, const char *server)
 		if(IsClient(client_p))
 		{
 			if(MyClient(client_p))
-				sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :You are trying to squit me.",
-					   me.name, client_p->name);
+				sendto_one_notice(source_p, POP_QUEUE, ":You are trying to squit me.");
 			return NULL;
 		}
 		else

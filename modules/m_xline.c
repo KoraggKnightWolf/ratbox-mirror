@@ -144,8 +144,8 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if((aconf = find_xline_mask(name)) != NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :[%s] already X-Lined by [%s] - %s",
-			   me.name, source_p->name, name, aconf->host, aconf->passwd);
+		sendto_one_notice(source_p, POP_QUEUE, ":[%s] already X-Lined by [%s] - %s",
+				  name, aconf->host, aconf->passwd);
 		return 0;
 	}
 
@@ -183,9 +183,8 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* already xlined */
 	if((aconf = find_xline_mask(name)) != NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :[%s] already X-Lined by [%s] - %s",
-				me.name, source_p->name, name, 
-				aconf->host, aconf->passwd);
+		sendto_one_notice(source_p, POP_QUEUE, ":[%s] already X-Lined by [%s] - %s",
+				  name, aconf->host, aconf->passwd);
 		return 0;
 	}
 

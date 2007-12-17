@@ -76,8 +76,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	/* username is required */
 	if((hostname = strchr(name, '@')) == NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid parameters",
-				me.name, source_p->name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Invalid parameters");
 		return 0;
 	}
 
@@ -94,8 +93,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 
 	if(EmptyString(username) || EmptyString(hostname))
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Invalid parameters",
-				me.name, source_p->name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Invalid parameters");
 		return 0;
 	}
 

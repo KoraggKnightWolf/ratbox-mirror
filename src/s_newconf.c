@@ -530,8 +530,7 @@ set_server_conf_autoconn(struct Client *source_p, char *name, int newval)
 				get_oper_name(source_p), name, newval);
 	}
 	else
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Can't find %s",
-				me.name, source_p->name, name);
+		sendto_one_notice(source_p, POP_QUEUE, ":Can't find %s", name);
 }
 
 struct ConfItem *
