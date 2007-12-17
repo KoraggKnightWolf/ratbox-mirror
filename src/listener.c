@@ -459,6 +459,7 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 
 	if(listener->ssl && (!ssl_ok || !get_ssld_count()))
 	{
+		fprintf(stderr, "closed socket\n");
 		rb_close(F);
 		return 0;
 	}
@@ -549,6 +550,8 @@ accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t add
 	}
 	if(listener->ssl)
 		accept_ssld(F, addr, (struct sockaddr *)&lip, listener);
+	else
+		add_connection(listener, F, addr, (struct sockaddr *)&lip, NULL);
 }
 
 
