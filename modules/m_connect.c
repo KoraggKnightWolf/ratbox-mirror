@@ -37,6 +37,7 @@
 #include "parse.h"
 #include "hash.h"
 #include "modules.h"
+#include "sslproc.h"
 
 static int mo_connect(struct Client *, struct Client *, int, const char **);
 static int ms_connect(struct Client *, struct Client *, int, const char **);
@@ -95,6 +96,14 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 		sendto_one(source_p, POP_QUEUE,
 			   "NOTICE %s :Connect: Host %s not listed in ircd.conf",
 			   parv[0], parv[1]);
+		return 0;
+	}
+
+	if(ServerConfSSL(server_p) && (!ssl_ok || !get_ssld_count()))
+	{
+		sendto_one_notice(source_p, POP_QUEUE,
+				  ":Connect: Server %s is set to use SSL/TLS but SSL/TLS is not configured.",
+				  parv[1]);
 		return 0;
 	}
 
@@ -187,6 +196,15 @@ ms_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 				  parv[1]);
 		return 0;
 	}
+
+	if(ServerConfSSL(server_p) && (!ssl_ok || !get_ssld_count()))
+	{
+		sendto_one_notice(source_p, POP_QUEUE,
+				  ":Connect: Server %s is set to use SSL/TLS but SSL/TLS is not configured.",
+				  parv[1]);
+		return 0;
+	}
+
 
 	/*
 	 * Get port number from user, if given. If not specified,

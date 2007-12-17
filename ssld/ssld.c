@@ -657,9 +657,12 @@ ssl_new_keys(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
 	if(strlen(dhparam) == 0)
 		dhparam = NULL;
 
-	if(!rb_setup_ssl_server(cert, key, dhparam))
+	if(rb_setup_ssl_server(cert, key, dhparam))
 	{
-		/* XXX handle errors */
+		
+		
+	} else  {
+			
 	}
 }
 

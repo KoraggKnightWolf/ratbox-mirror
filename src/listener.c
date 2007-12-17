@@ -213,13 +213,7 @@ inetport(struct Listener *listener)
 		return 0;
 	}
 
-	
-	if(listener->ssl && !ServerInfo.ssl_use_ssld)
-		ret = rb_ssl_listen(F, RATBOX_SOMAXCONN);
-	else
-		ret = rb_listen(F, RATBOX_SOMAXCONN);
-
-	if(ret)
+	if((ret = rb_listen(F, RATBOX_SOMAXCONN)))
 	{
 		report_error("listen failed for %s:%s", 
 			     get_listener_name(listener), 
@@ -463,7 +457,7 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 	char buf[BUFSIZE];
 	struct ConfItem *aconf;
 
-	if(listener->ssl && !ssl_ok)
+	if(listener->ssl && (!ssl_ok || !get_ssld_count()))
 	{
 		rb_close(F);
 		return 0;
@@ -553,10 +547,8 @@ accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t add
 		/* XXX add logging of this */
 		rb_close(F);
 	}
-	if(listener->ssl && ServerInfo.ssl_use_ssld)
+	if(listener->ssl)
 		accept_ssld(F, addr, (struct sockaddr *)&lip, listener);
-	else
-		add_connection(listener, F, addr, (struct sockaddr *)&lip, NULL);
 }
 
 

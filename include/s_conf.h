@@ -259,7 +259,6 @@ struct server_info
 	char *ssl_ca_cert;
 	char *ssl_cert;
 	char *ssl_dh_params;
-	int ssl_use_ssld;
 	int ssld_count;
 };
 

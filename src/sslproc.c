@@ -39,6 +39,7 @@
 
 static void collect_zipstats(void *unused);
 static void ssl_read_ctl(rb_fde_t *F, void *data);
+static int ssld_count;
 
 #define MAXPASSFD 4
 #define READSIZE 1024
@@ -81,6 +82,7 @@ allocate_ssl_daemon(rb_fde_t *F, rb_fde_t *P, int pid)
 	ctl->F = F;
 	ctl->P = P;
 	ctl->pid = pid;
+	ssld_count++;
 	rb_dlinkAdd(ctl, &ctl->node, &ssl_daemons);
 	return ctl;
 }
@@ -126,6 +128,7 @@ static void
 ssl_dead(ssl_ctl_t *ctl)
 {
 	ctl->dead = 1;
+	ssld_count--;
 	kill(ctl->pid, SIGKILL); /* make sure the process is really gone */
 	ilog(L_MAIN, "ssld helper died - attempting to restart");
 	sendto_realops_flags(UMODE_ALL, L_ALL, "ssld helper died - attempting to restart");
@@ -595,16 +598,7 @@ cleanup_dead_ssl(void *unused)
 int
 get_ssld_count(void)
 {
-	rb_dlink_node *ptr;
-	ssl_ctl_t *ctl;
-	int count = 0;
-	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
-	{
-		ctl = ptr->data;
-		if(!ctl->dead)
-			count++;
-	}
-	return count;
+	return ssld_count;
 }
 
 void init_ssld(void)

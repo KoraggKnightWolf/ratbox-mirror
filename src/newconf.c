@@ -2097,7 +2097,7 @@ load_conf_settings(void)
 	{
 		int start = ServerInfo.ssld_count - get_ssld_count();
 		/* start up additional ssld if needed */
-		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);			
+		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 				
 	}		
 	if(!split_users || !split_servers || (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
@@ -2135,7 +2135,6 @@ static struct conf_items conf_serverinfo_table[] =
         { "ssl_ca_cert",        CF_QSTRING, NULL, 0, &ServerInfo.ssl_ca_cert },
         { "ssl_cert",           CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },   
         { "ssl_dh_params",      CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
-        { "ssl_use_ssld",	CF_YESNO,   NULL, 0, &ServerInfo.ssl_use_ssld },
         { "ssld_count",		CF_INT,	    NULL, 0, &ServerInfo.ssld_count },
         { "\0", 0, NULL, 0, NULL }
 };
