@@ -522,12 +522,12 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	if(ServerConfSSL(server_p))
 		rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 				 (struct sockaddr *) &myipnum,
-				 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
+				 GET_SS_LEN(&myipnum), serv_connect_ssl_callback, client_p,
 				 ConfigFileEntry.connect_timeout);
 	else
-		rb_connect_tcp_ssl(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
+		rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 				 (struct sockaddr *) &myipnum,
-				 GET_SS_LEN(&myipnum), serv_connect_ssl_callback, client_p,
+				 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
 				 ConfigFileEntry.connect_timeout);
 
 	return 1;
