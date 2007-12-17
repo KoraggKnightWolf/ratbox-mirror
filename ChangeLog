@@ -1,3 +1,13 @@
+androsyn    2007/12/17 02:16:59 UTC	(20071217_2-24707)
+  Log:
+  stop exporting delay_exit and dline_tree.
+
+  Modified:
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2007/12/17 01:34:37 UTC	(20071217_1-24705)
   Log:
   fix some brain damage with ssl connects
