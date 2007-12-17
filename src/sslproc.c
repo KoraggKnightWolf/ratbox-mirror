@@ -428,7 +428,7 @@ start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
 {
 	rb_fde_t *F[2];
 	ssl_ctl_t *ctl;
-	rb_uint16_t id;
+	rb_int16_t id;
 	char buf[3];
 	F[0] = sslF;
 	F[1] = plainF;
@@ -449,7 +449,7 @@ start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
 {
 	rb_fde_t *F[2];
 	ssl_ctl_t *ctl;
-	rb_uint16_t id;
+	rb_int16_t id;
 	char buf[3];
 	F[0] = sslF;
 	F[1] = plainF;
@@ -492,9 +492,9 @@ start_zlib_session(struct Client *server)
 	rb_fde_t *F[2];
 	rb_fde_t *xF1, *xF2;
 	rb_uint8_t *buf;
-	rb_uint16_t id;
+	rb_int16_t id;
 	rb_uint8_t level;
-	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int16_t);
 	size_t len;
 	int cpylen, left;
 	
@@ -560,7 +560,7 @@ collect_zipstats(void *unused)
 	char buf[1+2+HOSTLEN]; /* S[id]HOSTLEN\0 */
 	char *odata;
 	size_t len;
-	rb_uint16_t id;
+	rb_int16_t id;
 	*buf = 'S';
 
 	odata = &buf[3];

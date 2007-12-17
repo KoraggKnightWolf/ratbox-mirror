@@ -67,7 +67,7 @@ typedef struct _conn
 	rawbuf_head_t *modbuf_out;
 	rawbuf_head_t *plainbuf_out;
 
-	rb_uint16_t id;
+	rb_int16_t id;
 
 	rb_fde_t *mod_fd;
 	rb_fde_t *plain_fd;
@@ -111,7 +111,7 @@ static rb_dlink_list connid_hash_table[CONN_HASH_SIZE];
 static rb_dlink_list dead_list;
 
 static conn_t *
-conn_find_by_id(rb_uint16_t id)
+conn_find_by_id(rb_int16_t id)
 {
 	rb_dlink_node *ptr;
 	conn_t *conn;
@@ -126,7 +126,7 @@ conn_find_by_id(rb_uint16_t id)
 }
 
 static void
-conn_add_id_hash(conn_t * conn, rb_uint16_t id)
+conn_add_id_hash(conn_t * conn, rb_int16_t id)
 {
 	conn->id = id;
 	rb_dlinkAdd(conn, &conn->node, connid_hash(id));
@@ -163,7 +163,7 @@ close_conn(conn_t * conn)
 	rb_close(conn->plain_fd);
 	SetDead(conn);
 
-	if(conn->id != 0)
+	if(conn->id >= 0)
 		rb_dlinkDelete(&conn->node, connid_hash(conn->id));
 	rb_dlinkAdd(conn, &conn->node, &dead_list);
 }
@@ -176,6 +176,7 @@ make_conn(rb_fde_t * mod_fd, rb_fde_t * plain_fd)
 	conn->plainbuf_out = rb_new_rawbuffer();
 	conn->mod_fd = mod_fd;
 	conn->plain_fd = plain_fd;
+	conn->id = -1;
 	return conn;
 }
 
@@ -480,12 +481,12 @@ static void
 ssl_process_accept(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	conn_t *conn;
-	rb_uint16_t id;
+	rb_int16_t id;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
 
 	memcpy(&id, &ctlb->buf[1], sizeof(id));
-
-	conn_add_id_hash(conn, id);
+	if(id >= 0)
+		conn_add_id_hash(conn, id);
 	SetSSL(conn);
 
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
@@ -501,11 +502,11 @@ static void
 ssl_process_connect(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	conn_t *conn;
-	rb_uint16_t id;
+	rb_int16_t id;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
 
-
-	conn_add_id_hash(conn, id);
+	if(id >= 0)
+		conn_add_id_hash(conn, id);
 	SetSSL(conn);
 
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
@@ -524,10 +525,12 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	char outstat[512];
 	conn_t *conn;
 	const char *odata;
-	rb_uint16_t id;
+	rb_int16_t id;
 
 	memcpy(&id, &ctlb->buf[1], sizeof(id));
-
+	if(id < 0)
+		return;
+	
 	odata = &ctlb->buf[3];
 	conn = conn_find_by_id(id);
 
@@ -548,15 +551,17 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 static void
 zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
-	rb_uint16_t id;
+	rb_int16_t id;
 	rb_uint8_t level;
-	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int16_t);
 	conn_t *conn;
 	void *leftover;
 
 	memcpy(&id, &ctlb->buf[1], sizeof(id));
+	if(id < 0)
+		return;
 	level = (rb_uint8_t) ctlb->buf[3];
-
+	
 	conn = conn_find_by_id(id);
 	if(conn == NULL)
 	{
@@ -595,9 +600,9 @@ zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 static void
 zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
-	rb_uint16_t id;
+	rb_int16_t id;
 	rb_uint8_t level;
-	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_uint16_t);
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int16_t);
 	conn_t *conn;
 	void *leftover;
 	conn = make_conn(ctlb->F[0], ctlb->F[1]);
@@ -608,8 +613,10 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
 
 	SetZip(conn);
-
+	
 	memcpy(&id, &ctlb->buf[1], sizeof(id));
+	if(id < 0)
+		return;
 	level = (rb_uint8_t) ctlb->buf[3];
 
 	conn_add_id_hash(conn, id);
