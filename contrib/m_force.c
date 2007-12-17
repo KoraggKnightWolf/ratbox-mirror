@@ -48,7 +48,6 @@
 #include "s_serv.h"
 #include "parse.h"
 #include "modules.h"
-#include "event.h"
 
 
 static int mo_forcejoin(struct Client *client_p, struct Client *source_p,
