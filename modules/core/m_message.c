@@ -737,9 +737,9 @@ flood_attack_client(int p_or_n, struct Client *source_p, struct Client *target_p
 				target_p->localClient->received_number_of_privmsgs += 2;
 			}
 			if(MyClient(source_p) && (p_or_n != NOTICE))
-				sendto_one(source_p, POP_QUEUE,
-					   ":%s NOTICE %s :*** Message to %s throttled due to flooding",
-					   me.name, source_p->name, target_p->name);
+				sendto_one_notice(source_p, POP_QUEUE,
+						  ":*** Message to %s throttled due to flooding",
+						  target_p->name);
 			return 1;
 		}
 		else
@@ -793,9 +793,9 @@ flood_attack_channel(int p_or_n, struct Client *source_p, struct Channel *chptr)
 				chptr->received_number_of_privmsgs += 2;
 			}
 			if(MyClient(source_p) && (p_or_n != NOTICE))
-				sendto_one(source_p, POP_QUEUE,
-					   ":%s NOTICE %s :*** Message to %s throttled due to flooding",
-					   me.name, source_p->name, chptr->chname);
+				sendto_one_notice(source_p, POP_QUEUE,
+						  ":*** Message to %s throttled due to flooding",
+						  chptr->chname);
 			return 1;
 		}
 		else
@@ -915,9 +915,9 @@ handle_special(const char *command, struct Client *client_p,
 			nick++;
 		else if(MyOper(source_p))
 		{
-			sendto_one(source_p, POP_QUEUE,
-				   ":%s NOTICE %s :The command %s %s is no longer supported, please use $%s",
-				   me.name, source_p->name, command, nick, nick);
+			sendto_one_notice(source_p, POP_QUEUE,
+					  ":The command %s %s is no longer supported, please use $%s",
+					  command, nick, nick);
 			return;
 		}
 

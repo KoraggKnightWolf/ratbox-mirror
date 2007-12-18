@@ -345,9 +345,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 
 	if(!valid_hostname(source_p->host))
 	{
-		sendto_one(source_p, POP_QUEUE, 
-			   ":%s NOTICE %s :*** Notice -- You have an invalid hostname",
-			   me.name, source_p->name);
+		sendto_one_notice(source_p, POP_QUEUE, ":*** Notice -- You have an invalid hostname");
 
 		rb_strlcpy(source_p->host, source_p->sockhost, sizeof(source_p->host));
 
@@ -374,9 +372,8 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		if(IsNeedIdentd(aconf))
 		{
 			ServerStats.is_ref++;
-			sendto_one(source_p, POP_QUEUE, 
-				   ":%s NOTICE %s :*** Notice -- You need to install identd to use this server",
-				   me.name, client_p->name);
+			sendto_one_notice(source_p, POP_QUEUE, 
+				   ":*** Notice -- You need to install identd to use this server");
 			exit_client(client_p, source_p, &me, "Install identd");
 			return (CLIENT_EXITED);
 		}
@@ -617,18 +614,14 @@ report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
 	/* If this user is being spoofed, tell them so */
 	if(IsConfDoSpoofIp(aconf))
 	{
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :*** Spoofing your IP. congrats.",
-			   me.name, source_p->name);
+		sendto_one_notice(source_p, HOLD_QUEUE, ":*** Spoofing your IP");
 	}
 
 	/* If this user is in the exception class, Set it "E lined" */
 	if(IsConfExemptKline(aconf))
 	{
 		SetExemptKline(source_p);
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :*** You are exempt from K/D/G/X lines. congrats.",
-			   me.name, source_p->name);
+		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from K/D/G/X lines");
 	}
 
 	if(IsConfExemptGline(aconf))
@@ -637,59 +630,46 @@ report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
 
 		/* dont send both a kline and gline exempt notice */
 		if(!IsConfExemptKline(aconf))
-			sendto_one(source_p, POP_QUEUE,
-				   ":%s NOTICE %s :*** You are exempt from G lines.",
-				   me.name, source_p->name);
+			sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from G lines");
 	}
 
 	/* If this user is exempt from user limits set it F lined" */
 	if(IsConfExemptLimits(aconf))
 	{
 		SetExemptLimits(source_p);
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :*** You are exempt from user limits. congrats.",
-			   me.name, source_p->name);
+		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from user limits");
 	}
 
 	if(IsConfExemptFlood(aconf))
 	{
 		SetExemptFlood(source_p);
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :*** You are exempt from flood limits.",
-			   me.name, source_p->name);
+		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from flood limits");
 	}
 
 	if(IsConfExemptSpambot(aconf))
 	{
 		SetExemptSpambot(source_p);
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :*** You are exempt from spambot checks.",
-			   me.name, source_p->name);
+		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from spambot checks");
 	}
 
 	if(IsConfExemptJupe(aconf))
 	{
 		SetExemptJupe(source_p);
-		sendto_one(source_p, POP_QUEUE,
-				":%s NOTICE %s :*** You are exempt from juped channel warnings.",
-				me.name, source_p->name);
+		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from juped channel warnings");
 	}
 
 	if(IsConfExemptShide(aconf))
 	{
 		SetExemptShide(source_p);
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :*** You are exempt from serverhiding.",
-			   me.name, source_p->name);
+		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from serverhiding");
 	}
 
 	if(IsConfExemptResv(aconf))
 	{
 		SetExemptResv(source_p);
-		sendto_one(source_p, POP_QUEUE,
-				":%s NOTICE %s :*** You are exempt from resvs.",
-				me.name, source_p->name);
+		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from resvs");
 	}
+	send_pop_queue(source_p);
 }
 
 /*
@@ -862,16 +842,14 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	if((source_p->umodes & UMODE_NCHANGE) && !IsOperN(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, 
-			   ":%s NOTICE %s :*** You need oper and N flag for +n", me.name, parv[0]);
+		sendto_one_notice(source_p, POP_QUEUE, ":*** You need oper and nick_changes flag for +n");
 		source_p->umodes &= ~UMODE_NCHANGE;	/* only tcm's really need this */
 	}
 
 	if(MyConnect(source_p) && (source_p->umodes & UMODE_ADMIN) &&
 	   (!IsOperAdmin(source_p) || IsOperHiddenAdmin(source_p)))
 	{
-		sendto_one(source_p, POP_QUEUE,
-			   ":%s NOTICE %s :*** You need oper and A flag for +a", me.name, parv[0]);
+		sendto_one_notice(source_p, POP_QUEUE, ":*** You need oper and admin flag for +a");
 		source_p->umodes &= ~UMODE_ADMIN;
 	}
 
