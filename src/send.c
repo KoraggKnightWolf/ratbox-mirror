@@ -984,11 +984,6 @@ sendto_wallops_flags(int flags, struct Client *source_p, const char *pattern, ..
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, oper_list.head)
 	{
 		client_p = ptr->data;
-
-		/* dont allow people without operwall privs to see operwalls */
-		if((flags == UMODE_OPERWALL) && !IsOperOperwall(client_p))
-			continue;
-
 		if(client_p->umodes & flags)
 			send_linebuf(client_p, &linebuf, 0);
 	}

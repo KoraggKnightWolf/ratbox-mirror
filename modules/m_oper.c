@@ -256,6 +256,8 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 		source_p->umodes |= UMODE_ADMIN;
 	if(!IsOperN(source_p))
 		source_p->umodes &= ~UMODE_NCHANGE;
+	if(!IsOperOperwall(source_p))
+		source_p->umodes &= ~UMODE_OPERWALL;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s (%s@%s) is now an operator", source_p->name,

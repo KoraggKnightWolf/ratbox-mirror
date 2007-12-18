@@ -854,6 +854,12 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 	if(badflag)
 		sendto_one(source_p, POP_QUEUE, form_str(ERR_UMODEUNKNOWNFLAG), me.name, source_p->name);
 
+	if((source_p->umodes & UMODE_OPERWALL) && !IsOperOperwall(source_p))
+	{
+		sendto_one_notice(source_p, POP_QUEUE, ":*** You need oper and operwall flag for +z");
+		source_p->umodes &= ~UMODE_OPERWALL;
+	}
+
 	if((source_p->umodes & UMODE_NCHANGE) && !IsOperN(source_p))
 	{
 		sendto_one(source_p, POP_QUEUE, 
