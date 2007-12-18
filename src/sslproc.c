@@ -208,7 +208,8 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		rb_close(F2);
 		rb_close(P1);
 		ctl = allocate_ssl_daemon(F1, P2, pid);
-		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
+		if(ssl_ok && ssl_cert != NULL && ssl_private_key != NULL)
+			send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
 		ssl_read_ctl(ctl->F, ctl);
 		ssl_do_pipe(P2, ctl);
 	}
@@ -415,6 +416,11 @@ void
 send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
 {
 	rb_dlink_node *ptr;
+	if(ssl_cert == NULL || ssl_private_key == NULL || ssl_dh_params == NULL)
+	{
+		ssl_ok = 0;
+		return;
+	}
 	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
 	{
 		ssl_ctl_t *ctl = ptr->data;
