@@ -942,7 +942,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 		{
 			ServerStats.is_save += 2;
 			save_user(&me, &me, target_p);
-			sendto_one(client_p, ":%s SAVE %s %ld", me.id,
+			sendto_one(client_p, POP_QUEUE, ":%s SAVE %s %ld", me.id,
 					source_p->id, (long)newts);
 			/* don't send a redundant nick change */
 			if (!IsDigit(source_p->name[0]))
@@ -992,7 +992,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 				/* can't broadcast a SAVE because the
 				 * nickchange has happened at client_p
 				 * but not in other directions -- jilles */
-				sendto_one(client_p, ":%s SAVE %s %ld", me.id,
+				sendto_one(client_p, POP_QUEUE, ":%s SAVE %s %ld", me.id,
 						source_p->id, (long)newts);
 				/* send a :<id> NICK <id> <ts> (!) */
 				if (!IsDigit(source_p->name[0]))
