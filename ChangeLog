@@ -1,3 +1,11 @@
+androsyn    2007/12/18 14:52:41 UTC	(20071218_0-24726)
+  Log:
+  fix a case of passing %f to the new snprintf
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2007/12/17 19:57:35 UTC	(20071217_9-24723)
   Log:
   remove event.h from m_force.c
