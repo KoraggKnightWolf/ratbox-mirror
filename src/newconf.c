@@ -2287,6 +2287,7 @@ static struct conf_items conf_general_table[] =
 	{ "stats_P_oper_only",	CF_YESNO, NULL, 0, &ConfigFileEntry.stats_P_oper_only	},
 	{ "stats_y_oper_only",	CF_YESNO, NULL, 0, &ConfigFileEntry.stats_y_oper_only	},
 	{ "target_change",	CF_YESNO, NULL, 0, &ConfigFileEntry.target_change	},
+	{ "collision_fnc",	CF_YESNO, NULL, 0, &ConfigFileEntry.collision_fnc	},
 	{ "ts_max_delta",	CF_TIME,  NULL, 0, &ConfigFileEntry.ts_max_delta	},
 	{ "use_egd",		CF_YESNO, NULL, 0, &ConfigFileEntry.use_egd		},
 	{ "ts_warn_delta",	CF_TIME,  NULL, 0, &ConfigFileEntry.ts_warn_delta	},

@@ -202,6 +202,7 @@ struct config_file_entry
 	int throttle_count;
 	int throttle_duration;
 	int target_change;
+	int collision_fnc;
 	int hide_spoof_ips;
 #ifdef RB_IPV6
 	int fallback_to_ip6_int;

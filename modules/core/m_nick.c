@@ -59,6 +59,7 @@ static int mc_nick(struct Client *, struct Client *, int, const char **);
 static int ms_nick(struct Client *, struct Client *, int, const char **);
 static int ms_uid(struct Client *, struct Client *, int, const char **);
 static int ms_save(struct Client *, struct Client *, int, const char **);
+static int can_save(struct Client *);
 static void save_user(struct Client *, struct Client *, struct Client *);
 
 struct Message nick_msgtab = {
@@ -804,31 +805,49 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 		      time_t newts, const char *nick, const char *uid)
 {
 	int sameuser;
+	int use_save;
+	const char *action;
+
+	use_save = ConfigFileEntry.collision_fnc && can_save(target_p) &&
+		uid != NULL && can_save(source_p);
+	action = use_save ? "saved" : "killed";
 
 	/* if we dont have a ts, or their TS's are the same, kill both */
 	if(!newts || !target_p->tsinfo || (newts == target_p->tsinfo))
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Nick collision on %s(%s <- %s)(both killed)",
-				     target_p->name, target_p->from->name, client_p->name);
+				     "Nick collision on %s(%s <- %s)(both %s)",
+				     target_p->name, target_p->from->name, client_p->name, action);
 
-		sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
-				   form_str(ERR_NICKCOLLISION), target_p->name);
+		if (use_save)
+		{
+			save_user(&me, &me, target_p);
+			ServerStats.is_save++;
+			sendto_one(client_p, POP_QUEUE, ":%s SAVE %s %ld",
+					me.id, uid, (long)newts);
+			register_client(client_p, source_p,
+					uid, SAVE_NICKTS, parc, parv);
+		}
+		else
+		{
+			sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+					   form_str(ERR_NICKCOLLISION), target_p->name);
 
-		/* if the new client being introduced has a UID, we need to
-		 * issue a KILL for it..
-		 */
-		if(uid)
-			sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Nick collision (new))",
-					me.id, uid, me.name);
+			/* if the new client being introduced has a UID, we need to
+			 * issue a KILL for it..
+			 */
+			if(uid)
+				sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Nick collision (new))",
+						me.id, uid, me.name);
 
-		/* we then need to KILL the old client everywhere */
-		kill_client_serv_butone(NULL, target_p,
-					"%s (Nick collision (new))", me.name);
-		ServerStats.is_kill++;
+			/* we then need to KILL the old client everywhere */
+			kill_client_serv_butone(NULL, target_p,
+						"%s (Nick collision (new))", me.name);
+			ServerStats.is_kill++;
 
-		target_p->flags |= FLAGS_KILLED;
-		exit_client(client_p, target_p, &me, "Nick collision (new)");
+			target_p->flags |= FLAGS_KILLED;
+			exit_client(client_p, target_p, &me, "Nick collision (new)");
+		}
 		return 0;
 	}
 	/* the timestamps are different */
@@ -844,7 +863,15 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 			 * otherwise we do nothing and hope that the other
 			 * client will collide it..
 			 */
-			if(uid)
+			if (use_save)
+			{
+				sendto_one(client_p, POP_QUEUE,
+						":%s SAVE %s %ld", me.id,
+						uid, (long)newts);
+				register_client(client_p, source_p,
+						uid, SAVE_NICKTS, parc, parv);
+			}
+			else if(uid)
 				sendto_one(client_p, POP_QUEUE,
 					":%s KILL %s :%s (Nick collision (new))",
 					me.id, uid, me.name);
@@ -854,25 +881,33 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 		{
 			if(sameuser)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Nick collision on %s(%s <- %s)(older killed)",
+						     "Nick collision on %s(%s <- %s)(older %s)",
 						     target_p->name, target_p->from->name,
-						     client_p->name);
+						     client_p->name, action);
 			else
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Nick collision on %s(%s <- %s)(newer killed)",
+						     "Nick collision on %s(%s <- %s)(newer %s)",
 						     target_p->name, target_p->from->name,
-						     client_p->name);
+						     client_p->name, action);
 
-			ServerStats.is_kill++;
-			sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
-					   form_str(ERR_NICKCOLLISION), target_p->name);
+			if (use_save)
+			{
+				ServerStats.is_save++;
+				save_user(&me, &me, target_p);
+			}
+			else
+			{
+				ServerStats.is_kill++;
+				sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+						   form_str(ERR_NICKCOLLISION), target_p->name);
 
-			/* now we just need to kill the existing client */
-			kill_client_serv_butone(client_p, target_p,
-						"%s (Nick collision (new))", me.name);
+				/* now we just need to kill the existing client */
+				kill_client_serv_butone(client_p, target_p,
+							"%s (Nick collision (new))", me.name);
 
-			target_p->flags |= FLAGS_KILLED;
-			(void) exit_client(client_p, target_p, &me, "Nick collision");
+				target_p->flags |= FLAGS_KILLED;
+				(void) exit_client(client_p, target_p, &me, "Nick collision");
+			}
 
 			register_client(client_p, parc == 10 ? source_p : NULL,
 					nick, newts, parc, parv);
@@ -888,29 +923,48 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 			    struct Client *target_p, time_t newts, const char *nick)
 {
 	int sameuser;
+	int use_save;
+	const char *action;
+
+	use_save = ConfigFileEntry.collision_fnc && can_save(target_p) &&
+		can_save(source_p);
+	action = use_save ? "saved" : "killed";
 
 	/* its a client changing nick and causing a collide */
 	if(!newts || !target_p->tsinfo || (newts == target_p->tsinfo) || !source_p->user)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Nick change collision from %s to %s(%s <- %s)(both killed)",
+				     "Nick change collision from %s to %s(%s <- %s)(both %s)",
 				     source_p->name, target_p->name, target_p->from->name,
-				     client_p->name);
+				     client_p->name, action);
 
-		ServerStats.is_kill++;
-		sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
-				   form_str(ERR_NICKCOLLISION), target_p->name);
+		if (use_save)
+		{
+			ServerStats.is_save += 2;
+			save_user(&me, &me, target_p);
+			sendto_one(client_p, ":%s SAVE %s %ld", me.id,
+					source_p->id, (long)newts);
+			/* don't send a redundant nick change */
+			if (!IsDigit(source_p->name[0]))
+				change_remote_nick(client_p, source_p, SAVE_NICKTS, source_p->id, 1);
+		}
+		else
+		{
+			ServerStats.is_kill++;
+			sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+					   form_str(ERR_NICKCOLLISION), target_p->name);
 
-		kill_client_serv_butone(NULL, source_p, "%s (Nick change collision)", me.name);
+			kill_client_serv_butone(NULL, source_p, "%s (Nick change collision)", me.name);
 
-		ServerStats.is_kill++;
+			ServerStats.is_kill++;
 
-		kill_client_serv_butone(NULL, target_p, "%s (Nick change collision)", me.name);
+			kill_client_serv_butone(NULL, target_p, "%s (Nick change collision)", me.name);
 
-		target_p->flags |= FLAGS_KILLED;
-		exit_client(NULL, target_p, &me, "Nick collision(new)");
-		source_p->flags |= FLAGS_KILLED;
-		exit_client(client_p, source_p, &me, "Nick collision(old)");
+			target_p->flags |= FLAGS_KILLED;
+			exit_client(NULL, target_p, &me, "Nick collision(new)");
+			source_p->flags |= FLAGS_KILLED;
+			exit_client(client_p, source_p, &me, "Nick collision(old)");
+		}
 		return 0;
 	}
 	else
@@ -923,56 +977,79 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 		{
 			if(sameuser)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Nick change collision from %s to %s(%s <- %s)(older killed)",
+						     "Nick change collision from %s to %s(%s <- %s)(older %s)",
 						     source_p->name, target_p->name,
-						     target_p->from->name, client_p->name);
+						     target_p->from->name, client_p->name, action);
 			else
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Nick change collision from %s to %s(%s <- %s)(newer killed)",
+						     "Nick change collision from %s to %s(%s <- %s)(newer %s)",
 						     source_p->name, target_p->name,
-						     target_p->from->name, client_p->name);
+						     target_p->from->name, client_p->name, action);
 
-			ServerStats.is_kill++;
-
-			sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
-					   form_str(ERR_NICKCOLLISION), target_p->name);
-
-			/* kill the client issuing the nickchange */
-			kill_client_serv_butone(client_p, source_p,
-						"%s (Nick change collision)", me.name);
-
-			source_p->flags |= FLAGS_KILLED;
-
-			if(sameuser)
-				exit_client(client_p, source_p, &me, "Nick collision(old)");
+			if (use_save)
+			{
+				ServerStats.is_save++;
+				/* can't broadcast a SAVE because the
+				 * nickchange has happened at client_p
+				 * but not in other directions -- jilles */
+				sendto_one(client_p, ":%s SAVE %s %ld", me.id,
+						source_p->id, (long)newts);
+				/* send a :<id> NICK <id> <ts> (!) */
+				if (!IsDigit(source_p->name[0]))
+					change_remote_nick(client_p, source_p, SAVE_NICKTS, source_p->id, 1);
+			}
 			else
-				exit_client(client_p, source_p, &me, "Nick collision(new)");
+			{
+				ServerStats.is_kill++;
+
+				sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+						   form_str(ERR_NICKCOLLISION), target_p->name);
+
+				/* kill the client issuing the nickchange */
+				kill_client_serv_butone(client_p, source_p,
+							"%s (Nick change collision)", me.name);
+
+				source_p->flags |= FLAGS_KILLED;
+
+				if(sameuser)
+					exit_client(client_p, source_p, &me, "Nick collision(old)");
+				else
+					exit_client(client_p, source_p, &me, "Nick collision(new)");
+			}
 			return 0;
 		}
 		else
 		{
 			if(sameuser)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Nick collision on %s(%s <- %s)(older killed)",
+						     "Nick collision on %s(%s <- %s)(older %s)",
 						     target_p->name, target_p->from->name,
-						     client_p->name);
+						     client_p->name, action);
 			else
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Nick collision on %s(%s <- %s)(newer killed)",
+						     "Nick collision on %s(%s <- %s)(newer %s)",
 						     target_p->name, target_p->from->name,
-						     client_p->name);
+						     client_p->name, action);
 
-			sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
-					   form_str(ERR_NICKCOLLISION), target_p->name);
+			if (use_save)
+			{
+				ServerStats.is_save++;
+				save_user(&me, &me, target_p);
+			}
+			else
+			{
+				sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+						   form_str(ERR_NICKCOLLISION), target_p->name);
 
-			/* kill the client who existed before hand */
-			kill_client_serv_butone(client_p, target_p, 
-					"%s (Nick collision)", me.name);
+				/* kill the client who existed before hand */
+				kill_client_serv_butone(client_p, target_p, 
+						"%s (Nick collision)", me.name);
 
-			ServerStats.is_kill++;
+				ServerStats.is_kill++;
 
-			target_p->flags |= FLAGS_KILLED;
-			(void) exit_client(client_p, target_p, &me, "Nick collision");
+				target_p->flags |= FLAGS_KILLED;
+				(void) exit_client(client_p, target_p, &me, "Nick collision");
+			}
 		}
 	}
 
@@ -1107,6 +1184,27 @@ register_client(struct Client *client_p, struct Client *server,
 
 	introduce_client(client_p, source_p);
 	return 0;
+}
+
+/* Check if we can do SAVE. target_p can be a client to save or a
+ * server introducing a client -- jilles */
+static int
+can_save(struct Client *target_p)
+{
+	struct Client *serv_p;
+
+	if (MyClient(target_p))
+		return 1;
+	if (!has_id(target_p))
+		return 0;
+	serv_p = IsServer(target_p) ? target_p : target_p->servptr;
+	while (serv_p != NULL && serv_p != &me)
+	{
+		if (!(serv_p->serv->caps & CAP_SAVE))
+			return 0;
+		serv_p = serv_p->servptr;
+	}
+	return serv_p == &me;
 }
 
 static void

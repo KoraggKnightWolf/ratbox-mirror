@@ -970,8 +970,8 @@ stats_tstats(struct Client *source_p)
 				"T :unknown commands %u prefixes %u",
 				sp.is_unco, sp.is_unpf);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-				"T :nick collisions %u unknown closes %u",
-				sp.is_kill, sp.is_ni);
+				"T :nick collisions %u saves %u unknown closes %u",
+				sp.is_kill, sp.is_save, sp.is_ni);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 				"T :wrong direction %u empty %u", 
 				sp.is_wrdi, sp.is_empt);

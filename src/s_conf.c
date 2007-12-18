@@ -709,6 +709,7 @@ set_default_conf(void)
 	ConfigFileEntry.max_monitor = 60;
 	ConfigFileEntry.nick_delay = 900;	/* 15 minutes */
 	ConfigFileEntry.target_change = YES;
+	ConfigFileEntry.collision_fnc = NO;
 	ConfigFileEntry.anti_spam_exit_message_time = 0;
 	ConfigFileEntry.ts_warn_delta = TS_WARN_DELTA_DEFAULT;
 	ConfigFileEntry.ts_max_delta = TS_MAX_DELTA_DEFAULT;

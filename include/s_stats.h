@@ -63,6 +63,7 @@ struct ServerStatistics
 	unsigned int is_empt;	/* empty message */
 	unsigned int is_num;	/* numeric message */
 	unsigned int is_kill;	/* number of kills generated on collisions */
+	unsigned int is_save;	/* number of saves generated on collisions */
 	unsigned int is_asuc;	/* successful auth requests */
 	unsigned int is_abad;	/* bad auth requests */
 	unsigned int is_rej;	/* rejected from cache */

@@ -334,6 +334,12 @@ static struct InfoStruct info_table[] = {
 		"Number of lines before a client Excess Flood's",
 	},
 	{
+		"collision_fnc",
+		OUTPUT_BOOLEAN_YN,
+		{ &ConfigFileEntry.collision_fnc }, 
+		"Forced nick change on collision"
+	},
+	{
 		"connect_timeout",
 		OUTPUT_DECIMAL,
 		{ &ConfigFileEntry.connect_timeout }, 

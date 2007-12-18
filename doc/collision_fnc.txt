@@ -2,10 +2,6 @@ Nick collision FNC
 Jilles Tjoelker <jilles -at- stack.nl>
 --------------------------------------
 
-NOTE: At this time, ircd-ratbox only accepts and propagates SAVE messages,
-it does not generate them. In other words, it behaves as charybdis with the
-general::collision_fnc option disabled.
-
 Nick collision FNC performs a forced nick change to the user's UID instead
 of a kill. The criteria for which user may keep the nick are the same as
 before. Server notices will say the clients are being "saved" instead of
