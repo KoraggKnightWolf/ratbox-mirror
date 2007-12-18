@@ -1,3 +1,15 @@
+androsyn    2007/12/18 15:35:39 UTC	(20071218_1-24728)
+  Log:
+  fix some floating point formatting sillyness
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2007/12/18 14:52:41 UTC	(20071218_0-24726)
   Log:
   fix a case of passing %f to the new snprintf
