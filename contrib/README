@@ -45,9 +45,6 @@ m_olist.c      - OLIST - Lists channels like LIST, but shows hidden
 m_opme.c       - OPME - Allows an admin to op themselves in an opless channel
                  Syntax: OPME <channel>
 
-m_omode.c      - OMODE - Allows an admin to do all sorts of evil upon a
-			 channel, sets modes with extreme prejudice
-
 m_owho.c       - OWHO -  Just like WHO but doesn't hide things from opers
 
 m_owhois.c     - OWHOIS - Allows an oper to do a whois on any user and see
