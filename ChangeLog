@@ -1,3 +1,11 @@
+androsyn    2007/12/18 21:19:24 UTC	(20071218_8-24742)
+  Log:
+  add POP_QUEUE to a few sendto_one calls
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+
+
 jilles      2007/12/18 20:02:44 UTC	(20071218_7-24740)
   Log:
   Add special treatment for +z in m_flags.c.
