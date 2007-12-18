@@ -1,3 +1,12 @@
+jilles      2007/12/18 20:02:44 UTC	(20071218_7-24740)
+  Log:
+  Add special treatment for +z in m_flags.c.
+  
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_flags.c (File Modified) 
+
+
 jilles      2007/12/18 19:48:01 UTC	(20071218_6-24738)
   Log:
   Add SAVE generation (forced nick change on collision) from charybdis.
