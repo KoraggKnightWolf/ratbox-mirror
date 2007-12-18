@@ -1,3 +1,13 @@
+androsyn    2007/12/18 16:47:58 UTC	(20071218_2-24730)
+  Log:
+  restrict umode +z to operators with the operwall flag and remove IsOperOperwall check from sendto_wallops_flags
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2007/12/18 15:35:39 UTC	(20071218_1-24728)
   Log:
   fix some floating point formatting sillyness
