@@ -1,3 +1,11 @@
+androsyn    2007/12/18 18:03:37 UTC	(20071218_4-24734)
+  Log:
+  remove reference to m_omode.c
+
+  Modified:
+	ircd-ratbox/trunk/contrib/README (File Modified) 
+
+
 androsyn    2007/12/18 16:58:28 UTC	(20071218_3-24732)
   Log:
   - clean up most of the remaining sendto_one(source_p, "%s NOTICE %s type notices to use sendto_one_notice()
