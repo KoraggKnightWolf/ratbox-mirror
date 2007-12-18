@@ -1467,19 +1467,22 @@ stats_ziplinks (struct Client *source_p)
 	struct Client *target_p;
 	struct ZipStats *zipstats;
 	int sent_data = 0;
+	char buf[128], buf1[128];
 	RB_DLINK_FOREACH (ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 		if(IsCapable (target_p, CAP_ZIP))
 		{
 			zipstats = target_p->localClient->zipstats;				
+			sprintf(buf, "%.2f%%", zipstats->out_ratio);
+			sprintf(buf1, "%.2f%%", zipstats->in_ratio);
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-					    "Z :ZipLinks stats for %s send[%.2f%% compression "
-					    "(%lu kB data/%lu kB wire)] recv[%.2f%% compression "
+					    "Z :ZipLinks stats for %s send[%s compression "
+					    "(%lu kB data/%lu kB wire)] recv[%s compression "
 					    "(%lu kB data/%lu kB wire)]",
 					    target_p->name,
-					    zipstats->out_ratio, (unsigned long)zipstats->outK, 
-					    (unsigned long)zipstats->outK_wire, zipstats->in_ratio, 
+					    buf, (unsigned long)zipstats->outK, 
+					    (unsigned long)zipstats->outK_wire, buf1, 
 					    (unsigned long)zipstats->inK, (unsigned long)zipstats->inK_wire);
 			sent_data++;
 		}
@@ -1495,7 +1498,7 @@ stats_servlinks (struct Client *source_p)
 	static char Sformat[] = ":%s %d %s %s %u %u %u %u %u :%u %u %s";
 	long uptime, sendK, receiveK;
 	struct Client *target_p;
-	char buf[128];
+	static char buf[512];
 	rb_dlink_node *ptr;
 	int j = 0;
 
@@ -1545,18 +1548,26 @@ stats_servlinks (struct Client *source_p)
 			   buf, _GMKs (receiveK));
 
 	uptime = (rb_current_time() - startup_time);
+#ifdef HAVE_SNPRINTF
+	snprintf(buf, sizeof(buf), 
+#else
+	sprintf(buf,
+#endif	 
+		"%7.2f %s (%4.1f K/s)", _GMKv (me.localClient->sendK), _GMKs (me.localClient->sendK), 
+		(float) ((float) me.localClient->sendK / (float) uptime));
 
-	sprintf(buf, "%4.1f", (float) ((float) me.localClient->sendK / (float) uptime));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "? :Server send: %7.2f %s (%s K/s)",
-			   _GMKv (me.localClient->sendK), 
-			   _GMKs (me.localClient->sendK),
-			   buf);
-	sprintf(buf, "%4.1f", (float) ((float) me.localClient->receiveK / (float) uptime));
+			   "? :Server send: %s", buf);
+
+#ifdef HAVE_SNPRINTF
+	snprintf(buf, sizeof(buf), 
+#else
+	sprintf(buf,
+#endif	 
+		"%7.2f %s (%4.1f K/s)", _GMKv (me.localClient->receiveK), _GMKs (me.localClient->receiveK),
+		(float) ((float) me.localClient->receiveK / (float) uptime));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "? :Server recv: %7.2f %s (%s K/s)",
-			   _GMKv (me.localClient->receiveK),
-			   _GMKs (me.localClient->receiveK),
+			   "? :Server recv: %s",
 			   buf);
 }
 

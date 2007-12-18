@@ -661,8 +661,12 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 			"B :%s Hash Statistics", name);
 
 	/* rb_snprintf which sendto_one_* uses doesn't support float formats */
-	sprintf(buf, "%.3f%%", (float) ((counts[0]*100) / (float) length));
-
+#ifdef HAVE_SNPRINTF
+	snprintf(buf, sizeof(buf), 
+#else
+	sprintf(buf, 
+#endif
+		"%.3f%%", (float) ((counts[0]*100) / (float) length));
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG,
 			"B :Size: %d Empty: %d (%s)",
 			length, counts[0], buf);
@@ -675,7 +679,12 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 	/* dont want to divide by 0! --fl */
 	if(counts[0] != length) 
 	{
-		sprintf(buf, "%.3f%%/%.3f%%", (float) (total / (length - counts[0])), 
+#ifdef HAVE_SNPRINTF
+		snprintf(buf, sizeof(buf),
+#else
+		sprintf(buf,
+#endif
+			"%.3f%%/%.3f%%", (float) (total / (length - counts[0])), 
 			(float) (total / length));
 		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG,
 				"B :Average depth: %s Highest depth: %d",
