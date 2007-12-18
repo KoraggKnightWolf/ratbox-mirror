@@ -1534,12 +1534,15 @@ stats_servlinks (struct Client *source_p)
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :%u total server(s)", j);
 
+	sprintf(buf, "%7.2f", _GMKv (sendK));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "? :Sent total : %7.2f %s",
-			   _GMKv (sendK), _GMKs (sendK));
+			   "? :Sent total : %s %s",
+			   buf, _GMKs (sendK));
+
+	sprintf(buf, "%7.2f", _GMKv (receiveK));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "? :Recv total : %7.2f %s",
-			   _GMKv (receiveK), _GMKs (receiveK));
+			   "? :Recv total : %s %s",
+			   buf, _GMKs (receiveK));
 
 	uptime = (rb_current_time() - startup_time);
 
