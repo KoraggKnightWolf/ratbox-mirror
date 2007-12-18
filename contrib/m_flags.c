@@ -83,7 +83,10 @@ struct FlagTable
 /* *INDENT-OFF* */
 static struct FlagTable flag_table[] = {
 	/* name               mode it represents      oper only? */
+#if 0
+	/* This one is special...controlled via an oper block option */
 	{ "OWALLOPS",		UMODE_OPERWALL,		1 },
+#endif
 	{ "SWALLOPS",		UMODE_WALLOP,		0 },
 	{ "STATSNOTICES",	UMODE_SPY,		1 },
 	/* We don't have a separate OKILL and SKILL modes */
@@ -126,7 +129,7 @@ static struct FlagTable flag_table[] = {
 
 #define FL_ALL_OPER_FLAGS (FL_ALL_USER_FLAGS | UMODE_CCONN | UMODE_REJ |\
                            UMODE_FULL | UMODE_SPY | UMODE_DEBUG |\
-                           UMODE_OPERWALL | UMODE_BOTS | UMODE_EXTERNAL |\
+                           UMODE_BOTS | UMODE_EXTERNAL |\
                            UMODE_UNAUTH | UMODE_LOCOPS )
 
 /*
@@ -313,6 +316,22 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 				isgood = 1;
 				continue;
 			}
+			if(!irccmp(flag, "OWALLOPS"))
+			{
+				if(!IsOperOperwall(source_p))
+				{
+					sendto_one(source_p, POP_QUEUE,
+						   ":%s NOTICE %s :*** You need oper and operwall flag for +z",
+						   me.name, parv[0]);
+					continue;
+				}
+				if(isadd)
+					source_p->umodes |= UMODE_OPERWALL;
+				else
+					source_p->umodes &= ~UMODE_OPERWALL;
+				isgood = 1;
+				continue;
+			}
 
 			for(j = 0; flag_table[j].name; j++)
 			{
@@ -362,6 +381,11 @@ set_flags_to_string(struct Client *client_p)
 	 ** flags and not showing them
 	 */
 
+	if(client_p->umodes & UMODE_OPERWALL)
+	{
+		rb_sprintf(setflags, "%s %s", setflags, "OWALLOPS");
+	}
+
 	for(i = 0; flag_table[i].name; i++)
 	{
 		if(client_p->umodes & flag_table[i].mode)
@@ -403,6 +427,14 @@ unset_flags_to_string(struct Client *client_p)
 		isoper = 1;
 	else
 		isoper = 0;
+
+	if(IsOper(client_p) && IsOperOperwall(client_p))
+	{
+		if(!(client_p->umodes & UMODE_OPERWALL))
+		{
+			rb_sprintf(setflags, "%s %s", setflags, "OWALLOPS");
+		}
+	}
 
 	for(i = 0; flag_table[i].name; i++)
 	{
