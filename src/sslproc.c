@@ -263,10 +263,11 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 {
 	rb_dlink_node *ptr, *next;	
 	ssl_ctl_buf_t *ctl_buf;
+	if(ctl->dead)
+		return;
 	RB_DLINK_FOREACH_SAFE(ptr, next, ctl->readq.head)
 	{
 		ctl_buf = ptr->data;		
-
 		switch(*ctl_buf->buf)
 		{
 		
