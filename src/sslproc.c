@@ -69,8 +69,6 @@ static void send_new_ssl_certs_one(ssl_ctl_t *ctl, const char *ssl_cert, const c
 
 static rb_dlink_list ssl_daemons;
 
-
-
 static ssl_ctl_t *
 allocate_ssl_daemon(rb_fde_t *F, rb_fde_t *P, int pid)
 {
@@ -132,7 +130,6 @@ ssl_dead(ssl_ctl_t *ctl)
 	kill(ctl->pid, SIGKILL); /* make sure the process is really gone */
 	ilog(L_MAIN, "ssld helper died - attempting to restart");
 	sendto_realops_flags(UMODE_ALL, L_ALL, "ssld helper died - attempting to restart");
-	free_ssl_daemon(ctl);
 	start_ssldaemon(1, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 }
 
