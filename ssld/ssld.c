@@ -343,10 +343,25 @@ conn_plain_read_cb(rb_fde_t * fd, void *data)
 	if(plain_check_cork(conn))
 		return;
 
-	while ((length = rb_read(conn->plain_fd, inbuf, sizeof(inbuf))) > 0)
+	while (1)
 	{
-		conn->plain_in += length;
+		if(IsDead(conn))
+			return;
+		length = rb_read(conn->plain_fd, inbuf, sizeof(inbuf));
 
+		if(length == 0 || (length < 0 && !rb_ignore_errno(errno)))
+		{
+			close_conn(conn);
+			return;
+		}
+
+		if(length < 0)
+		{
+			rb_setselect(conn->plain_fd, RB_SELECT_READ, conn_plain_read_cb, conn);
+			conn_mod_write_sendq(conn->mod_fd, conn);
+			return;
+		}
+		conn->plain_in += length;
 
 #ifdef HAVE_LIBZ
 		if(IsZip(conn))
@@ -354,18 +369,11 @@ conn_plain_read_cb(rb_fde_t * fd, void *data)
 		else
 #endif
 			conn_mod_write(conn, inbuf, length);
+		if(IsDead(conn))
+			return;
 		if(plain_check_cork(conn))
 			return;
 	}
-	if(length == 0 || (length < 0 && !rb_ignore_errno(errno)))
-	{
-		close_conn(conn);
-		return;
-	}
-
-	rb_setselect(conn->plain_fd, RB_SELECT_READ, conn_plain_read_cb, conn);
-	conn_mod_write_sendq(conn->mod_fd, conn);
-
 }
 
 static void
@@ -378,8 +386,23 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 	if(IsDead(conn))
 		return;
 
-	while ((length = rb_read(conn->mod_fd, inbuf, sizeof(inbuf))) > 0)
+	while (1)
 	{
+		if(IsDead(conn))
+			return;
+		length = rb_read(conn->mod_fd, inbuf, sizeof(inbuf));
+
+		if(length == 0 || (length < 0 && !rb_ignore_errno(errno)))
+		{
+			close_conn(conn);
+			return;
+		}
+		if(length < 0)
+		{
+			rb_setselect(conn->mod_fd, RB_SELECT_READ, conn_mod_read_cb, conn);
+			conn_plain_write_sendq(conn->plain_fd, conn);
+			return;
+		}	
 		conn->mod_in += length;
 #ifdef HAVE_LIBZ
 		if(IsZip(conn))
@@ -388,13 +411,6 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 #endif
 			conn_plain_write(conn, inbuf, length);
 	}
-	if(length == 0 || (length < 0 && !rb_ignore_errno(errno)))
-	{
-		close_conn(conn);
-		return;
-	}
-	rb_setselect(conn->mod_fd, RB_SELECT_READ, conn_mod_read_cb, conn);
-	conn_plain_write_sendq(conn->plain_fd, conn);
 }
 
 static void
