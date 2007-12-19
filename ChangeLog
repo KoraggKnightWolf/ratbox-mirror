@@ -1,3 +1,11 @@
+androsyn    2007/12/19 18:23:30 UTC	(20071219_2-24748)
+  Log:
+  don't call free_ssl_daemon from ssl_dead
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2007/12/19 18:15:25 UTC	(20071219_1-24746)
   Log:
   make ssld stop reading from dead sockets
