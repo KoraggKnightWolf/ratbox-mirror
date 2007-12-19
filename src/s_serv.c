@@ -351,6 +351,9 @@ show_capabilities(struct Client *target_p)
 	else
 		rb_strlcpy(msgbuf, "TS ", sizeof(msgbuf));
 
+	if(IsSSL(target_p))
+		rb_strlcat(msgbuf, "SSL ", sizeof(msgbuf));
+
 	if(!IsServer(target_p) || !target_p->serv->caps)	/* short circuit if no caps */
 		return msgbuf;
 
@@ -359,10 +362,6 @@ show_capabilities(struct Client *target_p)
 		if(cap->cap & target_p->serv->caps)
 			rb_snprintf_append(msgbuf, sizeof(msgbuf), "%s ", cap->name);
 	}
-
-
-	if(IsSSL(target_p))
-		rb_strlcat(msgbuf, "SSL", sizeof(msgbuf));
 
 	return msgbuf;
 }
