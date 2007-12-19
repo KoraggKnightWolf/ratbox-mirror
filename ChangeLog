@@ -1,3 +1,11 @@
+androsyn    2007/12/19 17:01:07 UTC	(20071219_0-24744)
+  Log:
+  move ssl before the short circuit in show_capabilities
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2007/12/18 21:19:24 UTC	(20071218_8-24742)
   Log:
   add POP_QUEUE to a few sendto_one calls
