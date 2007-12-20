@@ -122,6 +122,9 @@ free_ssl_daemon(ssl_ctl_t *ctl)
 
 static char *ssld_path;
 
+static int ssld_spin_count = 0;
+static time_t last_spin;
+static int ssld_wait = 0;
 static void
 ssl_dead(ssl_ctl_t *ctl)
 {
@@ -147,6 +150,21 @@ ssl_do_pipe(rb_fde_t *F, void *data)
 	rb_setselect(F, RB_SELECT_READ, ssl_do_pipe, data);
 }
 
+static void
+restart_ssld_event(void *unused)
+{
+	ssld_spin_count = 0;
+	last_spin = 0;
+	ssld_wait = 0;
+	if(ServerInfo.ssld_count > get_ssld_count())
+	{
+		int start = ServerInfo.ssld_count - get_ssld_count();
+		ilog(L_MAIN, "Attempting to restart ssld processes");
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Attempt to restart ssld processes");
+		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
+	}
+}
+
 int
 start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
 {
@@ -159,6 +177,20 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 	pid_t pid;
 	int started = 0, i;
 
+	if(ssld_wait)
+		return 0;
+
+	if(ssld_spin_count > 20 && (rb_current_time() - last_spin < 5))
+	{
+		ilog(L_MAIN, "ssld helper is spinning - will attempt to restart in 5 minutes");
+		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld helper is spinning - will attempt to restart in 1 minute");
+		rb_event_add("restart_ssld_event", restart_ssld_event, NULL, 60);
+		ssld_wait = 1;
+		return 0;
+	}
+
+	ssld_spin_count++;
+	last_spin = rb_current_time();
 	if(ssld_path == NULL)
 	{
 		rb_snprintf(fullpath, sizeof(fullpath), "%s/ssld", BINPATH);
@@ -525,7 +557,7 @@ start_zlib_session(struct Client *server)
 	{
 		rb_free(buf);
 		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld - attempted to pass message of %ld len, max len %d, giving up", (long)len, READBUF_SIZE);
-		ilog(L_MAIN, "ssld - ttempted to pass message of %ld len, max len %d, giving up", (long)len, READBUF_SIZE);
+		ilog(L_MAIN, "ssld - attempted to pass message of %ld len, max len %d, giving up", (long)len, READBUF_SIZE);
 		exit_client(server, server, server, "ssld readbuf exceeded");
 		return;
 	}
