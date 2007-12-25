@@ -1,3 +1,14 @@
+androsyn    2007/12/25 20:34:17 UTC	(20071225_1-24764)
+  Log:
+  fix ircd to deal with rb_note interface change
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 jilles      2007/12/25 00:25:34 UTC	(20071225_0-24758)
   Log:
   Use "SID Exists" instead of "Server Exists" where appropriate.
