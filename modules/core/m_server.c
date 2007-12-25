@@ -1157,6 +1157,7 @@ server_estab(struct Client *client_p)
 	hook_data_client hdata;
 	int zip = 0;
 	const char *host;
+	char note[HOSTLEN + 10];
 	rb_dlink_node *ptr;
 
 	s_assert(NULL != client_p);
@@ -1301,7 +1302,8 @@ server_estab(struct Client *client_p)
 	hdata.target = client_p;
 	call_hook(h_server_introduced, &hdata);
 
-	rb_note(client_p->localClient->F, "Server: %s", client_p->name);
+	rb_snprintf(note, sizeof(note), "Server: %s", client_p->name);
+	rb_note(client_p->localClient->F, note);
 
 	/*
 	 ** Old sendto_serv_but_one() call removed because we now

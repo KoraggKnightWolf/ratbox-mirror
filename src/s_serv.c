@@ -394,6 +394,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 {
 	struct Client *client_p;
 	struct rb_sockaddr_storage myipnum; 
+	char note[HOSTLEN + 10];
 	rb_fde_t *F;
 
 	s_assert(server_p != NULL);
@@ -428,7 +429,8 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	}
 
 	/* servernames are always guaranteed under HOSTLEN chars */
-	rb_note(F, "Server: %s", server_p->name);
+	rb_snprintf(note, sizeof(note), "Server: %s", server_p->name);	
+	rb_note(F, note);
 
 	/* Create a local client */
 	client_p = make_client(NULL);

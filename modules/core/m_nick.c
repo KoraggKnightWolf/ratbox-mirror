@@ -633,7 +633,7 @@ static void
 set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 {
 	char buf[USERLEN + 1];
-
+	char note[NICKLEN + 10];
 	/* This had to be copied here to avoid problems.. */
 	source_p->tsinfo = rb_current_time();
 	if(source_p->name)
@@ -644,8 +644,8 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	source_p->name = source_p->user->name;
 	add_to_hash(HASH_CLIENT, nick, source_p);
 
-	/* fd_desc is long enough */
-	rb_note(client_p->localClient->F, "Nick: %s", nick);
+	rb_snprintf(note, sizeof(note), "Nick: %s", nick);
+	rb_note(client_p->localClient->F, note);
 
 	if(!EmptyString(source_p->info))
 	{
@@ -663,6 +663,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick,
 {
 	struct Client *target_p;
 	rb_dlink_node *ptr, *next_ptr;
+	char note[NICKLEN + 10];
 	int samenick;
 
 	if (dosend)
@@ -742,8 +743,8 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick,
 		rb_dlinkDestroy(ptr, &source_p->on_allow_list);
 	}
 
-	/* fd_desc is long enough */
-	rb_note(client_p->localClient->F, "Nick: %s", nick);
+	rb_snprintf(note, sizeof(note), "Nick: %s", nick);
+	rb_note(client_p->localClient->F, note);
 
 	return;
 }
