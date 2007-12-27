@@ -42,7 +42,10 @@
 #define hash_channel(x) (fnv_hash_upper_len((const unsigned char *)(x), CH_MAX_BITS, 30))
 #define hash_hostname(x) (fnv_hash_upper_len((const unsigned char *)(x), HOST_MAX_BITS, 30))
 #define hash_resv(x) (fnv_hash_upper_len((const unsigned char *)(x), R_MAX_BITS, 30))
+#define hash_cli_fd(x)	(x % CLI_FD_MAX)
 
+
+static rb_dlink_list clientbyfdTable[U_MAX];
 static rb_dlink_list clientTable[U_MAX];
 static rb_dlink_list channelTable[CH_MAX];
 static rb_dlink_list idTable[U_MAX];
@@ -242,6 +245,9 @@ clear_help_hash(void)
 	}
 	HASH_WALK_END
 }
+
+
+
 
 /* find_id()
  *
@@ -650,6 +656,37 @@ hash_find_nd(const char *name)
 	return NULL;
 }
 
+void
+add_to_cli_fd_hash(struct Client *client_p)
+{
+	rb_dlinkAddAlloc(client_p, &clientbyfdTable[hash_cli_fd(rb_get_fd(client_p->localClient->F))]);
+}
+
+
+void
+del_from_cli_fd_hash(struct Client *client_p)
+{
+	unsigned int hashv;
+	hashv = hash_cli_fd(rb_get_fd(client_p->localClient->F));
+	rb_dlinkFindDestroy(client_p, &clientbyfdTable[hashv]);
+}
+
+struct Client *
+find_cli_fd_hash(int fd)
+{
+	struct Client *target_p;
+	rb_dlink_node *ptr;
+	unsigned int hashv;
+	hashv = hash_cli_fd(fd);
+	RB_DLINK_FOREACH(ptr, clientbyfdTable[hashv].head)
+	{
+		target_p = ptr->data;
+		if(rb_get_fd(target_p->localClient->F) == fd)
+			return target_p;
+	}
+	return  NULL;	
+}
+
 static void
 output_hash(struct Client *source_p, const char *name, int length, int *counts, int deepest)
 {
@@ -732,4 +769,6 @@ hash_stats(struct Client *source_p)
 	count_hash(source_p, idTable, U_MAX, "ID");
 	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG, "B :--");
 	count_hash(source_p, hostTable, HOST_MAX, "Hostname");
+	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDEBUG, "B :--");
+	count_hash(source_p, clientbyfdTable, CLI_FD_MAX, "Client by FD");
 }	

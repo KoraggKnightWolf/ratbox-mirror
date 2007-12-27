@@ -289,6 +289,27 @@ ssl_process_zipstats(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 		zips->out_ratio = 0;
 }
 
+static void
+ssl_process_dead_fd(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
+{
+	struct Client *client_p;
+	char reason[256];
+	rb_int32_t fd;
+	char *buf = ctl_buf->buf;
+
+	if(ctl_buf->buflen < 6)
+		return; /* bogus message..drop it.. XXX should warn here */
+	
+	fd = buf[1] << 24;
+	fd |= buf[2] << 16;
+	fd |= buf[3] << 8;
+	fd |= buf[4];
+	rb_strlcpy(reason, &buf[5], sizeof(reason));
+	client_p = find_cli_fd_hash(fd);
+	if(client_p == NULL)
+		return;
+	exit_client(client_p, client_p, &me, reason);
+}
 
 static void
 ssl_process_cmd_recv(ssl_ctl_t *ctl)
@@ -302,7 +323,9 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 		ctl_buf = ptr->data;		
 		switch(*ctl_buf->buf)
 		{
-		
+			case 'D':
+				ssl_process_dead_fd(ctl, ctl_buf);
+				break;				
 			case 'S':
 				ssl_process_zipstats(ctl, ctl_buf);
 				break;
@@ -460,20 +483,19 @@ send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char
 
 
 ssl_ctl_t * 
-start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
+start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, rb_int32_t id)
 {
 	rb_fde_t *F[2];
 	ssl_ctl_t *ctl;
-	rb_int16_t id;
-	char buf[3];
+	rb_uint8_t buf[5];
 	F[0] = sslF;
 	F[1] = plainF;
 
-	id = xid;
-	memcpy(&buf[1], &id, sizeof(id));
-
 	buf[0] = 'A';
-	
+	buf[1] = (id >> 24) & 0xFF;
+	buf[2] = (id >> 16) & 0xFF;
+	buf[3] = (id >> 8) & 0xFF;
+	buf[4] = id & 0xFF;
 	ctl = which_ssld();
 	ctl->cli_count++;
 	ssl_cmd_write_queue(ctl, F, 2, buf, sizeof(buf));
@@ -481,19 +503,19 @@ start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
 }
 
 ssl_ctl_t *
-start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, int xid)
+start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, rb_int32_t id)
 {
 	rb_fde_t *F[2];
 	ssl_ctl_t *ctl;
-	rb_int16_t id;
-	char buf[3];
+	rb_uint8_t buf[5];
 	F[0] = sslF;
 	F[1] = plainF;
 
-	id = xid;
-	memcpy(&buf[1], &id, sizeof(id));
-
 	buf[0] = 'C';
+	buf[1] = (id >> 24) & 0xFF;
+	buf[2] = (id >> 16) & 0xFF;
+	buf[3] = (id >> 8) & 0xFF;
+	buf[4] = id & 0xFF;
 	
 	ctl = which_ssld();
 	ctl->cli_count++;
@@ -516,7 +538,7 @@ ssld_decrement_clicount(ssl_ctl_t *ctl)
 
 /* 
  * what we end up sending to the ssld process for ziplinks is the following
- * Z[ourfd][RECVQ]
+ * Z[ourfd][level][RECVQ]
  * Z = ziplinks command
  * ourfd = Our end of the socketpair
  * recvq = any data we read prior to starting ziplinks
@@ -528,9 +550,9 @@ start_zlib_session(struct Client *server)
 	rb_fde_t *F[2];
 	rb_fde_t *xF1, *xF2;
 	rb_uint8_t *buf;
-	rb_int16_t id;
+	rb_int32_t id;
 	rb_uint8_t level;
-	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int16_t);
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int32_t);
 	size_t len;
 	int cpylen, left;
 	
@@ -539,8 +561,11 @@ start_zlib_session(struct Client *server)
 	buf = rb_malloc(len);
 
 	level = ConfigFileEntry.compression_level;
-
-	buf[3] = level;
+	buf[1] = (id >> 24) & 0xFF;
+	buf[2] = (id >> 16) & 0xFF;
+	buf[3] = (id >> 8) & 0xFF;
+	buf[4] = id & 0xFF;
+	buf[5] = level;
 
 	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
 
@@ -578,10 +603,6 @@ start_zlib_session(struct Client *server)
 	F[0] = server->localClient->F; 
 	F[1] = xF1;
 	server->localClient->F = xF2;
-
-	id = rb_get_fd(server->localClient->F);
-	memcpy(&buf[1], &id, sizeof(id));
-
 	server->localClient->ssl_ctl = which_ssld();
 	server->localClient->ssl_ctl->cli_count++;
 	ssl_cmd_write_queue(server->localClient->ssl_ctl, F, 2, buf, len);
@@ -593,23 +614,28 @@ collect_zipstats(void *unused)
 {
 	rb_dlink_node *ptr;
 	struct Client *target_p;
-	char buf[1+2+HOSTLEN]; /* S[id]HOSTLEN\0 */
-	char *odata;
+	rb_uint8_t buf[sizeof(rb_uint8_t) + sizeof(rb_int32_t) + HOSTLEN];
+//	char buf[1+4+HOSTLEN]; /* S[id]HOSTLEN\0 */
+	void *odata;
 	size_t len;
-	rb_int16_t id;
-	*buf = 'S';
+	rb_int32_t id;
 
-	odata = &buf[3];
+	buf[0] = 'S';
+	odata = buf + sizeof(rb_uint8_t) + sizeof(rb_int32_t);
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 		if(IsCapable(target_p, CAP_ZIP))
 		{
-			len = 3;
+			len = sizeof(rb_uint8_t) + sizeof(rb_uint32_t);
+
 			id = rb_get_fd(target_p->localClient->F);
-			memcpy(&buf[1], &id, sizeof(id));
-			rb_strlcpy(odata, target_p->name, (sizeof(buf)-3));
+			buf[1] = (id >> 24) & 0xFF;
+			buf[2] = (id >> 16) & 0xFF;
+			buf[3] = (id >> 8) & 0xFF;
+			buf[4] = id & 0xFF;
+			rb_strlcpy(odata, target_p->name, (sizeof(buf)-len));
 			len += strlen(odata) + 1; /* Get the \0 as well */
 			ssl_cmd_write_queue(target_p->localClient->ssl_ctl, NULL, 0, buf, len); 
 		}

@@ -33,12 +33,6 @@
 #define READBUF_SIZE 16384
 #endif
 
-static void conn_mod_write_sendq(rb_fde_t *, void *data);
-static void conn_plain_write_sendq(rb_fde_t *, void *data);
-static void mod_write_ctl(rb_fde_t *, void *data);
-static void conn_plain_read_cb(rb_fde_t * fd, void *data);
-
-
 static char inbuf[READBUF_SIZE];
 static char outbuf[READBUF_SIZE];
 
@@ -64,10 +58,11 @@ typedef struct _mod_ctl
 typedef struct _conn
 {
 	rb_dlink_node node;
+	mod_ctl_t *ctl;
 	rawbuf_head_t *modbuf_out;
 	rawbuf_head_t *plainbuf_out;
 
-	rb_int16_t id;
+	rb_int32_t id;
 
 	rb_fde_t *mod_fd;
 	rb_fde_t *plain_fd;
@@ -103,6 +98,8 @@ typedef struct _conn
 #define ClearCork(x) ((x)->flags &= ~FLAG_CORK)
 #define ClearDead(x) ((x)->flags &= ~FLAG_DEAD)
 
+#define NO_WAIT 0x0
+#define WAIT_PLAIN 0x1
 
 #define CONN_HASH_SIZE 2000
 #define connid_hash(x)	(&connid_hash_table[(x % CONN_HASH_SIZE)])
@@ -110,8 +107,28 @@ typedef struct _conn
 static rb_dlink_list connid_hash_table[CONN_HASH_SIZE];
 static rb_dlink_list dead_list;
 
+static void conn_mod_write_sendq(rb_fde_t *, void *data);
+static void conn_plain_write_sendq(rb_fde_t *, void *data);
+static void mod_write_ctl(rb_fde_t *, void *data);
+static void conn_plain_read_cb(rb_fde_t * fd, void *data);
+static void mod_cmd_write_queue(mod_ctl_t *ctl, void *data, size_t len);
+static const char *remote_closed = "Remote host closed the connection";
+
+
+static void *
+ssld_alloc(void *unused, size_t count, size_t size)
+{
+	return rb_malloc(count * size);
+}
+
+static void
+ssld_free(void *unused, void *ptr)
+{
+	rb_free(ptr);	
+}
+
 static conn_t *
-conn_find_by_id(rb_int16_t id)
+conn_find_by_id(rb_int32_t id)
 {
 	rb_dlink_node *ptr;
 	conn_t *conn;
@@ -126,7 +143,7 @@ conn_find_by_id(rb_int16_t id)
 }
 
 static void
-conn_add_id_hash(conn_t * conn, rb_int16_t id)
+conn_add_id_hash(conn_t * conn, rb_int32_t id)
 {
 	conn->id = id;
 	rb_dlinkAdd(conn, &conn->node, connid_hash(id));
@@ -155,23 +172,47 @@ clean_dead_conns(void *unused)
 
 
 static void
-close_conn(conn_t * conn)
+close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 {
+	va_list ap;
+	char reason[128]; /* must always be under 250 bytes */
+	char buf[256];
+	rb_int32_t id;
+	int len;
 	rb_rawbuf_flush(conn->modbuf_out, conn->mod_fd);
 	rb_rawbuf_flush(conn->plainbuf_out, conn->plain_fd);
 	rb_close(conn->mod_fd);
-	rb_close(conn->plain_fd);
 	SetDead(conn);
 
-	if(conn->id >= 0)
-		rb_dlinkDelete(&conn->node, connid_hash(conn->id));
-	rb_dlinkAdd(conn, &conn->node, &dead_list);
+	if(!wait_plain || fmt == NULL)
+	{
+		rb_close(conn->plain_fd);
+	
+		if(conn->id >= 0)
+			rb_dlinkDelete(&conn->node, connid_hash(conn->id));
+		rb_dlinkAdd(conn, &conn->node, &dead_list);
+		return;
+	}
+	va_start(ap, fmt);
+	rb_vsnprintf(reason, sizeof(reason), fmt, ap);
+	va_end(ap);
+
+	id = conn->id;
+	buf[0] = 'D';
+	buf[1] = (id >> 24) && 0xFF;
+	buf[2] = (id >> 16) && 0xFF;
+	buf[3] = (id >> 8) && 0xFF;
+	buf[4] = id & 0xFF;
+	strcpy(&buf[5], reason);
+	len = (strlen(reason) + 1) + 5;
+	mod_cmd_write_queue(conn->ctl, buf, len);
 }
 
 static conn_t *
-make_conn(rb_fde_t * mod_fd, rb_fde_t * plain_fd)
+make_conn(mod_ctl_t *ctl, rb_fde_t * mod_fd, rb_fde_t * plain_fd)
 {
 	conn_t *conn = rb_malloc(sizeof(conn_t));
+	conn->ctl = ctl;
 	conn->modbuf_out = rb_new_rawbuffer();
 	conn->plainbuf_out = rb_new_rawbuffer();
 	conn->mod_fd = mod_fd;
@@ -184,8 +225,8 @@ static void
 conn_mod_write_sendq(rb_fde_t * fd, void *data)
 {
 	conn_t *conn = data;
+	const char *err;
 	int retlen;
-
 	if(IsDead(conn))
 		return;
 
@@ -194,7 +235,14 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 
 	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 	{
-		close_conn(data);
+		if(retlen == 0)
+			close_conn(conn, WAIT_PLAIN, "%s", remote_closed);
+		if(retlen == -2)
+			err = rb_get_ssl_strerror(conn->mod_fd);
+		else
+			err = strerror(errno);
+
+		close_conn(conn, WAIT_PLAIN, "Write error: %s", err);
 		return;
 	}
 	if(rb_rawbuf_length(conn->modbuf_out) > 0)
@@ -254,19 +302,19 @@ common_zlib_deflate(conn_t * conn, void *buf, size_t len)
 	if(ret != Z_OK)
 	{
 		/* deflate error */
-		close_conn(conn);
+		close_conn(conn, WAIT_PLAIN, "Deflate failed: %s", zError(ret));
 		return;
 	}
 	if(conn->outstream.avail_out == 0)
 	{
 		/* avail_out empty */
-		close_conn(conn);
+		close_conn(conn, WAIT_PLAIN, "error compressing data, avail_out == 0");
 		return;
 	}
 	if(conn->outstream.avail_in != 0)
 	{
 		/* avail_in isn't empty...*/
-		close_conn(conn);
+		close_conn(conn, WAIT_PLAIN, "error compressing data, avail_in != 0");
 		return;
 	}
 	have = sizeof(outbuf) - conn->outstream.avail_out;
@@ -289,10 +337,11 @@ common_zlib_inflate(conn_t * conn, void *buf, size_t len)
 		{
 			if(!strncmp("ERROR ", buf, 6))
 			{
-				/* XXX deal with error */
+				close_conn(conn, WAIT_PLAIN, "Received uncompressed ERROR");
+				return;
 			}
 			/* other error */
-			close_conn(conn);
+			close_conn(conn, WAIT_PLAIN, "Inflate failed: %s", zError(ret));
 			return;
 		}
 		have = sizeof(outbuf) - conn->instream.avail_out;
@@ -351,7 +400,7 @@ conn_plain_read_cb(rb_fde_t * fd, void *data)
 
 		if(length == 0 || (length < 0 && !rb_ignore_errno(errno)))
 		{
-			close_conn(conn);
+			close_conn(conn, NO_WAIT, NULL);
 			return;
 		}
 
@@ -380,6 +429,7 @@ static void
 conn_mod_read_cb(rb_fde_t * fd, void *data)
 {
 	conn_t *conn = data;
+	const char *err = remote_closed;
 	int length;
 	if(conn == NULL)
 		return;
@@ -394,7 +444,14 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 
 		if(length == 0 || (length < 0 && !rb_ignore_errno(errno)))
 		{
-			close_conn(conn);
+			if(length == 0)
+				close_conn(conn, WAIT_PLAIN, "%s", remote_closed);
+
+			if(length == -2)
+				err = rb_get_ssl_strerror(conn->mod_fd);
+			else
+				err = strerror(errno);
+			close_conn(conn, WAIT_PLAIN, "Read error: %s", err);
 			return;
 		}
 		if(length < 0)
@@ -428,7 +485,7 @@ conn_plain_write_sendq(rb_fde_t * fd, void *data)
 	}
 	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 	{
-		close_conn(data);
+		close_conn(data, NO_WAIT, NULL);
 		return;
 	}
 
@@ -474,7 +531,7 @@ ssl_process_accept_cb(rb_fde_t * F, int status, struct sockaddr *addr, rb_sockle
 		conn_plain_read_cb(conn->plain_fd, conn);
 		return;
 	}
-	close_conn(conn);
+	close_conn(conn, NO_WAIT, 0);
 	return;
 }
 
@@ -488,7 +545,7 @@ ssl_process_connect_cb(rb_fde_t * F, int status, void *data)
 		conn_plain_read_cb(conn->plain_fd, conn);
 		return;
 	}
-	close_conn(conn);
+	close_conn(conn, NO_WAIT, 0);
 	return;
 }
 
@@ -497,17 +554,23 @@ static void
 ssl_process_accept(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	conn_t *conn;
-	rb_int16_t id;
-	conn = make_conn(ctlb->F[0], ctlb->F[1]);
+	rb_int32_t id;
+	conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
 
-	memcpy(&id, &ctlb->buf[1], sizeof(id));
+	id = ctlb->buf[1] << 24;
+	id |= ctlb->buf[2] << 16;
+	id |= ctlb->buf[3] << 8; 
+	id |= ctlb->buf[4];
+
 	if(id >= 0)
 		conn_add_id_hash(conn, id);
 	SetSSL(conn);
 
-	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
+	if(rb_get_type(conn->mod_fd) & RB_FD_UNKNOWN)
+	{
+		
 		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
-
+	}
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
 
@@ -518,8 +581,13 @@ static void
 ssl_process_connect(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	conn_t *conn;
-	rb_int16_t id;
-	conn = make_conn(ctlb->F[0], ctlb->F[1]);
+	rb_int32_t id;
+	conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
+
+	id = ctlb->buf[1] << 24;
+	id |= ctlb->buf[2] << 16;
+	id |= ctlb->buf[3] << 8; 
+	id |= ctlb->buf[4];
 
 	if(id >= 0)
 		conn_add_id_hash(conn, id);
@@ -541,13 +609,17 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	char outstat[512];
 	conn_t *conn;
 	const char *odata;
-	rb_int16_t id;
+	rb_int32_t id;
 
-	memcpy(&id, &ctlb->buf[1], sizeof(id));
+	id = ctlb->buf[1] << 24;
+	id |= ctlb->buf[2] << 16;
+	id |= ctlb->buf[3] << 8; 
+	id |= ctlb->buf[4];
+
 	if(id < 0)
 		return;
 	
-	odata = &ctlb->buf[3];
+	odata = &ctlb->buf[5];
 	conn = conn_find_by_id(id);
 
 	if(conn == NULL)
@@ -567,16 +639,20 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 static void
 zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
-	rb_int16_t id;
+	rb_int32_t id;
 	rb_uint8_t level;
-	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int16_t);
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int32_t);
 	conn_t *conn;
 	void *leftover;
 
-	memcpy(&id, &ctlb->buf[1], sizeof(id));
+	id = ctlb->buf[1] << 24;
+	id |= ctlb->buf[2] << 16;
+	id |= ctlb->buf[3] << 8; 
+	id |= ctlb->buf[4];
+                
 	if(id < 0)
 		return;
-	level = (rb_uint8_t) ctlb->buf[3];
+	level = (rb_uint8_t) ctlb->buf[5];
 	
 	conn = conn_find_by_id(id);
 	if(conn == NULL)
@@ -587,15 +663,15 @@ zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 
 	conn->instream.total_in = 0;
 	conn->instream.total_out = 0;
-	conn->instream.zalloc = (alloc_func) 0;
-	conn->instream.zfree = (free_func) 0;
+	conn->instream.zalloc = (alloc_func) ssld_alloc;
+	conn->instream.zfree = (free_func) ssld_free;
 	conn->instream.data_type = Z_ASCII;
 	inflateInit(&conn->instream);
 
 	conn->outstream.total_in = 0;
 	conn->outstream.total_out = 0;
-	conn->outstream.zalloc = (alloc_func) 0;
-	conn->outstream.zfree = (free_func) 0;
+	conn->outstream.zalloc = (alloc_func) ssld_alloc;
+	conn->outstream.zfree = (free_func) ssld_free;
 	conn->outstream.data_type = Z_ASCII;
 
 	if(level > 9)
@@ -616,12 +692,12 @@ zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 static void
 zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
-	rb_int16_t id;
+	rb_int32_t id;
 	rb_uint8_t level;
-	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int16_t);
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int32_t);
 	conn_t *conn;
 	void *leftover;
-	conn = make_conn(ctlb->F[0], ctlb->F[1]);
+	conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
 
@@ -629,25 +705,29 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
 
 	SetZip(conn);
-	
-	memcpy(&id, &ctlb->buf[1], sizeof(id));
+
+	id = ctlb->buf[1] << 24;
+	id |= ctlb->buf[2] << 16;
+	id |= ctlb->buf[3] << 8; 
+	id |= ctlb->buf[4];
+                                	
 	if(id < 0)
 		return;
-	level = (rb_uint8_t) ctlb->buf[3];
+	level = (rb_uint8_t) ctlb->buf[5];
 
 	conn_add_id_hash(conn, id);
 
 	conn->instream.total_in = 0;
 	conn->instream.total_out = 0;
-	conn->instream.zalloc = (alloc_func) 0;
-	conn->instream.zfree = (free_func) 0;
+	conn->instream.zalloc = (alloc_func) ssld_alloc;
+	conn->instream.zfree = (free_func) ssld_free;
 	conn->instream.data_type = Z_ASCII;
 	inflateInit(&conn->instream);
 
 	conn->outstream.total_in = 0;
 	conn->outstream.total_out = 0;
-	conn->outstream.zalloc = (alloc_func) 0;
-	conn->outstream.zfree = (free_func) 0;
+	conn->outstream.zalloc = (alloc_func) ssld_alloc;
+	conn->outstream.zfree = (free_func) ssld_free;
 	conn->outstream.data_type = Z_ASCII;
 
 	if(level > 9)

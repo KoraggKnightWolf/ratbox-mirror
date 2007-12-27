@@ -40,6 +40,7 @@
 #include "reject.h"
 #include "s_log.h"
 #include "sslproc.h"
+#include "hash.h"
 
 static rb_dlink_list listener_list;
 static int accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, void *data);
@@ -435,7 +436,7 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 #endif
 
 	new_client->localClient->F = F;
-
+	add_to_cli_fd_hash(new_client);
 	new_client->localClient->listener = listener;
 	new_client->localClient->ssl_ctl = ssl_ctl;
 	if(ssl_ctl != NULL || rb_fd_ssl(F))

@@ -183,8 +183,10 @@ free_local_client(struct Client *client_p)
 	}
 	
 	if(client_p->localClient->F != NULL)
+	{
+		del_from_cli_fd_hash(client_p);
 		rb_close(client_p->localClient->F);
-
+	}
 
 	if(client_p->localClient->passwd)
 	{
@@ -1804,7 +1806,7 @@ close_connection(struct Client *client_p)
 		/* attempt to flush any pending linebufs. Evil, but .. -- adrian */
 		if(!IsIOError(client_p))
 			send_pop_queue(client_p);
-
+		del_from_cli_fd_hash(client_p);			
 		rb_close(client_p->localClient->F);
 		client_p->localClient->F = NULL;
 	}

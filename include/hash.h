@@ -37,6 +37,9 @@ extern rb_dlink_list ndTable[];
 #define U_MAX_BITS (32-17)
 #define U_MAX 131072 /* 2^17 */
 
+/* Client fd hash table size, used in hash.c */
+#define CLI_FD_MAX 4096
+
 /* Channel hash table size, hash.c/s_debug.c */
 #define CH_MAX_BITS (32-16)
 #define CH_MAX 65536 /* 2^16 */
@@ -101,6 +104,10 @@ struct cachefile *hash_find_help(const char *name, int flags);
 void add_to_nd_hash(const char *name, struct nd_entry *nd);
 struct nd_entry *hash_find_nd(const char *name);
 
+void add_to_cli_fd_hash(struct Client *client_p);
+void del_from_cli_fd_hash(struct Client *client_p);
+struct Client *find_cli_fd_hash(int fd);
+                                  
 void hash_stats(struct Client *);
 
 #endif /* INCLUDED_hash_h */
