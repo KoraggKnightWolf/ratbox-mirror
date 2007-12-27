@@ -1,3 +1,23 @@
+androsyn    2007/12/27 17:56:34 UTC	(20071227_0-24782)
+  Log:
+  - Add hash to find clients by file descriptor
+  - Add support for ssld telling the ircd the real reason for the connection closing
+  - Have ssld connection ids be 32bit ints instead of 16bit.
+  
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/12/25 20:34:17 UTC	(20071225_1-24764)
   Log:
   fix ircd to deal with rb_note interface change
