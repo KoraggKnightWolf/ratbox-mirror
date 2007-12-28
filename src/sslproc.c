@@ -599,10 +599,11 @@ start_zlib_session(struct Client *server)
 	
 		
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs");
-	
 	F[0] = server->localClient->F; 
 	F[1] = xF1;
+	del_from_cli_fd_hash(server);	
 	server->localClient->F = xF2;
+	add_to_cli_fd_hash(server);
 	server->localClient->ssl_ctl = which_ssld();
 	server->localClient->ssl_ctl->cli_count++;
 	ssl_cmd_write_queue(server->localClient->ssl_ctl, F, 2, buf, len);
