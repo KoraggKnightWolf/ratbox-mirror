@@ -1,3 +1,19 @@
+androsyn    2007/12/28 02:36:59 UTC	(20071228_0-24794)
+  Log:
+  Some hash related cleanups
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/include/hostmask.h (File Modified) 
+	ircd-ratbox/trunk/include/monitor.h (File Modified) 
+	ircd-ratbox/trunk/include/whowas.h (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+	ircd-ratbox/trunk/src/scache.c (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2007/12/27 17:56:34 UTC	(20071227_0-24782)
   Log:
   - Add hash to find clients by file descriptor
