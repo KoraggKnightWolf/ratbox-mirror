@@ -37,10 +37,10 @@
 #include "hash.h"
 #include "operhash.h"
 
-#define OPERHASH_MAX_BITS (32-7)
-#define OPERHASH_MAX 128	/* 2^7 */
+#define OPERHASH_MAX_BITS 7
+#define OPERHASH_MAX (1<<OPERHASH_MAX_BITS)
 
-#define hash_opername(x) fnv_hash_upper_len((const unsigned char *)(x), OPERHASH_MAX_BITS, 30)
+#define hash_opername(x) fnv_hash_upper((const unsigned char *)(x), OPERHASH_MAX_BITS, 0)
 
 static rb_dlink_list operhash_table[OPERHASH_MAX];
 

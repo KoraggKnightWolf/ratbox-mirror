@@ -21,8 +21,8 @@ struct monitor
 
 extern struct monitor *monitorTable[];
 
-#define MONITOR_HASH_SIZE 65536
 #define MONITOR_HASH_BITS 16
+#define MONITOR_HASH_SIZE (1<<MONITOR_HASH_BITS)
 
 void init_monitor(void);
 struct monitor *find_monitor(const char *name, int add);

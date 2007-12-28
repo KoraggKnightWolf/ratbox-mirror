@@ -39,8 +39,8 @@
  */
 
 
-#define SCACHE_MAX_BITS (32-8)
-#define SCACHE_MAX 256
+#define SCACHE_MAX_BITS 8
+#define SCACHE_MAX (1<<SCACHE_MAX_BITS)
 
 #define hash_server(x)	fnv_hash_upper_len((const unsigned char *)(x), SCACHE_MAX_BITS, 30)
 

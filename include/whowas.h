@@ -31,7 +31,7 @@
  *
  */
 #define WW_MAX_BITS 16
-#define WW_MAX 65536
+#define WW_MAX (1<<WW_MAX_BITS)
 
 struct User;
 struct Client;

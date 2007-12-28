@@ -47,11 +47,7 @@ struct Whowas *WHOWASHASH[WW_MAX];
 
 static int whowas_next = 0;
 
-uint32_t
-hash_whowas_name(const char *name)
-{
-	return fnv_hash_upper((const unsigned char *)name, WW_MAX_BITS, 0);
-}
+#define hash_whowas_name(x) fnv_hash_upper((const unsigned char *)x, WW_MAX_BITS, 0)
 
 void
 add_history(struct Client *client_p, int online)
