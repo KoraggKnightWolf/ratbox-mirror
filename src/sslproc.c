@@ -308,6 +308,8 @@ ssl_process_dead_fd(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 	client_p = find_cli_fd_hash(fd);
 	if(client_p == NULL)
 		return;
+	if(IsServer(client_p))
+		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld error for %s: %s", client_p->name, reason);
 	exit_client(client_p, client_p, &me, reason);
 }
 
@@ -559,7 +561,7 @@ start_zlib_session(struct Client *server)
 	len = rb_linebuf_len(&server->localClient->buf_recvq);
 	len += hdr;	
 	buf = rb_malloc(len);
-
+	id = rb_get_fd(server->localClient->F);
 	level = ConfigFileEntry.compression_level;
 	buf[1] = (id >> 24) & 0xFF;
 	buf[2] = (id >> 16) & 0xFF;
@@ -603,6 +605,12 @@ start_zlib_session(struct Client *server)
 	F[1] = xF1;
 	del_from_cli_fd_hash(server);	
 	server->localClient->F = xF2;
+	/* need to redo as what we did before isn't valid now */
+	id = rb_get_fd(server->localClient->F);
+	buf[1] = (id >> 24) & 0xFF;
+	buf[2] = (id >> 16) & 0xFF;
+	buf[3] = (id >> 8) & 0xFF;
+	buf[4] = id & 0xFF;
 	add_to_cli_fd_hash(server);
 	server->localClient->ssl_ctl = which_ssld();
 	server->localClient->ssl_ctl->cli_count++;
