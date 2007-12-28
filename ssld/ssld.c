@@ -33,6 +33,26 @@
 #define READBUF_SIZE 16384
 #endif
 
+
+static inline rb_int32_t buf_to_int32(char *buf)
+{
+	rb_int32_t x;
+	x = *buf << 24;
+	x |= *(++buf) << 16;
+	x |= *(++buf) << 8;
+	x |= *(++buf);
+	return x;
+}
+
+static inline void int32_to_buf(char *buf, rb_int32_t x)
+{
+	*(buf)   = x >> 24 & 0xFF;
+	*(++buf) = x >> 16 & 0xFF; 
+	*(++buf) = x >> 8 & 0xFF;
+	*(++buf) = x & 0xFF;
+	return;
+}
+
 static char inbuf[READBUF_SIZE];
 static char outbuf[READBUF_SIZE];
 
@@ -55,6 +75,12 @@ typedef struct _mod_ctl
 	rb_dlink_list writeq;
 } mod_ctl_t;
 
+typedef struct _zlib_stream
+{
+	z_stream instream;
+	z_stream outstream;
+} zlib_stream_t;
+
 typedef struct _conn
 {
 	rb_dlink_node node;
@@ -66,15 +92,12 @@ typedef struct _conn
 
 	rb_fde_t *mod_fd;
 	rb_fde_t *plain_fd;
-	unsigned long mod_out;
-	unsigned long mod_in;
-	unsigned long plain_in;
-	unsigned long plain_out;
+	rb_uint32_t mod_out;
+	rb_uint32_t mod_in;
+	rb_uint32_t plain_in;
+	rb_uint32_t plain_out;
 	rb_uint8_t flags;
-#ifdef HAVE_LIBZ
-	z_stream instream;
-	z_stream outstream;
-#endif
+	void *stream;
 } conn_t;
 
 #define FLAG_SSL	0x01
@@ -177,7 +200,6 @@ close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 	va_list ap;
 	char reason[128]; /* must always be under 250 bytes */
 	char buf[256];
-	rb_int32_t id;
 	int len;
 	rb_rawbuf_flush(conn->modbuf_out, conn->mod_fd);
 	rb_rawbuf_flush(conn->plainbuf_out, conn->plain_fd);
@@ -197,12 +219,8 @@ close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 	rb_vsnprintf(reason, sizeof(reason), fmt, ap);
 	va_end(ap);
 
-	id = conn->id;
 	buf[0] = 'D';
-	buf[1] = (id >> 24) && 0xFF;
-	buf[2] = (id >> 16) && 0xFF;
-	buf[3] = (id >> 8) && 0xFF;
-	buf[4] = id & 0xFF;
+	int32_to_buf(&buf[1], conn->id);
 	strcpy(&buf[5], reason);
 	len = (strlen(reason) + 1) + 5;
 	mod_cmd_write_queue(conn->ctl, buf, len);
@@ -218,6 +236,7 @@ make_conn(mod_ctl_t *ctl, rb_fde_t * mod_fd, rb_fde_t * plain_fd)
 	conn->mod_fd = mod_fd;
 	conn->plain_fd = plain_fd;
 	conn->id = -1;
+	conn->stream = NULL;
 	return conn;
 }
 
@@ -293,31 +312,31 @@ static void
 common_zlib_deflate(conn_t * conn, void *buf, size_t len)
 {
 	int ret, have;
-	conn->outstream.next_in = buf;
-	conn->outstream.avail_in = len;
-	conn->outstream.next_out = (Bytef *) outbuf;
-	conn->outstream.avail_out = sizeof(outbuf);
+	((zlib_stream_t *)conn->stream)->outstream.next_in = buf;
+	((zlib_stream_t *)conn->stream)->outstream.avail_in = len;
+	((zlib_stream_t *)conn->stream)->outstream.next_out = (Bytef *) outbuf;
+	((zlib_stream_t *)conn->stream)->outstream.avail_out = sizeof(outbuf);
 
-	ret = deflate(&conn->outstream, Z_SYNC_FLUSH);
+	ret = deflate(&((zlib_stream_t *)conn->stream)->outstream, Z_SYNC_FLUSH);
 	if(ret != Z_OK)
 	{
 		/* deflate error */
 		close_conn(conn, WAIT_PLAIN, "Deflate failed: %s", zError(ret));
 		return;
 	}
-	if(conn->outstream.avail_out == 0)
+	if(((zlib_stream_t *)conn->stream)->outstream.avail_out == 0)
 	{
 		/* avail_out empty */
 		close_conn(conn, WAIT_PLAIN, "error compressing data, avail_out == 0");
 		return;
 	}
-	if(conn->outstream.avail_in != 0)
+	if(((zlib_stream_t *)conn->stream)->outstream.avail_in != 0)
 	{
 		/* avail_in isn't empty...*/
 		close_conn(conn, WAIT_PLAIN, "error compressing data, avail_in != 0");
 		return;
 	}
-	have = sizeof(outbuf) - conn->outstream.avail_out;
+	have = sizeof(outbuf) - ((zlib_stream_t *)conn->stream)->outstream.avail_out;
 	conn_mod_write(conn, outbuf, have);
 }
 
@@ -325,14 +344,14 @@ static void
 common_zlib_inflate(conn_t * conn, void *buf, size_t len)
 {
 	int ret, have;
-	conn->instream.next_in = buf;
-	conn->instream.avail_in = len;
-	conn->instream.next_out = (Bytef *) outbuf;
-	conn->instream.avail_out = sizeof(outbuf);
+	((zlib_stream_t *)conn->stream)->instream.next_in = buf;
+	((zlib_stream_t *)conn->stream)->instream.avail_in = len;
+	((zlib_stream_t *)conn->stream)->instream.next_out = (Bytef *) outbuf;
+	((zlib_stream_t *)conn->stream)->instream.avail_out = sizeof(outbuf);
 
-	while (conn->instream.avail_in)
+	while (((zlib_stream_t *)conn->stream)->instream.avail_in)
 	{
-		ret = inflate(&conn->instream, Z_NO_FLUSH);
+		ret = inflate(&((zlib_stream_t *)conn->stream)->instream, Z_NO_FLUSH);
 		if(ret != Z_OK)
 		{
 			if(!strncmp("ERROR ", buf, 6))
@@ -344,14 +363,14 @@ common_zlib_inflate(conn_t * conn, void *buf, size_t len)
 			close_conn(conn, WAIT_PLAIN, "Inflate failed: %s", zError(ret));
 			return;
 		}
-		have = sizeof(outbuf) - conn->instream.avail_out;
+		have = sizeof(outbuf) - ((zlib_stream_t *)conn->stream)->instream.avail_out;
 
-		if(conn->instream.avail_in)
+		if(((zlib_stream_t *)conn->stream)->instream.avail_in)
 		{
 			conn_plain_write(conn, outbuf, have);
 			have = 0;
-			conn->instream.next_out = (Bytef *) outbuf;
-			conn->instream.avail_out = sizeof(outbuf);
+			((zlib_stream_t *)conn->stream)->instream.next_out = (Bytef *) outbuf;
+			((zlib_stream_t *)conn->stream)->instream.avail_out = sizeof(outbuf);
 		}
 	}
 	if(have == 0)
@@ -557,10 +576,7 @@ ssl_process_accept(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	rb_int32_t id;
 	conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
 
-	id = ctlb->buf[1] << 24;
-	id |= ctlb->buf[2] << 16;
-	id |= ctlb->buf[3] << 8; 
-	id |= ctlb->buf[4];
+	id = buf_to_int32(&ctlb->buf[1]);
 
 	if(id >= 0)
 		conn_add_id_hash(conn, id);
@@ -584,10 +600,7 @@ ssl_process_connect(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	rb_int32_t id;
 	conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
 
-	id = ctlb->buf[1] << 24;
-	id |= ctlb->buf[2] << 16;
-	id |= ctlb->buf[3] << 8; 
-	id |= ctlb->buf[4];
+	id = buf_to_int32(&ctlb->buf[1]);
 
 	if(id >= 0)
 		conn_add_id_hash(conn, id);
@@ -611,10 +624,7 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	const char *odata;
 	rb_int32_t id;
 
-	id = ctlb->buf[1] << 24;
-	id |= ctlb->buf[2] << 16;
-	id |= ctlb->buf[3] << 8; 
-	id |= ctlb->buf[4];
+	id = buf_to_int32(&ctlb->buf[1]);
 
 	if(id < 0)
 		return;
@@ -625,7 +635,7 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	if(conn == NULL)
 		return;
 
-	rb_snprintf(outstat, sizeof(outstat), "S %s %ld %ld %ld %ld", odata,
+	rb_snprintf(outstat, sizeof(outstat), "S %s %u %u %u %u", odata,
 		    conn->plain_out, conn->mod_in, conn->plain_in, conn->mod_out);
 	conn->plain_out = 0;
 	conn->plain_in = 0;
@@ -645,10 +655,7 @@ zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	conn_t *conn;
 	void *leftover;
 
-	id = ctlb->buf[1] << 24;
-	id |= ctlb->buf[2] << 16;
-	id |= ctlb->buf[3] << 8; 
-	id |= ctlb->buf[4];
+	id = buf_to_int32(&ctlb->buf[1]);
                 
 	if(id < 0)
 		return;
@@ -660,24 +667,24 @@ zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 		return;
 	}
 	SetZip(conn);
+	conn->stream = rb_malloc(sizeof(zlib_stream_t));
+	((zlib_stream_t *)conn->stream)->instream.total_in = 0;
+	((zlib_stream_t *)conn->stream)->instream.total_out = 0;
+	((zlib_stream_t *)conn->stream)->instream.zalloc = (alloc_func) ssld_alloc;
+	((zlib_stream_t *)conn->stream)->instream.zfree = (free_func) ssld_free;
+	((zlib_stream_t *)conn->stream)->instream.data_type = Z_ASCII;
+	inflateInit(&((zlib_stream_t *)conn->stream)->instream);
 
-	conn->instream.total_in = 0;
-	conn->instream.total_out = 0;
-	conn->instream.zalloc = (alloc_func) ssld_alloc;
-	conn->instream.zfree = (free_func) ssld_free;
-	conn->instream.data_type = Z_ASCII;
-	inflateInit(&conn->instream);
-
-	conn->outstream.total_in = 0;
-	conn->outstream.total_out = 0;
-	conn->outstream.zalloc = (alloc_func) ssld_alloc;
-	conn->outstream.zfree = (free_func) ssld_free;
-	conn->outstream.data_type = Z_ASCII;
+	((zlib_stream_t *)conn->stream)->outstream.total_in = 0;
+	((zlib_stream_t *)conn->stream)->outstream.total_out = 0;
+	((zlib_stream_t *)conn->stream)->outstream.zalloc = (alloc_func) ssld_alloc;
+	((zlib_stream_t *)conn->stream)->outstream.zfree = (free_func) ssld_free;
+	((zlib_stream_t *)conn->stream)->outstream.data_type = Z_ASCII;
 
 	if(level > 9)
 		level = Z_DEFAULT_COMPRESSION;
 
-	deflateInit(&conn->outstream, level);
+	deflateInit(&((zlib_stream_t *)conn->stream)->outstream, level);
 
 	if(ctlb->buflen > hdr)
 	{
@@ -706,10 +713,7 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 
 	SetZip(conn);
 
-	id = ctlb->buf[1] << 24;
-	id |= ctlb->buf[2] << 16;
-	id |= ctlb->buf[3] << 8; 
-	id |= ctlb->buf[4];
+	id = buf_to_int32(&ctlb->buf[1]);
                                 	
 	if(id < 0)
 		return;
@@ -717,23 +721,23 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 
 	conn_add_id_hash(conn, id);
 
-	conn->instream.total_in = 0;
-	conn->instream.total_out = 0;
-	conn->instream.zalloc = (alloc_func) ssld_alloc;
-	conn->instream.zfree = (free_func) ssld_free;
-	conn->instream.data_type = Z_ASCII;
-	inflateInit(&conn->instream);
+	((zlib_stream_t *)conn->stream)->instream.total_in = 0;
+	((zlib_stream_t *)conn->stream)->instream.total_out = 0;
+	((zlib_stream_t *)conn->stream)->instream.zalloc = (alloc_func) ssld_alloc;
+	((zlib_stream_t *)conn->stream)->instream.zfree = (free_func) ssld_free;
+	((zlib_stream_t *)conn->stream)->instream.data_type = Z_ASCII;
+	inflateInit(&((zlib_stream_t *)conn->stream)->instream);
 
-	conn->outstream.total_in = 0;
-	conn->outstream.total_out = 0;
-	conn->outstream.zalloc = (alloc_func) ssld_alloc;
-	conn->outstream.zfree = (free_func) ssld_free;
-	conn->outstream.data_type = Z_ASCII;
+	((zlib_stream_t *)conn->stream)->outstream.total_in = 0;
+	((zlib_stream_t *)conn->stream)->outstream.total_out = 0;
+	((zlib_stream_t *)conn->stream)->outstream.zalloc = (alloc_func) ssld_alloc;
+	((zlib_stream_t *)conn->stream)->outstream.zfree = (free_func) ssld_free;
+	((zlib_stream_t *)conn->stream)->outstream.data_type = Z_ASCII;
 
 	if(level > 9)
 		level = Z_DEFAULT_COMPRESSION;
 
-	deflateInit(&conn->outstream, level);
+	deflateInit(&((zlib_stream_t *)conn->stream)->outstream, level);
 
 	if(ctlb->buflen > hdr)
 	{
