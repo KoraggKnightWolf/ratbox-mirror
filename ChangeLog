@@ -1,3 +1,14 @@
+androsyn    2007/12/28 17:16:04 UTC	(20071228_3-24800)
+  Log:
+  - Have the compression related structs be in their own struct with conn_t has a pointer to in ssld.
+  - Add simple functions to deal with stuffing integers into buffers to make things a little more idiot proof :)
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/12/28 05:17:13 UTC	(20071228_2-24798)
   Log:
   - Report errors from ssld for servers via sendto_realops_flags
