@@ -26,6 +26,7 @@
 
 #include "stdinc.h"
 #include "struct.h"
+#include "hash.h"
 #include "whowas.h"
 #include "client.h"
 #include "match.h"

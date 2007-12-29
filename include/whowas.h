@@ -32,6 +32,7 @@
  */
 #define WW_MAX_BITS 16
 #define WW_MAX (1<<WW_MAX_BITS)
+#define hash_whowas_name(x) fnv_hash_upper((const unsigned char *)x, WW_MAX_BITS, 0)
 
 struct User;
 struct Client;
@@ -98,6 +99,5 @@ void count_whowas_memory(size_t *, size_t *);
 /* XXX m_whowas.c in modules needs these */
 extern struct Whowas WHOWAS[];
 extern struct Whowas *WHOWASHASH[];
-uint32_t hash_whowas_name(const char *name);
 
 #endif /* INCLUDED_whowas_h */
