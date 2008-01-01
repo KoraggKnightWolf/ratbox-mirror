@@ -333,7 +333,7 @@ AC_CHECK_HEADER(zlib.h, [
 	AC_CHECK_LIB(z, zlibVersion,
 	[
 		AC_SUBST(ZLIB_LD, -lz)
-		AC_DEFINE(HAVE_LIBZ, 1, [Define to 1 if zlib (-lz) is available.])
+		AC_DEFINE(HAVE_ZLIB, 1, [Define to 1 if zlib (-lz) is available.])
 	], zlib=no)
 ], zlib=no)
 

@@ -139,7 +139,7 @@ confopts(void)
 	*p++ = 'M';
 	*p++ = 'p';
 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 	*p++ = 'Z';
 #endif
 

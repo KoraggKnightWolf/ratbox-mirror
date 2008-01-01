@@ -260,9 +260,9 @@ static struct InfoStruct info_table[] = {
 		"OpenSSL CHALLENGE Support"
 	},
 	{
-		"HAVE_LIBZ", 
+		"HAVE_ZLIB", 
 		OUTPUT_BOOLEAN_RAW_YN, 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 		{ (void *)1 },
 #else
 		{ (void *)0 }, 

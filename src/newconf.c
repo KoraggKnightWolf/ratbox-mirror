@@ -1607,7 +1607,7 @@ conf_set_general_stats_i_oper_only(confentry_t * entry, conf_t * conf, struct co
 static void
 conf_set_general_compression_level(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 	ConfigFileEntry.compression_level = entry->number;
 
 	if((ConfigFileEntry.compression_level < 1) || (ConfigFileEntry.compression_level > 9))
@@ -1672,7 +1672,7 @@ conf_set_end_connect(conf_t * conf)
 		return;
 	}
 
-#ifndef HAVE_LIBZ
+#ifndef HAVE_ZLIB
 	if(ServerConfCompressed(t_server))
 	{
 		t_server->flags &= ~SERVER_COMPRESSED;

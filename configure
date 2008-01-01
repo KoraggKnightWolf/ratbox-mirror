@@ -24429,7 +24429,7 @@ if test $ac_cv_lib_z_zlibVersion = yes; then
 
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBZ 1
+#define HAVE_ZLIB 1
 _ACEOF
 
 

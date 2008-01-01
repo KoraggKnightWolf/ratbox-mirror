@@ -24,7 +24,7 @@
 
 #include "stdinc.h"
 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 #include <zlib.h>
 #endif
 
@@ -75,11 +75,13 @@ typedef struct _mod_ctl
 	rb_dlink_list writeq;
 } mod_ctl_t;
 
+#ifdef HAVE_ZLIB
 typedef struct _zlib_stream
 {
 	z_stream instream;
 	z_stream outstream;
 } zlib_stream_t;
+#endif
 
 typedef struct _conn
 {
@@ -307,7 +309,7 @@ mod_cmd_write_queue(mod_ctl_t * ctl, void *data, size_t len)
 }
 
 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 static void
 common_zlib_deflate(conn_t * conn, void *buf, size_t len)
 {
@@ -431,7 +433,7 @@ conn_plain_read_cb(rb_fde_t * fd, void *data)
 		}
 		conn->plain_in += length;
 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 		if(IsZip(conn))
 			common_zlib_deflate(conn, inbuf, length);
 		else
@@ -480,7 +482,7 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 			return;
 		}	
 		conn->mod_in += length;
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 		if(IsZip(conn))
 			common_zlib_inflate(conn, inbuf, length);
 		else
@@ -644,7 +646,7 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	mod_cmd_write_queue(ctl, outstat, strlen(outstat) + 1);	/* +1 is so we send the \0 as well */
 }
 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 /* starts zlib for an already established connection */
 static void
 zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
@@ -806,7 +808,7 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 				process_stats(ctl, ctl_buf);
 				break;
 			}
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 		case 'Y':
 			{
 				zlib_process_ssl(ctl, ctl_buf);
@@ -934,6 +936,14 @@ main(int argc, char **argv)
 		if(x != ctlfd && x != pipefd && x > 2)
 			close(x);
 	}
+	x = open("/dev/null", O_RDWR);
+	if(ctlfd != 0 && pipefd != 0)
+		dup2(x, 0);
+	if(ctlfd != 1 && pipefd != 1)
+		dup2(x, 1);
+	if(ctlfd != 2 && pipefd != 2)
+		dup2(x, 2);
+		
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);
 

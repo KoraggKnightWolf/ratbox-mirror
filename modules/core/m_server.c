@@ -725,7 +725,7 @@ check_server(const char *name, struct Client *client_p)
 	attach_server_conf(client_p, server_p);
 
 	/* clear ZIP/TB if they support but we dont want them */
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 	if(!ServerConfCompressed(server_p))
 #endif
 		ClearCap(client_p, CAP_ZIP);

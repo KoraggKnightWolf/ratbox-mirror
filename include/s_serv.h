@@ -73,7 +73,7 @@ struct Capability
 			 CAP_ZIP  | CAP_KNOCK  | \
 			 CAP_RSFNC | CAP_SAVE | CAP_SAVETS_100)
 
-#ifdef HAVE_LIBZ
+#ifdef HAVE_ZLIB
 #define CAP_ZIP_SUPPORTED       CAP_ZIP
 #else
 #define CAP_ZIP_SUPPORTED       0
