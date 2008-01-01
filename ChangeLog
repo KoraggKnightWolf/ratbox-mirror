@@ -1,3 +1,20 @@
+androsyn    2008/01/01 02:43:05 UTC	(20080101_0-24806)
+  Log:
+  change the define for HAVE_LIBZ to HAVE_ZLIB also deal with making fds 0-2 be /dev/null in ssld
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/s_serv.h (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_version.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2007/12/29 03:42:57 UTC	(20071229_0-24804)
   Log:
   make m_whowas.c work again
