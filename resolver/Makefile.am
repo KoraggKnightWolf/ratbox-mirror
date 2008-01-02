@@ -4,7 +4,7 @@
 bin_PROGRAMS = resolver
 
 INCLUDES = -I../include -Iadns -I../libratbox/include 
-
+AM_CFLAGS=$(WARNFLAGS)
 SUBDIRS=adns
 
 resolver_SOURCES = resolver.c

@@ -15,7 +15,7 @@ servicesdir	= @moduledir@/autoload
 SUBDIRS = libratbox libltdl tools doc help @SQLITE_SUBDIR@ bandb ssld resolver ident
 
 AM_YFLAGS = -d
-
+AM_CFLAGS = $(WARNFLAGS)
 INCLUDES = -Ilibratbox/include -Ilibltdl
 src/version.c: src/version.c.SH
 	$(SHELL) -c "(cd src; $(SHELL) ./version.c.SH)"

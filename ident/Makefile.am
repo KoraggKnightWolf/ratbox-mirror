@@ -2,7 +2,7 @@
 # $Id$
 #
 bin_PROGRAMS = ident
-
+AM_CFLAGS=$(WARNFLAGS)
 INCLUDES = -I../include -I../libratbox/include 
 
 

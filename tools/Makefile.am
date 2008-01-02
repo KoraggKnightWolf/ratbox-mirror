@@ -1,6 +1,7 @@
 # $Id$ 
 
 bin_PROGRAMS = mkpasswd
+AM_CFLAGS=$(WARNFLAGS)
 
 INCLUDES = $(DEFAULT_INCLUDES) -I../libratbox/include -I.
 

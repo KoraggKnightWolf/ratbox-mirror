@@ -1,4 +1,5 @@
 INCLUDES = -I../include -I../libratbox/include $(INCLTDL)
+AM_CFLAGS=$(WARNFLAGS)
 
 SRCS = \
 example_module.c        \

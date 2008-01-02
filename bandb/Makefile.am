@@ -2,6 +2,7 @@
 # $Id$
 #
 bin_PROGRAMS = bandb
+AM_CFLAGS=$(WARNFLAGS)
 
 INCLUDES = -I../include -I../libratbox/include @SQLITE_INCLUDES@
 

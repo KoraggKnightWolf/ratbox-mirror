@@ -99,7 +99,7 @@ if test "$LEX" != flex; then
 fi
 
 # backwards support for IRC_CFLAGS
-CFLAGS="$IRC_CFLAGS $CFLAGS -O0 -Wall"
+CFLAGS="$IRC_CFLAGS $CFLAGS -O0"
 
 dnl use directory structure of cached as default (hack)
 if test "$libexecdir" = '${exec_prefix}/libexec' &&
@@ -456,11 +456,12 @@ if test "$profile" = yes; then
 else
 	AC_MSG_RESULT(no)
 fi
-
+WARNFLAGS="-Wall"
 AC_ARG_ENABLE(warnings,
 AC_HELP_STRING([--enable-warnings],[Enable all sorts of warnings for debugging.]),
-[CFLAGS="$CFLAGS -Wall -Werror -Wcast-qual -Wcast-align -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wwrite-strings -W -Wno-unused -Wunused-function -Wunused-variable"],[])
+[WARNFLAGS="-Wall -Werror -Wcast-qual -Wcast-align -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wwrite-strings -W -Wno-unused -Wunused-function -Wunused-variable"],[])
 
+AC_SUBST(WARNFLAGS)
 dnl Server Tweaks
 dnl =============
 
