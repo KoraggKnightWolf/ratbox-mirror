@@ -1,3 +1,11 @@
+androsyn    2008/01/02 18:33:05 UTC	(20080102_2-24816)
+  Log:
+  tweak ssld.c to use rb_lib_loop and also close fds 0-2 and replace with /dev/null
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/01/02 18:32:25 UTC	(20080102_1-24814)
   Log:
   tweak resolver.c to use rb_helper_loop
