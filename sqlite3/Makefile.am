@@ -1,3 +1,13 @@
-libsqlite3_a_CFLAGS = -I../include -Isrc -DNO_TCL=1 
-libsqlite3_a_SOURCES = src/parse.c src/alter.c src/analyze.c src/attach.c src/auth.c src/btree.c src/build.c src/callback.c src/complete.c src/date.c src/delete.c src/expr.c src/func.c src/hash.c src/insert.c src/legacy.c src/main.c src/os.c src/os_unix.c src/os_win.c src/pager.c src/pragma.c src/prepare.c src/printf.c src/random.c src/select.c src/shell.c src/table.c src/tclsqlite.c src/tokenize.c src/trigger.c src/update.c src/utf.c src/util.c src/vacuum.c src/vdbe.c src/vdbeapi.c src/vdbeaux.c src/vdbefifo.c src/vdbemem.c src/where.c src/opcodes.c
-noinst_LIBRARIES = libsqlite3.a
+
+
+SOURCES = sqlite3.c
+
+.c.lo:
+	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION=1 -prefer-pic -I../include -I. -c $< -o $@ 
+
+S_OBJS= $(SOURCES:.c=.lo)
+
+libsqlite3.a: $(S_OBJS)
+	$(LIBTOOL) --mode=link $(CC) -all-static -o libsqlite3.a $(S_OBJS)
+
+all: libsqlite3.a

@@ -13,7 +13,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -42,50 +41,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/setup.h
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
-ARFLAGS = cru
-libsqlite3_a_AR = $(AR) $(ARFLAGS)
-libsqlite3_a_LIBADD =
-am_libsqlite3_a_OBJECTS = libsqlite3_a-parse.$(OBJEXT) \
-	libsqlite3_a-alter.$(OBJEXT) libsqlite3_a-analyze.$(OBJEXT) \
-	libsqlite3_a-attach.$(OBJEXT) libsqlite3_a-auth.$(OBJEXT) \
-	libsqlite3_a-btree.$(OBJEXT) libsqlite3_a-build.$(OBJEXT) \
-	libsqlite3_a-callback.$(OBJEXT) \
-	libsqlite3_a-complete.$(OBJEXT) libsqlite3_a-date.$(OBJEXT) \
-	libsqlite3_a-delete.$(OBJEXT) libsqlite3_a-expr.$(OBJEXT) \
-	libsqlite3_a-func.$(OBJEXT) libsqlite3_a-hash.$(OBJEXT) \
-	libsqlite3_a-insert.$(OBJEXT) libsqlite3_a-legacy.$(OBJEXT) \
-	libsqlite3_a-main.$(OBJEXT) libsqlite3_a-os.$(OBJEXT) \
-	libsqlite3_a-os_unix.$(OBJEXT) libsqlite3_a-os_win.$(OBJEXT) \
-	libsqlite3_a-pager.$(OBJEXT) libsqlite3_a-pragma.$(OBJEXT) \
-	libsqlite3_a-prepare.$(OBJEXT) libsqlite3_a-printf.$(OBJEXT) \
-	libsqlite3_a-random.$(OBJEXT) libsqlite3_a-select.$(OBJEXT) \
-	libsqlite3_a-shell.$(OBJEXT) libsqlite3_a-table.$(OBJEXT) \
-	libsqlite3_a-tclsqlite.$(OBJEXT) \
-	libsqlite3_a-tokenize.$(OBJEXT) libsqlite3_a-trigger.$(OBJEXT) \
-	libsqlite3_a-update.$(OBJEXT) libsqlite3_a-utf.$(OBJEXT) \
-	libsqlite3_a-util.$(OBJEXT) libsqlite3_a-vacuum.$(OBJEXT) \
-	libsqlite3_a-vdbe.$(OBJEXT) libsqlite3_a-vdbeapi.$(OBJEXT) \
-	libsqlite3_a-vdbeaux.$(OBJEXT) libsqlite3_a-vdbefifo.$(OBJEXT) \
-	libsqlite3_a-vdbemem.$(OBJEXT) libsqlite3_a-where.$(OBJEXT) \
-	libsqlite3_a-opcodes.$(OBJEXT)
-libsqlite3_a_OBJECTS = $(am_libsqlite3_a_OBJECTS)
-DEFAULT_INCLUDES = -I. -I$(top_builddir)/include@am__isrc@
-depcomp = $(SHELL) $(top_srcdir)/depcomp
-am__depfiles_maybe = depfiles
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
-SOURCES = $(libsqlite3_a_SOURCES)
-DIST_SOURCES = $(libsqlite3_a_SOURCES)
-ETAGS = etags
-CTAGS = ctags
+DIST_SOURCES =
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
@@ -170,6 +126,7 @@ SSL_SRCS_ENABLE = @SSL_SRCS_ENABLE@
 STRIP = @STRIP@
 TOUCH = @TOUCH@
 VERSION = @VERSION@
+WARNFLAGS = @WARNFLAGS@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
 ZLIB_LD = @ZLIB_LD@
@@ -229,13 +186,12 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-libsqlite3_a_CFLAGS = -I../include -Isrc -DNO_TCL=1 
-libsqlite3_a_SOURCES = src/parse.c src/alter.c src/analyze.c src/attach.c src/auth.c src/btree.c src/build.c src/callback.c src/complete.c src/date.c src/delete.c src/expr.c src/func.c src/hash.c src/insert.c src/legacy.c src/main.c src/os.c src/os_unix.c src/os_win.c src/pager.c src/pragma.c src/prepare.c src/printf.c src/random.c src/select.c src/shell.c src/table.c src/tclsqlite.c src/tokenize.c src/trigger.c src/update.c src/utf.c src/util.c src/vacuum.c src/vdbe.c src/vdbeapi.c src/vdbeaux.c src/vdbefifo.c src/vdbemem.c src/where.c src/opcodes.c
-noinst_LIBRARIES = libsqlite3.a
+SOURCES = sqlite3.c
+S_OBJS = $(SOURCES:.c=.lo)
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .lo
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -266,724 +222,17 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libsqlite3.a: $(libsqlite3_a_OBJECTS) $(libsqlite3_a_DEPENDENCIES) 
-	-rm -f libsqlite3.a
-	$(libsqlite3_a_AR) libsqlite3.a $(libsqlite3_a_OBJECTS) $(libsqlite3_a_LIBADD)
-	$(RANLIB) libsqlite3.a
-
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT)
-
-distclean-compile:
-	-rm -f *.tab.c
-
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-alter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-analyze.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-attach.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-auth.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-btree.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-build.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-callback.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-complete.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-date.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-delete.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-expr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-func.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-hash.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-insert.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-legacy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-opcodes.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-os.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-os_unix.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-os_win.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-pager.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-parse.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-pragma.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-prepare.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-printf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-random.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-select.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-shell.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-table.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-tclsqlite.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-tokenize.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-trigger.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-update.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-utf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-util.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-vacuum.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-vdbe.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-vdbeapi.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-vdbeaux.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-vdbefifo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-vdbemem.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsqlite3_a-where.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-libsqlite3_a-parse.o: src/parse.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-parse.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-parse.Tpo -c -o libsqlite3_a-parse.o `test -f 'src/parse.c' || echo '$(srcdir)/'`src/parse.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-parse.Tpo $(DEPDIR)/libsqlite3_a-parse.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/parse.c' object='libsqlite3_a-parse.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-parse.o `test -f 'src/parse.c' || echo '$(srcdir)/'`src/parse.c
-
-libsqlite3_a-parse.obj: src/parse.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-parse.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-parse.Tpo -c -o libsqlite3_a-parse.obj `if test -f 'src/parse.c'; then $(CYGPATH_W) 'src/parse.c'; else $(CYGPATH_W) '$(srcdir)/src/parse.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-parse.Tpo $(DEPDIR)/libsqlite3_a-parse.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/parse.c' object='libsqlite3_a-parse.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-parse.obj `if test -f 'src/parse.c'; then $(CYGPATH_W) 'src/parse.c'; else $(CYGPATH_W) '$(srcdir)/src/parse.c'; fi`
-
-libsqlite3_a-alter.o: src/alter.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-alter.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-alter.Tpo -c -o libsqlite3_a-alter.o `test -f 'src/alter.c' || echo '$(srcdir)/'`src/alter.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-alter.Tpo $(DEPDIR)/libsqlite3_a-alter.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/alter.c' object='libsqlite3_a-alter.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-alter.o `test -f 'src/alter.c' || echo '$(srcdir)/'`src/alter.c
-
-libsqlite3_a-alter.obj: src/alter.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-alter.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-alter.Tpo -c -o libsqlite3_a-alter.obj `if test -f 'src/alter.c'; then $(CYGPATH_W) 'src/alter.c'; else $(CYGPATH_W) '$(srcdir)/src/alter.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-alter.Tpo $(DEPDIR)/libsqlite3_a-alter.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/alter.c' object='libsqlite3_a-alter.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-alter.obj `if test -f 'src/alter.c'; then $(CYGPATH_W) 'src/alter.c'; else $(CYGPATH_W) '$(srcdir)/src/alter.c'; fi`
-
-libsqlite3_a-analyze.o: src/analyze.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-analyze.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-analyze.Tpo -c -o libsqlite3_a-analyze.o `test -f 'src/analyze.c' || echo '$(srcdir)/'`src/analyze.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-analyze.Tpo $(DEPDIR)/libsqlite3_a-analyze.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/analyze.c' object='libsqlite3_a-analyze.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-analyze.o `test -f 'src/analyze.c' || echo '$(srcdir)/'`src/analyze.c
-
-libsqlite3_a-analyze.obj: src/analyze.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-analyze.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-analyze.Tpo -c -o libsqlite3_a-analyze.obj `if test -f 'src/analyze.c'; then $(CYGPATH_W) 'src/analyze.c'; else $(CYGPATH_W) '$(srcdir)/src/analyze.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-analyze.Tpo $(DEPDIR)/libsqlite3_a-analyze.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/analyze.c' object='libsqlite3_a-analyze.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-analyze.obj `if test -f 'src/analyze.c'; then $(CYGPATH_W) 'src/analyze.c'; else $(CYGPATH_W) '$(srcdir)/src/analyze.c'; fi`
-
-libsqlite3_a-attach.o: src/attach.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-attach.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-attach.Tpo -c -o libsqlite3_a-attach.o `test -f 'src/attach.c' || echo '$(srcdir)/'`src/attach.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-attach.Tpo $(DEPDIR)/libsqlite3_a-attach.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/attach.c' object='libsqlite3_a-attach.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-attach.o `test -f 'src/attach.c' || echo '$(srcdir)/'`src/attach.c
-
-libsqlite3_a-attach.obj: src/attach.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-attach.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-attach.Tpo -c -o libsqlite3_a-attach.obj `if test -f 'src/attach.c'; then $(CYGPATH_W) 'src/attach.c'; else $(CYGPATH_W) '$(srcdir)/src/attach.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-attach.Tpo $(DEPDIR)/libsqlite3_a-attach.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/attach.c' object='libsqlite3_a-attach.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-attach.obj `if test -f 'src/attach.c'; then $(CYGPATH_W) 'src/attach.c'; else $(CYGPATH_W) '$(srcdir)/src/attach.c'; fi`
-
-libsqlite3_a-auth.o: src/auth.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-auth.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-auth.Tpo -c -o libsqlite3_a-auth.o `test -f 'src/auth.c' || echo '$(srcdir)/'`src/auth.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-auth.Tpo $(DEPDIR)/libsqlite3_a-auth.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/auth.c' object='libsqlite3_a-auth.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-auth.o `test -f 'src/auth.c' || echo '$(srcdir)/'`src/auth.c
-
-libsqlite3_a-auth.obj: src/auth.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-auth.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-auth.Tpo -c -o libsqlite3_a-auth.obj `if test -f 'src/auth.c'; then $(CYGPATH_W) 'src/auth.c'; else $(CYGPATH_W) '$(srcdir)/src/auth.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-auth.Tpo $(DEPDIR)/libsqlite3_a-auth.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/auth.c' object='libsqlite3_a-auth.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-auth.obj `if test -f 'src/auth.c'; then $(CYGPATH_W) 'src/auth.c'; else $(CYGPATH_W) '$(srcdir)/src/auth.c'; fi`
-
-libsqlite3_a-btree.o: src/btree.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-btree.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-btree.Tpo -c -o libsqlite3_a-btree.o `test -f 'src/btree.c' || echo '$(srcdir)/'`src/btree.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-btree.Tpo $(DEPDIR)/libsqlite3_a-btree.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/btree.c' object='libsqlite3_a-btree.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-btree.o `test -f 'src/btree.c' || echo '$(srcdir)/'`src/btree.c
-
-libsqlite3_a-btree.obj: src/btree.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-btree.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-btree.Tpo -c -o libsqlite3_a-btree.obj `if test -f 'src/btree.c'; then $(CYGPATH_W) 'src/btree.c'; else $(CYGPATH_W) '$(srcdir)/src/btree.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-btree.Tpo $(DEPDIR)/libsqlite3_a-btree.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/btree.c' object='libsqlite3_a-btree.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-btree.obj `if test -f 'src/btree.c'; then $(CYGPATH_W) 'src/btree.c'; else $(CYGPATH_W) '$(srcdir)/src/btree.c'; fi`
-
-libsqlite3_a-build.o: src/build.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-build.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-build.Tpo -c -o libsqlite3_a-build.o `test -f 'src/build.c' || echo '$(srcdir)/'`src/build.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-build.Tpo $(DEPDIR)/libsqlite3_a-build.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/build.c' object='libsqlite3_a-build.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-build.o `test -f 'src/build.c' || echo '$(srcdir)/'`src/build.c
-
-libsqlite3_a-build.obj: src/build.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-build.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-build.Tpo -c -o libsqlite3_a-build.obj `if test -f 'src/build.c'; then $(CYGPATH_W) 'src/build.c'; else $(CYGPATH_W) '$(srcdir)/src/build.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-build.Tpo $(DEPDIR)/libsqlite3_a-build.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/build.c' object='libsqlite3_a-build.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-build.obj `if test -f 'src/build.c'; then $(CYGPATH_W) 'src/build.c'; else $(CYGPATH_W) '$(srcdir)/src/build.c'; fi`
-
-libsqlite3_a-callback.o: src/callback.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-callback.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-callback.Tpo -c -o libsqlite3_a-callback.o `test -f 'src/callback.c' || echo '$(srcdir)/'`src/callback.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-callback.Tpo $(DEPDIR)/libsqlite3_a-callback.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/callback.c' object='libsqlite3_a-callback.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-callback.o `test -f 'src/callback.c' || echo '$(srcdir)/'`src/callback.c
-
-libsqlite3_a-callback.obj: src/callback.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-callback.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-callback.Tpo -c -o libsqlite3_a-callback.obj `if test -f 'src/callback.c'; then $(CYGPATH_W) 'src/callback.c'; else $(CYGPATH_W) '$(srcdir)/src/callback.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-callback.Tpo $(DEPDIR)/libsqlite3_a-callback.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/callback.c' object='libsqlite3_a-callback.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-callback.obj `if test -f 'src/callback.c'; then $(CYGPATH_W) 'src/callback.c'; else $(CYGPATH_W) '$(srcdir)/src/callback.c'; fi`
-
-libsqlite3_a-complete.o: src/complete.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-complete.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-complete.Tpo -c -o libsqlite3_a-complete.o `test -f 'src/complete.c' || echo '$(srcdir)/'`src/complete.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-complete.Tpo $(DEPDIR)/libsqlite3_a-complete.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/complete.c' object='libsqlite3_a-complete.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-complete.o `test -f 'src/complete.c' || echo '$(srcdir)/'`src/complete.c
-
-libsqlite3_a-complete.obj: src/complete.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-complete.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-complete.Tpo -c -o libsqlite3_a-complete.obj `if test -f 'src/complete.c'; then $(CYGPATH_W) 'src/complete.c'; else $(CYGPATH_W) '$(srcdir)/src/complete.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-complete.Tpo $(DEPDIR)/libsqlite3_a-complete.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/complete.c' object='libsqlite3_a-complete.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-complete.obj `if test -f 'src/complete.c'; then $(CYGPATH_W) 'src/complete.c'; else $(CYGPATH_W) '$(srcdir)/src/complete.c'; fi`
-
-libsqlite3_a-date.o: src/date.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-date.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-date.Tpo -c -o libsqlite3_a-date.o `test -f 'src/date.c' || echo '$(srcdir)/'`src/date.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-date.Tpo $(DEPDIR)/libsqlite3_a-date.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/date.c' object='libsqlite3_a-date.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-date.o `test -f 'src/date.c' || echo '$(srcdir)/'`src/date.c
-
-libsqlite3_a-date.obj: src/date.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-date.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-date.Tpo -c -o libsqlite3_a-date.obj `if test -f 'src/date.c'; then $(CYGPATH_W) 'src/date.c'; else $(CYGPATH_W) '$(srcdir)/src/date.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-date.Tpo $(DEPDIR)/libsqlite3_a-date.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/date.c' object='libsqlite3_a-date.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-date.obj `if test -f 'src/date.c'; then $(CYGPATH_W) 'src/date.c'; else $(CYGPATH_W) '$(srcdir)/src/date.c'; fi`
-
-libsqlite3_a-delete.o: src/delete.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-delete.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-delete.Tpo -c -o libsqlite3_a-delete.o `test -f 'src/delete.c' || echo '$(srcdir)/'`src/delete.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-delete.Tpo $(DEPDIR)/libsqlite3_a-delete.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/delete.c' object='libsqlite3_a-delete.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-delete.o `test -f 'src/delete.c' || echo '$(srcdir)/'`src/delete.c
-
-libsqlite3_a-delete.obj: src/delete.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-delete.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-delete.Tpo -c -o libsqlite3_a-delete.obj `if test -f 'src/delete.c'; then $(CYGPATH_W) 'src/delete.c'; else $(CYGPATH_W) '$(srcdir)/src/delete.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-delete.Tpo $(DEPDIR)/libsqlite3_a-delete.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/delete.c' object='libsqlite3_a-delete.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-delete.obj `if test -f 'src/delete.c'; then $(CYGPATH_W) 'src/delete.c'; else $(CYGPATH_W) '$(srcdir)/src/delete.c'; fi`
-
-libsqlite3_a-expr.o: src/expr.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-expr.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-expr.Tpo -c -o libsqlite3_a-expr.o `test -f 'src/expr.c' || echo '$(srcdir)/'`src/expr.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-expr.Tpo $(DEPDIR)/libsqlite3_a-expr.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/expr.c' object='libsqlite3_a-expr.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-expr.o `test -f 'src/expr.c' || echo '$(srcdir)/'`src/expr.c
-
-libsqlite3_a-expr.obj: src/expr.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-expr.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-expr.Tpo -c -o libsqlite3_a-expr.obj `if test -f 'src/expr.c'; then $(CYGPATH_W) 'src/expr.c'; else $(CYGPATH_W) '$(srcdir)/src/expr.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-expr.Tpo $(DEPDIR)/libsqlite3_a-expr.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/expr.c' object='libsqlite3_a-expr.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-expr.obj `if test -f 'src/expr.c'; then $(CYGPATH_W) 'src/expr.c'; else $(CYGPATH_W) '$(srcdir)/src/expr.c'; fi`
-
-libsqlite3_a-func.o: src/func.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-func.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-func.Tpo -c -o libsqlite3_a-func.o `test -f 'src/func.c' || echo '$(srcdir)/'`src/func.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-func.Tpo $(DEPDIR)/libsqlite3_a-func.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/func.c' object='libsqlite3_a-func.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-func.o `test -f 'src/func.c' || echo '$(srcdir)/'`src/func.c
-
-libsqlite3_a-func.obj: src/func.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-func.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-func.Tpo -c -o libsqlite3_a-func.obj `if test -f 'src/func.c'; then $(CYGPATH_W) 'src/func.c'; else $(CYGPATH_W) '$(srcdir)/src/func.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-func.Tpo $(DEPDIR)/libsqlite3_a-func.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/func.c' object='libsqlite3_a-func.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-func.obj `if test -f 'src/func.c'; then $(CYGPATH_W) 'src/func.c'; else $(CYGPATH_W) '$(srcdir)/src/func.c'; fi`
-
-libsqlite3_a-hash.o: src/hash.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-hash.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-hash.Tpo -c -o libsqlite3_a-hash.o `test -f 'src/hash.c' || echo '$(srcdir)/'`src/hash.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-hash.Tpo $(DEPDIR)/libsqlite3_a-hash.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/hash.c' object='libsqlite3_a-hash.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-hash.o `test -f 'src/hash.c' || echo '$(srcdir)/'`src/hash.c
-
-libsqlite3_a-hash.obj: src/hash.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-hash.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-hash.Tpo -c -o libsqlite3_a-hash.obj `if test -f 'src/hash.c'; then $(CYGPATH_W) 'src/hash.c'; else $(CYGPATH_W) '$(srcdir)/src/hash.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-hash.Tpo $(DEPDIR)/libsqlite3_a-hash.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/hash.c' object='libsqlite3_a-hash.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-hash.obj `if test -f 'src/hash.c'; then $(CYGPATH_W) 'src/hash.c'; else $(CYGPATH_W) '$(srcdir)/src/hash.c'; fi`
-
-libsqlite3_a-insert.o: src/insert.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-insert.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-insert.Tpo -c -o libsqlite3_a-insert.o `test -f 'src/insert.c' || echo '$(srcdir)/'`src/insert.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-insert.Tpo $(DEPDIR)/libsqlite3_a-insert.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/insert.c' object='libsqlite3_a-insert.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-insert.o `test -f 'src/insert.c' || echo '$(srcdir)/'`src/insert.c
-
-libsqlite3_a-insert.obj: src/insert.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-insert.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-insert.Tpo -c -o libsqlite3_a-insert.obj `if test -f 'src/insert.c'; then $(CYGPATH_W) 'src/insert.c'; else $(CYGPATH_W) '$(srcdir)/src/insert.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-insert.Tpo $(DEPDIR)/libsqlite3_a-insert.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/insert.c' object='libsqlite3_a-insert.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-insert.obj `if test -f 'src/insert.c'; then $(CYGPATH_W) 'src/insert.c'; else $(CYGPATH_W) '$(srcdir)/src/insert.c'; fi`
-
-libsqlite3_a-legacy.o: src/legacy.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-legacy.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-legacy.Tpo -c -o libsqlite3_a-legacy.o `test -f 'src/legacy.c' || echo '$(srcdir)/'`src/legacy.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-legacy.Tpo $(DEPDIR)/libsqlite3_a-legacy.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/legacy.c' object='libsqlite3_a-legacy.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-legacy.o `test -f 'src/legacy.c' || echo '$(srcdir)/'`src/legacy.c
-
-libsqlite3_a-legacy.obj: src/legacy.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-legacy.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-legacy.Tpo -c -o libsqlite3_a-legacy.obj `if test -f 'src/legacy.c'; then $(CYGPATH_W) 'src/legacy.c'; else $(CYGPATH_W) '$(srcdir)/src/legacy.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-legacy.Tpo $(DEPDIR)/libsqlite3_a-legacy.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/legacy.c' object='libsqlite3_a-legacy.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-legacy.obj `if test -f 'src/legacy.c'; then $(CYGPATH_W) 'src/legacy.c'; else $(CYGPATH_W) '$(srcdir)/src/legacy.c'; fi`
-
-libsqlite3_a-main.o: src/main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-main.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-main.Tpo -c -o libsqlite3_a-main.o `test -f 'src/main.c' || echo '$(srcdir)/'`src/main.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-main.Tpo $(DEPDIR)/libsqlite3_a-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/main.c' object='libsqlite3_a-main.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-main.o `test -f 'src/main.c' || echo '$(srcdir)/'`src/main.c
-
-libsqlite3_a-main.obj: src/main.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-main.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-main.Tpo -c -o libsqlite3_a-main.obj `if test -f 'src/main.c'; then $(CYGPATH_W) 'src/main.c'; else $(CYGPATH_W) '$(srcdir)/src/main.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-main.Tpo $(DEPDIR)/libsqlite3_a-main.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/main.c' object='libsqlite3_a-main.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-main.obj `if test -f 'src/main.c'; then $(CYGPATH_W) 'src/main.c'; else $(CYGPATH_W) '$(srcdir)/src/main.c'; fi`
-
-libsqlite3_a-os.o: src/os.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-os.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-os.Tpo -c -o libsqlite3_a-os.o `test -f 'src/os.c' || echo '$(srcdir)/'`src/os.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-os.Tpo $(DEPDIR)/libsqlite3_a-os.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/os.c' object='libsqlite3_a-os.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-os.o `test -f 'src/os.c' || echo '$(srcdir)/'`src/os.c
-
-libsqlite3_a-os.obj: src/os.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-os.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-os.Tpo -c -o libsqlite3_a-os.obj `if test -f 'src/os.c'; then $(CYGPATH_W) 'src/os.c'; else $(CYGPATH_W) '$(srcdir)/src/os.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-os.Tpo $(DEPDIR)/libsqlite3_a-os.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/os.c' object='libsqlite3_a-os.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-os.obj `if test -f 'src/os.c'; then $(CYGPATH_W) 'src/os.c'; else $(CYGPATH_W) '$(srcdir)/src/os.c'; fi`
-
-libsqlite3_a-os_unix.o: src/os_unix.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-os_unix.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-os_unix.Tpo -c -o libsqlite3_a-os_unix.o `test -f 'src/os_unix.c' || echo '$(srcdir)/'`src/os_unix.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-os_unix.Tpo $(DEPDIR)/libsqlite3_a-os_unix.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/os_unix.c' object='libsqlite3_a-os_unix.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-os_unix.o `test -f 'src/os_unix.c' || echo '$(srcdir)/'`src/os_unix.c
-
-libsqlite3_a-os_unix.obj: src/os_unix.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-os_unix.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-os_unix.Tpo -c -o libsqlite3_a-os_unix.obj `if test -f 'src/os_unix.c'; then $(CYGPATH_W) 'src/os_unix.c'; else $(CYGPATH_W) '$(srcdir)/src/os_unix.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-os_unix.Tpo $(DEPDIR)/libsqlite3_a-os_unix.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/os_unix.c' object='libsqlite3_a-os_unix.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-os_unix.obj `if test -f 'src/os_unix.c'; then $(CYGPATH_W) 'src/os_unix.c'; else $(CYGPATH_W) '$(srcdir)/src/os_unix.c'; fi`
-
-libsqlite3_a-os_win.o: src/os_win.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-os_win.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-os_win.Tpo -c -o libsqlite3_a-os_win.o `test -f 'src/os_win.c' || echo '$(srcdir)/'`src/os_win.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-os_win.Tpo $(DEPDIR)/libsqlite3_a-os_win.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/os_win.c' object='libsqlite3_a-os_win.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-os_win.o `test -f 'src/os_win.c' || echo '$(srcdir)/'`src/os_win.c
-
-libsqlite3_a-os_win.obj: src/os_win.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-os_win.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-os_win.Tpo -c -o libsqlite3_a-os_win.obj `if test -f 'src/os_win.c'; then $(CYGPATH_W) 'src/os_win.c'; else $(CYGPATH_W) '$(srcdir)/src/os_win.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-os_win.Tpo $(DEPDIR)/libsqlite3_a-os_win.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/os_win.c' object='libsqlite3_a-os_win.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-os_win.obj `if test -f 'src/os_win.c'; then $(CYGPATH_W) 'src/os_win.c'; else $(CYGPATH_W) '$(srcdir)/src/os_win.c'; fi`
-
-libsqlite3_a-pager.o: src/pager.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-pager.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-pager.Tpo -c -o libsqlite3_a-pager.o `test -f 'src/pager.c' || echo '$(srcdir)/'`src/pager.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-pager.Tpo $(DEPDIR)/libsqlite3_a-pager.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/pager.c' object='libsqlite3_a-pager.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-pager.o `test -f 'src/pager.c' || echo '$(srcdir)/'`src/pager.c
-
-libsqlite3_a-pager.obj: src/pager.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-pager.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-pager.Tpo -c -o libsqlite3_a-pager.obj `if test -f 'src/pager.c'; then $(CYGPATH_W) 'src/pager.c'; else $(CYGPATH_W) '$(srcdir)/src/pager.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-pager.Tpo $(DEPDIR)/libsqlite3_a-pager.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/pager.c' object='libsqlite3_a-pager.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-pager.obj `if test -f 'src/pager.c'; then $(CYGPATH_W) 'src/pager.c'; else $(CYGPATH_W) '$(srcdir)/src/pager.c'; fi`
-
-libsqlite3_a-pragma.o: src/pragma.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-pragma.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-pragma.Tpo -c -o libsqlite3_a-pragma.o `test -f 'src/pragma.c' || echo '$(srcdir)/'`src/pragma.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-pragma.Tpo $(DEPDIR)/libsqlite3_a-pragma.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/pragma.c' object='libsqlite3_a-pragma.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-pragma.o `test -f 'src/pragma.c' || echo '$(srcdir)/'`src/pragma.c
-
-libsqlite3_a-pragma.obj: src/pragma.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-pragma.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-pragma.Tpo -c -o libsqlite3_a-pragma.obj `if test -f 'src/pragma.c'; then $(CYGPATH_W) 'src/pragma.c'; else $(CYGPATH_W) '$(srcdir)/src/pragma.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-pragma.Tpo $(DEPDIR)/libsqlite3_a-pragma.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/pragma.c' object='libsqlite3_a-pragma.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-pragma.obj `if test -f 'src/pragma.c'; then $(CYGPATH_W) 'src/pragma.c'; else $(CYGPATH_W) '$(srcdir)/src/pragma.c'; fi`
-
-libsqlite3_a-prepare.o: src/prepare.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-prepare.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-prepare.Tpo -c -o libsqlite3_a-prepare.o `test -f 'src/prepare.c' || echo '$(srcdir)/'`src/prepare.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-prepare.Tpo $(DEPDIR)/libsqlite3_a-prepare.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/prepare.c' object='libsqlite3_a-prepare.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-prepare.o `test -f 'src/prepare.c' || echo '$(srcdir)/'`src/prepare.c
-
-libsqlite3_a-prepare.obj: src/prepare.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-prepare.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-prepare.Tpo -c -o libsqlite3_a-prepare.obj `if test -f 'src/prepare.c'; then $(CYGPATH_W) 'src/prepare.c'; else $(CYGPATH_W) '$(srcdir)/src/prepare.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-prepare.Tpo $(DEPDIR)/libsqlite3_a-prepare.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/prepare.c' object='libsqlite3_a-prepare.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-prepare.obj `if test -f 'src/prepare.c'; then $(CYGPATH_W) 'src/prepare.c'; else $(CYGPATH_W) '$(srcdir)/src/prepare.c'; fi`
-
-libsqlite3_a-printf.o: src/printf.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-printf.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-printf.Tpo -c -o libsqlite3_a-printf.o `test -f 'src/printf.c' || echo '$(srcdir)/'`src/printf.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-printf.Tpo $(DEPDIR)/libsqlite3_a-printf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/printf.c' object='libsqlite3_a-printf.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-printf.o `test -f 'src/printf.c' || echo '$(srcdir)/'`src/printf.c
-
-libsqlite3_a-printf.obj: src/printf.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-printf.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-printf.Tpo -c -o libsqlite3_a-printf.obj `if test -f 'src/printf.c'; then $(CYGPATH_W) 'src/printf.c'; else $(CYGPATH_W) '$(srcdir)/src/printf.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-printf.Tpo $(DEPDIR)/libsqlite3_a-printf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/printf.c' object='libsqlite3_a-printf.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-printf.obj `if test -f 'src/printf.c'; then $(CYGPATH_W) 'src/printf.c'; else $(CYGPATH_W) '$(srcdir)/src/printf.c'; fi`
-
-libsqlite3_a-random.o: src/random.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-random.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-random.Tpo -c -o libsqlite3_a-random.o `test -f 'src/random.c' || echo '$(srcdir)/'`src/random.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-random.Tpo $(DEPDIR)/libsqlite3_a-random.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/random.c' object='libsqlite3_a-random.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-random.o `test -f 'src/random.c' || echo '$(srcdir)/'`src/random.c
-
-libsqlite3_a-random.obj: src/random.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-random.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-random.Tpo -c -o libsqlite3_a-random.obj `if test -f 'src/random.c'; then $(CYGPATH_W) 'src/random.c'; else $(CYGPATH_W) '$(srcdir)/src/random.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-random.Tpo $(DEPDIR)/libsqlite3_a-random.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/random.c' object='libsqlite3_a-random.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-random.obj `if test -f 'src/random.c'; then $(CYGPATH_W) 'src/random.c'; else $(CYGPATH_W) '$(srcdir)/src/random.c'; fi`
-
-libsqlite3_a-select.o: src/select.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-select.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-select.Tpo -c -o libsqlite3_a-select.o `test -f 'src/select.c' || echo '$(srcdir)/'`src/select.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-select.Tpo $(DEPDIR)/libsqlite3_a-select.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/select.c' object='libsqlite3_a-select.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-select.o `test -f 'src/select.c' || echo '$(srcdir)/'`src/select.c
-
-libsqlite3_a-select.obj: src/select.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-select.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-select.Tpo -c -o libsqlite3_a-select.obj `if test -f 'src/select.c'; then $(CYGPATH_W) 'src/select.c'; else $(CYGPATH_W) '$(srcdir)/src/select.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-select.Tpo $(DEPDIR)/libsqlite3_a-select.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/select.c' object='libsqlite3_a-select.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-select.obj `if test -f 'src/select.c'; then $(CYGPATH_W) 'src/select.c'; else $(CYGPATH_W) '$(srcdir)/src/select.c'; fi`
-
-libsqlite3_a-shell.o: src/shell.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-shell.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-shell.Tpo -c -o libsqlite3_a-shell.o `test -f 'src/shell.c' || echo '$(srcdir)/'`src/shell.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-shell.Tpo $(DEPDIR)/libsqlite3_a-shell.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/shell.c' object='libsqlite3_a-shell.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-shell.o `test -f 'src/shell.c' || echo '$(srcdir)/'`src/shell.c
-
-libsqlite3_a-shell.obj: src/shell.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-shell.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-shell.Tpo -c -o libsqlite3_a-shell.obj `if test -f 'src/shell.c'; then $(CYGPATH_W) 'src/shell.c'; else $(CYGPATH_W) '$(srcdir)/src/shell.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-shell.Tpo $(DEPDIR)/libsqlite3_a-shell.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/shell.c' object='libsqlite3_a-shell.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-shell.obj `if test -f 'src/shell.c'; then $(CYGPATH_W) 'src/shell.c'; else $(CYGPATH_W) '$(srcdir)/src/shell.c'; fi`
-
-libsqlite3_a-table.o: src/table.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-table.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-table.Tpo -c -o libsqlite3_a-table.o `test -f 'src/table.c' || echo '$(srcdir)/'`src/table.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-table.Tpo $(DEPDIR)/libsqlite3_a-table.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/table.c' object='libsqlite3_a-table.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-table.o `test -f 'src/table.c' || echo '$(srcdir)/'`src/table.c
-
-libsqlite3_a-table.obj: src/table.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-table.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-table.Tpo -c -o libsqlite3_a-table.obj `if test -f 'src/table.c'; then $(CYGPATH_W) 'src/table.c'; else $(CYGPATH_W) '$(srcdir)/src/table.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-table.Tpo $(DEPDIR)/libsqlite3_a-table.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/table.c' object='libsqlite3_a-table.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-table.obj `if test -f 'src/table.c'; then $(CYGPATH_W) 'src/table.c'; else $(CYGPATH_W) '$(srcdir)/src/table.c'; fi`
-
-libsqlite3_a-tclsqlite.o: src/tclsqlite.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-tclsqlite.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-tclsqlite.Tpo -c -o libsqlite3_a-tclsqlite.o `test -f 'src/tclsqlite.c' || echo '$(srcdir)/'`src/tclsqlite.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-tclsqlite.Tpo $(DEPDIR)/libsqlite3_a-tclsqlite.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/tclsqlite.c' object='libsqlite3_a-tclsqlite.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-tclsqlite.o `test -f 'src/tclsqlite.c' || echo '$(srcdir)/'`src/tclsqlite.c
-
-libsqlite3_a-tclsqlite.obj: src/tclsqlite.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-tclsqlite.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-tclsqlite.Tpo -c -o libsqlite3_a-tclsqlite.obj `if test -f 'src/tclsqlite.c'; then $(CYGPATH_W) 'src/tclsqlite.c'; else $(CYGPATH_W) '$(srcdir)/src/tclsqlite.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-tclsqlite.Tpo $(DEPDIR)/libsqlite3_a-tclsqlite.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/tclsqlite.c' object='libsqlite3_a-tclsqlite.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-tclsqlite.obj `if test -f 'src/tclsqlite.c'; then $(CYGPATH_W) 'src/tclsqlite.c'; else $(CYGPATH_W) '$(srcdir)/src/tclsqlite.c'; fi`
-
-libsqlite3_a-tokenize.o: src/tokenize.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-tokenize.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-tokenize.Tpo -c -o libsqlite3_a-tokenize.o `test -f 'src/tokenize.c' || echo '$(srcdir)/'`src/tokenize.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-tokenize.Tpo $(DEPDIR)/libsqlite3_a-tokenize.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/tokenize.c' object='libsqlite3_a-tokenize.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-tokenize.o `test -f 'src/tokenize.c' || echo '$(srcdir)/'`src/tokenize.c
-
-libsqlite3_a-tokenize.obj: src/tokenize.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-tokenize.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-tokenize.Tpo -c -o libsqlite3_a-tokenize.obj `if test -f 'src/tokenize.c'; then $(CYGPATH_W) 'src/tokenize.c'; else $(CYGPATH_W) '$(srcdir)/src/tokenize.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-tokenize.Tpo $(DEPDIR)/libsqlite3_a-tokenize.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/tokenize.c' object='libsqlite3_a-tokenize.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-tokenize.obj `if test -f 'src/tokenize.c'; then $(CYGPATH_W) 'src/tokenize.c'; else $(CYGPATH_W) '$(srcdir)/src/tokenize.c'; fi`
-
-libsqlite3_a-trigger.o: src/trigger.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-trigger.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-trigger.Tpo -c -o libsqlite3_a-trigger.o `test -f 'src/trigger.c' || echo '$(srcdir)/'`src/trigger.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-trigger.Tpo $(DEPDIR)/libsqlite3_a-trigger.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/trigger.c' object='libsqlite3_a-trigger.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-trigger.o `test -f 'src/trigger.c' || echo '$(srcdir)/'`src/trigger.c
-
-libsqlite3_a-trigger.obj: src/trigger.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-trigger.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-trigger.Tpo -c -o libsqlite3_a-trigger.obj `if test -f 'src/trigger.c'; then $(CYGPATH_W) 'src/trigger.c'; else $(CYGPATH_W) '$(srcdir)/src/trigger.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-trigger.Tpo $(DEPDIR)/libsqlite3_a-trigger.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/trigger.c' object='libsqlite3_a-trigger.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-trigger.obj `if test -f 'src/trigger.c'; then $(CYGPATH_W) 'src/trigger.c'; else $(CYGPATH_W) '$(srcdir)/src/trigger.c'; fi`
-
-libsqlite3_a-update.o: src/update.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-update.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-update.Tpo -c -o libsqlite3_a-update.o `test -f 'src/update.c' || echo '$(srcdir)/'`src/update.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-update.Tpo $(DEPDIR)/libsqlite3_a-update.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/update.c' object='libsqlite3_a-update.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-update.o `test -f 'src/update.c' || echo '$(srcdir)/'`src/update.c
-
-libsqlite3_a-update.obj: src/update.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-update.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-update.Tpo -c -o libsqlite3_a-update.obj `if test -f 'src/update.c'; then $(CYGPATH_W) 'src/update.c'; else $(CYGPATH_W) '$(srcdir)/src/update.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-update.Tpo $(DEPDIR)/libsqlite3_a-update.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/update.c' object='libsqlite3_a-update.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-update.obj `if test -f 'src/update.c'; then $(CYGPATH_W) 'src/update.c'; else $(CYGPATH_W) '$(srcdir)/src/update.c'; fi`
-
-libsqlite3_a-utf.o: src/utf.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-utf.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-utf.Tpo -c -o libsqlite3_a-utf.o `test -f 'src/utf.c' || echo '$(srcdir)/'`src/utf.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-utf.Tpo $(DEPDIR)/libsqlite3_a-utf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utf.c' object='libsqlite3_a-utf.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-utf.o `test -f 'src/utf.c' || echo '$(srcdir)/'`src/utf.c
-
-libsqlite3_a-utf.obj: src/utf.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-utf.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-utf.Tpo -c -o libsqlite3_a-utf.obj `if test -f 'src/utf.c'; then $(CYGPATH_W) 'src/utf.c'; else $(CYGPATH_W) '$(srcdir)/src/utf.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-utf.Tpo $(DEPDIR)/libsqlite3_a-utf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/utf.c' object='libsqlite3_a-utf.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-utf.obj `if test -f 'src/utf.c'; then $(CYGPATH_W) 'src/utf.c'; else $(CYGPATH_W) '$(srcdir)/src/utf.c'; fi`
-
-libsqlite3_a-util.o: src/util.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-util.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-util.Tpo -c -o libsqlite3_a-util.o `test -f 'src/util.c' || echo '$(srcdir)/'`src/util.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-util.Tpo $(DEPDIR)/libsqlite3_a-util.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/util.c' object='libsqlite3_a-util.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-util.o `test -f 'src/util.c' || echo '$(srcdir)/'`src/util.c
-
-libsqlite3_a-util.obj: src/util.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-util.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-util.Tpo -c -o libsqlite3_a-util.obj `if test -f 'src/util.c'; then $(CYGPATH_W) 'src/util.c'; else $(CYGPATH_W) '$(srcdir)/src/util.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-util.Tpo $(DEPDIR)/libsqlite3_a-util.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/util.c' object='libsqlite3_a-util.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-util.obj `if test -f 'src/util.c'; then $(CYGPATH_W) 'src/util.c'; else $(CYGPATH_W) '$(srcdir)/src/util.c'; fi`
-
-libsqlite3_a-vacuum.o: src/vacuum.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vacuum.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-vacuum.Tpo -c -o libsqlite3_a-vacuum.o `test -f 'src/vacuum.c' || echo '$(srcdir)/'`src/vacuum.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vacuum.Tpo $(DEPDIR)/libsqlite3_a-vacuum.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vacuum.c' object='libsqlite3_a-vacuum.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vacuum.o `test -f 'src/vacuum.c' || echo '$(srcdir)/'`src/vacuum.c
-
-libsqlite3_a-vacuum.obj: src/vacuum.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vacuum.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-vacuum.Tpo -c -o libsqlite3_a-vacuum.obj `if test -f 'src/vacuum.c'; then $(CYGPATH_W) 'src/vacuum.c'; else $(CYGPATH_W) '$(srcdir)/src/vacuum.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vacuum.Tpo $(DEPDIR)/libsqlite3_a-vacuum.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vacuum.c' object='libsqlite3_a-vacuum.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vacuum.obj `if test -f 'src/vacuum.c'; then $(CYGPATH_W) 'src/vacuum.c'; else $(CYGPATH_W) '$(srcdir)/src/vacuum.c'; fi`
-
-libsqlite3_a-vdbe.o: src/vdbe.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbe.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbe.Tpo -c -o libsqlite3_a-vdbe.o `test -f 'src/vdbe.c' || echo '$(srcdir)/'`src/vdbe.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbe.Tpo $(DEPDIR)/libsqlite3_a-vdbe.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbe.c' object='libsqlite3_a-vdbe.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbe.o `test -f 'src/vdbe.c' || echo '$(srcdir)/'`src/vdbe.c
-
-libsqlite3_a-vdbe.obj: src/vdbe.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbe.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbe.Tpo -c -o libsqlite3_a-vdbe.obj `if test -f 'src/vdbe.c'; then $(CYGPATH_W) 'src/vdbe.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbe.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbe.Tpo $(DEPDIR)/libsqlite3_a-vdbe.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbe.c' object='libsqlite3_a-vdbe.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbe.obj `if test -f 'src/vdbe.c'; then $(CYGPATH_W) 'src/vdbe.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbe.c'; fi`
-
-libsqlite3_a-vdbeapi.o: src/vdbeapi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbeapi.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbeapi.Tpo -c -o libsqlite3_a-vdbeapi.o `test -f 'src/vdbeapi.c' || echo '$(srcdir)/'`src/vdbeapi.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbeapi.Tpo $(DEPDIR)/libsqlite3_a-vdbeapi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbeapi.c' object='libsqlite3_a-vdbeapi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbeapi.o `test -f 'src/vdbeapi.c' || echo '$(srcdir)/'`src/vdbeapi.c
-
-libsqlite3_a-vdbeapi.obj: src/vdbeapi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbeapi.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbeapi.Tpo -c -o libsqlite3_a-vdbeapi.obj `if test -f 'src/vdbeapi.c'; then $(CYGPATH_W) 'src/vdbeapi.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbeapi.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbeapi.Tpo $(DEPDIR)/libsqlite3_a-vdbeapi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbeapi.c' object='libsqlite3_a-vdbeapi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbeapi.obj `if test -f 'src/vdbeapi.c'; then $(CYGPATH_W) 'src/vdbeapi.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbeapi.c'; fi`
-
-libsqlite3_a-vdbeaux.o: src/vdbeaux.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbeaux.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbeaux.Tpo -c -o libsqlite3_a-vdbeaux.o `test -f 'src/vdbeaux.c' || echo '$(srcdir)/'`src/vdbeaux.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbeaux.Tpo $(DEPDIR)/libsqlite3_a-vdbeaux.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbeaux.c' object='libsqlite3_a-vdbeaux.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbeaux.o `test -f 'src/vdbeaux.c' || echo '$(srcdir)/'`src/vdbeaux.c
-
-libsqlite3_a-vdbeaux.obj: src/vdbeaux.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbeaux.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbeaux.Tpo -c -o libsqlite3_a-vdbeaux.obj `if test -f 'src/vdbeaux.c'; then $(CYGPATH_W) 'src/vdbeaux.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbeaux.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbeaux.Tpo $(DEPDIR)/libsqlite3_a-vdbeaux.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbeaux.c' object='libsqlite3_a-vdbeaux.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbeaux.obj `if test -f 'src/vdbeaux.c'; then $(CYGPATH_W) 'src/vdbeaux.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbeaux.c'; fi`
-
-libsqlite3_a-vdbefifo.o: src/vdbefifo.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbefifo.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbefifo.Tpo -c -o libsqlite3_a-vdbefifo.o `test -f 'src/vdbefifo.c' || echo '$(srcdir)/'`src/vdbefifo.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbefifo.Tpo $(DEPDIR)/libsqlite3_a-vdbefifo.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbefifo.c' object='libsqlite3_a-vdbefifo.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbefifo.o `test -f 'src/vdbefifo.c' || echo '$(srcdir)/'`src/vdbefifo.c
-
-libsqlite3_a-vdbefifo.obj: src/vdbefifo.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbefifo.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbefifo.Tpo -c -o libsqlite3_a-vdbefifo.obj `if test -f 'src/vdbefifo.c'; then $(CYGPATH_W) 'src/vdbefifo.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbefifo.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbefifo.Tpo $(DEPDIR)/libsqlite3_a-vdbefifo.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbefifo.c' object='libsqlite3_a-vdbefifo.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbefifo.obj `if test -f 'src/vdbefifo.c'; then $(CYGPATH_W) 'src/vdbefifo.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbefifo.c'; fi`
-
-libsqlite3_a-vdbemem.o: src/vdbemem.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbemem.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbemem.Tpo -c -o libsqlite3_a-vdbemem.o `test -f 'src/vdbemem.c' || echo '$(srcdir)/'`src/vdbemem.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbemem.Tpo $(DEPDIR)/libsqlite3_a-vdbemem.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbemem.c' object='libsqlite3_a-vdbemem.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbemem.o `test -f 'src/vdbemem.c' || echo '$(srcdir)/'`src/vdbemem.c
-
-libsqlite3_a-vdbemem.obj: src/vdbemem.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-vdbemem.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-vdbemem.Tpo -c -o libsqlite3_a-vdbemem.obj `if test -f 'src/vdbemem.c'; then $(CYGPATH_W) 'src/vdbemem.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbemem.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-vdbemem.Tpo $(DEPDIR)/libsqlite3_a-vdbemem.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/vdbemem.c' object='libsqlite3_a-vdbemem.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-vdbemem.obj `if test -f 'src/vdbemem.c'; then $(CYGPATH_W) 'src/vdbemem.c'; else $(CYGPATH_W) '$(srcdir)/src/vdbemem.c'; fi`
-
-libsqlite3_a-where.o: src/where.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-where.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-where.Tpo -c -o libsqlite3_a-where.o `test -f 'src/where.c' || echo '$(srcdir)/'`src/where.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-where.Tpo $(DEPDIR)/libsqlite3_a-where.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/where.c' object='libsqlite3_a-where.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-where.o `test -f 'src/where.c' || echo '$(srcdir)/'`src/where.c
-
-libsqlite3_a-where.obj: src/where.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-where.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-where.Tpo -c -o libsqlite3_a-where.obj `if test -f 'src/where.c'; then $(CYGPATH_W) 'src/where.c'; else $(CYGPATH_W) '$(srcdir)/src/where.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-where.Tpo $(DEPDIR)/libsqlite3_a-where.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/where.c' object='libsqlite3_a-where.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-where.obj `if test -f 'src/where.c'; then $(CYGPATH_W) 'src/where.c'; else $(CYGPATH_W) '$(srcdir)/src/where.c'; fi`
-
-libsqlite3_a-opcodes.o: src/opcodes.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-opcodes.o -MD -MP -MF $(DEPDIR)/libsqlite3_a-opcodes.Tpo -c -o libsqlite3_a-opcodes.o `test -f 'src/opcodes.c' || echo '$(srcdir)/'`src/opcodes.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-opcodes.Tpo $(DEPDIR)/libsqlite3_a-opcodes.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/opcodes.c' object='libsqlite3_a-opcodes.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-opcodes.o `test -f 'src/opcodes.c' || echo '$(srcdir)/'`src/opcodes.c
-
-libsqlite3_a-opcodes.obj: src/opcodes.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -MT libsqlite3_a-opcodes.obj -MD -MP -MF $(DEPDIR)/libsqlite3_a-opcodes.Tpo -c -o libsqlite3_a-opcodes.obj `if test -f 'src/opcodes.c'; then $(CYGPATH_W) 'src/opcodes.c'; else $(CYGPATH_W) '$(srcdir)/src/opcodes.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libsqlite3_a-opcodes.Tpo $(DEPDIR)/libsqlite3_a-opcodes.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/opcodes.c' object='libsqlite3_a-opcodes.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsqlite3_a_CFLAGS) $(CFLAGS) -c -o libsqlite3_a-opcodes.obj `if test -f 'src/opcodes.c'; then $(CYGPATH_W) 'src/opcodes.c'; else $(CYGPATH_W) '$(srcdir)/src/opcodes.c'; fi`
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-
-ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
-	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '    { files[$$0] = 1; } \
-	       END { for (i in files) print i; }'`; \
-	mkid -fID $$unique
 tags: TAGS
+TAGS:
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-		$(TAGS_FILES) $(LISP)
-	tags=; \
-	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '    { files[$$0] = 1; } \
-	       END { for (i in files) print i; }'`; \
-	if test -z "$(ETAGS_ARGS)$$tags$$unique"; then :; else \
-	  test -n "$$unique" || unique=$$empty_fix; \
-	  $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	    $$tags $$unique; \
-	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
-		$(TAGS_FILES) $(LISP)
-	tags=; \
-	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
-	unique=`for i in $$list; do \
-	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-	  done | \
-	  $(AWK) '    { files[$$0] = 1; } \
-	       END { for (i in files) print i; }'`; \
-	test -z "$(CTAGS_ARGS)$$tags$$unique" \
-	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
-	     $$tags $$unique
+CTAGS:
 
-GTAGS:
-	here=`$(am__cd) $(top_builddir) && pwd` \
-	  && cd $(top_srcdir) \
-	  && gtags -i $(GTAGS_ARGS) $$here
-
-distclean-tags:
-	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
@@ -1013,7 +262,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -1041,14 +290,11 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-tags
+distclean-am: clean-am distclean-generic
 
 dvi: dvi-am
 
@@ -1079,14 +325,12 @@ install-ps: install-ps-am
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -1100,19 +344,25 @@ uninstall-am:
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLIBRARIES ctags distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am
+.PHONY: all all-am check check-am clean clean-generic clean-libtool \
+	distclean distclean-generic distclean-libtool distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am
 
+
+.c.lo:
+	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -DSQLITE_THREADSAFE=0 -prefer-pic -I../include -I. -c $< -o $@ 
+
+libsqlite3.a: $(S_OBJS)
+	$(LIBTOOL) --mode=link $(CC) -all-static -o libsqlite3.a $(S_OBJS)
+
+all: libsqlite3.a
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
