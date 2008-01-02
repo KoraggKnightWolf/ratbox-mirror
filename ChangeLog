@@ -1,3 +1,11 @@
+androsyn    2008/01/02 18:32:25 UTC	(20080102_1-24814)
+  Log:
+  tweak resolver.c to use rb_helper_loop
+
+  Modified:
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+
+
 androsyn    2008/01/02 17:07:11 UTC	(20080102_0-24812)
   Log:
   - Update to sqlite 3.5.4.
