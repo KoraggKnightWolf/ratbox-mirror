@@ -318,29 +318,6 @@ static void process_adns_incoming(void)
 }
 
 
-/* read_io()
- *   The main IO loop for reading/writing data.
- *
- * inputs	-
- * outputs	-
- */
-static void
-read_io(void)
-{
-	rb_helper_run(res_helper);
-	while(1)
-	{
-		dns_select();
-		rb_event_run();
-		rb_select(1000);
-		if(do_rehash)
-		{
-			restart_resolver();
-			do_rehash = 0;
-		}
-	}
-}
-
 static void
 resolve_host(char **parv)
 {
@@ -447,6 +424,16 @@ timeout_adns(void *ptr)
 	process_adns_incoming();
 }
 
+static void
+check_rehash(void *unused)
+{
+	if(do_rehash)
+	{
+		restart_resolver();
+		do_rehash = 0;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	res_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256, 256); /* XXX fix me */
@@ -461,9 +448,11 @@ int main(int argc, char **argv)
 
 	adns_init(&dns_state, adns_if_noautosys, 0);
 	rb_set_time();
-	rb_event_add("timeout_adns", timeout_adns, NULL, 1);
 	setup_signals();
-	read_io();	
+	rb_event_add("timeout_adns", timeout_adns, NULL, 5);
+	rb_event_add("check_rehash", check_rehash, NULL, 5);
+	dns_select();
+	rb_helper_loop(res_helper, 0);
 	return 1;
 }
 
