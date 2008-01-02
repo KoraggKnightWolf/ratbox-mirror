@@ -516,18 +516,6 @@ conn_plain_write_sendq(rb_fde_t * fd, void *data)
 		rb_setselect(conn->plain_fd, RB_SELECT_WRITE, NULL, NULL);
 }
 
-
-static void
-mod_main_loop(void)
-{
-	while (1)
-	{
-		rb_select(1000);
-		rb_event_run();
-	}
-}
-
-
 static int
 maxconn(void)
 {
@@ -943,6 +931,8 @@ main(int argc, char **argv)
 		dup2(x, 1);
 	if(ctlfd != 2 && pipefd != 2)
 		dup2(x, 2);
+	if(x > 2)
+		close(x);
 		
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);
@@ -953,6 +943,6 @@ main(int argc, char **argv)
 	rb_event_addish("clean_dead_conns", clean_dead_conns, NULL, 10);
 	read_pipe_ctl(ctl->F_pipe, NULL);
 	mod_read_ctl(ctl->F, ctl);
-	mod_main_loop();
+	rb_lib_loop(0);
 	return 0;
 }
