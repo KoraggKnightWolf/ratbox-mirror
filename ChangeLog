@@ -1,3 +1,21 @@
+androsyn    2008/01/02 17:07:11 UTC	(20080102_0-24812)
+  Log:
+  - Update to sqlite 3.5.4.
+    Sqlite 3.5.4 has a combined sqlite3.c file that has everything we need it in, so copy that in instead.
+    This also aids gcc in optimizing things a bit.
+    
+  
+
+  Modified:
+	ircd-ratbox/trunk/sqlite3/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/sqlite3/VERSION (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/sqlite3.c (File Added) 
+	ircd-ratbox/trunk/sqlite3/sqlite3.h (File Modified) 
+	ircd-ratbox/trunk/sqlite3/src/ (File Deleted) 
+	ircd-ratbox/trunk/sqlite3/tool/ (File Deleted) 
+
+
 androsyn    2008/01/01 02:43:05 UTC	(20080101_0-24806)
   Log:
   change the define for HAVE_LIBZ to HAVE_ZLIB also deal with making fds 0-2 be /dev/null in ssld
