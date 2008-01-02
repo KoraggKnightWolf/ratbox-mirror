@@ -1,3 +1,30 @@
+androsyn    2008/01/02 18:38:26 UTC	(20080102_3-24818)
+  Log:
+  Move compiler warning flags into WARNFLAGS and have it used in most makefiles in AM_CFLAGS
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ident/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/ident/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/adns/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/resolver/adns/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ssld/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2008/01/02 18:33:05 UTC	(20080102_2-24816)
   Log:
   tweak ssld.c to use rb_lib_loop and also close fds 0-2 and replace with /dev/null
