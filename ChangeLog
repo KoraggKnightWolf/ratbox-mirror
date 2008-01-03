@@ -1,3 +1,11 @@
+androsyn    2008/01/03 00:58:57 UTC	(20080103_0-24830)
+  Log:
+  Fix a thinko with static modules
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/01/02 18:38:26 UTC	(20080102_3-24818)
   Log:
   Move compiler warning flags into WARNFLAGS and have it used in most makefiles in AM_CFLAGS
