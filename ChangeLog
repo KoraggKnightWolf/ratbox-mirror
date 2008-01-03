@@ -1,3 +1,12 @@
+androsyn    2008/01/03 21:05:40 UTC	(20080103_4-24842)
+  Log:
+  Another minor ziplinks cleanup
+  
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/01/03 16:39:35 UTC	(20080103_3-24838)
   Log:
   cleanup zlib streams
