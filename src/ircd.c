@@ -102,6 +102,8 @@ int doremotd = 0;
 int kline_queued = 0;
 int server_state_foreground = 0;
 int ssl_ok = 0;
+int zlib_ok = 1;
+
 int testing_conf = 0;
 int conf_parse_failure = 0;
 time_t startup_time;

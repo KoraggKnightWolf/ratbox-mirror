@@ -144,9 +144,30 @@ static char *ssld_path;
 static int ssld_spin_count = 0;
 static time_t last_spin;
 static int ssld_wait = 0;
+
+
+static void
+ssl_killall(void)
+{
+	rb_dlink_node *ptr, *next;
+	ssl_ctl_t *ctl;
+	RB_DLINK_FOREACH_SAFE(ptr, next, ssl_daemons.head)
+	{
+		if(ctl->dead)
+			continue;
+		ctl = ptr->data;
+		ctl->dead = 1;
+		ssld_count--;
+		kill(ctl->pid, SIGKILL);
+	}
+}
+
 static void
 ssl_dead(ssl_ctl_t *ctl)
 {
+	if(ctl->dead)
+		return;
+		
 	ctl->dead = 1;
 	ssld_count--;
 	kill(ctl->pid, SIGKILL); /* make sure the process is really gone */
@@ -340,11 +361,24 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 		ctl_buf = ptr->data;		
 		switch(*ctl_buf->buf)
 		{
+			case 'N':
+				ssl_ok = 0; /* ssld says it can't do ssl/tls */
+				break;
 			case 'D':
 				ssl_process_dead_fd(ctl, ctl_buf);
 				break;				
 			case 'S':
 				ssl_process_zipstats(ctl, ctl_buf);
+				break;
+			case 'U':
+				zlib_ok = 0;
+				ssl_ok = 0;
+				ilog(L_MAIN, "ssld has neither SSL/TLS or zlib support killing all sslds");
+				sendto_realops_flags(UMODE_ALL, L_ALL, "ssld has neither SSL/TLS or zlib support killing all sslds");
+				ssl_killall();
+				break;
+			case 'z':
+				zlib_ok = 0;
 				break;
 			default:
 				ilog(L_MAIN, "Received invalid command from ssld: %s", ctl_buf->buf);

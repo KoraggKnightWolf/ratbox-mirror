@@ -136,10 +136,14 @@ static void conn_mod_write_sendq(rb_fde_t *, void *data);
 static void conn_plain_write_sendq(rb_fde_t *, void *data);
 static void mod_write_ctl(rb_fde_t *, void *data);
 static void conn_plain_read_cb(rb_fde_t * fd, void *data);
-static void mod_cmd_write_queue(mod_ctl_t *ctl, void *data, size_t len);
+static void mod_cmd_write_queue(mod_ctl_t *ctl, const void *data, size_t len);
 static const char *remote_closed = "Remote host closed the connection";
-
-
+static int ssl_ok;
+#ifdef HAVE_ZLIB
+static int zlib_ok = 1;
+#else
+static int zlib_ok = 0;
+#endif
 static void *
 ssld_alloc(void *unused, size_t count, size_t size)
 {
@@ -258,7 +262,7 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 	{
 		if(retlen == 0)
 			close_conn(conn, WAIT_PLAIN, "%s", remote_closed);
-		if(retlen == -2)
+		if(ssl_ok && retlen == -2)
 			err = rb_get_ssl_strerror(conn->mod_fd);
 		else
 			err = strerror(errno);
@@ -296,7 +300,7 @@ conn_plain_write(conn_t * conn, void *data, size_t len)
 }
 
 static void
-mod_cmd_write_queue(mod_ctl_t * ctl, void *data, size_t len)
+mod_cmd_write_queue(mod_ctl_t * ctl, const void *data, size_t len)
 {
 	mod_ctl_buf_t *ctl_buf;
 	ctl_buf = rb_malloc(sizeof(mod_ctl_buf_t));
@@ -468,7 +472,7 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 			if(length == 0)
 				close_conn(conn, WAIT_PLAIN, "%s", remote_closed);
 
-			if(length == -2)
+			if(ssl_ok && length == -2)
 				err = rb_get_ssl_strerror(conn->mod_fd);
 			else
 				err = strerror(errno);
@@ -745,6 +749,7 @@ ssl_new_keys(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
 {
 	char *buf;
 	char *cert, *key, *dhparam;
+
 	buf = &ctl_buf->buf[2];
 	cert = buf;
 	buf += strlen(cert) + 1;
@@ -764,6 +769,50 @@ ssl_new_keys(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
 }
 
 static void
+send_nossl_support(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
+{
+	static const char *nossl_cmd = "N";
+	conn_t *conn;
+	rb_int32_t id;
+
+	if(ctlb != NULL)
+	{	
+		conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
+		id = buf_to_int32(&ctlb->buf[1]);
+
+		if(id >= 0)
+			conn_add_id_hash(conn, id);
+		close_conn(conn, WAIT_PLAIN, "libratbox reports no SSL/TLS support");
+	} 
+	mod_cmd_write_queue(ctl, nossl_cmd, strlen(nossl_cmd));	
+}
+
+static void
+send_i_am_useless(mod_ctl_t *ctl)
+{
+	static const char *useless = "U";
+	mod_cmd_write_queue(ctl, useless, strlen(useless));
+}
+
+static void
+send_nozlib_support(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
+{
+	static const char *nozlib_cmd = "z";
+	conn_t *conn;
+	rb_int32_t id;
+	if(ctlb != NULL)
+	{
+		conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
+		id = buf_to_int32(&ctlb->buf[1]);
+
+		if(id >= 0)
+			conn_add_id_hash(conn, id);
+		close_conn(conn, WAIT_PLAIN, "libratbox reports no zlib support");
+	} 
+	mod_cmd_write_queue(ctl, nozlib_cmd, strlen(nozlib_cmd));
+}
+
+static void
 mod_process_cmd_recv(mod_ctl_t * ctl)
 {
 	rb_dlink_node *ptr, *next;
@@ -777,17 +826,32 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 		{
 		case 'A':
 			{
+				if(!ssl_ok)
+				{
+					send_nossl_support(ctl, ctl_buf);
+					break;
+				}
 				ssl_process_accept(ctl, ctl_buf);
 				break;
 			}
 		case 'C':
 			{
+				if(!ssl_ok)
+				{
+					send_nossl_support(ctl, ctl_buf);
+					break;
+				}
 				ssl_process_connect(ctl, ctl_buf);
 				break;
 			}
 
 		case 'K':
 			{
+				if(!ssl_ok)
+				{
+					send_nossl_support(ctl, ctl_buf);
+					break;
+				}
 				ssl_new_keys(ctl, ctl_buf);
 				break;
 			}
@@ -808,6 +872,12 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 				zlib_process(ctl, ctl_buf);
 				break;
 			}
+#else
+		case 'Y':
+		case 'Z':
+			send_nozlib_support(ctl);
+			break;
+			
 #endif
 		default:
 			break;
@@ -933,9 +1003,9 @@ main(int argc, char **argv)
 		dup2(x, 2);
 	if(x > 2)
 		close(x);
-		
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);
+	ssl_ok = rb_supports_ssl();		
 
 	ctl = rb_malloc(sizeof(mod_ctl_t));
 	ctl->F = rb_open(ctlfd, RB_FD_SOCKET, "ircd control socket");
@@ -943,6 +1013,19 @@ main(int argc, char **argv)
 	rb_event_addish("clean_dead_conns", clean_dead_conns, NULL, 10);
 	read_pipe_ctl(ctl->F_pipe, NULL);
 	mod_read_ctl(ctl->F, ctl);
+	if(!zlib_ok && !ssl_ok)
+	{
+		/* this is really useless... */
+		send_i_am_useless(ctl);
+		/* sleep until the ircd kills us */
+		rb_sleep(2<<30, 0);
+		exit(1);
+	}
+
+	if(!zlib_ok)
+		send_nozlib_support(ctl, NULL);
+	if(!ssl_ok)
+		send_nossl_support(ctl, NULL);
 	rb_lib_loop(0);
 	return 0;
 }

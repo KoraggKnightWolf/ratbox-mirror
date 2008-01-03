@@ -104,5 +104,6 @@ extern int testing_conf;
 extern int conf_parse_failure;
 extern int maxconnections;
 extern int ssl_ok;
+extern int zlib_ok;
 
 #endif

@@ -725,9 +725,7 @@ check_server(const char *name, struct Client *client_p)
 	attach_server_conf(client_p, server_p);
 
 	/* clear ZIP/TB if they support but we dont want them */
-#ifdef HAVE_ZLIB
 	if(!ServerConfCompressed(server_p))
-#endif
 		ClearCap(client_p, CAP_ZIP);
 
 	if(!ServerConfTb(server_p))
@@ -1222,7 +1220,7 @@ server_estab(struct Client *client_p)
 
 		/* pass info to new server */
 		send_capabilities(client_p, default_server_capabs
-				  | (ServerConfCompressed(server_p) ? CAP_ZIP_SUPPORTED : 0)
+				  | (ServerConfCompressed(server_p) && zlib_ok ? CAP_ZIP : 0)
 				  | (ServerConfTb(server_p) ? CAP_TB : 0));
 
 		sendto_one(client_p, POP_QUEUE, "SERVER %s 1 :%s%s",

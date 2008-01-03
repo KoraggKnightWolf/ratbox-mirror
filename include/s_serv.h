@@ -72,13 +72,6 @@ struct Capability
 			 CAP_GLN | CAP_ENCAP | \
 			 CAP_ZIP  | CAP_KNOCK  | \
 			 CAP_RSFNC | CAP_SAVE | CAP_SAVETS_100)
-
-#ifdef HAVE_ZLIB
-#define CAP_ZIP_SUPPORTED       CAP_ZIP
-#else
-#define CAP_ZIP_SUPPORTED       0
-#endif
-
 /*
  * Capability macros.
  */
