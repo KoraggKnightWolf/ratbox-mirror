@@ -604,7 +604,6 @@ if test "x$enable_static" = "xyes"; then
 fi
 
 echo "Modules ........................ $tmpresult"
-echo "IPv6 support ................... $have_v6"
 echo "IO Debugging hooks ............. $iodebug"
 echo "Assert debugging ............... $assert"
 echo "Small network .................. $small_net"
