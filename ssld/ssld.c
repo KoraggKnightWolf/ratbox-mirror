@@ -183,6 +183,12 @@ free_conn(conn_t * conn)
 {
 	rb_free_rawbuffer(conn->modbuf_out);
 	rb_free_rawbuffer(conn->plainbuf_out);
+	if(IsZip(conn))
+	{
+		zlib_stream_t *stream = conn->stream;
+		inflateEnd(stream->instream);
+		deflateEnd(stream->outstream);		
+	}
 	rb_free(conn);
 }
 
