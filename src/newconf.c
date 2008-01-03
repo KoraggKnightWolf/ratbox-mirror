@@ -852,7 +852,7 @@ conf_set_modules_path(confentry_t * entry, conf_t * conf, struct conf_items *ite
 #ifndef STATIC_MODULES
 	mod_add_path(entry->string);
 #else
-	conf_report_warning_nl("Ignoring modules::path at %s:%d -- loadable module support not present", entry->file,
+	conf_report_warning_nl("Ignoring modules::path at %s:%d -- loadable module support not present", entry->filename,
 			       entry->line);
 #endif
 }
@@ -872,7 +872,7 @@ conf_set_modules_module(confentry_t * entry, conf_t * conf, struct conf_items *i
 
 	rb_free(m_bn);
 #else
-	conf_report_error("Ignoring modules::module at %s:%d -- loadable module support not present.", entry->file,
+	conf_report_error("Ignoring modules::module at %s:%d -- loadable module support not present.", entry->filename,
 			  entry->line);
 #endif
 
