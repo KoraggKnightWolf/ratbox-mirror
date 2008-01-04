@@ -610,25 +610,6 @@ start_zlib_session(struct Client *server)
 
 	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
 
-	if(server->localClient->ssl_ctl != NULL)
-	{
-		*buf = 'Y'; 	
-		rb_linebuf_get(&server->localClient->buf_recvq, (char *)(buf+hdr), len - hdr, LINEBUF_PARTIAL, LINEBUF_RAW);		
-		ssl_cmd_write_queue(server->localClient->ssl_ctl, NULL, 0, buf, len);
-		rb_free(buf);
-		return;
-	} 
-	
-	if(len > READBUF_SIZE)
-	{
-		rb_free(buf);
-		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld - attempted to pass message of %ld len, max len %d, giving up", (long)len, READBUF_SIZE);
-		ilog(L_MAIN, "ssld - attempted to pass message of %ld len, max len %d, giving up", (long)len, READBUF_SIZE);
-		exit_client(server, server, server, "ssld readbuf exceeded");
-		return;
-	}
-	
-	*buf = 'Z';
 	xbuf = buf + hdr;
 	left = len - hdr;
 	do
@@ -637,8 +618,25 @@ start_zlib_session(struct Client *server)
 		left -= cpylen;
 		xbuf += cpylen;
 	} while(cpylen > 0);
+
+	if(len > READBUF_SIZE)
+	{
+		rb_free(buf);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld - attempted to pass message of %ld len, max len %d, giving up", (long)len, READBUF_SIZE);
+		ilog(L_MAIN, "ssld - attempted to pass message of %ld len, max len %d, giving up", (long)len, READBUF_SIZE);
+		exit_client(server, server, server, "ssld readbuf exceeded");
+		return;
+	}
+
+	if(server->localClient->ssl_ctl != NULL)
+	{
+		*buf = 'Y'; 	
+		ssl_cmd_write_queue(server->localClient->ssl_ctl, NULL, 0, buf, len);
+		rb_free(buf);
+		return;
+	} 
 	
-		
+	*buf = 'Z';
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs");
 	F[0] = server->localClient->F; 
 	F[1] = xF1;
