@@ -1,3 +1,11 @@
+androsyn    2008/01/04 17:55:28 UTC	(20080104_0-24844)
+  Log:
+  fix ziplinks breakage when running with ssl enabled connections
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2008/01/03 21:05:40 UTC	(20080103_4-24842)
   Log:
   Another minor ziplinks cleanup
