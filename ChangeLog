@@ -1,3 +1,14 @@
+androsyn    2008/01/06 23:02:38 UTC	(20080106_1-24848)
+  Log:
+  rename bants to ban_serial so its a bit less misleading
+
+  Modified:
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+
+
 androsyn    2008/01/06 22:30:07 UTC	(20080106_0-24846)
   Log:
   change struct Channel's bants from rb_uint32_t to time_t as we end up storing a time_t in it all the time anyways
