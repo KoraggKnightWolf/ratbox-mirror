@@ -1,3 +1,11 @@
+androsyn    2008/01/06 22:30:07 UTC	(20080106_0-24846)
+  Log:
+  change struct Channel's bants from rb_uint32_t to time_t as we end up storing a time_t in it all the time anyways
+
+  Modified:
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+
+
 androsyn    2008/01/04 17:55:28 UTC	(20080104_0-24844)
   Log:
   fix ziplinks breakage when running with ssl enabled connections
