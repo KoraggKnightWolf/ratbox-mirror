@@ -815,7 +815,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 			remove_ban_list(chptr, source_p, &chptr->invexlist,
 					'I', CAP_IE, ONLY_CHANOPS);
 
-		chptr->bants++;
+		chptr->ban_serial++;
 	}
 
 	

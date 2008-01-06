@@ -446,7 +446,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 
 	/* invalidate the can_send() cache */
 	if(mode_type == CHFL_BAN || mode_type == CHFL_EXCEPTION)
-		chptr->bants++;
+		chptr->ban_serial++;
 
 	return 1;
 }
@@ -478,7 +478,7 @@ del_id(struct Channel *chptr, const char *banid, rb_dlink_list *list,
 
 			/* invalidate the can_send() cache */
 			if(mode_type == CHFL_BAN || mode_type == CHFL_EXCEPTION)
-				chptr->bants++;
+				chptr->ban_serial++;
 
 			return 1;
 		}

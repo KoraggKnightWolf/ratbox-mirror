@@ -301,7 +301,7 @@ invalidate_bancache_user(struct Client *client_p)
 	RB_DLINK_FOREACH(ptr, client_p->user->channel.head)
 	{
 		msptr = ptr->data;
-		msptr->bants = 0;
+		msptr->ban_serial = 0;
 		msptr->flags &= ~CHFL_BANNED;
 	}
 }
@@ -542,7 +542,7 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 				/* cache the fact theyre not banned */
 				if(msptr != NULL)
 				{
-					msptr->bants = chptr->bants;
+					msptr->ban_serial = chptr->ban_serial;
 					msptr->flags &= ~CHFL_BANNED;
 				}
 
@@ -554,7 +554,7 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 	/* cache the banned/not banned status */
 	if(msptr != NULL)
 	{
-		msptr->bants = chptr->bants;
+		msptr->ban_serial = chptr->ban_serial;
 
 		if(actualBan != NULL)
 		{
@@ -615,7 +615,7 @@ can_send(struct Channel *chptr, struct Client *source_p,
 	if(ConfigChannel.quiet_on_ban && MyClient(source_p))
 	{
 		/* cached can_send */
-		if(msptr->bants == chptr->bants)
+		if(msptr->ban_serial == chptr->ban_serial)
 		{
 			if(can_send_banned(msptr))
 				return CAN_SEND_NO;
