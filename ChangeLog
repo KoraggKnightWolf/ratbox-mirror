@@ -1,3 +1,11 @@
+androsyn    2008/01/08 15:38:57 UTC	(20080108_1-24852)
+  Log:
+  if length == 0 return after doing a close_conn.  Also if a connection is already dead, don't allow close_conn to be done again
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/01/08 15:25:04 UTC	(20080108_0-24850)
   Log:
   setup signal handlers to catch things like SIGPIPE and what not
