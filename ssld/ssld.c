@@ -215,6 +215,9 @@ close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 	char reason[128]; /* must always be under 250 bytes */
 	char buf[256];
 	int len;
+	if(IsDead(conn))
+		return;
+	
 	rb_rawbuf_flush(conn->modbuf_out, conn->mod_fd);
 	rb_rawbuf_flush(conn->plainbuf_out, conn->plain_fd);
 	rb_close(conn->mod_fd);
@@ -477,8 +480,10 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 
 		if(length == 0 || (length < 0 && !rb_ignore_errno(errno)))
 		{
-			if(length == 0)
+			if(length == 0) {
 				close_conn(conn, WAIT_PLAIN, "%s", remote_closed);
+				return;
+			}
 
 			if(ssl_ok && length == -2)
 				err = rb_get_ssl_strerror(conn->mod_fd);
