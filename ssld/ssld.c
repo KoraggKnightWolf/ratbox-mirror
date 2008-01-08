@@ -33,6 +33,8 @@
 #define READBUF_SIZE 16384
 #endif
 
+static void setup_signals(void);
+
 
 static inline rb_int32_t buf_to_int32(char *buf)
 {
@@ -1018,6 +1020,7 @@ main(int argc, char **argv)
 		dup2(x, 2);
 	if(x > 2)
 		close(x);
+	setup_signals();
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);
 	ssl_ok = rb_supports_ssl();		
@@ -1044,3 +1047,40 @@ main(int argc, char **argv)
 	rb_lib_loop(0);
 	return 0;
 }
+
+
+static void
+dummy_handler(int sig)
+{
+	return;
+}
+
+static void
+setup_signals()
+{
+	struct sigaction act;
+
+	act.sa_flags = 0;
+	act.sa_handler = SIG_IGN;
+	sigemptyset(&act.sa_mask);
+	sigaddset(&act.sa_mask, SIGPIPE);
+	sigaddset(&act.sa_mask, SIGALRM);
+#ifdef SIGTRAP
+	sigaddset(&act.sa_mask, SIGTRAP);
+#endif
+
+#ifdef SIGWINCH
+	sigaddset(&act.sa_mask, SIGWINCH);
+	sigaction(SIGWINCH, &act, 0);
+#endif
+	sigaction(SIGPIPE, &act, 0);
+#ifdef SIGTRAP
+	sigaction(SIGTRAP, &act, 0);
+#endif
+
+	act.sa_handler = dummy_handler;
+	sigaction(SIGALRM, &act, 0);
+
+
+}
+
