@@ -273,7 +273,7 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 	{
 		if(retlen == 0)
 			close_conn(conn, WAIT_PLAIN, "%s", remote_closed);
-		if(ssl_ok && retlen == -2)
+		if(IsSSL(conn) && retlen == -2)
 			err = rb_get_ssl_strerror(conn->mod_fd);
 		else
 			err = strerror(errno);
@@ -485,7 +485,7 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 				return;
 			}
 
-			if(ssl_ok && length == -2)
+			if(IsSSL(conn) && length == -2)
 				err = rb_get_ssl_strerror(conn->mod_fd);
 			else
 				err = strerror(errno);
