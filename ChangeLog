@@ -1,3 +1,12 @@
+androsyn    2008/01/09 20:06:10 UTC	(20080109_1-24860)
+  Log:
+  it helps if i do a svn add
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Added) 
+	ircd-ratbox/trunk/bandb/bantool.h (File Added) 
+
+
 androsyn    2008/01/09 20:05:25 UTC	(20080109_0-24858)
   Log:
   add dubkat's new bantool that is written in C and remove the old perl version
