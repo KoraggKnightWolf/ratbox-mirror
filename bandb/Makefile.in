@@ -32,7 +32,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = bandb$(EXEEXT)
+bin_PROGRAMS = bandb$(EXEEXT) bantool$(EXEEXT)
 subdir = bandb
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -50,6 +50,10 @@ am_bandb_OBJECTS = bandb.$(OBJEXT) rsdb_sqlite3.$(OBJEXT) \
 	rsdb_snprintf.$(OBJEXT)
 bandb_OBJECTS = $(am_bandb_OBJECTS)
 bandb_DEPENDENCIES = ../libratbox/src/libratbox.la
+am_bantool_OBJECTS = bantool.$(OBJEXT) rsdb_sqlite3.$(OBJEXT) \
+	rsdb_snprintf.$(OBJEXT)
+bantool_OBJECTS = $(am_bantool_OBJECTS)
+bantool_DEPENDENCIES = ../libratbox/src/libratbox.la
 DEFAULT_INCLUDES = -I. -I$(top_builddir)/include@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -62,8 +66,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(bandb_SOURCES)
-DIST_SOURCES = $(bandb_SOURCES)
+SOURCES = $(bandb_SOURCES) $(bantool_SOURCES)
+DIST_SOURCES = $(bandb_SOURCES) $(bantool_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -214,6 +218,8 @@ AM_CFLAGS = $(WARNFLAGS)
 INCLUDES = -I../include -I../libratbox/include @SQLITE_INCLUDES@
 bandb_SOURCES = bandb.c rsdb_sqlite3.c rsdb_snprintf.c
 bandb_LDADD = ../libratbox/src/libratbox.la @SQLITE_LD@
+bantool_SOURCES = bantool.c rsdb_sqlite3.c rsdb_snprintf.c
+bantool_LDADD = ../libratbox/src/libratbox.la @SQLITE_LD@
 all: all-am
 
 .SUFFIXES:
@@ -278,6 +284,9 @@ clean-binPROGRAMS:
 bandb$(EXEEXT): $(bandb_OBJECTS) $(bandb_DEPENDENCIES) 
 	@rm -f bandb$(EXEEXT)
 	$(LINK) $(bandb_OBJECTS) $(bandb_LDADD) $(LIBS)
+bantool$(EXEEXT): $(bantool_OBJECTS) $(bantool_DEPENDENCIES) 
+	@rm -f bantool$(EXEEXT)
+	$(LINK) $(bantool_OBJECTS) $(bantool_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -286,6 +295,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bandb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bantool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsdb_snprintf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rsdb_sqlite3.Po@am__quote@
 
