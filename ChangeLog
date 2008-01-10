@@ -1,3 +1,11 @@
+androsyn    2008/01/10 18:08:22 UTC	(20080110_3-24872)
+  Log:
+  give a bit more info when ssld gets run directly
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/01/10 16:51:01 UTC	(20080110_2-24870)
   Log:
   Tweak makefiles to make version.c get built correctly again.
