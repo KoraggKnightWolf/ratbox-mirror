@@ -1,3 +1,13 @@
+androsyn    2008/01/10 16:36:13 UTC	(20080110_1-24868)
+  Log:
+  sync tree with libratbox rb_ctime changes
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_whowas.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2008/01/10 16:30:01 UTC	(20080110_0-24864)
   Log:
   remove tools/bantool.pl from tools/Makefile.am
