@@ -1,3 +1,12 @@
+androsyn    2008/01/10 20:36:50 UTC	(20080110_4-24876)
+  Log:
+  add support for passing along egd related info into ssld
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/01/10 18:08:22 UTC	(20080110_3-24872)
   Log:
   give a bit more info when ssld gets run directly
