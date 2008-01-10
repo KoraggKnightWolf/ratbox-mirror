@@ -1,3 +1,12 @@
+androsyn    2008/01/10 16:30:01 UTC	(20080110_0-24864)
+  Log:
+  remove tools/bantool.pl from tools/Makefile.am
+
+  Modified:
+	ircd-ratbox/trunk/tools/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2008/01/09 20:06:10 UTC	(20080109_1-24860)
   Log:
   it helps if i do a svn add
