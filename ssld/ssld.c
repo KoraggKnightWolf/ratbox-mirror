@@ -767,6 +767,18 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 #endif
 
 static void
+init_prng(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
+{
+	char *path;
+	prng_seed_t seed_type;
+	
+	seed_type = (prng_seed_t)ctl_buf->buf[1];	
+	path = &ctl_buf->buf[2];
+	rb_init_prng(path, seed_type);
+}
+
+
+static void
 ssl_new_keys(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
 {
 	char *buf;
@@ -877,6 +889,9 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 				ssl_new_keys(ctl, ctl_buf);
 				break;
 			}
+		case 'I':
+				init_prng(ctl, ctl_buf);
+				break;
 		case 'S':
 			{
 				process_stats(ctl, ctl_buf);

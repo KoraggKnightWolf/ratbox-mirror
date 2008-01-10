@@ -41,6 +41,9 @@ static void collect_zipstats(void *unused);
 static void ssl_read_ctl(rb_fde_t *F, void *data);
 static int ssld_count;
 
+static char tmpbuf[READBUF_SIZE];	
+static char nul = '\0';
+
 #define MAXPASSFD 4
 #define READSIZE 1024
 typedef struct _ssl_ctl_buf
@@ -66,6 +69,8 @@ struct _ssl_ctl
 };
 
 static void send_new_ssl_certs_one(ssl_ctl_t *ctl, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params);
+static void send_init_prng(ssl_ctl_t *ctl, prng_seed_t seedtype, const char *path);
+
 
 static rb_dlink_list ssl_daemons;
 
@@ -110,7 +115,6 @@ free_ssl_daemon(ssl_ctl_t *ctl)
 	rb_dlink_node *ptr;
 	ssl_ctl_buf_t *ctl_buf;
 	int x;
-
 	if(ctl->cli_count)
 		return;
 	
@@ -277,6 +281,13 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		rb_close(F2);
 		rb_close(P1);
 		ctl = allocate_ssl_daemon(F1, P2, pid);
+		if(ssl_ok)
+		{
+			if(ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
+				send_init_prng(ctl, RB_PRNG_EGD, ConfigFileEntry.egdpool_path);
+			else
+				send_init_prng(ctl, RB_PRNG_DEFAULT, NULL);
+		}
 		if(ssl_ok && ssl_cert != NULL && ssl_private_key != NULL)
 			send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
 		ssl_read_ctl(ctl->F, ctl);
@@ -509,11 +520,47 @@ ssl_cmd_write_queue(ssl_ctl_t *ctl, rb_fde_t **F, int count, const void *buf, si
 static void
 send_new_ssl_certs_one(ssl_ctl_t *ctl, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
 {
-	static char buf[READBUF_SIZE];	
-	static char nul = '\0';
-	int len;
-	len = rb_snprintf(buf, sizeof(buf), "K%c%s%c%s%c%s%c", nul, ssl_cert, nul, ssl_private_key, nul, ssl_dh_params, nul);
-	ssl_cmd_write_queue(ctl, NULL, 0, buf, len);
+	size_t len;
+
+	len = strlen(ssl_cert) + strlen(ssl_private_key) + strlen(ssl_dh_params) + 5; 
+	if(len > sizeof(tmpbuf))
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL, 
+			"Parameters for send_new_ssl_certs_one too long (%ld > %ld) to pass to ssld, not sending...",
+			len, sizeof(tmpbuf));
+		ilog(L_MAIN, "Parameters for send_new_ssl_certs_one too long (%ld > %ld) to pass to ssld, not sending...",
+			len, sizeof(tmpbuf));
+		return;
+	}
+	len = rb_snprintf(tmpbuf, sizeof(tmpbuf), "K%c%s%c%s%c%s%c", nul, ssl_cert, nul, ssl_private_key, nul, ssl_dh_params, nul);
+	ssl_cmd_write_queue(ctl, NULL, 0, tmpbuf, len);
+}
+
+static void
+send_init_prng(ssl_ctl_t *ctl, prng_seed_t seedtype, const char *path)
+{
+	size_t len;
+	const char *s;
+	rb_uint8_t seed = (rb_uint8_t) seedtype;
+
+	if(path == NULL)
+		s = "";
+	else
+		s = path;
+
+	len = strlen(s) + 3;
+	if(len > sizeof(tmpbuf))
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL, 
+			"Parameters for send_init_prng too long (%ld > %ld) to pass to ssld, not sending...",
+			len, sizeof(tmpbuf));
+		ilog(L_MAIN, "Parameters for send_init_prng too long (%ld > %ld) to pass to ssld, not sending...",
+			len, sizeof(tmpbuf));
+		return;
+	
+	}	
+	len = rb_snprintf(tmpbuf, sizeof(tmpbuf), "I%c%s%c", seed, s, nul);
+	ssl_cmd_write_queue(ctl, NULL, 0, tmpbuf, len);
 }
 
 void
