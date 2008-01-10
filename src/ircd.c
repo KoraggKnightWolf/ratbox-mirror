@@ -480,13 +480,13 @@ diecb(const char *buf)
 	abort();
 }
 
-static void
-seed_random(void *unused)
-{
-	const struct timeval *tv;	
 #ifndef _WIN32
-	int fd;
+static int
+seed_with_urandom(void)
+{
 	unsigned int seed;
+	int fd;
+
 	fd = open("/dev/urandom", O_RDONLY);
 	if(fd >= 0)
 	{
@@ -494,13 +494,35 @@ seed_random(void *unused)
 		{
 			close(fd);
 			srand(seed);
-			return;
+			return 1;
 		}
 	}
+	return 0;
+}
 #endif
+
+static void
+seed_with_clock(void)
+{
+ 	const struct timeval *tv;	
 	rb_set_time();
 	tv = rb_current_time_tv();
 	srand(tv->tv_sec ^ (tv->tv_usec | (getpid() << 20)));
+}
+
+static void
+seed_random(void *unused)
+{
+	unsigned int seed;
+	if(rb_get_random(&seed, sizeof(seed)) == -1)
+	{
+#ifndef _WIN32
+		if(!seed_with_urandom())
+#endif	
+		seed_with_clock();
+		return;
+	}
+	srand(seed);
 }
 
 int
@@ -574,7 +596,6 @@ ratbox_main(int argc, char *argv[])
 	rb_set_time();
 	setup_corefile();
 	initialVMTop = get_vm_top();
-	seed_random(NULL);
 
 	memset(&me, 0, sizeof(me));
 	me.name = emptyname;
@@ -634,6 +655,7 @@ ratbox_main(int argc, char *argv[])
 		rb_init_prng(ConfigFileEntry.egdpool_path, RB_PRNG_EGD);
 	} else
 	rb_init_prng(NULL, RB_PRNG_DEFAULT);
+	seed_random(NULL);
 	
 	init_main_logfile();
 	init_hash();
