@@ -106,7 +106,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 			sendto_one_numeric(source_p, HOLD_QUEUE, RPL_WHOISSERVER,
 					   form_str(RPL_WHOISSERVER),
 					   temp->name, temp->servername,
-					   rb_ctime(temp->logoff, tbuf));
+					   rb_ctime(temp->logoff, tbuf, sizeof(tbuf)));
 			cur++;
 			found++;
 		}

@@ -937,7 +937,7 @@ send_birthdate_online_time(struct Client *source_p)
 
 	sendto_one(source_p, POP_QUEUE, ":%s %d %s :On-line since %s",
 		   get_id(&me, source_p), RPL_INFO, 
-		   get_id(source_p, source_p), rb_ctime(startup_time, tbuf));
+		   get_id(source_p, source_p), rb_ctime(startup_time, tbuf, sizeof(tbuf)));
 }
 
 /*

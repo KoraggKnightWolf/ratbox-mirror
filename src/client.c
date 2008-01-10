@@ -1370,7 +1370,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	on_for = rb_current_time() - source_p->localClient->firsttime;
 
 	ilog(L_USER, "%s (%3lu:%02lu:%02lu): %s!%s@%s %d/%d",
-		rb_ctime(rb_current_time(), tbuf), on_for / 3600,
+		rb_ctime(rb_current_time(), tbuf, sizeof(tbuf)), on_for / 3600,
 		(on_for % 3600) / 60, on_for % 60,
 		source_p->name, source_p->username, source_p->host,
 		source_p->localClient->sendK, source_p->localClient->receiveK);
