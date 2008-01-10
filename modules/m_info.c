@@ -931,9 +931,9 @@ static void
 send_birthdate_online_time(struct Client *source_p)
 {
 	char tbuf[26]; /* this needs to be 26 - see ctime_r manpage */
-	sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :Birth Date: %s",
+	sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :Birth Date: %s, compile # %s",
 		   get_id(&me, source_p), RPL_INFO, 
-		   get_id(source_p, source_p), creation);
+		   get_id(source_p, source_p), creation, generation);
 
 	sendto_one(source_p, POP_QUEUE, ":%s %d %s :On-line since %s",
 		   get_id(&me, source_p), RPL_INFO, 

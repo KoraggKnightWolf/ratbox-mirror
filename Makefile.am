@@ -17,8 +17,9 @@ SUBDIRS = libratbox libltdl tools doc help @SQLITE_SUBDIR@ bandb ssld resolver i
 AM_YFLAGS = -d
 AM_CFLAGS = $(WARNFLAGS)
 INCLUDES = -Ilibratbox/include -Ilibltdl
-src/version.c: src/version.c.SH
+src/version.c: src/version.c.SH CREDITS
 	$(SHELL) -c "(cd src; $(SHELL) ./version.c.SH)"
+	$(CP) src/version.c src/version.c.last
 
 src/version.lo: src/version.c include/patchlevel.h include/serno.h
 	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
@@ -396,6 +397,7 @@ modules: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 modules_core: $(core_LTLIBRARIES)
 
 install-exec-hook: install-libcoreLTLIBRARIES move-old-modules
+	$(RM) src/version.c
 
 move-old-modules:
 # move the old module directory out of the way, stale modules cause massive
