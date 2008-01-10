@@ -1,3 +1,16 @@
+androsyn    2008/01/10 16:51:01 UTC	(20080110_2-24870)
+  Log:
+  Tweak makefiles to make version.c get built correctly again.
+  Add generation back into version.c and have /INFO report it again
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/src/version.c.SH (File Modified) 
+
+
 androsyn    2008/01/10 16:36:13 UTC	(20080110_1-24868)
   Log:
   sync tree with libratbox rb_ctime changes
