@@ -1,3 +1,11 @@
+androsyn    2008/01/10 21:03:26 UTC	(20080110_5-24878)
+  Log:
+  try to seed data from rb_get_random which in turns gets its data from openssl prng
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2008/01/10 20:36:50 UTC	(20080110_4-24876)
   Log:
   add support for passing along egd related info into ssld
