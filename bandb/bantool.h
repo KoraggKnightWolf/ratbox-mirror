@@ -56,4 +56,4 @@ static char *getfield(char *newline);
 static void check_schema(void);
 static void print_help(int i_exit);
 static void wipe_schema(void);
-static int drop_dupes(char user[], char host[], char t[]);
+static int drop_dupes(const char *user, const char *host, const char *t);

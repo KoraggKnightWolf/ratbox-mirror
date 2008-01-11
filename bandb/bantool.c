@@ -58,7 +58,7 @@ main(int argc, char *argv[])
 	int verbose = 0;
 	int wipe = 0;
 	int dupes = 1;		/* by default we dont allow duplicate ?-lines to be entered. */
-	unsigned int sleep = 10 * 1000 * 1000;
+	unsigned int xsleep = 10 * 1000 * 1000;
 	int opt;
 	int i;
 
@@ -112,7 +112,7 @@ main(int argc, char *argv[])
 
 			fprintf(stdout, "* Press ^C to abort! ");
 			fflush(stdout);
-			usleep(sleep);
+			usleep(xsleep);
 			fprintf(stdout, "Carrying on...\n");
 			wipe_schema();
 		}
@@ -520,7 +520,7 @@ wipe_schema(void)
 }
 
 int
-drop_dupes(char user[], char host[], char t[])
+drop_dupes(const char *user, const char *host, const char *t)
 {
 
 	/*
