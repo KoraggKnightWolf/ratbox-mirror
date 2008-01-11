@@ -30,11 +30,11 @@
  * never-ending questions.
  *
  * BUGS none that i'm aware of.
- * TODO prevent duplicates.
  *
  */
 
 #include <ratbox_lib.h>
+#include <unistd.h>		/* for usleep */
 #include "stdinc.h"
 #include "common.h"
 #include "setup.h"
@@ -54,16 +54,19 @@ main(int argc, char *argv[])
 	int dlines = 0;
 	int xlines = 0;
 	int resvs = 0;
-	int opt;
-	int pretend = 1;
+	int pretend = 0;
 	int verbose = 0;
+	int wipe = 0;
+	int dupes = 1;		/* by default we dont allow duplicate ?-lines to be entered. */
+	unsigned int sleep = 10 * 1000 * 1000;
+	int opt;
+	int i;
 
-	while ((opt = getopt(argc, argv, "hipv")) != -1)
+	while ((opt = getopt(argc, argv, "hipvwd")) != -1)
 	{
 		switch (opt)
 		{
 		case 'h':
-			i_didnt_use_a_flag = 0;
 			print_help(EXIT_SUCCESS);
 			break;
 		case 'i':
@@ -76,6 +79,12 @@ main(int argc, char *argv[])
 			break;
 		case 'v':
 			verbose = 1;
+			break;
+		case 'w':
+			wipe = 1;
+			break;
+		case 'd':
+			dupes = 0;
 			break;
 		default:	/* '?' */
 			print_help(EXIT_FAILURE);
@@ -94,14 +103,25 @@ main(int argc, char *argv[])
 	{
 		rsdb_init();
 		check_schema();
+		if(wipe)
+		{
+			dupes = 1;	/* dont check for dupes if we are wiping the db clean */
+			for (i = 0; i < 3; i++)
+				fprintf(stdout,
+					"* WARNING: YOU ARE ABOUT TO WIPE YOUR DATABASE!\n");
+
+			fprintf(stdout, "* Press ^C to abort! ");
+			usleep(sleep);
+			fprintf(stdout, "Carrying on...\n");
+			wipe_schema();
+		}
 	}
 
 	/* checking for our files to import */
-	int i;
 	for (i = 0; i < 4; i++)
 	{
 		rb_snprintf(conf, sizeof(conf), "%s/%s.conf", etc, bandb_table[i]);
-		fprintf(stdout, "checking for %s: ", conf);	/* debug  */
+		fprintf(stdout, "* checking for %s: ", conf);	/* debug  */
 
 		if(access(conf, R_OK) == -1)
 		{
@@ -111,28 +131,26 @@ main(int argc, char *argv[])
 		}
 		fprintf(stdout, "\tok!\n");
 
-		/* Open Seseme */
+		/* open config for reading, or skip to the next */
 		if(!(fd = fopen(conf, "r")))
-		{
-			/* fprintf(stderr, "\tParse Failed.\n", conf); */
 			continue;
-		}
+
 		if(!pretend)
 			rsdb_transaction(RSDB_TRANS_START);
 
 		switch (bandb_letter[i])
 		{
 		case 'K':
-			klines = parse_k_file(fd, pretend, verbose);
+			klines = parse_k_file(fd, pretend, verbose, dupes);
 			break;
 		case 'D':
-			dlines = parse_d_file(fd, pretend, verbose);
+			dlines = parse_d_file(fd, pretend, verbose, dupes);
 			break;
 		case 'X':
-			xlines = parse_x_file(fd, pretend, verbose);
+			xlines = parse_x_file(fd, pretend, verbose, dupes);
 			break;
 		case 'R':
-			resvs = parse_r_file(fd, pretend, verbose);
+			resvs = parse_r_file(fd, pretend, verbose, dupes);
 			break;
 		default:
 			exit(EXIT_FAILURE);
@@ -145,14 +163,14 @@ main(int argc, char *argv[])
 	}
 
 	if(err)
-		fprintf(stderr, "I was unable to locate %i config files to import.\n", err);
+		fprintf(stderr, "* I was unable to locate %i config files to import.\n", err);
 
-	fprintf(stdout, "Import Stats: Klines: %i Dlines: %i Xlines: %i Jupes: %i \n",
+	fprintf(stdout, "* Import Stats: Klines: %i Dlines: %i Xlines: %i Jupes: %i \n",
 		klines, dlines, xlines, resvs);
 
 	if(pretend)
 		fprintf(stdout,
-			"pretend mode engaged. nothing was actually entered into the database.\n");
+			"* Pretend mode engaged. Nothing was actually entered into the database.\n");
 
 	return 0;
 }
@@ -160,13 +178,12 @@ main(int argc, char *argv[])
 
 /*
  * parse_k_file
- * Inputs       - pointer to line to parse
- * Output       - NONE
+ * Inputs       - pointer to line to parse, pretend mode?, verbosoity
+ * Output       - Number parsed
  * Side Effects - Parse one new style K line
  */
-
 int
-parse_k_file(FILE * file, int mode, int verb)
+parse_k_file(FILE * file, int mode, int verb, int dupes)
 {
 	char *user_field = NULL;
 	char *reason_field = NULL;
@@ -212,8 +229,13 @@ parse_k_file(FILE * file, int mode, int verb)
 			rb_snprintf(newreason, sizeof(newreason), "%s", reason_field);
 
 		if(!mode)
+		{
+			if(!dupes)
+				drop_dupes(user_field, host_field, "kline");
+
 			rsdb_exec(NULL, "INSERT INTO kline VALUES('%Q','%Q','%Q','%Q','%Q')",
 				  user_field, host_field, oper_field, timestamp, newreason);
+		}
 
 		if(mode && verb)
 			fprintf(stdout, "KLINE: user(%s@%s) oper(%s) reason(%s) time(%s)\n",
@@ -226,7 +248,7 @@ parse_k_file(FILE * file, int mode, int verb)
 
 
 int
-parse_x_file(FILE * file, int mode, int verb)
+parse_x_file(FILE * file, int mode, int verb, int dupes)
 {
 	char *gecos_field = NULL;
 	char *reason_field = NULL;
@@ -268,8 +290,13 @@ parse_x_file(FILE * file, int mode, int verb)
 			rb_snprintf(newreason, sizeof(newreason), "%s", reason_field);
 
 		if(!mode)
+		{
+			if(!dupes)
+				drop_dupes(gecos_field, NULL, "xline");
+
 			rsdb_exec(NULL, "INSERT INTO xline VALUES('%Q','%Q','%Q','%Q','%Q')",
 				  gecos_field, NULL, oper_field, timestamp, newreason);
+		}
 
 		if(mode && verb)
 			fprintf(stdout, "XLINE: gecos(%s) oper(%s) reason(%s) timestamp(%s)\n",
@@ -281,15 +308,8 @@ parse_x_file(FILE * file, int mode, int verb)
 	return i;
 }
 
-/*
- * parse_d_file
- * Inputs       - pointer to line to parse
- * Output       - NONE
- * Side Effects - Parse one new style D line
- */
-
 int
-parse_d_file(FILE * file, int mode, int verb)
+parse_d_file(FILE * file, int mode, int verb, int dupes)
 {
 	char *reason_field = NULL;
 	char newreason[REASONLEN];
@@ -330,8 +350,13 @@ parse_d_file(FILE * file, int mode, int verb)
 			rb_snprintf(newreason, sizeof(newreason), "%s", reason_field);
 
 		if(!mode)
+		{
+			if(!dupes)
+				drop_dupes(host_field, NULL, "dline");
+
 			rsdb_exec(NULL, "INSERT INTO dline VALUES('%Q','%Q','%Q','%Q','%Q')",
 				  host_field, NULL, oper_field, timestamp, newreason);
+		}
 
 		if(mode && verb)
 			fprintf(stdout, "DLINE: ip(%s) oper(%s) reason(%s) timestamp(%s)\n",
@@ -344,7 +369,7 @@ parse_d_file(FILE * file, int mode, int verb)
 
 
 int
-parse_r_file(FILE * file, int mode, int verb)
+parse_r_file(FILE * file, int mode, int verb, int dupes)
 {
 	char *reason_field;
 	char *host_field;
@@ -374,8 +399,13 @@ parse_r_file(FILE * file, int mode, int verb)
 		timestamp = oper_field + strlen(oper_field) + 2;
 
 		if(!mode)
+		{
+			if(!dupes)
+				drop_dupes(host_field, NULL, "resv");
+
 			rsdb_exec(NULL, "INSERT INTO resv VALUES('%Q','%Q','%Q','%Q','%Q')",
 				  host_field, NULL, oper_field, timestamp, reason_field);
+		}
 
 		if(mode && verb)
 			fprintf(stdout, "JUPE: mask(%s) reason(%s) oper(%s) timestamp(%s)\n",
@@ -473,6 +503,42 @@ check_schema(void)
 	}
 }
 
+/* this function completly wipes out an existing ban.db of all entries.
+	* i don't yet see the point of it, but was requested. --dubkat
+	*/
+static void
+wipe_schema(void)
+{
+	int i;
+	rsdb_transaction(RSDB_TRANS_START);
+	for (i = 0; i < LAST_BANDB_TYPE; i++)
+		rsdb_exec(NULL, "DELETE FROM %s", bandb_table[i]);
+	rsdb_transaction(RSDB_TRANS_END);
+}
+
+int
+drop_dupes(char user[], char host[], char t[])
+{
+
+	/*
+	 * actually looking for a duplicate before inserting is an enormous
+	 * performance hit, so instead, drop the old, and insert then new.
+	 * --dubkat
+	 */
+	/*
+	   struct rsdb_table table;
+	   rsdb_exec_fetch(&table,
+	   "SELECT mask1,mask2 FROM '%s' WHERE mask1='%s' AND mask2='%s'",
+	   t, user, host);
+
+	   rsdb_exec_fetch_end(&table);
+	 */
+
+	rsdb_exec(NULL, "DELETE FROM %s WHERE mask1='%Q' AND mask2='%Q'", t, user, host);
+	return 0;
+}
+
+
 
 void
 print_help(int i_exit)
@@ -487,15 +553,17 @@ print_help(int i_exit)
 		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
 		"GNU General Public License for more details.\n\n");
 
-	fprintf(stderr, "Usage: bantool <-i|-p> [-v] [-h] [path]\n");
-	fprintf(stderr, "       -h : display some slightly useful help.\n");
-	fprintf(stderr, "       -i : actually import configs into your database.\n");
+	fprintf(stderr, "Usage: bantool <-i|-p> [-v] [-h] [-d] [-w] [path]\n");
+	fprintf(stderr, "       -h : Display some slightly useful help.\n");
+	fprintf(stderr, "       -i : Actually import configs into your database.\n");
 	fprintf(stderr,
 		"       -p : pretend, checks for the configs, and parses them, then tells you some data...\n");
-	fprintf(stderr, "          : but does not touch your database.\n");
+	fprintf(stderr, "            but does not touch your database.\n");
 	fprintf(stderr,
-		"       -v : be verbose... and it *is* very verbose! (intended for debugging)\n");
-	fprintf(stderr, "     path : an optional directory containing old ratbox configs.\n");
+		"       -v : Be verbose... and it *is* very verbose! (intended for debugging)\n");
+	fprintf(stderr, "       -d : Enable checking for redunant entries.\n");
+	fprintf(stderr, "       -w : Completly wipe your database clean.\n");
+	fprintf(stderr, "     path : An optional directory containing old ratbox configs.\n");
 	fprintf(stderr, "            If not specified, it looks in PREFIX/etc.\n");
 	exit(i_exit);
 }
