@@ -1,3 +1,17 @@
+androsyn    2008/01/11 02:52:18 UTC	(20080111_1-24884)
+  Log:
+  Another bantool update from dubkat:
+  
+  - unbuffered warning notice so it prints when expected.
+  - changed DELETE FROM table to DROP TABLE
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/bandb/bantool.h (File Modified) 
+
+
 androsyn    2008/01/11 01:58:59 UTC	(20080111_0-24882)
   Log:
   A bantool update from dubkat:
