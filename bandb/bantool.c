@@ -111,6 +111,7 @@ main(int argc, char *argv[])
 					"* WARNING: YOU ARE ABOUT TO WIPE YOUR DATABASE!\n");
 
 			fprintf(stdout, "* Press ^C to abort! ");
+			fflush(stdout);
 			usleep(sleep);
 			fprintf(stdout, "Carrying on...\n");
 			wipe_schema();
@@ -512,8 +513,10 @@ wipe_schema(void)
 	int i;
 	rsdb_transaction(RSDB_TRANS_START);
 	for (i = 0; i < LAST_BANDB_TYPE; i++)
-		rsdb_exec(NULL, "DELETE FROM %s", bandb_table[i]);
+		rsdb_exec(NULL, "DROP TABLE %s", bandb_table[i]);
 	rsdb_transaction(RSDB_TRANS_END);
+
+	check_schema();
 }
 
 int

@@ -28,7 +28,7 @@
 
 #define EmptyString(x) ((x == NULL) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
-#define BT_VERSION "0.3"
+#define BT_VERSION "0.3.1"
 
 typedef enum
 {
