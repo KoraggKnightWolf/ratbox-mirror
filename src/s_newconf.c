@@ -591,6 +591,23 @@ find_nick_resv(const char *name)
 	return NULL;
 }
 
+struct ConfItem *
+find_nick_resv_mask(const char *name)
+{
+	struct ConfItem *aconf;
+	rb_dlink_node *ptr;
+
+	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
+	{
+		aconf = ptr->data;
+
+		if(!irccmp(aconf->host, name))
+			return aconf;
+	}
+
+	return NULL;
+}
+
 /* clean_resv_nick()
  *
  * inputs	- nick
