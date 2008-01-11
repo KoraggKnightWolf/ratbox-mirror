@@ -1,3 +1,21 @@
+androsyn    2008/01/11 01:58:59 UTC	(20080111_0-24882)
+  Log:
+  A bantool update from dubkat:
+  
+  changes:
+          standardized the version string.
+          added -w to wipe the database clean
+          added -d to disable duplicate entries.
+          replaced lame comments with more descriptive ones.
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/bandb/bantool.h (File Modified) 
+
+
 androsyn    2008/01/10 21:03:26 UTC	(20080110_5-24878)
   Log:
   try to seed data from rb_get_random which in turns gets its data from openssl prng
