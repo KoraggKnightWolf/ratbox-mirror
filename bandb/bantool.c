@@ -33,12 +33,7 @@
  *
  */
 
-#include <ratbox_lib.h>
-#include <unistd.h>		/* for usleep */
 #include "stdinc.h"
-#include "common.h"
-#include "setup.h"
-#include "config.h"
 #include "rsdb.h"
 #include "bantool.h"
 
