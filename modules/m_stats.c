@@ -70,7 +70,6 @@ mapi_hlist_av1 stats_hlist[] = {
 
 DECLARE_MODULE_AV1(stats, NULL, NULL, stats_clist, stats_hlist, NULL, "$Revision$");
 
-static const char *Lformat = "%s %u %u %u %u %u :%u %u %s";
 
 static void stats_l_list(struct Client *s, const char *, int, int, rb_dlink_list *, char);
 static void stats_l_client(struct Client *source_p, struct Client *target_p,
@@ -759,19 +758,19 @@ stats_operedup (struct Client *source_p)
 		if(MyClient(source_p) && IsOper(source_p))
 		{
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-					   "p :[%c][%s] %s (%s@%s) Idle: %d",
+					   "p :[%c][%s] %s (%s@%s) Idle: %ld",
 					   IsAdmin (target_p) ? 'A' : 'O',
 					   get_oper_privs(target_p->operflags),
 					   target_p->name, target_p->username, target_p->host,
-					   (int) (rb_current_time() - target_p->localClient->last));
+					   (long) (rb_current_time() - target_p->localClient->last));
 		}
 		else
 		{
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-					   "p :[%c] %s (%s@%s) Idle: %d",
+					   "p :[%c] %s (%s@%s) Idle: %ld",
 					   IsAdmin (target_p) ? 'A' : 'O',
 					   target_p->name, target_p->username, target_p->host,
-					   (int) (rb_current_time() - target_p->localClient->last));
+					   (long) (rb_current_time() - target_p->localClient->last));
 		}
 	}
 
@@ -878,29 +877,29 @@ stats_usage (struct Client *source_p)
 		rup = 1;
   
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "R :CPU Secs %d:%d User %d:%d System %d:%d",
-			   (int) (secs / 60), (int) (secs % 60),
-			   (int) (rus.ru_utime.tv_sec / 60),
-			   (int) (rus.ru_utime.tv_sec % 60),
-			   (int) (rus.ru_stime.tv_sec / 60), 
-			   (int) (rus.ru_stime.tv_sec % 60));
+			   "R :CPU Secs %ld:%ld User %ld:%ld System %ld:%ld",
+			   (long) (secs / 60), (long) (secs % 60),
+			   (long) (rus.ru_utime.tv_sec / 60),
+			   (long) (rus.ru_utime.tv_sec % 60),
+			   (long) (rus.ru_stime.tv_sec / 60), 
+			   (long) (rus.ru_stime.tv_sec % 60));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "R :RSS %ld ShMem %ld Data %ld Stack %ld",
 			   rus.ru_maxrss, (rus.ru_ixrss / rup), 
 			   (rus.ru_idrss / rup), (rus.ru_isrss / rup));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "R :Swaps %d Reclaims %d Faults %d",
-			   (int) rus.ru_nswap, (int) rus.ru_minflt, (int) rus.ru_majflt);
+			   "R :Swaps %ld Reclaims %ld Faults %ld",
+			   rus.ru_nswap, rus.ru_minflt, rus.ru_majflt);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "R :Block in %d out %d",
-			   (int) rus.ru_inblock, (int) rus.ru_oublock);
+			   "R :Block in %ld out %ld",
+			   rus.ru_inblock, rus.ru_oublock);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "R :Msg Rcv %d Send %d",
-			   (int) rus.ru_msgrcv, (int) rus.ru_msgsnd);
+			   "R :Msg Rcv %ld Send %ld",
+			   rus.ru_msgrcv, rus.ru_msgsnd);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "R :Signals %d Context Vol. %d Invol %d",
-			   (int) rus.ru_nsignals, (int) rus.ru_nvcsw, 
-			   (int) rus.ru_nivcsw);
+			   "R :Signals %ld Context Vol. %ld Invol %ld",
+			   rus.ru_nsignals, rus.ru_nvcsw, 
+			   rus.ru_nivcsw);
 #endif
 }
 
@@ -986,16 +985,16 @@ stats_tstats(struct Client *source_p)
 				"T :connected %u %u",
 				sp.is_cl, sp.is_sv);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-				"T :bytes sent %d.%uK %d.%uK",
-				(int) sp.is_cks, sp.is_cbs, 
-				(int) sp.is_sks, sp.is_sbs);
+				"T :bytes sent %lu.%uK %lu.%uK",
+				sp.is_cks, sp.is_cbs, 
+				sp.is_sks, sp.is_sbs);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-				"T :bytes recv %d.%uK %d.%uK",
-				(int) sp.is_ckr, sp.is_cbr, 
-				(int) sp.is_skr, sp.is_sbr);
+				"T :bytes recv %lu.%uK %lu.%uK",
+				sp.is_ckr, sp.is_cbr, 
+				sp.is_skr, sp.is_sbr);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-				"T :time connected %d %d",
-				(int) sp.is_cti, (int) sp.is_sti);
+				"T :time connected %lu %lu",
+				sp.is_cti, sp.is_sti);
 }
 
 static void
@@ -1100,7 +1099,7 @@ stats_servers (struct Client *source_p)
 	struct Client *target_p;
 	rb_dlink_node *ptr;
 	time_t seconds;
-	int days, hours, minutes;
+	long days, hours, minutes;
 	int j = 0;
 
 	if(ConfigServerHide.flatten_links && !IsOper(source_p) &&
@@ -1118,22 +1117,22 @@ stats_servers (struct Client *source_p)
 		j++;
 		seconds = rb_current_time() - target_p->localClient->firsttime;
 
-		days = (int) (seconds / 86400);
+		days = (long) (seconds / 86400);
 		seconds %= 86400;
-		hours = (int) (seconds / 3600);
+		hours = (long) (seconds / 3600);
 		seconds %= 3600;
-		minutes = (int) (seconds / 60);
+		minutes = (long) (seconds / 60);
 		seconds %= 60;
 
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-				   "V :%s (%s!*@*) Idle: %d SendQ: %d "
-				   "Connected: %d day%s, %d:%02d:%02d",
+				   "V :%s (%s!*@*) Idle: %ld SendQ: %d "
+				   "Connected: %ld day%s, %ld:%02ld:%02ld",
 				   target_p->name,
 				   (target_p->serv->by[0] ? target_p->serv->by : "Remote."),
-				   (int) (rb_current_time() - target_p->localClient->lasttime),
-				   (int) rb_linebuf_len (&target_p->localClient->buf_sendq),
+				   (long) (rb_current_time() - target_p->localClient->lasttime),
+				   rb_linebuf_len (&target_p->localClient->buf_sendq),
 				   days, (days == 1) ? "" : "s", hours, minutes, 
-				   (int) seconds);
+				   seconds);
 	}
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
@@ -1219,8 +1218,8 @@ stats_bh_callback(size_t bused, size_t bfree, size_t bmemusage, size_t heapalloc
 {
 	struct Client *source_p = (struct Client *)data;
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :blockheap %s elements used: %lu elements free: %lu memory in use: %lu total memory: %lu",
-			   desc, (unsigned long)bused, (unsigned long)bfree, (unsigned long)bmemusage, (unsigned long)heapalloc);
+			   "z :blockheap %s elements used: %zu elements free: %zu memory in use: %zu total memory: %zu",
+			   desc, bused, bfree, bmemusage, heapalloc);
 	
 	return;
 }
@@ -1279,8 +1278,8 @@ stats_memory (struct Client *source_p)
 	rb_bh_total_usage(&bh_total, &bh_used);
 	
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :blockheap Total Allocated: %lu Total Used: %lu",
-			   (unsigned long)bh_total, (unsigned long)bh_used);
+			   "z :blockheap Total Allocated: %zu Total Used: %zu",
+			   bh_total, bh_used);
 	
 	count_whowas_memory(&wwu, &wwm);
 
@@ -1349,76 +1348,76 @@ stats_memory (struct Client *source_p)
 	rb_count_rb_linebuf_memory(&rb_linebuf_count, &rb_linebuf_memory_used);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Users %u(%lu) Invites %u(%lu)",
+			   "z :Users %u(%zu) Invites %u(%zu)",
 			   users_counted,
-			   (unsigned long) users_counted * sizeof(struct User),
+			   users_counted * sizeof(struct User),
 			   users_invited_count, 
-			   (unsigned long) users_invited_count * sizeof(rb_dlink_node));
+			   users_invited_count * sizeof(rb_dlink_node));
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :User channels %u(%lu) Aways %u(%d)",
+			   "z :User channels %u(%zu) Aways %u(%zu)",
 			   user_channels,
-			   (unsigned long) user_channels * sizeof(rb_dlink_node),
-			   aways_counted, (int) away_memory);
+			   user_channels * sizeof(rb_dlink_node),
+			   aways_counted, away_memory);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Attached confs %u(%lu)",
+			   "z :Attached confs %u(%zu)",
 			   local_client_conf_count,
-			   (unsigned long) local_client_conf_count * sizeof(rb_dlink_node));
+			   local_client_conf_count * sizeof(rb_dlink_node));
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Conflines %u(%d)", conf_count, (int) conf_memory);
+			   "z :Conflines %u(%zu)", conf_count, conf_memory);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Classes %u(%lu)",
+			   "z :Classes %u(%zu)",
 			   class_count, 
-			   (unsigned long) class_count * sizeof(struct Class));
+			   class_count * sizeof(struct Class));
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Channels %u(%d)",
-			   channel_count, (int) channel_memory);
+			   "z :Channels %u(%zu)",
+			   channel_count, channel_memory);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Bans %u(%d)",
-			   channel_bans, (int) channel_ban_memory);
+			   "z :Bans %u(%zu)",
+			   channel_bans, channel_ban_memory);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Exceptions %u(%d)",
-			   channel_except, (int) channel_except_memory);
+			   "z :Exceptions %u(%zu)",
+			   channel_except, channel_except_memory);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Invex %u(%d)",
-			   channel_invex, (int) channel_invex_memory);
+			   "z :Invex %u(%zu)",
+			   channel_invex, channel_invex_memory);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Channel members %u(%lu) invite %u(%lu)",
+			   "z :Channel members %u(%zu) invite %u(%zu)",
 			   channel_users,
-			   (unsigned long) channel_users * sizeof(rb_dlink_node),
+			   channel_users * sizeof(rb_dlink_node),
 			   channel_invites, 
-			   (unsigned long) channel_invites * sizeof(rb_dlink_node));
+			   channel_invites * sizeof(rb_dlink_node));
 
 	total_channel_memory = channel_memory +
 		channel_ban_memory +
 		channel_users * sizeof(rb_dlink_node) + channel_invites * sizeof(rb_dlink_node);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Whowas users %ld(%ld)",
-			   (long)wwu, (long) (wwu * sizeof(struct User)));
+			   "z :Whowas users %zu(%zu)",
+			   wwu, (wwu * sizeof(struct User)));
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Whowas array %u(%d)",
-			   NICKNAMEHISTORYLENGTH, (int) wwm);
+			   "z :Whowas array %u(%zu)",
+			   NICKNAMEHISTORYLENGTH, wwm);
 
 	totww = wwu * sizeof(struct User) + wwm;
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Hash: client %u(%ld) chan %u(%ld)",
-			   U_MAX, (long)(U_MAX * sizeof(rb_dlink_list)), 
-			   CH_MAX, (long)(CH_MAX * sizeof(rb_dlink_list)));
+			   "z :Hash: client %u(%zu) chan %u(%zu)",
+			   U_MAX, (U_MAX * sizeof(rb_dlink_list)), 
+			   CH_MAX, (CH_MAX * sizeof(rb_dlink_list)));
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :linebuf %ld(%ld)",
-			   (long)rb_linebuf_count, (long)rb_linebuf_memory_used);
+			   "z :linebuf %zu(%zu)",
+			   rb_linebuf_count, rb_linebuf_memory_used);
 
 	count_scache(&number_servers_cached, &mem_servers_cached);
 
@@ -1435,29 +1434,29 @@ stats_memory (struct Client *source_p)
 
 	total_memory += mem_servers_cached;
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Total: whowas %d channel %d conf %d", 
-			   (int) totww, (int) total_channel_memory, 
-			   (int) conf_memory);
+			   "z :Total: whowas %zu channel %zu conf %zu", 
+			   totww, total_channel_memory, 
+			   conf_memory);
 
 	count_local_client_memory(&local_client_count, &local_client_memory_used);
 	total_memory += local_client_memory_used;
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Local client Memory in use: %ld(%ld)",
-			   (long)local_client_count, (long)local_client_memory_used);
+			   "z :Local client Memory in use: %zu(%zu)",
+			   local_client_count, local_client_memory_used);
 
 
 	count_remote_client_memory(&remote_client_count, &remote_client_memory_used);
 	total_memory += remote_client_memory_used;
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :Remote client Memory in use: %ld(%ld)",
-			   (long)remote_client_count,
-			   (long)remote_client_memory_used);
+			   "z :Remote client Memory in use: %zu(%zu)",
+			   remote_client_count,
+			   remote_client_memory_used);
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-			   "z :TOTAL: %d Available:  Current max RSS: %lu",
-			   (int) total_memory, get_maxrss());
+			   "z :TOTAL: %zu Available:  Current max RSS: %lu",
+			   total_memory, get_maxrss());
 }
 
 static void
@@ -1495,7 +1494,6 @@ stats_ziplinks (struct Client *source_p)
 static void
 stats_servlinks (struct Client *source_p)
 {
-	static char Sformat[] = ":%s %d %s %s %u %u %u %u %u :%u %u %s";
 	long uptime, sendK, receiveK;
 	struct Client *target_p;
 	static char buf[512];
@@ -1520,17 +1518,17 @@ stats_servlinks (struct Client *source_p)
 		sendK += target_p->localClient->sendK;
 		receiveK += target_p->localClient->receiveK;
 
-		sendto_one(source_p, POP_QUEUE, Sformat,
+		sendto_one(source_p, POP_QUEUE, ":%s %d %s %s %u %u %u %u %u :%lu %lu %s",
 			get_id(&me, source_p), RPL_STATSLINKINFO, get_id(source_p, source_p),
 			target_p->name,
-			(int) rb_linebuf_len (&target_p->localClient->buf_sendq),
-			(int) target_p->localClient->sendM,
-			(int) target_p->localClient->sendK,
-			(int) target_p->localClient->receiveM,
-			(int) target_p->localClient->receiveK,
-			rb_current_time() - target_p->localClient->firsttime,
-			(rb_current_time() > target_p->localClient->lasttime) ? 
-			 (rb_current_time() - target_p->localClient->lasttime) : 0,
+			rb_linebuf_len (&target_p->localClient->buf_sendq),
+			target_p->localClient->sendM,
+			target_p->localClient->sendK,
+			target_p->localClient->receiveM,
+			target_p->localClient->receiveK,
+			(long)(rb_current_time() - target_p->localClient->firsttime),
+			(long)((rb_current_time() > target_p->localClient->lasttime) ? 
+			 (rb_current_time() - target_p->localClient->lasttime) : 0),
 			IsOper (source_p) ? show_capabilities (target_p) : "TS");
 	}
 
@@ -1679,6 +1677,8 @@ stats_l_list(struct Client *source_p, const char *name, int doall, int wilds,
 	}
 }
 
+#define Lformat "%s %u %u %u %u %u :%ld %ld %s"
+
 void
 stats_l_client(struct Client *source_p, struct Client *target_p,
 		char statchar)
@@ -1687,13 +1687,13 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSLINKINFO, Lformat,
 				target_p->name,
-				(int) rb_linebuf_len(&target_p->localClient->buf_sendq),
-				(int) target_p->localClient->sendM,
-				(int) target_p->localClient->sendK,
-				(int) target_p->localClient->receiveM,
-				(int) target_p->localClient->receiveK,
-				rb_current_time() - target_p->localClient->firsttime,
-				(rb_current_time() > target_p->localClient->lasttime) ? 
+				rb_linebuf_len(&target_p->localClient->buf_sendq),
+				target_p->localClient->sendM,
+				target_p->localClient->sendK,
+				target_p->localClient->receiveM,
+				target_p->localClient->receiveK,
+				(long)rb_current_time() - target_p->localClient->firsttime,
+				(long)(rb_current_time() > target_p->localClient->lasttime) ? 
 				 (rb_current_time() - target_p->localClient->lasttime) : 0,
 				IsOper(source_p) ? show_capabilities(target_p) : "-");
 	}
@@ -1702,11 +1702,11 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSLINKINFO, Lformat,
 				    get_client_name(target_p, MASK_IP),
-				    (int) rb_linebuf_len(&target_p->localClient->buf_sendq),
-				    (int) target_p->localClient->sendM,
-				    (int) target_p->localClient->sendK,
-				    (int) target_p->localClient->receiveM,
-				    (int) target_p->localClient->receiveK,
+				    rb_linebuf_len(&target_p->localClient->buf_sendq),
+				    target_p->localClient->sendM,
+				    target_p->localClient->sendK,
+				    target_p->localClient->receiveM,
+				    target_p->localClient->receiveK,
 				    rb_current_time() - target_p->localClient->firsttime,
 				    (rb_current_time() > target_p->localClient->lasttime) ? 
 				     (rb_current_time() - target_p->localClient->lasttime) : 0,
@@ -1719,11 +1719,11 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				   IsUpper(statchar) ?
 				   get_client_name(target_p, SHOW_IP) :
 				   get_client_name(target_p, HIDE_IP),
-				   (int) rb_linebuf_len(&target_p->localClient->buf_sendq),
-				   (int) target_p->localClient->sendM,
-				   (int) target_p->localClient->sendK,
-				   (int) target_p->localClient->receiveM,
-				   (int) target_p->localClient->receiveK,
+				   rb_linebuf_len(&target_p->localClient->buf_sendq),
+				   target_p->localClient->sendM,
+				   target_p->localClient->sendK,
+				   target_p->localClient->receiveM,
+				   target_p->localClient->receiveK,
 				   rb_current_time() - target_p->localClient->firsttime,
 				   (rb_current_time() > target_p->localClient->lasttime) ? 
 				    (rb_current_time() - target_p->localClient->lasttime) : 0,
