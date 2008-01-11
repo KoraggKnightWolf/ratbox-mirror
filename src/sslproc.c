@@ -526,9 +526,9 @@ send_new_ssl_certs_one(ssl_ctl_t *ctl, const char *ssl_cert, const char *ssl_pri
 	if(len > sizeof(tmpbuf))
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, 
-			"Parameters for send_new_ssl_certs_one too long (%ld > %ld) to pass to ssld, not sending...",
+			"Parameters for send_new_ssl_certs_one too long (%zu > %zu) to pass to ssld, not sending...",
 			len, sizeof(tmpbuf));
-		ilog(L_MAIN, "Parameters for send_new_ssl_certs_one too long (%ld > %ld) to pass to ssld, not sending...",
+		ilog(L_MAIN, "Parameters for send_new_ssl_certs_one too long (%zu > %zu) to pass to ssld, not sending...",
 			len, sizeof(tmpbuf));
 		return;
 	}
@@ -552,9 +552,9 @@ send_init_prng(ssl_ctl_t *ctl, prng_seed_t seedtype, const char *path)
 	if(len > sizeof(tmpbuf))
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, 
-			"Parameters for send_init_prng too long (%ld > %ld) to pass to ssld, not sending...",
+			"Parameters for send_init_prng too long (%zd > %zd) to pass to ssld, not sending...",
 			len, sizeof(tmpbuf));
-		ilog(L_MAIN, "Parameters for send_init_prng too long (%ld > %ld) to pass to ssld, not sending...",
+		ilog(L_MAIN, "Parameters for send_init_prng too long (%zd > %zd) to pass to ssld, not sending...",
 			len, sizeof(tmpbuf));
 		return;
 	
