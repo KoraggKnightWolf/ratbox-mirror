@@ -1,3 +1,11 @@
+androsyn    2008/01/14 20:44:42 UTC	(20080114_0-24940)
+  Log:
+  have bandb use rb_help_write_queue as it can end up sending a lot of data
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+
+
 androsyn    2008/01/11 18:53:37 UTC	(20080111_7-24896)
   Log:
   Fix a bug with duplicate wildcard resvs.  Using match_esc to find duplicates isn't a good way to go.
