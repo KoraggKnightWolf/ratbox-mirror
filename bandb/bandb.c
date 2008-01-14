@@ -123,7 +123,7 @@ list_bans(void)
 	int i, j;
 
 	/* schedule a clear of anything already pending */
-	rb_helper_write(bandb_helper, "C");
+	rb_helper_write_queue(bandb_helper, "C");
 
 	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
@@ -142,7 +142,7 @@ list_bans(void)
 					bandb_letter[i], table.row[j][0], 
 					table.row[j][2], table.row[j][3]);
 
-			rb_helper_write(bandb_helper, "%s", buf);
+			rb_helper_write_queue(bandb_helper, "%s", buf);
 		}
 				
 		rsdb_exec_fetch_end(&table);
