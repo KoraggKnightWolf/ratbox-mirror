@@ -363,6 +363,8 @@ ssl_process_dead_fd(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 static void
 ssl_process_cmd_recv(ssl_ctl_t *ctl)
 {
+	static const char *cannot_setup_ssl = "ssld cannot setup ssl, check your certificates and private key";
+	static const char *no_ssl_or_zlib = "ssld has neither SSL/TLS or zlib support killing all sslds";
 	rb_dlink_node *ptr, *next;	
 	ssl_ctl_buf_t *ctl_buf;
 	if(ctl->dead)
@@ -381,11 +383,15 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 			case 'S':
 				ssl_process_zipstats(ctl, ctl_buf);
 				break;
+			case 'I':
+				ssl_ok = 0;
+				ilog(L_MAIN, cannot_setup_ssl);				
+				sendto_realops_flags(UMODE_ALL, L_ALL, cannot_setup_ssl);
 			case 'U':
 				zlib_ok = 0;
 				ssl_ok = 0;
-				ilog(L_MAIN, "ssld has neither SSL/TLS or zlib support killing all sslds");
-				sendto_realops_flags(UMODE_ALL, L_ALL, "ssld has neither SSL/TLS or zlib support killing all sslds");
+				ilog(L_MAIN, no_ssl_or_zlib);
+				sendto_realops_flags(UMODE_ALL, L_ALL, no_ssl_or_zlib);
 				ssl_killall();
 				break;
 			case 'z':
