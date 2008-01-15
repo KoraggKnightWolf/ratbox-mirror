@@ -1,3 +1,14 @@
+androsyn    2008/01/15 17:20:47 UTC	(20080115_2-24948)
+  Log:
+  Handle signals in helpers.  Also run through indent
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/ident/ident.c (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+
+
 androsyn    2008/01/15 17:14:15 UTC	(20080115_1-24946)
   Log:
   add some more error handling in ssld
