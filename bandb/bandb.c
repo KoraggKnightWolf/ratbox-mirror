@@ -46,13 +46,11 @@ typedef enum
 	LAST_BANDB_TYPE
 } bandb_type;
 
-static char bandb_letter[LAST_BANDB_TYPE] =
-{
+static char bandb_letter[LAST_BANDB_TYPE] = {
 	'K', 'D', 'X', 'R'
 };
 
-static const char *bandb_table[LAST_BANDB_TYPE] = 
-{
+static const char *bandb_table[LAST_BANDB_TYPE] = {
 	"kline", "dline", "xline", "resv"
 };
 
@@ -88,8 +86,9 @@ parse_ban(bandb_type type, char *parv[], int parc)
 	curtime = parv[para++];
 	reason = parv[para++];
 
-	rsdb_exec(NULL, "INSERT INTO %s (mask1, mask2, oper, time, reason) VALUES('%Q', '%Q', '%Q', %s, '%Q')",
-			bandb_table[type], mask1, mask2 ? mask2 : "", oper, curtime, reason);
+	rsdb_exec(NULL,
+		  "INSERT INTO %s (mask1, mask2, oper, time, reason) VALUES('%Q', '%Q', '%Q', %s, '%Q')",
+		  bandb_table[type], mask1, mask2 ? mask2 : "", oper, curtime, reason);
 }
 
 static void
@@ -112,7 +111,7 @@ parse_unban(bandb_type type, char *parv[], int parc)
 		mask2 = parv[2];
 
 	rsdb_exec(NULL, "DELETE FROM %s WHERE mask1='%Q' AND mask2='%Q'",
-			bandb_table[type], mask1, mask2 ? mask2 : "");
+		  bandb_table[type], mask1, mask2 ? mask2 : "");
 }
 
 static void
@@ -125,26 +124,25 @@ list_bans(void)
 	/* schedule a clear of anything already pending */
 	rb_helper_write_queue(bandb_helper, "C");
 
-	for(i = 0; i < LAST_BANDB_TYPE; i++)
+	for (i = 0; i < LAST_BANDB_TYPE; i++)
 	{
 		rsdb_exec_fetch(&table, "SELECT mask1,mask2,oper,reason FROM %s WHERE 1",
 				bandb_table[i]);
 
-		for(j = 0; j < table.row_count; j++)
+		for (j = 0; j < table.row_count; j++)
 		{
 			if(i == BANDB_KLINE)
 				rb_snprintf(buf, sizeof(buf), "%c %s %s %s :%s",
-					bandb_letter[i], table.row[j][0],
-					table.row[j][1], table.row[j][2],
-					table.row[j][3]);
+					    bandb_letter[i], table.row[j][0],
+					    table.row[j][1], table.row[j][2], table.row[j][3]);
 			else
 				rb_snprintf(buf, sizeof(buf), "%c %s %s :%s",
-					bandb_letter[i], table.row[j][0], 
-					table.row[j][2], table.row[j][3]);
+					    bandb_letter[i], table.row[j][0],
+					    table.row[j][2], table.row[j][3]);
 
 			rb_helper_write_queue(bandb_helper, "%s", buf);
 		}
-				
+
 		rsdb_exec_fetch_end(&table);
 	}
 
@@ -152,84 +150,119 @@ list_bans(void)
 }
 
 static void
-parse_request(rb_helper *helper)
+parse_request(rb_helper * helper)
 {
-	static char *parv[MAXPARA+1];
+	static char *parv[MAXPARA + 1];
 	static char readbuf[READBUF_SIZE];
 	int parc;
 	int len;
 
-		
-	while((len = rb_helper_read(helper, readbuf, sizeof(readbuf))) > 0)
+
+	while ((len = rb_helper_read(helper, readbuf, sizeof(readbuf))) > 0)
 	{
 		parc = rb_string_to_array(readbuf, parv, MAXPARA);
 
 		if(parc < 1)
 			continue;
 
-		switch(parv[0][0])
+		switch (parv[0][0])
 		{
-			case 'K':
-				parse_ban(BANDB_KLINE, parv, parc);
-				break;
+		case 'K':
+			parse_ban(BANDB_KLINE, parv, parc);
+			break;
 
-			case 'D':
-				parse_ban(BANDB_DLINE, parv, parc);
-				break;
+		case 'D':
+			parse_ban(BANDB_DLINE, parv, parc);
+			break;
 
-			case 'X':
-				parse_ban(BANDB_XLINE, parv, parc);
-				break;
+		case 'X':
+			parse_ban(BANDB_XLINE, parv, parc);
+			break;
 
-			case 'R':
-				parse_ban(BANDB_RESV, parv, parc);
-				break;
+		case 'R':
+			parse_ban(BANDB_RESV, parv, parc);
+			break;
 
-			case 'k':
-				parse_unban(BANDB_KLINE, parv, parc);
-				break;
+		case 'k':
+			parse_unban(BANDB_KLINE, parv, parc);
+			break;
 
-			case 'd':
-				parse_unban(BANDB_DLINE, parv, parc);
-				break;
+		case 'd':
+			parse_unban(BANDB_DLINE, parv, parc);
+			break;
 
-			case 'x':
-				parse_unban(BANDB_XLINE, parv, parc);
-				break;
+		case 'x':
+			parse_unban(BANDB_XLINE, parv, parc);
+			break;
 
-			case 'r':
-				parse_unban(BANDB_RESV, parv, parc);
-				break;
+		case 'r':
+			parse_unban(BANDB_RESV, parv, parc);
+			break;
 
-			case 'L':
-				list_bans();
-				break;
-			default:
-				break;
+		case 'L':
+			list_bans();
+			break;
+		default:
+			break;
 		}
 	}
 }
-		
+
 
 static void
-error_cb(rb_helper *helper)
+error_cb(rb_helper * helper)
 {
 	exit(1);
 }
 
+static void
+dummy_handler(int sig)
+{
+	return;
+}
+
+static void
+setup_signals()
+{
+	struct sigaction act;
+
+	act.sa_flags = 0;
+	act.sa_handler = SIG_IGN;
+	sigemptyset(&act.sa_mask);
+	sigaddset(&act.sa_mask, SIGPIPE);
+	sigaddset(&act.sa_mask, SIGALRM);
+#ifdef SIGTRAP
+	sigaddset(&act.sa_mask, SIGTRAP);
+#endif
+
+#ifdef SIGWINCH
+	sigaddset(&act.sa_mask, SIGWINCH);
+	sigaction(SIGWINCH, &act, 0);
+#endif
+	sigaction(SIGPIPE, &act, 0);
+#ifdef SIGTRAP
+	sigaction(SIGTRAP, &act, 0);
+#endif
+
+	act.sa_handler = dummy_handler;
+	sigaction(SIGALRM, &act, 0);
+}
+
+
 int
 main(int argc, char *argv[])
 {
-
-	bandb_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 256, 256, 256); /* XXX fix me */
+	setup_signals();
+	bandb_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 256, 256, 256);	/* XXX fix me */
 	if(bandb_helper == NULL)
 	{
-		fprintf(stderr, "This is ircd-ratbox bandb.  You aren't supposed to run me directly.\n");
-                fprintf(stderr, "However I will print my Id tag $Id$\n");
+		fprintf(stderr,
+			"This is ircd-ratbox bandb.  You aren't supposed to run me directly.\n");
+		fprintf(stderr,
+			"However I will print my Id tag $Id$\n");
 		fprintf(stderr, "Have a nice day\n");
 		exit(1);
 	}
-
 	rsdb_init();
 	check_schema();
 	rb_helper_loop(bandb_helper, 0);
@@ -243,16 +276,17 @@ check_schema(void)
 	struct rsdb_table table;
 	int i;
 
-	for(i = 0; i < LAST_BANDB_TYPE; i++)
+	for (i = 0; i < LAST_BANDB_TYPE; i++)
 	{
-		rsdb_exec_fetch(&table, "SELECT name FROM sqlite_master WHERE type='table' AND name='%s'",
+		rsdb_exec_fetch(&table,
+				"SELECT name FROM sqlite_master WHERE type='table' AND name='%s'",
 				bandb_table[i]);
 
 		rsdb_exec_fetch_end(&table);
 
 		if(!table.row_count)
-			rsdb_exec(NULL, "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, reason TEXT)",
-					bandb_table[i]);
+			rsdb_exec(NULL,
+				  "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, reason TEXT)",
+				  bandb_table[i]);
 	}
 }
-
