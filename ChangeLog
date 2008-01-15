@@ -1,3 +1,11 @@
+androsyn    2008/01/15 16:50:29 UTC	(20080115_0-24944)
+  Log:
+  set file descriptors non blocking and the like after receiving them from another process
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/01/14 20:44:42 UTC	(20080114_0-24940)
   Log:
   have bandb use rb_help_write_queue as it can end up sending a lot of data
