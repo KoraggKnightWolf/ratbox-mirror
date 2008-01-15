@@ -254,6 +254,8 @@ make_conn(mod_ctl_t *ctl, rb_fde_t * mod_fd, rb_fde_t * plain_fd)
 	conn->plain_fd = plain_fd;
 	conn->id = -1;
 	conn->stream = NULL;
+	rb_set_nb(mod_fd);
+	rb_set_nb(plain_fd);
 	return conn;
 }
 
@@ -581,6 +583,7 @@ ssl_process_accept(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	conn_t *conn;
 	rb_int32_t id;
+
 	conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
 
 	id = buf_to_int32(&ctlb->buf[1]);
@@ -1033,15 +1036,20 @@ main(int argc, char **argv)
 		if(x != ctlfd && x != pipefd && x > 2)
 			close(x);
 	}
+
 	x = open("/dev/null", O_RDWR);
-	if(ctlfd != 0 && pipefd != 0)
-		dup2(x, 0);
-	if(ctlfd != 1 && pipefd != 1)
-		dup2(x, 1);
-	if(ctlfd != 2 && pipefd != 2)
-		dup2(x, 2);
-	if(x > 2)
-		close(x);
+	if(x >= 0)
+	{
+		if(ctlfd != 0 && pipefd != 0)
+			dup2(x, 0);
+		if(ctlfd != 1 && pipefd != 1)
+			dup2(x, 1);
+		if(ctlfd != 2 && pipefd != 2)
+			dup2(x, 2);
+		if(x > 2)
+			close(x);
+	}
+
 	setup_signals();
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);
@@ -1050,6 +1058,8 @@ main(int argc, char **argv)
 	ctl = rb_malloc(sizeof(mod_ctl_t));
 	ctl->F = rb_open(ctlfd, RB_FD_SOCKET, "ircd control socket");
 	ctl->F_pipe = rb_open(pipefd, RB_FD_PIPE, "ircd pipe");
+	rb_set_nb(ctl->F);
+	rb_set_nb(ctl->F_pipe);
 	rb_event_addish("clean_dead_conns", clean_dead_conns, NULL, 10);
 	read_pipe_ctl(ctl->F_pipe, NULL);
 	mod_read_ctl(ctl->F, ctl);
