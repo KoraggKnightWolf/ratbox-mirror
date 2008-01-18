@@ -142,7 +142,7 @@ void
 load_static_modules(void)
 {
 	int x = 1;
-	char *p, *basename;
+	char *p, *xbasename;
 	lt_dlhandle tmpptr = NULL;
 	int *mapi_version;
 	const char *ver;
@@ -156,8 +156,8 @@ load_static_modules(void)
 	{
 		if(lt_preloaded_symbols[x].address == NULL)		
 		{
-			basename = LOCAL_COPY(lt_preloaded_symbols[x].name);
-			p = strchr(basename, '.');
+			xbasename = LOCAL_COPY(lt_preloaded_symbols[x].name);
+			p = strchr(xbasename, '.');
 			if(p != NULL)
 				*p = '\0';
 
@@ -170,14 +170,14 @@ load_static_modules(void)
 			if(mapi_version == NULL)
 			{
 				char buf[512];
-				rb_strlcpy(buf, basename, sizeof(buf));
+				rb_strlcpy(buf, xbasename, sizeof(buf));
 				rb_strlcat(buf, "_LTX__mheader", sizeof(buf));
 				mapi_version = (int *) (rb_uintptr_t) lt_dlsym(tmpptr, buf);
 			}
 
 			if(mapi_version == NULL || MAPI_MAGIC(*mapi_version) != MAPI_MAGIC_HDR)		
 			{
-				ilog(L_MAIN, "Data format error: module %s has no MAPI header.", basename);
+				ilog(L_MAIN, "Data format error: module %s has no MAPI header.", xbasename);
 				abort();
 			}
 
@@ -189,7 +189,7 @@ load_static_modules(void)
 					if(mheader->mapi_register && (mheader->mapi_register() == -1))
 					{
 						
-						ilog(L_MAIN, "Module %s indicated failure during load.", basename);
+						ilog(L_MAIN, "Module %s indicated failure during load.", xbasename);
 						abort();
 					}
 				
@@ -221,7 +221,7 @@ load_static_modules(void)
 				default:
 				{
 					ilog(L_MAIN, "Module %s has unknown/unsupported MAPI version %d.", 
-						     basename, MAPI_VERSION(*mapi_version));
+						     xbasename, MAPI_VERSION(*mapi_version));
 					abort();
 				}
 			}
@@ -235,7 +235,7 @@ load_static_modules(void)
 			modlist[num_mods]->address = tmpptr;
 			modlist[num_mods]->version = ver;
 			modlist[num_mods]->core = 1;
-			modlist[num_mods]->name = rb_strdup(basename);
+			modlist[num_mods]->name = rb_strdup(xbasename);
 			modlist[num_mods]->mapi_header = mapi_version;
 			modlist[num_mods]->mapi_version = MAPI_VERSION(*mapi_version);
 			num_mods++;
