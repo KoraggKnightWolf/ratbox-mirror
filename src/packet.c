@@ -294,6 +294,13 @@ read_packet(rb_fde_t *F, void *data)
 			}
 	
 		}
+
+		/* bail if short read */
+		if(length < READBUF_SIZE)
+		{
+			rb_setselect(client_p->localClient->F, RB_SELECT_READ, read_packet, client_p);
+			return;
+		}
 	}
 }
 
