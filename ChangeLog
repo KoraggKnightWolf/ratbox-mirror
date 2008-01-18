@@ -1,3 +1,11 @@
+androsyn    2008/01/18 00:10:14 UTC	(20080118_0-24964)
+  Log:
+  bail out of read_packet if you we get a short read as this should work with edge triggered i/o
+
+  Modified:
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+
+
 androsyn    2008/01/15 17:20:47 UTC	(20080115_2-24948)
   Log:
   Handle signals in helpers.  Also run through indent
