@@ -560,6 +560,8 @@ fi
 
 dnl lets see what libtool thinks our suffix is...
 AC_MSG_CHECKING([for shared library suffix])
+dnl this whole thing is a big hack...
+module=yes
 eval SHLIBEXT=\"$shrext_cmds\"
 AC_MSG_RESULT($SHLIBEXT)
 AC_SUBST(SHLIBEXT,$SHLIBEXT)
