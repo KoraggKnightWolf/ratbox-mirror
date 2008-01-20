@@ -1,3 +1,12 @@
+androsyn    2008/01/20 19:20:42 UTC	(20080120_2-24972)
+  Log:
+  oops forgot to add Makefile.in and Makefile.am
+
+  Modified:
+	ircd-ratbox/trunk/src/Makefile.am (File Added) 
+	ircd-ratbox/trunk/src/Makefile.in (File Added) 
+
+
 androsyn    2008/01/20 19:12:34 UTC	(20080120_1-24970)
   Log:
   more makefile cleanups
