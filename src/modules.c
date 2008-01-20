@@ -38,9 +38,10 @@
 #include "parse.h"
 #include "match.h"
 
+
+#ifndef STATIC_MODULES
+
 #include "ltdl.h"
-
-
 struct module **modlist = NULL;
 static char unknown_ver[] = "<unknown>";
 static const char *core_module_table[] = {
@@ -66,8 +67,6 @@ int max_mods = MODS_INCREMENT;
 static rb_dlink_list mod_paths;
 
 static void increase_modlist(void);
-
-#ifndef STATIC_MODULES
 
 static int mo_modload(struct Client *, struct Client *, int, const char **);
 static int mo_modreload(struct Client *, struct Client *, int, const char **);
@@ -95,7 +94,6 @@ struct Message modrestart_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_modrestart, 0}}
 };
 
-#endif
 
 static int mo_modlist(struct Client *, struct Client *, int, const char **);
 
@@ -105,20 +103,13 @@ struct Message modlist_msgtab = {
 };
 
 
-
-
 extern struct Message error_msgtab;
-
-#ifdef STATIC_MODULES
-extern const lt_dlsymlist lt_preloaded_symbols[];
-#endif
+#endif /* !STATIC_MODULES */
 
 void
 modules_init(void)
 {
-#ifdef STATIC_MODULES
-	lt_dlpreload_default(lt_preloaded_symbols);
-#endif
+#ifndef STATIC_MODULES
 	if(lt_dlinit())
 	{
 		ilog(L_MAIN, "lt_dlinit failed");
@@ -126,126 +117,16 @@ modules_init(void)
 	}
 
 	modlist = rb_malloc(sizeof(struct module) * (MODS_INCREMENT));
-
-#ifndef STATIC_MODULES
 	mod_add_cmd(&modload_msgtab);
 	mod_add_cmd(&modunload_msgtab);
 	mod_add_cmd(&modreload_msgtab);
 	mod_add_cmd(&modrestart_msgtab);
-#endif
 	mod_add_cmd(&modlist_msgtab); /* have modlist if we are static or not */
-
-}
-
-#ifdef STATIC_MODULES
-void
-load_static_modules(void)
-{
-	int x = 1;
-	char *p, *xbasename;
-	lt_dlhandle tmpptr = NULL;
-	int *mapi_version;
-	const char *ver;
-
-	/* i'm going to hell for this..i know it */
-	/* note that we abort() in here because if any failures happen in here..something is broken badly */
-	
-	modules_init();
-    
-	while(lt_preloaded_symbols[x].name != NULL)
-	{
-		if(lt_preloaded_symbols[x].address == NULL)		
-		{
-			xbasename = LOCAL_COPY(lt_preloaded_symbols[x].name);
-			p = strchr(xbasename, '.');
-			if(p != NULL)
-				*p = '\0';
-
-			tmpptr = lt_dlopen(lt_preloaded_symbols[x].name);
-			if(tmpptr == NULL) 
-				abort();
-
-			mapi_version = (int *) (rb_uintptr_t) lt_dlsym(tmpptr, "_mheader");
-
-			if(mapi_version == NULL)
-			{
-				char buf[512];
-				rb_strlcpy(buf, xbasename, sizeof(buf));
-				rb_strlcat(buf, "_LTX__mheader", sizeof(buf));
-				mapi_version = (int *) (rb_uintptr_t) lt_dlsym(tmpptr, buf);
-			}
-
-			if(mapi_version == NULL || MAPI_MAGIC(*mapi_version) != MAPI_MAGIC_HDR)		
-			{
-				ilog(L_MAIN, "Data format error: module %s has no MAPI header.", xbasename);
-				abort();
-			}
-
-			switch (MAPI_VERSION(*mapi_version))
-			{
-				case 1:
-				{
-					struct mapi_mheader_av1 *mheader = (struct mapi_mheader_av1 *) mapi_version;	/* see above */
-					if(mheader->mapi_register && (mheader->mapi_register() == -1))
-					{
-						
-						ilog(L_MAIN, "Module %s indicated failure during load.", xbasename);
-						abort();
-					}
-				
-					if(mheader->mapi_command_list)
-					{
-						struct Message **m;
-						for (m = mheader->mapi_command_list; *m; ++m)
-							mod_add_cmd(*m);
-					}
-
-					if(mheader->mapi_hook_list)
-					{
-						mapi_hlist_av1 *m;
-						for (m = mheader->mapi_hook_list; m->hapi_name; ++m)
-							*m->hapi_id = register_hook(m->hapi_name);
-					}
-
-					if(mheader->mapi_hfn_list)
-					{
-						mapi_hfn_list_av1 *m;
-						for (m = mheader->mapi_hfn_list; m->hapi_name; ++m)
-							add_hook(m->hapi_name, m->hookfn);
-					}
-
-					ver = mheader->mapi_module_version;
-					break;
-				}
-				
-				default:
-				{
-					ilog(L_MAIN, "Module %s has unknown/unsupported MAPI version %d.", 
-						     xbasename, MAPI_VERSION(*mapi_version));
-					abort();
-				}
-			}
-
-			if(ver == NULL)
-				ver = unknown_ver;
-
-			increase_modlist();
-
-			modlist[num_mods] = rb_malloc(sizeof(struct module));
-			modlist[num_mods]->address = tmpptr;
-			modlist[num_mods]->version = ver;
-			modlist[num_mods]->core = 1;
-			modlist[num_mods]->name = rb_strdup(xbasename);
-			modlist[num_mods]->mapi_header = mapi_version;
-			modlist[num_mods]->mapi_version = MAPI_VERSION(*mapi_version);
-			num_mods++;
-
-		}
-		x++;
-	}
-}
 #endif
 
+}
+
+#ifndef STATIC_MODULES
 /* mod_find_path()
  *
  * input	- path
@@ -488,7 +369,7 @@ load_one_module(const char *path, int coremodule)
 	return -1;
 }
 
-#ifndef STATIC_MODULES
+
 /* load a module .. */
 static int
 mo_modload(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
@@ -633,7 +514,6 @@ mo_modrestart(struct Client *client_p, struct Client *source_p, int parc, const 
 	ilog(L_MAIN, "Module Restart: %d modules unloaded, %d modules loaded", modnum, num_mods);
 	return 0;
 }
-#endif
 
 /* list modules .. */
 static int
@@ -673,7 +553,6 @@ mo_modlist(struct Client *client_p, struct Client *source_p, int parc, const cha
 	sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFMODLIST), me.name, source_p->name);
 	return 0;
 }
-
 
 /* unload_one_module()
  *
@@ -775,10 +654,6 @@ load_a_module(const char *path, int warn, int core)
 		rb_free(mod_basename);
 		return -1;
 	}
-#ifdef STATIC_MODULES
-	
-
-#endif
 
 	/*
 	 * _mheader is actually a struct mapi_mheader_*, but mapi_version
@@ -895,5 +770,65 @@ increase_modlist(void)
 	modlist = rb_realloc(modlist, sizeof(struct module) * (max_mods + MODS_INCREMENT));
 	max_mods += MODS_INCREMENT;
 }
-
+#endif /* !STATIC_MODULES */
  
+
+#ifdef STATIC_MODULES
+extern const struct mapi_header_av1 *static_mapi_headers[];
+void load_static_modules(void)
+{
+	int x;
+	const int *mapi_version;
+	
+	modules_init();
+	for(x = 0; static_mapi_headers[x] != NULL; x++)
+	{
+		mapi_version = (const int *)static_mapi_headers[x];
+		if(MAPI_MAGIC(*mapi_version) != MAPI_MAGIC_HDR)
+		{
+			ilog(L_MAIN, "Error: linked in module without a MAPI header..giving up");
+			exit(70);
+		} 	
+		switch(MAPI_VERSION(*mapi_version))
+		{
+			case 1:
+			{
+				const struct mapi_mheader_av1 *mheader = (const struct mapi_mheader_av1 *)mapi_version;
+				if (mheader->mapi_register && (mheader->mapi_register() == -1))
+				{
+					ilog(L_MAIN, "Error: linked in module failed loading..giving up");
+					exit(70);
+				}
+				
+				if(mheader->mapi_command_list)
+				{
+					struct Message **m;
+					for(m = mheader->mapi_command_list; *m; ++m)
+						mod_add_cmd(*m);
+				}
+				
+				if(mheader->mapi_hook_list)
+				{
+					mapi_hlist_av1 *m;
+					for(m = mheader->mapi_hook_list; m->hapi_name; ++m)
+						*m->hapi_id = register_hook(m->hapi_name);
+				}	
+				
+				if(mheader->mapi_hfn_list)
+				{
+					mapi_hfn_list_av1 *m;
+					for(m = mheader->mapi_hfn_list; m->hapi_name; ++m)
+						add_hook(m->hapi_name, m->hookfn);
+						
+				}
+				break;
+			}	
+			default:
+			{
+				ilog(L_MAIN, "Error: Unknown MAPI version (%d)in linked in module..giving up", MAPI_VERSION(*mapi_version));
+				exit(70);
+			}				
+		}
+	}
+}
+#endif
