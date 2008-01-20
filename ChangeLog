@@ -1,3 +1,14 @@
+androsyn    2008/01/20 19:33:51 UTC	(20080120_3-24974)
+  Log:
+  fixed shared library extension stuff on darwin
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/ltmain.sh (File Modified) 
+
+
 androsyn    2008/01/20 19:20:42 UTC	(20080120_2-24972)
   Log:
   oops forgot to add Makefile.in and Makefile.am
