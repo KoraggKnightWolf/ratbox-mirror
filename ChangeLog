@@ -1,3 +1,12 @@
+androsyn    2008/01/20 19:47:23 UTC	(20080120_5-24982)
+  Log:
+  more SHLIBEXT hackishness
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2008/01/20 19:34:57 UTC	(20080120_4-24976)
   Log:
   add Id tag to install-mod.sh.in
