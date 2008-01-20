@@ -1,3 +1,12 @@
+androsyn    2008/01/20 20:25:22 UTC	(20080120_6-24984)
+  Log:
+  helps if we install modules into the correct directory
+
+  Modified:
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+
+
 androsyn    2008/01/20 19:47:23 UTC	(20080120_5-24982)
   Log:
   more SHLIBEXT hackishness
