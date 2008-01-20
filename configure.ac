@@ -114,7 +114,7 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
 
-AC_CHECK_HEADERS([sys/types.h sys/resource.h sys/param.h sys/stat.h netinet/in.h arpa/inet.h errno.h stddef.h ])
+AC_CHECK_HEADERS([sys/types.h sys/resource.h sys/param.h sys/stat.h sys/socket.h netinet/in.h arpa/inet.h errno.h stddef.h ])
 AC_HEADER_TIME
 
 AC_CHECK_FUNCS([snprintf])
@@ -123,21 +123,6 @@ dnl Networking Functions
 dnl ====================
 
 AC_SEARCH_LIBS(socket, [socket],,)
-
-
-AC_CHECK_MEMBER([struct sockaddr.sa_len], [AC_DEFINE(SOCKADDR_IN_HAS_LEN, 1, [Define to 1 if sockaddr has a 'sa_len'
-member.])],,[[
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
-#ifdef HAVE_WINSOCK2_H
-#include <winsock2.h>
-#endif
-]])
-
 
 dnl this gets passed on to the libratbox configure
 AC_ARG_ENABLE(ipv6,

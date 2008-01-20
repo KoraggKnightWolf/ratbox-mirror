@@ -108,6 +108,9 @@
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #undef HAVE_SYS_RESOURCE_H
 
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#undef HAVE_SYS_SOCKET_H
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
@@ -191,9 +194,6 @@
 
 /* Extension that shared libs use */
 #undef SHLIBEXT
-
-/* Define to 1 if sockaddr has a 'sa_len' member. */
-#undef SOCKADDR_IN_HAS_LEN
 
 /* Define this to enable soft asserts. */
 #undef SOFT_ASSERT
