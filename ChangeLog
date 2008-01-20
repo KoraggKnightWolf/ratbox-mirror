@@ -1,3 +1,11 @@
+androsyn    2008/01/20 23:49:58 UTC	(20080120_9-24992)
+  Log:
+  clear event handlers when doing PLAIN_WAIT
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/01/20 22:59:17 UTC	(20080120_8-24990)
   Log:
   Remove the sa_len check as libratbox handles this
