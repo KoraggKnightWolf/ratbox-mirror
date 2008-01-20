@@ -20,8 +20,6 @@ if !STATIC_MODULES
 
 if MINGW
 MODULE_LIBS = ../libratbox/src/libratbox.la ../libcore.la @SSL_LIBS@ 
-else
-MODULE_LIBS = @SSL_LIBS@
 endif # MINGW
 
 
@@ -54,7 +52,7 @@ m_map_la_LDFLAGS =  -module $(MODULE_FLAGS)
 m_monitor_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 m_motd_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 m_names_la_LDFLAGS =  -module $(MODULE_FLAGS)  
-m_oper_la_LDFLAGS =  -module $(MODULE_FLAGS)  
+m_oper_la_LDFLAGS =  -module $(MODULE_FLAGS) @SSL_LIBS@
 m_operspy_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 m_pass_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 m_ping_la_LDFLAGS =  -module $(MODULE_FLAGS)  

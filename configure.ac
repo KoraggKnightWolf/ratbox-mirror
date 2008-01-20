@@ -582,6 +582,7 @@ AC_CONFIG_FILES(		\
 	help/Makefile		\
 	sqlite3/Makefile	\
 	modules/Makefile	\
+	src/Makefile		\
 	install-mod.sh
 )
 

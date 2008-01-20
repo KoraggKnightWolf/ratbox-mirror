@@ -25058,7 +25058,7 @@ _ACEOF
 
 
 
-ac_config_files="$ac_config_files Makefile bandb/Makefile ssld/Makefile ident/Makefile resolver/adns/Makefile resolver/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile sqlite3/Makefile install-mod.sh modules/Makefile"
+ac_config_files="$ac_config_files Makefile bandb/Makefile ssld/Makefile ident/Makefile resolver/adns/Makefile resolver/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile sqlite3/Makefile modules/Makefile src/Makefile install-mod.sh"
 
 
 cat >confcache <<\_ACEOF
@@ -25700,6 +25700,8 @@ do
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "help/Makefile") CONFIG_FILES="$CONFIG_FILES help/Makefile" ;;
     "sqlite3/Makefile") CONFIG_FILES="$CONFIG_FILES sqlite3/Makefile" ;;
+    "modules/Makefile") CONFIG_FILES="$CONFIG_FILES modules/Makefile" ;;
+    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "install-mod.sh") CONFIG_FILES="$CONFIG_FILES install-mod.sh" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
