@@ -1,3 +1,13 @@
+androsyn    2008/01/20 22:59:17 UTC	(20080120_8-24990)
+  Log:
+  Remove the sa_len check as libratbox handles this
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+
+
 androsyn    2008/01/20 20:26:31 UTC	(20080120_7-24986)
   Log:
   add it also helps if we create the correct directory
