@@ -232,6 +232,7 @@ close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 		rb_dlinkAdd(conn, &conn->node, &dead_list);
 		return;
 	}
+	rb_setselect(conn->plain_fd, RB_SELECT_WRITE|RB_SELECT_READ, NULL, NULL);
 	va_start(ap, fmt);
 	rb_vsnprintf(reason, sizeof(reason), fmt, ap);
 	va_end(ap);
