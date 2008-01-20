@@ -1,3 +1,12 @@
+androsyn    2008/01/20 20:26:31 UTC	(20080120_7-24986)
+  Log:
+  add it also helps if we create the correct directory
+
+  Modified:
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+
+
 androsyn    2008/01/20 20:25:22 UTC	(20080120_6-24984)
   Log:
   helps if we install modules into the correct directory
