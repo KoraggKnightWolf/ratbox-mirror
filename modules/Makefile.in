@@ -1878,7 +1878,7 @@ uninstall-am: uninstall-coreLTLIBRARIES \
 
 @STATIC_MODULES_FALSE@install-modulesLTLIBRARIES: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 @STATIC_MODULES_FALSE@	-@$(MKDIR_P) $(DESTDIR)$(moduledir); \
-@STATIC_MODULES_FALSE@	for x in $(modules_LTLIBRARIES) $(services_LTLIBRARIES); do $(SHELL) ../install-mod.sh $$x $(DESTDIR)$(moduledir);done
+@STATIC_MODULES_FALSE@	for x in $(modules_LTLIBRARIES) $(services_LTLIBRARIES); do $(SHELL) ../install-mod.sh $$x $(DESTDIR)$(modulesdir);done
 
 @STATIC_MODULES_FALSE@install-coreLTLIBRARIES: $(core_LTLIBRARIES)
 @STATIC_MODULES_FALSE@	-@$(MKDIR_P) $(DESTDIR)$(coredir); \

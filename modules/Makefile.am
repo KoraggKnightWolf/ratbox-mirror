@@ -313,7 +313,7 @@ modules_core: $(core_LTLIBRARIES)
 
 install-modulesLTLIBRARIES: $(modules_LTLIBRARIES) $(services_LTLIBRARIES)
 	-@$(MKDIR_P) $(DESTDIR)$(moduledir); \
-	for x in $(modules_LTLIBRARIES) $(services_LTLIBRARIES); do $(SHELL) ../install-mod.sh $$x $(DESTDIR)$(moduledir);done
+	for x in $(modules_LTLIBRARIES) $(services_LTLIBRARIES); do $(SHELL) ../install-mod.sh $$x $(DESTDIR)$(modulesdir);done
 
 install-coreLTLIBRARIES: $(core_LTLIBRARIES)
 	-@$(MKDIR_P) $(DESTDIR)$(coredir); \
