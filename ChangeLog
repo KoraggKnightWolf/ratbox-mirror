@@ -1,3 +1,16 @@
+androsyn    2008/01/20 19:12:34 UTC	(20080120_1-24970)
+  Log:
+  more makefile cleanups
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+
+
 androsyn    2008/01/20 00:54:33 UTC	(20080120_0-24968)
   Log:
   Rework the module install system and the like. Skip using libtool to install shared modules.
