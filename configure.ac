@@ -278,7 +278,7 @@ AC_CHECK_HEADER(sqlite3.h, [
 if test "$ac_cv_build_sqlite3" = yes; then
 	SQLITE_SUBDIR=sqlite3
 	AC_SUBST(SQLITE_SUBDIR)
-	AC_SUBST(SQLITE_INCLUDES, [-I../sqlite3/])
+	AC_SUBST(SQLITE_INCLUDES, [-Isqlite3])
 	save_LIBS=$LIBS
 	AC_SEARCH_LIBS(fdatasync, [rt],,)
 	FDATASYNCLIB=$ac_cv_search_fdatasync
@@ -292,7 +292,7 @@ if test "$ac_cv_build_sqlite3" = yes; then
 		unset FDATASYNCLIB
 	fi
         	
-	SQLITE_LD="$FDATASYNCLIB ../sqlite3/libsqlite3.a"
+	SQLITE_LD="$FDATASYNCLIB sqlite3/libsqlite3.a"
 	AC_SUBST(SQLITE_LD, $SQLITE_LD)
 	
 fi
@@ -559,6 +559,7 @@ AC_SUBST(IRCD_PREFIX)
 AC_CONFIG_FILES(		\
 	Makefile		\
 	bandb/Makefile		\
+	bandb/sqlite3/Makefile	\
 	ssld/Makefile		\
 	ident/Makefile		\
 	resolver/adns/Makefile	\
@@ -567,7 +568,6 @@ AC_CONFIG_FILES(		\
 	tools/Makefile		\
 	doc/Makefile		\
 	help/Makefile		\
-	sqlite3/Makefile	\
 	modules/Makefile	\
 	src/Makefile		\
 	install-mod.sh

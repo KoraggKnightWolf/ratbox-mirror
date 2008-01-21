@@ -23980,7 +23980,7 @@ fi
 if test "$ac_cv_build_sqlite3" = yes; then
 	SQLITE_SUBDIR=sqlite3
 
-	SQLITE_INCLUDES=-I../sqlite3/
+	SQLITE_INCLUDES=-Isqlite3
 
 	save_LIBS=$LIBS
 	{ echo "$as_me:$LINENO: checking for library containing fdatasync" >&5
@@ -24077,7 +24077,7 @@ fi
 		unset FDATASYNCLIB
 	fi
 
-	SQLITE_LD="$FDATASYNCLIB ../sqlite3/libsqlite3.a"
+	SQLITE_LD="$FDATASYNCLIB sqlite3/libsqlite3.a"
 	SQLITE_LD=$SQLITE_LD
 
 
@@ -24934,7 +24934,7 @@ _ACEOF
 
 
 
-ac_config_files="$ac_config_files Makefile bandb/Makefile ssld/Makefile ident/Makefile resolver/adns/Makefile resolver/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile sqlite3/Makefile modules/Makefile src/Makefile install-mod.sh"
+ac_config_files="$ac_config_files Makefile bandb/Makefile bandb/sqlite3/Makefile ssld/Makefile ident/Makefile resolver/adns/Makefile resolver/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile modules/Makefile src/Makefile install-mod.sh"
 
 
 cat >confcache <<\_ACEOF
@@ -25567,6 +25567,7 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "bandb/Makefile") CONFIG_FILES="$CONFIG_FILES bandb/Makefile" ;;
+    "bandb/sqlite3/Makefile") CONFIG_FILES="$CONFIG_FILES bandb/sqlite3/Makefile" ;;
     "ssld/Makefile") CONFIG_FILES="$CONFIG_FILES ssld/Makefile" ;;
     "ident/Makefile") CONFIG_FILES="$CONFIG_FILES ident/Makefile" ;;
     "resolver/adns/Makefile") CONFIG_FILES="$CONFIG_FILES resolver/adns/Makefile" ;;
@@ -25575,7 +25576,6 @@ do
     "tools/Makefile") CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "help/Makefile") CONFIG_FILES="$CONFIG_FILES help/Makefile" ;;
-    "sqlite3/Makefile") CONFIG_FILES="$CONFIG_FILES sqlite3/Makefile" ;;
     "modules/Makefile") CONFIG_FILES="$CONFIG_FILES modules/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "install-mod.sh") CONFIG_FILES="$CONFIG_FILES install-mod.sh" ;;

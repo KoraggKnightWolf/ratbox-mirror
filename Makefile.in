@@ -98,8 +98,8 @@ RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = libratbox libltdl src modules tools doc help \
-	@SQLITE_SUBDIR@ bandb ssld resolver ident
+DIST_SUBDIRS = libratbox libltdl src modules tools doc help bandb ssld \
+	resolver ident @SQLITE_SUBDIR@
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -263,7 +263,7 @@ servicesdir = @moduledir@/autoload
 AM_CFLAGS = $(WARNFLAGS)
 ircd_SOURCES = src/main.c
 @MINGW_TRUE@EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
-@STATIC_MODULES_FALSE@SUBDIRS = libratbox libltdl src modules tools doc help @SQLITE_SUBDIR@ bandb ssld resolver ident
+@STATIC_MODULES_FALSE@SUBDIRS = libratbox libltdl src modules tools doc help bandb ssld resolver ident
 @STATIC_MODULES_TRUE@SUBDIRS = libratbox libltdl modules src tools doc help @SQLITE_SUBDIR@ bandb ssld resolver ident
 @STATIC_MODULES_FALSE@ircd_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
 @STATIC_MODULES_TRUE@ircd_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)

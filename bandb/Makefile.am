@@ -1,6 +1,10 @@
 #
 # $Id$
 #
+AUTOMAKE_OPTIONS = foreign subdir-objects
+
+SUBDIR = @SQLITE_SUBDIR@
+
 bin_PROGRAMS = bandb bantool
 AM_CFLAGS=$(WARNFLAGS)
 

@@ -24,7 +24,7 @@ endif
 
 if !STATIC_MODULES
 
-SUBDIRS = libratbox libltdl src modules tools doc help @SQLITE_SUBDIR@ bandb ssld resolver ident
+SUBDIRS = libratbox libltdl src modules tools doc help bandb ssld resolver ident
 ircd_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
 ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
