@@ -1,3 +1,12 @@
+androsyn    2008/01/21 01:19:42 UTC	(20080121_0-24994)
+  Log:
+  - work around some sparc alignment related issues
+  
+
+  Modified:
+	ircd-ratbox/trunk/resolver/adns/query.c (File Modified) 
+
+
 androsyn    2008/01/20 23:49:58 UTC	(20080120_9-24992)
   Log:
   clear event handlers when doing PLAIN_WAIT
