@@ -272,11 +272,13 @@ int adns_submit_reverse_ip6(adns_state ads,
   char shortbuf[100];
   char *buf, *buf_free;
   const unsigned char *cp;
+  struct sockaddr_in6 in6; 
   char *qp;
   int n, c, lreq, r;
-		
+  memcpy(&in6, addr, sizeof(in6));		
   if(addr->sa_family != AF_INET6) return ENOSYS;
-  cp = (const unsigned char *)&(((const struct sockaddr_in6*)addr) -> sin6_addr.s6_addr);
+   
+  cp = (const unsigned char *)&in6.sin6_addr.s6_addr;
 	lreq = 71 + strlen(zone) + 1;
   if (lreq > (int)sizeof(shortbuf)) {
     buf= malloc(strlen(zone) + 4*4 + 1);
@@ -310,12 +312,14 @@ int adns_submit_reverse_any(adns_state ads,
   const unsigned char *iaddr;
   char *buf, *buf_free;
   char shortbuf[100];
+  struct sockaddr_in in;
   int r, lreq;
 
   flags &= ~adns_qf_search;
 
   if (addr->sa_family != AF_INET) return ENOSYS;
-  iaddr= (const unsigned char*) &(((const struct sockaddr_in*)addr) -> sin_addr);
+  memcpy(&in, addr, sizeof(in));
+  iaddr= (const unsigned char*) &in.sin_addr;
 
   lreq= strlen(zone) + 4*4 + 1;
   if (lreq > (int)sizeof(shortbuf)) {
