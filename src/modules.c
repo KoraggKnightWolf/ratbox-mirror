@@ -325,6 +325,7 @@ load_core_modules(int warn)
 			exit(0);
 		}
 	}
+	closedir(core_dir);
 }
 
 /* load_one_module()
