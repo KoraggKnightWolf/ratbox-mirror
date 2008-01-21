@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign
 
 prefix		= @prefix@
-libcoredir	= @prefix@
+libcoredir	= @libdir@
 
 AM_YFLAGS = -d
 AM_CFLAGS = $(WARNFLAGS)
