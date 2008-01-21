@@ -1,3 +1,11 @@
+androsyn    2008/01/21 06:20:44 UTC	(20080121_2-25004)
+  Log:
+  closedir after opening modules/core
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2008/01/21 01:29:04 UTC	(20080121_1-24996)
   Log:
   change libcoredir to libdir instead of prefix...oops
