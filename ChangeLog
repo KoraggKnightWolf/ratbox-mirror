@@ -1,3 +1,20 @@
+androsyn    2008/01/21 06:58:00 UTC	(20080121_3-25008)
+  Log:
+  - Move sqlite3 into bandb/ and adjust makefiles etc
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/ (File Added) 
+	ircd-ratbox/trunk/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/sqlite3/ (File Deleted) 
+
+
 androsyn    2008/01/21 06:20:44 UTC	(20080121_2-25004)
   Log:
   closedir after opening modules/core
