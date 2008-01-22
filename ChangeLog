@@ -1,3 +1,12 @@
+androsyn    2008/01/22 16:22:51 UTC	(20080122_2-25014)
+  Log:
+  fix sqlite3 build
+
+  Modified:
+	ircd-ratbox/trunk/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+
+
 androsyn    2008/01/22 16:15:08 UTC	(20080122_1-25012)
   Log:
   minor tweak in makefiles
