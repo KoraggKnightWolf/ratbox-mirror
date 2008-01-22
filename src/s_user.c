@@ -617,11 +617,10 @@ report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
 		sendto_one_notice(source_p, HOLD_QUEUE, ":*** Spoofing your IP");
 	}
 
-	/* If this user is in the exception class, Set it "E lined" */
 	if(IsConfExemptKline(aconf))
 	{
 		SetExemptKline(source_p);
-		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from K/D/G/X lines");
+		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from K/G/X lines");
 	}
 
 	if(IsConfExemptGline(aconf))
