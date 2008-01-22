@@ -30,7 +30,7 @@ ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
 else
 
-SUBDIRS = libratbox libltdl modules src tools doc help @SQLITE_SUBDIR@ bandb ssld resolver ident
+SUBDIRS = libratbox libltdl modules src tools doc help bandb ssld resolver ident
 ircd_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)
 
 
