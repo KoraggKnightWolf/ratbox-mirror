@@ -1,3 +1,11 @@
+androsyn    2008/01/22 00:01:58 UTC	(20080122_0-25010)
+  Log:
+  Kline exempt doesn't get you out of D lines, don't say as such
+
+  Modified:
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2008/01/21 06:58:00 UTC	(20080121_3-25008)
   Log:
   - Move sqlite3 into bandb/ and adjust makefiles etc
