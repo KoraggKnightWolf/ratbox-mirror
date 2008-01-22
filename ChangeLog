@@ -1,3 +1,12 @@
+androsyn    2008/01/22 16:15:08 UTC	(20080122_1-25012)
+  Log:
+  minor tweak in makefiles
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 androsyn    2008/01/22 00:01:58 UTC	(20080122_0-25010)
   Log:
   Kline exempt doesn't get you out of D lines, don't say as such
