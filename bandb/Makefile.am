@@ -3,7 +3,9 @@
 #
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-SUBDIR = @SQLITE_SUBDIR@
+if BUILD_SQLITE
+SUBDIRS = sqlite3
+endif
 
 bin_PROGRAMS = bandb bantool
 AM_CFLAGS=$(WARNFLAGS)
