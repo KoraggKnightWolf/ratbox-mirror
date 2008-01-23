@@ -1,3 +1,11 @@
+androsyn    2008/01/23 16:23:28 UTC	(20080123_4-25046)
+  Log:
+  fix an uninitialized use of a pointer
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2008/01/23 04:36:30 UTC	(20080123_3-25030)
   Log:
   use unsigned long long for collecting byte stats
