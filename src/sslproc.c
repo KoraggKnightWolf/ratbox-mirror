@@ -157,9 +157,9 @@ ssl_killall(void)
 	ssl_ctl_t *ctl;
 	RB_DLINK_FOREACH_SAFE(ptr, next, ssl_daemons.head)
 	{
+		ctl = ptr->data;
 		if(ctl->dead)
 			continue;
-		ctl = ptr->data;
 		ctl->dead = 1;
 		ssld_count--;
 		kill(ctl->pid, SIGKILL);
