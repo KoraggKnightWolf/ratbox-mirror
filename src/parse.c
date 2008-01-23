@@ -64,7 +64,7 @@ static char buffer[1024];
 /* turn a string into a parc/parv pair */
 
 
-inline int
+int
 string_to_array(char *string, char **parv)
 {
 	char *p, *buf = string;

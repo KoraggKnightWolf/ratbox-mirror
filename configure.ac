@@ -18,8 +18,16 @@ AC_PREFIX_DEFAULT(/usr/local/ircd)
 AC_GNU_SOURCE
 
 dnl Checks for programs.
-AM_PROG_LEX
 AC_PROG_CC
+AC_PROG_CC_C99
+
+if test x"$ac_cv_prog_cc_c99" = "xno"; then
+	AC_ERROR([ircd-ratbox requires a C99 capable compiler])
+fi
+
+
+AM_PROG_LEX
+
 AC_PROG_INSTALL
 AC_PROG_EGREP
 if test "$enable_static" = "yes"; then
