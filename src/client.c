@@ -1265,14 +1265,14 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 {
 	static char comment1[(HOSTLEN*2)+2];
 	static char newcomment[BUFSIZE];
-	unsigned int sendk, recvk;
+	unsigned long long int sendb, recvb;
 	
 	rb_dlinkDelete(&source_p->localClient->tnode, &serv_list);
 	rb_dlinkFindDestroy(source_p, &global_serv_list);
 	
 	unset_chcap_usage_counts(source_p);
-	sendk = source_p->localClient->sendK;
-	recvk = source_p->localClient->receiveK;
+	sendb = source_p->localClient->sendB;
+	recvb = source_p->localClient->receiveB;
 
 	/* Always show source here, so the server notices show
 	 * which side initiated the split -- jilles
@@ -1310,11 +1310,11 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 		remove_dependents(client_p, source_p, IsClient(from) ? newcomment : comment, comment1);
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s was connected"
-			     " for %ld seconds.  %d/%d sendK/recvK.",
-			     source_p->name, rb_current_time() - source_p->localClient->firsttime, sendk, recvk);
+			     " for %ld seconds.  %llu/%llu send/recv.",
+			     source_p->name, rb_current_time() - source_p->localClient->firsttime, sendb, recvb);
 
-	ilog(L_SERVER, "%s was connected for %ld seconds.  %d/%d sendK/recvK.",
-	     source_p->name, rb_current_time() - source_p->localClient->firsttime, sendk, recvk);
+	ilog(L_SERVER, "%s was connected for %ld seconds.  %llu/%llu send/recv.",
+	     source_p->name, rb_current_time() - source_p->localClient->firsttime, sendb, recvb);
 	
 	if(has_id(source_p))
 		del_from_hash(HASH_ID, source_p->id, source_p);
@@ -1369,11 +1369,11 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 
 	on_for = rb_current_time() - source_p->localClient->firsttime;
 
-	ilog(L_USER, "%s (%3lu:%02lu:%02lu): %s!%s@%s %d/%d",
+	ilog(L_USER, "%s (%3lu:%02lu:%02lu): %s!%s@%s %llu/%llu",
 		rb_ctime(rb_current_time(), tbuf, sizeof(tbuf)), on_for / 3600,
 		(on_for % 3600) / 60, on_for % 60,
 		source_p->name, source_p->username, source_p->host,
-		source_p->localClient->sendK, source_p->localClient->receiveK);
+		source_p->localClient->sendB, source_p->localClient->receiveB);
 
 	sendto_one(source_p, POP_QUEUE, "ERROR :Closing Link: %s (%s)", source_p->host, comment);
 	close_connection(source_p);
@@ -1746,19 +1746,7 @@ close_connection(struct Client *client_p)
 		ServerStats.is_sv++;
 		ServerStats.is_sbs += client_p->localClient->sendB;
 		ServerStats.is_sbr += client_p->localClient->receiveB;
-		ServerStats.is_sks += client_p->localClient->sendK;
-		ServerStats.is_skr += client_p->localClient->receiveK;
 		ServerStats.is_sti += rb_current_time() - client_p->localClient->firsttime;
-		if(ServerStats.is_sbs > 2047)
-		{
-			ServerStats.is_sks += (ServerStats.is_sbs >> 10);
-			ServerStats.is_sbs &= 0x3ff;
-		}
-		if(ServerStats.is_sbr > 2047)
-		{
-			ServerStats.is_skr += (ServerStats.is_sbr >> 10);
-			ServerStats.is_sbr &= 0x3ff;
-		}
 
 		/*
 		 * If the connection has been up for a long amount of time, schedule
@@ -1784,19 +1772,7 @@ close_connection(struct Client *client_p)
 		ServerStats.is_cl++;
 		ServerStats.is_cbs += client_p->localClient->sendB;
 		ServerStats.is_cbr += client_p->localClient->receiveB;
-		ServerStats.is_cks += client_p->localClient->sendK;
-		ServerStats.is_ckr += client_p->localClient->receiveK;
 		ServerStats.is_cti += rb_current_time() - client_p->localClient->firsttime;
-		if(ServerStats.is_cbs > 2047)
-		{
-			ServerStats.is_cks += (ServerStats.is_cbs >> 10);
-			ServerStats.is_cbs &= 0x3ff;
-		}
-		if(ServerStats.is_cbr > 2047)
-		{
-			ServerStats.is_ckr += (ServerStats.is_cbr >> 10);
-			ServerStats.is_cbr &= 0x3ff;
-		}
 	}
 	else
 		ServerStats.is_ni++;

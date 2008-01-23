@@ -336,20 +336,7 @@ client_dopacket(struct Client *client_p, char *buffer, size_t length)
 	 * Update bytes received
 	 */
 	client_p->localClient->receiveB += length;
-
-	if(client_p->localClient->receiveB > 1023)
-	{
-		client_p->localClient->receiveK += (client_p->localClient->receiveB >> 10);
-		client_p->localClient->receiveB &= 0x03ff;	/* 2^10 = 1024, 3ff = 1023 */
-	}
-
 	me.localClient->receiveB += length;
-
-	if(me.localClient->receiveB > 1023)
-	{
-		me.localClient->receiveK += (me.localClient->receiveB >> 10);
-		me.localClient->receiveB &= 0x03ff;
-	}
 
 	parse(client_p, buffer, buffer + length);
 }

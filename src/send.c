@@ -199,16 +199,6 @@ send_queued(struct Client *to)
 
 			to->localClient->sendB += retlen;
 			me.localClient->sendB += retlen;
-			if(to->localClient->sendB > 1023)
-			{
-				to->localClient->sendK += (to->localClient->sendB >> 10);
-				to->localClient->sendB &= 0x03ff;	/* 2^10 = 1024, 3ff = 1023 */
-			}
-			else if(me.localClient->sendB > 1023)
-			{
-				me.localClient->sendK += (me.localClient->sendB >> 10);
-				me.localClient->sendB &= 0x03ff;
-			}
 		}
 
 		if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))

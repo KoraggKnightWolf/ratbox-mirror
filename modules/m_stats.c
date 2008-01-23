@@ -918,20 +918,8 @@ stats_tstats(struct Client *source_p)
 
 		sp.is_sbs += target_p->localClient->sendB;
 		sp.is_sbr += target_p->localClient->receiveB;
-		sp.is_sks += target_p->localClient->sendK;
-		sp.is_skr += target_p->localClient->receiveK;
 		sp.is_sti += rb_current_time() - target_p->localClient->firsttime;
 		sp.is_sv++;
-		if(sp.is_sbs > 1023)
-		{
-			sp.is_sks += (sp.is_sbs >> 10);
-			sp.is_sbs &= 0x3ff;
-		}
-		if(sp.is_sbr > 1023)
-		{
-			sp.is_skr += (sp.is_sbr >> 10);
-			sp.is_sbr &= 0x3ff;
-		}
 	}
 
 	RB_DLINK_FOREACH(ptr, lclient_list.head)
@@ -940,21 +928,8 @@ stats_tstats(struct Client *source_p)
 
 		sp.is_cbs += target_p->localClient->sendB;
 		sp.is_cbr += target_p->localClient->receiveB;
-		sp.is_cks += target_p->localClient->sendK;
-		sp.is_ckr += target_p->localClient->receiveK;
 		sp.is_cti += rb_current_time() - target_p->localClient->firsttime;
 		sp.is_cl++;
-		if(sp.is_cbs > 1023)
-		{
-			sp.is_cks += (sp.is_cbs >> 10);
-			sp.is_cbs &= 0x3ff;
-		}
-		if(sp.is_cbr > 1023)
-		{
-			sp.is_ckr += (sp.is_cbr >> 10);
-			sp.is_cbr &= 0x3ff;
-		}
-
 	}
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
@@ -985,13 +960,13 @@ stats_tstats(struct Client *source_p)
 				"T :connected %u %u",
 				sp.is_cl, sp.is_sv);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-				"T :bytes sent %lu.%uK %lu.%uK",
-				sp.is_cks, sp.is_cbs, 
-				sp.is_sks, sp.is_sbs);
+				"T :bytes sent %lluK %lluK",
+				sp.is_cbs / 1024, 
+				sp.is_sbs / 1024);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
-				"T :bytes recv %lu.%uK %lu.%uK",
-				sp.is_ckr, sp.is_cbr, 
-				sp.is_skr, sp.is_sbr);
+				"T :bytes recv %lluK %lluK",
+				sp.is_cbr / 1024, 
+				sp.is_sbr / 1024);
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 				"T :time connected %lu %lu",
 				sp.is_cti, sp.is_sti);
@@ -1477,12 +1452,12 @@ stats_ziplinks (struct Client *source_p)
 			sprintf(buf1, "%.2f%%", zipstats->in_ratio);
 			sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 					    "Z :ZipLinks stats for %s send[%s compression "
-					    "(%lu kB data/%lu kB wire)] recv[%s compression "
-					    "(%lu kB data/%lu kB wire)]",
+					    "(%llu kB data/%llu kB wire)] recv[%s compression "
+					    "(%llu kB data/%llu kB wire)]",
 					    target_p->name,
-					    buf, (unsigned long)zipstats->outK, 
-					    (unsigned long)zipstats->outK_wire, buf1, 
-					    (unsigned long)zipstats->inK, (unsigned long)zipstats->inK_wire);
+					    buf, zipstats->out / 1024, 
+					    zipstats->out_wire / 1024, buf1, 
+					    zipstats->in / 1024, zipstats->in_wire / 1024);
 			sent_data++;
 		}
 	}
@@ -1494,7 +1469,8 @@ stats_ziplinks (struct Client *source_p)
 static void
 stats_servlinks (struct Client *source_p)
 {
-	long uptime, sendK, receiveK;
+	long uptime;
+	unsigned long long int send, receive;
 	struct Client *target_p;
 	static char buf[512];
 	rb_dlink_node *ptr;
@@ -1508,24 +1484,24 @@ stats_servlinks (struct Client *source_p)
 		return;
 	}
 
-	sendK = receiveK = 0;
+	send = receive = 0;
 
 	RB_DLINK_FOREACH (ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 
 		j++;
-		sendK += target_p->localClient->sendK;
-		receiveK += target_p->localClient->receiveK;
+		send += target_p->localClient->sendB;
+		receive += target_p->localClient->receiveB;
 
-		sendto_one(source_p, POP_QUEUE, ":%s %d %s %s %u %u %u %u %u :%lu %lu %s",
+		sendto_one(source_p, POP_QUEUE, ":%s %d %s %s %u %u %llu %u %llu :%lu %lu %s",
 			get_id(&me, source_p), RPL_STATSLINKINFO, get_id(source_p, source_p),
 			target_p->name,
 			rb_linebuf_len (&target_p->localClient->buf_sendq),
 			target_p->localClient->sendM,
-			target_p->localClient->sendK,
+			target_p->localClient->sendB / 1024,
 			target_p->localClient->receiveM,
-			target_p->localClient->receiveK,
+			target_p->localClient->receiveB / 1024,
 			(long)(rb_current_time() - target_p->localClient->firsttime),
 			(long)((rb_current_time() > target_p->localClient->lasttime) ? 
 			 (rb_current_time() - target_p->localClient->lasttime) : 0),
@@ -1535,15 +1511,15 @@ stats_servlinks (struct Client *source_p)
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :%u total server(s)", j);
 
-	sprintf(buf, "%7.2f", _GMKv (sendK));
+	sprintf(buf, "%7.2f", _GMKv ((send/1024)));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :Sent total : %s %s",
-			   buf, _GMKs (sendK));
+			   buf, _GMKs ((send/1024)));
 
-	sprintf(buf, "%7.2f", _GMKv (receiveK));
+	sprintf(buf, "%7.2f", _GMKv ((receive/1024)));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :Recv total : %s %s",
-			   buf, _GMKs (receiveK));
+			   buf, _GMKs ((receive/1024)));
 
 	uptime = (rb_current_time() - startup_time);
 #ifdef HAVE_SNPRINTF
@@ -1551,8 +1527,8 @@ stats_servlinks (struct Client *source_p)
 #else
 	sprintf(buf,
 #endif	 
-		"%7.2f %s (%4.1f K/s)", _GMKv (me.localClient->sendK), _GMKs (me.localClient->sendK), 
-		(float) ((float) me.localClient->sendK / (float) uptime));
+		"%7.2f %s (%4.1f K/s)", _GMKv (me.localClient->sendB/1024), _GMKs ((me.localClient->sendB/1024)), 
+		(float) ((float) (me.localClient->sendB/1024) / (float) uptime));
 
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :Server send: %s", buf);
@@ -1562,8 +1538,8 @@ stats_servlinks (struct Client *source_p)
 #else
 	sprintf(buf,
 #endif	 
-		"%7.2f %s (%4.1f K/s)", _GMKv (me.localClient->receiveK), _GMKs (me.localClient->receiveK),
-		(float) ((float) me.localClient->receiveK / (float) uptime));
+		"%7.2f %s (%4.1f K/s)", _GMKv ((me.localClient->receiveB/1024)), _GMKs ((me.localClient->receiveB/1024)),
+		(float) ((float) (me.localClient->receiveB/1024) / (float) uptime));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :Server recv: %s",
 			   buf);
@@ -1677,7 +1653,7 @@ stats_l_list(struct Client *source_p, const char *name, int doall, int wilds,
 	}
 }
 
-#define Lformat "%s %u %u %u %u %u :%ld %ld %s"
+#define Lformat "%s %u %u %llu %u %llu :%ld %ld %s"
 
 void
 stats_l_client(struct Client *source_p, struct Client *target_p,
@@ -1689,9 +1665,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				target_p->name,
 				rb_linebuf_len(&target_p->localClient->buf_sendq),
 				target_p->localClient->sendM,
-				target_p->localClient->sendK,
+				target_p->localClient->sendB/1024,
 				target_p->localClient->receiveM,
-				target_p->localClient->receiveK,
+				target_p->localClient->receiveB/1024,
 				(long)rb_current_time() - target_p->localClient->firsttime,
 				(long)(rb_current_time() > target_p->localClient->lasttime) ? 
 				 (rb_current_time() - target_p->localClient->lasttime) : 0,
@@ -1704,9 +1680,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				    get_client_name(target_p, MASK_IP),
 				    rb_linebuf_len(&target_p->localClient->buf_sendq),
 				    target_p->localClient->sendM,
-				    target_p->localClient->sendK,
+				    target_p->localClient->sendB/1024,
 				    target_p->localClient->receiveM,
-				    target_p->localClient->receiveK,
+				    target_p->localClient->receiveB/1024,
 				    rb_current_time() - target_p->localClient->firsttime,
 				    (rb_current_time() > target_p->localClient->lasttime) ? 
 				     (rb_current_time() - target_p->localClient->lasttime) : 0,
@@ -1721,9 +1697,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				   get_client_name(target_p, HIDE_IP),
 				   rb_linebuf_len(&target_p->localClient->buf_sendq),
 				   target_p->localClient->sendM,
-				   target_p->localClient->sendK,
+				   target_p->localClient->sendB/1024,
 				   target_p->localClient->receiveM,
-				   target_p->localClient->receiveK,
+				   target_p->localClient->receiveB/1024,
 				   rb_current_time() - target_p->localClient->firsttime,
 				   (rb_current_time() > target_p->localClient->lasttime) ? 
 				    (rb_current_time() - target_p->localClient->lasttime) : 0,

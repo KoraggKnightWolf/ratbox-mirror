@@ -317,25 +317,13 @@ ssl_process_zipstats(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 	zips->out += strtoul(parv[4], NULL, 10);
 	zips->out_wire += strtoul(parv[5], NULL, 10);
 	
-	zips->inK += zips->in >> 10;
-	zips->in &= 0x03ff;
-	
-	zips->inK_wire += zips->in_wire >> 10;
-	zips->in_wire &= 0x03ff;
-	
-	zips->outK += zips->out >> 10;
-	zips->out &= 0x03ff;
-	
-	zips->outK_wire += zips->out_wire >> 10;
-	zips->out_wire &= 0x03ff;
-	
-	if(zips->inK > 0)
-		zips->in_ratio = (((double) (zips->inK - zips->inK_wire) / (double) zips->inK) * 100.00);
+	if(zips->in > 0)
+		zips->in_ratio = (((((double)(zips->in - zips->in_wire) / (double) zips->in)) / 1024.00) * 100.00);
 	else
 		zips->in_ratio = 0;
 		
-	if(zips->outK > 0)
-		zips->out_ratio = (((double) (zips->outK - zips->outK_wire) / (double) zips->outK) * 100.00);
+	if(zips->out > 0)
+		zips->out_ratio = (((((double)(zips->out - zips->out_wire) / (double) zips->out)) / 1024.00) * 100.00); 
 	else
 		zips->out_ratio = 0;
 }

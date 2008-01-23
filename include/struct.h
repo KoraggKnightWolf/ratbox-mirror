@@ -53,14 +53,10 @@ struct Server
 
 struct ZipStats
 {
-	uint32_t in;
-	uint32_t in_wire;
-	uint32_t out;
-	uint32_t out_wire;
-	uint32_t inK;
-	uint32_t inK_wire;
-	uint32_t outK;
-	uint32_t outK_wire;
+	rb_uint64_t in;
+	rb_uint64_t in_wire;
+	rb_uint64_t out;
+	rb_uint64_t out_wire;
 	double in_ratio;
 	double out_ratio;
 };
@@ -148,12 +144,10 @@ struct LocalUser
 	buf_head_t buf_sendq;
 	buf_head_t buf_recvq;
 
+	unsigned long long int sendB;	/* Statistics: total bytes sent */
+	unsigned long long int receiveB;	/* Statistics: total bytes received */
 	rb_uint32_t sendM;	/* Statistics: protocol messages send */
-	rb_uint32_t sendK;	/* Statistics: total k-bytes send */
 	rb_uint32_t receiveM;	/* Statistics: protocol messages received */
-	rb_uint32_t receiveK;	/* Statistics: total k-bytes received */
-	rb_uint16_t sendB;	/* counters to count upto 1-k lots of bytes */
-	rb_uint16_t receiveB;	/* sent and received. */
 	struct Listener *listener;	/* listener accepted from */
 	struct ConfItem *att_conf;	/* attached conf */
 	struct server_conf *att_sconf;
