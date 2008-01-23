@@ -276,7 +276,7 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 	{
 		if(retlen == 0)
 			close_conn(conn, WAIT_PLAIN, "%s", remote_closed);
-		if(IsSSL(conn) && retlen == -2)
+		if(IsSSL(conn) && retlen == RB_RW_SSL_ERROR)
 			err = rb_get_ssl_strerror(conn->mod_fd);
 		else
 			err = strerror(errno);
@@ -285,7 +285,13 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 		return;
 	}
 	if(rb_rawbuf_length(conn->modbuf_out) > 0)
-		rb_setselect(conn->mod_fd, RB_SELECT_WRITE, conn_mod_write_sendq, conn);
+	{
+		int flags = RB_SELECT_WRITE;
+		if(retlen == RB_RW_SSL_NEED_READ)
+			flags |= RB_SELECT_READ;
+
+		rb_setselect(conn->mod_fd, flags, conn_mod_write_sendq, conn);
+	}
 	else
 		rb_setselect(conn->mod_fd, RB_SELECT_WRITE, NULL, NULL);
 
@@ -488,7 +494,7 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 				return;
 			}
 
-			if(IsSSL(conn) && length == -2)
+			if(IsSSL(conn) && length == RB_RW_SSL_ERROR)
 				err = rb_get_ssl_strerror(conn->mod_fd);
 			else
 				err = strerror(errno);
@@ -497,7 +503,11 @@ conn_mod_read_cb(rb_fde_t * fd, void *data)
 		}
 		if(length < 0)
 		{
-			rb_setselect(conn->mod_fd, RB_SELECT_READ, conn_mod_read_cb, conn);
+			int flags = RB_SELECT_READ;
+			if(length == RB_RW_SSL_NEED_WRITE)
+				flags |= RB_SELECT_WRITE;
+				
+			rb_setselect(conn->mod_fd, flags, conn_mod_read_cb, conn);
 			conn_plain_write_sendq(conn->plain_fd, conn);
 			return;
 		}	
