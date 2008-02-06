@@ -1,3 +1,21 @@
+androsyn    2008/02/06 20:47:40 UTC	(20080206_1-25056)
+  Log:
+  Add a somewhat hackish global cidr limit implementation.  Its not per class, but oh well..
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2008/02/06 16:45:19 UTC	(20080206_0-25054)
   Log:
   change a few things to const char and clean up a few warnings
