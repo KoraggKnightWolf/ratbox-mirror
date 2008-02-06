@@ -9,6 +9,9 @@ servicesdir     = @moduledir@/autoload
 libmodulesdir	= @moduledir@
 INCLUDES = -I../libratbox/include -I../include -I../libltdl
 
+AM_CFLAGS = $(WARNFLAGS)
+
+
 if MINGW
 EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
 endif

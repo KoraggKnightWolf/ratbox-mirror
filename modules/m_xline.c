@@ -294,7 +294,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 		int temp_time)
 {
 	struct ConfItem *aconf;
-	char *oper = get_oper_name(source_p);
+	const char *oper = get_oper_name(source_p);
 
 	aconf = make_conf();
 	aconf->status = CONF_XLINE;

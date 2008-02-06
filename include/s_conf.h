@@ -309,11 +309,11 @@ int detach_conf(struct Client *);
 struct ConfItem *conf_connect_allowed(struct sockaddr *addr, int);
 
 struct ConfItem *find_tkline(const char *, const char *, struct sockaddr *);
-char *show_iline_prefix(struct Client *, struct ConfItem *, char *);
+
 void get_printable_conf(struct ConfItem *,
-			       char **, char **, char **, char **, int *, char **);
+			       const char **, const char **, const char **, const char **, int *, const char **);
 void get_printable_kline(struct Client *, struct ConfItem *,
-				char **, char **, char **, char **);
+				const char **, const char **, const char **, const char **);
 
 void yyerror(const char *);
 int conf_yy_fatal_error(const char *);
@@ -334,8 +334,8 @@ void conf_add_class(struct ConfItem *, int);
 void conf_add_d_conf(struct ConfItem *);
 void flush_expired_ips(void *);
 
-char *get_oper_name(struct Client *client_p);
-char *get_class_name(struct ConfItem *aconf);
+const char *get_oper_name(struct Client *client_p);
+const char *get_class_name(struct ConfItem *aconf);
 void set_default_conf();
 
 

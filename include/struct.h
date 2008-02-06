@@ -53,10 +53,10 @@ struct Server
 
 struct ZipStats
 {
-	rb_uint64_t in;
-	rb_uint64_t in_wire;
-	rb_uint64_t out;
-	rb_uint64_t out_wire;
+	unsigned long long in;
+	unsigned long long in_wire;
+	unsigned long long out;
+	unsigned long long out_wire;
 	double in_ratio;
 	double out_ratio;
 };

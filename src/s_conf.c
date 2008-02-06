@@ -974,7 +974,7 @@ reorganise_temp_kd(void *list)
  *         "oper" is server name for remote opers
  * Side effects: None.
  */
-char *
+const char *
 get_oper_name(struct Client *client_p)
 {
 	/* +5 for !,@,{,} and null */
@@ -995,10 +995,10 @@ get_oper_name(struct Client *client_p)
 }
 
 /* returns class name */
-char *
+const char *
 get_class_name(struct ConfItem *aconf)
 {
-	static char zero[] = "default";
+	static const char *zero = "default";
 
 	if(aconf == NULL || aconf->c_class == NULL || EmptyString(ConfClassName(aconf)))
 		return zero;
@@ -1023,10 +1023,10 @@ get_class_name(struct ConfItem *aconf)
  * in aconf, or "<NULL>" port is set to aconf->port in all cases.
  */
 void
-get_printable_conf(struct ConfItem *aconf, char **name, char **host,
-		   char **pass, char **user, int *port, char **classname)
+get_printable_conf(struct ConfItem *aconf, const char **name, const char **host,
+		   const char **pass, const char **user, int *port, const char **classname)
 {
-	static char null[] = "<NULL>";
+	static const char *null = "<NULL>";
 
 	*name = EmptyString(aconf->info.name) ? null : aconf->info.name;
 	*host = EmptyString(aconf->host) ? null : aconf->host;
@@ -1038,10 +1038,10 @@ get_printable_conf(struct ConfItem *aconf, char **name, char **host,
 
 void
 get_printable_kline(struct Client *source_p, struct ConfItem *aconf, 
-		    char **host, char **reason,
-		    char **user, char **oper_reason)
+		    const char **host, const char **reason,
+		    const char **user, const char **oper_reason)
 {
-	static char null[] = "<NULL>";
+	static const char *null = "<NULL>";
 
 	*host = EmptyString(aconf->host) ? null : aconf->host;
 	*reason = EmptyString(aconf->passwd) ? null : aconf->passwd;

@@ -647,8 +647,8 @@ clear_out_address_conf_bans(void)
  * output       - pointer to static string with prefixes listed in ascii form
  * side effects - NONE
  */
-char *
-show_iline_prefix(struct Client *sptr, struct ConfItem *aconf, char *name)
+const char *
+show_iline_prefix(struct Client *sptr, struct ConfItem *aconf, const char *name)
 {
 	static char prefix_of_host[USERLEN + 15];
 	char *prefix_ptr;

@@ -500,7 +500,7 @@ stats_hubleaf(struct Client *source_p)
 static void
 stats_auth (struct Client *source_p)
 {
-        char *name, *host, *pass, *user, *classname;
+        const char *name, *host, *pass, *user, *classname;
 	struct AddressRec *arec;
 	struct ConfItem *aconf;
 	int i, port;
@@ -559,6 +559,9 @@ stats_auth (struct Client *source_p)
 static void
 stats_tklines(struct Client *source_p)
 {
+	const char *host, *pass, *user, *oper_reason;
+	struct ConfItem *aconf;
+
 	/* Oper only, if unopered, return ERR_NOPRIVS */
 	if((ConfigFileEntry.stats_k_oper_only == 2) && !IsOper (source_p))
 		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOPRIVILEGES,
@@ -567,8 +570,6 @@ stats_tklines(struct Client *source_p)
 	/* If unopered, Only return matching klines */
 	else if((ConfigFileEntry.stats_k_oper_only == 1) && !IsOper (source_p))
 	{
-		struct ConfItem *aconf;
-		char *host, *pass, *user, *oper_reason;
 
 		if(MyConnect (source_p))
 			aconf = find_conf_by_address (source_p->host, source_p->sockhost,
@@ -597,10 +598,8 @@ stats_tklines(struct Client *source_p)
 	/* Theyre opered, or allowed to see all klines */
 	else
 	{
-		struct ConfItem *aconf;
 		rb_dlink_node *ptr;
 		int i;
-		char *user, *host, *pass, *oper_reason;
 
 		for(i = 0; i < LAST_TEMP_TYPE; i++)
 		{
@@ -625,7 +624,7 @@ static void
 stats_klines(struct Client *source_p)
 {
 	struct ConfItem *aconf;
-	char *host, *pass, *user, *oper_reason;
+	const char *host, *pass, *user, *oper_reason;
 	struct AddressRec *arec;
 	int i;
 	
@@ -1470,7 +1469,7 @@ static void
 stats_servlinks (struct Client *source_p)
 {
 	long uptime;
-	unsigned long long int send, receive;
+	unsigned long long int sent, receive;
 	struct Client *target_p;
 	static char buf[512];
 	rb_dlink_node *ptr;
@@ -1484,14 +1483,14 @@ stats_servlinks (struct Client *source_p)
 		return;
 	}
 
-	send = receive = 0;
+	sent = receive = 0;
 
 	RB_DLINK_FOREACH (ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 
 		j++;
-		send += target_p->localClient->sendB;
+		sent += target_p->localClient->sendB;
 		receive += target_p->localClient->receiveB;
 
 		sendto_one(source_p, POP_QUEUE, ":%s %d %s %s %u %u %llu %u %llu :%lu %lu %s",
@@ -1511,10 +1510,10 @@ stats_servlinks (struct Client *source_p)
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :%u total server(s)", j);
 
-	sprintf(buf, "%7.2f", _GMKv ((send/1024)));
+	sprintf(buf, "%7.2f", _GMKv ((sent/1024)));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,
 			   "? :Sent total : %s %s",
-			   buf, _GMKs ((send/1024)));
+			   buf, _GMKs ((sent/1024)));
 
 	sprintf(buf, "%7.2f", _GMKv ((receive/1024)));
 	sendto_one_numeric(source_p, POP_QUEUE, RPL_STATSDEBUG,

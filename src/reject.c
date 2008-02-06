@@ -315,7 +315,7 @@ report_dlines(struct Client *source_p)
 {
 	rb_patricia_node_t *pnode;
 	struct ConfItem *aconf;
-	char *host, *pass, *user, *oper_reason;
+	const char *host, *pass, *user, *oper_reason;
 	RB_PATRICIA_WALK(dline_tree->head, pnode)
 	{
 		aconf = pnode->data;
@@ -336,7 +336,7 @@ report_tdlines(struct Client *source_p)
 {
 	rb_patricia_node_t *pnode;
 	struct ConfItem *aconf;
-	char *host, *pass, *user, *oper_reason;
+	const char *host, *pass, *user, *oper_reason;
 	RB_PATRICIA_WALK(dline_tree->head, pnode)
 	{
 		aconf = pnode->data;
@@ -358,7 +358,7 @@ report_elines(struct Client *source_p)
 	rb_patricia_node_t *pnode;
 	struct ConfItem *aconf;
 	int port;
-	char *name, *host, *pass, *user, *classname;
+	const char *name, *host, *pass, *user, *classname;
 	RB_PATRICIA_WALK(eline_tree->head, pnode)
 	{
 		aconf = pnode->data;
