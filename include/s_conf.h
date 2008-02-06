@@ -204,6 +204,11 @@ struct config_file_entry
 	int target_change;
 	int collision_fnc;
 	int hide_spoof_ips;
+	int global_cidr_ipv4_bitlen;
+	int global_cidr_ipv4_count;
+	int global_cidr_ipv6_bitlen;
+	int global_cidr_ipv6_count;
+	int global_cidr;
 #ifdef RB_IPV6
 	int fallback_to_ip6_int;
 #endif
@@ -346,5 +351,6 @@ void set_default_conf();
 #define TOO_MANY_LOCAL	(-6)
 #define TOO_MANY_GLOBAL (-7)
 #define TOO_MANY_IDENT	(-8)
+#define TOO_MANY_GLOBAL_CIDR (-9)
 
 #endif /* INCLUDED_s_conf_h */

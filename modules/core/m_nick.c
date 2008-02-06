@@ -45,6 +45,7 @@
 #include "scache.h"
 #include "s_newconf.h"
 #include "monitor.h"
+#include "reject.h"
 
 /* Give all UID nicks the same TS. This ensures nick TS is always the same on
  * all servers for each nick-user pair, also if a user with a UID nick changes
@@ -1117,6 +1118,7 @@ register_client(struct Client *client_p, struct Client *server,
 
 	add_to_hash(HASH_CLIENT, nick, source_p);
 	add_to_hash(HASH_HOSTNAME, source_p->host, source_p);
+	inc_global_cidr_count(source_p);
 	monitor_signon(source_p);
 
 	m = &parv[4][1];

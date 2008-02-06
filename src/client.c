@@ -1115,7 +1115,7 @@ exit_generic_client(struct Client *source_p, const char *comment)
 	off_history(source_p);
 
 	monitor_signoff(source_p);
-
+	dec_global_cidr_count(source_p);
 	if(has_id(source_p))
 		del_from_hash(HASH_ID, source_p->id, source_p);
 

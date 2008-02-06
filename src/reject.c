@@ -34,7 +34,9 @@
 #include "numeric.h"
 #include "parse.h"
 #include "hostmask.h"
+#include "match.h"
 
+static rb_patricia_tree_t *global_tree;
 static rb_patricia_tree_t *reject_tree;
 static rb_patricia_tree_t *dline_tree;
 static rb_patricia_tree_t *eline_tree;
@@ -45,18 +47,30 @@ static rb_patricia_tree_t *throttle_tree;
 static void throttle_expires(void *unused);
 
 
-struct reject_data
+typedef struct _reject_data
 {
 	rb_dlink_node rnode;
 	time_t time;
 	unsigned int count;
-};
+} reject_t;
 
-struct delay_data
+typedef struct _delay_data
 {
 	rb_dlink_node node;
 	rb_fde_t *F;
-};
+} delay_t;
+
+typedef struct _throttle
+{
+	rb_dlink_node node;
+	time_t last;
+	int count;
+} throttle_t;
+
+typedef struct _global_data
+{
+	int count;
+} global_t;
 
 
 static rb_patricia_node_t *
@@ -107,7 +121,7 @@ static void
 reject_exit(void *unused)
 {
 	rb_dlink_node *ptr, *ptr_next;
-	struct delay_data *ddata;
+	delay_t *ddata;
 	static const char *errbuf = "ERROR :Closing Link: (*** Banned (cache))\r\n";
 	
 	RB_DLINK_FOREACH_SAFE(ptr, ptr_next, delay_exit.head)
@@ -128,7 +142,7 @@ reject_expires(void *unused)
 {
 	rb_dlink_node *ptr, *next;
 	rb_patricia_node_t *pnode;
-	struct reject_data *rdata;
+	reject_t *rdata;
 	
 	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
 	{
@@ -151,6 +165,7 @@ init_reject(void)
 	dline_tree = rb_new_patricia(PATRICIA_BITS);
 	eline_tree = rb_new_patricia(PATRICIA_BITS);
 	throttle_tree = rb_new_patricia(PATRICIA_BITS);
+	global_tree =  rb_new_patricia(PATRICIA_BITS);
 	rb_event_add("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
 	rb_event_add("reject_expires", reject_expires, NULL, 60);
 	rb_event_add("throttle_expires", throttle_expires, NULL, 10);
@@ -161,7 +176,7 @@ void
 add_reject(struct Client *client_p)
 {
 	rb_patricia_node_t *pnode;
-	struct reject_data *rdata;
+	reject_t *rdata;
 
 	/* Reject is disabled */
 	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
@@ -181,7 +196,7 @@ add_reject(struct Client *client_p)
 			bitlen = 128;
 #endif
 		pnode = make_and_lookup_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);
-		pnode->data = rdata = rb_malloc(sizeof(struct reject_data));
+		pnode->data = rdata = rb_malloc(sizeof(reject_t));
 		rb_dlinkAddTail(pnode, &rdata->rnode, &reject_list);
 		rdata->time = rb_current_time();
 		rdata->count = 1;
@@ -192,8 +207,8 @@ int
 check_reject(rb_fde_t *F, struct sockaddr *addr)
 {
 	rb_patricia_node_t *pnode;
-	struct reject_data *rdata;
-	struct delay_data *ddata;
+	reject_t *rdata;
+	delay_t *ddata;
 	/* Reject is disabled */
 	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return 0;
@@ -206,7 +221,7 @@ check_reject(rb_fde_t *F, struct sockaddr *addr)
 		rdata->time = rb_current_time();
 		if(rdata->count > (unsigned long)ConfigFileEntry.reject_after_count)
 		{
-			ddata = rb_malloc(sizeof(struct delay_data));
+			ddata = rb_malloc(sizeof(delay_t));
 			ServerStats.is_rej++;
 			rb_setselect(F, RB_SELECT_WRITE | RB_SELECT_READ, NULL, NULL);
 			ddata->F = F;
@@ -223,7 +238,7 @@ flush_reject(void)
 {
 	rb_dlink_node *ptr, *next;
 	rb_patricia_node_t *pnode;
-	struct reject_data *rdata;
+	reject_t *rdata;
 	
 	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
 	{
@@ -246,7 +261,7 @@ remove_reject(const char *ip)
 
 	if((pnode = rb_match_string(reject_tree, ip)) != NULL)
 	{
-		struct reject_data *rdata = pnode->data;
+		reject_t *rdata = pnode->data;
 		rb_dlinkDelete(&rdata->rnode, &reject_list);
 		rb_free(rdata);
 		rb_patricia_remove(reject_tree, pnode);
@@ -372,13 +387,6 @@ report_elines(struct Client *source_p)
 }
 
 
-typedef struct _throttle
-{
-	rb_dlink_node node;
-	time_t last;
-	int count;
-} throttle_t;
-
 
 int
 throttle_add(struct sockaddr *addr)
@@ -434,5 +442,151 @@ throttle_expires(void *unused)
 	}
 }
 
+static int 
+get_global_count(struct sockaddr *addr)
+{
+	rb_patricia_node_t *pnode;
+	global_t *glb;
+	
+	if((pnode = rb_match_ip(global_tree, addr)))
+	{
+		glb = pnode->data;
+		return glb->count;
+	}
+	return 0;		
+}
 
+static int
+inc_global_ip(struct sockaddr *addr, int bitlen)
+{
+	rb_patricia_node_t *pnode;
+	global_t *glb;
+
+
+	if((pnode = rb_match_ip(global_tree, addr)))
+	{
+		glb = pnode->data;
+	} 
+	else
+	{
+		pnode = make_and_lookup_ip(global_tree, addr, bitlen);
+		glb = rb_malloc(sizeof(global_t));
+		pnode->data = glb;
+	}
+	glb->count++;
+	return glb->count;
+}
+
+static void
+dec_global_ip(struct sockaddr *addr)
+{
+	rb_patricia_node_t *pnode;
+	global_t *glb;
+	
+	if((pnode = rb_match_ip(global_tree, addr)))
+	{
+		glb = pnode->data;
+		glb->count--;
+		if(glb->count == 0)
+		{
+			rb_free(glb);
+			rb_patricia_remove(global_tree, pnode);
+			return;
+		}
+	}
+}
+
+int
+inc_global_cidr_count(struct Client *client_p)
+{
+	struct rb_sockaddr_storage ip;
+	struct sockaddr *addr;
+	int bitlen;
+
+	if(!MyClient(client_p))
+	{
+		if(EmptyString(client_p->sockhost) || !strcmp(client_p->sockhost, "0"))
+			return -1; 
+		if(!rb_inet_pton_sock(client_p->sockhost, (struct sockaddr *)&ip))
+			return -1;
+		addr = (struct sockaddr *)&ip;
+	} else
+		addr = (struct sockaddr *)&client_p->localClient->ip;
+#ifdef RB_IPV6	
+	if(GET_SS_FAMILY(addr) == AF_INET6)
+	{
+		bitlen = ConfigFileEntry.global_cidr_ipv6_bitlen;
+	} else
+#endif
+		bitlen = ConfigFileEntry.global_cidr_ipv4_bitlen;
+
+	return inc_global_ip(addr, bitlen);
+}
+
+void
+dec_global_cidr_count(struct Client *client_p)
+{
+	struct rb_sockaddr_storage ip;
+	struct sockaddr *addr;
+	if(!MyClient(client_p))
+	{
+		if(EmptyString(client_p->sockhost) || !strcmp(client_p->sockhost, "0"))
+			return;
+		if(!rb_inet_pton_sock(client_p->sockhost, (struct sockaddr *)&ip))
+			return;
+		addr = (struct sockaddr *)&ip;
+	} else
+		addr = (struct sockaddr *)&client_p->localClient->ip;
+	
+	dec_global_ip(addr);
+}
+
+int
+check_global_cidr_count(struct Client *client_p)
+{
+	struct rb_sockaddr_storage ip;
+	struct sockaddr *addr;
+	int count, max;
+	if(!MyClient(client_p))
+	{
+		if(EmptyString(client_p->sockhost) || !strcmp(client_p->sockhost, "0"))
+			return -1;
+		if(!rb_inet_pton_sock(client_p->sockhost, (struct sockaddr *)&ip))
+			return -1;
+		addr = (struct sockaddr *)&ip;
+	} else 
+		addr = (struct sockaddr *)&client_p->localClient->ip;
+	count = get_global_count(addr);
+#ifdef RB_IPV6
+	if(GET_SS_FAMILY(addr) == AF_INET6)
+		max = ConfigFileEntry.global_cidr_ipv6_count;
+	else
+#endif
+		max = ConfigFileEntry.global_cidr_ipv4_count;
+	if(count >= max)
+		return 1;
+	return 0;
+}
+
+static void
+clear_cidr_tree(void *data)
+{
+	rb_free(data);	
+}
+
+void
+rehash_global_cidr_tree(void)
+{
+	struct Client *client_p;
+	rb_dlink_node *ptr;
+	rb_clear_patricia(global_tree, clear_cidr_tree);
+	RB_DLINK_FOREACH(ptr, global_client_list.head)
+	{
+		client_p = ptr->data;
+		if(IsMe(client_p) && IsServer(client_p))
+			continue;
+		inc_global_cidr_count(client_p);	
+	}
+	return;
+}
 

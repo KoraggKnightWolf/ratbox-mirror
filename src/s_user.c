@@ -538,6 +538,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(find_tgchange(source_p->sockhost))
 		USED_TARGETS(source_p) = 6;
 
+	inc_global_cidr_count(client_p);
 	monitor_signon(source_p);
 	user_welcome(source_p);
 	introduce_client(client_p, source_p);

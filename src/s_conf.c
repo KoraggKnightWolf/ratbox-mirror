@@ -208,6 +208,20 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		exit_client(client_p, source_p, &me, "Too many host connections (global)");
 		break;
 
+	case TOO_MANY_GLOBAL_CIDR:
+		sendto_realops_flags(UMODE_FULL, L_ALL,
+				"Too many global connections(cidr) for %s!%s%s@%s",
+				source_p->name, IsGotId(source_p) ? "" : "~",
+				source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
+		ilog(L_FUSER, "Too many global connections(cidr) from %s!%s%s@%s",
+			source_p->name, IsGotId(source_p) ? "" : "~",
+			source_p->username, source_p->sockhost);
+
+		ServerStats.is_ref++;
+		exit_client(client_p, source_p, &me, "Too many host connections (global cidr)");
+		break;
+
+	
 	case TOO_MANY_IDENT:
 		sendto_realops_flags(UMODE_FULL, L_ALL,
 				"Too many user connections for %s!%s%s@%s",
@@ -470,7 +484,6 @@ attach_iline(struct Client *client_p, struct ConfItem *aconf)
 	if(*client_p->username == '~')
 		unidented = 1;
 
-
 	/* find_hostname() returns the head of the list to search */
 	RB_DLINK_FOREACH(ptr, find_hostname(client_p->host))
 	{
@@ -500,7 +513,8 @@ attach_iline(struct Client *client_p, struct ConfItem *aconf)
 			return (TOO_MANY_IDENT);
 	}
 
-
+	if(check_global_cidr_count(client_p) > 0)
+		return (TOO_MANY_GLOBAL_CIDR);
 	return (attach_conf(client_p, aconf));
 }
 
@@ -607,12 +621,14 @@ rehash(int sig)
 {
 	const char *filename;
 	int r;
+	int old_global_ipv4_cidr = ConfigFileEntry.global_cidr_ipv4_bitlen;
+	int old_global_ipv6_cidr = ConfigFileEntry.global_cidr_ipv6_bitlen;
 	if(sig != 0)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Got signal SIGHUP, reloading ircd conf. file");
 	}
-
+	
 	filename = ConfigFileEntry.configfile;
 
 	r = read_config_file(filename);
@@ -644,6 +660,10 @@ rehash(int sig)
 		rb_strlcpy(me.info, "unknown", sizeof(me.info));
 
 	open_logfiles();
+        if(old_global_ipv4_cidr != ConfigFileEntry.global_cidr_ipv4_bitlen || 
+        			old_global_ipv6_cidr != ConfigFileEntry.global_cidr_ipv6_bitlen)
+		rehash_global_cidr_tree();
+                
 	return;
 }
 
@@ -796,6 +816,11 @@ set_default_conf(void)
 	ConfigFileEntry.reject_duration = 120;
 	ConfigFileEntry.throttle_count = 4;
 	ConfigFileEntry.throttle_duration = 60;
+	ConfigFileEntry.global_cidr_ipv4_bitlen = 24;
+	ConfigFileEntry.global_cidr_ipv4_count = 128;
+	ConfigFileEntry.global_cidr_ipv6_bitlen = 64;
+	ConfigFileEntry.global_cidr_ipv6_count = 128;
+	ConfigFileEntry.global_cidr = YES;
 }
 
 #undef YES
