@@ -1,3 +1,12 @@
+jilles      2008/02/07 00:20:04 UTC	(20080207_0-25058)
+  Log:
+  Fix a UID leak.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_invite.c (File Modified) 
+
+
 androsyn    2008/02/06 20:47:40 UTC	(20080206_1-25056)
   Log:
   Add a somewhat hackish global cidr limit implementation.  Its not per class, but oh well..
