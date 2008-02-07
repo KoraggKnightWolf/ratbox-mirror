@@ -64,7 +64,11 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if(MyClient(source_p) && !IsFloodDone(source_p))
 		flood_endgrace(source_p);
 
-	if((target_p = find_person(parv[1])) == NULL)
+	if(MyClient(source_p))
+		target_p = find_named_person(parv[1]);
+	else
+		target_p = find_person(parv[1]);
+	if(target_p == NULL)
 	{
 		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHNICK, 
 				   form_str(ERR_NOSUCHNICK), 
