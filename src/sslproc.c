@@ -312,10 +312,10 @@ ssl_process_zipstats(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 	
 	zips = server->localClient->zipstats;
 
-	zips->in += strtoul(parv[2], NULL, 10);
-	zips->in_wire += strtoul(parv[3], NULL, 10);
-	zips->out += strtoul(parv[4], NULL, 10);
-	zips->out_wire += strtoul(parv[5], NULL, 10);
+	zips->in += strtoull(parv[2], NULL, 10);
+	zips->in_wire += strtoull(parv[3], NULL, 10);
+	zips->out += strtoull(parv[4], NULL, 10);
+	zips->out_wire += strtoull(parv[5], NULL, 10);
 	
 	if(zips->in > 0)
 		zips->in_ratio = ((double)(zips->in - zips->in_wire) / (double) zips->in) * 100.00;

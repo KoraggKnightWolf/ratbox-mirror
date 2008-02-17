@@ -96,10 +96,10 @@ typedef struct _conn
 
 	rb_fde_t *mod_fd;
 	rb_fde_t *plain_fd;
-	rb_uint32_t mod_out;
-	rb_uint32_t mod_in;
-	rb_uint32_t plain_in;
-	rb_uint32_t plain_out;
+	unsigned long long mod_out;
+	unsigned long long mod_in;
+	unsigned long long plain_in;
+	unsigned long long plain_out;
 	rb_uint8_t flags;
 	void *stream;
 } conn_t;
@@ -656,7 +656,7 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	if(conn == NULL)
 		return;
 
-	rb_snprintf(outstat, sizeof(outstat), "S %s %u %u %u %u", odata,
+	rb_snprintf(outstat, sizeof(outstat), "S %s %llu %llu %llu %llu", odata,
 		    conn->plain_out, conn->mod_in, conn->plain_in, conn->mod_out);
 	conn->plain_out = 0;
 	conn->plain_in = 0;
