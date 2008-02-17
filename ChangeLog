@@ -1,3 +1,12 @@
+androsyn    2008/02/17 03:54:19 UTC	(20080217_1-25074)
+  Log:
+  have ssld store byte counts in unsigned long long and use strtoull to convert from string to integer
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/02/17 03:50:00 UTC	(20080217_0-25072)
   Log:
   fix stats Z output
