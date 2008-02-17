@@ -1,3 +1,13 @@
+androsyn    2008/02/17 04:47:25 UTC	(20080217_2-25077)
+  Log:
+  fix some cast-qual warnings on sparc64
+
+  Modified:
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2008/02/17 03:54:19 UTC	(20080217_1-25074)
   Log:
   have ssld store byte counts in unsigned long long and use strtoull to convert from string to integer
