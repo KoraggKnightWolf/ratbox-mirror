@@ -639,6 +639,7 @@ load_a_module(const char *path, int warn, int core)
 	char *mod_basename;
 	const char *ver;
 
+	void *mapi_base;
 	int *mapi_version;
 
 	mod_basename = irc_basename(path);
@@ -662,10 +663,15 @@ load_a_module(const char *path, int warn, int core)
 	 * as a single int in order to determine the API version.
 	 *      -larne.
 	 */
-	mapi_version = (int *) (rb_uintptr_t) lt_dlsym(tmpptr, "_mheader");
-	if((mapi_version == NULL
-	    && (mapi_version = (int *) (rb_uintptr_t) lt_dlsym(tmpptr, "__mheader")) == NULL)
-	   || MAPI_MAGIC(*mapi_version) != MAPI_MAGIC_HDR)
+	mapi_base = lt_dlsym(tmpptr, "_mheader");
+	if(mapi_base == NULL)
+	{
+		mapi_base = lt_dlsym(tmpptr, "__mheader");		
+	}
+
+	mapi_version = (int *)mapi_base;
+
+	if(mapi_base == NULL || (MAPI_MAGIC(*mapi_version) != MAPI_MAGIC_HDR))
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Data format error: module %s has no MAPI header.",
@@ -680,7 +686,7 @@ load_a_module(const char *path, int warn, int core)
 	{
 	case 1:
 		{
-			struct mapi_mheader_av1 *mheader = (struct mapi_mheader_av1 *) mapi_version;	/* see above */
+			struct mapi_mheader_av1 *mheader = mapi_base;	/* see above */
 			if(mheader->mapi_register && (mheader->mapi_register() == -1))
 			{
 				ilog(L_MAIN, "Module %s indicated failure during load.",

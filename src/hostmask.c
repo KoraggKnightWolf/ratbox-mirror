@@ -48,21 +48,23 @@ static uint32_t hash_ipv4(struct sockaddr *, int);
  * Side effects: None
  */
 int
-parse_netmask(const char *text, struct sockaddr  *naddr, int *nb)
+parse_netmask(const char *text, struct sockaddr *naddr, int *nb)
 {
 	char *ip = LOCAL_COPY(text);
 	char *ptr;
-	struct rb_sockaddr_storage *addr, xaddr;
+	struct sockaddr *addr;
+	struct rb_sockaddr_storage xaddr;
 	int *b, xb;
+
 	if(nb == NULL)
 		b = &xb;
 	else
 		b = nb;
 	
 	if(naddr == NULL)
-		addr = (struct rb_sockaddr_storage *)&xaddr;
+		addr = (struct sockaddr *)&xaddr;
 	else
-		addr = (struct rb_sockaddr_storage *)naddr;
+		addr = naddr;
 	
 #ifdef RB_IPV6
 	if(strchr(ip, ':'))
@@ -76,7 +78,7 @@ parse_netmask(const char *text, struct sockaddr  *naddr, int *nb)
 				*b = 128;
 		} else
 			*b = 128;
-		if(rb_inet_pton_sock(ip, (struct sockaddr *)addr) > 0)
+		if(rb_inet_pton_sock(ip, addr) > 0)
 			return HM_IPV6;
 		else
 			return HM_HOST;
@@ -93,7 +95,7 @@ parse_netmask(const char *text, struct sockaddr  *naddr, int *nb)
 				*b = 32;
 		} else
 			*b = 32;
-		if(rb_inet_pton_sock(ip, (struct sockaddr *)addr) > 0)
+		if(rb_inet_pton_sock(ip, addr) > 0)
 			return HM_IPV4;
 		else
 			return HM_HOST;
@@ -118,7 +120,7 @@ init_host_hash(void)
 static uint32_t
 hash_ipv4(struct sockaddr *saddr, int bits)
 {
-	struct sockaddr_in *addr = (struct sockaddr_in *) saddr;
+	struct sockaddr_in *addr = (struct sockaddr_in *)(void *)saddr;
 	
 	if(bits != 0)
 	{
@@ -138,7 +140,7 @@ hash_ipv4(struct sockaddr *saddr, int bits)
 static uint32_t
 hash_ipv6(struct sockaddr *saddr, int bits)
 {
-	struct sockaddr_in6 *addr = (struct sockaddr_in6 *) saddr;
+	struct sockaddr_in6 *addr = (struct sockaddr_in6 *)(void *) saddr;
 	uint32_t v = 0, n;
 	for (n = 0; n < 16; n++)
 	{
