@@ -1454,9 +1454,9 @@ stats_ziplinks (struct Client *source_p)
 					    "(%llu kB data/%llu kB wire)] recv[%s compression "
 					    "(%llu kB data/%llu kB wire)]",
 					    target_p->name,
-					    buf, zipstats->out / 1024, 
-					    zipstats->out_wire / 1024, buf1, 
-					    zipstats->in / 1024, zipstats->in_wire / 1024);
+					    buf, zipstats->out >> 10, 
+					    zipstats->out_wire >> 10, buf1, 
+					    zipstats->in >> 10, zipstats->in_wire >> 10);
 			sent_data++;
 		}
 	}

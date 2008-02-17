@@ -318,12 +318,12 @@ ssl_process_zipstats(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 	zips->out_wire += strtoul(parv[5], NULL, 10);
 	
 	if(zips->in > 0)
-		zips->in_ratio = (((((double)(zips->in - zips->in_wire) / (double) zips->in)) / 1024.00) * 100.00);
+		zips->in_ratio = ((double)(zips->in - zips->in_wire) / (double) zips->in) * 100.00;
 	else
 		zips->in_ratio = 0;
 		
 	if(zips->out > 0)
-		zips->out_ratio = (((((double)(zips->out - zips->out_wire) / (double) zips->out)) / 1024.00) * 100.00); 
+		zips->out_ratio = ((double)(zips->out - zips->out_wire) / (double) zips->out) * 100.00;
 	else
 		zips->out_ratio = 0;
 }
