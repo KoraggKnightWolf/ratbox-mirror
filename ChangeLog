@@ -1,3 +1,11 @@
+androsyn    2008/03/07 02:16:45 UTC	(20080307_1-25097)
+  Log:
+  fix another RB_IPV6 related compile error
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/03/07 00:10:27 UTC	(20080307_0-25095)
   Log:
   fix global_cidr
