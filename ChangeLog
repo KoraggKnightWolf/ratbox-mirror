@@ -1,3 +1,11 @@
+androsyn    2008/03/07 16:30:59 UTC	(20080307_3-25101)
+  Log:
+  remove the creation of kline.conf etc from the doc/Makefile.in
+
+  Modified:
+	ircd-ratbox/trunk/doc/Makefile.in (File Modified) 
+
+
 androsyn    2008/03/07 16:10:01 UTC	(20080307_2-25099)
   Log:
   Rerun automake/aclocal to rebuild contrib/Makefile.in
