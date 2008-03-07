@@ -1,3 +1,11 @@
+prefix          = @prefix@
+libcoredir      = @libdir@
+modulesdir      = @moduledir@/autoload
+coredir         = @moduledir@
+servicesdir     = @moduledir@/autoload
+libmodulesdir   = @moduledir@
+contribdir	= @moduledir@/contrib
+
 INCLUDES = -I../include -I../libratbox/include $(INCLTDL)
 AM_CFLAGS=$(WARNFLAGS)
 
@@ -39,7 +47,8 @@ clean-generic:
 	$(LIBTOOL) --mode=clean $(RM) -f $(S_OBJS) $(S_CORE_OBJS)  $(ST_OBJS)
 
 install_modules: $(S_OBJS)
-	$(LIBTOOL) --mode=install $(INSTALL_DATA) $(S_OBJS) $(DESTDIR)$(moduledir);
+	-@@$(MKDIR_P) $(contribdir); \
+	for x in $(S_OBJS); do $(SHELL) ../install-mod.sh $$x $(contribdir);done
 
 #install-mkdirs:
 #	@echo "ircd: setting up modular directory structure"
