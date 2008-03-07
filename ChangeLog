@@ -1,3 +1,11 @@
+androsyn    2008/03/07 00:10:27 UTC	(20080307_0-25095)
+  Log:
+  fix global_cidr
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/03/06 20:54:27 UTC	(20080306_0-25093)
   Log:
   keep newconf.c from bombing out when ipv6 isn't found
