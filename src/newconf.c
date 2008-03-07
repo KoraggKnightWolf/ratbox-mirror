@@ -2299,7 +2299,7 @@ static struct conf_items conf_general_table[] =
 	{ "global_cidr_ipv4_count", CF_INT,  NULL, 0, &ConfigFileEntry.global_cidr_ipv4_count },
 	{ "global_cidr_ipv6_bitlen", CF_INT,  NULL, 0, &ConfigFileEntry.global_cidr_ipv6_bitlen },
 	{ "global_cidr_ipv6_count", CF_INT,  NULL, 0, &ConfigFileEntry.global_cidr_ipv6_count },
-	{ "global_cidr_ipv6_count", CF_YESNO,  NULL, 0, &ConfigFileEntry.global_cidr },
+	{ "global_cidr", CF_YESNO,  NULL, 0, &ConfigFileEntry.global_cidr },
 	{ "fallback_to_ip6_int", CF_YESNO, NULL, 0, &ConfigFileEntry.fallback_to_ip6_int },
 	{ "\0", 		0, 	  NULL, 0, NULL }
 };
