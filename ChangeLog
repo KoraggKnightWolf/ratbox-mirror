@@ -1,3 +1,24 @@
+androsyn    2008/03/10 16:52:47 UTC	(20080310_0-25103)
+  Log:
+  - Add support for SSL only channels, channel mode +S.  I don't care for these too much, but enough people seem
+    to whine for them.  Enable with configure --enable-sslonly-channels.  Note that all servers on the network
+    need this enabled for it to work.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/doc/modes.txt (File Modified) 
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+	ircd-ratbox/trunk/include/numeric.h (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 androsyn    2008/03/07 16:30:59 UTC	(20080307_3-25101)
   Log:
   remove the creation of kline.conf etc from the doc/Makefile.in
