@@ -1,3 +1,11 @@
+androsyn    2008/03/10 20:28:36 UTC	(20080310_2-25109)
+  Log:
+  fix a minor documentation issue
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 androsyn    2008/03/10 18:50:43 UTC	(20080310_1-25105)
   Log:
   add flags = ssl to the example.conf for servers
