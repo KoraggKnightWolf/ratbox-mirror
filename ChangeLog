@@ -1,3 +1,11 @@
+androsyn    2008/03/10 18:50:43 UTC	(20080310_1-25105)
+  Log:
+  add flags = ssl to the example.conf for servers
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 androsyn    2008/03/10 16:52:47 UTC	(20080310_0-25103)
   Log:
   - Add support for SSL only channels, channel mode +S.  I don't care for these too much, but enough people seem
