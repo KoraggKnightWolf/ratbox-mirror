@@ -47,7 +47,7 @@ Channel Modes:
 +t - topic      - Only chanops can change the topic
 +v - voice      - Can speak in a moderated channel, and is exempt from flood 
                   restrictions
-
++S - ssl only 	- Requires SSL/TLS connections to join
 The third part of the 004 numeric lists channel modes that require arguments.
 Currently these are bkloveIh.
 

@@ -823,6 +823,10 @@ channel_modes(struct Channel *chptr, struct Client *client_p)
 	if(chptr->mode.mode & MODE_REGONLY)
 		*mbuf++ = 'r';
 #endif
+#ifdef ENABLE_SSLONLY_CHAN
+	if(chptr->mode.mode & MODE_SSLONLY)
+		*mbuf++ = 'S';	
+#endif
 	if(chptr->mode.limit && *chptr->mode.key)
 	{
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))

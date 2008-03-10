@@ -1269,7 +1269,11 @@ static struct ChannelMode ModeTable[255] =
   {chm_nosuch,	0 },			/* P */
   {chm_nosuch,	0 },			/* Q */
   {chm_nosuch,	0 },			/* R */
+#ifdef ENABLE_SSLONLY_CHAN		
+  {chm_simple,  MODE_SSLONLY },         /* S */
+#else 
   {chm_nosuch,	0 },			/* S */
+#endif
   {chm_nosuch,	0 },			/* T */
   {chm_nosuch,	0 },			/* U */
   {chm_nosuch,	0 },			/* V */

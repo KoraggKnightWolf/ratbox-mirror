@@ -264,7 +264,7 @@ const char *form_str(int);
 #define ERR_NEEDREGGEDNICK   477
 #define ERR_BANLISTFULL      478	/* I stole the numeric from ircu -db */
 #define ERR_BADCHANNAME      479
-
+#define ERR_SSLONLYCHAN	     480
 #define ERR_NOPRIVILEGES     481
 #define ERR_CHANOPRIVSNEEDED 482
 #define ERR_CANTKILLSERVER   483
