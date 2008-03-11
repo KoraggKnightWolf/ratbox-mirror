@@ -53,6 +53,7 @@ libcore_la_SOURCES =			\
 	scache.c			\
 	send.c				\
 	sslproc.c			\
+	supported.c			\
 	whowas.c			\
 	version.c			\
 	ircd_parser.y			\

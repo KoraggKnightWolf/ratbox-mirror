@@ -230,31 +230,6 @@ show_lusers(struct Client *source_p)
 }
 
 /*
- * show_isupport
- *
- * inputs	- pointer to client
- * output	- 
- * side effects	- display to client what we support (for them)
- */
-void
-show_isupport(struct Client *source_p)
-{
-	char isupportbuffer[512];
-
-	rb_sprintf(isupportbuffer, FEATURES, FEATURESVALUES);
-	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
-
-	rb_sprintf(isupportbuffer, FEATURES2, FEATURES2VALUES);
-	sendto_one_numeric(source_p, HOLD_QUEUE,  RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
-
-	rb_sprintf(isupportbuffer, FEATURES3, FEATURES3VALUES);
-	sendto_one_numeric(source_p, POP_QUEUE,  RPL_ISUPPORT, form_str(RPL_ISUPPORT), isupportbuffer);
-
-	return;
-}
-
-
-/*
 ** register_local_user
 **      This function is called when both NICK and USER messages
 **      have been accepted for the client, in whatever order. Only

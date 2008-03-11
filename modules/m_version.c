@@ -31,7 +31,7 @@
 #include "numeric.h"
 #include "s_conf.h"
 #include "s_serv.h"
-#include "s_user.h"
+#include "supported.h"
 #include "send.h"
 #include "parse.h"
 #include "modules.h"

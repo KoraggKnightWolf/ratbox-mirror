@@ -669,6 +669,7 @@ ratbox_main(int argc, char *argv[])
 	init_reject();
 	init_cache();
 	init_monitor();
+	init_isupport();
 #ifdef STATIC_MODULES
 	load_static_modules();
 #else
