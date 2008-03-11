@@ -1,3 +1,14 @@
+jilles      2008/03/11 22:23:39 UTC	(20080311_0-25111)
+  Log:
+  004: remove nonexistent umode +e and add cmode +r
+  The way it works now, making 004 conditional is quite
+  hard and rarely anything ever looks at it anyway.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 androsyn    2008/03/10 20:28:36 UTC	(20080310_2-25109)
   Log:
   fix a minor documentation issue
