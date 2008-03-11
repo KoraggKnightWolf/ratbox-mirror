@@ -1,3 +1,11 @@
+androsyn    2008/03/11 22:49:00 UTC	(20080311_2-25115)
+  Log:
+  rerun automake
+
+  Modified:
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+
+
 jilles      2008/03/11 22:46:57 UTC	(20080311_1-25113)
   Log:
   Replace the 005 implementation with a more dynamic one from charybdis
