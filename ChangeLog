@@ -1,3 +1,22 @@
+jilles      2008/03/11 22:46:57 UTC	(20080311_1-25113)
+  Log:
+  Replace the 005 implementation with a more dynamic one from charybdis
+  written by me.
+  This adds an FNC token, and shows cmode +r if it is
+  compiled in and there is a service{} block and cmode +S
+  if it is compiled in.
+  It goes through the list whenever a 005 is to be sent.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/supported.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_version.c (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/supported.c (File Added) 
+
+
 jilles      2008/03/11 22:23:39 UTC	(20080311_0-25111)
   Log:
   004: remove nonexistent umode +e and add cmode +r
