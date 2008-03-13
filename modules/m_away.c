@@ -87,7 +87,7 @@ m_away(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			free_away(source_p);
 		}
 		if(MyConnect(source_p))
-			sendto_one(source_p, POP_QUEUE, form_str(RPL_UNAWAY),
+			sendto_one(source_p, form_str(RPL_UNAWAY),
 				   me.name, source_p->name);
 		return 0;
 	}
@@ -107,7 +107,7 @@ m_away(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	}
 	
 	if(MyConnect(source_p))
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_NOWAWAY), me.name, source_p->name);
+		sendto_one(source_p, form_str(RPL_NOWAWAY), me.name, source_p->name);
 
 	return 0;
 }

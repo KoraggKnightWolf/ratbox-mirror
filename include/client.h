@@ -155,6 +155,7 @@ struct LocalUser;
 /* flags for local clients, this needs stuff moved from above to here at some point */
 #define LFLAGS_SSL		0x00000001
 #define LFLAGS_FLUSH		0x00000002
+#define LFLAGS_CORK		0x00000004
 
 
 /* umodes, settable flags */
@@ -242,6 +243,7 @@ struct LocalUser;
 #define ClearFlush(x)		((x)->localClient->localflags &= ~LFLAGS_FLUSH)
 
 
+
 /* oper flags */
 #define MyOper(x)               (MyConnect(x) && IsOper(x))
 
@@ -306,6 +308,13 @@ struct LocalUser;
 
 #define IsFloodDone(x)          ((x)->flags & FLAGS_FLOODDONE)
 #define SetFloodDone(x)         ((x)->flags |= FLAGS_FLOODDONE)
+
+
+/* These also operate on the uplink from which it came */
+#define IsCork(x)		(MyConnect(x) ? (x)->localClient->cork_count : (x)->from->localClient->cork_count)
+#define SetCork(x)		(MyConnect(x) ? (x)->localClient->cork_count++ : (x)->from->localClient->cork_count++ )
+#define ClearCork(x)		(MyConnect(x) ? (x)->localClient->cork_count-- : (x)->from->localClient->cork_count--)
+
 
 /*
  * definitions for get_client_name

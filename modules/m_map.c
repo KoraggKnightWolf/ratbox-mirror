@@ -62,9 +62,10 @@ m_map(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 		m_not_oper(client_p, source_p, parc, parv);
 		return 0;
 	}
-
+	SetCork(source_p);
 	dump_map(source_p, &me, buf);
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_MAPEND), me.name, source_p->name);
+	ClearCork(source_p);
+	sendto_one(source_p, form_str(RPL_MAPEND), me.name, source_p->name);
 	return 0;
 }
 
@@ -75,8 +76,10 @@ m_map(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 static int
 mo_map(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
+	SetCork(source_p);
 	dump_map(source_p, &me, buf);
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_MAPEND), me.name, source_p->name);
+	ClearCork(source_p);
+	sendto_one(source_p, form_str(RPL_MAPEND), me.name, source_p->name);
 
 	return 0;
 }
@@ -118,7 +121,7 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 		 " | Users: %5lu (%s)", rb_dlink_list_length(&root_p->serv->users),
 		scratch);
 
-	sendto_one(client_p, HOLD_QUEUE, form_str(RPL_MAP), me.name, client_p->name, buf);
+	sendto_one(client_p, form_str(RPL_MAP), me.name, client_p->name, buf);
 
 	if(root_p->serv->servers.head != NULL)
 	{

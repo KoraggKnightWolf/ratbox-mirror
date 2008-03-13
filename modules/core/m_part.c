@@ -99,7 +99,7 @@ part_one_client(struct Client *client_p, struct Client *source_p, char *name, ch
 
 	if((chptr = find_channel(name)) == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), name);
 		return;
 	}
@@ -107,7 +107,7 @@ part_one_client(struct Client *client_p, struct Client *source_p, char *name, ch
 	msptr = find_channel_membership(chptr, source_p);
 	if(msptr == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOTONCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
 				   form_str(ERR_NOTONCHANNEL), name);
 		return;
 	}

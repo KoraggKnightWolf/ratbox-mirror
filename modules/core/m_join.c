@@ -97,7 +97,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		/* check the length and name of channel is ok */
 		if(!check_channel_name_loc(source_p, name) || (strlen(name) > LOC_CHANNELLEN))
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_BADCHANNAME,
+			sendto_one_numeric(source_p, ERR_BADCHANNAME,
 					   form_str(ERR_BADCHANNAME),
 					   (unsigned char *) name);
 			continue;
@@ -113,7 +113,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		/* check it begins with # or &, and local chans are disabled */
 		else if(!IsChannelName(name))
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+			sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 					   form_str(ERR_NOSUCHCHANNEL), name);
 			continue;
 		}
@@ -121,7 +121,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		/* see if its resv'd */
 		if(!IsExemptResv(source_p) && (aconf = hash_find_resv(name)))
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_BADCHANNAME,
+			sendto_one_numeric(source_p, ERR_BADCHANNAME,
 					form_str(ERR_BADCHANNAME), name);
 
 			/* dont warn for opers */
@@ -143,7 +143,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		if(splitmode && !IsOper(source_p) && (*name != '&') &&
 		   ConfigChannel.no_join_on_split)
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_UNAVAILRESOURCE),
+			sendto_one(source_p, form_str(ERR_UNAVAILRESOURCE),
 				   me.name, source_p->name, name);
 			continue;
 		}
@@ -188,7 +188,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			if(splitmode && !IsOper(source_p) && (*name != '&') &&
 			   ConfigChannel.no_create_on_split)
 			{
-				sendto_one(source_p, POP_QUEUE, form_str(ERR_UNAVAILRESOURCE),
+				sendto_one(source_p, form_str(ERR_UNAVAILRESOURCE),
 					   me.name, source_p->name, name);
 				continue;
 			}
@@ -202,7 +202,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		    (rb_dlink_list_length(&source_p->user->channel) >=
 				 (unsigned long)ConfigChannel.max_chans_per_user * 3)))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYCHANNELS),
+			sendto_one(source_p, form_str(ERR_TOOMANYCHANNELS),
 				   me.name, source_p->name, name);
 			if(successful_join_count)
 				source_p->localClient->last_join_time = rb_current_time();
@@ -218,7 +218,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 			if(chptr == NULL)
 			{
-				sendto_one(source_p, POP_QUEUE, form_str(ERR_UNAVAILRESOURCE),
+				sendto_one(source_p, form_str(ERR_UNAVAILRESOURCE),
 					   me.name, source_p->name, name);
 				if(successful_join_count > 0)
 					successful_join_count--;
@@ -232,7 +232,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		/* can_join checks for +i key, bans etc */
 		if((i = can_join(source_p, chptr, key)))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(i),
+			sendto_one(source_p, form_str(i),
 				   me.name, source_p->name, name);
 			if(successful_join_count > 0)
 				successful_join_count--;
@@ -288,10 +288,10 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 		if(chptr->topic != NULL)
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(RPL_TOPIC), me.name,
+			sendto_one(source_p, form_str(RPL_TOPIC), me.name,
 				   source_p->name, chptr->chname, chptr->topic->topic);
 
-			sendto_one(source_p, POP_QUEUE, form_str(RPL_TOPICWHOTIME),
+			sendto_one(source_p, form_str(RPL_TOPICWHOTIME),
 				   me.name, source_p->name, chptr->chname,
 				   chptr->topic->topic_info, chptr->topic->topic_time);
 		}

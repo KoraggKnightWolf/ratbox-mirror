@@ -112,7 +112,7 @@ show_ports(struct Client *source_p)
 	RB_DLINK_FOREACH(ptr, listener_list.head)
 	{
 		listener = ptr->data;
-		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSPLINE, 
+		sendto_one_numeric(source_p, RPL_STATSPLINE, 
 				   form_str(RPL_STATSPLINE), 'P',
 #ifdef RB_IPV6
 			   ntohs(GET_SS_FAMILY(&listener->addr) == AF_INET ? ((struct sockaddr_in *)&listener->addr)->sin_port :

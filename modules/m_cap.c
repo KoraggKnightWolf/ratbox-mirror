@@ -174,7 +174,7 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 	int buflen = 0;
 	int curlen, mlen;
 	unsigned int i;
-
+	SetCork(source_p);
 	mlen = rb_sprintf(buf, ":%s CAP %s %s",
 			me.name, 
 			EmptyString(source_p->name) ? "*" : source_p->name, 
@@ -186,7 +186,7 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 	/* shortcut, nothing to do */
 	if(flags == -1)
 	{
-		sendto_one(source_p, POP_QUEUE, "%s :", buf);
+		sendto_one(source_p, "%s :", buf);
 		return;
 	}
 
@@ -212,7 +212,7 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 			else
 				*p = '\0';
 
-			sendto_one(source_p, HOLD_QUEUE, "%s * :%s", buf, capbuf);
+			sendto_one(source_p, "%s * :%s", buf, capbuf);
 			p = capbuf;
 			buflen = mlen;
 		}
@@ -259,8 +259,8 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 		*(p - 1) = '\0';
 	else
 		*p = '\0';
-
-	sendto_one(source_p, POP_QUEUE, "%s :%s", buf, capbuf);
+	ClearCork(source_p);
+	sendto_one(source_p, "%s :%s", buf, capbuf);
 }
 
 static void
@@ -418,18 +418,18 @@ cap_req(struct Client *source_p, const char *arg)
 
 	if(!finished)
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s CAP %s NAK :%s",
+		sendto_one(source_p, ":%s CAP %s NAK :%s",
 			me.name, EmptyString(source_p->name) ? "*" : source_p->name, arg);
 		return;
 	}
 
 	if(i)
 	{
-		sendto_one(source_p, HOLD_QUEUE, "%s * :%s", buf, pbuf[0]);
-		sendto_one(source_p, POP_QUEUE, "%s :%s", buf, pbuf[1]);
+		sendto_one(source_p, "%s * :%s", buf, pbuf[0]);
+		sendto_one(source_p, "%s :%s", buf, pbuf[1]);
 	}
 	else
-		sendto_one(source_p, POP_QUEUE, "%s :%s", buf, pbuf[0]);
+		sendto_one(source_p, "%s :%s", buf, pbuf[0]);
 
 	source_p->localClient->caps |= capadd;
 	source_p->localClient->caps &= ~capdel;
@@ -464,7 +464,7 @@ m_cap(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 				sizeof(clicap_cmdlist) / sizeof(struct clicap_cmd),
 				sizeof(struct clicap_cmd), (bqcmp) clicap_cmd_search)))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_INVALIDCAPCMD),
+		sendto_one(source_p, form_str(ERR_INVALIDCAPCMD),
 				me.name,  EmptyString(source_p->name) ? "*" : source_p->name, parv[1]);
 		return 0;
 	}

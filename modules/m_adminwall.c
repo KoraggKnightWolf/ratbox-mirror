@@ -58,7 +58,7 @@ mo_adminwall(struct Client *client_p, struct Client *source_p, int parc, const c
 { 
         if(!IsAdmin(source_p))
         {
-                sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+                sendto_one(source_p, form_str(ERR_NOPRIVS),
                            me.name, source_p->name, "adminwall");
                 return 0;
         }

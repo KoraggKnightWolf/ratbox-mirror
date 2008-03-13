@@ -201,6 +201,7 @@ struct LocalUser
 	struct _ssl_ctl *ssl_ctl;		/* which ssl daemon we're associate with */
 	rb_uint32_t localflags;
 	struct ZipStats *zipstats;		/* zipstats */
+	rb_uint16_t cork_count;			/* used for corking/uncorking connections */
 };
 
 

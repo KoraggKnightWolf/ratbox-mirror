@@ -66,20 +66,20 @@ m_ping(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	{
 		if((target_p = find_server(source_p, destination)))
 		{
-			sendto_one(target_p, POP_QUEUE, ":%s PING %s :%s",
+			sendto_one(target_p, ":%s PING %s :%s",
 				   get_id(source_p, target_p),
 				   source_p->name, get_id(target_p, target_p));
 		}
 		else
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHSERVER,
+			sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
 					   form_str(ERR_NOSUCHSERVER),
 					   destination);
 			return 0;
 		}
 	}
 	else
-		sendto_one(source_p, POP_QUEUE, ":%s PONG %s :%s", me.name,
+		sendto_one(source_p, ":%s PONG %s :%s", me.name,
 			   (destination) ? destination : me.name, parv[1]);
 
 	return 0;
@@ -97,17 +97,17 @@ ms_ping(struct Client *client_p, struct Client *source_p, int parc, const char *
 	   irccmp(destination, me.id))
 	{
 		if((target_p = find_client(destination)) && IsServer(target_p))
-			sendto_one(target_p, POP_QUEUE, ":%s PING %s :%s", 
+			sendto_one(target_p, ":%s PING %s :%s", 
 				   get_id(source_p, target_p), source_p->name,
 				   get_id(target_p, target_p));
 		/* not directed at an id.. */
 		else if(!IsDigit(*destination))
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHSERVER,
+			sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
 					   form_str(ERR_NOSUCHSERVER),
 					   destination);
 	}
 	else
-		sendto_one(source_p, POP_QUEUE, ":%s PONG %s :%s", 
+		sendto_one(source_p, ":%s PONG %s :%s", 
 			   get_id(&me, source_p), me.name, 
 			   get_id(source_p, source_p));
 

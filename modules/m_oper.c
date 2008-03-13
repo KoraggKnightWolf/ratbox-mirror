@@ -96,7 +96,7 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(IsOper(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_YOUREOPER), me.name, source_p->name);
+		sendto_one(source_p, form_str(RPL_YOUREOPER), me.name, source_p->name);
 		send_oper_motd(source_p);
 		return 0;
 	}
@@ -110,7 +110,7 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(oper_p == NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOOPERHOST), me.name, source_p->name);
+		sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
 		ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 		     name, source_p->name,
 		     source_p->username, source_p->host);
@@ -135,7 +135,7 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	}
 	else
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH),
+		sendto_one(source_p, form_str(ERR_PASSWDMISMATCH),
 			   me.name, source_p->name);
 
 		ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
@@ -167,18 +167,18 @@ send_oper_motd(struct Client *source_p)
 
 	if(oper_motd == NULL || rb_dlink_list_length(&oper_motd->contents) == 0)
 		return;
-
-	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_OMOTDSTART), 
+	SetCork(source_p);
+	sendto_one(source_p, form_str(RPL_OMOTDSTART), 
 		   me.name, source_p->name);
 
 	RB_DLINK_FOREACH(ptr, oper_motd->contents.head)
 	{
 		lineptr = ptr->data;
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_OMOTD),
+		sendto_one(source_p, form_str(RPL_OMOTD),
 			   me.name, source_p->name, lineptr->data);
 	}
-
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFOMOTD), 
+	ClearCork(source_p);
+	sendto_one(source_p, form_str(RPL_ENDOFOMOTD), 
 		   me.name, source_p->name);
 }
 
@@ -267,8 +267,8 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 	if((old & UMODE_INVISIBLE) && !IsInvisible(source_p))
 		--Count.invisi;
 	send_umode_out(source_p, source_p, old);
-	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_YOUREOPER), me.name, source_p->name);
-	sendto_one_notice(source_p, POP_QUEUE, ":*** Oper privs are %s", get_oper_privs(oper_p->flags));
+	sendto_one(source_p, form_str(RPL_YOUREOPER), me.name, source_p->name);
+	sendto_one_notice(source_p, ":*** Oper privs are %s", get_oper_privs(oper_p->flags));
 	send_oper_motd(source_p);
 
 	return (1);
@@ -279,7 +279,7 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 static int
 m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	sendto_one_notice(source_p, POP_QUEUE, ":Challenge not implemented");
+	sendto_one_notice(source_p, ":Challenge not implemented");
 	return 0;
 }
 
@@ -319,7 +319,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(IsOper(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_YOUREOPER), me.name, source_p->name);
+		sendto_one(source_p, form_str(RPL_YOUREOPER), me.name, source_p->name);
 		send_oper_motd(source_p);
 		return 0;
 	}
@@ -331,7 +331,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		if((rb_current_time() - source_p->localClient->chal_time) > CHALLENGE_EXPIRES)
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
+			sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "EXPIRED CHALLENGE (%s) by (%s!%s@%s)",
 			     source_p->localClient->opername, source_p->name,
 			     source_p->username, source_p->host);
@@ -349,7 +349,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		if(len != SHA_DIGEST_LENGTH || memcmp(source_p->localClient->passwd, b_response, SHA_DIGEST_LENGTH))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
+			sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
 			     source_p->localClient->opername, source_p->name,
 			     source_p->username, source_p->host);
@@ -373,7 +373,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		if(oper_p == NULL)
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_NOOPERHOST), 
+			sendto_one(source_p, form_str(ERR_NOOPERHOST), 
 				   me.name, source_p->name);
 			ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 			     source_p->localClient->opername, source_p->name,
@@ -404,7 +404,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(oper_p == NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOOPERHOST), me.name, source_p->name);
+		sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
 		ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 		     parv[1], source_p->name,
 		     source_p->username, source_p->host);
@@ -418,7 +418,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(!oper_p->rsa_pubkey)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":I'm sorry, PK authentication "
+		sendto_one_notice(source_p, ":I'm sorry, PK authentication "
 				  "is not enabled for your oper{} block.");
 		return 0;
 	}
@@ -427,24 +427,26 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 	{
 		char *chal = challenge;
 		source_p->localClient->chal_time = rb_current_time();
+		SetCork(source_p);
 		for(;;)
 		{
 			cnt = rb_strlcpy(chal_line, chal, CHALLENGE_WIDTH);
-			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_RSACHALLENGE2), me.name, source_p->name, chal_line);
+			sendto_one(source_p, form_str(RPL_RSACHALLENGE2), me.name, source_p->name, chal_line);
 			if(cnt > CHALLENGE_WIDTH)
 				chal += CHALLENGE_WIDTH - 1;
 			else
 				break;
 			
 		}
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFRSACHALLENGE2), 
+		ClearCork(source_p);
+		sendto_one(source_p, form_str(RPL_ENDOFRSACHALLENGE2), 
 			   me.name, source_p->name);
 
 		source_p->localClient->opername = rb_strdup(oper_p->name);
 		rb_free(challenge);
 	}
 	else
-		sendto_one_notice(source_p, POP_QUEUE, ":Failed to generate challenge.");
+		sendto_one_notice(source_p, ":Failed to generate challenge.");
 
 	return 0;
 }

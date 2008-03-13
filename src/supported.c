@@ -150,7 +150,7 @@ show_isupport(struct Client *client_p)
 	/* :<me.name> 005 <nick> <params> :are supported by this server */
 	/* form_str(RPL_ISUPPORT) is %s :are supported by this server */
 	extra_space += strlen(me.name) + 1 + strlen(form_str(RPL_ISUPPORT));
-
+	SetCork(client_p);
 	nchars = extra_space, nparams = 0, buf[0] = '\0';
 	RB_DLINK_FOREACH(ptr, isupportlist.head)
 	{
@@ -161,7 +161,7 @@ show_isupport(struct Client *client_p)
 		l = strlen(item->name) + (EmptyString(value) ? 0 : 1 + strlen(value));
 		if (nchars + l + (nparams > 0) >= sizeof buf || nparams + 1 > 12)
 		{
-			sendto_one_numeric(client_p, HOLD_QUEUE, RPL_ISUPPORT, form_str(RPL_ISUPPORT), buf);
+			sendto_one_numeric(client_p, RPL_ISUPPORT, form_str(RPL_ISUPPORT), buf);
 			nchars = extra_space, nparams = 0, buf[0] = '\0';
 		}
 		if (nparams > 0)
@@ -175,8 +175,11 @@ show_isupport(struct Client *client_p)
 		nchars += l;
 		nparams++;
 	}
+	
 	if (nparams > 0)
-		sendto_one_numeric(client_p, POP_QUEUE, RPL_ISUPPORT, form_str(RPL_ISUPPORT), buf);
+		sendto_one_numeric(client_p, RPL_ISUPPORT, form_str(RPL_ISUPPORT), buf);
+	ClearCork(client_p);
+	send_pop_queue(client_p);
 }
 
 const char *

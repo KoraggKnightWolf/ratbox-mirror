@@ -59,13 +59,13 @@ mo_close(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		target_p = ptr->data;
 
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_CLOSING), me.name, source_p->name,
+		sendto_one(source_p, form_str(RPL_CLOSING), me.name, source_p->name,
 			   get_client_name(target_p, SHOW_IP), target_p->status);
 
 		(void) exit_client(target_p, target_p, target_p, "Oper Closing");
 		closed++;
 	}
 
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_CLOSEEND), me.name, source_p->name, closed);
+	sendto_one(source_p, form_str(RPL_CLOSEEND), me.name, source_p->name, closed);
 	return 0;
 }

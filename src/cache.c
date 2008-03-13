@@ -255,22 +255,21 @@ send_user_motd(struct Client *source_p)
 	rb_dlink_node *ptr;
 	const char *myname = get_id(&me, source_p);
 	const char *nick = get_id(source_p, source_p);
-
 	if(user_motd == NULL || rb_dlink_list_length(&user_motd->contents) == 0)
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOMOTD), myname, nick);
+		sendto_one(source_p, form_str(ERR_NOMOTD), myname, nick);
 		return;
 	}
-
-	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MOTDSTART), myname, nick, me.name);
+	SetCork(source_p);
+	sendto_one(source_p, form_str(RPL_MOTDSTART), myname, nick, me.name);
 
 	RB_DLINK_FOREACH(ptr, user_motd->contents.head)
 	{
 		lineptr = ptr->data;
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MOTD), myname, nick, lineptr->data);
+		sendto_one(source_p, form_str(RPL_MOTD), myname, nick, lineptr->data);
 	}
-
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFMOTD), myname, nick);
+	ClearCork(source_p);
+	sendto_one(source_p, form_str(RPL_ENDOFMOTD), myname, nick);
 }
 
 void

@@ -77,7 +77,7 @@ typedef enum
 }
 ReportType;
 
-#define sendheader(c, r) sendto_one(c, POP_QUEUE, HeaderMessages[(r)])
+#define sendheader(c, r) sendto_one(c, HeaderMessages[(r)])
 
 static rb_dlink_list auth_poll_list;
 static rb_bh *auth_heap;
@@ -364,7 +364,7 @@ start_auth(struct Client *client)
 		return;
 
 	/* to aid bopm which needs something unique to match against */
-	sendto_one(client, POP_QUEUE, "NOTICE AUTH :*** Processing connection to %s",
+	sendto_one(client, "NOTICE AUTH :*** Processing connection to %s",
 			me.name);
 
 	auth = make_auth_request(client);

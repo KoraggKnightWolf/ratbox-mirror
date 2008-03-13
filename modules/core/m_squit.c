@@ -85,7 +85,7 @@ mo_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 		}
 		else if(!IsOperRemote(source_p))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+			sendto_one(source_p, form_str(ERR_NOPRIVS),
 				   me.name, source_p->name, "remote");
 			return 0;
 		}
@@ -95,7 +95,7 @@ mo_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 	else
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHSERVER,
+		sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
 				   form_str(ERR_NOSUCHSERVER), parv[1]);
 	}
 
@@ -209,7 +209,7 @@ find_squit(struct Client *client_p, struct Client *source_p, const char *server)
 		if(IsClient(client_p))
 		{
 			if(MyClient(client_p))
-				sendto_one_notice(source_p, POP_QUEUE, ":You are trying to squit me.");
+				sendto_one_notice(source_p, ":You are trying to squit me.");
 			return NULL;
 		}
 		else

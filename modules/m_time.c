@@ -60,7 +60,7 @@ m_time(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	
 	if(hunt_server(client_p, source_p, ":%s TIME :%s", 1, parc, parv) == HUNTED_ISME)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, RPL_TIME, form_str(RPL_TIME),
+		sendto_one_numeric(source_p, RPL_TIME, form_str(RPL_TIME),
 				   me.name, rb_date(rb_current_time(), buf, sizeof(buf)));
 	}
 	return 0;

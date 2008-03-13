@@ -337,7 +337,7 @@ report_dlines(struct Client *source_p)
 		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			RB_PATRICIA_WALK_BREAK;
 		get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
-		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDLINE,
+		sendto_one_numeric(source_p, RPL_STATSDLINE,
                             		     form_str (RPL_STATSDLINE),
                                              'D', host, pass,
                                              oper_reason ? "|" : "",
@@ -358,7 +358,7 @@ report_tdlines(struct Client *source_p)
 		if(!(aconf->flags & CONF_FLAGS_TEMPORARY))
 			RB_PATRICIA_WALK_BREAK;
 		get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
-		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDLINE,
+		sendto_one_numeric(source_p, RPL_STATSDLINE,
                             		     form_str (RPL_STATSDLINE),
                                              'd', host, pass,
                                              oper_reason ? "|" : "",
@@ -378,7 +378,7 @@ report_elines(struct Client *source_p)
 	{
 		aconf = pnode->data;
 		get_printable_conf(aconf, &name, &host, &pass, &user, &port, &classname);
-		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSDLINE,
+		sendto_one_numeric(source_p, RPL_STATSDLINE,
                             		     form_str (RPL_STATSDLINE),
                                              'e', host, pass,
                                              "", "");

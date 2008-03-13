@@ -66,9 +66,9 @@ m_list(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		/* pace this due to the sheer traffic involved */
 		if(((last_used + ConfigFileEntry.pace_wait) > rb_current_time()))
 		{
-			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
+			sendto_one(source_p, form_str(RPL_LOAD2HI),
 					me.name, source_p->name, "LIST");
-			sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTEND), me.name, source_p->name);
+			sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
 			return 0;
 		}
 		else
@@ -121,9 +121,10 @@ list_all_channels(struct Client *source_p)
 	sendq_limit = (int) get_sendq(source_p);
 	sendq_limit /= 10;
 	sendq_limit *= 9;
-
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTSTART), me.name, source_p->name);
-
+	
+	sendto_one(source_p, form_str(RPL_LISTSTART), me.name, source_p->name);
+	SetCork(source_p);
+	
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
 		chptr = ptr->data;
@@ -131,26 +132,29 @@ list_all_channels(struct Client *source_p)
 		/* if theyre overflowing their sendq, stop. --fl */
 		if(rb_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYMATCHES),
+			ClearCork(source_p);
+			sendto_one(source_p, form_str(ERR_TOOMANYMATCHES),
 				   me.name, source_p->name, "LIST");
 			break;
 		}
 
 		if(SecretChannel(chptr) && !IsMember(source_p, chptr))
 			continue;
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LIST), 
+		sendto_one(source_p, form_str(RPL_LIST), 
 			   me.name, source_p->name, chptr->chname, 
 			   rb_dlink_list_length(&chptr->members), 
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 
 		if(count++ >= 10) 
 		{
+			ClearCork(source_p);
 			send_pop_queue(source_p);
+			SetCork(source_p);
 			count = 0;
 		}
 	}
-
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTEND), me.name, source_p->name);
+	ClearCork(source_p);
+	sendto_one(source_p,form_str(RPL_LISTEND), me.name, source_p->name);
 	return;
 }
 
@@ -198,8 +202,9 @@ list_limit_channels(struct Client *source_p, const char *param)
 	sendq_limit /= 10;
 	sendq_limit *= 9;
 
-	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LISTSTART), me.name, source_p->name);
-
+	sendto_one(source_p, form_str(RPL_LISTSTART), me.name, source_p->name);
+	SetCork(source_p);
+	
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
 		chptr = ptr->data;
@@ -207,7 +212,8 @@ list_limit_channels(struct Client *source_p, const char *param)
 		/* if theyre overflowing their sendq, stop. --fl */
 		if(rb_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_TOOMANYMATCHES),
+			ClearCork(source_p);
+			sendto_one(source_p, form_str(ERR_TOOMANYMATCHES),
 				   me.name, source_p->name, "LIST");
 			break;
 		}
@@ -219,19 +225,20 @@ list_limit_channels(struct Client *source_p, const char *param)
 		if(SecretChannel(chptr) && !IsMember(source_p, chptr))
 			continue;
 
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LIST), 
+		sendto_one(source_p, form_str(RPL_LIST), 
 			   me.name, source_p->name, chptr->chname, 
 			   rb_dlink_list_length(&chptr->members), 
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 
 		if(count++ >= 10) 
 		{
+			ClearCork(source_p);
 			send_pop_queue(source_p);
 			count = 0;
 		}
 	}
-
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTEND), me.name, source_p->name);
+	ClearCork(source_p);
+	sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
 	return;
 }
 
@@ -249,16 +256,18 @@ list_named_channel(struct Client *source_p, const char *name)
 	char *p;
 	char *n = LOCAL_COPY(name);
 
-	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LISTSTART), me.name, source_p->name);
+	SetCork(source_p);
+	sendto_one(source_p, form_str(RPL_LISTSTART), me.name, source_p->name);
 
 	if((p = strchr(n, ',')))
 		*p = '\0';
 
 	if(*n == '\0')
 	{
-		sendto_one_numeric(source_p, HOLD_QUEUE, ERR_NOSUCHNICK, 
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
 				   form_str(ERR_NOSUCHNICK), name);
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTEND), me.name, source_p->name);
+		ClearCork(source_p);
+		sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
 		return;
 	}
 
@@ -266,18 +275,19 @@ list_named_channel(struct Client *source_p, const char *name)
 
 	if(chptr == NULL)
 	{
-		sendto_one_numeric(source_p, HOLD_QUEUE, ERR_NOSUCHNICK,
-				   form_str(ERR_NOSUCHNICK), n);
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTEND), me.name, source_p->name);
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK, form_str(ERR_NOSUCHNICK), n);
+		ClearCork(source_p);
+		sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
 		return;
 	}
 
 	if(ShowChannel(source_p, chptr))
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LIST),
+		sendto_one(source_p, form_str(RPL_LIST),
 			   me.name, source_p->name, chptr->chname, 
 			   rb_dlink_list_length(&chptr->members),
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_LISTEND), me.name, source_p->name);
+	ClearCork(source_p);
+	sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
 	return;
 }

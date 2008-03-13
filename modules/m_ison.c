@@ -114,7 +114,7 @@ m_ison(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	*current_insert_point = '\0';
 	*current_insert_point2 = '\0';
 
-	sendto_one_buffer(source_p, POP_QUEUE, buf);
+	sendto_one_buffer(source_p, buf);
 
 	return 0;
 }

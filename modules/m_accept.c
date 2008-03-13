@@ -80,7 +80,7 @@ m_accept(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* shouldnt happen, but lets be paranoid */
 		if((target_p = find_named_person(nick)) == NULL)
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHNICK,
+			sendto_one_numeric(source_p, ERR_NOSUCHNICK,
 					   form_str(ERR_NOSUCHNICK), nick);
 			continue;
 		}
@@ -88,7 +88,7 @@ m_accept(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* user isnt on clients accept list */
 		if(!accept_message(target_p, source_p))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_ACCEPTNOT),
+			sendto_one(source_p, form_str(ERR_ACCEPTNOT),
 				   me.name, source_p->name, target_p->name);
 			continue;
 		}
@@ -107,7 +107,7 @@ m_accept(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* shouldnt happen, but lets be paranoid */
 		if((target_p = find_named_person(nick)) == NULL)
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHNICK,
+			sendto_one_numeric(source_p, ERR_NOSUCHNICK,
 					   form_str(ERR_NOSUCHNICK), nick);
 			continue;
 		}
@@ -115,14 +115,14 @@ m_accept(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* user is already on clients accept list */
 		if(accept_message(target_p, source_p))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_ACCEPTEXIST),
+			sendto_one(source_p, form_str(ERR_ACCEPTEXIST),
 				   me.name, source_p->name, target_p->name);
 			continue;
 		}
 
 		if(accept_num >= ConfigFileEntry.max_accept)
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_ACCEPTFULL), me.name, source_p->name);
+			sendto_one(source_p, form_str(ERR_ACCEPTFULL), me.name, source_p->name);
 			return 0;
 		}
 
@@ -170,7 +170,7 @@ build_nicklist(struct Client *source_p, char *addbuf, char *delbuf, const char *
 
 		if((target_p = find_named_person(name)) == NULL)
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHNICK, 
+			sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
 					   form_str(ERR_NOSUCHNICK), name);
 			continue;
 		}
@@ -232,6 +232,7 @@ list_accepts(struct Client *source_p)
 	*nicks = '\0';
 	len2 = strlen(source_p->name) + 10;
 
+	SetCork(source_p);
 	RB_DLINK_FOREACH(ptr, source_p->localClient->allow_list.head)
 	{
 		target_p = ptr->data;
@@ -241,7 +242,7 @@ list_accepts(struct Client *source_p)
 
 			if((len + strlen(target_p->name) + len2 > BUFSIZE) || count > 14)
 			{
-				sendto_one(source_p, HOLD_QUEUE, form_str(RPL_ACCEPTLIST),
+				sendto_one(source_p, form_str(RPL_ACCEPTLIST),
 					   me.name, source_p->name, nicks);
 
 				len = count = 0;
@@ -254,10 +255,11 @@ list_accepts(struct Client *source_p)
 	}
 
 	if(*nicks)
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_ACCEPTLIST), 
+		sendto_one(source_p, form_str(RPL_ACCEPTLIST), 
 			   me.name, source_p->name, nicks);
 
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFACCEPT), 
+	ClearCork(source_p);
+	sendto_one(source_p, form_str(RPL_ENDOFACCEPT), 
 		   me.name, source_p->name);
 
 }

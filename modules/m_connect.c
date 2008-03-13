@@ -73,7 +73,7 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(MyConnect(source_p) && !IsOperRemote(source_p) && parc > 3)
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "remote");
 		return 0;
 	}
@@ -83,7 +83,7 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if((target_p = find_server(source_p, parv[1])))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Connect: Server %s already exists from %s.",
+		sendto_one_notice(source_p, ":Connect: Server %s already exists from %s.",
 				  parv[1], target_p->from->name);
 		return 0;
 	}
@@ -93,14 +93,13 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 */
 	if((server_p = find_server_conf(parv[1])) == NULL)
 	{
-		sendto_one_notice(source_p, POP_QUEUE,
-			   	  ":Connect: Host %s not listed in ircd.conf", parv[1]);
+		sendto_one_notice(source_p, ":Connect: Host %s not listed in ircd.conf", parv[1]);
 		return 0;
 	}
 
 	if(ServerConfSSL(server_p) && (!ssl_ok || !get_ssld_count()))
 	{
-		sendto_one_notice(source_p, POP_QUEUE,
+		sendto_one_notice(source_p,
 				  ":Connect: Server %s is set to use SSL/TLS but SSL/TLS is not configured.",
 				  parv[1]);
 		return 0;
@@ -116,13 +115,13 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		if((port = atoi(parv[2])) <= 0)
 		{
-			sendto_one_notice(source_p, POP_QUEUE, ":Connect: Illegal port number");
+			sendto_one_notice(source_p, ":Connect: Illegal port number");
 			return 0;
 		}
 	}
 	else if(port <= 0 && (port = PORTNUM) <= 0)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Connect: missing port number");
+		sendto_one_notice(source_p, ":Connect: missing port number");
 		return 0;
 	}
 	/*
@@ -138,12 +137,12 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 */
 	if(serv_connect(server_p, source_p))
 	{
-			sendto_one_notice(source_p, POP_QUEUE, ":*** Connecting to %s.%d",
+			sendto_one_notice(source_p, ":*** Connecting to %s.%d",
 					  server_p->name, server_p->port);
 	}
 	else
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":*** Couldn't connect to %s.%d",
+		sendto_one_notice(source_p, ":*** Couldn't connect to %s.%d",
 				  server_p->name, server_p->port);
 
 	}
@@ -180,7 +179,7 @@ ms_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if((target_p = find_server(NULL, parv[1])))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Connect: Server %s already exists from %s.",
+		sendto_one_notice(source_p, ":Connect: Server %s already exists from %s.",
 				  parv[1], target_p->from->name);
 		return 0;
 	}
@@ -190,14 +189,14 @@ ms_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 */
 	if((server_p = find_server_conf(parv[1])) == NULL)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Connect: Host %s not listed in ircd.conf",
+		sendto_one_notice(source_p, ":Connect: Host %s not listed in ircd.conf",
 				  parv[1]);
 		return 0;
 	}
 
 	if(ServerConfSSL(server_p) && (!ssl_ok || !get_ssld_count()))
 	{
-		sendto_one_notice(source_p, POP_QUEUE,
+		sendto_one_notice(source_p,
 				  ":Connect: Server %s is set to use SSL/TLS but SSL/TLS is not configured.",
 				  parv[1]);
 		return 0;
@@ -218,7 +217,7 @@ ms_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 		port = server_p->port;
 	else if(port <= 0)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Connect: Illegal port number");
+		sendto_one_notice(source_p, ":Connect: Illegal port number");
 		return 0;
 	}
 
@@ -243,10 +242,10 @@ ms_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 * C:line and a valid port in the C:line
 	 */
 	if(serv_connect(server_p, source_p))
-		sendto_one_notice(source_p, POP_QUEUE, ":*** Connecting to %s.%d",
+		sendto_one_notice(source_p, ":*** Connecting to %s.%d",
 				  server_p->name, server_p->port);
 	else
-		sendto_one_notice(source_p, POP_QUEUE, ":*** Couldn't connect to %s.%d",
+		sendto_one_notice(source_p, ":*** Couldn't connect to %s.%d",
 				  server_p->name, server_p->port);
 	/*
 	 * client is either connecting with all the data it needs or has been

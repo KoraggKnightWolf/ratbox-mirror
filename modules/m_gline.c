@@ -104,13 +104,13 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(!ConfigFileEntry.glines)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":GLINE disabled");
+		sendto_one_notice(source_p, ":GLINE disabled");
 		return 0;
 	}
 
 	if(!IsOperGline(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "gline");
 		return 0;
 	}
@@ -133,7 +133,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* ok, its not a host.. abort */
 		if(strchr(parv[1], '.') == NULL)
 		{
-			sendto_one_notice(source_p, POP_QUEUE, ":Invalid parameters");
+			sendto_one_notice(source_p, ":Invalid parameters");
 			return 0;
 		}
 
@@ -150,7 +150,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if(check_wild_gline(user, host))
 	{
 		if(MyClient(source_p))
-			sendto_one_notice(source_p, POP_QUEUE,
+			sendto_one_notice(source_p,
 					  ":Please include at least %d non-wildcard "
 					  "characters with the user@host",
 					  ConfigFileEntry.min_nonwildcard);
@@ -167,7 +167,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		{
 			if(bitlen < ConfigFileEntry.gline_min_cidr)
 			{
-				sendto_one_notice(source_p, POP_QUEUE, ":Cannot set G-Lines with cidr length < %d",
+				sendto_one_notice(source_p, ":Cannot set G-Lines with cidr length < %d",
 						  ConfigFileEntry.gline_min_cidr);
 				return 0;
 			}
@@ -175,7 +175,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* ipv6 */
 		else if(bitlen < ConfigFileEntry.gline_min_cidr6)
 		{
-			sendto_one_notice(source_p, POP_QUEUE, ":Cannot set G-Lines with cidr length < %d",
+			sendto_one_notice(source_p, ":Cannot set G-Lines with cidr length < %d",
 					  ConfigFileEntry.gline_min_cidr6);
 			return 0;
 		}
@@ -407,13 +407,13 @@ mo_ungline(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(!ConfigFileEntry.glines)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":UNGLINE disabled");
+		sendto_one_notice(source_p, ":UNGLINE disabled");
 		return 0;
 	}
 
 	if(!IsOperUnkline(source_p) || !IsOperGline(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "unkline");
 		return 0;
 	}
@@ -443,13 +443,13 @@ mo_ungline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	}
 	else
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Invalid parameters");
+		sendto_one_notice(source_p, ":Invalid parameters");
 		return 0;
 	}
 
 	if(remove_temp_gline(user, host))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Un-glined [%s@%s]", user, host);
+		sendto_one_notice(source_p, ":Un-glined [%s@%s]", user, host);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s has removed the G-Line for: [%s@%s]",
 				     get_oper_name(source_p), user, host);
@@ -459,7 +459,7 @@ mo_ungline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	}
 	else
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":No G-Line for %s@%s", user, host);
+		sendto_one_notice(source_p, ":No G-Line for %s@%s", user, host);
 	}
 
 	return 0;
@@ -521,7 +521,7 @@ invalid_gline(struct Client *source_p, const char *luser, char *lreason)
 {
 	if(strchr(luser, '!'))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Invalid character '!' in gline");
+		sendto_one_notice(source_p, ":Invalid character '!' in gline");
 		return 1;
 	}
 

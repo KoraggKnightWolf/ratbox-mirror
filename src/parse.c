@@ -233,7 +233,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 			if(pbuffer[0] != '\0')
 			{
 				if(IsClient(from))
-					sendto_one(from, POP_QUEUE, form_str(ERR_UNKNOWNCOMMAND),
+					sendto_one(from, form_str(ERR_UNKNOWNCOMMAND),
 						   me.name, from->name, ch);
 			}
 			ServerStats.is_unco++;
@@ -335,7 +335,7 @@ handle_command(struct Message *mptr, struct Client *client_p,
 	{
 		if(!IsServer(client_p))
 		{
-			sendto_one(client_p, POP_QUEUE, form_str(ERR_NEEDMOREPARAMS),
+			sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
 				   me.name, 
 				   EmptyString(client_p->name) ? "*" : client_p->name, 
 				   mptr->cmd);
@@ -586,13 +586,12 @@ remove_unknown(struct Client *client_p, char *lsender, char *lbuffer)
 				     "Unknown prefix (%s) from %s, Squitting %s",
 				     lbuffer, client_p->name, lsender);
 
-		sendto_one(client_p, POP_QUEUE,
-			   ":%s SQUIT %s :(Unknown prefix (%s) from %s)",
+		sendto_one(client_p, ":%s SQUIT %s :(Unknown prefix (%s) from %s)",
 			   get_id(&me, client_p), lsender, 
 			   lbuffer, client_p->name);
 	}
 	else
-		sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Unknown Client)", 
+		sendto_one(client_p, ":%s KILL %s :%s (Unknown Client)", 
 			   get_id(&me, client_p), lsender, me.name);
 }
 
@@ -691,7 +690,7 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 			return;
 
 		/* Fake it for server hiding, if its our client */
-		sendto_one(target_p, POP_QUEUE, ":%s %s %s%s", 
+		sendto_one(target_p, ":%s %s %s%s", 
 			   get_id(source_p, target_p), numeric, 
 			   get_id(target_p, target_p), buffer);
 		return;
@@ -706,7 +705,7 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 int
 m_not_oper(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	sendto_one_numeric(source_p, POP_QUEUE, ERR_NOPRIVILEGES, form_str(ERR_NOPRIVILEGES));
+	sendto_one_numeric(source_p, ERR_NOPRIVILEGES, form_str(ERR_NOPRIVILEGES));
 	return 0;
 }
 
@@ -720,7 +719,7 @@ m_unregistered(struct Client *client_p, struct Client *source_p, int parc, const
 	 */
 	if(client_p->localClient->number_of_nick_changes == 0)
 	{
-		sendto_one(client_p, POP_QUEUE, form_str(ERR_NOTREGISTERED), me.name);
+		sendto_one(client_p, form_str(ERR_NOTREGISTERED), me.name);
 		client_p->localClient->number_of_nick_changes++;
 	}
 
@@ -730,7 +729,7 @@ m_unregistered(struct Client *client_p, struct Client *source_p, int parc, const
 int
 m_registered(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	sendto_one(client_p, POP_QUEUE, form_str(ERR_ALREADYREGISTRED), me.name, source_p->name);
+	sendto_one(client_p, form_str(ERR_ALREADYREGISTRED), me.name, source_p->name);
 	return 0;
 }
 

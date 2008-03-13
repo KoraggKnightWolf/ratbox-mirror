@@ -171,7 +171,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 			return 0;
 
 		if(MyClient(exist_p))
-			sendto_one(exist_p, POP_QUEUE, ":%s KILL %s :(Nickname regained by services)",
+			sendto_one(exist_p, ":%s KILL %s :(Nickname regained by services)",
 				me.name, exist_p->name);
 
 		exist_p->flags |= FLAGS_KILLED;
@@ -245,7 +245,7 @@ h_svc_burst_client(hook_data_client *hdata)
 	if(EmptyString(hdata->target->user->suser))
 		return;
 
-	sendto_one(hdata->client, POP_QUEUE, ":%s ENCAP * LOGIN %s",
+	sendto_one(hdata->client, ":%s ENCAP * LOGIN %s",
 			get_id(hdata->target, hdata->client),
 			hdata->target->user->suser);
 }
@@ -270,7 +270,7 @@ h_svc_whois(hook_data_client *data)
 {
 	if(!EmptyString(data->target->user->suser))
 	{
-		sendto_one(data->client, POP_QUEUE, form_str(RPL_WHOISLOGGEDIN),
+		sendto_one(data->client, form_str(RPL_WHOISLOGGEDIN),
 				get_id(&me, data->client),
 				get_id(data->client, data->client),
 				data->target->name,
@@ -288,7 +288,7 @@ h_svc_stats(hook_data_int *data)
 	{
 		RB_DLINK_FOREACH(ptr, service_list.head)
 		{
-			sendto_one_numeric(data->client, POP_QUEUE, RPL_STATSULINE,
+			sendto_one_numeric(data->client, RPL_STATSULINE,
 						form_str(RPL_STATSULINE),
 						ptr->data, "*", "*", "s");
 		}

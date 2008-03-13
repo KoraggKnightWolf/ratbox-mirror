@@ -60,6 +60,7 @@
 #include "dns.h"
 #include "bandbi.h"
 #include "sslproc.h"
+#include "supported.h"
 /*
  * Try and find the correct name to use with getrlimit() for setting the max.
  * number of files allowed to be open by this process.
@@ -129,8 +130,7 @@ ircd_shutdown(const char *reason)
 	{
 		target_p = ptr->data;
 
-		sendto_one(target_p, POP_QUEUE,
-			":%s NOTICE %s :Server Terminating. %s",
+		sendto_one(target_p, ":%s NOTICE %s :Server Terminating. %s",
 			me.name, target_p->name, reason);
 	}
 
@@ -138,7 +138,7 @@ ircd_shutdown(const char *reason)
 	{
 		target_p = ptr->data;
 
-		sendto_one(target_p, POP_QUEUE, ":%s ERROR :Terminated by %s",
+		sendto_one(target_p, ":%s ERROR :Terminated by %s",
 			me.name, reason);
 	}
 

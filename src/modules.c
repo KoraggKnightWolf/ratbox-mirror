@@ -379,7 +379,7 @@ mo_modload(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "admin");
 		return 0;
 	}
@@ -388,7 +388,7 @@ mo_modload(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(findmodule_byname(m_bn) != -1)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is already loaded", m_bn);
+		sendto_one_notice(source_p, ":Module %s is already loaded", m_bn);
 		rb_free(m_bn);
 		return 0;
 	}
@@ -410,7 +410,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "admin");
 		return 0;
 	}
@@ -419,14 +419,14 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if((modindex = findmodule_byname(m_bn)) == -1)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is not loaded", m_bn);
+		sendto_one_notice(source_p, ":Module %s is not loaded", m_bn);
 		rb_free(m_bn);
 		return 0;
 	}
 
 	if(modlist[modindex]->core == 1)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, 
+		sendto_one_notice(source_p, 
 				  ":Module %s is a core module and may not be unloaded", m_bn);
 		rb_free(m_bn);
 		return 0;
@@ -434,7 +434,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(unload_one_module(m_bn, 1) == -1)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is not loaded", m_bn);
+		sendto_one_notice(source_p, ":Module %s is not loaded", m_bn);
 	}
 	rb_free(m_bn);
 	return 0;
@@ -450,7 +450,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "admin");
 		return 0;
 	}
@@ -459,7 +459,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if((modindex = findmodule_byname(m_bn)) == -1)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is not loaded", m_bn);
+		sendto_one_notice(source_p, ":Module %s is not loaded", m_bn);
 		rb_free(m_bn);
 		return 0;
 	}
@@ -468,7 +468,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(unload_one_module(m_bn, 1) == -1)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Module %s is not loaded", m_bn);
+		sendto_one_notice(source_p, ":Module %s is not loaded", m_bn);
 		rb_free(m_bn);
 		return 0;
 	}
@@ -494,12 +494,12 @@ mo_modrestart(struct Client *client_p, struct Client *source_p, int parc, const 
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "admin");
 		return 0;
 	}
 
-	sendto_one_notice(source_p, POP_QUEUE, ":Reloading all modules");
+	sendto_one_notice(source_p, ":Reloading all modules");
 
 	modnum = num_mods;
 	while (num_mods)
@@ -524,18 +524,18 @@ mo_modlist(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "admin");
 		return 0;
 	}
-
+	SetCork(source_p);
 	for (i = 0; i < num_mods; i++)
 	{
 		if(parc > 1)
 		{
 			if(match(parv[1], modlist[i]->name))
 			{
-				sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MODLIST),
+				sendto_one(source_p, form_str(RPL_MODLIST),
 					   me.name, source_p->name,
 					   modlist[i]->name,
 					   modlist[i]->address,
@@ -544,14 +544,14 @@ mo_modlist(struct Client *client_p, struct Client *source_p, int parc, const cha
 		}
 		else
 		{
-			sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MODLIST),
+			sendto_one(source_p, form_str(RPL_MODLIST),
 				   me.name, source_p->name, modlist[i]->name,
 				   modlist[i]->address, modlist[i]->version,
 				   modlist[i]->core ? "(core)" : "");
 		}
 	}
-
-	sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFMODLIST), me.name, source_p->name);
+	ClearCork(source_p);
+	sendto_one(source_p, form_str(RPL_ENDOFMODLIST), me.name, source_p->name);
 	return 0;
 }
 

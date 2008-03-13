@@ -68,13 +68,13 @@ ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		if((target_p = find_client(destination)) || 
 		   (target_p = find_server(NULL, destination)))
-			sendto_one(target_p, POP_QUEUE, ":%s PONG %s %s", 
+			sendto_one(target_p, ":%s PONG %s %s", 
 				   get_id(source_p, target_p), parv[1], 
 				   get_id(target_p, target_p));
 		else
 		{
 			if(!IsDigit(*destination))
-				sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHSERVER,
+				sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
 						   form_str(ERR_NOSUCHSERVER), destination);
 			return 0;
 		}
@@ -114,7 +114,7 @@ mr_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 				}
 				else
 				{
-					sendto_one(source_p, POP_QUEUE, form_str(ERR_WRONGPONG),
+					sendto_one(source_p, form_str(ERR_WRONGPONG),
 						   me.name, source_p->name,
 						   source_p->localClient->random_ping);
 					return 0;
@@ -124,7 +124,7 @@ mr_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	}
 	else
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOORIGIN), me.name, EmptyString(source_p->name) ? "*" : source_p->name);
+		sendto_one(source_p, form_str(ERR_NOORIGIN), me.name, EmptyString(source_p->name) ? "*" : source_p->name);
 
 	source_p->flags &= ~FLAGS_PINGSENT;
 

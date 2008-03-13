@@ -179,40 +179,41 @@ int user_modes_from_c_to_bitmask[] = {
 int
 show_lusers(struct Client *source_p)
 {
-	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSERCLIENT, form_str(RPL_LUSERCLIENT),
+	SetCork(source_p);
+	sendto_one_numeric(source_p, RPL_LUSERCLIENT, form_str(RPL_LUSERCLIENT),
 			   (Count.total - Count.invisi),
 			   Count.invisi, rb_dlink_list_length(&global_serv_list));
 
 	if(Count.oper > 0)
-		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSEROP, 
+		sendto_one_numeric(source_p, RPL_LUSEROP, 
 				   form_str(RPL_LUSEROP), Count.oper);
 
 	if(rb_dlink_list_length(&unknown_list) > 0)
-		sendto_one_numeric(source_p, HOLD_QUEUE,  RPL_LUSERUNKNOWN, 
+		sendto_one_numeric(source_p, RPL_LUSERUNKNOWN, 
 				   form_str(RPL_LUSERUNKNOWN),
 				   rb_dlink_list_length(&unknown_list));
 
 	if(rb_dlink_list_length(&global_channel_list) > 0)
-		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSERCHANNELS, 
+		sendto_one_numeric(source_p, RPL_LUSERCHANNELS, 
 				   form_str(RPL_LUSERCHANNELS),
 				   rb_dlink_list_length(&global_channel_list));
 
-	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LUSERME, form_str(RPL_LUSERME),
+	sendto_one_numeric(source_p, RPL_LUSERME, form_str(RPL_LUSERME),
 			   rb_dlink_list_length(&lclient_list),
 			   rb_dlink_list_length(&serv_list));
 
-	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LOCALUSERS, 
+	sendto_one_numeric(source_p, RPL_LOCALUSERS, 
 			   form_str(RPL_LOCALUSERS),
 			   rb_dlink_list_length(&lclient_list),
 			   Count.max_loc,
 			   rb_dlink_list_length(&lclient_list),
 			   Count.max_loc);
 
-	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_GLOBALUSERS, form_str(RPL_GLOBALUSERS),
+	sendto_one_numeric(source_p, RPL_GLOBALUSERS, form_str(RPL_GLOBALUSERS),
 			   Count.total, Count.max_tot,
 			   Count.total, Count.max_tot);
 
-	sendto_one_numeric(source_p, HOLD_QUEUE, RPL_STATSCONN,
+	sendto_one_numeric(source_p, RPL_STATSCONN,
 			   form_str(RPL_STATSCONN),
 			   MaxConnectionCount, MaxClientCount, 
 			   Count.totalrestartcount);
@@ -224,6 +225,7 @@ show_lusers(struct Client *source_p)
 	   (unsigned long)MaxConnectionCount)
 		MaxConnectionCount = rb_dlink_list_length(&lclient_list) + 
 					rb_dlink_list_length(&serv_list);
+	ClearCork(source_p);
 	send_pop_queue(source_p);
 
 	return 0;
@@ -277,7 +279,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		if(!(source_p->flags & FLAGS_PINGSENT) && source_p->localClient->random_ping == 0)
 		{
 			source_p->localClient->random_ping = (uint32_t) (rand() * rand()) << 1;
-			sendto_one(source_p, POP_QUEUE, "PING :%08X",
+			sendto_one(source_p, "PING :%08X",
 				   (unsigned int)source_p->localClient->random_ping);
 			source_p->flags |= FLAGS_PINGSENT;
 			return -1;
@@ -320,7 +322,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 
 	if(!valid_hostname(source_p->host))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":*** Notice -- You have an invalid hostname");
+		sendto_one_notice(source_p, ":*** Notice -- You have an invalid hostname");
 
 		rb_strlcpy(source_p->host, source_p->sockhost, sizeof(source_p->host));
 
@@ -347,7 +349,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		if(IsNeedIdentd(aconf))
 		{
 			ServerStats.is_ref++;
-			sendto_one_notice(source_p, POP_QUEUE, 
+			sendto_one_notice(source_p, 
 				   ":*** Notice -- You need to install identd to use this server");
 			exit_client(client_p, source_p, &me, "Install identd");
 			return (CLIENT_EXITED);
@@ -387,7 +389,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		if(strcmp(encr, aconf->passwd))
 		{
 			ServerStats.is_ref++;
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
+			sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			exit_client(client_p, source_p, &me, "Bad Password");
 			return (CLIENT_EXITED);
 		}
@@ -588,15 +590,16 @@ static void
 report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
 {
 	/* If this user is being spoofed, tell them so */
+	SetCork(source_p);
 	if(IsConfDoSpoofIp(aconf))
 	{
-		sendto_one_notice(source_p, HOLD_QUEUE, ":*** Spoofing your IP");
+		sendto_one_notice(source_p, ":*** Spoofing your IP");
 	}
 
 	if(IsConfExemptKline(aconf))
 	{
 		SetExemptKline(source_p);
-		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from K/G/X lines");
+		sendto_one_notice(source_p, ":*** You are exempt from K/G/X lines");
 	}
 
 	if(IsConfExemptGline(aconf))
@@ -605,45 +608,46 @@ report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
 
 		/* dont send both a kline and gline exempt notice */
 		if(!IsConfExemptKline(aconf))
-			sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from G lines");
+			sendto_one_notice(source_p, ":*** You are exempt from G lines");
 	}
 
 	/* If this user is exempt from user limits set it F lined" */
 	if(IsConfExemptLimits(aconf))
 	{
 		SetExemptLimits(source_p);
-		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from user limits");
+		sendto_one_notice(source_p, ":*** You are exempt from user limits");
 	}
 
 	if(IsConfExemptFlood(aconf))
 	{
 		SetExemptFlood(source_p);
-		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from flood limits");
+		sendto_one_notice(source_p, ":*** You are exempt from flood limits");
 	}
 
 	if(IsConfExemptSpambot(aconf))
 	{
 		SetExemptSpambot(source_p);
-		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from spambot checks");
+		sendto_one_notice(source_p, ":*** You are exempt from spambot checks");
 	}
 
 	if(IsConfExemptJupe(aconf))
 	{
 		SetExemptJupe(source_p);
-		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from juped channel warnings");
+		sendto_one_notice(source_p, ":*** You are exempt from juped channel warnings");
 	}
 
 	if(IsConfExemptShide(aconf))
 	{
 		SetExemptShide(source_p);
-		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from serverhiding");
+		sendto_one_notice(source_p, ":*** You are exempt from serverhiding");
 	}
 
 	if(IsConfExemptResv(aconf))
 	{
 		SetExemptResv(source_p);
-		sendto_one_notice(source_p, HOLD_QUEUE, ":*** You are exempt from resvs");
+		sendto_one_notice(source_p, ":*** You are exempt from resvs");
 	}
+	ClearCork(source_p);
 	send_pop_queue(source_p);
 }
 
@@ -672,14 +676,14 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	if(parc < 2)
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name, "MODE");
+		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name, "MODE");
 		return 0;
 	}
 
 	if((target_p = find_person(parv[1])) == NULL)
 	{
 		if(MyConnect(source_p))
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+			sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 					   form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
@@ -697,7 +701,7 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	if(source_p != target_p || target_p->from != source_p->from)
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_USERSDONTMATCH), me.name, source_p->name);
+		sendto_one(source_p, form_str(ERR_USERSDONTMATCH), me.name, source_p->name);
 		return 0;
 	}
 
@@ -711,7 +715,7 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 			if(source_p->umodes & user_modes[i].mode)
 				*m++ = user_modes[i].letter;
 		*m = '\0';
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_UMODEIS), me.name, source_p->name, buf);
+		sendto_one(source_p, form_str(RPL_UMODEIS), me.name, source_p->name, buf);
 		return 0;
 	}
 
@@ -807,24 +811,24 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 			}
 
 	if(badflag)
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_UMODEUNKNOWNFLAG), me.name, source_p->name);
+		sendto_one(source_p, form_str(ERR_UMODEUNKNOWNFLAG), me.name, source_p->name);
 
 	if((source_p->umodes & UMODE_OPERWALL) && !IsOperOperwall(source_p))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":*** You need oper and operwall flag for +z");
+		sendto_one_notice(source_p, ":*** You need oper and operwall flag for +z");
 		source_p->umodes &= ~UMODE_OPERWALL;
 	}
 
 	if((source_p->umodes & UMODE_NCHANGE) && !IsOperN(source_p))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":*** You need oper and nick_changes flag for +n");
+		sendto_one_notice(source_p, ":*** You need oper and nick_changes flag for +n");
 		source_p->umodes &= ~UMODE_NCHANGE;	/* only tcm's really need this */
 	}
 
 	if(MyConnect(source_p) && (source_p->umodes & UMODE_ADMIN) &&
 	   (!IsOperAdmin(source_p) || IsOperHiddenAdmin(source_p)))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":*** You need oper and admin flag for +a");
+		sendto_one_notice(source_p, ":*** You need oper and admin flag for +a");
 		source_p->umodes &= ~UMODE_ADMIN;
 	}
 
@@ -892,7 +896,7 @@ send_umode(struct Client *client_p, struct Client *source_p, int old, int sendma
 	}
 	*m = '\0';
 	if(*umode_buf && client_p)
-		sendto_one(client_p, POP_QUEUE, ":%s MODE %s :%s", source_p->name, source_p->name, umode_buf);
+		sendto_one(client_p, ":%s MODE %s :%s", source_p->name, source_p->name, umode_buf);
 }
 
 /*
@@ -917,7 +921,7 @@ send_umode_out(struct Client *client_p, struct Client *source_p, int old)
 
 		if((target_p != client_p) && (target_p != source_p) && (*buf))
 		{
-			sendto_one(target_p, POP_QUEUE, ":%s MODE %s :%s",
+			sendto_one(target_p, ":%s MODE %s :%s",
 				   get_id(source_p, target_p), 
 				   get_id(source_p, target_p), buf);
 		}
@@ -937,37 +941,40 @@ send_umode_out(struct Client *client_p, struct Client *source_p, int old)
 void
 user_welcome(struct Client *source_p)
 {
-	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_WELCOME), me.name, source_p->name,
+	SetCork(source_p);
+	sendto_one(source_p, form_str(RPL_WELCOME), me.name, source_p->name,
 		   ServerInfo.network_name, source_p->name);
-	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_YOURHOST), me.name,
+	sendto_one(source_p, form_str(RPL_YOURHOST), me.name,
 		   source_p->name,
 		   get_listener_name(source_p->localClient->listener), ircd_version);
 
-	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_CREATED), me.name, source_p->name, creation);
-	sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MYINFO), me.name, source_p->name, me.name, ircd_version);
+	sendto_one(source_p, form_str(RPL_CREATED), me.name, source_p->name, creation);
+	sendto_one(source_p, form_str(RPL_MYINFO), me.name, source_p->name, me.name, ircd_version);
 	show_isupport(source_p);
 
 	show_lusers(source_p);
 
 	if(ConfigFileEntry.short_motd)
 	{
-		sendto_one(source_p, HOLD_QUEUE,
+		sendto_one(source_p,
 			   "NOTICE %s :*** Notice -- motd was last changed at %s",
 			   source_p->name, user_motd_changed);
 
-		sendto_one(source_p, HOLD_QUEUE,
+		sendto_one(source_p,
 			   "NOTICE %s :*** Notice -- Please read the motd if you haven't read it",
 			   source_p->name);
 
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MOTDSTART), 
+		sendto_one(source_p, form_str(RPL_MOTDSTART), 
 			   me.name, source_p->name, me.name);
 
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_MOTD),
+		sendto_one(source_p, form_str(RPL_MOTD),
 			   me.name, source_p->name, "*** This is the short motd ***");
-
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_ENDOFMOTD), me.name, source_p->name);
+		ClearCork(source_p);
+		sendto_one(source_p, form_str(RPL_ENDOFMOTD), me.name, source_p->name);
 	}
-	else
+	else {	
+		ClearCork(source_p);
 		send_user_motd(source_p);
+	}
 }
 

@@ -90,7 +90,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(!IsOperXline(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "xline");
 		return 0;
 	}
@@ -109,7 +109,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		if(!IsOperRemoteBan(source_p))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+			sendto_one(source_p, form_str(ERR_NOPRIVS),
 				me.name, source_p->name, "remoteban");
 			return 0;
 		}
@@ -120,7 +120,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(parc <= loc || EmptyString(parv[loc]))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NEEDMOREPARAMS),
+		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
 				me.name, source_p->name, "XLINE");
 		return 0;
 	}
@@ -144,7 +144,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if((aconf = find_xline_mask(name)) != NULL)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":[%s] already X-Lined by [%s] - %s",
+		sendto_one_notice(source_p, ":[%s] already X-Lined by [%s] - %s",
 				  name, aconf->host, aconf->passwd);
 		return 0;
 	}
@@ -183,7 +183,7 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* already xlined */
 	if((aconf = find_xline_mask(name)) != NULL)
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":[%s] already X-Lined by [%s] - %s",
+		sendto_one_notice(source_p, ":[%s] already X-Lined by [%s] - %s",
 				  name, aconf->host, aconf->passwd);
 		return 0;
 	}
@@ -204,7 +204,7 @@ valid_xline(struct Client *source_p, const char *gecos,
 {
 	if(EmptyString(reason))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NEEDMOREPARAMS),
+		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
 			   get_id(&me, source_p), 
 			   get_id(source_p, source_p), "XLINE");
 		return 0;
@@ -212,21 +212,21 @@ valid_xline(struct Client *source_p, const char *gecos,
 
 	if(strchr(reason, ':') != NULL)
 	{
-		sendto_one_notice(source_p, POP_QUEUE,
+		sendto_one_notice(source_p,
 				  ":Invalid character ':' in comment");
 		return 0;
 	}
 
 	if(strchr(reason, '"'))
 	{
-		sendto_one_notice(source_p, POP_QUEUE,
+		sendto_one_notice(source_p,
 				":Invalid character '\"' in comment");
 		return 0;
 	}
 
 	if(!valid_wild_card_simple(gecos))
 	{
-		sendto_one_notice(source_p, POP_QUEUE,
+		sendto_one_notice(source_p,
 				  ":Please include at least %d non-wildcard "
 				  "characters with the xline",
 				  ConfigFileEntry.min_nonwildcard_simple);
@@ -241,7 +241,7 @@ valid_xline(struct Client *source_p, const char *gecos,
 	 */
 	if(!temp_time && strstr(gecos, "\","))
 	{
-		sendto_one_notice(source_p, POP_QUEUE,
+		sendto_one_notice(source_p,
 				":Xlines containing \", must be temporary.");
 		return 0;
 	}
@@ -316,7 +316,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 		ilog(L_KLINE, "X %s %d %s %s",
 			aconf->info.oper, temp_time / 60,
 			name, reason);
-		sendto_one_notice(source_p, POP_QUEUE, ":Added temporary %d min. X-Line [%s]",
+		sendto_one_notice(source_p, ":Added temporary %d min. X-Line [%s]",
 				temp_time / 60, aconf->host);
 	}
 	else
@@ -326,7 +326,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
 				aconf->info.oper, aconf->host, aconf->passwd);
-		sendto_one_notice(source_p, POP_QUEUE, ":Added X-Line for [%s] [%s]",
+		sendto_one_notice(source_p, ":Added X-Line for [%s] [%s]",
 					aconf->host, aconf->passwd);
 		ilog(L_KLINE, "X %s 0 %s %s",
 			aconf->info.oper, name, reason);
@@ -345,7 +345,7 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 {
 	if(!IsOperXline(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "xline");
 		return 0;
 	}
@@ -354,7 +354,7 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		if(!IsOperRemoteBan(source_p))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+			sendto_one(source_p, form_str(ERR_NOPRIVS),
 				me.name, source_p->name, "remoteban");
 			return 0;
 		}
@@ -409,7 +409,7 @@ remove_xline(struct Client *source_p, const char *name)
 		if(irccmp(aconf->host, name))
 			continue;
 
-		sendto_one_notice(source_p, POP_QUEUE, 
+		sendto_one_notice(source_p, 
 				":X-Line for [%s] is removed", name);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s has removed the X-Line for: [%s]",

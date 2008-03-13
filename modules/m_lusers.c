@@ -71,7 +71,7 @@ m_lusers(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
 			/* safe enough to give this on a local connect only */
-			sendto_one(source_p, POP_QUEUE, form_str(RPL_LOAD2HI),
+			sendto_one(source_p, form_str(RPL_LOAD2HI),
 				   me.name, source_p->name, "LUSERS");
 			return 0;
 		}
@@ -123,14 +123,14 @@ m_users(struct Client *client_p, struct Client *source_p, int parc, const char *
 {
 	if(hunt_server(client_p, source_p, ":%s USERS :%s", 1, parc, parv) == HUNTED_ISME)
 	{
-		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_LOCALUSERS,
+		sendto_one_numeric(source_p, RPL_LOCALUSERS,
 				   form_str(RPL_LOCALUSERS),
 				   rb_dlink_list_length(&lclient_list), 
 				   Count.max_loc,
 				   rb_dlink_list_length(&lclient_list), 
 				   Count.max_loc);
 
-		sendto_one_numeric(source_p, POP_QUEUE, RPL_GLOBALUSERS, 
+		sendto_one_numeric(source_p, RPL_GLOBALUSERS, 
 				   form_str(RPL_GLOBALUSERS),
 				   Count.total, Count.max_tot,
 				   Count.total, Count.max_tot);

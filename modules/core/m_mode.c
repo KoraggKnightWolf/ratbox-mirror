@@ -108,7 +108,7 @@ m_mode(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 		if(EmptyString(dest))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_NEEDMOREPARAMS),
+			sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
 					me.name, source_p->name, "MODE");
 			return 0;
 		}
@@ -124,7 +124,7 @@ m_mode(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(!check_channel_name(dest))
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_BADCHANNAME,
+		sendto_one_numeric(source_p, ERR_BADCHANNAME,
 				   form_str(ERR_BADCHANNAME), parv[1]);
 		return 0;
 	}
@@ -133,7 +133,7 @@ m_mode(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(chptr == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
@@ -144,12 +144,12 @@ m_mode(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		if(operspy)
 			report_operspy(source_p, "MODE", chptr->chname);
 
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_CHANNELMODEIS),
+		sendto_one(source_p, form_str(RPL_CHANNELMODEIS),
 			   me.name, source_p->name, parv[1],
 			   operspy ? channel_modes(chptr, &me) :
 			    channel_modes(chptr, source_p));
 
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_CREATIONTIME),
+		sendto_one(source_p, form_str(RPL_CREATIONTIME),
 			   me.name, source_p->name, parv[1], chptr->channelts);
 	}
 	else
@@ -182,7 +182,7 @@ ms_mode(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(chptr == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
@@ -202,7 +202,7 @@ ms_tmode(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* Now, try to find the channel in question */
 	if(!IsChanPrefix(parv[2][0]) || !check_channel_name(parv[2]))
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_BADCHANNAME,
+		sendto_one_numeric(source_p, ERR_BADCHANNAME,
 				   form_str(ERR_BADCHANNAME), 
 				   parv[2]);
 		return 0;
@@ -212,7 +212,7 @@ ms_tmode(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(chptr == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), parv[2]);
 		return 0;
 	}
@@ -409,7 +409,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 	{
 		if((rb_dlink_list_length(&chptr->banlist) + rb_dlink_list_length(&chptr->exceptlist) + rb_dlink_list_length(&chptr->invexlist)) >= (unsigned long)ConfigChannel.max_bans)
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_BANLISTFULL),
+			sendto_one(source_p, form_str(ERR_BANLISTFULL),
 				   me.name, source_p->name, chptr->chname, realban);
 			return 0;
 		}
@@ -680,7 +680,7 @@ chm_nosuch(struct Client *source_p, struct Channel *chptr,
 	if(*errors & SM_ERR_UNKNOWN)
 		return;
 	*errors |= SM_ERR_UNKNOWN;
-	sendto_one(source_p, POP_QUEUE, form_str(ERR_UNKNOWNMODE), me.name, source_p->name, c);
+	sendto_one(source_p, form_str(ERR_UNKNOWNMODE), me.name, source_p->name, c);
 }
 
 static void
@@ -691,7 +691,7 @@ chm_simple(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 				   me.name, source_p->name, chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
@@ -808,7 +808,7 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 		if(alevel != CHFL_CHANOP && mode_type != CHFL_BAN)
 		{
 			if(!(*errors & SM_ERR_NOOPS))
-				sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+				sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 					   me.name, source_p->name, chptr->chname);
 			*errors |= SM_ERR_NOOPS;
 			return;
@@ -817,11 +817,11 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 		RB_DLINK_FOREACH(ptr, list->head)
 		{
 			banptr = ptr->data;
-			sendto_one(source_p, POP_QUEUE, form_str(rpl_list),
+			sendto_one(source_p, form_str(rpl_list),
 				   me.name, source_p->name, chptr->chname,
 				   banptr->banstr, banptr->who, banptr->when);
 		}
-		sendto_one(source_p, POP_QUEUE, form_str(rpl_endlist),
+		sendto_one(source_p, form_str(rpl_endlist),
 			   me.name, source_p->name, chptr->chname);
 		return;
 	}
@@ -829,7 +829,7 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 				   me.name, source_p->name, chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
@@ -907,7 +907,7 @@ chm_op(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 				   me.name, source_p->name, chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
@@ -922,7 +922,7 @@ chm_op(struct Client *source_p, struct Channel *chptr,
 	/* empty nick */
 	if(EmptyString(opnick))
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHNICK,
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK,
 				   form_str(ERR_NOSUCHNICK), "*");
 		return;
 	}
@@ -937,7 +937,7 @@ chm_op(struct Client *source_p, struct Channel *chptr,
 	if(mstptr == NULL)
 	{
 		if(!(*errors & SM_ERR_NOTONCHANNEL) && MyClient(source_p))
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_USERNOTINCHANNEL,
+			sendto_one_numeric(source_p, ERR_USERNOTINCHANNEL,
 					   form_str(ERR_USERNOTINCHANNEL), opnick, chptr->chname);
 		*errors |= SM_ERR_NOTONCHANNEL;
 		return;
@@ -968,7 +968,7 @@ chm_op(struct Client *source_p, struct Channel *chptr,
 #ifdef ENABLE_SERVICES
 		if(MyClient(source_p) && IsService(targ_p))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_ISCHANSERVICE),
+			sendto_one(source_p, form_str(ERR_ISCHANSERVICE),
 					me.name, source_p->name, targ_p->name,
 					chptr->chname);
 			return;
@@ -1000,7 +1000,7 @@ chm_voice(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 				   me.name, source_p->name, chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
@@ -1015,7 +1015,7 @@ chm_voice(struct Client *source_p, struct Channel *chptr,
 	/* empty nick */
 	if(EmptyString(opnick))
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHNICK, 
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
 				   form_str(ERR_NOSUCHNICK), "*");
 		return;
 	}
@@ -1030,7 +1030,7 @@ chm_voice(struct Client *source_p, struct Channel *chptr,
 	if(mstptr == NULL)
 	{
 		if(!(*errors & SM_ERR_NOTONCHANNEL) && MyClient(source_p))
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_USERNOTINCHANNEL,
+			sendto_one_numeric(source_p, ERR_USERNOTINCHANNEL,
 					   form_str(ERR_USERNOTINCHANNEL), opnick, chptr->chname);
 		*errors |= SM_ERR_NOTONCHANNEL;
 		return;
@@ -1079,7 +1079,7 @@ chm_limit(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 				   me.name, source_p->name, chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
@@ -1135,7 +1135,7 @@ chm_key(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 				   me.name, source_p->name, chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
@@ -1210,7 +1210,7 @@ chm_regonly(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 				   me.name, source_p->name, chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;

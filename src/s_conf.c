@@ -334,7 +334,7 @@ verify_access(struct Client *client_p, const char *username)
 	{
 		if(aconf->flags & CONF_FLAGS_REDIR)
 		{
-			sendto_one(client_p, POP_QUEUE, form_str(RPL_REDIR),
+			sendto_one(client_p, form_str(RPL_REDIR),
 					me.name, client_p->name,
 					aconf->info.name ? aconf->info.name : "", aconf->port);
 			return (NOT_AUTHORISED);
@@ -374,15 +374,15 @@ verify_access(struct Client *client_p, const char *username)
 	else if(aconf->status & CONF_KILL)
 	{
 		if(ConfigFileEntry.kline_with_reason)
-			sendto_one_notice(client_p, POP_QUEUE, ":*** Banned %s", aconf->passwd);
+			sendto_one_notice(client_p, ":*** Banned %s", aconf->passwd);
 		return (BANNED_CLIENT);
 	}
 	else if(aconf->status & CONF_GLINE)
 	{
-		sendto_one_notice(client_p, POP_QUEUE, ":*** G-lined");
+		sendto_one_notice(client_p, ":*** G-lined");
 
 		if(ConfigFileEntry.kline_with_reason)
-			sendto_one_notice(client_p, POP_QUEUE, ":*** Banned %s", aconf->passwd);
+			sendto_one_notice(client_p, ":*** Banned %s", aconf->passwd);
 
 		return (BANNED_CLIENT);
 	}
@@ -593,7 +593,7 @@ attach_conf(struct Client *client_p, struct ConfItem *aconf)
 		}
 		else
 		{
-			sendto_one_notice(client_p, POP_QUEUE, ":*** I: line is full, but you have an >I: line!");
+			sendto_one_notice(client_p, ":*** I: line is full, but you have an >I: line!");
 			SetExemptLimits(client_p);
 		}
 

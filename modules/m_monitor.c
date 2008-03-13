@@ -108,16 +108,16 @@ add_monitor(struct Client *client_p, const char *nicks)
 			char buf[100];
 
 			if(cur_onlen != mlen)
-				sendto_one_buffer(client_p, POP_QUEUE, onbuf);
+				sendto_one_buffer(client_p, onbuf);
 			if(cur_offlen != mlen)
-				sendto_one_buffer(client_p, POP_QUEUE, offbuf);
+				sendto_one_buffer(client_p, offbuf);
 
 			if(p)
 				rb_snprintf(buf, sizeof(buf), "%s,%s", name, p);
 			else
 				rb_snprintf(buf, sizeof(buf), "%s", name);
 
-			sendto_one(client_p, POP_QUEUE, form_str(ERR_MONLISTFULL),
+			sendto_one(client_p, form_str(ERR_MONLISTFULL),
 					me.name, client_p->name,
 					ConfigFileEntry.max_monitor, buf);
 			return;
@@ -137,7 +137,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 			if(cur_onlen + strlen(target_p->name) + 
 			   strlen(target_p->username) + strlen(target_p->host) + 3 >= BUFSIZE-3)
 			{
-				sendto_one_buffer(client_p, POP_QUEUE, onbuf);
+				sendto_one_buffer(client_p, onbuf);
 				cur_onlen = mlen;
 				onptr = onbuf + mlen;
 			}
@@ -157,7 +157,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 		{
 			if(cur_offlen + strlen(name) + 1 >= BUFSIZE-3)
 			{
-				sendto_one_buffer(client_p, POP_QUEUE, offbuf);
+				sendto_one_buffer(client_p, offbuf);
 				cur_offlen = mlen;
 				offptr = offbuf + mlen;
 			}
@@ -174,9 +174,9 @@ add_monitor(struct Client *client_p, const char *nicks)
 	}
 
 	if(cur_onlen != mlen)
-		sendto_one_buffer(client_p, POP_QUEUE, onbuf);
+		sendto_one_buffer(client_p, onbuf);
 	if(cur_offlen != mlen)
-		sendto_one_buffer(client_p, POP_QUEUE, offbuf);
+		sendto_one_buffer(client_p, offbuf);
 }
 
 static void
@@ -217,7 +217,7 @@ list_monitor(struct Client *client_p)
 
 	if(!rb_dlink_list_length(&client_p->localClient->monitor_list))
 	{
-		sendto_one(client_p, POP_QUEUE, form_str(RPL_ENDOFMONLIST),
+		sendto_one(client_p, form_str(RPL_ENDOFMONLIST),
 				me.name, client_p->name);
 		return;
 	}
@@ -225,14 +225,14 @@ list_monitor(struct Client *client_p)
 	cur_len = mlen = rb_sprintf(buf, form_str(RPL_MONLIST),
 				me.name, client_p->name, "");
 	nbuf = buf + mlen;
-
+	SetCork(client_p);
 	RB_DLINK_FOREACH(ptr, client_p->localClient->monitor_list.head)
 	{
 		monptr = ptr->data;
 
 		if(cur_len + strlen(monptr->name) + 1 >= BUFSIZE-3)
 		{
-			sendto_one_buffer(client_p, HOLD_QUEUE, buf);
+			sendto_one_buffer(client_p, buf);
 			nbuf = buf + mlen;
 			cur_len = mlen;
 		}
@@ -246,9 +246,9 @@ list_monitor(struct Client *client_p)
 		nbuf += arglen;
 	}
 
-	sendto_one_buffer(client_p, POP_QUEUE, buf);
-	sendto_one(client_p, POP_QUEUE, form_str(RPL_ENDOFMONLIST), 
-			me.name, client_p->name);
+	sendto_one_buffer(client_p, buf);
+	ClearCork(client_p);
+	sendto_one(client_p, form_str(RPL_ENDOFMONLIST), me.name, client_p->name);
 }
 
 static void
@@ -269,7 +269,7 @@ show_monitor_status(struct Client *client_p)
 
 	onptr = onbuf + mlen;
 	offptr = offbuf + mlen;
-
+	SetCork(client_p);
 	RB_DLINK_FOREACH(ptr, client_p->localClient->monitor_list.head)
 	{
 		monptr = ptr->data;
@@ -279,7 +279,7 @@ show_monitor_status(struct Client *client_p)
 			if(cur_onlen + strlen(target_p->name) + 
 			   strlen(target_p->username) + strlen(target_p->host) + 3 >= BUFSIZE-3)
 			{
-				sendto_one_buffer(client_p, HOLD_QUEUE, onbuf);
+				sendto_one_buffer(client_p, onbuf);
 				cur_onlen = mlen;
 				onptr = onbuf + mlen;
 			}
@@ -299,7 +299,7 @@ show_monitor_status(struct Client *client_p)
 		{
 			if(cur_offlen + strlen(monptr->name) + 1 >= BUFSIZE-3)
 			{
-				sendto_one_buffer(client_p, POP_QUEUE, offbuf);
+				sendto_one_buffer(client_p, offbuf);
 				cur_offlen = mlen;
 				offptr = offbuf + mlen;
 			}
@@ -316,10 +316,11 @@ show_monitor_status(struct Client *client_p)
 		}
 	}
 
+	ClearCork(client_p);
 	if(cur_onlen != mlen)
-		sendto_one_buffer(client_p, POP_QUEUE, onbuf);
+		sendto_one_buffer(client_p, onbuf);
 	if(cur_offlen != mlen)
-		sendto_one_buffer(client_p, POP_QUEUE, offbuf);
+		sendto_one_buffer(client_p, offbuf);
 }
 
 
@@ -360,7 +361,7 @@ m_monitor(struct Client *client_p, struct Client *source_p, int parc, const char
 		case '+':
 			if(parc < 3 || EmptyString(parv[2]))
 			{
-				sendto_one(client_p, POP_QUEUE, form_str(ERR_NEEDMOREPARAMS),
+				sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
 						me.name, source_p->name, "MONITOR");
 				return 0;
 			}
@@ -370,7 +371,7 @@ m_monitor(struct Client *client_p, struct Client *source_p, int parc, const char
 		case '-':
 			if(parc < 3 || EmptyString(parv[2]))
 			{
-				sendto_one(client_p, POP_QUEUE, form_str(ERR_NEEDMOREPARAMS),
+				sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
 						me.name, source_p->name, "MONITOR");
 				return 0;
 			}

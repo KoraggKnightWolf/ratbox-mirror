@@ -415,7 +415,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 	int cur_len;
 	int is_member;
 	int stack = IsCapable(client_p, CLICAP_MULTI_PREFIX);
-
+	SetCork(client_p);
 	if(ShowChannel(client_p, chptr))
 	{
 		is_member = IsMember(client_p, chptr);
@@ -439,7 +439,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 			if(cur_len + strlen(target_p->name) + 3 >= BUFSIZE-3)
 			{
 				*(t - 1) = '\0';
-				sendto_one_buffer(client_p, HOLD_QUEUE, lbuf);
+				sendto_one_buffer(client_p, lbuf);
 				cur_len = mlen;
 				t = lbuf + mlen;
 			}
@@ -461,14 +461,14 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 		if(cur_len != mlen)
 		{
 			*(t - 1) = '\0';
-			sendto_one_buffer(client_p, HOLD_QUEUE, lbuf);
+			sendto_one_buffer(client_p, lbuf);
 		}
 	}
 
 	if(show_eon)
-		sendto_one(client_p, HOLD_QUEUE, form_str(RPL_ENDOFNAMES),
+		sendto_one(client_p, form_str(RPL_ENDOFNAMES),
 			   me.name, client_p->name, chptr->chname);
-
+	ClearCork(client_p);
 	send_pop_queue(client_p);
 }
 

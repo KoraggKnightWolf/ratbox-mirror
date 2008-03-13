@@ -64,7 +64,7 @@ m_version(struct Client *client_p, struct Client *source_p, int parc, const char
 		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
 			/* safe enough to give this on a local connect only */
-			sendto_one(source_p, POP_QUEUE, form_str(RPL_LOAD2HI),
+			sendto_one(source_p, form_str(RPL_LOAD2HI),
 				   me.name, source_p->name, "VERSION");
 			return 0;
 		}
@@ -75,7 +75,7 @@ m_version(struct Client *client_p, struct Client *source_p, int parc, const char
 			return 0;
 	}
 	rb_snprintf(version, sizeof(version), "%s+%s", ircd_version, rb_lib_version());
-	sendto_one_numeric(source_p, POP_QUEUE, RPL_VERSION, form_str(RPL_VERSION),
+	sendto_one_numeric(source_p, RPL_VERSION, form_str(RPL_VERSION),
 			   ircd_version, serno,
 			   me.name, confopts(), TS_CURRENT,
 			   ServerInfo.sid);
@@ -95,7 +95,7 @@ mo_version(struct Client *client_p, struct Client *source_p, int parc, const cha
 {
 	if(hunt_server(client_p, source_p, ":%s VERSION :%s", 1, parc, parv) == HUNTED_ISME)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, RPL_VERSION, form_str(RPL_VERSION),
+		sendto_one_numeric(source_p, RPL_VERSION, form_str(RPL_VERSION),
 				   ircd_version, serno, 
 				   me.name, confopts(), TS_CURRENT,
 				   ServerInfo.sid);

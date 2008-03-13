@@ -80,7 +80,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	chptr = find_channel(name);
 	if(chptr == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), name);
 		return 0;
 	}
@@ -91,7 +91,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 		if((msptr == NULL) && MyConnect(source_p))
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOTONCHANNEL,
+			sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
 					   form_str(ERR_NOTONCHANNEL), name);
 			return 0;
 		}
@@ -100,7 +100,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		{
 			if(MyConnect(source_p))
 			{
-				sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+				sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 					   me.name, source_p->name, name);
 				return 0;
 			}
@@ -108,7 +108,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			/* If its a TS 0 channel, do it the old way */
 			if(chptr->channelts == 0)
 			{
-				sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+				sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 					   get_id(&me, source_p), 
 					   get_id(source_p, source_p), name);
 				return 0;
@@ -154,7 +154,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 #ifdef ENABLE_SERVICES
 		if(MyClient(source_p) && IsService(who))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_ISCHANSERVICE),
+			sendto_one(source_p, form_str(ERR_ISCHANSERVICE),
 					me.name, source_p->name, who->name,
 					chptr->chname);
 			return 0;
@@ -189,7 +189,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		remove_user_from_channel(msptr);
 	}
 	else if (MyClient(source_p))
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_USERNOTINCHANNEL,
+		sendto_one_numeric(source_p, ERR_USERNOTINCHANNEL,
 				   form_str(ERR_USERNOTINCHANNEL), user, name);
 
 	return 0;

@@ -158,7 +158,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		if(!wilds)
 		{
 			if(MyClient(source_p) || !IsDigit(parv[server][0]))
-				sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHSERVER,
+				sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
 						   form_str(ERR_NOSUCHSERVER),
 						   parv[server]);
 			return (HUNTED_NOSUCH);
@@ -182,7 +182,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 	{
 		if(!IsRegistered(target_p))
 		{
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHSERVER,
+			sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
 					   form_str(ERR_NOSUCHSERVER),
 					   parv[server]);
 			return HUNTED_NOSUCH;
@@ -194,14 +194,14 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		old = parv[server];
 		parv[server] = get_id(target_p, target_p);
 
-		sendto_one(target_p, POP_QUEUE, command, get_id(source_p, target_p),
+		sendto_one(target_p, command, get_id(source_p, target_p),
 			   parv[1], parv[2], parv[3], parv[4], parv[5], parv[6], parv[7], parv[8]);
 		parv[server] = old;
 		return (HUNTED_PASS);
 	}
 
 	if(!IsDigit(parv[server][0]))
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHSERVER,
+		sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
 				   form_str(ERR_NOSUCHSERVER), parv[server]);
 	return (HUNTED_NOSUCH);
 }
@@ -330,7 +330,7 @@ send_capabilities(struct Client *client_p, int cap_can_send)
 	t--;
 	*t = '\0';
 
-	sendto_one(client_p, POP_QUEUE, "CAPAB :%s", msgbuf);
+	sendto_one(client_p, "CAPAB :%s", msgbuf);
 }
 
 /*
@@ -414,7 +414,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 				     "Server %s already present from %s",
 				     server_p->name, client_p->name);
 		if(by && IsClient(by) && !MyClient(by))
-			sendto_one_notice(by, POP_QUEUE, ":Server %s already present from %s",
+			sendto_one_notice(by, ":Server %s already present from %s",
 					  server_p->name, client_p->name);
 		return 0;
 	}
@@ -643,10 +643,10 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 	if(!EmptyString(server_p->spasswd))
 	{
 		if(ServerInfo.use_ts6)
-			sendto_one(client_p, POP_QUEUE, "PASS %s TS %d :%s", 
+			sendto_one(client_p, "PASS %s TS %d :%s", 
 				   server_p->spasswd, TS_CURRENT, me.id);
 		else
-			sendto_one(client_p, POP_QUEUE, "PASS %s :TS",
+			sendto_one(client_p, "PASS %s :TS",
 				   server_p->spasswd);
 	}
 
@@ -655,8 +655,7 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 			  | (ServerConfCompressed(server_p) && zlib_ok ? CAP_ZIP : 0)
 			  | (ServerConfTb(server_p) ? CAP_TB : 0));
 
-	sendto_one(client_p, POP_QUEUE, "SERVER %s 1 :%s%s",
-		   me.name,
+	sendto_one(client_p, "SERVER %s 1 :%s%s", me.name,
 		   ConfigServerHide.hidden ? "(H) " : "", me.info);
 
 	/* 

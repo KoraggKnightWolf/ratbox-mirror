@@ -855,9 +855,9 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
-		sendto_one(source_p, HOLD_QUEUE, form_str(RPL_LOAD2HI),
+		sendto_one(source_p, form_str(RPL_LOAD2HI),
 			   me.name, source_p->name, "INFO");
-		sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
+		sendto_one_numeric(source_p, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
 		return 0;
 	}
 	else
@@ -867,11 +867,11 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		return 0;
 
 	info_spy(source_p);
-
+	SetCork(source_p);
 	send_info_text(source_p);
 	send_birthdate_online_time(source_p);
-
-	sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
+	ClearCork(source_p);
+	sendto_one_numeric(source_p, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
 	return 0;
 }
 
@@ -886,15 +886,15 @@ mo_info(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(hunt_server(client_p, source_p, ":%s INFO :%s", 1, parc, parv) == HUNTED_ISME)
 	{
 		info_spy(source_p);
-
+		SetCork(source_p);
 		send_info_text(source_p);
 
 		if(IsOper(source_p))
 			send_conf_options(source_p);
 
 		send_birthdate_online_time(source_p);
-
-		sendto_one_numeric(source_p, POP_QUEUE, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
+		ClearCork(source_p);
+		sendto_one_numeric(source_p, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
 	}
 
 	return 0;
@@ -914,10 +914,10 @@ send_info_text(struct Client *source_p)
 
 	while (*text)
 	{
-		sendto_one_numeric(source_p, HOLD_QUEUE, RPL_INFO, form_str(RPL_INFO), *text++);
+		sendto_one_numeric(source_p, RPL_INFO, form_str(RPL_INFO), *text++);
 	}
 
-	sendto_one_numeric(source_p, POP_QUEUE, RPL_INFO, form_str(RPL_INFO), "");
+	sendto_one_numeric(source_p, RPL_INFO, form_str(RPL_INFO), "");
 }
 
 /*
@@ -931,11 +931,11 @@ static void
 send_birthdate_online_time(struct Client *source_p)
 {
 	char tbuf[26]; /* this needs to be 26 - see ctime_r manpage */
-	sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :Birth Date: %s, compile # %s",
+	sendto_one(source_p, ":%s %d %s :Birth Date: %s, compile # %s",
 		   get_id(&me, source_p), RPL_INFO, 
 		   get_id(source_p, source_p), creation, generation);
 
-	sendto_one(source_p, POP_QUEUE, ":%s %d %s :On-line since %s",
+	sendto_one(source_p, ":%s %d %s :On-line since %s",
 		   get_id(&me, source_p), RPL_INFO, 
 		   get_id(source_p, source_p), rb_ctime(startup_time, tbuf, sizeof(tbuf)));
 }
@@ -966,7 +966,7 @@ send_conf_options(struct Client *source_p)
 			{
 				const char *option = *(info_table[i].option.pstring);
 
-				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+				sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   info_table[i].name,
@@ -982,7 +982,7 @@ send_conf_options(struct Client *source_p)
 			{
 				const char *option = info_table[i].option.string;
 
-				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+				sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   info_table[i].name,
@@ -998,7 +998,7 @@ send_conf_options(struct Client *source_p)
 			{
 				int option = *info_table[i].option.decimal_ptr;
 
-				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5d [%-30s]",
+				sendto_one(source_p, ":%s %d %s :%-30s %-5d [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   info_table[i].name,
@@ -1015,7 +1015,7 @@ send_conf_options(struct Client *source_p)
 			{
 				int option = info_table[i].option.decimal;
 
-				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5d [%-30s]",
+				sendto_one(source_p, ":%s %d %s :%-30s %-5d [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   info_table[i].name,
@@ -1032,7 +1032,7 @@ send_conf_options(struct Client *source_p)
 			{
 				int option = *(info_table[i].option.decimal_ptr);
 
-				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+				sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   info_table[i].name,
@@ -1048,7 +1048,7 @@ send_conf_options(struct Client *source_p)
 			{
 				int option = *(info_table[i].option.decimal_ptr);
 
-				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+				sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   info_table[i].name,
@@ -1063,7 +1063,7 @@ send_conf_options(struct Client *source_p)
 			{
 				int option = info_table[i].option.decimal;
 
-				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+				sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   info_table[i].name,
@@ -1079,7 +1079,7 @@ send_conf_options(struct Client *source_p)
 			{
 				int option = info_table[i].option.decimal;
 
-				sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+				sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   info_table[i].name,
@@ -1093,7 +1093,7 @@ send_conf_options(struct Client *source_p)
 		{
 			int option = *info_table[i].option.decimal_ptr;
 
-			sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+			sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
 				   me.name, RPL_INFO, source_p->name,
 				   info_table[i].name,
 				   option ? ((option == 1) ? "MASK" : "YES") : "NO",
@@ -1102,13 +1102,13 @@ send_conf_options(struct Client *source_p)
 		}
 	}			/* forloop */
 
-	sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]",
+	sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   "io_type",
 					   rb_get_iotype(),
 					   "Method of Multiplexed I/O");
-	sendto_one(source_p, HOLD_QUEUE, ":%s %d %s :%-30s %-5s [%-30s]", 
+	sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]", 
 					   get_id(&me, source_p), RPL_INFO,
 					   get_id(source_p, source_p),
 					   "libratbox",
@@ -1119,7 +1119,7 @@ send_conf_options(struct Client *source_p)
 	 ** in order for it to show up properly to opers who issue INFO
 	 */
 
-	sendto_one_numeric(source_p, POP_QUEUE, RPL_INFO, form_str(RPL_INFO), "");
+	sendto_one_numeric(source_p, RPL_INFO, form_str(RPL_INFO), "");
 }
 
 /* info_spy()

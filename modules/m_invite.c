@@ -70,7 +70,7 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 		target_p = find_person(parv[1]);
 	if(target_p == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHNICK, 
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
 				   form_str(ERR_NOSUCHNICK), 
 				   IsDigit(parv[1][0]) ? "*" : parv[1]);
 		return 0;
@@ -78,7 +78,7 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(check_channel_name(parv[2]) == 0)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_BADCHANNAME,
+		sendto_one_numeric(source_p, ERR_BADCHANNAME,
 				   form_str(ERR_BADCHANNAME),
 				   parv[2]);
 		return 0;
@@ -87,7 +87,7 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if(!IsChannelName(parv[2]))
 	{
 		if(MyClient(source_p))
-			sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+			sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 					   form_str(ERR_NOSUCHCHANNEL), parv[2]);
 		return 0;
 	}
@@ -97,14 +97,14 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 	 */
 	if(parv[2][0] == '&' && !MyConnect(target_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_USERNOTONSERV),
+		sendto_one(source_p, form_str(ERR_USERNOTONSERV),
 			   me.name, source_p->name, target_p->name);
 		return 0;
 	}
 
 	if((chptr = find_channel(parv[2])) == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), parv[2]);
 		return 0;
 	}
@@ -112,14 +112,14 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 	msptr = find_channel_membership(chptr, source_p);
 	if(MyClient(source_p) && (msptr == NULL))
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOTONCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
 				   form_str(ERR_NOTONCHANNEL), parv[2]);
 		return 0;
 	}
 
 	if(IsMember(target_p, chptr))
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_USERONCHANNEL,
+		sendto_one_numeric(source_p, ERR_USERONCHANNEL,
 				   form_str(ERR_USERONCHANNEL), target_p->name, parv[2]);
 		return 0;
 	}
@@ -130,7 +130,7 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* treat remote clients as chanops */
 		if(MyClient(source_p) && !is_chanop(msptr))
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_CHANOPRIVSNEEDED),
+			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
 				   me.name, source_p->name, parv[2]);
 			return 0;
 		}
@@ -141,17 +141,17 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(MyConnect(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_INVITING), 
+		sendto_one(source_p, form_str(RPL_INVITING), 
 			   me.name, source_p->name,
 			   target_p->name, parv[2]);
 		if(target_p->user->away)
-			sendto_one_numeric(source_p, POP_QUEUE, RPL_AWAY, form_str(RPL_AWAY),
+			sendto_one_numeric(source_p, RPL_AWAY, form_str(RPL_AWAY),
 					   target_p->name, target_p->user->away);
 	}
 
 	if(MyConnect(target_p))
 	{
-		sendto_one(target_p, POP_QUEUE, ":%s!%s@%s INVITE %s :%s", 
+		sendto_one(target_p, ":%s!%s@%s INVITE %s :%s", 
 			   source_p->name, source_p->username, source_p->host, 
 			   target_p->name, chptr->chname);
 

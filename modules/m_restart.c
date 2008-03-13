@@ -60,19 +60,19 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(!IsOperDie(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, "die");
 		return 0;
 	}
 
 	if(parc < 2 || EmptyString(parv[1]))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Need server name /restart %s", me.name);
+		sendto_one_notice(source_p, ":Need server name /restart %s", me.name);
 		return 0;
 	}
 	else if(irccmp(parv[1], me.name))
 	{
-		sendto_one_notice(source_p, POP_QUEUE, ":Mismatch on /restart %s", me.name);
+		sendto_one_notice(source_p, ":Mismatch on /restart %s", me.name);
 		return 0;
 	}
 
@@ -80,14 +80,14 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		target_p = ptr->data;
 
-		sendto_one_notice(target_p, POP_QUEUE, ":Server Restarting. %s", get_client_name(source_p, HIDE_IP));
+		sendto_one_notice(target_p, ":Server Restarting. %s", get_client_name(source_p, HIDE_IP));
 	}
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 
-		sendto_one(target_p, POP_QUEUE, ":%s ERROR :Restart by %s",
+		sendto_one(target_p, ":%s ERROR :Restart by %s",
 			   me.name, get_client_name(source_p, HIDE_IP));
 	}
 

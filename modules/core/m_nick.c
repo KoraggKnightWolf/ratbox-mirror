@@ -110,7 +110,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(parc < 2 || EmptyString(parv[1]) || (parv[1][0] == '~'))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NONICKNAMEGIVEN),
+		sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
 			   me.name, 
 			   EmptyString(source_p->name) ? "*" : source_p->name);
 		return 0;
@@ -129,7 +129,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* check the nickname is ok */
 	if(!clean_nick(nick, 1))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_ERRONEUSNICKNAME),
+		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME),
 			   me.name, EmptyString(parv[0]) ? "*" : parv[0], parv[1]);
 		return 0;
 	}
@@ -137,14 +137,14 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* check if the nick is resv'd */
 	if(!IsExemptResv(source_p) && find_nick_resv(nick))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_ERRONEUSNICKNAME),
+		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME),
 			   me.name, EmptyString(source_p->name) ? "*" : source_p->name, nick);
 		return 0;
 	}
 
 	if(hash_find_nd(nick))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_UNAVAILRESOURCE),
+		sendto_one(source_p, form_str(ERR_UNAVAILRESOURCE),
 			me.name, 
 			EmptyString(source_p->name) ? "*" : source_p->name,
 			nick);
@@ -156,7 +156,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	else if(source_p == target_p)
 		strcpy(source_p->user->name, nick);
 	else
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NICKNAMEINUSE), me.name, "*", nick);
+		sendto_one(source_p, form_str(ERR_NICKNAMEINUSE), me.name, "*", nick);
 
 	return 0;
 }
@@ -174,7 +174,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(parc < 2 || EmptyString(parv[1]) || (parv[1][0] == '~'))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NONICKNAMEGIVEN),
+		sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
 			   me.name, source_p->name);
 		return 0;
 	}
@@ -196,21 +196,21 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	/* check the nickname is ok */
 	if(!clean_nick(nick, 1))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_ERRONEUSNICKNAME),
+		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME),
 			   me.name, parv[0], nick);
 		return 0;
 	}
 
 	if(find_nick_resv(nick))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_ERRONEUSNICKNAME),
+		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME),
 			   me.name, source_p->name, nick);
 		return 0;
 	}
 
 	if(hash_find_nd(nick))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_UNAVAILRESOURCE),
+		sendto_one(source_p, form_str(ERR_UNAVAILRESOURCE),
 			me.name, 
 			EmptyString(source_p->name) ? "*" : source_p->name,
 			nick);
@@ -237,7 +237,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			change_local_nick(client_p, source_p, nick, 1);
 		}
 		else
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_NICKNAMEINUSE), me.name, parv[0], nick);
+			sendto_one(source_p, form_str(ERR_NICKNAMEINUSE), me.name, parv[0], nick);
 
 		return 0;
 	}
@@ -279,7 +279,7 @@ mc_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 				     "Bad Nick: %s From: %s(via %s)",
 				     parv[1], source_p->servptr->name,
 				     client_p->name);
-		sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Bad Nickname)",
+		sendto_one(client_p, ":%s KILL %s :%s (Bad Nickname)",
 			   me.name, parv[1], me.name);
 
 		/* bad nick change, issue kill for the old nick to the rest
@@ -345,7 +345,7 @@ ms_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
 				     "Bad Nick: %s From: %s(via %s)",
 				     parv[1], parv[7], client_p->name);
-		sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Bad Nickname)",
+		sendto_one(client_p, ":%s KILL %s :%s (Bad Nickname)",
 			   me.name, parv[1], me.name);
 		return 0;
 	}
@@ -358,7 +358,7 @@ ms_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 				"Bad user@host: %s@%s From: %s(via %s)",
 				parv[5], parv[6], parv[7],
 				client_p->name);
-		sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Bad user@host)",
+		sendto_one(client_p, ":%s KILL %s :%s (Bad user@host)",
 				me.name, parv[1], me.name);
 		return 0;
 	}
@@ -443,7 +443,7 @@ ms_uid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 				     "Bad Nick: %s From: %s(via %s)",
 				     parv[1], source_p->name,
 				     client_p->name);
-		sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Bad Nickname)",
+		sendto_one(client_p, ":%s KILL %s :%s (Bad Nickname)",
 			   me.id, parv[8], me.name);
 		return 0;
 	}
@@ -455,7 +455,7 @@ ms_uid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 				     "Bad user@host: %s@%s From: %s(via %s)",
 				     parv[5], parv[6], source_p->name,
 				     client_p->name);
-		sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Bad user@host)",
+		sendto_one(client_p, ":%s KILL %s :%s (Bad user@host)",
 			   me.id, parv[8], me.name);
 		return 0;
 	}
@@ -467,7 +467,7 @@ ms_uid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 					"Bad UID: %s From: %s(via %s)",
 					parv[8], source_p->name,
 					client_p->name);
-		sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Bad UID)",
+		sendto_one(client_p, ":%s KILL %s :%s (Bad UID)",
 				me.id, parv[8], me.name);
 		return 0;
 	}
@@ -675,7 +675,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick,
 		if(ConfigFileEntry.anti_nick_flood && !IsOper(source_p) &&
 				source_p->localClient->number_of_nick_changes > ConfigFileEntry.max_nick_changes)
 		{
-			sendto_one(source_p, POP_QUEUE, form_str(ERR_NICKTOOFAST), 
+			sendto_one(source_p, form_str(ERR_NICKTOOFAST), 
 					me.name, source_p->name, source_p->name, 
 					nick, ConfigFileEntry.max_nick_time);
 			return;
@@ -825,21 +825,21 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 		{
 			save_user(&me, &me, target_p);
 			ServerStats.is_save++;
-			sendto_one(client_p, POP_QUEUE, ":%s SAVE %s %ld",
+			sendto_one(client_p, ":%s SAVE %s %ld",
 					me.id, uid, (long)newts);
 			register_client(client_p, source_p,
 					uid, SAVE_NICKTS, parc, parv);
 		}
 		else
 		{
-			sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+			sendto_one_numeric(target_p, ERR_NICKCOLLISION,
 					   form_str(ERR_NICKCOLLISION), target_p->name);
 
 			/* if the new client being introduced has a UID, we need to
 			 * issue a KILL for it..
 			 */
 			if(uid)
-				sendto_one(client_p, POP_QUEUE, ":%s KILL %s :%s (Nick collision (new))",
+				sendto_one(client_p, ":%s KILL %s :%s (Nick collision (new))",
 						me.id, uid, me.name);
 
 			/* we then need to KILL the old client everywhere */
@@ -867,14 +867,14 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 			 */
 			if (use_save)
 			{
-				sendto_one(client_p, POP_QUEUE,
+				sendto_one(client_p,
 						":%s SAVE %s %ld", me.id,
 						uid, (long)newts);
 				register_client(client_p, source_p,
 						uid, SAVE_NICKTS, parc, parv);
 			}
 			else if(uid)
-				sendto_one(client_p, POP_QUEUE,
+				sendto_one(client_p,
 					":%s KILL %s :%s (Nick collision (new))",
 					me.id, uid, me.name);
 			return 0;
@@ -900,7 +900,7 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 			else
 			{
 				ServerStats.is_kill++;
-				sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+				sendto_one_numeric(target_p, ERR_NICKCOLLISION,
 						   form_str(ERR_NICKCOLLISION), target_p->name);
 
 				/* now we just need to kill the existing client */
@@ -944,7 +944,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 		{
 			ServerStats.is_save += 2;
 			save_user(&me, &me, target_p);
-			sendto_one(client_p, POP_QUEUE, ":%s SAVE %s %ld", me.id,
+			sendto_one(client_p, ":%s SAVE %s %ld", me.id,
 					source_p->id, (long)newts);
 			/* don't send a redundant nick change */
 			if (!IsDigit(source_p->name[0]))
@@ -953,7 +953,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 		else
 		{
 			ServerStats.is_kill++;
-			sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+			sendto_one_numeric(target_p, ERR_NICKCOLLISION,
 					   form_str(ERR_NICKCOLLISION), target_p->name);
 
 			kill_client_serv_butone(NULL, source_p, "%s (Nick change collision)", me.name);
@@ -994,7 +994,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 				/* can't broadcast a SAVE because the
 				 * nickchange has happened at client_p
 				 * but not in other directions -- jilles */
-				sendto_one(client_p, POP_QUEUE, ":%s SAVE %s %ld", me.id,
+				sendto_one(client_p, ":%s SAVE %s %ld", me.id,
 						source_p->id, (long)newts);
 				/* send a :<id> NICK <id> <ts> (!) */
 				if (!IsDigit(source_p->name[0]))
@@ -1004,7 +1004,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 			{
 				ServerStats.is_kill++;
 
-				sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+				sendto_one_numeric(target_p, ERR_NICKCOLLISION,
 						   form_str(ERR_NICKCOLLISION), target_p->name);
 
 				/* kill the client issuing the nickchange */
@@ -1040,7 +1040,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 			}
 			else
 			{
-				sendto_one_numeric(target_p, POP_QUEUE, ERR_NICKCOLLISION,
+				sendto_one_numeric(target_p, ERR_NICKCOLLISION,
 						   form_str(ERR_NICKCOLLISION), target_p->name);
 
 				/* kill the client who existed before hand */
@@ -1240,7 +1240,7 @@ save_user(struct Client *client_p, struct Client *source_p,
 				target_p->name, source_p->name);
 	if (MyClient(target_p))
 	{
-		sendto_one_numeric(target_p, HOLD_QUEUE, RPL_SAVENICK,
+		sendto_one_numeric(target_p, RPL_SAVENICK,
 				form_str(RPL_SAVENICK), target_p->id);
 		change_local_nick(target_p, target_p, target_p->id, 0);
 		target_p->tsinfo = SAVE_NICKTS;

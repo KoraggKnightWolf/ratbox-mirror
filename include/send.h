@@ -32,16 +32,14 @@ struct Channel;
 struct rb_dlink_list;
 struct monitor;
 
-#define POP_QUEUE 0
-#define HOLD_QUEUE 1
 void send_pop_queue(struct Client *);
-void sendto_one(struct Client *target_p, int queue, const char *, ...) AFP(3, 4);
-void sendto_one_buffer(struct Client *target_p, int queue, const char *buffer);
-void sendto_one_notice(struct Client *target_p, int queue, const char *, ...) AFP(3, 4);
+void sendto_one(struct Client *target_p, const char *, ...) AFP(2, 3);
+void sendto_one_buffer(struct Client *target_p, const char *buffer);
+void sendto_one_notice(struct Client *target_p, const char *, ...) AFP(2, 3);
 void sendto_one_prefix(struct Client *target_p, struct Client *source_p,
 			      const char *command, const char *, ...) AFP(4, 5);
-void sendto_one_numeric(struct Client *target_p,
-			       int queue, int numeric, const char *, ...) AFP(4, 5);
+void sendto_one_numeric(struct Client *target_p, 
+			      int numeric, const char *, ...) AFP(3, 4);
 
 void sendto_server(struct Client *one, struct Channel *chptr,
 			  unsigned long caps, unsigned long nocaps,
