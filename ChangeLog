@@ -1,3 +1,11 @@
+androsyn    2008/03/16 14:00:11 UTC	(20080316_0-25123)
+  Log:
+  add whats-new-3.0.txt. Thanks to Moggie for writing this
+
+  Modified:
+	ircd-ratbox/trunk/doc/whats-new-3.0.txt (File Added) 
+
+
 androsyn    2008/03/13 16:57:05 UTC	(20080313_0-25119)
   Log:
   remove POP_QUEUE and HOLD_QUEUE and add a SetCork/ClearCork flag
