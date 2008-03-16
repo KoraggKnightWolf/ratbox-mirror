@@ -83,7 +83,7 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	if (!strchr(parv[4], '.') && !strchr(parv[4], ':'))
 	{
-		sendto_one(source_p, POP_QUEUE, "NOTICE * :Invalid IP");
+		sendto_one(source_p, "NOTICE * :Invalid IP");
 		return 0;
 	}
 
@@ -96,12 +96,12 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
 	if (!IsConfDoSpoofIp(aconf) || irccmp(aconf->info.name, "webirc."))
 	{
 		/* XXX */
-		sendto_one(source_p, POP_QUEUE, "NOTICE * :Not a CGI:IRC auth block");
+		sendto_one(source_p, "NOTICE * :Not a CGI:IRC auth block");
 		return 0;
 	}
 	if (EmptyString(aconf->passwd))
 	{
-		sendto_one(source_p, POP_QUEUE, "NOTICE * :CGI:IRC auth blocks must have a password");
+		sendto_one(source_p, "NOTICE * :CGI:IRC auth blocks must have a password");
 		return 0;
 	}
 
@@ -114,7 +114,7 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	if (strcmp(encr, aconf->passwd))
 	{
-		sendto_one(source_p, POP_QUEUE, "NOTICE * :CGI:IRC password incorrect");
+		sendto_one(source_p, "NOTICE * :CGI:IRC password incorrect");
 		return 0;
 	}
 
@@ -136,6 +136,6 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
 		}
 	}
 
-	sendto_one(source_p, POP_QUEUE, "NOTICE * :CGI:IRC host/IP set to %s %s", parv[3], parv[4]);
+	sendto_one(source_p, "NOTICE * :CGI:IRC host/IP set to %s %s", parv[3], parv[4]);
 	return 0;
 }

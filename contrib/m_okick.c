@@ -73,7 +73,7 @@ mo_okick(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(*parv[2] == '\0')
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NEEDMOREPARAMS), me.name, parv[0], "KICK");
+		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, parv[0], "KICK");
 		return 0;
 	}
 
@@ -93,7 +93,7 @@ mo_okick(struct Client *client_p, struct Client *source_p, int parc, const char 
 	chptr = find_channel(name);
 	if(!chptr)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL, form_str(ERR_NOSUCHCHANNEL), name);
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL, form_str(ERR_NOSUCHCHANNEL), name);
 		return 0;
 	}
 
@@ -108,13 +108,13 @@ mo_okick(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if((target_p = find_client(user)) == NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOSUCHNICK), me.name, parv[0], user);
+		sendto_one(source_p, form_str(ERR_NOSUCHNICK), me.name, parv[0], user);
 		return 0;
 	}
 
 	if((msptr = find_channel_membership(chptr, target_p)) == NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_USERNOTINCHANNEL),
+		sendto_one(source_p, form_str(ERR_USERNOTINCHANNEL),
 			   me.name, parv[0], parv[1], parv[2]);
 		return 0;
 	}

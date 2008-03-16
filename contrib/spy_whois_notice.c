@@ -49,7 +49,7 @@ show_whois(hook_data_client *data)
 	if(MyClient(target_p) && IsOper(target_p) && (source_p != target_p) &&
 	   (target_p->umodes & UMODE_SPY))
 	{
-		sendto_one(target_p, POP_QUEUE,
+		sendto_one(target_p,
 				":%s NOTICE %s :*** Notice -- %s (%s@%s) is doing a whois on you [%s]",
 				me.name, target_p->name, source_p->name,
 				source_p->username, source_p->host,

@@ -66,21 +66,21 @@ mo_clearchan(struct Client *client_p, struct Client *source_p, int parc, const c
 	/* admins only */
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :You have no A flag", me.name, parv[0]);
+		sendto_one(source_p, ":%s NOTICE %s :You have no A flag", me.name, parv[0]);
 		return 0;
 	}
 
 
 	if((chptr = find_channel(parv[1])) == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
 
 	if(IsMember(source_p, chptr))
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :*** Please part %s before using CLEARCHAN",
+		sendto_one(source_p, ":%s NOTICE %s :*** Please part %s before using CLEARCHAN",
 			   me.name, source_p->name, parv[1]);
 		return 0;
 	}
@@ -149,7 +149,7 @@ mo_clearchan(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	/* Join the user themselves to the channel down here, so they dont see a nicklist 
 	 * or people being kicked */
-	sendto_one(source_p, POP_QUEUE, ":%s!%s@%s JOIN %s",
+	sendto_one(source_p, ":%s!%s@%s JOIN %s",
 		   source_p->name, source_p->username, source_p->host, chptr->chname);
 
 	channel_member_names(chptr, source_p, 1);

@@ -63,7 +63,7 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* admins only */
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(ERR_NOPRIVS), me.name, source_p->name, "ojoin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "ojoin");
 		return 0;
 	}
 
@@ -78,14 +78,14 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if((chptr = find_channel(parv[1])) == NULL)
 	{
-		sendto_one_numeric(source_p, POP_QUEUE, ERR_NOSUCHCHANNEL,
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
 
 	if(IsMember(source_p, chptr))
 	{
-		sendto_one(source_p, POP_QUEUE, ":%s NOTICE %s :Please part %s before using OJOIN",
+		sendto_one(source_p, ":%s NOTICE %s :Please part %s before using OJOIN",
 			   me.name, source_p->name, parv[1]);
 		return 0;
 	}
@@ -132,9 +132,9 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* send the topic... */
 	if(chptr->topic != NULL)
 	{
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_TOPIC), me.name,
+		sendto_one(source_p, form_str(RPL_TOPIC), me.name,
 			   source_p->name, chptr->chname, chptr->topic->topic);
-		sendto_one(source_p, POP_QUEUE, form_str(RPL_TOPICWHOTIME), me.name,
+		sendto_one(source_p, form_str(RPL_TOPICWHOTIME), me.name,
 			   source_p->name, chptr->chname, chptr->topic->topic_info, chptr->topic->topic_time);
 	}
 
