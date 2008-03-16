@@ -1,3 +1,14 @@
+androsyn    2008/03/16 14:12:14 UTC	(20080316_1-25125)
+  Log:
+  add dubkat's genssl.sh shell script
+
+  Modified:
+	ircd-ratbox/trunk/tools/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/README (File Modified) 
+	ircd-ratbox/trunk/tools/genssl.sh (File Added) 
+
+
 androsyn    2008/03/16 14:00:11 UTC	(20080316_0-25123)
   Log:
   add whats-new-3.0.txt. Thanks to Moggie for writing this
