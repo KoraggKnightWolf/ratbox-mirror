@@ -35,14 +35,14 @@
 #ifndef INCLUDED_supported_h
 #define INCLUDED_supported_h
 
-void add_isupport(const char *, const char *(*)(void *), void *);
+void add_isupport(const char *, const char *(*)(const void *), const void *);
 void delete_isupport(const char *);
 void show_isupport(struct Client *);
 void init_isupport(void);
 
-const char *isupport_intptr(void *);
-const char *isupport_boolean(void *);
-const char *isupport_string(void *);
-const char *isupport_stringptr(void *);
+const char *isupport_intptr(const void *);
+const char *isupport_boolean(const void *);
+const char *isupport_string(const void *);
+const char *isupport_stringptr(const void *);
 
 #endif /* INCLUDED_supported_h */
