@@ -35,6 +35,7 @@
 #include "hash.h"
 #include "cache.h"
 #include "match.h"
+#include "client.h"
 
 static int m_help(struct Client *, struct Client *, int, const char **);
 static int mo_help(struct Client *, struct Client *, int, const char **);
