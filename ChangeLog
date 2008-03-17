@@ -1,3 +1,13 @@
+androsyn    2008/03/17 12:58:27 UTC	(20080317_2-25135)
+  Log:
+  Some const related and prototype fixes for supported.c/h
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/supported.h (File Modified) 
+	ircd-ratbox/trunk/src/supported.c (File Modified) 
+
+
 androsyn    2008/03/17 12:50:47 UTC	(20080317_1-25133)
   Log:
   add client.h to m_list.c
