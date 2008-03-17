@@ -1,3 +1,11 @@
+androsyn    2008/03/17 12:50:47 UTC	(20080317_1-25133)
+  Log:
+  add client.h to m_list.c
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_list.c (File Modified) 
+
+
 androsyn    2008/03/17 12:48:13 UTC	(20080317_0-25131)
   Log:
   modules/m_help.c needs client.h
