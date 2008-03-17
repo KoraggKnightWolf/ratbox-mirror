@@ -1,3 +1,11 @@
+androsyn    2008/03/17 12:48:13 UTC	(20080317_0-25131)
+  Log:
+  modules/m_help.c needs client.h
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_help.c (File Modified) 
+
+
 jilles      2008/03/16 20:45:20 UTC	(20080316_2-25127)
   Log:
   Make contrib compile again.
