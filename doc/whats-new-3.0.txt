@@ -34,8 +34,6 @@ Opers
 -----
  o Added adminwall allowing admins to broadcast messages to each other in the
    same manner as wallops for opers.
- o Servers generate notices to announce they are closing links from an SQUIT,
-   these messages passed through to other servers.
  o Notify opers and log when the ident helper is started or restarted.
  o Server /rehash options for restarting ident and resolver daemons.
 
