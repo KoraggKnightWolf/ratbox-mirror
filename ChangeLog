@@ -1,3 +1,12 @@
+jilles      2008/03/18 22:41:26 UTC	(20080318_0-25139)
+  Log:
+  The SQUIT changes are not notable enough for whats-new-3.0.txt.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/whats-new-3.0.txt (File Modified) 
+
+
 androsyn    2008/03/17 12:58:27 UTC	(20080317_2-25135)
   Log:
   Some const related and prototype fixes for supported.c/h
