@@ -299,7 +299,6 @@ conn_mod_write_sendq(rb_fde_t * fd, void *data)
 			err = rb_get_ssl_strerror(conn->mod_fd);
 		else
 			err = strerror(errno);
-		fprintf(stderr, "SSLD: conn_mod_write_sendq writes: %d\n", retlen);
 		close_conn(conn, WAIT_PLAIN, "Write error: %s", err);
 		return;
 	}
@@ -396,8 +395,6 @@ common_zlib_inflate(conn_t * conn, void *buf, size_t len)
 	
 	while (((zlib_stream_t *)conn->stream)->instream.avail_in)
 	{
-		fprintf(stderr, "Called zlib_inflate: %zd\n", len);
-		fprintf(stderr, "mod: %d plain: %d\n", rb_rawbuf_length(conn->modbuf_out), rb_rawbuf_length(conn->plainbuf_out));
 		ret = inflate(&((zlib_stream_t *)conn->stream)->instream, Z_NO_FLUSH);
 		if(ret != Z_OK)
 		{
@@ -406,9 +403,6 @@ common_zlib_inflate(conn_t * conn, void *buf, size_t len)
 				close_conn(conn, WAIT_PLAIN, "Received uncompressed ERROR");
 				return;
 			}
-			/* other error */
-			write(1, buf, len);
-			abort();
 			close_conn(conn, WAIT_PLAIN, "Inflate failed: %s", zError(ret));
 			return;
 		}
