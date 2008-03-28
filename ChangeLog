@@ -1,3 +1,11 @@
+androsyn    2008/03/28 17:33:30 UTC	(20080328_1-25155)
+  Log:
+  remove some debugging code
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/03/28 17:28:30 UTC	(20080328_0-25153)
   Log:
   this should fix most of the ssl+ziplinks linking issues i think
