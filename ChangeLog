@@ -1,3 +1,16 @@
+androsyn    2008/03/28 17:28:30 UTC	(20080328_0-25153)
+  Log:
+  this should fix most of the ssl+ziplinks linking issues i think
+
+  Modified:
+	ircd-ratbox/trunk/include/sslproc.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 jilles      2008/03/18 22:41:26 UTC	(20080318_0-25139)
   Log:
   The SQUIT changes are not notable enough for whats-new-3.0.txt.
