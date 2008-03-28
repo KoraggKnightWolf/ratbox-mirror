@@ -1297,6 +1297,9 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 
 
 	close_connection(source_p);
+
+	if(source_p->localClient->event != NULL)
+		rb_event_delete(source_p->localClient->event);
 	
 	if(source_p->servptr)
 		 strcpy(comment1, source_p->servptr->name);
@@ -1377,6 +1380,9 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 
 	sendto_one(source_p, "ERROR :Closing Link: %s (%s)", source_p->host, comment);
 	close_connection(source_p);
+
+	if(source_p->localClient->event != NULL)
+		rb_event_delete(source_p->localClient->event);
 
 	if((source_p->flags & FLAGS_KILLED) == 0)
 	{

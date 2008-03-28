@@ -202,6 +202,7 @@ struct LocalUser
 	rb_uint32_t localflags;
 	struct ZipStats *zipstats;		/* zipstats */
 	rb_uint16_t cork_count;			/* used for corking/uncorking connections */
+	struct ev_entry *event;			/* used for associated events */
 };
 
 

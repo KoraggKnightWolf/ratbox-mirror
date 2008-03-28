@@ -33,7 +33,7 @@
 #include "hash.h"
 #include "client.h"
 #include "send.h"
-
+#include "packet.h"
 
 #define ZIPSTATS_TIME           60
 
@@ -92,6 +92,23 @@ static inline void int32_to_buf(char *buf, rb_int32_t x)
 	*(++buf) = x & 0xFF;
 	return;
 }
+
+
+static inline rb_uint16_t buf_to_uint16(char *buf)
+{
+	rb_uint16_t x;
+	x = *(buf) << 8;
+	x |= *(++buf);
+	return x;
+}
+
+static inline void uint16_to_buf(char *buf, rb_uint16_t x)
+{
+	*(buf) = x >> 8 & 0xFF;
+	*(++buf) = x & 0xFF;
+	return;
+}
+
 
 static ssl_ctl_t *
 allocate_ssl_daemon(rb_fde_t *F, rb_fde_t *P, int pid)
@@ -348,6 +365,27 @@ ssl_process_dead_fd(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 	exit_client(client_p, client_p, &me, reason);
 }
 
+
+static void
+ssl_process_zip_ready(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
+{
+	struct Client *client_p;
+	rb_int32_t fd;
+
+	if(ctl_buf->buflen < 5)
+		return; /* bogus message..drop it.. XXX should warn here */
+	
+	fd = buf_to_int32(&ctl_buf->buf[1]);
+	client_p = find_cli_fd_hash(fd);
+	if(client_p == NULL)
+		return;
+
+	ClearCork(client_p);
+	send_pop_queue(client_p);
+	read_packet(client_p->localClient->F, client_p);
+}
+
+
 static void
 ssl_process_cmd_recv(ssl_ctl_t *ctl)
 {
@@ -381,6 +419,9 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 				ilog(L_MAIN, no_ssl_or_zlib);
 				sendto_realops_flags(UMODE_ALL, L_ALL, no_ssl_or_zlib);
 				ssl_killall();
+				break;
+			case 'R':
+				ssl_process_zip_ready(ctl, ctl_buf);
 				break;
 			case 'z':
 				zlib_ok = 0;
@@ -624,41 +665,35 @@ ssld_decrement_clicount(ssl_ctl_t *ctl)
 
 /* 
  * what we end up sending to the ssld process for ziplinks is the following
- * Z[ourfd][level][RECVQ]
- * Z = ziplinks command
- * ourfd = Our end of the socketpair
+ * Z[ourfd][level][RECVQ]  
+ * Z = ziplinks command	= buf[0]   
+ * ourfd = Our end of the socketpair = buf[1..4]
+ * level = zip level buf[5]
+ * recvqlen = our recvq len = buf[6-7]
  * recvq = any data we read prior to starting ziplinks
  */
-void
-start_zlib_session(struct Client *server)
+static void
+start_zlib_session(void *data)
 {
+	struct Client *server = (struct Client *)data;
+	rb_uint16_t recvqlen;
+	rb_uint8_t level;
 	void *xbuf;
+
 	rb_fde_t *F[2];
 	rb_fde_t *xF1, *xF2;
 	char *buf;
-	rb_uint8_t level;
-	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int32_t);
+	void *recvq_start;
+
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int32_t) + (sizeof(rb_uint16_t));
 	size_t len;
 	int cpylen, left;
+
+	server->localClient->event = NULL;
+
+	recvqlen = rb_linebuf_len(&server->localClient->buf_recvq);
 	
-	len = rb_linebuf_len(&server->localClient->buf_recvq);
-	len += hdr;	
-	buf = rb_malloc(len);
-	level = ConfigFileEntry.compression_level;
-
-	int32_to_buf(&buf[1], rb_get_fd(server->localClient->F));
-	buf[5] = level;
-
-	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
-
-	xbuf = buf + hdr;
-	left = len - hdr;
-	do
-	{
-		cpylen = rb_linebuf_get(&server->localClient->buf_recvq, xbuf, left, LINEBUF_PARTIAL, LINEBUF_RAW);
-		left -= cpylen;
-		xbuf += cpylen;
-	} while(cpylen > 0);
+	len = recvqlen + hdr;
 
 	if(len > READBUF_SIZE)
 	{
@@ -669,9 +704,32 @@ start_zlib_session(struct Client *server)
 		return;
 	}
 
+	buf = rb_malloc(len);	
+	level = ConfigFileEntry.compression_level;
+
+	int32_to_buf(&buf[1], rb_get_fd(server->localClient->F));
+	buf[5] = (char)level;
+	uint16_to_buf(&buf[6], recvqlen);
+
+	recvq_start = &buf[8];	
+	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
+
+	xbuf = recvq_start;
+	left = recvqlen;
+
+	do
+	{
+		cpylen = rb_linebuf_get(&server->localClient->buf_recvq, xbuf, left, LINEBUF_PARTIAL, LINEBUF_RAW);
+		left -= cpylen;
+		xbuf += cpylen;
+	} while(cpylen > 0);
+
 	if(server->localClient->ssl_ctl != NULL)
 	{
-		*buf = 'Y'; 	
+		*buf = 'Y';
+		/* don't try to read until we get the okay */
+		rb_setselect(server->localClient->F, RB_SELECT_READ, NULL, NULL); 
+
 		ssl_cmd_write_queue(server->localClient->ssl_ctl, NULL, 0, buf, len);
 		rb_free(buf);
 		return;
@@ -679,6 +737,10 @@ start_zlib_session(struct Client *server)
 	
 	*buf = 'Z';
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs");
+
+	/* don't try to read until we get the okay */
+	rb_setselect(server->localClient->F, RB_SELECT_READ, NULL, NULL); 
+
 	F[0] = server->localClient->F; 
 	F[1] = xF1;
 	del_from_cli_fd_hash(server);	
@@ -720,6 +782,12 @@ collect_zipstats(void *unused)
 			ssl_cmd_write_queue(target_p->localClient->ssl_ctl, NULL, 0, buf, len); 
 		}
 	}
+}
+
+void 
+setup_zlib_session(struct Client *server)
+{
+	server->localClient->event = rb_event_addonce("start_zlib_session", start_zlib_session, server, 1);
 }
 
 static void

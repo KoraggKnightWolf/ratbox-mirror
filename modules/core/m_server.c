@@ -1133,14 +1133,6 @@ burst_TS6(struct Client *client_p)
 	call_hook(h_burst_finished, &hclientinfo);
 }
 
-static void
-server_estab_pop(void *data)
-{
-	struct Client *client_p = data;
-	ClearCork(client_p);
-	send_pop_queue(client_p);
-}
-
 /*
  * server_estab
  *
@@ -1239,10 +1231,7 @@ server_estab(struct Client *client_p)
 	
 	/* Hand the server off to servlink now */
 	if(IsCapable(client_p, CAP_ZIP))
-	{
 		zip = 1;
-		start_zlib_session(client_p);
-	}
 
 	sendto_one(client_p, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, rb_current_time());
 
@@ -1394,9 +1383,12 @@ server_estab(struct Client *client_p)
 
 	/* Always send a PING after connect burst is done */
 	sendto_one(client_p, "PING :%s", get_id(&me, client_p));
-	if(zip)
-		rb_event_addonce("server_estab_pop", server_estab_pop, client_p, 1);	
-	else {
+	if(zip) 
+	{
+		setup_zlib_session(client_p);
+	}
+	else 
+	{
 		ClearCork(client_p);
 		send_pop_queue(client_p);
 	}
