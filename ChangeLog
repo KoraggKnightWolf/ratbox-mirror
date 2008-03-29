@@ -1,3 +1,13 @@
+androsyn    2008/03/29 16:06:01 UTC	(20080329_2-25161)
+  Log:
+  fix the zip only case now
+
+  Modified:
+	ircd-ratbox/trunk/include/sslproc.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 jilles      2008/03/29 16:03:02 UTC	(20080329_1-25159)
   Log:
   Also report ssld errors for handshakes to opers.
