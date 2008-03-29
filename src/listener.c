@@ -121,7 +121,8 @@ show_ports(struct Client *source_p)
 			   ntohs(((struct sockaddr_in *)&listener->addr)->sin_port),
 #endif
 			   IsOperAdmin(source_p) ? listener->name : me.name,
-			   listener->ref_count, (listener->active) ? "active" : "disabled");
+			   listener->ref_count, (listener->active) ? "active" : "disabled",
+			   listener->ssl ? " ssl" : "");
 	}
 }
 
