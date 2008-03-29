@@ -1,3 +1,12 @@
+jilles      2008/03/29 16:03:02 UTC	(20080329_1-25159)
+  Log:
+  Also report ssld errors for handshakes to opers.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2008/03/29 03:05:28 UTC	(20080329_0-25157)
   Log:
   Make zip links + ssl really work now.  This commit brought to you by several bottles of beer and a Red Harvest album set on repeat.
