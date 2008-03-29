@@ -360,7 +360,7 @@ ssl_process_dead_fd(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 	client_p = find_cli_fd_hash(fd);
 	if(client_p == NULL)
 		return;
-	if(IsServer(client_p))
+	if(IsAnyServer(client_p))
 		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld error for %s: %s", client_p->name, reason);
 	exit_client(client_p, client_p, &me, reason);
 }
