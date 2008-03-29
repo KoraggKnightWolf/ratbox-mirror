@@ -1232,8 +1232,13 @@ server_estab(struct Client *client_p)
 	/* Hand the server off to servlink now */
 	if(IsCapable(client_p, CAP_ZIP))
 	{
-		SetNoParse(client_p);
-		zip = 1;
+		if(IsSSL(client_p))
+		{
+			SetNoParse(client_p);
+			zip = 1;
+		} else {
+			start_zlib_session(client_p);
+		}
 	}
 	sendto_one(client_p, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, rb_current_time());
 

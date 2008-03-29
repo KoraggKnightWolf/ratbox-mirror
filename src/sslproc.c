@@ -672,7 +672,7 @@ ssld_decrement_clicount(ssl_ctl_t *ctl)
  * recvqlen = our recvq len = buf[6-7]
  * recvq = any data we read prior to starting ziplinks
  */
-static void
+void
 start_zlib_session(void *data)
 {
 	struct Client *server = (struct Client *)data;
