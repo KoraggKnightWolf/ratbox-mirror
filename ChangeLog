@@ -1,3 +1,17 @@
+jilles      2008/03/29 17:55:47 UTC	(20080329_4-25165)
+  Log:
+  Fix ziplinks without SSL.
+  server_estab() called SetCork and ClearCork, but then
+  called ClearCork again when the confirmation from ssld
+  came in, so the connection would be corked forever.
+  Fix this by not calling ClearCork from server_estab in
+  this case.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 jilles      2008/03/29 16:14:36 UTC	(20080329_3-25163)
   Log:
   Get rid of the extraneous space in server capabilities list.
