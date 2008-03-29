@@ -685,7 +685,7 @@ start_zlib_session(void *data)
 	char *buf;
 	void *recvq_start;
 
-	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int32_t) + (sizeof(rb_uint16_t));
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int32_t);
 	size_t len;
 	int cpylen, left;
 
@@ -710,9 +710,8 @@ start_zlib_session(void *data)
 
 	int32_to_buf(&buf[1], rb_get_fd(server->localClient->F));
 	buf[5] = (char)level;
-	uint16_to_buf(&buf[6], recvqlen);
 
-	recvq_start = &buf[8];	
+	recvq_start = &buf[6];	
 	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
 
 	xbuf = recvq_start;

@@ -700,12 +700,15 @@ static void
 zlib_process_common(conn_t *conn, mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	rb_uint8_t level;
-	rb_uint16_t recvqlen;
+	size_t recvqlen;
+	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int32_t);
 	void *recvq_start;
 	z_stream *instream, *outstream;
+
 	level = (rb_uint8_t) ctlb->buf[5];
-	recvqlen = buf_to_uint16(&ctlb->buf[6]);
-	recvq_start = &ctlb->buf[8];
+
+	recvqlen = ctlb->buflen - hdr;
+	recvq_start = &ctlb->buf[6];
 
 	SetZip(conn);
 	conn->stream = rb_malloc(sizeof(zlib_stream_t));
