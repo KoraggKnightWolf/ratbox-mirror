@@ -1231,8 +1231,10 @@ server_estab(struct Client *client_p)
 	
 	/* Hand the server off to servlink now */
 	if(IsCapable(client_p, CAP_ZIP))
+	{
+		SetNoParse(client_p);
 		zip = 1;
-
+	}
 	sendto_one(client_p, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, rb_current_time());
 
 	client_p->servptr = &me;

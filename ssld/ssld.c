@@ -392,7 +392,7 @@ common_zlib_inflate(conn_t * conn, void *buf, size_t len)
 	((zlib_stream_t *)conn->stream)->instream.avail_in = len;
 	((zlib_stream_t *)conn->stream)->instream.next_out = (Bytef *) outbuf;
 	((zlib_stream_t *)conn->stream)->instream.avail_out = sizeof(outbuf);
-	
+
 	while (((zlib_stream_t *)conn->stream)->instream.avail_in)
 	{
 		ret = inflate(&((zlib_stream_t *)conn->stream)->instream, Z_NO_FLUSH);
@@ -558,6 +558,7 @@ conn_plain_write_sendq(rb_fde_t * fd, void *data)
 		close_conn(data, NO_WAIT, NULL);
 		return;
 	}
+	
 
 	if(rb_rawbuf_length(conn->plainbuf_out) > 0)
 		rb_setselect(conn->plain_fd, RB_SELECT_WRITE, conn_plain_write_sendq, conn);
@@ -702,7 +703,6 @@ zlib_process_common(conn_t *conn, mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	rb_uint16_t recvqlen;
 	void *recvq_start;
 	z_stream *instream, *outstream;
-
 	level = (rb_uint8_t) ctlb->buf[5];
 	recvqlen = buf_to_uint16(&ctlb->buf[6]);
 	recvq_start = &ctlb->buf[8];
@@ -729,10 +729,8 @@ zlib_process_common(conn_t *conn, mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 		level = Z_DEFAULT_COMPRESSION;
 
 	deflateInit(&((zlib_stream_t *)conn->stream)->outstream, level);
-
 	if(recvqlen > 0)
 		common_zlib_inflate(conn, recvq_start, recvqlen);
-
 	zlib_send_zip_ready(ctl, conn);
 	conn_mod_read_cb(conn->mod_fd, conn);
 	conn_plain_read_cb(conn->plain_fd, conn);

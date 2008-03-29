@@ -689,6 +689,7 @@ start_zlib_session(void *data)
 	size_t len;
 	int cpylen, left;
 
+	ClearNoParse(server);
 	server->localClient->event = NULL;
 
 	recvqlen = rb_linebuf_len(&server->localClient->buf_recvq);
@@ -727,9 +728,6 @@ start_zlib_session(void *data)
 	if(server->localClient->ssl_ctl != NULL)
 	{
 		*buf = 'Y';
-		/* don't try to read until we get the okay */
-		rb_setselect(server->localClient->F, RB_SELECT_READ, NULL, NULL); 
-
 		ssl_cmd_write_queue(server->localClient->ssl_ctl, NULL, 0, buf, len);
 		rb_free(buf);
 		return;
@@ -737,9 +735,6 @@ start_zlib_session(void *data)
 	
 	*buf = 'Z';
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs");
-
-	/* don't try to read until we get the okay */
-	rb_setselect(server->localClient->F, RB_SELECT_READ, NULL, NULL); 
 
 	F[0] = server->localClient->F; 
 	F[1] = xF1;
