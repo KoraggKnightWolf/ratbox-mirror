@@ -1,3 +1,13 @@
+jilles      2008/03/29 23:39:25 UTC	(20080329_7-25171)
+  Log:
+  Improve comments in the ziplinks code.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 jilles      2008/03/29 21:41:31 UTC	(20080329_6-25169)
   Log:
   Show in /stats P if a port is an SSL port.
