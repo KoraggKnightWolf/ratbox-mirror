@@ -1,3 +1,13 @@
+jilles      2008/03/29 16:14:36 UTC	(20080329_3-25163)
+  Log:
+  Get rid of the extraneous space in server capabilities list.
+  This made "Link with <server> established: (<list>) link" ugly.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2008/03/29 16:06:01 UTC	(20080329_2-25161)
   Log:
   fix the zip only case now
