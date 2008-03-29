@@ -1394,7 +1394,7 @@ server_estab(struct Client *client_p)
 	{
 		setup_zlib_session(client_p);
 	}
-	else 
+	else if (!IsCapable(client_p, CAP_ZIP))
 	{
 		ClearCork(client_p);
 		send_pop_queue(client_p);
