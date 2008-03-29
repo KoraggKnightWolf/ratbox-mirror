@@ -347,23 +347,23 @@ show_capabilities(struct Client *target_p)
 	struct Capability *cap;
 
 	if(has_id(target_p))
-		rb_strlcpy(msgbuf, "TS6 ", sizeof(msgbuf));
+		rb_strlcpy(msgbuf, " TS6", sizeof(msgbuf));
 	else
-		rb_strlcpy(msgbuf, "TS ", sizeof(msgbuf));
+		rb_strlcpy(msgbuf, " TS", sizeof(msgbuf));
 
 	if(IsSSL(target_p))
-		rb_strlcat(msgbuf, "SSL ", sizeof(msgbuf));
+		rb_strlcat(msgbuf, " SSL", sizeof(msgbuf));
 
 	if(!IsServer(target_p) || !target_p->serv->caps)	/* short circuit if no caps */
-		return msgbuf;
+		return msgbuf + 1;
 
 	for (cap = captab; cap->cap; ++cap)
 	{
 		if(cap->cap & target_p->serv->caps)
-			rb_snprintf_append(msgbuf, sizeof(msgbuf), "%s ", cap->name);
+			rb_snprintf_append(msgbuf, sizeof(msgbuf), " %s", cap->name);
 	}
 
-	return msgbuf;
+	return msgbuf + 1;
 }
 
 /*
