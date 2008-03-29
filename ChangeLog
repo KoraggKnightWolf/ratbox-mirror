@@ -1,3 +1,16 @@
+androsyn    2008/03/29 03:05:28 UTC	(20080329_0-25157)
+  Log:
+  Make zip links + ssl really work now.  This commit brought to you by several bottles of beer and a Red Harvest album set on repeat.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/03/28 17:33:30 UTC	(20080328_1-25155)
   Log:
   remove some debugging code
