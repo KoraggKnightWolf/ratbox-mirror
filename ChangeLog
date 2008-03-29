@@ -1,3 +1,12 @@
+androsyn    2008/03/29 18:12:51 UTC	(20080329_5-25167)
+  Log:
+  don't bother sending the recvqlen now
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 jilles      2008/03/29 17:55:47 UTC	(20080329_4-25165)
   Log:
   Fix ziplinks without SSL.
