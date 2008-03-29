@@ -1227,9 +1227,14 @@ server_estab(struct Client *client_p)
 			     client_p->name, 
 			     log_client_name(client_p, SHOW_IP), errno);
 
-	SetCork(client_p); /* this will get unset after we get our ssld ack on the Z/Y command */
+	/* Buffer up the burst before trying to send anything.
+	 * In any case, this saves on system calls, and for ziplinks it
+	 * is required so that we only start sending it when ssld confirms
+	 * it has enabled compression ('R' message on control pipe).
+	 */
+	SetCork(client_p);
 	
-	/* Hand the server off to servlink now */
+	/* Enable compression now */
 	if(IsCapable(client_p, CAP_ZIP))
 	{
 		if(IsSSL(client_p))

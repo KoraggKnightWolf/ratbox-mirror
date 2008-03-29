@@ -380,8 +380,10 @@ ssl_process_zip_ready(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 	if(client_p == NULL)
 		return;
 
+	/* Now start sending the data that should be compressed. */
 	ClearCork(client_p);
 	send_pop_queue(client_p);
+	/* Start reading uncompressed data. */
 	read_packet(client_p->localClient->F, client_p);
 }
 
@@ -726,12 +728,17 @@ start_zlib_session(void *data)
 
 	if(server->localClient->ssl_ctl != NULL)
 	{
+		/* Enable compression on existing (SSL) connection.
+		 * XXX More compressed data may arrive after this, and
+		 * will not be handled properly.
+		 */
 		*buf = 'Y';
 		ssl_cmd_write_queue(server->localClient->ssl_ctl, NULL, 0, buf, len);
 		rb_free(buf);
 		return;
 	} 
 	
+	/* Pass the socket to ssld. */
 	*buf = 'Z';
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs");
 
@@ -781,6 +788,23 @@ collect_zipstats(void *unused)
 void 
 setup_zlib_session(struct Client *server)
 {
+	/* XXX
+	 * For SSL+ziplinks.
+	 *
+	 * This attempts to ensure ssld sends the preceding SERVER
+	 * message uncompressed. This is only an issue for the listening
+	 * side, which needs to send the SERVER message uncompressed and
+	 * immediately after that the burst compressed.
+	 * Without SSL, the SERVER message is sent before the socket is
+	 * handed to ssld, which already takes care of this
+	 * synchronization.
+	 *
+	 * This may break if ssld takes more than one second between
+	 * socket checks, possibly causing it to read the 'Y' message on
+	 * the control pipe before the SERVER message on the data socket,
+	 * so the SERVER message is compressed too which the other side
+	 * will not understand.
+	 */
 	server->localClient->event = rb_event_addonce("start_zlib_session", start_zlib_session, server, 1);
 }
 
