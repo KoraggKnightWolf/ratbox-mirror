@@ -1,3 +1,18 @@
+androsyn    2008/03/30 16:34:57 UTC	(20080330_0-25179)
+  Log:
+  remove traces of dealing with ssl+zip
+
+  Modified:
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/include/sslproc.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 jilles      2008/03/29 23:39:25 UTC	(20080329_7-25171)
   Log:
   Improve comments in the ziplinks code.
