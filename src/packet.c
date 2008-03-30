@@ -266,7 +266,7 @@ read_packet(rb_fde_t *F, void *data)
 		 * it on the end of the receive queue and do it when its
 		 * turn comes around.
 		 */
-		if(IsHandshake(client_p) || IsUnknown(client_p) || IsNoParse(client_p))
+		if(IsHandshake(client_p) || IsUnknown(client_p))
 			binary = 1;
 
 		lbuf_len = rb_linebuf_parse(&client_p->localClient->buf_recvq, readBuf, length, binary);
@@ -277,8 +277,7 @@ read_packet(rb_fde_t *F, void *data)
 			return;
 		
 		/* Attempt to parse what we have */
-		if(!IsNoParse(client_p))
-			parse_client_queued(client_p);
+		parse_client_queued(client_p);
 
 		if(IsAnyDead(client_p))
 			return;

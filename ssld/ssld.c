@@ -697,13 +697,25 @@ zlib_send_zip_ready(mod_ctl_t *ctl, conn_t *conn)
 }
 
 static void
-zlib_process_common(conn_t *conn, mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
+zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	rb_uint8_t level;
 	size_t recvqlen;
 	size_t hdr = (sizeof(rb_uint8_t) * 2) + sizeof(rb_int32_t);
 	void *recvq_start;
 	z_stream *instream, *outstream;
+	conn_t *conn;
+	rb_int32_t id;
+
+	conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
+	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
+		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
+
+	if(rb_get_type(conn->plain_fd) == RB_FD_UNKNOWN)
+		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
+
+	id = buf_to_int32(&ctlb->buf[1]);
+	conn_add_id_hash(conn, id);
 
 	level = (rb_uint8_t) ctlb->buf[5];
 
@@ -739,45 +751,6 @@ zlib_process_common(conn_t *conn, mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	conn_plain_read_cb(conn->plain_fd, conn);
 	return;
 
-}
-
-/* starts zlib for an already established connection */
-static void
-zlib_process_ssl(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
-{
-	rb_int32_t id;
-	conn_t *conn;
-
-	id = buf_to_int32(&ctlb->buf[1]);
-                
-	if(id < 0)
-		return;
-
-	conn = conn_find_by_id(id);
-	if(conn == NULL)
-		return;
-
-	zlib_process_common(conn, ctl, ctlb);
-	return;
-}
-
-static void
-zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
-{
-	conn_t *conn;
-	rb_int32_t id;
-
-	conn = make_conn(ctl, ctlb->F[0], ctlb->F[1]);
-	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
-		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
-
-	if(rb_get_type(conn->plain_fd) == RB_FD_UNKNOWN)
-		rb_set_type(conn->plain_fd, RB_FD_SOCKET);
-
-	id = buf_to_int32(&ctlb->buf[1]);
-	conn_add_id_hash(conn, id);
-	zlib_process_common(conn, ctl, ctlb);
-	return;
 }
 #endif
 
@@ -912,11 +885,6 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 				break;
 			}
 #ifdef HAVE_ZLIB
-		case 'Y':
-			{
-				zlib_process_ssl(ctl, ctl_buf);
-				break;
-			}
 		case 'Z':
 			{
 				/* just zlib only */
@@ -1047,6 +1015,7 @@ main(int argc, char **argv)
 			close(x);
 	}
 
+#if 0
 	x = open("/dev/null", O_RDWR);
 	if(x >= 0)
 	{
@@ -1059,7 +1028,7 @@ main(int argc, char **argv)
 		if(x > 2)
 			close(x);
 	}
-
+#endif
 	setup_signals();
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);

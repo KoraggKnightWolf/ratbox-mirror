@@ -1146,7 +1146,6 @@ server_estab(struct Client *client_p)
 	struct Client *target_p;
 	struct server_conf *server_p;
 	hook_data_client hdata;
-	int zip = 0;
 	const char *host;
 	char note[HOSTLEN + 10];
 	rb_dlink_node *ptr;
@@ -1237,13 +1236,7 @@ server_estab(struct Client *client_p)
 	/* Enable compression now */
 	if(IsCapable(client_p, CAP_ZIP))
 	{
-		if(IsSSL(client_p))
-		{
-			SetNoParse(client_p);
-			zip = 1;
-		} else {
-			start_zlib_session(client_p);
-		}
+		start_zlib_session(client_p);
 	}
 	sendto_one(client_p, "SVINFO %d %d 0 :%ld", TS_CURRENT, TS_MIN, rb_current_time());
 
@@ -1395,11 +1388,8 @@ server_estab(struct Client *client_p)
 
 	/* Always send a PING after connect burst is done */
 	sendto_one(client_p, "PING :%s", get_id(&me, client_p));
-	if(zip) 
-	{
-		setup_zlib_session(client_p);
-	}
-	else if (!IsCapable(client_p, CAP_ZIP))
+
+	if (!IsCapable(client_p, CAP_ZIP))
 	{
 		ClearCork(client_p);
 		send_pop_queue(client_p);

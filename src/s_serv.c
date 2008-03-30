@@ -652,7 +652,7 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 
 	/* pass my info to the new server */
 	send_capabilities(client_p, default_server_capabs
-			  | (ServerConfCompressed(server_p) && zlib_ok ? CAP_ZIP : 0)
+			  | (ServerConfCompressed(server_p) && zlib_ok && !ServerConfSSL(server_p) ? CAP_ZIP : 0)
 			  | (ServerConfTb(server_p) ? CAP_TB : 0));
 
 	sendto_one(client_p, "SERVER %s 1 :%s%s", me.name,
