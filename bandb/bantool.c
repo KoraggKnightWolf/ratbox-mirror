@@ -241,11 +241,31 @@ parse_k_file(FILE * file, int mode, int verb, int dupes)
 	return i;
 }
 
+static const char *
+clean_gecos_field(const char *gecos)
+{
+	static char buf[BUFSIZE];
+	char *str = buf;
+	
+	while(*gecos)
+	{
+		if(*gecos == ' ') 
+		{
+			*str++ = '\\';
+			*str++ = 's';
+		}	
+		else
+			*str++ = *gecos++;
+	}
+	return buf;
+}
+
+
 
 int
 parse_x_file(FILE * file, int mode, int verb, int dupes)
 {
-	char *gecos_field = NULL;
+	const char *gecos_field = NULL;
 	char *reason_field = NULL;
 	char newreason[REASONLEN];
 	char *oper_field = NULL;
@@ -263,10 +283,11 @@ parse_x_file(FILE * file, int mode, int verb, int dupes)
 		if((*line == '\0') || (line[0] == '#'))
 			continue;
 
-		gecos_field = getfield(line);
+		gecos_field = clean_gecos_field(getfield(line));
 		if(EmptyString(gecos_field))
 			continue;
 
+			
 		/* field for xline types, which no longer exist */
 		getfield(NULL);
 
