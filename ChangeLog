@@ -1,3 +1,11 @@
+androsyn    2008/03/31 20:24:33 UTC	(20080331_5-25193)
+  Log:
+  fix user@host spoofs
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/03/31 15:09:48 UTC	(20080331_4-25191)
   Log:
   fix a typo
