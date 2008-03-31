@@ -1,3 +1,12 @@
+androsyn    2008/03/31 04:02:32 UTC	(20080331_3-25189)
+  Log:
+  Fix bantool to deal with old xlines that have a space in them instead of a \s
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 androsyn    2008/03/31 03:36:15 UTC	(20080331_2-25187)
   Log:
   honor global_cidr setting
