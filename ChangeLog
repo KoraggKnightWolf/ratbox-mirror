@@ -1,3 +1,11 @@
+androsyn    2008/03/31 03:36:15 UTC	(20080331_2-25187)
+  Log:
+  honor global_cidr setting
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2008/03/31 02:25:43 UTC	(20080331_1-25183)
   Log:
   make that say 3.0.0beta1
