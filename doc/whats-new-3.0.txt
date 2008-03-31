@@ -29,6 +29,8 @@ Config
  o Support for global CIDR limits.
  o Idletime checking option removed from config, server no longer does any
    client idletime checks.
+ o SSL server connections and ZIPLINKS are mutually exclusive.  OpenSSL
+   can typically enabled zlib compression for TLSv1 connections.
 
 Opers
 -----
