@@ -513,7 +513,7 @@ attach_iline(struct Client *client_p, struct ConfItem *aconf)
 			return (TOO_MANY_IDENT);
 	}
 
-	if(check_global_cidr_count(client_p) > 0)
+	if(ConfigFileEntry.global_cidr && check_global_cidr_count(client_p) > 0)
 		return (TOO_MANY_GLOBAL_CIDR);
 	return (attach_conf(client_p, aconf));
 }
