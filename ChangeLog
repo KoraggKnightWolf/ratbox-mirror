@@ -1,3 +1,13 @@
+androsyn    2008/03/31 02:23:08 UTC	(20080331_0-25181)
+  Log:
+  rev to 3.0beta1..
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/doc/whats-new-3.0.txt (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/03/30 16:34:57 UTC	(20080330_0-25179)
   Log:
   remove traces of dealing with ssl+zip
