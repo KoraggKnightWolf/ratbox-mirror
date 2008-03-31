@@ -25,7 +25,7 @@
  */
 
 #ifndef PATCHLEVEL
-#define PATCHLEVEL   "ircd-ratbox-3.0beta1"
+#define PATCHLEVEL   "ircd-ratbox-3.0.0beta1"
 #define PATCHLEVEL_NUM	0300000101
 
 /* patchlevel numbers:
