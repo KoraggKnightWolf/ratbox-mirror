@@ -1,3 +1,11 @@
+androsyn    2008/03/31 02:25:43 UTC	(20080331_1-25183)
+  Log:
+  make that say 3.0.0beta1
+
+  Modified:
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/03/31 02:23:08 UTC	(20080331_0-25181)
   Log:
   rev to 3.0beta1..
