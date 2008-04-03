@@ -1194,11 +1194,11 @@ conf_set_auth_spoof(confentry_t * entry, conf_t * conf, struct conf_items *item)
 	char *user = NULL, *host = NULL, *p;
 
 	host = LOCAL_COPY(entry->string);
+	user = host;
 	/* user@host spoof */
 	if((p = strchr(host, '@')) != NULL)
 	{
 		*p = '\0';
-		user = host;
 		host = p + 1;
 		if(EmptyString(user))
 		{
