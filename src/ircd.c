@@ -321,7 +321,7 @@ initialize_global_set_options(void)
 	memset(&GlobalSetOptions, 0, sizeof(GlobalSetOptions));
 	/* memset( &ConfigFileEntry, 0, sizeof(ConfigFileEntry)); */
 
-	GlobalSetOptions.maxclients = maxconnections - MAX_BUFFER;
+	GlobalSetOptions.maxclients = ServerInfo.default_max_clients;
 
 	if(GlobalSetOptions.maxclients > (maxconnections - MAX_BUFFER))
 		GlobalSetOptions.maxclients = maxconnections - MAX_BUFFER;
