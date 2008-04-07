@@ -1,3 +1,11 @@
+androsyn    2008/04/07 19:03:07 UTC	(20080407_0-25207)
+  Log:
+  fix maxclients stuff thanks to dwr@efnet
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2008/04/04 18:19:48 UTC	(20080404_0-25201)
   Log:
   remove some old debugging code
