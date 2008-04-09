@@ -1,3 +1,11 @@
+androsyn    2008/04/09 18:58:09 UTC	(20080409_1-25213)
+  Log:
+  test if default_max_clients == 0 and if so override it.
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2008/04/09 18:24:36 UTC	(20080409_0-25209)
   Log:
   update patchlevel.h and RELNOTES for beta2
