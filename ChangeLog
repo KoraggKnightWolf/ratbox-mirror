@@ -1,3 +1,13 @@
+androsyn    2008/04/09 19:17:24 UTC	(20080409_2-25215)
+  Log:
+  fix some long unsigned int format, time_t arg warnings
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2008/04/09 18:58:09 UTC	(20080409_1-25213)
   Log:
   test if default_max_clients == 0 and if so override it.
