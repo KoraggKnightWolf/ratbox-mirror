@@ -1,3 +1,13 @@
+jilles      2008/04/09 22:12:16 UTC	(20080409_3-25221)
+  Log:
+  Fix WANT_READ/WANT_WRITE in ssld (used for SSL renegotiations).
+  This should really be done in libratbox.
+  
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/04/09 19:17:24 UTC	(20080409_2-25215)
   Log:
   fix some long unsigned int format, time_t arg warnings
