@@ -6,6 +6,14 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0beta2
+- honor global_cidr setting
+- fix a bug in bantool that improperly parsed X-lines with spaces them
+- fix user@host spoofs
+- fix default maxclients to work correctly
+- fix libratbox build with openssl disabled
+- don't spin on openssl accepts when there is no data
+
 -- ircd-ratbox-3.0beta1
 - No release notes, see doc/whats-new-3.0.txt
 
