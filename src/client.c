@@ -1314,10 +1314,10 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s was connected"
 			     " for %ld seconds.  %llu/%llu send/recv.",
-			     source_p->name, rb_current_time() - source_p->localClient->firsttime, sendb, recvb);
+			     source_p->name, (long int)(rb_current_time() - source_p->localClient->firsttime), sendb, recvb);
 
 	ilog(L_SERVER, "%s was connected for %ld seconds.  %llu/%llu send/recv.",
-	     source_p->name, rb_current_time() - source_p->localClient->firsttime, sendb, recvb);
+	     source_p->name, (long int)(rb_current_time() - source_p->localClient->firsttime), sendb, recvb);
 	
 	if(has_id(source_p))
 		del_from_hash(HASH_ID, source_p->id, source_p);

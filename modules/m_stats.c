@@ -968,8 +968,8 @@ stats_tstats(struct Client *source_p)
 				sp.is_cbr / 1024, 
 				sp.is_sbr / 1024);
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-				"T :time connected %lu %lu",
-				sp.is_cti, sp.is_sti);
+				"T :time connected %ld %ld",
+				(long int)sp.is_cti, (long int)sp.is_sti);
 }
 
 static void
@@ -1073,8 +1073,7 @@ stats_servers (struct Client *source_p)
 {
 	struct Client *target_p;
 	rb_dlink_node *ptr;
-	time_t seconds;
-	long days, hours, minutes;
+	long days, hours, minutes, seconds;
 	int j = 0;
 
 	if(ConfigServerHide.flatten_links && !IsOper(source_p) &&
@@ -1090,13 +1089,13 @@ stats_servers (struct Client *source_p)
 		target_p = ptr->data;
 
 		j++;
-		seconds = rb_current_time() - target_p->localClient->firsttime;
+		seconds = (long)(rb_current_time() - target_p->localClient->firsttime);
 
-		days = (long) (seconds / 86400);
+		days = seconds / 86400;
 		seconds %= 86400;
-		hours = (long) (seconds / 3600);
+		hours = seconds / 3600;
 		seconds %= 3600;
-		minutes = (long) (seconds / 60);
+		minutes = seconds / 60;
 		seconds %= 60;
 
 		sendto_one_numeric(source_p, RPL_STATSDEBUG,
@@ -1670,7 +1669,7 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				target_p->localClient->receiveB/1024,
 				(long)rb_current_time() - target_p->localClient->firsttime,
 				(long)(rb_current_time() > target_p->localClient->lasttime) ? 
-				 (rb_current_time() - target_p->localClient->lasttime) : 0,
+				(long)(rb_current_time() - target_p->localClient->lasttime) : 0,
 				IsOper(source_p) ? show_capabilities(target_p) : "-");
 	}
 
@@ -1683,9 +1682,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				    target_p->localClient->sendB/1024,
 				    target_p->localClient->receiveM,
 				    target_p->localClient->receiveB/1024,
-				    rb_current_time() - target_p->localClient->firsttime,
-				    (rb_current_time() > target_p->localClient->lasttime) ? 
-				     (rb_current_time() - target_p->localClient->lasttime) : 0,
+				    (long)(rb_current_time() - target_p->localClient->firsttime),
+				    (long)(rb_current_time() > target_p->localClient->lasttime) ? 
+				    (long)(rb_current_time() - target_p->localClient->lasttime) : 0,
 				    "-");
 	}
 
@@ -1700,9 +1699,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p,
 				   target_p->localClient->sendB/1024,
 				   target_p->localClient->receiveM,
 				   target_p->localClient->receiveB/1024,
-				   rb_current_time() - target_p->localClient->firsttime,
-				   (rb_current_time() > target_p->localClient->lasttime) ? 
-				    (rb_current_time() - target_p->localClient->lasttime) : 0,
+				   (long)rb_current_time() - target_p->localClient->firsttime,
+				   (long)(rb_current_time() > target_p->localClient->lasttime) ? 
+				   (long)(rb_current_time() - target_p->localClient->lasttime) : 0,
 				   "-");
 	}
 }

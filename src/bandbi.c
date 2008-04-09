@@ -121,8 +121,8 @@ bandb_add(bandb_type type, struct Client *source_p, const char *mask1,
 	if(!EmptyString(mask2))
 		rb_snprintf_append(buf, sizeof(buf), "%s ", mask2);
 
-	rb_snprintf_append(buf, sizeof(buf), "%s %lu :%s", 
-				get_oper_name(source_p), rb_current_time(), reason);
+	rb_snprintf_append(buf, sizeof(buf), "%s %ld :%s", 
+				get_oper_name(source_p), (long int)rb_current_time(), reason);
 
 	if(!EmptyString(oper_reason))
 		rb_snprintf_append(buf, sizeof(buf), "|%s", oper_reason);
