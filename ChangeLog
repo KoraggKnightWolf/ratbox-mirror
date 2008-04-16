@@ -1,3 +1,14 @@
+jilles      2008/04/16 18:34:28 UTC	(20080416_0-25231)
+  Log:
+  Fix some cases where /list could freeze the client
+  because SetCork and ClearCork were not matched correctly.
+  Reported by cirrux@EFnet.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_list.c (File Modified) 
+
+
 jilles      2008/04/09 22:12:16 UTC	(20080409_3-25221)
   Log:
   Fix WANT_READ/WANT_WRITE in ssld (used for SSL renegotiations).
