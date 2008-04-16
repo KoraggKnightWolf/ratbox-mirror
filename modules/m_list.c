@@ -133,7 +133,6 @@ list_all_channels(struct Client *source_p)
 		/* if theyre overflowing their sendq, stop. --fl */
 		if(rb_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
 		{
-			ClearCork(source_p);
 			sendto_one(source_p, form_str(ERR_TOOMANYMATCHES),
 				   me.name, source_p->name, "LIST");
 			break;
@@ -213,7 +212,6 @@ list_limit_channels(struct Client *source_p, const char *param)
 		/* if theyre overflowing their sendq, stop. --fl */
 		if(rb_linebuf_len(&source_p->localClient->buf_sendq) > sendq_limit)
 		{
-			ClearCork(source_p);
 			sendto_one(source_p, form_str(ERR_TOOMANYMATCHES),
 				   me.name, source_p->name, "LIST");
 			break;
@@ -235,6 +233,7 @@ list_limit_channels(struct Client *source_p, const char *param)
 		{
 			ClearCork(source_p);
 			send_pop_queue(source_p);
+			SetCork(source_p);
 			count = 0;
 		}
 	}
