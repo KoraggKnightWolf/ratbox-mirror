@@ -1,3 +1,14 @@
+androsyn    2008/04/17 14:30:26 UTC	(20080417_0-25237)
+  Log:
+  stop libltdl from creating an empty include dir
+
+  Modified:
+	ircd-ratbox/trunk/libltdl/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libltdl/aclocal.m4 (File Modified) 
+	ircd-ratbox/trunk/libltdl/configure (File Modified) 
+
+
 jilles      2008/04/16 18:34:28 UTC	(20080416_0-25231)
   Log:
   Fix some cases where /list could freeze the client
