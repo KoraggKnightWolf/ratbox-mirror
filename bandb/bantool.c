@@ -95,7 +95,7 @@ main(int argc, char *argv[])
 
 	if(!pretend)
 	{
-		rsdb_init();
+		rsdb_init(NULL);
 		check_schema();
 		if(wipe)
 		{

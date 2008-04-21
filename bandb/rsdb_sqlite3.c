@@ -37,12 +37,33 @@
 
 struct sqlite3 *rb_bandb;
 
-void
-rsdb_init(void)
+rsdb_error_cb *error_cb;
+
+static void
+mlog(const char *errstr, ...)
 {
-	if(sqlite3_open(DBPATH, &rb_bandb))
+	if(error_cb != NULL)
 	{
+		char buf[256];
+		va_list ap;
+		va_start(ap, errstr);
+		rb_vsnprintf(buf, sizeof(buf), errstr, ap);
+		va_end(ap);
+		error_cb(buf);
 		exit(1);
+	} else
+		exit(1);
+}
+
+void
+rsdb_init(rsdb_error_cb *ecb)
+{
+	error_cb = ecb;
+	if(sqlite3_open(DBPATH, &rb_bandb) != SQLITE_OK)
+	{
+		char errbuf[128];
+		rb_snprintf(errbuf, sizeof(errbuf), "Unable to open sqlite database: %s", sqlite3_errmsg(rb_bandb));
+		mlog(errbuf);
 	}
 }
 
@@ -98,8 +119,7 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 
 	if(i >= sizeof(buf))
 	{
-//		mlog("fatal error: length problem with compiling sql");
-		exit(1);
+		mlog("fatal error: length problem with compiling sql");
 	}
 
 	if((i = sqlite3_exec(rb_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg)))
@@ -115,13 +135,11 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 				}
 
 				/* failed, fall through to default */
-//				mlog("fatal error: problem with db file: %s", errmsg);
-				exit(1);
+				mlog("fatal error: problem with db file: %s", errmsg);
 				break;
 
 			default:
-//				mlog("fatal error: problem with db file: %s", errmsg);
-				exit(1);
+				mlog("fatal error: problem with db file: %s", errmsg);
 				break;
 		}
 	}
@@ -144,8 +162,7 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 
 	if(retval >= sizeof(buf))
 	{
-//		mlog("fatal error: length problem with compiling sql");
-		exit(1);
+		mlog("fatal error: length problem with compiling sql");
 	}
 
 	if((retval = sqlite3_get_table(rb_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg)))
@@ -168,13 +185,11 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 				if(success)
 					break;
 
-//				mlog("fatal error: problem with db file: %s", errmsg);
-				exit(1);
+				mlog("fatal error: problem with db file: %s", errmsg);
 				break;
 
 			default:
-//				mlog("fatal error: problem with db file: %s", errmsg);
-				exit(1);
+				mlog("fatal error: problem with db file: %s", errmsg);
 				break;
 		}
 	}

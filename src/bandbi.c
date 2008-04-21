@@ -45,6 +45,7 @@
 #include "hash.h"
 #include "s_newconf.h"
 #include "reject.h"
+#include "send.h"
 
 static char bandb_add_letter[LAST_BANDB_TYPE] =
 {
@@ -54,7 +55,7 @@ static char bandb_add_letter[LAST_BANDB_TYPE] =
 rb_dlink_list bandb_pending;
 
 static rb_helper *bandb_helper;
-static void fork_bandb(void);
+static int start_bandb(void);
 
 static void bandb_parse(rb_helper *);
 static void bandb_restart_cb(rb_helper *);
@@ -63,12 +64,16 @@ static char *bandb_path;
 void
 init_bandb(void)
 {
-	fork_bandb();
+	if(start_bandb())
+	{
+		ilog(L_MAIN, "Unable to start bandb helper: %s", strerror(errno));
+		exit(0);	
+	}
 }
 
 
-static void
-fork_bandb(void)
+static int
+start_bandb(void)
 {
 	char fullpath[PATH_MAX+1];
 #ifdef _WIN32
@@ -90,7 +95,7 @@ fork_bandb(void)
 			{
 				ilog(L_MAIN, "Unable to execute bandb in %s or %s/bin",
 					BINPATH, ConfigFileEntry.dpath);
-				return;
+				return 0;
 			}
 		}
 		bandb_path = rb_strdup(fullpath);
@@ -103,11 +108,11 @@ fork_bandb(void)
 	{
 		ilog(L_MAIN, "Unable to start bandb: %s", strerror(errno));
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to start bandb: %s", strerror(errno));
-		return;
+		return 1;
 	}
 
 	rb_helper_run(bandb_helper);
-	return;
+	return 0;
 }
 
 void
@@ -374,6 +379,14 @@ bandb_handle_finish(void)
 }
 
 static void
+bandb_handle_failure(rb_helper *helper, char **parv, int parc)
+{
+	ilog(L_MAIN, "bandb - bandb failure: %s", parv[1]);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "bandb - bandb failure: %s", parv[1]);
+	exit(1);
+}
+
+static void
 bandb_parse(rb_helper *helper)
 {
 	static char buf[READBUF_SIZE];
@@ -389,6 +402,9 @@ bandb_parse(rb_helper *helper)
 
 		switch(parv[0][0])
 		{
+			case '!':
+				bandb_handle_failure(helper, parv, parc);
+				break;		
 			case 'K':
 			case 'D':
 			case 'X':
@@ -421,7 +437,7 @@ static void bandb_restart_cb(rb_helper *helper)
 		rb_helper_close(helper);
 		bandb_helper = NULL;
 	}	
-	fork_bandb();	
+	start_bandb();	
 	return;
 }
 

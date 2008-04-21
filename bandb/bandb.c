@@ -249,6 +249,15 @@ setup_signals()
 }
 
 
+static void
+db_error_cb(const char *errstr)
+{
+	char buf[256];
+	rb_snprintf(buf, sizeof(buf), "! :%s", errstr);
+	rb_helper_write(bandb_helper, buf);
+	rb_sleep(2<<30, 0);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -263,7 +272,7 @@ main(int argc, char *argv[])
 		fprintf(stderr, "Have a nice day\n");
 		exit(1);
 	}
-	rsdb_init();
+	rsdb_init(db_error_cb);
 	check_schema();
 	rb_helper_loop(bandb_helper, 0);
 
