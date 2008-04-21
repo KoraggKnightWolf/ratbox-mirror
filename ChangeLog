@@ -1,3 +1,11 @@
+androsyn    2008/04/21 18:31:40 UTC	(20080421_1-25243)
+  Log:
+  untabify files we read in via cache_file
+
+  Modified:
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+
+
 jilles      2008/04/21 17:14:24 UTC	(20080421_0-25241)
   Log:
   Replace tabs with spaces in umode help files.
