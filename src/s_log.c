@@ -145,6 +145,7 @@ ilog(ilogfile dest, const char *format, ...)
 #endif
 	if(fputs(buf2, logfile) < 0)
 	{
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Closing logfile: %s (%s)", *log_table[dest].name, strerror(errno));
 		fclose(logfile);
 		*log_table[dest].logfile = NULL;
 		return;
