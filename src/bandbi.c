@@ -101,7 +101,8 @@ fork_bandb(void)
 
 	if(bandb_helper == NULL)
 	{
-		ilog(L_MAIN, "rb_helper_start failed: %s", strerror(errno));
+		ilog(L_MAIN, "Unable to start bandb: %s", strerror(errno));
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to start bandb: %s", strerror(errno));
 		return;
 	}
 
@@ -413,6 +414,8 @@ bandb_rehash_bans(void)
 
 static void bandb_restart_cb(rb_helper *helper)
 {
+	ilog(L_MAIN, "bandb - bandb_restart_cb called, bandb helper died?");
+	sendto_realops_flags(UMODE_ALL, L_ALL, "bandb - bandb_restart_cb called, bandb helper died?");
 	if(helper != NULL)
 	{
 		rb_helper_close(helper);
