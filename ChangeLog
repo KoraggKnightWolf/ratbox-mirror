@@ -1,3 +1,15 @@
+androsyn    2008/04/21 19:39:18 UTC	(20080421_3-25249)
+  Log:
+  deal with bandb failures a bit more gracefully
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/bandb/rsdb.h (File Modified) 
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+
+
 androsyn    2008/04/21 18:49:40 UTC	(20080421_2-25247)
   Log:
   make bandb restarts a bit more clear
