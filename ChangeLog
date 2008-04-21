@@ -1,3 +1,13 @@
+jilles      2008/04/21 17:14:24 UTC	(20080421_0-25241)
+  Log:
+  Replace tabs with spaces in umode help files.
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/umode (File Modified) 
+	ircd-ratbox/trunk/help/users/umode (File Modified) 
+
+
 jilles      2008/04/17 22:43:20 UTC	(20080417_1-25239)
   Log:
   Improve SIGCHLD handler
