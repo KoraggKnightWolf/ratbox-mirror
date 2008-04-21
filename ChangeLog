@@ -1,3 +1,11 @@
+androsyn    2008/04/21 19:56:15 UTC	(20080421_4-25251)
+  Log:
+  don't try to fflush a file we just closed
+
+  Modified:
+	ircd-ratbox/trunk/src/s_log.c (File Modified) 
+
+
 androsyn    2008/04/21 19:39:18 UTC	(20080421_3-25249)
   Log:
   deal with bandb failures a bit more gracefully
