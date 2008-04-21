@@ -24,5 +24,5 @@ Usermodes: (* designates that the umode is oper only)
        * +x     - Can see new server introduction and split messages.
        * +y     - Can see stats/links/admin requests to name a few.
        * +z     - Can see oper wallops.
-       * +Z	- Can see operspy notices
-	 +D     - Deaf - ignores all channel messages.
+       * +Z     - Can see operspy notices
+         +D     - Deaf - ignores all channel messages.
