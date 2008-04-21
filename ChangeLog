@@ -1,3 +1,11 @@
+androsyn    2008/04/21 20:02:00 UTC	(20080421_5-25255)
+  Log:
+  report to opers that a logfile is being closed due to errors
+
+  Modified:
+	ircd-ratbox/trunk/src/s_log.c (File Modified) 
+
+
 androsyn    2008/04/21 19:56:15 UTC	(20080421_4-25251)
   Log:
   don't try to fflush a file we just closed
