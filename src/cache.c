@@ -70,6 +70,36 @@ init_cache(void)
 	memset(&links_cache_list, 0, sizeof(links_cache_list));
 }
 
+/* 
+ * removes tabs from src, replaces with 8 spaces, and returns the length
+ * of the new string.  if the new string would be greater than destlen,
+ * it is truncated to destlen - 1
+ */
+static size_t
+untabify(char *dest, const char *src, size_t destlen)
+{
+	size_t x = 0, i;
+	const char *s = src;
+	char *d = dest;
+
+	while(*s != '\0' && x < destlen - 1)
+	{
+		if(*s == '\t')
+		{
+			for(i = 0; i < 8 && x < destlen - 1; i++, x++, d++)
+				*d = ' ';
+			s++;
+		} else 
+		{
+			*d++ = *s++;
+			x++;
+		}
+	}
+	*d = '\0';
+	return x;
+}
+
+
 /* cache_file()
  *
  * inputs	- file to cache, files "shortname", flags to set
@@ -103,7 +133,7 @@ cache_file(const char *filename, const char *shortname, int flags)
 		if(!EmptyString(line))
 		{
 			lineptr = rb_malloc(sizeof(struct cacheline));
-			rb_strlcpy(lineptr->data, line, sizeof(lineptr->data));
+			untabify(lineptr->data, line, sizeof(lineptr->data));
 			rb_dlinkAddTail(lineptr, &lineptr->linenode, &cacheptr->contents);
 		}
 		else
