@@ -256,6 +256,7 @@ db_error_cb(const char *errstr)
 	rb_snprintf(buf, sizeof(buf), "! :%s", errstr);
 	rb_helper_write(bandb_helper, buf);
 	rb_sleep(2<<30, 0);
+	exit(1);
 }
 
 int
