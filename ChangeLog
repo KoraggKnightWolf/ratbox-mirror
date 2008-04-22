@@ -1,3 +1,11 @@
+androsyn    2008/04/22 16:32:06 UTC	(20080422_0-25257)
+  Log:
+  for the sake of sanity, do an exit if rb_sleep for some unknown reason actually returns
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+
+
 androsyn    2008/04/21 20:02:00 UTC	(20080421_5-25255)
   Log:
   report to opers that a logfile is being closed due to errors
