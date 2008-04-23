@@ -1,3 +1,26 @@
+androsyn    2008/04/23 19:43:17 UTC	(20080423_5-25271)
+  Log:
+  have helper programs installed into prefix/libexec/ircd-ratbox
+
+  Modified:
+	ircd-ratbox/trunk/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/help/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ident/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/ident/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/ssld/Makefile.in (File Modified) 
+
+
 androsyn    2008/04/23 17:23:54 UTC	(20080423_4-25269)
   Log:
   Add a disable-backups configure flag which disables moving modules/help out of the way, which is useful for some package maintainers
