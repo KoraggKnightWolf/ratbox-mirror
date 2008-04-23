@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = mkpasswd$(EXEEXT)
+bin_PROGRAMS = ratbox-mkpasswd$(EXEEXT)
 subdir = tools
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -48,9 +48,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_mkpasswd_OBJECTS = mkpasswd.$(OBJEXT)
-mkpasswd_OBJECTS = $(am_mkpasswd_OBJECTS)
-mkpasswd_DEPENDENCIES = ../libratbox/src/libratbox.la
+am_ratbox_mkpasswd_OBJECTS = mkpasswd.$(OBJEXT)
+ratbox_mkpasswd_OBJECTS = $(am_ratbox_mkpasswd_OBJECTS)
+ratbox_mkpasswd_DEPENDENCIES = ../libratbox/src/libratbox.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -63,8 +63,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(mkpasswd_SOURCES)
-DIST_SOURCES = $(mkpasswd_SOURCES)
+SOURCES = $(ratbox_mkpasswd_SOURCES)
+DIST_SOURCES = $(ratbox_mkpasswd_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -114,6 +114,7 @@ LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
 LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
+LIBEXEC_DIR = @LIBEXEC_DIR@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -216,8 +217,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = $(WARNFLAGS)
 INCLUDES = $(DEFAULT_INCLUDES) -I../libratbox/include -I.
-mkpasswd_SOURCES = mkpasswd.c
-mkpasswd_LDADD = ../libratbox/src/libratbox.la
+ratbox_mkpasswd_SOURCES = mkpasswd.c
+ratbox_mkpasswd_LDADD = ../libratbox/src/libratbox.la
 all: all-am
 
 .SUFFIXES:
@@ -279,9 +280,9 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-mkpasswd$(EXEEXT): $(mkpasswd_OBJECTS) $(mkpasswd_DEPENDENCIES) 
-	@rm -f mkpasswd$(EXEEXT)
-	$(LINK) $(mkpasswd_OBJECTS) $(mkpasswd_LDADD) $(LIBS)
+ratbox-mkpasswd$(EXEEXT): $(ratbox_mkpasswd_OBJECTS) $(ratbox_mkpasswd_DEPENDENCIES) 
+	@rm -f ratbox-mkpasswd$(EXEEXT)
+	$(LINK) $(ratbox_mkpasswd_OBJECTS) $(ratbox_mkpasswd_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -447,8 +448,6 @@ install-data-am:
 install-dvi: install-dvi-am
 
 install-exec-am: install-binPROGRAMS
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 
 install-html: install-html-am
 
@@ -482,25 +481,22 @@ ps-am:
 
 uninstall-am: uninstall-binPROGRAMS
 
-.MAKE: install-am install-exec-am install-strip
+.MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libtool ctags distclean distclean-compile \
 	distclean-generic distclean-libtool distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-exec-hook \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-binPROGRAMS
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-binPROGRAMS
 
-
-install-exec-hook:
-	$(INSTALL) genssl.sh $(DESTDIR)$(bindir)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

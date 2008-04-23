@@ -56,6 +56,8 @@ install: install-mkdirs build
 		$(INSTALL_DATA) ircd.motd $(DESTDIR)$(confdir); \
 	fi
 
+	$(INSTALL_BIN) genssl.sh $(DESTDIR)$(confdir)
+
 	-@if test -f $(DESTDIR)$(confdir)/links.txt; then \
 		$(RM) $(DESTDIR)$(confdir)/links.txt; \
 	fi
