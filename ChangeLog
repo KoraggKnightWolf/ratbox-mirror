@@ -1,3 +1,11 @@
+androsyn    2008/04/23 03:32:29 UTC	(20080423_1-25261)
+  Log:
+  change a source_p->name check to EmptyString
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_user.c (File Modified) 
+
+
 androsyn    2008/04/23 03:30:34 UTC	(20080423_0-25259)
   Log:
   port revision 21199 from 2.2 that fixes a possible core dump with CAP
