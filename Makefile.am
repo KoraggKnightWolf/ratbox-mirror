@@ -36,6 +36,12 @@ ircd_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la mod
 
 endif
 
+build_contrib:
+	cd contrib && $(MAKE)
 
+install_contrib: build_contrib
+	cd contrib && $(MAKE) install
+	
+contrib: build_contrib
 
 
