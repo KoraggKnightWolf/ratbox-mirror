@@ -1,3 +1,26 @@
+androsyn    2008/04/23 19:59:46 UTC	(20080423_6-25273)
+  Log:
+  have genssl.sh install into etc, rename mkpasswd to ratbox-mkpasswd
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/doc/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/doc/genssl.sh (File Added) 
+	ircd-ratbox/trunk/help/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ident/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/adns/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/genssl.sh (File Deleted) 
+
+
 androsyn    2008/04/23 19:43:17 UTC	(20080423_5-25271)
   Log:
   have helper programs installed into prefix/libexec/ircd-ratbox
