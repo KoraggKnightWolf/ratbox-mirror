@@ -1,3 +1,17 @@
+androsyn    2008/04/23 17:23:54 UTC	(20080423_4-25269)
+  Log:
+  Add a disable-backups configure flag which disables moving modules/help out of the way, which is useful for some package maintainers
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/help/Makefile.am (File Added) 
+	ircd-ratbox/trunk/help/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+
+
 androsyn    2008/04/23 14:05:05 UTC	(20080423_3-25267)
   Log:
   add contrib and install_contrib targets in top level makefile
