@@ -93,7 +93,7 @@ do_local_user(struct Client *client_p, struct Client *source_p,
 		rb_strlcpy(source_p->username, username, sizeof(source_p->username));
 	}
 
-	if(source_p->name)
+	if(!EmptyString(source_p->name))
 	{
 		/* NICK already received, now I have USER... */
 		return register_local_user(client_p, source_p, username);
