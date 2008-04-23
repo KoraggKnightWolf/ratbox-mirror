@@ -1,3 +1,12 @@
+androsyn    2008/04/23 03:34:13 UTC	(20080423_2-25263)
+  Log:
+  update to 3.0.0beta3
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/04/23 03:32:29 UTC	(20080423_1-25261)
   Log:
   change a source_p->name check to EmptyString
