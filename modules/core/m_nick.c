@@ -637,7 +637,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	char note[NICKLEN + 10];
 	/* This had to be copied here to avoid problems.. */
 	source_p->tsinfo = rb_current_time();
-	if(source_p->name)
+	if(!EmptyString(source_p->name))
 		del_from_hash(HASH_CLIENT, source_p->name, source_p);
 
 	make_user(source_p);		
@@ -648,7 +648,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	rb_snprintf(note, sizeof(note), "Nick: %s", nick);
 	rb_note(client_p->localClient->F, note);
 
-	if(!EmptyString(source_p->info))
+	if(HasSentUser(source_p))
 	{
 		rb_strlcpy(buf, source_p->username, sizeof(buf));
 

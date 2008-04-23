@@ -156,6 +156,7 @@ struct LocalUser;
 #define LFLAGS_SSL		0x00000001
 #define LFLAGS_FLUSH		0x00000002
 #define LFLAGS_CORK		0x00000004
+#define LFLAGS_SENTUSER		0x00000008
 
 /* umodes, settable flags */
 
@@ -241,6 +242,10 @@ struct LocalUser;
 #define SetFlush(x)		((x)->localClient->localflags |= LFLAGS_FLUSH)
 #define ClearFlush(x)		((x)->localClient->localflags &= ~LFLAGS_FLUSH)
 
+#define HasSentUser(x)		((x)->localClient->localflags & LFLAGS_SENTUSER)
+#define SetSentUser(x)		((x)->localClient->localflags |= LFLAGS_SENTUSER)
+ 
+ 
 /* oper flags */
 #define MyOper(x)               (MyConnect(x) && IsOper(x))
 

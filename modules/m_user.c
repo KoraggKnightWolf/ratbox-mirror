@@ -80,6 +80,7 @@ do_local_user(struct Client *client_p, struct Client *source_p,
 	s_assert(NULL != source_p);
 	s_assert(source_p->username != username);
 
+	SetSentUser(source_p);
 	user = make_user(source_p);
 
 	rb_strlcpy(source_p->info, realname, sizeof(source_p->info));
