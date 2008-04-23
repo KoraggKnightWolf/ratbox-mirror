@@ -1,3 +1,12 @@
+androsyn    2008/04/23 14:05:05 UTC	(20080423_3-25267)
+  Log:
+  add contrib and install_contrib targets in top level makefile
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 androsyn    2008/04/23 03:34:13 UTC	(20080423_2-25263)
   Log:
   update to 3.0.0beta3
