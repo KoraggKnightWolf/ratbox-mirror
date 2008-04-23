@@ -14,9 +14,7 @@
 
 @SET_MAKE@
 
-# Generated automatically from Makefile.in by configure.
 # $Id$
-# makefile for include/
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@

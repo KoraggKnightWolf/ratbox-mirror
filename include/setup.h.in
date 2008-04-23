@@ -138,6 +138,9 @@
 /* Size of the local client heap. */
 #undef LCLIENT_HEAP_SIZE
 
+/* Prefix where to install non-user executables. */
+#undef LIBEXEC_DIR
+
 /* Size of the linebuf heap. */
 #undef LINEBUF_HEAP_SIZE
 

@@ -85,16 +85,16 @@ start_bandb(void)
 
 	if(bandb_path == NULL)
 	{
-		rb_snprintf(fullpath, sizeof(fullpath), "%s/bandb%s", BINPATH, suffix);
+		rb_snprintf(fullpath, sizeof(fullpath), "%s/bandb%s", LIBEXEC_DIR, suffix);
 
 		if(access(fullpath, X_OK) == -1)
 		{
-			rb_snprintf(fullpath, sizeof(fullpath), "%s/bin/bandb%s", ConfigFileEntry.dpath, suffix);
+			rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/bandb%s", ConfigFileEntry.dpath, suffix);
 
 			if(access(fullpath, X_OK) == -1)
 			{
-				ilog(L_MAIN, "Unable to execute bandb in %s or %s/bin",
-					BINPATH, ConfigFileEntry.dpath);
+				ilog(L_MAIN, "Unable to execute bandb in %s or %s/libexec/ircd-ratbox",
+					LIBEXEC_DIR, ConfigFileEntry.dpath);
 				return 0;
 			}
 		}

@@ -254,14 +254,14 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 	last_spin = rb_current_time();
 	if(ssld_path == NULL)
 	{
-		rb_snprintf(fullpath, sizeof(fullpath), "%s/ssld", BINPATH);
+		rb_snprintf(fullpath, sizeof(fullpath), "%s/ssld", LIBEXEC_DIR);
 		
 		if(access(fullpath, X_OK) == -1)
 		{
-			rb_snprintf(fullpath, sizeof(fullpath), "%s/bin/ssld", ConfigFileEntry.dpath);
+			rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/ssld", ConfigFileEntry.dpath);
 			if(access(fullpath, X_OK) == -1)
 			{
-				ilog(L_MAIN, "Unable to execute ssld in %s/bin or %s", ConfigFileEntry.dpath, BINPATH);
+				ilog(L_MAIN, "Unable to execute ssld in %s/libexec/ircd-ratbox or %s", ConfigFileEntry.dpath, LIBEXEC_DIR);
 				return 0 ;
 			}
 		}

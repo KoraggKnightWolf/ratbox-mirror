@@ -1,7 +1,7 @@
 #
 # $Id$
 #
-bin_PROGRAMS = ident
+libexec_PROGRAMS = ident
 AM_CFLAGS=$(WARNFLAGS)
 INCLUDES = -I../include -I../libratbox/include 
 

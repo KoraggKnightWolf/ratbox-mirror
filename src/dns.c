@@ -192,16 +192,16 @@ start_resolver(void)
 #endif
 	if(resolver_path == NULL)
 	{	
-		rb_snprintf(fullpath, sizeof(fullpath), "%s/resolver%s", BINPATH, suffix);
+		rb_snprintf(fullpath, sizeof(fullpath), "%s/resolver%s", LIBEXEC_DIR, suffix);
 	
 		if(access(fullpath, X_OK) == -1)
 		{
-			rb_snprintf(fullpath, sizeof(fullpath), "%s/bin/resolver%s", ConfigFileEntry.dpath, suffix);
+			rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/resolver%s", ConfigFileEntry.dpath, suffix);
 			if(access(fullpath, X_OK) == -1)
 			{
-				ilog(L_MAIN, "Unable to execute resolver in %s or %s/bin", BINPATH, ConfigFileEntry.dpath);
-				sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to execute resolver in %s or %s/bin", 
-						     BINPATH, ConfigFileEntry.dpath);
+				ilog(L_MAIN, "Unable to execute resolver in %s or %s/libexec/ircd-ratbox", LIBEXEC_DIR, ConfigFileEntry.dpath);
+				sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to execute resolver in %s or %s/libexec/ircd-ratbox", 
+						     LIBEXEC_DIR, ConfigFileEntry.dpath);
 				return 1;
 			}
 		

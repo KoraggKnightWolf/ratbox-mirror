@@ -116,16 +116,16 @@ fork_ident(void)
 
 	if(ident_path == NULL)
 	{
-	        rb_snprintf(fullpath, sizeof(fullpath), "%s/ident%s", BINPATH, suffix);
+	        rb_snprintf(fullpath, sizeof(fullpath), "%s/ident%s", LIBEXEC_DIR, suffix);
 
 	        if(access(fullpath, X_OK) == -1)
 	        {
-	                rb_snprintf(fullpath, sizeof(fullpath), "%s/bin/ident%s", ConfigFileEntry.dpath, suffix);
+	                rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/ident%s", ConfigFileEntry.dpath, suffix);
 	                if(access(fullpath, X_OK) == -1)
 	                {
-	                	sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to execute ident in %s/bin or %s", 
-						     ConfigFileEntry.dpath, BINPATH);
-	                        ilog(L_MAIN, "Unable to execute ident in %s/bin or %s", ConfigFileEntry.dpath, BINPATH);
+	                	sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to execute ident in %s/libexec/ircd-ratbox or %s", 
+						     ConfigFileEntry.dpath, LIBEXEC_DIR);
+	                        ilog(L_MAIN, "Unable to execute ident in %s/libexec/ircd-ratbox or %s", ConfigFileEntry.dpath, LIBEXEC_DIR);
 	                        return;   
         	        }
                  

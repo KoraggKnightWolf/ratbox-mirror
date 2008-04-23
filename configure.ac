@@ -108,13 +108,6 @@ fi
 # backwards support for IRC_CFLAGS
 CFLAGS="$IRC_CFLAGS $CFLAGS -O0"
 
-dnl use directory structure of cached as default (hack)
-if test "$libexecdir" = '${exec_prefix}/libexec' &&
-   test "$localstatedir" = '${prefix}/var'; then
-	libexecdir='${bindir}'
-	localstatedir='${prefix}'
-fi
-
 dnl Checks for header files.
 AC_HEADER_STDC
 
@@ -558,6 +551,15 @@ dnl a custom prefix with a trailing slash
 	AC_DEFINE_UNQUOTED(IRCD_PREFIX, "$prefix", [Prefix where the ircd is installed.])
 	
 fi
+
+if test "x$libexecdir" = "xNONE"; then
+	rb_cv_libexecdir=$ac_default_libexecdir
+else
+	rb_cv_libexecdir=$libexecdir
+fi
+
+libexecdir=`eval "echo ${rb_cv_libexecdir}/ircd-ratbox"`
+AC_DEFINE_DIR(LIBEXEC_DIR, libexecdir, [Prefix where to install non-user executables.])
 
 dnl lets see what libtool thinks our suffix is...
 AC_MSG_CHECKING([for shared library suffix])

@@ -1,7 +1,7 @@
 #
 # $Id$
 #
-bin_PROGRAMS = ssld
+libexec_PROGRAMS = ssld
 AM_CFLAGS=$(WARNFLAGS)
 
 INCLUDES = -I../include -I../libratbox/include 
