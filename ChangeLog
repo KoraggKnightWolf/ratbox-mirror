@@ -1,3 +1,15 @@
+androsyn    2008/04/23 03:30:34 UTC	(20080423_0-25259)
+  Log:
+  port revision 21199 from 2.2 that fixes a possible core dump with CAP
+
+  Modified:
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_cap.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_pong.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_user.c (File Modified) 
+
+
 androsyn    2008/04/22 16:32:06 UTC	(20080422_0-25257)
   Log:
   for the sake of sanity, do an exit if rb_sleep for some unknown reason actually returns
