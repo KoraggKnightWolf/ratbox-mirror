@@ -571,6 +571,10 @@ AC_DEFINE_UNQUOTED(SHLIBEXT,"$SHLIBEXT", [Extension that shared libs use])
                    
 AC_SUBST(IRCD_PREFIX)
 
+disable_backups=n
+AC_ARG_ENABLE(backups,,disable_backups=y)
+AM_CONDITIONAL([DISABLE_BACKUPS], [test x"$disable_backups" = "xy"])
+
 
 AC_CONFIG_FILES(		\
 	Makefile		\

@@ -1785,6 +1785,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@DISABLE_BACKUPS_TRUE@install-exec-hook:
 @STATIC_MODULES_TRUE@install-exec-hook:
 clean: clean-am
 
@@ -1886,7 +1887,7 @@ uninstall-am: uninstall-coreLTLIBRARIES \
 @STATIC_MODULES_FALSE@	-@$(MKDIR_P) $(DESTDIR)$(coredir); \
 @STATIC_MODULES_FALSE@	for x in $(core_LTLIBRARIES); do $(SHELL) ../install-mod.sh $$x $(DESTDIR)$(coredir);done
 
-@STATIC_MODULES_FALSE@install-exec-hook: move-old-modules
+@DISABLE_BACKUPS_FALSE@@STATIC_MODULES_FALSE@install-exec-hook: move-old-modules
 
 @STATIC_MODULES_FALSE@move-old-modules:
 # move the old module directory out of the way, stale modules cause massive

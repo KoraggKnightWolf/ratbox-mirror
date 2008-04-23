@@ -322,7 +322,9 @@ install-coreLTLIBRARIES: $(core_LTLIBRARIES)
 	-@$(MKDIR_P) $(DESTDIR)$(coredir); \
 	for x in $(core_LTLIBRARIES); do $(SHELL) ../install-mod.sh $$x $(DESTDIR)$(coredir);done
 
+if !DISABLE_BACKUPS
 install-exec-hook: move-old-modules
+endif
 
 move-old-modules:
 # move the old module directory out of the way, stale modules cause massive
