@@ -1,3 +1,11 @@
+androsyn    2008/04/24 15:45:49 UTC	(20080424_1-25277)
+  Log:
+  tidy up install-mod.sh.in and turn on Id tags as well
+
+  Modified:
+	ircd-ratbox/trunk/install-mod.sh.in (File Modified) (Property Modified)
+
+
 androsyn    2008/04/24 15:43:42 UTC	(20080424_0-25275)
   Log:
   update ircd-shortcut.pl for 3.0.0
