@@ -1,3 +1,11 @@
+androsyn    2008/04/24 15:50:29 UTC	(20080424_2-25279)
+  Log:
+  get rid of the LIBTOOL variable in install-mod.sh.in
+
+  Modified:
+	ircd-ratbox/trunk/install-mod.sh.in (File Modified) 
+
+
 androsyn    2008/04/24 15:45:49 UTC	(20080424_1-25277)
   Log:
   tidy up install-mod.sh.in and turn on Id tags as well
