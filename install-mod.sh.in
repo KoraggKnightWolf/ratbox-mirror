@@ -18,10 +18,8 @@ DEST="${2}"
 SOBASE=$(echo ${OBJBASE} | sed -e's/\.la$//')
 TARGETOBJ="${SOBASE}${SHLIBEXT}"
 
-#RUN="$LIBTOOL --mode=install cp ${SOBASE} ${DEST}/"
 RUN="${CP} ${SRCDIR}${LT_OBJDIR}/${TARGETOBJ} ${DEST}/${TARGETOBJ}"
 
-#echo $RUN
 echo "Installing ${OBJECT} as ${DEST}/${TARGETOBJ}"
 $RUN
 
