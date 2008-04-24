@@ -10,7 +10,6 @@ if test "$#" != "2"; then
 fi
 
 SHLIBEXT="@SHLIBEXT@"
-LIBTOOL=$(echo '@LIBTOOL@'|sed -e's/^$(SHELL)/${SHELL}'/)
 OBJECT="${1}"
 OBJBASE=`basename ${1}`
 SRCDIR=`echo ${OBJECT}|sed -es/${OBJBASE}//`
