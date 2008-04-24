@@ -1,3 +1,11 @@
+androsyn    2008/04/24 15:43:42 UTC	(20080424_0-25275)
+  Log:
+  update ircd-shortcut.pl for 3.0.0
+
+  Modified:
+	ircd-ratbox/trunk/contrib/ircd-shortcut.pl (File Added) 
+
+
 androsyn    2008/04/23 19:59:46 UTC	(20080423_6-25273)
   Log:
   have genssl.sh install into etc, rename mkpasswd to ratbox-mkpasswd
