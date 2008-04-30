@@ -244,7 +244,7 @@ parse_k_file(FILE * file, int mode, int verb, int dupes)
 static const char *
 clean_gecos_field(const char *gecos)
 {
-	static char buf[BUFSIZE];
+	static char buf[BUFSIZE * 2];
 	char *str = buf;
 	
 	while(*gecos)
@@ -255,8 +255,10 @@ clean_gecos_field(const char *gecos)
 			*str++ = 's';
 		}	
 		else
-			*str++ = *gecos++;
+			*str++ = *gecos;
+		gecos++;
 	}
+	*str = '\0';
 	return buf;
 }
 
