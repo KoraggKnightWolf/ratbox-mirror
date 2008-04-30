@@ -1,3 +1,13 @@
+jilles      2008/04/30 18:01:55 UTC	(20080430_2-25285)
+  Log:
+  Fold bantool.h into bantool.c.
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/bandb/bantool.h (File Deleted) 
+
+
 jilles      2008/04/30 17:48:08 UTC	(20080430_1-25283)
   Log:
   Fix crash on certain malformed lines in xline.conf.
