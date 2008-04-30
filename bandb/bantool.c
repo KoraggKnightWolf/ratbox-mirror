@@ -35,7 +35,38 @@
 
 #include "stdinc.h"
 #include "rsdb.h"
-#include "bantool.h"
+
+#define EmptyString(x) ((x == NULL) || (*(x) == '\0'))
+#define CheckEmpty(x) EmptyString(x) ? "" : x
+#define BT_VERSION "0.3.1"
+
+typedef enum
+{
+	BANDB_KLINE,
+	BANDB_DLINE,
+	BANDB_XLINE,
+	BANDB_RESV,
+	LAST_BANDB_TYPE
+} bandb_type;
+
+
+static char bandb_letter[LAST_BANDB_TYPE] = {
+	'K', 'D', 'X', 'R'
+};
+
+static const char *bandb_table[LAST_BANDB_TYPE] = {
+	"kline", "dline", "xline", "resv"
+};
+
+static int parse_k_file(FILE * file, int mode, int verb, int dupes);
+static int parse_x_file(FILE * file, int mode, int verb, int dupes);
+static int parse_d_file(FILE * file, int mode, int verb, int dupes);
+static int parse_r_file(FILE * file, int mode, int verb, int dupes);
+static char *getfield(char *newline);
+static void check_schema(void);
+static void print_help(int i_exit);
+static void wipe_schema(void);
+static int drop_dupes(const char *user, const char *host, const char *t);
 
 int
 main(int argc, char *argv[])
