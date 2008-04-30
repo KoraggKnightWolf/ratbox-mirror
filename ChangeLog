@@ -1,3 +1,12 @@
+jilles      2008/04/30 17:48:08 UTC	(20080430_1-25283)
+  Log:
+  Fix crash on certain malformed lines in xline.conf.
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 jilles      2008/04/30 01:18:18 UTC	(20080430_0-25281)
   Log:
   bantool: fix crashes/corruption when converting xlines.
