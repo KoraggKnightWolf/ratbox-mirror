@@ -247,6 +247,8 @@ clean_gecos_field(const char *gecos)
 	static char buf[BUFSIZE * 2];
 	char *str = buf;
 	
+	if (gecos == NULL)
+		return NULL;
 	while(*gecos)
 	{
 		if(*gecos == ' ') 
