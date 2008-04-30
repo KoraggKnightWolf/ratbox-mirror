@@ -1,3 +1,13 @@
+jilles      2008/04/30 01:18:18 UTC	(20080430_0-25281)
+  Log:
+  bantool: fix crashes/corruption when converting xlines.
+  Tested by dubkat.
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 androsyn    2008/04/24 15:50:29 UTC	(20080424_2-25279)
   Log:
   get rid of the LIBTOOL variable in install-mod.sh.in
