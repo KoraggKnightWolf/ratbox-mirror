@@ -43,19 +43,30 @@
 typedef enum
 {
 	BANDB_KLINE,
+	BANDB_KLINE_PERM,
 	BANDB_DLINE,
+	BANDB_DLINE_PERM,
 	BANDB_XLINE,
+	BANDB_XLINE_PERM,
 	BANDB_RESV,
+	BANDB_RESV_PERM,
 	LAST_BANDB_TYPE
 } bandb_type;
 
 
 static char bandb_letter[LAST_BANDB_TYPE] = {
-	'K', 'D', 'X', 'R'
+	'K', 'K', 'D', 'D', 'X', 'X', 'R', 'R'
 };
 
 static const char *bandb_table[LAST_BANDB_TYPE] = {
-	"kline", "dline", "xline", "resv"
+	"kline", "kline", "dline", "dline", "xline", "xline", "resv", "resv"
+};
+
+static const char *bandb_suffix[LAST_BANDB_TYPE] = {
+	"", ".perm",
+	"", ".perm",
+	"", ".perm",
+	"", ".perm"
 };
 
 static int parse_k_file(FILE * file, int mode, int verb, int dupes);
@@ -144,22 +155,20 @@ main(int argc, char *argv[])
 	}
 
 	/* checking for our files to import */
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < LAST_BANDB_TYPE; i++)
 	{
-		rb_snprintf(conf, sizeof(conf), "%s/%s.conf", etc, bandb_table[i]);
+		rb_snprintf(conf, sizeof(conf), "%s/%s.conf%s",
+				etc, bandb_table[i], bandb_suffix[i]);
 		fprintf(stdout, "* checking for %s: ", conf);	/* debug  */
-
-		if(access(conf, R_OK) == -1)
-		{
-			fprintf(stdout, "\tMISSING!\n");
-			err++;
-			continue;
-		}
-		fprintf(stdout, "\tok!\n");
 
 		/* open config for reading, or skip to the next */
 		if(!(fd = fopen(conf, "r")))
+		{
+			fprintf(stdout, "\tmissing\n");
+			err++;
 			continue;
+		}
+		fprintf(stdout, "\tok\n");
 
 		if(!pretend)
 			rsdb_transaction(RSDB_TRANS_START);
