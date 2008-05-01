@@ -267,8 +267,7 @@ parse_k_file(FILE * file, int mode, int verb, int dupes)
 		{
 			if(!dupes)
 				drop_dupes(user_field, host_field, "kline");
-
-			rsdb_exec(NULL, "INSERT INTO kline VALUES('%Q','%Q','%Q','%Q','%Q')",
+			rsdb_exec(NULL, "INSERT INTO kline (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
 				  user_field, host_field, oper_field, timestamp, newreason);
 		}
 
@@ -354,7 +353,7 @@ parse_x_file(FILE * file, int mode, int verb, int dupes)
 			if(!dupes)
 				drop_dupes(gecos_field, NULL, "xline");
 
-			rsdb_exec(NULL, "INSERT INTO xline VALUES('%Q','%Q','%Q','%Q','%Q')",
+			rsdb_exec(NULL, "INSERT INTO xline (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
 				  gecos_field, NULL, oper_field, timestamp, newreason);
 		}
 
@@ -414,7 +413,7 @@ parse_d_file(FILE * file, int mode, int verb, int dupes)
 			if(!dupes)
 				drop_dupes(host_field, NULL, "dline");
 
-			rsdb_exec(NULL, "INSERT INTO dline VALUES('%Q','%Q','%Q','%Q','%Q')",
+			rsdb_exec(NULL, "INSERT INTO dline (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
 				  host_field, NULL, oper_field, timestamp, newreason);
 		}
 
@@ -463,7 +462,7 @@ parse_r_file(FILE * file, int mode, int verb, int dupes)
 			if(!dupes)
 				drop_dupes(host_field, NULL, "resv");
 
-			rsdb_exec(NULL, "INSERT INTO resv VALUES('%Q','%Q','%Q','%Q','%Q')",
+			rsdb_exec(NULL, "INSERT INTO resv (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
 				  host_field, NULL, oper_field, timestamp, reason_field);
 		}
 
