@@ -1,3 +1,11 @@
+androsyn    2008/05/01 15:14:35 UTC	(20080501_0-25289)
+  Log:
+  use column names when inserting with bantool
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 jilles      2008/04/30 18:23:25 UTC	(20080430_3-25287)
   Log:
   Import .perm ban confs too.
