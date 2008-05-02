@@ -1,3 +1,11 @@
+androsyn    2008/05/02 18:45:11 UTC	(20080502_1-25295)
+  Log:
+  oops..change that to ircd_ssl_ok as well
+
+  Modified:
+	ircd-ratbox/trunk/include/ircd.h (File Modified) 
+
+
 androsyn    2008/05/02 17:24:24 UTC	(20080502_0-25293)
   Log:
   change ssl_ok to ircd_ssl_ok as this clashes with a symbol in openssl
