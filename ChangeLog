@@ -1,3 +1,18 @@
+androsyn    2008/05/02 17:24:24 UTC	(20080502_0-25293)
+  Log:
+  change ssl_ok to ircd_ssl_ok as this clashes with a symbol in openssl
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_connect.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2008/05/01 15:14:35 UTC	(20080501_0-25289)
   Log:
   use column names when inserting with bantool
