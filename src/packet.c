@@ -184,6 +184,8 @@ flood_recalc(void *unused)
 		if(unlikely(IsAnyDead(client_p)))
 			continue;
 
+		if(!IsFloodDone(client_p) && ((client_p->localClient->firsttime + 30) < rb_current_time()))
+			flood_endgrace(client_p);
 	}
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, unknown_list.head)
@@ -348,7 +350,7 @@ void
 flood_endgrace(struct Client *client_p)
 {
 	SetFloodDone(client_p);
-
+	fprintf(stderr, "ending flood grace for: %s\n", client_p->name);
 	/* Drop their flood limit back down */
 	client_p->localClient->allow_read = MAX_FLOOD;
 

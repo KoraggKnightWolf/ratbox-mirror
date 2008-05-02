@@ -2101,9 +2101,9 @@ load_conf_settings(void)
 	if(!rb_setup_ssl_server(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params))
 	{
 		ilog(L_MAIN, "WARNING: Unable to setup SSL.");
-		ssl_ok = 0;
+		ircd_ssl_ok = 0;
 	} else {
-		ssl_ok = 1;
+		ircd_ssl_ok = 1;
 		send_new_ssl_certs(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
 	}
 	if(ServerInfo.ssld_count > get_ssld_count())

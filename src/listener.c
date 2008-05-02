@@ -459,7 +459,7 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 	char buf[BUFSIZE];
 	struct ConfItem *aconf;
 
-	if(listener->ssl && (!ssl_ok || !get_ssld_count()))
+	if(listener->ssl && (!ircd_ssl_ok || !get_ssld_count()))
 	{
 		rb_close(F);
 		return 0;

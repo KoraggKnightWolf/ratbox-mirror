@@ -298,14 +298,14 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		rb_close(F2);
 		rb_close(P1);
 		ctl = allocate_ssl_daemon(F1, P2, pid);
-		if(ssl_ok)
+		if(ircd_ssl_ok)
 		{
 			if(ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
 				send_init_prng(ctl, RB_PRNG_EGD, ConfigFileEntry.egdpool_path);
 			else
 				send_init_prng(ctl, RB_PRNG_DEFAULT, NULL);
 		}
-		if(ssl_ok && ssl_cert != NULL && ssl_private_key != NULL)
+		if(ircd_ssl_ok && ssl_cert != NULL && ssl_private_key != NULL)
 			send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
 		ssl_read_ctl(ctl->F, ctl);
 		ssl_do_pipe(P2, ctl);
@@ -403,7 +403,7 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 		switch(*ctl_buf->buf)
 		{
 			case 'N':
-				ssl_ok = 0; /* ssld says it can't do ssl/tls */
+				ircd_ssl_ok = 0; /* ssld says it can't do ssl/tls */
 				break;
 			case 'D':
 				ssl_process_dead_fd(ctl, ctl_buf);
@@ -412,12 +412,12 @@ ssl_process_cmd_recv(ssl_ctl_t *ctl)
 				ssl_process_zipstats(ctl, ctl_buf);
 				break;
 			case 'I':
-				ssl_ok = 0;
+				ircd_ssl_ok = 0;
 				ilog(L_MAIN, cannot_setup_ssl);				
 				sendto_realops_flags(UMODE_ALL, L_ALL, cannot_setup_ssl);
 			case 'U':
 				zlib_ok = 0;
-				ssl_ok = 0;
+				ircd_ssl_ok = 0;
 				ilog(L_MAIN, no_ssl_or_zlib);
 				sendto_realops_flags(UMODE_ALL, L_ALL, no_ssl_or_zlib);
 				ssl_killall();
@@ -606,7 +606,7 @@ send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char
 	rb_dlink_node *ptr;
 	if(ssl_cert == NULL || ssl_private_key == NULL || ssl_dh_params == NULL)
 	{
-		ssl_ok = 0;
+		ircd_ssl_ok = 0;
 		return;
 	}
 	RB_DLINK_FOREACH(ptr, ssl_daemons.head)

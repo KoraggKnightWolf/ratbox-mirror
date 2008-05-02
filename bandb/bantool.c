@@ -554,7 +554,7 @@ check_schema(void)
 				bandb_table[i]);
 
 		rsdb_exec_fetch_end(&table);
-
+		
 		if(!table.row_count)
 			rsdb_exec(NULL,
 				  "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, reason TEXT)",
