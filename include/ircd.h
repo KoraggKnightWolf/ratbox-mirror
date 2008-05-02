@@ -103,7 +103,7 @@ int ratbox_main(int argc, char **argv);
 extern int testing_conf;
 extern int conf_parse_failure;
 extern int maxconnections;
-extern int ssl_ok;
+extern int ircd_ssl_ok;
 extern int zlib_ok;
 
 #endif
