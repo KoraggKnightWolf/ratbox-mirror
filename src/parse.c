@@ -526,7 +526,7 @@ cmd_hash(const char *p)
 		hash_val += ((n) + (q++ << 1)) ^ ((n) << 2);
 	}
 	/* note that 9 comes from 2^9 = MAX_MSG_HASH */
-	return (hash_val >> 9) ^ (hash_val & (MAX_MSG_HASH-1));
+	return (hash_val >> (32 - 9)) ^ (hash_val & (MAX_MSG_HASH-1));
 }
 
 
