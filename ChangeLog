@@ -1,3 +1,11 @@
+androsyn    2008/05/03 15:51:37 UTC	(20080503_0-25297)
+  Log:
+  oops..fix the hash function
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2008/05/02 18:45:11 UTC	(20080502_1-25295)
   Log:
   oops..change that to ircd_ssl_ok as well
