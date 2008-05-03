@@ -1,3 +1,11 @@
+androsyn    2008/05/03 16:34:55 UTC	(20080503_1-25299)
+  Log:
+  change cmd_hash to be unsigned int
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2008/05/03 15:51:37 UTC	(20080503_0-25297)
   Log:
   oops..fix the hash function
