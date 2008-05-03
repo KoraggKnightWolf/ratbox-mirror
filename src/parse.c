@@ -54,7 +54,7 @@ static void do_numeric(char[], struct Client *, struct Client *, int, char **);
 
 static int handle_command(struct Message *, struct Client *, struct Client *, int, const char**);
 
-static int cmd_hash(const char *p);
+static unsigned int cmd_hash(const char *p);
 static struct Message *hash_parse(const char *);
 
 struct MessageHash *msg_hash_table[MAX_MSG_HASH];
@@ -515,10 +515,10 @@ hash_parse(const char *cmd)
  *
  * BUGS		- This was a horrible hash function, now its an okay one...
  */
-static int
+static unsigned int
 cmd_hash(const char *p)
 {
-	int hash_val = 0, q = 1, n;
+	unsigned int hash_val = 0, q = 1, n;
 
 	while (*p)
 	{
