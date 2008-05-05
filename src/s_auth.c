@@ -82,9 +82,10 @@ ReportType;
 static rb_dlink_list auth_poll_list;
 static rb_bh *auth_heap;
 static void read_auth_reply(rb_helper *);
+static void fail_auth_requests(void);
 static EVH timeout_auth_queries_event;
 
-static uint16_t id;
+static uint16_t last_id;
 #define IDTABLE 0x1000
 
 static struct AuthRequest *authtable[IDTABLE];
@@ -92,11 +93,17 @@ static struct AuthRequest *authtable[IDTABLE];
 static uint16_t
 assign_auth_id(void)
 {
-	if(id < IDTABLE - 1)
-		id++;
-	else
-		id = 1;
-	return id;
+	unsigned int attempts;
+
+	attempts = 0;
+	do
+	{
+		if(last_id < IDTABLE - 1)
+			last_id++;
+		else
+			last_id = 1;
+	} while (++attempts < IDTABLE && authtable[last_id] != NULL);
+	return authtable[last_id] == NULL ? last_id : 0;
 }
 
 static char *ident_path;
@@ -152,6 +159,7 @@ static void ident_restart(rb_helper *helper)
 {
 	ilog(L_MAIN, "ident - ident_restart called, helper died?");
 	sendto_realops_flags(UMODE_ALL, L_ALL, "ident - ident_restart called, helper died?");
+	fail_auth_requests();
 	if(helper != NULL)
 	{
 		rb_helper_close(helper);
@@ -287,6 +295,7 @@ auth_error(struct AuthRequest *auth)
 
 	if(auth->reqid > 0)
 		authtable[auth->reqid] = NULL;
+	auth->reqid = 0;
 	ClearAuth(auth);
 	sendheader(auth->client, REPORT_FAIL_ID);
 }
@@ -341,6 +350,13 @@ start_auth_query(struct AuthRequest *auth)
 	rb_inet_ntop_sock((struct sockaddr *)localaddr, myip, sizeof(myip));
 
 	auth->reqid = assign_auth_id();
+	if (auth->reqid == 0)
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Dropping an ident query, authtable is full", auth->reqid);
+		auth_error(auth);
+		release_auth_client(auth);
+		return;
+	}
 	authtable[auth->reqid] = auth;
 
 	rb_helper_write(ident_helper, "%x %s %s %u %u", auth->reqid, myip, 
@@ -460,6 +476,7 @@ read_auth_reply(rb_helper *helper)
 	int length;
 	char *q, *p;
 	struct AuthRequest *auth;
+	uint16_t id;
 
 	while((length = rb_helper_read(helper, authBuf, sizeof(authBuf))) > 0)
 	{
@@ -498,6 +515,23 @@ read_auth_reply(rb_helper *helper)
 	}
 
 
+}
+
+static void
+fail_auth_requests(void)
+{
+	uint16_t id;
+	struct AuthRequest *auth;
+
+	for (id = 1; id < IDTABLE; id++)
+	{
+		auth = authtable[id];
+		if (auth != NULL)
+		{
+			auth_error(auth);
+			release_auth_client(auth);
+		}
+	}
 }
 
 void
