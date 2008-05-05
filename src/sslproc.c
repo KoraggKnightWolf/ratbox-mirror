@@ -91,15 +91,13 @@ static inline void int32_to_buf(char *buf, rb_int32_t x)
 static inline rb_uint16_t buf_to_uint16(char *buf)
 {
 	rb_uint16_t x;
-	x = *(buf) << 8;
-	x |= *(++buf);
+	memcpy(&x, buf, sizeof(x));
 	return x;
 }
 
 static inline void uint16_to_buf(char *buf, rb_uint16_t x)
 {
-	*(buf) = x >> 8 & 0xFF;
-	*(++buf) = x & 0xFF;
+	memcpy(buf, &x, sizeof(x));
 	return;
 }
 
