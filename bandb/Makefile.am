@@ -7,7 +7,8 @@ if BUILD_SQLITE
 SUBDIRS = sqlite3
 endif
 
-libexec_PROGRAMS = bandb bantool
+libexec_PROGRAMS = bandb 
+bin_PROGRAMS = bantool
 AM_CFLAGS=$(WARNFLAGS)
 
 INCLUDES = -I../include -I../libratbox/include @SQLITE_INCLUDES@
