@@ -1,3 +1,12 @@
+androsyn    2008/05/05 18:39:22 UTC	(20080505_8-25319)
+  Log:
+  do some hackery to hold a authtable spot until the ircd gets the cancel response
+
+  Modified:
+	ircd-ratbox/trunk/ident/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 jilles      2008/05/05 18:34:56 UTC	(20080505_7-25317)
   Log:
   Remove unnecessary and confusing prototype for macro accept_message.
