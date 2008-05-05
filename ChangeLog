@@ -1,3 +1,11 @@
+androsyn    2008/05/05 18:19:52 UTC	(20080505_5-25313)
+  Log:
+  oops..committed some debug code by accident
+
+  Modified:
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+
+
 androsyn    2008/05/05 16:59:44 UTC	(20080505_4-25311)
   Log:
   do memcpy to stuff ints into a buffer for 16bit ints as well
