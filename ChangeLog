@@ -1,3 +1,11 @@
+androsyn    2008/05/05 14:50:51 UTC	(20080505_1-25305)
+  Log:
+  add stuff about defaulting binding to ipv4
+
+  Modified:
+	ircd-ratbox/trunk/doc/whats-new-3.0.txt (File Modified) 
+
+
 androsyn    2008/05/05 04:33:39 UTC	(20080505_0-25303)
   Log:
   - Install bantool in bin, not libexec
