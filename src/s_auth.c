@@ -79,6 +79,9 @@ ReportType;
 
 #define sendheader(c, r) sendto_one(c, HeaderMessages[(r)])
 
+static struct AuthRequest fake_auth;
+static struct AuthRequest *no_auth = &fake_auth;
+
 static rb_dlink_list auth_poll_list;
 static rb_bh *auth_heap;
 static void read_auth_reply(rb_helper *);
@@ -429,7 +432,10 @@ timeout_auth_queries_event(void *notused)
 			if(IsAuth(auth))
 			{
 				if(auth->reqid > 0)
+				{
 					rb_helper_write(ident_helper, "D %x", auth->reqid);
+					authtable[auth->reqid] = no_auth;
+				}
 				auth_error(auth);
 			}
 			if(IsDNS(auth))
@@ -465,7 +471,7 @@ delete_auth_queries(struct Client *target_p)
 	if(auth->reqid > 0)
 	{
 		rb_helper_write(ident_helper, "D %x", auth->reqid);
-		authtable[auth->reqid] = NULL;
+		authtable[auth->reqid] = no_auth;
 	}
 	rb_dlinkDelete(&auth->node, &auth_poll_list);
 	free_auth_request(auth);
@@ -497,8 +503,12 @@ read_auth_reply(rb_helper *helper)
 		auth = authtable[id];
 
 		if(auth == NULL)
-			continue; /* its gone away...oh well */
-	
+			continue;
+		if(auth == no_auth)
+		{
+			authtable[id] = NULL;
+			continue;
+		}
 		p = strchr(q, '\n');
 
 		if(p != NULL)
@@ -533,6 +543,11 @@ fail_auth_requests(void)
 		auth = authtable[id];
 		if (auth != NULL)
 		{
+			if(auth == no_auth)
+			{
+				authtable[id] = NULL;
+				continue;
+			}
 			auth_error(auth);
 			release_auth_client(auth);
 		}

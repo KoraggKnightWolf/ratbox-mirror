@@ -285,7 +285,7 @@ delete_request(const char *reqid)
 	if(auth == NULL)
 		return;
 	auth_table[id] = NULL;
-	/* close uncondtionally...don't notify the ircd or anything */
+	rb_helper_write(ident_helper, "%x 0", id);	 
 	rb_close(auth->authF); 
 	rb_bh_free(authheap, auth);
 }
