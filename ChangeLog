@@ -1,3 +1,11 @@
+androsyn    2008/05/05 15:57:44 UTC	(20080505_2-25307)
+  Log:
+  commit jilles identd patch
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2008/05/05 14:50:51 UTC	(20080505_1-25305)
   Log:
   add stuff about defaulting binding to ipv4
