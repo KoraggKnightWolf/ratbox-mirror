@@ -350,7 +350,6 @@ void
 flood_endgrace(struct Client *client_p)
 {
 	SetFloodDone(client_p);
-	fprintf(stderr, "ending flood grace for: %s\n", client_p->name);
 	/* Drop their flood limit back down */
 	client_p->localClient->allow_read = MAX_FLOOD;
 
