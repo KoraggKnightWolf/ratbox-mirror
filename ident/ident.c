@@ -36,13 +36,15 @@ int ident_timeout;
 
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 
+#define IDTABLE 0x1000 /* this must match the value in src/s_auth.c or there will be hell */
+
 struct auth_request
 {
 	struct rb_sockaddr_storage bindaddr;
 	struct rb_sockaddr_storage destaddr;
 	int srcport;
 	int dstport;
-	char reqid[REQIDLEN];
+	uint16_t reqid;
 	rb_fde_t *authF;
 };
 
@@ -53,6 +55,7 @@ static char readBuf[READBUF_SIZE];
 
 static rb_helper *ident_helper;
 
+struct auth_request *auth_table[IDTABLE];
 
 static int
 send_sprintf(rb_fde_t * F, const char *format, ...)
@@ -85,7 +88,8 @@ static void
 read_auth_timeout(rb_fde_t * F, void *data)
 {
 	struct auth_request *auth = data;
-	rb_helper_write(ident_helper, "%s 0", auth->reqid);
+	rb_helper_write(ident_helper, "%x 0", auth->reqid);
+	auth_table[auth->reqid] = NULL;
 	rb_bh_free(authheap, auth);
 	rb_close(F);
 }
@@ -181,11 +185,12 @@ read_auth(rb_fde_t * F, void *data)
 				}
 			}
 			*t = '\0';
-			rb_helper_write(ident_helper, "%s %s", auth->reqid, username);
+			rb_helper_write(ident_helper, "%x %s", auth->reqid, username);
 		}
 		else
-			rb_helper_write(ident_helper, "%s 0", auth->reqid);
+			rb_helper_write(ident_helper, "%x 0", auth->reqid);
 		rb_close(F);
+		auth_table[auth->reqid] = NULL;
 		rb_bh_free(authheap, auth);
 	}
 }
@@ -202,8 +207,9 @@ connect_callback(rb_fde_t * F, int status, void *data)
 		 */
 		if(send_sprintf(F, "%u , %u\r\n", auth->srcport, auth->dstport) <= 0)
 		{
-			rb_helper_write(ident_helper, "%s 0", auth->reqid);
+			rb_helper_write(ident_helper, "%x 0", auth->reqid);
 			rb_close(F);
+			auth_table[auth->reqid] = NULL;
 			rb_bh_free(authheap, auth);
 			return;
 		}
@@ -211,8 +217,9 @@ connect_callback(rb_fde_t * F, int status, void *data)
 	}
 	else
 	{
-		rb_helper_write(ident_helper, "%s 0", auth->reqid);
+		rb_helper_write(ident_helper, "%x 0", auth->reqid);
 		rb_close(F);
+		auth_table[auth->reqid] = NULL;
 		rb_bh_free(authheap, auth);
 	}
 }
@@ -242,17 +249,45 @@ check_identd(const char *id, const char *bindaddr, const char *destaddr, const c
 	if(auth->authF == NULL)
 	{
 		rb_helper_write(ident_helper, "%s 0", id);
+		/* no need to clear the auth_table here as we haven't set it yet */
 		rb_bh_free(authheap, auth);
 		return;
 	}
 
 	auth->srcport = atoi(srcport);
 	auth->dstport = atoi(dstport);
-	strcpy(auth->reqid, id);
+	auth->reqid = strtoul(id, NULL, 16);
+	if(auth->reqid <= 0)
+	{
+		rb_close(auth->authF);
+		rb_bh_free(authheap, auth);
+		return;
+	}
+	auth_table[auth->reqid] = auth;
 
 	rb_connect_tcp(auth->authF, (struct sockaddr *) &auth->destaddr,
 		       (struct sockaddr *) &auth->bindaddr, GET_SS_LEN(&auth->destaddr),
 		       connect_callback, auth, ident_timeout);
+}
+
+static void
+delete_request(const char *reqid)
+{
+	struct auth_request *auth;
+	uint16_t id;
+	id = strtoul(reqid, NULL, 16);
+	if(id > IDTABLE || id <= 0)
+	{
+		abort();
+		exit(0);
+	}
+	auth = auth_table[id];
+	if(auth == NULL)
+		return;
+	auth_table[id] = NULL;
+	/* close uncondtionally...don't notify the ircd or anything */
+	rb_close(auth->authF); 
+	rb_bh_free(authheap, auth);
 }
 
 static void
@@ -264,18 +299,26 @@ parse_request(rb_helper * helper)
 	while ((len = rb_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
 	{
 		parc = rb_string_to_array(readBuf, parv, MAXPARA);
-		switch (parc)
+		switch(*parv[0])
 		{
-		case 5:
-			check_identd(parv[0], parv[1], parv[2], parv[3], parv[4]);
+		case 'C':
+			if(parc != 6)
+				exit(0);
+			check_identd(parv[1], parv[2], parv[3], parv[4], parv[5]);
 			break;
-		case 2:
-			if(*parv[0] == 'T')
-			{
-				ident_timeout = atoi(parv[1]);
-				break;
-			}
+		
+		case 'T':
+			if(parc != 2)
+				exit(0);
+			ident_timeout = atoi(parv[1]);
+			break;
+		case 'D':
+			if(parc != 2)
+				exit(0);
+			delete_request(parv[1]);
+			break;
 		default:
+			abort();
 			exit(0);
 		}
 	}

@@ -293,8 +293,9 @@ auth_error(struct AuthRequest *auth)
 {
 	ServerStats.is_abad++;
 
-	if(auth->reqid > 0)
+	if(auth->reqid > 0) 
 		authtable[auth->reqid] = NULL;
+
 	auth->reqid = 0;
 	ClearAuth(auth);
 	sendheader(auth->client, REPORT_FAIL_ID);
@@ -352,14 +353,15 @@ start_auth_query(struct AuthRequest *auth)
 	auth->reqid = assign_auth_id();
 	if (auth->reqid == 0)
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Dropping an ident query, authtable is full", auth->reqid);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Dropping an ident query, authtable is full");
+		ilog(L_MAIN, "Dropping an ident query, authtable is full");
 		auth_error(auth);
 		release_auth_client(auth);
 		return;
 	}
 	authtable[auth->reqid] = auth;
 
-	rb_helper_write(ident_helper, "%x %s %s %u %u", auth->reqid, myip, 
+	rb_helper_write(ident_helper, "C %x %s %s %u %u", auth->reqid, myip, 
 		    auth->client->sockhost, (unsigned int)rport, (unsigned int)lport); 
 
 	return;
@@ -426,6 +428,8 @@ timeout_auth_queries_event(void *notused)
 		{
 			if(IsAuth(auth))
 			{
+				if(auth->reqid > 0)
+					rb_helper_write(ident_helper, "D %x", auth->reqid);
 				auth_error(auth);
 			}
 			if(IsDNS(auth))
@@ -458,10 +462,11 @@ delete_auth_queries(struct Client *target_p)
 		cancel_lookup(auth->dns_query);
 		auth->dns_query = 0;
 	}
-
 	if(auth->reqid > 0)
+	{
+		rb_helper_write(ident_helper, "D %x", auth->reqid);
 		authtable[auth->reqid] = NULL;
-
+	}
 	rb_dlinkDelete(&auth->node, &auth_poll_list);
 	free_auth_request(auth);
 }
