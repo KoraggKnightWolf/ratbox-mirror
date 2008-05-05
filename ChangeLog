@@ -1,3 +1,12 @@
+androsyn    2008/05/05 18:23:36 UTC	(20080505_6-25315)
+  Log:
+  allow the ircd to cancel pending auth requests in ident process
+
+  Modified:
+	ircd-ratbox/trunk/ident/ident.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2008/05/05 18:19:52 UTC	(20080505_5-25313)
   Log:
   oops..committed some debug code by accident
