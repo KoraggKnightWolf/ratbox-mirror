@@ -77,19 +77,13 @@ static rb_dlink_list ssl_daemons;
 static inline rb_int32_t buf_to_int32(char *buf)
 {
 	rb_int32_t x;
-	x = *buf << 24;
-	x |= *(++buf) << 16;
-	x |= *(++buf) << 8;
-	x |= *(++buf);
+	memcpy(&x, buf, sizeof(x));
 	return x;
 }
 
 static inline void int32_to_buf(char *buf, rb_int32_t x)
 {
-	*(buf)   = x >> 24 & 0xFF;
-	*(++buf) = x >> 16 & 0xFF; 
-	*(++buf) = x >> 8 & 0xFF;
-	*(++buf) = x & 0xFF;
+	memcpy(buf, &x, sizeof(x));
 	return;
 }
 
