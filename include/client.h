@@ -361,7 +361,6 @@ struct Client *find_named_person(const char *);
 struct Client *next_client(struct Client *, const char *);
 void notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban);
 
-int accept_message(struct Client *source, struct Client *target);
 void del_from_accept(struct Client *source, struct Client *target);
 
 #define accept_message(s, t) ((s) == (t) || (rb_dlinkFind((s), &((t)->localClient->allow_list))))
