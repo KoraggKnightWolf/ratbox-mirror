@@ -31,6 +31,8 @@ Config
    client idletime checks.
  o SSL server connections and ZIPLINKS are mutually exclusive.  OpenSSL
    can typically enable zlib compression for TLSv1 connections.
+ o By default, if no aftype is specified in listen {} blocks, it will bind
+   to ipv4 only.
 
 Opers
 -----
