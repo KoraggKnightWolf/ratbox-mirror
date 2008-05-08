@@ -1,3 +1,11 @@
+androsyn    2008/05/08 17:43:58 UTC	(20080508_0-25321)
+  Log:
+  revert comp_with_mask to 2.2 version
+
+  Modified:
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 androsyn    2008/05/05 18:39:22 UTC	(20080505_8-25319)
   Log:
   do some hackery to hold a authtable spot until the ircd gets the cancel response
