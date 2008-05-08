@@ -1,3 +1,11 @@
+androsyn    2008/05/08 19:35:47 UTC	(20080508_2-25329)
+  Log:
+  a rough pass at dealing with handshake flooding...
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/05/08 17:44:33 UTC	(20080508_1-25323)
   Log:
   short circuit parse_netmask to HM_HOST if a * or ? is found in the mask.
