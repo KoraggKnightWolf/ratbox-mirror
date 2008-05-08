@@ -299,9 +299,9 @@ check_handshake_flood(void *unused)
 		count = rb_ssl_handshake_count(conn->mod_fd);
 		/* nothing needs to do this more than twice in ten seconds i don't think */
 		if(count > 2)
-		{
 			close_conn(conn, WAIT_PLAIN, "Handshake flooding");
-		}		
+		else
+			rb_ssl_clear_handshake_count(conn->mod_fd);
 	} 
 	HASH_WALK_END
 
