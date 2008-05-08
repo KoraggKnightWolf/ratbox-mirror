@@ -1,3 +1,13 @@
+androsyn    2008/05/08 17:44:33 UTC	(20080508_1-25323)
+  Log:
+  short circuit parse_netmask to HM_HOST if a * or ? is found in the mask.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+
+
 androsyn    2008/05/08 17:43:58 UTC	(20080508_0-25321)
   Log:
   revert comp_with_mask to 2.2 version
