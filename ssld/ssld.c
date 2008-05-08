@@ -146,8 +146,12 @@ typedef struct _conn
 #define NO_WAIT 0x0
 #define WAIT_PLAIN 0x1
 
+#define HASH_WALK_SAFE(i, max, ptr, next, table) for(i = 0; i < max; i++) { RB_DLINK_FOREACH_SAFE(ptr, next, table[i].head)
+#define HASH_WALK_END }
 #define CONN_HASH_SIZE 2000
 #define connid_hash(x)	(&connid_hash_table[(x % CONN_HASH_SIZE)])
+
+
 
 static rb_dlink_list connid_hash_table[CONN_HASH_SIZE];
 static rb_dlink_list dead_list;
@@ -277,6 +281,30 @@ make_conn(mod_ctl_t *ctl, rb_fde_t * mod_fd, rb_fde_t * plain_fd)
 	rb_set_nb(mod_fd);
 	rb_set_nb(plain_fd);
 	return conn;
+}
+
+static void
+check_handshake_flood(void *unused)
+{
+	conn_t *conn;
+	rb_dlink_node *ptr, *next;
+	unsigned int count;
+	int i;
+	HASH_WALK_SAFE(i, CONN_HASH_SIZE, ptr, next, connid_hash_table)
+	{
+		conn = ptr->data;
+		if(!IsSSL(conn))
+			continue;
+				
+		count = rb_ssl_handshake_count(conn->mod_fd);
+		/* nothing needs to do this more than twice in ten seconds i don't think */
+		if(count > 2)
+		{
+			close_conn(conn, WAIT_PLAIN, "Handshake flooding");
+		}		
+	} 
+	HASH_WALK_END
+
 }
 
 static void
@@ -1062,6 +1090,7 @@ main(int argc, char **argv)
 	rb_set_nb(mod_ctl->F);
 	rb_set_nb(mod_ctl->F_pipe);
 	rb_event_addish("clean_dead_conns", clean_dead_conns, NULL, 10);
+	rb_event_add("check_handshake_flood", check_handshake_flood, NULL, 10);
 	read_pipe_ctl(mod_ctl->F_pipe, NULL);
 	mod_read_ctl(mod_ctl->F, mod_ctl);
 	if(!zlib_ok && !ssl_ok)
