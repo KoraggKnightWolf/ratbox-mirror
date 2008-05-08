@@ -1,3 +1,12 @@
+jilles      2008/05/08 22:48:26 UTC	(20080508_3-25331)
+  Log:
+  Reset the handshake count after a while so it works like the comment says.
+  
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/05/08 19:35:47 UTC	(20080508_2-25329)
   Log:
   a rough pass at dealing with handshake flooding...
