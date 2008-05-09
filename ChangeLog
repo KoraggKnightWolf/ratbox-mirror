@@ -1,3 +1,11 @@
+androsyn    2008/05/09 18:56:00 UTC	(20080509_2-25337)
+  Log:
+  change smalldate to work like the main ircd\'s smalltime does
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 androsyn    2008/05/09 18:52:08 UTC	(20080509_1-25335)
   Log:
   get rid of that inline
