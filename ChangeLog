@@ -1,3 +1,11 @@
+androsyn    2008/05/09 18:41:07 UTC	(20080509_0-25333)
+  Log:
+  new bantool updates from dubkat
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 jilles      2008/05/08 22:48:26 UTC	(20080508_3-25331)
   Log:
   Reset the handshake count after a while so it works like the comment says.
