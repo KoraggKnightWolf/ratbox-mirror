@@ -797,9 +797,11 @@ static char *
 smalldate(const char *string)
 {
 	static char buf[MAX_DATE_STRING];
-	struct tm time;
-	strptime(string, "%s", &time);	/* convert string digits into a time */
-	strftime(buf, sizeof(buf), "%Y/%m/%d %H.%M", &time);	/* convert from timestamp to smalldate */
+	struct tm lt;
+	strptime(string, "%s", &lt);	/* convert string digits into a time */
+        rb_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
+        		lt.tm_year + 1900, lt.tm_mon + 1,
+			lt.tm_mday, lt.tm_hour, lt.tm_min);
 	return buf;
 }
 
