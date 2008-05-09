@@ -105,7 +105,7 @@ static int parse_r_file(FILE * file);
 static int table_has_rows(const char *table);
 static int table_exists(const char *table);
 
-static inline char *smalldate(const char *string);
+static char *smalldate(const char *string);
 static const char *clean_gecos_field(const char *gecos);
 static char *getfield(char *newline);
 static char *strip_quotes(const char *string);
@@ -793,7 +793,7 @@ drop_dupes(const char *user, const char *host, const char *t)
 /**
  * convert unix timestamp to human readable (small) date
  */
-static inline char *
+static char *
 smalldate(const char *string)
 {
 	static char buf[MAX_DATE_STRING];
