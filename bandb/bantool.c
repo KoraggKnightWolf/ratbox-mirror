@@ -426,6 +426,7 @@ parse_file(FILE * file, int id)
 			f_mask2 = getfield(NULL);
 			if(EmptyString(f_mask2))
 				continue;
+			break;
 		}
 
 		/* reason */
@@ -440,6 +441,9 @@ parse_file(FILE * file, int id)
 		case BANDB_DLINE:
 			f_oreason = getfield(NULL);
 			getfield(NULL);
+			break;
+
+		default: 
 			break;
 		}
 
