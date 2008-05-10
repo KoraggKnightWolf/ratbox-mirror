@@ -1,4 +1,4 @@
-/*
+/**
  *  ircd-ratbox: A slightly useful ircd.
  *  bantool.c: The ircd-ratbox database managment tool.
  *
@@ -38,6 +38,12 @@
  *
  */
 
+/* to do list
+ * TODO add or remove bans on command line
+ * TODO switch to verify the database, without having to -i or -e
+ * TODO support permanent bans
+ */
+
 #define _XOPEN_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,7 +55,7 @@
 #define EmptyString(x) ((x == NULL) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
 
-#define BT_VERSION "0.3.3"
+#define BT_VERSION "0.3.5"
 
 typedef enum
 {
@@ -98,10 +104,14 @@ static int verbose = NO;
 static int wipe = NO;
 static int dupes_ok = NO;	/* by default we do not allow duplicate bans to be entered. */
 
-static int parse_k_file(FILE * file);
-static int parse_x_file(FILE * file);
-static int parse_d_file(FILE * file);
-static int parse_r_file(FILE * file);
+static int parse_file(FILE * file, int id);
+/*
+ * static int parse_k_file(FILE * file);
+ * static int parse_x_file(FILE * file);
+ * static int parse_d_file(FILE * file);
+ * static int parse_r_file(FILE * file);
+ */
+
 static int table_has_rows(const char *table);
 static int table_exists(const char *table);
 
@@ -109,6 +119,8 @@ static char *smalldate(const char *string);
 static const char *clean_gecos_field(const char *gecos);
 static char *getfield(char *newline);
 static char *strip_quotes(const char *string);
+static char *mangle_quotes(const char *string);
+static char *escape_quotes(const char *string);
 
 static void export_config(const char *conf, int id);
 static void import_config(const char *conf, int id);
@@ -117,12 +129,6 @@ static void print_help(int i_exit);
 static void wipe_schema(void);
 static void drop_dupes(const char *user, const char *host, const char *t);
 
-/*
- * TODO xlines need to have \" escaped.
- * this is a temporary place holder.
- */
-#define string_escape(x) x
-
 int
 main(int argc, char *argv[])
 {
@@ -130,7 +136,7 @@ main(int argc, char *argv[])
 	char conf[PATH_MAX];
 	int opt;
 	int i;
-	
+
 	rb_strlcpy(me, argv[0], sizeof(me));
 
 	while ((opt = getopt(argc, argv, "hiepvwd")) != -1)
@@ -199,6 +205,8 @@ main(int argc, char *argv[])
 			wipe_schema();
 		}
 	}
+	if (verbose && dupes_ok == YES)
+		fprintf(stdout, "* Allowing duplicate bans...\n");
 
 	/* checking for our files to import or export */
 	for (i = 0; i < LAST_BANDB_TYPE; i++)
@@ -226,72 +234,66 @@ main(int argc, char *argv[])
 
 	if(import)
 	{
-		if(err)
+		if(err && verbose)
 			fprintf(stderr, "* I was unable to locate %i config files to import.\n",
 				err);
 
-		fprintf(stdout, "* Import Stats: Klines: %i Dlines: %i Xlines: %i Jupes: %i \n",
+		fprintf(stdout, "* Import Stats: Klines: %i, Dlines: %i, Xlines: %i, Resvs: %i \n",
 			klines, dlines, xlines, resvs);
 
 		fprintf(stdout,
-			"\n* If your IRC server is currently running, newly imported bans \n* will not take effect until you issue the command: /quote rehash bans\n");
+			"*\n* If your IRC server is currently running, newly imported bans \n* will not take effect until you issue the command: /quote rehash bans\n");
 
 		if(pretend)
 			fprintf(stdout,
 				"* Pretend mode engaged. Nothing was actually entered into the database.\n");
 	}
-/*	
-	if(export)
-	{
-		if(err)
-			fprintf(stderr, "* I had %d unknown errors.\n", err);
-		
-		fprintf(stdout, "* Export Stats: Klines: %d Dlines: %d Xlines: %d Jupes: %d \n",
-				klines, dlines, xlines, resvs);
-		
-		if(pretend)
-			fprintf(stdout,
-					"* Pretend mode engaged. Nothing was actually exported.\n");
-	}
-*/
+
 	return 0;
 }
 
-void
+static void
 import_config(const char *conf, int id)
 {
 	FILE *fd;
-	fprintf(stdout, "* checking for %s: ", conf);	/* debug  */
+	if (verbose)
+		fprintf(stdout, "* checking for %s: ", conf);	/* debug  */
 
 	/* open config for reading, or skip to the next */
 	if(!(fd = fopen(conf, "r")))
 	{
-		fprintf(stdout, "\tmissing.\n");
+		if(verbose)
+			fprintf(stdout, "\tmissing.\n");
 		err++;
 		return;
 	}
-	fprintf(stdout, "\tok.\n");
 
 	switch (bandb_letter[id])
 	{
 	case 'K':
-		klines += parse_k_file(fd);
+		klines += parse_file(fd, id);
 		break;
 	case 'D':
-		dlines += parse_d_file(fd);
+		dlines += parse_file(fd, id);
 		break;
 	case 'X':
-		xlines += parse_x_file(fd);
+		xlines += parse_file(fd, id);
 		break;
 	case 'R':
-		resvs += parse_r_file(fd);
+		resvs += parse_file(fd, id);
 		break;
 	default:
 		exit(EXIT_FAILURE);
 	}
+	
+	if(verbose)
+		fprintf(stdout, "\tok.\n");
 }
 
-void
+/**
+ * export the database to old-style flat files
+ */
+static void
 export_config(const char *conf, int id)
 {
 	struct rsdb_table table;
@@ -299,34 +301,30 @@ export_config(const char *conf, int id)
 	FILE *fd = NULL;
 	int j;
 
+	/* for sanity sake */
+	const int mask1 = 0;
+	const int mask2 = 1;
+	const int reason = 2;
+	const int oper = 3;
+	const int ts = 4;
+
 	if(!table_has_rows(bandb_table[id]))
 	{
 		return;
 	}
+
 	fprintf(stdout, "* exporting to %s: ", conf);	/* debug  */
 	if(!(fd = fopen(conf, "w")))
 	{
 		fprintf(stdout, "\terror.\n");
 		return;		/* no write permission? */
 	}
-	fprintf(stdout, "\topened.\n");
+	fprintf(stdout, "\twritten.\n");
 
 	rsdb_exec_fetch(&table,
 			"SELECT DISTINCT mask1,mask2,reason,oper,time FROM %s WHERE 1 ORDER BY time",
 			bandb_table[id]);
-	/** 
-	 * TODO DELETE THIS COMMENT LATER ONCE VERIFIED
-	 * ban.conf formats.
-	 * DLINE: ok.
-	 * "194.158.192.0/19","laptop scammers","","2005/3/17 05.33","stevoo!stevoo@efnet.port80.se{stevoo}",1111033988
-	 * KLINE: ok.
-	 * "james","you.are.a.hacker.wa-nn-a.be","byebye","","2006/1/10 01.45","stevoo!stevoo@stevoo.bgpmonkey.net{stevoo}",1136853940
-	 * XLINE: ok.
-	 * "wSTEAM","0","Drones (JamesOff 20060221)","JamesOff!james@oper.efnet.demon.co.uk{efnet.demon.co.uk}",1140526148
-	 * RESV: ok.
-	 * "darkacid","banned nickname","stevoo!stevoo@efnet.port80.se{stevoo}",1111034233
-	 * "#dethnet","drones are not welcome on this server","HardyP80!hardy@efnet.port80.se{hardy}",1115814351
-	 */
+
 	for (j = 0; j < table.row_count; j++)
 	{
 		switch (id)
@@ -334,30 +332,36 @@ export_config(const char *conf, int id)
 		case BANDB_DLINE:
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"\",\"%s\",\"%s\",%s\n",
-				    table.row[j][0], table.row[j][2], smalldate(table.row[j][4]),
-				    table.row[j][3], table.row[j][4]);
+				    table.row[j][mask1],
+				    mangle_quotes(table.row[j][reason]),
+				    smalldate(table.row[j][ts]),
+				    table.row[j][oper], table.row[j][ts]);
 			break;
 
 		case BANDB_XLINE:
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"0\",\"%s\",\"%s\",%s\n",
-				    string_escape(table.row[j][0]), table.row[j][2],
-				    table.row[j][3], table.row[j][4]);
+				    escape_quotes(table.row[j][mask1]),
+				    mangle_quotes(table.row[j][reason]),
+				    table.row[j][oper], table.row[j][ts]);
 			break;
 
 		case BANDB_RESV:
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"%s\",%s\n",
-				    table.row[j][0], table.row[j][2],
-				    table.row[j][3], table.row[j][4]);
+				    table.row[j][mask1],
+				    mangle_quotes(table.row[j][reason]),
+				    table.row[j][oper], table.row[j][ts]);
 			break;
 
 
 		default:	/* Klines */
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"%s\",\"\",\"%s\",\"%s\",%s\n",
-				    table.row[j][0], table.row[j][1], table.row[j][2],
-				    smalldate(table.row[j][4]), table.row[j][3], table.row[j][4]);
+				    table.row[j][mask1], table.row[j][mask2],
+				    mangle_quotes(table.row[j][reason]),
+				    smalldate(table.row[j][ts]), table.row[j][oper],
+				    table.row[j][ts]);
 			break;
 		}
 
@@ -368,6 +372,109 @@ export_config(const char *conf, int id)
 	fclose(fd);
 }
 
+/**
+ * attempt to condense the individual conf functions into one
+ */
+static int
+parse_file(FILE * file, int id)
+{
+	char line[BUFSIZE];
+	char *p;
+	int i = 0;
+
+	char *f_mask1 = NULL;
+	char *f_mask2 = NULL;
+	char *f_oper = NULL;
+	char *f_time = NULL;
+	char *f_reason = NULL;
+	char *f_oreason = NULL;
+	char newreason[REASONLEN];
+	
+	/* xline
+	 * "SYSTEM","0","banned","stevoo!stevoo@efnet.port80.se{stevoo}",1111080437
+	 * resv
+	 * "OseK","banned nickname","stevoo!stevoo@efnet.port80.se{stevoo}",1111031619
+	 * dline
+	 * "194.158.192.0/19","laptop scammers","","2005/3/17 05.33","stevoo!stevoo@efnet.port80.se{stevoo}",1111033988
+	 */
+	while (fgets(line, sizeof(line), file))
+	{
+		if((p = strpbrk(line, "\r\n")) != NULL)
+			*p = '\0';
+
+		if((*line == '\0') || (*line == '#'))
+			continue;
+
+		/* mask1 */
+		f_mask1 = getfield(line);
+		if(EmptyString(f_mask1))
+			continue;
+
+		/* mask2 */
+		switch (id)
+		{
+		case BANDB_XLINE:
+			f_mask1 = escape_quotes(clean_gecos_field(f_mask1));
+			getfield(NULL);	/* empty field */
+			break;
+
+		case BANDB_RESV:
+		case BANDB_DLINE:
+			break;
+
+		default:
+			f_mask2 = getfield(NULL);
+			if(EmptyString(f_mask2))
+				continue;
+		}
+
+		/* reason */
+		f_reason = getfield(NULL);
+		if(EmptyString(f_reason))
+			continue;
+
+		/* oper comment */
+		switch (id)
+		{
+		case BANDB_KLINE:
+		case BANDB_DLINE:
+			f_oreason = getfield(NULL);
+			getfield(NULL);
+			break;
+		}
+
+		f_oper = getfield(NULL);
+		f_time = strip_quotes(f_oper + strlen(f_oper) + 2);
+
+		/* append operreason_field to reason_field */
+		if(!EmptyString(f_oreason))
+			rb_snprintf(newreason, sizeof(newreason), "%s | %s", f_reason, f_oreason);
+		else
+			rb_snprintf(newreason, sizeof(newreason), "%s", f_reason);
+
+		if(pretend == NO)
+		{
+			if(dupes_ok == NO)
+				drop_dupes(f_mask1, f_mask2, bandb_table[id]);
+
+			rsdb_exec(NULL,
+				  "INSERT INTO %s (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
+				  bandb_table[id], f_mask1, f_mask2, f_oper, f_time, newreason);
+		}
+
+		if(pretend && verbose)
+			fprintf(stdout, "%s: mask1(%s) mask2(%s) oper(%s) reason(%s) time(%s)\n",
+				bandb_table[id], f_mask1, f_mask2, f_oper, newreason, f_time);
+
+		i++;
+	}
+	return i;
+}
+
+
+
+
+/*
 int
 parse_k_file(FILE * file)
 {
@@ -407,7 +514,7 @@ parse_k_file(FILE * file)
 		oper_field = getfield(NULL);
 		timestamp = strip_quotes(oper_field + strlen(oper_field) + 2);
 
-		/* append operreason_field to reason_field */
+		// append operreason_field to reason_field
 		if(!EmptyString(operreason_field))
 			rb_snprintf(newreason, sizeof(newreason), "%s | %s", reason_field,
 				    operreason_field);
@@ -459,7 +566,7 @@ parse_x_file(FILE * file)
 			continue;
 
 
-		/* field for xline types, which no longer exist */
+		// field for xline types, which no longer exist
 		getfield(NULL);
 
 		reason_field = getfield(NULL);
@@ -469,7 +576,7 @@ parse_x_file(FILE * file)
 		oper_field = getfield(NULL);
 		timestamp = oper_field + strlen(oper_field) + 2;
 
-		/* append operreason_field to reason_field */
+		// append operreason_field to reason_field
 		if(!EmptyString(operreason_field))
 			rb_snprintf(newreason, sizeof(newreason), "%s | %s", reason_field,
 				    operreason_field);
@@ -529,7 +636,7 @@ parse_d_file(FILE * file)
 		oper_field = getfield(NULL);
 		timestamp = strip_quotes(oper_field + strlen(oper_field) + 2);
 
-		/* append operreason_field to reason_field */
+		// append operreason_field to reason_field
 		if(!EmptyString(operreason_field))
 			rb_snprintf(newreason, sizeof(newreason), "%s | %s", reason_field,
 				    operreason_field);
@@ -604,6 +711,7 @@ parse_r_file(FILE * file)
 	}
 	return i;
 }
+*/
 
 /**
  * getfield
@@ -676,8 +784,9 @@ getfield(char *newline)
 static char *
 strip_quotes(const char *string)
 {
-	static char buff[14];	/* int(11) + 2 + \0 */
-	char *str = buff;
+	static char buf[14];	/* int(11) + 2 + \0 */
+	char *str = buf;
+
 	if(string == NULL)
 		return NULL;
 
@@ -690,8 +799,64 @@ strip_quotes(const char *string)
 		string++;
 	}
 	*str = '\0';
-	return buff;
+	return buf;
 }
+
+/**
+ * escape quotes in a string
+ */
+static char *
+escape_quotes(const char *string)
+{
+	static char buf[BUFSIZE * 2];
+	char *str = buf;
+
+	if(string == NULL)
+		return NULL;
+
+	while (*string)
+	{
+		if(*string == '"')
+		{
+			*str++ = '\\';
+			*str++ = '"';
+		}
+		else
+		{
+			*str++ = *string;
+		}
+		string++;
+	}
+	*str = '\0';
+	return buf;
+}
+
+
+/**
+ * change double-quotes to single-quotes
+ */
+static char *
+mangle_quotes(const char *string)
+{
+	static char buf[BUFSIZE * 2];
+	char *str = buf;
+
+	if(string == NULL)
+		return NULL;
+
+	while (*string)
+	{
+		if(*string != '"')
+			*str++ = *string;
+		else
+			*str++ = '\'';
+
+		string++;
+	}
+	*str = '\0';
+	return buf;
+}
+
 
 /**
  * change spaces to \s in gecos field
@@ -704,6 +869,7 @@ clean_gecos_field(const char *gecos)
 
 	if(gecos == NULL)
 		return NULL;
+
 	while (*gecos)
 	{
 		if(*gecos == ' ')
@@ -799,9 +965,8 @@ smalldate(const char *string)
 	static char buf[MAX_DATE_STRING];
 	struct tm lt;
 	strptime(string, "%s", &lt);	/* convert string digits into a time */
-        rb_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
-        		lt.tm_year + 1900, lt.tm_mon + 1,
-			lt.tm_mday, lt.tm_hour, lt.tm_min);
+	rb_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
+		    lt.tm_year + 1900, lt.tm_mon + 1, lt.tm_mday, lt.tm_hour, lt.tm_min);
 	return buf;
 }
 
