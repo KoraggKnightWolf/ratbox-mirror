@@ -980,10 +980,7 @@ smalldate(const char *string)
 void
 print_help(int i_exit)
 {
-	char version[10];
-	rb_strlcpy(version, BT_VERSION, sizeof(version));
-
-	fprintf(stderr, "bantool v.%s - the ircd-ratbox database tool.\n", version);
+	fprintf(stderr, "bantool v.%s - the ircd-ratbox database tool.\n", BT_VERSION);
 	fprintf(stderr, "Copyright (C) 2008 Daniel J Reidy <dubkat@gmail.com>\n");
 	fprintf(stderr, "$Id$\n\n");
 	fprintf(stderr, "This program is distributed in the hope that it will be useful,\n"
