@@ -1,3 +1,11 @@
+androsyn    2008/05/14 03:43:41 UTC	(20080514_0-25362)
+  Log:
+  if there is an error handler for rsdb, don't exit
+
+  Modified:
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+
+
 androsyn    2008/05/13 17:41:21 UTC	(20080513_0-25360)
   Log:
   remove a useless rb_strlcpy
