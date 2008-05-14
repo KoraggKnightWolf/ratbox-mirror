@@ -50,7 +50,6 @@ mlog(const char *errstr, ...)
 		rb_vsnprintf(buf, sizeof(buf), errstr, ap);
 		va_end(ap);
 		error_cb(buf);
-		exit(1);
 	} else
 		exit(1);
 }
