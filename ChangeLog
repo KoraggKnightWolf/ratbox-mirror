@@ -1,3 +1,12 @@
+androsyn    2008/05/14 18:08:23 UTC	(20080514_1-25366)
+  Log:
+  update for beta4
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/05/14 03:43:41 UTC	(20080514_0-25362)
   Log:
   if there is an error handler for rsdb, don't exit
