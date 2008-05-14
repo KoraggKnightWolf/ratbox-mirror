@@ -6,6 +6,20 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0.0beta4
+- some configure/makefile changes that are useful for package maintainers
+- various bantool fixes
+- fix a bug with the command hash that could cause the ircd to crash
+- fix an ident checking bug that would sometimes cause users to get the 
+  wrong ident
+- fix an ssld crash due to mangling connection ids incorrectly
+- fix matching of cidr masks where the bit length was 0 
+- implement throttling of ssl connection handshake flooding 
+- fix build on bsd platforms that lack EVFILT_TIMER
+- fix kqueue from sometimes dropping updates
+- fix a possible crash with ssl connections closing quickly
+- perserve errno so that connect failures report the correct error
+
 -- ircd-ratbox-3.0.0beta3
 - fix an issue with CAP END releasing clients before it should
 - report bandb errors in a useful fashion
