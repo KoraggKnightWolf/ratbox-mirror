@@ -38,12 +38,6 @@
  *
  */
 
-/* to do list
- * TODO add or remove bans on command line
- * TODO switch to verify the database, without having to -i or -e
- * TODO support permanent bans
- */
-
 #define _XOPEN_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,7 +49,7 @@
 #define EmptyString(x) ((x == NULL) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
 
-#define BT_VERSION "0.3.5"
+#define BT_VERSION "0.4.0"
 
 typedef enum
 {
@@ -88,40 +82,44 @@ static const char *bandb_suffix[LAST_BANDB_TYPE] = {
 
 static char me[PATH_MAX];
 
-/* counters */
-static int klines = 0;
-static int dlines = 0;
-static int xlines = 0;
-static int resvs = 0;
-static int err = 0;
+/* *INDENT-OFF* */
+/* report counters */
+struct counter
+{
+	unsigned int klines;
+	unsigned int dlines;
+	unsigned int xlines;
+	unsigned int resvs;
+	unsigned int error;
+} count = {0, 0, 0, 0, 0};
 
-/* task flags */
-static int i_didnt_use_a_flag = YES;
-static int export = NO;
-static int import = NO;
-static int pretend = NO;
-static int verbose = NO;
-static int wipe = NO;
-static int dupes_ok = NO;	/* by default we do not allow duplicate bans to be entered. */
-
-static int parse_file(FILE * file, int id);
-/*
- * static int parse_k_file(FILE * file);
- * static int parse_x_file(FILE * file);
- * static int parse_d_file(FILE * file);
- * static int parse_r_file(FILE * file);
- */
+/* flags set by command line options */
+struct flags
+{
+	int none;
+	int export;
+	int import;
+	int verify;
+	int vacuum;
+	int pretend;
+	int verbose;
+	int wipe;
+	int dupes_ok;
+} flag = {YES, NO, NO, NO, NO, NO, NO, NO, NO};
+/* *INDENT-ON* */
 
 static int table_has_rows(const char *table);
 static int table_exists(const char *table);
 
-static char *smalldate(const char *string);
 static const char *clean_gecos_field(const char *gecos);
+static char *smalldate(const char *string);
 static char *getfield(char *newline);
 static char *strip_quotes(const char *string);
 static char *mangle_quotes(const char *string);
 static char *escape_quotes(const char *string);
 
+static void db_error_cb(const char *errstr);
+static void db_reclaim_slack(void);
 static void export_config(const char *conf, int id);
 static void import_config(const char *conf, int id);
 static void check_schema(void);
@@ -129,6 +127,9 @@ static void print_help(int i_exit);
 static void wipe_schema(void);
 static void drop_dupes(const char *user, const char *host, const char *t);
 
+/**
+ *  swing your pants 
+ */
 int
 main(int argc, char *argv[])
 {
@@ -139,7 +140,7 @@ main(int argc, char *argv[])
 
 	rb_strlcpy(me, argv[0], sizeof(me));
 
-	while ((opt = getopt(argc, argv, "hiepvwd")) != -1)
+	while ((opt = getopt(argc, argv, "hieuspvwd")) != -1)
 	{
 		switch (opt)
 		{
@@ -147,38 +148,47 @@ main(int argc, char *argv[])
 			print_help(EXIT_SUCCESS);
 			break;
 		case 'i':
-			i_didnt_use_a_flag = NO;
-			import = YES;
+			flag.none = NO;
+			flag.import = YES;
 			break;
 		case 'e':
-			i_didnt_use_a_flag = NO;
-			export = YES;
+			flag.none = NO;
+			flag.export = YES;
+			break;
+		case 'u':
+			flag.none = NO;
+			flag.verify = YES;
+			break;
+		case 's':
+			flag.none = NO;
+			flag.vacuum = YES;
 			break;
 		case 'p':
-			pretend = YES;
+			flag.pretend = YES;
 			break;
 		case 'v':
-			verbose = YES;
+			flag.verbose = YES;
 			break;
 		case 'w':
-			wipe = YES;
+			flag.wipe = YES;
 			break;
 		case 'd':
-			dupes_ok = YES;
+			flag.dupes_ok = YES;
 			break;
 		default:	/* '?' */
 			print_help(EXIT_FAILURE);
 		}
 	}
+
 	/* they should really read the help. */
-	if(i_didnt_use_a_flag)
+	if(flag.none)
 		print_help(EXIT_FAILURE);
 
-	if((import && export) || (export && wipe))
+	if((flag.import && flag.export) || (flag.export && flag.wipe)
+	   || (flag.verify && flag.pretend))
 	{
-		fprintf(stderr,
-			"* Error: Conflicting flags. You may only do import [-i] or export [-e].\n");
-		fprintf(stderr, "* For an explination of commands, run: %s -h\n", argv[0]);
+		fprintf(stderr, "* Error: Conflicting flags.\n");
+		fprintf(stderr, "* For an explination of commands, run: %s -h\n", me);
 		exit(EXIT_FAILURE);
 	}
 
@@ -187,13 +197,21 @@ main(int argc, char *argv[])
 	else
 		rb_strlcpy(etc, ETCPATH, sizeof(ETCPATH));
 
-	if(pretend == NO)
+	fprintf(stdout,
+		"* ircd-ratbox bantool v.%s ($Id$)\n",
+		BT_VERSION);
+
+	if(flag.pretend == NO)
 	{
-		rsdb_init(NULL);
+		rsdb_init(db_error_cb);
 		check_schema();
-		if(import && wipe)
+
+		if(flag.vacuum)
+			db_reclaim_slack();
+
+		if(flag.import && flag.wipe)
 		{
-			dupes_ok = YES;	/* dont check for dupes if we are wiping the db clean */
+			flag.dupes_ok = YES;	/* dont check for dupes if we are wiping the db clean */
 			for (i = 0; i < 3; i++)
 				fprintf(stdout,
 					"* WARNING: YOU ARE ABOUT TO WIPE YOUR DATABASE!\n");
@@ -205,7 +223,7 @@ main(int argc, char *argv[])
 			wipe_schema();
 		}
 	}
-	if (verbose && dupes_ok == YES)
+	if(flag.verbose && flag.dupes_ok == YES)
 		fprintf(stdout, "* Allowing duplicate bans...\n");
 
 	/* checking for our files to import or export */
@@ -214,37 +232,32 @@ main(int argc, char *argv[])
 		rb_snprintf(conf, sizeof(conf), "%s/%s.conf%s",
 			    etc, bandb_table[i], bandb_suffix[i]);
 
-		if(import && pretend == NO)
+		if(flag.import && flag.pretend == NO)
 			rsdb_transaction(RSDB_TRANS_START);
 
-		if(import)
+		if(flag.import)
 			import_config(conf, i);
 
-		if(export)
+		if(flag.export)
 			export_config(conf, i);
 
-		if(import && pretend == NO)
+		if(flag.import && flag.pretend == NO)
 			rsdb_transaction(RSDB_TRANS_END);
-
-		/* ratbox doesn't currently support permanent klines */
-		if(export)
-			i++;
-
 	}
 
-	if(import)
+	if(flag.import)
 	{
-		if(err && verbose)
+		if(count.error && flag.verbose)
 			fprintf(stderr, "* I was unable to locate %i config files to import.\n",
-				err);
+				count.error);
 
 		fprintf(stdout, "* Import Stats: Klines: %i, Dlines: %i, Xlines: %i, Resvs: %i \n",
-			klines, dlines, xlines, resvs);
+			count.klines, count.dlines, count.xlines, count.resvs);
 
 		fprintf(stdout,
 			"*\n* If your IRC server is currently running, newly imported bans \n* will not take effect until you issue the command: /quote rehash bans\n");
 
-		if(pretend)
+		if(flag.pretend)
 			fprintf(stdout,
 				"* Pretend mode engaged. Nothing was actually entered into the database.\n");
 	}
@@ -252,43 +265,6 @@ main(int argc, char *argv[])
 	return 0;
 }
 
-static void
-import_config(const char *conf, int id)
-{
-	FILE *fd;
-	if (verbose)
-		fprintf(stdout, "* checking for %s: ", conf);	/* debug  */
-
-	/* open config for reading, or skip to the next */
-	if(!(fd = fopen(conf, "r")))
-	{
-		if(verbose)
-			fprintf(stdout, "\tmissing.\n");
-		err++;
-		return;
-	}
-
-	switch (bandb_letter[id])
-	{
-	case 'K':
-		klines += parse_file(fd, id);
-		break;
-	case 'D':
-		dlines += parse_file(fd, id);
-		break;
-	case 'X':
-		xlines += parse_file(fd, id);
-		break;
-	case 'R':
-		resvs += parse_file(fd, id);
-		break;
-	default:
-		exit(EXIT_FAILURE);
-	}
-	
-	if(verbose)
-		fprintf(stdout, "\tok.\n");
-}
 
 /**
  * export the database to old-style flat files
@@ -297,6 +273,7 @@ static void
 export_config(const char *conf, int id)
 {
 	struct rsdb_table table;
+	static char sql[BUFSIZE * 2];
 	static char buf[512];
 	FILE *fd = NULL;
 	int j;
@@ -307,29 +284,45 @@ export_config(const char *conf, int id)
 	const int reason = 2;
 	const int oper = 3;
 	const int ts = 4;
+	/* const int perm = 5; */
 
 	if(!table_has_rows(bandb_table[id]))
+		return;
+
+	if(strstr(conf, ".perm") != 0)
+		rb_snprintf(sql, sizeof(sql),
+			    "SELECT DISTINCT mask1,mask2,reason,oper,time FROM %s WHERE perm = 1 ORDER BY time",
+			    bandb_table[id]);
+	else
+		rb_snprintf(sql, sizeof(sql),
+			    "SELECT DISTINCT mask1,mask2,reason,oper,time FROM %s WHERE perm = 0 ORDER BY time",
+			    bandb_table[id]);
+
+	rsdb_exec_fetch(&table, sql);
+	if(table.row_count <= 0)
 	{
+		rsdb_exec_fetch_end(&table);
 		return;
 	}
 
-	fprintf(stdout, "* exporting to %s: ", conf);	/* debug  */
+	if(flag.verbose)
+		fprintf(stdout, "* checking for %s: ", conf);	/* debug  */
+
+	/* open config for reading, or skip to the next */
 	if(!(fd = fopen(conf, "w")))
 	{
-		fprintf(stdout, "\terror.\n");
-		return;		/* no write permission? */
+		if(flag.verbose)
+			fprintf(stdout, "\tmissing.\n");
+		count.error++;
+		return;
 	}
-	fprintf(stdout, "\twritten.\n");
-
-	rsdb_exec_fetch(&table,
-			"SELECT DISTINCT mask1,mask2,reason,oper,time FROM %s WHERE 1 ORDER BY time",
-			bandb_table[id]);
 
 	for (j = 0; j < table.row_count; j++)
 	{
 		switch (id)
 		{
 		case BANDB_DLINE:
+		case BANDB_DLINE_PERM:
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"\",\"%s\",\"%s\",%s\n",
 				    table.row[j][mask1],
@@ -339,6 +332,7 @@ export_config(const char *conf, int id)
 			break;
 
 		case BANDB_XLINE:
+		case BANDB_XLINE_PERM:
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"0\",\"%s\",\"%s\",%s\n",
 				    escape_quotes(table.row[j][mask1]),
@@ -347,6 +341,7 @@ export_config(const char *conf, int id)
 			break;
 
 		case BANDB_RESV:
+		case BANDB_RESV_PERM:
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"%s\",%s\n",
 				    table.row[j][mask1],
@@ -369,19 +364,24 @@ export_config(const char *conf, int id)
 	}
 
 	rsdb_exec_fetch_end(&table);
+	if(flag.verbose)
+		fprintf(stdout, "\twritten.\n");
 	fclose(fd);
 }
 
 /**
  * attempt to condense the individual conf functions into one
  */
-static int
-parse_file(FILE * file, int id)
+static void
+import_config(const char *conf, int id)
 {
+	FILE *fd;
+
 	char line[BUFSIZE];
 	char *p;
 	int i = 0;
 
+	char f_perm = 0;
 	char *f_mask1 = NULL;
 	char *f_mask2 = NULL;
 	char *f_oper = NULL;
@@ -389,7 +389,24 @@ parse_file(FILE * file, int id)
 	char *f_reason = NULL;
 	char *f_oreason = NULL;
 	char newreason[REASONLEN];
-	
+
+	if(flag.verbose)
+		fprintf(stdout, "* checking for %s: ", conf);	/* debug  */
+
+	/* open config for reading, or skip to the next */
+	if(!(fd = fopen(conf, "r")))
+	{
+		if(flag.verbose)
+			fprintf(stdout, "%*s", strlen(bandb_suffix[id]) > 0 ? 10 : 15,
+				"missing.\n");
+		count.error++;
+		return;
+	}
+
+	if(strstr(conf, ".perm") != 0)
+		f_perm = 1;
+
+
 	/* xline
 	 * "SYSTEM","0","banned","stevoo!stevoo@efnet.port80.se{stevoo}",1111080437
 	 * resv
@@ -397,7 +414,7 @@ parse_file(FILE * file, int id)
 	 * dline
 	 * "194.158.192.0/19","laptop scammers","","2005/3/17 05.33","stevoo!stevoo@efnet.port80.se{stevoo}",1111033988
 	 */
-	while (fgets(line, sizeof(line), file))
+	while (fgets(line, sizeof(line), fd))
 	{
 		if((p = strpbrk(line, "\r\n")) != NULL)
 			*p = '\0';
@@ -407,6 +424,7 @@ parse_file(FILE * file, int id)
 
 		/* mask1 */
 		f_mask1 = getfield(line);
+
 		if(EmptyString(f_mask1))
 			continue;
 
@@ -414,12 +432,15 @@ parse_file(FILE * file, int id)
 		switch (id)
 		{
 		case BANDB_XLINE:
+		case BANDB_XLINE_PERM:
 			f_mask1 = escape_quotes(clean_gecos_field(f_mask1));
 			getfield(NULL);	/* empty field */
 			break;
 
 		case BANDB_RESV:
+		case BANDB_RESV_PERM:
 		case BANDB_DLINE:
+		case BANDB_DLINE_PERM:
 			break;
 
 		default:
@@ -438,17 +459,34 @@ parse_file(FILE * file, int id)
 		switch (id)
 		{
 		case BANDB_KLINE:
+		case BANDB_KLINE_PERM:
 		case BANDB_DLINE:
+		case BANDB_DLINE_PERM:
 			f_oreason = getfield(NULL);
 			getfield(NULL);
 			break;
 
-		default: 
+		default:
 			break;
 		}
 
 		f_oper = getfield(NULL);
 		f_time = strip_quotes(f_oper + strlen(f_oper) + 2);
+
+		/* attempt to fix useless klines set by opers not paying attention */
+		if(id == BANDB_KLINE || id == BANDB_KLINE_PERM)
+		{
+			if(strstr(f_mask1, "!") != NULL)
+			{
+				fprintf(stderr,
+					"* Attempting to fix INVALID KLINE %s@%s set by %s\n",
+					f_mask1, f_mask2, f_oper);
+				while (strstr(f_mask1, "!") != NULL)
+					f_mask1++;
+				fprintf(stderr, "* I think i fixed it, please verify: %s@%s \n",
+					f_mask1, f_mask2);
+			}
+		}
 
 		/* append operreason_field to reason_field */
 		if(!EmptyString(f_oreason))
@@ -456,266 +494,49 @@ parse_file(FILE * file, int id)
 		else
 			rb_snprintf(newreason, sizeof(newreason), "%s", f_reason);
 
-		if(pretend == NO)
+		if(flag.pretend == NO)
 		{
-			if(dupes_ok == NO)
+			if(flag.dupes_ok == NO)
 				drop_dupes(f_mask1, f_mask2, bandb_table[id]);
 
 			rsdb_exec(NULL,
-				  "INSERT INTO %s (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
-				  bandb_table[id], f_mask1, f_mask2, f_oper, f_time, newreason);
+				  "INSERT INTO %s (mask1, mask2, oper, time, perm, reason) VALUES('%Q','%Q','%Q','%Q','%d','%Q')",
+				  bandb_table[id], f_mask1, f_mask2, f_oper, f_time, f_perm,
+				  newreason);
 		}
 
-		if(pretend && verbose)
-			fprintf(stdout, "%s: mask1(%s) mask2(%s) oper(%s) reason(%s) time(%s)\n",
-				bandb_table[id], f_mask1, f_mask2, f_oper, newreason, f_time);
+		if(flag.pretend && flag.verbose)
+			fprintf(stdout,
+				"%s: perm(%d) mask1(%s) mask2(%s) oper(%s) reason(%s) time(%s)\n",
+				bandb_table[id], f_perm, f_mask1, f_mask2, f_oper, newreason,
+				f_time);
 
 		i++;
 	}
-	return i;
-}
 
-
-
-
-/*
-int
-parse_k_file(FILE * file)
-{
-	char *user_field = NULL;
-	char *reason_field = NULL;
-	char *operreason_field = NULL;
-	char newreason[REASONLEN];
-	char *host_field = NULL;
-	char *oper_field = NULL;
-	char *timestamp = NULL;
-	char line[BUFSIZE];
-	int i = 0;
-	char *p;
-
-	while (fgets(line, sizeof(line), file))
+	switch (bandb_letter[id])
 	{
-		if((p = strpbrk(line, "\r\n")) != NULL)
-			*p = '\0';
-
-		if((*line == '\0') || (*line == '#'))
-			continue;
-
-		user_field = getfield(line);
-		if(EmptyString(user_field))
-			continue;
-
-		host_field = getfield(NULL);
-		if(EmptyString(host_field))
-			continue;
-
-		reason_field = getfield(NULL);
-		if(EmptyString(reason_field))
-			continue;
-
-		operreason_field = getfield(NULL);
-		getfield(NULL);
-		oper_field = getfield(NULL);
-		timestamp = strip_quotes(oper_field + strlen(oper_field) + 2);
-
-		// append operreason_field to reason_field
-		if(!EmptyString(operreason_field))
-			rb_snprintf(newreason, sizeof(newreason), "%s | %s", reason_field,
-				    operreason_field);
-		else
-			rb_snprintf(newreason, sizeof(newreason), "%s", reason_field);
-
-		if(pretend == NO)
-		{
-			if(dupes_ok == NO)
-				drop_dupes(user_field, host_field, "kline");
-
-			rsdb_exec(NULL,
-				  "INSERT INTO kline (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
-				  user_field, host_field, oper_field, timestamp, newreason);
-		}
-
-		if(pretend && verbose)
-			fprintf(stdout, "KLINE: user(%s@%s) oper(%s) reason(%s) time(%s)\n",
-				user_field, host_field, oper_field, newreason, timestamp);
-
-		i++;
+	case 'K':
+		count.klines += i;
+		break;
+	case 'D':
+		count.dlines += i;
+		break;
+	case 'X':
+		count.xlines += i;
+		break;
+	case 'R':
+		count.resvs += i;
+		break;
+	default:
+		break;
 	}
-	return i;
+
+	if(flag.verbose)
+		fprintf(stdout, "%*s\n", strlen(bandb_suffix[id]) > 0 ? 10 : 15, "imported.");
+
+	return;
 }
-
-int
-parse_x_file(FILE * file)
-{
-	const char *gecos_field = NULL;
-	char *reason_field = NULL;
-	char newreason[REASONLEN];
-	char *oper_field = NULL;
-	char *operreason_field = NULL;
-	char *timestamp = NULL;
-	char line[BUFSIZE];
-	char *p;
-	int i = 0;
-
-	while (fgets(line, sizeof(line), file))
-	{
-		if((p = strpbrk(line, "\r\n")))
-			*p = '\0';
-
-		if((*line == '\0') || (line[0] == '#'))
-			continue;
-
-		gecos_field = clean_gecos_field(getfield(line));
-		if(EmptyString(gecos_field))
-			continue;
-
-
-		// field for xline types, which no longer exist
-		getfield(NULL);
-
-		reason_field = getfield(NULL);
-		if(EmptyString(reason_field))
-			continue;
-
-		oper_field = getfield(NULL);
-		timestamp = oper_field + strlen(oper_field) + 2;
-
-		// append operreason_field to reason_field
-		if(!EmptyString(operreason_field))
-			rb_snprintf(newreason, sizeof(newreason), "%s | %s", reason_field,
-				    operreason_field);
-		else
-			rb_snprintf(newreason, sizeof(newreason), "%s", reason_field);
-
-		if(pretend == NO)
-		{
-			if(dupes_ok == NO)
-				drop_dupes(gecos_field, NULL, "xline");
-
-			rsdb_exec(NULL,
-				  "INSERT INTO xline (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
-				  gecos_field, NULL, oper_field, timestamp, newreason);
-		}
-
-		if(pretend && verbose)
-			fprintf(stdout, "XLINE: gecos(%s) oper(%s) reason(%s) timestamp(%s)\n",
-				gecos_field, oper_field, newreason, timestamp);
-
-		i++;
-	}
-	return i;
-}
-
-int
-parse_d_file(FILE * file)
-{
-	char *reason_field = NULL;
-	char newreason[REASONLEN];
-	char *host_field = NULL;
-	char *oper_field = NULL;
-	char *operreason_field = NULL;
-	char *timestamp = NULL;
-	char line[BUFSIZE];
-	char *p;
-	int i = 0;
-
-	while (fgets(line, sizeof(line), file))
-	{
-		if((p = strpbrk(line, "\r\n")))
-			*p = '\0';
-
-		if((*line == '\0') || (line[0] == '#'))
-			continue;
-
-		host_field = getfield(line);
-		if(EmptyString(host_field))
-			continue;
-
-		reason_field = getfield(NULL);
-		if(EmptyString(reason_field))
-			continue;
-
-		operreason_field = getfield(NULL);
-		getfield(NULL);
-		oper_field = getfield(NULL);
-		timestamp = strip_quotes(oper_field + strlen(oper_field) + 2);
-
-		// append operreason_field to reason_field
-		if(!EmptyString(operreason_field))
-			rb_snprintf(newreason, sizeof(newreason), "%s | %s", reason_field,
-				    operreason_field);
-		else
-			rb_snprintf(newreason, sizeof(newreason), "%s", reason_field);
-
-		if(pretend == NO)
-		{
-			if(dupes_ok == NO)
-				drop_dupes(host_field, NULL, "dline");
-
-			rsdb_exec(NULL,
-				  "INSERT INTO dline (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
-				  host_field, NULL, oper_field, timestamp, newreason);
-		}
-
-		if(pretend && verbose)
-			fprintf(stdout, "DLINE: ip(%s) oper(%s) reason(%s) timestamp(%s)\n",
-				host_field, oper_field, newreason, timestamp);
-
-		i++;
-	}
-	return i;
-}
-
-
-int
-parse_r_file(FILE * file)
-{
-	char *reason_field;
-	char *host_field;
-	char line[BUFSIZE];
-	char *oper_field = NULL;
-	char *timestamp = NULL;
-	int i = 0;
-	char *p;
-
-	while (fgets(line, sizeof(line), file))
-	{
-		if((p = strpbrk(line, "\r\n")))
-			*p = '\0';
-
-		if((*line == '\0') || (line[0] == '#'))
-			continue;
-
-		host_field = getfield(line);
-		if(EmptyString(host_field))
-			continue;
-
-		reason_field = getfield(NULL);
-		if(EmptyString(reason_field))
-			continue;
-
-		oper_field = getfield(NULL);
-		timestamp = strip_quotes(oper_field + strlen(oper_field) + 2);
-
-		if(pretend == NO)
-		{
-			if(dupes_ok == NO)
-				drop_dupes(host_field, NULL, "resv");
-
-			rsdb_exec(NULL,
-				  "INSERT INTO resv (mask1, mask2, oper, time, reason) VALUES('%Q','%Q','%Q','%Q','%Q')",
-				  host_field, NULL, oper_field, timestamp, reason_field);
-		}
-
-		if(pretend && verbose)
-			fprintf(stdout, "JUPE: mask(%s) reason(%s) oper(%s) timestamp(%s)\n",
-				host_field, reason_field, oper_field, timestamp);
-
-		i++;
-	}
-	return i;
-}
-*/
 
 /**
  * getfield
@@ -895,17 +716,61 @@ clean_gecos_field(const char *gecos)
 static void
 check_schema(void)
 {
-	int i;
+	int i, j;
+	char type[8];		/* longest string is 'INTEGER\0' */
+
+	if(flag.verify || flag.verbose)
+		fprintf(stdout, "* Verifying database.\n");
+
+	const char *columns[] = {
+		"perm",
+		"mask1",
+		"mask2",
+		"oper",
+		"time",
+		"reason",
+		NULL
+	};
+
 	for (i = 0; i < LAST_BANDB_TYPE; i++)
 	{
 		if(!table_exists(bandb_table[i]))
+		{
 			rsdb_exec(NULL,
-				  "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, reason TEXT)",
+				  "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, perm INTEGER, reason TEXT)",
 				  bandb_table[i]);
+		}
+
+		/*
+		 * i can't think of any better way to do this, other then attempt to
+		 * force the creation of column that may, or may not already exist. --dubkat
+		 */
+		else
+		{
+			for (j = 0; columns[j] != NULL; j++)
+			{
+				if(!strcmp(columns[j], "time") && !strcmp(columns[j], "perm"))
+					rb_strlcpy(type, "INTEGER", sizeof(type));
+				else
+					rb_strlcpy(type, "TEXT", sizeof(type));
+
+				/* attempt to add a column with extreme prejudice, errors are ignored */
+				rsdb_exec(NULL, "ALTER TABLE %s ADD COLUMN %s %s", bandb_table[i],
+					  columns[j], type);
+			}
+		}
 
 		i++;		/* skip over .perm */
 	}
 }
+
+static void
+db_reclaim_slack(void)
+{
+	fprintf(stdout, "* Reclaiming free space.\n");
+	rsdb_exec(NULL, "VACUUM");
+}
+
 
 /**
  * check that appropriate tables exist.
@@ -960,6 +825,18 @@ drop_dupes(const char *user, const char *host, const char *t)
 	rsdb_exec(NULL, "DELETE FROM %s WHERE mask1='%Q' AND mask2='%Q'", t, user, host);
 }
 
+static void
+db_error_cb(const char *errstr)
+{
+	/* debug stuff 
+	   char buf[256];
+	   rb_snprintf(buf, sizeof(buf), "! :%s", errstr);
+	   fprintf(stderr, "ERROR: %s\n", buf);
+	 */
+	return;
+}
+
+
 /**
  * convert unix timestamp to human readable (small) date
  */
@@ -988,12 +865,17 @@ print_help(int i_exit)
 		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
 		"GNU General Public License for more details.\n\n");
 
-	fprintf(stderr, "Usage: %s <-i|-p> [-v] [-h] [-d] [-w] [path]\n", me);
+	fprintf(stderr, "Usage: %s <-i|-e> [-p] [-v] [-h] [-d] [-w] [path]\n", me);
 	fprintf(stderr, "       -h : Display some slightly useful help.\n");
 	fprintf(stderr, "       -i : Actually import configs into your database.\n");
 	fprintf(stderr, "       -e : Export your database to old-style flat files.\n");
 	fprintf(stderr,
 		"            This is suitable for redistrubuting your banlists, or creating backups.\n");
+	fprintf(stderr, "       -s : Reclaim empty slack space the database may be taking up.\n");
+	fprintf(stderr, "       -u : Update the database tables to support any new features.\n");
+	fprintf(stderr,
+		"            This is automaticlly done if you are importing or exporting\n");
+	fprintf(stderr, "            but should be run whenever you upgrade the ircd.\n");
 	fprintf(stderr,
 		"       -p : pretend, checks for the configs, and parses them, then tells you some data...\n");
 	fprintf(stderr, "            but does not touch your database.\n");
@@ -1001,7 +883,8 @@ print_help(int i_exit)
 		"       -v : Be verbose... and it *is* very verbose! (intended for debugging)\n");
 	fprintf(stderr, "       -d : Enable checking for redunant entries.\n");
 	fprintf(stderr, "       -w : Completly wipe your database clean. May be used with -i \n");
-	fprintf(stderr, "     path : An optional directory containing old ratbox configs.\n");
+	fprintf(stderr,
+		"     path : An optional directory containing old ratbox configs for import, or export.\n");
 	fprintf(stderr, "            If not specified, it looks in PREFIX/etc.\n");
 	exit(i_exit);
 }

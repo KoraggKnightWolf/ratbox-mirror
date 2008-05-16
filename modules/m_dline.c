@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
  *  Copyright (C) 1996-2002 Hybrid Development Team
- *  Copyright (C) 2002-2005 ircd-ratbox development team
+ *  Copyright (C) 2002-2008 ircd-ratbox development team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@ struct Message undline_msgtab = {
 };
 
 mapi_clist_av1 dline_clist[] = { &dline_msgtab, &undline_msgtab, NULL };
+
 DECLARE_MODULE_AV1(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision$");
 
 static int valid_comment(char *comment);
@@ -65,8 +66,7 @@ static void check_dlines(void);
  *   parv[2] - reason
  */
 static int
-mo_dline(struct Client *client_p, struct Client *source_p,
-	 int parc, const char *parv[])
+mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	char def[] = "No Reason";
 	const char *dlhost;
@@ -80,16 +80,28 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	const char *oper;
 	int tdline_time = 0;
 	int loc = 1;
+	int perm = 0;
 
 	if(!IsOperK(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "kline");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "kline");
 		return 0;
 	}
 
 	if((tdline_time = valid_temp_time(parv[loc])) >= 0)
 		loc++;
+
+	if(!irccmp(parv[loc], "-perm"))
+	{
+		if(!IsOperAdmin(source_p))
+		{
+			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
+				   "kline");
+			return 0;
+		}
+		perm = 1;
+		loc++;
+	}
 
 	if(parc < loc + 1)
 	{
@@ -125,7 +137,8 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	{
 		if(bits < 8)
 		{
-			sendto_one_notice(source_p, ":For safety, bitmasks less than 8 require conf access.");
+			sendto_one_notice(source_p,
+					  ":For safety, bitmasks less than 8 require db access.");
 			return 0;
 		}
 	}
@@ -133,7 +146,8 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 	{
 		if(bits < 16)
 		{
-			sendto_one_notice(source_p, ":Dline bitmasks less than 16 are for admins only.");
+			sendto_one_notice(source_p,
+					  ":Dline bitmasks less than 16 are for admins only.");
 			return 0;
 		}
 	}
@@ -143,15 +157,15 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		struct rb_sockaddr_storage daddr;
 		const char *creason;
 		int t = AF_INET, ty, b;
-		ty = parse_netmask(dlhost, (struct sockaddr *)&daddr, &b);
+		ty = parse_netmask(dlhost, (struct sockaddr *) &daddr, &b);
 #ifdef RB_IPV6
 		if(ty == HM_IPV6)
 			t = AF_INET6;
 		else
 #endif
 			t = AF_INET;
-						
-		if((aconf = find_dline((struct sockaddr *)&daddr)) != NULL)
+
+		if((aconf = find_dline((struct sockaddr *) &daddr)) != NULL)
 		{
 			int bx;
 			parse_netmask(aconf->host, NULL, &bx);
@@ -159,11 +173,11 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 			{
 				creason = aconf->passwd ? aconf->passwd : "<No Reason>";
 				if(IsConfExemptKline(aconf))
-					sendto_one_notice(source_p, 
+					sendto_one_notice(source_p,
 							  ":[%s] is (E)d-lined by [%s] - %s",
 							  dlhost, aconf->host, creason);
 				else
-					sendto_one_notice(source_p, 
+					sendto_one_notice(source_p,
 							  ":[%s] already D-lined by [%s] - %s",
 							  dlhost, aconf->host, creason);
 				return 0;
@@ -180,6 +194,8 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 
 	oper = get_oper_name(source_p);
 	aconf->info.oper = operhash_add(oper);
+	if(perm)
+		aconf->flags |= CONF_FLAGS_PERMANENT;
 
 	/* Look for an oper reason */
 	if((oper_reason = strchr(reason, '|')) != NULL)
@@ -193,9 +209,9 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 
 	if(tdline_time > 0)
 	{
-		rb_snprintf(dlbuffer, sizeof(dlbuffer), 
-			 "Temporary D-line %d min. - %s (%s)",
-			 (int) (tdline_time / 60), reason, current_date);
+		rb_snprintf(dlbuffer, sizeof(dlbuffer),
+			    "Temporary D-line %d min. - %s (%s)",
+			    (int) (tdline_time / 60), reason, current_date);
 		aconf->passwd = rb_strdup(dlbuffer);
 		aconf->hold = rb_current_time() + tdline_time;
 		add_temp_dline(aconf);
@@ -203,22 +219,20 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		if(EmptyString(oper_reason))
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"%s added temporary %d min. D-Line for [%s] [%s]",
-					aconf->info.oper, tdline_time / 60,
-					aconf->host, reason);
+					     "%s added temporary %d min. D-Line for [%s] [%s]",
+					     aconf->info.oper, tdline_time / 60,
+					     aconf->host, reason);
 			ilog(L_KLINE, "D %s %d %s %s",
-				aconf->info.oper, tdline_time / 60,
-				aconf->host, reason);
+			     aconf->info.oper, tdline_time / 60, aconf->host, reason);
 		}
 		else
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"%s added temporary %d min. D-Line for [%s] [%s|%s]",
-					aconf->info.oper, tdline_time / 60,
-					aconf->host, reason, oper_reason);
+					     "%s added temporary %d min. D-Line for [%s] [%s|%s]",
+					     aconf->info.oper, tdline_time / 60,
+					     aconf->host, reason, oper_reason);
 			ilog(L_KLINE, "D %s %d %s %s|%s",
-				aconf->info.oper, tdline_time / 60,
-				aconf->host, reason, oper_reason);
+			     aconf->info.oper, tdline_time / 60, aconf->host, reason, oper_reason);
 		}
 
 		sendto_one_notice(source_p, ":Added temporary %d min. D-Line for [%s]",
@@ -234,26 +248,24 @@ mo_dline(struct Client *client_p, struct Client *source_p,
 		if(EmptyString(oper_reason))
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"%s added D-Line for [%s] [%s]",
-					aconf->info.oper, aconf->host, reason);
-			ilog(L_KLINE, "D %s 0 %s %s",
-				aconf->info.oper, aconf->host, reason);
+					     "%s added D-Line for [%s] [%s]",
+					     aconf->info.oper, aconf->host, reason);
+			ilog(L_KLINE, "D %s 0 %s %s", aconf->info.oper, aconf->host, reason);
 		}
 		else
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"%s added D-Line for [%s] [%s|%s]",
-					aconf->info.oper, aconf->host, 
-					reason, oper_reason);
+					     "%s added D-Line for [%s] [%s|%s]",
+					     aconf->info.oper, aconf->host, reason, oper_reason);
 			ilog(L_KLINE, "D %s 0 %s %s|%s",
-				aconf->info.oper, aconf->host, 
-				reason, oper_reason);
+			     aconf->info.oper, aconf->host, reason, oper_reason);
 		}
 
-		sendto_one_notice(source_p, ":Added D-Line [%s]", aconf->host);
+		sendto_one_notice(source_p, ":Added %s [%s]", perm ? "Locked D-Line" : "D-Line",
+				  aconf->host);
 
 		bandb_add(BANDB_DLINE, source_p, aconf->host, NULL,
-				reason, EmptyString(oper_reason) ? NULL : oper_reason);
+			  reason, EmptyString(oper_reason) ? NULL : oper_reason, perm);
 	}
 
 	check_dlines();
@@ -274,18 +286,17 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	const char *host;
 	if(!IsOperUnkline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "unkline");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "unkline");
 		return 0;
 	}
 
-	if((ty = parse_netmask(cidr, (struct sockaddr *)&daddr, &b)) == HM_HOST)
+	if((ty = parse_netmask(cidr, (struct sockaddr *) &daddr, &b)) == HM_HOST)
 	{
 		sendto_one_notice(source_p, ":Invalid D-Line");
 		return 0;
 	}
 
-	aconf = find_dline_exact((struct sockaddr *)&daddr, b);
+	aconf = find_dline_exact((struct sockaddr *) &daddr, b);
 
 	if(aconf == NULL)
 	{
@@ -297,20 +308,22 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		sendto_one_notice(source_p, ":Cannot remove permanent D-Line %s", cidr);
 		return 0;
-	}	
+	}
 
-	host = LOCAL_COPY(aconf->host);	
+	host = LOCAL_COPY(aconf->host);
 	remove_dline(aconf);
 
 	if(!(aconf->flags & CONF_FLAGS_TEMPORARY))
 	{
 		bandb_del(BANDB_DLINE, host, NULL);
-		
-		sendto_one_notice(source_p, ":D-Line for [%s] is removed", host);
-		sendto_realops_flags(UMODE_ALL, L_ALL, "%s has removed the D-Line for: [%s]", 
-			             get_oper_name(source_p), host);
 
-	} else {
+		sendto_one_notice(source_p, ":D-Line for [%s] is removed", host);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "%s has removed the D-Line for: [%s]",
+				     get_oper_name(source_p), host);
+
+	}
+	else
+	{
 		rb_dlink_list *list;
 		list = &temp_dlines[aconf->port];
 		rb_dlinkFindDestroy(aconf, list);
@@ -366,7 +379,7 @@ check_dlines(void)
 		if(IsMe(client_p))
 			continue;
 
-		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)) != NULL)
+		if((aconf = find_dline((struct sockaddr *) &client_p->localClient->ip)) != NULL)
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;
@@ -385,7 +398,7 @@ check_dlines(void)
 	{
 		client_p = ptr->data;
 
-		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)) != NULL)
+		if((aconf = find_dline((struct sockaddr *) &client_p->localClient->ip)) != NULL)
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;
@@ -394,4 +407,3 @@ check_dlines(void)
 		}
 	}
 }
-

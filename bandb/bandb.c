@@ -1,7 +1,7 @@
 /* bandb/bandb.c
  *
  * Copyright (C) 2006 Lee Hardy <lee -at- leeh.co.uk>
- * Copyright (C) 2006 ircd-ratbox development team
+ * Copyright (C) 2006-2008 ircd-ratbox development team
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -35,6 +35,7 @@
 #include "rsdb.h"
 #include "common.h"
 
+
 #define MAXPARA 10
 
 typedef enum
@@ -67,14 +68,15 @@ parse_ban(bandb_type type, char *parv[], int parc)
 	const char *oper = NULL;
 	const char *curtime = NULL;
 	const char *reason = NULL;
+	const char *perm = NULL;
 	int para = 1;
 
 	if(type == BANDB_KLINE)
 	{
-		if(parc != 6)
+		if(parc != 7)
 			return;
 	}
-	else if(parc != 5)
+	else if(parc != 6)
 		return;
 
 	mask1 = parv[para++];
@@ -84,11 +86,12 @@ parse_ban(bandb_type type, char *parv[], int parc)
 
 	oper = parv[para++];
 	curtime = parv[para++];
+	perm = parv[para++];
 	reason = parv[para++];
 
 	rsdb_exec(NULL,
-		  "INSERT INTO %s (mask1, mask2, oper, time, reason) VALUES('%Q', '%Q', '%Q', %s, '%Q')",
-		  bandb_table[type], mask1, mask2 ? mask2 : "", oper, curtime, reason);
+		  "INSERT INTO %s (mask1, mask2, oper, time, perm, reason) VALUES('%Q', '%Q', '%Q', %s, %s, '%Q')",
+		  bandb_table[type], mask1, mask2 ? mask2 : "", oper, curtime, perm, reason);
 }
 
 static void
@@ -255,7 +258,7 @@ db_error_cb(const char *errstr)
 	char buf[256];
 	rb_snprintf(buf, sizeof(buf), "! :%s", errstr);
 	rb_helper_write(bandb_helper, buf);
-	rb_sleep(2<<30, 0);
+	rb_sleep(2 << 30, 0);
 	exit(1);
 }
 
@@ -267,7 +270,7 @@ main(int argc, char *argv[])
 	if(bandb_helper == NULL)
 	{
 		fprintf(stderr,
-			"This is ircd-ratbox bandb.  You aren't supposed to run me directly.\n");
+			"This is ircd-ratbox bandb.  You aren't supposed to run me directly. Maybe you want bantool?\n");
 		fprintf(stderr,
 			"However I will print my Id tag $Id$\n");
 		fprintf(stderr, "Have a nice day\n");
@@ -296,7 +299,7 @@ check_schema(void)
 
 		if(!table.row_count)
 			rsdb_exec(NULL,
-				  "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, reason TEXT)",
+				  "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, perm INTEGER, reason TEXT)",
 				  bandb_table[i]);
 	}
 }

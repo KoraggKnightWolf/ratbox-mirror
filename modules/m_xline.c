@@ -1,7 +1,7 @@
 /* modules/m_xline.c
  * 
  *  Copyright (C) 2002-2003 Lee Hardy <lee@leeh.co.uk>
- *  Copyright (C) 2002-2005 ircd-ratbox development team
+ *  Copyright (C) 2002-2008 ircd-ratbox development team
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -50,8 +50,10 @@
 
 static int mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int me_unxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
+static int mo_unxline(struct Client *client_p, struct Client *source_p, int parc,
+		      const char *parv[]);
+static int me_unxline(struct Client *client_p, struct Client *source_p, int parc,
+		      const char *parv[]);
 
 struct Message xline_msgtab = {
 	"XLINE", 0, 0, 0, MFLG_SLOW,
@@ -67,7 +69,7 @@ DECLARE_MODULE_AV1(xline, NULL, NULL, xline_clist, NULL, NULL, "$Revision$");
 
 static int valid_xline(struct Client *, const char *, const char *, int temp);
 static void apply_xline(struct Client *client_p, const char *name, 
-			const char *reason, int temp_time);
+			const char *reason, int temp_time, int perm);
 
 static void remove_xline(struct Client *source_p, const char *gecos);
 
@@ -87,11 +89,11 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	const char *target_server = NULL;
 	int temp_time;
 	int loc = 1;
+	int perm = 0;
 
 	if(!IsOperXline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "xline");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "xline");
 		return 0;
 	}
 
@@ -101,27 +103,39 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		temp_time = 0;
 
+	if(!irccmp(parv[loc], "-perm"))
+	{
+		if(!IsOperAdmin(source_p))
+		{
+			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
+				   "xline");
+			return 0;
+		}
+		perm = 1;
+		loc++;
+	}
+
 	name = parv[loc];
 	loc++;
 
-	/* XLINE <gecos> ON <server> :<reason> */
-	if(parc >= loc+2 && !irccmp(parv[loc], "ON"))
+	/* XLINE [-perm] <gecos> ON <server> :<reason> */
+	if(parc >= loc + 2 && !irccmp(parv[loc], "ON"))
 	{
-		if(!IsOperRemoteBan(source_p))
+		if(!IsOperRemoteBan(source_p) || perm)
 		{
 			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				me.name, source_p->name, "remoteban");
+				   me.name, source_p->name, "remoteban");
 			return 0;
 		}
 
-		target_server = parv[loc+1];
+		target_server = parv[loc + 1];
 		loc += 2;
 	}
 
 	if(parc <= loc || EmptyString(parv[loc]))
 	{
 		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-				me.name, source_p->name, "XLINE");
+			   me.name, source_p->name, "XLINE");
 		return 0;
 	}
 
@@ -130,8 +144,8 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if(target_server != NULL)
 	{
 		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
-				"ENCAP %s XLINE %d %s 2 :%s",
-				target_server, temp_time, name, reason);
+				   "ENCAP %s XLINE %d %s 2 :%s",
+				   target_server, temp_time, name, reason);
 
 		if(!match(target_server, me.name))
 			return 0;
@@ -139,8 +153,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else if(rb_dlink_list_length(&cluster_conf_list) > 0)
 		cluster_generic(source_p, "XLINE",
 				(temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE,
-				"%d %s 2 :%s",
-				temp_time, name, reason);
+				"%d %s 2 :%s", temp_time, name, reason);
 
 	if((aconf = find_xline_mask(name)) != NULL)
 	{
@@ -152,7 +165,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if(!valid_xline(source_p, name, reason, temp_time))
 		return 0;
 
-	apply_xline(source_p, name, reason, temp_time);
+	apply_xline(source_p, name, reason, temp_time, perm);
 
 	return 0;
 }
@@ -173,8 +186,8 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	reason = parv[4];
 
 	if(!find_shared_conf(source_p->username, source_p->host,
-				source_p->servptr->name,
-				(temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE))
+			     source_p->servptr->name,
+			     (temp_time > 0) ? SHARED_TXLINE : SHARED_PXLINE))
 		return 0;
 
 	if(!valid_xline(source_p, name, reason, temp_time))
@@ -188,7 +201,7 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 	}
 
-	apply_xline(source_p, name, reason, temp_time);
+	apply_xline(source_p, name, reason, temp_time, 0);
 	return 0;
 }
 
@@ -199,28 +212,24 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
  * side effects - checks the xline for validity, erroring if needed
  */
 static int
-valid_xline(struct Client *source_p, const char *gecos,
-	    const char *reason,  int temp_time)
+valid_xline(struct Client *source_p, const char *gecos, const char *reason, int temp_time)
 {
 	if(EmptyString(reason))
 	{
 		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-			   get_id(&me, source_p), 
-			   get_id(source_p, source_p), "XLINE");
+			   get_id(&me, source_p), get_id(source_p, source_p), "XLINE");
 		return 0;
 	}
 
 	if(strchr(reason, ':') != NULL)
 	{
-		sendto_one_notice(source_p,
-				  ":Invalid character ':' in comment");
+		sendto_one_notice(source_p, ":Invalid character ':' in comment");
 		return 0;
 	}
 
 	if(strchr(reason, '"'))
 	{
-		sendto_one_notice(source_p,
-				":Invalid character '\"' in comment");
+		sendto_one_notice(source_p, ":Invalid character '\"' in comment");
 		return 0;
 	}
 
@@ -241,8 +250,7 @@ valid_xline(struct Client *source_p, const char *gecos,
 	 */
 	if(!temp_time && strstr(gecos, "\","))
 	{
-		sendto_one_notice(source_p,
-				":Xlines containing \", must be temporary.");
+		sendto_one_notice(source_p, ":Xlines containing \", must be temporary.");
 		return 0;
 	}
 
@@ -290,8 +298,7 @@ check_xlines(void)
 }
 
 void
-apply_xline(struct Client *source_p, const char *name, const char *reason,
-		int temp_time)
+apply_xline(struct Client *source_p, const char *name, const char *reason, int temp_time, int perm)
 {
 	struct ConfItem *aconf;
 	const char *oper = get_oper_name(source_p);
@@ -300,6 +307,9 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 	aconf->status = CONF_XLINE;
 	aconf->host = rb_strdup(name);
 	aconf->passwd = rb_strdup(reason);
+	if(perm)
+		aconf->flags |= CONF_FLAGS_PERMANENT;
+
 	collapse(aconf->host);
 
 	aconf->info.oper = operhash_add(oper);
@@ -310,26 +320,22 @@ apply_xline(struct Client *source_p, const char *name, const char *reason,
 		aconf->hold = rb_current_time() + temp_time;
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-			     "%s added temporary %d min. X-Line for [%s] [%s]",
-			     aconf->info.oper, temp_time / 60,
-			     aconf->host, reason);
-		ilog(L_KLINE, "X %s %d %s %s",
-			aconf->info.oper, temp_time / 60,
-			name, reason);
+				     "%s added temporary %d min. X-Line for [%s] [%s]",
+				     aconf->info.oper, temp_time / 60, aconf->host, reason);
+		ilog(L_KLINE, "X %s %d %s %s", aconf->info.oper, temp_time / 60, name, reason);
 		sendto_one_notice(source_p, ":Added temporary %d min. X-Line [%s]",
-				temp_time / 60, aconf->host);
+				  temp_time / 60, aconf->host);
 	}
 	else
 	{
 		aconf->hold = rb_current_time();
-		bandb_add(BANDB_XLINE, source_p, aconf->host, NULL, reason, NULL);
+		bandb_add(BANDB_XLINE, source_p, aconf->host, NULL, reason, NULL, perm);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
-				aconf->info.oper, aconf->host, aconf->passwd);
-		sendto_one_notice(source_p, ":Added X-Line for [%s] [%s]",
-					aconf->host, aconf->passwd);
-		ilog(L_KLINE, "X %s 0 %s %s",
-			aconf->info.oper, name, reason);
+				     aconf->info.oper, aconf->host, aconf->passwd);
+		sendto_one_notice(source_p, ":Added %s for [%s] [%s]",
+				  perm ? "Locked X-Line" : "X-Line", aconf->host, aconf->passwd);
+		ilog(L_KLINE, "X %s 0 %s %s", aconf->info.oper, name, reason);
 	}
 
 	rb_dlinkAddAlloc(aconf, &xline_conf_list);
@@ -345,8 +351,7 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 {
 	if(!IsOperXline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "xline");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "xline");
 		return 0;
 	}
 
@@ -355,20 +360,18 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		if(!IsOperRemoteBan(source_p))
 		{
 			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				me.name, source_p->name, "remoteban");
+				   me.name, source_p->name, "remoteban");
 			return 0;
 		}
 
 		sendto_match_servs(source_p, parv[3], CAP_ENCAP, NOCAPS,
-				"ENCAP %s UNXLINE %s",
-				parv[3], parv[1]);
+				   "ENCAP %s UNXLINE %s", parv[3], parv[1]);
 
 		if(match(parv[3], me.name) == 0)
 			return 0;
 	}
 	else if(rb_dlink_list_length(&cluster_conf_list))
-		cluster_generic(source_p, "UNXLINE", SHARED_UNXLINE, 
-				"%s", parv[1]);
+		cluster_generic(source_p, "UNXLINE", SHARED_UNXLINE, "%s", parv[1]);
 
 	remove_xline(source_p, parv[1]);
 	return 0;
@@ -386,7 +389,7 @@ me_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	name = parv[1];
 
 	if(!find_shared_conf(source_p->username, source_p->host,
-				source_p->servptr->name, SHARED_UNXLINE))
+			     source_p->servptr->name, SHARED_UNXLINE))
 		return 0;
 
 	remove_xline(source_p, name);
@@ -403,19 +406,21 @@ remove_xline(struct Client *source_p, const char *name)
 	{
 		aconf = ptr->data;
 
-		if(IsConfPermanent(aconf))
+		if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+		{
+			sendto_one(source_p, form_str(ERR_NOPRIVS),
+				   me.name, source_p->name, "unxline");
 			continue;
+		}
 
 		if(irccmp(aconf->host, name))
 			continue;
 
-		sendto_one_notice(source_p, 
-				":X-Line for [%s] is removed", name);
+		sendto_one_notice(source_p, ":X-Line for [%s] is removed", name);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s has removed the X-Line for: [%s]",
 				     get_oper_name(source_p), name);
-		ilog(L_KLINE, "UX %s %s", 
-			get_oper_name(source_p), name);
+		ilog(L_KLINE, "UX %s %s", get_oper_name(source_p), name);
 
 
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
@@ -426,4 +431,3 @@ remove_xline(struct Client *source_p, const char *name)
 		return;
 	}
 }
-
