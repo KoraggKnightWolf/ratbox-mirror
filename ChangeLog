@@ -1,3 +1,11 @@
+androsyn    2008/05/16 16:19:45 UTC	(20080516_2-25383)
+  Log:
+  fix a typo in the help of mkpasswd.c and run through indent as well
+
+  Modified:
+	ircd-ratbox/trunk/tools/mkpasswd.c (File Modified) 
+
+
 androsyn    2008/05/16 16:15:52 UTC	(20080516_1-25381)
   Log:
   some README.FIRST updates
