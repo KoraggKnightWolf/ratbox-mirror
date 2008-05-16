@@ -1,3 +1,11 @@
+androsyn    2008/05/16 16:15:52 UTC	(20080516_1-25381)
+  Log:
+  some README.FIRST updates
+
+  Modified:
+	ircd-ratbox/trunk/README.FIRST (File Modified) 
+
+
 androsyn    2008/05/16 16:12:43 UTC	(20080516_0-25379)
   Log:
   make soft asserts work again
