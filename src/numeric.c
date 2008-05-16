@@ -26,6 +26,10 @@
 
 #include "stdinc.h"
 #include "numeric.h"
+#include "struct.h"
+#include "client.h"
+#include "send.h"
+#include "s_log.h"
 
 #include "messages.tab"
 

@@ -48,6 +48,7 @@
 #include "ircd.h"
 #include "class.h"
 #include "s_gline.h"
+#include "s_log.h"
 
 rb_dlink_list shared_conf_list;
 rb_dlink_list cluster_conf_list;

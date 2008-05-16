@@ -37,6 +37,7 @@
 #include "hook.h"
 #include "modules.h"
 #include "cache.h"
+#include "s_log.h"
 
 
 static int m_links(struct Client *, struct Client *, int, const char **);

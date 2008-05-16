@@ -50,6 +50,7 @@
 #include "reject.h"
 #include "whowas.h"
 #include "scache.h"
+#include "s_log.h"
 
 static int m_stats (struct Client *, struct Client *, int, const char **);
 

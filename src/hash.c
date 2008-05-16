@@ -36,6 +36,7 @@
 #include "send.h"
 #include "cache.h"
 #include "s_newconf.h"
+#include "s_log.h"
 
 #define hash_nick(x) (fnv_hash_upper((const unsigned char *)(x), U_MAX_BITS, 0))
 #define hash_id(x) (fnv_hash((const unsigned char *)(x), U_MAX_BITS, 0))

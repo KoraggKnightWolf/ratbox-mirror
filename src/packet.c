@@ -34,6 +34,7 @@
 #include "match.h"
 #include "hook.h"
 #include "send.h"
+#include "s_log.h"
 
 static char readBuf[READBUF_SIZE];
 static void client_dopacket(struct Client *client_p, char *buffer, size_t length);
@@ -162,10 +163,10 @@ flood_recalc(void *unused)
 	{
 		client_p = ptr->data;
 
-		if(unlikely(IsMe(client_p)))
+		if(rb_unlikely(IsMe(client_p)))
 			continue;
 			
-		if(unlikely(client_p->localClient == NULL))
+		if(rb_unlikely(client_p->localClient == NULL))
 			continue;
 		
 		if(IsFloodDone(client_p))
@@ -181,7 +182,7 @@ flood_recalc(void *unused)
 
 		parse_client_queued(client_p);
 		
-		if(unlikely(IsAnyDead(client_p)))
+		if(rb_unlikely(IsAnyDead(client_p)))
 			continue;
 
 		if(!IsFloodDone(client_p) && ((client_p->localClient->firsttime + 30) < rb_current_time()))

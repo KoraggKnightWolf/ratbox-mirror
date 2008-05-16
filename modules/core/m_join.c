@@ -37,6 +37,7 @@
 #include "s_conf.h"
 #include "parse.h"
 #include "modules.h"
+#include "s_log.h"
 
 static int m_join(struct Client *, struct Client *, int, const char **);
 static int ms_join(struct Client *, struct Client *, int, const char **);
