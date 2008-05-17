@@ -79,7 +79,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 	int loc = 1;
 	int perm = 0;
 
-	/* RESV [time|-perm] <name> [ON <server>] :<reason> */
+	/* RESV [time|-lock] <name> [ON <server>] :<reason> */
 
 	if((temp_time = valid_temp_time(parv[loc])) >= 0)
 		loc++;
@@ -87,7 +87,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 	else
 		temp_time = 0;
 
-	if(!irccmp(parv[loc], "-perm"))
+	if(!irccmp(parv[loc], "-lock"))
 	{
 		if(!IsOperAdmin(source_p))
 		{

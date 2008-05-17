@@ -112,7 +112,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		tkline_time = 0;
 
-	if(!irccmp(parv[loc], "-perm"))
+	if(!irccmp(parv[loc], "-lock"))
 	{
 		if(!IsOperAdmin(source_p))
 		{

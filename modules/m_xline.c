@@ -103,7 +103,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		temp_time = 0;
 
-	if(!irccmp(parv[loc], "-perm"))
+	if(!irccmp(parv[loc], "-lock"))
 	{
 		if(!IsOperAdmin(source_p))
 		{
@@ -118,7 +118,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	name = parv[loc];
 	loc++;
 
-	/* XLINE [-perm] <gecos> ON <server> :<reason> */
+	/* XLINE [-lock] <gecos> ON <server> :<reason> */
 	if(parc >= loc + 2 && !irccmp(parv[loc], "ON"))
 	{
 		if(!IsOperRemoteBan(source_p))

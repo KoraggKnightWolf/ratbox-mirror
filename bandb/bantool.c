@@ -473,18 +473,17 @@ import_config(const char *conf, int id)
 		f_oper = getfield(NULL);
 		f_time = strip_quotes(f_oper + strlen(f_oper) + 2);
 
-		/* attempt to fix useless klines set by opers not paying attention */
+		/* meh */
 		if(id == BANDB_KLINE || id == BANDB_KLINE_PERM)
 		{
 			if(strstr(f_mask1, "!") != NULL)
 			{
 				fprintf(stderr,
-					"* Attempting to fix INVALID KLINE %s@%s set by %s\n",
+					"* SKIPPING INVALID KLINE %s@%s set by %s\n",
 					f_mask1, f_mask2, f_oper);
-				while (strstr(f_mask1, "!") != NULL)
-					f_mask1++;
-				fprintf(stderr, "* I think i fixed it, please verify: %s@%s \n",
+				fprintf(stderr, "  You may wish to re-apply it correctly. \n",
 					f_mask1, f_mask2);
+				continue;
 			}
 		}
 
