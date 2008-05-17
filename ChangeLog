@@ -1,3 +1,18 @@
+androsyn    2008/05/17 18:47:52 UTC	(20080517_2-25393)
+  Log:
+  From dubkat: 
+  - rename -perm to -lock.
+  - don't attempt to fix invalid klines in bantool
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 jilles      2008/05/17 14:05:41 UTC	(20080517_1-25391)
   Log:
   Improve interaction of -perm with ON and cluster{}.
