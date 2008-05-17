@@ -1,3 +1,15 @@
+jilles      2008/05/17 13:42:43 UTC	(20080517_0-25389)
+  Log:
+  -perm: ERR_NOPRIVS should show the missing privilege, not the command name
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 androsyn    2008/05/16 16:24:00 UTC	(20080516_3-25385)
   Log:
   Add dubkat's patch to do admin only perm X/D/K/Q lines.  This reimplements the 
