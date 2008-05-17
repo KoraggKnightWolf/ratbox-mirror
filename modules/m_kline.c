@@ -131,8 +131,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(parc >= loc + 2 && !irccmp(parv[loc], "ON"))
 	{
-		/* cannot set PERM bans on remote server */
-		if(!IsOperRemoteBan(source_p) || perm)
+		if(!IsOperRemoteBan(source_p))
 		{
 			sendto_one(source_p, form_str(ERR_NOPRIVS),
 				   me.name, source_p->name, "remoteban");
@@ -141,6 +140,12 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 		target_server = parv[loc + 1];
 		loc += 2;
+
+		if(perm && irccmp(target_server, me.name))
+		{
+			sendto_one_notice(source_p, ":Cannot set locked bans on remote servers");
+			return 0;
+		}
 	}
 
 	if(parc <= loc || EmptyString(parv[loc]))
@@ -152,7 +157,9 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	reason = LOCAL_COPY(parv[loc]);
 
-	if(target_server != NULL)
+	if(perm)
+		;
+	else if(target_server != NULL)
 	{
 		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
 				   "ENCAP %s KLINE %d %s %s :%s",

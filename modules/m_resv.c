@@ -113,6 +113,12 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		target_server = parv[loc + 1];
 		loc += 2;
+
+		if(perm && irccmp(target_server, me.name))
+		{
+			sendto_one_notice(source_p, ":Cannot set locked bans on remote servers");
+			return 0;
+		}
 	}
 
 	if(parc <= loc || EmptyString(parv[loc]))
@@ -124,7 +130,9 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 	reason = parv[loc];
 
 	/* remote resv.. */
-	if(target_server)
+	if(perm)
+		;
+	else if(target_server)
 	{
 		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
 				   "ENCAP %s RESV %d %s 0 :%s",
