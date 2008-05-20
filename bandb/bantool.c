@@ -481,8 +481,7 @@ import_config(const char *conf, int id)
 				fprintf(stderr,
 					"* SKIPPING INVALID KLINE %s@%s set by %s\n",
 					f_mask1, f_mask2, f_oper);
-				fprintf(stderr, "  You may wish to re-apply it correctly. \n",
-					f_mask1, f_mask2);
+				fprintf(stderr, "  You may wish to re-apply it correctly.\n");
 				continue;
 			}
 		}
