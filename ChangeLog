@@ -1,3 +1,11 @@
+androsyn    2008/05/20 12:50:53 UTC	(20080520_0-25395)
+  Log:
+  remove unused arguments
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 androsyn    2008/05/17 18:47:52 UTC	(20080517_2-25393)
   Log:
   From dubkat: 
