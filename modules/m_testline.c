@@ -122,12 +122,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	/* parses as an IP, check for a dline */
 	if((type = parse_netmask(host, (struct sockaddr *)&ip, &host_mask)) != HM_HOST)
 	{
-#ifdef RB_IPV6
-		if(type == HM_IPV6)
-			aconf = find_dline((struct sockaddr *)&ip);
-		else
-#endif
-			aconf = find_dline((struct sockaddr *)&ip);
+		aconf = find_dline((struct sockaddr *)&ip);
 
 		if(aconf && aconf->status & CONF_DLINE)
 		{
