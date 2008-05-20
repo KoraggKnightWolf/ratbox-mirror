@@ -1,3 +1,11 @@
+androsyn    2008/05/20 15:54:19 UTC	(20080520_2-25399)
+  Log:
+  that #ifdef RB_IPV6 was in fact quite pointless
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+
+
 androsyn    2008/05/20 14:54:06 UTC	(20080520_1-25397)
   Log:
   add / to KWILD_C and unbreak cidr klines
