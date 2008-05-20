@@ -1,3 +1,16 @@
+androsyn    2008/05/20 23:25:54 UTC	(20080520_3-25424)
+  Log:
+  Update sqlite to the latest version, add shell.c and build the sqlite3 command line as ratbox-sqlite3
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/sqlite3/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/shell.c (File Added) 
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.c (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.h (File Modified) 
+
+
 androsyn    2008/05/20 15:54:19 UTC	(20080520_2-25399)
   Log:
   that #ifdef RB_IPV6 was in fact quite pointless
