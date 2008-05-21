@@ -1,3 +1,17 @@
+jilles      2008/05/21 21:50:07 UTC	(20080521_2-25430)
+  Log:
+  Make removing locked bans more consistent.
+  Admins may remove any kind of locked ban, non-admins
+  get an error that they may not remove locked bans.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 jilles      2008/05/21 21:27:24 UTC	(20080521_1-25428)
   Log:
   Give an error message for various invalid klines instead of silently ignoring them.
