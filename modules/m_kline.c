@@ -330,7 +330,7 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		return 0;
 	}
 
-	if((host = strchr(h, '@')) || *h == '*')
+	if((host = strchr(h, '@')) || *h == '*' || strchr(h, '.') || strchr(h, ':'))
 	{
 		/* Explicit user@host mask given */
 
@@ -599,7 +599,7 @@ find_user_host(const char *userhost, char *luser, char *lhost)
 		/* no '@', no '.', so its not a user@host or host, therefore
 		 * its a nick, which support was removed for.
 		 */
-		if(strchr(userhost, '.') == NULL)
+		if(strchr(userhost, '.') == NULL && strchr(userhost, ':') == NULL)
 			return 0;
 
 		luser[0] = '*';	/* no @ found, assume its *@somehost */
