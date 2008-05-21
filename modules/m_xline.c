@@ -437,4 +437,6 @@ remove_xline(struct Client *source_p, const char *name)
 		rb_dlinkDestroy(ptr, &xline_conf_list);
 		return;
 	}
+
+	sendto_one_notice(source_p, ":No X-Line for %s", name);
 }
