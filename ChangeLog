@@ -1,3 +1,12 @@
+jilles      2008/05/21 21:27:24 UTC	(20080521_1-25428)
+  Log:
+  Give an error message for various invalid klines instead of silently ignoring them.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+
+
 jilles      2008/05/21 21:19:48 UTC	(20080521_0-25426)
   Log:
   Allow kline/unkline on a bare host or address (assumes *@host).
