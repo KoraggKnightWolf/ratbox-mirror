@@ -1,3 +1,15 @@
+jilles      2008/05/21 21:19:48 UTC	(20080521_0-25426)
+  Log:
+  Allow kline/unkline on a bare host or address (assumes *@host).
+  This was already possible for some.host klines, but not
+  for unklines or some:ipv6 klines.
+  from charybdis (jilles) a while ago
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+
+
 androsyn    2008/05/20 23:25:54 UTC	(20080520_3-25424)
   Log:
   Update sqlite to the latest version, add shell.c and build the sqlite3 command line as ratbox-sqlite3
