@@ -61,7 +61,7 @@ mapi_clist_av1 kline_clist[] = { &kline_msgtab, &unkline_msgtab, NULL };
 DECLARE_MODULE_AV1(kline, NULL, NULL, kline_clist, NULL, NULL, "$Revision$");
 
 /* Local function prototypes */
-static int find_user_host(const char *userhost, char *user, char *host);
+static int find_user_host(struct Client *source_p, const char *userhost, char *user, char *host);
 static int valid_comment(struct Client *source_p, char *comment);
 static int valid_user_host(struct Client *source_p, const char *user, const char *host);
 static int valid_wild_card(struct Client *source_p, const char *user, const char *host);
@@ -124,7 +124,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		loc++;
 	}
 
-	if(find_user_host(parv[loc], user, host) == 0)
+	if(find_user_host(source_p, parv[loc], user, host) == 0)
 		return 0;
 
 	loc++;
@@ -570,7 +570,7 @@ mangle_wildcard_to_cidr(const char *text)
  * side effects -
  */
 static int
-find_user_host(const char *userhost, char *luser, char *lhost)
+find_user_host(struct Client *source_p, const char *userhost, char *luser, char *lhost)
 {
 	char *hostp;
 	const char *ptr;
@@ -600,7 +600,10 @@ find_user_host(const char *userhost, char *luser, char *lhost)
 		 * its a nick, which support was removed for.
 		 */
 		if(strchr(userhost, '.') == NULL && strchr(userhost, ':') == NULL)
+		{
+			sendto_one_notice(source_p, ":K-Line must be a user@host or host");
 			return 0;
+		}
 
 		luser[0] = '*';	/* no @ found, assume its *@somehost */
 		luser[1] = '\0';
@@ -629,13 +632,19 @@ valid_user_host(struct Client *source_p, const char *luser, const char *lhost)
 	for (p = luser; *p; p++)
 	{
 		if(!IsUserChar(*p) && !IsKWildChar(*p))
+		{
+			sendto_one_notice(source_p, ":Invalid K-Line");
 			return 0;
+		}
 	}
 
 	for (p = lhost; *p; p++)
 	{
 		if(!IsHostChar(*p) && !IsKWildChar(*p))
+		{
+			sendto_one_notice(source_p, ":Invalid K-Line");
 			return 0;
+		}
 	}
 
 	return 1;
