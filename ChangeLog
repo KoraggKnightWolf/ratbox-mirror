@@ -1,3 +1,12 @@
+jilles      2008/05/21 21:53:24 UTC	(20080521_3-25432)
+  Log:
+  Put back error message if unxline cannot find the xline.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 jilles      2008/05/21 21:50:07 UTC	(20080521_2-25430)
   Log:
   Make removing locked bans more consistent.
