@@ -787,11 +787,14 @@ remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 			if(aconf->flags & CONF_FLAGS_TEMPORARY)
 				continue;
 
-			if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
-				continue;
-
 			if((aconf->user && irccmp(user, aconf->user)) || irccmp(host, aconf->host))
 				continue;
+
+			if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+			{
+				sendto_one_notice(source_p, ":Cannot remove locked K-Line %s@%s", user, host);
+				return;
+			}
 
 			bandb_del(BANDB_KLINE, aconf->user, aconf->host);
 			delete_one_address_conf(host, aconf);

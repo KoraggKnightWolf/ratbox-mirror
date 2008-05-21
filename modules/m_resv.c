@@ -379,10 +379,15 @@ remove_resv(struct Client *source_p, const char *name)
 
 	if(IsChannelName(name))
 	{
-		if(((aconf = hash_find_resv(name)) == NULL) ||
-		   (IsConfPermanent(aconf) || !IsOperAdmin(source_p)))
+		if((aconf = hash_find_resv(name)) == NULL)
 		{
 			sendto_one_notice(source_p, ":No RESV for %s", name);
+			return;
+		}
+
+		if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+		{
+			sendto_one_notice(source_p, ":Cannot remove locked RESV %s", name);
 			return;
 		}
 
@@ -407,9 +412,15 @@ remove_resv(struct Client *source_p, const char *name)
 				break;
 		}
 
-		if(aconf == NULL || IsConfPermanent(aconf))
+		if(aconf == NULL)
 		{
 			sendto_one_notice(source_p, ":No RESV for %s", name);
+			return;
+		}
+
+		if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+		{
+			sendto_one_notice(source_p, ":Cannot remove locked RESV %s", name);
 			return;
 		}
 

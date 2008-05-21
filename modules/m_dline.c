@@ -304,9 +304,9 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		return 0;
 	}
 
-	if(IsConfPermanent(aconf))
+	if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
 	{
-		sendto_one_notice(source_p, ":Cannot remove permanent D-Line %s", cidr);
+		sendto_one_notice(source_p, ":Cannot remove locked D-Line %s", cidr);
 		return 0;
 	}
 

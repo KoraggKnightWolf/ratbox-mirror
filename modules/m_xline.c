@@ -414,15 +414,14 @@ remove_xline(struct Client *source_p, const char *name)
 	{
 		aconf = ptr->data;
 
-		if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
-		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "unxline");
-			continue;
-		}
-
 		if(irccmp(aconf->host, name))
 			continue;
+
+		if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+		{
+			sendto_one_notice(source_p, ":Cannot remove locked X-Line %s", name);
+			return;
+		}
 
 		sendto_one_notice(source_p, ":X-Line for [%s] is removed", name);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
