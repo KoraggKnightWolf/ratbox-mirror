@@ -1,3 +1,12 @@
+androsyn    2008/05/28 18:37:23 UTC	(20080528_0-25474)
+  Log:
+  update patchlevel and RELNOTES for beta5
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 jilles      2008/05/21 21:53:24 UTC	(20080521_3-25432)
   Log:
   Put back error message if unxline cannot find the xline.
