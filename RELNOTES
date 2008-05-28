@@ -6,6 +6,22 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0.0beta5
+- fix things so that --enable-assert=soft compiles again
+- fix a typo in mkpasswd
+- add admin only -lock klines, doing KLINE -lock will allow admins to
+  add klines that normal opers cannot remove. 
+- modify bantool to have a -u option that updates the database schema.
+  if upgrading from previous betas, this needs to be run to support
+  the -lock kline changes.
+- fix cidr klines so they work again
+- update included sqlite3 to the latest revision
+- allow kline/unkline of a bare host or address, this gets treated as 
+  *@host
+- report when an invalid kline is passed, instead of silently ignoring
+- fix --enable-assert=soft
+- fix libratbox build on OS X and others
+
 -- ircd-ratbox-3.0.0beta4
 - some configure/makefile changes that are useful for package maintainers
 - various bantool fixes
