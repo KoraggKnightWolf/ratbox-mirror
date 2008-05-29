@@ -1,3 +1,11 @@
+androsyn    2008/05/29 15:00:29 UTC	(20080529_0-25486)
+  Log:
+  fix a warning with passing a time_t to a format expecting a long int
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2008/05/28 18:37:23 UTC	(20080528_0-25474)
   Log:
   update patchlevel and RELNOTES for beta5
