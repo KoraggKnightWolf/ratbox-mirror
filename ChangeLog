@@ -1,3 +1,14 @@
+androsyn    2008/06/03 19:19:42 UTC	(20080603_4-25512)
+  Log:
+  tell people trying to use lock and temps together to rtfm
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 androsyn    2008/06/03 19:17:28 UTC	(20080603_3-25510)
   Log:
   Make temp k/d/x/resvs mutually exclusive to lock.  Also rename CONF_FLAGS_PERMANENT to CONF_FLAGS_LOCKED
