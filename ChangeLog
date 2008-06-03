@@ -1,3 +1,14 @@
+androsyn    2008/06/03 15:21:40 UTC	(20080603_0-25504)
+  Log:
+  Change XLINE -lock to work as follows:
+  XLINE mask -lock :reason
+  This allows people to actually XLINE -lock if necessary.  Also this makes -lock and ON server mutually exclusive.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 androsyn    2008/05/29 15:00:29 UTC	(20080529_0-25486)
   Log:
   fix a warning with passing a time_t to a format expecting a long int
