@@ -1,3 +1,28 @@
+androsyn    2008/06/03 16:17:12 UTC	(20080603_1-25506)
+  Log:
+  Change -lock to lock.  Change order of lock command to be
+  as follows:
+  
+  KLINE user@host lock :reason
+  DLINE ip lock :reason
+  RESV nick|#channel lock :reason
+  XLINE gecos lock :reason
+  
+  Also update help files to reflect these changes
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/dline (File Modified) 
+	ircd-ratbox/trunk/help/opers/kline (File Modified) 
+	ircd-ratbox/trunk/help/opers/resv (File Modified) 
+	ircd-ratbox/trunk/help/opers/xline (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 androsyn    2008/06/03 15:21:40 UTC	(20080603_0-25504)
   Log:
   Change XLINE -lock to work as follows:
