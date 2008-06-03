@@ -91,17 +91,6 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if((tdline_time = valid_temp_time(parv[loc])) >= 0)
 		loc++;
 
-	if(!irccmp(parv[loc], "-lock"))
-	{
-		if(!IsOperAdmin(source_p))
-		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
-				   "admin");
-			return 0;
-		}
-		perm = 1;
-		loc++;
-	}
 
 	if(parc < loc + 1)
 	{
@@ -121,7 +110,19 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	loc++;
 
-	if(parc >= loc + 1)	/* host :reason */
+	if(parc >= loc + 2 && !irccmp(parv[loc], "lock"))
+	{
+		if(!IsOperAdmin(source_p))
+		{
+			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
+				   "admin");
+			return 0;
+		}
+		perm = 1;
+		loc++;
+	}
+
+	if(parc >= loc + 1)	/* reason */
 	{
 		if(!EmptyString(parv[loc]))
 			reason = LOCAL_COPY(parv[loc]);

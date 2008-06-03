@@ -112,18 +112,6 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		tkline_time = 0;
 
-	if(!irccmp(parv[loc], "-lock"))
-	{
-		if(!IsOperAdmin(source_p))
-		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
-				   "admin");
-			return 0;
-		}
-		perm = 1;
-		loc++;
-	}
-
 	if(find_user_host(source_p, parv[loc], user, host) == 0)
 		return 0;
 
@@ -140,12 +128,17 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 		target_server = parv[loc + 1];
 		loc += 2;
-
-		if(perm && irccmp(target_server, me.name))
+	} 
+	else if(parc >= loc + 1 && !irccmp(parv[loc], "lock"))
+	{
+		if(!IsOperAdmin(source_p))
 		{
-			sendto_one_notice(source_p, ":Cannot set locked bans on remote servers");
+			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
+				   "admin");
 			return 0;
 		}
+		perm = 1;
+		loc++;
 	}
 
 	if(parc <= loc || EmptyString(parv[loc]))

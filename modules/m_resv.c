@@ -79,25 +79,13 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 	int loc = 1;
 	int perm = 0;
 
-	/* RESV [time|-lock] <name> [ON <server>] :<reason> */
+	/* RESV [time] <name> [ON <server>] :<reason> */
 
 	if((temp_time = valid_temp_time(parv[loc])) >= 0)
 		loc++;
 	/* we just set temp_time to -1! */
 	else
 		temp_time = 0;
-
-	if(!irccmp(parv[loc], "-lock"))
-	{
-		if(!IsOperAdmin(source_p))
-		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
-				   "admin");
-			return 0;
-		}
-		perm = 1;
-		loc++;
-	}
 
 	name = parv[loc];
 	loc++;
@@ -119,6 +107,17 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 			sendto_one_notice(source_p, ":Cannot set locked bans on remote servers");
 			return 0;
 		}
+	} 
+	else if((parc >= loc + 1) && (irccmp(parv[loc], "lock") == 0))
+	{
+		if(!IsOperAdmin(source_p))
+		{
+			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
+				   "admin");
+			return 0;
+		}
+		perm = 1;
+		loc++;
 	}
 
 	if(parc <= loc || EmptyString(parv[loc]))

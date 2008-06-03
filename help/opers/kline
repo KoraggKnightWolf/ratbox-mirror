@@ -1,6 +1,6 @@
 KLINE <user@host> :[reason] [| oper reason]
 
-Adds a KLINE to the kline.conf file which will ban the
+Adds a KLINE to the kline database which will ban the
 specified user from using this server.  The banned
 client will receive a message saying he/she is banned
 with reason [reason].
@@ -22,5 +22,12 @@ KLINE 10 <user@host> :cool off for 10 minutes
 KLINE [duration] <user@host> ON irc.server :[reason] [| oper reason]
 will kline the user on irc.server if irc.server accepts
 remote klines. irc.server can contain wildcards.
+
+Administrators can also add a locked KLINE with the following 
+syntax:
+
+KLINE <user@host> lock :[reason]
+
+A locked KLINE can only be removed by an administrator.
 
 - Requires Oper Priv: K
