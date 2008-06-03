@@ -93,7 +93,7 @@ struct ConfItem
 #define CONF_FLAGS_COMPRESSED           0x00004000
 #define CONF_FLAGS_TEMPORARY            0x00008000
 #define CONF_FLAGS_TB			0x00010000
-#define CONF_FLAGS_PERMANENT		0x00020000
+#define CONF_FLAGS_LOCKED		0x00020000
 
 /* Macros for struct ConfItem */
 #define IsConfBan(x)		((x)->status & (CONF_KILL|CONF_XLINE|CONF_DLINE|\
@@ -114,7 +114,7 @@ struct ConfItem
 #define IsConfEncrypted(x)      ((x)->flags & CONF_FLAGS_ENCRYPTED)
 #define IsConfCompressed(x)     ((x)->flags & CONF_FLAGS_COMPRESSED)
 #define IsConfTburst(x)		((x)->flags & CONF_FLAGS_TB)
-#define IsConfPermanent(x)	((x)->flags & CONF_FLAGS_PERMANENT)
+#define IsConfLocked(x)		((x)->flags & CONF_FLAGS_LOCKED)
 
 /* flag definitions for opers now in client.h */
 

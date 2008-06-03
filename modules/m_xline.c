@@ -310,7 +310,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason, int t
 	aconf->host = rb_strdup(name);
 	aconf->passwd = rb_strdup(reason);
 	if(perm)
-		aconf->flags |= CONF_FLAGS_PERMANENT;
+		aconf->flags |= CONF_FLAGS_LOCKED;
 
 	collapse(aconf->host);
 
@@ -411,7 +411,7 @@ remove_xline(struct Client *source_p, const char *name)
 		if(irccmp(aconf->host, name))
 			continue;
 
-		if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+		if(IsConfLocked(aconf) && !IsOperAdmin(source_p))
 		{
 			sendto_one_notice(source_p, ":Cannot remove locked X-Line %s", name);
 			return;

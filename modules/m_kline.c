@@ -418,7 +418,7 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	aconf->info.oper = operhash_add(oper);
 	aconf->hold = rb_current_time();
 	if(perm)
-		aconf->flags |= CONF_FLAGS_PERMANENT;
+		aconf->flags |= CONF_FLAGS_LOCKED;
 
 	if(EmptyString(oper_reason))
 	{
@@ -783,7 +783,7 @@ remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 			if((aconf->user && irccmp(user, aconf->user)) || irccmp(host, aconf->host))
 				continue;
 
-			if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+			if(IsConfLocked(aconf) && !IsOperAdmin(source_p))
 			{
 				sendto_one_notice(source_p, ":Cannot remove locked K-Line %s@%s", user, host);
 				return;

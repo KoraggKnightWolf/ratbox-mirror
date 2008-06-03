@@ -244,7 +244,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		aconf->passwd = rb_strdup(reason);
 		aconf->info.oper = operhash_add(oper);
 		if(perm)
-			aconf->flags |= CONF_FLAGS_PERMANENT;
+			aconf->flags |= CONF_FLAGS_LOCKED;
 
 		add_to_hash(HASH_RESV, aconf->host, aconf);
 
@@ -299,7 +299,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		aconf->passwd = rb_strdup(reason);
 		aconf->info.oper = operhash_add(oper);
 		if(perm)
-			aconf->flags |= CONF_FLAGS_PERMANENT;
+			aconf->flags |= CONF_FLAGS_LOCKED;
 
 		rb_dlinkAddAlloc(aconf, &resv_conf_list);
 
@@ -384,7 +384,7 @@ remove_resv(struct Client *source_p, const char *name)
 			return;
 		}
 
-		if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+		if(IsConfLocked(aconf) && !IsOperAdmin(source_p))
 		{
 			sendto_one_notice(source_p, ":Cannot remove locked RESV %s", name);
 			return;
@@ -417,7 +417,7 @@ remove_resv(struct Client *source_p, const char *name)
 			return;
 		}
 
-		if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+		if(IsConfLocked(aconf) && !IsOperAdmin(source_p))
 		{
 			sendto_one_notice(source_p, ":Cannot remove locked RESV %s", name);
 			return;

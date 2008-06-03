@@ -196,7 +196,7 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	oper = get_oper_name(source_p);
 	aconf->info.oper = operhash_add(oper);
 	if(perm)
-		aconf->flags |= CONF_FLAGS_PERMANENT;
+		aconf->flags |= CONF_FLAGS_LOCKED;
 
 	/* Look for an oper reason */
 	if((oper_reason = strchr(reason, '|')) != NULL)
@@ -305,7 +305,7 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		return 0;
 	}
 
-	if(IsConfPermanent(aconf) && !IsOperAdmin(source_p))
+	if(IsConfLocked(aconf) && !IsOperAdmin(source_p))
 	{
 		sendto_one_notice(source_p, ":Cannot remove locked D-Line %s", cidr);
 		return 0;
