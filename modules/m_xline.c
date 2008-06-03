@@ -130,7 +130,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		}
 		if(temp_time > 0)
 		{
-			sendto_one_notice(source_p, ":Lock and temporary xlines are mutually exclusive");
+			sendto_one_notice(source_p, ":Lock and temporary xlines are mutually exclusive. See /QUOTE HELP XLINE");
 			return 0;
 		}
 		locked = 1;

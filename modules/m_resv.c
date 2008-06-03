@@ -118,7 +118,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 		}
 		if(temp_time > 0)
 		{
-			sendto_one_notice(source_p, ":Lock and temporary resv are mutually exclusive");
+			sendto_one_notice(source_p, ":Lock and temporary resv are mutually exclusive. See /QUOTE HELP RESV");
 			return 0;
 		}
 		locked = 1;

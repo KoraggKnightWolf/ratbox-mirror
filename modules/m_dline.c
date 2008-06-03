@@ -121,7 +121,7 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		
 		if(tdline_time > 0)
 		{
-			sendto_one_notice(source_p, ":Lock and temporary dlines are mutually exclusive");
+			sendto_one_notice(source_p, ":Lock and temporary dlines are mutually exclusive. See /QUOTE HELP DLINE");
 			return 0;
 		}
 		locked = 1;
