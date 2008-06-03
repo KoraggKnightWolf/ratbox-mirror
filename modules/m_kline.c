@@ -98,7 +98,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	struct ConfItem *aconf;
 	int tkline_time = 0;
 	int loc = 1;
-	int perm = 0;
+	int locked = 0;
 
 	if(!IsOperK(source_p))
 	{
@@ -137,7 +137,12 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 				   "admin");
 			return 0;
 		}
-		perm = 1;
+		if(tkline_time > 0)
+		{
+			sendto_one_notice(source_p, ":Lock and temporary klines are mutually exclusive");
+			return 0;
+		}
+		locked = 1;
 		loc++;
 	}
 
@@ -150,7 +155,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	reason = LOCAL_COPY(parv[loc]);
 
-	if(perm)
+	if(locked)
 		;
 	else if(target_server != NULL)
 	{
@@ -205,7 +210,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
 		aconf->passwd = rb_strdup(buffer);
-		apply_kline(source_p, aconf, reason, oper_reason, current_date, perm);
+		apply_kline(source_p, aconf, reason, oper_reason, current_date, locked);
 	}
 
 	if(ConfigFileEntry.kline_delay)
@@ -411,13 +416,13 @@ me_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
  */
 static void
 apply_kline(struct Client *source_p, struct ConfItem *aconf,
-	    const char *reason, const char *oper_reason, const char *current_date, int perm)
+	    const char *reason, const char *oper_reason, const char *current_date, int locked)
 {
 	const char *oper = get_oper_name(source_p);
 
 	aconf->info.oper = operhash_add(oper);
 	aconf->hold = rb_current_time();
-	if(perm)
+	if(locked)
 		aconf->flags |= CONF_FLAGS_LOCKED;
 
 	if(EmptyString(oper_reason))
@@ -439,11 +444,11 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	}
 
 	sendto_one_notice(source_p, ":Added %s [%s@%s]",
-			  perm ? "Locked K-Line" : "K-Line", aconf->user, aconf->host);
+			  locked ? "Locked K-Line" : "K-Line", aconf->user, aconf->host);
 
 	add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
 	bandb_add(BANDB_KLINE, source_p, aconf->user, aconf->host,
-		  reason, EmptyString(oper_reason) ? NULL : oper_reason, perm);
+		  reason, EmptyString(oper_reason) ? NULL : oper_reason, locked);
 }
 
 /* apply_tkline()

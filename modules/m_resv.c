@@ -77,7 +77,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 	const char *target_server = NULL;
 	int temp_time;
 	int loc = 1;
-	int perm = 0;
+	int locked = 0;
 
 	/* RESV [time] <name> [ON <server>] :<reason> */
 
@@ -102,7 +102,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 		target_server = parv[loc + 1];
 		loc += 2;
 
-		if(perm && irccmp(target_server, me.name))
+		if(locked && irccmp(target_server, me.name))
 		{
 			sendto_one_notice(source_p, ":Cannot set locked bans on remote servers");
 			return 0;
@@ -116,7 +116,12 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 				   "admin");
 			return 0;
 		}
-		perm = 1;
+		if(temp_time > 0)
+		{
+			sendto_one_notice(source_p, ":Lock and temporary resv are mutually exclusive");
+			return 0;
+		}
+		locked = 1;
 		loc++;
 	}
 
@@ -129,7 +134,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 	reason = parv[loc];
 
 	/* remote resv.. */
-	if(perm)
+	if(locked)
 		;
 	else if(target_server)
 	{
@@ -145,7 +150,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 				(temp_time > 0) ? SHARED_TRESV : SHARED_PRESV,
 				"%d %s 0 :%s", temp_time, name, reason);
 
-	parse_resv(source_p, name, reason, temp_time, perm);
+	parse_resv(source_p, name, reason, temp_time, locked);
 
 	return 0;
 }
@@ -194,7 +199,7 @@ notify_resv(struct Client *source_p, const char *name, const char *reason, int t
  * side effects - will parse the resv and create it if valid
  */
 static void
-parse_resv(struct Client *source_p, const char *name, const char *reason, int temp_time, int perm)
+parse_resv(struct Client *source_p, const char *name, const char *reason, int temp_time, int locked)
 {
 	struct ConfItem *aconf;
 	const char *oper = get_oper_name(source_p);
@@ -243,7 +248,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		aconf->host = rb_strdup(name);
 		aconf->passwd = rb_strdup(reason);
 		aconf->info.oper = operhash_add(oper);
-		if(perm)
+		if(locked)
 			aconf->flags |= CONF_FLAGS_LOCKED;
 
 		add_to_hash(HASH_RESV, aconf->host, aconf);
@@ -258,7 +263,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		else
 		{
 			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL,
-				  perm);
+				  locked);
 			aconf->hold = rb_current_time();
 		}
 	}
@@ -298,7 +303,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		aconf->host = rb_strdup(name);
 		aconf->passwd = rb_strdup(reason);
 		aconf->info.oper = operhash_add(oper);
-		if(perm)
+		if(locked)
 			aconf->flags |= CONF_FLAGS_LOCKED;
 
 		rb_dlinkAddAlloc(aconf, &resv_conf_list);
@@ -313,7 +318,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		else
 		{
 			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL,
-				  perm);
+				  locked);
 			aconf->hold = rb_current_time();
 		}
 

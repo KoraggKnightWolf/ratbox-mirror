@@ -80,7 +80,7 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	const char *oper;
 	int tdline_time = 0;
 	int loc = 1;
-	int perm = 0;
+	int locked = 0;
 
 	if(!IsOperK(source_p))
 	{
@@ -118,7 +118,13 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 				   "admin");
 			return 0;
 		}
-		perm = 1;
+		
+		if(tdline_time > 0)
+		{
+			sendto_one_notice(source_p, ":Lock and temporary dlines are mutually exclusive");
+			return 0;
+		}
+		locked = 1;
 		loc++;
 	}
 
@@ -195,7 +201,7 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	oper = get_oper_name(source_p);
 	aconf->info.oper = operhash_add(oper);
-	if(perm)
+	if(locked)
 		aconf->flags |= CONF_FLAGS_LOCKED;
 
 	/* Look for an oper reason */
@@ -262,11 +268,11 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 			     aconf->info.oper, aconf->host, reason, oper_reason);
 		}
 
-		sendto_one_notice(source_p, ":Added %s [%s]", perm ? "Locked D-Line" : "D-Line",
+		sendto_one_notice(source_p, ":Added %s [%s]", locked ? "Locked D-Line" : "D-Line",
 				  aconf->host);
 
 		bandb_add(BANDB_DLINE, source_p, aconf->host, NULL,
-			  reason, EmptyString(oper_reason) ? NULL : oper_reason, perm);
+			  reason, EmptyString(oper_reason) ? NULL : oper_reason, locked);
 	}
 
 	check_dlines();
