@@ -103,8 +103,28 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		temp_time = 0;
 
-	if(!irccmp(parv[loc], "-lock"))
+	name = parv[loc];
+	loc++;
+
+	/* XLINE <gecos> ON <server> :<reason> */
+	if(parc >= loc + 2 && !irccmp(parv[loc], "ON"))
 	{
+		if(!irccmp(parv[loc], "ON"))
+		{
+			if(!IsOperRemoteBan(source_p))
+			{
+				sendto_one(source_p, form_str(ERR_NOPRIVS),
+					   me.name, source_p->name, "remoteban");
+				return 0;
+			}
+
+			target_server = parv[loc + 1];
+			loc += 2;
+		} 
+
+	} else if(parc >= loc + 1 && !irccmp(parv[loc], "-lock"))
+	{
+		/* XLINE <gecos> -lock :<reason>  */
 		if(!IsOperAdmin(source_p))
 		{
 			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
@@ -113,29 +133,6 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		}
 		perm = 1;
 		loc++;
-	}
-
-	name = parv[loc];
-	loc++;
-
-	/* XLINE [-lock] <gecos> ON <server> :<reason> */
-	if(parc >= loc + 2 && !irccmp(parv[loc], "ON"))
-	{
-		if(!IsOperRemoteBan(source_p))
-		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "remoteban");
-			return 0;
-		}
-
-		target_server = parv[loc + 1];
-		loc += 2;
-
-		if(perm && irccmp(target_server, me.name))
-		{
-			sendto_one_notice(source_p, ":Cannot set locked bans on remote servers");
-			return 0;
-		}
 	}
 
 	if(parc <= loc || EmptyString(parv[loc]))
