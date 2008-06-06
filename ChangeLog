@@ -1,3 +1,17 @@
+androsyn    2008/06/06 18:08:26 UTC	(20080606_0-25514)
+  Log:
+  Fix make distclean crap..this is kinda ugly...
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libltdl/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/main.c (File Added) 
+	ircd-ratbox/trunk/src/main.c (File Deleted) 
+
+
 androsyn    2008/06/03 19:19:42 UTC	(20080603_4-25512)
   Log:
   tell people trying to use lock and temps together to rtfm
