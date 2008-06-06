@@ -1,3 +1,15 @@
+leeh        2008/06/06 18:45:59 UTC	(20080606_1-25516)
+  Log:
+  - remove 'lock' from KLINE and move it into a new command, ADMINKLINE
+  - tidy up the kline code, so the generic stuff is handled by a set_kline()
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/adminkline (File Added) 
+	ircd-ratbox/trunk/help/opers/kline (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+
+
 androsyn    2008/06/06 18:08:26 UTC	(20080606_0-25514)
   Log:
   Fix make distclean crap..this is kinda ugly...
