@@ -23,11 +23,7 @@ KLINE [duration] <user@host> ON irc.server :[reason] [| oper reason]
 will kline the user on irc.server if irc.server accepts
 remote klines. irc.server can contain wildcards.
 
-Administrators can also add a locked KLINE with the following 
-syntax:
-
-KLINE <user@host> lock :[reason]
-
-A locked KLINE can only be removed by an administrator.
+Administrators can also add a KLINE that can only be removed by
+other administrators with the ADMINKLINE command.
 
 - Requires Oper Priv: K

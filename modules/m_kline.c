@@ -43,6 +43,7 @@
 
 static int mo_kline(struct Client *, struct Client *, int, const char **);
 static int me_kline(struct Client *, struct Client *, int, const char **);
+static int mo_adminkline(struct Client *, struct Client *, int, const char **);
 static int mo_unkline(struct Client *, struct Client *, int, const char **);
 static int me_unkline(struct Client *, struct Client *, int, const char **);
 
@@ -51,12 +52,17 @@ struct Message kline_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_kline, 5}, {mo_kline, 3}}
 };
 
+struct Message adminkline_msgtab = {
+	"ADMINKLINE", 0, 0, 0, MFLG_SLOW,
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminkline, 3}}
+};
+
 struct Message unkline_msgtab = {
 	"UNKLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unkline, 3}, {mo_unkline, 2}}
 };
 
-mapi_clist_av1 kline_clist[] = { &kline_msgtab, &unkline_msgtab, NULL };
+mapi_clist_av1 kline_clist[] = { &kline_msgtab, &unkline_msgtab, &adminkline_msgtab, NULL };
 
 DECLARE_MODULE_AV1(kline, NULL, NULL, kline_clist, NULL, NULL, "$Revision$");
 
@@ -66,6 +72,8 @@ static int valid_comment(struct Client *source_p, char *comment);
 static int valid_user_host(struct Client *source_p, const char *user, const char *host);
 static int valid_wild_card(struct Client *source_p, const char *user, const char *host);
 
+static void set_kline(struct Client *source_p, const char *user, const char *host, 
+			const char *lreason, int tkline_time);
 static void apply_kline(struct Client *source_p, struct ConfItem *aconf,
 			const char *reason, const char *oper_reason, const char *current_date,
 			int perm);
@@ -90,15 +98,10 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	char def[] = "No Reason";
 	char user[USERLEN + 2];
 	char host[HOSTLEN + 2];
-	char buffer[IRCD_BUFSIZE];
 	char *reason = def;
-	char *oper_reason;
-	const char *current_date;
 	const char *target_server = NULL;
-	struct ConfItem *aconf;
 	int tkline_time = 0;
 	int loc = 1;
-	int locked = 0;
 
 	if(!IsOperK(source_p))
 	{
@@ -129,22 +132,6 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		target_server = parv[loc + 1];
 		loc += 2;
 	} 
-	else if(parc >= loc + 1 && !irccmp(parv[loc], "lock"))
-	{
-		if(!IsOperAdmin(source_p))
-		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
-				   "admin");
-			return 0;
-		}
-		if(tkline_time > 0)
-		{
-			sendto_one_notice(source_p, ":Lock and temporary klines are mutually exclusive. See /QUOTE HELP KLINE");
-			return 0;
-		}
-		locked = 1;
-		loc++;
-	}
 
 	if(parc <= loc || EmptyString(parv[loc]))
 	{
@@ -153,11 +140,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 	}
 
-	reason = LOCAL_COPY(parv[loc]);
-
-	if(locked)
-		;
-	else if(target_server != NULL)
+	if(target_server != NULL)
 	{
 		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
 				   "ENCAP %s KLINE %d %s %s :%s",
@@ -173,57 +156,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 				(tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE,
 				"%lu %s %s :%s", tkline_time, user, host, reason);
 
-	if(!valid_user_host(source_p, user, host) ||
-	   !valid_wild_card(source_p, user, host) || !valid_comment(source_p, reason))
-		return 0;
-
-	if(already_placed_kline(source_p, user, host, tkline_time))
-		return 0;
-
-	rb_set_time();
-	current_date = smalldate(rb_current_time());
-	aconf = make_conf();
-	aconf->status = CONF_KILL;
-	aconf->host = rb_strdup(host);
-	aconf->user = rb_strdup(user);
-	aconf->port = 0;
-
-	/* Look for an oper reason */
-	if((oper_reason = strchr(reason, '|')) != NULL)
-	{
-		*oper_reason = '\0';
-		oper_reason++;
-
-		if(!EmptyString(oper_reason))
-			aconf->spasswd = rb_strdup(oper_reason);
-	}
-
-	if(tkline_time > 0)
-	{
-		rb_snprintf(buffer, sizeof(buffer),
-			    "Temporary K-line %d min. - %s (%s)",
-			    (int) (tkline_time / 60), reason, current_date);
-		aconf->passwd = rb_strdup(buffer);
-		apply_tkline(source_p, aconf, reason, oper_reason, current_date, tkline_time);
-	}
-	else
-	{
-		rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
-		aconf->passwd = rb_strdup(buffer);
-		apply_kline(source_p, aconf, reason, oper_reason, current_date, locked);
-	}
-
-	if(ConfigFileEntry.kline_delay)
-	{
-		if(kline_queued == 0)
-		{
-			rb_event_addonce("check_klines", check_klines_event, NULL,
-					 ConfigFileEntry.kline_delay);
-			kline_queued = 1;
-		}
-	}
-	else
-		check_klines();
+	set_kline(source_p, user, host, parv[loc], tkline_time);
 
 	return 0;
 }
@@ -231,12 +164,6 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 static int
 me_kline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	char buffer[BUFSIZE];
-	struct ConfItem *aconf = NULL;
-	const char *current_date;
-	const char *user, *host;
-	char *reason;
-	char *oper_reason;
 	int tkline_time;
 
 	/* <tkline_time> <user> <host> :<reason> */
@@ -244,69 +171,49 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 
 	tkline_time = atoi(parv[1]);
-	user = parv[2];
-	host = parv[3];
-	reason = LOCAL_COPY(parv[4]);
 
 	if(!find_shared_conf(source_p->username, source_p->host,
 			     source_p->servptr->name,
 			     (tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE))
 		return 0;
 
-	if(!valid_user_host(source_p, user, host) ||
-	   !valid_wild_card(source_p, user, host) || !valid_comment(source_p, reason))
-		return 0;
-
-	if(already_placed_kline(source_p, user, host, tkline_time))
-		return 0;
-
-	aconf = make_conf();
-
-	aconf->status = CONF_KILL;
-	aconf->user = rb_strdup(user);
-	aconf->host = rb_strdup(host);
-
-	/* Look for an oper reason */
-	if((oper_reason = strchr(reason, '|')) != NULL)
-	{
-		*oper_reason = '\0';
-		oper_reason++;
-
-		if(!EmptyString(oper_reason))
-			aconf->spasswd = rb_strdup(oper_reason);
-	}
-
-	current_date = smalldate(rb_current_time());
-
-	if(tkline_time > 0)
-	{
-		rb_snprintf(buffer, sizeof(buffer),
-			    "Temporary K-line %d min. - %s (%s)",
-			    (int) (tkline_time / 60), reason, current_date);
-		aconf->passwd = rb_strdup(buffer);
-		apply_tkline(source_p, aconf, reason, oper_reason, current_date, tkline_time);
-	}
-	else
-	{
-		rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
-		aconf->passwd = rb_strdup(buffer);
-		apply_kline(source_p, aconf, reason, oper_reason, current_date, 0);
-	}
-
-	if(ConfigFileEntry.kline_delay)
-	{
-		if(kline_queued == 0)
-		{
-			rb_event_addonce("check_klines", check_klines_event, NULL,
-					 ConfigFileEntry.kline_delay);
-			kline_queued = 1;
-		}
-	}
-	else
-		check_klines();
+	set_kline(source_p, parv[2], parv[3], parv[4], tkline_time);
 
 	return 0;
 }
+
+/* mo_adminkline()
+ *
+ *   parv[1] - user@host
+ *   parv[2] - reason
+ */
+static int
+mo_adminkline(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
+{
+	char user[USERLEN + 2];
+	char host[HOSTLEN + 2];
+
+	if(!IsOperK(source_p))
+	{
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "kline");
+		return 0;
+	}
+
+	if(!IsOperAdmin(source_p))
+	{
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
+			   "admin");
+		return 0;
+	}
+
+	if(find_user_host(source_p, parv[1], user, host) == 0)
+		return 0;
+
+	set_kline(source_p, user, host, parv[2], 0);
+
+	return 0;
+}
+
 
 /* mo_unkline()
  *
@@ -405,6 +312,69 @@ me_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	remove_perm_kline(source_p, user, host);
 	return 0;
+}
+
+static void
+set_kline(struct Client *source_p, const char *user, const char *host, const char *lreason, int tkline_time)
+{
+	char buffer[IRCD_BUFSIZE];
+	struct ConfItem *aconf;
+	const char *current_date;
+	char *reason;
+	char *oper_reason;
+
+	reason = LOCAL_COPY(lreason);
+
+	if(!valid_user_host(source_p, user, host) ||
+	   !valid_wild_card(source_p, user, host) || !valid_comment(source_p, reason))
+		return;
+
+	if(already_placed_kline(source_p, user, host, tkline_time))
+		return;
+
+	rb_set_time();
+	current_date = smalldate(rb_current_time());
+	aconf = make_conf();
+	aconf->status = CONF_KILL;
+	aconf->user = rb_strdup(user);
+	aconf->host = rb_strdup(host);
+
+	/* Look for an oper reason */
+	if((oper_reason = strchr(reason, '|')) != NULL)
+	{
+		*oper_reason = '\0';
+		oper_reason++;
+
+		if(!EmptyString(oper_reason))
+			aconf->spasswd = rb_strdup(oper_reason);
+	}
+
+	if(tkline_time > 0)
+	{
+		rb_snprintf(buffer, sizeof(buffer),
+			    "Temporary K-line %d min. - %s (%s)",
+			    (int) (tkline_time / 60), reason, current_date);
+		aconf->passwd = rb_strdup(buffer);
+		apply_tkline(source_p, aconf, reason, oper_reason, current_date, tkline_time);
+	}
+	else
+	{
+		rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
+		aconf->passwd = rb_strdup(buffer);
+		apply_kline(source_p, aconf, reason, oper_reason, current_date, 0);
+	}
+
+	if(ConfigFileEntry.kline_delay)
+	{
+		if(kline_queued == 0)
+		{
+			rb_event_addonce("check_klines", check_klines_event, NULL,
+					 ConfigFileEntry.kline_delay);
+			kline_queued = 1;
+		}
+	}
+	else
+		check_klines();
 }
 
 /* apply_kline()
