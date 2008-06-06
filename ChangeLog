@@ -1,3 +1,12 @@
+leeh        2008/06/06 18:52:30 UTC	(20080606_2-25518)
+  Log:
+  - pass the 'admin' flag through properly too
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+
+
 leeh        2008/06/06 18:45:59 UTC	(20080606_1-25516)
   Log:
   - remove 'lock' from KLINE and move it into a new command, ADMINKLINE
