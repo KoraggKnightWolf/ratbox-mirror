@@ -15,7 +15,7 @@ servicesdir	= @moduledir@/autoload
 
 AM_CFLAGS = $(WARNFLAGS)
 
-ircd_SOURCES = src/main.c
+ircd_SOURCES = main.c
 bin_PROGRAMS = ircd
 
 if MINGW

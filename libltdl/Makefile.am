@@ -32,3 +32,5 @@ libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 	
 install-includeHEADERS:
+
+distclean: clean
