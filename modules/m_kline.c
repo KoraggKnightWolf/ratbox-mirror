@@ -51,12 +51,10 @@ struct Message kline_msgtab = {
 	"KLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_kline, 5}, {mo_kline, 3}}
 };
-
 struct Message adminkline_msgtab = {
 	"ADMINKLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminkline, 3}}
 };
-
 struct Message unkline_msgtab = {
 	"UNKLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unkline, 3}, {mo_unkline, 2}}
@@ -73,7 +71,7 @@ static int valid_user_host(struct Client *source_p, const char *user, const char
 static int valid_wild_card(struct Client *source_p, const char *user, const char *host);
 
 static void set_kline(struct Client *source_p, const char *user, const char *host, 
-			const char *lreason, int tkline_time);
+			const char *lreason, int tkline_time, int admin);
 static void apply_kline(struct Client *source_p, struct ConfItem *aconf,
 			const char *reason, const char *oper_reason, const char *current_date,
 			int perm);
@@ -156,7 +154,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 				(tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE,
 				"%lu %s %s :%s", tkline_time, user, host, reason);
 
-	set_kline(source_p, user, host, parv[loc], tkline_time);
+	set_kline(source_p, user, host, parv[loc], tkline_time, 0);
 
 	return 0;
 }
@@ -177,7 +175,7 @@ me_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 			     (tkline_time > 0) ? SHARED_TKLINE : SHARED_PKLINE))
 		return 0;
 
-	set_kline(source_p, parv[2], parv[3], parv[4], tkline_time);
+	set_kline(source_p, parv[2], parv[3], parv[4], tkline_time, 0);
 
 	return 0;
 }
@@ -209,7 +207,7 @@ mo_adminkline(struct Client *client_p, struct Client *source_p, int parc, const 
 	if(find_user_host(source_p, parv[1], user, host) == 0)
 		return 0;
 
-	set_kline(source_p, user, host, parv[2], 0);
+	set_kline(source_p, user, host, parv[2], 0, 1);
 
 	return 0;
 }
@@ -315,7 +313,7 @@ me_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 }
 
 static void
-set_kline(struct Client *source_p, const char *user, const char *host, const char *lreason, int tkline_time)
+set_kline(struct Client *source_p, const char *user, const char *host, const char *lreason, int tkline_time, int admin)
 {
 	char buffer[IRCD_BUFSIZE];
 	struct ConfItem *aconf;
@@ -361,7 +359,7 @@ set_kline(struct Client *source_p, const char *user, const char *host, const cha
 	{
 		rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
 		aconf->passwd = rb_strdup(buffer);
-		apply_kline(source_p, aconf, reason, oper_reason, current_date, 0);
+		apply_kline(source_p, aconf, reason, oper_reason, current_date, admin);
 	}
 
 	if(ConfigFileEntry.kline_delay)
