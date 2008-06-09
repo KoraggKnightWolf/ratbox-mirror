@@ -180,6 +180,15 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		break;
 	}
 
+	/* require TS6 for direct links */
+	if(!IsCapable(client_p, CAP_TS6))
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+					"Link %s dropped, TS6 protocol is required", name);
+		exit_client(client_p, client_p, client_p, "Incompatible TS version");
+		return 0;
+	}
+
 	if((target_p = server_exists(name)))
 	{
 		/*
