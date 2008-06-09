@@ -83,7 +83,7 @@ mr_pass(struct Client *client_p, struct Client *source_p, int parc, const char *
 		/* kludge, if we're not using ts6, dont ever mark a server
 		 * as TS6 capable, that way we'll never send them TS6 data.
 		 */
-		if(ServerInfo.use_ts6 && parc == 5 && atoi(parv[3]) >= 6)
+		if(parc == 5 && atoi(parv[3]) >= 6)
 		{
 			/* only mark as TS6 if the SID is valid.. */
 			if(IsDigit(parv[4][0]) && IsIdChar(parv[4][1]) &&

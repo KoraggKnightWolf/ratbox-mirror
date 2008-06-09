@@ -637,17 +637,10 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 	/* Next, send the initial handshake */
 	SetHandshake(client_p);
 
-	/* kludge, if we're not using TS6, dont ever send
-	 * ourselves as being TS6 capable.
-	 */
 	if(!EmptyString(server_p->spasswd))
 	{
-		if(ServerInfo.use_ts6)
-			sendto_one(client_p, "PASS %s TS %d :%s", 
-				   server_p->spasswd, TS_CURRENT, me.id);
-		else
-			sendto_one(client_p, "PASS %s :TS",
-				   server_p->spasswd);
+		sendto_one(client_p, "PASS %s TS %d :%s", 
+			   server_p->spasswd, TS_CURRENT, me.id);
 	}
 
 	/* pass my info to the new server */

@@ -251,7 +251,6 @@ struct server_info
 	char *network_name;
 	char *network_desc;
 	int hub;
-	int use_ts6;
 	int default_max_clients;
 	struct sockaddr_in ip;
 #ifdef RB_IPV6
