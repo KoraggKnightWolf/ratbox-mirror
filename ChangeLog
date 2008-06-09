@@ -1,3 +1,14 @@
+leeh        2008/06/09 18:32:50 UTC	(20080609_1-25522)
+  Log:
+  - force TS6_ONLY to (ie, raise TS_MIN to 6)
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+	ircd-ratbox/trunk/include/config.h.dist (File Modified) 
+
+
 leeh        2008/06/09 18:28:35 UTC	(20080609_0-25520)
   Log:
   - remove use_ts6 conf option, it's now always enabled.
