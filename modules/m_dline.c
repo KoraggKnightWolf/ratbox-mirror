@@ -42,22 +42,30 @@
 #include "bandbi.h"
 
 static int mo_dline(struct Client *, struct Client *, int, const char **);
+static int mo_admindline(struct Client *, struct Client *, int, const char **);
 static int mo_undline(struct Client *, struct Client *, int, const char **);
 
 struct Message dline_msgtab = {
 	"DLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_dline, 2}}
 };
+struct Message admindline_msgtab = {
+	"ADMINDLINE", 0, 0, 0, MFLG_SLOW,
+	{ mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_admindline, 2}}
+};
 struct Message undline_msgtab = {
 	"UNDLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_undline, 2}}
 };
 
-mapi_clist_av1 dline_clist[] = { &dline_msgtab, &undline_msgtab, NULL };
+mapi_clist_av1 dline_clist[] = { &dline_msgtab, &admindline_msgtab, &undline_msgtab, NULL };
 
 DECLARE_MODULE_AV1(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision$");
 
-static int valid_comment(char *comment);
+static int valid_dline(struct Client *source_p, const char *dlhost);
+static int already_placed_dline(struct Client *source_p, const char *dlhost);
+static struct ConfItem *set_dline(struct Client *source_p, const char *dlhost, 
+				const char *lreason, int tkline_time, int admin);
 static void check_dlines(void);
 
 /* mo_dline()
@@ -70,14 +78,10 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 {
 	char def[] = "No Reason";
 	const char *dlhost;
-	char *oper_reason;
-	char *reason = def;
-	char cidr_form_host[HOSTLEN + 1];
+	const char *reason = def;
 	struct ConfItem *aconf;
-	int bits;
 	char dlbuffer[IRCD_BUFSIZE];
 	const char *current_date;
-	const char *oper;
 	int tdline_time = 0;
 	int loc = 1;
 	int locked = 0;
@@ -100,119 +104,19 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 
 	dlhost = parv[loc];
-	rb_strlcpy(cidr_form_host, dlhost, sizeof(cidr_form_host));
-
-	if(!parse_netmask(dlhost, NULL, &bits))
-	{
-		sendto_one_notice(source_p, ":Invalid D-Line");
-		return 0;
-	}
-
 	loc++;
 
-	if(parc >= loc + 2 && !irccmp(parv[loc], "lock"))
-	{
-		if(!IsOperAdmin(source_p))
-		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
-				   "admin");
-			return 0;
-		}
-		
-		if(tdline_time > 0)
-		{
-			sendto_one_notice(source_p, ":Lock and temporary dlines are mutually exclusive. See /QUOTE HELP DLINE");
-			return 0;
-		}
-		locked = 1;
-		loc++;
-	}
+	if(!valid_dline(source_p, dlhost))
+		return 0;
 
-	if(parc >= loc + 1)	/* reason */
-	{
-		if(!EmptyString(parv[loc]))
-			reason = LOCAL_COPY(parv[loc]);
+	/* reason */
+	if((parc >= loc + 1) && !EmptyString(parv[loc]))
+		reason = parv[loc];
 
-		if(!valid_comment(reason))
-		{
-			sendto_one_notice(source_p, ":Invalid character '\"' in comment");
-			return 0;
-		}
-	}
+	if(already_placed_dline(source_p, dlhost))
+		return 0;
 
-	if(IsOperAdmin(source_p))
-	{
-		if(bits < 8)
-		{
-			sendto_one_notice(source_p,
-					  ":For safety, bitmasks less than 8 require db access.");
-			return 0;
-		}
-	}
-	else
-	{
-		if(bits < 16)
-		{
-			sendto_one_notice(source_p,
-					  ":Dline bitmasks less than 16 are for admins only.");
-			return 0;
-		}
-	}
-
-	if(ConfigFileEntry.non_redundant_klines)
-	{
-		struct rb_sockaddr_storage daddr;
-		const char *creason;
-		int t = AF_INET, ty, b;
-		ty = parse_netmask(dlhost, (struct sockaddr *) &daddr, &b);
-#ifdef RB_IPV6
-		if(ty == HM_IPV6)
-			t = AF_INET6;
-		else
-#endif
-			t = AF_INET;
-
-		if((aconf = find_dline((struct sockaddr *) &daddr)) != NULL)
-		{
-			int bx;
-			parse_netmask(aconf->host, NULL, &bx);
-			if(b >= bx)
-			{
-				creason = aconf->passwd ? aconf->passwd : "<No Reason>";
-				if(IsConfExemptKline(aconf))
-					sendto_one_notice(source_p,
-							  ":[%s] is (E)d-lined by [%s] - %s",
-							  dlhost, aconf->host, creason);
-				else
-					sendto_one_notice(source_p,
-							  ":[%s] already D-lined by [%s] - %s",
-							  dlhost, aconf->host, creason);
-				return 0;
-			}
-		}
-	}
-
-	rb_set_time();
-	current_date = smalldate(rb_current_time());
-
-	aconf = make_conf();
-	aconf->status = CONF_DLINE;
-	aconf->host = rb_strdup(dlhost);
-
-	oper = get_oper_name(source_p);
-	aconf->info.oper = operhash_add(oper);
-	if(locked)
-		aconf->flags |= CONF_FLAGS_LOCKED;
-
-	/* Look for an oper reason */
-	if((oper_reason = strchr(reason, '|')) != NULL)
-	{
-		*oper_reason = '\0';
-		oper_reason++;
-
-		if(!EmptyString(oper_reason))
-			aconf->spasswd = rb_strdup(oper_reason);
-	}
+	aconf = set_dline(source_p, dlhost, reason, tdline_time, 0);
 
 	if(tdline_time > 0)
 	{
@@ -223,7 +127,7 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		aconf->hold = rb_current_time() + tdline_time;
 		add_temp_dline(aconf);
 
-		if(EmptyString(oper_reason))
+		if(EmptyString(aconf->spasswd))
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "%s added temporary %d min. D-Line for [%s] [%s]",
@@ -237,9 +141,9 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "%s added temporary %d min. D-Line for [%s] [%s|%s]",
 					     aconf->info.oper, tdline_time / 60,
-					     aconf->host, reason, oper_reason);
+					     aconf->host, reason, aconf->spasswd);
 			ilog(L_KLINE, "D %s %d %s %s|%s",
-			     aconf->info.oper, tdline_time / 60, aconf->host, reason, oper_reason);
+			     aconf->info.oper, tdline_time / 60, aconf->host, reason, aconf->spasswd);
 		}
 
 		sendto_one_notice(source_p, ":Added temporary %d min. D-Line for [%s]",
@@ -252,7 +156,7 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		aconf->hold = rb_current_time();
 		add_dline(aconf);
 
-		if(EmptyString(oper_reason))
+		if(EmptyString(aconf->spasswd))
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "%s added D-Line for [%s] [%s]",
@@ -263,17 +167,77 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "%s added D-Line for [%s] [%s|%s]",
-					     aconf->info.oper, aconf->host, reason, oper_reason);
+					     aconf->info.oper, aconf->host, reason, aconf->spasswd);
 			ilog(L_KLINE, "D %s 0 %s %s|%s",
-			     aconf->info.oper, aconf->host, reason, oper_reason);
+			     aconf->info.oper, aconf->host, reason, aconf->spasswd);
 		}
 
 		sendto_one_notice(source_p, ":Added %s [%s]", locked ? "Locked D-Line" : "D-Line",
 				  aconf->host);
 
 		bandb_add(BANDB_DLINE, source_p, aconf->host, NULL,
-			  reason, EmptyString(oper_reason) ? NULL : oper_reason, locked);
+			  reason, EmptyString(aconf->spasswd) ? NULL : aconf->spasswd, locked);
 	}
+
+	check_dlines();
+	return 0;
+}
+
+static int
+mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+{
+	const char *dlhost;
+	struct ConfItem *aconf;
+	char dlbuffer[IRCD_BUFSIZE];
+	const char *current_date;
+	int locked = 1;
+
+	if(!IsOperK(source_p))
+	{
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "kline");
+		return 0;
+	}
+
+	if(!IsOperAdmin(source_p))
+	{
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
+		return 0;
+	}
+
+	if(!valid_dline(source_p, parv[1]))
+		return 0;
+
+	if(already_placed_dline(source_p, parv[1]))
+		return 0;
+
+	aconf = set_dline(source_p, dlhost, parv[2], 0, locked);
+
+	rb_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", parv[2], current_date);
+	aconf->passwd = rb_strdup(dlbuffer);
+	aconf->hold = rb_current_time();
+	add_dline(aconf);
+
+	if(EmptyString(aconf->spasswd))
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "%s added D-Line for [%s] [%s]",
+				     aconf->info.oper, aconf->host, parv[2]);
+		ilog(L_KLINE, "D %s 0 %s %s", aconf->info.oper, aconf->host, parv[2]);
+	}
+	else
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "%s added D-Line for [%s] [%s|%s]",
+				     aconf->info.oper, aconf->host, parv[2], aconf->spasswd);
+		ilog(L_KLINE, "D %s 0 %s %s|%s",
+		     aconf->info.oper, aconf->host, parv[2], aconf->spasswd);
+	}
+
+	sendto_one_notice(source_p, ":Added %s [%s]", locked ? "Locked D-Line" : "D-Line",
+			  aconf->host);
+
+	bandb_add(BANDB_DLINE, source_p, aconf->host, NULL,
+		  parv[2], EmptyString(aconf->spasswd) ? NULL : aconf->spasswd, locked);
 
 	check_dlines();
 	return 0;
@@ -346,23 +310,120 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	return 0;
 }
 
-/*
- * valid_comment
- * inputs	- pointer to client
- *              - pointer to comment
- * output       - 0 if no valid comment, 1 if valid
- * side effects - NONE
- */
 static int
-valid_comment(char *comment)
+valid_dline(struct Client *source_p, const char *dlhost)
 {
-	if(strchr(comment, '"'))
-		return 0;
+	static char cidr_form_host[HOSTLEN + 1];
+	int bits;
 
-	if(strlen(comment) > REASONLEN)
-		comment[REASONLEN] = '\0';
+	rb_strlcpy(cidr_form_host, dlhost, sizeof(cidr_form_host));
+
+	if(!parse_netmask(dlhost, NULL, &bits))
+	{
+		sendto_one_notice(source_p, ":Invalid D-Line");
+		return 0;
+	}
+
+	if(IsOperAdmin(source_p))
+	{
+		if(bits < 8)
+		{
+			sendto_one_notice(source_p,
+					  ":For safety, bitmasks less than 8 require db access.");
+			return 0;
+		}
+	}
+	else
+	{
+		if(bits < 16)
+		{
+			sendto_one_notice(source_p,
+					  ":Dline bitmasks less than 16 are for admins only.");
+			return 0;
+		}
+	}
 
 	return 1;
+}
+
+static int
+already_placed_dline(struct Client *source_p, const char *dlhost)
+{
+	if(ConfigFileEntry.non_redundant_klines)
+	{
+		struct ConfItem *aconf;
+		struct rb_sockaddr_storage daddr;
+		const char *creason;
+		int t = AF_INET, ty, b;
+		ty = parse_netmask(dlhost, (struct sockaddr *) &daddr, &b);
+#ifdef RB_IPV6
+		if(ty == HM_IPV6)
+			t = AF_INET6;
+		else
+#endif
+			t = AF_INET;
+
+		if((aconf = find_dline((struct sockaddr *) &daddr)) != NULL)
+		{
+			int bx;
+			parse_netmask(aconf->host, NULL, &bx);
+			if(b >= bx)
+			{
+				creason = aconf->passwd ? aconf->passwd : "<No Reason>";
+				if(IsConfExemptKline(aconf))
+					sendto_one_notice(source_p,
+							  ":[%s] is (E)d-lined by [%s] - %s",
+							  dlhost, aconf->host, creason);
+				else
+					sendto_one_notice(source_p,
+							  ":[%s] already D-lined by [%s] - %s",
+							  dlhost, aconf->host, creason);
+				return 0;
+			}
+		}
+	}
+
+	return 1;
+}
+
+static struct ConfItem *
+set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int tkline_time, int admin)
+{
+	struct ConfItem *aconf;
+	const char *current_date;
+	const char *oper;
+	char *reason;
+	char *oper_reason;
+
+	reason = LOCAL_COPY(lreason);
+
+	if(strlen(reason) > REASONLEN)
+		reason[REASONLEN] = '\0';
+
+	rb_set_time();
+	current_date = smalldate(rb_current_time());
+
+	aconf = make_conf();
+	aconf->status = CONF_DLINE;
+	aconf->host = rb_strdup(dlhost);
+
+	oper = get_oper_name(source_p);
+	aconf->info.oper = operhash_add(oper);
+
+	if(admin)
+		aconf->flags |= CONF_FLAGS_LOCKED;
+
+	/* Look for an oper reason */
+	if((oper_reason = strchr(reason, '|')) != NULL)
+	{
+		*oper_reason = '\0';
+		oper_reason++;
+
+		if(!EmptyString(oper_reason))
+			aconf->spasswd = rb_strdup(oper_reason);
+	}
+
+	return aconf;
 }
 
 /* check_dlines()
