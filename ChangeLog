@@ -1,3 +1,19 @@
+leeh        2008/06/09 18:28:35 UTC	(20080609_0-25520)
+  Log:
+  - remove use_ts6 conf option, it's now always enabled.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_pass.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 leeh        2008/06/06 18:52:30 UTC	(20080606_2-25518)
   Log:
   - pass the 'admin' flag through properly too
