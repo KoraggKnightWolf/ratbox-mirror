@@ -64,7 +64,7 @@ DECLARE_MODULE_AV1(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision$");
 
 static int valid_dline(struct Client *source_p, const char *dlhost);
 static int already_placed_dline(struct Client *source_p, const char *dlhost);
-static struct ConfItem *set_dline(struct Client *source_p, const char *dlhost, 
+static void set_dline(struct Client *source_p, const char *dlhost, 
 				const char *lreason, int tkline_time, int admin);
 static void check_dlines(void);
 
@@ -79,12 +79,8 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	char def[] = "No Reason";
 	const char *dlhost;
 	const char *reason = def;
-	struct ConfItem *aconf;
-	char dlbuffer[IRCD_BUFSIZE];
-	const char *current_date;
 	int tdline_time = 0;
 	int loc = 1;
-	int locked = 0;
 
 	if(!IsOperK(source_p))
 	{
@@ -116,70 +112,9 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if(already_placed_dline(source_p, dlhost))
 		return 0;
 
-	aconf = set_dline(source_p, dlhost, reason, tdline_time, 0);
-
-	if(tdline_time > 0)
-	{
-		rb_snprintf(dlbuffer, sizeof(dlbuffer),
-			    "Temporary D-line %d min. - %s (%s)",
-			    (int) (tdline_time / 60), reason, current_date);
-		aconf->passwd = rb_strdup(dlbuffer);
-		aconf->hold = rb_current_time() + tdline_time;
-		add_temp_dline(aconf);
-
-		if(EmptyString(aconf->spasswd))
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "%s added temporary %d min. D-Line for [%s] [%s]",
-					     aconf->info.oper, tdline_time / 60,
-					     aconf->host, reason);
-			ilog(L_KLINE, "D %s %d %s %s",
-			     aconf->info.oper, tdline_time / 60, aconf->host, reason);
-		}
-		else
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "%s added temporary %d min. D-Line for [%s] [%s|%s]",
-					     aconf->info.oper, tdline_time / 60,
-					     aconf->host, reason, aconf->spasswd);
-			ilog(L_KLINE, "D %s %d %s %s|%s",
-			     aconf->info.oper, tdline_time / 60, aconf->host, reason, aconf->spasswd);
-		}
-
-		sendto_one_notice(source_p, ":Added temporary %d min. D-Line for [%s]",
-				  tdline_time / 60, aconf->host);
-	}
-	else
-	{
-		rb_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
-		aconf->passwd = rb_strdup(dlbuffer);
-		aconf->hold = rb_current_time();
-		add_dline(aconf);
-
-		if(EmptyString(aconf->spasswd))
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "%s added D-Line for [%s] [%s]",
-					     aconf->info.oper, aconf->host, reason);
-			ilog(L_KLINE, "D %s 0 %s %s", aconf->info.oper, aconf->host, reason);
-		}
-		else
-		{
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "%s added D-Line for [%s] [%s|%s]",
-					     aconf->info.oper, aconf->host, reason, aconf->spasswd);
-			ilog(L_KLINE, "D %s 0 %s %s|%s",
-			     aconf->info.oper, aconf->host, reason, aconf->spasswd);
-		}
-
-		sendto_one_notice(source_p, ":Added %s [%s]", locked ? "Locked D-Line" : "D-Line",
-				  aconf->host);
-
-		bandb_add(BANDB_DLINE, source_p, aconf->host, NULL,
-			  reason, EmptyString(aconf->spasswd) ? NULL : aconf->spasswd, locked);
-	}
-
+	set_dline(source_p, dlhost, reason, tdline_time, 0);
 	check_dlines();
+
 	return 0;
 }
 
@@ -187,10 +122,6 @@ static int
 mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *dlhost;
-	struct ConfItem *aconf;
-	char dlbuffer[IRCD_BUFSIZE];
-	const char *current_date;
-	int locked = 1;
 
 	if(!IsOperK(source_p))
 	{
@@ -210,36 +141,9 @@ mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const 
 	if(already_placed_dline(source_p, parv[1]))
 		return 0;
 
-	aconf = set_dline(source_p, dlhost, parv[2], 0, locked);
-
-	rb_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", parv[2], current_date);
-	aconf->passwd = rb_strdup(dlbuffer);
-	aconf->hold = rb_current_time();
-	add_dline(aconf);
-
-	if(EmptyString(aconf->spasswd))
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added D-Line for [%s] [%s]",
-				     aconf->info.oper, aconf->host, parv[2]);
-		ilog(L_KLINE, "D %s 0 %s %s", aconf->info.oper, aconf->host, parv[2]);
-	}
-	else
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added D-Line for [%s] [%s|%s]",
-				     aconf->info.oper, aconf->host, parv[2], aconf->spasswd);
-		ilog(L_KLINE, "D %s 0 %s %s|%s",
-		     aconf->info.oper, aconf->host, parv[2], aconf->spasswd);
-	}
-
-	sendto_one_notice(source_p, ":Added %s [%s]", locked ? "Locked D-Line" : "D-Line",
-			  aconf->host);
-
-	bandb_add(BANDB_DLINE, source_p, aconf->host, NULL,
-		  parv[2], EmptyString(aconf->spasswd) ? NULL : aconf->spasswd, locked);
-
+	set_dline(source_p, dlhost, parv[2], 0, 1);
 	check_dlines();
+
 	return 0;
 }
 
@@ -386,10 +290,11 @@ already_placed_dline(struct Client *source_p, const char *dlhost)
 	return 1;
 }
 
-static struct ConfItem *
-set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int tkline_time, int admin)
+static void
+set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int tdline_time, int admin)
 {
 	struct ConfItem *aconf;
+	char dlbuffer[IRCD_BUFSIZE];
 	const char *current_date;
 	const char *oper;
 	char *reason;
@@ -423,7 +328,42 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 			aconf->spasswd = rb_strdup(oper_reason);
 	}
 
-	return aconf;
+	if(tdline_time > 0)
+	{
+		rb_snprintf(dlbuffer, sizeof(dlbuffer),
+			    "Temporary D-line %d min. - %s (%s)",
+			    (int) (tdline_time / 60), reason, current_date);
+		aconf->passwd = rb_strdup(dlbuffer);
+		aconf->hold = rb_current_time() + tdline_time;
+		add_temp_dline(aconf);
+
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "%s added temporary %d min. D-Line for [%s] [%s]",
+				     aconf->info.oper, tdline_time / 60,
+				     aconf->host, make_ban_reason(reason, oper_reason));
+		ilog(L_KLINE, "D %s %d %s %s",
+		     aconf->info.oper, tdline_time / 60, aconf->host, make_ban_reason(reason, oper_reason));
+
+		sendto_one_notice(source_p, ":Added temporary %d min. D-Line for [%s]",
+				  tdline_time / 60, aconf->host);
+	}
+	else
+	{
+		rb_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
+		aconf->passwd = rb_strdup(dlbuffer);
+		add_dline(aconf);
+
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "%s added D-Line for [%s] [%s]",
+				     aconf->info.oper, aconf->host, make_ban_reason(reason, oper_reason));
+		ilog(L_KLINE, "D %s 0 %s %s", aconf->info.oper, aconf->host, make_ban_reason(reason, oper_reason));
+
+		sendto_one_notice(source_p, ":Added %s [%s]", admin ? "Admin D-Line" : "D-Line",
+				  aconf->host);
+
+		bandb_add(BANDB_DLINE, source_p, aconf->host, NULL,
+			  reason, EmptyString(aconf->spasswd) ? NULL : aconf->spasswd, admin);
+	}
 }
 
 /* check_dlines()
