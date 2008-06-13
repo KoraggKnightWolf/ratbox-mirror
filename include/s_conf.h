@@ -323,6 +323,8 @@ void yyerror(const char *);
 int conf_yy_fatal_error(const char *);
 int conf_fgets(char *, int, FILE *);
 
+const char *make_ban_reason(const char *reason, const char *oper_reason);
+
 void add_temp_kline(struct ConfItem *);
 void add_temp_dline(struct ConfItem *);
 void report_temp_klines(struct Client *);

@@ -854,6 +854,27 @@ conf_connect_allowed(struct sockaddr *addr, int aftype)
 	return NULL;
 }
 
+/* make_ban_reason()
+ *
+ * inputs	- reason, oper reason
+ * outputs	-
+ * side effects	- returns a single reason, combining the two fields if
+ * 		  appropriate
+ */
+const char *
+make_ban_reason(const char *reason, const char *oper_reason)
+{
+	static char buf[IRCD_BUFSIZE];
+
+	if(!EmptyString(oper_reason))
+	{
+		snprintf(buf, sizeof(buf), "%s|%s", reason, oper_reason);
+		return buf;
+	}
+	else
+		return reason;
+}
+
 /* add_temp_kline()
  *
  * inputs        - pointer to struct ConfItem
