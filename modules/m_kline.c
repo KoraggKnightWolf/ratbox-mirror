@@ -393,23 +393,11 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	if(locked)
 		aconf->flags |= CONF_FLAGS_LOCKED;
 
-	if(EmptyString(oper_reason))
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added K-Line for [%s@%s] [%s]",
-				     aconf->info.oper, aconf->user, aconf->host, reason);
-		ilog(L_KLINE, "K %s 0 %s %s %s",
-		     aconf->info.oper, aconf->user, aconf->host, reason);
-	}
-	else
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added K-Line for [%s@%s] [%s|%s]",
-				     aconf->info.oper, aconf->user, aconf->host,
-				     reason, oper_reason);
-		ilog(L_KLINE, "K %s 0 %s %s %s|%s",
-		     aconf->info.oper, aconf->user, aconf->host, reason, oper_reason);
-	}
+	sendto_realops_flags(UMODE_ALL, L_ALL,
+			     "%s added K-Line for [%s@%s] [%s]",
+			     aconf->info.oper, aconf->user, aconf->host, make_ban_reason(reason, oper_reason));
+	ilog(L_KLINE, "K %s 0 %s %s %s",
+	     aconf->info.oper, aconf->user, aconf->host, make_ban_reason(reason, oper_reason));
 
 	sendto_one_notice(source_p, ":Added %s [%s@%s]",
 			  locked ? "Locked K-Line" : "K-Line", aconf->user, aconf->host);
@@ -435,26 +423,13 @@ apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 	aconf->hold = rb_current_time() + tkline_time;
 	add_temp_kline(aconf);
 
-	/* no oper reason.. */
-	if(EmptyString(oper_reason))
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added temporary %d min. K-Line for [%s@%s] [%s]",
-				     aconf->info.oper, tkline_time / 60,
-				     aconf->user, aconf->host, reason);
-		ilog(L_KLINE, "K %s %d %s %s %s",
-		     aconf->info.oper, tkline_time / 60, aconf->user, aconf->host, reason);
-	}
-	else
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s added temporary %d min. K-Line for [%s@%s] [%s|%s]",
-				     aconf->info.oper, tkline_time / 60,
-				     aconf->user, aconf->host, reason, oper_reason);
-		ilog(L_KLINE, "K %s %d %s %s %s|%s",
-		     aconf->info.oper, tkline_time / 60,
-		     aconf->user, aconf->host, reason, oper_reason);
-	}
+	sendto_realops_flags(UMODE_ALL, L_ALL,
+			     "%s added temporary %d min. K-Line for [%s@%s] [%s]",
+			     aconf->info.oper, tkline_time / 60,
+			     aconf->user, aconf->host, make_ban_reason(reason, oper_reason));
+	ilog(L_KLINE, "K %s %d %s %s %s",
+	     aconf->info.oper, tkline_time / 60, aconf->user, aconf->host, 
+	     make_ban_reason(reason, oper_reason));
 
 	sendto_one_notice(source_p, ":Added temporary %d min. K-Line [%s@%s]",
 			  tkline_time / 60, aconf->user, aconf->host);
