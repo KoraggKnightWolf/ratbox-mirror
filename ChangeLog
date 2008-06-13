@@ -1,3 +1,12 @@
+leeh        2008/06/13 18:41:41 UTC	(20080613_1-25536)
+  Log:
+  - finish cleaning up the dline code to cope with admindline
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+
+
 leeh        2008/06/13 18:35:58 UTC	(20080613_0-25534)
   Log:
   - add make_ban_reason(), to make joining the reason|oper_reason together
