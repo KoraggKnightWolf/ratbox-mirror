@@ -51,7 +51,7 @@ struct Message dline_msgtab = {
 };
 struct Message admindline_msgtab = {
 	"ADMINDLINE", 0, 0, 0, MFLG_SLOW,
-	{ mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_admindline, 2}}
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_admindline, 3}}
 };
 struct Message undline_msgtab = {
 	"UNDLINE", 0, 0, 0, MFLG_SLOW,
