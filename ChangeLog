@@ -1,3 +1,12 @@
+leeh        2008/06/16 18:42:05 UTC	(20080616_1-25542)
+  Log:
+  - add in adminxline
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 leeh        2008/06/16 18:20:51 UTC	(20080616_0-25540)
   Log:
   - make admindline require 2 full params
