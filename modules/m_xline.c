@@ -50,6 +50,7 @@
 
 static int mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
+static int mo_adminxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int mo_unxline(struct Client *client_p, struct Client *source_p, int parc,
 		      const char *parv[]);
 static int me_unxline(struct Client *client_p, struct Client *source_p, int parc,
@@ -59,6 +60,11 @@ struct Message xline_msgtab = {
 	"XLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_xline, 5}, {mo_xline, 3}}
 };
+struct Message adminxline_msgtab = {
+	"ADMINXLINE", 0, 0, 0, MFLG_SLOW,
+	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminxline, 3}}
+};
+
 struct Message unxline_msgtab = {
 	"UNXLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unxline, 2}, {mo_unxline, 2}}
@@ -89,7 +95,6 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	const char *target_server = NULL;
 	int temp_time;
 	int loc = 1;
-	int locked = 0;
 
 	if(!IsOperXline(source_p))
 	{
@@ -118,23 +123,6 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 		target_server = parv[loc + 1];
 		loc += 2;
-
-	} else if(parc >= loc + 1 && !irccmp(parv[loc], "lock"))
-	{
-		/* XLINE <gecos> lock :<reason>  */
-		if(!IsOperAdmin(source_p))
-		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
-				   "admin");
-			return 0;
-		}
-		if(temp_time > 0)
-		{
-			sendto_one_notice(source_p, ":Lock and temporary xlines are mutually exclusive. See /QUOTE HELP XLINE");
-			return 0;
-		}
-		locked = 1;
-		loc++;
 	}
 
 	if(parc <= loc || EmptyString(parv[loc]))
@@ -146,9 +134,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	reason = parv[loc];
 
-	if(locked)
-		;
-	else if(target_server != NULL)
+	if(target_server != NULL)
 	{
 		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
 				   "ENCAP %s XLINE %d %s 2 :%s",
@@ -172,7 +158,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if(!valid_xline(source_p, name, reason, temp_time))
 		return 0;
 
-	apply_xline(source_p, name, reason, temp_time, locked);
+	apply_xline(source_p, name, reason, temp_time, 0);
 
 	return 0;
 }
@@ -209,6 +195,37 @@ me_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 
 	apply_xline(source_p, name, reason, temp_time, 0);
+	return 0;
+}
+
+static int
+mo_adminxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+{
+	struct ConfItem *aconf;
+
+	if(!IsOperXline(source_p))
+	{
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "xline");
+		return 0;
+	}
+
+	if(!IsOperAdmin(source_p))
+	{
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
+		return 0;
+	}
+
+	if((aconf = find_xline_mask(parv[1])) != NULL)
+	{
+		sendto_one_notice(source_p, ":[%s] already X-Lined by [%s] - %s",
+				  parv[1], aconf->host, aconf->passwd);
+		return 0;
+	}
+
+	if(!valid_xline(source_p, parv[1], parv[2], 0))
+		return 0;
+
+	apply_xline(source_p, parv[1], parv[2], 0, 1);
 	return 0;
 }
 
