@@ -25,10 +25,7 @@ XLINE [time] <gecos> ON <server> :<reason>
 Will attempt to set the XLINE on <server> if <server> accepts
 remote xlines.
 
-Admins can also add a locked XLINE with the following syntax:
-
-XLINE <gecos> lock :[reason]
-
-A locked XLINE can only be removed by an administrator.
+Administrators can also add a XLINE that can only be removed by
+other administrators with the ADMINXLINE command.
 
 - Requires Oper Priv: X

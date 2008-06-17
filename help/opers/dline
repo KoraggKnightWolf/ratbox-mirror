@@ -7,11 +7,7 @@ a message saying he/she is banned with reason [reason]
 
 Duration is optional, and is in minutes.
 
-Administrators can also add a locked KLINE with the 
-following syntax:
-
-DLINE <ip> lock :[reason]
-
-A locked DLINE can only be removed by an administrator.
+Administrators can also add a DLINE that can only be removed by
+other administrators with the ADMINDLINE command.
 
 - Requires Oper Priv: K

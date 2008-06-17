@@ -10,8 +10,5 @@ RESV [time] <channel|nick> ON <server> :<reason>
 
 Will attempt to set the RESV on <server> if <server> accepts remote RESVs.
 
-Administrators can also add a locked RESV with the following syntax:
-
-RESV <channel|nick> lock :[reason]
-
-A locked RESV can only be removed by an administrator.
+Administrators can also add a XLINE that can only be removed by
+other administrators with the ADMINXLINE command.
