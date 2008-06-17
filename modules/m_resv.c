@@ -43,6 +43,7 @@
 
 static int mo_resv(struct Client *, struct Client *, int, const char **);
 static int me_resv(struct Client *, struct Client *, int, const char **);
+static int mo_adminresv(struct Client *, struct Client *, int, const char **);
 static int mo_unresv(struct Client *, struct Client *, int, const char **);
 static int me_unresv(struct Client *, struct Client *, int, const char **);
 
@@ -50,12 +51,16 @@ struct Message resv_msgtab = {
 	"RESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_resv, 5}, {mo_resv, 3}}
 };
+struct Message adminresv_msgtab = {
+	"ADMINRESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
+	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminresv, 3}}
+};
 struct Message unresv_msgtab = {
 	"UNRESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_unresv, 2}, {mo_unresv, 2}}
 };
 
-mapi_clist_av1 resv_clist[] = {	&resv_msgtab, &unresv_msgtab, NULL };
+mapi_clist_av1 resv_clist[] = {	&resv_msgtab, &adminresv_msgtab, &unresv_msgtab, NULL };
 DECLARE_MODULE_AV1(resv, NULL, NULL, resv_clist, NULL, NULL, "$Revision$");
 
 static void parse_resv(struct Client *source_p, const char *name,
@@ -77,7 +82,6 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 	const char *target_server = NULL;
 	int temp_time;
 	int loc = 1;
-	int locked = 0;
 
 	/* RESV [time] <name> [ON <server>] :<reason> */
 
@@ -101,29 +105,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		target_server = parv[loc + 1];
 		loc += 2;
-
-		if(locked && irccmp(target_server, me.name))
-		{
-			sendto_one_notice(source_p, ":Cannot set locked bans on remote servers");
-			return 0;
-		}
 	} 
-	else if((parc >= loc + 1) && (irccmp(parv[loc], "lock") == 0))
-	{
-		if(!IsOperAdmin(source_p))
-		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
-				   "admin");
-			return 0;
-		}
-		if(temp_time > 0)
-		{
-			sendto_one_notice(source_p, ":Lock and temporary resv are mutually exclusive. See /QUOTE HELP RESV");
-			return 0;
-		}
-		locked = 1;
-		loc++;
-	}
 
 	if(parc <= loc || EmptyString(parv[loc]))
 	{
@@ -133,10 +115,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	reason = parv[loc];
 
-	/* remote resv.. */
-	if(locked)
-		;
-	else if(target_server)
+	if(target_server)
 	{
 		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
 				   "ENCAP %s RESV %d %s 0 :%s",
@@ -150,10 +129,26 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 				(temp_time > 0) ? SHARED_TRESV : SHARED_PRESV,
 				"%d %s 0 :%s", temp_time, name, reason);
 
-	parse_resv(source_p, name, reason, temp_time, locked);
+	parse_resv(source_p, name, reason, temp_time, 0);
 
 	return 0;
 }
+
+static int
+mo_adminresv(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+{
+	if(!IsOperAdmin(source_p))
+	{
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
+			   me.name, source_p->name, "admin");
+		return 0;
+	}
+
+	parse_resv(source_p, parv[1], parv[2], 0, 1);
+
+	return 0;
+}
+
 
 static int
 me_resv(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
