@@ -1,3 +1,17 @@
+leeh        2008/06/17 20:09:45 UTC	(20080617_1-25546)
+  Log:
+  - helpfiles for the admin* commands
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/admindline (File Added) 
+	ircd-ratbox/trunk/help/opers/adminresv (File Added) 
+	ircd-ratbox/trunk/help/opers/adminxline (File Added) 
+	ircd-ratbox/trunk/help/opers/dline (File Modified) 
+	ircd-ratbox/trunk/help/opers/resv (File Modified) 
+	ircd-ratbox/trunk/help/opers/xline (File Modified) 
+
+
 leeh        2008/06/17 20:04:30 UTC	(20080617_0-25544)
   Log:
   - add in adminresv
