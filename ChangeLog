@@ -1,3 +1,12 @@
+leeh        2008/06/17 20:04:30 UTC	(20080617_0-25544)
+  Log:
+  - add in adminresv
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+
+
 leeh        2008/06/16 18:42:05 UTC	(20080616_1-25542)
   Log:
   - add in adminxline
