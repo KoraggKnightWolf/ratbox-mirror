@@ -137,7 +137,8 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 			   me.name, source_p->name, "KLINE");
 		return 0;
 	}
-
+	reason = LOCAL_COPY(parv[loc]);
+	
 	if(target_server != NULL)
 	{
 		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
