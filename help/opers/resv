@@ -12,3 +12,5 @@ Will attempt to set the RESV on <server> if <server> accepts remote RESVs.
 
 Administrators can also add a RESV that can only be removed by
 other administrators with the ADMINRESV command.
+
+- Requires Oper Priv: Q
