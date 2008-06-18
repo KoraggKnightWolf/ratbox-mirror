@@ -1,3 +1,12 @@
+jilles      2008/06/18 17:44:46 UTC	(20080618_0-25548)
+  Log:
+  Fix mistake in help file RESV<->XLINE.
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/resv (File Modified) 
+
+
 leeh        2008/06/17 20:09:45 UTC	(20080617_1-25546)
   Log:
   - helpfiles for the admin* commands
