@@ -1,3 +1,21 @@
+jilles      2008/06/18 17:49:53 UTC	(20080618_1-25550)
+  Log:
+  Add resv (Q) oper priv controlling resv and unresv.
+  Adminresv requires both resv and admin priv.
+  The new priv is not enabled by default.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/help/opers/adminresv (File Modified) 
+	ircd-ratbox/trunk/help/opers/resv (File Modified) 
+	ircd-ratbox/trunk/help/opers/unresv (File Modified) 
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 jilles      2008/06/18 17:44:46 UTC	(20080618_0-25548)
   Log:
   Fix mistake in help file RESV<->XLINE.
