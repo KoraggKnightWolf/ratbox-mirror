@@ -263,22 +263,26 @@ dnl End OpenSSL detection
 
 ac_cv_build_sqlite3=no
 
-AC_ARG_WITH(sqlite3-path,
-AC_HELP_STRING([--with-sqlite3-path=DIR],[Path to libsqlite3.so]),
-[LIBS="$LIBS -L$withval"],)
+PKG_CHECK_MODULES(sqlite3, [sqlite3], [ac_cv_build_sqlite3="no"], [ac_cv_build_sqlite3="yes"])
 
+
+dnl then try the old way...
+if test x"$ac_cv_build_sqlite3" = "yes"; then
 AC_CHECK_HEADER(sqlite3.h, [
 	AC_CHECK_LIB([sqlite3], [main],
 	[
-		AC_SUBST(SQLITE_LD, [-lsqlite3])
+		sqlite3_LIBS="-lsqlite3"
 		AC_DEFINE(HAVE_SQLITE3, 1, [Define to 1 if sqlite3 is available.])
 	], ac_cv_build_sqlite3=yes)
 ], ac_cv_build_sqlite3=yes)
 
+fi
+
+
 if test "$ac_cv_build_sqlite3" = yes; then
 	SQLITE_SUBDIR=sqlite3
-	AC_SUBST(SQLITE_SUBDIR)
-	AC_SUBST(SQLITE_INCLUDES, [-Isqlite3])
+	AC_SUBST(sqlite3_SUBDIR)
+	sqlite3_CFLAGS="-Isqlite3"
 	save_LIBS=$LIBS
 	AC_SEARCH_LIBS(fdatasync, [rt],,)
 	FDATASYNCLIB=$ac_cv_search_fdatasync
@@ -292,11 +296,13 @@ if test "$ac_cv_build_sqlite3" = yes; then
 		unset FDATASYNCLIB
 	fi
         	
-	SQLITE_LD="$FDATASYNCLIB sqlite3/libsqlite3.a"
-	AC_SUBST(SQLITE_LD, $SQLITE_LD)
+	sqlite3_LIBS="$FDATASYNCLIB sqlite3/libsqlite3.a"
+	AC_SUBST(SQLITE3_LIBS, $sqlite3_LIBS)
 	
 fi
 
+AC_SUBST(SQLITE3_LIBS, $sqlite3_LIBS)
+AC_SUBST(SQLITE3_CFLAGS, $sqlite3_CFLAGS)
 AM_CONDITIONAL([BUILD_SQLITE], [test "$ac_cv_build_sqlite3" = yes])
 
 
