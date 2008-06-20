@@ -1,3 +1,11 @@
+androsyn    2008/06/20 16:28:55 UTC	(20080620_3-25564)
+  Log:
+  set s == NULL in case rb_read returns 0
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2008/06/20 16:27:20 UTC	(20080620_2-25562)
   Log:
   remove unused ip6_int from struct AuthRequest
