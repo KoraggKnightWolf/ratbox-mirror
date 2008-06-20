@@ -21,9 +21,9 @@
 %option case-insensitive
 %option noyywrap
 %option nounput
-
 %{
 
+#define YY_NO_INPUT 1
 #include "ratbox_lib.h"
 #include "stdinc.h"
 #include "newconf.h"
