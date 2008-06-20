@@ -1,3 +1,15 @@
+androsyn    2008/06/20 16:25:40 UTC	(20080620_1-25560)
+  Log:
+  Move ident checking back into the ircd, update makefiles to reflect this as well.
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ident/ (File Deleted) 
+	ircd-ratbox/trunk/include/s_auth.h (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2008/06/20 16:23:34 UTC	(20080620_0-25558)
   Log:
   shutup some gcc warnings for the lexer and rebuild ircd_lexer.c
