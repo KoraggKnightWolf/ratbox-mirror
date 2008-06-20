@@ -1,3 +1,12 @@
+androsyn    2008/06/20 16:23:34 UTC	(20080620_0-25558)
+  Log:
+  shutup some gcc warnings for the lexer and rebuild ircd_lexer.c
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd_lexer.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_lexer.l (File Modified) 
+
+
 androsyn    2008/06/19 15:06:52 UTC	(20080619_0-25554)
   Log:
   Make the sqlite3 check use pkg-config when it can find it..
