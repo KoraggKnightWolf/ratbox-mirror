@@ -247,7 +247,7 @@ fi
 if test "$cf_openssl_version_ok" != no; then
 	CPPFLAGS="$CPPFLAGS $SSL_LIBS"
 	AC_CHECK_LIB(crypto, RSA_free, 
-		[SSL_LIBS="$SSL_LIBS -lcrypto" SSL_SRCS_ENABLE='$(SSL_SRCS)'], 
+		[SSL_LIBS="$SSL_LIBS -lcrypto"], 
 		[cf_enable_openssl=no]  
 	)
 fi
@@ -536,7 +536,6 @@ if test x"$sslonly_chan" = "xyes"; then
 fi
 
 
-AC_SUBST(SSL_SRCS_ENABLE)
 AC_SUBST(SSL_INCLUDES)
 AC_SUBST(SSL_LIBS)
 
@@ -589,7 +588,6 @@ AC_CONFIG_FILES(		\
 	bandb/Makefile		\
 	bandb/sqlite3/Makefile	\
 	ssld/Makefile		\
-	ident/Makefile		\
 	resolver/adns/Makefile	\
 	resolver/Makefile	\
 	contrib/Makefile	\
