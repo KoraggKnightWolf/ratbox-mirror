@@ -61,9 +61,6 @@ struct AuthRequest
         time_t timeout;         /* time when query expires */
         int lport;
         int rport;
-#ifdef RB_IPV6
-        int ip6_int;
-#endif
 };
 
 /*
