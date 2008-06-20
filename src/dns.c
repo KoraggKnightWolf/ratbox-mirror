@@ -56,13 +56,18 @@ struct dnsreq
 static struct dnsreq querytable[IDTABLE];
 static uint16_t id = 1;
 
-static inline uint16_t 
+static uint16_t 
 assign_dns_id(void)
 {
-	if(id < IDTABLE-1)
-		id++;
-	else
-		id = 1;
+	while(1)
+	{
+		if(id < IDTABLE-1)
+			id++;
+		else
+			id = 1;
+		if(querytable[id].callback == NULL)
+			break;
+	}	
 	return(id);	
 }
 
