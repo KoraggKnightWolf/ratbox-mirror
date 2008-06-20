@@ -37,18 +37,9 @@
 
 struct Client;
 
-struct AuthRequest
-{
-	rb_dlink_node node;
-	struct Client *client;	/* pointer to client struct for request */
-	uint16_t dns_query; /* DNS Query */
-	uint16_t reqid;
-	unsigned int flags;	/* current state of request */
-	time_t timeout;		/* time when query expires */
-#ifdef RB_IPV6
-	int ip6_int;
-#endif
-};
+/* defined in s_auth.c now */
+struct AuthRequest;
+
 
 /*
  * flag values for AuthRequest

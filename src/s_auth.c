@@ -50,6 +50,22 @@
 #include "hook.h"
 #include "dns.h"
 
+
+struct AuthRequest
+{
+        rb_dlink_node node;
+        struct Client *client;  /* pointer to client struct for request */
+        uint16_t dns_query; /* DNS Query */
+        rb_fde_t *authF;
+        unsigned int flags;     /* current state of request */
+        time_t timeout;         /* time when query expires */
+        int lport;
+        int rport;
+#ifdef RB_IPV6
+        int ip6_int;
+#endif
+};
+
 /*
  * a bit different approach
  * this replaces the original sendheader macros
@@ -79,107 +95,10 @@ ReportType;
 
 #define sendheader(c, r) sendto_one(c, HeaderMessages[(r)])
 
-static struct AuthRequest fake_auth;
-static struct AuthRequest *no_auth = &fake_auth;
-
 static rb_dlink_list auth_poll_list;
 static rb_bh *auth_heap;
-static void read_auth_reply(rb_helper *);
-static void fail_auth_requests(void);
 static EVH timeout_auth_queries_event;
-
-static uint16_t last_id;
-#define IDTABLE 0x1000
-
-static struct AuthRequest *authtable[IDTABLE];
-
-static uint16_t
-assign_auth_id(void)
-{
-	unsigned int attempts;
-
-	attempts = 0;
-	do
-	{
-		if(last_id < IDTABLE - 1)
-			last_id++;
-		else
-			last_id = 1;
-	} while (++attempts < IDTABLE && authtable[last_id] != NULL);
-	return authtable[last_id] == NULL ? last_id : 0;
-}
-
-static char *ident_path;
-static rb_helper *ident_helper;
-static void ident_restart(rb_helper *helper);
-
-static void
-fork_ident(void)
-{
-	char fullpath[PATH_MAX + 1];
-#ifdef _WIN32
-	const char *suffix = ".exe";
-#else
-	const char *suffix = "";
-#endif
-	char timeout[6];
-
-	if(ident_path == NULL)
-	{
-	        rb_snprintf(fullpath, sizeof(fullpath), "%s/ident%s", LIBEXEC_DIR, suffix);
-
-	        if(access(fullpath, X_OK) == -1)
-	        {
-	                rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/ident%s", ConfigFileEntry.dpath, suffix);
-	                if(access(fullpath, X_OK) == -1)
-	                {
-	                	sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to execute ident in %s/libexec/ircd-ratbox or %s", 
-						     ConfigFileEntry.dpath, LIBEXEC_DIR);
-	                        ilog(L_MAIN, "Unable to execute ident in %s/libexec/ircd-ratbox or %s", ConfigFileEntry.dpath, LIBEXEC_DIR);
-	                        return;   
-        	        }
-                 
-	        }
-	        ident_path = rb_strdup(fullpath);
-	}
-	rb_snprintf(timeout, sizeof(timeout), "%d", GlobalSetOptions.ident_timeout);
-	setenv("IDENT_TIMEOUT", timeout, 1);
-	
-	ident_helper = rb_helper_start("ident", ident_path, read_auth_reply, ident_restart);
-	setenv("IDENT_TIMEOUT", "", 1);
-        if(ident_helper == NULL)
-	{
-		ilog(L_MAIN, "ident - rb_helper_start failed: %s", strerror(errno));
-		return;
-	}
-	ilog(L_MAIN, "ident helper daemon started");
-	sendto_realops_flags(UMODE_ALL, L_ALL, "ident helper daemon started");
-        rb_helper_run(ident_helper);
-	return;
-}
-
-static void ident_restart(rb_helper *helper)
-{
-	ilog(L_MAIN, "ident - ident_restart called, helper died?");
-	sendto_realops_flags(UMODE_ALL, L_ALL, "ident - ident_restart called, helper died?");
-	fail_auth_requests();
-	if(helper != NULL)
-	{
-		rb_helper_close(helper);
-		ident_helper = NULL;
-	}
-	fork_ident();
-}
-
-void restart_ident(void)
-{
-	if(ident_helper != NULL)
-	{
-		rb_helper_close(ident_helper);
-		ident_helper = NULL;
-	}
-	fork_ident();
-}
+static void read_auth(rb_fde_t * F, void *data);
 
 
 /*
@@ -190,13 +109,6 @@ void restart_ident(void)
 void
 init_auth(void)
 {
-	/* This hook takes a struct Client for its argument */
-	fork_ident();
-	if(ident_helper == NULL)
-	{
-		ilog(L_MAIN, "Unable to fork ident daemon");
-	}
-
 	memset(&auth_poll_list, 0, sizeof(auth_poll_list));
 	rb_event_addish("timeout_auth_queries_event", timeout_auth_queries_event, NULL, 3);
 	auth_heap = rb_bh_create(sizeof(struct AuthRequest), AUTH_HEAP_SIZE, "auth_heap");
@@ -213,7 +125,7 @@ make_auth_request(struct Client *client)
 	client->localClient->auth_request = request;
 	request->client = client;
 	request->dns_query = 0;
-	request->reqid = 0;
+	request->authF = NULL;
 	request->timeout = rb_current_time() + ConfigFileEntry.connect_timeout;
 	return request;
 }
@@ -239,9 +151,6 @@ release_auth_client(struct AuthRequest *auth)
 
 	if(IsDNS(auth) || IsAuth(auth))
 		return;
-
-	if(auth->reqid > 0)
-		authtable[auth->reqid] = NULL;
 
 	client->localClient->auth_request = NULL;
 	rb_dlinkDelete(&auth->node, &auth_poll_list);
@@ -296,12 +205,37 @@ auth_error(struct AuthRequest *auth)
 {
 	ServerStats.is_abad++;
 
-	if(auth->reqid > 0) 
-		authtable[auth->reqid] = NULL;
-
-	auth->reqid = 0;
+	if(auth->authF != NULL)
+		rb_close(auth->authF);
+	auth->authF = NULL;
 	ClearAuth(auth);
 	sendheader(auth->client, REPORT_FAIL_ID);
+}
+
+
+
+static void
+auth_connect_callback(rb_fde_t * F, int status, void *data)
+{
+        struct AuthRequest *auth = data;
+	char authbuf[32];
+
+	if(status != RB_OK)
+	{
+		auth_error(auth);
+		return;
+	}
+
+	/* one shot at the send, socket buffers should be able to handle it
+ 	 * if not, oh well, you lose
+ 	 */
+ 	rb_snprintf(authbuf, sizeof(authbuf), "%d , %d\r\n", auth->lport, auth->rport);
+ 	if(rb_write(auth->authF, authbuf, strlen(authbuf)) <= 0)
+ 	{
+		auth_error(auth);
+		return;
+	}
+	read_auth(F, auth);
 }
 
 
@@ -318,54 +252,53 @@ start_auth_query(struct AuthRequest *auth)
 {
 	struct rb_sockaddr_storage *localaddr;
 	struct rb_sockaddr_storage *remoteaddr;
-	char myip[HOSTIPLEN + 1];
-	int lport, rport;
+	struct rb_sockaddr_storage destaddr;
+	struct rb_sockaddr_storage bindaddr;
+	int family;
 
 	if(IsAnyDead(auth->client))
 		return;
 
 	sendheader(auth->client, REPORT_DO_ID);
 
-	if(ident_helper == NULL) /* hmm..ident is dead..skip it */
-	{
-		auth_error(auth);
-		release_auth_client(auth);
-		return;
-	}
-	
 	localaddr = auth->client->localClient->lip;
 	remoteaddr = &auth->client->localClient->ip;
 
+	family = GET_SS_FAMILY(remoteaddr);
 
-#ifdef RB_IPV6
-	if(GET_SS_FAMILY(&localaddr) == AF_INET6)
-		lport = ntohs(((struct sockaddr_in6 *) localaddr)->sin6_port);
-	else
-#endif
-		lport = ntohs(((struct sockaddr_in *) localaddr)->sin_port);
-
-#ifdef RB_IPV6
-	if(GET_SS_FAMILY(remoteaddr) == AF_INET6)
-		rport = ntohs(((struct sockaddr_in6 *) remoteaddr)->sin6_port);
-	else
-#endif
-		rport = ntohs(((struct sockaddr_in *) remoteaddr)->sin_port);
-
-	rb_inet_ntop_sock((struct sockaddr *)localaddr, myip, sizeof(myip));
-
-	auth->reqid = assign_auth_id();
-	if (auth->reqid == 0)
-	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Dropping an ident query, authtable is full");
-		ilog(L_MAIN, "Dropping an ident query, authtable is full");
+        if((auth->authF = rb_socket(family, SOCK_STREAM, 0, "ident")) == NULL)
+        {
+                sendto_realops_flags(UMODE_DEBUG, L_ALL,
+                                "Error creating auth stream socket: %s",
+                                strerror(errno));
+                ilog(L_IOERROR, "creating auth stream socket %s: %s",
+                        auth->client->sockhost, strerror(errno));
 		auth_error(auth);
-		release_auth_client(auth);
-		return;
+                return;
+        }
+	memcpy(&bindaddr, localaddr, sizeof(struct rb_sockaddr_storage));
+	memcpy(&destaddr, remoteaddr, sizeof(struct rb_sockaddr_storage));
+#ifdef RB_IPV6
+	if(family == AF_INET6)
+	{
+		auth->lport = ntohs(((struct sockaddr_in6 *) localaddr)->sin6_port);
+		auth->rport = ntohs(((struct sockaddr_in6 *) remoteaddr)->sin6_port);
+		((struct sockaddr_in6 *) &bindaddr)->sin6_port = 0;
+		((struct sockaddr_in6 *) &destaddr)->sin6_port = htons(113);
+		
 	}
-	authtable[auth->reqid] = auth;
+	else
+#endif
+	{
+		auth->lport = ntohs(((struct sockaddr_in *) localaddr)->sin_port);
+		auth->rport = ntohs(((struct sockaddr_in *) remoteaddr)->sin_port);
+		((struct sockaddr_in *) &bindaddr)->sin_port = 0;
+		((struct sockaddr_in *) &destaddr)->sin_port = htons(113);
+	}
 
-	rb_helper_write(ident_helper, "C %x %s %s %u %u", auth->reqid, myip, 
-		    auth->client->sockhost, (unsigned int)rport, (unsigned int)lport); 
+	rb_connect_tcp(auth->authF, (struct sockaddr *)&destaddr, (struct sockaddr *)&bindaddr, 
+	               GET_SS_LEN(&destaddr), auth_connect_callback, auth, 
+	               GlobalSetOptions.ident_timeout);
 
 	return;
 }
@@ -429,14 +362,16 @@ timeout_auth_queries_event(void *notused)
 
 		if(auth->timeout < rb_current_time())
 		{
+		        if(auth->authF != NULL) 
+			{
+                        	rb_close(auth->authF);
+				auth->authF = NULL;
+			}
 			if(IsAuth(auth))
 			{
-				if(auth->reqid > 0)
-				{
-					rb_helper_write(ident_helper, "D %x", auth->reqid);
-					authtable[auth->reqid] = no_auth;
-				}
-				auth_error(auth);
+				ClearAuth(auth);
+				ServerStats.is_abad++;
+				sendheader(auth->client, REPORT_FAIL_ID);
 			}
 			if(IsDNS(auth))
 			{
@@ -453,7 +388,7 @@ timeout_auth_queries_event(void *notused)
 	return;
 }
 
-
+/* this assumes the client is closing */
 void
 delete_auth_queries(struct Client *target_p)
 {
@@ -468,96 +403,126 @@ delete_auth_queries(struct Client *target_p)
 		cancel_lookup(auth->dns_query);
 		auth->dns_query = 0;
 	}
-	if(auth->reqid > 0)
-	{
-		rb_helper_write(ident_helper, "D %x", auth->reqid);
-		authtable[auth->reqid] = no_auth;
-	}
+
+	if(auth->authF != NULL)
+		rb_close(auth->authF);
+
 	rb_dlinkDelete(&auth->node, &auth_poll_list);
 	free_auth_request(auth);
 }
 
-/* read auth reply from ident daemon */
-static char authBuf[READBUF_SIZE];
 
-
-static void
-read_auth_reply(rb_helper *helper)
+static char *
+GetValidIdent(char *xbuf)
 {
-	int length;
-	char *q, *p;
-	struct AuthRequest *auth;
-	uint16_t id;
+        int remp = 0;
+        int locp = 0;
+        char *colon1Ptr;
+        char *colon2Ptr;
+        char *colon3Ptr;
+        char *commaPtr; 
+        char *remotePortString;
 
-	while((length = rb_helper_read(helper, authBuf, sizeof(authBuf))) > 0)
-	{
-		q = strchr(authBuf, ' ');
+        /* All this to get rid of a sscanf() fun. */
+        remotePortString = xbuf;
 
-		if(q == NULL)
-			continue;
+        colon1Ptr = strchr(remotePortString, ':');
+        if(!colon1Ptr)
+                return NULL;
 
-		*q = '\0';
-		q++;
+        *colon1Ptr = '\0';
+        colon1Ptr++;
+        colon2Ptr = strchr(colon1Ptr, ':');
+        if(!colon2Ptr)
+                return NULL;
 
-		id = strtoul(authBuf, NULL, 16);
-		auth = authtable[id];
+        *colon2Ptr = '\0';
+        colon2Ptr++;
+        commaPtr = strchr(remotePortString, ',');
 
-		if(auth == NULL)
-			continue;
-		if(auth == no_auth)
-		{
-			authtable[id] = NULL;
-			continue;
-		}
-		p = strchr(q, '\n');
+        if(!commaPtr)
+                return NULL;
 
-		if(p != NULL)
-			*p = '\0';
+        *commaPtr = '\0';
+        commaPtr++;
 
-		if(*q == '0')
-		{
-			auth_error(auth);
-			release_auth_client(auth);
-			continue;
-		}
+        remp = atoi(remotePortString);
+        if(!remp)
+                return NULL;
 
-		rb_strlcpy(auth->client->username, q, sizeof(auth->client->username));
-		ClearAuth(auth);
-		ServerStats.is_asuc++;
-		sendheader(auth->client, REPORT_FIN_ID);
-		SetGotId(auth->client);
-		release_auth_client(auth);
-	}
+        locp = atoi(commaPtr);
+        if(!locp)
+                return NULL;
 
+        /* look for USERID bordered by first pair of colons */
+        if(!strstr(colon1Ptr, "USERID"))
+                return NULL;
 
+        colon3Ptr = strchr(colon2Ptr, ':');
+        if(!colon3Ptr)
+                return NULL;
+
+        *colon3Ptr = '\0';
+        colon3Ptr++;
+        return (colon3Ptr);
 }
-
+ 
+#define AUTH_BUFSIZ 128
 static void
-fail_auth_requests(void)
+read_auth(rb_fde_t * F, void *data)
 {
-	uint16_t id;
-	struct AuthRequest *auth;
+        struct AuthRequest *auth = data;
+        char username[USERLEN], *s, *t;  
+        char buf[AUTH_BUFSIZ+1];
+        int len, count;
 
-	for (id = 1; id < IDTABLE; id++)
-	{
-		auth = authtable[id];
-		if (auth != NULL)
+        len = rb_read(F, buf, sizeof(buf));
+
+        if(len < 0 && rb_ignore_errno(errno))
+        {
+                rb_setselect(F, RB_SELECT_READ, read_auth, auth);
+                return;
+        }
+
+        if(len > 0)
+        {
+		buf[len] = '\0';
+		if((s = GetValidIdent(buf)))
 		{
-			if(auth == no_auth)
+			t = username;
+			while (*s == '~' || *s == '^')
+				s++;
+			for (count = USERLEN; *s && count; s++)
 			{
-				authtable[id] = NULL;
-				continue;
+				if(*s == '@')
+	                                break;
+	                        if(!isspace(*s) && *s != ':' && *s != '[')
+	                        {
+	                        	*t++ = *s;
+	                        	count--;  
+				}
 			}
-			auth_error(auth);
-			release_auth_client(auth);
+			*t = '\0';
 		}
 	}
-}
 
-void
-change_ident_timeout(int timeout)
-{
-	rb_helper_write(ident_helper, "T %d", timeout);
-}
+	rb_close(F);
+	auth->authF = NULL;
+	ClearAuth(auth);
+	
+        if(s == NULL)
+        {
+                ++ServerStats.is_abad;
+		rb_strlcpy(auth->client->username, "unknown", sizeof(auth->client->username));
+                sendheader(auth->client, REPORT_FAIL_ID); 
+        }
+        else
+        {   
+                sendheader(auth->client, REPORT_FIN_ID);
+                ++ServerStats.is_asuc;
+                SetGotId(auth->client);
+        }
 
+	release_auth_client(auth);
+}
 

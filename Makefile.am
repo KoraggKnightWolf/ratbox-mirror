@@ -24,13 +24,13 @@ endif
 
 if !STATIC_MODULES
 
-SUBDIRS = libratbox libltdl src modules tools doc help bandb ssld resolver ident
+SUBDIRS = libratbox libltdl src modules tools doc help bandb ssld resolver
 ircd_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
 ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
 else
 
-SUBDIRS = libratbox libltdl modules src tools doc help bandb ssld resolver ident
+SUBDIRS = libratbox libltdl modules src tools doc help bandb ssld resolver
 ircd_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)
 
 
