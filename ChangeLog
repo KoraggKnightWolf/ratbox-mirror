@@ -1,3 +1,11 @@
+androsyn    2008/06/20 16:27:20 UTC	(20080620_2-25562)
+  Log:
+  remove unused ip6_int from struct AuthRequest
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2008/06/20 16:25:40 UTC	(20080620_1-25560)
   Log:
   Move ident checking back into the ircd, update makefiles to reflect this as well.
