@@ -469,7 +469,7 @@ static void
 read_auth(rb_fde_t * F, void *data)
 {
         struct AuthRequest *auth = data;
-        char username[USERLEN], *s, *t;  
+        char username[USERLEN], *s = NULL, *t;  
         char buf[AUTH_BUFSIZ+1];
         int len, count;
 
