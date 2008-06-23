@@ -1,3 +1,14 @@
+androsyn    2008/06/23 15:55:13 UTC	(20080623_2-25584)
+  Log:
+  the reason restrictions for k/d/x/resvs don't make much sense now as the bans are stored in sqlite
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 androsyn    2008/06/23 15:42:13 UTC	(20080623_1-25582)
   Log:
   actually copy the username into the clients username
