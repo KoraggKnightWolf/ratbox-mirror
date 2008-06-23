@@ -1,3 +1,11 @@
+androsyn    2008/06/23 15:42:13 UTC	(20080623_1-25582)
+  Log:
+  actually copy the username into the clients username
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2008/06/23 15:10:51 UTC	(20080623_0-25580)
   Log:
   mangle exported reasons to not include a : as well
