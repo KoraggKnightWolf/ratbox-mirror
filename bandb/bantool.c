@@ -115,7 +115,7 @@ static const char *clean_gecos_field(const char *gecos);
 static char *smalldate(const char *string);
 static char *getfield(char *newline);
 static char *strip_quotes(const char *string);
-static char *mangle_quotes(const char *string);
+static char *mangle_reason(const char *string);
 static char *escape_quotes(const char *string);
 
 static void db_error_cb(const char *errstr);
@@ -326,7 +326,7 @@ export_config(const char *conf, int id)
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"\",\"%s\",\"%s\",%s\n",
 				    table.row[j][mask1],
-				    mangle_quotes(table.row[j][reason]),
+				    mangle_reason(table.row[j][reason]),
 				    smalldate(table.row[j][ts]),
 				    table.row[j][oper], table.row[j][ts]);
 			break;
@@ -336,7 +336,7 @@ export_config(const char *conf, int id)
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"0\",\"%s\",\"%s\",%s\n",
 				    escape_quotes(table.row[j][mask1]),
-				    mangle_quotes(table.row[j][reason]),
+				    mangle_reason(table.row[j][reason]),
 				    table.row[j][oper], table.row[j][ts]);
 			break;
 
@@ -345,7 +345,7 @@ export_config(const char *conf, int id)
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"%s\",%s\n",
 				    table.row[j][mask1],
-				    mangle_quotes(table.row[j][reason]),
+				    mangle_reason(table.row[j][reason]),
 				    table.row[j][oper], table.row[j][ts]);
 			break;
 
@@ -354,7 +354,7 @@ export_config(const char *conf, int id)
 			rb_snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"%s\",\"\",\"%s\",\"%s\",%s\n",
 				    table.row[j][mask1], table.row[j][mask2],
-				    mangle_quotes(table.row[j][reason]),
+				    mangle_reason(table.row[j][reason]),
 				    smalldate(table.row[j][ts]), table.row[j][oper],
 				    table.row[j][ts]);
 			break;
@@ -655,11 +655,8 @@ escape_quotes(const char *string)
 }
 
 
-/**
- * change double-quotes to single-quotes
- */
 static char *
-mangle_quotes(const char *string)
+mangle_reason(const char *string)
 {
 	static char buf[BUFSIZE * 2];
 	char *str = buf;
@@ -669,12 +666,20 @@ mangle_quotes(const char *string)
 
 	while (*string)
 	{
-		if(*string != '"')
-			*str++ = *string;
-		else
-			*str++ = '\'';
-
+		switch(*string)
+		{
+		case '"':
+			*str = '\'';
+			break;
+		case ':':
+			*str = ' ';
+			break;
+		default:
+			*str = *string;
+		}
 		string++;
+		str++;
+		
 	}
 	*str = '\0';
 	return buf;
