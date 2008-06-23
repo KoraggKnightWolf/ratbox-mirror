@@ -66,7 +66,6 @@ DECLARE_MODULE_AV1(kline, NULL, NULL, kline_clist, NULL, NULL, "$Revision$");
 
 /* Local function prototypes */
 static int find_user_host(struct Client *source_p, const char *userhost, char *user, char *host);
-static int valid_comment(struct Client *source_p, char *comment);
 static int valid_user_host(struct Client *source_p, const char *user, const char *host);
 static int valid_wild_card(struct Client *source_p, const char *user, const char *host);
 
@@ -322,10 +321,10 @@ set_kline(struct Client *source_p, const char *user, const char *host, const cha
 	char *reason;
 	char *oper_reason;
 
-	reason = LOCAL_COPY(lreason);
+	reason = LOCAL_COPY_N(lreason, REASONLEN);
 
 	if(!valid_user_host(source_p, user, host) ||
-	   !valid_wild_card(source_p, user, host) || !valid_comment(source_p, reason))
+	   !valid_wild_card(source_p, user, host))
 		return;
 
 	if(already_placed_kline(source_p, user, host, tkline_time))
@@ -632,27 +631,6 @@ valid_wild_card(struct Client *source_p, const char *luser, const char *lhost)
 	return 0;
 }
 
-/*
- * valid_comment
- * inputs	- pointer to client
- *              - pointer to comment
- * output       - 0 if no valid comment, 1 if valid
- * side effects - NONE
- */
-static int
-valid_comment(struct Client *source_p, char *comment)
-{
-	if(strchr(comment, '"'))
-	{
-		sendto_one_notice(source_p, ":Invalid character '\"' in comment");
-		return 0;
-	}
-
-	if(strlen(comment) > REASONLEN)
-		comment[REASONLEN] = '\0';
-
-	return 1;
-}
 
 /* already_placed_kline()
  *

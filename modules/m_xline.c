@@ -245,36 +245,12 @@ valid_xline(struct Client *source_p, const char *gecos, const char *reason, int 
 		return 0;
 	}
 
-	if(strchr(reason, ':') != NULL)
-	{
-		sendto_one_notice(source_p, ":Invalid character ':' in comment");
-		return 0;
-	}
-
-	if(strchr(reason, '"'))
-	{
-		sendto_one_notice(source_p, ":Invalid character '\"' in comment");
-		return 0;
-	}
-
 	if(!valid_wild_card_simple(gecos))
 	{
 		sendto_one_notice(source_p,
 				  ":Please include at least %d non-wildcard "
 				  "characters with the xline",
 				  ConfigFileEntry.min_nonwildcard_simple);
-		return 0;
-	}
-
-	/* The following test checks for an xline which would break the
-	 * parser (which doesnt understand quoting).
-	 *
-	 * We dont lose much here, permanent versions of these would break
-	 * the parser on a reload anyway. --anfl
-	 */
-	if(!temp_time && strstr(gecos, "\","))
-	{
-		sendto_one_notice(source_p, ":Xlines containing \", must be temporary.");
 		return 0;
 	}
 

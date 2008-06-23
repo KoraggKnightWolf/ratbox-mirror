@@ -300,10 +300,7 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 	char *reason;
 	char *oper_reason;
 
-	reason = LOCAL_COPY(lreason);
-
-	if(strlen(reason) > REASONLEN)
-		reason[REASONLEN] = '\0';
+	reason = LOCAL_COPY_N(lreason, REASONLEN);
 
 	rb_set_time();
 	current_date = smalldate(rb_current_time());
