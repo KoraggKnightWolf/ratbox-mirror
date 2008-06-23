@@ -1,3 +1,12 @@
+jilles      2008/06/23 17:22:25 UTC	(20080623_3-25586)
+  Log:
+  Rerun autoconf (for ident removal).
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+
+
 androsyn    2008/06/23 15:55:13 UTC	(20080623_2-25584)
   Log:
   the reason restrictions for k/d/x/resvs don't make much sense now as the bans are stored in sqlite
