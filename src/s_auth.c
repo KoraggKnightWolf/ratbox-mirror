@@ -469,7 +469,7 @@ static void
 read_auth(rb_fde_t * F, void *data)
 {
         struct AuthRequest *auth = data;
-        char username[USERLEN], *s = NULL, *t;  
+        char *s = NULL, *t;  
         char buf[AUTH_BUFSIZ+1];
         int len, count;
 
@@ -486,7 +486,7 @@ read_auth(rb_fde_t * F, void *data)
 		buf[len] = '\0';
 		if((s = GetValidIdent(buf)))
 		{
-			t = username;
+			t = auth->client->username;
 			while (*s == '~' || *s == '^')
 				s++;
 			for (count = USERLEN; *s && count; s++)
