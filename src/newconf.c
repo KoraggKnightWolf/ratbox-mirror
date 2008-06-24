@@ -1416,7 +1416,7 @@ conf_set_oper_rsa_public_key_file(confentry_t * entry, conf_t * conf, struct con
 	rb_free(t_oper->rsa_pubkey_file);
 	t_oper->rsa_pubkey_file = rb_strdup(entry->string);
 #else
-	conf_report_warning_nl("Warning -- ignoring rsa_public_key_file (OpenSSL support not available");
+	conf_report_warning_nl("Warning -- ignoring rsa_public_key_file (OpenSSL support not available)");
 #endif
 }
 
