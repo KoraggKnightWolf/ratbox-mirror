@@ -139,12 +139,7 @@ lookup_ip(const char *addr, int aftype, DNSCB *callback, void *data)
 	
 #ifdef RB_IPV6
 	if(aftype == AF_INET6)
-	{
-		if(ConfigFileEntry.fallback_to_ip6_int)
-			aft = 5;
-		else
-			aft = 6;
-	}
+		aft = 6;
 	else
 #endif
 		aft = 4;	
@@ -172,7 +167,7 @@ results_callback(const char *callid, const char *status, const char *aftype, con
 		return;
 	}
 #ifdef RB_IPV6
-	if(aft == 6 || aft == 5)
+	if(aft == 6)
 		aft = AF_INET6;
 	else
 #endif

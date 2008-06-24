@@ -25,7 +25,6 @@
 #define REVIPV4 0
 #define REVIPV6 1
 #define REVIPV6INT 2
-#define REVIPV6FALLBACK 3
 #define FWDHOST 4
 
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
@@ -54,9 +53,6 @@ struct dns_request
 #endif
 		struct sockaddr_in in;
 	} sins;
-#ifdef RB_IPV6
-	int fallback;
-#endif
 };
 
 static adns_state dns_state;
@@ -295,26 +291,6 @@ send_answer(struct dns_request *req, adns_answer * reply)
 	}
 	else
 	{
-#ifdef RB_IPV6
-		if(req->revfwd == REQREV && req->reqtype == REVIPV6FALLBACK && req->fallback == 0)
-		{
-			req->fallback = 1;
-			result = adns_submit_reverse(dns_state,
-						     (struct sockaddr *) &req->sins.in6,
-						     adns_r_ptr_ip6_old,
-						     adns_qf_owner | adns_qf_cname_loose |
-						     adns_qf_quoteok_anshost, req, &req->query);
-			rb_free(reply);
-			if(result != 0)
-			{
-				rb_helper_write(res_helper, "%s 0 FAILED", req->reqid);
-				rb_free(reply);
-				rb_free(req);
-
-			}
-			return;
-		}
-#endif
 		strcpy(response, "FAILED");
 		result = 0;
 	}
@@ -418,14 +394,6 @@ resolve_ip(char **parv)
 
 		break;
 #ifdef RB_IPV6
-	case '5':		/* This is the case of having to fall back to "ip6.int" */
-		req->reqtype = REVIPV6FALLBACK;
-		flags = adns_r_ptr_ip6;
-		if(!rb_inet_pton(AF_INET6, rec, &req->sins.in6.sin6_addr))
-			exit(6);
-		req->sins.in6.sin6_family = AF_INET6;
-		req->fallback = 0;
-		break;
 	case '6':
 		req->reqtype = REVIPV6;
 		flags = adns_r_ptr_ip6;
