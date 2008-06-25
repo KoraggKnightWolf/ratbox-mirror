@@ -1,3 +1,23 @@
+jilles      2008/06/25 21:52:10 UTC	(20080625_2-25598)
+  Log:
+  Some updates and consistency fixes to help files.
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/adminwall (File Modified) 
+	ircd-ratbox/trunk/help/opers/info (File Modified) 
+	ircd-ratbox/trunk/help/opers/invite (File Modified) 
+	ircd-ratbox/trunk/help/opers/kill (File Modified) 
+	ircd-ratbox/trunk/help/opers/modlist (File Modified) 
+	ircd-ratbox/trunk/help/opers/modload (File Modified) 
+	ircd-ratbox/trunk/help/opers/modrestart (File Modified) 
+	ircd-ratbox/trunk/help/opers/modunload (File Modified) 
+	ircd-ratbox/trunk/help/opers/oper (File Modified) 
+	ircd-ratbox/trunk/help/opers/operwall (File Modified) 
+	ircd-ratbox/trunk/help/opers/unresv (File Modified) 
+	ircd-ratbox/trunk/help/opers/wallops (File Modified) 
+
+
 androsyn    2008/06/25 19:15:30 UTC	(20080625_1-25596)
   Log:
   add help for ADMINWALL
