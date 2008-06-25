@@ -62,9 +62,10 @@ static inline void uint16_to_buf(char *buf, rb_uint16_t x)
 }
  
 
-
 static char inbuf[READBUF_SIZE];
+#ifdef HAVE_ZLIB
 static char outbuf[READBUF_SIZE];
+#endif
 
 typedef struct _mod_ctl_buf
 {
@@ -169,6 +170,9 @@ static int zlib_ok = 1;
 #else
 static int zlib_ok = 0;
 #endif
+
+
+#ifdef HAVE_ZLIB
 static void *
 ssld_alloc(void *unused, size_t count, size_t size)
 {
@@ -180,6 +184,7 @@ ssld_free(void *unused, void *ptr)
 {
 	rb_free(ptr);	
 }
+#endif
 
 static conn_t *
 conn_find_by_id(rb_int32_t id)
@@ -208,12 +213,14 @@ free_conn(conn_t * conn)
 {
 	rb_free_rawbuffer(conn->modbuf_out);
 	rb_free_rawbuffer(conn->plainbuf_out);
+#ifdef HAVE_ZLIB
 	if(IsZip(conn))
 	{
 		zlib_stream_t *stream = conn->stream;
 		inflateEnd(&stream->instream);
 		deflateEnd(&stream->outstream);		
 	}
+#endif
 	rb_free(conn);
 }
 
@@ -944,7 +951,7 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 #else
 		case 'Y':
 		case 'Z':
-			send_nozlib_support(ctl);
+			send_nozlib_support(ctl, ctl_buf);
 			break;
 			
 #endif
