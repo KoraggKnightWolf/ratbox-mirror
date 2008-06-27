@@ -6,6 +6,19 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0.0beta6
+- change -lock klines and friends to now be ADMINKLINE etc
+- default to only supporting TS6 
+- fix remote kline reasons
+- have sqlite3 checking use pkg-config when possible
+- move identd checking back into the ircd, this seems to have been more
+  problematic than what it was worth
+- add experimental gnutls support - note that CHALLENGE does not work when using just
+  gnutls 
+- some helpfile cleanups
+- fix compile error when zlib is not found
+- remove some restrictions on k/d/x/resv reasons that are no longer needed
+
 -- ircd-ratbox-3.0.0beta5
 - fix things so that --enable-assert=soft compiles again
 - fix a typo in mkpasswd
