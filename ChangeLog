@@ -1,3 +1,16 @@
+jilles      2008/06/28 20:13:16 UTC	(20080628_1-25643)
+  Log:
+  Clean up m_trace somewhat.
+  All visibility logic is now in m_trace(), none in
+  report_this_status().
+  (In fact, all the checks already were in m_trace(),
+  the check in report_this_status() was redundant.)
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+
+
 jilles      2008/06/28 19:30:00 UTC	(20080628_0-25641)
   Log:
   Reset checksplit_ev to NULL after removing it,
