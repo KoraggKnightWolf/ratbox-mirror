@@ -724,6 +724,7 @@ check_splitmode(void *unused)
 				     "Network rejoined, deactivating splitmode");
 
 			rb_event_delete(checksplit_ev);
+			checksplit_ev = NULL;
 		}
 	}
 }
