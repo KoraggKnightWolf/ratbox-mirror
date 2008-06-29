@@ -1,3 +1,14 @@
+jilles      2008/06/29 19:54:51 UTC	(20080629_0-25651)
+  Log:
+  Show reason for failed outgoing SSL handshakes to opers.
+  Also add a comment that ircd does not care about the
+  reason for failed incoming SSL handshakes.
+  
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 jilles      2008/06/28 20:13:16 UTC	(20080628_1-25643)
   Log:
   Clean up m_trace somewhat.
