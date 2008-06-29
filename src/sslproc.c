@@ -353,7 +353,10 @@ ssl_process_dead_fd(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 	if(client_p == NULL)
 		return;
 	if(IsAnyServer(client_p))
+	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld error for %s: %s", client_p->name, reason);
+		ilog(L_SERVER, "ssld error for %s: %s", log_client_name(client_p, SHOW_IP), reason);
+	}
 	exit_client(client_p, client_p, &me, reason);
 }
 
