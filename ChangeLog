@@ -1,3 +1,13 @@
+jilles      2008/06/29 21:48:31 UTC	(20080629_2-25655)
+  Log:
+  Call serv_connect_callback() directly from serv_connect_ssl_callback().
+  This speeds up outgoing SSL server connections by 1 second.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 jilles      2008/06/29 21:46:54 UTC	(20080629_1-25653)
   Log:
   Give proper error messages if connect fails for a server using SSL.
