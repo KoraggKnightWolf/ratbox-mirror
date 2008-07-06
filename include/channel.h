@@ -71,7 +71,7 @@ struct Channel
 	int received_number_of_privmsgs;
 	int flood_noticed;
 
-	rb_uint32_t ban_serial;
+	uint32_t ban_serial;
 	time_t channelts;
 	char *chname;
 };
@@ -84,9 +84,9 @@ struct membership
 
 	struct Channel *chptr;
 	struct Client *client_p;
-	rb_uint8_t flags;
+	uint8_t flags;
 
-	rb_uint32_t ban_serial;
+	uint32_t ban_serial;
 };
 
 #define BANLEN NICKLEN+USERLEN+HOSTLEN+6

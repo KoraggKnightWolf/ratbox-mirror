@@ -43,7 +43,7 @@
 
 #define LOG_BUFSIZE 2048
 
-rb_uint32_t current_serial = 0L;
+uint32_t current_serial = 0L;
 static void send_queued_write(rb_fde_t *F, void *data);
 static void send_queued(struct Client *to);
 

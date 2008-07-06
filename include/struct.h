@@ -72,13 +72,13 @@ struct Client
 
 	struct Whowas *whowas;	/* Pointers to whowas structs */
 	time_t tsinfo;		/* TS on the nick, SVINFO on server */
-	rb_uint32_t umodes;	/* opers, normal users subset */
-	rb_uint32_t flags;	/* client flags */
-	rb_uint32_t operflags;	/* ugh. overflow */
+	uint32_t umodes;	/* opers, normal users subset */
+	uint32_t flags;	/* client flags */
+	uint32_t operflags;	/* ugh. overflow */
 
-	rb_uint8_t hopcount;	/* number of servers to this 0 = local */
-	rb_uint8_t status;		/* Client type */
-	rb_uint8_t handler;	/* Handler index */
+	uint8_t hopcount;	/* number of servers to this 0 = local */
+	uint8_t status;		/* Client type */
+	uint8_t handler;	/* Handler index */
 
 	/* client->name is the unique name for a client nick or host */
 	const char *name;
@@ -128,7 +128,7 @@ struct LocalUser
 				 * left a channel */
 	int join_leave_count;	/* count of JOIN/LEAVE in less than 
 				   MIN_JOIN_LEAVE_TIME seconds */
-	rb_uint8_t oper_warn_count_down;	/* warn opers of this possible 
+	uint8_t oper_warn_count_down;	/* warn opers of this possible 
 					   spambot every time this gets to 0 */
 	time_t last_caller_id_time;
 	time_t first_received_message_time;
@@ -138,7 +138,7 @@ struct LocalUser
 	time_t lasttime;	/* last time we parsed something */
 	time_t firsttime;	/* time client was created */
 
-	rb_uint32_t serial;	/* used to enforce 1 send per nick */
+	uint32_t serial;	/* used to enforce 1 send per nick */
 
 	/* Send and receive linebuf queues .. */
 	buf_head_t buf_sendq;
@@ -146,15 +146,15 @@ struct LocalUser
 
 	unsigned long long int sendB;	/* Statistics: total bytes sent */
 	unsigned long long int receiveB;	/* Statistics: total bytes received */
-	rb_uint32_t sendM;	/* Statistics: protocol messages send */
-	rb_uint32_t receiveM;	/* Statistics: protocol messages received */
+	uint32_t sendM;	/* Statistics: protocol messages send */
+	uint32_t receiveM;	/* Statistics: protocol messages received */
 	struct Listener *listener;	/* listener accepted from */
 	struct ConfItem *att_conf;	/* attached conf */
 	struct server_conf *att_sconf;
 
 	struct rb_sockaddr_storage ip;
 	time_t last_nick_change;
-	rb_uint16_t number_of_nick_changes;
+	uint16_t number_of_nick_changes;
 
 	/*
 	 * XXX - there is no reason to save this, it should be checked when it's
@@ -186,22 +186,22 @@ struct LocalUser
 	 * to avoid flooding.
 	 *   -- adrian
 	 */
-	rb_uint16_t allow_read;		/* how many we're allowed to read in this second */
-	rb_int16_t actually_read;	/* how many we've actually read in this second */
-	rb_int16_t sent_parsed;	/* how many messages we've parsed in this second */
+	uint16_t allow_read;		/* how many we're allowed to read in this second */
+	int16_t actually_read;	/* how many we've actually read in this second */
+	int16_t sent_parsed;	/* how many messages we've parsed in this second */
 	time_t last_knock;	/* time of last knock */
-	rb_uint32_t random_ping;
+	uint32_t random_ping;
 	struct AuthRequest	*auth_request;
 
 	/* target change stuff */
 	void *targets[10];		/* targets were aware of */
-	rb_uint8_t targinfo[2];	/* cyclic array, no in use */
+	uint8_t targinfo[2];	/* cyclic array, no in use */
 	time_t target_last;		/* last time we cleared a slot */
 	struct rb_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
 	struct _ssl_ctl *ssl_ctl;		/* which ssl daemon we're associate with */
-	rb_uint32_t localflags;
+	uint32_t localflags;
 	struct ZipStats *zipstats;		/* zipstats */
-	rb_uint16_t cork_count;			/* used for corking/uncorking connections */
+	uint16_t cork_count;			/* used for corking/uncorking connections */
 	struct ev_entry *event;			/* used for associated events */
 };
 
