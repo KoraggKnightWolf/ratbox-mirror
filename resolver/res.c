@@ -80,7 +80,11 @@ struct reslist
 	struct DNSQuery *query;	/* query callback for this request */
 };
 
-static rb_fde_t *res_fd;
+static rb_fde_t *res_fd_ipv4 = NULL;
+#ifdef RB_IPV6
+static rb_fde_t *res_fd_ipv6 = NULL;
+#endif
+
 static rb_dlink_list request_list = { NULL, NULL, 0 };
 
 static void rem_request(struct reslist *request);
@@ -220,16 +224,34 @@ start_resolver(void)
 {
 	irc_res_init();
 
-	if(res_fd == NULL)
+	if(res_fd_ipv4 == NULL)
 	{
-		if((res_fd = rb_socket(irc_nsaddr_list[0].ss_family, SOCK_DGRAM, 0,
-				       "UDP resolver socket")) == NULL)
-			return;
-
-		/* At the moment, the resolver FD data is global .. */
-		rb_setselect(res_fd, RB_SELECT_READ, res_readreply, NULL);
-		timeout_resolver_ev = rb_event_add("timeout_resolver", timeout_resolver, NULL, 1);
+		res_fd_ipv4 = rb_socket(AF_INET, SOCK_DGRAM, 0, "UDP IPv4 resolver socket");
+		if(res_fd_ipv4 != NULL)
+		{
+			rb_setselect(res_fd_ipv4, RB_SELECT_READ, res_readreply, NULL);
+		}
 	}
+#ifdef RB_IPV6
+	if(res_fd_ipv6 == NULL)
+	{
+		res_fd_ipv6 = rb_socket(AF_INET6, SOCK_DGRAM, 0, "UDP IPv6 resolver socket");
+		if(res_fd_ipv6 != NULL)
+		{
+			rb_setselect(res_fd_ipv6, RB_SELECT_READ, res_readreply, NULL);
+		}
+	}
+#endif
+	if(res_fd_ipv4 == NULL
+#ifdef RB_IPV6
+	 && res_fd_ipv6 == NULL
+#else
+	) 
+#endif
+	{
+		abort(); /* something is fucked..badly this at least leaves a useful trail */
+	}
+	timeout_resolver_ev = rb_event_add("timeout_resolver", timeout_resolver, NULL, 1);
 }
 
 /*
@@ -247,8 +269,15 @@ init_resolver(void)
 void
 restart_resolver(void)
 {
-	rb_close(res_fd);
-	res_fd = NULL;
+	if(res_fd_ipv4 != NULL)
+		rb_close(res_fd_ipv4);
+	res_fd_ipv4 = NULL;
+
+#ifdef RB_IPV6
+	if(res_fd_ipv6 != NULL)
+		rb_close(res_fd_ipv6);		
+	res_fd_ipv6 = NULL;
+#endif	
 	rb_event_delete(timeout_resolver_ev);	/* -ddosen */
 	start_resolver();
 }
@@ -350,8 +379,9 @@ send_res_msg(const char *msg, int len, int rcount)
 {
 	int i;
 	int sent = 0;
+	rb_fde_t *F = NULL;
 	int max_queries = RES_MIN(irc_nscount, rcount);
-
+	
 	/* RES_PRIMARY option is not implemented
 	 * if (res.options & RES_PRIMARY || 0 == max_queries)
 	 */
@@ -360,7 +390,17 @@ send_res_msg(const char *msg, int len, int rcount)
 
 	for (i = 0; sent < max_queries && i < irc_nscount; i++)
 	{
-		if(sendto(rb_get_fd(res_fd), msg, len, 0,
+		if(GET_SS_FAMILY(&irc_nsaddr_list[i]) == AF_INET && res_fd_ipv4 != NULL)
+			F = res_fd_ipv4;
+#ifdef RB_IPV6
+		else {
+			if(GET_SS_FAMILY(&irc_nsaddr_list[i]) == AF_INET6 && res_fd_ipv6 != NULL)
+				F = res_fd_ipv6;
+		}
+#endif
+		if(F == NULL)
+			continue;
+		if(sendto(rb_get_fd(F), msg, len, 0,
 			  (struct sockaddr *) &(irc_nsaddr_list[i]),
 			  GET_SS_LEN(&irc_nsaddr_list[i])) == len)
 			++sent;
