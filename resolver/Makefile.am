@@ -3,13 +3,12 @@
 #
 libexec_PROGRAMS = resolver
 
-INCLUDES = -I../include -Iadns -I../libratbox/include 
+INCLUDES = -I../include -I. -I../libratbox/include 
 AM_CFLAGS=$(WARNFLAGS)
-SUBDIRS=adns
 
-resolver_SOURCES = resolver.c
+resolver_SOURCES = resolver.c res.c reslib.c
 
-resolver_LDADD = adns/libadns.a ../libratbox/src/libratbox.la
+resolver_LDADD = ../libratbox/src/libratbox.la
 
 
 

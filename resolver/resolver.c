@@ -4,17 +4,17 @@
  * and ircd-ratbox itself and who knows what else
  *
  * Copyright (C) 2003-2005 Lee Hardy <leeh@leeh.co.uk>
- * Copyright (C) 2003-2005 ircd-ratbox development team
- * Copyright (C) 2005 Aaron Sethman <androsyn@ratbox.org>
+ * Copyright (C) 2003-2008 ircd-ratbox development team
+ * Copyright (C) 2005-2008 Aaron Sethman <androsyn@ratbox.org>
  *
  * $Id$
  */
 
 #define READBUF_SIZE    16384
 
-#include "ratbox_lib.h"
-#include "internal.h"
-
+#include <ratbox_lib.h>
+#include "res.h"
+#include "reslib.h"
 
 #define MAXPARA 10
 #define REQIDLEN 10
@@ -29,103 +29,35 @@
 
 #define EmptyString(x) (!(x) || (*(x) == '\0'))
 
-static rb_helper *res_helper;
 static int do_rehash;
-static void dns_readable(rb_fde_t * F, void *ptr);
-static void dns_writeable(rb_fde_t * F, void *ptr);
-static void process_adns_incoming(void);
+static rb_helper *res_helper;
 
-static char readBuf[READBUF_SIZE];
-static void resolve_ip(char **parv);
+static char readBuf[READBUF_SIZE];    
+static void resolve_ip(char **parv);  
 static void resolve_host(char **parv);
-
 
 struct dns_request
 {
-	char reqid[REQIDLEN];
-	int reqtype;
-	int revfwd;
-	adns_query query;
-	union
-	{
-#ifdef RB_IPV6
-		struct sockaddr_in6 in6;
-#endif
-		struct sockaddr_in in;
-	} sins;
+        struct DNSQuery query;
+        char reqid[REQIDLEN];
+        struct rb_sockaddr_storage addr;
+        int reqtype;
+        int revfwd;  
 };
-
-static adns_state dns_state;
-
-/* void dns_select(void)
- * Input: None.
- * Output: None
- * Side effects: Re-register ADNS fds with the fd system. Also calls the
- *               callbacks into core ircd.
- */
-static void
-dns_select(void)
-{
-	struct adns_pollfd pollfds[MAXFD_POLL];
-	int npollfds, i, fd;
-	npollfds = adns__pollfds(dns_state, pollfds);
-	for (i = 0; i < npollfds; i++)
-	{
-		fd = pollfds[i].fd;
-		if(pollfds[i].events & ADNS_POLLIN)
-			rb_setselect(rb_get_fde(fd), RB_SELECT_READ, dns_readable, NULL);
-		if(pollfds[i].events & ADNS_POLLOUT)
-			rb_setselect(rb_get_fde(fd), RB_SELECT_WRITE, dns_writeable, NULL);
-	}
-}
-
-/* void dns_readable(int fd, void *ptr)
- * Input: An fd which has become readable, ptr not used.
- * Output: None.
- * Side effects: Read DNS responses from DNS servers.
- * Note: Called by the fd system.
- */
-static void
-dns_readable(rb_fde_t * F, void *ptr)
-{
-	adns_processreadable(dns_state, rb_get_fd(F), rb_current_time_tv());
-	process_adns_incoming();
-	dns_select();
-}
-
-/* void dns_writeable(int fd, void *ptr)
- * Input: An fd which has become writeable, ptr not used.
- * Output: None.
- * Side effects: Write any queued buffers out.
- * Note: Called by the fd system.
- */
-static void
-dns_writeable(rb_fde_t * F, void *ptr)
-{
-	adns_processwriteable(dns_state, rb_get_fd(F), rb_current_time_tv());
-	process_adns_incoming();
-	dns_select();
-}
-
-static void
-rehash(int sig)
-{
-	do_rehash = 1;
-}
-
-static void
-restart_resolver(void)
-{
-	/* Rehash dns configuration */
-	adns__rereadconfig(dns_state);
-}
 
 
 static void
 dummy_handler(int sig)
 {
-	return;
+        return;  
 }
+
+static void
+rehash(int sig) 
+{
+        do_rehash = 1;
+}
+
 
 static void
 setup_signals()
@@ -165,6 +97,116 @@ error_cb(rb_helper * helper)
 	exit(1);
 }
 
+
+static void
+send_answer(void *vptr, struct DNSReply *reply)
+{
+	struct dns_request *req = (struct dns_request *) vptr;
+	char response[64];
+	int result = 0;
+	int aftype = 0;
+	strcpy(response, "FAILED");
+	if(reply != NULL)
+	{
+		switch (req->revfwd)
+		{
+		case REQREV:
+			{
+				if(req->reqtype == REVIPV4)
+				{
+					struct sockaddr_in *ip, *ip_fwd;
+					ip = (struct sockaddr_in *) &req->addr;
+					ip_fwd = (struct sockaddr_in *) &reply->addr;
+					aftype = 4;
+					if(ip->sin_addr.s_addr != ip_fwd->sin_addr.s_addr)
+					{
+						result = 0;
+						break;
+					}
+				}
+#ifdef RB_IPV6
+				else if(req->reqtype == REVIPV6)
+				{
+					struct sockaddr_in6 *ip, *ip_fwd;
+					ip = (struct sockaddr_in6 *) &req->addr;
+					ip_fwd = (struct sockaddr_in6 *) &reply->addr;
+					aftype = 6;
+					if(memcmp
+					   (&ip->sin6_addr, &ip_fwd->sin6_addr,
+					    sizeof(struct in6_addr)) != 0)
+					{
+						result = 0;
+						break;
+					}
+				}
+#endif
+				else
+				{
+					/* uhh wut? */
+					result = 0;
+					break;
+				}
+
+				if(strlen(reply->h_name) < 63)
+				{
+					strcpy(response, reply->h_name);
+					result = 1;
+				}
+				else
+				{
+					strcpy(response, "HOSTTOOLONG");
+					result = 0;
+				}
+				break;
+			}
+
+		case REQFWD:
+			{
+#ifdef RB_IPV6
+				if(GET_SS_FAMILY(&reply->addr) == AF_INET6)
+				{
+					char tmpres[65];
+					rb_inet_ntop(AF_INET6, (struct sockaddr *) &reply->addr,
+						     tmpres, sizeof(tmpres) - 1);
+					aftype = 6;
+					if(*tmpres == ':')
+					{
+						strcpy(response, "0");
+						strcat(response, tmpres);
+					}
+					else
+						strcpy(response, tmpres);
+					result = 1;
+					break;
+				}
+				else
+#endif
+				if(GET_SS_FAMILY(&reply->addr) == AF_INET)
+				{
+					result = 1;
+					aftype = 4;
+					rb_inet_ntop(AF_INET, (struct sockaddr *) &reply->addr,
+						     response, sizeof(response));
+					break;
+				}
+				else
+					break;
+			}
+		default:
+			{
+				exit(1);
+			}
+		}
+
+	}
+
+	rb_helper_write(res_helper, "%s %d %d %s\n", req->reqid, result, aftype, response);
+	rb_free(req);
+}
+
+
+
+
 /*
 request protocol:
 
@@ -183,7 +225,7 @@ otherwise
 
 FWD requestid PASS/FAIL hostname or reason for failure
 REV requestid PASS/FAIL IP or reason
-
+  
 */
 
 
@@ -210,123 +252,7 @@ parse_request(rb_helper * helper)
 			break;
 		}
 	}
-
-
 }
-
-
-static void
-send_answer(struct dns_request *req, adns_answer * reply)
-{
-	char response[64];
-	int result = 0;
-	int aftype = 0;
-	if(reply && reply->status == adns_s_ok)
-	{
-		switch (req->revfwd)
-		{
-		case REQREV:
-			{
-				if(strlen(*reply->rrs.str) < 63)
-				{
-					strcpy(response, *reply->rrs.str);
-					result = 1;
-				}
-				else
-				{
-					strcpy(response, "HOSTTOOLONG");
-					result = 0;
-				}
-				break;
-			}
-
-		case REQFWD:
-			{
-				switch (reply->type)
-				{
-#ifdef RB_IPV6
-				case adns_r_addr6:
-					{
-						char tmpres[65];
-						rb_inet_ntop(AF_INET6,
-							     &reply->rrs.addr->addr.inet6.sin6_addr,
-							     tmpres, sizeof(tmpres) - 1);
-						aftype = 6;
-						if(*tmpres == ':')
-						{
-							strcpy(response, "0");
-							strcat(response, tmpres);
-						}
-						else
-							strcpy(response, tmpres);
-						result = 1;
-						break;
-					}
-#endif
-				case adns_r_addr:
-					{
-						result = 1;
-						aftype = 4;
-						rb_inet_ntop(AF_INET,
-							     &reply->rrs.addr->addr.inet.sin_addr,
-							     response, sizeof(response));
-						break;
-					}
-				default:
-					{
-						strcpy(response, "FAILED");
-						result = 0;
-						aftype = 0;
-						break;
-					}
-				}
-				break;
-			}
-		default:
-			{
-				exit(1);
-			}
-		}
-
-	}
-	else
-	{
-		strcpy(response, "FAILED");
-		result = 0;
-	}
-	rb_helper_write(res_helper, "%s %d %d %s\n", req->reqid, result, aftype, response);
-	rb_free(reply);
-	rb_free(req);
-}
-
-
-static void
-process_adns_incoming(void)
-{
-	adns_query q, r;
-	adns_answer *answer;
-	struct dns_request *req;
-
-	adns_forallqueries_begin(dns_state);
-	while ((q = adns_forallqueries_next(dns_state, (void *) &r)) != NULL)
-	{
-		switch (adns_check(dns_state, &q, &answer, (void *) &req))
-		{
-		case EAGAIN:
-			continue;
-		case 0:
-			send_answer(req, answer);
-			continue;
-		default:
-			if(answer != NULL && answer->status == adns_s_systemfail)
-				exit(2);
-			send_answer(req, NULL);
-			break;
-		}
-
-	}
-}
-
 
 static void
 resolve_host(char **parv)
@@ -335,34 +261,28 @@ resolve_host(char **parv)
 	char *requestid = parv[1];
 	char *iptype = parv[2];
 	char *rec = parv[3];
-	int result;
 	int flags;
+
 	req = rb_malloc(sizeof(struct dns_request));
 	strcpy(req->reqid, requestid);
 
 	req->revfwd = REQFWD;
 	req->reqtype = FWDHOST;
+
 	switch (*iptype)
 	{
-#ifdef RB_IPV6
-	case '5':		/* I'm not sure why somebody would pass a 5 here, but okay */
-	case '6':
-		flags = adns_r_addr6;
+	case 6:
+		flags = T_AAAA;
 		break;
-#endif
 	default:
-		flags = adns_r_addr;
+		flags = T_A;
 		break;
 	}
-	result = adns_submit(dns_state, rec, flags, adns_qf_owner, req, &req->query);
-	if(result != 0)
-	{
-		/* Failed to even submit */
-		send_answer(req, NULL);
-	}
 
+	req->query.ptr = req;
+	req->query.callback = send_answer;
+	gethost_byname_type(rec, &req->query, flags);
 }
-
 
 static void
 resolve_ip(char **parv)
@@ -370,71 +290,49 @@ resolve_ip(char **parv)
 	char *requestid = parv[1];
 	char *iptype = parv[2];
 	char *rec = parv[3];
+	int aftype;
 	struct dns_request *req;
-
-	int result;
-	int flags = adns_r_ptr;
-
-
 	if(strlen(requestid) >= REQIDLEN)
-	{
 		exit(3);
-	}
+
 	req = rb_malloc(sizeof(struct dns_request));
 	req->revfwd = REQREV;
 	strcpy(req->reqid, requestid);
+
+	if(!rb_inet_pton_sock(rec, (struct sockaddr *) &req->addr))
+		exit(6);
+
+	aftype = GET_SS_FAMILY(&req->addr);
 	switch (*iptype)
 	{
 	case '4':
-		flags = adns_r_ptr;
 		req->reqtype = REVIPV4;
-		if(!rb_inet_pton(AF_INET, rec, &req->sins.in.sin_addr))
+		if(aftype != AF_INET)
 			exit(6);
-		req->sins.in.sin_family = AF_INET;
-
 		break;
-#ifdef RB_IPV6
 	case '6':
 		req->reqtype = REVIPV6;
-		flags = adns_r_ptr_ip6;
-		if(!rb_inet_pton(AF_INET6, rec, &req->sins.in6.sin6_addr))
+		if(aftype != AF_INET6)
 			exit(6);
-		req->sins.in6.sin6_family = AF_INET6;
 		break;
-#endif
 	default:
 		exit(7);
 	}
-
-	result = adns_submit_reverse(dns_state,
-				     (struct sockaddr *) &req->sins,
-				     flags,
-				     adns_qf_owner | adns_qf_cname_loose |
-				     adns_qf_quoteok_anshost, req, &req->query);
-
-	if(result != 0)
-	{
-		send_answer(req, NULL);
-	}
-
-}
-
-static void
-timeout_adns(void *ptr)
-{
-	adns_processtimeouts(dns_state, rb_current_time_tv());
-	process_adns_incoming();
+	req->query.ptr = req;
+	req->query.callback = send_answer;
+	gethost_byaddr(&req->addr, &req->query);
 }
 
 static void
 check_rehash(void *unused)
 {
-	if(do_rehash)
-	{
+        if(do_rehash)
+        {
 		restart_resolver();
 		do_rehash = 0;
-	}
+        }
 }
+
 
 int
 main(int argc, char **argv)
@@ -450,13 +348,11 @@ main(int argc, char **argv)
 		fprintf(stderr, "Have a nice life\n");
 		exit(1);
 	}
-
-	adns_init(&dns_state, adns_if_noautosys, 0);
 	rb_set_time();
 	setup_signals();
-	rb_event_add("timeout_adns", timeout_adns, NULL, 5);
+	init_resolver();
+	rb_init_prng(NULL, RB_PRNG_DEFAULT);
 	rb_event_add("check_rehash", check_rehash, NULL, 5);
-	dns_select();
 	rb_helper_loop(res_helper, 0);
 	return 1;
 }
