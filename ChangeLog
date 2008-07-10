@@ -1,3 +1,22 @@
+androsyn    2008/07/10 18:57:38 UTC	(20080710_0-25701)
+  Log:
+  Well..here goes. Change the resolver to use the code from charybdis instead of adns.  
+  The resolver code still runs inside the resolver daemon.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/adns/ (File Deleted) 
+	ircd-ratbox/trunk/resolver/res.c (File Added) 
+	ircd-ratbox/trunk/resolver/res.h (File Added) 
+	ircd-ratbox/trunk/resolver/reslib.c (File Added) 
+	ircd-ratbox/trunk/resolver/reslib.h (File Added) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+
+
 androsyn    2008/07/06 04:21:42 UTC	(20080706_0-25677)
   Log:
   remove the rb_uint/rb_int stuff as we require a C99 compiler and this is standard now.
