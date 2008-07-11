@@ -555,8 +555,7 @@ query_name(struct reslist *request)
 	memset(buf, 0, sizeof(buf));
 
 	if((request_len =
-	    irc_res_mkquery(request->queryname, C_IN, request->type, (unsigned char *) buf,
-			    MAXPACKET)) > 0)
+	    irc_res_mkquery(request->queryname, C_IN, request->type, buf, MAXPACKET)) > 0)
 	{
 		HEADER *header = (HEADER *) buf;
 		/*

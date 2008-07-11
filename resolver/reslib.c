@@ -1139,10 +1139,11 @@ int
 irc_res_mkquery(
 	     const char *dname,		/* domain name */
 	     int class, int type,	/* class and type of query */
-	     unsigned char *buf,		/* buffer to put query */
+	     void *xbuf,		/* buffer to put query */
 	     int buflen)		/* size of buffer */
 {
 	HEADER *hp;
+	unsigned char *buf = xbuf;
 	unsigned char *cp;
 	int n;
 	unsigned char *dnptrs[20], **dpp, **lastdnptr;
