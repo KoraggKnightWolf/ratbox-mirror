@@ -552,7 +552,7 @@ query_name(struct reslist *request)
 	void *buf = alloca(MAXPACKET);
 	int request_len = 0;
 
-	memset(buf, 0, sizeof(buf));
+	memset(buf, 0, MAXPACKET);
 
 	if((request_len =
 	    irc_res_mkquery(request->queryname, C_IN, request->type, buf, MAXPACKET)) > 0)
