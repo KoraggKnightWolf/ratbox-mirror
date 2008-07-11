@@ -1,3 +1,11 @@
+androsyn    2008/07/11 20:01:12 UTC	(20080711_7-25721)
+  Log:
+  use void * for send_res_msg
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+
+
 androsyn    2008/07/11 19:56:39 UTC	(20080711_6-25719)
   Log:
   pull in setup.h so that dns requests go out in the correct endian order
