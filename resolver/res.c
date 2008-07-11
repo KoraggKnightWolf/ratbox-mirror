@@ -244,7 +244,7 @@ start_resolver(void)
 #endif
 	if(res_fd_ipv4 == NULL
 #ifdef RB_IPV6
-	 && res_fd_ipv6 == NULL
+	 && res_fd_ipv6 == NULL)
 #else
 	) 
 #endif
