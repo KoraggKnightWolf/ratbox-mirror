@@ -1,3 +1,11 @@
+androsyn    2008/07/11 18:30:06 UTC	(20080711_0-25707)
+  Log:
+  fix a syntax error
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+
+
 androsyn    2008/07/10 19:21:42 UTC	(20080710_1-25703)
   Log:
   deal with possibly getting an address family type we can't use in resolv.conf gracefully. if the first nameserver was an ipv6 one, but the host didn't support ipv6, this would break all further requests
