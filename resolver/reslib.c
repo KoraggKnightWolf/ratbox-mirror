@@ -82,6 +82,7 @@
 
 #include <ratbox_lib.h>
 #include <netdb.h>
+#include "setup.h"
 #include "res.h"
 #include "reslib.h"
 
