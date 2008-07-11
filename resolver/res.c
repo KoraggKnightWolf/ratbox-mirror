@@ -94,7 +94,7 @@ static void do_query_name(struct DNSQuery *query, const char *name, struct resli
 static void do_query_number(struct DNSQuery *query, const struct rb_sockaddr_storage *,
 			    struct reslist *request);
 static void query_name(struct reslist *request);
-static int send_res_msg(const char *buf, int len, int count);
+static int send_res_msg(void *buf, int len, int count);
 static void resend_query(struct reslist *request);
 static int check_question(struct reslist *request, HEADER * header, char *buf, char *eob);
 static int proc_answer(struct reslist *request, HEADER * header, char *, char *);
@@ -376,7 +376,7 @@ delete_resolver_queries(const struct DNSQuery *query)
  * nameservers or -1 if no successful sends.
  */
 static int
-send_res_msg(const char *msg, int len, int rcount)
+send_res_msg(void *msg, int len, int rcount)
 {
 	int i;
 	int sent = 0;
@@ -570,7 +570,7 @@ query_name(struct reslist *request)
 
 		request->id = header->id;
 		++request->sends;
-		request->sent += send_res_msg((char *)buf, request_len, request->sends);
+		request->sent += send_res_msg(buf, request_len, request->sends);
 	}
 }
 
