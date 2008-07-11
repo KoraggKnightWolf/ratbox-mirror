@@ -1,3 +1,11 @@
+androsyn    2008/07/11 18:49:47 UTC	(20080711_3-25713)
+  Log:
+  lets try this again with the alignment issue
+
+  Modified:
+	ircd-ratbox/trunk/resolver/reslib.c (File Modified) 
+
+
 androsyn    2008/07/11 18:45:30 UTC	(20080711_2-25711)
   Log:
   deal with another possibly alignment issue in reslib.c
