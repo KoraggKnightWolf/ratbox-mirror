@@ -1,3 +1,11 @@
+androsyn    2008/07/11 18:42:34 UTC	(20080711_1-25709)
+  Log:
+  deal with buffer alignment issues in a slightly different way by using alloca and having buf be a void *
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+
+
 androsyn    2008/07/11 18:30:06 UTC	(20080711_0-25707)
   Log:
   fix a syntax error
