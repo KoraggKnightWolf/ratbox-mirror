@@ -1139,11 +1139,10 @@ int
 irc_res_mkquery(
 	     const char *dname,		/* domain name */
 	     int class, int type,	/* class and type of query */
-	     void *xbuf,		/* buffer to put query */
+	     void *buf,		/* buffer to put query */
 	     int buflen)		/* size of buffer */
 {
 	HEADER *hp;
-	unsigned char *buf = xbuf;
 	unsigned char *cp;
 	int n;
 	unsigned char *dnptrs[20], **dpp, **lastdnptr;
@@ -1160,7 +1159,7 @@ irc_res_mkquery(
 	hp->opcode = QUERY;
 	hp->rd = 1;		/* recurse */
 	hp->rcode = NO_ERRORS;
-	cp = buf + HFIXEDSZ;
+	cp = (unsigned char *) ((uintptr_t)buf + HFIXEDSZ);
 	buflen -= HFIXEDSZ;
 	dpp = dnptrs;
 	*dpp++ = buf;
@@ -1178,5 +1177,5 @@ irc_res_mkquery(
 	IRC_NS_PUT16(class, cp);
 	hp->qdcount = htons(1);
 
-	return (cp - buf);
+	return ((uintptr_t)cp - (uintptr_t)buf);
 }
