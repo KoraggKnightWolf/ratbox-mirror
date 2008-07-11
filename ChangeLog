@@ -1,3 +1,11 @@
+androsyn    2008/07/11 19:09:33 UTC	(20080711_5-25717)
+  Log:
+  zero MAXPACKET size not sizeof buf
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+
+
 androsyn    2008/07/11 19:03:16 UTC	(20080711_4-25715)
   Log:
   fix port inversion for ident checking
