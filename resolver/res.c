@@ -549,14 +549,14 @@ do_query_number(struct DNSQuery *query, const struct rb_sockaddr_storage *addr,
 static void
 query_name(struct reslist *request)
 {
-	char buf[MAXPACKET];
+	void *buf = alloca(MAXPACKET);
 	int request_len = 0;
 
 	memset(buf, 0, sizeof(buf));
 
 	if((request_len =
 	    irc_res_mkquery(request->queryname, C_IN, request->type, (unsigned char *) buf,
-			    sizeof(buf))) > 0)
+			    MAXPACKET)) > 0)
 	{
 		HEADER *header = (HEADER *) buf;
 		/*
@@ -570,7 +570,7 @@ query_name(struct reslist *request)
 
 		request->id = header->id;
 		++request->sends;
-		request->sent += send_res_msg(buf, request_len, request->sends);
+		request->sent += send_res_msg((char *)buf, request_len, request->sends);
 	}
 }
 
@@ -762,15 +762,9 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 static void
 res_readreply(rb_fde_t * F, void *data)
 {
-	char buf[sizeof(HEADER) + MAXPACKET]
-		/* Sparc and alpha need 16bit-alignment for accessing header->id 
-		 * (which is uint16_t). Because of the header = (HEADER*) buf; 
-		 * lateron, this is neeeded. --FaUl
-		 */
-#if defined(__sparc__) || defined(__alpha__)
-		__attribute__ ((aligned(16)))
-#endif
-		;
+	int buflen = sizeof(HEADER) + MAXPACKET;
+	void *buf = alloca(buflen);
+
 	HEADER *header;
 	struct reslist *request = NULL;
 	struct DNSReply *reply = NULL;
@@ -779,7 +773,7 @@ res_readreply(rb_fde_t * F, void *data)
 	socklen_t len = sizeof(struct rb_sockaddr_storage);
 	struct rb_sockaddr_storage lsin;
 
-	rc = recvfrom(rb_get_fd(F), buf, sizeof(buf), 0, (struct sockaddr *) &lsin, &len);
+	rc = recvfrom(rb_get_fd(F), buf, buflen, 0, (struct sockaddr *) &lsin, &len);
 
 	/* Re-schedule a read *after* recvfrom, or we'll be registering
 	 * interest where it'll instantly be ready for read :-) -- adrian
@@ -811,7 +805,7 @@ res_readreply(rb_fde_t * F, void *data)
 	if(!res_ourserver(&lsin))
 		return;
 
-	if(!check_question(request, header, buf, buf + rc))
+	if(!check_question(request, header, (char *)buf, ((char *)buf) + rc))
 		return;
 
 	if((header->rcode != NO_ERRORS) || (header->ancount == 0))
@@ -836,7 +830,7 @@ res_readreply(rb_fde_t * F, void *data)
 	 * If this fails there was an error decoding the received packet, 
 	 * give up. -- jilles
 	 */
-	answer_count = proc_answer(request, header, buf, buf + rc);
+	answer_count = proc_answer(request, header, (char *)buf, ((char *)buf) + rc);
 
 	if(answer_count)
 	{
