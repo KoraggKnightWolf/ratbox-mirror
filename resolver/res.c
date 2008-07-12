@@ -228,9 +228,10 @@ start_resolver(void)
 	if(res_fd_ipv4 == NULL)
 	{
 		res_fd_ipv4 = rb_socket(AF_INET, SOCK_DGRAM, 0, "UDP IPv4 resolver socket");
-		rb_set_nb(res_fd_ipv4);
 		if(res_fd_ipv4 != NULL)
 		{
+			if(!rb_set_nb(res_fd_ipv4))
+				abort();
 			rb_setselect(res_fd_ipv4, RB_SELECT_READ, res_readreply, NULL);
 		}
 	}
@@ -238,9 +239,10 @@ start_resolver(void)
 	if(res_fd_ipv6 == NULL)
 	{
 		res_fd_ipv6 = rb_socket(AF_INET6, SOCK_DGRAM, 0, "UDP IPv6 resolver socket");
-		rb_set_nb(res_fd_ipv6);
 		if(res_fd_ipv6 != NULL)
 		{
+			if(!rb_set_nb(res_fd_ipv6))
+				abort();
 			rb_setselect(res_fd_ipv6, RB_SELECT_READ, res_readreply, NULL);
 		}
 	}
