@@ -1,3 +1,11 @@
+androsyn    2008/07/12 00:54:20 UTC	(20080712_1-25725)
+  Log:
+  set resolver sockets non blocking
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+
+
 androsyn    2008/07/12 00:51:28 UTC	(20080712_0-25723)
   Log:
   set resolver sockets non blocking
