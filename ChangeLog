@@ -1,3 +1,12 @@
+jilles      2008/07/16 20:22:11 UTC	(20080716_2-25761)
+  Log:
+  Fix a bug in that check, IsCork on an exited client crashes...
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 jilles      2008/07/16 18:32:21 UTC	(20080716_1-25759)
   Log:
   Fix clients not getting uncorked in CAP in some cases.
