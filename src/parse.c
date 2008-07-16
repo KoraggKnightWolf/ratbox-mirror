@@ -304,6 +304,7 @@ handle_command(struct Message *mptr, struct Client *client_p,
 {
 	struct MessageEntry ehandler;
 	MessageHandler handler = 0;
+	static time_t last_warning;
 
 	if(IsAnyDead(client_p))
 		return -1;
@@ -359,6 +360,16 @@ handle_command(struct Message *mptr, struct Client *client_p,
 	}
 
 	(*handler) (client_p, from, i, hpara);
+	if (IsCork(client_p))
+	{
+		if (last_warning + 300 <= rb_current_time())
+		{
+			sendto_realops_flags(UMODE_DEBUG, L_ALL, "Bug: client %s was left corked after command %s", client_p->name, mptr->cmd);
+			last_warning = rb_current_time();
+		}
+		client_p->localClient->cork_count = 0;
+		send_pop_queue(client_p);
+	}
 	return (1);
 }
 
