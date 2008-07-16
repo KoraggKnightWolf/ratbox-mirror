@@ -1,3 +1,14 @@
+jilles      2008/07/16 18:32:21 UTC	(20080716_1-25759)
+  Log:
+  Fix clients not getting uncorked in CAP in some cases.
+  (Before the previous commit, this froze output to the client.)
+  Bumped into by jackal@EFnet.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_cap.c (File Modified) 
+
+
 jilles      2008/07/16 18:12:33 UTC	(20080716_0-25757)
   Log:
   If an m_function leaves a client corked, fix it and warn +d opers (rate limited).
