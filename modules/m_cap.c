@@ -186,6 +186,7 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 	/* shortcut, nothing to do */
 	if(flags == -1)
 	{
+		ClearCork(source_p);
 		sendto_one(source_p, "%s :", buf);
 		return;
 	}
