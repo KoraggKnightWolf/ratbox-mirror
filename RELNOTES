@@ -6,6 +6,19 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0.0beta8
+- some cleanups in the checksplit code
+- some cleanups in the /trace code
+- show reasons for failed outbound SSL handshakes to opers
+- log ssl errors for servers and handshakes in serverlog
+- make sqlite3 checking more robust
+- change the resolver to use the code from charybdis instead of adns
+- fix identd checking so it works again
+- fix a bug where the ircd could stop reading from the client on the CAP 
+  command
+- add some functions for random number generation for the nossl case in
+  libratbox
+
 -- ircd-ratbox-3.0.0beta7
 - my release building script manage to not include libratbox, oops
 
