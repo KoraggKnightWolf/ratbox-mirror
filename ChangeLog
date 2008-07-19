@@ -1,3 +1,13 @@
+androsyn    2008/07/19 19:07:07 UTC	(20080719_0-25767)
+  Log:
+  Update patchlevel and release notes for 3.0.0beta8
+  
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 jilles      2008/07/16 20:22:11 UTC	(20080716_2-25761)
   Log:
   Fix a bug in that check, IsCork on an exited client crashes...
