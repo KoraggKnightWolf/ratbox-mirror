@@ -896,11 +896,10 @@ static struct DNSReply *
 make_dnsreply(struct reslist *request)
 {
 	struct DNSReply *cp;
-
 	cp = (struct DNSReply *) rb_malloc(sizeof(struct DNSReply));
 
 	cp->h_name = request->name;
-	memcpy(&cp->addr, &request->addr, sizeof(cp->addr));
+	memcpy(&cp->addr, &request->addr, GET_SS_LEN(&request->addr) > sizeof(cp->addr) ? sizeof(cp->addr) : GET_SS_LEN(&request->addr));
 	return (cp);
 }
 
