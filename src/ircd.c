@@ -463,12 +463,13 @@ setup_corefile(void)
 static void
 ilogcb(const char *buf)
 {
-	ilog(L_MAIN, "%s", buf);
+	ilog(L_MAIN, "libratbox reports: %s", buf);
 }
 
 static void
 restartcb(const char *buf)
 {
+	ilog(L_MAIN, "libratbox has called the restart callback: %s", buf);
 	restart(buf);
 }
 
@@ -476,7 +477,9 @@ static void
 diecb(const char *buf)
 {
 	if(buf != NULL)
-		ilog(L_MAIN, "%s", buf);
+		ilog(L_MAIN, "libratbox has called the die callback..aborting: %s", buf);
+	else
+		ilog(L_MAIN, "libratbox has called the die callback..aborting");
 	abort();
 }
 
