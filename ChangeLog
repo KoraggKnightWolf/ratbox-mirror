@@ -1,3 +1,11 @@
+androsyn    2008/07/31 15:46:29 UTC	(20080731_0-25799)
+  Log:
+  give a bit more info when libratbox calls logging callbacks
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 jilles      2008/07/30 21:20:48 UTC	(20080730_0-25797)
   Log:
   Fix resolver hangs with epoll.
