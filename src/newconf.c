@@ -1747,10 +1747,10 @@ conf_set_connect_aftype(confentry_t * entry, conf_t * conf, struct conf_items *i
 	char *aft = entry->string;
 
 	if(!strcasecmp(aft, "ipv4"))
-		GET_SS_FAMILY(&t_server->ipnum) = AF_INET;
+		SET_SS_FAMILY(&t_server->ipnum, AF_INET);
 #ifdef RB_IPV6
 	else if(!strcasecmp(aft, "ipv6"))
-		GET_SS_FAMILY(&t_server->ipnum) = AF_INET6;
+		SET_SS_FAMILY(&t_server->ipnum, AF_INET6);
 #endif
 	else
 		conf_report_warning_nl("connect::aftype '%s' at %s:%d is unknown", aft, entry->filename, entry->line);

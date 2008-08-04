@@ -489,14 +489,14 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	{
 		memcpy(&myipnum, &server_p->my_ipnum, sizeof(myipnum));
 		((struct sockaddr_in *)&myipnum)->sin_port = 0;
-		GET_SS_FAMILY(&myipnum) = GET_SS_FAMILY(&server_p->my_ipnum);
+		SET_SS_FAMILY(&myipnum, GET_SS_FAMILY(&server_p->my_ipnum));
 				
 	}
 	else if(GET_SS_FAMILY(&server_p->ipnum) == AF_INET && ServerInfo.specific_ipv4_vhost)
 	{
 		memcpy(&myipnum, &ServerInfo.ip, sizeof(myipnum));
 		((struct sockaddr_in *)&myipnum)->sin_port = 0;
-		GET_SS_FAMILY(&myipnum) = AF_INET;
+		SET_SS_FAMILY(&myipnum, AF_INET);
 		SET_SS_LEN(&myipnum, sizeof(struct sockaddr_in));
 	}
 	
@@ -505,7 +505,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	{
 		memcpy(&myipnum, &ServerInfo.ip6, sizeof(myipnum));
 		((struct sockaddr_in6 *)&myipnum)->sin6_port = 0;
-		GET_SS_FAMILY(&myipnum)= AF_INET6;
+		SET_SS_FAMILY(&myipnum, AF_INET6);
 		SET_SS_LEN(&myipnum, sizeof(struct sockaddr_in6));
 	}
 #endif

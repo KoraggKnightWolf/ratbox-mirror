@@ -303,7 +303,7 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 		return;
 		
 	memset(&vaddr, 0, sizeof(vaddr));
-	GET_SS_FAMILY(&vaddr) = family;
+	SET_SS_FAMILY(&vaddr, family);
 
 	if(vhost_ip != NULL)
 	{

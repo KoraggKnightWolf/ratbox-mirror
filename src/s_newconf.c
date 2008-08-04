@@ -374,7 +374,7 @@ struct server_conf *
 make_server_conf(void)
 {
 	struct server_conf *server_p = rb_malloc(sizeof(struct server_conf));
-	GET_SS_FAMILY(&server_p->ipnum) = AF_INET;
+	SET_SS_FAMILY(&server_p->ipnum, AF_INET);
 	return server_p;
 }
 
