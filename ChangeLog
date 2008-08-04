@@ -1,3 +1,11 @@
+androsyn    2008/08/04 22:26:49 UTC	(20080804_2-25837)
+  Log:
+  add dns source port randomization stuff
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+
+
 androsyn    2008/08/04 22:15:51 UTC	(20080804_1-25835)
   Log:
   make stuff use SET_SS_FAMILY where needed
