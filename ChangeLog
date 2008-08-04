@@ -1,3 +1,11 @@
+androsyn    2008/08/04 17:37:29 UTC	(20080804_0-25831)
+  Log:
+  revert 25801
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+
+
 androsyn    2008/07/31 19:58:29 UTC	(20080731_1-25801)
   Log:
   in make_dnsreply, if the sizeof request->addr is smaller than cp->addr, only copy the sizeof request->addr
