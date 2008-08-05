@@ -34,6 +34,7 @@
 #include "s_conf.h"
 #include "client.h"
 #include "send.h"
+#include "numeric.h"
 
 #define IDTABLE 0xffff
 
@@ -224,6 +225,39 @@ start_resolver(void)
 	return 0;
 }
 
+static rb_dlink_list nameservers;
+
+static void
+parse_nameservers(char **parv, int parc)
+{
+	rb_dlink_node *ptr, *next;
+	char *server;
+	int i;
+	
+	RB_DLINK_FOREACH_SAFE(ptr, next, nameservers.head)
+	{
+		rb_free(ptr->data);
+		rb_dlinkDestroy(ptr, &nameservers);
+	}
+	
+	for(i = 2; i < parc; i++)
+	{
+		server = rb_strdup(parv[i]);
+		rb_dlinkAddTailAlloc(server, &nameservers);
+	}
+}
+
+void
+report_dns_servers(struct Client *source_p)
+{
+	rb_dlink_node *ptr;
+	RB_DLINK_FOREACH(ptr, nameservers.head)
+	{
+		sendto_one_numeric(source_p, RPL_STATSDEBUG, "A %s", (char *) ptr->data);
+	}
+}
+
+
 static void
 parse_dns_reply(rb_helper *helper)
 {
@@ -235,13 +269,26 @@ parse_dns_reply(rb_helper *helper)
 	{
 		parc = string_to_array(dnsBuf, parv); /* we shouldn't be using this here, but oh well */
 
-		if(parc != 5)
+		if(*parv[1] == 'R')
 		{
-			ilog(L_MAIN, "Resolver sent a result with wrong number of arguments");
+			if(parc != 6)
+			{
+				ilog(L_MAIN, "Resolver sent a result with wrong number of arguments");
+				restart_resolver();
+				return;
+			}
+			results_callback(parv[2], parv[3], parv[4], parv[5]);
+		} 
+		else if(*parv[1] == 'A')
+		{
+			parse_nameservers(parv, parc);
+		}
+		else 
+		{
+			ilog(L_MAIN, "Resolver sent an unknown command..restarting resolver");
 			restart_resolver();
 			return;
 		}
-		results_callback(parv[1], parv[2], parv[3], parv[4]);
 	}
 }
 
