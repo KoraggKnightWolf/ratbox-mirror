@@ -1,3 +1,13 @@
+androsyn    2008/08/05 01:51:34 UTC	(20080805_2-25843)
+  Log:
+  readd code to do /stats A and get all of the code this time...
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+
+
 androsyn    2008/08/05 01:50:54 UTC	(20080805_1-25841)
   Log:
   readd code to do /stats A
