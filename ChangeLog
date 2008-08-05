@@ -1,3 +1,23 @@
+androsyn    2008/08/05 00:05:04 UTC	(20080805_0-25839)
+  Log:
+  Add code to allow binding outgoing dns requests to a particular IP address instead
+  of always using INADDR_ANY/IN6ADDR_ANY.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/include/dns.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2008/08/04 22:26:49 UTC	(20080804_2-25837)
   Log:
   add dns source port randomization stuff
