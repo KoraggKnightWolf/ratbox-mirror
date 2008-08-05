@@ -663,7 +663,8 @@ rehash(int sig)
         if(old_global_ipv4_cidr != ConfigFileEntry.global_cidr_ipv4_bitlen || 
         			old_global_ipv6_cidr != ConfigFileEntry.global_cidr_ipv6_bitlen)
 		rehash_global_cidr_tree();
-                
+
+	rehash_dns_vhost();
 	return;
 }
 
@@ -703,12 +704,14 @@ set_default_conf(void)
 
 	memset(&ServerInfo.ip, 0, sizeof(ServerInfo.ip));
 	ServerInfo.specific_ipv4_vhost = 0;
+
 #ifdef RB_IPV6
 	memset(&ServerInfo.ip6, 0, sizeof(ServerInfo.ip6));
 	ServerInfo.specific_ipv6_vhost = 0;
 #endif
 	ServerInfo.default_max_clients = MAXCONNECTIONS;
 	ServerInfo.ssld_count = 1;
+	
 	
 	/* Don't reset hub, as that will break lazylinks */
 	/* ServerInfo.hub = NO; */
@@ -1150,6 +1153,11 @@ clear_out_old_conf(void)
 	rb_free(AdminInfo.description);
 	AdminInfo.description = NULL;
 
+	rb_free(ServerInfo.vhost_dns);
+	ServerInfo.vhost_dns = NULL;
+	rb_free(ServerInfo.vhost6_dns);
+	ServerInfo.vhost6_dns = NULL;
+	
 	/* operator{} and class{} blocks are freed above */
 	/* clean out listeners */
 	close_listeners();

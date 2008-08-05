@@ -969,6 +969,33 @@ conf_set_serverinfo_vhost6(confentry_t * entry, conf_t * conf, struct conf_items
 #endif
 }
 
+static void
+conf_set_serverinfo_vhost_dns(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	struct rb_sockaddr_storage addr;
+	if(rb_inet_pton(AF_INET, (char *) entry->string, &addr) <= 0)
+	{
+		conf_report_warning_nl("Warning -- ignoring serverinfo::vhost_dns -- Invalid vhost (%s)", entry->string);
+		return;
+	}
+	rb_free(ServerInfo.vhost_dns);
+	ServerInfo.vhost_dns = rb_strdup(entry->string);
+}
+
+static void
+conf_set_serverinfo_vhost6_dns(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	struct rb_sockaddr_storage addr;
+	if(rb_inet_pton(AF_INET6, (char *) entry->string, &addr) <= 0)
+	{
+		conf_report_warning_nl("Warning -- ignoring serverinfo::vhost6_dns -- Invalid vhost (%s)", entry->string);
+		return;
+	}
+	rb_free(ServerInfo.vhost6_dns);
+	ServerInfo.vhost6_dns = rb_strdup(entry->string);
+}
+
+
 
 static void
 conf_set_serverinfo_sid(confentry_t * entry, conf_t * conf, struct conf_items *item)
@@ -2138,7 +2165,6 @@ static struct conf_items conf_serverinfo_table[] =
         { "network_desc",       CF_QSTRING, NULL, 0, &ServerInfo.network_desc   },
         { "hub",                CF_YESNO,   NULL, 0, &ServerInfo.hub            },
         { "default_max_clients",CF_INT,     NULL, 0, &ServerInfo.default_max_clients },
-
         { "network_name",       CF_QSTRING, conf_set_serverinfo_network_name,   0, NULL },
         { "name",               CF_QSTRING, conf_set_serverinfo_name,   0, NULL },
         { "sid",                CF_QSTRING, conf_set_serverinfo_sid,    0, NULL },
@@ -2149,6 +2175,8 @@ static struct conf_items conf_serverinfo_table[] =
         { "ssl_cert",           CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },   
         { "ssl_dh_params",      CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
         { "ssld_count",		CF_INT,	    NULL, 0, &ServerInfo.ssld_count },
+        { "vhost_dns",		CF_QSTRING, conf_set_serverinfo_vhost_dns, 0, NULL },
+        { "vhost6_dns",		CF_QSTRING, conf_set_serverinfo_vhost6_dns, 0, NULL },
         { "\0", 0, NULL, 0, NULL }
 };
 

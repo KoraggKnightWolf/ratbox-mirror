@@ -36,6 +36,13 @@ static char readBuf[READBUF_SIZE];
 static void resolve_ip(char **parv);  
 static void resolve_host(char **parv);
 
+/* these being in bss should be 0 which should be the same as IN6ADDR_ANY/INADDR_ANY */
+#ifdef RB_IPV6
+struct in6_addr ipv6_addr;
+#endif
+struct in_addr ipv4_addr;	
+
+
 struct dns_request
 {
         struct DNSQuery query;
@@ -204,6 +211,24 @@ send_answer(void *vptr, struct DNSReply *reply)
 	rb_free(req);
 }
 
+static void
+set_bind(char **parv)
+{
+	char *ipv4 = parv[2];
+#ifdef RB_IPV6
+	char *ipv6 = parv[3];
+#endif
+	if(!strcmp(ipv4, "0"))
+		ipv4_addr.s_addr = INADDR_ANY;
+	else
+		rb_inet_pton(AF_INET, ipv4, &ipv4_addr);
+#ifdef RB_IPV6
+	if(!strcmp(ipv6, "0"))
+		memcpy(&ipv6_addr, &in6addr_any, sizeof(&ipv6_addr));
+	else
+		rb_inet_pton(AF_INET6, ipv6, &ipv6_addr);
+#endif
+}
 
 
 
@@ -248,11 +273,15 @@ parse_request(rb_helper * helper)
 		case 'H':
 			resolve_host(parv);
 			break;
+		case 'B':
+			set_bind(parv);
+			break;			
 		default:
 			break;
 		}
 	}
 }
+
 
 static void
 resolve_host(char **parv)

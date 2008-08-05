@@ -265,6 +265,10 @@ struct server_info
 	char *ssl_cert;
 	char *ssl_dh_params;
 	int ssld_count;
+	char *vhost_dns;
+#ifdef RB_IPV6
+	char *vhost6_dns;
+#endif
 };
 
 struct admin_info

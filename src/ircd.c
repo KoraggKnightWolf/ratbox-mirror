@@ -695,7 +695,8 @@ ratbox_main(int argc, char *argv[])
 	initialize_global_set_options();
 
 	init_auth();		/* Initialise the auth code - depends on global set options */
-
+	rehash_dns_vhost();	/* load any vhost dns binds now */
+	
 	if(ServerInfo.name == NULL)
 	{
 		fprintf(stderr, "ERROR: No server name specified in serverinfo block.\n");

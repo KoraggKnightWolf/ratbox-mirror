@@ -38,6 +38,7 @@ uint16_t lookup_hostname(const char *hostname, int aftype, DNSCB *callback, void
 uint16_t lookup_ip(const char *hostname, int aftype, DNSCB *callback, void *data);
 void cancel_lookup(uint16_t xid);
 void report_dns_servers(struct Client *);
+void rehash_dns_vhost(void);
 
 
 #endif

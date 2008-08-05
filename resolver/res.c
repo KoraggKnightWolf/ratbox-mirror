@@ -61,6 +61,10 @@ static PF res_readreply;
 #define RDLENGTH_SIZE     (size_t)2
 #define ANSWER_FIXED_SIZE (TYPE_SIZE + CLASS_SIZE + TTL_SIZE + RDLENGTH_SIZE)
 
+#ifdef RB_IPV6
+extern struct in6_addr ipv6_addr;
+#endif
+extern struct in_addr ipv4_addr;
 
 extern struct rb_sockaddr_storage irc_nsaddr_list[];
 extern int irc_nscount;
@@ -337,14 +341,14 @@ delete_resolver_queries(const struct DNSQuery *query)
 #define RES_MIN(a, b)  ((a) < (b) ? (a) : (b))
 
 
-
+char *inet_ntoa(struct in_addr in);
 static rb_fde_t *
 random_socket(int family)
 {
 	rb_fde_t *F;
-	int *port;
+	int nport;
 	int i;
-	socklen_t len;
+	rb_socklen_t len;
 	struct rb_sockaddr_storage sockaddr;
 	F = rb_socket(family, SOCK_DGRAM, 0, "UDP resolver socket");
 	if(F == NULL)
@@ -358,19 +362,27 @@ random_socket(int family)
 	if(family == AF_INET6)
 	{
 		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)&sockaddr;
-		len = (socklen_t)sizeof(struct sockaddr_in6);
-		port = (int *) &(in6->sin6_port);
+		memcpy(&in6->sin6_addr, &ipv6_addr, sizeof(struct in6_addr));
+		len = (rb_socklen_t)sizeof(struct sockaddr_in6);
 	} else
 #endif
 	{
 		struct sockaddr_in *in = (struct sockaddr_in *)&sockaddr;
-		len = (socklen_t)sizeof(struct sockaddr_in);
-		port = (int *) &(in->sin_port);
+		in->sin_addr.s_addr = ipv4_addr.s_addr;
+		len = (rb_socklen_t)sizeof(struct sockaddr_in);
 	}
 
 	for(i = 0; i < 10; i++)
 	{
-		*port = htons(generate_random_port());
+		nport = htons(generate_random_port());
+
+		if(family == AF_INET)
+			((struct sockaddr_in *) &sockaddr)->sin_port = nport;
+#ifdef RB_IPV6
+		else
+			((struct sockaddr_in6 *) &sockaddr)->sin6_port = nport;
+		
+#endif
 		if(bind(rb_get_fd(F), (struct sockaddr *)&sockaddr, len) == 0)
 			return F;
 	}
