@@ -203,7 +203,6 @@ quote_identtimeout(struct Client *source_p, int newval)
 				     "%s has changed IDENTTIMEOUT to %d",
 				     get_oper_name(source_p), newval);
 		GlobalSetOptions.ident_timeout = newval;
-		change_ident_timeout(GlobalSetOptions.ident_timeout);
 	}
 	else
 		sendto_one_notice(source_p, ":IDENTTIMEOUT is currently %d",
