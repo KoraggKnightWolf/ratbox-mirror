@@ -62,7 +62,4 @@ void send_auth_query(struct AuthRequest *req);
 void remove_auth_request(struct AuthRequest *req);
 void init_auth(void);
 void delete_auth_queries(struct Client *);
-void ident_sigchld(void);
-void restart_ident(void);
-void change_ident_timeout(int timeout);
 #endif /* INCLUDED_s_auth_h */
