@@ -1,3 +1,11 @@
+androsyn    2008/08/05 01:50:54 UTC	(20080805_1-25841)
+  Log:
+  readd code to do /stats A
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 androsyn    2008/08/05 00:05:04 UTC	(20080805_0-25839)
   Log:
   Add code to allow binding outgoing dns requests to a particular IP address instead
