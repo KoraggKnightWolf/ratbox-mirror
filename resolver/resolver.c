@@ -207,7 +207,7 @@ send_answer(void *vptr, struct DNSReply *reply)
 
 	}
 
-	rb_helper_write(res_helper, "%s %d %d %s\n", req->reqid, result, aftype, response);
+	rb_helper_write(res_helper, "R %s %d %d %s\n", req->reqid, result, aftype, response);
 	rb_free(req);
 }
 
@@ -352,6 +352,28 @@ resolve_ip(char **parv)
 	gethost_byaddr(&req->addr, &req->query);
 }
 
+extern int irc_nscount;
+extern struct rb_sockaddr_storage irc_nsaddr_list[];
+
+static void
+report_nameservers(void)
+{
+	int i;
+	char ipaddr[HOSTIPLEN+1];
+	char buf[512];
+	buf[0] = '\0';
+	for(i = 0; i < irc_nscount; i++)
+	{
+		if (!rb_inet_ntop_sock((struct sockaddr *)&(irc_nsaddr_list[i]), ipaddr, sizeof(ipaddr)))
+		{
+			rb_strlcpy(ipaddr, "?", sizeof(ipaddr));
+		}
+		rb_snprintf_append(buf, sizeof(buf), "%s ", ipaddr);
+	}
+	rb_helper_write(res_helper, "A %s", buf);
+	
+}
+
 static void
 check_rehash(void *unused)
 {
@@ -359,6 +381,7 @@ check_rehash(void *unused)
         {
 		restart_resolver();
 		do_rehash = 0;
+		report_nameservers();
         }
 }
 
@@ -382,6 +405,7 @@ main(int argc, char **argv)
 	init_resolver();
 	rb_init_prng(NULL, RB_PRNG_DEFAULT);
 	rb_event_add("check_rehash", check_rehash, NULL, 5);
+	report_nameservers();
 	rb_helper_loop(res_helper, 0);
 	return 1;
 }

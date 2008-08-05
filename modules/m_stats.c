@@ -88,7 +88,7 @@ struct StatsStruct
 	int need_admin;
 };
 
-static void stats_adns_servers (struct Client *);
+static void stats_dns_servers (struct Client *);
 static void stats_delay(struct Client *);
 static void stats_hash(struct Client *);
 static void stats_connect(struct Client *);
@@ -127,8 +127,8 @@ static void stats_comm(struct Client *);
  */
 static struct StatsStruct stats_cmd_table[] = {
     /* letter     function        need_oper need_admin */
-	{'a', stats_adns_servers,	1, 1, },
-	{'A', stats_adns_servers,	1, 1, },
+	{'a', stats_dns_servers,	1, 1, },
+	{'A', stats_dns_servers,	1, 1, },
 	{'b', stats_delay,		1, 1, },
 	{'B', stats_hash,		1, 1, },
 	{'c', stats_connect,		0, 0, },
@@ -249,10 +249,9 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 }
 
 static void
-stats_adns_servers (struct Client *source_p)
+stats_dns_servers (struct Client *source_p)
 {
-	(void)source_p;
-/*	report_adns_servers (source_p); */
+	report_dns_servers(source_p);
 }
 
 static void
