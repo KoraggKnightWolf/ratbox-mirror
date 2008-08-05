@@ -1,3 +1,12 @@
+androsyn    2008/08/05 02:02:08 UTC	(20080805_3-25845)
+  Log:
+  get rid of traces of ident restarting and what not
+
+  Modified:
+	ircd-ratbox/trunk/include/s_auth.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_rehash.c (File Modified) 
+
+
 androsyn    2008/08/05 01:51:34 UTC	(20080805_2-25843)
   Log:
   readd code to do /stats A and get all of the code this time...
