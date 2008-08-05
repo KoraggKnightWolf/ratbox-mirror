@@ -1,3 +1,11 @@
+androsyn    2008/08/05 02:03:59 UTC	(20080805_4-25847)
+  Log:
+  get another trace of ident daemon stuff
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
+
+
 androsyn    2008/08/05 02:02:08 UTC	(20080805_3-25845)
   Log:
   get rid of traces of ident restarting and what not
