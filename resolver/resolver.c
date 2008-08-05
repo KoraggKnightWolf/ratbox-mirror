@@ -35,8 +35,8 @@ static rb_helper *res_helper;
 static char readBuf[READBUF_SIZE];    
 static void resolve_ip(char **parv);  
 static void resolve_host(char **parv);
+static void report_nameservers(void);
 
-/* these being in bss should be 0 which should be the same as IN6ADDR_ANY/INADDR_ANY */
 #ifdef RB_IPV6
 struct in6_addr ipv6_addr;
 #endif
@@ -263,19 +263,27 @@ parse_request(rb_helper * helper)
 	while ((len = rb_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
 	{
 		parc = rb_string_to_array(readBuf, parv, MAXPARA);
-		if(parc != 4)
-			exit(1);
 		switch (*parv[0])
 		{
 		case 'I':
+			if(parc != 4)
+				abort();
 			resolve_ip(parv);
 			break;
 		case 'H':
+			if(parc != 4)
+				abort();
 			resolve_host(parv);
 			break;
 		case 'B':
+			if(parc != 4)
+				abort();
 			set_bind(parv);
-			break;			
+			break;
+		case 'R':
+			restart_resolver();
+			report_nameservers();
+			break;						
 		default:
 			break;
 		}

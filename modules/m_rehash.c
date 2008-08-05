@@ -73,10 +73,10 @@ rehash_bans_loc(struct Client *source_p)
 static void
 rehash_dns(struct Client *source_p)
 {
-	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is restarting DNS", 
+	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is rehashing DNS", 
 			     get_oper_name(source_p));
 
-	restart_resolver();
+	rehash_resolver();
 }
 
 static void

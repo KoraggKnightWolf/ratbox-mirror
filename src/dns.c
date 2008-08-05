@@ -347,3 +347,10 @@ restart_resolver(void)
 {
 	restart_resolver_cb(dns_helper);
 }
+
+void
+rehash_resolver(void)
+{
+	rb_helper_write(dns_helper, "R");
+}
+
