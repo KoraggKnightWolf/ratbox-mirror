@@ -32,37 +32,37 @@
 static int do_rehash;
 static rb_helper *res_helper;
 
-static char readBuf[READBUF_SIZE];    
-static void resolve_ip(char **parv);  
+static char readBuf[READBUF_SIZE];
+static void resolve_ip(char **parv);
 static void resolve_host(char **parv);
 static void report_nameservers(void);
 
 #ifdef RB_IPV6
 struct in6_addr ipv6_addr;
 #endif
-struct in_addr ipv4_addr;	
+struct in_addr ipv4_addr;
 
 
 struct dns_request
 {
-        struct DNSQuery query;
-        char reqid[REQIDLEN];
-        struct rb_sockaddr_storage addr;
-        int reqtype;
-        int revfwd;  
+	struct DNSQuery query;
+	char reqid[REQIDLEN];
+	struct rb_sockaddr_storage addr;
+	int reqtype;
+	int revfwd;
 };
 
 
 static void
 dummy_handler(int sig)
 {
-        return;  
+	return;
 }
 
 static void
-rehash(int sig) 
+rehash(int sig)
 {
-        do_rehash = 1;
+	do_rehash = 1;
 }
 
 
@@ -283,7 +283,7 @@ parse_request(rb_helper * helper)
 		case 'R':
 			restart_resolver();
 			report_nameservers();
-			break;						
+			break;
 		default:
 			break;
 		}
@@ -367,30 +367,31 @@ static void
 report_nameservers(void)
 {
 	int i;
-	char ipaddr[HOSTIPLEN+1];
+	char ipaddr[HOSTIPLEN + 1];
 	char buf[512];
 	buf[0] = '\0';
-	for(i = 0; i < irc_nscount; i++)
+	for (i = 0; i < irc_nscount; i++)
 	{
-		if (!rb_inet_ntop_sock((struct sockaddr *)&(irc_nsaddr_list[i]), ipaddr, sizeof(ipaddr)))
+		if(!rb_inet_ntop_sock
+		   ((struct sockaddr *) &(irc_nsaddr_list[i]), ipaddr, sizeof(ipaddr)))
 		{
 			rb_strlcpy(ipaddr, "?", sizeof(ipaddr));
 		}
 		rb_snprintf_append(buf, sizeof(buf), "%s ", ipaddr);
 	}
 	rb_helper_write(res_helper, "A %s", buf);
-	
+
 }
 
 static void
 check_rehash(void *unused)
 {
-        if(do_rehash)
-        {
+	if(do_rehash)
+	{
 		restart_resolver();
 		do_rehash = 0;
 		report_nameservers();
-        }
+	}
 }
 
 
