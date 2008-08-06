@@ -83,7 +83,7 @@ struct reslist
 	struct rb_sockaddr_storage addr;
 	char *name;
 	struct DNSQuery *query;	/* query callback for this request */
-	rb_fde_t *ipv4_F; 		/* socket to send request on */ 
+	rb_fde_t *ipv4_F;	/* socket to send request on */
 	rb_fde_t *ipv6_F;
 };
 
@@ -283,14 +283,14 @@ static void
 rem_request(struct reslist *request)
 {
 	rb_dlinkDelete(&request->node, &request_list);
-	rb_free(request->name);
-	rb_free(request);
 	if(request->ipv4_F != NULL)
 		rb_close(request->ipv4_F);
 #ifdef RB_IPV6
 	if(request->ipv6_F != NULL)
 		rb_close(request->ipv6_F);
 #endif
+	rb_free(request->name);
+	rb_free(request);
 }
 
 /*
@@ -353,7 +353,7 @@ random_socket(int family)
 	F = rb_socket(family, SOCK_DGRAM, 0, "UDP resolver socket");
 	if(F == NULL)
 		return NULL;
-	
+
 	memset(&sockaddr, 0, sizeof(sockaddr));
 
 	SET_SS_FAMILY(&sockaddr, family);
@@ -361,18 +361,19 @@ random_socket(int family)
 #ifdef RB_IPV6
 	if(family == AF_INET6)
 	{
-		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)&sockaddr;
+		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *) &sockaddr;
 		memcpy(&in6->sin6_addr, &ipv6_addr, sizeof(struct in6_addr));
-		len = (rb_socklen_t)sizeof(struct sockaddr_in6);
-	} else
+		len = (rb_socklen_t) sizeof(struct sockaddr_in6);
+	}
+	else
 #endif
 	{
-		struct sockaddr_in *in = (struct sockaddr_in *)&sockaddr;
+		struct sockaddr_in *in = (struct sockaddr_in *) &sockaddr;
 		in->sin_addr.s_addr = ipv4_addr.s_addr;
-		len = (rb_socklen_t)sizeof(struct sockaddr_in);
+		len = (rb_socklen_t) sizeof(struct sockaddr_in);
 	}
 
-	for(i = 0; i < 10; i++)
+	for (i = 0; i < 10; i++)
 	{
 		nport = htons(generate_random_port());
 
@@ -381,9 +382,9 @@ random_socket(int family)
 #ifdef RB_IPV6
 		else
 			((struct sockaddr_in6 *) &sockaddr)->sin6_port = nport;
-		
+
 #endif
-		if(bind(rb_get_fd(F), (struct sockaddr *)&sockaddr, len) == 0)
+		if(bind(rb_get_fd(F), (struct sockaddr *) &sockaddr, len) == 0)
 			return F;
 	}
 	rb_close(F);
@@ -403,7 +404,7 @@ send_res_msg(void *msg, int len, struct reslist *request)
 	int i;
 	int sent = 0;
 	rb_fde_t *F = NULL;
-	int rcount = request->sends;	
+	int rcount = request->sends;
 	int max_queries = RES_MIN(irc_nscount, rcount);
 
 	/* RES_PRIMARY option is not implemented
@@ -423,7 +424,8 @@ send_res_msg(void *msg, int len, struct reslist *request)
 			F = request->ipv4_F;
 		}
 #ifdef RB_IPV6
-		else {
+		else
+		{
 			if(GET_SS_FAMILY(&irc_nsaddr_list[i]) == AF_INET6)
 			{
 				request->ipv6_F = random_socket(AF_INET6);
@@ -467,14 +469,15 @@ find_id(uint16_t id)
 static uint16_t
 generate_random_id(void)
 {
-	uint16_t id;		
+	uint16_t id;
 
-	do 
+	do
 	{
 		rb_get_pseudo_random(&id, sizeof(id));
 		if(id == 0xffff)
-			continue;			
-	} while(find_id(id));
+			continue;
+	}
+	while (find_id(id));
 	return id;
 }
 
@@ -482,14 +485,14 @@ static int
 generate_random_port(void)
 {
 	uint16_t port;
-	
-	while(1)
+
+	while (1)
 	{
 		rb_get_pseudo_random(&port, sizeof(port));
 		if(port > 1024)
 			break;
 	}
-	return (int)port;
+	return (int) port;
 }
 
 
@@ -522,7 +525,7 @@ do_query_name(struct DNSQuery *query, const char *name, struct reslist *request,
 	char host_name[HOSTLEN + 1];
 
 	rb_strlcpy(host_name, name, sizeof(host_name));
-//	add_local_domain(host_name, HOSTLEN);
+//      add_local_domain(host_name, HOSTLEN);
 
 	if(request == NULL)
 	{
@@ -566,24 +569,24 @@ do_query_number(struct DNSQuery *query, const struct rb_sockaddr_storage *addr,
 		cp = (const unsigned char *) &v6->sin6_addr.s6_addr;
 
 		rb_sprintf(request->queryname,
-				  "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x."
-				  "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.ip6.arpa",
-				  (unsigned int) (cp[15] & 0xf), (unsigned int) (cp[15] >> 4),
-				  (unsigned int) (cp[14] & 0xf), (unsigned int) (cp[14] >> 4),
-				  (unsigned int) (cp[13] & 0xf), (unsigned int) (cp[13] >> 4),
-				  (unsigned int) (cp[12] & 0xf), (unsigned int) (cp[12] >> 4),
-				  (unsigned int) (cp[11] & 0xf), (unsigned int) (cp[11] >> 4),
-				  (unsigned int) (cp[10] & 0xf), (unsigned int) (cp[10] >> 4),
-				  (unsigned int) (cp[9] & 0xf), (unsigned int) (cp[9] >> 4),
-				  (unsigned int) (cp[8] & 0xf), (unsigned int) (cp[8] >> 4),
-				  (unsigned int) (cp[7] & 0xf), (unsigned int) (cp[7] >> 4),
-				  (unsigned int) (cp[6] & 0xf), (unsigned int) (cp[6] >> 4),
-				  (unsigned int) (cp[5] & 0xf), (unsigned int) (cp[5] >> 4),
-				  (unsigned int) (cp[4] & 0xf), (unsigned int) (cp[4] >> 4),
-				  (unsigned int) (cp[3] & 0xf), (unsigned int) (cp[3] >> 4),
-				  (unsigned int) (cp[2] & 0xf), (unsigned int) (cp[2] >> 4),
-				  (unsigned int) (cp[1] & 0xf), (unsigned int) (cp[1] >> 4),
-				  (unsigned int) (cp[0] & 0xf), (unsigned int) (cp[0] >> 4));
+			   "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x."
+			   "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.ip6.arpa",
+			   (unsigned int) (cp[15] & 0xf), (unsigned int) (cp[15] >> 4),
+			   (unsigned int) (cp[14] & 0xf), (unsigned int) (cp[14] >> 4),
+			   (unsigned int) (cp[13] & 0xf), (unsigned int) (cp[13] >> 4),
+			   (unsigned int) (cp[12] & 0xf), (unsigned int) (cp[12] >> 4),
+			   (unsigned int) (cp[11] & 0xf), (unsigned int) (cp[11] >> 4),
+			   (unsigned int) (cp[10] & 0xf), (unsigned int) (cp[10] >> 4),
+			   (unsigned int) (cp[9] & 0xf), (unsigned int) (cp[9] >> 4),
+			   (unsigned int) (cp[8] & 0xf), (unsigned int) (cp[8] >> 4),
+			   (unsigned int) (cp[7] & 0xf), (unsigned int) (cp[7] >> 4),
+			   (unsigned int) (cp[6] & 0xf), (unsigned int) (cp[6] >> 4),
+			   (unsigned int) (cp[5] & 0xf), (unsigned int) (cp[5] >> 4),
+			   (unsigned int) (cp[4] & 0xf), (unsigned int) (cp[4] >> 4),
+			   (unsigned int) (cp[3] & 0xf), (unsigned int) (cp[3] >> 4),
+			   (unsigned int) (cp[2] & 0xf), (unsigned int) (cp[2] >> 4),
+			   (unsigned int) (cp[1] & 0xf), (unsigned int) (cp[1] >> 4),
+			   (unsigned int) (cp[0] & 0xf), (unsigned int) (cp[0] >> 4));
 	}
 #endif
 
@@ -613,7 +616,7 @@ query_name(struct reslist *request)
 		 * and returns it unchanged
 		 */
 
-		header->id = generate_random_id();		 
+		header->id = generate_random_id();
 
 		request->id = header->id;
 		++request->sends;
@@ -796,7 +799,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			 * but its possible its just a broken nameserver with still
 			 * valid answers. But lets do some rudimentary logging for now...
 			 */
-//			ilog(L_MAIN, "irc_res.c bogus type %d", type);
+//                      ilog(L_MAIN, "irc_res.c bogus type %d", type);
 			break;
 		}
 	}
@@ -809,7 +812,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
  * Return value: 1 if a packet was read, 0 otherwise
  */
 static int
-res_read_single_reply(rb_fde_t *F, void *data)
+res_read_single_reply(rb_fde_t * F, void *data)
 {
 	int buflen = sizeof(HEADER) + MAXPACKET;
 	void *buf = alloca(buflen);
@@ -825,7 +828,7 @@ res_read_single_reply(rb_fde_t *F, void *data)
 	rc = recvfrom(rb_get_fd(F), buf, buflen, 0, (struct sockaddr *) &lsin, &len);
 
 	/* No packet */
-	if (rc == 0 || rc == -1)
+	if(rc == 0 || rc == -1)
 		return 0;
 
 	/* Too small */
@@ -844,8 +847,8 @@ res_read_single_reply(rb_fde_t *F, void *data)
 	/*
 	 * response for an id which we have already received an answer for
 	 * just ignore this response.
-	 */	
-	 if(0 == (request = find_id(header->id)))
+	 */
+	if(0 == (request = find_id(header->id)))
 		return 1;
 
 	/*
@@ -854,7 +857,7 @@ res_read_single_reply(rb_fde_t *F, void *data)
 	if(!res_ourserver(&lsin))
 		return 1;
 
-	if(!check_question(request, header, (char *)buf, ((char *)buf) + rc))
+	if(!check_question(request, header, (char *) buf, ((char *) buf) + rc))
 		return 1;
 
 	if((header->rcode != NO_ERRORS) || (header->ancount == 0))
@@ -871,7 +874,7 @@ res_read_single_reply(rb_fde_t *F, void *data)
 	 * If this fails there was an error decoding the received packet, 
 	 * give up. -- jilles
 	 */
-	answer_count = proc_answer(request, header, (char *)buf, ((char *)buf) + rc);
+	answer_count = proc_answer(request, header, (char *) buf, ((char *) buf) + rc);
 
 	if(answer_count)
 	{
@@ -921,11 +924,12 @@ res_read_single_reply(rb_fde_t *F, void *data)
 	return -1;
 }
 
-static void res_readreply(rb_fde_t *F, void *data)
+static void
+res_readreply(rb_fde_t * F, void *data)
 {
 	int rc;
-	while((rc = res_read_single_reply(F, data)) > 0)
-		;; 
+	while ((rc = res_read_single_reply(F, data)) > 0)
+		;;
 	if(rc != -1)
 		rb_setselect(F, RB_SELECT_READ, res_readreply, NULL);
 }
@@ -941,4 +945,3 @@ make_dnsreply(struct reslist *request)
 	memcpy(&cp->addr, &request->addr, sizeof(cp->addr));
 	return (cp);
 }
-
