@@ -982,6 +982,7 @@ conf_set_serverinfo_vhost_dns(confentry_t * entry, conf_t * conf, struct conf_it
 	ServerInfo.vhost_dns = rb_strdup(entry->string);
 }
 
+#ifdef RB_IPV6
 static void
 conf_set_serverinfo_vhost6_dns(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
@@ -994,7 +995,7 @@ conf_set_serverinfo_vhost6_dns(confentry_t * entry, conf_t * conf, struct conf_i
 	rb_free(ServerInfo.vhost6_dns);
 	ServerInfo.vhost6_dns = rb_strdup(entry->string);
 }
-
+#endif
 
 
 static void
@@ -2176,7 +2177,9 @@ static struct conf_items conf_serverinfo_table[] =
         { "ssl_dh_params",      CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
         { "ssld_count",		CF_INT,	    NULL, 0, &ServerInfo.ssld_count },
         { "vhost_dns",		CF_QSTRING, conf_set_serverinfo_vhost_dns, 0, NULL },
+#ifdef RB_IPV6
         { "vhost6_dns",		CF_QSTRING, conf_set_serverinfo_vhost6_dns, 0, NULL },
+#endif
         { "\0", 0, NULL, 0, NULL }
 };
 
