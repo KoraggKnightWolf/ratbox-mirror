@@ -1,3 +1,11 @@
+androsyn    2008/08/07 12:49:33 UTC	(20080807_0-25863)
+  Log:
+  add a few missing ifdef RB_IPV6 for vhost6_dns
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/08/06 16:06:16 UTC	(20080806_0-25855)
   Log:
   close sockets *before* freeing the request
