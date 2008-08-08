@@ -1,3 +1,11 @@
+androsyn    2008/08/08 18:16:43 UTC	(20080808_1-25867)
+  Log:
+  add sslport example
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 androsyn    2008/08/08 17:41:14 UTC	(20080808_0-25865)
   Log:
   make ilog for ssl helper spinning match reality
