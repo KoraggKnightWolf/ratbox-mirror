@@ -1,3 +1,11 @@
+androsyn    2008/08/08 17:41:14 UTC	(20080808_0-25865)
+  Log:
+  make ilog for ssl helper spinning match reality
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2008/08/07 12:49:33 UTC	(20080807_0-25863)
   Log:
   add a few missing ifdef RB_IPV6 for vhost6_dns
