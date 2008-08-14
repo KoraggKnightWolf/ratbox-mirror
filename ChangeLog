@@ -1,3 +1,11 @@
+androsyn    2008/08/14 17:36:02 UTC	(20080814_2-25883)
+  Log:
+  fix a case of passing a NULL name to match
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2008/08/14 16:05:49 UTC	(20080814_1-25875)
   Log:
   release notes and patchlevel updates for beta9
