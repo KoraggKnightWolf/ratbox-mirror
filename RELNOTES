@@ -6,6 +6,22 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0.0beta9
+- fix a hang with the resolver using epoll
+- add dns source port randomization
+- add a vhost_dns/vhost6_dns option to control which IP addresses the
+  resolver binds to
+- make /stats A work again
+- cleanup some remains of the old ident helper
+- work around a core dump in libratbox with accepting sockets that 
+  appear to be open in the fd hash and log this condition
+- fix a buffer overrun in the arc4random code when there is no ssl
+  library
+- fix a memory alignment issue on sparc where the ircd would crash
+  with a SIGBUS accessing long long variables that were allocated
+  via the block allocator
+
+
 -- ircd-ratbox-3.0.0beta8
 - some cleanups in the checksplit code
 - some cleanups in the /trace code
