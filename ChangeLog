@@ -1,3 +1,11 @@
+androsyn    2008/08/14 02:33:13 UTC	(20080814_0-25873)
+  Log:
+  move jilles up in the CREDITS where he belongs
+
+  Modified:
+	ircd-ratbox/trunk/CREDITS (File Modified) 
+
+
 androsyn    2008/08/08 18:17:31 UTC	(20080808_2-25869)
   Log:
   add sslport example to example.efnet.conf
