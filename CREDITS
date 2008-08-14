@@ -5,11 +5,11 @@ Currently the ircd-ratbox team consists of the following developers:
  
 AndroSyn, Aaron Sethman <androsyn -at- ratbox.org>
 anfl, Lee Hardy <lee -at- leeh.co.uk>
+jilles, Jilles Tjoelker <jilles -at- stack.nl>
 
 Special thanks for support, code and ideas to:
 
 Hwy, W. Campbell <wcampbel -at- botbay.net>
-jilles, Jilles Tjoelker <jilles -at- stack.nl>
 larne, Edward Brocklesby <ejb -at- sdf.lonestar.org>
  
 Of course our work is based on the work of many, many others over the past
