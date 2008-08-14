@@ -169,7 +169,8 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 
 			RB_DLINK_FOREACH(ptr, global_client_list.head)
 			{
-				if(match(new, ((struct Client *) (ptr->data))->name))
+				struct Client *match_p = ptr->data;
+				if(!EmptyString(match_p->name) && match(new, match_p->name))
 				{
 					target_p = ptr->data;
 					break;
