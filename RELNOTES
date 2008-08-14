@@ -6,6 +6,10 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0.0beta10
+- fix a case a passing a NULL to match()
+- properly fix a crash in the block heap garbage collection code
+
 -- ircd-ratbox-3.0.0beta9
 - fix a hang with the resolver using epoll
 - add dns source port randomization
