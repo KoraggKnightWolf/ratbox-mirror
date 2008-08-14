@@ -1,3 +1,12 @@
+androsyn    2008/08/14 16:05:49 UTC	(20080814_1-25875)
+  Log:
+  release notes and patchlevel updates for beta9
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/08/14 02:33:13 UTC	(20080814_0-25873)
   Log:
   move jilles up in the CREDITS where he belongs
