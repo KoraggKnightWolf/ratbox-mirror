@@ -1,3 +1,11 @@
+androsyn    2008/08/15 14:23:20 UTC	(20080815_0-25895)
+  Log:
+  change the EmptyString check to IsRegistered in hunt_server
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2008/08/14 18:25:13 UTC	(20080814_3-25887)
   Log:
   bleh..beta10
