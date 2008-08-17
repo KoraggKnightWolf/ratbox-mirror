@@ -57,7 +57,6 @@
 
 /* files */
 #define SPATH    BINPATH "/ircd"	/* ircd executable */
-#define SLPATH   BINPATH "/servlink"	/* servlink executable */
 #define CPATH    ETCPATH "/ircd.conf"	/* ircd.conf file */
 #define DBPATH   ETCPATH "/ban.db"
 #define MPATH    ETCPATH "/ircd.motd"	/* MOTD file */

@@ -123,7 +123,6 @@ struct config_file_entry
 	const char *dpath;	/* DPATH if set from command line */
 	const char *configfile;
 
-	char *servlink_path;
 	char *egdpool_path;
 
 	char *default_operstring;

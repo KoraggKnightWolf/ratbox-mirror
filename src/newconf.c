@@ -2109,9 +2109,6 @@ load_conf_settings(void)
 	if(ConfigFileEntry.ts_max_delta < TS_MAX_DELTA_MIN)
 		ConfigFileEntry.ts_max_delta = TS_MAX_DELTA_DEFAULT;
 
-	if(ConfigFileEntry.servlink_path == NULL)
-		ConfigFileEntry.servlink_path = rb_strdup(SLPATH);
-
 	if(ServerInfo.network_name == NULL)
 		ServerInfo.network_name = rb_strdup(NETWORK_NAME_DEFAULT);
 
@@ -2275,7 +2272,6 @@ static struct conf_items conf_general_table[] =
 	{ "default_adminstring",CF_QSTRING, NULL, REALLEN,    &ConfigFileEntry.default_adminstring },
 	{ "egdpool_path",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.egdpool_path },
 	{ "kline_reason",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.kline_reason },
-	{ "servlink_path",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.servlink_path },
 
 	{ "anti_spam_exit_message_time", CF_TIME,  NULL, 0, &ConfigFileEntry.anti_spam_exit_message_time },
 	{ "disable_fake_channels",	 CF_YESNO, NULL, 0, &ConfigFileEntry.disable_fake_channels },

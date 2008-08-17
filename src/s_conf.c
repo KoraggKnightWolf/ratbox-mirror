@@ -774,7 +774,6 @@ set_default_conf(void)
 	ConfigFileEntry.hide_error_messages = 1;
 	ConfigFileEntry.dots_in_ident = 0;
 	ConfigFileEntry.max_targets = MAX_TARGETS_DEFAULT;
-	ConfigFileEntry.servlink_path = rb_strdup(SLPATH);
 	ConfigFileEntry.egdpool_path = NULL;
 	ConfigFileEntry.use_whois_actually = YES;
 	ConfigFileEntry.burst_away = NO;
@@ -1167,8 +1166,6 @@ clear_out_old_conf(void)
 	 */
 
 	/* clean out general */
-	rb_free(ConfigFileEntry.servlink_path);
-	ConfigFileEntry.servlink_path = NULL;
 
 #ifdef ENABLE_SERVICES
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
