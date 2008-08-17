@@ -1,3 +1,18 @@
+jilles      2008/08/17 13:16:36 UTC	(20080817_0-25899)
+  Log:
+  Remove servlink_path config option.
+  partly submitted by dwr
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+	ircd-ratbox/trunk/include/config.h.dist (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2008/08/15 14:23:20 UTC	(20080815_0-25895)
   Log:
   change the EmptyString check to IsRegistered in hunt_server
