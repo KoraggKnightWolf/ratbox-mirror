@@ -484,7 +484,7 @@ dnl	AC_DEFINE([HASHSIZE], 4096, [Max number of buckets in hash tables.])
 else
 dnl These settings are for a large network like efnet..they will use lots of memory
 dnl so enable small net unless you really need this much support
-        AC_DEFINE([NICKNAMEHISTORYLENGTH], 15000, [Size of the WHOWAS array.])
+        AC_DEFINE([NICKNAMEHISTORYLENGTH], 30000, [Size of the WHOWAS array.])
         AC_DEFINE([CHANNEL_HEAP_SIZE], 8192, [Size of the channel heap.])
         AC_DEFINE([BAN_HEAP_SIZE], 4096, [Size of the ban heap.])
         AC_DEFINE([CLIENT_HEAP_SIZE], 8192, [Size of the client heap.])
