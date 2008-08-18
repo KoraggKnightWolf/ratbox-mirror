@@ -1,3 +1,11 @@
+androsyn    2008/08/18 16:35:48 UTC	(20080818_2-25905)
+  Log:
+  up the size of the whowas array for large networks to 30000, this shouldn't be too big of an issue
+
+  Modified:
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2008/08/18 16:33:42 UTC	(20080818_1-25903)
   Log:
   add showing sockhost to whowas based on the same rules that whois shows them
