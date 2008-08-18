@@ -1,3 +1,11 @@
+androsyn    2008/08/18 15:50:49 UTC	(20080818_0-25901)
+  Log:
+  add sockhost to L_USER logging
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 jilles      2008/08/17 13:16:36 UTC	(20080817_0-25899)
   Log:
   Remove servlink_path config option.
