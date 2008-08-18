@@ -1,3 +1,12 @@
+androsyn    2008/08/18 23:48:52 UTC	(20080818_3-25907)
+  Log:
+  rev to beta11 and update RELNOTES
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/08/18 16:35:48 UTC	(20080818_2-25905)
   Log:
   up the size of the whowas array for large networks to 30000, this shouldn't be too big of an issue
