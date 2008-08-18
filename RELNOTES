@@ -6,6 +6,18 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+
+-- ircd-ratbox-3.0.0beta11
+- remove the remains of servlink_path from the config file parser
+- userlog now logs the users IP address as well as their hostname
+- whowas now supports showing the users IP address as well as 
+  hostname.  the same rules apply to showing the whowas IP as 
+  apply to showing whois_actually and uses the same numeric.
+- double the size of the whowas array for large networks.  this 
+  comes at a hit of about 2MB or so of memory.
+- really, really fix the block heap garbage collection code 
+
+
 -- ircd-ratbox-3.0.0beta10
 - fix a case a passing a NULL to match()
 - properly fix a crash in the block heap garbage collection code
