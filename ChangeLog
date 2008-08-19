@@ -1,3 +1,17 @@
+androsyn    2008/08/19 16:57:20 UTC	(20080819_0-25915)
+  Log:
+  add support for ssl/tls being required for auths and oper blocks
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2008/08/18 23:48:52 UTC	(20080818_3-25907)
   Log:
   rev to beta11 and update RELNOTES
