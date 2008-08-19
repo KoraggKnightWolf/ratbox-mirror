@@ -143,6 +143,7 @@ void cluster_generic(struct Client *, const char *, int cltype,
 #define OPER_INVIS	0x08000
 #define OPER_SPY	0x10000
 #define OPER_REMOTEBAN	0x20000
+#define OPER_NEEDSSL	0x40000
 
 #define OPER_FLAGS	(OPER_KLINE|OPER_UNKLINE|OPER_LOCKILL|OPER_GLOBKILL|\
 			 OPER_REMOTE|OPER_GLINE|OPER_XLINE|OPER_RESV|\
@@ -151,6 +152,7 @@ void cluster_generic(struct Client *, const char *, int cltype,
 			 OPER_REMOTEBAN)
 
 #define IsOperConfEncrypted(x)	((x)->flags & OPER_ENCRYPTED)
+#define IsOperConfNeedSSL(x)	((x)->flags & OPER_NEEDSSL)
 
 #define IsOperGlobalKill(x)     ((x)->operflags & OPER_GLOBKILL)
 #define IsOperLocalKill(x)      ((x)->operflags & OPER_LOCKILL)

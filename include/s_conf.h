@@ -88,12 +88,13 @@ struct ConfItem
 #define CONF_FLAGS_EXEMPTSPAMBOT	0x00000400
 #define CONF_FLAGS_EXEMPTSHIDE		0x00000800
 #define CONF_FLAGS_EXEMPTJUPE		0x00001000	/* exempt from resv generating warnings */
+#define CONF_FLAGS_NEED_SSL		0x00002000
 /* server flags */
-#define CONF_FLAGS_ENCRYPTED            0x00002000
-#define CONF_FLAGS_COMPRESSED           0x00004000
-#define CONF_FLAGS_TEMPORARY            0x00008000
-#define CONF_FLAGS_TB			0x00010000
-#define CONF_FLAGS_LOCKED		0x00020000
+#define CONF_FLAGS_ENCRYPTED            0x00004000
+#define CONF_FLAGS_COMPRESSED           0x00008000
+#define CONF_FLAGS_TEMPORARY            0x00010000
+#define CONF_FLAGS_TB			0x00020000
+#define CONF_FLAGS_LOCKED		0x00040000
 
 /* Macros for struct ConfItem */
 #define IsConfBan(x)		((x)->status & (CONF_KILL|CONF_XLINE|CONF_DLINE|\
@@ -115,6 +116,7 @@ struct ConfItem
 #define IsConfCompressed(x)     ((x)->flags & CONF_FLAGS_COMPRESSED)
 #define IsConfTburst(x)		((x)->flags & CONF_FLAGS_TB)
 #define IsConfLocked(x)		((x)->flags & CONF_FLAGS_LOCKED)
+#define IsConfSSLNeeded(x)	((x)->flags & CONF_FLAGS_NEED_SSL)
 
 /* flag definitions for opers now in client.h */
 
