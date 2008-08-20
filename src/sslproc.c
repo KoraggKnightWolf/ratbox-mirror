@@ -694,7 +694,6 @@ start_zlib_session(void *data)
 
 	if(len > READBUF_SIZE)
 	{
-		rb_free(buf);
 		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld - attempted to pass message of %zd len, max len %d, giving up", len, READBUF_SIZE);
 		ilog(L_MAIN, "ssld - attempted to pass message of %zd len, max len %d, giving up", len, READBUF_SIZE);
 		exit_client(server, server, server, "ssld readbuf exceeded");
