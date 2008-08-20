@@ -1,3 +1,11 @@
+androsyn    2008/08/20 21:29:15 UTC	(20080820_4-25925)
+  Log:
+  fix admindline
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+
+
 androsyn    2008/08/20 21:27:59 UTC	(20080820_3-25923)
   Log:
   fix the whowas 0 thing a bit better
