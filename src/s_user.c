@@ -341,7 +341,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		return (CLIENT_EXITED);
 	}
 
-	if(IsConfSSLNeeded(aconf))
+	if(IsConfSSLNeeded(aconf) && !IsSSL(source_p))
 	{
 		ServerStats.is_ref++;
 		sendto_one_notice(source_p, ":*** Notice -- You need to use SSL/TLS to use this server");
