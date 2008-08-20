@@ -1,3 +1,11 @@
+androsyn    2008/08/20 01:05:20 UTC	(20080820_1-25919)
+  Log:
+  fix an uninitialized use of a variable
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/08/20 00:43:03 UTC	(20080820_0-25917)
   Log:
   remove a bogus free in start_zlib_session..this is unlikely to ever get hit
