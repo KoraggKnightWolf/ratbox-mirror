@@ -21734,7 +21734,7 @@ if test "$LEX" != flex; then
 fi
 
 # backwards support for IRC_CFLAGS
-CFLAGS="$IRC_CFLAGS $CFLAGS -O0"
+CFLAGS="$IRC_CFLAGS $CFLAGS"
 
 { echo "$as_me:$LINENO: checking for ANSI C header files" >&5
 echo $ECHO_N "checking for ANSI C header files... $ECHO_C" >&6; }
@@ -24658,7 +24658,7 @@ _ACEOF
 else
 
 cat >>confdefs.h <<\_ACEOF
-#define NICKNAMEHISTORYLENGTH 15000
+#define NICKNAMEHISTORYLENGTH 30000
 _ACEOF
 
 

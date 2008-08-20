@@ -107,7 +107,7 @@ if test "$LEX" != flex; then
 fi
 
 # backwards support for IRC_CFLAGS
-CFLAGS="$IRC_CFLAGS $CFLAGS -O0"
+CFLAGS="$IRC_CFLAGS $CFLAGS"
 
 dnl Checks for header files.
 AC_HEADER_STDC
