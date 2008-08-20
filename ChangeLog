@@ -1,3 +1,11 @@
+androsyn    2008/08/20 19:00:07 UTC	(20080820_2-25921)
+  Log:
+  don't show whowas ips that are 0
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_whowas.c (File Modified) 
+
+
 androsyn    2008/08/20 01:05:20 UTC	(20080820_1-25919)
   Log:
   fix an uninitialized use of a variable
