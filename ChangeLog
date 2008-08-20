@@ -1,3 +1,11 @@
+androsyn    2008/08/20 00:43:03 UTC	(20080820_0-25917)
+  Log:
+  remove a bogus free in start_zlib_session..this is unlikely to ever get hit
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2008/08/19 16:57:20 UTC	(20080819_0-25915)
   Log:
   add support for ssl/tls being required for auths and oper blocks
