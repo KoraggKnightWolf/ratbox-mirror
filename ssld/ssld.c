@@ -433,7 +433,7 @@ common_zlib_deflate(conn_t * conn, void *buf, size_t len)
 static void
 common_zlib_inflate(conn_t * conn, void *buf, size_t len)
 {
-	int ret, have;
+	int ret, have = 0;
 	((zlib_stream_t *)conn->stream)->instream.next_in = buf;
 	((zlib_stream_t *)conn->stream)->instream.avail_in = len;
 	((zlib_stream_t *)conn->stream)->instream.next_out = (Bytef *) outbuf;
