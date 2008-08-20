@@ -121,8 +121,6 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 static int
 mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	const char *dlhost;
-
 	if(!IsOperK(source_p))
 	{
 		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "kline");
@@ -134,6 +132,7 @@ mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const 
 		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return 0;
 	}
+	
 
 	if(!valid_dline(source_p, parv[1]))
 		return 0;
@@ -141,7 +140,7 @@ mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const 
 	if(already_placed_dline(source_p, parv[1]))
 		return 0;
 
-	set_dline(source_p, dlhost, parv[2], 0, 1);
+	set_dline(source_p, parv[1], parv[2], 0, 1);
 	check_dlines();
 
 	return 0;
