@@ -104,7 +104,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 				   me.name, source_p->name, temp->name,
 				   temp->username, temp->hostname, temp->realname);
 			
-			if(ConfigFileEntry.use_whois_actually && !EmptyString(temp->sockhost))
+			if(ConfigFileEntry.use_whois_actually && !EmptyString(temp->sockhost) && strcmp(temp->sockhost, "0"))
 			{
 				if(!temp->spoof || (temp->spoof && !ConfigFileEntry.hide_spoof_ips && MyOper(source_p)))
 					sendto_one_numeric(source_p, RPL_WHOISACTUALLY, 
