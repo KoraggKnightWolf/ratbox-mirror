@@ -1,3 +1,12 @@
+androsyn    2008/08/20 21:27:59 UTC	(20080820_3-25923)
+  Log:
+  fix the whowas 0 thing a bit better
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_whowas.c (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2008/08/20 19:00:07 UTC	(20080820_2-25921)
   Log:
   don't show whowas ips that are 0
