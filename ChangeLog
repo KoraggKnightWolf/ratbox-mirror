@@ -1,3 +1,11 @@
+androsyn    2008/08/21 21:56:09 UTC	(20080821_1-25933)
+  Log:
+  ifdef a vhost6_dns case
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2008/08/21 12:53:40 UTC	(20080821_0-25931)
   Log:
   update example.efnet.conf
