@@ -1154,9 +1154,10 @@ clear_out_old_conf(void)
 
 	rb_free(ServerInfo.vhost_dns);
 	ServerInfo.vhost_dns = NULL;
+#ifdef IPV6
 	rb_free(ServerInfo.vhost6_dns);
 	ServerInfo.vhost6_dns = NULL;
-	
+#endif
 	/* operator{} and class{} blocks are freed above */
 	/* clean out listeners */
 	close_listeners();
