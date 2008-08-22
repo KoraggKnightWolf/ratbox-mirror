@@ -1,3 +1,11 @@
+androsyn    2008/08/22 18:55:21 UTC	(20080822_0-25935)
+  Log:
+  fix a logic inversion with already_placed_dline
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+
+
 androsyn    2008/08/21 21:56:09 UTC	(20080821_1-25933)
   Log:
   ifdef a vhost6_dns case
