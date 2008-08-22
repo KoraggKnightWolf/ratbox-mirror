@@ -109,7 +109,7 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if((parc >= loc + 1) && !EmptyString(parv[loc]))
 		reason = parv[loc];
 
-	if(already_placed_dline(source_p, dlhost))
+	if(!already_placed_dline(source_p, dlhost))
 		return 0;
 
 	set_dline(source_p, dlhost, reason, tdline_time, 0);
@@ -137,7 +137,7 @@ mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const 
 	if(!valid_dline(source_p, parv[1]))
 		return 0;
 
-	if(already_placed_dline(source_p, parv[1]))
+	if(!already_placed_dline(source_p, parv[1]))
 		return 0;
 
 	set_dline(source_p, parv[1], parv[2], 0, 1);
