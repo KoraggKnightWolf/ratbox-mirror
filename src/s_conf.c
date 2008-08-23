@@ -973,7 +973,10 @@ expire_temp_kd(void *list)
 						     (aconf->user) ? aconf->
 						     user : "*", (aconf->host) ? aconf->host : "*");
 
-			delete_one_address_conf(aconf->host, aconf);
+			if (aconf->status & CONF_DLINE)
+				remove_dline(aconf);
+			else
+				delete_one_address_conf(aconf->host, aconf);
 			rb_dlinkDestroy(ptr, list);
 		}
 	}
