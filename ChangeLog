@@ -1,3 +1,12 @@
+leeh        2008/08/23 22:27:40 UTC	(20080823_3-25947)
+  Log:
+  - default bursting of who set topics to on
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 jilles      2008/08/23 22:05:37 UTC	(20080823_2-25943)
   Log:
   Change ssl_required conf keyword to need_ssl, for consistency
