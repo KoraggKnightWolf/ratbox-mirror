@@ -473,7 +473,7 @@ read_auth(rb_fde_t * F, void *data)
         char buf[AUTH_BUFSIZ+1];
         int len, count;
 
-        len = rb_read(F, buf, sizeof(buf));
+        len = rb_read(F, buf, AUTH_BUFSIZ);
 
         if(len < 0 && rb_ignore_errno(errno))
         {
