@@ -1,3 +1,15 @@
+jilles      2008/08/23 22:05:37 UTC	(20080823_2-25943)
+  Log:
+  Change ssl_required conf keyword to need_ssl, for consistency
+  with need_ident (and need_sasl in charybdis).
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/08/23 20:16:50 UTC	(20080823_1-25939)
   Log:
   fix a minor buffer overrun
