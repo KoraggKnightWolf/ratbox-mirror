@@ -1,3 +1,11 @@
+androsyn    2008/08/23 20:16:50 UTC	(20080823_1-25939)
+  Log:
+  fix a minor buffer overrun
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 jilles      2008/08/23 00:59:53 UTC	(20080823_0-25937)
   Log:
   Fix expiry of temp dlines.
