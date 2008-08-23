@@ -1,3 +1,12 @@
+jilles      2008/08/23 00:59:53 UTC	(20080823_0-25937)
+  Log:
+  Fix expiry of temp dlines.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2008/08/22 18:55:21 UTC	(20080822_0-25935)
   Log:
   fix a logic inversion with already_placed_dline
