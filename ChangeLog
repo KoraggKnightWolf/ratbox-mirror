@@ -1,3 +1,11 @@
+androsyn    2008/08/25 16:46:35 UTC	(20080825_0-25953)
+  Log:
+  oops..un #if 0 the /dev/null stuff out
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 leeh        2008/08/23 22:27:40 UTC	(20080823_3-25947)
   Log:
   - default bursting of who set topics to on
