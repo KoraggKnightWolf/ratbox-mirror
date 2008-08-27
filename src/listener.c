@@ -548,6 +548,7 @@ accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t add
 		/* this shouldn't fail so... */
 		/* XXX add logging of this */
 		rb_close(F);
+		return;
 	}
 	if(listener->ssl)
 		accept_ssld(F, addr, (struct sockaddr *)&lip, listener);
