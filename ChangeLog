@@ -1,3 +1,11 @@
+androsyn    2008/08/27 14:21:41 UTC	(20080827_1-25959)
+  Log:
+  run through ident and move around a few functions for easy diffing against 2.2
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2008/08/27 14:06:31 UTC	(20080827_0-25957)
   Log:
   call release_auth_client in auth_error and tidy up a few other minor things
