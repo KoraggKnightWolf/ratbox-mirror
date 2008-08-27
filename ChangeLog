@@ -1,3 +1,11 @@
+androsyn    2008/08/27 14:06:31 UTC	(20080827_0-25957)
+  Log:
+  call release_auth_client in auth_error and tidy up a few other minor things
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2008/08/25 16:46:35 UTC	(20080825_0-25953)
   Log:
   oops..un #if 0 the /dev/null stuff out
