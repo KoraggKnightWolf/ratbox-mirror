@@ -207,6 +207,7 @@ auth_error(struct AuthRequest *auth)
 	auth->authF = NULL;
 	ClearAuth(auth);
 	sendheader(auth->client, REPORT_FAIL_ID);
+	release_auth_client(auth);
 }
 
 
@@ -395,12 +396,13 @@ delete_auth_queries(struct Client *target_p)
 	auth = target_p->localClient->auth_request;
 	target_p->localClient->auth_request = NULL;
 
-	if(auth->dns_query > 0)
+	if(IsDNS(auth) && auth->dns_query > 0)
 	{
 		cancel_lookup(auth->dns_query);
 		auth->dns_query = 0;
 	}
 
+	
 	if(auth->authF != NULL)
 		rb_close(auth->authF);
 
@@ -473,7 +475,7 @@ read_auth(rb_fde_t * F, void *data)
         char buf[AUTH_BUFSIZ+1];
         int len, count;
 
-        len = rb_read(F, buf, AUTH_BUFSIZ);
+        len = rb_read(auth->authF, buf, AUTH_BUFSIZ);
 
         if(len < 0 && rb_ignore_errno(errno))
         {
@@ -503,7 +505,7 @@ read_auth(rb_fde_t * F, void *data)
 		}
 	}
 
-	rb_close(F);
+	rb_close(auth->authF);
 	auth->authF = NULL;
 	ClearAuth(auth);
 	
