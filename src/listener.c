@@ -545,8 +545,7 @@ accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t add
 	ServerStats.is_ac++;
 	if(getsockname(rb_get_fd(F), (struct sockaddr *) &lip, &locallen) < 0)
 	{
-		/* this shouldn't fail so... */
-		/* XXX add logging of this */
+		/* this can fail if the connection disappeared in the meantime */
 		rb_close(F);
 		return;
 	}
