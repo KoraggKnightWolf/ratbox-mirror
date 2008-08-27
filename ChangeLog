@@ -1,3 +1,12 @@
+jilles      2008/08/27 22:12:02 UTC	(20080827_2-25965)
+  Log:
+  Don't try to add a closed connection.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2008/08/27 14:21:41 UTC	(20080827_1-25959)
   Log:
   run through ident and move around a few functions for easy diffing against 2.2
