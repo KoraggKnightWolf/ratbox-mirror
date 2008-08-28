@@ -1,3 +1,13 @@
+androsyn    2008/08/28 15:21:24 UTC	(20080828_0-25969)
+  Log:
+  replace localtime calls with gmtime to be a bit more in sync with the rest of the ircds time reporting
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+	ircd-ratbox/trunk/src/s_log.c (File Modified) 
+
+
 jilles      2008/08/27 22:21:47 UTC	(20080827_3-25967)
   Log:
   Fix comment, getsockname() can fail legitimately.
