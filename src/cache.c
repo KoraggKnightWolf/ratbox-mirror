@@ -310,7 +310,7 @@ cache_user_motd(void)
 	
 	if(stat(MPATH, &sb) == 0) 
 	{
-		local_tm = localtime(&sb.st_mtime);
+		local_tm = gmtime(&sb.st_mtime);
 
 		if(local_tm != NULL) 
 		{

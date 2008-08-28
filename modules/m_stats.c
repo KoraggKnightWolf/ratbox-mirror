@@ -404,7 +404,7 @@ stats_pending_glines (struct Client *source_p)
 		{
 			glp_ptr = pending_node->data;
 
-			tmptr = localtime (&glp_ptr->time_request1);
+			tmptr = gmtime (&glp_ptr->time_request1);
 			strftime (timebuffer, MAX_DATE_STRING, "%Y/%m/%d %H:%M:%S", tmptr);
 
 			sendto_one_notice(source_p,
@@ -416,7 +416,7 @@ stats_pending_glines (struct Client *source_p)
 
 			if(glp_ptr->oper_nick2[0])
 			{
-				tmptr = localtime (&glp_ptr->time_request2);
+				tmptr = gmtime (&glp_ptr->time_request2);
 				strftime (timebuffer, MAX_DATE_STRING, "%Y/%m/%d %H:%M:%S", tmptr);
 				sendto_one_notice(source_p,
 					    ":2) %s!%s@%s on %s requested gline at %s for %s@%s [%s]",

@@ -179,7 +179,7 @@ smalldate(time_t ltime)
 	static char buf[MAX_DATE_STRING];
 	struct tm *lt;
 
-	lt = localtime(&ltime);
+	lt = gmtime(&ltime);
 
 	rb_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
 		    lt->tm_year + 1900, lt->tm_mon + 1,
