@@ -60,15 +60,15 @@ DECLARE_MODULE_AV1(error, NULL, NULL, error_clist, NULL, NULL, "$Revision$");
 int
 m_error(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	const char *para;
-
-	para = (parc > 1 && *parv[1] != '\0') ? parv[1] : "<>";
-
-	ilog(L_SERVER, "Received ERROR message from %s: %s", 
-		log_client_name(source_p, SHOW_IP), para);
 
 	if(IsAnyServer(client_p) && ConfigFileEntry.hide_error_messages < 2)
 	{
+		const char *para;
+		para = (parc > 1 && *parv[1] != '\0') ? parv[1] : "<>";
+
+		ilog(L_SERVER, "Received ERROR message from %s: %s", 
+			log_client_name(source_p, SHOW_IP), para);
+
 		sendto_realops_flags(UMODE_ALL, L_ADMIN,
 				"ERROR :from %s -- %s",
 				EmptyString(client_p->name) ? "" : client_p->name, para);
