@@ -1,3 +1,11 @@
+androsyn    2008/09/01 21:14:24 UTC	(20080901_0-25986)
+  Log:
+  logging ERROR from non-servers is pretty much just noise and rather worthless
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_error.c (File Modified) 
+
+
 androsyn    2008/08/28 15:21:24 UTC	(20080828_0-25969)
   Log:
   replace localtime calls with gmtime to be a bit more in sync with the rest of the ircds time reporting
