@@ -54,7 +54,7 @@ restart(const char *mesg)
 void
 server_reboot(void)
 {
-	int i;
+	int i, fd;
 	char path[PATH_MAX+1];
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Restarting server...");
@@ -77,6 +77,13 @@ server_reboot(void)
 		close(i);
 
 	unlink(pidFileName);
+#ifndef _WIN32
+        fd = open("/dev/null", O_RDWR);
+	dup2(fd, 0);
+	dup2(fd, 1);
+	dup2(fd, 2);
+#endif                            
+
 	execv(SPATH, (void *)myargv);
 
 	/* use this if execv of SPATH fails */
