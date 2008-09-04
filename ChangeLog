@@ -1,3 +1,11 @@
+androsyn    2008/09/04 21:10:46 UTC	(20080904_1-26002)
+  Log:
+  in pretend mode, exit gracefully if we attempt to export configs
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 androsyn    2008/09/04 15:45:06 UTC	(20080904_0-25996)
   Log:
   some additional portability type fixes
