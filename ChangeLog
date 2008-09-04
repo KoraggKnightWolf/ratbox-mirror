@@ -1,3 +1,39 @@
+androsyn    2008/09/04 15:45:06 UTC	(20080904_0-25996)
+  Log:
+  some additional portability type fixes
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/help/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/getaddrinfo.c (File Added) 
+	ircd-ratbox/trunk/resolver/getaddrinfo.h (File Added) 
+	ircd-ratbox/trunk/resolver/getnameinfo.c (File Added) 
+	ircd-ratbox/trunk/resolver/getnameinfo.h (File Added) 
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+	ircd-ratbox/trunk/resolver/reslib.c (File Modified) 
+	ircd-ratbox/trunk/resolver/reslib.h (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2008/09/01 21:14:24 UTC	(20080901_0-25986)
   Log:
   logging ERROR from non-servers is pretty much just noise and rather worthless
