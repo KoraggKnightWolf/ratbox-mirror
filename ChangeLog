@@ -1,3 +1,11 @@
+androsyn    2008/09/04 22:01:29 UTC	(20080904_4-26010)
+  Log:
+  after closing all file descriptors on a restart, reopen 0-2 to /dev/null
+
+  Modified:
+	ircd-ratbox/trunk/src/restart.c (File Modified) 
+
+
 androsyn    2008/09/04 21:39:48 UTC	(20080904_3-26006)
   Log:
   change hard asserts to call both the soft assert code and the C library assert so that it gets in the log files and sent to opers as well
