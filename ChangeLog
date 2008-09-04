@@ -1,3 +1,14 @@
+androsyn    2008/09/04 21:34:33 UTC	(20080904_2-26004)
+  Log:
+  change CONFIG_RATBOX_LEVEL to 3
+
+  Modified:
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/include/config.h (File Modified) 
+	ircd-ratbox/trunk/include/defaults.h (File Modified) 
+	ircd-ratbox/trunk/include/ircd_defs.h (File Modified) 
+
+
 androsyn    2008/09/04 21:10:46 UTC	(20080904_1-26002)
   Log:
   in pretend mode, exit gracefully if we attempt to export configs
