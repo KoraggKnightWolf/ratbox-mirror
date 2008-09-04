@@ -1,3 +1,11 @@
+androsyn    2008/09/04 21:39:48 UTC	(20080904_3-26006)
+  Log:
+  change hard asserts to call both the soft assert code and the C library assert so that it gets in the log files and sent to opers as well
+
+  Modified:
+	ircd-ratbox/trunk/include/ircd_defs.h (File Modified) 
+
+
 androsyn    2008/09/04 21:34:33 UTC	(20080904_2-26004)
   Log:
   change CONFIG_RATBOX_LEVEL to 3
