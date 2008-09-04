@@ -102,7 +102,7 @@
  */
 #define MAX_BUFFER      60
 
-#define CONFIG_RATBOX_LEVEL_2
+#define CONFIG_RATBOX_LEVEL_3
 
 #include "defaults.h"
 #endif /* INCLUDED_config_h */

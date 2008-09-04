@@ -73,7 +73,7 @@
 #define s_assert(expr)	assert(expr)
 #endif
 
-#if !defined(CONFIG_RATBOX_LEVEL_2)
+#if !defined(CONFIG_RATBOX_LEVEL_3)
 #  error Incorrect config.h for this revision of ircd.
 #endif
 

@@ -27,7 +27,7 @@
 #ifndef INCLUDED_client_h
 #define INCLUDED_client_h
 
-#if !defined(CONFIG_RATBOX_LEVEL_2)
+#if !defined(CONFIG_RATBOX_LEVEL_3)
 #error Incorrect config.h for this revision of ircd.
 #endif
 
