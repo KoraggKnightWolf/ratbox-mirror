@@ -847,10 +847,14 @@ static char *
 smalldate(const char *string)
 {
 	static char buf[MAX_DATE_STRING];
-	struct tm lt;
-	strptime(string, "%s", &lt);	/* convert string digits into a time */
+	struct tm *lt;
+	time_t t;
+	t = strtol(string, NULL, 10);
+	lt = gmtime(&t);
+	if(lt == NULL)
+		return NULL;
 	rb_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
-		    lt.tm_year + 1900, lt.tm_mon + 1, lt.tm_mday, lt.tm_hour, lt.tm_min);
+		    lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min);
 	return buf;
 }
 

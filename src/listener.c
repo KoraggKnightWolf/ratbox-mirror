@@ -459,12 +459,13 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 	char buf[BUFSIZE];
 	struct ConfItem *aconf;
 
+#ifndef WINDOWS
 	if(listener->ssl && (!ircd_ssl_ok || !get_ssld_count()))
 	{
 		rb_close(F);
 		return 0;
 	}
-	
+#endif	
 	if((maxconnections - 10) < rb_get_fd(F)) /* XXX this is kinda bogus */
 	{
 		++ServerStats.is_ref;
@@ -540,7 +541,7 @@ accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t add
 {
 	struct Listener *listener = data;
 	struct rb_sockaddr_storage lip;
-	unsigned int locallen = sizeof(struct rb_sockaddr_storage);
+	rb_socklen_t locallen = (rb_socklen_t)sizeof(struct rb_sockaddr_storage);
 	
 	ServerStats.is_ac++;
 	if(getsockname(rb_get_fd(F), (struct sockaddr *) &lip, &locallen) < 0)

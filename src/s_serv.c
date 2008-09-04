@@ -607,7 +607,7 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 		}
 		else 
 		{
-			char *errstr = strerror(rb_get_sockerr(F));
+			const char *errstr = strerror(rb_get_sockerr(F));
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"Error connecting to %s[255.255.255.255]: %s (%s)",
 					client_p->name,

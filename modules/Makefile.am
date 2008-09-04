@@ -22,7 +22,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 if !STATIC_MODULES
 
 if MINGW
-MODULE_LIBS = ../libratbox/src/libratbox.la ../libcore.la @SSL_LIBS@ 
+MODULE_LIBS = ../libratbox/src/libratbox.la ../src/libcore.la @SSL_LIBS@ 
 endif # MINGW
 
 

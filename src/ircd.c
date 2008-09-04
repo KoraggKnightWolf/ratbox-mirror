@@ -427,7 +427,7 @@ check_pidfile(const char *filename)
 		if(fgets(buff, 20, fb) != NULL)
 		{
 			pidfromfile = atoi(buff);
-			if(!kill(pidfromfile, 0))
+			if(!rb_kill(pidfromfile, 0))
 			{
 				printf("ircd: daemon is already running\n");
 				exit(-1);
@@ -682,6 +682,7 @@ ratbox_main(int argc, char *argv[])
 	init_resolver();	/* Needs to be setup before the io loop */
 	init_bandb();
 	init_ssld();
+
 	load_conf_settings();
 		
 	rehash_bans(0);

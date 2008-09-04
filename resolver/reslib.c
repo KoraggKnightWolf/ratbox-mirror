@@ -81,8 +81,17 @@
  */
 
 #include <ratbox_lib.h>
-#include <netdb.h>
+
+
 #include "setup.h"
+
+#ifndef WINDOWS
+#include <netdb.h>
+#else
+#include "getaddrinfo.h"
+#include "getnameinfo.h"
+#endif
+
 #include "res.h"
 #include "reslib.h"
 

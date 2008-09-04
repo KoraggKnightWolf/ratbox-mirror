@@ -46,8 +46,13 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(libexecdir)"
 libexecPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(libexec_PROGRAMS)
-am_resolver_OBJECTS = resolver.$(OBJEXT) res.$(OBJEXT) \
-	reslib.$(OBJEXT)
+am__resolver_SOURCES_DIST = resolver.c res.c reslib.c getaddrinfo.c \
+	getnameinfo.c
+@MINGW_FALSE@am_resolver_OBJECTS = resolver.$(OBJEXT) res.$(OBJEXT) \
+@MINGW_FALSE@	reslib.$(OBJEXT)
+@MINGW_TRUE@am_resolver_OBJECTS = resolver.$(OBJEXT) res.$(OBJEXT) \
+@MINGW_TRUE@	reslib.$(OBJEXT) getaddrinfo.$(OBJEXT) \
+@MINGW_TRUE@	getnameinfo.$(OBJEXT)
 resolver_OBJECTS = $(am_resolver_OBJECTS)
 resolver_DEPENDENCIES = ../libratbox/src/libratbox.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
@@ -63,7 +68,7 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(resolver_SOURCES)
-DIST_SOURCES = $(resolver_SOURCES)
+DIST_SOURCES = $(am__resolver_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -108,7 +113,6 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 IRCD_PREFIX = @IRCD_PREFIX@
-LD = @LD@
 LDFLAGS = @LDFLAGS@
 LEX = @LEX@
 LEXLIB = @LEXLIB@
@@ -216,7 +220,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I../include -I. -I../libratbox/include 
 AM_CFLAGS = $(WARNFLAGS)
-resolver_SOURCES = resolver.c res.c reslib.c
+@MINGW_FALSE@resolver_SOURCES = resolver.c res.c reslib.c
+@MINGW_TRUE@resolver_SOURCES = resolver.c res.c reslib.c getaddrinfo.c getnameinfo.c
 resolver_LDADD = ../libratbox/src/libratbox.la
 all: all-am
 
@@ -289,6 +294,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getaddrinfo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getnameinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/res.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reslib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resolver.Po@am__quote@

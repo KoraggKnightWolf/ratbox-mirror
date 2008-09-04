@@ -340,8 +340,6 @@ delete_resolver_queries(const struct DNSQuery *query)
 
 #define RES_MIN(a, b)  ((a) < (b) ? (a) : (b))
 
-
-char *inet_ntoa(struct in_addr in);
 static rb_fde_t *
 random_socket(int family)
 {
@@ -822,7 +820,7 @@ res_read_single_reply(rb_fde_t * F, void *data)
 	struct DNSReply *reply = NULL;
 	int rc;
 	int answer_count;
-	socklen_t len = sizeof(struct rb_sockaddr_storage);
+	rb_socklen_t len = sizeof(struct rb_sockaddr_storage);
 	struct rb_sockaddr_storage lsin;
 
 	rc = recvfrom(rb_get_fd(F), buf, buflen, 0, (struct sockaddr *) &lsin, &len);
