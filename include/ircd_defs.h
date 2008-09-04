@@ -45,9 +45,9 @@
 #define AFP(a,b)
 #endif
 
-#ifdef SOFT_ASSERT
+
 #ifdef __GNUC__
-#define s_assert(expr)	do								\
+#define ss_assert(expr)	do								\
 			if(!(expr)) {							\
 				ilog(L_MAIN, 						\
 				"file: %s line: %d (%s): Assertion failed: (%s)",	\
@@ -58,7 +58,7 @@
 			}								\
 			while(0)
 #else
-#define s_assert(expr)	do								\
+#define ss_assert(expr)	do								\
 			if(!(expr)) {							\
 				ilog(L_MAIN, 						\
 				"file: %s line: %d: Assertion failed: (%s)",		\
@@ -69,8 +69,11 @@
 			}								\
 			while(0)
 #endif
+
+#ifdef SOFT_ASSERT
+#define s_assert(expr) ss_assert(expr)
 #else
-#define s_assert(expr)	assert(expr)
+#define s_assert(expr)	do { ss_assert(expr); assert(expr); } while(0)
 #endif
 
 #if !defined(CONFIG_RATBOX_LEVEL_3)
