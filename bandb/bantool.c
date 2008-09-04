@@ -49,7 +49,7 @@
 #define EmptyString(x) ((x == NULL) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
 
-#define BT_VERSION "0.4.0"
+#define BT_VERSION "0.4.1"
 
 typedef enum
 {
@@ -185,9 +185,12 @@ main(int argc, char *argv[])
 		print_help(EXIT_FAILURE);
 
 	if((flag.import && flag.export) || (flag.export && flag.wipe)
-	   || (flag.verify && flag.pretend))
+	   || (flag.verify && flag.pretend) || (flag.export && flag.pretend))
 	{
 		fprintf(stderr, "* Error: Conflicting flags.\n");
+        if (flag.export && flag.pretend)
+                fprintf(stderr, "* There is nothing to 'pretend' when exporting.\n");
+
 		fprintf(stderr, "* For an explination of commands, run: %s -h\n", me);
 		exit(EXIT_FAILURE);
 	}
