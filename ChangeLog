@@ -1,3 +1,12 @@
+androsyn    2008/09/05 19:18:59 UTC	(20080905_0-26014)
+  Log:
+  update RELNOTES and patchlevel for beta12
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/09/04 22:01:29 UTC	(20080904_4-26010)
   Log:
   after closing all file descriptors on a restart, reopen 0-2 to /dev/null
