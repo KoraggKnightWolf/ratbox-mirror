@@ -1,3 +1,11 @@
+androsyn    2008/09/06 15:09:09 UTC	(20080906_0-26026)
+  Log:
+  add a missing argument to LOAD2HI
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_mkpasswd.c (File Modified) 
+
+
 androsyn    2008/09/05 19:18:59 UTC	(20080905_0-26014)
   Log:
   update RELNOTES and patchlevel for beta12
