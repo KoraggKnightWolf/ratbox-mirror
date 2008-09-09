@@ -1,3 +1,11 @@
+androsyn    2008/09/09 16:41:10 UTC	(20080909_3-26050)
+  Log:
+  fix a compile warning
+
+  Modified:
+	ircd-ratbox/trunk/src/restart.c (File Modified) 
+
+
 androsyn    2008/09/09 16:28:08 UTC	(20080909_2-26042)
   Log:
   add SSL_INCLUDES to the modules include
