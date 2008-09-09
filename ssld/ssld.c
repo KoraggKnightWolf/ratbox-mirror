@@ -34,6 +34,7 @@
 #endif
 
 static void setup_signals(void);
+static pid_t ppid;
 
 static inline int32_t buf_to_int32(char *buf)
 {
@@ -1018,7 +1019,7 @@ mod_write_ctl(rb_fde_t * F, void *data)
 	{
 		ctl_buf = ptr->data;
 		retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds, ctl_buf->buf,
-					ctl_buf->buflen);
+					ctl_buf->buflen, ppid);
 		if(retlen > 0)
 		{
 			rb_dlinkDelete(ptr, &ctl->writeq);
@@ -1053,13 +1054,15 @@ read_pipe_ctl(rb_fde_t * F, void *data)
 int
 main(int argc, char **argv)
 {
-	const char *s_ctlfd, *s_pipe;
+	const char *s_ctlfd, *s_pipe, *s_pid;
 	int ctlfd, pipefd, x, maxfd;
 	maxfd = maxconn();
+
 	s_ctlfd = getenv("CTL_FD");
 	s_pipe = getenv("CTL_PIPE");
+	s_pid = getenv("CTL_PPID");
 
-	if(s_ctlfd == NULL || s_pipe == NULL)
+	if(s_ctlfd == NULL || s_pipe == NULL || s_pid == NULL)
 	{
 		fprintf(stderr, "This is ircd-ratbox ssld.  You know you aren't supposed to run me directly?\n");
 		fprintf(stderr, "You get an Id tag for this: $Id$\n");
@@ -1069,13 +1072,14 @@ main(int argc, char **argv)
 
 	ctlfd = atoi(s_ctlfd);
 	pipefd = atoi(s_pipe);
-
+	ppid = atoi(s_pid);
+	x = 0;	
+#ifndef _WIN32
 	for (x = 0; x < maxfd; x++)
 	{
 		if(x != ctlfd && x != pipefd && x > 2)
 			close(x);
 	}
-
 	x = open("/dev/null", O_RDWR);
 	if(x >= 0)
 	{
@@ -1088,12 +1092,11 @@ main(int argc, char **argv)
 		if(x > 2)
 			close(x);
 	}
-
+#endif
 	setup_signals();
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);
 	ssl_ok = rb_supports_ssl();		
-
 	mod_ctl = rb_malloc(sizeof(mod_ctl_t));
 	mod_ctl->F = rb_open(ctlfd, RB_FD_SOCKET, "ircd control socket");
 	mod_ctl->F_pipe = rb_open(pipefd, RB_FD_PIPE, "ircd pipe");
@@ -1121,16 +1124,18 @@ main(int argc, char **argv)
 }
 
 
-
+#ifndef _WIN32
 static void
 dummy_handler(int sig)
 {
 	return;
 }
+#endif
 
 static void
 setup_signals()
 {
+#ifndef _WIN32
 	struct sigaction act;
 
 	act.sa_flags = 0;
@@ -1153,5 +1158,6 @@ setup_signals()
 
 	act.sa_handler = dummy_handler;
 	sigaction(SIGALRM, &act, 0);
+#endif
 }
 

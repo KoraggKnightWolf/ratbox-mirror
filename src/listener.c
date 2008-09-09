@@ -459,13 +459,12 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 	char buf[BUFSIZE];
 	struct ConfItem *aconf;
 
-#ifndef WINDOWS
 	if(listener->ssl && (!ircd_ssl_ok || !get_ssld_count()))
 	{
 		rb_close(F);
 		return 0;
 	}
-#endif	
+
 	if((maxconnections - 10) < rb_get_fd(F)) /* XXX this is kinda bogus */
 	{
 		++ServerStats.is_ref;

@@ -37,7 +37,6 @@
 #include "send.h"
 #include "packet.h"
 
-#ifndef WINDOWS
 
 #define ZIPSTATS_TIME           60
 
@@ -175,7 +174,7 @@ ssl_killall(void)
 			continue;
 		ctl->dead = 1;
 		ssld_count--;
-		kill(ctl->pid, SIGKILL);
+		rb_kill(ctl->pid, SIGKILL);
 	}
 }
 
@@ -187,7 +186,7 @@ ssl_dead(ssl_ctl_t *ctl)
 		
 	ctl->dead = 1;
 	ssld_count--;
-	kill(ctl->pid, SIGKILL); /* make sure the process is really gone */
+	rb_kill(ctl->pid, SIGKILL); /* make sure the process is really gone */
 	ilog(L_MAIN, "ssld helper died - attempting to restart");
 	sendto_realops_flags(UMODE_ALL, L_ALL, "ssld helper died - attempting to restart");
 	start_ssldaemon(1, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
@@ -227,10 +226,17 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 {
 	rb_fde_t *F1, *F2;
 	rb_fde_t *P1, *P2;
+#ifdef _WIN32
+	const char *suffix = ".exe";
+#else
+	const char *suffix = "";
+#endif
+                
 	char fullpath[PATH_MAX + 1];
 	char fdarg[6];
 	const char *parv[2];
 	char buf[128];
+	char s_pid[10];
 	pid_t pid;
 	int started = 0, i;
 
@@ -250,20 +256,19 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 	last_spin = rb_current_time();
 	if(ssld_path == NULL)
 	{
-		rb_snprintf(fullpath, sizeof(fullpath), "%s/ssld", LIBEXEC_DIR);
+		rb_snprintf(fullpath, sizeof(fullpath), "%s/ssld%s", LIBEXEC_DIR, suffix);
 		
 		if(access(fullpath, X_OK) == -1)
 		{
-			rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/ssld", ConfigFileEntry.dpath);
+			rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/ssld%s", ConfigFileEntry.dpath, suffix);
 			if(access(fullpath, X_OK) == -1)
 			{
-				ilog(L_MAIN, "Unable to execute ssld in %s/libexec/ircd-ratbox or %s", ConfigFileEntry.dpath, LIBEXEC_DIR);
+				ilog(L_MAIN, "Unable to execute ssld%s in %s/libexec/ircd-ratbox or %s", ConfigFileEntry.dpath, suffix, LIBEXEC_DIR);
 				return 0 ;
 			}
 		}
 		ssld_path = rb_strdup(fullpath);
 	}
-
 	rb_strlcpy(buf, "-ircd ssld daemon helper", sizeof(buf));
 	parv[0] = buf;
 	parv[1] = NULL;
@@ -275,10 +280,16 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		rb_set_buffers(F1, READBUF_SIZE);
 		rb_set_buffers(F2, READBUF_SIZE);
 		rb_snprintf(fdarg, sizeof(fdarg), "%d", rb_get_fd(F2));
-		setenv("CTL_FD", fdarg, 1);
+		rb_setenv("CTL_FD", fdarg, 1);
 		rb_pipe(&P1, &P2, "SSL/TLS pipe");
 		rb_snprintf(fdarg, sizeof(fdarg), "%d", rb_get_fd(P1));
-		setenv("CTL_PIPE", fdarg, 1);
+		rb_setenv("CTL_PIPE", fdarg, 1);
+		rb_snprintf(s_pid, sizeof(s_pid), "%d", getpid());
+		rb_setenv("CTL_PPID", s_pid, 1);
+#ifdef _WIN32
+		SetHandleInformation((HANDLE)rb_get_fd(F2), HANDLE_FLAG_INHERIT, 1);
+		SetHandleInformation((HANDLE)rb_get_fd(P1), HANDLE_FLAG_INHERIT, 1);
+#endif
 		
 		pid = rb_spawn_process(ssld_path, (const char **)parv);
 		if(pid == -1)
@@ -305,6 +316,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 			send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
 		ssl_read_ctl(ctl->F, ctl);
 		ssl_do_pipe(P2, ctl);
+
 	}
 	return started;	
 }
@@ -508,7 +520,7 @@ ssl_write_ctl(rb_fde_t *F, void *data)
 	{
 		ctl_buf = ptr->data;
 		/* in theory unix sock_dgram shouldn't ever short write this.. */
-		retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds,  ctl_buf->buf, ctl_buf->buflen);
+		retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds,  ctl_buf->buf, ctl_buf->buflen, ctl->pid);
 		if(retlen > 0)
 		{
 			rb_dlinkDelete(ptr, &ctl->writeq);
@@ -796,8 +808,7 @@ void init_ssld(void)
 	rb_event_addish("cleanup_dead_ssld", cleanup_dead_ssl, NULL, 1200);
 }
 
-#else
-
+#if !defined(HAVE_SOCKETPAIR) && !defined(_WIN32)
 void init_ssld(void)
 {
 	ircd_ssl_ok = 0;
@@ -846,4 +857,5 @@ start_zlib_session(void *data)
 	return;
 }
 
-#endif /* !WINDOWS */
+#endif
+
