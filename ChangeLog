@@ -1,3 +1,15 @@
+androsyn    2008/09/09 16:50:33 UTC	(20080909_4-26054)
+  Log:
+  here is the ssld stuff for windows
+
+  Modified:
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/09/09 16:41:10 UTC	(20080909_3-26050)
   Log:
   fix a compile warning
