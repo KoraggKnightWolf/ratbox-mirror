@@ -1,3 +1,12 @@
+androsyn    2008/09/09 20:03:31 UTC	(20080909_6-26062)
+  Log:
+  remove an if MINGW case
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+
+
 androsyn    2008/09/09 16:55:09 UTC	(20080909_5-26056)
   Log:
   fix the if defined for sslproc
