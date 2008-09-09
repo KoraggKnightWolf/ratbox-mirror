@@ -1,3 +1,11 @@
+androsyn    2008/09/09 16:55:09 UTC	(20080909_5-26056)
+  Log:
+  fix the if defined for sslproc
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2008/09/09 16:50:33 UTC	(20080909_4-26054)
   Log:
   here is the ssld stuff for windows
