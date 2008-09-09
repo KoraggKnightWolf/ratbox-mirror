@@ -37,7 +37,7 @@
 #include "send.h"
 #include "packet.h"
 
-
+#if defined(HAVE_SOCKETPAIR) || defined(_WIN32)
 #define ZIPSTATS_TIME           60
 
 static void collect_zipstats(void *unused);
@@ -808,7 +808,7 @@ void init_ssld(void)
 	rb_event_addish("cleanup_dead_ssld", cleanup_dead_ssl, NULL, 1200);
 }
 
-#if !defined(HAVE_SOCKETPAIR) && !defined(_WIN32)
+#else
 void init_ssld(void)
 {
 	ircd_ssl_ok = 0;
