@@ -1,3 +1,12 @@
+androsyn    2008/09/09 16:26:48 UTC	(20080909_1-26040)
+  Log:
+  have bandb honor ConfigFileEntry.dpath stuff and fallback to the hard coded path if that does not work
+
+  Modified:
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+
+
 androsyn    2008/09/09 16:21:05 UTC	(20080909_0-26038)
   Log:
   Revert to old comment parsing..fixes a bug with EOF in comments blowing up rehashes
