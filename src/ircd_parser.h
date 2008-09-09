@@ -58,14 +58,14 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 154 "src/ircd_parser.y"
+#line 154 "ircd_parser.y"
 {
 	int 		number;
 	char 		string[IRCD_BUFSIZE + 1];
 	conf_parm_t *	conf_parm;
 }
 /* Line 1489 of yacc.c.  */
-#line 69 "y.tab.h"
+#line 69 "ircd_parser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

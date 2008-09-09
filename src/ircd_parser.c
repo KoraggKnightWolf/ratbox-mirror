@@ -84,7 +84,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 6 "src/ircd_parser.y"
+#line 6 "ircd_parser.y"
 
 
 #include "ratbox_lib.h"
@@ -253,14 +253,14 @@ add_cur_list(int type, char *str, int number)
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 154 "src/ircd_parser.y"
+#line 154 "ircd_parser.y"
 {
 	int 		number;
 	char 		string[IRCD_BUFSIZE + 1];
 	conf_parm_t *	conf_parm;
 }
 /* Line 187 of yacc.c.  */
-#line 264 "src/ircd_parser.c"
+#line 264 "ircd_parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -273,7 +273,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 277 "src/ircd_parser.c"
+#line 277 "ircd_parser.c"
 
 #ifdef short
 # undef short
@@ -1494,35 +1494,35 @@ yyreduce:
   switch (yyn)
     {
         case 7:
-#line 181 "src/ircd_parser.y"
+#line 181 "ircd_parser.y"
     { 
 		conf_start_block((yyvsp[(1) - (1)].string), NULL);
 	}
     break;
 
   case 8:
-#line 186 "src/ircd_parser.y"
+#line 186 "ircd_parser.y"
     {
 		conf_end_block();
 	}
     break;
 
   case 9:
-#line 191 "src/ircd_parser.y"
+#line 191 "ircd_parser.y"
     { 
 		conf_start_block((yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));
 	}
     break;
 
   case 10:
-#line 195 "src/ircd_parser.y"
+#line 195 "ircd_parser.y"
     {
 		conf_end_block();
 	}
     break;
 
   case 13:
-#line 205 "src/ircd_parser.y"
+#line 205 "ircd_parser.y"
     {
 		conf_call_set((yyvsp[(1) - (4)].string), cur_list, CF_LIST);
 		free_cur_list(cur_list);
@@ -1531,14 +1531,14 @@ yyreduce:
     break;
 
   case 16:
-#line 217 "src/ircd_parser.y"
+#line 217 "ircd_parser.y"
     {
 		add_cur_list_cpt((yyvsp[(1) - (1)].conf_parm));
 	}
     break;
 
   case 17:
-#line 221 "src/ircd_parser.y"
+#line 221 "ircd_parser.y"
     {
 		/* "1 .. 5" meaning 1,2,3,4,5 - only valid for integers */
 		if (((yyvsp[(1) - (3)].conf_parm)->type & CF_MTYPE) != CF_INT ||
@@ -1560,7 +1560,7 @@ yyreduce:
     break;
 
   case 18:
-#line 242 "src/ircd_parser.y"
+#line 242 "ircd_parser.y"
     {
 		(yyval.conf_parm) = rb_malloc(sizeof(conf_parm_t));
 		(yyval.conf_parm)->type = CF_QSTRING;
@@ -1569,7 +1569,7 @@ yyreduce:
     break;
 
   case 19:
-#line 248 "src/ircd_parser.y"
+#line 248 "ircd_parser.y"
     {
 		(yyval.conf_parm) = rb_malloc(sizeof(conf_parm_t));
 		(yyval.conf_parm)->type = CF_TIME;
@@ -1578,7 +1578,7 @@ yyreduce:
     break;
 
   case 20:
-#line 254 "src/ircd_parser.y"
+#line 254 "ircd_parser.y"
     {
 		(yyval.conf_parm) = rb_malloc(sizeof(conf_parm_t));
 		(yyval.conf_parm)->type = CF_INT;
@@ -1587,7 +1587,7 @@ yyreduce:
     break;
 
   case 21:
-#line 260 "src/ircd_parser.y"
+#line 260 "ircd_parser.y"
     {
 		/* a 'string' could also be a yes/no value .. 
 		 so pass it as that, if so */
@@ -1610,7 +1610,7 @@ yyreduce:
     break;
 
   case 22:
-#line 283 "src/ircd_parser.y"
+#line 283 "ircd_parser.y"
     {
 #ifndef STATIC_MODULES
 //	load_one_module($2, 0);
@@ -1619,22 +1619,22 @@ yyreduce:
     break;
 
   case 24:
-#line 291 "src/ircd_parser.y"
+#line 291 "ircd_parser.y"
     { strcpy((yyval.string), (yyvsp[(1) - (1)].string)); }
     break;
 
   case 25:
-#line 292 "src/ircd_parser.y"
+#line 292 "ircd_parser.y"
     { strcpy((yyval.string), (yyvsp[(1) - (1)].string)); }
     break;
 
   case 26:
-#line 293 "src/ircd_parser.y"
+#line 293 "ircd_parser.y"
     { (yyval.number) = (yyvsp[(1) - (1)].number); }
     break;
 
   case 27:
-#line 297 "src/ircd_parser.y"
+#line 297 "ircd_parser.y"
     {
 		time_t t;
 
@@ -1649,14 +1649,14 @@ yyreduce:
     break;
 
   case 28:
-#line 309 "src/ircd_parser.y"
+#line 309 "ircd_parser.y"
     {
 		(yyval.number) = (yyvsp[(1) - (2)].number) + (yyvsp[(2) - (2)].number);
 	}
     break;
 
   case 29:
-#line 313 "src/ircd_parser.y"
+#line 313 "ircd_parser.y"
     {
 		(yyval.number) = (yyvsp[(1) - (2)].number) + (yyvsp[(2) - (2)].number);
 	}
@@ -1664,7 +1664,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1668 "src/ircd_parser.c"
+#line 1668 "ircd_parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

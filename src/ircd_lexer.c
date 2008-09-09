@@ -364,8 +364,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 16
-#define YY_END_OF_BUFFER 17
+#define YY_NUM_RULES 12
+#define YY_END_OF_BUFFER 13
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -373,14 +373,13 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[56] =
+static yyconst flex_int16_t yy_accept[47] =
     {   0,
-        8,    8,    2,    2,   17,   15,    8,    7,   15,    9,
-       15,   15,   10,   13,   13,    2,    4,    3,    8,    7,
-        0,   11,    9,   14,    0,    1,   10,   13,   13,    2,
-        3,    3,    5,    0,   13,    0,   13,    0,   13,    0,
-       13,    0,   13,    0,   13,    0,    0,    0,   13,    0,
-        6,    0,    6,   12,    0
+        4,    4,   13,   11,    4,    3,   11,    5,   11,   11,
+        6,    9,    9,    4,    3,    0,    7,    5,   10,    0,
+        2,    6,    9,    9,    0,    9,    0,    9,    0,    9,
+        0,    9,    0,    9,    0,    9,    0,    0,    0,    9,
+        0,    1,    0,    1,    8,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -417,76 +416,66 @@ static yyconst flex_int32_t yy_ec[256] =
 
 static yyconst flex_int32_t yy_meta[34] =
     {   0,
-        1,    1,    2,    1,    1,    3,    1,    1,    4,    1,
-        1,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
-        4,    4,    1
+        1,    1,    2,    1,    1,    1,    1,    1,    3,    1,
+        1,    3,    3,    3,    3,    3,    3,    3,    3,    3,
+        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
+        3,    3,    1
     } ;
 
-static yyconst flex_int16_t yy_base[66] =
+static yyconst flex_int16_t yy_base[54] =
     {   0,
-        0,   28,    9,   10,  101,  128,   88,    0,   16,    0,
-       33,   83,   78,    0,   20,    0,  128,   15,   84,    0,
-       21,  128,    0,  128,   22,  128,   75,    0,   31,    0,
-       39,   47,  128,    3,   33,   31,   38,   39,   41,   48,
-       49,   49,   44,   75,   50,   78,   79,   59,   65,   65,
-       40,   15,   11,    0,  128,   91,   95,   99,  103,  107,
-       10,  111,  115,  119,  123
+        0,   28,   96,   97,   92,    0,    9,    0,   33,   85,
+       79,    0,   20,   80,    0,   11,   97,    0,   97,   22,
+       97,   60,    0,    4,   29,   29,   27,   28,   26,   28,
+       46,   47,   47,   42,   15,   47,   66,   62,   15,   51,
+       20,   19,   11,   10,    0,   97,   77,   80,   83,   86,
+       17,   89,   92
     } ;
 
-static yyconst flex_int16_t yy_def[66] =
+static yyconst flex_int16_t yy_def[54] =
     {   0,
-       56,   56,   57,   57,   55,   55,   55,   58,   59,   60,
-       55,   55,   55,   61,   61,   62,   55,   63,   55,   58,
-       59,   55,   60,   55,   55,   55,   55,   61,   61,   62,
-       63,   63,   55,   55,   61,   55,   61,   55,   61,   55,
-       61,   55,   61,   55,   61,   55,   64,   65,   61,   64,
-       64,   65,   65,   61,    0,   55,   55,   55,   55,   55,
-       55,   55,   55,   55,   55
+       47,   47,   46,   46,   46,   48,   49,   50,   46,   46,
+       46,   51,   51,   46,   48,   49,   46,   50,   46,   46,
+       46,   46,   51,   51,   46,   51,   46,   51,   46,   51,
+       46,   51,   46,   51,   46,   51,   46,   52,   53,   51,
+       52,   52,   53,   53,   51,    0,   46,   46,   46,   46,
+       46,   46,   46
     } ;
 
-static yyconst flex_int16_t yy_nxt[162] =
+static yyconst flex_int16_t yy_nxt[131] =
     {   0,
-        6,    7,    8,    9,   10,    6,   11,   12,   13,    6,
-        6,   17,   17,   28,   18,   18,   36,   15,   22,   22,
-       32,   53,   33,   22,   22,   53,   36,   15,    6,    7,
-        8,    9,   10,    6,   11,   12,   13,    6,    6,   24,
-       29,   34,   35,   51,   55,   15,   55,   37,   38,   25,
-       29,   34,   32,   35,   33,   15,   39,   37,   38,   25,
-       40,   41,   42,   43,   44,   45,   39,   49,   51,   53,
-       40,   41,   42,   43,   44,   45,   46,   49,   47,   46,
-       54,   47,   51,   27,   48,   19,   27,   48,   26,   19,
-       54,   14,   14,   14,   14,   16,   16,   16,   16,   20,
+        4,    5,    6,    7,    8,    4,    9,   10,   11,    4,
+        4,   17,   17,   17,   17,   26,   37,   13,   38,   23,
+       44,   44,   42,   42,   39,   44,   26,   13,    4,    5,
+        6,    7,    8,    4,    9,   10,   11,    4,    4,   19,
+       24,   25,   27,   28,   29,   13,   30,   31,   32,   20,
+       24,   25,   27,   28,   29,   13,   30,   31,   32,   20,
+       33,   34,   35,   36,   40,   42,   45,   37,   22,   38,
+       33,   34,   35,   36,   40,   39,   45,   12,   12,   12,
+       15,   14,   15,   16,   16,   16,   18,   22,   18,   41,
+       21,   41,   43,   14,   43,   46,    3,   46,   46,   46,
 
-       55,   20,   20,   21,   21,   21,   21,   23,   55,   23,
-       23,   30,   55,   55,   30,   31,   55,   31,   31,   50,
-       55,   50,   50,   52,   55,   52,   52,    5,   55,   55,
-       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
-       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
-       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
-       55
+       46,   46,   46,   46,   46,   46,   46,   46,   46,   46,
+       46,   46,   46,   46,   46,   46,   46,   46,   46,   46,
+       46,   46,   46,   46,   46,   46,   46,   46,   46,   46
     } ;
 
-static yyconst flex_int16_t yy_chk[162] =
+static yyconst flex_int16_t yy_chk[131] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    3,    4,   61,    3,    4,   34,    1,    9,    9,
-       18,   53,   18,   21,   21,   52,   34,    1,    2,    2,
-        2,    2,    2,    2,    2,    2,    2,    2,    2,   11,
-       15,   25,   29,   51,   31,    2,   31,   35,   36,   11,
-       15,   25,   32,   29,   32,    2,   37,   35,   36,   11,
-       38,   39,   40,   41,   42,   43,   37,   45,   50,   48,
-       38,   39,   40,   41,   42,   43,   44,   45,   44,   46,
-       49,   46,   47,   27,   44,   19,   13,   46,   12,    7,
-       49,   56,   56,   56,   56,   57,   57,   57,   57,   58,
+        1,    7,    7,   16,   16,   24,   35,    1,   35,   51,
+       44,   43,   42,   41,   35,   39,   24,    1,    2,    2,
+        2,    2,    2,    2,    2,    2,    2,    2,    2,    9,
+       13,   20,   25,   26,   27,    2,   28,   29,   30,    9,
+       13,   20,   25,   26,   27,    2,   28,   29,   30,    9,
+       31,   32,   33,   34,   36,   38,   40,   37,   22,   37,
+       31,   32,   33,   34,   36,   37,   40,   47,   47,   47,
+       48,   14,   48,   49,   49,   49,   50,   11,   50,   52,
+       10,   52,   53,    5,   53,    3,   46,   46,   46,   46,
 
-        5,   58,   58,   59,   59,   59,   59,   60,    0,   60,
-       60,   62,    0,    0,   62,   63,    0,   63,   63,   64,
-        0,   64,   64,   65,    0,   65,   65,   55,   55,   55,
-       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
-       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
-       55,   55,   55,   55,   55,   55,   55,   55,   55,   55,
-       55
+       46,   46,   46,   46,   46,   46,   46,   46,   46,   46,
+       46,   46,   46,   46,   46,   46,   46,   46,   46,   46,
+       46,   46,   46,   46,   46,   46,   46,   46,   46,   46
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -527,7 +516,6 @@ char *yytext;
  */
 #line 25 "ircd_lexer.l"
 
-#define YY_NO_INPUT 1
 #include "ratbox_lib.h"
 #include "stdinc.h"
 #include "newconf.h"
@@ -536,7 +524,6 @@ char *yytext;
 #include "s_log.h"
 
 int conf_fgets(char *lbuf, int max_size, FILE * fb);
-int conf_yy_fatal_error(const char *msg);
 
 int yylex(void);
 
@@ -559,7 +546,9 @@ int yylex_destroy(void);
 YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
 int include_stack_ptr=0;
 int lineno = 1;
+void ccomment(void);
 void cinclude(void);
+void hashcomment(void);
 int ieof(void);
 int lineno_stack[MAX_INCLUDE_DEPTH];
 char conffile_stack[MAX_INCLUDE_DEPTH][IRCD_BUFSIZE];
@@ -572,15 +561,11 @@ char linebuf[512];
 
 #undef YY_INPUT
 
-#define YY_FATAL_ERROR(msg) conf_yy_fatal_error(msg)
-
 #define YY_INPUT(buf,result,max_size) \
 	(result = conf_fgets(buf, max_size, conf_fbfile_in))
-
-#line 581 "ircd_lexer.c"
+#line 567 "ircd_lexer.c"
 
 #define INITIAL 0
-#define ccomment 1
 
 #ifndef YY_NO_UNISTD_H
 /* Special case for "unistd.h", since it is non-ANSI. We include it way
@@ -758,9 +743,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 86 "ircd_lexer.l"
+#line 82 "ircd_lexer.l"
 
-#line 764 "ircd_lexer.c"
+#line 749 "ircd_lexer.c"
 
 	if ( !(yy_init) )
 		{
@@ -819,13 +804,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 56 )
+				if ( yy_current_state >= 47 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 128 );
+		while ( yy_base[yy_current_state] != 97 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -851,60 +836,39 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 87 "ircd_lexer.l"
-BEGIN(ccomment);
+#line 83 "ircd_lexer.l"
+{ cinclude(); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 88 "ircd_lexer.l"
-/* eat anything that's not a '*' */
+#line 84 "ircd_lexer.l"
+{ ccomment(); }
 	YY_BREAK
 case 3:
+/* rule 3 can match eol */
 YY_RULE_SETUP
-#line 89 "ircd_lexer.l"
-/* eat up '*'s not followed by '/'s */
+#line 85 "ircd_lexer.l"
+{ strcpy(linebuf, yytext+1); lineno++; yyless(1); }
 	YY_BREAK
 case 4:
-/* rule 4 can match eol */
 YY_RULE_SETUP
-#line 90 "ircd_lexer.l"
-++lineno;
+#line 87 "ircd_lexer.l"
+;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 91 "ircd_lexer.l"
-BEGIN(INITIAL);
+#line 88 "ircd_lexer.l"
+{ hashcomment(); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 94 "ircd_lexer.l"
-{ cinclude(); }
+#line 90 "ircd_lexer.l"
+{ yylval.number = atoi(yytext); return NUMBER; }
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 95 "ircd_lexer.l"
-{ strcpy(linebuf, yytext+1); lineno++; yyless(1); }
-	YY_BREAK
-case 8:
-YY_RULE_SETUP
-#line 97 "ircd_lexer.l"
-;
-	YY_BREAK
-case 9:
-YY_RULE_SETUP
-#line 98 "ircd_lexer.l"
-;
-	YY_BREAK
-case 10:
-YY_RULE_SETUP
-#line 100 "ircd_lexer.l"
-{ yylval.number = atoi(yytext); return NUMBER; }
-	YY_BREAK
-case 11:
-/* rule 11 can match eol */
-YY_RULE_SETUP
-#line 102 "ircd_lexer.l"
+#line 92 "ircd_lexer.l"
 {
 		if(yytext[yyleng-2] == '\\')
 		{
@@ -948,41 +912,40 @@ YY_RULE_SETUP
 		}
 	}
 	YY_BREAK
-case 12:
+case 8:
 YY_RULE_SETUP
-#line 146 "ircd_lexer.l"
+#line 136 "ircd_lexer.l"
 { return LOADMODULE; }
 	YY_BREAK
-case 13:
+case 9:
 YY_RULE_SETUP
-#line 147 "ircd_lexer.l"
+#line 137 "ircd_lexer.l"
 { 
 			strcpy(yylval.string, yytext);
 			yylval.string[yyleng] = '\0';
 			return STRING;
 		}
 	YY_BREAK
-case 14:
+case 10:
 YY_RULE_SETUP
-#line 153 "ircd_lexer.l"
+#line 143 "ircd_lexer.l"
 { return TWODOTS; }
 	YY_BREAK
-case 15:
+case 11:
 YY_RULE_SETUP
-#line 154 "ircd_lexer.l"
+#line 144 "ircd_lexer.l"
 { return yytext[0]; }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-case YY_STATE_EOF(ccomment):
-#line 155 "ircd_lexer.l"
+#line 145 "ircd_lexer.l"
 { if (ieof()) yyterminate(); }
 	YY_BREAK
-case 16:
+case 12:
 YY_RULE_SETUP
-#line 156 "ircd_lexer.l"
+#line 146 "ircd_lexer.l"
 ECHO;
 	YY_BREAK
-#line 986 "ircd_lexer.c"
+#line 949 "ircd_lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1272,7 +1235,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 56 )
+			if ( yy_current_state >= 47 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1300,11 +1263,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 56 )
+		if ( yy_current_state >= 47 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 55);
+	yy_is_jam = (yy_current_state == 46);
 
 	return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1941,10 +1904,43 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 156 "ircd_lexer.l"
+#line 146 "ircd_lexer.l"
 
 
 
+/* C-comment ignoring routine -kre*/
+void ccomment()
+{
+	int c;
+  
+	/* log(L_NOTICE, "got comment"); */
+	while (1)
+	{
+		while ((c = input()) != '*' && c != EOF)
+		{
+			if(c == '\n')
+				++lineno;
+                        
+		}
+
+		if (c == '*')
+		{
+			while ((c = input()) == '*');
+			
+			if (c == '/') 
+				break;
+
+			if (c == '\n')
+				++lineno;
+		}
+
+		if (c == EOF)
+		{
+			conf_report_error("EOF in comment");
+			break;
+		}
+	}
+}
 
 void cinclude(void)
 {
@@ -1953,7 +1949,7 @@ void cinclude(void)
 		*strchr(c = strchr(yytext, '"') + 1, '"') = 0;
 	else
 		*strchr(++c, '>') = 0;
-	
+
 	/* do stacking and co. */ 
 	if (include_stack_ptr >= MAX_INCLUDE_DEPTH) 
 	{
@@ -2018,7 +2014,17 @@ int ieof(void)
 
 	yy_switch_to_buffer(include_stack[include_stack_ptr]);
 	return 0;
-	yy_fatal_error(NULL);
 }
 
+/* #-comment style, look for #include */
+#define INCLUDE "#include"
+
+void hashcomment(void)
+{
+	if (strlen(yytext) < sizeof(INCLUDE) - 1)
+		return;
+
+	if (!strncasecmp(yytext, INCLUDE, sizeof(INCLUDE) - 1))
+		yyerror("You probably meant '.include', skipping");
+}
 
