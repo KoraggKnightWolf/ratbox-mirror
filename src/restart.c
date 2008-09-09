@@ -54,7 +54,7 @@ restart(const char *mesg)
 void
 server_reboot(void)
 {
-	int i, fd;
+	int i;
 	char path[PATH_MAX+1];
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Restarting server...");
@@ -78,7 +78,7 @@ server_reboot(void)
 
 	unlink(pidFileName);
 #ifndef _WIN32
-        fd = open("/dev/null", O_RDWR);
+        int fd = open("/dev/null", O_RDWR);
 	dup2(fd, 0);
 	dup2(fd, 1);
 	dup2(fd, 2);
