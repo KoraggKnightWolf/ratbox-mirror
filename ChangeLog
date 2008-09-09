@@ -1,3 +1,12 @@
+androsyn    2008/09/09 16:28:08 UTC	(20080909_2-26042)
+  Log:
+  add SSL_INCLUDES to the modules include
+
+  Modified:
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+
+
 androsyn    2008/09/09 16:26:48 UTC	(20080909_1-26040)
   Log:
   have bandb honor ConfigFileEntry.dpath stuff and fallback to the hard coded path if that does not work
