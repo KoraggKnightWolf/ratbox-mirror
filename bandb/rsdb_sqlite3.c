@@ -57,7 +57,19 @@ mlog(const char *errstr, ...)
 void
 rsdb_init(rsdb_error_cb *ecb)
 {
+	const char *bandb_dpath;
+	char dbpath[PATH_MAX];
 	error_cb = ecb;
+
+	/* try a path from the environment first, useful for basedir overrides */	
+	bandb_dpath = getenv("BANDB_DPATH");
+	if(bandb_dpath != NULL)
+	{
+		rb_snprintf(dbpath, sizeof(dbpath), "%s/etc/ban.db", bandb_dpath);
+		if(sqlite3_open(dbpath, &rb_bandb) == SQLITE_OK)
+			return;
+	}
+
 	if(sqlite3_open(DBPATH, &rb_bandb) != SQLITE_OK)
 	{
 		char errbuf[128];

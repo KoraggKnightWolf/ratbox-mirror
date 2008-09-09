@@ -81,7 +81,7 @@ start_bandb(void)
 	const char *suffix = "";
 #endif
 
-
+	rb_setenv("BANDB_DPATH", ConfigFileEntry.dpath, 1);
 	if(bandb_path == NULL)
 	{
 		rb_snprintf(fullpath, sizeof(fullpath), "%s/bandb%s", LIBEXEC_DIR, suffix);
