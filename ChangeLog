@@ -1,3 +1,15 @@
+androsyn    2008/09/09 16:21:05 UTC	(20080909_0-26038)
+  Log:
+  Revert to old comment parsing..fixes a bug with EOF in comments blowing up rehashes
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd_lexer.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_lexer.l (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.h (File Modified) 
+
+
 androsyn    2008/09/06 15:09:09 UTC	(20080906_0-26026)
   Log:
   add a missing argument to LOAD2HI
