@@ -1,3 +1,14 @@
+androsyn    2008/09/10 01:42:27 UTC	(20080910_0-26070)
+  Log:
+  add support for getting nameservers on windows..swiped from c-ares
+
+  Modified:
+	ircd-ratbox/trunk/resolver/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/reslib.c (File Modified) 
+	ircd-ratbox/trunk/resolver/reslist.c (File Added) 
+
+
 androsyn    2008/09/09 20:03:31 UTC	(20080909_6-26062)
   Log:
   remove an if MINGW case
