@@ -47,12 +47,12 @@ am__installdirs = "$(DESTDIR)$(libexecdir)"
 libexecPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(libexec_PROGRAMS)
 am__resolver_SOURCES_DIST = resolver.c res.c reslib.c getaddrinfo.c \
-	getnameinfo.c
+	getnameinfo.c reslist.c
 @MINGW_FALSE@am_resolver_OBJECTS = resolver.$(OBJEXT) res.$(OBJEXT) \
 @MINGW_FALSE@	reslib.$(OBJEXT)
 @MINGW_TRUE@am_resolver_OBJECTS = resolver.$(OBJEXT) res.$(OBJEXT) \
 @MINGW_TRUE@	reslib.$(OBJEXT) getaddrinfo.$(OBJEXT) \
-@MINGW_TRUE@	getnameinfo.$(OBJEXT)
+@MINGW_TRUE@	getnameinfo.$(OBJEXT) reslist.$(OBJEXT)
 resolver_OBJECTS = $(am_resolver_OBJECTS)
 resolver_DEPENDENCIES = ../libratbox/src/libratbox.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
@@ -221,7 +221,7 @@ top_srcdir = @top_srcdir@
 INCLUDES = -I../include -I. -I../libratbox/include 
 AM_CFLAGS = $(WARNFLAGS)
 @MINGW_FALSE@resolver_SOURCES = resolver.c res.c reslib.c
-@MINGW_TRUE@resolver_SOURCES = resolver.c res.c reslib.c getaddrinfo.c getnameinfo.c
+@MINGW_TRUE@resolver_SOURCES = resolver.c res.c reslib.c getaddrinfo.c getnameinfo.c reslist.c
 resolver_LDADD = ../libratbox/src/libratbox.la
 all: all-am
 
@@ -298,6 +298,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getnameinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/res.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reslib.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reslist.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resolver.Po@am__quote@
 
 .c.o:
