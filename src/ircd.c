@@ -264,13 +264,13 @@ static const char *logfile = LPATH;
 
 struct lgetopt myopts[] = {
 	{"basedir", &basedir,
-	 STRING, "Base directory to run ircd from"},
+	 ISTRING, "Base directory to run ircd from"},
 	{"configfile", &configfile,
-	 STRING, "File to use for ircd.conf"},
+	 ISTRING, "File to use for ircd.conf"},
 	{"logfile", &logfile,
-	 STRING, "File to use for ircd.log"},
+	 ISTRING, "File to use for ircd.log"},
 	{"pidfile", &pidFileName,
-	 STRING, "File to use for process ID"},
+	 ISTRING, "File to use for process ID"},
 	{"foreground", &server_state_foreground,
 	 YESNO, "Run in foreground (don't detach)"},
 	{"version", &printVersion,
@@ -278,7 +278,7 @@ struct lgetopt myopts[] = {
 	{"conftest", &testing_conf,
 	 YESNO, "Test the configuration files and exit"},
 	{"help", NULL, USAGE, "Print this text"},
-	{NULL, NULL, STRING, NULL},
+	{NULL, NULL, ISTRING, NULL},
 };
 
 static void

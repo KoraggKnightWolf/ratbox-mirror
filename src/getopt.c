@@ -84,7 +84,7 @@ parseargs(int *argc, char ***argv, struct lgetopt *opts)
 					(*argc)--;
 					(*argv)++;
 					break;
-				case STRING:
+				case ISTRING:
 					if(*argc < 2)
 					{
 						fprintf(stderr,
