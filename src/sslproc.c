@@ -37,7 +37,6 @@
 #include "send.h"
 #include "packet.h"
 
-#if defined(HAVE_SOCKETPAIR) || defined(_WIN32)
 #define ZIPSTATS_TIME           60
 
 static void collect_zipstats(void *unused);
@@ -807,55 +806,4 @@ void init_ssld(void)
 	rb_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
 	rb_event_addish("cleanup_dead_ssld", cleanup_dead_ssl, NULL, 1200);
 }
-
-#else
-void init_ssld(void)
-{
-	ircd_ssl_ok = 0;
-	zlib_ok = 0;
-}
-
-int
-get_ssld_count()
-{
-	return -1;
-}
-
-ssl_ctl_t * 
-start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, int32_t id)
-{
-	return NULL;
-}
-
-void
-ssld_decrement_clicount(ssl_ctl_t *ctl)
-{
-
-}
-
-int
-start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
-{
-	return 0;
-}
-
-void
-send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
-{
-	return;
-}
-
-ssl_ctl_t *
-start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, int32_t id)
-{
-	return NULL;
-}
-
-void
-start_zlib_session(void *data)
-{
-	return;
-}
-
-#endif
 
