@@ -1,3 +1,12 @@
+jilles      2008/09/14 18:39:24 UTC	(20080914_0-26076)
+  Log:
+  Disable locale for the date command in version.c.SH.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/version.c.SH (File Modified) 
+
+
 androsyn    2008/09/10 01:49:06 UTC	(20080910_1-26074)
   Log:
   blarg - STRING collides with a symbol in openssl snapshots... *stab*
