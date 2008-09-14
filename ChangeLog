@@ -1,3 +1,11 @@
+androsyn    2008/09/14 23:49:14 UTC	(20080914_1-26080)
+  Log:
+  get rid of the non-socketpair case code..libratbox should handle that...
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 jilles      2008/09/14 18:39:24 UTC	(20080914_0-26076)
   Log:
   Disable locale for the date command in version.c.SH.
