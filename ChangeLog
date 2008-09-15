@@ -1,3 +1,28 @@
+leeh        2008/09/15 21:01:05 UTC	(20080915_0-26084)
+  Log:
+  - drop the configure arg for sslonly channels
+  - force ssl only channel mode +S to be always enabled
+  - add a new option to channel {}; use_sslonly = yes|no;
+    controls whether +S actually takes effect on the server
+  
+    I still need to make the config option extend to whether users can set +S
+    or not..
+    
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/supported.c (File Modified) 
+
+
 androsyn    2008/09/14 23:49:14 UTC	(20080914_1-26080)
   Log:
   get rid of the non-socketpair case code..libratbox should handle that...
