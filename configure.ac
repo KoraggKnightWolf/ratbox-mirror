@@ -514,14 +514,6 @@ AC_HELP_STRING([--with-nicklen=LENGTH],[Set the nick length to LENGTH (default 9
 AC_DEFINE_UNQUOTED(NICKLEN, (${NICKLEN}+1), [Nickname length])
 AC_DEFINE_UNQUOTED(RATBOX_CONFIGURE_OPTS, "$ac_configure_args", [configure arguments])
 
-sslonly_chan=no
-AC_ARG_ENABLE(sslonly-channels,
-AC_HELP_STRING([--enable-sslonly-channels],[Enable SSL only channel support(channel mode +S)]),[sslonly_chan=$enableval],[sslonly_chan=no])
-
-if test x"$sslonly_chan" = "xyes"; then
-	AC_DEFINE(ENABLE_SSLONLY_CHAN, 1, [Enable SSL only channel support])
-fi
-
 
 AC_SUBST(SSL_INCLUDES)
 AC_SUBST(SSL_LIBS)
@@ -610,7 +602,6 @@ echo "IO Debugging hooks ............. $iodebug"
 echo "Assert debugging ............... $assert"
 echo "Small network .................. $small_net"
 echo "ratbox-services compatibility .. $ratbox_services"
-echo "SSL/TLS only channel support ... $sslonly_chan"
 echo
 echo "Configured limits:"
 echo "NICKLEN ................. $NICKLEN"

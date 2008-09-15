@@ -35,9 +35,6 @@
 /* ratbox-services compatibility code */
 #undef ENABLE_SERVICES
 
-/* Enable SSL only channel support */
-#undef ENABLE_SSLONLY_CHAN
-
 /* Prefix where config files are installed. */
 #undef ETC_DIR
 

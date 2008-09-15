@@ -2355,6 +2355,7 @@ static struct conf_items conf_channel_table[] =
 	{ "use_except",		CF_YESNO, NULL, 0, &ConfigChannel.use_except		},
 	{ "use_invex",		CF_YESNO, NULL, 0, &ConfigChannel.use_invex		},
 	{ "use_knock",		CF_YESNO, NULL, 0, &ConfigChannel.use_knock		},
+	{ "use_sslonly",	CF_YESNO, NULL, 0, &ConfigChannel.use_sslonly		},
 	{ "topiclen",		CF_INT,	  NULL, 0, &ConfigChannel.topiclen		},
 	{ "\0", 		0, 	  NULL, 0, NULL }
 };

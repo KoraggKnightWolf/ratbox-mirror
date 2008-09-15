@@ -500,11 +500,9 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 			mode.mode |= MODE_REGONLY;
 			break;
 #endif
-#ifdef ENABLE_SSLONLY_CHAN
 		case 'S':
 			mode.mode |= MODE_SSLONLY;
 			break;
-#endif
 		case 'k':
 			rb_strlcpy(mode.key, parv[4 + args], sizeof(mode.key));
 			args++;
@@ -956,10 +954,10 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 	if(chptr->mode.mode & MODE_REGONLY && EmptyString(source_p->user->suser))
 		return ERR_NEEDREGGEDNICK;
 #endif
-#ifdef ENABLE_SSLONLY_CHAN
-	if(chptr->mode.mode & MODE_SSLONLY && !IsSSL(source_p))
+
+	if(ConfigChannel.use_sslonly && chptr->mode.mode & MODE_SSLONLY && !IsSSL(source_p))
 		return ERR_SSLONLYCHAN;
-#endif
+
 	return 0;
 }
 
@@ -977,9 +975,7 @@ static struct mode_letter
 #ifdef ENABLE_SERVICES
 	{MODE_REGONLY,		'r'},
 #endif
-#ifdef ENABLE_SSLONLY_CHAN
 	{MODE_SSLONLY,		'S'},
-#endif
 	{0,			0}
 };
 
