@@ -1238,6 +1238,49 @@ chm_regonly(struct Client *source_p, struct Channel *chptr,
 }
 #endif
 
+
+static void
+chm_sslonly(struct Client *source_p, struct Channel *chptr,
+		int alevel, int parc, int *parn,
+		const char **parv, int *errors, int dir, char c, long mode_type)
+{
+	if(alevel != CHFL_CHANOP)
+	{
+		if(!(*errors & SM_ERR_NOOPS))
+			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
+				   me.name, source_p->name, chptr->chname);
+		*errors |= SM_ERR_NOOPS;
+		return;
+	}
+
+	if(dir == MODE_QUERY)
+		return;
+
+	if(((dir == MODE_ADD) && (chptr->mode.mode & MODE_SSLONLY)) ||
+	   ((dir == MODE_DEL) && !(chptr->mode.mode & MODE_SSLONLY)))
+		return;
+
+	/* do not allow our clients to set use_sslonly if it is disabled
+	 * we do however allow them to remove it if it gets set 
+	 */
+	if(dir == MODE_ADD && MyClient(source_p) && ConfigChannel.use_sslonly == FALSE)
+		return;
+
+	if(dir == MODE_ADD)
+		chptr->mode.mode |= MODE_SSLONLY;
+	else
+		chptr->mode.mode &= ~MODE_SSLONLY;
+
+	mode_changes[mode_count].letter = c;
+	mode_changes[mode_count].dir = dir;
+	mode_changes[mode_count].caps = 0;
+	mode_changes[mode_count].nocaps = 0;
+	mode_changes[mode_count].mems = ALL_MEMBERS;
+	mode_changes[mode_count].id = NULL;
+	mode_changes[mode_count++].arg = NULL;
+}
+
+
 struct ChannelMode
 {
 	void (*func) (struct Client *source_p, struct Channel *chptr,
@@ -1269,7 +1312,7 @@ static struct ChannelMode ModeTable[255] =
   {chm_nosuch,	0 },			/* P */
   {chm_nosuch,	0 },			/* Q */
   {chm_nosuch,	0 },			/* R */
-  {chm_simple,  MODE_SSLONLY },         /* S */
+  {chm_sslonly,  MODE_SSLONLY },         /* S */
   {chm_nosuch,	0 },			/* T */
   {chm_nosuch,	0 },			/* U */
   {chm_nosuch,	0 },			/* V */
