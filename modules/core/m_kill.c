@@ -52,6 +52,7 @@ struct Message kill_msgtab = {
 };
 
 mapi_clist_av1 kill_clist[] = { &kill_msgtab, NULL };
+
 DECLARE_MODULE_AV1(kill, NULL, NULL, kill_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -72,8 +73,7 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(!IsOperLocalKill(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "local_kill");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "local_kill");
 		return 0;
 	}
 
@@ -91,14 +91,13 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 		 ** rewrite the KILL for this new nickname--this keeps
 		 ** servers in synch when nick change and kill collide
 		 */
-		if((target_p = get_history(user, (long) KILLCHASETIMELIMIT)) == NULL)
+		if((target_p = get_history(user, (long)KILLCHASETIMELIMIT)) == NULL)
 		{
-			sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
+			sendto_one_numeric(source_p, ERR_NOSUCHNICK,
 					   form_str(ERR_NOSUCHNICK), user);
 			return 0;
 		}
-		sendto_one_notice(source_p, ":KILL changed from %s to %s",
-				  user, target_p->name);
+		sendto_one_notice(source_p, ":KILL changed from %s to %s", user, target_p->name);
 	}
 	if(IsServer(target_p) || IsMe(target_p))
 	{
@@ -124,9 +123,8 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 			     target_p->name, parv[0], me.name, reason);
 
 	ilog(L_KILL, "%c %s %s!%s@%s %s %s",
-		MyConnect(target_p) ? 'L' : 'G', get_oper_name(source_p),
-		target_p->name, target_p->username, target_p->host,
-		target_p->servptr->name, reason);
+	     MyConnect(target_p) ? 'L' : 'G', get_oper_name(source_p),
+	     target_p->name, target_p->username, target_p->host, target_p->servptr->name, reason);
 
 	/*
 	 ** And pass on the message to other servers. Note, that if KILL
@@ -203,15 +201,13 @@ ms_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 		 * not an uid, automatically rewrite the KILL for this new nickname.
 		 * --this keeps servers in synch when nick change and kill collide
 		 */
-		if(IsDigit(*user) || (!(target_p = get_history(user, (long) KILLCHASETIMELIMIT))))
+		if(IsDigit(*user) || (!(target_p = get_history(user, (long)KILLCHASETIMELIMIT))))
 		{
-			sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
-					   form_str(ERR_NOSUCHNICK), 
-					   IsDigit(*user) ? "*" : user);
+			sendto_one_numeric(source_p, ERR_NOSUCHNICK,
+					   form_str(ERR_NOSUCHNICK), IsDigit(*user) ? "*" : user);
 			return 0;
 		}
-		sendto_one_notice(source_p, ":KILL changed from %s to %s",
-				  user, target_p->name);
+		sendto_one_notice(source_p, ":KILL changed from %s to %s", user, target_p->name);
 		chasing = 1;
 	}
 
@@ -241,9 +237,9 @@ ms_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 				     source_p->host, source_p->username, source_p->name, reason);
 
 		ilog(L_KILL, "%c %s %s!%s@%s %s %s",
-			MyConnect(target_p) ? 'O' : 'R', get_oper_name(source_p),
-			target_p->name, target_p->username, target_p->host,
-			target_p->servptr->name, reason);
+		     MyConnect(target_p) ? 'O' : 'R', get_oper_name(source_p),
+		     target_p->name, target_p->username, target_p->host,
+		     target_p->servptr->name, reason);
 	}
 	else
 	{
@@ -252,8 +248,8 @@ ms_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 				     target_p->name, parv[0], reason);
 
 		ilog(L_KILL, "S %s %s!%s@%s %s %s",
-			source_p->name, target_p->name, target_p->username,
-			target_p->host, target_p->servptr->name, reason);
+		     source_p->name, target_p->name, target_p->username,
+		     target_p->host, target_p->servptr->name, reason);
 	}
 
 	relay_kill(client_p, source_p, target_p, path, reason);
@@ -279,11 +275,9 @@ relay_kill(struct Client *one, struct Client *source_p,
 	if(MyClient(source_p))
 		rb_snprintf(buffer, sizeof(buffer),
 			    "%s!%s!%s!%s (%s)",
-			    me.name, source_p->host, source_p->username,
-			    source_p->name, reason);
+			    me.name, source_p->host, source_p->username, source_p->name, reason);
 	else
-		rb_snprintf(buffer, sizeof(buffer),
-			    "%s %s", inpath, reason);
+		rb_snprintf(buffer, sizeof(buffer), "%s %s", inpath, reason);
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
@@ -293,7 +287,6 @@ relay_kill(struct Client *one, struct Client *source_p,
 			continue;
 
 		sendto_one(client_p, ":%s KILL %s :%s",
-			   get_id(source_p, client_p),
-			   get_id(target_p, client_p), buffer);
+			   get_id(source_p, client_p), get_id(target_p, client_p), buffer);
 	}
 }

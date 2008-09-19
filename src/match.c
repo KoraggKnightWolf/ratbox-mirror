@@ -45,10 +45,10 @@
 int
 match(const char *mask, const char *name)
 {
-	const unsigned char *m = (const unsigned char *) mask;
-	const unsigned char *n = (const unsigned char *) name;
-	const unsigned char *ma = (const unsigned char *) mask;
-	const unsigned char *na = (const unsigned char *) name;
+	const unsigned char *m = (const unsigned char *)mask;
+	const unsigned char *n = (const unsigned char *)name;
+	const unsigned char *ma = (const unsigned char *)mask;
+	const unsigned char *na = (const unsigned char *)name;
 	int wild = 0;
 	int calls = 0;
 
@@ -59,10 +59,10 @@ match(const char *mask, const char *name)
 		return 0;
 
 	/* if the mask is "*", it matches everything */
-	if((*m == '*') && (*(m+1) == '\0'))
+	if((*m == '*') && (*(m + 1) == '\0'))
 		return 1;
 
-	while (calls++ < MATCH_MAX_CALLS)
+	while(calls++ < MATCH_MAX_CALLS)
 	{
 		if(*m == '*')
 		{
@@ -70,7 +70,7 @@ match(const char *mask, const char *name)
 			 * XXX - shouldn't need to spin here, the mask should have been
 			 * collapsed before match is called
 			 */
-			while (*m == '*')
+			while(*m == '*')
 				m++;
 			wild = 1;
 			ma = m;
@@ -81,9 +81,9 @@ match(const char *mask, const char *name)
 		{
 			if(!*n)
 				return 1;
-			for (m--; (m > (const unsigned char *) mask) && (*m == '?'); m--)
+			for(m--; (m > (const unsigned char *)mask) && (*m == '?'); m--)
 				;
-			if(*m == '*' && (m > (const unsigned char *) mask))
+			if(*m == '*' && (m > (const unsigned char *)mask))
 				return 1;
 			if(!wild)
 				return 0;
@@ -96,7 +96,7 @@ match(const char *mask, const char *name)
 			 * XXX - shouldn't need to spin here, the mask should have been
 			 * collapsed before match is called
 			 */
-			while (*m == '*')
+			while(*m == '*')
 				m++;
 			return (*m == 0);
 		}
@@ -126,10 +126,10 @@ match(const char *mask, const char *name)
 int
 match_esc(const char *mask, const char *name)
 {
-	const unsigned char *m = (const unsigned char *) mask;
-	const unsigned char *n = (const unsigned char *) name;
-	const unsigned char *ma = (const unsigned char *) mask;
-	const unsigned char *na = (const unsigned char *) name;
+	const unsigned char *m = (const unsigned char *)mask;
+	const unsigned char *n = (const unsigned char *)name;
+	const unsigned char *ma = (const unsigned char *)mask;
+	const unsigned char *na = (const unsigned char *)name;
 	int wild = 0;
 	int calls = 0;
 	int quote = 0;
@@ -142,10 +142,10 @@ match_esc(const char *mask, const char *name)
 		return 0;
 
 	/* if the mask is "*", it matches everything */
-	if((*m == '*') && (*(m+1) == '\0'))
+	if((*m == '*') && (*(m + 1) == '\0'))
 		return 1;
 
-	while (calls++ < MATCH_MAX_CALLS)
+	while(calls++ < MATCH_MAX_CALLS)
 	{
 		if(quote)
 			quote++;
@@ -163,7 +163,7 @@ match_esc(const char *mask, const char *name)
 			 * XXX - shouldn't need to spin here, the mask should have been
 			 * collapsed before match is called
 			 */
-			while (*m == '*')
+			while(*m == '*')
 				m++;
 
 			wild = 1;
@@ -187,9 +187,9 @@ match_esc(const char *mask, const char *name)
 				return 1;
 			if(quote)
 				return 0;
-			for (m--; (m > (const unsigned char *) mask) && (*m == '?'); m--);;
+			for(m--; (m > (const unsigned char *)mask) && (*m == '?'); m--);;
 
-			if(*m == '*' && (m > (const unsigned char *) mask))
+			if(*m == '*' && (m > (const unsigned char *)mask))
 				return 1;
 			if(!wild)
 				return 0;
@@ -204,22 +204,22 @@ match_esc(const char *mask, const char *name)
 			 */
 			if(quote)
 				return 0;
-			while (*m == '*')
+			while(*m == '*')
 				m++;
 			return (*m == 0);
 		}
 
-		if (quote)
+		if(quote)
 			match1 = *m == 's' ? *n == ' ' : ToLower(*m) == ToLower(*n);
-		else if (*m == '?')
+		else if(*m == '?')
 			match1 = 1;
-		else if (*m == '@')
+		else if(*m == '@')
 			match1 = IsLetter(*n);
-		else if (*m == '#')
+		else if(*m == '#')
 			match1 = IsDigit(*n);
 		else
 			match1 = ToLower(*m) == ToLower(*n);
-		if (match1)
+		if(match1)
 		{
 			if(*m)
 				m++;
@@ -244,9 +244,9 @@ comp_with_mask(void *addr, void *dest, unsigned int mask)
 	{
 		int n = mask / 8;
 		int m = ((-1) << (8 - (mask % 8)));
-		if(mask % 8 == 0 || (((uint8_t *) addr)[n] & m) == (((uint8_t *) dest)[n] & m))
+		if(mask % 8 == 0 || (((uint8_t *)addr)[n] & m) == (((uint8_t *)dest)[n] & m))
 			return 1;
-        }
+	}
 	return 0;
 }
 
@@ -255,22 +255,22 @@ comp_with_mask_sock(struct sockaddr *addr, struct sockaddr *dest, unsigned int m
 {
 	void *iaddr = NULL;
 	void *idest = NULL;
-	
+
 	if(addr->sa_family == AF_INET)
 	{
 		iaddr = &((struct sockaddr_in *)(void *)addr)->sin_addr;
 		idest = &((struct sockaddr_in *)(void *)dest)->sin_addr;
-	} 
+	}
 #ifdef RB_IPV6
 	else
 	{
 		iaddr = &((struct sockaddr_in6 *)(void *)addr)->sin6_addr;
 		idest = &((struct sockaddr_in6 *)(void *)dest)->sin6_addr;
-	
-	} 
+
+	}
 #endif
 
-	return(comp_with_mask(iaddr, idest, mask));
+	return (comp_with_mask(iaddr, idest, mask));
 }
 
 /*
@@ -326,7 +326,7 @@ match_ips(const char *s1, const char *s2)
 	else
 		return 0;
 }
- 
+
 
 /* match_cidr()
  * Matches cidr channel bans in *@host form
@@ -411,7 +411,7 @@ collapse(char *pattern)
 	if(p == NULL)
 		return NULL;
 
-	while ((c = *p++))
+	while((c = *p++))
 	{
 		if(c == '*')
 		{
@@ -444,7 +444,7 @@ collapse_esc(char *pattern)
 	if(p == NULL)
 		return NULL;
 
-	while ((c = *p++))
+	while((c = *p++))
 	{
 		if(!(f & 2) && c == '*')
 		{
@@ -477,14 +477,14 @@ collapse_esc(char *pattern)
 int
 irccmp(const char *s1, const char *s2)
 {
-	const unsigned char *str1 = (const unsigned char *) s1;
-	const unsigned char *str2 = (const unsigned char *) s2;
+	const unsigned char *str1 = (const unsigned char *)s1;
+	const unsigned char *str2 = (const unsigned char *)s2;
 	int res;
 
 	s_assert(s1 != NULL);
 	s_assert(s2 != NULL);
 
-	while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
+	while((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
 	{
 		if(*str1 == '\0')
 			return 0;
@@ -497,13 +497,13 @@ irccmp(const char *s1, const char *s2)
 int
 ircncmp(const char *s1, const char *s2, int n)
 {
-	const unsigned char *str1 = (const unsigned char *) s1;
-	const unsigned char *str2 = (const unsigned char *) s2;
+	const unsigned char *str1 = (const unsigned char *)s1;
+	const unsigned char *str2 = (const unsigned char *)s2;
 	int res;
 	s_assert(s1 != NULL);
 	s_assert(s2 != NULL);
 
-	while ((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
+	while((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
 	{
 		str1++;
 		str2++;
@@ -539,7 +539,7 @@ valid_hostname(const char *hostname)
 	if('.' == *p || ':' == *p)
 		return NO;
 
-	while (*p)
+	while(*p)
 	{
 		if(!IsHostChar(*p))
 			return NO;
@@ -549,7 +549,7 @@ valid_hostname(const char *hostname)
 	}
 
 	if(found_sep == 0)
-		return(NO);
+		return (NO);
 
 	return (YES);
 }
@@ -587,7 +587,7 @@ valid_username(const char *username)
 	if(!IsAlNum(*p))
 		return NO;
 
-	while (*++p)
+	while(*++p)
 	{
 		if((*p == '.') && ConfigFileEntry.dots_in_ident)
 		{
@@ -608,7 +608,7 @@ valid_servername(const char *servername)
 {
 	const char *s;
 	int dots = 0;
-	
+
 	for(s = servername; *s != '\0'; s++)
 	{
 		if(!IsServChar(*s))
@@ -621,7 +621,7 @@ valid_servername(const char *servername)
 	if(dots == 0)
 	{
 		return NO;
-	}	
+	}
 	return YES;
 }
 

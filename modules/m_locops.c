@@ -44,6 +44,7 @@ struct Message locops_msgtab = {
 };
 
 mapi_clist_av1 locops_clist[] = { &locops_msgtab, NULL };
+
 DECLARE_MODULE_AV1(locops, NULL, NULL, locops_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -56,17 +57,15 @@ static int
 m_locops(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	sendto_wallops_flags(UMODE_LOCOPS, source_p, "LOCOPS - %s", parv[1]);
-	
+
 	if(rb_dlink_list_length(&cluster_conf_list) > 0)
-		cluster_generic(source_p, "LOCOPS", SHARED_LOCOPS, 
-				":%s", parv[1]);
+		cluster_generic(source_p, "LOCOPS", SHARED_LOCOPS, ":%s", parv[1]);
 
 	return 0;
 }
 
 static int
-me_locops(struct Client *client_p, struct Client *source_p,
-		int parc, const char *parv[])
+me_locops(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	if(!IsClient(source_p))
 		return 0;
@@ -76,4 +75,3 @@ me_locops(struct Client *client_p, struct Client *source_p,
 
 	return 0;
 }
-

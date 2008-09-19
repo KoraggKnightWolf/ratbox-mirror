@@ -37,7 +37,7 @@ parseargs(int *argc, char ***argv, struct lgetopt *opts)
 	char *progname = (*argv)[0];
 
 	/* loop through each argument */
-	for (;;)
+	for(;;)
 	{
 		int found = 0;
 
@@ -58,7 +58,7 @@ parseargs(int *argc, char ***argv, struct lgetopt *opts)
 		(*argv)[0]++;
 
 		/* search through our argument list, and see if it matches */
-		for (i = 0; opts[i].opt; i++)
+		for(i = 0; opts[i].opt; i++)
 		{
 			if(!strcmp(opts[i].opt, (*argv)[0]))
 			{
@@ -68,7 +68,7 @@ parseargs(int *argc, char ***argv, struct lgetopt *opts)
 				switch (opts[i].argtype)
 				{
 				case YESNO:
-					*((int *) opts[i].argloc) = 1;
+					*((int *)opts[i].argloc) = 1;
 					break;
 				case INTEGER:
 					if(*argc < 2)
@@ -79,7 +79,7 @@ parseargs(int *argc, char ***argv, struct lgetopt *opts)
 						usage((*argv)[0]);
 					}
 
-					*((int *) opts[i].argloc) = atoi((*argv)[1]);
+					*((int *)opts[i].argloc) = atoi((*argv)[1]);
 
 					(*argc)--;
 					(*argv)++;
@@ -93,9 +93,8 @@ parseargs(int *argc, char ***argv, struct lgetopt *opts)
 						usage(progname);
 					}
 
-					*((char **) opts[i].argloc) =
-						malloc(strlen((*argv)[1]) + 1);
-					strcpy(*((char **) opts[i].argloc), (*argv)[1]);
+					*((char **)opts[i].argloc) = malloc(strlen((*argv)[1]) + 1);
+					strcpy(*((char **)opts[i].argloc), (*argv)[1]);
 
 					(*argc)--;
 					(*argv)++;
@@ -127,7 +126,7 @@ usage(char *name)
 	fprintf(stderr, "Usage: %s [options]\n", name);
 	fprintf(stderr, "Where valid options are:\n");
 
-	for (i = 0; myopts[i].opt; i++)
+	for(i = 0; myopts[i].opt; i++)
 	{
 		fprintf(stderr, "\t%c%-10s %-20s%s\n", OPTCHAR,
 			myopts[i].opt, (myopts[i].argtype == YESNO

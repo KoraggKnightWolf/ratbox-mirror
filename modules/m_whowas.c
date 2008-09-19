@@ -45,6 +45,7 @@ struct Message whowas_msgtab = {
 };
 
 mapi_clist_av1 whowas_clist[] = { &whowas_msgtab, NULL };
+
 DECLARE_MODULE_AV1(whowas, NULL, NULL, whowas_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -54,13 +55,13 @@ DECLARE_MODULE_AV1(whowas, NULL, NULL, whowas_clist, NULL, NULL, "$Revision$");
 */
 static int
 m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
-{	
+{
 	struct Whowas *temp;
 	int cur = 0;
 	int max = -1, found = 0;
 	char *p;
 	const char *nick;
-	char tbuf[26]; 
+	char tbuf[26];
 
 	static time_t last_used = 0L;
 
@@ -96,20 +97,22 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 	temp = WHOWASHASH[hash_whowas_name(nick)];
 	found = 0;
 	SetCork(source_p);
-	for (; temp; temp = temp->next)
+	for(; temp; temp = temp->next)
 	{
 		if(!irccmp(nick, temp->name))
 		{
 			sendto_one(source_p, form_str(RPL_WHOWASUSER),
 				   me.name, source_p->name, temp->name,
 				   temp->username, temp->hostname, temp->realname);
-			
+
 			if(ConfigFileEntry.use_whois_actually && !EmptyString(temp->sockhost))
 			{
-				if(!temp->spoof || (temp->spoof && !ConfigFileEntry.hide_spoof_ips && MyOper(source_p)))
-					sendto_one_numeric(source_p, RPL_WHOISACTUALLY, 
-						           form_str(RPL_WHOISACTUALLY),
-						           temp->name, temp->sockhost);
+				if(!temp->spoof
+				   || (temp->spoof && !ConfigFileEntry.hide_spoof_ips
+				       && MyOper(source_p)))
+					sendto_one_numeric(source_p, RPL_WHOISACTUALLY,
+							   form_str(RPL_WHOISACTUALLY), temp->name,
+							   temp->sockhost);
 			}
 
 			sendto_one_numeric(source_p, RPL_WHOISSERVER,
@@ -123,10 +126,8 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 			break;
 	}
 	if(!found)
-		sendto_one(source_p, form_str(ERR_WASNOSUCHNICK), 
-			   me.name, source_p->name, nick);
+		sendto_one(source_p, form_str(ERR_WASNOSUCHNICK), me.name, source_p->name, nick);
 	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_ENDOFWHOWAS), 
-		   me.name, source_p->name, parv[1]);
+	sendto_one(source_p, form_str(RPL_ENDOFWHOWAS), me.name, source_p->name, parv[1]);
 	return 0;
 }

@@ -106,7 +106,8 @@ monitor_signon(struct Client *client_p)
 	if(monptr == NULL)
 		return;
 
-	rb_snprintf(buf, sizeof(buf), "%s!%s@%s", client_p->name, client_p->username, client_p->host);
+	rb_snprintf(buf, sizeof(buf), "%s!%s@%s", client_p->name, client_p->username,
+		    client_p->host);
 
 	sendto_monitor(monptr, form_str(RPL_MONONLINE), me.name, "*", buf);
 }
@@ -127,12 +128,11 @@ monitor_signoff(struct Client *client_p)
 	if(monptr == NULL)
 		return;
 
-	sendto_monitor(monptr, form_str(RPL_MONOFFLINE), me.name, "*",
-			client_p->name);
+	sendto_monitor(monptr, form_str(RPL_MONOFFLINE), me.name, "*", client_p->name);
 }
 
 
-void 
+void
 clear_monitor(struct Client *client_p)
 {
 	struct monitor *monptr;
@@ -152,4 +152,3 @@ clear_monitor(struct Client *client_p)
 	client_p->localClient->monitor_list.head = client_p->localClient->monitor_list.tail = NULL;
 	client_p->localClient->monitor_list.length = 0;
 }
-

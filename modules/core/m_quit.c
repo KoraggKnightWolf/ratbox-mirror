@@ -43,6 +43,7 @@ struct Message quit_msgtab = {
 };
 
 mapi_clist_av1 quit_clist[] = { &quit_msgtab, NULL };
+
 DECLARE_MODULE_AV1(quit, NULL, NULL, quit_clist, NULL, NULL, "$Revision$");
 
 
@@ -73,7 +74,8 @@ m_quit(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	}
 
 	if(!IsOper(source_p) &&
-	   (source_p->localClient->firsttime + ConfigFileEntry.anti_spam_exit_message_time) > rb_current_time())
+	   (source_p->localClient->firsttime + ConfigFileEntry.anti_spam_exit_message_time) >
+	   rb_current_time())
 	{
 		exit_client(client_p, source_p, source_p, "Client Quit");
 		return 0;

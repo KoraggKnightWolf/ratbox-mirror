@@ -44,6 +44,7 @@ struct Message invite_msgtab = {
 	{mg_unreg, {m_invite, 3}, {m_invite, 3}, mg_ignore, mg_ignore, {m_invite, 3}}
 };
 mapi_clist_av1 invite_clist[] = { &invite_msgtab, NULL };
+
 DECLARE_MODULE_AV1(invite, NULL, NULL, invite_clist, NULL, NULL, "$Revision$");
 
 static void add_invite(struct Channel *, struct Client *);
@@ -70,17 +71,14 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 		target_p = find_person(parv[1]);
 	if(target_p == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
-				   form_str(ERR_NOSUCHNICK), 
-				   IsDigit(parv[1][0]) ? "*" : parv[1]);
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK,
+				   form_str(ERR_NOSUCHNICK), IsDigit(parv[1][0]) ? "*" : parv[1]);
 		return 0;
 	}
 
 	if(check_channel_name(parv[2]) == 0)
 	{
-		sendto_one_numeric(source_p, ERR_BADCHANNAME,
-				   form_str(ERR_BADCHANNAME),
-				   parv[2]);
+		sendto_one_numeric(source_p, ERR_BADCHANNAME, form_str(ERR_BADCHANNAME), parv[2]);
 		return 0;
 	}
 
@@ -112,8 +110,7 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 	msptr = find_channel_membership(chptr, source_p);
 	if(MyClient(source_p) && (msptr == NULL))
 	{
-		sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
-				   form_str(ERR_NOTONCHANNEL), parv[2]);
+		sendto_one_numeric(source_p, ERR_NOTONCHANNEL, form_str(ERR_NOTONCHANNEL), parv[2]);
 		return 0;
 	}
 
@@ -141,9 +138,8 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(MyConnect(source_p))
 	{
-		sendto_one(source_p, form_str(RPL_INVITING), 
-			   me.name, source_p->name,
-			   target_p->name, parv[2]);
+		sendto_one(source_p, form_str(RPL_INVITING),
+			   me.name, source_p->name, target_p->name, parv[2]);
 		if(target_p->user->away)
 			sendto_one_numeric(source_p, RPL_AWAY, form_str(RPL_AWAY),
 					   target_p->name, target_p->user->away);
@@ -151,8 +147,8 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(MyConnect(target_p))
 	{
-		sendto_one(target_p, ":%s!%s@%s INVITE %s :%s", 
-			   source_p->name, source_p->username, source_p->host, 
+		sendto_one(target_p, ":%s!%s@%s INVITE %s :%s",
+			   source_p->name, source_p->username, source_p->host,
 			   target_p->name, chptr->chname);
 
 		if(store_invite)
@@ -160,8 +156,7 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 	else if(target_p->from != client_p)
 	{
-		sendto_one_prefix(target_p, source_p, "INVITE", ":%s",
-				  chptr->chname);
+		sendto_one_prefix(target_p, source_p, "INVITE", ":%s", chptr->chname);
 	}
 
 	return 0;
@@ -186,7 +181,7 @@ add_invite(struct Channel *chptr, struct Client *who)
 	}
 
 	/* ok, if their invite list is too long, remove the tail */
-	if((int)rb_dlink_list_length(&who->localClient->invited) >= 
+	if((int)rb_dlink_list_length(&who->localClient->invited) >=
 	   ConfigChannel.max_chans_per_user)
 	{
 		ptr = who->localClient->invited.tail;
@@ -199,5 +194,3 @@ add_invite(struct Channel *chptr, struct Client *who)
 	/* add channel to user invite list */
 	rb_dlinkAddAlloc(chptr, &who->localClient->invited);
 }
-
-

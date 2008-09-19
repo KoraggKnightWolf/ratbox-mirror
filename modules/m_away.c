@@ -44,6 +44,7 @@ struct Message away_msgtab = {
 };
 
 mapi_clist_av1 away_clist[] = { &away_msgtab, NULL };
+
 DECLARE_MODULE_AV1(away, NULL, NULL, away_clist, NULL, NULL, "$Revision$");
 
 /***********************************************************************
@@ -82,13 +83,11 @@ m_away(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			/* we now send this only if they were away before --is */
 			sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
 				      ":%s AWAY", use_id(source_p));
-			sendto_server(client_p, NULL, NOCAPS, CAP_TS6, 
-				      ":%s AWAY", source_p->name);
+			sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s AWAY", source_p->name);
 			free_away(source_p);
 		}
 		if(MyConnect(source_p))
-			sendto_one(source_p, form_str(RPL_UNAWAY),
-				   me.name, source_p->name);
+			sendto_one(source_p, form_str(RPL_UNAWAY), me.name, source_p->name);
 		return 0;
 	}
 
@@ -97,15 +96,17 @@ m_away(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	{
 		allocate_away(source_p);
 		rb_strlcpy(source_p->user->away, parv[1], AWAYLEN);
-		sendto_server(client_p, NULL, CAP_TS6, NOCAPS, 
+		sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
 			      ":%s AWAY :%s", use_id(source_p), source_p->user->away);
 		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
 			      ":%s AWAY :%s", source_p->name, source_p->user->away);
-			
-	} else {
+
+	}
+	else
+	{
 		rb_strlcpy(source_p->user->away, parv[1], AWAYLEN);
 	}
-	
+
 	if(MyConnect(source_p))
 		sendto_one(source_p, form_str(RPL_NOWAWAY), me.name, source_p->name);
 

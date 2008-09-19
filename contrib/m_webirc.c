@@ -65,6 +65,7 @@ struct Message webirc_msgtab = {
 };
 
 mapi_clist_av1 webirc_clist[] = { &webirc_msgtab, NULL };
+
 DECLARE_MODULE_AV1(webirc, NULL, NULL, webirc_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -81,38 +82,38 @@ mr_webirc(struct Client *client_p, struct Client *source_p, int parc, const char
 	struct ConfItem *aconf;
 	const char *encr;
 
-	if (!strchr(parv[4], '.') && !strchr(parv[4], ':'))
+	if(!strchr(parv[4], '.') && !strchr(parv[4], ':'))
 	{
 		sendto_one(source_p, "NOTICE * :Invalid IP");
 		return 0;
 	}
 
-	aconf = find_address_conf(client_p->host, client_p->sockhost, 
-				IsGotId(client_p) ? client_p->username : "webirc",
-				(struct sockaddr *) &client_p->localClient->ip,
-				client_p->localClient->ip.ss_family);
-	if (aconf == NULL || !(aconf->status & CONF_CLIENT))
+	aconf = find_address_conf(client_p->host, client_p->sockhost,
+				  IsGotId(client_p) ? client_p->username : "webirc",
+				  (struct sockaddr *)&client_p->localClient->ip,
+				  client_p->localClient->ip.ss_family);
+	if(aconf == NULL || !(aconf->status & CONF_CLIENT))
 		return 0;
-	if (!IsConfDoSpoofIp(aconf) || irccmp(aconf->info.name, "webirc."))
+	if(!IsConfDoSpoofIp(aconf) || irccmp(aconf->info.name, "webirc."))
 	{
 		/* XXX */
 		sendto_one(source_p, "NOTICE * :Not a CGI:IRC auth block");
 		return 0;
 	}
-	if (EmptyString(aconf->passwd))
+	if(EmptyString(aconf->passwd))
 	{
 		sendto_one(source_p, "NOTICE * :CGI:IRC auth blocks must have a password");
 		return 0;
 	}
 
-	if (EmptyString(parv[1]))
+	if(EmptyString(parv[1]))
 		encr = "";
-	else if (IsConfEncrypted(aconf))
+	else if(IsConfEncrypted(aconf))
 		encr = crypt(parv[1], aconf->passwd);
 	else
 		encr = parv[1];
 
-	if (strcmp(encr, aconf->passwd))
+	if(strcmp(encr, aconf->passwd))
 	{
 		sendto_one(source_p, "NOTICE * :CGI:IRC password incorrect");
 		return 0;

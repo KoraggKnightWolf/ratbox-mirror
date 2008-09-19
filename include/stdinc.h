@@ -41,16 +41,16 @@
 #   include <alloca.h>
 #  else
 #   ifdef _AIX
- #pragma alloca
+#pragma alloca
 #   else
-#    ifndef alloca /* predefined by HP cc +Olibcalls */
-char *alloca ();
+#    ifndef alloca		/* predefined by HP cc +Olibcalls */
+char *alloca();
 #    endif
 #   endif
 #  endif
 # endif
 #endif
- 
+
 
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
@@ -168,17 +168,17 @@ extern int errno;
 
 
 #ifdef strdupa
-#define LOCAL_COPY(s) strdupa(s) 
+#define LOCAL_COPY(s) strdupa(s)
 #else
 #if defined(__INTEL_COMPILER) || defined(__GNUC__)
 # define LOCAL_COPY(s) __extension__({ char *_s = alloca(strlen(s) + 1); strcpy(_s, s); _s; })
 #else
-# define LOCAL_COPY(s) strcpy(alloca(strlen(s) + 1), s) /* XXX Is that allowed? */
+# define LOCAL_COPY(s) strcpy(alloca(strlen(s) + 1), s)	/* XXX Is that allowed? */
 #endif /* defined(__INTEL_COMPILER) || defined(__GNUC__) */
 #endif /* strdupa */
 
 /* LOCAL_COPY_N copies n part of string and adds one to terminate the string */
-#ifdef strndupa 
+#ifdef strndupa
 #define LOCAL_COPY_N(s, n) strndupa(s, n)
 #else
 #if defined(__INTEL_COMPILER) || defined(__GNUC__)
@@ -187,15 +187,16 @@ extern int errno;
 #define LOCAL_COPY_N(s, n) xc_strlcpy(alloca(strlen(s)+1), s, n)
 INLINE_FUNC size_t
 xc_strlcpy(char *dest, const char *src, size_t size)
-{ 
-        size_t ret = strlen(src);
-   
-        if (size) {
-                size_t len = (ret >= size) ? size-1 : ret;
-                memcpy(dest, src, len);
-                dest[len] = '\0';
-        }
-        return dest;
+{
+	size_t ret = strlen(src);
+
+	if(size)
+	{
+		size_t len = (ret >= size) ? size - 1 : ret;
+		memcpy(dest, src, len);
+		dest[len] = '\0';
+	}
+	return dest;
 }
 #endif /* defined(__INTEL_COMPILER) || defined(__GNUC__) */
 #endif /* strndupa */

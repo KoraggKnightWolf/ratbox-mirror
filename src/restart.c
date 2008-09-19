@@ -31,7 +31,7 @@
 #include "send.h"
 #include "s_log.h"
 #include "s_conf.h"
-#include "client.h"		
+#include "client.h"
 #include "ircd_signal.h"
 
 /* external var */
@@ -55,12 +55,12 @@ void
 server_reboot(void)
 {
 	int i;
-	char path[PATH_MAX+1];
+	char path[PATH_MAX + 1];
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Restarting server...");
 
 	ilog(L_MAIN, "Restarting server...");
-	
+
 	/* set all the signal handlers to a dummy */
 	setup_reboot_signals();
 	/*
@@ -73,16 +73,16 @@ server_reboot(void)
 	 * bah, for now, the program ain't coming back to here, so forcibly
 	 * close everything the "wrong" way for now, and just LEAVE...
 	 */
-	for (i = 0; i < maxconnections; ++i)
+	for(i = 0; i < maxconnections; ++i)
 		close(i);
 
 	unlink(pidFileName);
 #ifndef _WIN32
-        int fd = open("/dev/null", O_RDWR);
+	int fd = open("/dev/null", O_RDWR);
 	dup2(fd, 0);
 	dup2(fd, 1);
 	dup2(fd, 2);
-#endif                            
+#endif
 
 	execv(SPATH, (void *)myargv);
 

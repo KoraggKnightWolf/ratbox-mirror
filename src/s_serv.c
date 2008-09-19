@@ -68,21 +68,21 @@ static char buf[BUFSIZE];
  */
 struct Capability captab[] = {
 /*  name     cap     */
-	{ "QS",		CAP_QS },
-	{ "EX",		CAP_EX },
-	{ "CHW",	CAP_CHW},
-	{ "IE", 	CAP_IE},
-	{ "GLN",	CAP_GLN},
-	{ "KNOCK",	CAP_KNOCK},
-	{ "ZIP",	CAP_ZIP},
-	{ "TB",		CAP_TB},
-	{ "ENCAP",	CAP_ENCAP },
+	{"QS", CAP_QS},
+	{"EX", CAP_EX},
+	{"CHW", CAP_CHW},
+	{"IE", CAP_IE},
+	{"GLN", CAP_GLN},
+	{"KNOCK", CAP_KNOCK},
+	{"ZIP", CAP_ZIP},
+	{"TB", CAP_TB},
+	{"ENCAP", CAP_ENCAP},
 #ifdef ENABLE_SERVICES
-	{ "SERVICES",	CAP_SERVICE },
-	{ "RSFNC",	CAP_RSFNC },
+	{"SERVICES", CAP_SERVICE},
+	{"RSFNC", CAP_RSFNC},
 #endif
-	{ "SAVE",	CAP_SAVE },
-	{ "SAVETS_100",	CAP_SAVETS_100 },
+	{"SAVE", CAP_SAVE},
+	{"SAVETS_100", CAP_SAVETS_100},
 	{0, 0}
 };
 
@@ -125,7 +125,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 	   match(me.name, parv[server]) || match(parv[server], me.name) ||
 	   (strcmp(parv[server], me.id) == 0))
 		return (HUNTED_ISME);
-	
+
 	new = LOCAL_COPY(parv[server]);
 
 	/*
@@ -159,8 +159,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		{
 			if(MyClient(source_p) || !IsDigit(parv[server][0]))
 				sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
-						   form_str(ERR_NOSUCHSERVER),
-						   parv[server]);
+						   form_str(ERR_NOSUCHSERVER), parv[server]);
 			return (HUNTED_NOSUCH);
 		}
 		else
@@ -184,8 +183,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		if(!IsRegistered(target_p))
 		{
 			sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
-					   form_str(ERR_NOSUCHSERVER),
-					   parv[server]);
+					   form_str(ERR_NOSUCHSERVER), parv[server]);
 			return HUNTED_NOSUCH;
 		}
 
@@ -296,7 +294,7 @@ try_connections(void *unused)
 	 */
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Connection to %s activated", server_p->name);
 	ilog(L_SERVER, "Connection to %s activated", server_p->name);
-	
+
 	serv_connect(server_p, 0);
 }
 
@@ -319,7 +317,7 @@ send_capabilities(struct Client *client_p, int cap_can_send)
 
 	t = msgbuf;
 
-	for (cap = captab; cap->name; ++cap)
+	for(cap = captab; cap->name; ++cap)
 	{
 		if(cap->cap & cap_can_send)
 		{
@@ -358,7 +356,7 @@ show_capabilities(struct Client *target_p)
 	if(!IsServer(target_p) || !target_p->serv->caps)	/* short circuit if no caps */
 		return msgbuf + 1;
 
-	for (cap = captab; cap->cap; ++cap)
+	for(cap = captab; cap->cap; ++cap)
 	{
 		if(cap->cap & target_p->serv->caps)
 			rb_snprintf_append(msgbuf, sizeof(msgbuf), " %s", cap->name);
@@ -394,7 +392,7 @@ int
 serv_connect(struct server_conf *server_p, struct Client *by)
 {
 	struct Client *client_p;
-	struct rb_sockaddr_storage myipnum; 
+	struct rb_sockaddr_storage myipnum;
 	char note[HOSTLEN + 10];
 	rb_fde_t *F;
 
@@ -424,13 +422,13 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	if((F = rb_socket(GET_SS_FAMILY(&server_p->ipnum), SOCK_STREAM, 0, NULL)) == NULL)
 	{
 		/* Eek, failure to create the socket */
-		report_error("opening stream socket to %s: %s", 
+		report_error("opening stream socket to %s: %s",
 			     server_p->name, server_p->name, errno);
 		return 0;
 	}
 
 	/* servernames are always guaranteed under HOSTLEN chars */
-	rb_snprintf(note, sizeof(note), "Server: %s", server_p->name);	
+	rb_snprintf(note, sizeof(note), "Server: %s", server_p->name);
 	rb_note(F, note);
 
 	/* Create a local client */
@@ -459,9 +457,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	if(!rb_set_buffers(client_p->localClient->F, READBUF_SIZE))
 	{
 		report_error("rb_set_buffers failed for server %s:%s",
-				client_p->name,
-				log_client_name(client_p, SHOW_IP),
-				errno);
+			     client_p->name, log_client_name(client_p, SHOW_IP), errno);
 	}
 
 	/*
@@ -491,7 +487,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 		memcpy(&myipnum, &server_p->my_ipnum, sizeof(myipnum));
 		((struct sockaddr_in *)&myipnum)->sin_port = 0;
 		SET_SS_FAMILY(&myipnum, GET_SS_FAMILY(&server_p->my_ipnum));
-				
+
 	}
 	else if(GET_SS_FAMILY(&server_p->ipnum) == AF_INET && ServerInfo.specific_ipv4_vhost)
 	{
@@ -500,7 +496,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 		SET_SS_FAMILY(&myipnum, AF_INET);
 		SET_SS_LEN(&myipnum, sizeof(struct sockaddr_in));
 	}
-	
+
 #ifdef RB_IPV6
 	else if((GET_SS_FAMILY(&server_p->ipnum) == AF_INET6) && ServerInfo.specific_ipv6_vhost)
 	{
@@ -514,27 +510,29 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	{
 		if(ServerConfSSL(server_p))
 		{
-			rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
-					 NULL, 0, serv_connect_ssl_callback, 
-					 client_p, ConfigFileEntry.connect_timeout);
+			rb_connect_tcp(client_p->localClient->F,
+				       (struct sockaddr *)&server_p->ipnum, NULL, 0,
+				       serv_connect_ssl_callback, client_p,
+				       ConfigFileEntry.connect_timeout);
 		}
 		else
-			rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
-					 NULL, 0, serv_connect_callback, 
-					 client_p, ConfigFileEntry.connect_timeout);
+			rb_connect_tcp(client_p->localClient->F,
+				       (struct sockaddr *)&server_p->ipnum, NULL, 0,
+				       serv_connect_callback, client_p,
+				       ConfigFileEntry.connect_timeout);
 
-		 return 1;
+		return 1;
 	}
 	if(ServerConfSSL(server_p))
 		rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
-				 (struct sockaddr *) &myipnum,
-				 GET_SS_LEN(&myipnum), serv_connect_ssl_callback, client_p,
-				 ConfigFileEntry.connect_timeout);
+			       (struct sockaddr *)&myipnum,
+			       GET_SS_LEN(&myipnum), serv_connect_ssl_callback, client_p,
+			       ConfigFileEntry.connect_timeout);
 	else
 		rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
-				 (struct sockaddr *) &myipnum,
-				 GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
-				 ConfigFileEntry.connect_timeout);
+			       (struct sockaddr *)&myipnum,
+			       GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
+			       ConfigFileEntry.connect_timeout);
 
 	return 1;
 }
@@ -544,7 +542,8 @@ serv_connect_ssl_callback(rb_fde_t *F, int status, void *data)
 {
 	struct Client *client_p = data;
 	rb_fde_t *xF[2];
-	rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
+	rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip,
+			    sizeof(client_p->localClient->ip));
 	if(status != RB_OK)
 	{
 		/* Print error message, just like non-SSL. */
@@ -591,39 +590,42 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 	}
 
 	if(client_p->localClient->ssl_ctl == NULL)
-		rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
-	
+		rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip,
+				    sizeof(client_p->localClient->ip));
+
 	/* Check the status */
 	if(status != RB_OK)
 	{
 		/* RB_ERR_TIMEOUT wont have an errno associated with it,
 		 * the others will.. --fl
 		 */
-		if(status == RB_ERR_TIMEOUT) 
+		if(status == RB_ERR_TIMEOUT)
 		{
-			sendto_realops_flags(UMODE_ALL, L_ALL, "Error connecting to %s[255.255.255.255]: %s",
-					client_p->name, rb_errstr(status));
-			ilog(L_SERVER, "Error connecting to %s: %s", client_p->name, rb_errstr(status));
+			sendto_realops_flags(UMODE_ALL, L_ALL,
+					     "Error connecting to %s[255.255.255.255]: %s",
+					     client_p->name, rb_errstr(status));
+			ilog(L_SERVER, "Error connecting to %s: %s", client_p->name,
+			     rb_errstr(status));
 		}
-		else 
+		else
 		{
 			const char *errstr = strerror(rb_get_sockerr(F));
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"Error connecting to %s[255.255.255.255]: %s (%s)",
-					client_p->name,
-					rb_errstr(status), errstr);
-			ilog(L_SERVER, "Error connecting to %s: %s (%s)", client_p->name, rb_errstr(status), errstr);
+					     "Error connecting to %s[255.255.255.255]: %s (%s)",
+					     client_p->name, rb_errstr(status), errstr);
+			ilog(L_SERVER, "Error connecting to %s: %s (%s)", client_p->name,
+			     rb_errstr(status), errstr);
 		}
 		exit_client(client_p, client_p, &me, rb_errstr(status));
 		return;
-	} 
-	
+	}
+
 	/* RB_OK, so continue the connection procedure */
 	/* Get the C/N lines */
 	if((server_p = client_p->localClient->att_sconf) == NULL)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Lost connect{} block for %s",
-				client_p->name);
+				     client_p->name);
 		ilog(L_SERVER, "Lost connect{} block for %s", client_p->name);
 		exit_client(client_p, client_p, &me, "Lost connect{} block");
 		return;
@@ -634,14 +636,14 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 
 	if(!EmptyString(server_p->spasswd))
 	{
-		sendto_one(client_p, "PASS %s TS %d :%s", 
-			   server_p->spasswd, TS_CURRENT, me.id);
+		sendto_one(client_p, "PASS %s TS %d :%s", server_p->spasswd, TS_CURRENT, me.id);
 	}
 
 	/* pass my info to the new server */
 	send_capabilities(client_p, default_server_capabs
-			  | (ServerConfCompressed(server_p) && zlib_ok && !ServerConfSSL(server_p) ? CAP_ZIP : 0)
-			  | (ServerConfTb(server_p) ? CAP_TB : 0));
+			  | (ServerConfCompressed(server_p) && zlib_ok
+			     && !ServerConfSSL(server_p) ? CAP_ZIP : 0) | (ServerConfTb(server_p) ?
+									   CAP_TB : 0));
 
 	sendto_one(client_p, "SERVER %s 1 :%s%s", me.name,
 		   ConfigServerHide.hidden ? "(H) " : "", me.info);
@@ -664,4 +666,3 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 	/* If we get here, we're ok, so lets start reading some data */
 	read_packet(F, client_p);
 }
-

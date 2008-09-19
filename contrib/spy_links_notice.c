@@ -40,7 +40,7 @@ mapi_hfn_list_av1 links_hfnlist[] = {
 DECLARE_MODULE_AV1(links_spy, NULL, NULL, NULL, NULL, links_hfnlist, "$Revision$");
 
 void
-show_links(hook_data *data)
+show_links(hook_data * data)
 {
 	const char *mask = data->arg1;
 

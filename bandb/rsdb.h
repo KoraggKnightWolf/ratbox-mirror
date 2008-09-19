@@ -3,7 +3,7 @@
 #define INCLUDED_rsdb_h
 
 /* error handler callback */
-typedef void rsdb_error_cb(const char *);    
+typedef void rsdb_error_cb(const char *);
 
 typedef int (*rsdb_callback) (int, const char **);
 
@@ -11,7 +11,7 @@ typedef enum rsdb_transtype
 {
 	RSDB_TRANS_START,
 	RSDB_TRANS_END
-} 
+}
 rsdb_transtype;
 
 struct rsdb_table

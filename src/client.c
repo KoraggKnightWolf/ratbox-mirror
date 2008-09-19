@@ -55,14 +55,14 @@
 
 #define DEBUG_EXITED_CLIENTS
 
-static void check_pings_list(rb_dlink_list * list);
-static void check_unknowns_list(rb_dlink_list * list);
+static void check_pings_list(rb_dlink_list *list);
+static void check_unknowns_list(rb_dlink_list *list);
 static void free_exited_clients(void *unused);
 static void exit_aborted_clients(void *unused);
 
-static int exit_remote_client(struct Client *, struct Client *, struct Client *,const char *);
-static int exit_remote_server(struct Client *, struct Client *, struct Client *,const char *);
-static int exit_local_client(struct Client *, struct Client *, struct Client *,const char *);
+static int exit_remote_client(struct Client *, struct Client *, struct Client *, const char *);
+static int exit_remote_server(struct Client *, struct Client *, struct Client *, const char *);
+static int exit_local_client(struct Client *, struct Client *, struct Client *, const char *);
 static int exit_unknown_client(struct Client *, struct Client *, const char *);
 static int exit_local_server(struct Client *, struct Client *, struct Client *, const char *);
 static int qs_server(struct Client *);
@@ -142,7 +142,8 @@ make_client(struct Client *from)
 		SetMyConnect(client_p);
 		client_p->localClient = localClient;
 
-		client_p->localClient->lasttime = client_p->localClient->firsttime = rb_current_time();
+		client_p->localClient->lasttime = client_p->localClient->firsttime =
+			rb_current_time();
 
 		client_p->localClient->F = NULL;
 
@@ -154,7 +155,7 @@ make_client(struct Client *from)
 		client_p->localClient = NULL;
 		client_p->from = from;	/* 'from' of local client is self! */
 	}
-	
+
 	SetUnknown(client_p);
 	strcpy(client_p->username, "unknown");
 
@@ -181,7 +182,7 @@ free_local_client(struct Client *client_p)
 			free_listener(client_p->localClient->listener);
 		client_p->localClient->listener = 0;
 	}
-	
+
 	if(client_p->localClient->F != NULL)
 	{
 		del_from_cli_fd_hash(client_p);
@@ -190,8 +191,7 @@ free_local_client(struct Client *client_p)
 
 	if(client_p->localClient->passwd)
 	{
-		memset(client_p->localClient->passwd, 0,
-			strlen(client_p->localClient->passwd));
+		memset(client_p->localClient->passwd, 0, strlen(client_p->localClient->passwd));
 		rb_free(client_p->localClient->passwd);
 	}
 
@@ -256,7 +256,7 @@ check_pings(void *notused)
  * side effects	- 
  */
 static void
-check_pings_list(rb_dlink_list * list)
+check_pings_list(rb_dlink_list *list)
 {
 	char scratch[32];	/* way too generous but... */
 	struct Client *client_p;	/* current local client_p being examined */
@@ -297,9 +297,10 @@ check_pings_list(rb_dlink_list * list)
 					     "No response from %s, closing link",
 					     log_client_name(client_p, HIDE_IP));
 				}
-				(void) rb_snprintf(scratch, sizeof(scratch),
+				(void)rb_snprintf(scratch, sizeof(scratch),
 						  "Ping timeout: %d seconds",
-						  (int) (rb_current_time() - client_p->localClient->lasttime));
+						  (int)(rb_current_time() -
+							client_p->localClient->lasttime));
 
 				exit_client(client_p, client_p, &me, scratch);
 				continue;
@@ -330,7 +331,7 @@ check_pings_list(rb_dlink_list * list)
  * side effects	- unknown clients get marked for termination after n seconds
  */
 static void
-check_unknowns_list(rb_dlink_list * list)
+check_unknowns_list(rb_dlink_list *list)
 {
 	rb_dlink_node *ptr, *next_ptr;
 	struct Client *client_p;
@@ -388,10 +389,10 @@ notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban)
 	else
 		sendto_one(client_p, form_str(ERR_YOUREBANNEDCREEP),
 			   me.name, client_p->name, reason);
-	
-	exit_client(client_p, client_p, &me, 
-			EmptyString(ConfigFileEntry.kline_reason) ? exit_reason :
-			 ConfigFileEntry.kline_reason);
+
+	exit_client(client_p, client_p, &me,
+		    EmptyString(ConfigFileEntry.kline_reason) ? exit_reason :
+		    ConfigFileEntry.kline_reason);
 }
 
 /*
@@ -437,15 +438,15 @@ check_banned_lines(void)
 			if(IsExemptKline(client_p))
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						"KLINE over-ruled for %s, client is kline_exempt [%s@%s]",
-						get_client_name(client_p, HIDE_IP),
-						aconf->user, aconf->host);
+						     "KLINE over-ruled for %s, client is kline_exempt [%s@%s]",
+						     get_client_name(client_p, HIDE_IP),
+						     aconf->user, aconf->host);
 				continue;
 			}
 
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"KLINE active for %s",
-					get_client_name(client_p, HIDE_IP));
+					     "KLINE active for %s",
+					     get_client_name(client_p, HIDE_IP));
 			notify_banned_client(client_p, aconf, K_LINED);
 			continue;
 		}
@@ -454,24 +455,24 @@ check_banned_lines(void)
 			if(IsExemptKline(client_p))
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						"GLINE over-ruled for %s, client is kline_exempt [%s@%s]",
-						get_client_name(client_p, HIDE_IP),
-						aconf->user, aconf->host);
+						     "GLINE over-ruled for %s, client is kline_exempt [%s@%s]",
+						     get_client_name(client_p, HIDE_IP),
+						     aconf->user, aconf->host);
 				continue;
 			}
 
 			if(IsExemptGline(client_p))
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						"GLINE over-ruled for %s, client is gline_exempt [%s@%s]",
-						get_client_name(client_p, HIDE_IP),
-						aconf->user, aconf->host);
+						     "GLINE over-ruled for %s, client is gline_exempt [%s@%s]",
+						     get_client_name(client_p, HIDE_IP),
+						     aconf->user, aconf->host);
 				continue;
 			}
 
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					"GLINE active for %s",
-					get_client_name(client_p, HIDE_IP));
+					     "GLINE active for %s",
+					     get_client_name(client_p, HIDE_IP));
 
 			notify_banned_client(client_p, aconf, G_LINED);
 			continue;
@@ -481,16 +482,16 @@ check_banned_lines(void)
 			if(IsExemptKline(client_p))
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						"XLINE over-ruled for %s, client is kline_exempt [%s]",
-						get_client_name(client_p, HIDE_IP),
-						aconf->info.oper);
+						     "XLINE over-ruled for %s, client is kline_exempt [%s]",
+						     get_client_name(client_p, HIDE_IP),
+						     aconf->info.oper);
 				continue;
 			}
 
 			sendto_realops_flags(UMODE_ALL, L_ALL, "XLINE active for %s",
-					get_client_name(client_p, HIDE_IP));
+					     get_client_name(client_p, HIDE_IP));
 
-			(void) exit_client(client_p, client_p, &me, "Bad user info");
+			(void)exit_client(client_p, client_p, &me, "Bad user info");
 			continue;
 		}
 	}
@@ -701,10 +702,9 @@ find_chasing(struct Client *source_p, const char *user, int *chasing)
 	if(who || IsDigit(*user))
 		return who;
 
-	if(!(who = get_history(user, (long) KILLCHASETIMELIMIT)))
+	if(!(who = get_history(user, (long)KILLCHASETIMELIMIT)))
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHNICK,
-				   form_str(ERR_NOSUCHNICK), user);
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK, form_str(ERR_NOSUCHNICK), user);
 		return (NULL);
 	}
 	if(chasing)
@@ -734,53 +734,51 @@ find_chasing(struct Client *source_p, const char *user, int *chasing)
 const char *
 get_client_name(struct Client *client, int showip)
 {
-        static char empty_name[] = "";
-        static char nbuf[HOSTLEN * 2 + USERLEN + 5];
-        const char *name;
+	static char empty_name[] = "";
+	static char nbuf[HOSTLEN * 2 + USERLEN + 5];
+	const char *name;
 
-        s_assert(NULL != client);
-        if(client == NULL)
-                return NULL;
+	s_assert(NULL != client);
+	if(client == NULL)
+		return NULL;
 
-        if(MyConnect(client))
-        {
-                if(EmptyString(client->name))
-                        name = empty_name;   
-                else
-                        name = client->name;
+	if(MyConnect(client))
+	{
+		if(EmptyString(client->name))
+			name = empty_name;
+		else
+			name = client->name;
 
-                if(!irccmp(name, client->host))
-                        return name;
+		if(!irccmp(name, client->host))
+			return name;
 
-                if(ConfigFileEntry.hide_spoof_ips &&
-                   showip == SHOW_IP && IsIPSpoof(client))
-                        showip = MASK_IP;
-                if(IsAnyServer(client))
-                        showip = MASK_IP;
+		if(ConfigFileEntry.hide_spoof_ips && showip == SHOW_IP && IsIPSpoof(client))
+			showip = MASK_IP;
+		if(IsAnyServer(client))
+			showip = MASK_IP;
 
-                /* And finally, let's get the host information, ip or name */
-                switch (showip)
-                {
-                case SHOW_IP:
-                        rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
-                                   name, client->username, 
-                                   client->sockhost);
-                        break;
-                case MASK_IP: 
-                        rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
-                                   name, client->username);
-                        break;
-                default:
-                        rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
-                                   name, client->username, client->host);
-                }
-                return nbuf;
-        }
+		/* And finally, let's get the host information, ip or name */
+		switch (showip)
+		{
+		case SHOW_IP:
+			rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
+				    name, client->username, client->sockhost);
+			break;
+		case MASK_IP:
+			rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
+				    name, client->username);
+			break;
+		default:
+			rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]",
+				    name, client->username, client->host);
+		}
+		return nbuf;
+	}
 
-        /* As pointed out by Adel Mezibra 
-         * Neph|l|m@EFnet. Was missing a return here.
-         */
-        return client->name;
+	/* As pointed out by Adel Mezibra 
+	 * Neph|l|m@EFnet. Was missing a return here.
+	 */
+	return client->name;
 }
 
 /* log_client_name()
@@ -812,16 +810,16 @@ log_client_name(struct Client *target_p, int showip)
 		{
 		case SHOW_IP:
 			rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", name,
-				   target_p->username, target_p->sockhost);
+				    target_p->username, target_p->sockhost);
 			break;
 
 		case MASK_IP:
 			rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@255.255.255.255]",
-				   name, target_p->username);
+				    name, target_p->username);
 
 		default:
 			rb_snprintf(nbuf, sizeof(nbuf), "%s[%s@%s]", name,
-				   target_p->username, target_p->host);
+				    target_p->username, target_p->host);
 		}
 
 		return nbuf;
@@ -852,12 +850,14 @@ free_exited_clients(void *unused)
 				if(abt->client == target_p)
 				{
 					s_assert(0);
-					sendto_realops_flags(UMODE_ALL, L_ALL, 
-						"On abort_list: %s stat: %u flags: %u/%u handler: %c",
-						target_p->name, (unsigned int) target_p->status,
-						target_p->flags, target_p->operflags, target_p->handler);
 					sendto_realops_flags(UMODE_ALL, L_ALL,
-						"Please report this to the ratbox developers!");
+							     "On abort_list: %s stat: %u flags: %u/%u handler: %c",
+							     target_p->name,
+							     (unsigned int)target_p->status,
+							     target_p->flags, target_p->operflags,
+							     target_p->handler);
+					sendto_realops_flags(UMODE_ALL, L_ALL,
+							     "Please report this to the ratbox developers!");
 					found++;
 				}
 			}
@@ -899,7 +899,7 @@ free_exited_clients(void *unused)
 		rb_dlinkDestroy(ptr, &dead_remote_list);
 	}
 #endif
-	
+
 }
 
 /*
@@ -911,9 +911,8 @@ free_exited_clients(void *unused)
 ** on that one -orabidoo
 */
 static void
-recurse_send_quits(struct Client *client_p, struct Client *source_p, 
-		   struct Client *to, const char *comment1,
-		   const char *comment)
+recurse_send_quits(struct Client *client_p, struct Client *source_p,
+		   struct Client *to, const char *comment1, const char *comment)
 {
 	struct Client *target_p;
 	rb_dlink_node *ptr, *ptr_next;
@@ -923,8 +922,7 @@ recurse_send_quits(struct Client *client_p, struct Client *source_p,
 
 	if(IsCapable(to, CAP_QS))
 	{
-		sendto_one(to, "SQUIT %s :%s", 
-			   get_id(source_p, to), comment);
+		sendto_one(to, "SQUIT %s :%s", get_id(source_p, to), comment);
 	}
 	else
 	{
@@ -986,7 +984,7 @@ recurse_remove_clients(struct Client *source_p, const char *comment)
 			if(!IsDead(target_p) && !IsClosing(target_p))
 				exit_remote_client(NULL, target_p, &me, comment);
 		}
-	}	
+	}
 
 	RB_DLINK_FOREACH_SAFE(ptr, ptr_next, source_p->serv->servers.head)
 	{
@@ -1003,9 +1001,7 @@ recurse_remove_clients(struct Client *source_p, const char *comment)
 */
 static void
 remove_dependents(struct Client *client_p,
-		  struct Client *source_p,
-		  const char *comment,
-		  const char *comment1)
+		  struct Client *source_p, const char *comment, const char *comment1)
 {
 	struct Client *to;
 	rb_dlink_node *ptr, *next;
@@ -1014,8 +1010,7 @@ remove_dependents(struct Client *client_p,
 	{
 		to = ptr->data;
 
-		if(IsMe(to) || to == source_p->from || 
-		   (to == client_p && IsCapable(to, CAP_QS)))
+		if(IsMe(to) || to == source_p->from || (to == client_p && IsCapable(to, CAP_QS)))
 			continue;
 
 		recurse_send_quits(client_p, source_p, to, comment1, comment);
@@ -1038,18 +1033,20 @@ exit_aborted_clients(void *unused)
 			if(rb_dlinkFind(abt->client, &dead_list))
 			{
 				s_assert(0);
-				sendto_realops_flags(UMODE_ALL, L_ALL, 
-					"On dead_list: %s stat: %u flags: %u/%u handler: %c",
-					abt->client->name, (unsigned int) abt->client->status,
-					abt->client->flags, abt->client->operflags, abt->client->handler);
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-					"Please report this to the ratbox developers!");
+						     "On dead_list: %s stat: %u flags: %u/%u handler: %c",
+						     abt->client->name,
+						     (unsigned int)abt->client->status,
+						     abt->client->flags, abt->client->operflags,
+						     abt->client->handler);
+				sendto_realops_flags(UMODE_ALL, L_ALL,
+						     "Please report this to the ratbox developers!");
 				continue;
 			}
 		}
 #endif
 
-		s_assert(*((unsigned long*)abt->client) != 0xdeadbeef); /* This is lame but its a debug thing */
+		s_assert(*((unsigned long *)abt->client) != 0xdeadbeef);	/* This is lame but its a debug thing */
 		rb_dlinkDelete(ptr, &abort_list);
 
 		if(IsAnyServer(abt->client))
@@ -1100,8 +1097,7 @@ static inline void
 exit_generic_client(struct Client *source_p, const char *comment)
 {
 	sendto_common_channels_local(source_p, ":%s!%s@%s QUIT :%s",
-				     source_p->name,
-				     source_p->username, source_p->host, comment);
+				     source_p->name, source_p->username, source_p->host, comment);
 
 	remove_user_from_channels(source_p);
 
@@ -1133,7 +1129,7 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
 		   const char *comment)
 {
 	exit_generic_client(source_p, comment);
-	
+
 	if(source_p->servptr && source_p->servptr->serv)
 	{
 		rb_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->users);
@@ -1153,7 +1149,7 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
 #else
 	rb_dlinkAddAlloc(source_p, &dead_list);
 #endif
-	return(CLIENT_EXITED);
+	return (CLIENT_EXITED);
 }
 
 /*
@@ -1168,8 +1164,7 @@ exit_unknown_client(struct Client *client_p, struct Client *source_p, const char
 
 	if(!IsIOError(source_p))
 		sendto_one(source_p, "ERROR :Closing Link: %s (%s)",
-				source_p->user != NULL ? source_p->host : "127.0.0.1",
-				comment);
+			   source_p->user != NULL ? source_p->host : "127.0.0.1", comment);
 
 	close_connection(source_p);
 
@@ -1180,30 +1175,30 @@ exit_unknown_client(struct Client *client_p, struct Client *source_p, const char
 	rb_dlinkAddAlloc(source_p, &dead_list);
 
 	/* Note that we don't need to add unknowns to the dead_list */
-	return(CLIENT_EXITED);
+	return (CLIENT_EXITED);
 }
 
 static int
-exit_remote_server(struct Client *client_p, struct Client *source_p, struct Client *from, 
-		  const char *comment)
+exit_remote_server(struct Client *client_p, struct Client *source_p, struct Client *from,
+		   const char *comment)
 {
-	static char comment1[(HOSTLEN*2)+2];
+	static char comment1[(HOSTLEN * 2) + 2];
 	static char newcomment[BUFSIZE];
 	struct Client *target_p;
-	
+
 	if(source_p->servptr)
-		 strcpy(comment1, source_p->servptr->name);
+		strcpy(comment1, source_p->servptr->name);
 	else
 		strcpy(comment1, "<Unknown>");
-	
+
 	strcat(comment1, " ");
 	strcat(comment1, source_p->name);
-	if (IsClient(from))
-		rb_snprintf(newcomment, sizeof(newcomment), "by %s: %s",
-				from->name, comment);
+	if(IsClient(from))
+		rb_snprintf(newcomment, sizeof(newcomment), "by %s: %s", from->name, comment);
 
 	if(source_p->serv != NULL)
-		remove_dependents(client_p, source_p, IsClient(from) ? newcomment : comment, comment1);
+		remove_dependents(client_p, source_p, IsClient(from) ? newcomment : comment,
+				  comment1);
 
 	if(source_p->servptr && source_p->servptr->serv)
 		rb_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
@@ -1212,21 +1207,20 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 
 	rb_dlinkFindDestroy(source_p, &global_serv_list);
 	target_p = source_p->from;
-	
+
 	if(target_p != NULL && IsServer(target_p) && target_p != client_p &&
 	   !IsMe(target_p) && (source_p->flags & FLAGS_KILLED) == 0)
 	{
-		sendto_one(target_p, ":%s SQUIT %s :%s", 
-			   get_id(from, target_p), get_id(source_p, target_p),
-			   comment);
+		sendto_one(target_p, ":%s SQUIT %s :%s",
+			   get_id(from, target_p), get_id(source_p, target_p), comment);
 	}
 
 	if(has_id(source_p))
 		del_from_hash(HASH_ID, source_p->id, source_p);
 
 	del_from_hash(HASH_CLIENT, source_p->name, source_p);
-	remove_client_from_list(source_p);  
-	
+	remove_client_from_list(source_p);
+
 	SetDead(source_p);
 #ifdef DEBUG_EXITED_CLIENTS
 	rb_dlinkAddAlloc(source_p, &dead_remote_list);
@@ -1248,28 +1242,29 @@ qs_server(struct Client *source_p)
 
 	rb_dlinkFindDestroy(source_p, &global_serv_list);
 	target_p = source_p->from;
-	
+
 	if(has_id(source_p))
 		del_from_hash(HASH_ID, source_p->id, source_p);
 
 	del_from_hash(HASH_CLIENT, source_p->name, source_p);
-	remove_client_from_list(source_p);  
-	
+	remove_client_from_list(source_p);
+
 	SetDead(source_p);
-	rb_dlinkAddAlloc(source_p, &dead_list);	
+	rb_dlinkAddAlloc(source_p, &dead_list);
 	return 0;
 }
 
 static int
-exit_local_server(struct Client *client_p, struct Client *source_p, struct Client *from, const char *comment)
+exit_local_server(struct Client *client_p, struct Client *source_p, struct Client *from,
+		  const char *comment)
 {
-	static char comment1[(HOSTLEN*2)+2];
+	static char comment1[(HOSTLEN * 2) + 2];
 	static char newcomment[BUFSIZE];
 	unsigned long long int sendb, recvb;
-	
+
 	rb_dlinkDelete(&source_p->localClient->tnode, &serv_list);
 	rb_dlinkFindDestroy(source_p, &global_serv_list);
-	
+
 	unset_chcap_usage_counts(source_p);
 	sendb = source_p->localClient->sendB;
 	recvb = source_p->localClient->receiveB;
@@ -1278,18 +1273,17 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	 * which side initiated the split -- jilles
 	 */
 	rb_snprintf(newcomment, sizeof(newcomment), "by %s: %s",
-			from == source_p ? me.name : from->name, comment);
-#if 0 /* let's not do this for now -- jilles */
-	if (!IsIOError(source_p))
-		sendto_one(source_p, "SQUIT %s :%s",
-				use_id(source_p), newcomment);
+		    from == source_p ? me.name : from->name, comment);
+#if 0				/* let's not do this for now -- jilles */
+	if(!IsIOError(source_p))
+		sendto_one(source_p, "SQUIT %s :%s", use_id(source_p), newcomment);
 #endif
 	if(client_p != NULL && source_p != client_p && !IsIOError(source_p))
 	{
 		sendto_one(source_p, "ERROR :Closing Link: 127.0.0.1 %s (%s)",
 			   source_p->name, comment);
 	}
-	
+
 	if(source_p->servptr && source_p->servptr->serv)
 		rb_dlinkDelete(&source_p->lnode, &source_p->servptr->serv->servers);
 	else
@@ -1300,31 +1294,35 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 
 	if(source_p->localClient->event != NULL)
 		rb_event_delete(source_p->localClient->event);
-	
+
 	if(source_p->servptr)
-		 strcpy(comment1, source_p->servptr->name);
+		strcpy(comment1, source_p->servptr->name);
 	else
 		strcpy(comment1, "<Unknown>");
-	
+
 	strcat(comment1, " ");
 	strcat(comment1, source_p->name);
 
 	if(source_p->serv != NULL)
-		remove_dependents(client_p, source_p, IsClient(from) ? newcomment : comment, comment1);
+		remove_dependents(client_p, source_p, IsClient(from) ? newcomment : comment,
+				  comment1);
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s was connected"
 			     " for %ld seconds.  %llu/%llu send/recv.",
-			     source_p->name, (long int)(rb_current_time() - source_p->localClient->firsttime), sendb, recvb);
+			     source_p->name,
+			     (long int)(rb_current_time() - source_p->localClient->firsttime),
+			     sendb, recvb);
 
 	ilog(L_SERVER, "%s was connected for %ld seconds.  %llu/%llu send/recv.",
-	     source_p->name, (long int)(rb_current_time() - source_p->localClient->firsttime), sendb, recvb);
-	
+	     source_p->name, (long int)(rb_current_time() - source_p->localClient->firsttime),
+	     sendb, recvb);
+
 	if(has_id(source_p))
 		del_from_hash(HASH_ID, source_p->id, source_p);
 
 	del_from_hash(HASH_CLIENT, source_p->name, source_p);
 	remove_client_from_list(source_p);
-	
+
 	SetDead(source_p);
 	rb_dlinkAddAlloc(source_p, &dead_list);
 	return 0;
@@ -1366,17 +1364,18 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 			     show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255");
 
 	sendto_realops_flags(UMODE_CCONNEXT, L_ALL,
-			"CLIEXIT %s %s %s %s 0 %s",
-			source_p->name, source_p->username, source_p->host,
-			show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255", comment);
+			     "CLIEXIT %s %s %s %s 0 %s",
+			     source_p->name, source_p->username, source_p->host,
+			     show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255",
+			     comment);
 
 	on_for = rb_current_time() - source_p->localClient->firsttime;
 
 	ilog(L_USER, "%s (%3lu:%02lu:%02lu): %s!%s@%s %s %llu/%llu",
-		rb_ctime(rb_current_time(), tbuf, sizeof(tbuf)), on_for / 3600,
-		(on_for % 3600) / 60, on_for % 60,
-		source_p->name, source_p->username, source_p->host, source_p->sockhost,
-		source_p->localClient->sendB, source_p->localClient->receiveB);
+	     rb_ctime(rb_current_time(), tbuf, sizeof(tbuf)), on_for / 3600,
+	     (on_for % 3600) / 60, on_for % 60,
+	     source_p->name, source_p->username, source_p->host, source_p->sockhost,
+	     source_p->localClient->sendB, source_p->localClient->receiveB);
 
 	sendto_one(source_p, "ERROR :Closing Link: %s (%s)", source_p->host, comment);
 	close_connection(source_p);
@@ -1394,7 +1393,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 
 	SetDead(source_p);
 	rb_dlinkAddAlloc(source_p, &dead_list);
-	return(CLIENT_EXITED);
+	return (CLIENT_EXITED);
 }
 
 
@@ -1450,8 +1449,8 @@ exit_client(struct Client *client_p,	/* The local client originating the
 		/* IsUnknown || IsConnecting || IsHandShake */
 		else if(!IsReject(source_p))
 			return exit_unknown_client(client_p, source_p, comment);
-	} 
-	else 
+	}
+	else
 	{
 		/* Remotes */
 		if(IsClient(source_p))
@@ -1469,7 +1468,7 @@ exit_client(struct Client *client_p,	/* The local client originating the
 
 /* XXX one common Client list now */
 void
-count_local_client_memory(size_t * count, size_t * local_client_memory_used)
+count_local_client_memory(size_t *count, size_t *local_client_memory_used)
 {
 	size_t lusage;
 	rb_bh_usage(lclient_heap, count, NULL, &lusage, NULL);
@@ -1480,7 +1479,7 @@ count_local_client_memory(size_t * count, size_t * local_client_memory_used)
  * Count up remote client memory
  */
 void
-count_remote_client_memory(size_t * count, size_t * remote_client_memory_used)
+count_remote_client_memory(size_t *count, size_t *remote_client_memory_used)
 {
 	size_t lcount, rcount;
 	rb_bh_usage(lclient_heap, &lcount, NULL, NULL, NULL);
@@ -1551,38 +1550,37 @@ del_all_accepts(struct Client *client_p)
 int
 show_ip(struct Client *source_p, struct Client *target_p)
 {
-        if(IsAnyServer(target_p))
-        {
-                return 0;
-        }
-        else if(IsIPSpoof(target_p))
-        {
-                /* source == NULL indicates message is being sent
-                 * to local opers.
-                 */
-                if(!ConfigFileEntry.hide_spoof_ips && 
-                   (source_p == NULL || MyOper(source_p)))
-                        return 1;
+	if(IsAnyServer(target_p))
+	{
+		return 0;
+	}
+	else if(IsIPSpoof(target_p))
+	{
+		/* source == NULL indicates message is being sent
+		 * to local opers.
+		 */
+		if(!ConfigFileEntry.hide_spoof_ips && (source_p == NULL || MyOper(source_p)))
+			return 1;
 
-                return 0;
-        }   
-        else
-                return 1;
-}  
+		return 0;
+	}
+	else
+		return 1;
+}
 
 
 int
 show_ip_conf(struct ConfItem *aconf, struct Client *source_p)
 {
-        if(IsConfDoSpoofIp(aconf))
-        {
-                if(!ConfigFileEntry.hide_spoof_ips && MyOper(source_p))
-                        return 1;
+	if(IsConfDoSpoofIp(aconf))
+	{
+		if(!ConfigFileEntry.hide_spoof_ips && MyOper(source_p))
+			return 1;
 
-                return 0;
-        }
-        else
-                return 1;
+		return 0;
+	}
+	else
+		return 1;
 
 }
 
@@ -1650,13 +1648,12 @@ free_user(struct User *user, struct Client *client_p)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "* %#lx user (%s!%s@%s) %#lx %#lx %lu *",
-				     (unsigned long) client_p,
-				     client_p ? client_p->
-				     name : "<noname>",
+				     (unsigned long)client_p,
+				     client_p ? client_p->name : "<noname>",
 				     client_p->username,
 				     client_p->host,
-				     (unsigned long) user,
-				     (unsigned long) user->channel.head, 
+				     (unsigned long)user,
+				     (unsigned long)user->channel.head,
 				     rb_dlink_list_length(&user->channel));
 		s_assert(!user->channel.head);
 	}
@@ -1668,14 +1665,15 @@ void
 allocate_away(struct Client *client_p)
 {
 	if(client_p->user->away == NULL)
-		client_p->user->away = rb_bh_alloc(away_heap);	
+		client_p->user->away = rb_bh_alloc(away_heap);
 }
 
 
 void
 free_away(struct Client *client_p)
 {
-	if(client_p->user->away != NULL) {
+	if(client_p->user->away != NULL)
+	{
 		rb_bh_free(away_heap, client_p->user->away);
 		client_p->user->away = NULL;
 	}
@@ -1744,7 +1742,7 @@ close_connection(struct Client *client_p)
 	s_assert(MyConnect(client_p));
 	if(!MyConnect(client_p))
 		return;
-	
+
 	if(IsServer(client_p))
 	{
 		struct server_conf *server_p;
@@ -1788,7 +1786,7 @@ close_connection(struct Client *client_p)
 		/* attempt to flush any pending linebufs. Evil, but .. -- adrian */
 		if(!IsIOError(client_p))
 			send_pop_queue(client_p);
-		del_from_cli_fd_hash(client_p);			
+		del_from_cli_fd_hash(client_p);
 		rb_close(client_p->localClient->F);
 		client_p->localClient->F = NULL;
 	}
@@ -1831,8 +1829,7 @@ error_exit_client(struct Client *client_p, int error)
 		if(error == 0)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "Server %s closed the connection",
-					     client_p->name);
+					     "Server %s closed the connection", client_p->name);
 
 			ilog(L_SERVER, "Server %s closed the connection",
 			     log_client_name(client_p, SHOW_IP));
@@ -1840,9 +1837,8 @@ error_exit_client(struct Client *client_p, int error)
 		else
 		{
 			report_error("Lost connection to %s: %s",
-					client_p->name,
-					log_client_name(client_p, SHOW_IP),
-					current_error);
+				     client_p->name,
+				     log_client_name(client_p, SHOW_IP), current_error);
 		}
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -1860,5 +1856,3 @@ error_exit_client(struct Client *client_p, int error)
 
 	exit_client(client_p, client_p, &me, errmsg);
 }
-
-

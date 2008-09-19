@@ -46,12 +46,14 @@ struct Message help_msgtab = {
 	"HELP", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, {m_help, 0}, mg_ignore, mg_ignore, mg_ignore, {mo_help, 0}}
 };
+
 struct Message uhelp_msgtab = {
 	"UHELP", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, {m_help, 0}, mg_ignore, mg_ignore, mg_ignore, {mo_uhelp, 0}}
 };
 
 mapi_clist_av1 help_clist[] = { &help_msgtab, &uhelp_msgtab, NULL };
+
 DECLARE_MODULE_AV1(help, NULL, NULL, help_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -67,8 +69,7 @@ m_help(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	if((last_used + ConfigFileEntry.pace_wait_simple) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
-		sendto_one(source_p, form_str(RPL_LOAD2HI), 
-			   me.name, source_p->name, "HELP");
+		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "HELP");
 		sendto_one(source_p, form_str(RPL_ENDOFHELP),
 			   me.name, source_p->name,
 			   (parc > 1 && !EmptyString(parv[1])) ? parv[1] : "index");
@@ -123,8 +124,7 @@ dohelp(struct Client *source_p, int flags, const char *topic)
 
 	if(hptr == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_HELPNOTFOUND),
-			   me.name, source_p->name, topic);
+		sendto_one(source_p, form_str(ERR_HELPNOTFOUND), me.name, source_p->name, topic);
 		return;
 	}
 
@@ -143,7 +143,6 @@ dohelp(struct Client *source_p, int flags, const char *topic)
 			   me.name, source_p->name, topic, lineptr->data);
 	}
 	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_ENDOFHELP),
-		   me.name, source_p->name, topic);
+	sendto_one(source_p, form_str(RPL_ENDOFHELP), me.name, source_p->name, topic);
 	return;
 }

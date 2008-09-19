@@ -36,7 +36,7 @@ struct User
 	char *away;		/* pointer to away message */
 	char name[NICKLEN];
 #ifdef ENABLE_SERVICES
-	char suser[NICKLEN+1];
+	char suser[NICKLEN + 1];
 #endif
 
 };
@@ -73,7 +73,7 @@ struct Client
 	struct Whowas *whowas;	/* Pointers to whowas structs */
 	time_t tsinfo;		/* TS on the nick, SVINFO on server */
 	uint32_t umodes;	/* opers, normal users subset */
-	uint32_t flags;	/* client flags */
+	uint32_t flags;		/* client flags */
 	uint32_t operflags;	/* ugh. overflow */
 
 	uint8_t hopcount;	/* number of servers to this 0 = local */
@@ -98,7 +98,7 @@ struct Client
 	 * considered a read-only field after the client has registered.
 	 */
 	char host[HOSTLEN + 1];	/* client's hostname */
-	char sockhost[HOSTIPLEN + 1]; /* clients ip */
+	char sockhost[HOSTIPLEN + 1];	/* clients ip */
 	char info[REALLEN + 1];	/* Free form additional client info */
 
 	char id[IDLEN + 1];	/* UID/SID, unique on the network */
@@ -116,7 +116,7 @@ struct _ssl_ctl;
 
 struct LocalUser
 {
-	rb_dlink_node tnode;	/* This is the node for the local list type the client is on*/
+	rb_dlink_node tnode;	/* This is the node for the local list type the client is on */
 	/*
 	 * The following fields are allocated only for local clients
 	 * (directly connected to *this* server with a socket.
@@ -146,7 +146,7 @@ struct LocalUser
 
 	unsigned long long int sendB;	/* Statistics: total bytes sent */
 	unsigned long long int receiveB;	/* Statistics: total bytes received */
-	uint32_t sendM;	/* Statistics: protocol messages send */
+	uint32_t sendM;		/* Statistics: protocol messages send */
 	uint32_t receiveM;	/* Statistics: protocol messages received */
 	struct Listener *listener;	/* listener accepted from */
 	struct ConfItem *att_conf;	/* attached conf */
@@ -171,7 +171,7 @@ struct LocalUser
 
 	/* challenge stuff */
 	time_t chal_time;
-	
+
 	/* clients allowed to talk through +g */
 	rb_dlink_list allow_list;
 
@@ -186,23 +186,23 @@ struct LocalUser
 	 * to avoid flooding.
 	 *   -- adrian
 	 */
-	uint16_t allow_read;		/* how many we're allowed to read in this second */
+	uint16_t allow_read;	/* how many we're allowed to read in this second */
 	int16_t actually_read;	/* how many we've actually read in this second */
 	int16_t sent_parsed;	/* how many messages we've parsed in this second */
 	time_t last_knock;	/* time of last knock */
 	uint32_t random_ping;
-	struct AuthRequest	*auth_request;
+	struct AuthRequest *auth_request;
 
 	/* target change stuff */
-	void *targets[10];		/* targets were aware of */
+	void *targets[10];	/* targets were aware of */
 	uint8_t targinfo[2];	/* cyclic array, no in use */
-	time_t target_last;		/* last time we cleared a slot */
+	time_t target_last;	/* last time we cleared a slot */
 	struct rb_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
-	struct _ssl_ctl *ssl_ctl;		/* which ssl daemon we're associate with */
+	struct _ssl_ctl *ssl_ctl;	/* which ssl daemon we're associate with */
 	uint32_t localflags;
-	struct ZipStats *zipstats;		/* zipstats */
-	uint16_t cork_count;			/* used for corking/uncorking connections */
-	struct ev_entry *event;			/* used for associated events */
+	struct ZipStats *zipstats;	/* zipstats */
+	uint16_t cork_count;	/* used for corking/uncorking connections */
+	struct ev_entry *event;	/* used for associated events */
 };
 
 

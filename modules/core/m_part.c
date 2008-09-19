@@ -46,6 +46,7 @@ struct Message part_msgtab = {
 };
 
 mapi_clist_av1 part_clist[] = { &part_msgtab, NULL };
+
 DECLARE_MODULE_AV1(part, NULL, NULL, part_clist, NULL, NULL, "$Revision$");
 
 static void part_one_client(struct Client *client_p,
@@ -74,7 +75,7 @@ m_part(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	if(MyClient(source_p) && !IsFloodDone(source_p))
 		flood_endgrace(source_p);
 
-	while (name)
+	while(name)
 	{
 		part_one_client(client_p, source_p, name, reason);
 		name = rb_strtok_r(NULL, ",", &p);
@@ -99,16 +100,14 @@ part_one_client(struct Client *client_p, struct Client *source_p, char *name, ch
 
 	if((chptr = find_channel(name)) == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-				   form_str(ERR_NOSUCHCHANNEL), name);
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL, form_str(ERR_NOSUCHCHANNEL), name);
 		return;
 	}
 
 	msptr = find_channel_membership(chptr, source_p);
 	if(msptr == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
-				   form_str(ERR_NOTONCHANNEL), name);
+		sendto_one_numeric(source_p, ERR_NOTONCHANNEL, form_str(ERR_NOTONCHANNEL), name);
 		return;
 	}
 
@@ -120,31 +119,28 @@ part_one_client(struct Client *client_p, struct Client *source_p, char *name, ch
 	 *  only allow /part reasons in -m chans
 	 */
 	if(!EmptyString(reason) && (is_chanop(msptr) || !MyConnect(source_p) ||
-			 ((can_send(chptr, source_p, msptr) > 0 &&
-			   (source_p->localClient->firsttime + ConfigFileEntry.anti_spam_exit_message_time)
-			   < rb_current_time()))))
+				    ((can_send(chptr, source_p, msptr) > 0 &&
+				      (source_p->localClient->firsttime +
+				       ConfigFileEntry.anti_spam_exit_message_time) <
+				      rb_current_time()))))
 	{
 		sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
-				":%s PART %s :%s",
-				use_id(source_p), chptr->chname, reason);
+			      ":%s PART %s :%s", use_id(source_p), chptr->chname, reason);
 		sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
-				":%s PART %s :%s",
-				source_p->name, chptr->chname, reason);
+			      ":%s PART %s :%s", source_p->name, chptr->chname, reason);
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s PART %s :%s",
-					source_p->name, source_p->username,
-					source_p->host, chptr->chname, reason);
+				     source_p->name, source_p->username,
+				     source_p->host, chptr->chname, reason);
 	}
 	else
 	{
 		sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
-				":%s PART %s",
-				use_id(source_p), chptr->chname);
+			      ":%s PART %s", use_id(source_p), chptr->chname);
 		sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
-				":%s PART %s",
-				source_p->name, chptr->chname);
+			      ":%s PART %s", source_p->name, chptr->chname);
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s PART %s",
-					source_p->name, source_p->username,
-					source_p->host, chptr->chname);
+				     source_p->name, source_p->username,
+				     source_p->host, chptr->chname);
 	}
 	remove_user_from_channel(msptr);
 }

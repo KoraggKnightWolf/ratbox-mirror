@@ -43,7 +43,7 @@ static void collect_zipstats(void *unused);
 static void ssl_read_ctl(rb_fde_t *F, void *data);
 static int ssld_count;
 
-static char tmpbuf[READBUF_SIZE];	
+static char tmpbuf[READBUF_SIZE];
 static char nul = '\0';
 
 #define MAXPASSFD 4
@@ -70,34 +70,39 @@ struct _ssl_ctl
 	uint8_t dead;
 };
 
-static void send_new_ssl_certs_one(ssl_ctl_t *ctl, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params);
-static void send_init_prng(ssl_ctl_t *ctl, prng_seed_t seedtype, const char *path);
+static void send_new_ssl_certs_one(ssl_ctl_t * ctl, const char *ssl_cert,
+				   const char *ssl_private_key, const char *ssl_dh_params);
+static void send_init_prng(ssl_ctl_t * ctl, prng_seed_t seedtype, const char *path);
 
 
 static rb_dlink_list ssl_daemons;
 
-static inline int32_t buf_to_int32(char *buf)
+static inline int32_t
+buf_to_int32(char *buf)
 {
 	int32_t x;
 	memcpy(&x, buf, sizeof(x));
 	return x;
 }
 
-static inline void int32_to_buf(char *buf, int32_t x)
+static inline void
+int32_to_buf(char *buf, int32_t x)
 {
 	memcpy(buf, &x, sizeof(x));
 	return;
 }
 
 
-static inline uint16_t buf_to_uint16(char *buf)
+static inline uint16_t
+buf_to_uint16(char *buf)
 {
 	uint16_t x;
 	memcpy(&x, buf, sizeof(x));
 	return x;
 }
 
-static inline void uint16_to_buf(char *buf, uint16_t x)
+static inline void
+uint16_to_buf(char *buf, uint16_t x)
 {
 	memcpy(buf, &x, sizeof(x));
 	return;
@@ -108,10 +113,10 @@ static ssl_ctl_t *
 allocate_ssl_daemon(rb_fde_t *F, rb_fde_t *P, int pid)
 {
 	ssl_ctl_t *ctl;
-	
+
 	if(F == NULL || pid < 0)
 		return NULL;
-	ctl = rb_malloc(sizeof(ssl_ctl_t));	
+	ctl = rb_malloc(sizeof(ssl_ctl_t));
 	ctl->F = F;
 	ctl->P = P;
 	ctl->pid = pid;
@@ -121,22 +126,22 @@ allocate_ssl_daemon(rb_fde_t *F, rb_fde_t *P, int pid)
 }
 
 static void
-free_ssl_daemon(ssl_ctl_t *ctl)
+free_ssl_daemon(ssl_ctl_t * ctl)
 {
 	rb_dlink_node *ptr;
 	ssl_ctl_buf_t *ctl_buf;
 	int x;
 	if(ctl->cli_count)
 		return;
-	
+
 	RB_DLINK_FOREACH(ptr, ctl->readq.head)
 	{
 		ctl_buf = ptr->data;
 		for(x = 0; x < ctl_buf->nfds; x++)
-			rb_close(ctl_buf->F[x]);	
+			rb_close(ctl_buf->F[x]);
 
 		rb_free(ctl_buf->buf);
-		rb_free(ctl_buf);	
+		rb_free(ctl_buf);
 	}
 
 	RB_DLINK_FOREACH(ptr, ctl->writeq.head)
@@ -178,17 +183,18 @@ ssl_killall(void)
 }
 
 static void
-ssl_dead(ssl_ctl_t *ctl)
+ssl_dead(ssl_ctl_t * ctl)
 {
 	if(ctl->dead)
 		return;
-		
+
 	ctl->dead = 1;
 	ssld_count--;
-	rb_kill(ctl->pid, SIGKILL); /* make sure the process is really gone */
+	rb_kill(ctl->pid, SIGKILL);	/* make sure the process is really gone */
 	ilog(L_MAIN, "ssld helper died - attempting to restart");
 	sendto_realops_flags(UMODE_ALL, L_ALL, "ssld helper died - attempting to restart");
-	start_ssldaemon(1, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
+	start_ssldaemon(1, ServerInfo.ssl_cert, ServerInfo.ssl_private_key,
+			ServerInfo.ssl_dh_params);
 }
 
 static void
@@ -216,12 +222,14 @@ restart_ssld_event(void *unused)
 		int start = ServerInfo.ssld_count - get_ssld_count();
 		ilog(L_MAIN, "Attempting to restart ssld processes");
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Attempt to restart ssld processes");
-		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params);
+		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key,
+				ServerInfo.ssl_dh_params);
 	}
 }
 
 int
-start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
+start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key,
+		const char *ssl_dh_params)
 {
 	rb_fde_t *F1, *F2;
 	rb_fde_t *P1, *P2;
@@ -230,7 +238,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 #else
 	const char *suffix = "";
 #endif
-                
+
 	char fullpath[PATH_MAX + 1];
 	char fdarg[6];
 	const char *parv[2];
@@ -245,7 +253,8 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 	if(ssld_spin_count > 20 && (rb_current_time() - last_spin < 5))
 	{
 		ilog(L_MAIN, "ssld helper is spinning - will attempt to restart in 1 minute");
-		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld helper is spinning - will attempt to restart in 1 minute");
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "ssld helper is spinning - will attempt to restart in 1 minute");
 		rb_event_add("restart_ssld_event", restart_ssld_event, NULL, 60);
 		ssld_wait = 1;
 		return 0;
@@ -256,14 +265,17 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 	if(ssld_path == NULL)
 	{
 		rb_snprintf(fullpath, sizeof(fullpath), "%s/ssld%s", LIBEXEC_DIR, suffix);
-		
+
 		if(access(fullpath, X_OK) == -1)
 		{
-			rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/ssld%s", ConfigFileEntry.dpath, suffix);
+			rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/ssld%s",
+				    ConfigFileEntry.dpath, suffix);
 			if(access(fullpath, X_OK) == -1)
 			{
-				ilog(L_MAIN, "Unable to execute ssld%s in %s/libexec/ircd-ratbox or %s", ConfigFileEntry.dpath, suffix, LIBEXEC_DIR);
-				return 0 ;
+				ilog(L_MAIN,
+				     "Unable to execute ssld%s in %s/libexec/ircd-ratbox or %s",
+				     ConfigFileEntry.dpath, suffix, LIBEXEC_DIR);
+				return 0;
 			}
 		}
 		ssld_path = rb_strdup(fullpath);
@@ -286,10 +298,10 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 		rb_snprintf(s_pid, sizeof(s_pid), "%d", getpid());
 		rb_setenv("CTL_PPID", s_pid, 1);
 #ifdef _WIN32
-		SetHandleInformation((HANDLE)rb_get_fd(F2), HANDLE_FLAG_INHERIT, 1);
-		SetHandleInformation((HANDLE)rb_get_fd(P1), HANDLE_FLAG_INHERIT, 1);
+		SetHandleInformation((HANDLE) rb_get_fd(F2), HANDLE_FLAG_INHERIT, 1);
+		SetHandleInformation((HANDLE) rb_get_fd(P1), HANDLE_FLAG_INHERIT, 1);
 #endif
-		
+
 		pid = rb_spawn_process(ssld_path, (const char **)parv);
 		if(pid == -1)
 		{
@@ -312,56 +324,58 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key, co
 				send_init_prng(ctl, RB_PRNG_DEFAULT, NULL);
 		}
 		if(ircd_ssl_ok && ssl_cert != NULL && ssl_private_key != NULL)
-			send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params != NULL ? ssl_dh_params : "");
+			send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key,
+					       ssl_dh_params != NULL ? ssl_dh_params : "");
 		ssl_read_ctl(ctl->F, ctl);
 		ssl_do_pipe(P2, ctl);
 
 	}
-	return started;	
+	return started;
 }
 
 static void
-ssl_process_zipstats(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
+ssl_process_zipstats(ssl_ctl_t * ctl, ssl_ctl_buf_t * ctl_buf)
 {
 	struct Client *server;
 	struct ZipStats *zips;
 	int parc;
 	char *parv[6];
-	parc = rb_string_to_array(ctl_buf->buf, parv, 6);		
+	parc = rb_string_to_array(ctl_buf->buf, parv, 6);
 	server = find_server(NULL, parv[1]);
 	if(server == NULL || server->localClient == NULL || !IsCapable(server, CAP_ZIP))
 		return;
 	if(server->localClient->zipstats == NULL)
 		server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
-	
+
 	zips = server->localClient->zipstats;
 
 	zips->in += strtoull(parv[2], NULL, 10);
 	zips->in_wire += strtoull(parv[3], NULL, 10);
 	zips->out += strtoull(parv[4], NULL, 10);
 	zips->out_wire += strtoull(parv[5], NULL, 10);
-	
+
 	if(zips->in > 0)
-		zips->in_ratio = ((double)(zips->in - zips->in_wire) / (double) zips->in) * 100.00;
+		zips->in_ratio = ((double)(zips->in - zips->in_wire) / (double)zips->in) * 100.00;
 	else
 		zips->in_ratio = 0;
-		
+
 	if(zips->out > 0)
-		zips->out_ratio = ((double)(zips->out - zips->out_wire) / (double) zips->out) * 100.00;
+		zips->out_ratio =
+			((double)(zips->out - zips->out_wire) / (double)zips->out) * 100.00;
 	else
 		zips->out_ratio = 0;
 }
 
 static void
-ssl_process_dead_fd(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
+ssl_process_dead_fd(ssl_ctl_t * ctl, ssl_ctl_buf_t * ctl_buf)
 {
 	struct Client *client_p;
 	char reason[256];
 	int32_t fd;
 
 	if(ctl_buf->buflen < 6)
-		return; /* bogus message..drop it.. XXX should warn here */
-	
+		return;		/* bogus message..drop it.. XXX should warn here */
+
 	fd = buf_to_int32(&ctl_buf->buf[1]);
 	rb_strlcpy(reason, &ctl_buf->buf[5], sizeof(reason));
 	client_p = find_cli_fd_hash(fd);
@@ -369,7 +383,8 @@ ssl_process_dead_fd(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 		return;
 	if(IsAnyServer(client_p))
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld error for %s: %s", client_p->name, reason);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld error for %s: %s", client_p->name,
+				     reason);
 		ilog(L_SERVER, "ssld error for %s: %s", log_client_name(client_p, SHOW_IP), reason);
 	}
 	exit_client(client_p, client_p, &me, reason);
@@ -377,14 +392,14 @@ ssl_process_dead_fd(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 
 
 static void
-ssl_process_zip_ready(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
+ssl_process_zip_ready(ssl_ctl_t * ctl, ssl_ctl_buf_t * ctl_buf)
 {
 	struct Client *client_p;
 	int32_t fd;
 
 	if(ctl_buf->buflen < 5)
-		return; /* bogus message..drop it.. XXX should warn here */
-	
+		return;		/* bogus message..drop it.. XXX should warn here */
+
 	fd = buf_to_int32(&ctl_buf->buf[1]);
 	client_p = find_cli_fd_hash(fd);
 	if(client_p == NULL)
@@ -399,49 +414,52 @@ ssl_process_zip_ready(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 
 
 static void
-ssl_process_cmd_recv(ssl_ctl_t *ctl)
+ssl_process_cmd_recv(ssl_ctl_t * ctl)
 {
-	static const char *cannot_setup_ssl = "ssld cannot setup ssl, check your certificates and private key";
-	static const char *no_ssl_or_zlib = "ssld has neither SSL/TLS or zlib support killing all sslds";
-	rb_dlink_node *ptr, *next;	
+	static const char *cannot_setup_ssl =
+		"ssld cannot setup ssl, check your certificates and private key";
+	static const char *no_ssl_or_zlib =
+		"ssld has neither SSL/TLS or zlib support killing all sslds";
+	rb_dlink_node *ptr, *next;
 	ssl_ctl_buf_t *ctl_buf;
 	if(ctl->dead)
 		return;
 	RB_DLINK_FOREACH_SAFE(ptr, next, ctl->readq.head)
 	{
-		ctl_buf = ptr->data;		
-		switch(*ctl_buf->buf)
+		ctl_buf = ptr->data;
+		switch (*ctl_buf->buf)
 		{
-			case 'N':
-				ircd_ssl_ok = 0; /* ssld says it can't do ssl/tls */
-				break;
-			case 'D':
-				ssl_process_dead_fd(ctl, ctl_buf);
-				break;				
-			case 'S':
-				ssl_process_zipstats(ctl, ctl_buf);
-				break;
-			case 'I':
-				ircd_ssl_ok = 0;
-				ilog(L_MAIN, cannot_setup_ssl);				
-				sendto_realops_flags(UMODE_ALL, L_ALL, cannot_setup_ssl);
-			case 'U':
-				zlib_ok = 0;
-				ircd_ssl_ok = 0;
-				ilog(L_MAIN, no_ssl_or_zlib);
-				sendto_realops_flags(UMODE_ALL, L_ALL, no_ssl_or_zlib);
-				ssl_killall();
-				break;
-			case 'R':
-				ssl_process_zip_ready(ctl, ctl_buf);
-				break;
-			case 'z':
-				zlib_ok = 0;
-				break;
-			default:
-				ilog(L_MAIN, "Received invalid command from ssld: %s", ctl_buf->buf);
-				sendto_realops_flags(UMODE_ALL, L_ALL, "Received invalid command from ssld");
-				break;
+		case 'N':
+			ircd_ssl_ok = 0;	/* ssld says it can't do ssl/tls */
+			break;
+		case 'D':
+			ssl_process_dead_fd(ctl, ctl_buf);
+			break;
+		case 'S':
+			ssl_process_zipstats(ctl, ctl_buf);
+			break;
+		case 'I':
+			ircd_ssl_ok = 0;
+			ilog(L_MAIN, cannot_setup_ssl);
+			sendto_realops_flags(UMODE_ALL, L_ALL, cannot_setup_ssl);
+		case 'U':
+			zlib_ok = 0;
+			ircd_ssl_ok = 0;
+			ilog(L_MAIN, no_ssl_or_zlib);
+			sendto_realops_flags(UMODE_ALL, L_ALL, no_ssl_or_zlib);
+			ssl_killall();
+			break;
+		case 'R':
+			ssl_process_zip_ready(ctl, ctl_buf);
+			break;
+		case 'z':
+			zlib_ok = 0;
+			break;
+		default:
+			ilog(L_MAIN, "Received invalid command from ssld: %s", ctl_buf->buf);
+			sendto_realops_flags(UMODE_ALL, L_ALL,
+					     "Received invalid command from ssld");
+			break;
 		}
 		rb_dlinkDelete(ptr, &ctl->readq);
 		rb_free(ctl_buf->buf);
@@ -466,19 +484,21 @@ ssl_read_ctl(rb_fde_t *F, void *data)
 		ctl_buf->buf = rb_malloc(READSIZE);
 		retlen = rb_recv_fd_buf(ctl->F, ctl_buf->buf, READSIZE, ctl_buf->F, 4);
 		ctl_buf->buflen = retlen;
-		if(retlen <= 0) {
+		if(retlen <= 0)
+		{
 			rb_free(ctl_buf->buf);
 			rb_free(ctl_buf);
 		}
 		else
 			rb_dlinkAddTail(ctl_buf, &ctl_buf->node, &ctl->readq);
-	} while(retlen > 0);	
-	
+	}
+	while(retlen > 0);
+
 	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 	{
 		ssl_dead(ctl);
 		return;
-	} 
+	}
 	ssl_process_cmd_recv(ctl);
 	rb_setselect(ctl->F, RB_SELECT_READ, ssl_read_ctl, ctl);
 }
@@ -488,20 +508,21 @@ which_ssld(void)
 {
 	ssl_ctl_t *ctl, *lowest = NULL;
 	rb_dlink_node *ptr;
-	
+
 	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
 	{
 		ctl = ptr->data;
 		if(ctl->dead)
 			continue;
-		if(lowest == NULL) {
+		if(lowest == NULL)
+		{
 			lowest = ctl;
 			continue;
 		}
 		if(ctl->cli_count < lowest->cli_count)
 			lowest = ctl;
 	}
-	return(lowest);
+	return (lowest);
 }
 
 static void
@@ -519,7 +540,8 @@ ssl_write_ctl(rb_fde_t *F, void *data)
 	{
 		ctl_buf = ptr->data;
 		/* in theory unix sock_dgram shouldn't ever short write this.. */
-		retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds,  ctl_buf->buf, ctl_buf->buflen, ctl->pid);
+		retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds, ctl_buf->buf,
+					ctl_buf->buflen, ctl->pid);
 		if(retlen > 0)
 		{
 			rb_dlinkDelete(ptr, &ctl->writeq);
@@ -527,36 +549,38 @@ ssl_write_ctl(rb_fde_t *F, void *data)
 				rb_close(ctl_buf->F[x]);
 			rb_free(ctl_buf->buf);
 			rb_free(ctl_buf);
-			
+
 		}
 		if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 		{
 			ssl_dead(ctl);
 			return;
-		} else  {
+		}
+		else
+		{
 			rb_setselect(ctl->F, RB_SELECT_WRITE, ssl_write_ctl, ctl);
 		}
 	}
 }
 
 static void
-ssl_cmd_write_queue(ssl_ctl_t *ctl, rb_fde_t **F, int count, const void *buf, size_t buflen)
+ssl_cmd_write_queue(ssl_ctl_t * ctl, rb_fde_t **F, int count, const void *buf, size_t buflen)
 {
 	ssl_ctl_buf_t *ctl_buf;
-	int x; 
+	int x;
 
 	/* don't bother */
 	if(ctl->dead)
 		return;
-		
+
 	ctl_buf = rb_malloc(sizeof(ssl_ctl_buf_t));
 	ctl_buf->buf = rb_malloc(buflen);
 	memcpy(ctl_buf->buf, buf, buflen);
 	ctl_buf->buflen = buflen;
-		
+
 	for(x = 0; x < count && x < MAXPASSFD; x++)
 	{
-		ctl_buf->F[x] = F[x];	
+		ctl_buf->F[x] = F[x];
 	}
 	ctl_buf->nfds = count;
 	rb_dlinkAddTail(ctl_buf, &ctl_buf->node, &ctl->writeq);
@@ -565,30 +589,33 @@ ssl_cmd_write_queue(ssl_ctl_t *ctl, rb_fde_t **F, int count, const void *buf, si
 
 
 static void
-send_new_ssl_certs_one(ssl_ctl_t *ctl, const char *ssl_cert, const char *ssl_private_key, const char *ssl_dh_params)
+send_new_ssl_certs_one(ssl_ctl_t * ctl, const char *ssl_cert, const char *ssl_private_key,
+		       const char *ssl_dh_params)
 {
 	size_t len;
 
-	len = strlen(ssl_cert) + strlen(ssl_private_key) + strlen(ssl_dh_params) + 5; 
+	len = strlen(ssl_cert) + strlen(ssl_private_key) + strlen(ssl_dh_params) + 5;
 	if(len > sizeof(tmpbuf))
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, 
-			"Parameters for send_new_ssl_certs_one too long (%zu > %zu) to pass to ssld, not sending...",
-			len, sizeof(tmpbuf));
-		ilog(L_MAIN, "Parameters for send_new_ssl_certs_one too long (%zu > %zu) to pass to ssld, not sending...",
-			len, sizeof(tmpbuf));
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "Parameters for send_new_ssl_certs_one too long (%zu > %zu) to pass to ssld, not sending...",
+				     len, sizeof(tmpbuf));
+		ilog(L_MAIN,
+		     "Parameters for send_new_ssl_certs_one too long (%zu > %zu) to pass to ssld, not sending...",
+		     len, sizeof(tmpbuf));
 		return;
 	}
-	len = rb_snprintf(tmpbuf, sizeof(tmpbuf), "K%c%s%c%s%c%s%c", nul, ssl_cert, nul, ssl_private_key, nul, ssl_dh_params, nul);
+	len = rb_snprintf(tmpbuf, sizeof(tmpbuf), "K%c%s%c%s%c%s%c", nul, ssl_cert, nul,
+			  ssl_private_key, nul, ssl_dh_params, nul);
 	ssl_cmd_write_queue(ctl, NULL, 0, tmpbuf, len);
 }
 
 static void
-send_init_prng(ssl_ctl_t *ctl, prng_seed_t seedtype, const char *path)
+send_init_prng(ssl_ctl_t * ctl, prng_seed_t seedtype, const char *path)
 {
 	size_t len;
 	const char *s;
-	uint8_t seed = (uint8_t) seedtype;
+	uint8_t seed = (uint8_t)seedtype;
 
 	if(path == NULL)
 		s = "";
@@ -598,14 +625,15 @@ send_init_prng(ssl_ctl_t *ctl, prng_seed_t seedtype, const char *path)
 	len = strlen(s) + 3;
 	if(len > sizeof(tmpbuf))
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, 
-			"Parameters for send_init_prng too long (%zd > %zd) to pass to ssld, not sending...",
-			len, sizeof(tmpbuf));
-		ilog(L_MAIN, "Parameters for send_init_prng too long (%zd > %zd) to pass to ssld, not sending...",
-			len, sizeof(tmpbuf));
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "Parameters for send_init_prng too long (%zd > %zd) to pass to ssld, not sending...",
+				     len, sizeof(tmpbuf));
+		ilog(L_MAIN,
+		     "Parameters for send_init_prng too long (%zd > %zd) to pass to ssld, not sending...",
+		     len, sizeof(tmpbuf));
 		return;
-	
-	}	
+
+	}
 	len = rb_snprintf(tmpbuf, sizeof(tmpbuf), "I%c%s%c", seed, s, nul);
 	ssl_cmd_write_queue(ctl, NULL, 0, tmpbuf, len);
 }
@@ -622,12 +650,12 @@ send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key, const char
 	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
 	{
 		ssl_ctl_t *ctl = ptr->data;
-		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params);	
+		send_new_ssl_certs_one(ctl, ssl_cert, ssl_private_key, ssl_dh_params);
 	}
 }
 
 
-ssl_ctl_t * 
+ssl_ctl_t *
 start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, int32_t id)
 {
 	rb_fde_t *F[2];
@@ -659,11 +687,11 @@ start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, int32_t id)
 	ctl = which_ssld();
 	ctl->cli_count++;
 	ssl_cmd_write_queue(ctl, F, 2, buf, sizeof(buf));
-	return ctl; 
+	return ctl;
 }
 
-void 
-ssld_decrement_clicount(ssl_ctl_t *ctl)
+void
+ssld_decrement_clicount(ssl_ctl_t * ctl)
 {
 	if(ctl == NULL)
 		return;
@@ -704,24 +732,27 @@ start_zlib_session(void *data)
 	server->localClient->event = NULL;
 
 	recvqlen = rb_linebuf_len(&server->localClient->buf_recvq);
-	
+
 	len = recvqlen + hdr;
 
 	if(len > READBUF_SIZE)
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "ssld - attempted to pass message of %zd len, max len %d, giving up", len, READBUF_SIZE);
-		ilog(L_MAIN, "ssld - attempted to pass message of %zd len, max len %d, giving up", len, READBUF_SIZE);
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "ssld - attempted to pass message of %zd len, max len %d, giving up",
+				     len, READBUF_SIZE);
+		ilog(L_MAIN, "ssld - attempted to pass message of %zd len, max len %d, giving up",
+		     len, READBUF_SIZE);
 		exit_client(server, server, server, "ssld readbuf exceeded");
 		return;
 	}
 
-	buf = rb_malloc(len);	
+	buf = rb_malloc(len);
 	level = ConfigFileEntry.compression_level;
 
 	int32_to_buf(&buf[1], rb_get_fd(server->localClient->F));
 	buf[5] = (char)level;
 
-	recvq_start = &buf[6];	
+	recvq_start = &buf[6];
 	server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
 
 	xbuf = recvq_start;
@@ -729,18 +760,20 @@ start_zlib_session(void *data)
 
 	do
 	{
-		cpylen = rb_linebuf_get(&server->localClient->buf_recvq, xbuf, left, LINEBUF_PARTIAL, LINEBUF_RAW);
+		cpylen = rb_linebuf_get(&server->localClient->buf_recvq, xbuf, left,
+					LINEBUF_PARTIAL, LINEBUF_RAW);
 		left -= cpylen;
 		xbuf += cpylen;
-	} while(cpylen > 0);
+	}
+	while(cpylen > 0);
 
 	/* Pass the socket to ssld. */
 	*buf = 'Z';
 	rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs");
 
-	F[0] = server->localClient->F; 
+	F[0] = server->localClient->F;
 	F[1] = xF1;
-	del_from_cli_fd_hash(server);	
+	del_from_cli_fd_hash(server);
 	server->localClient->F = xF2;
 	/* need to redo as what we did before isn't valid now */
 	int32_to_buf(&buf[1], rb_get_fd(server->localClient->F));
@@ -773,9 +806,9 @@ collect_zipstats(void *unused)
 
 			id = rb_get_fd(target_p->localClient->F);
 			int32_to_buf(&buf[1], rb_get_fd(target_p->localClient->F));
-			rb_strlcpy(odata, target_p->name, (sizeof(buf)-len));
-			len += strlen(odata) + 1; /* Get the \0 as well */
-			ssl_cmd_write_queue(target_p->localClient->ssl_ctl, NULL, 0, buf, len); 
+			rb_strlcpy(odata, target_p->name, (sizeof(buf) - len));
+			len += strlen(odata) + 1;	/* Get the \0 as well */
+			ssl_cmd_write_queue(target_p->localClient->ssl_ctl, NULL, 0, buf, len);
 		}
 	}
 }
@@ -790,7 +823,7 @@ cleanup_dead_ssl(void *unused)
 		ctl = ptr->data;
 		if(ctl->dead && !ctl->cli_count)
 		{
-			free_ssl_daemon(ctl);			
+			free_ssl_daemon(ctl);
 		}
 	}
 }
@@ -801,9 +834,9 @@ get_ssld_count(void)
 	return ssld_count;
 }
 
-void init_ssld(void)
+void
+init_ssld(void)
 {
 	rb_event_addish("collect_zipstats", collect_zipstats, NULL, ZIPSTATS_TIME);
 	rb_event_addish("cleanup_dead_ssld", cleanup_dead_ssl, NULL, 1200);
 }
-

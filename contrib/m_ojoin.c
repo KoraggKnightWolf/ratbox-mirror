@@ -98,7 +98,7 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		add_user_to_channel(chptr, source_p, CHFL_CHANOP);
 		sendto_server(client_p, chptr, NOCAPS, NOCAPS,
 			      ":%s SJOIN %ld %s + :@%s",
-			      me.name, (long) chptr->channelts, chptr->chname, source_p->name);
+			      me.name, (long)chptr->channelts, chptr->chname, source_p->name);
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s JOIN %s",
 				     source_p->name,
 				     source_p->username, source_p->host, chptr->chname);
@@ -111,7 +111,7 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		add_user_to_channel(chptr, source_p, CHFL_VOICE);
 		sendto_server(client_p, chptr, NOCAPS, NOCAPS,
 			      ":%s SJOIN %ld %s + :+%s",
-			      me.name, (long) chptr->channelts, chptr->chname, source_p->name);
+			      me.name, (long)chptr->channelts, chptr->chname, source_p->name);
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s JOIN %s",
 				     source_p->name,
 				     source_p->username, source_p->host, chptr->chname);
@@ -123,7 +123,7 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		add_user_to_channel(chptr, source_p, CHFL_PEON);
 		sendto_server(client_p, chptr, NOCAPS, NOCAPS,
 			      ":%s SJOIN %ld %s + :%s",
-			      me.name, (long) chptr->channelts, chptr->chname, source_p->name);
+			      me.name, (long)chptr->channelts, chptr->chname, source_p->name);
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s JOIN %s",
 				     source_p->name,
 				     source_p->username, source_p->host, chptr->chname);
@@ -135,7 +135,8 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		sendto_one(source_p, form_str(RPL_TOPIC), me.name,
 			   source_p->name, chptr->chname, chptr->topic->topic);
 		sendto_one(source_p, form_str(RPL_TOPICWHOTIME), me.name,
-			   source_p->name, chptr->chname, chptr->topic->topic_info, chptr->topic->topic_time);
+			   source_p->name, chptr->chname, chptr->topic->topic_info,
+			   chptr->topic->topic_time);
 	}
 
 	source_p->localClient->last_join_time = rb_current_time();

@@ -127,7 +127,7 @@ struct ChCapCombo
 #define CHFL_CHANOP     	0x0001	/* Channel operator */
 #define CHFL_VOICE      	0x0002	/* the power to speak */
 #define CHFL_DEOPPED    	0x0004	/* deopped on sjoin, bounce modes */
-#define CHFL_BANNED		0x0008  /* cached as banned */
+#define CHFL_BANNED		0x0008	/* cached as banned */
 #define ONLY_SERVERS		0x0010
 #define ALL_MEMBERS		CHFL_PEON
 #define ONLY_CHANOPS		CHFL_CHANOP
@@ -181,10 +181,9 @@ void free_ban(struct Ban *bptr);
 
 void destroy_channel(struct Channel *);
 
-int can_send(struct Channel *chptr, struct Client *who, 
-		    struct membership *);
+int can_send(struct Channel *chptr, struct Client *who, struct membership *);
 int is_banned(struct Channel *chptr, struct Client *who,
-		     struct membership *msptr, const char *, const char *);
+	      struct membership *msptr, const char *, const char *);
 
 struct membership *find_channel_membership(struct Channel *, struct Client *);
 const char *find_channel_status(struct membership *msptr, int combine);
@@ -197,8 +196,7 @@ void free_channel_list(rb_dlink_list *);
 
 int check_channel_name(const char *name);
 
-void channel_member_names(struct Channel *chptr, struct Client *,
-				 int show_eon);
+void channel_member_names(struct Channel *chptr, struct Client *, int show_eon);
 
 void del_invite(struct Channel *chptr, struct Client *who);
 
@@ -215,7 +213,7 @@ void init_chcap_usage_counts(void);
 void set_chcap_usage_counts(struct Client *serv_p);
 void unset_chcap_usage_counts(struct Client *serv_p);
 void send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
-				  struct Channel *chptr, struct ChModeChange foo[], int);
+			   struct Channel *chptr, struct ChModeChange foo[], int);
 
 
 #endif /* INCLUDED_channel_h */

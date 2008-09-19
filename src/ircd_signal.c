@@ -48,7 +48,7 @@ sigchld_handler(int sig)
 	int status, olderrno;
 
 	olderrno = errno;
-	while (waitpid(-1, &status, WNOHANG) > 0)
+	while(waitpid(-1, &status, WNOHANG) > 0)
 		;
 	errno = olderrno;
 }
@@ -165,6 +165,7 @@ setup_signals()
 	sigaction(SIGCHLD, &act, 0);
 
 }
+
 /*
  * setup_reboot_signals() we need to not try to do stuff before reboot with signals
  */
@@ -172,10 +173,10 @@ void
 setup_reboot_signals()
 {
 	struct sigaction act;
-	
+
 	act.sa_flags = 0;
 	act.sa_handler = dummy_handler;
-	
+
 	sigemptyset(&act.sa_mask);
 
 #ifdef SIGTRAP
@@ -195,7 +196,7 @@ setup_reboot_signals()
 	sigaddset(&act.sa_mask, SIGUSR1);
 	sigaddset(&act.sa_mask, SIGUSR2);
 	sigaddset(&act.sa_mask, SIGCHLD);
-	
+
 	sigaction(SIGALRM, &act, 0);
 	sigaction(SIGPIPE, &act, 0);
 	sigaction(SIGHUP, &act, 0);
@@ -203,12 +204,12 @@ setup_reboot_signals()
 	sigaction(SIGTERM, &act, 0);
 	sigaction(SIGUSR1, &act, 0);
 	sigaction(SIGUSR2, &act, 0);
-	sigaction(SIGTERM, &act, 0);	
+	sigaction(SIGTERM, &act, 0);
 	sigaction(SIGUSR1, &act, 0);
 	sigaction(SIGUSR2, &act, 0);
 	sigaction(SIGCHLD, &act, 0);
-	
-	
+
+
 
 
 }
@@ -228,4 +229,3 @@ setup_reboot_signals()
 /* this is a stub for mingw32 */
 }
 #endif
-

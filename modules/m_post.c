@@ -38,10 +38,12 @@ struct Message post_msgtab = {
 	"POST", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{{mr_dumb_proxy, 0}, mg_ignore, mg_ignore, mg_ignore, mg_ignore, mg_ignore}
 };
+
 struct Message get_msgtab = {
 	"GET", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{{mr_dumb_proxy, 0}, mg_ignore, mg_ignore, mg_ignore, mg_ignore, mg_ignore}
 };
+
 struct Message put_msgtab = {
 	"PUT", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{{mr_dumb_proxy, 0}, mg_ignore, mg_ignore, mg_ignore, mg_ignore, mg_ignore}
@@ -51,6 +53,7 @@ struct Message put_msgtab = {
 mapi_clist_av1 post_clist[] = {
 	&post_msgtab, &get_msgtab, &put_msgtab, NULL
 };
+
 DECLARE_MODULE_AV1(post, NULL, NULL, post_clist, NULL, NULL, "$Revision$");
 
 

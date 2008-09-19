@@ -54,14 +54,13 @@ parse_client_queued(struct Client *client_p)
 
 	if(IsUnknown(client_p))
 	{
-		for (;;)
+		for(;;)
 		{
 			if(client_p->localClient->sent_parsed >= client_p->localClient->allow_read)
 				break;
 
-			dolen = rb_linebuf_get(&client_p->localClient->
-					    buf_recvq, readBuf, READBUF_SIZE,
-					    LINEBUF_COMPLETE, LINEBUF_PARSED);
+			dolen = rb_linebuf_get(&client_p->localClient->buf_recvq, readBuf,
+					       READBUF_SIZE, LINEBUF_COMPLETE, LINEBUF_PARSED);
 
 			if(dolen <= 0 || IsDead(client_p))
 				break;
@@ -88,9 +87,10 @@ parse_client_queued(struct Client *client_p)
 
 	if(IsAnyServer(client_p) || IsExemptFlood(client_p))
 	{
-		while (!IsAnyDead(client_p) && (dolen = rb_linebuf_get(&client_p->localClient->buf_recvq,
-					   readBuf, READBUF_SIZE, LINEBUF_COMPLETE,
-					   LINEBUF_PARSED)) > 0)
+		while(!IsAnyDead(client_p)
+		      && (dolen =
+			  rb_linebuf_get(&client_p->localClient->buf_recvq, readBuf, READBUF_SIZE,
+					 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 		{
 			client_dopacket(client_p, readBuf, dolen);
 		}
@@ -105,7 +105,7 @@ parse_client_queued(struct Client *client_p)
 		 * messages in this loop, we simply drop out of the loop prematurely.
 		 *   -- adrian
 		 */
-		for (;;)
+		for(;;)
 		{
 			/* This flood protection works as follows:
 			 *
@@ -122,19 +122,20 @@ parse_client_queued(struct Client *client_p)
 			 */
 			if(checkflood)
 			{
-				if(client_p->localClient->sent_parsed >= client_p->localClient->allow_read)
+				if(client_p->localClient->sent_parsed >=
+				   client_p->localClient->allow_read)
 					break;
 			}
 
 			/* allow opers 4 times the amount of messages as users. why 4?
 			 * why not. :) --fl_
 			 */
-			else if(client_p->localClient->sent_parsed >= (4 * client_p->localClient->allow_read))
+			else if(client_p->localClient->sent_parsed >=
+				(4 * client_p->localClient->allow_read))
 				break;
 
-			dolen = rb_linebuf_get(&client_p->localClient->
-					    buf_recvq, readBuf, READBUF_SIZE,
-					    LINEBUF_COMPLETE, LINEBUF_PARSED);
+			dolen = rb_linebuf_get(&client_p->localClient->buf_recvq, readBuf,
+					       READBUF_SIZE, LINEBUF_COMPLETE, LINEBUF_PARSED);
 
 			if(!dolen)
 				break;
@@ -165,15 +166,15 @@ flood_recalc(void *unused)
 
 		if(rb_unlikely(IsMe(client_p)))
 			continue;
-			
+
 		if(rb_unlikely(client_p->localClient == NULL))
 			continue;
-		
+
 		if(IsFloodDone(client_p))
 			client_p->localClient->sent_parsed -= 2;
 		else
 			client_p->localClient->sent_parsed = 0;
-			
+
 		if(client_p->localClient->sent_parsed < 0)
 			client_p->localClient->sent_parsed = 0;
 
@@ -181,11 +182,12 @@ flood_recalc(void *unused)
 			client_p->localClient->actually_read = 0;
 
 		parse_client_queued(client_p);
-		
+
 		if(rb_unlikely(IsAnyDead(client_p)))
 			continue;
 
-		if(!IsFloodDone(client_p) && ((client_p->localClient->firsttime + 30) < rb_current_time()))
+		if(!IsFloodDone(client_p)
+		   && ((client_p->localClient->firsttime + 30) < rb_current_time()))
 			flood_endgrace(client_p);
 	}
 
@@ -205,7 +207,7 @@ flood_recalc(void *unused)
 			client_p->localClient->actually_read = 0;
 
 		parse_client_queued(client_p);
-       }
+	}
 }
 
 
@@ -226,7 +228,7 @@ read_packet(rb_fde_t *F, void *data)
 #endif
 
 
-	while(1) /* note..for things like rt sigio to work you *must* loop on read until you get EAGAIN */
+	while(1)		/* note..for things like rt sigio to work you *must* loop on read until you get EAGAIN */
 	{
 		if(IsAnyDead(client_p))
 			return;
@@ -241,18 +243,19 @@ read_packet(rb_fde_t *F, void *data)
 		{
 			if(rb_ignore_errno(errno))
 			{
-				rb_setselect(client_p->localClient->F, 
-						RB_SELECT_READ, read_packet, client_p);
-			} else
+				rb_setselect(client_p->localClient->F,
+					     RB_SELECT_READ, read_packet, client_p);
+			}
+			else
 				error_exit_client(client_p, length);
 			return;
-		} else
-		if(length == 0)
+		}
+		else if(length == 0)
 		{
 			error_exit_client(client_p, length);
 			return;
 		}
-		
+
 #ifdef USE_IODEBUG_HOOKS
 		hdata.client = client_p;
 		hdata.arg1 = readBuf;
@@ -262,7 +265,7 @@ read_packet(rb_fde_t *F, void *data)
 
 		if(client_p->localClient->lasttime < rb_current_time())
 			client_p->localClient->lasttime = rb_current_time();
-			client_p->flags &= ~FLAGS_PINGSENT;
+		client_p->flags &= ~FLAGS_PINGSENT;
 
 		/*
 		 * Before we even think of parsing what we just read, stick
@@ -272,35 +275,39 @@ read_packet(rb_fde_t *F, void *data)
 		if(IsHandshake(client_p) || IsUnknown(client_p))
 			binary = 1;
 
-		lbuf_len = rb_linebuf_parse(&client_p->localClient->buf_recvq, readBuf, length, binary);
+		lbuf_len =
+			rb_linebuf_parse(&client_p->localClient->buf_recvq, readBuf, length,
+					 binary);
 
 		lclient_p->actually_read += lbuf_len;
 
 		if(IsAnyDead(client_p))
 			return;
-		
+
 		/* Attempt to parse what we have */
 		parse_client_queued(client_p);
 
 		if(IsAnyDead(client_p))
 			return;
-		
+
 		/* Check to make sure we're not flooding */
 		if(!IsAnyServer(client_p) &&
-		   (rb_linebuf_alloclen(&client_p->localClient->buf_recvq) > ConfigFileEntry.client_flood))
+		   (rb_linebuf_alloclen(&client_p->localClient->buf_recvq) >
+		    ConfigFileEntry.client_flood))
 		{
 			if(!(ConfigFileEntry.no_oper_flood && IsOper(client_p)))
 			{
 				exit_client(client_p, client_p, client_p, "Excess Flood");
 				return;
 			}
-	
+
 		}
 
 		/* bail if short read */
 		if(length < READBUF_SIZE)
 		{
-			rb_setselect(client_p->localClient->F, RB_SELECT_READ, read_packet, client_p);
+			rb_setselect(client_p->localClient->F, RB_SELECT_READ, read_packet,
+				     client_p);
 			return;
 		}
 	}

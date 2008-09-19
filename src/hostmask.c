@@ -60,7 +60,7 @@ parse_netmask(const char *text, struct sockaddr *naddr, int *nb)
 		b = &xb;
 	else
 		b = nb;
-	
+
 	if(naddr == NULL)
 		addr = (struct sockaddr *)&xaddr;
 	else
@@ -72,7 +72,7 @@ parse_netmask(const char *text, struct sockaddr *naddr, int *nb)
 	}
 #ifdef RB_IPV6
 	if(strchr(ip, ':'))
-	{	
+	{
 		if((ptr = strchr(ip, '/')))
 		{
 			*ptr = '\0';
@@ -80,13 +80,15 @@ parse_netmask(const char *text, struct sockaddr *naddr, int *nb)
 			*b = atoi(ptr);
 			if(*b > 128)
 				*b = 128;
-		} else
+		}
+		else
 			*b = 128;
 		if(rb_inet_pton_sock(ip, addr) > 0)
 			return HM_IPV6;
 		else
 			return HM_HOST;
-	} else
+	}
+	else
 #endif
 	if(strchr(text, '.'))
 	{
@@ -97,7 +99,8 @@ parse_netmask(const char *text, struct sockaddr *naddr, int *nb)
 			*b = atoi(ptr);
 			if(*b > 32)
 				*b = 32;
-		} else
+		}
+		else
 			*b = 32;
 		if(rb_inet_pton_sock(ip, addr) > 0)
 			return HM_IPV4;
@@ -125,7 +128,7 @@ static uint32_t
 hash_ipv4(struct sockaddr *saddr, int bits)
 {
 	struct sockaddr_in *addr = (struct sockaddr_in *)(void *)saddr;
-	
+
 	if(bits != 0)
 	{
 		uint32_t av = ntohl(addr->sin_addr.s_addr) & ~((1 << (32 - bits)) - 1);
@@ -144,9 +147,9 @@ hash_ipv4(struct sockaddr *saddr, int bits)
 static uint32_t
 hash_ipv6(struct sockaddr *saddr, int bits)
 {
-	struct sockaddr_in6 *addr = (struct sockaddr_in6 *)(void *) saddr;
+	struct sockaddr_in6 *addr = (struct sockaddr_in6 *)(void *)saddr;
 	uint32_t v = 0, n;
-	for (n = 0; n < 16; n++)
+	for(n = 0; n < 16; n++)
 	{
 		if(bits >= 8)
 		{
@@ -178,7 +181,7 @@ hash_text(const char *start)
 
 	while(*p)
 	{
-		h = (h << 4) - (h + (unsigned char) ToLower(*p++));
+		h = (h << 4) - (h + (unsigned char)ToLower(*p++));
 	}
 
 	return (h & (ATABLE_SIZE - 1));
@@ -195,7 +198,7 @@ get_mask_hash(const char *text)
 {
 	const char *hp = "", *p;
 
-	for (p = text + strlen(text) - 1; p >= text; p--)
+	for(p = text + strlen(text) - 1; p >= text; p--)
 		if(*p == '*' || *p == '?')
 			return hash_text(hp);
 		else if(*p == '.')
@@ -211,8 +214,8 @@ get_mask_hash(const char *text)
  * Side-effects: None
  */
 struct ConfItem *
-find_auth(const char *name, const char *sockhost, 
-		struct sockaddr *addr, int fam, const char *username)
+find_auth(const char *name, const char *sockhost,
+	  struct sockaddr *addr, int fam, const char *username)
 {
 	uint32_t hprecv = 0;
 	struct ConfItem *hprec = NULL;
@@ -229,16 +232,18 @@ find_auth(const char *name, const char *sockhost,
 		if(fam == AF_INET6)
 		{
 
-			for (b = 128; b >= 0; b -= 16)
+			for(b = 128; b >= 0; b -= 16)
 			{
-				for (arec = atable[hash_ipv6(addr, b)]; arec; arec = arec->next)
+				for(arec = atable[hash_ipv6(addr, b)]; arec; arec = arec->next)
 				{
 					if((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT &&
 					   arec->masktype == HM_IPV6 &&
-					   comp_with_mask_sock(addr, (struct sockaddr *)&arec->Mask.ipa.addr,
-							       arec->Mask.ipa.bits) && 
-					  (arec->type & CONF_SKIPUSER || match(arec->username, username)) &&
-					  arec->precedence > hprecv)
+					   comp_with_mask_sock(addr,
+							       (struct sockaddr *)&arec->Mask.
+							       ipa.addr, arec->Mask.ipa.bits)
+					   && (arec->type & CONF_SKIPUSER
+					       || match(arec->username, username))
+					   && arec->precedence > hprecv)
 					{
 						hprecv = arec->precedence;
 						hprec = arec->aconf;
@@ -250,15 +255,17 @@ find_auth(const char *name, const char *sockhost,
 #endif
 		if(fam == AF_INET)
 		{
-			for (b = 32; b >= 0; b -= 8)
+			for(b = 32; b >= 0; b -= 8)
 			{
-				for (arec = atable[hash_ipv4(addr, b)]; arec; arec = arec->next)
+				for(arec = atable[hash_ipv4(addr, b)]; arec; arec = arec->next)
 					if((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT &&
 					   arec->masktype == HM_IPV4 &&
-					   arec->precedence > hprecv && 
-					   comp_with_mask_sock(addr, (struct sockaddr *)&arec->Mask.ipa.addr,
-							       arec->Mask.ipa.bits) && 
-					   (arec->type & CONF_SKIPUSER || match(arec->username, username)))
+					   arec->precedence > hprecv &&
+					   comp_with_mask_sock(addr,
+							       (struct sockaddr *)&arec->Mask.
+							       ipa.addr, arec->Mask.ipa.bits)
+					   && (arec->type & CONF_SKIPUSER
+					       || match(arec->username, username)))
 					{
 						hprecv = arec->precedence;
 						hprec = arec->aconf;
@@ -272,9 +279,9 @@ find_auth(const char *name, const char *sockhost,
 		const char *p;
 		/* And yes - we have to check p after strchr and p after increment for
 		 * NULL -kre */
-		for (p = name; p != NULL;)
+		for(p = name; p != NULL;)
 		{
-			for (arec = atable[hash_text(p)]; arec; arec = arec->next)
+			for(arec = atable[hash_text(p)]; arec; arec = arec->next)
 			{
 				if((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT &&
 				   (arec->masktype == HM_HOST) &&
@@ -293,11 +300,11 @@ find_auth(const char *name, const char *sockhost,
 			else
 				break;
 		}
-		for (arec = atable[0]; arec; arec = arec->next)
+		for(arec = atable[0]; arec; arec = arec->next)
 		{
 			if((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT &&
 			   arec->masktype == HM_HOST &&
-			   arec->precedence > hprecv && 
+			   arec->precedence > hprecv &&
 			   (match(arec->Mask.hostname, name) ||
 			    (sockhost && match(arec->Mask.hostname, sockhost))) &&
 			   (arec->type & CONF_SKIPUSER || match(arec->username, username)))
@@ -319,9 +326,8 @@ find_auth(const char *name, const char *sockhost,
  * Side-effects: None
  */
 struct ConfItem *
-find_conf_by_address(const char *name, const char *sockhost, 
-			struct sockaddr *addr, int type, int fam, 
-			const char *username)
+find_conf_by_address(const char *name, const char *sockhost,
+		     struct sockaddr *addr, int type, int fam, const char *username)
 {
 	struct AddressRec *arec;
 	int b;
@@ -336,15 +342,17 @@ find_conf_by_address(const char *name, const char *sockhost,
 		if(fam == AF_INET6)
 		{
 
-			for (b = 128; b >= 0; b -= 16)
+			for(b = 128; b >= 0; b -= 16)
 			{
-				for (arec = atable[hash_ipv6(addr, b)]; arec; arec = arec->next)
+				for(arec = atable[hash_ipv6(addr, b)]; arec; arec = arec->next)
 				{
 					if(type == (arec->type & ~CONF_SKIPUSER) &&
 					   arec->masktype == HM_IPV6 &&
-					   comp_with_mask_sock(addr, (struct sockaddr *)&arec->Mask.ipa.addr,
-							       arec->Mask.ipa.bits) && 
-					  (arec->type & CONF_SKIPUSER || match(arec->username, username)))
+					   comp_with_mask_sock(addr,
+							       (struct sockaddr *)&arec->Mask.
+							       ipa.addr, arec->Mask.ipa.bits)
+					   && (arec->type & CONF_SKIPUSER
+					       || match(arec->username, username)))
 						return arec->aconf;
 				}
 			}
@@ -353,15 +361,17 @@ find_conf_by_address(const char *name, const char *sockhost,
 #endif
 		if(fam == AF_INET)
 		{
-			for (b = 32; b >= 0; b -= 8)
+			for(b = 32; b >= 0; b -= 8)
 			{
-				for (arec = atable[hash_ipv4(addr, b)]; arec; arec = arec->next)
+				for(arec = atable[hash_ipv4(addr, b)]; arec; arec = arec->next)
 				{
 					if(type == (arec->type & ~CONF_SKIPUSER) &&
 					   arec->masktype == HM_IPV4 &&
-					   comp_with_mask_sock(addr, (struct sockaddr *)&arec->Mask.ipa.addr,
-							       arec->Mask.ipa.bits) && 
-					   (arec->type & CONF_SKIPUSER || match(arec->username, username)))
+					   comp_with_mask_sock(addr,
+							       (struct sockaddr *)&arec->Mask.
+							       ipa.addr, arec->Mask.ipa.bits)
+					   && (arec->type & CONF_SKIPUSER
+					       || match(arec->username, username)))
 						return arec->aconf;
 				}
 			}
@@ -373,9 +383,9 @@ find_conf_by_address(const char *name, const char *sockhost,
 		const char *p;
 		/* And yes - we have to check p after strchr and p after increment for
 		 * NULL -kre */
-		for (p = name; p != NULL;)
+		for(p = name; p != NULL;)
 		{
-			for (arec = atable[hash_text(p)]; arec; arec = arec->next)
+			for(arec = atable[hash_text(p)]; arec; arec = arec->next)
 			{
 				if(type == (arec->type & ~CONF_SKIPUSER) &&
 				   (arec->masktype == HM_HOST) &&
@@ -390,7 +400,7 @@ find_conf_by_address(const char *name, const char *sockhost,
 			else
 				break;
 		}
-		for (arec = atable[0]; arec; arec = arec->next)
+		for(arec = atable[0]; arec; arec = arec->next)
 		{
 			if(type == (arec->type & ~CONF_SKIPUSER) &&
 			   arec->masktype == HM_HOST &&
@@ -411,8 +421,8 @@ find_conf_by_address(const char *name, const char *sockhost,
  * Side-effects: None
  */
 struct ConfItem *
-find_address_conf(const char *host, const char *sockhost, const char *user, 
-		struct sockaddr *ip, int aftype)
+find_address_conf(const char *host, const char *sockhost, const char *user,
+		  struct sockaddr *ip, int aftype)
 {
 	struct ConfItem *iconf, *kconf;
 
@@ -442,11 +452,13 @@ find_address_conf(const char *host, const char *sockhost, const char *user,
 		if(p)
 		{
 			*p = '\0';
-			kconf = find_conf_by_address(p+1, NULL, ip, CONF_KILL, aftype, iconf->info.name);
+			kconf = find_conf_by_address(p + 1, NULL, ip, CONF_KILL, aftype,
+						     iconf->info.name);
 			*p = '@';
 		}
 		else
-			kconf = find_conf_by_address(iconf->info.name, NULL, ip, CONF_KILL, aftype, user);
+			kconf = find_conf_by_address(iconf->info.name, NULL, ip, CONF_KILL, aftype,
+						     user);
 
 		if(kconf)
 			return kconf;
@@ -489,7 +501,8 @@ add_conf_by_address(const char *address, int type, const char *username, struct 
 	{
 		/* We have to do this, since we do not re-hash for every bit -A1kmm. */
 		bits -= bits % 16;
-		arec->next = atable[(hv = hash_ipv6((struct sockaddr *)&arec->Mask.ipa.addr, bits))];
+		arec->next =
+			atable[(hv = hash_ipv6((struct sockaddr *)&arec->Mask.ipa.addr, bits))];
 		atable[hv] = arec;
 	}
 	else
@@ -498,7 +511,8 @@ add_conf_by_address(const char *address, int type, const char *username, struct 
 	{
 		/* We have to do this, since we do not re-hash for every bit -A1kmm. */
 		bits -= bits % 8;
-		arec->next = atable[(hv = hash_ipv4((struct sockaddr *)&arec->Mask.ipa.addr, bits))];
+		arec->next =
+			atable[(hv = hash_ipv4((struct sockaddr *)&arec->Mask.ipa.addr, bits))];
 		atable[hv] = arec;
 	}
 	else
@@ -550,7 +564,7 @@ delete_one_address_conf(const char *address, struct ConfItem *aconf)
 	}
 	else
 		hv = get_mask_hash(address);
-	for (arec = atable[hv]; arec; arec = arec->next)
+	for(arec = atable[hv]; arec; arec = arec->next)
 	{
 		if(arec->aconf == aconf)
 		{
@@ -582,16 +596,16 @@ clear_out_address_conf(void)
 	struct AddressRec **store_next;
 	struct AddressRec *arec, *arecn;
 
-	for (i = 0; i < ATABLE_SIZE; i++)
+	for(i = 0; i < ATABLE_SIZE; i++)
 	{
 		store_next = &atable[i];
-		for (arec = atable[i]; arec; arec = arecn)
+		for(arec = atable[i]; arec; arec = arecn)
 		{
 			arecn = arec->next;
 			/* We keep the temporary K-lines and destroy the
 			 * permanent ones, just to be confusing :) -A1kmm */
 			if(arec->aconf->flags & CONF_FLAGS_TEMPORARY ||
-			   ((arec->type & ~CONF_SKIPUSER) != CONF_CLIENT && 
+			   ((arec->type & ~CONF_SKIPUSER) != CONF_CLIENT &&
 			    (arec->type & ~CONF_SKIPUSER) != CONF_EXEMPTDLINE))
 			{
 				*store_next = arec;
@@ -616,16 +630,16 @@ clear_out_address_conf_bans(void)
 	struct AddressRec **store_next;
 	struct AddressRec *arec, *arecn;
 
-	for (i = 0; i < ATABLE_SIZE; i++)
+	for(i = 0; i < ATABLE_SIZE; i++)
 	{
 		store_next = &atable[i];
-		for (arec = atable[i]; arec; arec = arecn)
+		for(arec = atable[i]; arec; arec = arecn)
 		{
 			arecn = arec->next;
 			/* We keep the temporary K-lines and destroy the
 			 * permanent ones, just to be confusing :) -A1kmm */
 			if(arec->aconf->flags & CONF_FLAGS_TEMPORARY ||
-			   ((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT || 
+			   ((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT ||
 			    (arec->type & ~CONF_SKIPUSER) == CONF_EXEMPTDLINE))
 			{
 				*store_next = arec;
@@ -674,4 +688,3 @@ show_iline_prefix(struct Client *sptr, struct ConfItem *aconf, const char *name)
 	strncpy(prefix_ptr, name, USERLEN);
 	return (prefix_of_host);
 }
-

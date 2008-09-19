@@ -37,9 +37,9 @@ enum
 
 int parse_netmask(const char *, struct sockaddr *, int *);
 struct ConfItem *find_conf_by_address(const char *host, const char *sockhost,
-					struct sockaddr *, int, int, const char *);
+				      struct sockaddr *, int, int, const char *);
 struct ConfItem *find_auth(const char *host, const char *sockhost,
-				struct sockaddr *, int, const char *);
+			   struct sockaddr *, int, const char *);
 void add_conf_by_address(const char *, int, const char *, struct ConfItem *);
 void delete_one_address_conf(const char *, struct ConfItem *);
 void clear_out_address_conf(void);
@@ -47,8 +47,8 @@ void clear_out_address_conf_bans(void);
 void init_host_hash(void);
 const char *show_iline_prefix(struct Client *, struct ConfItem *, const char *);
 
-struct ConfItem *find_address_conf(const char *host, const char *sockhost, 
-				const char *, struct sockaddr *, int);
+struct ConfItem *find_address_conf(const char *host, const char *sockhost,
+				   const char *, struct sockaddr *, int);
 
 #define find_kline(x)	(find_conf_by_address((x)->host, (x)->sockhost,\
 			 (struct sockaddr *)&(x)->localClient->ip, CONF_KILL,\
@@ -64,7 +64,7 @@ int match_ipv4(struct sockaddr *, struct sockaddr *, int);
 
 /* Hashtable stuff... */
 #define ATABLE_BITS 12
-#define ATABLE_SIZE (1<<ATABLE_BITS) 
+#define ATABLE_SIZE (1<<ATABLE_BITS)
 
 extern struct AddressRec *atable[ATABLE_SIZE];
 

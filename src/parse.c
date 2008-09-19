@@ -52,7 +52,7 @@ static void remove_unknown(struct Client *, char *, char *);
 
 static void do_numeric(char[], struct Client *, struct Client *, int, char **);
 
-static int handle_command(struct Message *, struct Client *, struct Client *, int, const char**);
+static int handle_command(struct Message *, struct Client *, struct Client *, int, const char **);
 
 static uint32_t cmd_hash(const char *p);
 static struct Message *hash_parse(const char *);
@@ -71,7 +71,7 @@ string_to_array(char *string, char **parv)
 	int x = 1;
 
 	parv[x] = NULL;
-	while (*buf == ' ')	/* skip leading spaces */
+	while(*buf == ' ')	/* skip leading spaces */
 		buf++;
 	if(*buf == '\0')	/* ignore all-space args */
 		return x;
@@ -97,13 +97,13 @@ string_to_array(char *string, char **parv)
 			else
 				return x;
 		}
-		while (*buf == ' ')
+		while(*buf == ' ')
 			buf++;
 		if(*buf == '\0')
 			return x;
 	}
 	/* we can go upto parv[MAXPARA], as parv[0] is taken by source */
-	while (x < MAXPARA);
+	while(x < MAXPARA);
 
 	if(*p == ':')
 		p++;
@@ -132,14 +132,14 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 	if(IsAnyDead(client_p))
 		return;
 
-	for (ch = pbuffer; *ch == ' '; ch++)	/* skip spaces */
+	for(ch = pbuffer; *ch == ' '; ch++)	/* skip spaces */
 		/* null statement */ ;
 
 	if(from->name != NULL)
 		para[0] = LOCAL_COPY(from->name);
 	else
 		para[0] = NULL;
-	
+
 	if(*ch == ':')
 	{
 		ch++;
@@ -176,7 +176,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 				return;
 			}
 		}
-		while (*ch == ' ')
+		while(*ch == ' ')
 			ch++;
 	}
 
@@ -261,18 +261,19 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 		return;
 	}
 
-	if(handle_command(mptr, client_p, from, i, /* XXX discards const!!! */ (const char **)para) < -1)
+	if(handle_command(mptr, client_p, from, i,	/* XXX discards const!!! */
+			  (const char **)para) < -1)
 	{
 		char *p;
-		for (p = pbuffer; p <= end; p += 8)
+		for(p = pbuffer; p <= end; p += 8)
 		{
 			/* HACK HACK */
 			/* Its expected this nasty code can be removed
 			 * or rewritten later if still needed.
 			 */
-			if((unsigned long) (p + 8) > (unsigned long) end)
+			if((unsigned long)(p + 8) > (unsigned long)end)
 			{
-				for (; p <= end; p++)
+				for(; p <= end; p++)
 				{
 					ilog(L_MAIN, "%02x |%c", p[0], p[0]);
 				}
@@ -300,7 +301,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
  */
 static int
 handle_command(struct Message *mptr, struct Client *client_p,
-	       struct Client *from, int i, const char** hpara)
+	       struct Client *from, int i, const char **hpara)
 {
 	struct MessageEntry ehandler;
 	MessageHandler handler = 0;
@@ -331,15 +332,14 @@ handle_command(struct Message *mptr, struct Client *client_p,
 	handler = ehandler.handler;
 
 	/* check right amount of params is passed... --is */
-	if(i < ehandler.min_para || 
+	if(i < ehandler.min_para ||
 	   (ehandler.min_para && EmptyString(hpara[ehandler.min_para - 1])))
 	{
 		if(!IsServer(client_p))
 		{
 			sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
-				   me.name, 
-				   EmptyString(client_p->name) ? "*" : client_p->name, 
-				   mptr->cmd);
+				   me.name,
+				   EmptyString(client_p->name) ? "*" : client_p->name, mptr->cmd);
 			if(MyClient(client_p))
 				return (1);
 			else
@@ -360,11 +360,13 @@ handle_command(struct Message *mptr, struct Client *client_p,
 	}
 
 	(*handler) (client_p, from, i, hpara);
-	if (!IsAnyDead(client_p) && IsCork(client_p))
+	if(!IsAnyDead(client_p) && IsCork(client_p))
 	{
-		if (last_warning + 300 <= rb_current_time())
+		if(last_warning + 300 <= rb_current_time())
 		{
-			sendto_realops_flags(UMODE_DEBUG, L_ALL, "Bug: client %s was left corked after command %s", client_p->name, mptr->cmd);
+			sendto_realops_flags(UMODE_DEBUG, L_ALL,
+					     "Bug: client %s was left corked after command %s",
+					     client_p->name, mptr->cmd);
 			last_warning = rb_current_time();
 		}
 		client_p->localClient->cork_count = 0;
@@ -391,7 +393,7 @@ handle_encap(struct Client *client_p, struct Client *source_p,
 	ehandler = mptr->handlers[ENCAP_HANDLER];
 	handler = ehandler.handler;
 
-	if(parc < ehandler.min_para || 
+	if(parc < ehandler.min_para ||
 	   (ehandler.min_para && EmptyString(parv[ehandler.min_para - 1])))
 		return;
 
@@ -436,7 +438,7 @@ mod_add_cmd(struct Message *msg)
 
 	msgindex = cmd_hash(msg->cmd);
 
-	for (ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
+	for(ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
 	{
 		if(strcasecmp(msg->cmd, ptr->cmd) == 0)
 			return;	/* Its already added */
@@ -478,7 +480,7 @@ mod_del_cmd(struct Message *msg)
 
 	msgindex = cmd_hash(msg->cmd);
 
-	for (ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
+	for(ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
 	{
 		if(strcasecmp(msg->cmd, ptr->cmd) == 0)
 		{
@@ -505,10 +507,10 @@ hash_parse(const char *cmd)
 {
 	struct MessageHash *ptr;
 	int msgindex;
-	
+
 	msgindex = cmd_hash(cmd);
 
-	for (ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
+	for(ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
 	{
 		if(strcasecmp(cmd, ptr->cmd) == 0)
 			return (ptr->msg);
@@ -531,13 +533,13 @@ cmd_hash(const char *p)
 {
 	uint32_t hash_val = 0, q = 1, n;
 
-	while (*p)
+	while(*p)
 	{
 		n = ToUpper(*p++);
 		hash_val += ((n) + (q++ << 1)) ^ ((n) << 2);
 	}
 	/* note that 9 comes from 2^9 = MAX_MSG_HASH */
-	return (hash_val >> (32 - 9)) ^ (hash_val & (MAX_MSG_HASH-1));
+	return (hash_val >> (32 - 9)) ^ (hash_val & (MAX_MSG_HASH - 1));
 }
 
 
@@ -559,8 +561,7 @@ cancel_clients(struct Client *client_p, struct Client *source_p)
 	{
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
 				     "Message for %s[%s] from %s",
-				     source_p->name, source_p->from->name,
-				     client_p->name);
+				     source_p->name, source_p->from->name, client_p->name);
 	}
 	else
 	{
@@ -568,9 +569,7 @@ cancel_clients(struct Client *client_p, struct Client *source_p)
 				     "Message for %s[%s@%s!%s] from %s (TS, ignored)",
 				     source_p->name,
 				     source_p->username,
-				     source_p->host,
-				     source_p->from->name,
-				     client_p->name);
+				     source_p->host, source_p->from->name, client_p->name);
 	}
 }
 
@@ -585,24 +584,22 @@ remove_unknown(struct Client *client_p, char *lsender, char *lbuffer)
 {
 	int slen = strlen(lsender);
 
-	/* meepfoo	is a nickname (KILL)
-	 * #XXXXXXXX	is a UID (KILL)
-	 * #XX		is a SID (SQUIT)
-	 * meep.foo	is a server (SQUIT)
+	/* meepfoo      is a nickname (KILL)
+	 * #XXXXXXXX    is a UID (KILL)
+	 * #XX          is a SID (SQUIT)
+	 * meep.foo     is a server (SQUIT)
 	 */
-	if((IsDigit(lsender[0]) && slen == 3) || 
-	   (strchr(lsender, '.') != NULL))
+	if((IsDigit(lsender[0]) && slen == 3) || (strchr(lsender, '.') != NULL))
 	{
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
 				     "Unknown prefix (%s) from %s, Squitting %s",
 				     lbuffer, client_p->name, lsender);
 
 		sendto_one(client_p, ":%s SQUIT %s :(Unknown prefix (%s) from %s)",
-			   get_id(&me, client_p), lsender, 
-			   lbuffer, client_p->name);
+			   get_id(&me, client_p), lsender, lbuffer, client_p->name);
 	}
 	else
-		sendto_one(client_p, ":%s KILL %s :%s (Unknown Client)", 
+		sendto_one(client_p, ":%s KILL %s :%s (Unknown Client)",
 			   get_id(&me, client_p), lsender, me.name);
 }
 
@@ -647,7 +644,7 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 		char *t = buffer;	/* Current position within the buffer */
 		int i;
 		int tl;		/* current length of presently being built string in t */
-		for (i = 2; i < (parc - 1); i++)
+		for(i = 2; i < (parc - 1); i++)
 		{
 			tl = rb_sprintf(t, " %s", parv[i]);
 			t += tl;
@@ -680,8 +677,7 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 			/* note, now we send PING on server connect, we can
 			 * also get ERR_NOSUCHSERVER..
 			 */
-			if(atoi(numeric) != ERR_NOSUCHNICK &&
-			   atoi(numeric) != ERR_NOSUCHSERVER)
+			if(atoi(numeric) != ERR_NOSUCHNICK && atoi(numeric) != ERR_NOSUCHSERVER)
 				sendto_realops_flags(UMODE_ALL, L_ADMIN,
 						     "*** %s(via %s) sent a %s numeric to me: %s",
 						     source_p->name,
@@ -701,9 +697,8 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 			return;
 
 		/* Fake it for server hiding, if its our client */
-		sendto_one(target_p, ":%s %s %s%s", 
-			   get_id(source_p, target_p), numeric, 
-			   get_id(target_p, target_p), buffer);
+		sendto_one(target_p, ":%s %s %s%s",
+			   get_id(source_p, target_p), numeric, get_id(target_p, target_p), buffer);
 		return;
 	}
 	else if((chptr = find_channel(parv[1])) != NULL)

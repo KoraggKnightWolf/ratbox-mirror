@@ -40,7 +40,7 @@ mapi_hfn_list_av1 whois_hfnlist[] = {
 DECLARE_MODULE_AV1(whois_spy, NULL, NULL, NULL, NULL, whois_hfnlist, "$Revision$");
 
 void
-show_whois(hook_data_client *data)
+show_whois(hook_data_client * data)
 {
 	struct Client *source_p = data->client;
 	struct Client *target_p = data->target;
@@ -50,9 +50,8 @@ show_whois(hook_data_client *data)
 	   (target_p->umodes & UMODE_SPY))
 	{
 		sendto_one(target_p,
-				":%s NOTICE %s :*** Notice -- %s (%s@%s) is doing a whois on you [%s]",
-				me.name, target_p->name, source_p->name,
-				source_p->username, source_p->host,
-				source_p->servptr->name);
+			   ":%s NOTICE %s :*** Notice -- %s (%s@%s) is doing a whois on you [%s]",
+			   me.name, target_p->name, source_p->name,
+			   source_p->username, source_p->host, source_p->servptr->name);
 	}
 }

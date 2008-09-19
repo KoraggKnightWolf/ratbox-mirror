@@ -42,7 +42,8 @@
 #include "modules.h"
 #include "s_newconf.h"
 
-static void do_whois(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
+static void do_whois(struct Client *client_p, struct Client *source_p, int parc,
+		     const char *parv[]);
 static void single_whois(struct Client *source_p, struct Client *target_p, int operspy);
 
 static int m_whois(struct Client *, struct Client *, int, const char **);
@@ -57,10 +58,11 @@ int doing_whois_hook;
 int doing_whois_global_hook;
 
 mapi_clist_av1 whois_clist[] = { &whois_msgtab, NULL };
+
 mapi_hlist_av1 whois_hlist[] = {
-	{ "doing_whois",	&doing_whois_hook },
-	{ "doing_whois_global",	&doing_whois_global_hook },
-	{ NULL, NULL }
+	{"doing_whois", &doing_whois_hook},
+	{"doing_whois_global", &doing_whois_global_hook},
+	{NULL, NULL}
 };
 
 DECLARE_MODULE_AV1(whois, NULL, NULL, whois_clist, whois_hlist, NULL, "$Revision$");
@@ -80,7 +82,7 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(EmptyString(parv[2]))
 		{
 			sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
-					me.name, source_p->name);
+				   me.name, source_p->name);
 			return 0;
 		}
 
@@ -91,7 +93,7 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 			{
 				sendto_one(source_p, form_str(RPL_LOAD2HI),
 					   me.name, source_p->name, "WHOIS");
-				sendto_one_numeric(source_p, RPL_ENDOFWHOIS, 
+				sendto_one_numeric(source_p, RPL_ENDOFWHOIS,
 						   form_str(RPL_ENDOFWHOIS), parv[1]);
 				return 0;
 			}
@@ -128,18 +130,16 @@ ms_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	 */
 	if(parc < 3 || EmptyString(parv[2]))
 	{
-		sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
-				me.name, source_p->name);
+		sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN), me.name, source_p->name);
 		return 0;
-	}  
-	
+	}
+
 
 	/* check if parv[1] exists */
 	if((target_p = find_client(parv[1])) == NULL)
 	{
 		sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
-				   form_str(ERR_NOSUCHSERVER), 
-				   IsDigit(parv[1][0]) ? "*" : parv[1]);
+				   form_str(ERR_NOSUCHSERVER), IsDigit(parv[1][0]) ? "*" : parv[1]);
 		return 0;
 	}
 
@@ -148,9 +148,8 @@ ms_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	 */
 	if(!MyClient(target_p) && !IsMe(target_p))
 	{
-		sendto_one(target_p, ":%s WHOIS %s :%s", 
-			   get_id(source_p, target_p), 
-			   get_id(target_p, target_p), parv[2]);
+		sendto_one(target_p, ":%s WHOIS %s :%s",
+			   get_id(source_p, target_p), get_id(target_p, target_p), parv[2]);
 		return 0;
 	}
 
@@ -200,8 +199,8 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 			char buffer[BUFSIZE];
 
 			rb_snprintf(buffer, sizeof(buffer), "%s!%s@%s %s",
-				target_p->name, target_p->username,
-				target_p->host, target_p->servptr->name);
+				    target_p->name, target_p->username,
+				    target_p->host, target_p->servptr->name);
 			report_operspy(source_p, "WHOIS", buffer);
 		}
 
@@ -209,11 +208,9 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 	else
 		sendto_one_numeric(source_p, ERR_NOSUCHNICK,
-				   form_str(ERR_NOSUCHNICK), 
-				   IsDigit(*nick) ? "*" : parv[1]);
+				   form_str(ERR_NOSUCHNICK), IsDigit(*nick) ? "*" : parv[1]);
 	ClearCork(source_p);
-	sendto_one_numeric(source_p, RPL_ENDOFWHOIS, 
-			   form_str(RPL_ENDOFWHOIS), parv[1]);
+	sendto_one_numeric(source_p, RPL_ENDOFWHOIS, form_str(RPL_ENDOFWHOIS), parv[1]);
 	return;
 }
 
@@ -258,28 +255,27 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 	a2client_p = target_p->servptr;
 
 	sendto_one_numeric(source_p, RPL_WHOISUSER, form_str(RPL_WHOISUSER),
-			   target_p->name, target_p->username, 
-			   target_p->host, target_p->info);
+			   target_p->name, target_p->username, target_p->host, target_p->info);
 
-	cur_len = mlen = rb_sprintf(buf, form_str(RPL_WHOISCHANNELS), 
-				    get_id(&me, source_p), get_id(source_p, source_p), 
+	cur_len = mlen = rb_sprintf(buf, form_str(RPL_WHOISCHANNELS),
+				    get_id(&me, source_p), get_id(source_p, source_p),
 				    target_p->name);
 	/* Make sure it won't overflow when sending it to the client
 	 * in full names; note that serverhiding may require more space
 	 * for a different server name (not done here) -- jilles */
-	if (!MyConnect(source_p))
+	if(!MyConnect(source_p))
 	{
 		extra_space = strlen(source_p->name) - 9;
-		if (extra_space < 0)
+		if(extra_space < 0)
 			extra_space = 0;
-		extra_space += strlen(me.name) - 2; /* make sure >= 0 */
+		extra_space += strlen(me.name) - 2;	/* make sure >= 0 */
 		cur_len += extra_space;
 	}
 
 	t = buf + mlen;
 
 #ifdef ENABLE_SERVICES
-	if (!IsService(target_p))
+	if(!IsService(target_p))
 #endif
 	{
 		RB_DLINK_FOREACH(ptr, target_p->user->channel.head)
@@ -299,9 +295,8 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 				}
 
 				tlen = rb_sprintf(t, "%s%s%s ",
-						visible ? "" : "!",
-						find_channel_status(msptr, 1),
-						chptr->chname);
+						  visible ? "" : "!",
+						  find_channel_status(msptr, 1), chptr->chname);
 				t += tlen;
 				cur_len += tlen;
 			}
@@ -324,15 +319,14 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 		sendto_one_numeric(source_p, RPL_WHOISOPERATOR, form_str(RPL_WHOISOPERATOR),
 				   target_p->name,
 				   IsAdmin(target_p) ? GlobalSetOptions.adminstring :
-				    GlobalSetOptions.operstring);
+				   GlobalSetOptions.operstring);
 	}
 
 	if(MyClient(target_p))
 	{
 		if(IsSSL(target_p))
 			sendto_one_numeric(source_p, RPL_WHOISSECURE,
-					form_str(RPL_WHOISSECURE),
-					target_p->name);
+					   form_str(RPL_WHOISSECURE), target_p->name);
 
 		if(ConfigFileEntry.use_whois_actually && show_ip(source_p, target_p))
 			sendto_one_numeric(source_p, RPL_WHOISACTUALLY,
@@ -340,8 +334,8 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 					   target_p->name, target_p->sockhost);
 
 		sendto_one_numeric(source_p, RPL_WHOISIDLE, form_str(RPL_WHOISIDLE),
-				   target_p->name, 
-				   rb_current_time() - target_p->localClient->last, 
+				   target_p->name,
+				   rb_current_time() - target_p->localClient->last,
 				   target_p->localClient->firsttime);
 	}
 	else
@@ -352,9 +346,9 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 			sendto_one_numeric(source_p, RPL_WHOISACTUALLY,
 					   form_str(RPL_WHOISACTUALLY),
 					   target_p->name, target_p->sockhost);
-			
+
 		}
-	
+
 	}
 
 	send_pop_queue(source_p);
@@ -374,4 +368,3 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 
 	return;
 }
-

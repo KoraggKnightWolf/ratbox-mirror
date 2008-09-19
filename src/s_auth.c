@@ -95,7 +95,7 @@ ReportType;
 static rb_dlink_list auth_poll_list;
 static rb_bh *auth_heap;
 static EVH timeout_auth_queries_event;
-static void read_auth(rb_fde_t * F, void *data);
+static void read_auth(rb_fde_t *F, void *data);
 
 
 /*
@@ -213,7 +213,7 @@ auth_error(struct AuthRequest *auth)
 
 
 static void
-auth_connect_callback(rb_fde_t * F, int status, void *data)
+auth_connect_callback(rb_fde_t *F, int status, void *data)
 {
 	struct AuthRequest *auth = data;
 	char authbuf[32];
@@ -266,8 +266,10 @@ start_auth_query(struct AuthRequest *auth)
 
 	if((auth->authF = rb_socket(family, SOCK_STREAM, 0, "ident")) == NULL)
 	{
-		sendto_realops_flags(UMODE_DEBUG, L_ALL, "Error creating auth stream socket: %s", strerror(errno));
-		ilog(L_IOERROR, "creating auth stream socket %s: %s", auth->client->sockhost, strerror(errno));
+		sendto_realops_flags(UMODE_DEBUG, L_ALL, "Error creating auth stream socket: %s",
+				     strerror(errno));
+		ilog(L_IOERROR, "creating auth stream socket %s: %s", auth->client->sockhost,
+		     strerror(errno));
 		auth_error(auth);
 		return;
 	}
@@ -276,23 +278,24 @@ start_auth_query(struct AuthRequest *auth)
 #ifdef RB_IPV6
 	if(family == AF_INET6)
 	{
-		auth->lport = ntohs(((struct sockaddr_in6 *) localaddr)->sin6_port);
-		auth->rport = ntohs(((struct sockaddr_in6 *) remoteaddr)->sin6_port);
-		((struct sockaddr_in6 *) &bindaddr)->sin6_port = 0;
-		((struct sockaddr_in6 *) &destaddr)->sin6_port = htons(113);
+		auth->lport = ntohs(((struct sockaddr_in6 *)localaddr)->sin6_port);
+		auth->rport = ntohs(((struct sockaddr_in6 *)remoteaddr)->sin6_port);
+		((struct sockaddr_in6 *)&bindaddr)->sin6_port = 0;
+		((struct sockaddr_in6 *)&destaddr)->sin6_port = htons(113);
 
 	}
 	else
 #endif
 	{
-		auth->lport = ntohs(((struct sockaddr_in *) localaddr)->sin_port);
-		auth->rport = ntohs(((struct sockaddr_in *) remoteaddr)->sin_port);
-		((struct sockaddr_in *) &bindaddr)->sin_port = 0;
-		((struct sockaddr_in *) &destaddr)->sin_port = htons(113);
+		auth->lport = ntohs(((struct sockaddr_in *)localaddr)->sin_port);
+		auth->rport = ntohs(((struct sockaddr_in *)remoteaddr)->sin_port);
+		((struct sockaddr_in *)&bindaddr)->sin_port = 0;
+		((struct sockaddr_in *)&destaddr)->sin_port = htons(113);
 	}
 
-	rb_connect_tcp(auth->authF, (struct sockaddr *) &destaddr, (struct sockaddr *) &bindaddr,
-		       GET_SS_LEN(&destaddr), auth_connect_callback, auth, GlobalSetOptions.ident_timeout);
+	rb_connect_tcp(auth->authF, (struct sockaddr *)&destaddr, (struct sockaddr *)&bindaddr,
+		       GET_SS_LEN(&destaddr), auth_connect_callback, auth,
+		       GlobalSetOptions.ident_timeout);
 
 	return;
 }
@@ -388,7 +391,9 @@ start_auth(struct Client *client)
 	else
 		ClearAuth(auth);
 
-	auth->dns_query = lookup_ip(client->sockhost, GET_SS_FAMILY(&client->localClient->ip), auth_dns_callback, auth);
+	auth->dns_query =
+		lookup_ip(client->sockhost, GET_SS_FAMILY(&client->localClient->ip),
+			  auth_dns_callback, auth);
 }
 
 /*
@@ -439,7 +444,7 @@ timeout_auth_queries_event(void *notused)
 
 #define AUTH_BUFSIZ 128
 static void
-read_auth(rb_fde_t * F, void *data)
+read_auth(rb_fde_t *F, void *data)
 {
 	struct AuthRequest *auth = data;
 	char *s = NULL, *t;
@@ -501,7 +506,8 @@ void
 delete_auth_queries(struct Client *target_p)
 {
 	struct AuthRequest *auth;
-	if(target_p == NULL || target_p->localClient == NULL || target_p->localClient->auth_request == NULL)
+	if(target_p == NULL || target_p->localClient == NULL
+	   || target_p->localClient->auth_request == NULL)
 		return;
 	auth = target_p->localClient->auth_request;
 	target_p->localClient->auth_request = NULL;

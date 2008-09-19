@@ -62,12 +62,14 @@ struct Message privmsg_msgtab = {
 	"PRIVMSG", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{mg_unreg, {m_privmsg, 0}, {m_privmsg, 0}, mg_ignore, mg_ignore, {m_privmsg, 0}}
 };
+
 struct Message notice_msgtab = {
 	"NOTICE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, {m_notice, 0}, {m_notice, 0}, {m_notice, 0}, mg_ignore, {m_notice, 0}}
 };
 
 mapi_clist_av1 message_clist[] = { &privmsg_msgtab, &notice_msgtab, NULL };
+
 DECLARE_MODULE_AV1(message, modinit, moddeinit, message_clist, NULL, NULL, "$Revision$");
 
 struct entity
@@ -82,8 +84,7 @@ static int build_target_list(int p_or_n, const char *command,
 			     struct Client *source_p, const char *nicks_channels, const char *text);
 
 static int flood_attack_client(int p_or_n, struct Client *source_p, struct Client *target_p);
-static int flood_attack_channel(int p_or_n, struct Client *source_p,
-				struct Channel *chptr);
+static int flood_attack_channel(int p_or_n, struct Client *source_p, struct Channel *chptr);
 static struct Client *find_userhost(const char *, const char *, int *);
 
 #define ENTITY_NONE    0
@@ -109,7 +110,8 @@ static void msg_client(int p_or_n, const char *command,
 		       struct Client *source_p, struct Client *target_p, const char *text);
 
 static void handle_special(const char *command,
-			 struct Client *client_p, struct Client *source_p, const char *nick, const char *text);
+			   struct Client *client_p, struct Client *source_p, const char *nick,
+			   const char *text);
 
 /*
 ** m_privmsg
@@ -177,8 +179,7 @@ m_message(int p_or_n,
 	/* Finish the flood grace period if theyre not messaging themselves
 	 * as some clients (ircN) do this as a "lag check"
 	 */
-	if(MyClient(source_p) && !IsFloodDone(source_p) &&
-	   irccmp(source_p->name, parv[1]))
+	if(MyClient(source_p) && !IsFloodDone(source_p) && irccmp(source_p->name, parv[1]))
 		flood_endgrace(source_p);
 
 	if(build_target_list(p_or_n, command, client_p, source_p, parv[1], parv[2]) < 0)
@@ -186,24 +187,24 @@ m_message(int p_or_n,
 		return 0;
 	}
 
-	for (i = 0; i < ntargets; i++)
+	for(i = 0; i < ntargets; i++)
 	{
 		switch (targets[i].type)
 		{
 		case ENTITY_CHANNEL:
 			msg_channel(p_or_n, command, client_p, source_p,
-				    (struct Channel *) targets[i].ptr, parv[2]);
+				    (struct Channel *)targets[i].ptr, parv[2]);
 			break;
 
 		case ENTITY_CHANOPS_ON_CHANNEL:
 			msg_channel_flags(p_or_n, command, client_p, source_p,
-					  (struct Channel *) targets[i].ptr,
+					  (struct Channel *)targets[i].ptr,
 					  targets[i].flags, parv[2]);
 			break;
 
 		case ENTITY_CLIENT:
 			msg_client(p_or_n, command, source_p,
-				   (struct Client *) targets[i].ptr, parv[2]);
+				   (struct Client *)targets[i].ptr, parv[2]);
 			break;
 		}
 	}
@@ -242,7 +243,7 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 
 	ntargets = 0;
 
-	for (nick = rb_strtok_r(target_list, ",", &p); nick; nick = rb_strtok_r(NULL, ",", &p))
+	for(nick = rb_strtok_r(target_list, ",", &p); nick; nick = rb_strtok_r(NULL, ",", &p))
 	{
 		char *with_prefix;
 		/*
@@ -266,7 +267,7 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 							   me.name, source_p->name, nick);
 						return (1);
 					}
-					targets[ntargets].ptr = (void *) chptr;
+					targets[ntargets].ptr = (void *)chptr;
 					targets[ntargets++].type = ENTITY_CHANNEL;
 				}
 			}
@@ -295,7 +296,7 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 						   me.name, source_p->name, nick);
 					return (1);
 				}
-				targets[ntargets].ptr = (void *) target_p;
+				targets[ntargets].ptr = (void *)target_p;
 				targets[ntargets].type = ENTITY_CLIENT;
 				targets[ntargets++].flags = 0;
 			}
@@ -307,7 +308,7 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 		type = 0;
 		with_prefix = nick;
 		/*  allow %+@ if someone wants to do that */
-		for (;;)
+		for(;;)
 		{
 			if(*nick == '@')
 				type |= CHFL_CHANOP;
@@ -353,7 +354,7 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 							   me.name, source_p->name, nick);
 						return (1);
 					}
-					targets[ntargets].ptr = (void *) chptr;
+					targets[ntargets].ptr = (void *)chptr;
 					targets[ntargets].type = ENTITY_CHANOPS_ON_CHANNEL;
 					targets[ntargets++].flags = type;
 				}
@@ -381,9 +382,9 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 			 */
 			if(!MyClient(source_p) && IsDigit(*nick))
 				sendto_one(source_p, ":%s %d %s * :Target left IRC. "
-						"Failed to deliver: [%.20s]",
-						get_id(&me, source_p), ERR_NOSUCHNICK,
-						get_id(source_p, source_p), text);
+					   "Failed to deliver: [%.20s]",
+					   get_id(&me, source_p), ERR_NOSUCHNICK,
+					   get_id(source_p, source_p), text);
 			else
 				sendto_one_numeric(source_p, ERR_NOSUCHNICK,
 						   form_str(ERR_NOSUCHNICK), nick);
@@ -407,7 +408,7 @@ static int
 duplicate_ptr(void *ptr)
 {
 	int i;
-	for (i = 0; i < ntargets; i++)
+	for(i = 0; i < ntargets; i++)
 		if(targets[i].ptr == ptr)
 			return YES;
 	return NO;
@@ -426,7 +427,8 @@ duplicate_ptr(void *ptr)
  */
 static void
 msg_channel(int p_or_n, const char *command,
-	    struct Client *client_p, struct Client *source_p, struct Channel *chptr, const char *text)
+	    struct Client *client_p, struct Client *source_p, struct Channel *chptr,
+	    const char *text)
 {
 	int result;
 
@@ -440,12 +442,10 @@ msg_channel(int p_or_n, const char *command,
 	/* chanops and voiced can flood their own channel with impunity */
 	if((result = can_send(chptr, source_p, NULL)))
 	{
-		if(result == CAN_SEND_OPV ||
-		   !flood_attack_channel(p_or_n, source_p, chptr))
+		if(result == CAN_SEND_OPV || !flood_attack_channel(p_or_n, source_p, chptr))
 		{
-			sendto_channel_flags(client_p, ALL_MEMBERS, source_p, chptr, 
-					      "%s %s :%s",
-					      command, chptr->chname, text);
+			sendto_channel_flags(client_p, ALL_MEMBERS, source_p, chptr,
+					     "%s %s :%s", command, chptr->chname, text);
 		}
 	}
 	else
@@ -535,8 +535,7 @@ add_target(struct Client *source_p, struct Client *target_p)
 	{
 		/* hunt for an existing target */
 		for(i = PREV_FREE_TARGET(source_p), j = USED_TARGETS(source_p);
-			j;
-			--j, PREV_TARGET(i))
+		    j; --j, PREV_TARGET(i))
 		{
 			if(source_p->localClient->targets[i] == target_p)
 				return 1;
@@ -615,7 +614,7 @@ msg_client(int p_or_n, const char *command,
 			if(!add_target(source_p, target_p))
 			{
 				sendto_one(source_p, form_str(ERR_TARGCHANGE),
-						me.name, source_p->name, target_p->name);
+					   me.name, source_p->name, target_p->name);
 				return;
 			}
 		}
@@ -623,9 +622,8 @@ msg_client(int p_or_n, const char *command,
 	else if(source_p->from == target_p->from)
 	{
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
-				"Send message to %s[%s] dropped from %s(Fake Dir)",
-				target_p->name, target_p->from->name,
-				source_p->name);
+				     "Send message to %s[%s] dropped from %s(Fake Dir)",
+				     target_p->name, target_p->from->name, source_p->name);
 		return;
 	}
 
@@ -668,10 +666,11 @@ msg_client(int p_or_n, const char *command,
 						   me.name, target_p->name, source_p->name,
 						   source_p->username, source_p->host);
 
-					target_p->localClient->last_caller_id_time = rb_current_time();
+					target_p->localClient->last_caller_id_time =
+						rb_current_time();
 				}
 				/* Only so opers can watch for floods */
-				(void) flood_attack_client(p_or_n, source_p, target_p);
+				(void)flood_attack_client(p_or_n, source_p, target_p);
 			}
 		}
 		else
@@ -683,8 +682,7 @@ msg_client(int p_or_n, const char *command,
 			 * and flooding    -- fl */
 			if(!MyClient(source_p) || IsOper(source_p) ||
 			   !flood_attack_client(p_or_n, source_p, target_p))
-				sendto_anywhere(target_p, source_p, command,
-						":%s", text);
+				sendto_anywhere(target_p, source_p, command, ":%s", text);
 		}
 	}
 	else if(!MyClient(source_p) || IsOper(source_p) ||
@@ -712,7 +710,8 @@ flood_attack_client(int p_or_n, struct Client *source_p, struct Client *target_p
 	{
 		if((target_p->localClient->first_received_message_time + 1) < rb_current_time())
 		{
-			delta = rb_current_time() - target_p->localClient->first_received_message_time;
+			delta = rb_current_time() -
+				target_p->localClient->first_received_message_time;
 			target_p->localClient->received_number_of_privmsgs -= delta;
 			target_p->localClient->first_received_message_time = rb_current_time();
 			if(target_p->localClient->received_number_of_privmsgs <= 0)
@@ -824,7 +823,7 @@ flood_attack_channel(int p_or_n, struct Client *source_p, struct Channel *chptr)
  */
 static void
 handle_special(const char *command, struct Client *client_p,
-	     struct Client *source_p, const char *nick, const char *text)
+	       struct Client *source_p, const char *nick, const char *text)
 {
 	struct Client *target_p;
 	char *host;
@@ -840,7 +839,7 @@ handle_special(const char *command, struct Client *client_p,
 	{
 		if((target_p = find_server(source_p, server + 1)) == NULL)
 		{
-			sendto_one_numeric(source_p, ERR_NOSUCHSERVER, 
+			sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
 					   form_str(ERR_NOSUCHSERVER), server + 1);
 			return;
 		}
@@ -851,7 +850,7 @@ handle_special(const char *command, struct Client *client_p,
 		{
 			if(strchr(nick, '%') || (strncmp(nick, "opers", 5) == 0))
 			{
-				sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
+				sendto_one_numeric(source_p, ERR_NOSUCHNICK,
 						   form_str(ERR_NOSUCHNICK), nick);
 				return;
 			}
@@ -860,9 +859,8 @@ handle_special(const char *command, struct Client *client_p,
 		/* somewhere else.. */
 		if(!IsMe(target_p))
 		{
-			sendto_one(target_p, ":%s %s %s :%s", 
-				   get_id(source_p, target_p), 
-				   command, nick, text);
+			sendto_one(target_p, ":%s %s %s :%s",
+				   get_id(source_p, target_p), command, nick, text);
 			return;
 		}
 
@@ -894,12 +892,10 @@ handle_special(const char *command, struct Client *client_p,
 				*--host = '%';
 
 			if(count == 1)
-				sendto_anywhere(target_p, source_p, command, 
-						":%s", text);
+				sendto_anywhere(target_p, source_p, command, ":%s", text);
 			else
 				sendto_one(source_p, form_str(ERR_TOOMANYTARGETS),
-					   get_id(&me, source_p),
-					   get_id(source_p, source_p), nick);
+					   get_id(&me, source_p), get_id(source_p, source_p), nick);
 		}
 	}
 
@@ -927,7 +923,7 @@ handle_special(const char *command, struct Client *client_p,
 					   form_str(ERR_NOTOPLEVEL), nick);
 			return;
 		}
-		while (*++s)
+		while(*++s)
 			if(*s == '.' || *s == '*' || *s == '?')
 				break;
 		if(*s == '*' || *s == '?')
@@ -970,8 +966,7 @@ find_userhost(const char *user, const char *host, int *count)
 			c2ptr = ptr->data;
 			if(!MyClient(c2ptr))	/* implies mine and an user */
 				continue;
-			if((!host || match(host, c2ptr->host)) &&
-			   irccmp(u, c2ptr->username) == 0)
+			if((!host || match(host, c2ptr->host)) && irccmp(u, c2ptr->username) == 0)
 			{
 				(*count)++;
 				res = c2ptr;

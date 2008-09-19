@@ -42,7 +42,7 @@
 
 static int m_links(struct Client *, struct Client *, int, const char **);
 static int mo_links(struct Client *, struct Client *, int, const char **);
-static char * clean_string(char *dest, const unsigned char *src, size_t len);
+static char *clean_string(char *dest, const unsigned char *src, size_t len);
 
 struct Message links_msgtab = {
 	"LINKS", 0, 0, 0, MFLG_SLOW,
@@ -52,9 +52,10 @@ struct Message links_msgtab = {
 int doing_links_hook;
 
 mapi_clist_av1 links_clist[] = { &links_msgtab, NULL };
+
 mapi_hlist_av1 links_hlist[] = {
-	{ "doing_links",	&doing_links_hook },
-	{ NULL, NULL }
+	{"doing_links", &doing_links_hook},
+	{NULL, NULL}
 };
 
 DECLARE_MODULE_AV1(links, NULL, NULL, links_clist, links_hlist, NULL, "$Revision$");
@@ -103,8 +104,7 @@ mo_links(struct Client *client_p, struct Client *source_p, int parc, const char 
 		mask = parv[1];
 
 	if(*mask)		/* only necessary if there is a mask */
-		mask = collapse(clean_string
-				(clean_mask, (const unsigned char *) mask, 2 * HOSTLEN));
+		mask = collapse(clean_string(clean_mask, (const unsigned char *)mask, 2 * HOSTLEN));
 
 	hd.client = source_p;
 	hd.arg1 = mask;
@@ -151,8 +151,7 @@ send_links_cache(struct Client *source_p)
 			   me.name, source_p->name, (const char *)ptr->data);
 	}
 
-	sendto_one_numeric(source_p, RPL_LINKS, form_str(RPL_LINKS), 
-			   me.name, me.name, 0, me.info);
+	sendto_one_numeric(source_p, RPL_LINKS, form_str(RPL_LINKS), me.name, me.name, 0, me.info);
 	ClearCork(source_p);
 	sendto_one_numeric(source_p, RPL_ENDOFLINKS, form_str(RPL_ENDOFLINKS), "*");
 }
@@ -169,7 +168,7 @@ clean_string(char *dest, const unsigned char *src, size_t len)
 
 	len -= 3;		/* allow for worst case, '^A\0' */
 
-	while (*src && (len > 0))
+	while(*src && (len > 0))
 	{
 		if(*src & 0x80)	/* if high bit is set */
 		{
@@ -190,4 +189,3 @@ clean_string(char *dest, const unsigned char *src, size_t len)
 	*d = '\0';
 	return dest;
 }
-

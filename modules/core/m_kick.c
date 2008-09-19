@@ -46,6 +46,7 @@ struct Message kick_msgtab = {
 };
 
 mapi_clist_av1 kick_clist[] = { &kick_msgtab, NULL };
+
 DECLARE_MODULE_AV1(kick, NULL, NULL, kick_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -80,8 +81,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	chptr = find_channel(name);
 	if(chptr == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-				   form_str(ERR_NOSUCHCHANNEL), name);
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL, form_str(ERR_NOSUCHCHANNEL), name);
 		return 0;
 	}
 
@@ -109,8 +109,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			if(chptr->channelts == 0)
 			{
 				sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-					   get_id(&me, source_p), 
-					   get_id(source_p, source_p), name);
+					   get_id(&me, source_p), get_id(source_p, source_p), name);
 				return 0;
 			}
 		}
@@ -155,8 +154,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		if(MyClient(source_p) && IsService(who))
 		{
 			sendto_one(source_p, form_str(ERR_ISCHANSERVICE),
-					me.name, source_p->name, who->name,
-					chptr->chname);
+				   me.name, source_p->name, who->name, chptr->chname);
 			return 0;
 		}
 #endif
@@ -180,18 +178,16 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 					     source_p->host, name, who->name, comment);
 
 		sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
-			      ":%s KICK %s %s :%s", 
-			      use_id(source_p), chptr->chname, 
-			      use_id(who), comment);
+			      ":%s KICK %s %s :%s",
+			      use_id(source_p), chptr->chname, use_id(who), comment);
 		sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
-			      ":%s KICK %s %s :%s", 
+			      ":%s KICK %s %s :%s",
 			      source_p->name, chptr->chname, who->name, comment);
 		remove_user_from_channel(msptr);
 	}
-	else if (MyClient(source_p))
+	else if(MyClient(source_p))
 		sendto_one_numeric(source_p, ERR_USERNOTINCHANNEL,
 				   form_str(ERR_USERNOTINCHANNEL), user, name);
 
 	return 0;
 }
-

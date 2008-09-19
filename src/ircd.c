@@ -88,9 +88,9 @@ rb_dlink_list global_client_list;
 /* unknown/client pointer lists */
 rb_dlink_list unknown_list;	/* unknown clients ON this server only */
 rb_dlink_list lclient_list;	/* local clients only ON this server */
-rb_dlink_list serv_list;		/* local servers to this server ONLY */
+rb_dlink_list serv_list;	/* local servers to this server ONLY */
 rb_dlink_list global_serv_list;	/* global servers on the network */
-rb_dlink_list oper_list;		/* our opers, duplicated in lclient_list */
+rb_dlink_list oper_list;	/* our opers, duplicated in lclient_list */
 
 static unsigned long initialVMTop = 0;	/* top of virtual memory at init */
 const char *logFileName = LPATH;
@@ -131,15 +131,14 @@ ircd_shutdown(const char *reason)
 		target_p = ptr->data;
 
 		sendto_one(target_p, ":%s NOTICE %s :Server Terminating. %s",
-			me.name, target_p->name, reason);
+			   me.name, target_p->name, reason);
 	}
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 
-		sendto_one(target_p, ":%s ERROR :Terminated by %s",
-			me.name, reason);
+		sendto_one(target_p, ":%s ERROR :Terminated by %s", me.name, reason);
 	}
 
 	ilog(L_MAIN, "Server Terminating. %s", reason);
@@ -167,7 +166,7 @@ get_vm_top(void)
 	 */
 #ifndef _WIN32
 	void *vptr = sbrk(0);
-	return (unsigned long) vptr;
+	return (unsigned long)vptr;
 #else
 	return -1;
 #endif
@@ -192,11 +191,9 @@ print_startup(int pid)
 	printf("ircd: pid %d\n", pid);
 #ifndef RATBOX_PROFILE
 	printf("ircd: running in %s mode from %s\n",
-	       !server_state_foreground ? "background" : "foreground",
-		ConfigFileEntry.dpath);
+	       !server_state_foreground ? "background" : "foreground", ConfigFileEntry.dpath);
 #else
-	printf("ircd: running in foreground mode from %s for profiling\n",
-			ConfigFileEntry.dpath);
+	printf("ircd: running in foreground mode from %s for profiling\n", ConfigFileEntry.dpath);
 #endif
 }
 
@@ -219,7 +216,9 @@ init_sys(void)
 		if(maxconnections <= MAX_BUFFER)
 		{
 			fprintf(stderr, "ERROR: Shell FD limits are too low.\n");
-			fprintf(stderr, "ERROR: ircd-ratbox reserves %d FDs, shell limits must be above this\n", MAX_BUFFER);
+			fprintf(stderr,
+				"ERROR: ircd-ratbox reserves %d FDs, shell limits must be above this\n",
+				MAX_BUFFER);
 			exit(EXIT_FAILURE);
 		}
 		return;
@@ -323,7 +322,8 @@ initialize_global_set_options(void)
 
 	GlobalSetOptions.maxclients = ServerInfo.default_max_clients;
 
-	if(GlobalSetOptions.maxclients > (maxconnections - MAX_BUFFER) || (GlobalSetOptions.maxclients <= 0))
+	if(GlobalSetOptions.maxclients > (maxconnections - MAX_BUFFER)
+	   || (GlobalSetOptions.maxclients <= 0))
 		GlobalSetOptions.maxclients = maxconnections - MAX_BUFFER;
 
 	GlobalSetOptions.autoconn = 1;
@@ -349,11 +349,9 @@ initialize_global_set_options(void)
 	GlobalSetOptions.ident_timeout = IDENT_TIMEOUT;
 
 	rb_strlcpy(GlobalSetOptions.operstring,
-		ConfigFileEntry.default_operstring,
-		sizeof(GlobalSetOptions.operstring));
+		   ConfigFileEntry.default_operstring, sizeof(GlobalSetOptions.operstring));
 	rb_strlcpy(GlobalSetOptions.adminstring,
-		ConfigFileEntry.default_adminstring,
-		sizeof(GlobalSetOptions.adminstring));
+		   ConfigFileEntry.default_adminstring, sizeof(GlobalSetOptions.adminstring));
 
 	/* memset( &ConfigChannel, 0, sizeof(ConfigChannel)); */
 
@@ -388,7 +386,7 @@ write_pidfile(const char *filename)
 	char buff[32];
 	if((fb = fopen(filename, "w")))
 	{
-		unsigned int pid = (unsigned int) getpid();
+		unsigned int pid = (unsigned int)getpid();
 
 		rb_snprintf(buff, sizeof(buff), "%u\n", pid);
 		if((fputs(buff, fb) == -1))
@@ -507,7 +505,7 @@ seed_with_urandom(void)
 static void
 seed_with_clock(void)
 {
- 	const struct timeval *tv;	
+	const struct timeval *tv;
 	rb_set_time();
 	tv = rb_current_time_tv();
 	srand(tv->tv_sec ^ (tv->tv_usec | (getpid() << 20)));
@@ -521,8 +519,8 @@ seed_random(void *unused)
 	{
 #ifndef _WIN32
 		if(!seed_with_urandom())
-#endif	
-		seed_with_clock();
+#endif
+			seed_with_clock();
 		return;
 	}
 	srand(seed);
@@ -559,7 +557,9 @@ ratbox_main(int argc, char *argv[])
 	r = read_config_file(configfile);
 	if(r > 0)
 	{
-		fprintf(stderr, "ERROR: Unable to start ircd: found %d syntax error(s) whlist loading config file.  Try running with -conftest\n", r);
+		fprintf(stderr,
+			"ERROR: Unable to start ircd: found %d syntax error(s) whlist loading config file.  Try running with -conftest\n",
+			r);
 		return 1;
 	}
 
@@ -567,16 +567,18 @@ ratbox_main(int argc, char *argv[])
 		fprintf(stderr, "Syntax OK, doing second pass...\n");
 
 
-	r = check_valid_entries();	
+	r = check_valid_entries();
 	if(r > 0)
 	{
-		fprintf(stderr, "ERROR: Unable to start ircd: found %d error(s) whilst loading config file.  Try running with -conftest\n", r);
+		fprintf(stderr,
+			"ERROR: Unable to start ircd: found %d error(s) whilst loading config file.  Try running with -conftest\n",
+			r);
 		return 1;
 	}
 
 	if(testing_conf)
 		fprintf(stderr, "Second pass reports OK\n");
-	
+
 	ConfigFileEntry.dpath = basedir;
 	ConfigFileEntry.configfile = configfile;	/* Server configuration file */
 
@@ -641,25 +643,25 @@ ratbox_main(int argc, char *argv[])
 	init_s_conf();
 	init_s_newconf();
 
-	
+
 
 #if defined(__CYGWIN__) || defined(_WIN32) || defined(RATBOX_PROFILE)
 	server_state_foreground = 1;
 #endif
 
 	if(ConfigServerHide.links_delay > 0)
-		rb_event_add("cache_links", cache_links, NULL,
-			    ConfigServerHide.links_delay);
+		rb_event_add("cache_links", cache_links, NULL, ConfigServerHide.links_delay);
 	else
 		ConfigServerHide.links_disabled = 1;
 
 	if(ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
 	{
 		rb_init_prng(ConfigFileEntry.egdpool_path, RB_PRNG_EGD);
-	} else
-	rb_init_prng(NULL, RB_PRNG_DEFAULT);
+	}
+	else
+		rb_init_prng(NULL, RB_PRNG_DEFAULT);
 	seed_random(NULL);
-	
+
 	init_main_logfile();
 	init_hash();
 	init_host_hash();
@@ -684,12 +686,12 @@ ratbox_main(int argc, char *argv[])
 	init_ssld();
 
 	load_conf_settings();
-		
+
 	rehash_bans(0);
 
 #ifndef STATIC_MODULES
-	mod_add_path(MODULE_DIR); 
-	mod_add_path(MODULE_DIR "/autoload"); 
+	mod_add_path(MODULE_DIR);
+	mod_add_path(MODULE_DIR "/autoload");
 #endif
 
 	initialize_server_capabs();	/* Set up default_server_capabs */
@@ -697,7 +699,7 @@ ratbox_main(int argc, char *argv[])
 
 	init_auth();		/* Initialise the auth code - depends on global set options */
 	rehash_dns_vhost();	/* load any vhost dns binds now */
-	
+
 	if(ServerInfo.name == NULL)
 	{
 		fprintf(stderr, "ERROR: No server name specified in serverinfo block.\n");
@@ -727,7 +729,8 @@ ratbox_main(int argc, char *argv[])
 	if(ServerInfo.ssl_cert != NULL && ServerInfo.ssl_private_key != NULL)
 	{
 		/* just do the rb_setup_ssl_server to validate the config */
-		if(!rb_setup_ssl_server(ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params))
+		if(!rb_setup_ssl_server
+		   (ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params))
 		{
 			ilog(L_MAIN, "WARNING: Unable to setup SSL.");
 			ircd_ssl_ok = 0;
@@ -736,7 +739,7 @@ ratbox_main(int argc, char *argv[])
 			ircd_ssl_ok = 1;
 	}
 
-	if (testing_conf)
+	if(testing_conf)
 	{
 		exit(conf_parse_failure ? 1 : 0);
 	}
@@ -766,11 +769,11 @@ ratbox_main(int argc, char *argv[])
 	rb_event_addish("try_connections", try_connections, NULL, STARTUP_CONNECTIONS_TIME);
 	rb_event_addonce("try_connections_startup", try_connections, NULL, 2);
 	rb_event_add("check_rehash", check_rehash, NULL, 3);
-	rb_event_addish("reseed_srand", seed_random, NULL, 300); /* reseed every 10 minutes */
+	rb_event_addish("reseed_srand", seed_random, NULL, 300);	/* reseed every 10 minutes */
 
 	if(splitmode)
 		rb_event_add("check_splitmode", check_splitmode, NULL, 5);
 
-	rb_lib_loop(0); /* we'll never return from here */
+	rb_lib_loop(0);		/* we'll never return from here */
 	return 0;
 }

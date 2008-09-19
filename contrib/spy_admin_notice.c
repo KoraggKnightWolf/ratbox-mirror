@@ -40,7 +40,7 @@ mapi_hfn_list_av1 admin_hfnlist[] = {
 DECLARE_MODULE_AV1(admin_spy, NULL, NULL, NULL, NULL, admin_hfnlist, "$Revision$");
 
 void
-show_admin(hook_data *data)
+show_admin(hook_data * data)
 {
 	sendto_realops_flags(UMODE_SPY, L_ALL,
 			     "admin requested by %s (%s@%s) [%s]",

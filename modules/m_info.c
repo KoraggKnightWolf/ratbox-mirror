@@ -54,9 +54,10 @@ struct Message info_msgtab = {
 int doing_info_hook;
 
 mapi_clist_av1 info_clist[] = { &info_msgtab, NULL };
+
 mapi_hlist_av1 info_hlist[] = {
-	{ "doing_info",		&doing_info_hook },
-	{ NULL, NULL }
+	{"doing_info", &doing_info_hook},
+	{NULL, NULL}
 };
 
 DECLARE_MODULE_AV1(info, NULL, NULL, info_clist, info_hlist, NULL, "$Revision$");
@@ -68,7 +69,8 @@ struct InfoStruct
 {
 	const char *name;	/* Displayed variable name */
 	unsigned int output_type;	/* See below #defines */
-	union {
+	union
+	{
 		const void *ptr;
 		int decimal;
 		const int *decimal_ptr;
@@ -96,8 +98,8 @@ struct InfoStruct
 
 #if !defined(CPATH) || !defined(DPATH) || !defined(HPATH) || \
     !defined(UHPATH) || !defined(LPATH) || !defined(MPATH) || \
-    !defined(OPATH) || !defined(SPATH) 
-static const char *none = "NONE"; /* because we don't need a bunch of NONEs in the executables */
+    !defined(OPATH) || !defined(SPATH)
+static const char *none = "NONE";	/* because we don't need a bunch of NONEs in the executables */
 #endif
 
 #ifndef CPATH
@@ -108,7 +110,7 @@ static const char *none = "NONE"; /* because we don't need a bunch of NONEs in t
 #define DPATH none
 #endif
 
-#ifndef HPATH 
+#ifndef HPATH
 #define HPATH none
 #endif
 
@@ -855,8 +857,7 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
-		sendto_one(source_p, form_str(RPL_LOAD2HI),
-			   me.name, source_p->name, "INFO");
+		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "INFO");
 		sendto_one_numeric(source_p, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
 		return 0;
 	}
@@ -912,7 +913,7 @@ send_info_text(struct Client *source_p)
 {
 	const char **text = infotext;
 
-	while (*text)
+	while(*text)
 	{
 		sendto_one_numeric(source_p, RPL_INFO, form_str(RPL_INFO), *text++);
 	}
@@ -930,13 +931,13 @@ send_info_text(struct Client *source_p)
 static void
 send_birthdate_online_time(struct Client *source_p)
 {
-	char tbuf[26]; /* this needs to be 26 - see ctime_r manpage */
+	char tbuf[26];		/* this needs to be 26 - see ctime_r manpage */
 	sendto_one(source_p, ":%s %d %s :Birth Date: %s, compile # %s",
-		   get_id(&me, source_p), RPL_INFO, 
+		   get_id(&me, source_p), RPL_INFO,
 		   get_id(source_p, source_p), creation, generation);
 
 	sendto_one(source_p, ":%s %d %s :On-line since %s",
-		   get_id(&me, source_p), RPL_INFO, 
+		   get_id(&me, source_p), RPL_INFO,
 		   get_id(source_p, source_p), rb_ctime(startup_time, tbuf, sizeof(tbuf)));
 }
 
@@ -955,7 +956,7 @@ send_conf_options(struct Client *source_p)
 	/*
 	 * Parse the info_table[] and do the magic.
 	 */
-	for (i = 0; info_table[i].name; i++)
+	for(i = 0; info_table[i].name; i++)
 	{
 		switch (info_table[i].output_type)
 		{
@@ -1090,31 +1091,27 @@ send_conf_options(struct Client *source_p)
 			}
 
 		case OUTPUT_BOOLEAN2:
-		{
-			int option = *info_table[i].option.decimal_ptr;
+			{
+				int option = *info_table[i].option.decimal_ptr;
 
-			sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
-				   me.name, RPL_INFO, source_p->name,
-				   info_table[i].name,
-				   option ? ((option == 1) ? "MASK" : "YES") : "NO",
-				   info_table[i].desc ? info_table[i].desc : "<none>");
-		}		/* switch (info_table[i].output_type) */
+				sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
+					   me.name, RPL_INFO, source_p->name,
+					   info_table[i].name,
+					   option ? ((option == 1) ? "MASK" : "YES") : "NO",
+					   info_table[i].desc ? info_table[i].desc : "<none>");
+			}	/* switch (info_table[i].output_type) */
 		}
 	}			/* forloop */
 
 	sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
-					   get_id(&me, source_p), RPL_INFO,
-					   get_id(source_p, source_p),
-					   "io_type",
-					   rb_get_iotype(),
-					   "Method of Multiplexed I/O");
-	sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]", 
-					   get_id(&me, source_p), RPL_INFO,
-					   get_id(source_p, source_p),
-					   "libratbox",
-					   rb_lib_version(),
-					   "Version of libratbox the ircd is using");
-	
+		   get_id(&me, source_p), RPL_INFO,
+		   get_id(source_p, source_p),
+		   "io_type", rb_get_iotype(), "Method of Multiplexed I/O");
+	sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
+		   get_id(&me, source_p), RPL_INFO,
+		   get_id(source_p, source_p),
+		   "libratbox", rb_lib_version(), "Version of libratbox the ircd is using");
+
 	/* Don't send oper_only_umodes...it's a bit mask, we will have to decode it
 	 ** in order for it to show up properly to opers who issue INFO
 	 */
@@ -1138,6 +1135,3 @@ info_spy(struct Client *source_p)
 
 	call_hook(doing_info_hook, &hd);
 }
-
-
-

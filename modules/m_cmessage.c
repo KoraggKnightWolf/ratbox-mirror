@@ -52,12 +52,14 @@ struct Message cprivmsg_msgtab = {
 	"CPRIVMSG", 0, 0, 0, MFLG_SLOW,
 	{mg_ignore, {m_cprivmsg, 4}, mg_ignore, mg_ignore, mg_ignore, {m_cprivmsg, 4}}
 };
+
 struct Message cnotice_msgtab = {
 	"CNOTICE", 0, 0, 0, MFLG_SLOW,
 	{mg_ignore, {m_cnotice, 4}, mg_ignore, mg_ignore, mg_ignore, {m_cnotice, 4}}
 };
 
 mapi_clist_av1 cmessage_clist[] = { &cprivmsg_msgtab, &cnotice_msgtab, NULL };
+
 DECLARE_MODULE_AV1(cmessage, NULL, NULL, cmessage_clist, NULL, NULL, "$Revision$");
 
 #define PRIVMSG 0
@@ -77,7 +79,7 @@ m_cnotice(struct Client *client_p, struct Client *source_p, int parc, const char
 
 static int
 m_cmessage(int p_or_n, const char *command,
-		struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
+	   struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 	struct Channel *chptr;
@@ -90,7 +92,7 @@ m_cmessage(int p_or_n, const char *command,
 	{
 		if(p_or_n != NOTICE)
 			sendto_one_numeric(source_p, ERR_NOSUCHNICK,
-					form_str(ERR_NOSUCHNICK), parv[1]);
+					   form_str(ERR_NOSUCHNICK), parv[1]);
 		return 0;
 	}
 
@@ -98,7 +100,7 @@ m_cmessage(int p_or_n, const char *command,
 	{
 		if(p_or_n != NOTICE)
 			sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-					form_str(ERR_NOSUCHCHANNEL), parv[2]);
+					   form_str(ERR_NOSUCHCHANNEL), parv[2]);
 		return 0;
 	}
 
@@ -106,8 +108,7 @@ m_cmessage(int p_or_n, const char *command,
 	{
 		if(p_or_n != NOTICE)
 			sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
-					form_str(ERR_NOTONCHANNEL), 
-					chptr->chname);
+					   form_str(ERR_NOTONCHANNEL), chptr->chname);
 		return 0;
 	}
 
@@ -115,7 +116,7 @@ m_cmessage(int p_or_n, const char *command,
 	{
 		if(p_or_n != NOTICE)
 			sendto_one(source_p, form_str(ERR_VOICENEEDED),
-				me.name, source_p->name, chptr->chname);
+				   me.name, source_p->name, chptr->chname);
 		return 0;
 	}
 
@@ -123,8 +124,8 @@ m_cmessage(int p_or_n, const char *command,
 	{
 		if(p_or_n != NOTICE)
 			sendto_one_numeric(source_p, ERR_USERNOTINCHANNEL,
-					form_str(ERR_USERNOTINCHANNEL),
-					target_p->name, chptr->chname);
+					   form_str(ERR_USERNOTINCHANNEL),
+					   target_p->name, chptr->chname);
 		return 0;
 	}
 
@@ -133,19 +134,18 @@ m_cmessage(int p_or_n, const char *command,
 	{
 		if(p_or_n != NOTICE)
 			sendto_one_numeric(source_p, ERR_TARGUMODEG,
-					form_str(ERR_TARGUMODEG), target_p->name);
+					   form_str(ERR_TARGUMODEG), target_p->name);
 
 		if((target_p->localClient->last_caller_id_time +
 		    ConfigFileEntry.caller_id_wait) < rb_current_time())
 		{
 			if(p_or_n != NOTICE)
 				sendto_one_numeric(source_p, RPL_TARGNOTIFY,
-						form_str(RPL_TARGNOTIFY),
-						target_p->name);
+						   form_str(RPL_TARGNOTIFY), target_p->name);
 
 			sendto_one(target_p, form_str(RPL_UMODEGMSG),
-				me.name, target_p->name, source_p->name,
-				source_p->username, source_p->host);
+				   me.name, target_p->name, source_p->name,
+				   source_p->username, source_p->host);
 
 			target_p->localClient->last_caller_id_time = rb_current_time();
 		}

@@ -45,6 +45,7 @@ static struct Message die_msgtab = {
 };
 
 mapi_clist_av1 die_clist[] = { &die_msgtab, NULL };
+
 DECLARE_MODULE_AV1(die, NULL, NULL, die_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -55,8 +56,7 @@ mo_die(struct Client *client_p __unused, struct Client *source_p, int parc, cons
 {
 	if(!IsOperDie(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "die");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "die");
 		return 0;
 	}
 

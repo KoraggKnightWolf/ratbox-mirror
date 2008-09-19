@@ -43,6 +43,7 @@ struct Message pass_msgtab = {
 };
 
 mapi_clist_av1 pass_clist[] = { &pass_msgtab, NULL };
+
 DECLARE_MODULE_AV1(pass, NULL, NULL, pass_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -60,8 +61,7 @@ mr_pass(struct Client *client_p, struct Client *source_p, int parc, const char *
 {
 	if(client_p->localClient->passwd)
 	{
-		memset(client_p->localClient->passwd, 0,
-			strlen(client_p->localClient->passwd));
+		memset(client_p->localClient->passwd, 0, strlen(client_p->localClient->passwd));
 		rb_free(client_p->localClient->passwd);
 	}
 

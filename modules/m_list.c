@@ -47,6 +47,7 @@ struct Message list_msgtab = {
 };
 
 mapi_clist_av1 list_clist[] = { &list_msgtab, NULL };
+
 DECLARE_MODULE_AV1(list, NULL, NULL, list_clist, NULL, NULL, "$Revision$");
 
 static void list_all_channels(struct Client *source_p);
@@ -62,13 +63,13 @@ m_list(struct Client *client_p, struct Client *source_p, int parc, const char *p
 {
 	static time_t last_used = 0L;
 
-	if (parc < 2 || !IsChannelName(parv[1]))
+	if(parc < 2 || !IsChannelName(parv[1]))
 	{
 		/* pace this due to the sheer traffic involved */
 		if(((last_used + ConfigFileEntry.pace_wait) > rb_current_time()))
 		{
 			sendto_one(source_p, form_str(RPL_LOAD2HI),
-					me.name, source_p->name, "LIST");
+				   me.name, source_p->name, "LIST");
 			sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
 			return 0;
 		}
@@ -119,13 +120,13 @@ list_all_channels(struct Client *source_p)
 	int sendq_limit;
 	int count = 0;
 	/* give them an output limit of 90% of their sendq. --fl */
-	sendq_limit = (int) get_sendq(source_p);
+	sendq_limit = (int)get_sendq(source_p);
 	sendq_limit /= 10;
 	sendq_limit *= 9;
-	
+
 	sendto_one(source_p, form_str(RPL_LISTSTART), me.name, source_p->name);
 	SetCork(source_p);
-	
+
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
 		chptr = ptr->data;
@@ -140,12 +141,12 @@ list_all_channels(struct Client *source_p)
 
 		if(SecretChannel(chptr) && !IsMember(source_p, chptr))
 			continue;
-		sendto_one(source_p, form_str(RPL_LIST), 
-			   me.name, source_p->name, chptr->chname, 
-			   rb_dlink_list_length(&chptr->members), 
+		sendto_one(source_p, form_str(RPL_LIST),
+			   me.name, source_p->name, chptr->chname,
+			   rb_dlink_list_length(&chptr->members),
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 
-		if(count++ >= 10) 
+		if(count++ >= 10)
 		{
 			ClearCork(source_p);
 			send_pop_queue(source_p);
@@ -154,7 +155,7 @@ list_all_channels(struct Client *source_p)
 		}
 	}
 	ClearCork(source_p);
-	sendto_one(source_p,form_str(RPL_LISTEND), me.name, source_p->name);
+	sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
 	return;
 }
 
@@ -198,13 +199,13 @@ list_limit_channels(struct Client *source_p, const char *param)
 	}
 
 	/* give them an output limit of 90% of their sendq. --fl */
-	sendq_limit = (unsigned int) get_sendq(source_p);
+	sendq_limit = (unsigned int)get_sendq(source_p);
 	sendq_limit /= 10;
 	sendq_limit *= 9;
 
 	sendto_one(source_p, form_str(RPL_LISTSTART), me.name, source_p->name);
 	SetCork(source_p);
-	
+
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
 		chptr = ptr->data;
@@ -224,12 +225,12 @@ list_limit_channels(struct Client *source_p, const char *param)
 		if(SecretChannel(chptr) && !IsMember(source_p, chptr))
 			continue;
 
-		sendto_one(source_p, form_str(RPL_LIST), 
-			   me.name, source_p->name, chptr->chname, 
-			   rb_dlink_list_length(&chptr->members), 
+		sendto_one(source_p, form_str(RPL_LIST),
+			   me.name, source_p->name, chptr->chname,
+			   rb_dlink_list_length(&chptr->members),
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 
-		if(count++ >= 10) 
+		if(count++ >= 10)
 		{
 			ClearCork(source_p);
 			send_pop_queue(source_p);
@@ -264,8 +265,7 @@ list_named_channel(struct Client *source_p, const char *name)
 
 	if(*n == '\0')
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
-				   form_str(ERR_NOSUCHNICK), name);
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK, form_str(ERR_NOSUCHNICK), name);
 		ClearCork(source_p);
 		sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
 		return;
@@ -283,7 +283,7 @@ list_named_channel(struct Client *source_p, const char *name)
 
 	if(ShowChannel(source_p, chptr))
 		sendto_one(source_p, form_str(RPL_LIST),
-			   me.name, source_p->name, chptr->chname, 
+			   me.name, source_p->name, chptr->chname,
 			   rb_dlink_list_length(&chptr->members),
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 

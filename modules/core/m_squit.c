@@ -47,6 +47,7 @@ struct Message squit_msgtab = {
 };
 
 mapi_clist_av1 squit_clist[] = { &squit_msgtab, NULL };
+
 DECLARE_MODULE_AV1(squit, NULL, NULL, squit_clist, NULL, NULL, "$Revision$");
 
 struct squit_parms
@@ -95,8 +96,7 @@ mo_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 	else
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
-				   form_str(ERR_NOSUCHSERVER), parv[1]);
+		sendto_one_numeric(source_p, ERR_NOSUCHSERVER, form_str(ERR_NOSUCHSERVER), parv[1]);
 	}
 
 	return 0;
@@ -126,12 +126,12 @@ ms_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(!IsServer(target_p))
 			return 0;
 	}
-	
+
 	/* Server is closing its link */
-	if (target_p == client_p)
+	if(target_p == client_p)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Server %s closing link (%s)",
-				target_p->name, comment);
+				     target_p->name, comment);
 	}
 	/*
 	 **  Notify all opers, if my local link is remotely squitted
@@ -150,8 +150,7 @@ ms_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 			      ":%s WALLOPS :Remote SQUIT %s from %s (%s)",
 			      me.name, target_p->name, source_p->name, comment);
 
-		ilog(L_SERVER, "SQUIT From %s : %s (%s)", parv[0],
-		     target_p->name, comment);
+		ilog(L_SERVER, "SQUIT From %s : %s (%s)", parv[0], target_p->name, comment);
 
 	}
 	exit_client(client_p, target_p, source_p, comment);
@@ -179,7 +178,7 @@ find_squit(struct Client *client_p, struct Client *source_p, const char *server)
 	found_squit.target_p = NULL;
 	found_squit.server_name = NULL;
 
-	 
+
 	/*
 	 ** The following allows wild cards in SQUIT. Only useful
 	 ** when the command is issued by an oper.

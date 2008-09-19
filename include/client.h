@@ -239,8 +239,8 @@ struct LocalUser;
 
 #define HasSentUser(x)		((x)->localClient->localflags & LFLAGS_SENTUSER)
 #define SetSentUser(x)		((x)->localClient->localflags |= LFLAGS_SENTUSER)
- 
- 
+
+
 /* oper flags */
 #define MyOper(x)               (MyConnect(x) && IsOper(x))
 
@@ -329,7 +329,7 @@ enum
 	D_LINED,
 	K_LINED,
 	G_LINED
-};                     
+};
 
 void check_banned_lines(void);
 void check_klines_event(void *unused);
@@ -347,8 +347,8 @@ void error_exit_client(struct Client *, int);
 
 
 
-void count_local_client_memory(size_t * count, size_t * memory);
-void count_remote_client_memory(size_t * count, size_t * memory);
+void count_local_client_memory(size_t *count, size_t *memory);
+void count_remote_client_memory(size_t *count, size_t *memory);
 
 struct Client *find_chasing(struct Client *, const char *, int *);
 struct Client *find_person(const char *);

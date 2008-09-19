@@ -40,7 +40,7 @@ mapi_hfn_list_av1 info_hfnlist[] = {
 DECLARE_MODULE_AV1(info_spy, NULL, NULL, NULL, NULL, info_hfnlist, "$Revision$");
 
 void
-show_info(hook_data *data)
+show_info(hook_data * data)
 {
 	sendto_realops_flags(UMODE_SPY, L_ALL,
 			     "info requested by %s (%s@%s) [%s]",

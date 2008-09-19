@@ -104,12 +104,12 @@ fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused)
 {
 	uint32_t h = FNV1_32_INIT;
 	bits = 32 - bits;
-	while (*s)
+	while(*s)
 	{
 		h ^= ToUpper(*s++);
-		h += (h<<1) + (h<<4) + (h<<7) + (h << 8) + (h << 24);
+		h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
 	}
-	h = (h >> bits) ^ (h & ((2^bits)-1));
+	h = (h >> bits) ^ (h & ((2 ^ bits) - 1));
 	return h;
 }
 
@@ -118,12 +118,12 @@ fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused)
 {
 	uint32_t h = FNV1_32_INIT;
 	bits = 32 - bits;
-	while (*s)
+	while(*s)
 	{
 		h ^= *s++;
-		h += (h<<1) + (h<<4) + (h<<7) + (h << 8) + (h << 24);
+		h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
 	}
-	h = (h >> bits) ^ (h & ((2^bits)-1));
+	h = (h >> bits) ^ (h & ((2 ^ bits) - 1));
 	return h;
 }
 
@@ -133,12 +133,12 @@ fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len)
 	uint32_t h = FNV1_32_INIT;
 	bits = 32 - bits;
 	const unsigned char *x = s + len;
-	while (*s && s < x)
+	while(*s && s < x)
 	{
 		h ^= *s++;
-		h += (h<<1) + (h<<4) + (h<<7) + (h << 8) + (h << 24);
+		h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
 	}
-	h = (h >> bits) ^ (h & ((2^bits)-1));
+	h = (h >> bits) ^ (h & ((2 ^ bits) - 1));
 	return h;
 }
 
@@ -148,12 +148,12 @@ fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len)
 	uint32_t h = FNV1_32_INIT;
 	bits = 32 - bits;
 	const unsigned char *x = s + len;
-	while (*s && s < x)
+	while(*s && s < x)
 	{
 		h ^= ToUpper(*s++);
-		h += (h<<1) + (h<<4) + (h<<7) + (h << 8) + (h << 24);
+		h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
 	}
-	h = (h >> bits) ^ (h & ((2^bits)-1));
+	h = (h >> bits) ^ (h & ((2 ^ bits) - 1));
 	return h;
 }
 
@@ -164,7 +164,7 @@ hash_help(const char *name)
 
 	while(*name)
 	{
-		h += (unsigned int) (ToLower(*name++) & 0xDF);
+		h += (unsigned int)(ToLower(*name++) & 0xDF);
 	}
 
 	return (h % HELP_MAX);
@@ -176,12 +176,18 @@ static struct _hash_function
 	rb_dlink_list *table;
 	unsigned int hashbits;
 	unsigned int hashlen;
-} hash_function[] = {
-	{ fnv_hash_upper,	clientTable,	U_MAX_BITS,	0	},
-	{ fnv_hash,		idTable,	U_MAX_BITS,	0	},
-	{ fnv_hash_upper_len,	channelTable,	CH_MAX_BITS,	30	},
-	{ fnv_hash_upper_len,	hostTable,	HOST_MAX_BITS,	30	},
-	{ fnv_hash_upper_len,	resvTable,	R_MAX_BITS,	30	}
+} hash_function[] =
+{
+	{
+	fnv_hash_upper, clientTable, U_MAX_BITS, 0},
+	{
+	fnv_hash, idTable, U_MAX_BITS, 0},
+	{
+	fnv_hash_upper_len, channelTable, CH_MAX_BITS, 30},
+	{
+	fnv_hash_upper_len, hostTable, HOST_MAX_BITS, 30},
+	{
+	fnv_hash_upper_len, resvTable, R_MAX_BITS, 30}
 };
 
 void
@@ -193,10 +199,10 @@ add_to_hash(hash_type type, const char *hashindex, void *pointer)
 	if(EmptyString(hashindex) || (pointer == NULL))
 		return;
 
-	hashv = (hash_function[type].func)((const unsigned char *) hashindex, 
-					hash_function[type].hashbits, 
-					hash_function[type].hashlen);
-//	rb_dlinkAddAlloc(pointer, &hash_function[type].table[hashv]);
+	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
+					    hash_function[type].hashbits,
+					    hash_function[type].hashlen);
+//      rb_dlinkAddAlloc(pointer, &hash_function[type].table[hashv]);
 	rb_dlinkAddAlloc(pointer, &table[hashv]);
 }
 
@@ -209,9 +215,9 @@ del_from_hash(hash_type type, const char *hashindex, void *pointer)
 	if(EmptyString(hashindex) || (pointer == NULL))
 		return;
 
-	hashv = (hash_function[type].func)((const unsigned char *) hashindex,
-					hash_function[type].hashbits,
-					hash_function[type].hashlen);
+	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
+					    hash_function[type].hashbits,
+					    hash_function[type].hashlen);
 	rb_dlinkFindDestroy(pointer, &table[hashv]);
 }
 
@@ -246,8 +252,7 @@ clear_help_hash(void)
 		free_cachefile(ptr->data);
 		rb_dlinkDestroy(ptr, &helpTable[i]);
 	}
-	HASH_WALK_END
-}
+HASH_WALK_END}
 
 
 
@@ -304,7 +309,7 @@ hash_find_masked_server(struct Client *source_p, const char *name)
 	/* copy it across to give us a buffer to work on */
 	rb_strlcpy(buf, name, sizeof(buf));
 
-	while ((s = strchr(p, '.')) != 0)
+	while((s = strchr(p, '.')) != 0)
 	{
 		*--s = '*';
 		/*
@@ -422,15 +427,14 @@ find_server(struct Client *source_p, const char *name)
 	struct Client *target_p;
 	rb_dlink_node *ptr;
 	unsigned int hashv;
-  
+
 	if(EmptyString(name))
 		return NULL;
 
-	if((source_p == NULL || !MyClient(source_p)) && 
-	   IsDigit(*name) && strlen(name) == 3)
+	if((source_p == NULL || !MyClient(source_p)) && IsDigit(*name) && strlen(name) == 3)
 	{
 		target_p = find_id(name);
-		return(target_p);
+		return (target_p);
 	}
 
 	hashv = hash_nick(name);
@@ -439,9 +443,8 @@ find_server(struct Client *source_p, const char *name)
 	{
 		target_p = ptr->data;
 
-		if((IsServer(target_p) || IsMe(target_p)) &&
-		   irccmp(name, target_p->name) == 0)
-				return target_p;
+		if((IsServer(target_p) || IsMe(target_p)) && irccmp(name, target_p->name) == 0)
+			return target_p;
 	}
 
 	/* wasnt found, look for a masked server */
@@ -606,8 +609,7 @@ hash_find_help(const char *name, int flags)
 	{
 		hptr = ptr->data;
 
-		if((irccmp(name, hptr->name) == 0) &&
-		   (hptr->flags & flags))
+		if((irccmp(name, hptr->name) == 0) && (hptr->flags & flags))
 			return hptr;
 	}
 
@@ -633,8 +635,7 @@ clear_resv_hash(void)
 		free_conf(ptr->data);
 		rb_dlinkDestroy(ptr, &resvTable[i]);
 	}
-	HASH_WALK_END
-}
+HASH_WALK_END}
 
 struct nd_entry *
 hash_find_nd(const char *name)
@@ -662,7 +663,8 @@ hash_find_nd(const char *name)
 void
 add_to_cli_fd_hash(struct Client *client_p)
 {
-	rb_dlinkAddAlloc(client_p, &clientbyfdTable[hash_cli_fd(rb_get_fd(client_p->localClient->F))]);
+	rb_dlinkAddAlloc(client_p,
+			 &clientbyfdTable[hash_cli_fd(rb_get_fd(client_p->localClient->F))]);
 }
 
 
@@ -687,7 +689,7 @@ find_cli_fd_hash(int fd)
 		if(rb_get_fd(target_p->localClient->F) == fd)
 			return target_p;
 	}
-	return  NULL;	
+	return NULL;
 }
 
 static void
@@ -701,13 +703,13 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 
 	/* rb_snprintf which sendto_one_* uses doesn't support float formats */
 #ifdef HAVE_SNPRINTF
-	snprintf(buf, sizeof(buf), 
+	snprintf(buf, sizeof(buf),
 #else
-	sprintf(buf, 
+	sprintf(buf,
 #endif
-		"%.3f%%", (float) ((counts[0]*100) / (float) length));
+		"%.3f%%", (float)((counts[0] * 100) / (float)length));
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :Size: %d Empty: %d (%s)",
-			length, counts[0], buf);
+			   length, counts[0], buf);
 
 	for(i = 1; i < 11; i++)
 	{
@@ -715,27 +717,25 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 	}
 
 	/* dont want to divide by 0! --fl */
-	if(counts[0] != length) 
+	if(counts[0] != length)
 	{
 #ifdef HAVE_SNPRINTF
 		snprintf(buf, sizeof(buf),
 #else
 		sprintf(buf,
 #endif
-			"%.3f%%/%.3f%%", (float) (total / (length - counts[0])), 
-			(float) (total / length));
+			"%.3f%%/%.3f%%", (float)(total / (length - counts[0])),
+			(float)(total / length));
 		sendto_one_numeric(source_p, RPL_STATSDEBUG,
-				"B :Average depth: %s Highest depth: %d",
-				buf, deepest);
+				   "B :Average depth: %s Highest depth: %d", buf, deepest);
 	}
 	for(i = 0; i < 11; i++)
 	{
 		sendto_one_numeric(source_p, RPL_STATSDEBUG,
-				"B :Nodes with %d entries: %d",
-				i, counts[i]);
+				   "B :Nodes with %d entries: %d", i, counts[i]);
 	}
 }
-	
+
 
 static void
 count_hash(struct Client *source_p, rb_dlink_list *table, int length, const char *name)
@@ -745,7 +745,7 @@ count_hash(struct Client *source_p, rb_dlink_list *table, int length, const char
 	int i;
 
 	memset(counts, 0, sizeof(counts));
-	
+
 	for(i = 0; i < length; i++)
 	{
 		if(rb_dlink_list_length(&table[i]) >= 10)
@@ -772,4 +772,4 @@ hash_stats(struct Client *source_p)
 	count_hash(source_p, hostTable, HOST_MAX, "Hostname");
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");
 	count_hash(source_p, clientbyfdTable, CLI_FD_MAX, "Client by FD");
-}	
+}

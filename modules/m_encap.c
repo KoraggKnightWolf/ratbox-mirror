@@ -39,8 +39,7 @@
 #include "modules.h"
 #include "match.h"
 
-static int ms_encap(struct Client *client_p, struct Client *source_p,
-		     int parc, const char *parv[]);
+static int ms_encap(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 
 struct Message encap_msgtab = {
 	"ENCAP", 0, 0, 0, MFLG_SLOW,
@@ -48,6 +47,7 @@ struct Message encap_msgtab = {
 };
 
 mapi_clist_av1 encap_clist[] = { &encap_msgtab, NULL };
+
 DECLARE_MODULE_AV1(encap, NULL, NULL, encap_clist, NULL, NULL, "$Revision$");
 
 /* ms_encap()
@@ -66,7 +66,7 @@ ms_encap(struct Client *client_p, struct Client *source_p, int parc, const char 
 	int i;
 
 	ptr = buffer;
-	
+
 	for(i = 1; i < parc - 1; i++)
 	{
 		len = strlen(parv[i]) + 1;
@@ -86,14 +86,13 @@ ms_encap(struct Client *client_p, struct Client *source_p, int parc, const char 
 	if(parc == 3)
 		rb_snprintf(ptr, sizeof(buffer) - cur_len, "%s", parv[2]);
 	else
-		rb_snprintf(ptr, sizeof(buffer) - cur_len, ":%s", parv[parc-1]);
+		rb_snprintf(ptr, sizeof(buffer) - cur_len, ":%s", parv[parc - 1]);
 
 	/* add a trailing \0 if it was too long */
 	if((cur_len + len) >= BUFSIZE)
-		buffer[BUFSIZE-1] = '\0';
+		buffer[BUFSIZE - 1] = '\0';
 
-	sendto_match_servs(source_p, parv[1], CAP_ENCAP, NOCAPS,
-			   "ENCAP %s", buffer);
+	sendto_match_servs(source_p, parv[1], CAP_ENCAP, NOCAPS, "ENCAP %s", buffer);
 
 	/* if it matches us, find a matching handler and call it */
 	if(match(parv[1], me.name))
@@ -101,5 +100,3 @@ ms_encap(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	return 0;
 }
-
-

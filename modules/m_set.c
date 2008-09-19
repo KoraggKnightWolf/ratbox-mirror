@@ -48,6 +48,7 @@ struct Message set_msgtab = {
 };
 
 mapi_clist_av1 set_clist[] = { &set_msgtab, NULL };
+
 DECLARE_MODULE_AV1(set, NULL, NULL, set_clist, NULL, NULL, "$Revision$");
 
 /* Structure used for the SET table itself */
@@ -89,21 +90,21 @@ static void list_quote_commands(struct Client *);
 static struct SetStruct set_cmd_table[] = {
 	/* name               function      string arg  int arg */
 	/* -------------------------------------------------------- */
-	{"ADMINSTRING",	quote_adminstring,	1,	0	},
-	{"AUTOCONN", 	quote_autoconn, 	1,	1	},
-	{"AUTOCONNALL", quote_autoconnall, 	0,	1	},
-	{"FLOODCOUNT", 	quote_floodcount, 	0,	1	},
-	{"IDENTTIMEOUT", quote_identtimeout,	0,	1	},
-	{"MAX", 	quote_max, 		0,	1	},
-	{"MAXCLIENTS",	quote_max,		0,	1	},
-	{"OPERSTRING",	quote_operstring,	1,	0	},
-	{"SPAMNUM", 	quote_spamnum, 		0,	1	},
-	{"SPAMTIME", 	quote_spamtime, 	0,	1	},
-	{"SPLITMODE", 	quote_splitmode, 	1,	0	},
-	{"SPLITNUM", 	quote_splitnum, 	0,	1	},
-	{"SPLITUSERS", 	quote_splitusers, 	0,	1	},
+	{"ADMINSTRING", quote_adminstring, 1, 0},
+	{"AUTOCONN", quote_autoconn, 1, 1},
+	{"AUTOCONNALL", quote_autoconnall, 0, 1},
+	{"FLOODCOUNT", quote_floodcount, 0, 1},
+	{"IDENTTIMEOUT", quote_identtimeout, 0, 1},
+	{"MAX", quote_max, 0, 1},
+	{"MAXCLIENTS", quote_max, 0, 1},
+	{"OPERSTRING", quote_operstring, 1, 0},
+	{"SPAMNUM", quote_spamnum, 0, 1},
+	{"SPAMTIME", quote_spamtime, 0, 1},
+	{"SPLITMODE", quote_splitmode, 1, 0},
+	{"SPLITNUM", quote_splitnum, 0, 1},
+	{"SPLITUSERS", quote_splitusers, 0, 1},
 	/* -------------------------------------------------------- */
-	{(char *) 0, (void (*)()) 0, 0, 0}
+	{(char *)0, (void (*)())0, 0, 0}
 };
 
 
@@ -122,13 +123,13 @@ list_quote_commands(struct Client *source_p)
 
 	names[0] = names[1] = names[2] = names[3] = "";
 
-	for (i = 0; set_cmd_table[i].handler; i++)
+	for(i = 0; set_cmd_table[i].handler; i++)
 	{
 		names[j++] = set_cmd_table[i].name;
 
 		if(j > 3)
 		{
-			sendto_one_notice(source_p, ":%s %s %s %s", 
+			sendto_one_notice(source_p, ":%s %s %s %s",
 					  names[0], names[1], names[2], names[3]);
 			j = 0;
 			names[0] = names[1] = names[2] = names[3] = "";
@@ -136,8 +137,7 @@ list_quote_commands(struct Client *source_p)
 
 	}
 	if(j)
-		sendto_one_notice(source_p, ":%s %s %s %s",
-			   names[0], names[1], names[2], names[3]);
+		sendto_one_notice(source_p, ":%s %s %s %s", names[0], names[1], names[2], names[3]);
 	ClearCork(source_p);
 	send_pop_queue(source_p);
 }
@@ -192,8 +192,7 @@ quote_identtimeout(struct Client *source_p, int newval)
 {
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return;
 	}
 
@@ -236,7 +235,7 @@ quote_max(struct Client *source_p, int newval)
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s!%s@%s set new MAXCLIENTS to %d (%lu current)",
 				     source_p->name, source_p->username, source_p->host,
-				     GlobalSetOptions.maxclients, 
+				     GlobalSetOptions.maxclients,
 				     rb_dlink_list_length(&lclient_list));
 
 		return;
@@ -259,9 +258,8 @@ quote_operstring(struct Client *source_p, const char *arg)
 	}
 	else
 	{
-		rb_strlcpy(GlobalSetOptions.operstring, arg,
-			sizeof(GlobalSetOptions.operstring));
-		
+		rb_strlcpy(GlobalSetOptions.operstring, arg, sizeof(GlobalSetOptions.operstring));
+
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s has changed OPERSTRING to '%s'",
 				     get_oper_name(source_p), arg);
@@ -279,9 +277,8 @@ quote_adminstring(struct Client *source_p, const char *arg)
 	}
 	else
 	{
-		rb_strlcpy(GlobalSetOptions.adminstring, arg,
-			sizeof(GlobalSetOptions.adminstring));
-		
+		rb_strlcpy(GlobalSetOptions.adminstring, arg, sizeof(GlobalSetOptions.adminstring));
+
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s has changed ADMINSTRING to '%s'",
 				     get_oper_name(source_p), arg);
@@ -314,8 +311,7 @@ quote_spamnum(struct Client *source_p, int newval)
 	}
 	else
 	{
-		sendto_one_notice(source_p, ":SPAMNUM is currently %i",
-				  GlobalSetOptions.spam_num);
+		sendto_one_notice(source_p, ":SPAMNUM is currently %i", GlobalSetOptions.spam_num);
 	}
 }
 
@@ -368,7 +364,7 @@ quote_splitmode(struct Client *source_p, char *charval)
 	{
 		int newval;
 
-		for (newval = 0; splitmode_values[newval]; newval++)
+		for(newval = 0; splitmode_values[newval]; newval++)
 		{
 			if(!irccmp(splitmode_values[newval], charval))
 				break;
@@ -474,7 +470,7 @@ mo_set(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		 * lookup, but at least it's better than a big-ass switch/case
 		 * statement.
 		 */
-		for (i = 0; set_cmd_table[i].handler; i++)
+		for(i = 0; set_cmd_table[i].handler; i++)
 		{
 			if(!irccmp(set_cmd_table[i].name, parv[1]))
 			{
@@ -496,12 +492,12 @@ mo_set(struct Client *client_p, struct Client *source_p, int parc, const char *p
 				if((n - 1) > parc)
 				{
 					sendto_one_notice(source_p,
-						   	  ":SET %s expects (\"%s%s\") args",
-						   	  set_cmd_table[i].name,
-						   	  (set_cmd_table[i].
-						   	  wants_char ? "string, " : ""),
-						   	  (set_cmd_table[i].
-						   	  wants_char ? "int" : ""));
+							  ":SET %s expects (\"%s%s\") args",
+							  set_cmd_table[i].name,
+							  (set_cmd_table[i].wants_char ? "string, "
+							   : ""),
+							  (set_cmd_table[i].wants_char ? "int" :
+							   ""));
 					return 0;
 				}
 

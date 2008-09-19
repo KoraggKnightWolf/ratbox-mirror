@@ -75,7 +75,7 @@ struct Message
 #define MFLG_SLOW	0x01	/* executed roughly once per 2s */
 #define MFLG_UNREG	0x02	/* available to unregistered clients */
 
-#define MAX_MSG_HASH 512 /* don't change this unless you know what you are doing */
+#define MAX_MSG_HASH 512	/* don't change this unless you know what you are doing */
 #define MAXPARA    15
 
 struct MessageHash
@@ -88,8 +88,7 @@ struct MessageHash
 extern struct MessageHash *msg_hash_table[];
 void parse(struct Client *, char *, char *);
 int string_to_array(char *string, char *parv[]);
-void handle_encap(struct Client *, struct Client *, 
-			 const char *, int, const char *parv[]);
+void handle_encap(struct Client *, struct Client *, const char *, int, const char *parv[]);
 void clear_hash_parse(void);
 void mod_add_cmd(struct Message *msg);
 void mod_del_cmd(struct Message *msg);

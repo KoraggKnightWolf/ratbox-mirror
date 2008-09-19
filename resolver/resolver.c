@@ -102,7 +102,7 @@ setup_signals()
 }
 
 static void
-error_cb(rb_helper * helper)
+error_cb(rb_helper *helper)
 {
 	exit(1);
 }
@@ -111,7 +111,7 @@ error_cb(rb_helper * helper)
 static void
 send_answer(void *vptr, struct DNSReply *reply)
 {
-	struct dns_request *req = (struct dns_request *) vptr;
+	struct dns_request *req = (struct dns_request *)vptr;
 	char response[64];
 	int result = 0;
 	int aftype = 0;
@@ -125,8 +125,8 @@ send_answer(void *vptr, struct DNSReply *reply)
 				if(req->reqtype == REVIPV4)
 				{
 					struct sockaddr_in *ip, *ip_fwd;
-					ip = (struct sockaddr_in *) &req->addr;
-					ip_fwd = (struct sockaddr_in *) &reply->addr;
+					ip = (struct sockaddr_in *)&req->addr;
+					ip_fwd = (struct sockaddr_in *)&reply->addr;
 					aftype = 4;
 					if(ip->sin_addr.s_addr != ip_fwd->sin_addr.s_addr)
 					{
@@ -138,8 +138,8 @@ send_answer(void *vptr, struct DNSReply *reply)
 				else if(req->reqtype == REVIPV6)
 				{
 					struct sockaddr_in6 *ip, *ip_fwd;
-					ip = (struct sockaddr_in6 *) &req->addr;
-					ip_fwd = (struct sockaddr_in6 *) &reply->addr;
+					ip = (struct sockaddr_in6 *)&req->addr;
+					ip_fwd = (struct sockaddr_in6 *)&reply->addr;
 					aftype = 6;
 					if(memcmp
 					   (&ip->sin6_addr, &ip_fwd->sin6_addr,
@@ -176,7 +176,7 @@ send_answer(void *vptr, struct DNSReply *reply)
 				if(GET_SS_FAMILY(&reply->addr) == AF_INET6)
 				{
 					char tmpres[65];
-					rb_inet_ntop(AF_INET6, (struct sockaddr *) &reply->addr,
+					rb_inet_ntop(AF_INET6, (struct sockaddr *)&reply->addr,
 						     tmpres, sizeof(tmpres) - 1);
 					aftype = 6;
 					if(*tmpres == ':')
@@ -195,7 +195,7 @@ send_answer(void *vptr, struct DNSReply *reply)
 				{
 					result = 1;
 					aftype = 4;
-					rb_inet_ntop(AF_INET, (struct sockaddr *) &reply->addr,
+					rb_inet_ntop(AF_INET, (struct sockaddr *)&reply->addr,
 						     response, sizeof(response));
 					break;
 				}
@@ -258,12 +258,12 @@ REV requestid PASS/FAIL IP or reason
 
 
 static void
-parse_request(rb_helper * helper)
+parse_request(rb_helper *helper)
 {
 	int len;
 	static char *parv[MAXPARA + 1];
 	int parc;
-	while ((len = rb_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
+	while((len = rb_helper_read(helper, readBuf, sizeof(readBuf))) > 0)
 	{
 		parc = rb_string_to_array(readBuf, parv, MAXPARA);
 		switch (*parv[0])
@@ -339,7 +339,7 @@ resolve_ip(char **parv)
 	req->revfwd = REQREV;
 	strcpy(req->reqid, requestid);
 
-	if(!rb_inet_pton_sock(rec, (struct sockaddr *) &req->addr))
+	if(!rb_inet_pton_sock(rec, (struct sockaddr *)&req->addr))
 		exit(6);
 
 	aftype = GET_SS_FAMILY(&req->addr);
@@ -373,10 +373,10 @@ report_nameservers(void)
 	char ipaddr[HOSTIPLEN + 1];
 	char buf[512];
 	buf[0] = '\0';
-	for (i = 0; i < irc_nscount; i++)
+	for(i = 0; i < irc_nscount; i++)
 	{
 		if(!rb_inet_ntop_sock
-		   ((struct sockaddr *) &(irc_nsaddr_list[i]), ipaddr, sizeof(ipaddr)))
+		   ((struct sockaddr *)&(irc_nsaddr_list[i]), ipaddr, sizeof(ipaddr)))
 		{
 			rb_strlcpy(ipaddr, "?", sizeof(ipaddr));
 		}

@@ -52,12 +52,14 @@ struct Message testline_msgtab = {
 	"TESTLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_ignore, mg_ignore, mg_ignore, mg_ignore, {mo_testline, 2}}
 };
+
 struct Message testgecos_msgtab = {
 	"TESTGECOS", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_ignore, mg_ignore, mg_ignore, mg_ignore, {mo_testgecos, 2}}
 };
 
 mapi_clist_av1 testline_clist[] = { &testline_msgtab, &testgecos_msgtab, NULL };
+
 DECLARE_MODULE_AV1(testline, NULL, NULL, testline_clist, NULL, NULL, "$Revision$");
 
 static int
@@ -76,16 +78,18 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	mask = LOCAL_COPY(parv[1]);
 
-	if (IsChannelName(mask))
+	if(IsChannelName(mask))
 	{
 		resv_p = hash_find_resv(mask);
-		if (resv_p != NULL)
+		if(resv_p != NULL)
 		{
 			sendto_one(source_p, form_str(RPL_TESTLINE),
-					me.name, source_p->name,
-					(resv_p->flags & CONF_FLAGS_TEMPORARY) ? 'q' : 'Q',
-					(resv_p->flags & CONF_FLAGS_TEMPORARY) ? (long) ((resv_p->hold - rb_current_time()) / 60) : 0L,
-					resv_p->host, resv_p->passwd);
+				   me.name, source_p->name,
+				   (resv_p->flags & CONF_FLAGS_TEMPORARY) ? 'q' : 'Q',
+				   (resv_p->flags & CONF_FLAGS_TEMPORARY) ? (long)((resv_p->hold -
+										    rb_current_time
+										    ()) / 60) : 0L,
+				   resv_p->host, resv_p->passwd);
 			/* this is a false positive, so make sure it isn't counted in stats q
 			 * --nenolod
 			 */
@@ -93,7 +97,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 		}
 		else
 			sendto_one(source_p, form_str(RPL_NOTESTLINE),
-					me.name, source_p->name, parv[1]);
+				   me.name, source_p->name, parv[1]);
 		return 0;
 	}
 
@@ -127,11 +131,11 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 		if(aconf && aconf->status & CONF_DLINE)
 		{
 			sendto_one(source_p, form_str(RPL_TESTLINE),
-				me.name, source_p->name,
-				(aconf->flags & CONF_FLAGS_TEMPORARY) ? 'd' : 'D',
-				(aconf->flags & CONF_FLAGS_TEMPORARY) ? 
-				 (long) ((aconf->hold - rb_current_time()) / 60) : 0L, 
-				aconf->host, aconf->passwd);
+				   me.name, source_p->name,
+				   (aconf->flags & CONF_FLAGS_TEMPORARY) ? 'd' : 'D',
+				   (aconf->flags & CONF_FLAGS_TEMPORARY) ?
+				   (long)((aconf->hold - rb_current_time()) / 60) : 0L,
+				   aconf->host, aconf->passwd);
 
 			return 0;
 		}
@@ -139,35 +143,35 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	/* now look for a matching I/K/G */
 	if((aconf = find_address_conf(host, NULL, username ? username : "dummy",
-				(type != HM_HOST) ? (struct sockaddr *)&ip : NULL,
-				(type != HM_HOST) ? (
+				      (type != HM_HOST) ? (struct sockaddr *)&ip : NULL,
+				      (type != HM_HOST) ? (
 #ifdef RB_IPV6
-				 (type == HM_IPV6) ? AF_INET6 : 
+										(type ==
+										 HM_IPV6) ? AF_INET6
+										:
 #endif
-				  AF_INET) : 0)))
+										AF_INET) : 0)))
 	{
-		static char buf[HOSTLEN+USERLEN+2];
+		static char buf[HOSTLEN + USERLEN + 2];
 
 		if(aconf->status & CONF_KILL)
 		{
-			rb_snprintf(buf, sizeof(buf), "%s@%s", 
-					aconf->user, aconf->host);
+			rb_snprintf(buf, sizeof(buf), "%s@%s", aconf->user, aconf->host);
 			sendto_one(source_p, form_str(RPL_TESTLINE),
-				me.name, source_p->name,
-				(aconf->flags & CONF_FLAGS_TEMPORARY) ? 'k' : 'K',
-				(aconf->flags & CONF_FLAGS_TEMPORARY) ? 
-				 (long) ((aconf->hold - rb_current_time()) / 60) : 0L,
-				buf, aconf->passwd);
+				   me.name, source_p->name,
+				   (aconf->flags & CONF_FLAGS_TEMPORARY) ? 'k' : 'K',
+				   (aconf->flags & CONF_FLAGS_TEMPORARY) ?
+				   (long)((aconf->hold - rb_current_time()) / 60) : 0L,
+				   buf, aconf->passwd);
 			return 0;
 		}
 		else if(aconf->status & CONF_GLINE)
 		{
-			rb_snprintf(buf, sizeof(buf), "%s@%s",
-					aconf->user, aconf->host);
+			rb_snprintf(buf, sizeof(buf), "%s@%s", aconf->user, aconf->host);
 			sendto_one(source_p, form_str(RPL_TESTLINE),
-				me.name, source_p->name,
-				'G', (long) ((aconf->hold - rb_current_time()) / 60),
-				buf, aconf->passwd);
+				   me.name, source_p->name,
+				   'G', (long)((aconf->hold - rb_current_time()) / 60),
+				   buf, aconf->passwd);
 			return 0;
 		}
 	}
@@ -176,10 +180,12 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	if(name && (resv_p = find_nick_resv(name)))
 	{
 		sendto_one(source_p, form_str(RPL_TESTLINE),
-				me.name, source_p->name,
-				(resv_p->flags & CONF_FLAGS_TEMPORARY) ? 'q' : 'Q',
-				(resv_p->flags & CONF_FLAGS_TEMPORARY) ? (long) ((resv_p->hold - rb_current_time()) / 60) : 0L,
-				resv_p->host, resv_p->passwd);
+			   me.name, source_p->name,
+			   (resv_p->flags & CONF_FLAGS_TEMPORARY) ? 'q' : 'Q',
+			   (resv_p->flags & CONF_FLAGS_TEMPORARY) ? (long)((resv_p->hold -
+									    rb_current_time()) /
+									   60) : 0L, resv_p->host,
+			   resv_p->passwd);
 
 		/* this is a false positive, so make sure it isn't counted in stats q
 		 * --nenolod
@@ -192,14 +198,14 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	if(aconf && aconf->status & CONF_CLIENT)
 	{
 		sendto_one_numeric(source_p, RPL_STATSILINE, form_str(RPL_STATSILINE),
-				aconf->info.name, show_iline_prefix(source_p, aconf, aconf->user),
-				aconf->host, aconf->port, get_class_name(aconf));
+				   aconf->info.name, show_iline_prefix(source_p, aconf,
+								       aconf->user), aconf->host,
+				   aconf->port, get_class_name(aconf));
 		return 0;
 	}
 
 	/* nothing matches.. */
-	sendto_one(source_p, form_str(RPL_NOTESTLINE),
-			me.name, source_p->name, parv[1]);
+	sendto_one(source_p, form_str(RPL_NOTESTLINE), me.name, source_p->name, parv[1]);
 	return 0;
 }
 
@@ -210,15 +216,15 @@ mo_testgecos(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(!(aconf = find_xline(parv[1], 0)))
 	{
-		sendto_one(source_p, form_str(RPL_NOTESTLINE),
-				me.name, source_p->name, parv[1]);
+		sendto_one(source_p, form_str(RPL_NOTESTLINE), me.name, source_p->name, parv[1]);
 		return 0;
 	}
 
 	sendto_one(source_p, form_str(RPL_TESTLINE),
-			me.name, source_p->name,
-			(aconf->flags & CONF_FLAGS_TEMPORARY) ? 'x' : 'X',
-			(aconf->flags & CONF_FLAGS_TEMPORARY) ? (long) ((aconf->hold - rb_current_time()) / 60) : 0L,
-			aconf->host, aconf->passwd);
+		   me.name, source_p->name,
+		   (aconf->flags & CONF_FLAGS_TEMPORARY) ? 'x' : 'X',
+		   (aconf->flags & CONF_FLAGS_TEMPORARY) ? (long)((aconf->hold -
+								   rb_current_time()) / 60) : 0L,
+		   aconf->host, aconf->passwd);
 	return 0;
 }

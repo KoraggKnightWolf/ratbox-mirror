@@ -80,15 +80,16 @@ add_history(struct Client *client_p, int online)
 	{
 		strcpy(who->sockhost, client_p->sockhost);
 		who->spoof = (uint8_t)(IsIPSpoof(client_p) ? 1 : 0);
-	
-	} else 
+
+	}
+	else
 	{
 		who->spoof = 0;
 		if(EmptyString(client_p->sockhost) || !strcmp(client_p->sockhost, "0"))
 			who->sockhost[0] = '\0';
 		else
 			strcpy(who->sockhost, client_p->sockhost);
-	}	
+	}
 
 	who->servername = client_p->servptr->name;
 
@@ -110,7 +111,7 @@ off_history(struct Client *client_p)
 {
 	struct Whowas *temp, *next;
 
-	for (temp = client_p->whowas; temp; temp = next)
+	for(temp = client_p->whowas; temp; temp = next)
 	{
 		next = temp->cnext;
 		temp->online = NULL;
@@ -127,7 +128,7 @@ get_history(const char *nick, time_t timelimit)
 	timelimit = rb_current_time() - timelimit;
 	nhash = hash_whowas_name(nick);
 	temp = WHOWASHASH[nhash];
-	for (; temp; temp = temp->next)
+	for(; temp; temp = temp->next)
 	{
 		if(irccmp(nick, temp->name))
 			continue;
@@ -139,7 +140,7 @@ get_history(const char *nick, time_t timelimit)
 }
 
 void
-count_whowas_memory(size_t * wwu, size_t * wwum)
+count_whowas_memory(size_t *wwu, size_t *wwum)
 {
 	struct Whowas *tmp;
 	int i;
@@ -149,7 +150,7 @@ count_whowas_memory(size_t * wwu, size_t * wwum)
 	/* count the number of used whowas structs in 'u' */
 	/* count up the memory used of whowas structs in um */
 
-	for (i = 0, tmp = &WHOWAS[0]; i < NICKNAMEHISTORYLENGTH; i++, tmp++)
+	for(i = 0, tmp = &WHOWAS[0]; i < NICKNAMEHISTORYLENGTH; i++, tmp++)
 	{
 		if(tmp->hashv != -1)
 		{
@@ -167,12 +168,12 @@ initwhowas()
 {
 	int i;
 
-	for (i = 0; i < NICKNAMEHISTORYLENGTH; i++)
+	for(i = 0; i < NICKNAMEHISTORYLENGTH; i++)
 	{
 		memset(&WHOWAS[i], 0, sizeof(struct Whowas));
 		WHOWAS[i].hashv = -1;
 	}
-	for (i = 0; i < WW_MAX; i++)
+	for(i = 0; i < WW_MAX; i++)
 		WHOWASHASH[i] = NULL;
 }
 

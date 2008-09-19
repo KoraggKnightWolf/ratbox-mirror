@@ -44,6 +44,7 @@ struct Message userhost_msgtab = {
 };
 
 mapi_clist_av1 userhost_clist[] = { &userhost_msgtab, NULL };
+
 DECLARE_MODULE_AV1(userhost, NULL, NULL, userhost_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -64,7 +65,7 @@ m_userhost(struct Client *client_p, struct Client *source_p, int parc, const cha
 	cur_len = rb_sprintf(buf, form_str(RPL_USERHOST), me.name, parv[0], "");
 	t = buf + cur_len;
 
-	for (i = 1; i <= 5; i++)
+	for(i = 1; i <= 5; i++)
 	{
 		if(parc < i + 1)
 			break;
@@ -83,8 +84,7 @@ m_userhost(struct Client *client_p, struct Client *source_p, int parc, const cha
 						target_p->name,
 						IsOper(target_p) ? "*" : "",
 						(target_p->user->away) ? '-' : '+',
-						target_p->username,
-						target_p->sockhost);
+						target_p->username, target_p->sockhost);
 			}
 			else
 			{

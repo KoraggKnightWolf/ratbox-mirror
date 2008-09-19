@@ -51,10 +51,12 @@ struct Message kline_msgtab = {
 	"KLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_kline, 5}, {mo_kline, 3}}
 };
+
 struct Message adminkline_msgtab = {
 	"ADMINKLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminkline, 3}}
 };
+
 struct Message unkline_msgtab = {
 	"UNKLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unkline, 3}, {mo_unkline, 2}}
@@ -69,8 +71,8 @@ static int find_user_host(struct Client *source_p, const char *userhost, char *u
 static int valid_user_host(struct Client *source_p, const char *user, const char *host);
 static int valid_wild_card(struct Client *source_p, const char *user, const char *host);
 
-static void set_kline(struct Client *source_p, const char *user, const char *host, 
-			const char *lreason, int tkline_time, int admin);
+static void set_kline(struct Client *source_p, const char *user, const char *host,
+		      const char *lreason, int tkline_time, int admin);
 static void apply_kline(struct Client *source_p, struct ConfItem *aconf,
 			const char *reason, const char *oper_reason, const char *current_date,
 			int perm);
@@ -128,7 +130,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 		target_server = parv[loc + 1];
 		loc += 2;
-	} 
+	}
 
 	if(parc <= loc || EmptyString(parv[loc]))
 	{
@@ -137,7 +139,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 	}
 	reason = LOCAL_COPY(parv[loc]);
-	
+
 	if(target_server != NULL)
 	{
 		sendto_match_servs(source_p, target_server, CAP_ENCAP, NOCAPS,
@@ -199,8 +201,7 @@ mo_adminkline(struct Client *client_p, struct Client *source_p, int parc, const 
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name,
-			   "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return 0;
 	}
 
@@ -313,7 +314,8 @@ me_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 }
 
 static void
-set_kline(struct Client *source_p, const char *user, const char *host, const char *lreason, int tkline_time, int admin)
+set_kline(struct Client *source_p, const char *user, const char *host, const char *lreason,
+	  int tkline_time, int admin)
 {
 	char buffer[IRCD_BUFSIZE];
 	struct ConfItem *aconf;
@@ -323,8 +325,7 @@ set_kline(struct Client *source_p, const char *user, const char *host, const cha
 
 	reason = LOCAL_COPY_N(lreason, REASONLEN);
 
-	if(!valid_user_host(source_p, user, host) ||
-	   !valid_wild_card(source_p, user, host))
+	if(!valid_user_host(source_p, user, host) || !valid_wild_card(source_p, user, host))
 		return;
 
 	if(already_placed_kline(source_p, user, host, tkline_time))
@@ -351,7 +352,7 @@ set_kline(struct Client *source_p, const char *user, const char *host, const cha
 	{
 		rb_snprintf(buffer, sizeof(buffer),
 			    "Temporary K-line %d min. - %s (%s)",
-			    (int) (tkline_time / 60), reason, current_date);
+			    (int)(tkline_time / 60), reason, current_date);
 		aconf->passwd = rb_strdup(buffer);
 		apply_tkline(source_p, aconf, reason, oper_reason, current_date, tkline_time);
 	}
@@ -395,9 +396,10 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s added K-Line for [%s@%s] [%s]",
-			     aconf->info.oper, aconf->user, aconf->host, make_ban_reason(reason, oper_reason));
-	ilog(L_KLINE, "K %s 0 %s %s %s",
-	     aconf->info.oper, aconf->user, aconf->host, make_ban_reason(reason, oper_reason));
+			     aconf->info.oper, aconf->user, aconf->host, make_ban_reason(reason,
+											 oper_reason));
+	ilog(L_KLINE, "K %s 0 %s %s %s", aconf->info.oper, aconf->user, aconf->host,
+	     make_ban_reason(reason, oper_reason));
 
 	sendto_one_notice(source_p, ":Added %s [%s@%s]",
 			  locked ? "Locked K-Line" : "K-Line", aconf->user, aconf->host);
@@ -428,7 +430,7 @@ apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 			     aconf->info.oper, tkline_time / 60,
 			     aconf->user, aconf->host, make_ban_reason(reason, oper_reason));
 	ilog(L_KLINE, "K %s %d %s %s %s",
-	     aconf->info.oper, tkline_time / 60, aconf->user, aconf->host, 
+	     aconf->info.oper, tkline_time / 60, aconf->user, aconf->host,
 	     make_ban_reason(reason, oper_reason));
 
 	sendto_one_notice(source_p, ":Added temporary %d min. K-Line [%s@%s]",
@@ -441,7 +443,7 @@ is_ip_number(const char *number)
 {
 	if(strlen(number) > 3)
 		return 0;
-	while (*number)
+	while(*number)
 	{
 		if(!IsDigit(*number++))
 			return 0;
@@ -570,7 +572,7 @@ valid_user_host(struct Client *source_p, const char *luser, const char *lhost)
 {
 	const char *p;
 
-	for (p = luser; *p; p++)
+	for(p = luser; *p; p++)
 	{
 		if(!IsUserChar(*p) && !IsKWildChar(*p))
 		{
@@ -579,7 +581,7 @@ valid_user_host(struct Client *source_p, const char *luser, const char *lhost)
 		}
 	}
 
-	for (p = lhost; *p; p++)
+	for(p = lhost; *p; p++)
 	{
 		if(!IsHostChar(*p) && !IsKWildChar(*p))
 		{
@@ -606,7 +608,7 @@ valid_wild_card(struct Client *source_p, const char *luser, const char *lhost)
 
 	/* check there are enough non wildcard chars */
 	p = luser;
-	while ((tmpch = *p++))
+	while((tmpch = *p++))
 	{
 		if(!IsKWildChar(tmpch))
 		{
@@ -618,7 +620,7 @@ valid_wild_card(struct Client *source_p, const char *luser, const char *lhost)
 
 	/* try host, as user didnt contain enough */
 	p = lhost;
-	while ((tmpch = *p++))
+	while((tmpch = *p++))
 	{
 		if(!IsKWildChar(tmpch))
 			if(++nonwild >= ConfigFileEntry.min_nonwildcard)
@@ -652,7 +654,7 @@ already_placed_kline(struct Client *source_p, const char *luser, const char *lho
 	int t;
 	if(ConfigFileEntry.non_redundant_klines)
 	{
-		if((t = parse_netmask(lhost, (struct sockaddr *) &iphost, NULL)) != HM_HOST)
+		if((t = parse_netmask(lhost, (struct sockaddr *)&iphost, NULL)) != HM_HOST)
 		{
 #ifdef RB_IPV6
 			if(t == HM_IPV6)
@@ -667,7 +669,7 @@ already_placed_kline(struct Client *source_p, const char *luser, const char *lho
 			piphost = NULL;
 
 		if((aconf =
-		    find_conf_by_address(lhost, NULL, (struct sockaddr *) piphost, CONF_KILL, t,
+		    find_conf_by_address(lhost, NULL, (struct sockaddr *)piphost, CONF_KILL, t,
 					 luser)))
 		{
 			/* setting a tkline, or existing one is perm */
@@ -712,7 +714,8 @@ remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 
 			if(IsConfLocked(aconf) && !IsOperAdmin(source_p))
 			{
-				sendto_one_notice(source_p, ":Cannot remove locked K-Line %s@%s", user, host);
+				sendto_one_notice(source_p, ":Cannot remove locked K-Line %s@%s",
+						  user, host);
 				return;
 			}
 
@@ -729,7 +732,7 @@ remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 		}
 
 	}
-	HOSTHASH_WALK_END; 
+	HOSTHASH_WALK_END;
 	sendto_one_notice(source_p, ":No K-Line for %s@%s", user, host);
 }
 
@@ -746,7 +749,7 @@ remove_temp_kline(struct Client *source_p, const char *user, const char *host)
 	rb_dlink_node *ptr;
 	int i;
 
-	for (i = 0; i < LAST_TEMP_TYPE; i++)
+	for(i = 0; i < LAST_TEMP_TYPE; i++)
 	{
 		RB_DLINK_FOREACH(ptr, temp_klines[i].head)
 		{

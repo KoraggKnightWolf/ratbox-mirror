@@ -45,6 +45,7 @@ struct Message topic_msgtab = {
 };
 
 mapi_clist_av1 topic_clist[] = { &topic_msgtab, NULL };
+
 DECLARE_MODULE_AV1(topic, NULL, NULL, topic_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -78,7 +79,7 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(chptr == NULL)
 	{
 		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-				form_str(ERR_NOSUCHCHANNEL), parv[1]);
+				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
 
@@ -90,7 +91,7 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(msptr == NULL)
 		{
 			sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
-					form_str(ERR_NOTONCHANNEL), parv[1]);
+					   form_str(ERR_NOTONCHANNEL), parv[1]);
 			return 0;
 		}
 
@@ -98,49 +99,48 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 		{
 			char topic_info[USERHOST_REPLYLEN];
 			rb_sprintf(topic_info, "%s!%s@%s",
-					source_p->name, source_p->username, source_p->host);
+				   source_p->name, source_p->username, source_p->host);
 			set_channel_topic(chptr, parv[2], topic_info, rb_current_time());
 
 			sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
-					":%s TOPIC %s :%s",
-					use_id(source_p), chptr->chname,
-					chptr->topic == NULL ? "" : chptr->topic->topic);
+				      ":%s TOPIC %s :%s",
+				      use_id(source_p), chptr->chname,
+				      chptr->topic == NULL ? "" : chptr->topic->topic);
 			sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
-					":%s TOPIC %s :%s",
-					source_p->name, chptr->chname,
-					chptr->topic == NULL ? "" : chptr->topic->topic);
+				      ":%s TOPIC %s :%s",
+				      source_p->name, chptr->chname,
+				      chptr->topic == NULL ? "" : chptr->topic->topic);
 			sendto_channel_local(ALL_MEMBERS,
-					chptr, ":%s!%s@%s TOPIC %s :%s",
-					source_p->name, source_p->username,
-					source_p->host, chptr->chname,
-					chptr->topic == NULL ? "" : chptr->topic->topic);
+					     chptr, ":%s!%s@%s TOPIC %s :%s",
+					     source_p->name, source_p->username,
+					     source_p->host, chptr->chname,
+					     chptr->topic == NULL ? "" : chptr->topic->topic);
 		}
 		else
 			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-					me.name, source_p->name, parv[1]);
+				   me.name, source_p->name, parv[1]);
 	}
 	else if(MyClient(source_p))
 	{
 		if(!IsMember(source_p, chptr) && SecretChannel(chptr))
 		{
 			sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
-					form_str(ERR_NOTONCHANNEL), parv[1]);
+					   form_str(ERR_NOTONCHANNEL), parv[1]);
 			return 0;
 		}
 		if(chptr->topic == NULL)
 			sendto_one(source_p, form_str(RPL_NOTOPIC),
-					me.name, source_p->name, parv[1]);
+				   me.name, source_p->name, parv[1]);
 		else
 		{
 			sendto_one(source_p, form_str(RPL_TOPIC),
-					me.name, source_p->name, chptr->chname, chptr->topic->topic);
+				   me.name, source_p->name, chptr->chname, chptr->topic->topic);
 
 			sendto_one(source_p, form_str(RPL_TOPICWHOTIME),
-					me.name, source_p->name, chptr->chname,
-					chptr->topic->topic_info, chptr->topic->topic_time);
+				   me.name, source_p->name, chptr->chname,
+				   chptr->topic->topic_info, chptr->topic->topic_time);
 		}
 	}
 
 	return 0;
 }
-

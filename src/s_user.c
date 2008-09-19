@@ -185,46 +185,39 @@ show_lusers(struct Client *source_p)
 			   Count.invisi, rb_dlink_list_length(&global_serv_list));
 
 	if(Count.oper > 0)
-		sendto_one_numeric(source_p, RPL_LUSEROP, 
-				   form_str(RPL_LUSEROP), Count.oper);
+		sendto_one_numeric(source_p, RPL_LUSEROP, form_str(RPL_LUSEROP), Count.oper);
 
 	if(rb_dlink_list_length(&unknown_list) > 0)
-		sendto_one_numeric(source_p, RPL_LUSERUNKNOWN, 
-				   form_str(RPL_LUSERUNKNOWN),
-				   rb_dlink_list_length(&unknown_list));
+		sendto_one_numeric(source_p, RPL_LUSERUNKNOWN,
+				   form_str(RPL_LUSERUNKNOWN), rb_dlink_list_length(&unknown_list));
 
 	if(rb_dlink_list_length(&global_channel_list) > 0)
-		sendto_one_numeric(source_p, RPL_LUSERCHANNELS, 
+		sendto_one_numeric(source_p, RPL_LUSERCHANNELS,
 				   form_str(RPL_LUSERCHANNELS),
 				   rb_dlink_list_length(&global_channel_list));
 
 	sendto_one_numeric(source_p, RPL_LUSERME, form_str(RPL_LUSERME),
-			   rb_dlink_list_length(&lclient_list),
-			   rb_dlink_list_length(&serv_list));
+			   rb_dlink_list_length(&lclient_list), rb_dlink_list_length(&serv_list));
 
-	sendto_one_numeric(source_p, RPL_LOCALUSERS, 
+	sendto_one_numeric(source_p, RPL_LOCALUSERS,
 			   form_str(RPL_LOCALUSERS),
 			   rb_dlink_list_length(&lclient_list),
-			   Count.max_loc,
-			   rb_dlink_list_length(&lclient_list),
-			   Count.max_loc);
+			   Count.max_loc, rb_dlink_list_length(&lclient_list), Count.max_loc);
 
 	sendto_one_numeric(source_p, RPL_GLOBALUSERS, form_str(RPL_GLOBALUSERS),
-			   Count.total, Count.max_tot,
-			   Count.total, Count.max_tot);
+			   Count.total, Count.max_tot, Count.total, Count.max_tot);
 
 	sendto_one_numeric(source_p, RPL_STATSCONN,
 			   form_str(RPL_STATSCONN),
-			   MaxConnectionCount, MaxClientCount, 
-			   Count.totalrestartcount);
+			   MaxConnectionCount, MaxClientCount, Count.totalrestartcount);
 
 	if(rb_dlink_list_length(&lclient_list) > (unsigned long)MaxClientCount)
 		MaxClientCount = rb_dlink_list_length(&lclient_list);
 
 	if((rb_dlink_list_length(&lclient_list) + rb_dlink_list_length(&serv_list)) >
 	   (unsigned long)MaxConnectionCount)
-		MaxConnectionCount = rb_dlink_list_length(&lclient_list) + 
-					rb_dlink_list_length(&serv_list);
+		MaxConnectionCount = rb_dlink_list_length(&lclient_list) +
+			rb_dlink_list_length(&serv_list);
 	ClearCork(source_p);
 	send_pop_queue(source_p);
 
@@ -261,7 +254,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	struct ConfItem *aconf;
 	char tmpstr2[IRCD_BUFSIZE];
 	char ipaddr[HOSTIPLEN];
-	char myusername[USERLEN+1];
+	char myusername[USERLEN + 1];
 	int status;
 
 	s_assert(NULL != source_p);
@@ -278,7 +271,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	{
 		if(!(source_p->flags & FLAGS_PINGSENT) && source_p->localClient->random_ping == 0)
 		{
-			source_p->localClient->random_ping = (uint32_t) (rand() * rand()) << 1;
+			source_p->localClient->random_ping = (uint32_t)(rand() * rand()) << 1;
 			sendto_one(source_p, "PING :%08X",
 				   (unsigned int)source_p->localClient->random_ping);
 			source_p->flags |= FLAGS_PINGSENT;
@@ -327,11 +320,12 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		rb_strlcpy(source_p->host, source_p->sockhost, sizeof(source_p->host));
 
 #ifdef RB_IPV6
-		if(ConfigFileEntry.dot_in_ip6_addr == 1 && (GET_SS_FAMILY(&source_p->localClient->ip) == AF_INET6))
+		if(ConfigFileEntry.dot_in_ip6_addr == 1
+		   && (GET_SS_FAMILY(&source_p->localClient->ip) == AF_INET6))
 			rb_strlcat(source_p->host, ".", sizeof(source_p->host));
 #endif
 	}
- 
+
 
 	aconf = source_p->localClient->att_conf;
 
@@ -344,7 +338,8 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(IsConfSSLNeeded(aconf) && !IsSSL(source_p))
 	{
 		ServerStats.is_ref++;
-		sendto_one_notice(source_p, ":*** Notice -- You need to use SSL/TLS to use this server");
+		sendto_one_notice(source_p,
+				  ":*** Notice -- You need to use SSL/TLS to use this server");
 		exit_client(client_p, source_p, &me, "Use SSL/TLS");
 		return (CLIENT_EXITED);
 	}
@@ -357,8 +352,8 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		if(IsNeedIdentd(aconf))
 		{
 			ServerStats.is_ref++;
-			sendto_one_notice(source_p, 
-				   ":*** Notice -- You need to install identd to use this server");
+			sendto_one_notice(source_p,
+					  ":*** Notice -- You need to install identd to use this server");
 			exit_client(client_p, source_p, &me, "Install identd");
 			return (CLIENT_EXITED);
 		}
@@ -371,7 +366,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 			if(!IsNoTilde(aconf))
 				source_p->username[i++] = '~';
 
-			while (*p && i < USERLEN)
+			while(*p && i < USERLEN)
 			{
 				if(*p != '[')
 					source_p->username[i++] = *p;
@@ -422,13 +417,14 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	 *   -Taner
 	 */
 	/* Except "F:" clients */
-	if(((rb_dlink_list_length(&lclient_list) + 1) >= 
-	   ((unsigned long)GlobalSetOptions.maxclients + MAX_BUFFER) ||
-	   (rb_dlink_list_length(&lclient_list) + 1) >= 
+	if(((rb_dlink_list_length(&lclient_list) + 1) >=
+	    ((unsigned long)GlobalSetOptions.maxclients + MAX_BUFFER) ||
+	    (rb_dlink_list_length(&lclient_list) + 1) >=
 	    ((unsigned long)GlobalSetOptions.maxclients - 5)) && !(IsExemptLimits(source_p)))
 	{
 		sendto_realops_flags(UMODE_FULL, L_ALL,
-				     "Too many clients, rejecting %s[%s].", source_p->name, source_p->host);
+				     "Too many clients, rejecting %s[%s].", source_p->name,
+				     source_p->host);
 
 		ServerStats.is_ref++;
 		exit_client(client_p, source_p, &me, "Sorry, server is full - try later");
@@ -451,8 +447,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	/* end of valid user name check */
 
 	/* kline exemption extends to xline too */
-	if(!IsExemptKline(source_p) &&
-	   find_xline(source_p->info, 1) != NULL)
+	if(!IsExemptKline(source_p) && find_xline(source_p->info, 1) != NULL)
 	{
 		ServerStats.is_ref++;
 		add_reject(source_p);
@@ -472,13 +467,14 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 			     get_client_class(source_p), source_p->info);
 
 	sendto_realops_flags(UMODE_CCONNEXT, L_ALL,
-			"CLICONN %s %s %s %s %s %s 0 %s",
-			source_p->name, source_p->username, source_p->host,
-			show_ip(NULL, source_p) ? ipaddr : "255.255.255.255",
-			get_client_class(source_p),
-			/* mirc sometimes puts IPs in here */
-			show_ip(NULL, source_p) ? source_p->localClient->fullcaps : "<hidden> <hidden>",
-			source_p->info);
+			     "CLICONN %s %s %s %s %s %s 0 %s",
+			     source_p->name, source_p->username, source_p->host,
+			     show_ip(NULL, source_p) ? ipaddr : "255.255.255.255",
+			     get_client_class(source_p),
+			     /* mirc sometimes puts IPs in here */
+			     show_ip(NULL,
+				     source_p) ? source_p->
+			     localClient->fullcaps : "<hidden> <hidden>", source_p->info);
 
 	/* If they have died in send_* don't do anything. */
 	if(IsAnyDead(source_p))
@@ -564,7 +560,7 @@ introduce_client(struct Client *client_p, struct Client *source_p)
 			      ":%s UID %s %d %ld %s %s %s %s %s :%s",
 			      source_p->servptr->id, source_p->name,
 			      source_p->hopcount + 1,
-			      (long) source_p->tsinfo, ubuf,
+			      (long)source_p->tsinfo, ubuf,
 			      source_p->username, source_p->host,
 			      IsIPSpoof(source_p) ? "0" : source_p->sockhost,
 			      source_p->id, source_p->info);
@@ -572,7 +568,7 @@ introduce_client(struct Client *client_p, struct Client *source_p)
 		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
 			      "NICK %s %d %ld %s %s %s %s :%s",
 			      source_p->name, source_p->hopcount + 1,
-			      (long) source_p->tsinfo,
+			      (long)source_p->tsinfo,
 			      ubuf, source_p->username, source_p->host,
 			      source_p->servptr->name, source_p->info);
 	}
@@ -580,7 +576,7 @@ introduce_client(struct Client *client_p, struct Client *source_p)
 		sendto_server(client_p, NULL, NOCAPS, NOCAPS,
 			      "NICK %s %d %ld %s %s %s %s :%s",
 			      source_p->name, source_p->hopcount + 1,
-			      (long) source_p->tsinfo,
+			      (long)source_p->tsinfo,
 			      ubuf, source_p->username, source_p->host,
 			      source_p->servptr->name, source_p->info);
 }
@@ -719,7 +715,7 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 		m = buf;
 		*m++ = '+';
 
-		for (i = 0; user_modes[i].letter && (m - buf < BUFSIZE - 4); i++)
+		for(i = 0; user_modes[i].letter && (m - buf < BUFSIZE - 4); i++)
 			if(source_p->umodes & user_modes[i].mode)
 				*m++ = user_modes[i].letter;
 		*m = '\0';
@@ -733,8 +729,8 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 	/*
 	 * parse mode change string(s)
 	 */
-	for (p = &parv[2]; p && *p; p++)
-		for (pm = *p; *pm; pm++)
+	for(p = &parv[2]; p && *p; p++)
+		for(pm = *p; *pm; pm++)
 			switch (*pm)
 			{
 			case '+':
@@ -768,14 +764,15 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 
 					if(MyConnect(source_p))
 					{
-						source_p->umodes &= ~ConfigFileEntry.oper_only_umodes;
+						source_p->umodes &=
+							~ConfigFileEntry.oper_only_umodes;
 						source_p->operflags &= ~OPER_FLAGS;
 
 						rb_free(source_p->localClient->opername);
 						source_p->localClient->opername = NULL;
 
 						rb_dlinkFindDestroy(source_p, &oper_list);
-					} 
+					}
 				}
 				break;
 
@@ -783,7 +780,7 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 				 * but they shouldnt be in default
 				 */
 
-			/* can only be set on burst */
+				/* can only be set on burst */
 #ifdef ENABLE_SERVICES
 			case 'S':
 #endif
@@ -873,7 +870,7 @@ send_umode(struct Client *client_p, struct Client *source_p, int old, int sendma
 	m = umode_buf;
 	*m = '\0';
 
-	for (i = 0; user_modes[i].letter; i++)
+	for(i = 0; user_modes[i].letter; i++)
 	{
 		flag = user_modes[i].mode;
 
@@ -930,8 +927,7 @@ send_umode_out(struct Client *client_p, struct Client *source_p, int old)
 		if((target_p != client_p) && (target_p != source_p) && (*buf))
 		{
 			sendto_one(target_p, ":%s MODE %s :%s",
-				   get_id(source_p, target_p), 
-				   get_id(source_p, target_p), buf);
+				   get_id(source_p, target_p), get_id(source_p, target_p), buf);
 		}
 	}
 
@@ -972,17 +968,16 @@ user_welcome(struct Client *source_p)
 			   "NOTICE %s :*** Notice -- Please read the motd if you haven't read it",
 			   source_p->name);
 
-		sendto_one(source_p, form_str(RPL_MOTDSTART), 
-			   me.name, source_p->name, me.name);
+		sendto_one(source_p, form_str(RPL_MOTDSTART), me.name, source_p->name, me.name);
 
 		sendto_one(source_p, form_str(RPL_MOTD),
 			   me.name, source_p->name, "*** This is the short motd ***");
 		ClearCork(source_p);
 		sendto_one(source_p, form_str(RPL_ENDOFMOTD), me.name, source_p->name);
 	}
-	else {	
+	else
+	{
 		ClearCork(source_p);
 		send_user_motd(source_p);
 	}
 }
-

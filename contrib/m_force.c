@@ -142,7 +142,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 
 		sendto_server(target_p, chptr, NOCAPS, NOCAPS,
 			      ":%s SJOIN %ld %s + :%c%s",
-			      me.name, (long) chptr->channelts,
+			      me.name, (long)chptr->channelts,
 			      chptr->chname, type ? sjmode : ' ', target_p->name);
 
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s JOIN :%s",
@@ -170,7 +170,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		if(!check_channel_name(newch))
 		{
 			sendto_one(source_p, form_str(ERR_BADCHANNAME), me.name,
-				   source_p->name, (unsigned char *) newch);
+				   source_p->name, (unsigned char *)newch);
 			return 0;
 		}
 
@@ -178,7 +178,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		if(!IsChannelName(newch))
 		{
 			sendto_one(source_p, form_str(ERR_BADCHANNAME), me.name,
-				   source_p->name, (unsigned char *) newch);
+				   source_p->name, (unsigned char *)newch);
 			return 0;
 		}
 
@@ -196,7 +196,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		/* send out a join, make target_p join chptr */
 		sendto_server(target_p, chptr, NOCAPS, NOCAPS,
 			      ":%s SJOIN %ld %s +nt :@%s", me.name,
-			      (long) chptr->channelts, chptr->chname, target_p->name);
+			      (long)chptr->channelts, chptr->chname, target_p->name);
 
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s JOIN :%s",
 				     target_p->name, target_p->username,
@@ -250,7 +250,7 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if((chptr = find_channel(parv[2])) == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL, 
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
 				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}

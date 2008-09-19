@@ -179,8 +179,7 @@ free_remote_conf(struct remote_conf *remote_p)
 }
 
 int
-find_shared_conf(const char *username, const char *host, 
-		const char *server, int flags)
+find_shared_conf(const char *username, const char *host, const char *server, int flags)
 {
 	struct remote_conf *shared_p;
 	rb_dlink_node *ptr;
@@ -190,8 +189,7 @@ find_shared_conf(const char *username, const char *host,
 		shared_p = ptr->data;
 
 		if(match(shared_p->username, username) &&
-		   match(shared_p->host, host) &&
-		   match(shared_p->server, server))
+		   match(shared_p->host, host) && match(shared_p->server, server))
 		{
 			if(shared_p->flags & flags)
 				return YES;
@@ -204,8 +202,7 @@ find_shared_conf(const char *username, const char *host,
 }
 
 void
-cluster_generic(struct Client *source_p, const char *command,
-		int cltype, const char *format, ...)
+cluster_generic(struct Client *source_p, const char *command, int cltype, const char *format, ...)
 {
 	char buffer[BUFSIZE];
 	struct remote_conf *shared_p;
@@ -224,8 +221,7 @@ cluster_generic(struct Client *source_p, const char *command,
 			continue;
 
 		sendto_match_servs(source_p, shared_p->server, CAP_ENCAP, NOCAPS,
-				"ENCAP %s %s %s",
-				shared_p->server, command, buffer);
+				   "ENCAP %s %s %s", shared_p->server, command, buffer);
 	}
 }
 
@@ -287,7 +283,7 @@ find_oper_conf(const char *username, const char *host, const char *locip, const 
 {
 	struct oper_conf *oper_p;
 	struct rb_sockaddr_storage ip, cip;
-	char addr[HOSTLEN+1];
+	char addr[HOSTLEN + 1];
 	int bits, cbits;
 	rb_dlink_node *ptr;
 
@@ -306,7 +302,8 @@ find_oper_conf(const char *username, const char *host, const char *locip, const 
 		if(parse_netmask(addr, (struct sockaddr *)&ip, &bits) != HM_HOST)
 		{
 			if(GET_SS_FAMILY(&ip) == GET_SS_FAMILY(&cip) &&
-			   comp_with_mask_sock((struct sockaddr *)&ip, (struct sockaddr *)&cip, bits))
+			   comp_with_mask_sock((struct sockaddr *)&ip, (struct sockaddr *)&cip,
+					       bits))
 				return oper_p;
 		}
 
@@ -327,25 +324,24 @@ struct oper_flags
 	char has;
 	char hasnt;
 };
-static struct oper_flags oper_flagtable[] =
-{
-	{ OPER_GLINE,		'G', 'g' },
-	{ OPER_KLINE,		'K', 'k' },
-	{ OPER_XLINE,		'X', 'x' },
-	{ OPER_RESV,		'Q', 'q' },
-	{ OPER_GLOBKILL,	'O', 'o' },
-	{ OPER_LOCKILL,		'C', 'c' },
-	{ OPER_REMOTE,		'R', 'r' },
-	{ OPER_UNKLINE,		'U', 'u' },
-	{ OPER_REHASH,		'H', 'h' },
-	{ OPER_DIE,		'D', 'd' },
-	{ OPER_ADMIN,		'A', 'a' },
-	{ OPER_NICKS,		'N', 'n' },
-	{ OPER_OPERWALL,	'L', 'l' },
-	{ OPER_SPY,		'S', 's' },
-	{ OPER_INVIS,		'P', 'p' },
-	{ OPER_REMOTEBAN,	'B', 'b' },
-	{ 0,			'\0', '\0' }
+static struct oper_flags oper_flagtable[] = {
+	{OPER_GLINE, 'G', 'g'},
+	{OPER_KLINE, 'K', 'k'},
+	{OPER_XLINE, 'X', 'x'},
+	{OPER_RESV, 'Q', 'q'},
+	{OPER_GLOBKILL, 'O', 'o'},
+	{OPER_LOCKILL, 'C', 'c'},
+	{OPER_REMOTE, 'R', 'r'},
+	{OPER_UNKLINE, 'U', 'u'},
+	{OPER_REHASH, 'H', 'h'},
+	{OPER_DIE, 'D', 'd'},
+	{OPER_ADMIN, 'A', 'a'},
+	{OPER_NICKS, 'N', 'n'},
+	{OPER_OPERWALL, 'L', 'l'},
+	{OPER_SPY, 'S', 's'},
+	{OPER_INVIS, 'P', 'p'},
+	{OPER_REMOTEBAN, 'B', 'b'},
+	{0, '\0', '\0'}
 };
 
 const char *
@@ -432,13 +428,12 @@ add_server_conf(struct server_conf *server_p)
 {
 	if(EmptyString(server_p->class_name))
 		server_p->class = default_class;
-	else 
+	else
 		server_p->class = find_class(server_p->class_name);
 
 	if(server_p->class == default_class)
 	{
-		conf_report_error("Warning connect::class invalid for %s",
-				server_p->name);
+		conf_report_error("Warning connect::class invalid for %s", server_p->name);
 
 		rb_free(server_p->class_name);
 		server_p->class_name = rb_strdup("default");
@@ -450,7 +445,9 @@ add_server_conf(struct server_conf *server_p)
 	if(rb_inet_pton_sock(server_p->host, (struct sockaddr *)&server_p->ipnum) > 0)
 		return;
 
-	server_p->dns_query = lookup_hostname(server_p->host, GET_SS_FAMILY(&server_p->ipnum), conf_dns_callback, server_p);
+	server_p->dns_query =
+		lookup_hostname(server_p->host, GET_SS_FAMILY(&server_p->ipnum), conf_dns_callback,
+				server_p);
 }
 
 struct server_conf *
@@ -528,8 +525,8 @@ set_server_conf_autoconn(struct Client *source_p, char *name, int newval)
 			server_p->flags &= ~SERVER_AUTOCONN;
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				"%s has changed AUTOCONN for %s to %i",
-				get_oper_name(source_p), name, newval);
+				     "%s has changed AUTOCONN for %s to %i",
+				     get_oper_name(source_p), name, newval);
 	}
 	else
 		sendto_one_notice(source_p, ":Can't find %s", name);
@@ -627,7 +624,7 @@ clean_resv_nick(const char *nick)
 	if(*nick == '-' || IsDigit(*nick))
 		return 0;
 
-	while ((tmpch = *nick++))
+	while((tmpch = *nick++))
 	{
 		if(tmpch == '?' || tmpch == '@' || tmpch == '#')
 			q++;
@@ -703,7 +700,7 @@ valid_temp_time(const char *p)
 	if(result > (60 * 24 * 7 * 52))
 		result = (60 * 24 * 7 * 52);
 
-	return(result * 60);
+	return (result * 60);
 }
 
 static void
@@ -722,16 +719,14 @@ expire_temp_rxlines(void *unused)
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						"Temporary RESV for [%s] expired",
-						aconf->host);
+						     "Temporary RESV for [%s] expired",
+						     aconf->host);
 
 			free_conf(aconf);
 			rb_dlinkDestroy(ptr, &resvTable[i]);
 		}
 	}
-	HASH_WALK_END
-
-	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
+	HASH_WALK_END RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
 	{
 		aconf = ptr->data;
 
@@ -739,8 +734,8 @@ expire_temp_rxlines(void *unused)
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						"Temporary RESV for [%s] expired",
-						aconf->host);
+						     "Temporary RESV for [%s] expired",
+						     aconf->host);
 			free_conf(aconf);
 			rb_dlinkDestroy(ptr, &resv_conf_list);
 		}
@@ -754,8 +749,8 @@ expire_temp_rxlines(void *unused)
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						"Temporary X-line for [%s] expired",
-						aconf->host);
+						     "Temporary X-line for [%s] expired",
+						     aconf->host);
 			free_conf(aconf);
 			rb_dlinkDestroy(ptr, &xline_conf_list);
 		}
@@ -765,7 +760,7 @@ expire_temp_rxlines(void *unused)
 unsigned long
 get_nd_count(void)
 {
-	return(rb_dlink_list_length(&nd_list));
+	return (rb_dlink_list_length(&nd_list));
 }
 
 
@@ -778,7 +773,7 @@ add_nd_entry(const char *name)
 		return;
 
 	nd = rb_bh_alloc(nd_heap);
-	
+
 	rb_strlcpy(nd->name, name, sizeof(nd->name));
 	nd->expire = rb_current_time() + ConfigFileEntry.nick_delay;
 
@@ -832,7 +827,7 @@ add_tgchange(const char *host)
 	target->pnode = pnode;
 
 	target->ip = rb_strdup(host);
-	target->expiry = rb_current_time() + (60*60*12);
+	target->expiry = rb_current_time() + (60 * 60 * 12);
 
 	rb_dlinkAdd(target, &target->node, &tgchange_list);
 }
@@ -847,4 +842,3 @@ find_tgchange(const char *host)
 
 	return NULL;
 }
-

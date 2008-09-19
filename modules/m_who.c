@@ -48,6 +48,7 @@ struct Message who_msgtab = {
 };
 
 mapi_clist_av1 who_clist[] = { &who_msgtab, NULL };
+
 DECLARE_MODULE_AV1(who, NULL, NULL, who_clist, NULL, NULL, "$Revision$");
 
 static void do_who_on_channel(struct Client *source_p, struct Channel *chptr,
@@ -87,7 +88,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	{
 		if(source_p->user == NULL)
 			return 0;
-		
+
 		if((lp = source_p->user->channel.head) != NULL)
 		{
 			msptr = lp->data;
@@ -96,8 +97,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 			ClearCork(source_p);
 		}
 
-		sendto_one(source_p, form_str(RPL_ENDOFWHO),
-			   me.name, source_p->name, "*");
+		sendto_one(source_p, form_str(RPL_ENDOFWHO), me.name, source_p->name, "*");
 		return 0;
 	}
 
@@ -109,7 +109,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 		if(EmptyString(mask))
 		{
 			sendto_one(source_p, form_str(RPL_ENDOFWHO),
-					me.name, source_p->name, parv[1]);
+				   me.name, source_p->name, parv[1]);
 			return 0;
 		}
 	}
@@ -137,8 +137,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 
 	/* '/who nick' */
 
-	if(((target_p = find_named_person(mask)) != NULL) &&
-	   (!server_oper || IsOper(target_p)))
+	if(((target_p = find_named_person(mask)) != NULL) && (!server_oper || IsOper(target_p)))
 	{
 		int isinvis = 0;
 
@@ -162,12 +161,12 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 		 */
 		if(lp != NULL)
 			do_who(source_p, target_p, chptr->chname,
-			       find_channel_status(lp->data, IsCapable(source_p, CLICAP_MULTI_PREFIX)));
+			       find_channel_status(lp->data,
+						   IsCapable(source_p, CLICAP_MULTI_PREFIX)));
 		else
 			do_who(source_p, target_p, NULL, "");
 
-		sendto_one(source_p, form_str(RPL_ENDOFWHO), 
-			   me.name, source_p->name, mask);
+		sendto_one(source_p, form_str(RPL_ENDOFWHO), me.name, source_p->name, mask);
 		return 0;
 	}
 
@@ -179,10 +178,8 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	{
 		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
-			sendto_one(source_p, form_str(RPL_LOAD2HI),
-					me.name, source_p->name, "WHO");
-			sendto_one(source_p, form_str(RPL_ENDOFWHO),
-				   me.name, source_p->name, "*");
+			sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "WHO");
+			sendto_one(source_p, form_str(RPL_ENDOFWHO), me.name, source_p->name, "*");
 			return 0;
 		}
 		else
@@ -199,8 +196,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	else
 		who_global(source_p, mask, server_oper, operspy);
 	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_ENDOFWHO),
-		   me.name, source_p->name, mask);
+	sendto_one(source_p, form_str(RPL_ENDOFWHO), me.name, source_p->name, mask);
 
 	return 0;
 }
@@ -318,10 +314,8 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 
 	}
 
-	if (maxmatches <= 0)
-		sendto_one(source_p,
-			form_str(ERR_TOOMANYMATCHES),
-			me.name, source_p->name, "WHO");
+	if(maxmatches <= 0)
+		sendto_one(source_p, form_str(ERR_TOOMANYMATCHES), me.name, source_p->name, "WHO");
 }
 
 /*
@@ -336,8 +330,7 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
  * side effects - do a who on given channel
  */
 static void
-do_who_on_channel(struct Client *source_p, struct Channel *chptr,
-		  int server_oper, int member)
+do_who_on_channel(struct Client *source_p, struct Channel *chptr, int server_oper, int member)
 {
 	struct Client *target_p;
 	struct membership *msptr;
@@ -375,13 +368,11 @@ do_who(struct Client *source_p, struct Client *target_p, const char *chname, con
 	char status[5];
 
 	rb_snprintf(status, sizeof(status), "%c%s%s",
-		   target_p->user->away ? 'G' : 'H', IsOper(target_p) ? "*" : "", op_flags);
+		    target_p->user->away ? 'G' : 'H', IsOper(target_p) ? "*" : "", op_flags);
 
 	sendto_one(source_p, form_str(RPL_WHOREPLY), me.name, source_p->name,
 		   (chname) ? (chname) : "*",
 		   target_p->username,
 		   target_p->host, target_p->servptr->name, target_p->name,
-		   status, 
-		   ConfigServerHide.flatten_links ? 0 : target_p->hopcount, 
-		   target_p->info);
+		   status, ConfigServerHide.flatten_links ? 0 : target_p->hopcount, target_p->info);
 }

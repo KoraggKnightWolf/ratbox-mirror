@@ -140,7 +140,7 @@ main(int argc, char *argv[])
 
 	rb_strlcpy(me, argv[0], sizeof(me));
 
-	while ((opt = getopt(argc, argv, "hieuspvwd")) != -1)
+	while((opt = getopt(argc, argv, "hieuspvwd")) != -1)
 	{
 		switch (opt)
 		{
@@ -188,8 +188,8 @@ main(int argc, char *argv[])
 	   || (flag.verify && flag.pretend) || (flag.export && flag.pretend))
 	{
 		fprintf(stderr, "* Error: Conflicting flags.\n");
-        if (flag.export && flag.pretend)
-                fprintf(stderr, "* There is nothing to 'pretend' when exporting.\n");
+		if(flag.export && flag.pretend)
+			fprintf(stderr, "* There is nothing to 'pretend' when exporting.\n");
 
 		fprintf(stderr, "* For an explination of commands, run: %s -h\n", me);
 		exit(EXIT_FAILURE);
@@ -215,7 +215,7 @@ main(int argc, char *argv[])
 		if(flag.import && flag.wipe)
 		{
 			flag.dupes_ok = YES;	/* dont check for dupes if we are wiping the db clean */
-			for (i = 0; i < 3; i++)
+			for(i = 0; i < 3; i++)
 				fprintf(stdout,
 					"* WARNING: YOU ARE ABOUT TO WIPE YOUR DATABASE!\n");
 
@@ -230,7 +230,7 @@ main(int argc, char *argv[])
 		fprintf(stdout, "* Allowing duplicate bans...\n");
 
 	/* checking for our files to import or export */
-	for (i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
 		rb_snprintf(conf, sizeof(conf), "%s/%s.conf%s",
 			    etc, bandb_table[i], bandb_suffix[i]);
@@ -320,7 +320,7 @@ export_config(const char *conf, int id)
 		return;
 	}
 
-	for (j = 0; j < table.row_count; j++)
+	for(j = 0; j < table.row_count; j++)
 	{
 		switch (id)
 		{
@@ -417,7 +417,7 @@ import_config(const char *conf, int id)
 	 * dline
 	 * "194.158.192.0/19","laptop scammers","","2005/3/17 05.33","stevoo!stevoo@efnet.port80.se{stevoo}",1111033988
 	 */
-	while (fgets(line, sizeof(line), fd))
+	while(fgets(line, sizeof(line), fd))
 	{
 		if((p = strpbrk(line, "\r\n")) != NULL)
 			*p = '\0';
@@ -568,7 +568,7 @@ getfield(char *newline)
 
 	end = strchr(line, ',');
 
-	while (1)
+	while(1)
 	{
 		/* no trailing , - last field */
 		if(end == NULL)
@@ -616,7 +616,7 @@ strip_quotes(const char *string)
 	if(string == NULL)
 		return NULL;
 
-	while (*string)
+	while(*string)
 	{
 		if(*string != '"')
 		{
@@ -640,7 +640,7 @@ escape_quotes(const char *string)
 	if(string == NULL)
 		return NULL;
 
-	while (*string)
+	while(*string)
 	{
 		if(*string == '"')
 		{
@@ -667,9 +667,9 @@ mangle_reason(const char *string)
 	if(string == NULL)
 		return NULL;
 
-	while (*string)
+	while(*string)
 	{
-		switch(*string)
+		switch (*string)
 		{
 		case '"':
 			*str = '\'';
@@ -682,7 +682,7 @@ mangle_reason(const char *string)
 		}
 		string++;
 		str++;
-		
+
 	}
 	*str = '\0';
 	return buf;
@@ -701,7 +701,7 @@ clean_gecos_field(const char *gecos)
 	if(gecos == NULL)
 		return NULL;
 
-	while (*gecos)
+	while(*gecos)
 	{
 		if(*gecos == ' ')
 		{
@@ -738,7 +738,7 @@ check_schema(void)
 		NULL
 	};
 
-	for (i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
 		if(!table_exists(bandb_table[i]))
 		{
@@ -753,7 +753,7 @@ check_schema(void)
 		 */
 		else
 		{
-			for (j = 0; columns[j] != NULL; j++)
+			for(j = 0; columns[j] != NULL; j++)
 			{
 				if(!strcmp(columns[j], "time") && !strcmp(columns[j], "perm"))
 					rb_strlcpy(type, "INTEGER", sizeof(type));
@@ -811,7 +811,7 @@ wipe_schema(void)
 {
 	int i;
 	rsdb_transaction(RSDB_TRANS_START);
-	for (i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
 		rsdb_exec(NULL, "DROP TABLE %s", bandb_table[i]);
 		i++;		/* double increment to skip over .perm */

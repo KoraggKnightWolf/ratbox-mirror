@@ -14,7 +14,7 @@
 #include "ratbox_lib.h"
 #include "struct.h"
 #include "client.h"
-#include "common.h"		
+#include "common.h"
 #include "ircd.h"
 #include "match.h"
 #include "numeric.h"

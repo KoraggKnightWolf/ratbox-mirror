@@ -105,15 +105,13 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	if(!IsFloodDone(source_p))
 		flood_endgrace(source_p);
 
-	oper_p = find_oper_conf(source_p->username, source_p->host, 
-				source_p->sockhost, name);
+	oper_p = find_oper_conf(source_p->username, source_p->host, source_p->sockhost, name);
 
 	if(oper_p == NULL)
 	{
 		sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
 		ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
-		     name, source_p->name,
-		     source_p->username, source_p->host);
+		     name, source_p->name, source_p->username, source_p->host);
 
 		if(ConfigFileEntry.failed_oper_notice)
 		{
@@ -128,8 +126,7 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	{
 		sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
 		ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s) -- requires SSL/TLS",
-		     name, source_p->name,
-		     source_p->username, source_p->host);
+		     name, source_p->name, source_p->username, source_p->host);
 
 		if(ConfigFileEntry.failed_oper_notice)
 		{
@@ -150,8 +147,7 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	}
 	else
 	{
-		sendto_one(source_p, form_str(ERR_PASSWDMISMATCH),
-			   me.name, source_p->name);
+		sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 
 		ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 		     name, source_p->name, source_p->username, source_p->host);
@@ -183,18 +179,15 @@ send_oper_motd(struct Client *source_p)
 	if(oper_motd == NULL || rb_dlink_list_length(&oper_motd->contents) == 0)
 		return;
 	SetCork(source_p);
-	sendto_one(source_p, form_str(RPL_OMOTDSTART), 
-		   me.name, source_p->name);
+	sendto_one(source_p, form_str(RPL_OMOTDSTART), me.name, source_p->name);
 
 	RB_DLINK_FOREACH(ptr, oper_motd->contents.head)
 	{
 		lineptr = ptr->data;
-		sendto_one(source_p, form_str(RPL_OMOTD),
-			   me.name, source_p->name, lineptr->data);
+		sendto_one(source_p, form_str(RPL_OMOTD), me.name, source_p->name, lineptr->data);
 	}
 	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_ENDOFOMOTD), 
-		   me.name, source_p->name);
+	sendto_one(source_p, form_str(RPL_ENDOFOMOTD), me.name, source_p->name);
 }
 
 
@@ -307,7 +300,7 @@ cleanup_challenge(struct Client *target_p)
 {
 	if(target_p->localClient == NULL)
 		return;
-	
+
 	rb_free(target_p->localClient->passwd);
 	rb_free(target_p->localClient->opername);
 	target_p->localClient->passwd = NULL;
@@ -327,7 +320,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 {
 	struct oper_conf *oper_p;
 	char *challenge = NULL;
-	char chal_line[CHALLENGE_WIDTH]; 
+	char chal_line[CHALLENGE_WIDTH];
 	uint8_t *b_response;
 	int len = 0;
 	size_t cnt;
@@ -357,12 +350,14 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 						     source_p->name, source_p->username,
 						     source_p->host);
 			cleanup_challenge(source_p);
-			return 0;			
+			return 0;
 		}
 
-		b_response = rb_base64_decode((const unsigned char *)++parv[1], strlen(parv[1]), &len);
+		b_response =
+			rb_base64_decode((const unsigned char *)++parv[1], strlen(parv[1]), &len);
 
-		if(len != SHA_DIGEST_LENGTH || memcmp(source_p->localClient->passwd, b_response, SHA_DIGEST_LENGTH))
+		if(len != SHA_DIGEST_LENGTH
+		   || memcmp(source_p->localClient->passwd, b_response, SHA_DIGEST_LENGTH))
 		{
 			sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
@@ -382,14 +377,12 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		rb_free(b_response);
 
-		oper_p = find_oper_conf(source_p->username, source_p->host, 
-					source_p->sockhost, 
-					source_p->localClient->opername);
+		oper_p = find_oper_conf(source_p->username, source_p->host,
+					source_p->sockhost, source_p->localClient->opername);
 
 		if(oper_p == NULL)
 		{
-			sendto_one(source_p, form_str(ERR_NOOPERHOST), 
-				   me.name, source_p->name);
+			sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
 			ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 			     source_p->localClient->opername, source_p->name,
 			     source_p->username, source_p->host);
@@ -407,22 +400,20 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		oper_up(source_p, oper_p);
 
 		ilog(L_OPERED, "OPER %s by %s!%s@%s",
-		     source_p->localClient->opername, source_p->name, 
+		     source_p->localClient->opername, source_p->name,
 		     source_p->username, source_p->host);
 		return 0;
 	}
 
 	cleanup_challenge(source_p);
 
-	oper_p = find_oper_conf(source_p->username, source_p->host, 
-				source_p->sockhost, parv[1]);
+	oper_p = find_oper_conf(source_p->username, source_p->host, source_p->sockhost, parv[1]);
 
 	if(oper_p == NULL)
 	{
 		sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
 		ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
-		     parv[1], source_p->name,
-		     source_p->username, source_p->host);
+		     parv[1], source_p->name, source_p->username, source_p->host);
 
 		if(ConfigFileEntry.failed_oper_notice)
 			sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -462,16 +453,16 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		for(;;)
 		{
 			cnt = rb_strlcpy(chal_line, chal, CHALLENGE_WIDTH);
-			sendto_one(source_p, form_str(RPL_RSACHALLENGE2), me.name, source_p->name, chal_line);
+			sendto_one(source_p, form_str(RPL_RSACHALLENGE2), me.name, source_p->name,
+				   chal_line);
 			if(cnt > CHALLENGE_WIDTH)
 				chal += CHALLENGE_WIDTH - 1;
 			else
 				break;
-			
+
 		}
 		ClearCork(source_p);
-		sendto_one(source_p, form_str(RPL_ENDOFRSACHALLENGE2), 
-			   me.name, source_p->name);
+		sendto_one(source_p, form_str(RPL_ENDOFRSACHALLENGE2), me.name, source_p->name);
 
 		source_p->localClient->opername = rb_strdup(oper_p->name);
 		rb_free(challenge);
@@ -504,7 +495,8 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 
 		length = RSA_size(rsa);
 		tmp = rb_malloc(length);
-		ret = RSA_public_encrypt(CHALLENGE_SECRET_LENGTH, secret, tmp, rsa, RSA_PKCS1_OAEP_PADDING);
+		ret = RSA_public_encrypt(CHALLENGE_SECRET_LENGTH, secret, tmp, rsa,
+					 RSA_PKCS1_OAEP_PADDING);
 
 		if(ret >= 0)
 		{
@@ -519,7 +511,7 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 	}
 
 	ERR_load_crypto_strings();
-	while ((cnt < 100) && (e = ERR_get_error()))
+	while((cnt < 100) && (e = ERR_get_error()))
 	{
 		ilog(L_MAIN, "SSL error: %s", ERR_error_string(e, 0));
 		cnt++;

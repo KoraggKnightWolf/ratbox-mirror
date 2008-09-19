@@ -48,6 +48,7 @@ struct Message connect_msgtab = {
 };
 
 mapi_clist_av1 connect_clist[] = { &connect_msgtab, NULL };
+
 DECLARE_MODULE_AV1(connect, NULL, NULL, connect_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -73,8 +74,7 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(MyConnect(source_p) && !IsOperRemote(source_p) && parc > 3)
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "remote");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "remote");
 		return 0;
 	}
 
@@ -137,8 +137,8 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 */
 	if(serv_connect(server_p, source_p))
 	{
-			sendto_one_notice(source_p, ":*** Connecting to %s.%d",
-					  server_p->name, server_p->port);
+		sendto_one_notice(source_p, ":*** Connecting to %s.%d",
+				  server_p->name, server_p->port);
 	}
 	else
 	{
@@ -189,8 +189,7 @@ ms_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 */
 	if((server_p = find_server_conf(parv[1])) == NULL)
 	{
-		sendto_one_notice(source_p, ":Connect: Host %s not listed in ircd.conf",
-				  parv[1]);
+		sendto_one_notice(source_p, ":Connect: Host %s not listed in ircd.conf", parv[1]);
 		return 0;
 	}
 
@@ -225,8 +224,7 @@ ms_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 * Notify all operators about remote connect requests
 	 */
 	sendto_wallops_flags(UMODE_WALLOP, &me,
-			     "Remote CONNECT %s %d from %s", 
-			     parv[1], port, source_p->name);
+			     "Remote CONNECT %s %d from %s", parv[1], port, source_p->name);
 	sendto_server(NULL, NULL, CAP_TS6, NOCAPS,
 		      ":%s WALLOPS :Remote CONNECT %s %d from %s",
 		      me.id, parv[1], port, source_p->name);

@@ -47,6 +47,7 @@ struct Message version_msgtab = {
 };
 
 mapi_clist_av1 version_clist[] = { &version_msgtab, NULL };
+
 DECLARE_MODULE_AV1(version, NULL, NULL, version_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -76,9 +77,7 @@ m_version(struct Client *client_p, struct Client *source_p, int parc, const char
 	}
 	rb_snprintf(version, sizeof(version), "%s+%s", ircd_version, rb_lib_version());
 	sendto_one_numeric(source_p, RPL_VERSION, form_str(RPL_VERSION),
-			   ircd_version, serno,
-			   me.name, confopts(), TS_CURRENT,
-			   ServerInfo.sid);
+			   ircd_version, serno, me.name, confopts(), TS_CURRENT, ServerInfo.sid);
 
 	show_isupport(source_p);
 
@@ -96,9 +95,8 @@ mo_version(struct Client *client_p, struct Client *source_p, int parc, const cha
 	if(hunt_server(client_p, source_p, ":%s VERSION :%s", 1, parc, parv) == HUNTED_ISME)
 	{
 		sendto_one_numeric(source_p, RPL_VERSION, form_str(RPL_VERSION),
-				   ircd_version, serno, 
-				   me.name, confopts(), TS_CURRENT,
-				   ServerInfo.sid);
+				   ircd_version, serno,
+				   me.name, confopts(), TS_CURRENT, ServerInfo.sid);
 		show_isupport(source_p);
 	}
 

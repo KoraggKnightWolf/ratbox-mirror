@@ -97,13 +97,13 @@ rb_dlink_list isupportlist;
 struct isupportitem
 {
 	const char *name;
-	const char *(*func)(const void *);
+	const char *(*func) (const void *);
 	const void *param;
 	rb_dlink_node node;
 };
 
 void
-add_isupport(const char *name, const char *(*func)(const void *), const void *param)
+add_isupport(const char *name, const char *(*func) (const void *), const void *param)
 {
 	struct isupportitem *item;
 
@@ -124,7 +124,7 @@ delete_isupport(const char *name)
 	{
 		item = ptr->data;
 
-		if (!strcmp(item->name, name))
+		if(!strcmp(item->name, name))
 		{
 			rb_dlinkDelete(ptr, &isupportlist);
 			rb_free(item);
@@ -146,7 +146,7 @@ show_isupport(struct Client *client_p)
 
 	extra_space = strlen(client_p->name);
 	/* UID */
-	if (!MyClient(client_p) && extra_space < 9)
+	if(!MyClient(client_p) && extra_space < 9)
 		extra_space = 9;
 	/* :<me.name> 005 <nick> <params> :are supported by this server */
 	/* form_str(RPL_ISUPPORT) is %s :are supported by this server */
@@ -156,19 +156,19 @@ show_isupport(struct Client *client_p)
 	RB_DLINK_FOREACH(ptr, isupportlist.head)
 	{
 		item = ptr->data;
-		value = (*item->func)(item->param);
-		if (value == NULL)
+		value = (*item->func) (item->param);
+		if(value == NULL)
 			continue;
 		l = strlen(item->name) + (EmptyString(value) ? 0 : 1 + strlen(value));
-		if (nchars + l + (nparams > 0) >= sizeof buf || nparams + 1 > 12)
+		if(nchars + l + (nparams > 0) >= sizeof buf || nparams + 1 > 12)
 		{
 			sendto_one_numeric(client_p, RPL_ISUPPORT, form_str(RPL_ISUPPORT), buf);
 			nchars = extra_space, nparams = 0, buf[0] = '\0';
 		}
-		if (nparams > 0)
+		if(nparams > 0)
 			rb_strlcat(buf, " ", sizeof buf), nchars++;
 		rb_strlcat(buf, item->name, sizeof buf);
-		if (!EmptyString(value))
+		if(!EmptyString(value))
 		{
 			rb_strlcat(buf, "=", sizeof buf);
 			rb_strlcat(buf, value, sizeof buf);
@@ -176,8 +176,8 @@ show_isupport(struct Client *client_p)
 		nchars += l;
 		nparams++;
 	}
-	
-	if (nparams > 0)
+
+	if(nparams > 0)
 		sendto_one_numeric(client_p, RPL_ISUPPORT, form_str(RPL_ISUPPORT), buf);
 	ClearCork(client_p);
 	send_pop_queue(client_p);
@@ -208,7 +208,7 @@ isupport_string(const void *ptr)
 const char *
 isupport_stringptr(const void *ptr)
 {
-	return *(char * const *)ptr;	
+	return *(char *const *)ptr;
 }
 
 static const char *
@@ -217,14 +217,13 @@ isupport_chanmodes(const void *ptr)
 	static char result[80];
 
 	rb_snprintf(result, sizeof result, "%s%sb,k,l,imnpstS%s",
-			ConfigChannel.use_except ? "e" : "",
-			ConfigChannel.use_invex ? "I" : "",
+		    ConfigChannel.use_except ? "e" : "", ConfigChannel.use_invex ? "I" : "",
 #ifdef ENABLE_SERVICES
-			rb_dlink_list_length(&service_list) ? "r" : ""
+		    rb_dlink_list_length(&service_list) ? "r" : ""
 #else
-			""
+		    ""
 #endif
-			);
+		);
 	return result;
 }
 
@@ -243,9 +242,8 @@ isupport_maxlist(const void *ptr)
 	static char result[30];
 
 	rb_snprintf(result, sizeof result, "b%s%s:%i",
-			ConfigChannel.use_except ? "e" : "",
-			ConfigChannel.use_invex ? "I" : "",
-			ConfigChannel.max_bans);
+		    ConfigChannel.use_except ? "e" : "",
+		    ConfigChannel.use_invex ? "I" : "", ConfigChannel.max_bans);
 	return result;
 }
 
@@ -254,9 +252,9 @@ isupport_targmax(const void *ptr)
 {
 	static char result[200];
 
-	rb_snprintf(result, sizeof result, "NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:%d,NOTICE:%d,ACCEPT:,MONITOR:",
-			ConfigFileEntry.max_targets,
-			ConfigFileEntry.max_targets);
+	rb_snprintf(result, sizeof result,
+		    "NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:%d,NOTICE:%d,ACCEPT:,MONITOR:",
+		    ConfigFileEntry.max_targets, ConfigFileEntry.max_targets);
 	return result;
 }
 
@@ -264,7 +262,7 @@ void
 init_isupport(void)
 {
 	static int maxmodes = MAXMODEPARAMS;
-	static int nicklen = NICKLEN-1;
+	static int nicklen = NICKLEN - 1;
 	static int channellen = LOC_CHANNELLEN;
 
 	add_isupport("CHANTYPES", isupport_string, "&#");

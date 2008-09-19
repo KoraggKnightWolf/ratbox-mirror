@@ -120,19 +120,19 @@ res_ourserver(const struct rb_sockaddr_storage *inp)
 {
 #ifdef RB_IPV6
 	const struct sockaddr_in6 *v6;
-	const struct sockaddr_in6 *v6in = (const struct sockaddr_in6 *) inp;
+	const struct sockaddr_in6 *v6in = (const struct sockaddr_in6 *)inp;
 #endif
 	const struct sockaddr_in *v4;
-	const struct sockaddr_in *v4in = (const struct sockaddr_in *) inp;
+	const struct sockaddr_in *v4in = (const struct sockaddr_in *)inp;
 	int ns;
 
-	for (ns = 0; ns < irc_nscount; ns++)
+	for(ns = 0; ns < irc_nscount; ns++)
 	{
 		const struct rb_sockaddr_storage *srv = &irc_nsaddr_list[ns];
 #ifdef RB_IPV6
-		v6 = (const struct sockaddr_in6 *) srv;
+		v6 = (const struct sockaddr_in6 *)srv;
 #endif
-		v4 = (const struct sockaddr_in *) srv;
+		v4 = (const struct sockaddr_in *)srv;
 
 		/* could probably just memcmp(srv, inp, srv.ss_len) here
 		 * but we'll air on the side of caution - stu
@@ -359,30 +359,30 @@ random_socket(int family)
 #ifdef RB_IPV6
 	if(family == AF_INET6)
 	{
-		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *) &sockaddr;
+		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)&sockaddr;
 		memcpy(&in6->sin6_addr, &ipv6_addr, sizeof(struct in6_addr));
 		len = (rb_socklen_t) sizeof(struct sockaddr_in6);
 	}
 	else
 #endif
 	{
-		struct sockaddr_in *in = (struct sockaddr_in *) &sockaddr;
+		struct sockaddr_in *in = (struct sockaddr_in *)&sockaddr;
 		in->sin_addr.s_addr = ipv4_addr.s_addr;
 		len = (rb_socklen_t) sizeof(struct sockaddr_in);
 	}
 
-	for (i = 0; i < 10; i++)
+	for(i = 0; i < 10; i++)
 	{
 		nport = htons(generate_random_port());
 
 		if(family == AF_INET)
-			((struct sockaddr_in *) &sockaddr)->sin_port = nport;
+			((struct sockaddr_in *)&sockaddr)->sin_port = nport;
 #ifdef RB_IPV6
 		else
-			((struct sockaddr_in6 *) &sockaddr)->sin6_port = nport;
+			((struct sockaddr_in6 *)&sockaddr)->sin6_port = nport;
 
 #endif
-		if(bind(rb_get_fd(F), (struct sockaddr *) &sockaddr, len) == 0)
+		if(bind(rb_get_fd(F), (struct sockaddr *)&sockaddr, len) == 0)
 			return F;
 	}
 	rb_close(F);
@@ -411,7 +411,7 @@ send_res_msg(void *msg, int len, struct reslist *request)
 	if(max_queries == 0)
 		max_queries = 1;
 
-	for (i = 0; sent < max_queries && i < irc_nscount; i++)
+	for(i = 0; sent < max_queries && i < irc_nscount; i++)
 	{
 		if(GET_SS_FAMILY(&irc_nsaddr_list[i]) == AF_INET)
 		{
@@ -434,7 +434,7 @@ send_res_msg(void *msg, int len, struct reslist *request)
 		if(F == NULL)
 			continue;
 		if(sendto(rb_get_fd(F), msg, len, 0,
-			  (struct sockaddr *) &(irc_nsaddr_list[i]),
+			  (struct sockaddr *)&(irc_nsaddr_list[i]),
 			  GET_SS_LEN(&irc_nsaddr_list[i])) == len)
 			++sent;
 		res_readreply(F, NULL);
@@ -475,7 +475,7 @@ generate_random_id(void)
 		if(id == 0xffff)
 			continue;
 	}
-	while (find_id(id));
+	while(find_id(id));
 	return id;
 }
 
@@ -484,13 +484,13 @@ generate_random_port(void)
 {
 	uint16_t port;
 
-	while (1)
+	while(1)
 	{
 		rb_get_pseudo_random(&port, sizeof(port));
 		if(port > 1024)
 			break;
 	}
-	return (int) port;
+	return (int)port;
 }
 
 
@@ -549,42 +549,42 @@ do_query_number(struct DNSQuery *query, const struct rb_sockaddr_storage *addr,
 	{
 		request = make_request(query);
 		memcpy(&request->addr, addr, sizeof(struct rb_sockaddr_storage));
-		request->name = (char *) rb_malloc(HOSTLEN + 1);
+		request->name = (char *)rb_malloc(HOSTLEN + 1);
 	}
 
 	if(GET_SS_FAMILY(addr) == AF_INET)
 	{
-		const struct sockaddr_in *v4 = (const struct sockaddr_in *) addr;
-		cp = (const unsigned char *) &v4->sin_addr.s_addr;
+		const struct sockaddr_in *v4 = (const struct sockaddr_in *)addr;
+		cp = (const unsigned char *)&v4->sin_addr.s_addr;
 
-		rb_sprintf(request->queryname, "%u.%u.%u.%u.in-addr.arpa", (unsigned int) (cp[3]),
-			   (unsigned int) (cp[2]), (unsigned int) (cp[1]), (unsigned int) (cp[0]));
+		rb_sprintf(request->queryname, "%u.%u.%u.%u.in-addr.arpa", (unsigned int)(cp[3]),
+			   (unsigned int)(cp[2]), (unsigned int)(cp[1]), (unsigned int)(cp[0]));
 	}
 #ifdef RB_IPV6
 	else if(GET_SS_FAMILY(addr) == AF_INET6)
 	{
-		const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *) addr;
-		cp = (const unsigned char *) &v6->sin6_addr.s6_addr;
+		const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)addr;
+		cp = (const unsigned char *)&v6->sin6_addr.s6_addr;
 
 		rb_sprintf(request->queryname,
 			   "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x."
 			   "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.ip6.arpa",
-			   (unsigned int) (cp[15] & 0xf), (unsigned int) (cp[15] >> 4),
-			   (unsigned int) (cp[14] & 0xf), (unsigned int) (cp[14] >> 4),
-			   (unsigned int) (cp[13] & 0xf), (unsigned int) (cp[13] >> 4),
-			   (unsigned int) (cp[12] & 0xf), (unsigned int) (cp[12] >> 4),
-			   (unsigned int) (cp[11] & 0xf), (unsigned int) (cp[11] >> 4),
-			   (unsigned int) (cp[10] & 0xf), (unsigned int) (cp[10] >> 4),
-			   (unsigned int) (cp[9] & 0xf), (unsigned int) (cp[9] >> 4),
-			   (unsigned int) (cp[8] & 0xf), (unsigned int) (cp[8] >> 4),
-			   (unsigned int) (cp[7] & 0xf), (unsigned int) (cp[7] >> 4),
-			   (unsigned int) (cp[6] & 0xf), (unsigned int) (cp[6] >> 4),
-			   (unsigned int) (cp[5] & 0xf), (unsigned int) (cp[5] >> 4),
-			   (unsigned int) (cp[4] & 0xf), (unsigned int) (cp[4] >> 4),
-			   (unsigned int) (cp[3] & 0xf), (unsigned int) (cp[3] >> 4),
-			   (unsigned int) (cp[2] & 0xf), (unsigned int) (cp[2] >> 4),
-			   (unsigned int) (cp[1] & 0xf), (unsigned int) (cp[1] >> 4),
-			   (unsigned int) (cp[0] & 0xf), (unsigned int) (cp[0] >> 4));
+			   (unsigned int)(cp[15] & 0xf), (unsigned int)(cp[15] >> 4),
+			   (unsigned int)(cp[14] & 0xf), (unsigned int)(cp[14] >> 4),
+			   (unsigned int)(cp[13] & 0xf), (unsigned int)(cp[13] >> 4),
+			   (unsigned int)(cp[12] & 0xf), (unsigned int)(cp[12] >> 4),
+			   (unsigned int)(cp[11] & 0xf), (unsigned int)(cp[11] >> 4),
+			   (unsigned int)(cp[10] & 0xf), (unsigned int)(cp[10] >> 4),
+			   (unsigned int)(cp[9] & 0xf), (unsigned int)(cp[9] >> 4),
+			   (unsigned int)(cp[8] & 0xf), (unsigned int)(cp[8] >> 4),
+			   (unsigned int)(cp[7] & 0xf), (unsigned int)(cp[7] >> 4),
+			   (unsigned int)(cp[6] & 0xf), (unsigned int)(cp[6] >> 4),
+			   (unsigned int)(cp[5] & 0xf), (unsigned int)(cp[5] >> 4),
+			   (unsigned int)(cp[4] & 0xf), (unsigned int)(cp[4] >> 4),
+			   (unsigned int)(cp[3] & 0xf), (unsigned int)(cp[3] >> 4),
+			   (unsigned int)(cp[2] & 0xf), (unsigned int)(cp[2] >> 4),
+			   (unsigned int)(cp[1] & 0xf), (unsigned int)(cp[1] >> 4),
+			   (unsigned int)(cp[0] & 0xf), (unsigned int)(cp[0] >> 4));
 	}
 #endif
 
@@ -654,10 +654,10 @@ check_question(struct reslist *request, HEADER * header, char *buf, char *eob)
 	unsigned char *current;	/* current position in buf */
 	int n;			/* temp count */
 
-	current = (unsigned char *) buf + sizeof(HEADER);
+	current = (unsigned char *)buf + sizeof(HEADER);
 	if(header->qdcount != 1)
 		return 0;
-	n = irc_dn_expand((unsigned char *) buf, (unsigned char *) eob, current, hostbuf,
+	n = irc_dn_expand((unsigned char *)buf, (unsigned char *)eob, current, hostbuf,
 			  sizeof(hostbuf));
 	if(n <= 0)
 		return 0;
@@ -682,24 +682,24 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 #ifdef RB_IPV6
 	struct sockaddr_in6 *v6;
 #endif
-	current = (unsigned char *) buf + sizeof(HEADER);
+	current = (unsigned char *)buf + sizeof(HEADER);
 
-	for (; header->qdcount > 0; --header->qdcount)
+	for(; header->qdcount > 0; --header->qdcount)
 	{
-		if((n = irc_dn_skipname(current, (unsigned char *) eob)) < 0)
+		if((n = irc_dn_skipname(current, (unsigned char *)eob)) < 0)
 			return 0;
 
-		current += (size_t) n + QFIXEDSZ;
+		current += (size_t)n + QFIXEDSZ;
 	}
 
 	/*
 	 * process each answer sent to us blech.
 	 */
-	while (header->ancount > 0 && (char *) current < eob)
+	while(header->ancount > 0 && (char *)current < eob)
 	{
 		header->ancount--;
 
-		n = irc_dn_expand((unsigned char *) buf, (unsigned char *) eob, current, hostbuf,
+		n = irc_dn_expand((unsigned char *)buf, (unsigned char *)eob, current, hostbuf,
 				  sizeof(hostbuf));
 
 		if(n < 0)
@@ -723,9 +723,9 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 		 * this code was not working on alpha due to that
 		 * (spotted by rodder/jailbird/dianora)
 		 */
-		current += (size_t) n;
+		current += (size_t)n;
 
-		if(!(((char *) current + ANSWER_FIXED_SIZE) < eob))
+		if(!(((char *)current + ANSWER_FIXED_SIZE) < eob))
 			break;
 
 		type = irc_ns_get16(current);
@@ -754,7 +754,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			 */
 			if(rd_length != sizeof(struct in_addr))
 				return (0);
-			v4 = (struct sockaddr_in *) &request->addr;
+			v4 = (struct sockaddr_in *)&request->addr;
 			SET_SS_LEN(&request->addr, sizeof(struct sockaddr_in));
 			v4->sin_family = AF_INET;
 			memcpy(&v4->sin_addr, current, sizeof(struct in_addr));
@@ -767,7 +767,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			if(rd_length != sizeof(struct in6_addr))
 				return (0);
 			SET_SS_LEN(&request->addr, sizeof(struct sockaddr_in6));
-			v6 = (struct sockaddr_in6 *) &request->addr;
+			v6 = (struct sockaddr_in6 *)&request->addr;
 			v6->sin6_family = AF_INET6;
 			memcpy(&v6->sin6_addr, current, sizeof(struct in6_addr));
 			return (1);
@@ -776,7 +776,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 		case T_PTR:
 			if(request->type != T_PTR)
 				return (0);
-			n = irc_dn_expand((unsigned char *) buf, (unsigned char *) eob, current,
+			n = irc_dn_expand((unsigned char *)buf, (unsigned char *)eob, current,
 					  hostbuf, sizeof(hostbuf));
 			if(n < 0)
 				return (0);	/* broken message */
@@ -810,7 +810,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
  * Return value: 1 if a packet was read, 0 otherwise
  */
 static int
-res_read_single_reply(rb_fde_t * F, void *data)
+res_read_single_reply(rb_fde_t *F, void *data)
 {
 	int buflen = sizeof(HEADER) + MAXPACKET;
 	void *buf = alloca(buflen);
@@ -823,14 +823,14 @@ res_read_single_reply(rb_fde_t * F, void *data)
 	rb_socklen_t len = sizeof(struct rb_sockaddr_storage);
 	struct rb_sockaddr_storage lsin;
 
-	rc = recvfrom(rb_get_fd(F), buf, buflen, 0, (struct sockaddr *) &lsin, &len);
+	rc = recvfrom(rb_get_fd(F), buf, buflen, 0, (struct sockaddr *)&lsin, &len);
 
 	/* No packet */
 	if(rc == 0 || rc == -1)
 		return 0;
 
 	/* Too small */
-	if(rc <= (int) (sizeof(HEADER)))
+	if(rc <= (int)(sizeof(HEADER)))
 		return 1;
 
 	/*
@@ -855,7 +855,7 @@ res_read_single_reply(rb_fde_t * F, void *data)
 	if(!res_ourserver(&lsin))
 		return 1;
 
-	if(!check_question(request, header, (char *) buf, ((char *) buf) + rc))
+	if(!check_question(request, header, (char *)buf, ((char *)buf) + rc))
 		return 1;
 
 	if((header->rcode != NO_ERRORS) || (header->ancount == 0))
@@ -872,7 +872,7 @@ res_read_single_reply(rb_fde_t * F, void *data)
 	 * If this fails there was an error decoding the received packet, 
 	 * give up. -- jilles
 	 */
-	answer_count = proc_answer(request, header, (char *) buf, ((char *) buf) + rc);
+	answer_count = proc_answer(request, header, (char *)buf, ((char *)buf) + rc);
 
 	if(answer_count)
 	{
@@ -923,10 +923,10 @@ res_read_single_reply(rb_fde_t * F, void *data)
 }
 
 static void
-res_readreply(rb_fde_t * F, void *data)
+res_readreply(rb_fde_t *F, void *data)
 {
 	int rc;
-	while ((rc = res_read_single_reply(F, data)) > 0)
+	while((rc = res_read_single_reply(F, data)) > 0)
 		;;
 	if(rc != -1)
 		rb_setselect(F, RB_SELECT_READ, res_readreply, NULL);
@@ -937,7 +937,7 @@ make_dnsreply(struct reslist *request)
 {
 	struct DNSReply *cp;
 
-	cp = (struct DNSReply *) rb_malloc(sizeof(struct DNSReply));
+	cp = (struct DNSReply *)rb_malloc(sizeof(struct DNSReply));
 
 	cp->h_name = request->name;
 	memcpy(&cp->addr, &request->addr, sizeof(cp->addr));

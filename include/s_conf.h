@@ -44,7 +44,7 @@ struct ConfItem
 
 	union
 	{
-		char *name;		/* IRC name, nick, server name, or original u@h */
+		char *name;	/* IRC name, nick, server name, or original u@h */
 		const char *oper;
 	} info;
 
@@ -130,7 +130,7 @@ struct config_file_entry
 	char *default_operstring;
 	char *default_adminstring;
 	char *kline_reason;
-	
+
 	char *fname_userlog;
 	char *fname_fuserlog;
 	char *fname_operlog;
@@ -321,9 +321,10 @@ struct ConfItem *conf_connect_allowed(struct sockaddr *addr, int);
 struct ConfItem *find_tkline(const char *, const char *, struct sockaddr *);
 
 void get_printable_conf(struct ConfItem *,
-			       const char **, const char **, const char **, const char **, int *, const char **);
-void get_printable_kline(struct Client *, struct ConfItem *,
-				const char **, const char **, const char **, const char **);
+			const char **, const char **, const char **, const char **, int *,
+			const char **);
+void get_printable_kline(struct Client *, struct ConfItem *, const char **, const char **,
+			 const char **, const char **);
 
 void yyerror(const char *);
 int conf_yy_fatal_error(const char *);

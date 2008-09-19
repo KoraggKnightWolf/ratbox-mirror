@@ -44,6 +44,7 @@ struct Message map_msgtab = {
 };
 
 mapi_clist_av1 map_clist[] = { &map_msgtab, NULL };
+
 DECLARE_MODULE_AV1(map, NULL, NULL, map_clist, NULL, NULL, "$Revision$");
 
 static void dump_map(struct Client *client_p, struct Client *root, char *pbuf);
@@ -99,7 +100,7 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 	*pbuf = '\0';
 
 	rb_strlcat(pbuf, root_p->name, BUFSIZE);
-	if (has_id(root_p))
+	if(has_id(root_p))
 	{
 		rb_strlcat(pbuf, "[", BUFSIZE);
 		rb_strlcat(pbuf, root_p->id, BUFSIZE);
@@ -110,16 +111,17 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 
 	if(len < USER_COL)
 	{
-		for (i = len + 1; i < USER_COL; i++)
+		for(i = len + 1; i < USER_COL; i++)
 		{
 			buf[i] = '-';
 		}
 	}
-	sprintf(scratch, "%4.1f%%", (float)100 * (float) rb_dlink_list_length(&root_p->serv->users) / (float) Count.total);
+	sprintf(scratch, "%4.1f%%",
+		(float)100 * (float)rb_dlink_list_length(&root_p->serv->users) /
+		(float)Count.total);
 
 	rb_snprintf(buf + USER_COL, BUFSIZE - USER_COL,
-		 " | Users: %5lu (%s)", rb_dlink_list_length(&root_p->serv->users),
-		scratch);
+		    " | Users: %5lu (%s)", rb_dlink_list_length(&root_p->serv->users), scratch);
 
 	sendto_one(client_p, form_str(RPL_MAP), me.name, client_p->name, buf);
 

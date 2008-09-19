@@ -59,19 +59,18 @@ struct log_struct
 	FILE **logfile;
 };
 
-static struct log_struct log_table[LAST_LOGFILE] =
-{
-	{ NULL, 				&log_main	},
-	{ &ConfigFileEntry.fname_userlog,	&log_user	},
-	{ &ConfigFileEntry.fname_fuserlog,	&log_fuser	},
-	{ &ConfigFileEntry.fname_operlog,	&log_oper	},
-	{ &ConfigFileEntry.fname_foperlog,	&log_foper	},
-	{ &ConfigFileEntry.fname_serverlog,	&log_server	},
-	{ &ConfigFileEntry.fname_killlog,	&log_kill	},
-	{ &ConfigFileEntry.fname_klinelog,	&log_kline	},
-	{ &ConfigFileEntry.fname_glinelog,	&log_gline	},
-	{ &ConfigFileEntry.fname_operspylog,	&log_operspy	},
-	{ &ConfigFileEntry.fname_ioerrorlog,	&log_ioerror	}
+static struct log_struct log_table[LAST_LOGFILE] = {
+	{NULL, &log_main},
+	{&ConfigFileEntry.fname_userlog, &log_user},
+	{&ConfigFileEntry.fname_fuserlog, &log_fuser},
+	{&ConfigFileEntry.fname_operlog, &log_oper},
+	{&ConfigFileEntry.fname_foperlog, &log_foper},
+	{&ConfigFileEntry.fname_serverlog, &log_server},
+	{&ConfigFileEntry.fname_killlog, &log_kill},
+	{&ConfigFileEntry.fname_klinelog, &log_kline},
+	{&ConfigFileEntry.fname_glinelog, &log_gline},
+	{&ConfigFileEntry.fname_operspylog, &log_operspy},
+	{&ConfigFileEntry.fname_ioerrorlog, &log_ioerror}
 };
 
 void
@@ -97,7 +96,7 @@ open_logfiles(void)
 		if(!EmptyString(*log_table[i].name))
 			*log_table[i].logfile = fopen(*log_table[i].name, "a");
 	}
-}			
+}
 
 void
 close_logfiles(void)
@@ -139,13 +138,14 @@ ilog(ilogfile dest, const char *format, ...)
 #ifdef _WIN32
 	fputs(buf2, stderr);
 	fflush(stderr);
-	
+
 	if(logfile == NULL)
 		return;
 #endif
 	if(fputs(buf2, logfile) < 0)
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Closing logfile: %s (%s)", *log_table[dest].name, strerror(errno));
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Closing logfile: %s (%s)",
+				     *log_table[dest].name, strerror(errno));
 		fclose(logfile);
 		*log_table[dest].logfile = NULL;
 		return;
@@ -160,17 +160,13 @@ report_operspy(struct Client *source_p, const char *token, const char *arg)
 	/* if its not my client its already propagated */
 	if(MyClient(source_p))
 		sendto_match_servs(source_p, "*", CAP_ENCAP, NOCAPS,
-				   "ENCAP * OPERSPY %s %s",
-				   token, arg ? arg : "");
+				   "ENCAP * OPERSPY %s %s", token, arg ? arg : "");
 
 	sendto_realops_flags(UMODE_OPERSPY,
 			     ConfigFileEntry.operspy_admin_only ? L_ADMIN : L_ALL,
-			     "OPERSPY %s %s %s",
-			     get_oper_name(source_p), token,
-			     arg ? arg : "");
+			     "OPERSPY %s %s %s", get_oper_name(source_p), token, arg ? arg : "");
 
-	ilog(L_OPERSPY, "OPERSPY %s %s %s",
-	     get_oper_name(source_p), token, arg ? arg : "");
+	ilog(L_OPERSPY, "OPERSPY %s %s %s", get_oper_name(source_p), token, arg ? arg : "");
 }
 
 const char *
@@ -182,8 +178,7 @@ smalldate(time_t ltime)
 	lt = gmtime(&ltime);
 
 	rb_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
-		    lt->tm_year + 1900, lt->tm_mon + 1,
-		    lt->tm_mday, lt->tm_hour, lt->tm_min);
+		    lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min);
 
 	return buf;
 }

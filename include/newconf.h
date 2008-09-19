@@ -45,7 +45,7 @@ extern char linebuf[];
 extern int yyparse(void);
 
 
-typedef struct _confentry 
+typedef struct _confentry
 {
 	rb_dlink_node node;
 	char *entryname;
@@ -90,7 +90,7 @@ void conf_report_warning(const char *format, ...);
 void yyerror(const char *msg);
 int conf_fgets(char *, int, FILE *);
 
-                                        
+
 void delete_all_conf(void);
 int check_valid_blocks(void);
 int check_valid_entries(void);

@@ -44,6 +44,7 @@ struct Message ison_msgtab = {
 };
 
 mapi_clist_av1 ison_clist[] = { &ison_msgtab, NULL };
+
 DECLARE_MODULE_AV1(ison, NULL, NULL, ison_clist, NULL, NULL, "$Revision$");
 
 static char buf[BUFSIZE];
@@ -80,10 +81,10 @@ m_ison(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	/* rfc1489 is ambigious about how to handle ISON
 	 * this should handle both interpretations.
 	 */
-	for (i = 1; i < parc; i++)
+	for(i = 1; i < parc; i++)
 	{
 		char *cs = LOCAL_COPY(parv[i]);
-		for (nick = rb_strtok_r(cs, " ", &p); nick; nick = rb_strtok_r(NULL, " ", &p))
+		for(nick = rb_strtok_r(cs, " ", &p); nick; nick = rb_strtok_r(NULL, " ", &p))
 		{
 			target_p = find_named_client(nick);
 

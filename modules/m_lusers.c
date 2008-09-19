@@ -50,6 +50,7 @@ struct Message users_msgtab = {
 };
 
 mapi_clist_av1 lusers_clist[] = { &lusers_msgtab, &users_msgtab, NULL };
+
 DECLARE_MODULE_AV1(lusers, NULL, NULL, lusers_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -66,7 +67,7 @@ m_lusers(struct Client *client_p, struct Client *source_p, int parc, const char 
 {
 	static time_t last_used = 0;
 
-	if (parc > 2)
+	if(parc > 2)
 	{
 		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
@@ -79,7 +80,7 @@ m_lusers(struct Client *client_p, struct Client *source_p, int parc, const char 
 			last_used = rb_current_time();
 
 		if(hunt_server(client_p, source_p, ":%s LUSERS %s :%s", 2, parc, parv) !=
-			   HUNTED_ISME)
+		   HUNTED_ISME)
 			return 0;
 	}
 
@@ -125,15 +126,13 @@ m_users(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		sendto_one_numeric(source_p, RPL_LOCALUSERS,
 				   form_str(RPL_LOCALUSERS),
-				   rb_dlink_list_length(&lclient_list), 
+				   rb_dlink_list_length(&lclient_list),
 				   Count.max_loc,
-				   rb_dlink_list_length(&lclient_list), 
-				   Count.max_loc);
+				   rb_dlink_list_length(&lclient_list), Count.max_loc);
 
-		sendto_one_numeric(source_p, RPL_GLOBALUSERS, 
+		sendto_one_numeric(source_p, RPL_GLOBALUSERS,
 				   form_str(RPL_GLOBALUSERS),
-				   Count.total, Count.max_tot,
-				   Count.total, Count.max_tot);
+				   Count.total, Count.max_tot, Count.total, Count.max_tot);
 	}
 
 	return 0;

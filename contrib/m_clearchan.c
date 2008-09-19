@@ -107,8 +107,7 @@ mo_clearchan(struct Client *client_p, struct Client *source_p, int parc, const c
 		/* SJOIN the user to give them ops, and lock the channel */
 		sendto_server(client_p, chptr, NOCAPS, NOCAPS,
 			      ":%s SJOIN %ld %s +ntsi :@%s",
-			      me.name, (long) (chptr->channelts - 1),
-			      chptr->chname, source_p->name);
+			      me.name, (long)(chptr->channelts - 1), chptr->chname, source_p->name);
 	}
 
 	sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s JOIN %s",

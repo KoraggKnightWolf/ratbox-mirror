@@ -120,10 +120,8 @@ struct oper_conf
 struct remote_conf *make_remote_conf(void);
 void free_remote_conf(struct remote_conf *);
 
-int find_shared_conf(const char *username, const char *host,
-			const char *server, int flags);
-void cluster_generic(struct Client *, const char *, int cltype,
-			const char *format, ...);
+int find_shared_conf(const char *username, const char *host, const char *server, int flags);
+void cluster_generic(struct Client *, const char *, int cltype, const char *format, ...);
 
 #define OPER_ENCRYPTED	0x00001
 #define OPER_KLINE	0x00002
@@ -178,7 +176,7 @@ void free_oper_conf(struct oper_conf *);
 void clear_oper_conf(void);
 
 struct oper_conf *find_oper_conf(const char *username, const char *host,
-					const char *locip, const char *oname);
+				 const char *locip, const char *oname);
 
 const char *get_oper_privs(int flags);
 
@@ -229,8 +227,7 @@ struct server_conf *find_server_conf(const char *name);
 
 void attach_server_conf(struct Client *, struct server_conf *);
 void detach_server_conf(struct Client *);
-void set_server_conf_autoconn(struct Client *source_p, char *name, 
-					int newval);
+void set_server_conf_autoconn(struct Client *source_p, char *name, int newval);
 
 
 struct ConfItem *find_xline(const char *, int);
@@ -244,7 +241,7 @@ time_t valid_temp_time(const char *p);
 
 struct nd_entry
 {
-	char name[NICKLEN+1];
+	char name[NICKLEN + 1];
 	time_t expire;
 	unsigned int hashv;
 
@@ -257,4 +254,3 @@ void free_nd_entry(struct nd_entry *);
 unsigned long get_nd_count(void);
 
 #endif
-

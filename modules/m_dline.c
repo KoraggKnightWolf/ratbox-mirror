@@ -49,10 +49,12 @@ struct Message dline_msgtab = {
 	"DLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_dline, 2}}
 };
+
 struct Message admindline_msgtab = {
 	"ADMINDLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_admindline, 3}}
 };
+
 struct Message undline_msgtab = {
 	"UNDLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_undline, 2}}
@@ -64,8 +66,8 @@ DECLARE_MODULE_AV1(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision$");
 
 static int valid_dline(struct Client *source_p, const char *dlhost);
 static int already_placed_dline(struct Client *source_p, const char *dlhost);
-static void set_dline(struct Client *source_p, const char *dlhost, 
-				const char *lreason, int tkline_time, int admin);
+static void set_dline(struct Client *source_p, const char *dlhost,
+		      const char *lreason, int tkline_time, int admin);
 static void check_dlines(void);
 
 /* mo_dline()
@@ -132,7 +134,7 @@ mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const 
 		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return 0;
 	}
-	
+
 
 	if(!valid_dline(source_p, parv[1]))
 		return 0;
@@ -164,13 +166,13 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 		return 0;
 	}
 
-	if((ty = parse_netmask(cidr, (struct sockaddr *) &daddr, &b)) == HM_HOST)
+	if((ty = parse_netmask(cidr, (struct sockaddr *)&daddr, &b)) == HM_HOST)
 	{
 		sendto_one_notice(source_p, ":Invalid D-Line");
 		return 0;
 	}
 
-	aconf = find_dline_exact((struct sockaddr *) &daddr, b);
+	aconf = find_dline_exact((struct sockaddr *)&daddr, b);
 
 	if(aconf == NULL)
 	{
@@ -258,7 +260,7 @@ already_placed_dline(struct Client *source_p, const char *dlhost)
 		struct rb_sockaddr_storage daddr;
 		const char *creason;
 		int t = AF_INET, ty, b;
-		ty = parse_netmask(dlhost, (struct sockaddr *) &daddr, &b);
+		ty = parse_netmask(dlhost, (struct sockaddr *)&daddr, &b);
 #ifdef RB_IPV6
 		if(ty == HM_IPV6)
 			t = AF_INET6;
@@ -266,7 +268,7 @@ already_placed_dline(struct Client *source_p, const char *dlhost)
 #endif
 			t = AF_INET;
 
-		if((aconf = find_dline((struct sockaddr *) &daddr)) != NULL)
+		if((aconf = find_dline((struct sockaddr *)&daddr)) != NULL)
 		{
 			int bx;
 			parse_netmask(aconf->host, NULL, &bx);
@@ -290,7 +292,8 @@ already_placed_dline(struct Client *source_p, const char *dlhost)
 }
 
 static void
-set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int tdline_time, int admin)
+set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int tdline_time,
+	  int admin)
 {
 	struct ConfItem *aconf;
 	char dlbuffer[IRCD_BUFSIZE];
@@ -328,7 +331,7 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 	{
 		rb_snprintf(dlbuffer, sizeof(dlbuffer),
 			    "Temporary D-line %d min. - %s (%s)",
-			    (int) (tdline_time / 60), reason, current_date);
+			    (int)(tdline_time / 60), reason, current_date);
 		aconf->passwd = rb_strdup(dlbuffer);
 		aconf->hold = rb_current_time() + tdline_time;
 		add_temp_dline(aconf);
@@ -338,7 +341,8 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 				     aconf->info.oper, tdline_time / 60,
 				     aconf->host, make_ban_reason(reason, oper_reason));
 		ilog(L_KLINE, "D %s %d %s %s",
-		     aconf->info.oper, tdline_time / 60, aconf->host, make_ban_reason(reason, oper_reason));
+		     aconf->info.oper, tdline_time / 60, aconf->host, make_ban_reason(reason,
+										      oper_reason));
 
 		sendto_one_notice(source_p, ":Added temporary %d min. D-Line for [%s]",
 				  tdline_time / 60, aconf->host);
@@ -351,8 +355,10 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s added D-Line for [%s] [%s]",
-				     aconf->info.oper, aconf->host, make_ban_reason(reason, oper_reason));
-		ilog(L_KLINE, "D %s 0 %s %s", aconf->info.oper, aconf->host, make_ban_reason(reason, oper_reason));
+				     aconf->info.oper, aconf->host, make_ban_reason(reason,
+										    oper_reason));
+		ilog(L_KLINE, "D %s 0 %s %s", aconf->info.oper, aconf->host,
+		     make_ban_reason(reason, oper_reason));
 
 		sendto_one_notice(source_p, ":Added %s [%s]", admin ? "Admin D-Line" : "D-Line",
 				  aconf->host);
@@ -383,7 +389,7 @@ check_dlines(void)
 		if(IsMe(client_p))
 			continue;
 
-		if((aconf = find_dline((struct sockaddr *) &client_p->localClient->ip)) != NULL)
+		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)) != NULL)
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;
@@ -402,7 +408,7 @@ check_dlines(void)
 	{
 		client_p = ptr->data;
 
-		if((aconf = find_dline((struct sockaddr *) &client_p->localClient->ip)) != NULL)
+		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)) != NULL)
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;

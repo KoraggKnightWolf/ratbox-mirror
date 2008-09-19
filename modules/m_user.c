@@ -44,6 +44,7 @@ struct Message user_msgtab = {
 };
 
 mapi_clist_av1 user_clist[] = { &user_msgtab, NULL };
+
 DECLARE_MODULE_AV1(user, NULL, NULL, user_clist, NULL, NULL, "$Revision$");
 
 static int do_local_user(struct Client *client_p, struct Client *source_p,

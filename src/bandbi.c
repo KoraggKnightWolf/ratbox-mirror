@@ -129,7 +129,7 @@ bandb_add(bandb_type type, struct Client *source_p, const char *mask1,
 		rb_snprintf_append(buf, sizeof(buf), "%s ", mask2);
 
 	rb_snprintf_append(buf, sizeof(buf), "%s %ld %d :%s",
-			   get_oper_name(source_p), (long int) rb_current_time(), perm, reason);
+			   get_oper_name(source_p), (long int)rb_current_time(), perm, reason);
 
 	if(!EmptyString(oper_reason))
 		rb_snprintf_append(buf, sizeof(buf), "|%s", oper_reason);
@@ -214,7 +214,7 @@ bandb_check_kline(struct ConfItem *aconf)
 	int aftype;
 	const char *p;
 
-	aftype = parse_netmask(aconf->host, (struct sockaddr *) &daddr, NULL);
+	aftype = parse_netmask(aconf->host, (struct sockaddr *)&daddr, NULL);
 
 	if(aftype != HM_HOST)
 	{
@@ -225,7 +225,7 @@ bandb_check_kline(struct ConfItem *aconf)
 #endif
 			aftype = AF_INET;
 
-		kconf = find_conf_by_address(aconf->host, NULL, (struct sockaddr *) &daddr,
+		kconf = find_conf_by_address(aconf->host, NULL, (struct sockaddr *)&daddr,
 					     CONF_KILL, aftype, aconf->user);
 	}
 	else
@@ -234,13 +234,13 @@ bandb_check_kline(struct ConfItem *aconf)
 	if(kconf && ((kconf->flags & CONF_FLAGS_TEMPORARY) == 0))
 		return 0;
 
-	for (p = aconf->user; *p; p++)
+	for(p = aconf->user; *p; p++)
 	{
 		if(!IsUserChar(*p) && !IsKWildChar(*p))
 			return 0;
 	}
 
-	for (p = aconf->host; *p; p++)
+	for(p = aconf->host; *p; p++)
 	{
 		if(!IsHostChar(*p) && !IsKWildChar(*p))
 			return 0;
@@ -256,7 +256,7 @@ bandb_check_dline(struct ConfItem *aconf)
 /* 	struct ConfItem *dconf; */
 	int bits;
 
-	if(!parse_netmask(aconf->host, (struct sockaddr *) &daddr, &bits))
+	if(!parse_netmask(aconf->host, (struct sockaddr *)&daddr, &bits))
 		return 0;
 
 	return 1;
@@ -283,7 +283,7 @@ bandb_check_resv_channel(struct ConfItem *aconf)
 	if(hash_find_resv(aconf->host) || strlen(aconf->host) > CHANNELLEN)
 		return 0;
 
-	for (p = aconf->host; *p; p++)
+	for(p = aconf->host; *p; p++)
 	{
 		if(!IsChanChar(*p))
 			return 0;
@@ -379,7 +379,7 @@ bandb_handle_finish(void)
 }
 
 static void
-bandb_handle_failure(rb_helper * helper, char **parv, int parc)
+bandb_handle_failure(rb_helper *helper, char **parv, int parc)
 {
 	ilog(L_MAIN, "bandb - bandb failure: %s", parv[1]);
 	sendto_realops_flags(UMODE_ALL, L_ALL, "bandb - bandb failure: %s", parv[1]);
@@ -387,13 +387,13 @@ bandb_handle_failure(rb_helper * helper, char **parv, int parc)
 }
 
 static void
-bandb_parse(rb_helper * helper)
+bandb_parse(rb_helper *helper)
 {
 	static char buf[READBUF_SIZE];
 	char *parv[MAXPARA + 1];
 	int len, parc;
 
-	while ((len = rb_helper_read(helper, buf, sizeof(buf))))
+	while((len = rb_helper_read(helper, buf, sizeof(buf))))
 	{
 		parc = rb_string_to_array(buf, parv, MAXPARA);
 
@@ -429,7 +429,7 @@ bandb_rehash_bans(void)
 }
 
 static void
-bandb_restart_cb(rb_helper * helper)
+bandb_restart_cb(rb_helper *helper)
 {
 	ilog(L_MAIN, "bandb - bandb_restart_cb called, bandb helper died?");
 	sendto_realops_flags(UMODE_ALL, L_ALL,

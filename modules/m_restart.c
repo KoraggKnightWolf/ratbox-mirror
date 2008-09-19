@@ -45,6 +45,7 @@ struct Message restart_msgtab = {
 };
 
 mapi_clist_av1 restart_clist[] = { &restart_msgtab, NULL };
+
 DECLARE_MODULE_AV1(restart, NULL, NULL, restart_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -60,8 +61,7 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(!IsOperDie(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "die");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "die");
 		return 0;
 	}
 
@@ -80,7 +80,8 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		target_p = ptr->data;
 
-		sendto_one_notice(target_p, ":Server Restarting. %s", get_client_name(source_p, HIDE_IP));
+		sendto_one_notice(target_p, ":Server Restarting. %s",
+				  get_client_name(source_p, HIDE_IP));
 	}
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)

@@ -32,7 +32,7 @@
  */
 
 
-#define MAXCONNECTIONS 65535 /* default max connections if getrlimit doesn't work */
+#define MAXCONNECTIONS 65535	/* default max connections if getrlimit doesn't work */
 /* class {} default values */
 #define DEFAULT_SENDQ 20000000	/* default max SendQ */
 #define PORTNUM 6667		/* default outgoing portnum */
@@ -59,4 +59,4 @@
 #define MIN_SPAM_NUM 5
 #define MIN_SPAM_TIME 60
 #define CONFIG_RATBOX_LEVEL_3
-#endif				/* INCLUDED_defaults_h */
+#endif /* INCLUDED_defaults_h */

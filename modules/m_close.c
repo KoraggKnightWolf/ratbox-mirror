@@ -41,6 +41,7 @@ struct Message close_msgtab = {
 };
 
 mapi_clist_av1 close_clist[] = { &close_msgtab, NULL };
+
 DECLARE_MODULE_AV1(close, NULL, NULL, close_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -62,7 +63,7 @@ mo_close(struct Client *client_p, struct Client *source_p, int parc, const char 
 		sendto_one(source_p, form_str(RPL_CLOSING), me.name, source_p->name,
 			   get_client_name(target_p, SHOW_IP), target_p->status);
 
-		(void) exit_client(target_p, target_p, target_p, "Oper Closing");
+		(void)exit_client(target_p, target_p, target_p, "Oper Closing");
 		closed++;
 	}
 

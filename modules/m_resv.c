@@ -51,20 +51,23 @@ struct Message resv_msgtab = {
 	"RESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_resv, 5}, {mo_resv, 3}}
 };
+
 struct Message adminresv_msgtab = {
 	"ADMINRESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminresv, 3}}
 };
+
 struct Message unresv_msgtab = {
 	"UNRESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_unresv, 2}, {mo_unresv, 2}}
 };
 
-mapi_clist_av1 resv_clist[] = {	&resv_msgtab, &adminresv_msgtab, &unresv_msgtab, NULL };
+mapi_clist_av1 resv_clist[] = { &resv_msgtab, &adminresv_msgtab, &unresv_msgtab, NULL };
+
 DECLARE_MODULE_AV1(resv, NULL, NULL, resv_clist, NULL, NULL, "$Revision$");
 
 static void parse_resv(struct Client *source_p, const char *name,
-			const char *reason, int temp_time, int perm);
+		       const char *reason, int temp_time, int perm);
 
 static void remove_resv(struct Client *source_p, const char *name);
 
@@ -85,8 +88,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(!IsOperResv(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "resv");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "resv");
 		return 0;
 	}
 
@@ -112,7 +114,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		target_server = parv[loc + 1];
 		loc += 2;
-	} 
+	}
 
 	if(parc <= loc || EmptyString(parv[loc]))
 	{
@@ -146,15 +148,13 @@ mo_adminresv(struct Client *client_p, struct Client *source_p, int parc, const c
 {
 	if(!IsOperResv(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "resv");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "resv");
 		return 0;
 	}
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return 0;
 	}
 
@@ -236,7 +236,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 			return;
 		}
 
-		for (p = name; *p; p++)
+		for(p = name; *p; p++)
 		{
 			if(!IsChanChar(*p))
 			{
@@ -334,8 +334,7 @@ mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 {
 	if(!IsOperResv(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "resv");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "resv");
 		return 0;
 	}
 

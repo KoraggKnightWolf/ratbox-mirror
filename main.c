@@ -30,8 +30,8 @@
 
 int ratbox_main(int, char **);
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	return ratbox_main(argc, argv);
 }
-

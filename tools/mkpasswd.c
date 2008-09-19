@@ -74,7 +74,7 @@ getpass(const char *prompt)
 
 	memset(getpassbuf, sizeof(getpassbuf), 0);
 	fputs(prompt, stderr);
-	for (;;)
+	for(;;)
 	{
 		c = _getch();
 		if(c == '\r')
@@ -109,7 +109,7 @@ main(int argc, char *argv[])
 				 ** parameter.
 				 */
 
-	while ((c = getopt(argc, argv, "xymdber:h?l:s:p:")) != -1)
+	while((c = getopt(argc, argv, "xymdber:h?l:s:p:")) != -1)
 	{
 		switch (c)
 		{
@@ -268,7 +268,7 @@ int_to_base64(int value)
 	static char buf[5];
 	int i;
 
-	for (i = 0; i < 4; i++)
+	for(i = 0; i < 4; i++)
 	{
 		buf[i] = saltChars[value & 63];
 		value >>= 6;	/* Right shifting 6 places is the same as dividing by 64 */
@@ -456,7 +456,7 @@ generate_poor_salt(char *salt, int length)
 {
 	int i;
 	srand(time(NULL));
-	for (i = 0; i < length; i++)
+	for(i = 0; i < length; i++)
 	{
 		salt[i] = saltChars[rand() % 64];
 	}
@@ -479,7 +479,7 @@ generate_random_salt(char *salt, int length)
 		return (generate_poor_salt(salt, length));
 	}
 
-	for (i = 0; i < length; i++)
+	for(i = 0; i < length; i++)
 	{
 		salt[i] = saltChars[abs(buf[i]) % 64];
 	}

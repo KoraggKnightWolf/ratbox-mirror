@@ -46,6 +46,7 @@ struct Message operspy_msgtab = {
 };
 
 mapi_clist_av1 operspy_clist[] = { &operspy_msgtab, NULL };
+
 DECLARE_MODULE_AV1(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision$");
 
 /* ms_operspy()
@@ -54,8 +55,7 @@ DECLARE_MODULE_AV1(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision$")
  * parv[2] - optional params
  */
 static int
-ms_operspy(struct Client *client_p, struct Client *source_p,
-	   int parc, const char *parv[])
+ms_operspy(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	static char buffer[BUFSIZE];
 	char *ptr;
@@ -64,8 +64,7 @@ ms_operspy(struct Client *client_p, struct Client *source_p,
 
 	if(parc < 4)
 	{
-		report_operspy(source_p, parv[1],
-			    parc < 3 ? NULL : parv[2]);
+		report_operspy(source_p, parv[1], parc < 3 ? NULL : parv[2]);
 	}
 	/* buffer all remaining into one param */
 	else
@@ -80,8 +79,7 @@ ms_operspy(struct Client *client_p, struct Client *source_p,
 			if((size_t)(cur_len + len) >= sizeof(buffer))
 				return 0;
 
-			rb_snprintf(ptr, sizeof(buffer) - cur_len, "%s ",
-				 parv[i]);
+			rb_snprintf(ptr, sizeof(buffer) - cur_len, "%s ", parv[i]);
 			ptr += len;
 			cur_len += len;
 		}
@@ -91,4 +89,3 @@ ms_operspy(struct Client *client_p, struct Client *source_p,
 
 	return 0;
 }
-

@@ -40,7 +40,7 @@ mapi_hfn_list_av1 stats_p_hfnlist[] = {
 DECLARE_MODULE_AV1(stats_p_spy, NULL, NULL, NULL, NULL, stats_p_hfnlist, "$Revision$");
 
 void
-show_stats_p(hook_data *data)
+show_stats_p(hook_data * data)
 {
 	sendto_realops_flags(UMODE_SPY, L_ALL,
 			     "STATS p requested by %s (%s@%s) [%s]",

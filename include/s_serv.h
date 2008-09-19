@@ -61,11 +61,11 @@ struct Capability
 #define CAP_KNOCK	0x00400	/* supports KNOCK */
 #define CAP_TB		0x00800	/* supports TBURST */
 #define CAP_ENCAP	0x04000	/* supports ENCAP */
-#define CAP_TS6		0x08000 /* supports TS6 or above */
+#define CAP_TS6		0x08000	/* supports TS6 or above */
 #define CAP_SERVICE	0x10000
 #define CAP_RSFNC	0x20000	/* rserv FNC */
-#define CAP_SAVE	0x40000 /* supports SAVE (nick collision FNC) */
-#define CAP_SAVETS_100	0x80000 /* supports SAVE at TS 100 */
+#define CAP_SAVE	0x40000	/* supports SAVE (nick collision FNC) */
+#define CAP_SAVETS_100	0x80000	/* supports SAVE at TS 100 */
 
 #define CAP_MASK        (CAP_QS  | CAP_EX   | CAP_CHW  | \
 			 CAP_IE  | CAP_SERVICE |\
@@ -103,8 +103,8 @@ extern int refresh_user_links;
 
 
 int hunt_server(struct Client *client_pt,
-		       struct Client *source_pt,
-		       const char *command, int server, int parc, const char **parv);
+		struct Client *source_pt,
+		const char *command, int server, int parc, const char **parv);
 void send_capabilities(struct Client *, int);
 const char *show_capabilities(struct Client *client);
 void try_connections(void *unused);

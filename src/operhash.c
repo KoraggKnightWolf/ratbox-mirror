@@ -129,4 +129,3 @@ operhash_delete(const char *name)
 		}
 	}
 }
-

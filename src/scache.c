@@ -78,12 +78,13 @@ scache_add(const char *name)
 	return sc->server_name;
 }
 
-void count_scache(size_t *number, size_t *mem)
+void
+count_scache(size_t *number, size_t *mem)
 {
 	int i;
 	rb_dlink_node *ptr;
 	struct scache_entry *sc;
-	
+
 	*number = 0;
 	*mem = 0;
 
@@ -95,4 +96,3 @@ void count_scache(size_t *number, size_t *mem)
 	}
 	HASH_WALK_END;
 }
-

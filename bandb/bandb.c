@@ -127,12 +127,12 @@ list_bans(void)
 	/* schedule a clear of anything already pending */
 	rb_helper_write_queue(bandb_helper, "C");
 
-	for (i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
 		rsdb_exec_fetch(&table, "SELECT mask1,mask2,oper,reason FROM %s WHERE 1",
 				bandb_table[i]);
 
-		for (j = 0; j < table.row_count; j++)
+		for(j = 0; j < table.row_count; j++)
 		{
 			if(i == BANDB_KLINE)
 				rb_snprintf(buf, sizeof(buf), "%c %s %s %s :%s",
@@ -153,7 +153,7 @@ list_bans(void)
 }
 
 static void
-parse_request(rb_helper * helper)
+parse_request(rb_helper *helper)
 {
 	static char *parv[MAXPARA + 1];
 	static char readbuf[READBUF_SIZE];
@@ -161,7 +161,7 @@ parse_request(rb_helper * helper)
 	int len;
 
 
-	while ((len = rb_helper_read(helper, readbuf, sizeof(readbuf))) > 0)
+	while((len = rb_helper_read(helper, readbuf, sizeof(readbuf))) > 0)
 	{
 		parc = rb_string_to_array(readbuf, parv, MAXPARA);
 
@@ -213,7 +213,7 @@ parse_request(rb_helper * helper)
 
 
 static void
-error_cb(rb_helper * helper)
+error_cb(rb_helper *helper)
 {
 	exit(1);
 }
@@ -293,7 +293,7 @@ check_schema(void)
 	struct rsdb_table table;
 	int i;
 
-	for (i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
 		rsdb_exec_fetch(&table,
 				"SELECT name FROM sqlite_master WHERE type='table' AND name='%s'",

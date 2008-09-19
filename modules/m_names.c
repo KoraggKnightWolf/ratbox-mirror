@@ -45,6 +45,7 @@ struct Message names_msgtab = {
 };
 
 mapi_clist_av1 names_clist[] = { &names_msgtab, NULL };
+
 DECLARE_MODULE_AV1(names, NULL, NULL, names_clist, NULL, NULL, "$Revision$");
 
 static void names_global(struct Client *source_p);
@@ -74,16 +75,14 @@ m_names(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(!check_channel_name(p))
 		{
 			sendto_one_numeric(source_p, ERR_BADCHANNAME,
-					   form_str(ERR_BADCHANNAME),
-					   (unsigned char *) p);
+					   form_str(ERR_BADCHANNAME), (unsigned char *)p);
 			return 0;
 		}
 
 		if((chptr = find_channel(p)) != NULL)
 			channel_member_names(chptr, source_p, 1);
 		else
-			sendto_one(source_p, form_str(RPL_ENDOFNAMES), 
-				   me.name, source_p->name, p);
+			sendto_one(source_p, form_str(RPL_ENDOFNAMES), me.name, source_p->name, p);
 	}
 	else
 	{
@@ -102,8 +101,7 @@ m_names(struct Client *client_p, struct Client *source_p, int parc, const char *
 		}
 
 		names_global(source_p);
-		sendto_one(source_p, form_str(RPL_ENDOFNAMES), 
-			   me.name, source_p->name, "*");
+		sendto_one(source_p, form_str(RPL_ENDOFNAMES), me.name, source_p->name, "*");
 	}
 
 	return 0;
@@ -136,8 +134,7 @@ names_global(struct Client *source_p)
 		chptr = ptr->data;
 		channel_member_names(chptr, source_p, 0);
 	}
-	cur_len = mlen = rb_sprintf(buf, form_str(RPL_NAMREPLY), 
-				    me.name, source_p->name, "*", "*");
+	cur_len = mlen = rb_sprintf(buf, form_str(RPL_NAMREPLY), me.name, source_p->name, "*", "*");
 	t = buf + mlen;
 
 	/* Second, do all clients in one big sweep */
@@ -161,8 +158,7 @@ names_global(struct Client *source_p)
 			msptr = lp->data;
 			chptr = msptr->chptr;
 
-			if(PubChannel(chptr) || IsMember(source_p, chptr) ||
-			   SecretChannel(chptr))
+			if(PubChannel(chptr) || IsMember(source_p, chptr) || SecretChannel(chptr))
 			{
 				dont_show = YES;
 				break;

@@ -14,21 +14,23 @@
 #include "ircd.h"
 #include "send.h"
 
-static int mclient_42(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int mclient_kilroy(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
+static int mclient_42(struct Client *client_p, struct Client *source_p, int parc,
+		      const char *parv[]);
+static int mclient_kilroy(struct Client *client_p, struct Client *source_p, int parc,
+			  const char *parv[]);
 
 struct Message hgtg_msgtab = {
-  "42", 0, 0, 0, MFLG_SLOW,
-  { mg_ignore, {mclient_42, 0}, mg_ignore, mg_ignore, mg_ignore, {mclient_42, 0}
-  }
+	"42", 0, 0, 0, MFLG_SLOW,
+	{mg_ignore, {mclient_42, 0}, mg_ignore, mg_ignore, mg_ignore, {mclient_42, 0}
+	 }
 };
 
 struct Message kilroy_msgtab = {
-  "KILROY", 0, 0, 0, MFLG_SLOW,
-  { mg_ignore, {mclient_kilroy, 0}, mg_ignore, mg_ignore, mg_ignore, {mclient_kilroy, 0}
-  }
+	"KILROY", 0, 0, 0, MFLG_SLOW,
+	{mg_ignore, {mclient_kilroy, 0}, mg_ignore, mg_ignore, mg_ignore, {mclient_kilroy, 0}
+	 }
 };
- 
+
 
 mapi_clist_av1 hgtg_clist[] = { &hgtg_msgtab, &kilroy_msgtab, NULL };
 
@@ -48,12 +50,13 @@ static int
 mclient_kilroy(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	SetCork(source_p);
-	sendto_one(source_p, ":%s NOTICE %s :                ___              ", me.name, source_p->name);
-	sendto_one(source_p, ":%s NOTICE %s :___________mm__(O O)__mm_________", me.name, source_p->name);
-	sendto_one(source_p, ":%s NOTICE %s :           \"\"    U    \"\"         ", me.name, source_p->name);
+	sendto_one(source_p, ":%s NOTICE %s :                ___              ", me.name,
+		   source_p->name);
+	sendto_one(source_p, ":%s NOTICE %s :___________mm__(O O)__mm_________", me.name,
+		   source_p->name);
+	sendto_one(source_p, ":%s NOTICE %s :           \"\"    U    \"\"         ", me.name,
+		   source_p->name);
 	ClearCork(source_p);
-	sendto_one(source_p,  ":%s NOTICE %s :Kilroy was here", me.name, source_p->name);
+	sendto_one(source_p, ":%s NOTICE %s :Kilroy was here", me.name, source_p->name);
 	return 0;
 }
-
-

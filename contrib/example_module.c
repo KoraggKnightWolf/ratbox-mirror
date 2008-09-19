@@ -40,37 +40,43 @@
  * parv     == an array of the parameters
  */
 
-static int munreg_test(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int mclient_test(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int mserver_test(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int mrclient_test(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int moper_test(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
+static int munreg_test(struct Client *client_p, struct Client *source_p, int parc,
+		       const char *parv[]);
+static int mclient_test(struct Client *client_p, struct Client *source_p, int parc,
+			const char *parv[]);
+static int mserver_test(struct Client *client_p, struct Client *source_p, int parc,
+			const char *parv[]);
+static int mrclient_test(struct Client *client_p, struct Client *source_p, int parc,
+			 const char *parv[]);
+static int moper_test(struct Client *client_p, struct Client *source_p, int parc,
+		      const char *parv[]);
 
 /* Show the commands this module can handle in a msgtab
  * and give the msgtab a name, here its test_msgtab
  */
 
 struct Message test_msgtab = {
-  "TEST",               /* the /COMMAND you want */
-  0,                    /* SET TO ZERO -- number of times command used by clients */
-  0,                    /* SET TO ZERO -- number of times command used by clients */
-  0,                    /* SET TO ZERO -- number of times command used by clients */
-  MFLG_SLOW,            /* ALWAYS SET TO MFLG_SLOW */
+	"TEST",			/* the /COMMAND you want */
+	0,			/* SET TO ZERO -- number of times command used by clients */
+	0,			/* SET TO ZERO -- number of times command used by clients */
+	0,			/* SET TO ZERO -- number of times command used by clients */
+	MFLG_SLOW,		/* ALWAYS SET TO MFLG_SLOW */
 
-  /* the functions to call for each handler.  If not using the generic
-   * handlers, the first param is the function to call, the second is the
-   * required number of parameters.  NOTE: If you specify a min para of 2,
-   * then parv[1] must *also* be non-empty.
-   */
-  {
-    {munreg_test, 0},   /* function call for unregistered clients, 0 parms required */
-    {mclient_test, 0},  /* function call for local clients, 0 parms required */
-    {mrclient_test, 0}, /* function call for remote clients, 0 parms required */
-    {mserver_test, 0},  /* function call for servers, 0 parms required */
-    mg_ignore,          /* function call for ENCAP, unused in this test */
-    {moper_test, 0}     /* function call for operators, 0 parms required */
-  }
+	/* the functions to call for each handler.  If not using the generic
+	 * handlers, the first param is the function to call, the second is the
+	 * required number of parameters.  NOTE: If you specify a min para of 2,
+	 * then parv[1] must *also* be non-empty.
+	 */
+	{
+	 {munreg_test, 0},	/* function call for unregistered clients, 0 parms required */
+	 {mclient_test, 0},	/* function call for local clients, 0 parms required */
+	 {mrclient_test, 0},	/* function call for remote clients, 0 parms required */
+	 {mserver_test, 0},	/* function call for servers, 0 parms required */
+	 mg_ignore,		/* function call for ENCAP, unused in this test */
+	 {moper_test, 0}	/* function call for operators, 0 parms required */
+	 }
 };
+
 /*
  * There are also some macros for the above function calls and parameter counts.
  * Here's a list:
@@ -97,9 +103,9 @@ mapi_clist_av1 test_clist[] = { &test_msgtab, NULL };
  * terminated with NULLs.
  */
 int doing_example_hook;
-mapi_hlist_av1 test_hlist[] = { 
-	{ "doing_example_hook", &doing_example_hook, },
-	{ NULL, NULL }
+mapi_hlist_av1 test_hlist[] = {
+	{"doing_example_hook", &doing_example_hook,},
+	{NULL, NULL}
 };
 
 /* The mapi_hfn_list_av1 declares the hook functions which other modules can
@@ -110,8 +116,8 @@ mapi_hlist_av1 test_hlist[] = {
 static void show_example_hook(void *unused);
 
 mapi_hfn_list_av1 test_hfnlist[] = {
-	{ "doing_example_hook", (hookfn) show_example_hook },
-	{ NULL, NULL }
+	{"doing_example_hook", (hookfn) show_example_hook},
+	{NULL, NULL}
 };
 
 /* Here we tell it what to do when the module is loaded */
@@ -196,7 +202,7 @@ mclient_test(struct Client *client_p, struct Client *source_p, int parc, const c
 	}
 	else
 	{
-		sendto_one(source_p, 
+		sendto_one(source_p,
 			   ":%s NOTICE %s :You are a normal user, and send parameters: %s", me.name,
 			   source_p->name, parv[1]);
 	}

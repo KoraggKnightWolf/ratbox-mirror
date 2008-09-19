@@ -46,6 +46,7 @@ struct Message pong_msgtab = {
 };
 
 mapi_clist_av1 pong_clist[] = { &pong_msgtab, NULL };
+
 DECLARE_MODULE_AV1(pong, NULL, NULL, pong_clist, NULL, NULL, "$Revision$");
 
 static int
@@ -63,14 +64,12 @@ ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 	 * That being the case, we will route, but only for registered clients (a
 	 * case can be made to allow them only from servers). -Shadowfax
 	 */
-	if(!EmptyString(destination) && !match(destination, me.name) &&
-	   irccmp(destination, me.id))
+	if(!EmptyString(destination) && !match(destination, me.name) && irccmp(destination, me.id))
 	{
-		if((target_p = find_client(destination)) || 
+		if((target_p = find_client(destination)) ||
 		   (target_p = find_server(NULL, destination)))
-			sendto_one(target_p, ":%s PONG %s %s", 
-				   get_id(source_p, target_p), parv[1], 
-				   get_id(target_p, target_p));
+			sendto_one(target_p, ":%s PONG %s %s",
+				   get_id(source_p, target_p), parv[1], get_id(target_p, target_p));
 		else
 		{
 			if(!IsDigit(*destination))
@@ -87,7 +86,8 @@ ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "End of burst (emulated) from %s (%d seconds)",
 					     source_p->name,
-					     (signed int) (rb_current_time() - source_p->localClient->firsttime));
+					     (signed int)(rb_current_time() -
+							  source_p->localClient->firsttime));
 		SetEob(source_p);
 		eob_count++;
 	}
@@ -100,7 +100,8 @@ mr_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 {
 	if(parc == 2 && !EmptyString(parv[1]))
 	{
-		if(ConfigFileEntry.ping_cookie && HasSentUser(source_p) && !EmptyString(source_p->name))
+		if(ConfigFileEntry.ping_cookie && HasSentUser(source_p)
+		   && !EmptyString(source_p->name))
 		{
 			uint32_t incoming_ping = strtoul(parv[1], NULL, 16);
 			if(incoming_ping)
@@ -124,7 +125,8 @@ mr_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	}
 	else
-		sendto_one(source_p, form_str(ERR_NOORIGIN), me.name, EmptyString(source_p->name) ? "*" : source_p->name);
+		sendto_one(source_p, form_str(ERR_NOORIGIN), me.name,
+			   EmptyString(source_p->name) ? "*" : source_p->name);
 
 	source_p->flags &= ~FLAGS_PINGSENT;
 

@@ -111,7 +111,7 @@ find_freehookslot(void)
 	}
 
 	/* shouldnt ever get here */
-	return(max_hooks - 1);
+	return (max_hooks - 1);
 }
 
 /* find_hook()
@@ -199,4 +199,3 @@ call_hook(int id, void *arg)
 		fn(arg);
 	}
 }
-

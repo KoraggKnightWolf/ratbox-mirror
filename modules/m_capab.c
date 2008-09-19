@@ -39,12 +39,14 @@ struct Message capab_msgtab = {
 	"CAPAB", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
 	{{mr_capab, 0}, mg_ignore, mg_ignore, mg_ignore, mg_ignore, mg_ignore}
 };
+
 struct Message gcap_msgtab = {
 	"GCAP", 0, 0, 0, MFLG_SLOW,
 	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_gcap, 2}, mg_ignore}
 };
 
 mapi_clist_av1 capab_clist[] = { &capab_msgtab, &gcap_msgtab, NULL };
+
 DECLARE_MODULE_AV1(capab, NULL, NULL, capab_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -77,12 +79,12 @@ mr_capab(struct Client *client_p, struct Client *source_p, int parc, const char 
 	rb_free(client_p->localClient->fullcaps);
 	client_p->localClient->fullcaps = rb_strdup(parv[1]);
 
-	for (i = 1; i < parc; i++)
+	for(i = 1; i < parc; i++)
 	{
 		char *t = LOCAL_COPY(parv[i]);
-		for (s = rb_strtok_r(t, " ", &p); s; s = rb_strtok_r(NULL, " ", &p))
+		for(s = rb_strtok_r(t, " ", &p); s; s = rb_strtok_r(NULL, " ", &p))
 		{
-			for (cap = captab; cap->name; cap++)
+			for(cap = captab; cap->name; cap++)
 			{
 				if(!irccmp(cap->name, s))
 				{
@@ -97,8 +99,7 @@ mr_capab(struct Client *client_p, struct Client *source_p, int parc, const char 
 }
 
 static int
-me_gcap(struct Client *client_p, struct Client *source_p,
-		int parc, const char *parv[])
+me_gcap(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Capability *cap;
 	char *t = LOCAL_COPY(parv[1]);
@@ -114,9 +115,9 @@ me_gcap(struct Client *client_p, struct Client *source_p,
 
 	source_p->serv->fullcaps = rb_strdup(parv[1]);
 
-	for (s = rb_strtok_r(t, " ", &p); s; s = rb_strtok_r(NULL, " ", &p))
+	for(s = rb_strtok_r(t, " ", &p); s; s = rb_strtok_r(NULL, " ", &p))
 	{
-		for (cap = captab; cap->name; cap++)
+		for(cap = captab; cap->name; cap++)
 		{
 			if(!irccmp(cap->name, s))
 			{

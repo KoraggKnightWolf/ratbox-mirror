@@ -44,4 +44,3 @@ void load_help(void);
 void send_user_motd(struct Client *);
 void cache_user_motd(void);
 #endif
-

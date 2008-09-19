@@ -49,11 +49,13 @@ static rb_bh *topic_heap;
 static rb_bh *member_heap;
 struct ev_entry *checksplit_ev;
 
-static int channel_capabs[] = { CAP_EX, CAP_IE, 
+static int channel_capabs[] = { CAP_EX, CAP_IE,
 #ifdef ENABLE_SERVICES
-				CAP_SERVICE,
+	CAP_SERVICE,
 #endif
-				CAP_TS6 };
+	CAP_TS6
+};
+
 #define NCHCAPS         (sizeof(channel_capabs)/sizeof(int))
 #define NCHCAP_COMBOS   (1 << NCHCAPS)
 
@@ -85,7 +87,7 @@ allocate_channel(const char *chname)
 	struct Channel *chptr;
 	chptr = rb_bh_alloc(channel_heap);
 	chptr->chname = rb_strndup(chname, CHANNELLEN);
-	return(chptr);
+	return (chptr);
 }
 
 void
@@ -102,8 +104,8 @@ allocate_ban(const char *banstr, const char *who)
 	bptr = rb_bh_alloc(ban_heap);
 	bptr->banstr = rb_strndup(banstr, BANLEN);
 	bptr->who = rb_strndup(who, BANLEN);
-	
-	return(bptr);
+
+	return (bptr);
 }
 
 void
@@ -319,7 +321,7 @@ check_channel_name(const char *name)
 	if(name == NULL)
 		return 0;
 
-	for (; *name; ++name)
+	for(; *name; ++name)
 	{
 		if(!IsChanChar(*name))
 			return 0;
@@ -421,9 +423,8 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 		is_member = IsMember(client_p, chptr);
 
 		cur_len = mlen = rb_sprintf(lbuf, form_str(RPL_NAMREPLY),
-					    me.name, client_p->name, 
-					    channel_pub_or_secret(chptr),
-					    chptr->chname);
+					    me.name, client_p->name,
+					    channel_pub_or_secret(chptr), chptr->chname);
 
 		t = lbuf + cur_len;
 
@@ -436,7 +437,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 				continue;
 
 			/* space, possible "@+" prefix */
-			if(cur_len + strlen(target_p->name) + 3 >= BUFSIZE-3)
+			if(cur_len + strlen(target_p->name) + 3 >= BUFSIZE - 3)
 			{
 				*(t - 1) = '\0';
 				sendto_one_buffer(client_p, lbuf);
@@ -445,7 +446,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 			}
 
 			tlen = rb_sprintf(t, "%s%s ", find_channel_status(msptr, stack),
-				   target_p->name);
+					  target_p->name);
 
 			cur_len += tlen;
 			t += tlen;
@@ -508,10 +509,8 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 	/* if the buffers havent been built, do it here */
 	if(s == NULL)
 	{
-		rb_sprintf(src_host, "%s!%s@%s",
-			   who->name, who->username, who->host);
-		rb_sprintf(src_iphost, "%s!%s@%s",
-			   who->name, who->username, who->sockhost);
+		rb_sprintf(src_host, "%s!%s@%s", who->name, who->username, who->host);
+		rb_sprintf(src_iphost, "%s!%s@%s", who->name, who->username, who->sockhost);
 
 		s = src_host;
 		s2 = src_iphost;
@@ -521,8 +520,7 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 	{
 		actualBan = ptr->data;
 		if(match(actualBan->banstr, s) ||
-		   match(actualBan->banstr, s2) || 
-		   match_cidr(actualBan->banstr, s2))
+		   match(actualBan->banstr, s2) || match_cidr(actualBan->banstr, s2))
 			break;
 		else
 			actualBan = NULL;
@@ -536,8 +534,7 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 
 			/* theyre exempted.. */
 			if(match(actualExcept->banstr, s) ||
-			   match(actualExcept->banstr, s2) || 
-			   match_cidr(actualExcept->banstr, s2))
+			   match(actualExcept->banstr, s2) || match_cidr(actualExcept->banstr, s2))
 			{
 				/* cache the fact theyre not banned */
 				if(msptr != NULL)
@@ -578,8 +575,7 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
  * side effects -
  */
 int
-can_send(struct Channel *chptr, struct Client *source_p, 
-	 struct membership *msptr)
+can_send(struct Channel *chptr, struct Client *source_p, struct membership *msptr)
 {
 	if(IsServer(source_p))
 		return CAN_SEND_OPV;
@@ -598,8 +594,7 @@ can_send(struct Channel *chptr, struct Client *source_p,
 			 * they cant send.  we dont check bans here because
 			 * theres no possibility of caching them --fl
 			 */
-			if(chptr->mode.mode & MODE_NOPRIVMSGS ||
-			   chptr->mode.mode & MODE_MODERATED)
+			if(chptr->mode.mode & MODE_NOPRIVMSGS || chptr->mode.mode & MODE_MODERATED)
 				return CAN_SEND_NO;
 			else
 				return CAN_SEND_NONOP;
@@ -711,8 +706,10 @@ check_splitmode(void *unused)
 			{
 				splitmode = 1;
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "Network split, activating splitmode");
-				checksplit_ev = rb_event_addish("check_splitmode", check_splitmode, NULL, 5);
+						     "Network split, activating splitmode");
+				checksplit_ev =
+					rb_event_addish("check_splitmode", check_splitmode, NULL,
+							5);
 			}
 		}
 		/* in splitmode, check whether its finished */
@@ -721,7 +718,7 @@ check_splitmode(void *unused)
 			splitmode = 0;
 
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Network rejoined, deactivating splitmode");
+					     "Network rejoined, deactivating splitmode");
 
 			rb_event_delete(checksplit_ev);
 			checksplit_ev = NULL;
@@ -772,20 +769,19 @@ free_topic(struct Channel *chptr)
  * side effects - channels topic, topic info and TS are set.
  */
 void
-set_channel_topic(struct Channel *chptr, const char *topic,
-		  const char *topic_info, time_t topicts)
+set_channel_topic(struct Channel *chptr, const char *topic, const char *topic_info, time_t topicts)
 {
 	if(strlen(topic) > 0)
 	{
-		if(chptr->topic == NULL) 
+		if(chptr->topic == NULL)
 			allocate_topic(chptr);
 		else
 			rb_free(chptr->topic->topic);
 
-		chptr->topic->topic = rb_strndup(topic, ConfigChannel.topiclen + 1); /* the + 1 for the \0 */
+		chptr->topic->topic = rb_strndup(topic, ConfigChannel.topiclen + 1);	/* the + 1 for the \0 */
 		rb_strlcpy(chptr->topic->topic_info, topic_info, sizeof(chptr->topic->topic_info));
 		chptr->topic->topic_time = topicts;
-	} 
+	}
 	else
 	{
 		if(chptr->topic != NULL)
@@ -825,7 +821,7 @@ channel_modes(struct Channel *chptr, struct Client *client_p)
 		*mbuf++ = 'r';
 #endif
 	if(chptr->mode.mode & MODE_SSLONLY)
-		*mbuf++ = 'S';	
+		*mbuf++ = 'S';
 
 	if(chptr->mode.limit && *chptr->mode.key)
 	{
@@ -880,10 +876,10 @@ init_chcap_usage_counts(void)
 	memset(chcap_combos, 0, sizeof(chcap_combos));
 
 	/* For every possible combination */
-	for (m = 0; m < NCHCAP_COMBOS; m++)
+	for(m = 0; m < NCHCAP_COMBOS; m++)
 	{
 		/* Check each capab */
-		for (c = y = n = 0; c < NCHCAPS; c++)
+		for(c = y = n = 0; c < NCHCAPS; c++)
 		{
 			if((m & (1 << c)) == 0)
 				n |= channel_capabs[c];
@@ -906,7 +902,7 @@ set_chcap_usage_counts(struct Client *serv_p)
 {
 	int n;
 
-	for (n = 0; n < NCHCAP_COMBOS; n++)
+	for(n = 0; n < NCHCAP_COMBOS; n++)
 	{
 		if(IsCapable(serv_p, chcap_combos[n].cap_yes) &&
 		   NotCapable(serv_p, chcap_combos[n].cap_no))
@@ -932,7 +928,7 @@ unset_chcap_usage_counts(struct Client *serv_p)
 {
 	int n;
 
-	for (n = 0; n < NCHCAP_COMBOS; n++)
+	for(n = 0; n < NCHCAP_COMBOS; n++)
 	{
 		if(IsCapable(serv_p, chcap_combos[n].cap_yes) &&
 		   NotCapable(serv_p, chcap_combos[n].cap_no))
@@ -964,8 +960,7 @@ unset_chcap_usage_counts(struct Client *serv_p)
  */
 void
 send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
-		      struct Channel *chptr, struct ChModeChange mode_changes[],
-		      int mode_count)
+		      struct Channel *chptr, struct ChModeChange mode_changes[], int mode_count)
 {
 	static char modebuf[BUFSIZE];
 	static char parabuf[BUFSIZE];
@@ -979,7 +974,7 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 	int arglen;
 
 	/* Now send to servers... */
-	for (j = 0; j < NCHCAP_COMBOS; j++)
+	for(j = 0; j < NCHCAP_COMBOS; j++)
 	{
 		if(chcap_combos[j].count == 0)
 			continue;
@@ -996,22 +991,22 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 
 		if(cap & CAP_TS6)
 			mbl = preflen = rb_sprintf(modebuf, ":%s TMODE %ld %s ",
-						use_id(source_p), (long) chptr->channelts,
-						chptr->chname);
+						   use_id(source_p), (long)chptr->channelts,
+						   chptr->chname);
 		else
 			mbl = preflen = rb_sprintf(modebuf, ":%s MODE %s ",
-						source_p->name, chptr->chname);
+						   source_p->name, chptr->chname);
 
 		/* loop the list of - modes we have */
-		for (i = 0; i < mode_count; i++)
+		for(i = 0; i < mode_count; i++)
 		{
 			/* if they dont support the cap we need, or they do support a cap they
 			 * cant have, then dont add it to the modebuf.. that way they wont see
 			 * the mode
 			 */
 			if((mode_changes[i].letter == 0) ||
-				((cap & mode_changes[i].caps) != mode_changes[i].caps)
-				|| ((nocap & mode_changes[i].nocaps) != mode_changes[i].nocaps))
+			   ((cap & mode_changes[i].caps) != mode_changes[i].caps)
+			   || ((nocap & mode_changes[i].nocaps) != mode_changes[i].nocaps))
 				continue;
 
 			if((cap & CAP_TS6) && !EmptyString(mode_changes[i].id))
@@ -1024,7 +1019,7 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 				arglen = strlen(arg);
 
 				/* dont even think about it! --fl */
-				if(arglen > MODEBUFLEN-5)
+				if(arglen > MODEBUFLEN - 5)
 					continue;
 			}
 
@@ -1036,11 +1031,11 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 			 * which even then won't work as we don't always know the uid -A1kmm.
 			 */
 			if(arg && ((mc == MAXMODEPARAMSSERV) ||
-				((mbl + pbl + arglen + 4) > (BUFSIZE-3))))
+				   ((mbl + pbl + arglen + 4) > (BUFSIZE - 3))))
 			{
 				if(nc != 0)
 					sendto_server(client_p, chptr, cap, nocap,
-							"%s %s", modebuf, parabuf);
+						      "%s %s", modebuf, parabuf);
 				nc = 0;
 				mc = 0;
 

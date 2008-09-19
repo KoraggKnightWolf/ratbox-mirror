@@ -121,7 +121,7 @@ modules_init(void)
 	mod_add_cmd(&modunload_msgtab);
 	mod_add_cmd(&modreload_msgtab);
 	mod_add_cmd(&modrestart_msgtab);
-	mod_add_cmd(&modlist_msgtab); /* have modlist if we are static or not */
+	mod_add_cmd(&modlist_msgtab);	/* have modlist if we are static or not */
 #endif
 
 }
@@ -208,7 +208,7 @@ irc_basename(const char *path)
 	else
 		s++;
 
-	(void) strcpy(mod_basename, s);
+	(void)strcpy(mod_basename, s);
 	return mod_basename;
 }
 
@@ -224,13 +224,14 @@ findmodule_byname(const char *name)
 {
 	int i;
 
-	for (i = 0; i < num_mods; i++)
+	for(i = 0; i < num_mods; i++)
 	{
 		if(!irccmp(modlist[i]->name, name))
 			return i;
 	}
 	return -1;
 }
+
 /* load_all_modules()
  *
  * input        -
@@ -260,24 +261,25 @@ load_all_modules(int warn)
 		rb_strlcat(module_dir_name, "/modules/autoload", sizeof(module_dir_name));
 		system_module_dir = opendir(module_dir_name);
 	}
-	
+
 	if(system_module_dir == NULL)
 	{
 		ilog(L_MAIN, "Could not load modules from %s: %s", AUTOMODPATH, strerror(errno));
 		return;
 	}
 
-	while ((ldirent = readdir(system_module_dir)) != NULL)
+	while((ldirent = readdir(system_module_dir)) != NULL)
 	{
 		len = strlen(ldirent->d_name);
 
-		if((len > ext_len) && !strcmp(ldirent->d_name+len-ext_len, shext))
+		if((len > ext_len) && !strcmp(ldirent->d_name + len - ext_len, shext))
 		{
-			(void) rb_snprintf(module_fq_name, sizeof(module_fq_name), "%s/%s", module_dir_name, ldirent->d_name);
-			(void) load_a_module(module_fq_name, warn, 0);
-		} 
+			(void)rb_snprintf(module_fq_name, sizeof(module_fq_name), "%s/%s",
+					  module_dir_name, ldirent->d_name);
+			(void)load_a_module(module_fq_name, warn, 0);
+		}
 	}
-	(void) closedir(system_module_dir);
+	(void)closedir(system_module_dir);
 }
 
 /* load_core_modules()
@@ -294,24 +296,28 @@ load_core_modules(int warn)
 	DIR *core_dir;
 	int i;
 
-	core_dir  = opendir(MODPATH);
+	core_dir = opendir(MODPATH);
 	if(core_dir == NULL)
 	{
 		rb_snprintf(dir_name, sizeof(dir_name), "%s/modules", ConfigFileEntry.dpath);
 		core_dir = opendir(dir_name);
-	} else {
+	}
+	else
+	{
 		rb_strlcpy(dir_name, MODPATH, sizeof(dir_name));
 	}
-	
-	
+
+
 	if(core_dir == NULL)
 	{
-		ilog(L_MAIN, "Cannot find where core modules are located(tried %s and %s): terminating ircd", MODPATH, dir_name);
+		ilog(L_MAIN,
+		     "Cannot find where core modules are located(tried %s and %s): terminating ircd",
+		     MODPATH, dir_name);
 		exit(0);
 	}
 
 
-	for (i = 0; core_module_table[i]; i++)
+	for(i = 0; core_module_table[i]; i++)
 	{
 
 		rb_snprintf(module_name, sizeof(module_name), "%s/%s%s", dir_name,
@@ -320,7 +326,7 @@ load_core_modules(int warn)
 		if(load_a_module(module_name, warn, 1) == -1)
 		{
 			ilog(L_MAIN,
-			"Error loading core module %s%s: terminating ircd",
+			     "Error loading core module %s%s: terminating ircd",
 			     core_module_table[i], SHLIBEXT);
 			exit(0);
 		}
@@ -379,8 +385,7 @@ mo_modload(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return 0;
 	}
 
@@ -410,8 +415,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return 0;
 	}
 
@@ -426,7 +430,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(modlist[modindex]->core == 1)
 	{
-		sendto_one_notice(source_p, 
+		sendto_one_notice(source_p,
 				  ":Module %s is a core module and may not be unloaded", m_bn);
 		rb_free(m_bn);
 		return 0;
@@ -450,8 +454,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return 0;
 	}
 
@@ -494,15 +497,14 @@ mo_modrestart(struct Client *client_p, struct Client *source_p, int parc, const 
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return 0;
 	}
 
 	sendto_one_notice(source_p, ":Reloading all modules");
 
 	modnum = num_mods;
-	while (num_mods)
+	while(num_mods)
 		unload_one_module(modlist[0]->name, 0);
 
 	load_all_modules(0);
@@ -524,12 +526,11 @@ mo_modlist(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
 		return 0;
 	}
 	SetCork(source_p);
-	for (i = 0; i < num_mods; i++)
+	for(i = 0; i < num_mods; i++)
 	{
 		if(parc > 1)
 		{
@@ -578,7 +579,7 @@ unload_one_module(const char *name, int warn)
 			if(mheader->mapi_command_list)
 			{
 				struct Message **m;
-				for (m = mheader->mapi_command_list; *m; ++m)
+				for(m = mheader->mapi_command_list; *m; ++m)
 					mod_del_cmd(*m);
 			}
 
@@ -588,7 +589,7 @@ unload_one_module(const char *name, int warn)
 			if(mheader->mapi_hfn_list)
 			{
 				mapi_hfn_list_av1 *m;
-				for (m = mheader->mapi_hfn_list; m->hapi_name; ++m)
+				for(m = mheader->mapi_hfn_list; m->hapi_name; ++m)
 					remove_hook(m->hapi_name, m->hookfn);
 			}
 
@@ -666,7 +667,7 @@ load_a_module(const char *path, int warn, int core)
 	mapi_base = lt_dlsym(tmpptr, "_mheader");
 	if(mapi_base == NULL)
 	{
-		mapi_base = lt_dlsym(tmpptr, "__mheader");		
+		mapi_base = lt_dlsym(tmpptr, "__mheader");
 	}
 
 	mapi_version = (int *)mapi_base;
@@ -701,21 +702,21 @@ load_a_module(const char *path, int warn, int core)
 			if(mheader->mapi_command_list)
 			{
 				struct Message **m;
-				for (m = mheader->mapi_command_list; *m; ++m)
+				for(m = mheader->mapi_command_list; *m; ++m)
 					mod_add_cmd(*m);
 			}
 
 			if(mheader->mapi_hook_list)
 			{
 				mapi_hlist_av1 *m;
-				for (m = mheader->mapi_hook_list; m->hapi_name; ++m)
+				for(m = mheader->mapi_hook_list; m->hapi_name; ++m)
 					*m->hapi_id = register_hook(m->hapi_name);
 			}
 
 			if(mheader->mapi_hfn_list)
 			{
 				mapi_hfn_list_av1 *m;
-				for (m = mheader->mapi_hfn_list; m->hapi_name; ++m)
+				for(m = mheader->mapi_hfn_list; m->hapi_name; ++m)
 					add_hook(m->hapi_name, m->hookfn);
 			}
 
@@ -729,7 +730,7 @@ load_a_module(const char *path, int warn, int core)
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Module %s has unknown/unsupported MAPI version %d.",
 				     mod_basename, *mapi_version);
-		lt_dlclose(tmpptr); 
+		lt_dlclose(tmpptr);
 		rb_free(mod_basename);
 		return -1;
 	}
@@ -752,8 +753,7 @@ load_a_module(const char *path, int warn, int core)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Module %s [version: %s; MAPI version: %d] loaded at 0x%p",
-				     mod_basename, ver, MAPI_VERSION(*mapi_version),
-				     tmpptr);
+				     mod_basename, ver, MAPI_VERSION(*mapi_version), tmpptr);
 		ilog(L_MAIN, "Module %s [version: %s; MAPI version: %d] loaded at 0x%p",
 		     mod_basename, ver, MAPI_VERSION(*mapi_version), tmpptr);
 	}
@@ -778,15 +778,16 @@ increase_modlist(void)
 	max_mods += MODS_INCREMENT;
 }
 #endif /* !STATIC_MODULES */
- 
+
 
 #ifdef STATIC_MODULES
 extern const struct mapi_header_av1 *static_mapi_headers[];
-void load_static_modules(void)
+void
+load_static_modules(void)
 {
 	int x;
 	const int *mapi_version;
-	
+
 	modules_init();
 	for(x = 0; static_mapi_headers[x] != NULL; x++)
 	{
@@ -795,46 +796,50 @@ void load_static_modules(void)
 		{
 			ilog(L_MAIN, "Error: linked in module without a MAPI header..giving up");
 			exit(70);
-		} 	
-		switch(MAPI_VERSION(*mapi_version))
+		}
+		switch (MAPI_VERSION(*mapi_version))
 		{
-			case 1:
+		case 1:
 			{
-				const struct mapi_mheader_av1 *mheader = (const struct mapi_mheader_av1 *)mapi_version;
-				if (mheader->mapi_register && (mheader->mapi_register() == -1))
+				const struct mapi_mheader_av1 *mheader =
+					(const struct mapi_mheader_av1 *)mapi_version;
+				if(mheader->mapi_register && (mheader->mapi_register() == -1))
 				{
-					ilog(L_MAIN, "Error: linked in module failed loading..giving up");
+					ilog(L_MAIN,
+					     "Error: linked in module failed loading..giving up");
 					exit(70);
 				}
-				
+
 				if(mheader->mapi_command_list)
 				{
 					struct Message **m;
 					for(m = mheader->mapi_command_list; *m; ++m)
 						mod_add_cmd(*m);
 				}
-				
+
 				if(mheader->mapi_hook_list)
 				{
 					mapi_hlist_av1 *m;
 					for(m = mheader->mapi_hook_list; m->hapi_name; ++m)
 						*m->hapi_id = register_hook(m->hapi_name);
-				}	
-				
+				}
+
 				if(mheader->mapi_hfn_list)
 				{
 					mapi_hfn_list_av1 *m;
 					for(m = mheader->mapi_hfn_list; m->hapi_name; ++m)
 						add_hook(m->hapi_name, m->hookfn);
-						
+
 				}
 				break;
-			}	
-			default:
+			}
+		default:
 			{
-				ilog(L_MAIN, "Error: Unknown MAPI version (%d)in linked in module..giving up", MAPI_VERSION(*mapi_version));
+				ilog(L_MAIN,
+				     "Error: Unknown MAPI version (%d)in linked in module..giving up",
+				     MAPI_VERSION(*mapi_version));
 				exit(70);
-			}				
+			}
 		}
 	}
 }

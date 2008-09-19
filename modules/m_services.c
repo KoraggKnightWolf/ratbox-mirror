@@ -61,33 +61,35 @@ struct Message su_msgtab = {
 	"SU", 0, 0, 0, MFLG_SLOW,
 	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_su, 2}, mg_ignore}
 };
+
 struct Message login_msgtab = {
 	"LOGIN", 0, 0, 0, MFLG_SLOW,
 	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_login, 2}, mg_ignore}
 };
+
 struct Message rsfnc_msgtab = {
 	"RSFNC", 0, 0, 0, MFLG_SLOW,
 	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_rsfnc, 3}, mg_ignore}
 };
 
-mapi_clist_av1 services_clist[] = { 
-	&su_msgtab, &login_msgtab, &rsfnc_msgtab, NULL 
+mapi_clist_av1 services_clist[] = {
+	&su_msgtab, &login_msgtab, &rsfnc_msgtab, NULL
 };
 
 mapi_hfn_list_av1 services_hfnlist[] = {
-	{ "doing_stats",        (hookfn) h_svc_stats },
-	{ "doing_whois",	(hookfn) h_svc_whois },
-	{ "doing_whois_global",	(hookfn) h_svc_whois },
-	{ "burst_client",	(hookfn) h_svc_burst_client },
-	{ "server_introduced",	(hookfn) h_svc_server_introduced },
-	{ NULL, NULL }
+	{"doing_stats", (hookfn) h_svc_stats},
+	{"doing_whois", (hookfn) h_svc_whois},
+	{"doing_whois_global", (hookfn) h_svc_whois},
+	{"burst_client", (hookfn) h_svc_burst_client},
+	{"server_introduced", (hookfn) h_svc_server_introduced},
+	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(services, NULL, NULL, services_clist, NULL, services_hfnlist, "$Revision$");
+DECLARE_MODULE_AV1(services, NULL, NULL, services_clist, NULL, services_hfnlist,
+		   "$Revision$");
 
 static int
-me_su(struct Client *client_p, struct Client *source_p,
-	int parc, const char *parv[])
+me_su(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 
@@ -130,8 +132,7 @@ clean_nick(const char *nick)
 }
 
 static int
-me_rsfnc(struct Client *client_p, struct Client *source_p,
-	int parc, const char *parv[])
+me_rsfnc(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 	struct Client *exist_p;
@@ -172,7 +173,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 
 		if(MyClient(exist_p))
 			sendto_one(exist_p, ":%s KILL %s :(Nickname regained by services)",
-				me.name, exist_p->name);
+				   me.name, exist_p->name);
 
 		exist_p->flags |= FLAGS_KILLED;
 		/* Do not send kills to servers for unknowns -- jilles */
@@ -181,7 +182,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 						me.name);
 
 		rb_snprintf(buf, sizeof(buf), "Killed (%s (Nickname regained by services))",
-			me.name);
+			    me.name);
 		exit_client(NULL, exist_p, &me, buf);
 	}
 
@@ -198,19 +199,17 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 	invalidate_bancache_user(target_p);
 
 	sendto_realops_flags(UMODE_NCHANGE, L_ALL,
-			"Nick change: From %s to %s [%s@%s]",
-			target_p->name, parv[2], target_p->username,
-			target_p->host);
+			     "Nick change: From %s to %s [%s@%s]",
+			     target_p->name, parv[2], target_p->username, target_p->host);
 
 	sendto_common_channels_local(target_p, ":%s!%s@%s NICK :%s",
-				target_p->name, target_p->username,
-				target_p->host, parv[2]);
+				     target_p->name, target_p->username, target_p->host, parv[2]);
 
 	add_history(target_p, 1);
 	sendto_server(NULL, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
-			use_id(target_p), parv[2], (long) target_p->tsinfo);
+		      use_id(target_p), parv[2], (long)target_p->tsinfo);
 	sendto_server(NULL, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%ld",
-			target_p->name, parv[2], (long) target_p->tsinfo);
+		      target_p->name, parv[2], (long)target_p->tsinfo);
 
 	del_from_hash(HASH_CLIENT, target_p->name, target_p);
 	strcpy(target_p->user->name, parv[2]);
@@ -225,8 +224,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p,
 }
 
 static int
-me_login(struct Client *client_p, struct Client *source_p,
-	int parc, const char *parv[])
+me_login(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	if(!IsClient(source_p) || !ServerInfo.hub)
 		return 0;
@@ -240,24 +238,23 @@ me_login(struct Client *client_p, struct Client *source_p,
 }
 
 static void
-h_svc_burst_client(hook_data_client *hdata)
+h_svc_burst_client(hook_data_client * hdata)
 {
 	if(EmptyString(hdata->target->user->suser))
 		return;
 
 	sendto_one(hdata->client, ":%s ENCAP * LOGIN %s",
-			get_id(hdata->target, hdata->client),
-			hdata->target->user->suser);
+		   get_id(hdata->target, hdata->client), hdata->target->user->suser);
 }
 
 static void
-h_svc_server_introduced(hook_data_client *hdata)
+h_svc_server_introduced(hook_data_client * hdata)
 {
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, service_list.head)
 	{
-		if(!irccmp((const char *) ptr->data, hdata->target->name))
+		if(!irccmp((const char *)ptr->data, hdata->target->name))
 		{
 			hdata->target->flags |= FLAGS_SERVICE;
 			return;
@@ -266,33 +263,31 @@ h_svc_server_introduced(hook_data_client *hdata)
 }
 
 static void
-h_svc_whois(hook_data_client *data)
+h_svc_whois(hook_data_client * data)
 {
 	if(!EmptyString(data->target->user->suser))
 	{
 		sendto_one(data->client, form_str(RPL_WHOISLOGGEDIN),
-				get_id(&me, data->client),
-				get_id(data->client, data->client),
-				data->target->name,
-				data->target->user->suser);
+			   get_id(&me, data->client),
+			   get_id(data->client, data->client),
+			   data->target->name, data->target->user->suser);
 	}
 }
 
 static void
-h_svc_stats(hook_data_int *data)
+h_svc_stats(hook_data_int * data)
 {
-	char statchar = (char) data->arg2;
+	char statchar = (char)data->arg2;
 	rb_dlink_node *ptr;
-	 
-	if (statchar == 'U' && IsOper(data->client))
+
+	if(statchar == 'U' && IsOper(data->client))
 	{
 		RB_DLINK_FOREACH(ptr, service_list.head)
 		{
 			sendto_one_numeric(data->client, RPL_STATSULINE,
-						form_str(RPL_STATSULINE),
-						ptr->data, "*", "*", "s");
+					   form_str(RPL_STATSULINE), ptr->data, "*", "*", "s");
 		}
-	 }
+	}
 }
-	 
+
 #endif

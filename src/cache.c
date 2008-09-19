@@ -89,7 +89,8 @@ untabify(char *dest, const char *src, size_t destlen)
 			for(i = 0; i < 8 && x < destlen - 1; i++, x++, d++)
 				*d = ' ';
 			s++;
-		} else 
+		}
+		else
 		{
 			*d++ = *s++;
 			x++;
@@ -166,16 +167,14 @@ cache_links(void *unused)
 		target_p = ptr->data;
 
 		/* skip ourselves (done in /links) and hidden servers */
-		if(IsMe(target_p) ||
-		   (IsHidden(target_p) && !ConfigServerHide.disable_hidden))
+		if(IsMe(target_p) || (IsHidden(target_p) && !ConfigServerHide.disable_hidden))
 			continue;
 
 		/* if the below is ever modified, change LINKSLINELEN */
 		links_line = rb_malloc(LINKSLINELEN);
 		rb_snprintf(links_line, LINKSLINELEN, "%s %s :1 %s",
-			   target_p->name, me.name, 
-			   target_p->info[0] ? target_p->info : 
-			    "(Unknown Location)");
+			    target_p->name, me.name,
+			    target_p->info[0] ? target_p->info : "(Unknown Location)");
 
 		rb_dlinkAddTailAlloc(links_line, &links_cache_list);
 	}
@@ -215,7 +214,7 @@ void
 load_help(void)
 {
 	DIR *helpfile_dir = NULL;
-	struct dirent *ldirent= NULL;
+	struct dirent *ldirent = NULL;
 	char filename[MAXPATHLEN];
 	struct cachefile *cacheptr;
 
@@ -307,21 +306,19 @@ cache_user_motd(void)
 {
 	struct stat sb;
 	struct tm *local_tm;
-	
-	if(stat(MPATH, &sb) == 0) 
+
+	if(stat(MPATH, &sb) == 0)
 	{
 		local_tm = gmtime(&sb.st_mtime);
 
-		if(local_tm != NULL) 
+		if(local_tm != NULL)
 		{
 			rb_snprintf(user_motd_changed, sizeof(user_motd_changed),
-				 "%d/%d/%d %d:%d",
-				 local_tm->tm_mday, local_tm->tm_mon + 1,
-				 1900 + local_tm->tm_year, local_tm->tm_hour,
-				 local_tm->tm_min);
+				    "%d/%d/%d %d:%d",
+				    local_tm->tm_mday, local_tm->tm_mon + 1,
+				    1900 + local_tm->tm_year, local_tm->tm_hour, local_tm->tm_min);
 		}
-	} 
+	}
 	free_cachefile(user_motd);
 	user_motd = cache_file(MPATH, "ircd.motd", 0);
 }
-

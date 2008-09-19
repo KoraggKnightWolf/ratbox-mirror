@@ -45,7 +45,7 @@
 #include "modules.h"
 
 static int mo_testmask(struct Client *client_p, struct Client *source_p,
-			int parc, const char *parv[]);
+		       int parc, const char *parv[]);
 
 struct Message testmask_msgtab = {
 	"TESTMASK", 0, 0, 0, MFLG_SLOW,
@@ -53,14 +53,14 @@ struct Message testmask_msgtab = {
 };
 
 mapi_clist_av1 testmask_clist[] = { &testmask_msgtab, NULL };
+
 DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision$");
 
 static const char *empty_sockhost = "255.255.255.255";
 static const char *spoofed_sockhost = "0";
 
 static int
-mo_testmask(struct Client *client_p, struct Client *source_p,
-			int parc, const char *parv[])
+mo_testmask(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 	int lcount = 0;
@@ -118,7 +118,8 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 			sockhost = target_p->sockhost;
 
 		if(match(username, target_p->username) &&
-		   (match(hostname, target_p->host) || match(hostname, sockhost) || match_ips(hostname, sockhost)))
+		   (match(hostname, target_p->host) || match(hostname, sockhost)
+		    || match_ips(hostname, sockhost)))
 		{
 			if(name && !match(name, target_p->name))
 				continue;
@@ -134,9 +135,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p,
 	}
 
 	sendto_one(source_p, form_str(RPL_TESTMASKGECOS),
-                               me.name, source_p->name,
-                               lcount, gcount, name ? name : "*",
-                               username, hostname, gecos ? gecos : "*");
+		   me.name, source_p->name,
+		   lcount, gcount, name ? name : "*", username, hostname, gecos ? gecos : "*");
 	return 0;
 }
-

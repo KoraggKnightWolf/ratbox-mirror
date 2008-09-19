@@ -47,9 +47,10 @@ struct Message motd_msgtab = {
 int doing_motd_hook;
 
 mapi_clist_av1 motd_clist[] = { &motd_msgtab, NULL };
+
 mapi_hlist_av1 motd_hlist[] = {
-	{ "doing_motd",	&doing_motd_hook },
-	{ NULL, NULL }
+	{"doing_motd", &doing_motd_hook},
+	{NULL, NULL}
 };
 
 DECLARE_MODULE_AV1(motd, NULL, NULL, motd_clist, motd_hlist, NULL, "$Revision$");
@@ -69,10 +70,8 @@ m_motd(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
-		sendto_one(source_p, form_str(RPL_LOAD2HI),
-			   me.name, source_p->name, "MOTD");
-		sendto_one(source_p, form_str(RPL_ENDOFMOTD),
-			   me.name, source_p->name);
+		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "MOTD");
+		sendto_one(source_p, form_str(RPL_ENDOFMOTD), me.name, source_p->name);
 		return 0;
 	}
 	else

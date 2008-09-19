@@ -50,7 +50,8 @@
 
 static int mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int me_xline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
-static int mo_adminxline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
+static int mo_adminxline(struct Client *client_p, struct Client *source_p, int parc,
+			 const char *parv[]);
 static int mo_unxline(struct Client *client_p, struct Client *source_p, int parc,
 		      const char *parv[]);
 static int me_unxline(struct Client *client_p, struct Client *source_p, int parc,
@@ -60,6 +61,7 @@ struct Message xline_msgtab = {
 	"XLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_xline, 5}, {mo_xline, 3}}
 };
+
 struct Message adminxline_msgtab = {
 	"ADMINXLINE", 0, 0, 0, MFLG_SLOW,
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminxline, 3}}
@@ -70,11 +72,12 @@ struct Message unxline_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unxline, 2}, {mo_unxline, 2}}
 };
 
-mapi_clist_av1 xline_clist[] =  { &xline_msgtab, &unxline_msgtab, NULL };
+mapi_clist_av1 xline_clist[] = { &xline_msgtab, &unxline_msgtab, NULL };
+
 DECLARE_MODULE_AV1(xline, NULL, NULL, xline_clist, NULL, NULL, "$Revision$");
 
 static int valid_xline(struct Client *, const char *, const char *, int temp);
-static void apply_xline(struct Client *client_p, const char *name, 
+static void apply_xline(struct Client *client_p, const char *name,
 			const char *reason, int temp_time, int perm);
 
 static void remove_xline(struct Client *source_p, const char *gecos);
@@ -291,14 +294,15 @@ check_xlines(void)
 			sendto_realops_flags(UMODE_ALL, L_ALL, "XLINE active for %s",
 					     get_client_name(client_p, HIDE_IP));
 
-			(void) exit_client(client_p, client_p, &me, "Bad user info");
+			(void)exit_client(client_p, client_p, &me, "Bad user info");
 			continue;
 		}
 	}
 }
 
 void
-apply_xline(struct Client *source_p, const char *name, const char *reason, int temp_time, int locked)
+apply_xline(struct Client *source_p, const char *name, const char *reason, int temp_time,
+	    int locked)
 {
 	struct ConfItem *aconf;
 	const char *oper = get_oper_name(source_p);

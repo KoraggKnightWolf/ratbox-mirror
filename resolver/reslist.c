@@ -27,20 +27,20 @@
  *
  *
  */
-               
+
 #ifdef _WIN32
 #include <ratbox_lib.h>
 
 #include <windows.h>
 #include <iphlpapi.h>
 
-const char * get_windows_nameservers(void);
+const char *get_windows_nameservers(void);
 
 
 #define IS_NT()        ((int)GetVersion() > 0)
 #define WIN_NS_9X      "System\\CurrentControlSet\\Services\\VxD\\MSTCP"
 #define WIN_NS_NT_KEY  "System\\CurrentControlSet\\Services\\Tcpip\\Parameters"
-#define NAMESERVER     "NameServer"   
+#define NAMESERVER     "NameServer"
 #define DHCPNAMESERVER "DhcpNameServer"
 #define DATABASEPATH   "DatabasePath"
 #define WIN_PATH_HOSTS  "\\hosts"
@@ -94,8 +94,8 @@ get_iphlpapi_dns_info(char *ret_buf, size_t ret_size)
 		count++;
 	}
 
-	for (i = 0, ipAddr = fi->DnsServerList.Next; ipAddr && left > ip_size;
-	     ipAddr = ipAddr->Next, i++)
+	for(i = 0, ipAddr = fi->DnsServerList.Next; ipAddr && left > ip_size;
+	    ipAddr = ipAddr->Next, i++)
 	{
 		if(inet_addr(ipAddr->IpAddress.String) != INADDR_NONE)
 		{
@@ -122,55 +122,55 @@ get_iphlpapi_dns_info(char *ret_buf, size_t ret_size)
  * Warning: returns a dynamically allocated buffer, the user MUST
  * use free() if the function returns 1
  */
-static int get_res_nt(HKEY hKey, const char *subkey, char **obuf)
+static int
+get_res_nt(HKEY hKey, const char *subkey, char **obuf)
 {
-  /* Test for the size we need */
-  DWORD size = 0;
-  int result;
+	/* Test for the size we need */
+	DWORD size = 0;
+	int result;
 
-  result = RegQueryValueEx(hKey, subkey, 0, NULL, NULL, &size);
-  if ((result != ERROR_SUCCESS && result != ERROR_MORE_DATA) || !size)
-    return 0;
-  *obuf = malloc(size+1);
-  if (!*obuf)
-    return 0;
+	result = RegQueryValueEx(hKey, subkey, 0, NULL, NULL, &size);
+	if((result != ERROR_SUCCESS && result != ERROR_MORE_DATA) || !size)
+		return 0;
+	*obuf = malloc(size + 1);
+	if(!*obuf)
+		return 0;
 
-  if (RegQueryValueEx(hKey, subkey, 0, NULL,
-                      (LPBYTE)*obuf, &size) != ERROR_SUCCESS)
-  {
-    free(*obuf);
-    return 0;
-  }
-  if (size == 1)
-  {
-    free(*obuf);
-    return 0;
-  }
-  return 1;
+	if(RegQueryValueEx(hKey, subkey, 0, NULL, (LPBYTE) * obuf, &size) != ERROR_SUCCESS)
+	{
+		free(*obuf);
+		return 0;
+	}
+	if(size == 1)
+	{
+		free(*obuf);
+		return 0;
+	}
+	return 1;
 }
 
-static int get_res_interfaces_nt(HKEY hKey, const char *subkey, char **obuf)
+static int
+get_res_interfaces_nt(HKEY hKey, const char *subkey, char **obuf)
 {
-  char enumbuf[39]; /* GUIDs are 38 chars + 1 for NULL */
-  DWORD enum_size = 39;
-  int idx = 0;
-  HKEY hVal;
+	char enumbuf[39];	/* GUIDs are 38 chars + 1 for NULL */
+	DWORD enum_size = 39;
+	int idx = 0;
+	HKEY hVal;
 
-  while (RegEnumKeyEx(hKey, idx++, enumbuf, &enum_size, 0,
-                      NULL, NULL, NULL) != ERROR_NO_MORE_ITEMS)
-  {
-    int rc;
+	while(RegEnumKeyEx(hKey, idx++, enumbuf, &enum_size, 0,
+			   NULL, NULL, NULL) != ERROR_NO_MORE_ITEMS)
+	{
+		int rc;
 
-    enum_size = 39;
-    if (RegOpenKeyEx(hKey, enumbuf, 0, KEY_QUERY_VALUE, &hVal) !=
-        ERROR_SUCCESS)
-      continue;
-    rc = get_res_nt(hVal, subkey, obuf);
-      RegCloseKey(hVal);
-    if (rc)
-      return 1;
-    }
-  return 0;
+		enum_size = 39;
+		if(RegOpenKeyEx(hKey, enumbuf, 0, KEY_QUERY_VALUE, &hVal) != ERROR_SUCCESS)
+			continue;
+		rc = get_res_nt(hVal, subkey, obuf);
+		RegCloseKey(hVal);
+		if(rc)
+			return 1;
+	}
+	return 0;
 }
 
 const char *
@@ -254,9 +254,9 @@ get_windows_nameservers(void)
 			{
 				if(bytes)
 				{
-					line = (char *) malloc(bytes + 1);
+					line = (char *)malloc(bytes + 1);
 					if(RegQueryValueEx(mykey, NAMESERVER, NULL, &data_type,
-							   (unsigned char *) line, &bytes) ==
+							   (unsigned char *)line, &bytes) ==
 					   ERROR_SUCCESS)
 					{
 						rb_strlcpy(namelist, line, sizeof(namelist));

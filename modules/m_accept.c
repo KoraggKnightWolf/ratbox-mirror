@@ -49,6 +49,7 @@ struct Message accept_msgtab = {
 mapi_clist_av1 accept_clist[] = {
 	&accept_msgtab, NULL
 };
+
 DECLARE_MODULE_AV1(accept, NULL, NULL, accept_clist, NULL, NULL, "$Revision$");
 
 /*
@@ -75,7 +76,7 @@ m_accept(struct Client *client_p, struct Client *source_p, int parc, const char 
 	build_nicklist(source_p, addbuf, delbuf, parv[1]);
 
 	/* parse the delete list */
-	for (nick = rb_strtok_r(delbuf, ",", &p); nick != NULL; nick = rb_strtok_r(NULL, ",", &p))
+	for(nick = rb_strtok_r(delbuf, ",", &p); nick != NULL; nick = rb_strtok_r(NULL, ",", &p))
 	{
 		/* shouldnt happen, but lets be paranoid */
 		if((target_p = find_named_person(nick)) == NULL)
@@ -102,7 +103,8 @@ m_accept(struct Client *client_p, struct Client *source_p, int parc, const char 
 	accept_num = rb_dlink_list_length(&source_p->localClient->allow_list);
 
 	/* parse the add list */
-	for (nick = rb_strtok_r(addbuf, ",", &p); nick; nick = rb_strtok_r(NULL, ",", &p), accept_num++)
+	for(nick = rb_strtok_r(addbuf, ",", &p); nick;
+	    nick = rb_strtok_r(NULL, ",", &p), accept_num++)
 	{
 		/* shouldnt happen, but lets be paranoid */
 		if((target_p = find_named_person(nick)) == NULL)
@@ -160,7 +162,7 @@ build_nicklist(struct Client *source_p, char *addbuf, char *delbuf, const char *
 	del = lenadd = lendel = 0;
 
 	/* build list of clients to add into addbuf, clients to remove in delbuf */
-	for (name = rb_strtok_r(n, ",", &p); name; name = rb_strtok_r(NULL, ",", &p), del = 0)
+	for(name = rb_strtok_r(n, ",", &p); name; name = rb_strtok_r(NULL, ",", &p), del = 0)
 	{
 		if(*name == '-')
 		{
@@ -170,7 +172,7 @@ build_nicklist(struct Client *source_p, char *addbuf, char *delbuf, const char *
 
 		if((target_p = find_named_person(name)) == NULL)
 		{
-			sendto_one_numeric(source_p, ERR_NOSUCHNICK, 
+			sendto_one_numeric(source_p, ERR_NOSUCHNICK,
 					   form_str(ERR_NOSUCHNICK), name);
 			continue;
 		}
@@ -179,18 +181,18 @@ build_nicklist(struct Client *source_p, char *addbuf, char *delbuf, const char *
 		if(del)
 		{
 			if(*delbuf)
-				(void) strcat(delbuf, ",");
+				(void)strcat(delbuf, ",");
 
-			(void) strncat(delbuf, name, BUFSIZE - lendel - 1);
+			(void)strncat(delbuf, name, BUFSIZE - lendel - 1);
 			lendel += strlen(name) + 1;
 		}
 		/* adding a client */
 		else
 		{
 			if(*addbuf)
-				(void) strcat(addbuf, ",");
+				(void)strcat(addbuf, ",");
 
-			(void) strncat(addbuf, name, BUFSIZE - lenadd - 1);
+			(void)strncat(addbuf, name, BUFSIZE - lenadd - 1);
 			lenadd += strlen(name) + 1;
 		}
 	}
@@ -255,11 +257,9 @@ list_accepts(struct Client *source_p)
 	}
 
 	if(*nicks)
-		sendto_one(source_p, form_str(RPL_ACCEPTLIST), 
-			   me.name, source_p->name, nicks);
+		sendto_one(source_p, form_str(RPL_ACCEPTLIST), me.name, source_p->name, nicks);
 
 	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_ENDOFACCEPT), 
-		   me.name, source_p->name);
+	sendto_one(source_p, form_str(RPL_ENDOFACCEPT), me.name, source_p->name);
 
 }

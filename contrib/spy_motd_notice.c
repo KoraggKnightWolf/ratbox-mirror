@@ -40,7 +40,7 @@ mapi_hfn_list_av1 motd_hfnlist[] = {
 DECLARE_MODULE_AV1(motd_spy, NULL, NULL, NULL, NULL, motd_hfnlist, "$Revision$");
 
 void
-show_motd(hook_data *data)
+show_motd(hook_data * data)
 {
 	sendto_realops_flags(UMODE_SPY, L_ALL,
 			     "motd requested by %s (%s@%s) [%s]",

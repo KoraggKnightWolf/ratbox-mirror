@@ -85,7 +85,7 @@ add_ipline(struct ConfItem *aconf, rb_patricia_tree_t *tree, struct sockaddr *ad
 	return (pnode);
 }
 
-int 
+int
 add_dline(struct ConfItem *aconf)
 {
 	struct rb_sockaddr_storage st;
@@ -123,12 +123,12 @@ reject_exit(void *unused)
 	rb_dlink_node *ptr, *ptr_next;
 	delay_t *ddata;
 	static const char *errbuf = "ERROR :Closing Link: (*** Banned (cache))\r\n";
-	
+
 	RB_DLINK_FOREACH_SAFE(ptr, ptr_next, delay_exit.head)
 	{
 		ddata = ptr->data;
 
-		rb_write(ddata->F, errbuf, strlen(errbuf));		
+		rb_write(ddata->F, errbuf, strlen(errbuf));
 		rb_close(ddata->F);
 		rb_free(ddata);
 	}
@@ -143,11 +143,11 @@ reject_expires(void *unused)
 	rb_dlink_node *ptr, *next;
 	rb_patricia_node_t *pnode;
 	reject_t *rdata;
-	
+
 	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
 	{
 		pnode = ptr->data;
-		rdata = pnode->data;		
+		rdata = pnode->data;
 
 		if(rdata->time + ConfigFileEntry.reject_duration > rb_current_time())
 			continue;
@@ -165,7 +165,7 @@ init_reject(void)
 	dline_tree = rb_new_patricia(PATRICIA_BITS);
 	eline_tree = rb_new_patricia(PATRICIA_BITS);
 	throttle_tree = rb_new_patricia(PATRICIA_BITS);
-	global_tree =  rb_new_patricia(PATRICIA_BITS);
+	global_tree = rb_new_patricia(PATRICIA_BITS);
 	rb_event_add("reject_exit", reject_exit, NULL, DELAYED_EXIT_TIME);
 	rb_event_add("reject_expires", reject_expires, NULL, 60);
 	rb_event_add("throttle_expires", throttle_expires, NULL, 10);
@@ -182,7 +182,8 @@ add_reject(struct Client *client_p)
 	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return;
 
-	if((pnode = rb_match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
+	if((pnode =
+	    rb_match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
 	{
 		rdata = pnode->data;
 		rdata->time = rb_current_time();
@@ -195,7 +196,8 @@ add_reject(struct Client *client_p)
 		if(GET_SS_FAMILY(&client_p->localClient->ip) == AF_INET6)
 			bitlen = 128;
 #endif
-		pnode = make_and_lookup_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip, bitlen);
+		pnode = make_and_lookup_ip(reject_tree,
+					   (struct sockaddr *)&client_p->localClient->ip, bitlen);
 		pnode->data = rdata = rb_malloc(sizeof(reject_t));
 		rb_dlinkAddTail(pnode, &rdata->rnode, &reject_list);
 		rdata->time = rb_current_time();
@@ -212,7 +214,7 @@ check_reject(rb_fde_t *F, struct sockaddr *addr)
 	/* Reject is disabled */
 	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return 0;
-		
+
 	pnode = rb_match_ip(reject_tree, addr);
 	if(pnode != NULL)
 	{
@@ -228,18 +230,18 @@ check_reject(rb_fde_t *F, struct sockaddr *addr)
 			rb_dlinkAdd(ddata, &ddata->node, &delay_exit);
 			return 1;
 		}
-	}	
-	/* Caller does what it wants */	
+	}
+	/* Caller does what it wants */
 	return 0;
 }
 
-void 
+void
 flush_reject(void)
 {
 	rb_dlink_node *ptr, *next;
 	rb_patricia_node_t *pnode;
 	reject_t *rdata;
-	
+
 	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
 	{
 		pnode = ptr->data;
@@ -250,11 +252,11 @@ flush_reject(void)
 	}
 }
 
-int 
+int
 remove_reject(const char *ip)
 {
 	rb_patricia_node_t *pnode;
-	
+
 	/* Reject is disabled */
 	if(ConfigFileEntry.reject_after_count == 0 || ConfigFileEntry.reject_duration == 0)
 		return -1;
@@ -286,7 +288,7 @@ find_ipline(rb_patricia_tree_t *t, struct sockaddr *addr)
 	rb_patricia_node_t *pnode;
 	pnode = rb_match_ip(t, addr);
 	if(pnode != NULL)
-		return (struct ConfItem *) pnode->data;
+		return (struct ConfItem *)pnode->data;
 	return NULL;
 }
 
@@ -296,7 +298,7 @@ find_ipline_exact(rb_patricia_tree_t *t, struct sockaddr *addr, unsigned int bit
 	rb_patricia_node_t *pnode;
 	pnode = rb_match_ip_exact(t, addr, bitlen);
 	if(pnode != NULL)
-		return (struct ConfItem *) pnode->data;
+		return (struct ConfItem *)pnode->data;
 	return NULL;
 }
 
@@ -338,10 +340,9 @@ report_dlines(struct Client *source_p)
 			RB_PATRICIA_WALK_BREAK;
 		get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
 		sendto_one_numeric(source_p, RPL_STATSDLINE,
-                            		     form_str (RPL_STATSDLINE),
-                                             'D', host, pass,
-                                             oper_reason ? "|" : "",
-                                             oper_reason ? oper_reason : "");
+				   form_str(RPL_STATSDLINE),
+				   'D', host, pass,
+				   oper_reason ? "|" : "", oper_reason ? oper_reason : "");
 	}
 	RB_PATRICIA_WALK_END;
 }
@@ -359,10 +360,9 @@ report_tdlines(struct Client *source_p)
 			RB_PATRICIA_WALK_BREAK;
 		get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
 		sendto_one_numeric(source_p, RPL_STATSDLINE,
-                            		     form_str (RPL_STATSDLINE),
-                                             'd', host, pass,
-                                             oper_reason ? "|" : "",
-                                             oper_reason ? oper_reason : "");
+				   form_str(RPL_STATSDLINE),
+				   'd', host, pass,
+				   oper_reason ? "|" : "", oper_reason ? oper_reason : "");
 	}
 	RB_PATRICIA_WALK_END;
 }
@@ -379,9 +379,7 @@ report_elines(struct Client *source_p)
 		aconf = pnode->data;
 		get_printable_conf(aconf, &name, &host, &pass, &user, &port, &classname);
 		sendto_one_numeric(source_p, RPL_STATSDLINE,
-                            		     form_str (RPL_STATSDLINE),
-                                             'e', host, pass,
-                                             "", "");
+				   form_str(RPL_STATSDLINE), 'e', host, pass, "", "");
 	}
 	RB_PATRICIA_WALK_END;
 }
@@ -399,25 +397,27 @@ throttle_add(struct sockaddr *addr)
 		t = pnode->data;
 
 		if(t->count > ConfigFileEntry.throttle_count)
-			return 1;			
+			return 1;
 
 		/* Stop penalizing them after they've been throttled */
 		t->last = rb_current_time();
 		t->count++;
 
-	} else {
+	}
+	else
+	{
 		int bitlen = 32;
 #ifdef RB_IPV6
 		if(GET_SS_FAMILY(addr) == AF_INET6)
 			bitlen = 128;
 #endif
-		t = rb_malloc(sizeof(throttle_t));	
+		t = rb_malloc(sizeof(throttle_t));
 		t->last = rb_current_time();
 		t->count = 1;
 		pnode = make_and_lookup_ip(throttle_tree, addr, bitlen);
 		pnode->data = t;
-		rb_dlinkAdd(pnode, &t->node, &throttle_list); 
-	}	
+		rb_dlinkAdd(pnode, &t->node, &throttle_list);
+	}
 	return 0;
 }
 
@@ -427,11 +427,11 @@ throttle_expires(void *unused)
 	rb_dlink_node *ptr, *next;
 	rb_patricia_node_t *pnode;
 	throttle_t *t;
-	
+
 	RB_DLINK_FOREACH_SAFE(ptr, next, throttle_list.head)
 	{
 		pnode = ptr->data;
-		t = pnode->data;		
+		t = pnode->data;
 
 		if(t->last + ConfigFileEntry.throttle_duration > rb_current_time())
 			continue;
@@ -442,18 +442,18 @@ throttle_expires(void *unused)
 	}
 }
 
-static int 
+static int
 get_global_count(struct sockaddr *addr)
 {
 	rb_patricia_node_t *pnode;
 	global_t *glb;
-	
+
 	if((pnode = rb_match_ip(global_tree, addr)))
 	{
 		glb = pnode->data;
 		return glb->count;
 	}
-	return 0;		
+	return 0;
 }
 
 static int
@@ -466,7 +466,7 @@ inc_global_ip(struct sockaddr *addr, int bitlen)
 	if((pnode = rb_match_ip(global_tree, addr)))
 	{
 		glb = pnode->data;
-	} 
+	}
 	else
 	{
 		pnode = make_and_lookup_ip(global_tree, addr, bitlen);
@@ -482,7 +482,7 @@ dec_global_ip(struct sockaddr *addr)
 {
 	rb_patricia_node_t *pnode;
 	global_t *glb;
-	
+
 	if((pnode = rb_match_ip(global_tree, addr)))
 	{
 		glb = pnode->data;
@@ -506,17 +506,19 @@ inc_global_cidr_count(struct Client *client_p)
 	if(!MyClient(client_p))
 	{
 		if(EmptyString(client_p->sockhost) || !strcmp(client_p->sockhost, "0"))
-			return -1; 
+			return -1;
 		if(!rb_inet_pton_sock(client_p->sockhost, (struct sockaddr *)&ip))
 			return -1;
 		addr = (struct sockaddr *)&ip;
-	} else
+	}
+	else
 		addr = (struct sockaddr *)&client_p->localClient->ip;
-#ifdef RB_IPV6	
+#ifdef RB_IPV6
 	if(GET_SS_FAMILY(addr) == AF_INET6)
 	{
 		bitlen = ConfigFileEntry.global_cidr_ipv6_bitlen;
-	} else
+	}
+	else
 #endif
 		bitlen = ConfigFileEntry.global_cidr_ipv4_bitlen;
 
@@ -535,9 +537,10 @@ dec_global_cidr_count(struct Client *client_p)
 		if(!rb_inet_pton_sock(client_p->sockhost, (struct sockaddr *)&ip))
 			return;
 		addr = (struct sockaddr *)&ip;
-	} else
+	}
+	else
 		addr = (struct sockaddr *)&client_p->localClient->ip;
-	
+
 	dec_global_ip(addr);
 }
 
@@ -554,7 +557,8 @@ check_global_cidr_count(struct Client *client_p)
 		if(!rb_inet_pton_sock(client_p->sockhost, (struct sockaddr *)&ip))
 			return -1;
 		addr = (struct sockaddr *)&ip;
-	} else 
+	}
+	else
 		addr = (struct sockaddr *)&client_p->localClient->ip;
 	count = get_global_count(addr);
 #ifdef RB_IPV6
@@ -571,7 +575,7 @@ check_global_cidr_count(struct Client *client_p)
 static void
 clear_cidr_tree(void *data)
 {
-	rb_free(data);	
+	rb_free(data);
 }
 
 void
@@ -585,8 +589,7 @@ rehash_global_cidr_tree(void)
 		client_p = ptr->data;
 		if(IsMe(client_p) && IsServer(client_p))
 			continue;
-		inc_global_cidr_count(client_p);	
+		inc_global_cidr_count(client_p);
 	}
 	return;
 }
-

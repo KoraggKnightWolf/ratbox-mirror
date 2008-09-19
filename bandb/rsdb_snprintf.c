@@ -279,7 +279,7 @@ rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 	int written = 0;	/* bytes written so far */
 	int maxbytes = bytes - 1;
 
-	while ((ch = *format++) && (written < maxbytes))
+	while((ch = *format++) && (written < maxbytes))
 	{
 		if(ch == '%')
 		{
@@ -296,7 +296,7 @@ rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 			{
 				const char *str = va_arg(args, const char *);
 
-				while ((*dest = *str))
+				while((*dest = *str))
 				{
 					++dest;
 					++str;
@@ -370,23 +370,23 @@ rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 
 					str = IntTable[num - (quotient * TABLE_MAX)];
 
-					while ((*digitptr = *str))
+					while((*digitptr = *str))
 					{
 						++digitptr;
 						++str;
 					}
 				}
-				while ((num = quotient) != 0);
+				while((num = quotient) != 0);
 
 				/*
 				 * If the last quotient was a 1 or 2 digit number, there
 				 * will be one or more leading zeroes in TempBuffer[] -
 				 * get rid of them.
 				 */
-				while (*(digitptr - 1) == '0')
+				while(*(digitptr - 1) == '0')
 					--digitptr;
 
-				while (digitptr != TempBuffer)
+				while(digitptr != TempBuffer)
 				{
 					*dest++ = *--digitptr;
 					if(++written >= maxbytes)
@@ -429,18 +429,18 @@ rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 
 					str = IntTable[num - (quotient * TABLE_MAX)];
 
-					while ((*digitptr = *str))
+					while((*digitptr = *str))
 					{
 						++digitptr;
 						++str;
 					}
 				}
-				while ((num = quotient) != 0);
+				while((num = quotient) != 0);
 
-				while (*(digitptr - 1) == '0')
+				while(*(digitptr - 1) == '0')
 					--digitptr;
 
-				while (digitptr != TempBuffer)
+				while(digitptr != TempBuffer)
 				{
 					*dest++ = *--digitptr;
 					if(++written >= maxbytes)
@@ -459,7 +459,7 @@ rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 
 				const char *str = rsdb_quote(arg);
 
-				while ((*dest = *str))
+				while((*dest = *str))
 				{
 					++dest;
 					++str;
@@ -499,18 +499,18 @@ rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 
 						str = IntTable[num - (quotient * TABLE_MAX)];
 
-						while ((*digitptr = *str))
+						while((*digitptr = *str))
 						{
 							++digitptr;
 							++str;
 						}
 					}
-					while ((num = quotient) != 0);
+					while((num = quotient) != 0);
 
-					while (*(digitptr - 1) == '0')
+					while(*(digitptr - 1) == '0')
 						--digitptr;
 
-					while (digitptr != TempBuffer)
+					while(digitptr != TempBuffer)
 					{
 						*dest++ = *--digitptr;
 						if(++written >= maxbytes)
@@ -518,9 +518,9 @@ rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 					}
 
 					continue;
-				} else	/* if (*format == 'u') */
-
-				if(*format == 'd')
+				}
+				else
+					/* if (*format == 'u') */ if(*format == 'd')
 				{
 					long num = va_arg(args, long);
 					long quotient;
@@ -551,18 +551,18 @@ rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 
 						str = IntTable[num - (quotient * TABLE_MAX)];
 
-						while ((*digitptr = *str))
+						while((*digitptr = *str))
 						{
 							++digitptr;
 							++str;
 						}
 					}
-					while ((num = quotient) != 0);
+					while((num = quotient) != 0);
 
-					while (*(digitptr - 1) == '0')
+					while(*(digitptr - 1) == '0')
 						--digitptr;
 
-					while (digitptr != TempBuffer)
+					while(digitptr != TempBuffer)
 					{
 						*dest++ = *--digitptr;
 						if(++written >= maxbytes)
@@ -570,13 +570,14 @@ rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args)
 					}
 
 					continue;
-				} else	/* if (*format == 'd') */
+				}
+				else	/* if (*format == 'd') */
 				{
 					/* XXX error */
 					exit(1);
 				}
-				
-				
+
+
 			}	/* if (ch == 'l') */
 
 			if(ch != '%')
@@ -625,4 +626,3 @@ rs_snprintf(char *dest, const size_t bytes, const char *format, ...)
 
 	return (count);
 }				/* Snprintf() */
-

@@ -99,8 +99,8 @@ extern const unsigned int CharAttrs[];
 #define SERV_C   0x2000
 #define EOL_C    0x4000
 #define MWILD_C  0x8000
-#define LET_C   0x10000 /* an actual letter */
-#define FCHAN_C 0x20000 /* a 'fake' channel char */
+#define LET_C   0x10000		/* an actual letter */
+#define FCHAN_C 0x20000		/* a 'fake' channel char */
 
 #define IsHostChar(c)   (CharAttrs[(unsigned char)(c)] & HOST_C)
 #define IsUserChar(c)   (CharAttrs[(unsigned char)(c)] & USER_C)
