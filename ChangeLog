@@ -1,3 +1,11 @@
+androsyn    2008/09/20 01:08:38 UTC	(20080920_0-26098)
+  Log:
+  don't do the close on restart stuff on windows
+
+  Modified:
+	ircd-ratbox/trunk/src/restart.c (File Modified) 
+
+
 androsyn    2008/09/19 15:33:46 UTC	(20080919_1-26094)
   Log:
   Update .indent.pro and run through indent
