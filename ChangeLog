@@ -1,3 +1,11 @@
+androsyn    2008/09/20 02:24:38 UTC	(20080920_2-26104)
+  Log:
+  technically we should not cast a function pointer to a void *, so fix the hook code to do it "The Right Way"(tm)
+
+  Modified:
+	ircd-ratbox/trunk/src/hook.c (File Modified) 
+
+
 androsyn    2008/09/20 01:30:44 UTC	(20080920_1-26102)
   Log:
   fix a few pedantic warnings
