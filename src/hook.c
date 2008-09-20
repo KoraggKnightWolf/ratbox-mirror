@@ -41,6 +41,12 @@
 #include "hook.h"
 #include "match.h"
 
+struct hook_info
+{
+	rb_dlink_node node;
+	hookfn fn;	
+};
+
 hook *hooks;
 
 #define HOOK_INCREMENT 10
@@ -153,6 +159,7 @@ register_hook(const char *name)
 	return i;
 }
 
+
 /* add_hook()
  *   Adds a hook to an event in the hook table, creating event first if
  *   needed.
@@ -160,11 +167,13 @@ register_hook(const char *name)
 void
 add_hook(const char *name, hookfn fn)
 {
+	struct hook_info *info;
 	int i;
 
 	i = register_hook(name);
-
-	rb_dlinkAddAlloc(fn, &hooks[i].hooks);
+	info = rb_malloc(sizeof(struct hook_info));
+	info->fn = fn;
+	rb_dlinkAdd(info, &info->node, &hooks[i].hooks);
 }
 
 /* remove_hook()
@@ -174,11 +183,21 @@ void
 remove_hook(const char *name, hookfn fn)
 {
 	int i;
-
+	struct hook_info *info;
+	rb_dlink_node *ptr, *next;
 	if((i = find_hook(name)) < 0)
 		return;
 
-	rb_dlinkFindDestroy(fn, &hooks[i].hooks);
+	RB_DLINK_FOREACH_SAFE(ptr, next, hooks[i].hooks.head)
+	{
+		info = ptr->data;
+		if(info->fn == fn)
+		{
+			rb_dlinkDelete(&info->node, &hooks[i].hooks);
+			rb_free(info);
+			return;		
+		}				
+	}
 }
 
 /* call_hook()
@@ -187,7 +206,6 @@ remove_hook(const char *name, hookfn fn)
 void
 call_hook(int id, void *arg)
 {
-	hookfn fn;
 	rb_dlink_node *ptr;
 
 	/* The ID we were passed is the position in the hook table of this
@@ -195,7 +213,6 @@ call_hook(int id, void *arg)
 	 */
 	RB_DLINK_FOREACH(ptr, hooks[id].hooks.head)
 	{
-		fn = ptr->data;
-		fn(arg);
+		((struct hook_info *)ptr->data)->fn(arg);
 	}
 }
