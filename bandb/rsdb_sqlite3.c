@@ -112,7 +112,7 @@ rsdb_quote(const char *src)
 static int
 rsdb_callback_func(void *cbfunc, int argc, char **argv, char **colnames)
 {
-	rsdb_callback cb = cbfunc;
+	rsdb_callback cb = (rsdb_callback)((uintptr_t)cbfunc);
 	(cb) (argc, (const char **)argv);
 	return 0;
 }
@@ -135,7 +135,7 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 		mlog("fatal error: length problem with compiling sql");
 	}
 
-	if((i = sqlite3_exec(rb_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg)))
+	if((i = sqlite3_exec(rb_bandb, buf, (cb ? rsdb_callback_func : NULL), (void *)((uintptr_t)cb), &errmsg)))
 	{
 		switch (i)
 		{
@@ -144,7 +144,7 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 			{
 				rb_sleep(0, 500000);
 				if(!sqlite3_exec
-				   (rb_bandb, buf, (cb ? rsdb_callback_func : NULL), cb, &errmsg))
+				   (rb_bandb, buf, (cb ? rsdb_callback_func : NULL), (void *)((uintptr_t)cb), &errmsg))
 					return;
 			}
 

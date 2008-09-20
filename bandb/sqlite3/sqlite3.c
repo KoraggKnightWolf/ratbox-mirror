@@ -441,7 +441,7 @@ SQLITE_PRIVATE void sqlite3Coverage(int);
 #ifndef _SQLITE3_H_
 #define _SQLITE3_H_
 #include <stdarg.h>		/* Needed for the definition of va_list */
-
+#include <stdint.h>
 /*
 ** Make sure we can call this stuff from C++.
 */
@@ -69251,7 +69251,7 @@ sqlite3AutoLoadExtensions(sqlite3 * db)
 		else
 		{
 			xInit = (int (*)(sqlite3 *, char **, const sqlite3_api_routines *))
-				autoext.aExt[i];
+				((uintptr_t)autoext.aExt[i]);
 		}
 		sqlite3_mutex_leave(mutex);
 		if(xInit && xInit(db, &zErrmsg, &sqlite3Apis))
