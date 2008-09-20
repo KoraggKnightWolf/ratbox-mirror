@@ -1,3 +1,13 @@
+androsyn    2008/09/20 01:30:44 UTC	(20080920_1-26102)
+  Log:
+  fix a few pedantic warnings
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2008/09/20 01:08:38 UTC	(20080920_0-26098)
   Log:
   don't do the close on restart stuff on windows
