@@ -753,9 +753,9 @@ load_a_module(const char *path, int warn, int core)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Module %s [version: %s; MAPI version: %d] loaded at 0x%p",
-				     mod_basename, ver, MAPI_VERSION(*mapi_version), tmpptr);
+				     mod_basename, ver, MAPI_VERSION(*mapi_version), (void *)tmpptr);
 		ilog(L_MAIN, "Module %s [version: %s; MAPI version: %d] loaded at 0x%p",
-		     mod_basename, ver, MAPI_VERSION(*mapi_version), tmpptr);
+		     mod_basename, ver, MAPI_VERSION(*mapi_version), (void *)tmpptr);
 	}
 	rb_free(mod_basename);
 	return 0;

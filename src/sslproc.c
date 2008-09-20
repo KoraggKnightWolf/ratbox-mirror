@@ -763,7 +763,7 @@ start_zlib_session(void *data)
 		cpylen = rb_linebuf_get(&server->localClient->buf_recvq, xbuf, left,
 					LINEBUF_PARTIAL, LINEBUF_RAW);
 		left -= cpylen;
-		xbuf += cpylen;
+		xbuf = (void *) (((uintptr_t) xbuf) + cpylen);
 	}
 	while(cpylen > 0);
 

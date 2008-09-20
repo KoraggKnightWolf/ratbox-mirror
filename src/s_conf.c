@@ -432,17 +432,17 @@ add_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 
 	if(pnode != NULL)
 	{
-		if(((long)pnode->data) >= ConfCidrAmount(aconf) && !IsConfExemptLimits(aconf))
+		if(((intptr_t)pnode->data) >= ConfCidrAmount(aconf) && !IsConfExemptLimits(aconf))
 		{
 			/* This should only happen if the limits are set to 0 */
-			if((unsigned long)pnode->data == 0)
+			if((intptr_t)pnode->data == 0)
 			{
 				rb_patricia_remove(ConfIpLimits(aconf), pnode);
 			}
 			return (0);
 		}
 
-		pnode->data++;
+		pnode->data = (void *)(((intptr_t)pnode->data) + 1);
 	}
 	return 1;
 }
@@ -461,8 +461,8 @@ remove_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 	if(pnode == NULL)
 		return;
 
-	pnode->data--;
-	if(((unsigned long)pnode->data) == 0)
+	pnode->data = (void *)(((intptr_t)pnode->data) - 1);
+	if(((intptr_t)pnode->data) == 0)
 	{
 		rb_patricia_remove(ConfIpLimits(aconf), pnode);
 	}
