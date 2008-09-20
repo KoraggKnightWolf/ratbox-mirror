@@ -54,7 +54,6 @@ restart(const char *mesg)
 void
 server_reboot(void)
 {
-	int i;
 	char path[PATH_MAX + 1];
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Restarting server...");
@@ -73,8 +72,11 @@ server_reboot(void)
 	 * bah, for now, the program ain't coming back to here, so forcibly
 	 * close everything the "wrong" way for now, and just LEAVE...
 	 */
+#ifndef _WIN32
+	int i;
 	for(i = 0; i < maxconnections; ++i)
 		close(i);
+#endif
 
 	unlink(pidFileName);
 #ifndef _WIN32
