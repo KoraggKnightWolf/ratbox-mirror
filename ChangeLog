@@ -1,3 +1,12 @@
+androsyn    2008/09/22 18:38:10 UTC	(20080922_0-26108)
+  Log:
+  update example configs for use_sslonly option
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 androsyn    2008/09/20 03:24:47 UTC	(20080920_3-26106)
   Log:
   fix building with -pedantic aka ISO C
