@@ -1,3 +1,12 @@
+androsyn    2008/09/23 15:41:39 UTC	(20080923_0-26110)
+  Log:
+  Do not abort configure AC_CHECK_SQLITE3 fails
+
+  Modified:
+	ircd-ratbox/trunk/acinclude.m4 (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+
+
 androsyn    2008/09/22 18:38:10 UTC	(20080922_0-26108)
   Log:
   update example configs for use_sslonly option
