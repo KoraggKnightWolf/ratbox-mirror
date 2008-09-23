@@ -79,28 +79,36 @@ AC_DEFUN([AC_CHECK_SQLITE3], [
           sqlite3_incdirs="/usr/include /usr/local/include /usr/include/sqlite /usr/local/include/sqlite /usr/local/sqlite/include /opt/sqlite/include"
           AC_FIND_FILE(sqlite3.h, $sqlite3_incdirs, ac_sqlite3_incdir)
           if test "$ac_sqlite3_incdir" = "no"; then
-              AC_MSG_ERROR([Invalid SQLite directory - include files not found.])
+              AC_MSG_WARN([Invalid SQLite directory - include files not found.])
+              sqlite3_missing=yes
+              ac_sqlite3=no
           fi
       fi
       if test "$ac_sqlite3_libdir" = "no"; then
           sqlite3_libdirs="/usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib/sqlite usr/lib64/sqlite /usr/local/lib/sqlite /usr/local/sqlite/lib /opt/sqlite/lib"
-          sqlite3_libs="libsqlite3.so libsqlite3.a"
+          sqlite3_libs="libsqlite3.so libsqlite3.dylib libsqlite3.a"
           AC_FIND_FILE($sqlite3_libs, $sqlite3_libdirs, ac_sqlite3_libdir)
           if test "$ac_sqlite3_libdir" = "no"; then
-              AC_MSG_ERROR([Invalid SQLite directory - libraries not found.])
+              AC_MSG_WARN([Invalid SQLite directory - libraries not found.])
+              sqlite3_missing=yes
+              ac_sqlite3=no
           fi
       fi
-      have_sqlite3="yes"
+      if test x"$sqlite3_missing" != "xyes"; then
+	      have_sqlite3="yes"
 
-      if test x"$ac_sqlite3_libdir" = xno; then
-          test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-lsqlite3"
+	      if test x"$ac_sqlite3_libdir" = xno; then
+	          test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-lsqlite3"
+	      else
+	          test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-L$ac_sqlite3_libdir -lsqlite3"
+	      fi
+	      test x"$ac_sqlite3_incdir" != xno && test "x$SQLITE3_CFLAGS" = "x" && SQLITE3_CFLAGS=-I$ac_sqlite3_incdir
+
+	      AC_SUBST(SQLITE3_LIBS)
+	      AC_SUBST(SQLITE3_CFLAGS)
       else
-          test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-L$ac_sqlite3_libdir -lsqlite3"
+      	     ac_sqlite3=no
       fi
-      test x"$ac_sqlite3_incdir" != xno && test "x$SQLITE3_CFLAGS" = "x" && SQLITE3_CFLAGS=-I$ac_sqlite3_incdir
-
-      AC_SUBST(SQLITE3_LIBS)
-      AC_SUBST(SQLITE3_CFLAGS)
   fi
 
   AC_MSG_RESULT([$ac_sqlite3])

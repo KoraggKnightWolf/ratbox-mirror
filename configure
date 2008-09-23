@@ -23691,14 +23691,15 @@ fi
       done
   done
           if test "$ac_sqlite3_incdir" = "no"; then
-              { { echo "$as_me:$LINENO: error: Invalid SQLite directory - include files not found." >&5
-echo "$as_me: error: Invalid SQLite directory - include files not found." >&2;}
-   { (exit 1); exit 1; }; }
+              { echo "$as_me:$LINENO: WARNING: Invalid SQLite directory - include files not found." >&5
+echo "$as_me: WARNING: Invalid SQLite directory - include files not found." >&2;}
+              sqlite3_missing=yes
+              ac_sqlite3=no
           fi
       fi
       if test "$ac_sqlite3_libdir" = "no"; then
           sqlite3_libdirs="/usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib /usr/lib/sqlite usr/lib64/sqlite /usr/local/lib/sqlite /usr/local/sqlite/lib /opt/sqlite/lib"
-          sqlite3_libs="libsqlite3.so libsqlite3.a"
+          sqlite3_libs="libsqlite3.so libsqlite3.dylib libsqlite3.a"
 
   ac_sqlite3_libdir=no
   for i in $sqlite3_libdirs; do
@@ -23710,22 +23711,27 @@ echo "$as_me: error: Invalid SQLite directory - include files not found." >&2;}
       done
   done
           if test "$ac_sqlite3_libdir" = "no"; then
-              { { echo "$as_me:$LINENO: error: Invalid SQLite directory - libraries not found." >&5
-echo "$as_me: error: Invalid SQLite directory - libraries not found." >&2;}
-   { (exit 1); exit 1; }; }
+              { echo "$as_me:$LINENO: WARNING: Invalid SQLite directory - libraries not found." >&5
+echo "$as_me: WARNING: Invalid SQLite directory - libraries not found." >&2;}
+              sqlite3_missing=yes
+              ac_sqlite3=no
           fi
       fi
-      have_sqlite3="yes"
+      if test x"$sqlite3_missing" != "xyes"; then
+	      have_sqlite3="yes"
 
-      if test x"$ac_sqlite3_libdir" = xno; then
-          test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-lsqlite3"
+	      if test x"$ac_sqlite3_libdir" = xno; then
+	          test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-lsqlite3"
+	      else
+	          test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-L$ac_sqlite3_libdir -lsqlite3"
+	      fi
+	      test x"$ac_sqlite3_incdir" != xno && test "x$SQLITE3_CFLAGS" = "x" && SQLITE3_CFLAGS=-I$ac_sqlite3_incdir
+
+
+
       else
-          test "x$SQLITE3_LIBS" = "x" && SQLITE3_LIBS="-L$ac_sqlite3_libdir -lsqlite3"
+      	     ac_sqlite3=no
       fi
-      test x"$ac_sqlite3_incdir" != xno && test "x$SQLITE3_CFLAGS" = "x" && SQLITE3_CFLAGS=-I$ac_sqlite3_incdir
-
-
-
   fi
 
   { echo "$as_me:$LINENO: result: $ac_sqlite3" >&5
