@@ -6,6 +6,25 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0.0rc1
+- fix a bug in comment parsing in the config file
+- have bandb honor -basedir option
+- if ssld to work on win32 should you ever desire such a thing and a 
+  few other minor win32 fixes
+- fix up a few things so that the source code builds with gcc -pedantic
+- do not abort configure if the AC_CHECK_SQLITE3 check fails
+- drop configure option for ssl only channels, this is now controlled by
+  channel {} use_sslonly option
+- attempt to override FD_SETSIZE when using select, and if this cannot 
+  be overriden, lower maxconnections
+- fix signalfd code on 32bit platforms
+- add support for timerfd_create event handling on linux systems with 
+  new enough kernels and glibc
+- fix our fake rb_sockaddr_storage so that it actually compiles
+- Add some work arounds so arounds to avoid OPENSSL_applink does not
+  need to be used on some platforms
+
+
 -- ircd-ratbox-3.0.0beta12
 - add support for ssl only oper and auth blocks
 - do not show whowas ip info if the ip is 0
