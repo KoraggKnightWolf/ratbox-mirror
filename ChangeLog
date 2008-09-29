@@ -1,3 +1,12 @@
+androsyn    2008/09/29 14:54:52 UTC	(20080929_0-26112)
+  Log:
+  update release notes and patch level
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/09/23 15:41:39 UTC	(20080923_0-26110)
   Log:
   Do not abort configure AC_CHECK_SQLITE3 fails
