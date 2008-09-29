@@ -1,3 +1,11 @@
+androsyn    2008/09/29 17:49:58 UTC	(20080929_1-26120)
+  Log:
+  log ERRORs to file regardless of hide_error_messages setting, but still only log servers
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_error.c (File Modified) 
+
+
 androsyn    2008/09/29 14:54:52 UTC	(20080929_0-26112)
   Log:
   update release notes and patch level
