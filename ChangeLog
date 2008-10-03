@@ -1,3 +1,16 @@
+jilles      2008/10/03 16:32:15 UTC	(20081003_0-26124)
+  Log:
+  Restrict JOIN 0 to the useful parts:
+  only allow "0" by itself and "0," followed by channels.
+  Multiple zeroes or zeroes after commas are no longer
+  special and result in a "no such channel" error.
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+
+
 androsyn    2008/09/29 17:49:58 UTC	(20080929_1-26120)
   Log:
   log ERRORs to file regardless of hide_error_messages setting, but still only log servers
