@@ -74,20 +74,20 @@ static struct log_struct log_table[LAST_LOGFILE] = {
 };
 
 void
-init_main_logfile(void)
+init_main_logfile(const char *filename)
 {
 	if(log_main == NULL)
-		log_main = fopen(LPATH, "a");
+		log_main = fopen(filename, "a");
 }
 
 void
-open_logfiles(void)
+open_logfiles(const char *filename)
 {
 	int i;
 
 	close_logfiles();
 
-	log_main = fopen(LPATH, "a");
+	log_main = fopen(filename, "a");
 
 	/* log_main is handled above, so just do the rest */
 	for(i = 1; i < LAST_LOGFILE; i++)

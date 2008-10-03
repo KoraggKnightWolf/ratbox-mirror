@@ -52,8 +52,8 @@ typedef enum ilogfile
 
 struct Client;
 
-void init_main_logfile(void);
-void open_logfiles(void);
+void init_main_logfile(const char *filename);
+void open_logfiles(const char *filename);
 void close_logfiles(void);
 void
 ilog(ilogfile dest, const char *fmt, ...)

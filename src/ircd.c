@@ -102,6 +102,7 @@ int dorehashbans = 0;
 int doremotd = 0;
 int kline_queued = 0;
 int server_state_foreground = 0;
+int printVersion = 0;
 int ircd_ssl_ok = 0;
 int zlib_ok = 1;
 
@@ -256,17 +257,15 @@ make_daemon(void)
 	return 0;
 }
 
-static int printVersion = 0;
 static const char *basedir = DPATH;
 static const char *configfile = CPATH;
-static const char *logfile = LPATH;
 
 struct lgetopt myopts[] = {
 	{"basedir", &basedir,
 	 ISTRING, "Base directory to run ircd from"},
 	{"configfile", &configfile,
 	 ISTRING, "File to use for ircd.conf"},
-	{"logfile", &logfile,
+	{"logfile", &logFileName,
 	 ISTRING, "File to use for ircd.log"},
 	{"pidfile", &pidFileName,
 	 ISTRING, "File to use for process ID"},
@@ -536,7 +535,7 @@ ratbox_main(int argc, char *argv[])
 	if(geteuid() == 0)
 	{
 		fprintf(stderr, "Don't run ircd as root!!!\n");
-		return 1;
+		exit(EXIT_FAILURE);
 	}
 #endif
 	init_sys();
@@ -545,6 +544,14 @@ ratbox_main(int argc, char *argv[])
 
 	myargv = argv;
 	parseargs(&argc, &argv, myopts);
+
+	if(printVersion)
+	{
+		printf("ircd: version %s\n", ircd_version);
+		printf("ircd: configure options\n");
+		puts(RATBOX_CONFIGURE_OPTS);
+		exit(EXIT_SUCCESS);
+	}
 
 	if(chdir(basedir))
 	{
@@ -630,15 +637,6 @@ ratbox_main(int argc, char *argv[])
 	umask(077);		/* better safe than sorry --SRB */
 
 
-	if(printVersion)
-	{
-		printf("ircd: version %s\n", ircd_version);
-		printf("ircd: configure options\n");
-		puts(RATBOX_CONFIGURE_OPTS);
-		exit(EXIT_SUCCESS);
-	}
-
-
 	setup_signals();
 	init_s_conf();
 	init_s_newconf();
@@ -662,7 +660,7 @@ ratbox_main(int argc, char *argv[])
 		rb_init_prng(NULL, RB_PRNG_DEFAULT);
 	seed_random(NULL);
 
-	init_main_logfile();
+	init_main_logfile(logFileName);
 	init_hash();
 	init_host_hash();
 	clear_hash_parse();
@@ -757,7 +755,7 @@ ratbox_main(int argc, char *argv[])
 	check_class();
 	write_pidfile(pidFileName);
 	load_help();
-	open_logfiles();
+	open_logfiles(logFileName);
 
 	ilog(L_MAIN, "Server Ready");
 

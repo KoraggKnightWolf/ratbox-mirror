@@ -671,7 +671,7 @@ rehash(int sig)
 	else
 		rb_strlcpy(me.info, "unknown", sizeof(me.info));
 
-	open_logfiles();
+	open_logfiles(logFileName);
 	if(old_global_ipv4_cidr != ConfigFileEntry.global_cidr_ipv4_bitlen ||
 	   old_global_ipv6_cidr != ConfigFileEntry.global_cidr_ipv6_bitlen)
 		rehash_global_cidr_tree();
