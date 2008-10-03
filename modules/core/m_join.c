@@ -104,7 +104,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		}
 
 		/* join 0 parts all channels */
-		if(*name == '0' && !atoi(name))
+		if(*name == '0' && (name[1] == ',' || name[1] == '\0') && name == chanlist)
 		{
 			(void)strcpy(jbuf, "0");
 			continue;
