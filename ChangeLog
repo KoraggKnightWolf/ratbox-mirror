@@ -1,3 +1,12 @@
+androsyn    2008/10/06 13:54:40 UTC	(20081006_0-26130)
+  Log:
+  update patchlevel and release notes
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/10/03 18:07:46 UTC	(20081003_1-26128)
   Log:
   Honor -logfile setting and move the -version check further up 
