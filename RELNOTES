@@ -6,6 +6,13 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0.0rc2
+- log ERROR commands to file regardless of hide_error_messages setting 
+- restrict JOIN 0 to only allow 0 by itself, no multiple zeros or zeros
+  before or after commas
+- honor -logfile command line option
+- fix timerfd_create check that
+
 -- ircd-ratbox-3.0.0rc1
 - fix a bug in comment parsing in the config file
 - have bandb honor -basedir option
