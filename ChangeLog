@@ -1,3 +1,11 @@
+androsyn    2008/10/07 14:36:14 UTC	(20081007_0-26138)
+  Log:
+  fix a few thinkos in the RELNOTES file
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+
+
 androsyn    2008/10/06 13:54:40 UTC	(20081006_0-26130)
   Log:
   update patchlevel and release notes
