@@ -1,3 +1,11 @@
+androsyn    2008/10/07 17:06:06 UTC	(20081007_1-26140)
+  Log:
+  make a few changes to whats-new-3.0.txt
+
+  Modified:
+	ircd-ratbox/trunk/doc/whats-new-3.0.txt (File Modified) 
+
+
 androsyn    2008/10/07 14:36:14 UTC	(20081007_0-26138)
   Log:
   fix a few thinkos in the RELNOTES file
