@@ -1,3 +1,15 @@
+androsyn    2008/10/07 18:34:35 UTC	(20081007_2-26142)
+  Log:
+  replace some cases of using malloc/free with rb_malloc/rb_free via ahf@efnet
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+	ircd-ratbox/trunk/resolver/getaddrinfo.c (File Modified) 
+	ircd-ratbox/trunk/resolver/reslib.c (File Modified) 
+	ircd-ratbox/trunk/resolver/reslist.c (File Modified) 
+	ircd-ratbox/trunk/src/getopt.c (File Modified) 
+
+
 androsyn    2008/10/07 17:06:06 UTC	(20081007_1-26140)
   Log:
   make a few changes to whats-new-3.0.txt
