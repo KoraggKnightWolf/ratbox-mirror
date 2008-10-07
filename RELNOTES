@@ -11,7 +11,7 @@ If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 - restrict JOIN 0 to only allow 0 by itself, no multiple zeros or zeros
   before or after commas
 - honor -logfile command line option
-- fix timerfd_create check that
+- fix timerfd_create check
 
 -- ircd-ratbox-3.0.0rc1
 - fix a bug in comment parsing in the config file
@@ -28,8 +28,7 @@ If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 - add support for timerfd_create event handling on linux systems with 
   new enough kernels and glibc
 - fix our fake rb_sockaddr_storage so that it actually compiles
-- Add some work arounds so arounds to avoid OPENSSL_applink does not
-  need to be used on some platforms
+- Add some work arounds to avoid OPENSSL_applink on some platforms
 
 
 -- ircd-ratbox-3.0.0beta12
