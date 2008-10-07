@@ -490,7 +490,7 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 	{
 		SHA1_Init(&ctx);
 		SHA1_Update(&ctx, (uint8_t *)secret, CHALLENGE_SECRET_LENGTH);
-		*r_response = malloc(SHA_DIGEST_LENGTH);
+		*r_response = rb_malloc(SHA_DIGEST_LENGTH);
 		SHA1_Final((uint8_t *)*r_response, &ctx);
 
 		length = RSA_size(rsa);

@@ -120,7 +120,7 @@ get_iphlpapi_dns_info(char *ret_buf, size_t ret_size)
 
 /*
  * Warning: returns a dynamically allocated buffer, the user MUST
- * use free() if the function returns 1
+ * use free() / rb_free() if the function returns 1
  */
 static int
 get_res_nt(HKEY hKey, const char *subkey, char **obuf)
@@ -132,18 +132,18 @@ get_res_nt(HKEY hKey, const char *subkey, char **obuf)
 	result = RegQueryValueEx(hKey, subkey, 0, NULL, NULL, &size);
 	if((result != ERROR_SUCCESS && result != ERROR_MORE_DATA) || !size)
 		return 0;
-	*obuf = malloc(size + 1);
+	*obuf = rb_malloc(size + 1);
 	if(!*obuf)
 		return 0;
 
 	if(RegQueryValueEx(hKey, subkey, 0, NULL, (LPBYTE) * obuf, &size) != ERROR_SUCCESS)
 	{
-		free(*obuf);
+		rb_free(*obuf);
 		return 0;
 	}
 	if(size == 1)
 	{
-		free(*obuf);
+		rb_free(*obuf);
 		return 0;
 	}
 	return 1;
@@ -226,18 +226,18 @@ get_windows_nameservers(void)
 			else if(get_res_nt(mykey, DHCPNAMESERVER, &line))
 			{
 				rb_strlcpy(namelist, line, sizeof(namelist));
-				free(line);
+				rb_free(line);
 			}
 			/* Try the interfaces */
 			else if(get_res_interfaces_nt(subkey, NAMESERVER, &line))
 			{
 				rb_strlcpy(namelist, line, sizeof(namelist));
-				free(line);
+				rb_free(line);
 			}
 			else if(get_res_interfaces_nt(subkey, DHCPNAMESERVER, &line))
 			{
 				rb_strlcpy(namelist, line, sizeof(namelist));
-				free(line);
+				rb_free(line);
 			}
 			RegCloseKey(subkey);
 			RegCloseKey(mykey);
@@ -254,7 +254,7 @@ get_windows_nameservers(void)
 			{
 				if(bytes)
 				{
-					line = (char *)malloc(bytes + 1);
+					line = (char *)rb_malloc(bytes + 1);
 					if(RegQueryValueEx(mykey, NAMESERVER, NULL, &data_type,
 							   (unsigned char *)line, &bytes) ==
 					   ERROR_SUCCESS)

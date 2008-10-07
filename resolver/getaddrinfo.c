@@ -175,9 +175,9 @@ freeaddrinfo(struct addrinfo *ai)
 	do {
 		next = ai->ai_next;
 		if (ai->ai_canonname)
-			free(ai->ai_canonname);
+			rb_free(ai->ai_canonname);
 		/* no need to free(ai->ai_addr) */
-		free(ai);
+		rb_free(ai);
 		ai = next;
 	} while (ai);
 }
@@ -497,7 +497,7 @@ get_ai(const struct addrinfo *pai, const struct afd *afd, const char *addr)
   char *p;
   struct addrinfo *ai;
 	
-    ai = (struct addrinfo *)malloc(sizeof(struct addrinfo)
+    ai = (struct addrinfo *)rb_malloc(sizeof(struct addrinfo)
 		+ (afd->a_socklen));
 	if (ai == NULL)
 		return NULL;

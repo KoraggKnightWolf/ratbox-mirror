@@ -179,7 +179,7 @@ parse_windows_resolvers(void)
 	{
 		add_nameserver(server);	
 	}
-	free(buf);
+	rb_free(buf);
 }
 #else
 /* parse_resvconf()
