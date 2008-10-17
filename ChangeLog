@@ -1,3 +1,11 @@
+androsyn    2008/10/17 00:55:52 UTC	(20081017_0-26146)
+  Log:
+  righto..a useful commit here
+
+  Modified:
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 androsyn    2008/10/14 16:33:26 UTC	(20081014_0-26144)
   Log:
   keep people from passing absurd values to --with-nicklen or without values all together\!
