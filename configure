@@ -1531,7 +1531,7 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --enable-ipv6           Enable IPv6 support
+  --disable-ipv6          Disable IPv6 support (not recommended)
   --enable-openssl=DIR    Enable OpenSSL support (DIR optional).
   --disable-openssl       Disable OpenSSL support.
   --disable-zlib          Disable ziplinks support
@@ -22491,8 +22491,9 @@ fi
 if test "${enable_ipv6+set}" = set; then
   enableval=$enable_ipv6; ipv6=$enableval
 else
-  ipv6=no
+  ipv6=yes
 fi
+
 
 
 { echo "$as_me:$LINENO: checking whether string.h and strings.h may both be included" >&5

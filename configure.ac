@@ -123,8 +123,8 @@ dnl ====================
 AC_SEARCH_LIBS(socket, [socket],,)
 
 dnl this gets passed on to the libratbox configure
-AC_ARG_ENABLE(ipv6,
-AC_HELP_STRING([--enable-ipv6],[Enable IPv6 support]),[ipv6=$enableval],[ipv6=no])
+AC_ARG_ENABLE(ipv6,AC_HELP_STRING([--disable-ipv6],[Disable IPv6 support (not recommended)]),[ipv6=$enableval],[ipv6=yes])
+        
 
 dnl See whether we can include both string.h and strings.h.
 AC_CACHE_CHECK([whether string.h and strings.h may both be included],
