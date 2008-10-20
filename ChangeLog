@@ -1,3 +1,12 @@
+androsyn    2008/10/20 14:16:16 UTC	(20081020_2-26152)
+  Log:
+  update patchlevel and RELNOTES
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/10/20 06:13:52 UTC	(20081020_1-26150)
   Log:
   make is_cti/is_sti collect times connected in unsigned long long instead of time_t as well..on 32bit boxes that is going to wrap pretty quickly
