@@ -1,3 +1,13 @@
+androsyn    2008/10/20 06:13:52 UTC	(20081020_1-26150)
+  Log:
+  make is_cti/is_sti collect times connected in unsigned long long instead of time_t as well..on 32bit boxes that is going to wrap pretty quickly
+
+  Modified:
+	ircd-ratbox/trunk/include/s_stats.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2008/10/20 05:21:59 UTC	(20081020_0-26148)
   Log:
   free localClient->lip after we no longer need it..this keeps us from leaking 128 bytes for connection
