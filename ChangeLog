@@ -1,3 +1,12 @@
+androsyn    2008/10/20 05:21:59 UTC	(20081020_0-26148)
+  Log:
+  free localClient->lip after we no longer need it..this keeps us from leaking 128 bytes for connection
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2008/10/17 00:55:52 UTC	(20081017_0-26146)
   Log:
   righto..a useful commit here
