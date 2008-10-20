@@ -1,3 +1,11 @@
+androsyn    2008/10/20 16:05:37 UTC	(20081020_3-26160)
+  Log:
+  change rb_clear_patricia to rb_destroy_patricia and just wipe the whole damn thing clean and reallocate a new one...
+
+  Modified:
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2008/10/20 14:16:16 UTC	(20081020_2-26152)
   Log:
   update patchlevel and RELNOTES
