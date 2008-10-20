@@ -275,6 +275,7 @@ start_auth_query(struct AuthRequest *auth)
 	}
 	memcpy(&bindaddr, localaddr, sizeof(struct rb_sockaddr_storage));
 	memcpy(&destaddr, remoteaddr, sizeof(struct rb_sockaddr_storage));
+	
 #ifdef RB_IPV6
 	if(family == AF_INET6)
 	{
@@ -292,6 +293,10 @@ start_auth_query(struct AuthRequest *auth)
 		((struct sockaddr_in *)&bindaddr)->sin_port = 0;
 		((struct sockaddr_in *)&destaddr)->sin_port = htons(113);
 	}
+
+	/* allocated in listener.c - after we copy this..we can discard it */
+	rb_free(auth->client->localClient->lip);
+	auth->client->localClient->lip = NULL;
 
 	rb_connect_tcp(auth->authF, (struct sockaddr *)&destaddr, (struct sockaddr *)&bindaddr,
 		       GET_SS_LEN(&destaddr), auth_connect_callback, auth,
@@ -388,9 +393,11 @@ start_auth(struct Client *client)
 	{
 		start_auth_query(auth);
 	}
-	else
+	else {
+		rb_free(client->localClient->lip);
+		client->localClient->lip = NULL;
 		ClearAuth(auth);
-
+	}
 	auth->dns_query =
 		lookup_ip(client->sockhost, GET_SS_FAMILY(&client->localClient->ip),
 			  auth_dns_callback, auth);

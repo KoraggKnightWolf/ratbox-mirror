@@ -199,7 +199,8 @@ free_local_client(struct Client *client_p)
 	rb_free(client_p->localClient->opername);
 
 	ssld_decrement_clicount(client_p->localClient->ssl_ctl);
-
+	/* not needed per-se, but in case start_auth_query never gets called... */
+	rb_free(client_p->localClient->lip);
 
 	rb_bh_free(lclient_heap, client_p->localClient);
 	client_p->localClient = NULL;
