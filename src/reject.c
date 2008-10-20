@@ -583,7 +583,8 @@ rehash_global_cidr_tree(void)
 {
 	struct Client *client_p;
 	rb_dlink_node *ptr;
-	rb_clear_patricia(global_tree, clear_cidr_tree);
+	rb_destroy_patricia(global_tree, clear_cidr_tree);
+	global_tree = rb_new_patricia(PATRICIA_BITS);	
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		client_p = ptr->data;
