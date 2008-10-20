@@ -1,3 +1,12 @@
+androsyn    2008/10/20 22:01:30 UTC	(20081020_4-26162)
+  Log:
+  change the configure option for ipv6 to be --disable-ipv6
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2008/10/20 16:05:37 UTC	(20081020_3-26160)
   Log:
   change rb_clear_patricia to rb_destroy_patricia and just wipe the whole damn thing clean and reallocate a new one...
