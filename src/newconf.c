@@ -878,7 +878,7 @@ conf_set_modules_module(confentry_t * entry, conf_t * conf, struct conf_items *i
 #ifndef STATIC_MODULES
 	char *m_bn;
 
-	m_bn = irc_basename(entry->string);
+	m_bn = rb_basename(entry->string);
 
 	if(findmodule_byname(m_bn) != -1)
 		return;

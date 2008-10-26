@@ -105,7 +105,6 @@ int unload_one_module(const char *, int);
 int load_one_module(const char *, int);
 int load_a_module(const char *, int, int);
 int findmodule_byname(const char *);
-char *irc_basename(const char *);
 void modules_init(void);
 
 #endif /* INCLUDED_modules_h */

@@ -191,27 +191,6 @@ mod_clear_paths(void)
 	mod_paths.length = 0;
 }
 
-/* irc_basename
- *
- * input	-
- * output	-
- * side effects -
- */
-char *
-irc_basename(const char *path)
-{
-	char *mod_basename = rb_malloc(strlen(path) + 1);
-	const char *s;
-
-	if(!(s = strrchr(path, '/')))
-		s = path;
-	else
-		s++;
-
-	(void)strcpy(mod_basename, s);
-	return mod_basename;
-}
-
 /* findmodule_byname
  *
  * input        -
@@ -389,7 +368,7 @@ mo_modload(struct Client *client_p, struct Client *source_p, int parc, const cha
 		return 0;
 	}
 
-	m_bn = irc_basename(parv[1]);
+	m_bn = rb_basename(parv[1]);
 
 	if(findmodule_byname(m_bn) != -1)
 	{
@@ -419,7 +398,7 @@ mo_modunload(struct Client *client_p, struct Client *source_p, int parc, const c
 		return 0;
 	}
 
-	m_bn = irc_basename(parv[1]);
+	m_bn = rb_basename(parv[1]);
 
 	if((modindex = findmodule_byname(m_bn)) == -1)
 	{
@@ -458,7 +437,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 		return 0;
 	}
 
-	m_bn = irc_basename(parv[1]);
+	m_bn = rb_basename(parv[1]);
 
 	if((modindex = findmodule_byname(m_bn)) == -1)
 	{
@@ -643,7 +622,7 @@ load_a_module(const char *path, int warn, int core)
 	void *mapi_base;
 	int *mapi_version;
 
-	mod_basename = irc_basename(path);
+	mod_basename = rb_basename(path);
 
 	tmpptr = lt_dlopen(path);
 
