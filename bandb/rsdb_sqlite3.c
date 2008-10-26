@@ -55,7 +55,7 @@ mlog(const char *errstr, ...)
 		exit(1);
 }
 
-void
+int
 rsdb_init(rsdb_error_cb * ecb)
 {
 	const char *bandb_dpath;
@@ -68,7 +68,7 @@ rsdb_init(rsdb_error_cb * ecb)
 	{
 		rb_snprintf(dbpath, sizeof(dbpath), "%s/etc/ban.db", bandb_dpath);
 		if(sqlite3_open(dbpath, &rb_bandb) == SQLITE_OK)
-			return;
+			return 0;
 	}
 
 	if(sqlite3_open(DBPATH, &rb_bandb) != SQLITE_OK)
@@ -77,7 +77,9 @@ rsdb_init(rsdb_error_cb * ecb)
 		rb_snprintf(errbuf, sizeof(errbuf), "Unable to open sqlite database: %s",
 			    sqlite3_errmsg(rb_bandb));
 		mlog(errbuf);
+		return -1;
 	}
+	return 0;
 }
 
 void

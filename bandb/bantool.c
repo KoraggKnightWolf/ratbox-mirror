@@ -206,7 +206,11 @@ main(int argc, char *argv[])
 
 	if(flag.pretend == NO)
 	{
-		rsdb_init(db_error_cb);
+		if(rsdb_init(db_error_cb) == -1)
+		{
+			fprintf(stderr, "* Error: Unable to open database\n");
+			exit(EXIT_FAILURE);
+		}
 		check_schema();
 
 		if(flag.vacuum)
@@ -834,11 +838,6 @@ drop_dupes(const char *user, const char *host, const char *t)
 static void
 db_error_cb(const char *errstr)
 {
-	/* debug stuff 
-	   char buf[256];
-	   rb_snprintf(buf, sizeof(buf), "! :%s", errstr);
-	   fprintf(stderr, "ERROR: %s\n", buf);
-	 */
 	return;
 }
 
