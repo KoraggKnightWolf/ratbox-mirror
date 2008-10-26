@@ -1,3 +1,13 @@
+androsyn    2008/10/26 21:03:00 UTC	(20081026_1-26172)
+  Log:
+  use rb_basename
+
+  Modified:
+	ircd-ratbox/trunk/include/modules.h (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/10/26 19:52:43 UTC	(20081026_0-26164)
   Log:
   have rsdb_init return a value if it fails to open the database and have bantool use that value
