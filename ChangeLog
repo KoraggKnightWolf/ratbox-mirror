@@ -1,3 +1,23 @@
+androsyn    2008/11/04 20:15:48 UTC	(20081104_1-26176)
+  Log:
+  Rerun libtoolize to get updated libtool and libltdl
+  
+
+  Modified:
+	ircd-ratbox/trunk/config.guess (File Modified) 
+	ircd-ratbox/trunk/config.sub (File Modified) 
+	ircd-ratbox/trunk/libltdl/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/libltdl/acinclude.m4 (File Modified) 
+	ircd-ratbox/trunk/libltdl/config.guess (File Modified) 
+	ircd-ratbox/trunk/libltdl/config.sub (File Modified) 
+	ircd-ratbox/trunk/libltdl/configure (File Modified) 
+	ircd-ratbox/trunk/libltdl/ltdl.c (File Modified) 
+	ircd-ratbox/trunk/libltdl/ltmain.sh (File Modified) 
+	ircd-ratbox/trunk/libltdl/missing (File Modified) 
+	ircd-ratbox/trunk/ltmain.sh (File Modified) 
+
+
 androsyn    2008/11/04 19:42:27 UTC	(20081104_0-26174)
   Log:
   report logfile access issues
