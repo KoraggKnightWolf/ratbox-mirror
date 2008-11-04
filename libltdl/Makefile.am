@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 AUTOMAKE_OPTIONS = no-dependencies foreign
-CONVENIENCE_LTDL=1
+
 if INSTALL_LTDL
 include_HEADERS = ltdl.h
 lib_LTLIBRARIES = libltdl.la
@@ -18,7 +18,7 @@ endif
 CLEANFILES = libltdl.la libltdlc.la
 
 libltdl_la_SOURCES = ltdl.c
-libltdl_la_LDFLAGS = -no-undefined -version-info 4:5:1
+libltdl_la_LDFLAGS = -no-undefined -version-info 4:6:1
 libltdl_la_LIBADD = $(LIBADD_DL)
 
 libltdlc_la_SOURCES = ltdl.c
@@ -30,7 +30,3 @@ ltdl.lo: ltdl.h config.h
 $(libltdl_la_OBJECTS) $(libltdlc_la_OBJECTS): libtool
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
-	
-install-includeHEADERS:
-
-distclean: clean
