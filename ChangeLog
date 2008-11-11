@@ -1,3 +1,11 @@
+androsyn    2008/11/11 02:52:41 UTC	(20081111_0-26182)
+  Log:
+  meh..this is crappy - check to see if the file we just opened with sqlite, if we have write access to it, sqlite falls back to read only if opening read/write fails...retarded
+
+  Modified:
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+
+
 androsyn    2008/11/04 20:15:48 UTC	(20081104_1-26176)
   Log:
   Rerun libtoolize to get updated libtool and libltdl
