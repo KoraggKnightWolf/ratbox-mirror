@@ -46,6 +46,7 @@
 #include "s_newconf.h"
 #include "reject.h"
 #include "send.h"
+#include "ircd.h"
 
 static char bandb_add_letter[LAST_BANDB_TYPE] = {
 	'K', 'D', 'X', 'R'
@@ -381,6 +382,9 @@ bandb_handle_finish(void)
 static void
 bandb_handle_failure(rb_helper *helper, char **parv, int parc)
 {
+	if(server_state_foreground)
+		fprintf(stderr, "bandb - bandb failure: %s\n", parv[1]);
+	
 	ilog(L_MAIN, "bandb - bandb failure: %s", parv[1]);
 	sendto_realops_flags(UMODE_ALL, L_ALL, "bandb - bandb failure: %s", parv[1]);
 	exit(1);
