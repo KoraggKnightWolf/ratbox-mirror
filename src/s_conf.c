@@ -830,7 +830,7 @@ set_default_conf(void)
 	ConfigFileEntry.throttle_count = 4;
 	ConfigFileEntry.throttle_duration = 60;
 	ConfigFileEntry.global_cidr_ipv4_bitlen = 24;
-	ConfigFileEntry.global_cidr_ipv4_count = 128;
+	ConfigFileEntry.global_cidr_ipv4_count = 384;
 	ConfigFileEntry.global_cidr_ipv6_bitlen = 64;
 	ConfigFileEntry.global_cidr_ipv6_count = 128;
 	ConfigFileEntry.global_cidr = YES;
