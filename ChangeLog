@@ -1,3 +1,12 @@
+androsyn    2008/11/14 19:00:43 UTC	(20081114_1-26188)
+  Log:
+  update RELNOTES and patchlevel.h
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 androsyn    2008/11/14 16:37:10 UTC	(20081114_0-26186)
   Log:
   change the default for global ipv4 cidr counts to 384
