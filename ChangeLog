@@ -1,3 +1,12 @@
+androsyn    2008/11/14 16:37:10 UTC	(20081114_0-26186)
+  Log:
+  change the default for global ipv4 cidr counts to 384
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2008/11/12 01:35:10 UTC	(20081112_0-26184)
   Log:
   report bandb failure to stderr, if we are in the foreground
