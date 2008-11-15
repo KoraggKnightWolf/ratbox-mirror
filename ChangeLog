@@ -1,3 +1,11 @@
+androsyn    2008/11/15 02:10:43 UTC	(20081115_0-26196)
+  Log:
+  call rb_helper_close on bandb failure
+
+  Modified:
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+
+
 androsyn    2008/11/14 19:00:43 UTC	(20081114_1-26188)
   Log:
   update RELNOTES and patchlevel.h
