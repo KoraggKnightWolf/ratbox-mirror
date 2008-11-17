@@ -1,3 +1,11 @@
+androsyn    2008/11/17 16:55:27 UTC	(20081117_0-26218)
+  Log:
+  report the correct filename/lines for spoof warnings
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/11/15 02:10:43 UTC	(20081115_0-26196)
   Log:
   call rb_helper_close on bandb failure
