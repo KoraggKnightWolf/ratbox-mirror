@@ -1254,19 +1254,22 @@ conf_set_auth_spoof(confentry_t * entry, conf_t * conf, struct conf_items *item)
 		host = p + 1;
 		if(EmptyString(user))
 		{
-			conf_report_error("Warning -- spoof ident empty.");
+			conf_report_warning_nl("Invalid spoof (ident empty): %s::%s at %s:%d", 
+						conf->confname, entry->entryname, entry->filename, entry->line);
 			return;
 		}
 
 		if(strlen(user) > USERLEN)
 		{
-			conf_report_error("Warning -- spoof ident length invalid.");
+			conf_report_warning_nl("Invalid spoof (username too long): %s::%s at %s:%d", 
+						conf->confname, entry->entryname, entry->filename, entry->line);
 			return;
 		}
 
 		if(!valid_username(user))
 		{
-			conf_report_error("Warning -- invalid spoof (ident).");
+			conf_report_warning_nl("Invalid spoof (invalid username): %s::%s at %s:%d", 
+						conf->confname, entry->entryname, entry->filename, entry->line);
 			return;
 		}
 
@@ -1276,19 +1279,22 @@ conf_set_auth_spoof(confentry_t * entry, conf_t * conf, struct conf_items *item)
 
 	if(EmptyString(host))
 	{
-		conf_report_error("Warning -- spoof host empty.");
+		conf_report_warning_nl("Invalid spoof (empty hostname): %s::%s at %s:%d", 
+				conf->confname, entry->entryname, entry->filename, entry->line);
 		return;
 	}
 
 	if(strlen(host) > HOSTLEN)
 	{
-		conf_report_error("Warning -- spoof host length invalid.");
+		conf_report_warning_nl("Invalid spoof (hostname too long): %s::%s at %s:%d", 
+				conf->confname, entry->entryname, entry->filename, entry->line);
 		return;
 	}
 
 	if(!valid_hostname(host))
 	{
-		conf_report_error("Warning -- invalid spoof (host).");
+		conf_report_warning_nl("Invalid spoof (invalid hostname): %s::%s at %s:%d", 
+				conf->confname, entry->entryname, entry->filename, entry->line);
 		return;
 	}
 
