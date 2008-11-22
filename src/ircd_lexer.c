@@ -642,7 +642,12 @@ static int input (void );
 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k */
+#define YY_READ_BUF_SIZE 16384
+#else
 #define YY_READ_BUF_SIZE 8192
+#endif /* __ia64__ */
 #endif
 
 /* Copy whatever the last rule matched to the standard output. */
@@ -650,7 +655,7 @@ static int input (void );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO fwrite( yytext, yyleng, 1, yyout )
+#define ECHO do { if (fwrite( yytext, yyleng, 1, yyout )) {} } while (0)
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -745,7 +750,7 @@ YY_DECL
     
 #line 82 "ircd_lexer.l"
 
-#line 749 "ircd_lexer.c"
+#line 754 "ircd_lexer.c"
 
 	if ( !(yy_init) )
 		{
@@ -945,7 +950,7 @@ YY_RULE_SETUP
 #line 146 "ircd_lexer.l"
 ECHO;
 	YY_BREAK
-#line 949 "ircd_lexer.c"
+#line 954 "ircd_lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1664,8 +1669,8 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
  * scan from a @e copy of @a bytes.
- * @param bytes the byte buffer to scan
- * @param len the number of bytes in the buffer pointed to by @a bytes.
+ * @param yybytes the byte buffer to scan
+ * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
  * 
  * @return the newly allocated buffer state object.
  */
