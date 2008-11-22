@@ -1,3 +1,11 @@
+androsyn    2008/11/22 16:31:59 UTC	(20081122_0-26232)
+  Log:
+  sid should be defined as sid[4] not [3], somebody forgot space for the trailing \0
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+
+
 androsyn    2008/11/17 16:55:27 UTC	(20081117_0-26218)
   Log:
   report the correct filename/lines for spoof warnings
