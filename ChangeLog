@@ -1,3 +1,11 @@
+androsyn    2008/12/10 04:45:19 UTC	(20081210_3-26268)
+  Log:
+  change another case of conf_report_error to conf_report_error_nl
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/12/10 04:12:15 UTC	(20081210_2-26266)
   Log:
   Rebuild configure with autoconf 2.63
