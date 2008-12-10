@@ -1,3 +1,11 @@
+androsyn    2008/12/10 04:09:41 UTC	(20081210_0-26262)
+  Log:
+  remove _XOPEN_SOURCE from bantool.c
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 androsyn    2008/11/22 16:46:17 UTC	(20081122_1-26236)
   Log:
   rebuild the lexer
