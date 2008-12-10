@@ -1,3 +1,11 @@
+androsyn    2008/12/10 23:45:24 UTC	(20081210_7-26288)
+  Log:
+  slightly alter the info output for libratbox
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+
+
 androsyn    2008/12/10 21:07:39 UTC	(20081210_6-26284)
   Log:
   spew the libratbox version info on -version and at startup
