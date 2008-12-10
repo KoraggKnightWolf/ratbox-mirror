@@ -1,3 +1,11 @@
+androsyn    2008/12/10 04:10:54 UTC	(20081210_1-26264)
+  Log:
+  cast getpid() to int
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2008/12/10 04:09:41 UTC	(20081210_0-26262)
   Log:
   remove _XOPEN_SOURCE from bantool.c
