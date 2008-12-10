@@ -890,9 +890,11 @@ mo_info(struct Client *client_p, struct Client *source_p, int parc, const char *
 		SetCork(source_p);
 		send_info_text(source_p);
 
-		if(IsOper(source_p))
+		if(IsOper(source_p)) {
 			send_conf_options(source_p);
-
+                        sendto_one(source_p, ":%s %d %s :%s",  
+                                   get_id(&me, source_p), RPL_INFO, get_id(source_p, source_p), rb_lib_version());                                                 
+                }
 		send_birthdate_online_time(source_p);
 		ClearCork(source_p);
 		sendto_one_numeric(source_p, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
@@ -1107,10 +1109,6 @@ send_conf_options(struct Client *source_p)
 		   get_id(&me, source_p), RPL_INFO,
 		   get_id(source_p, source_p),
 		   "io_type", rb_get_iotype(), "Method of Multiplexed I/O");
-	sendto_one(source_p, ":%s %d %s :%-30s %-5s [%-30s]",
-		   get_id(&me, source_p), RPL_INFO,
-		   get_id(source_p, source_p),
-		   "libratbox", rb_lib_version(), "Version of libratbox the ircd is using");
 
 	/* Don't send oper_only_umodes...it's a bit mask, we will have to decode it
 	 ** in order for it to show up properly to opers who issue INFO
