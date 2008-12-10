@@ -1,3 +1,12 @@
+androsyn    2008/12/10 14:26:42 UTC	(20081210_5-26278)
+  Log:
+  fix installing with install-sh
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2008/12/10 04:46:14 UTC	(20081210_4-26270)
   Log:
   fix a typo
