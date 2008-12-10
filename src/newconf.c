@@ -1400,8 +1400,8 @@ conf_set_end_operator(conf_t * conf)
 			BIO *file;
 			if((file = BIO_new_file(t_oper->rsa_pubkey_file, "r")) == NULL)
 			{
-				conf_report_error
-					("ERROR: operator block for %s at %s:%d rsa_public_key_file cant be opened",
+				conf_report_error_nl
+					("operator block for %s at %s:%d rsa_public_key_file cannot be opened",
 					 tmp_oper->name, conf->filename, conf->line);
 				return;
 			}
@@ -1410,8 +1410,8 @@ conf_set_end_operator(conf_t * conf)
 
 			if(tmp_oper->rsa_pubkey == NULL)
 			{
-				conf_report_error
-					("ERROR: operator block for %s at %s:%d -- invalid rsa_public_key_file",
+				conf_report_error_np
+					("operator block for %s at %s:%d -- invalid rsa_public_key_file",
 					 tmp_oper->name, conf->filename, conf->line);
 				return;
 			}
