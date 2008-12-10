@@ -54,6 +54,15 @@ AC_C_INLINE
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+
+srcpwd=`cd ${srcdir} ; ${PWDCMD-pwd}`
+
+# We pase INSTALL explicitly to sub-makes.  Make sure that it is not
+# a relative path.
+if test "$INSTALL" = "${srcdir}/install-sh -c"; then
+  INSTALL="${srcpwd}/install-sh -c"
+fi
+
 AC_PATH_PROG(AUTOMAKE, automake)
 AC_PATH_PROG(ACLOCAL, aclocal)
 AC_PATH_PROG(AUTOHEADER, autoheader)
