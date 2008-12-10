@@ -189,6 +189,7 @@ static void
 print_startup(int pid)
 {
 	printf("ircd: version %s\n", ircd_version);
+	printf("ircd: %s\n", rb_lib_version());
 	printf("ircd: pid %d\n", pid);
 #ifndef RATBOX_PROFILE
 	printf("ircd: running in %s mode from %s\n",
@@ -548,6 +549,7 @@ ratbox_main(int argc, char *argv[])
 	if(printVersion)
 	{
 		printf("ircd: version %s\n", ircd_version);
+		printf("ircd: %s\n", rb_lib_version());
 		printf("ircd: configure options\n");
 		puts(RATBOX_CONFIGURE_OPTS);
 		exit(EXIT_SUCCESS);
