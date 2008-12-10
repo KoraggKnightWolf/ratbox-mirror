@@ -1,3 +1,11 @@
+androsyn    2008/12/10 04:46:14 UTC	(20081210_4-26270)
+  Log:
+  fix a typo
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/12/10 04:45:19 UTC	(20081210_3-26268)
   Log:
   change another case of conf_report_error to conf_report_error_nl
