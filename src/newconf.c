@@ -1410,7 +1410,7 @@ conf_set_end_operator(conf_t * conf)
 
 			if(tmp_oper->rsa_pubkey == NULL)
 			{
-				conf_report_error_np
+				conf_report_error_nl
 					("operator block for %s at %s:%d -- invalid rsa_public_key_file",
 					 tmp_oper->name, conf->filename, conf->line);
 				return;
