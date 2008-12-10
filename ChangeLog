@@ -1,3 +1,11 @@
+androsyn    2008/12/10 21:07:39 UTC	(20081210_6-26284)
+  Log:
+  spew the libratbox version info on -version and at startup
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2008/12/10 14:26:42 UTC	(20081210_5-26278)
   Log:
   fix installing with install-sh
