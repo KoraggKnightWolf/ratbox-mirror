@@ -199,6 +199,7 @@ struct LocalUser
 	time_t target_last;	/* last time we cleared a slot */
 	struct rb_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
 	struct _ssl_ctl *ssl_ctl;	/* which ssl daemon we're associate with */
+	struct _ssl_ctl *z_ctl;		/* second ctl for ssl+zlib */
 	uint32_t localflags;
 	struct ZipStats *zipstats;	/* zipstats */
 	uint16_t cork_count;	/* used for corking/uncorking connections */
