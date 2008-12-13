@@ -1747,13 +1747,6 @@ conf_set_end_connect(conf_t * conf)
 		t_server->flags &= ~SERVER_COMPRESSED;
 	}
 #endif
-	if(ServerConfCompressed(t_server) && ServerConfSSL(t_server))
-	{
-		conf_report_warning_nl("Ignoring compressed for connect block %s at %s:%d -- "
-				       "ssl and compressed are mutually exclusive (OpenSSL does its own compression)",
-				       conf->subname, conf->filename, conf->line);
-		t_server->flags &= ~SERVER_COMPRESSED;
-	}
 
 	add_server_conf(t_server);
 	rb_dlinkAdd(t_server, &t_server->node, &server_conf_list);

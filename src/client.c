@@ -198,7 +198,11 @@ free_local_client(struct Client *client_p)
 	rb_free(client_p->localClient->fullcaps);
 	rb_free(client_p->localClient->opername);
 
-	ssld_decrement_clicount(client_p->localClient->ssl_ctl);
+	if(IsSSL(client_p))
+        	ssld_decrement_clicount(client_p->localClient->ssl_ctl);
+
+	if(IsCapable(client_p, CAP_ZIP))
+		ssld_decrement_clicount(client_p->localClient->z_ctl);
 	/* not needed per-se, but in case start_auth_query never gets called... */
 	rb_free(client_p->localClient->lip);
 
