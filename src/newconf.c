@@ -925,19 +925,22 @@ conf_set_serverinfo_name(confentry_t * entry, conf_t * conf, struct conf_items *
 	{
 		if(!valid_servername(entry->string))
 		{
-			conf_report_error("Error serverinfo::name -- Invalid servername");
-			return;
+			conf_report_error_nl("serverinfo::name -- Invalid servername at %s:%d", conf->filename, conf->line);
+			conf_report_error_nl("cannot continue without a valid servername");
+			exit(1);
 		}
 
 		if(IsDigit(*entry->string))
 		{
-			conf_report_error("Error serverinfo::name -- cannot begin with digit.");
-			return;
+			conf_report_error_nl("serverinfo::name -- cannot begin with digit at %s:%d", conf->filename, conf->line);
+			conf_report_error_nl("cannot continue without a valid servername");
+			exit(1);
 		}
 
 		/* the ircd will exit() in main() if we dont set one */
 		if(strlen(entry->string) <= HOSTLEN)
 			ServerInfo.name = rb_strdup(entry->string);
+		return;
 	}
 }
 
@@ -1027,7 +1030,7 @@ conf_set_serverinfo_sid(confentry_t * entry, conf_t * conf, struct conf_items *i
 	{
 		if(!IsDigit(sid[0]) || !IsIdChar(sid[1]) || !IsIdChar(sid[2]) || sid[3] != '\0')
 		{
-			conf_report_error("Error serverinfo::sid " "-- bogus sid.");
+			conf_report_error_nl("Error serverinfo::sid -- invalid sid at %s:%d", conf->filename, conf->line);
 			return;
 		}
 
@@ -1650,7 +1653,7 @@ conf_set_general_stats_k_oper_only(confentry_t * entry, conf_t * conf, struct co
 	else if(strcasecmp(val, "no") == 0)
 		ConfigFileEntry.stats_k_oper_only = 0;
 	else
-		conf_report_error("Invalid setting '%s' for general::stats_k_oper_only.", val);
+		conf_report_warning_nl("Invalid setting '%s' for general::stats_k_oper_only at %s:%d", val, conf->filename, conf->line);
 }
 
 static void
@@ -1665,7 +1668,7 @@ conf_set_general_stats_i_oper_only(confentry_t * entry, conf_t * conf, struct co
 	else if(strcasecmp(val, "no") == 0)
 		ConfigFileEntry.stats_i_oper_only = 0;
 	else
-		conf_report_error("Invalid setting '%s' for general::stats_i_oper_only.", val);
+		conf_report_warning_nl("Invalid setting '%s' for general::stats_i_oper_only at %s:%d", val, conf->filename, conf->line);
 }
 
 static void
@@ -1765,7 +1768,7 @@ conf_set_connect_vhost(confentry_t * entry, conf_t * conf, struct conf_items *it
 {
 	if(rb_inet_pton_sock(entry->string, (struct sockaddr *)&t_server->my_ipnum) <= 0)
 	{
-		conf_report_error("Invalid netmask for server vhost (%s)", entry->string);
+		conf_report_warning_nl("Invalid netmask for server vhost (%s) at %s:%d", entry->string, conf->filename, conf->line);
 		return;
 	}
 
