@@ -1,3 +1,11 @@
+androsyn    2008/12/14 02:15:21 UTC	(20081214_0-26298)
+  Log:
+  tweak some warnings for config file parsing and exit when there is no servername set at all
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/12/13 02:05:08 UTC	(20081213_1-26292)
   Log:
   forgot to commit struct.h
