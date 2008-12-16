@@ -31,7 +31,7 @@
  */
 #include "setup.h"
 #include <ratbox_lib.h>
-#include <stdio.h>
+#include "config.h"
 #include "rsdb.h"
 #include "common.h"
 
@@ -269,6 +269,7 @@ db_error_cb(const char *errstr)
 int
 main(int argc, char *argv[])
 {
+	const char *dbpath;
 	setup_signals();
 	bandb_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 256, 256, 256);	/* XXX fix me */
 	if(bandb_helper == NULL)
@@ -280,7 +281,11 @@ main(int argc, char *argv[])
 		fprintf(stderr, "Have a nice day\n");
 		exit(1);
 	}
-	rsdb_init(db_error_cb);
+	dbpath = getenv("BANDB_DPATH");
+	if(dbpath == NULL)
+		dbpath = DBPATH;
+
+	rsdb_init(dbpath, db_error_cb);
 	check_schema();
 	rb_helper_loop(bandb_helper, 0);
 

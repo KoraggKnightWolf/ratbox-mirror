@@ -104,7 +104,8 @@ struct flags
 	int verbose;
 	int wipe;
 	int dupes_ok;
-} flag = {YES, NO, NO, NO, NO, NO, NO, NO, NO};
+	char *path;
+} flag = {YES, NO, NO, NO, NO, NO, NO, NO, NO, NULL};
 /* *INDENT-ON* */
 
 static int table_has_rows(const char *table);
@@ -139,7 +140,7 @@ main(int argc, char *argv[])
 
 	rb_strlcpy(me, argv[0], sizeof(me));
 
-	while((opt = getopt(argc, argv, "hieuspvwd")) != -1)
+	while((opt = getopt(argc, argv, "hieuspvwdf:")) != -1)
 	{
 		switch (opt)
 		{
@@ -174,14 +175,20 @@ main(int argc, char *argv[])
 		case 'd':
 			flag.dupes_ok = YES;
 			break;
+		case 'f':
+			flag.path = rb_strdup(optarg);
+			fprintf(stderr, "flag.path: %s\n", flag.path);
+			break;
 		default:	/* '?' */
 			print_help(EXIT_FAILURE);
 		}
 	}
-
 	/* they should really read the help. */
 	if(flag.none)
 		print_help(EXIT_FAILURE);
+
+	if(flag.path == NULL)
+		flag.path = rb_strdup(DBPATH);
 
 	if((flag.import && flag.export) || (flag.export && flag.wipe)
 	   || (flag.verify && flag.pretend) || (flag.export && flag.pretend))
@@ -205,7 +212,7 @@ main(int argc, char *argv[])
 
 	if(flag.pretend == NO)
 	{
-		if(rsdb_init(db_error_cb) == -1)
+		if(rsdb_init(flag.path, db_error_cb) == -1)
 		{
 			fprintf(stderr, "* Error: Unable to open database\n");
 			exit(EXIT_FAILURE);
@@ -865,6 +872,7 @@ smalldate(const char *string)
 void
 print_help(int i_exit)
 {
+	/* *INDENT-OFF* */
 	fprintf(stderr, "bantool v.%s - the ircd-ratbox database tool.\n", BT_VERSION);
 	fprintf(stderr, "Copyright (C) 2008 Daniel J Reidy <dubkat@gmail.com>\n");
 	fprintf(stderr, "$Id$\n\n");
@@ -873,26 +881,25 @@ print_help(int i_exit)
 		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
 		"GNU General Public License for more details.\n\n");
 
-	fprintf(stderr, "Usage: %s <-i|-e> [-p] [-v] [-h] [-d] [-w] [path]\n", me);
+
+	fprintf(stderr, "Usage: %s [-f databasename] <-i|-e> [-p] [-v] [-h] [-d] [-w] [path]\n", me);
 	fprintf(stderr, "       -h : Display some slightly useful help.\n");
+	fprintf(stderr, "       -f : Path to the ban database, default is %s\n", DBPATH);
 	fprintf(stderr, "       -i : Actually import configs into your database.\n");
 	fprintf(stderr, "       -e : Export your database to old-style flat files.\n");
-	fprintf(stderr,
-		"            This is suitable for redistrubuting your banlists, or creating backups.\n");
+	fprintf(stderr, "            This is suitable for redistrubuting your banlists, or creating backups.\n");
 	fprintf(stderr, "       -s : Reclaim empty slack space the database may be taking up.\n");
 	fprintf(stderr, "       -u : Update the database tables to support any new features.\n");
-	fprintf(stderr,
-		"            This is automaticlly done if you are importing or exporting\n");
+	fprintf(stderr, "            This is automaticlly done if you are importing or exporting\n");
 	fprintf(stderr, "            but should be run whenever you upgrade the ircd.\n");
-	fprintf(stderr,
-		"       -p : pretend, checks for the configs, and parses them, then tells you some data...\n");
+	fprintf(stderr, "       -p : pretend, checks for the configs, and parses them, then tells you some data...\n");
 	fprintf(stderr, "            but does not touch your database.\n");
-	fprintf(stderr,
-		"       -v : Be verbose... and it *is* very verbose! (intended for debugging)\n");
+	fprintf(stderr, "       -v : Be verbose... and it *is* very verbose! (intended for debugging)\n");
 	fprintf(stderr, "       -d : Enable checking for redunant entries.\n");
 	fprintf(stderr, "       -w : Completly wipe your database clean. May be used with -i \n");
-	fprintf(stderr,
-		"     path : An optional directory containing old ratbox configs for import, or export.\n");
-	fprintf(stderr, "            If not specified, it looks in PREFIX/etc.\n");
+	fprintf(stderr, "     path : An optional directory containing old ratbox configs for import, or export.\n");
+	fprintf(stderr, "            If not specified, it looks in %s.\n", ETCPATH);
+	/* *INDENT-ON* */
+
 	exit(i_exit);
 }

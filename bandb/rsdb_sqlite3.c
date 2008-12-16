@@ -56,21 +56,11 @@ mlog(const char *errstr, ...)
 }
 
 int
-rsdb_init(rsdb_error_cb * ecb)
+rsdb_init(const char *dbpath, rsdb_error_cb * ecb)
 {
-	const char *bandb_dpath;
-	char dbpath[PATH_MAX];
 	char errbuf[128];
 	error_cb = ecb;
 
-	/* try a path from the environment first, useful for basedir overrides */
-	bandb_dpath = getenv("BANDB_DPATH");
-
-	if(bandb_dpath != NULL)
-		rb_strlcpy(dbpath, bandb_dpath, sizeof(dbpath));
-	else
-		rb_strlcpy(dbpath, DBPATH, sizeof(dbpath));
-	
 	if(sqlite3_open(dbpath, &rb_bandb) != SQLITE_OK)
 	{
 		rb_snprintf(errbuf, sizeof(errbuf), "Unable to open sqlite database: %s",

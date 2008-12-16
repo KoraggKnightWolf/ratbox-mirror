@@ -22,7 +22,7 @@ struct rsdb_table
 	void *arg;
 };
 
-int rsdb_init(rsdb_error_cb *);
+int rsdb_init(const char *path, rsdb_error_cb *);
 void rsdb_shutdown(void);
 
 const char *rsdb_quote(const char *src);
