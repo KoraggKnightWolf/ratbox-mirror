@@ -205,6 +205,7 @@ add_reject(struct Client *client_p)
 	}
 }
 
+
 int
 check_reject(rb_fde_t *F, struct sockaddr *addr)
 {
@@ -241,7 +242,6 @@ flush_reject(void)
 	rb_dlink_node *ptr, *next;
 	rb_patricia_node_t *pnode;
 	reject_t *rdata;
-
 	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
 	{
 		pnode = ptr->data;
@@ -391,7 +391,7 @@ throttle_add(struct sockaddr *addr)
 {
 	throttle_t *t;
 	rb_patricia_node_t *pnode;
-
+	char sockhost[HOSTIPLEN+1];
 	if((pnode = rb_match_ip(throttle_tree, addr)) != NULL)
 	{
 		t = pnode->data;
@@ -417,6 +417,8 @@ throttle_add(struct sockaddr *addr)
 		pnode = make_and_lookup_ip(throttle_tree, addr, bitlen);
 		pnode->data = t;
 		rb_dlinkAdd(pnode, &t->node, &throttle_list);
+		rb_inet_ntop_sock(addr, sockhost, sizeof(sockhost));		
+		sendto_realops_flags(UMODE_REJ, L_ALL, "Adding throttle for %s", sockhost);
 	}
 	return 0;
 }
