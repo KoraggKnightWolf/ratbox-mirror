@@ -1,3 +1,12 @@
+jilles      2008/12/16 19:27:02 UTC	(20081216_5-26314)
+  Log:
+  Allow clearing kline_reason via a rehash.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2008/12/16 18:27:37 UTC	(20081216_4-26312)
   Log:
   report adding throttles to umode +r
