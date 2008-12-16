@@ -633,6 +633,8 @@ rehash(int sig)
 	int r;
 	int old_global_ipv4_cidr = ConfigFileEntry.global_cidr_ipv4_bitlen;
 	int old_global_ipv6_cidr = ConfigFileEntry.global_cidr_ipv6_bitlen;
+	char *old_bandb_path = LOCAL_COPY(ServerInfo.bandb_path);
+	
 	if(sig != 0)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -670,6 +672,12 @@ rehash(int sig)
 		rb_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
 	else
 		rb_strlcpy(me.info, "unknown", sizeof(me.info));
+		
+	if(ServerInfo.bandb_path == NULL)
+		ServerInfo.bandb_path = rb_strdup(DBPATH);
+
+	if(strcmp(old_bandb_path, ServerInfo.bandb_path))
+		bandb_restart();
 
 	open_logfiles(logFileName);
 	if(old_global_ipv4_cidr != ConfigFileEntry.global_cidr_ipv4_bitlen ||
@@ -712,7 +720,7 @@ set_default_conf(void)
 	ServerInfo.description = NULL;
 	ServerInfo.network_name = rb_strdup(NETWORK_NAME_DEFAULT);
 	ServerInfo.network_desc = rb_strdup(NETWORK_DESC_DEFAULT);
-
+	ServerInfo.bandb_path = NULL;
 	memset(&ServerInfo.ip, 0, sizeof(ServerInfo.ip));
 	ServerInfo.specific_ipv4_vhost = 0;
 
@@ -1158,6 +1166,9 @@ clear_out_old_conf(void)
 	rb_free(ServerInfo.network_desc);
 	ServerInfo.network_desc = NULL;
 
+	rb_free(ServerInfo.bandb_path);
+	ServerInfo.bandb_path = NULL;
+	
 	/* clean out AdminInfo */
 	rb_free(AdminInfo.name);
 	AdminInfo.name = NULL;

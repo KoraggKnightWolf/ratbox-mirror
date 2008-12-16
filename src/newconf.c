@@ -1038,8 +1038,32 @@ conf_set_serverinfo_sid(confentry_t * entry, conf_t * conf, struct conf_items *i
 	}
 }
 
+static void
+conf_set_serverinfo_bandb_path(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	char *path = entry->string;
+	
+	if(access(path, F_OK) == -1)
+	{
+		char *dirname, *d = rb_dirname(path);
+		dirname = LOCAL_COPY(d);
+		rb_free(d);
 
-
+		if(access(dirname, W_OK) == -1)
+		{
+			conf_report_error_nl("Unable to access bandb %s: %s ignoring...", path, rb_strerror(errno));
+			return;
+		}
+	} else {
+		if(access(path, W_OK) == -1)
+		{
+			conf_report_error_nl("Unable to access bandb %s: %s ignoring...", path, rb_strerror(errno));
+			return;
+		}
+	}		
+	rb_free(ServerInfo.bandb_path);
+	ServerInfo.bandb_path = rb_strdup(path);
+}
 
 static struct Class *t_class;
 static void
@@ -2213,6 +2237,7 @@ static struct conf_items conf_serverinfo_table[] =
         { "network_name",       CF_QSTRING, conf_set_serverinfo_network_name,   0, NULL },
         { "name",               CF_QSTRING, conf_set_serverinfo_name,   0, NULL },
         { "sid",                CF_QSTRING, conf_set_serverinfo_sid,    0, NULL },
+        { "bandb",		CF_QSTRING, conf_set_serverinfo_bandb_path,  0, NULL },
         { "vhost",              CF_QSTRING, conf_set_serverinfo_vhost,  0, NULL },
         { "vhost6",             CF_QSTRING, conf_set_serverinfo_vhost6, 0, NULL },
         { "ssl_private_key",    CF_QSTRING, NULL, 0, &ServerInfo.ssl_private_key },
@@ -2463,7 +2488,7 @@ struct top_conf_table_t
 static struct top_conf_table_t top_conf_table[] =
 {
 	{ "modules", 	NULL,			 NULL,			conf_modules_table, 	0},
-	{ "serverinfo",	NULL,			 NULL,			conf_serverinfo_table, 	0},
+	{ "serverinfo",	NULL,			 NULL,			conf_serverinfo_table,	0},
 	{ "admin",	NULL,			 NULL,			conf_admin_table, 	0},
 	{ "log",	NULL,			 NULL,			conf_log_table,		0},
 	{ "general",	NULL,			 NULL,			conf_general_table,	0},

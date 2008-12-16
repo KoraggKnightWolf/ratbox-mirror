@@ -271,6 +271,7 @@ struct server_info
 #ifdef RB_IPV6
 	char *vhost6_dns;
 #endif
+	char *bandb_path;
 };
 
 struct admin_info

@@ -82,7 +82,8 @@ start_bandb(void)
 	const char *suffix = "";
 #endif
 
-	rb_setenv("BANDB_DPATH", ConfigFileEntry.dpath, 1);
+        
+	rb_setenv("BANDB_DPATH", ServerInfo.bandb_path, 1);
 	if(bandb_path == NULL)
 	{
 		rb_snprintf(fullpath, sizeof(fullpath), "%s/bandb%s", LIBEXEC_DIR, suffix);
@@ -446,3 +447,19 @@ bandb_restart_cb(rb_helper *helper)
 	start_bandb();
 	return;
 }
+
+void 
+bandb_restart(void)
+{
+        ilog(L_MAIN, "bandb - restarting bandb with a new path");
+        sendto_realops_flags(UMODE_ALL, L_ALL, "bandb - restarting bandb with a new path");
+        
+        if(bandb_helper != NULL)
+        {
+                rb_helper_close(bandb_helper);
+                bandb_helper = NULL;
+        }
+        start_bandb();
+        bandb_rehash_bans();
+}
+

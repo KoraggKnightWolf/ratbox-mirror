@@ -682,11 +682,13 @@ ratbox_main(int argc, char *argv[])
 	load_core_modules(1);
 #endif
 	init_resolver();	/* Needs to be setup before the io loop */
-	init_bandb();
 	init_ssld();
 
 	load_conf_settings();
+	if(ServerInfo.bandb_path == NULL)
+	        ServerInfo.bandb_path = rb_strdup(DBPATH);
 
+	init_bandb();
 	rehash_bans(0);
 
 #ifndef STATIC_MODULES
