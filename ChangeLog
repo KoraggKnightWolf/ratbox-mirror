@@ -1,3 +1,12 @@
+jilles      2008/12/16 20:10:49 UTC	(20081216_8-26320)
+  Log:
+  Only count throttle entries that cause rejection in /stats t.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2008/12/16 19:40:25 UTC	(20081216_7-26318)
   Log:
   report correct throttle adding info
