@@ -1,3 +1,12 @@
+androsyn    2008/12/16 17:32:08 UTC	(20081216_3-26310)
+  Log:
+  fix passing of ssl related errors when using zip + ssl
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/12/16 15:55:10 UTC	(20081216_2-26308)
   Log:
   tweak bantool to take a path and pass said path to rsdb_sqlite3.c via rsdb_init and update bandb to do this as well
