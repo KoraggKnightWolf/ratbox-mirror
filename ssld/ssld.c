@@ -127,6 +127,7 @@ typedef struct _conn
 #define FLAG_DEAD	0x08
 #define FLAG_SSL_W_WANTS_R 0x10	/* output needs to wait until input possible */
 #define FLAG_SSL_R_WANTS_W 0x20	/* input needs to wait until output possible */
+#define FLAG_ZIPSSL	0x40
 
 #define IsSSL(x) ((x)->flags & FLAG_SSL)
 #define IsZip(x) ((x)->flags & FLAG_ZIP)
@@ -134,6 +135,7 @@ typedef struct _conn
 #define IsDead(x) ((x)->flags & FLAG_DEAD)
 #define IsSSLWWantsR(x) ((x)->flags & FLAG_SSL_W_WANTS_R)
 #define IsSSLRWantsW(x) ((x)->flags & FLAG_SSL_R_WANTS_W)
+#define IsZipSSL(x)	((x)->flags & FLAG_ZIPSSL)
 
 #define SetSSL(x) ((x)->flags |= FLAG_SSL)
 #define SetZip(x) ((x)->flags |= FLAG_ZIP)
@@ -141,6 +143,7 @@ typedef struct _conn
 #define SetDead(x) ((x)->flags |= FLAG_DEAD)
 #define SetSSLWWantsR(x) ((x)->flags |= FLAG_SSL_W_WANTS_R)
 #define SetSSLRWantsW(x) ((x)->flags |= FLAG_SSL_R_WANTS_W)
+#define SetZipSSL(x)	((x)->flags |= FLAG_ZIPSSL)
 
 #define ClearSSL(x) ((x)->flags &= ~FLAG_SSL)
 #define ClearZip(x) ((x)->flags &= ~FLAG_ZIP)
@@ -148,6 +151,7 @@ typedef struct _conn
 #define ClearDead(x) ((x)->flags &= ~FLAG_DEAD)
 #define ClearSSLWWantsR(x) ((x)->flags &= ~FLAG_SSL_W_WANTS_R)
 #define ClearSSLRWantsW(x) ((x)->flags &= ~FLAG_SSL_R_WANTS_W)
+#define ClearZipSSL(x)	((x)->flags &= ~FLAG_ZIPSSL)
 
 #define NO_WAIT 0x0
 #define WAIT_PLAIN 0x1
@@ -262,7 +266,7 @@ close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 	{
 		rb_close(conn->plain_fd);
 
-		if(conn->id >= 0)
+		if(conn->id >= 0 && !IsZipSSL(conn))
 			rb_dlinkDelete(&conn->node, connid_hash(conn->id));
 		rb_dlinkAdd(conn, &conn->node, &dead_list);
 		return;
@@ -750,6 +754,18 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 	mod_cmd_write_queue(ctl, outstat, strlen(outstat) + 1);	/* +1 is so we send the \0 as well */
 }
 
+static void
+change_connid(mod_ctl_t *ctl, mod_ctl_buf_t *ctlb)
+{
+	int32_t id = buf_to_int32(&ctlb->buf[1]);
+	int32_t newid = buf_to_int32(&ctlb->buf[5]);
+	conn_t *conn = conn_find_by_id(id);
+	if(conn->id >= 0)
+		rb_dlinkDelete(&conn->node, connid_hash(conn->id));
+	SetZipSSL(conn);
+	conn->id = newid;
+}
+
 #ifdef HAVE_ZLIB
 static void
 zlib_send_zip_ready(mod_ctl_t * ctl, conn_t * conn)
@@ -949,6 +965,12 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 				process_stats(ctl, ctl_buf);
 				break;
 			}
+		case 'Y':
+			{
+				change_connid(ctl, ctl_buf);
+				break;
+			}
+
 #ifdef HAVE_ZLIB
 		case 'Z':
 			{
@@ -957,7 +979,7 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 				break;
 			}
 #else
-		case 'Y':
+			
 		case 'Z':
 			send_nozlib_support(ctl, ctl_buf);
 			break;
@@ -1079,6 +1101,7 @@ main(int argc, char **argv)
 	pipefd = atoi(s_pipe);
 	ppid = atoi(s_pid);
 	x = 0;
+
 #ifndef _WIN32
 	for(x = 0; x < maxfd; x++)
 	{
@@ -1098,6 +1121,7 @@ main(int argc, char **argv)
 			close(x);
 	}
 #endif
+
 	setup_signals();
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);
