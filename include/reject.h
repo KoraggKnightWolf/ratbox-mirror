@@ -45,6 +45,7 @@ void report_elines(struct Client *);
 unsigned long delay_exit_length(void);
 
 int throttle_add(struct sockaddr *addr);
+unsigned long throttle_size(void);
 
 int inc_global_cidr_count(struct Client *client_p);
 void dec_global_cidr_count(struct Client *client_p);

@@ -385,6 +385,11 @@ report_elines(struct Client *source_p)
 }
 
 
+unsigned long
+throttle_size(void)
+{
+	return rb_dlink_list_length(&throttle_list);
+}
 
 int
 throttle_add(struct sockaddr *addr)
@@ -397,8 +402,10 @@ throttle_add(struct sockaddr *addr)
 		t = pnode->data;
 
 		if(t->count > ConfigFileEntry.throttle_count)
+		{
+			ServerStats.is_thr++;
 			return 1;
-
+		}
 		/* Stop penalizing them after they've been throttled */
 		t->last = rb_current_time();
 		t->count++;

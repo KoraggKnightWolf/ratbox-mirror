@@ -63,6 +63,7 @@ struct ServerStatistics
 	unsigned int is_asuc;	/* successful auth requests */
 	unsigned int is_abad;	/* bad auth requests */
 	unsigned int is_rej;	/* rejected from cache */
+	unsigned int is_thr;	/* number of throttled connections */
 };
 
 /* declared in ircd.c */
