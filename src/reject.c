@@ -388,6 +388,7 @@ report_elines(struct Client *source_p)
 unsigned long
 throttle_size(void)
 {
+	
 	return rb_dlink_list_length(&throttle_list);
 }
 
@@ -403,13 +404,18 @@ throttle_add(struct sockaddr *addr)
 
 		if(t->count > ConfigFileEntry.throttle_count)
 		{
+			if(t->count == ConfigFileEntry.throttle_count + 1)
+			{
+				rb_inet_ntop_sock(addr, sockhost, sizeof(sockhost));		
+				sendto_realops_flags(UMODE_REJ, L_ALL, "Adding throttle for %s", sockhost);
+			}
+			t->count++;
 			ServerStats.is_thr++;
 			return 1;
 		}
 		/* Stop penalizing them after they've been throttled */
 		t->last = rb_current_time();
 		t->count++;
-
 	}
 	else
 	{
@@ -424,8 +430,6 @@ throttle_add(struct sockaddr *addr)
 		pnode = make_and_lookup_ip(throttle_tree, addr, bitlen);
 		pnode->data = t;
 		rb_dlinkAdd(pnode, &t->node, &throttle_list);
-		rb_inet_ntop_sock(addr, sockhost, sizeof(sockhost));		
-		sendto_realops_flags(UMODE_REJ, L_ALL, "Adding throttle for %s", sockhost);
 	}
 	return 0;
 }
