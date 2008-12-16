@@ -1,3 +1,14 @@
+androsyn    2008/12/16 15:55:10 UTC	(20081216_2-26308)
+  Log:
+  tweak bantool to take a path and pass said path to rsdb_sqlite3.c via rsdb_init and update bandb to do this as well
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/bandb/rsdb.h (File Modified) 
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+
+
 androsyn    2008/12/16 03:09:16 UTC	(20081216_1-26306)
   Log:
   add support for a serverinfo::bandb setting
