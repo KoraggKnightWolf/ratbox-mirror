@@ -67,7 +67,7 @@ rsdb_init(rsdb_error_cb * ecb)
 	bandb_dpath = getenv("BANDB_DPATH");
 
 	if(bandb_dpath != NULL)
-		rb_snprintf(dbpath, sizeof(dbpath), "%s/etc/ban.db", bandb_dpath);
+		rb_strlcpy(dbpath, bandb_dpath, sizeof(dbpath));
 	else
 		rb_strlcpy(dbpath, DBPATH, sizeof(dbpath));
 	
