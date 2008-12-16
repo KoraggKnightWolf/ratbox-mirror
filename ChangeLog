@@ -1,3 +1,11 @@
+androsyn    2008/12/16 19:40:25 UTC	(20081216_7-26318)
+  Log:
+  report correct throttle adding info
+
+  Modified:
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2008/12/16 19:28:23 UTC	(20081216_6-26316)
   Log:
   add throttle info to stats T
