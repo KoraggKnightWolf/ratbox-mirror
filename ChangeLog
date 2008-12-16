@@ -1,3 +1,14 @@
+androsyn    2008/12/16 19:28:23 UTC	(20081216_6-26316)
+  Log:
+  add throttle info to stats T
+
+  Modified:
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/include/s_stats.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 jilles      2008/12/16 19:27:02 UTC	(20081216_5-26314)
   Log:
   Allow clearing kline_reason via a rehash.
