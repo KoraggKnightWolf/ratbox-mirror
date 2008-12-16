@@ -1,3 +1,11 @@
+androsyn    2008/12/16 18:27:37 UTC	(20081216_4-26312)
+  Log:
+  report adding throttles to umode +r
+
+  Modified:
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 androsyn    2008/12/16 17:32:08 UTC	(20081216_3-26310)
   Log:
   fix passing of ssl related errors when using zip + ssl
