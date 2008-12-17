@@ -1,3 +1,13 @@
+androsyn    2008/12/17 20:17:16 UTC	(20081217_2-26332)
+  Log:
+  get rid of the zip ready stuff
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2008/12/17 08:41:36 UTC	(20081217_1-26330)
   Log:
   its intended to be corked after SERVER with CAP_ZIP
