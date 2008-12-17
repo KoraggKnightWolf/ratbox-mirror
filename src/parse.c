@@ -360,7 +360,7 @@ handle_command(struct Message *mptr, struct Client *client_p,
 	}
 
 	(*handler) (client_p, from, i, hpara);
-	if(!IsAnyDead(client_p) && IsCork(client_p))
+	if(!IsAnyDead(client_p) && IsCork(client_p) && !IsCapable(client_p, CAP_ZIP))
 	{
 		if(last_warning + 300 <= rb_current_time())
 		{
