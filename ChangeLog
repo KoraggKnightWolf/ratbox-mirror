@@ -1,3 +1,12 @@
+androsyn    2008/12/17 03:08:36 UTC	(20081217_0-26322)
+  Log:
+  update relnotes/patchlevel for 3.0.1
+
+  Modified:
+	ircd-ratbox/trunk/RELNOTES (File Modified) 
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 jilles      2008/12/16 20:10:49 UTC	(20081216_8-26320)
   Log:
   Only count throttle entries that cause rejection in /stats t.
