@@ -1,3 +1,11 @@
+androsyn    2008/12/17 08:41:36 UTC	(20081217_1-26330)
+  Log:
+  its intended to be corked after SERVER with CAP_ZIP
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2008/12/17 03:08:36 UTC	(20081217_0-26322)
   Log:
   update relnotes/patchlevel for 3.0.1
