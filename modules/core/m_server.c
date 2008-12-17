@@ -1371,10 +1371,7 @@ server_estab(struct Client *client_p)
 	/* Always send a PING after connect burst is done */
 	sendto_one(client_p, "PING :%s", get_id(&me, client_p));
 
-	if(!IsCapable(client_p, CAP_ZIP))
-	{
-		ClearCork(client_p);
-		send_pop_queue(client_p);
-	}
+	ClearCork(client_p);
+	send_pop_queue(client_p);
 	return 0;
 }
