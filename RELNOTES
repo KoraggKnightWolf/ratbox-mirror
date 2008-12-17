@@ -10,6 +10,21 @@ If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
 
+-- ircd-ratbox-3.0.1
+- call rb_helper_close on bandb errors to kill off old bandb processes
+- report correct files/line numbers for spoof warnings
+- sid in the serverinfo struct should be 4 bytes, not 3
+- rebuild the included ircd_lexer.c 
+- fix ports and /dev/poll on solaris
+- report libratbox version on -version and /info
+- libratbox version info includes ssl info
+- fix installing when using install-sh
+- reenable ziplinks + ssl
+- fix a gnutls related core dump
+- add support for a serverinfo::bandb setting for the ban database
+- report adding throttles when an oper is set umode +r
+- report throttle stats in /stats T
+
 -- ircd-ratbox-3.0.0
 - fix a crash with the the global cidr code
 - fix a core dump in bantool if bantool cannot open the database
