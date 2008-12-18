@@ -1,3 +1,11 @@
+androsyn    2008/12/18 16:53:13 UTC	(20081218_1-26343)
+  Log:
+  fix Warning: Warning type messages
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2008/12/18 05:35:21 UTC	(20081218_0-26341)
   Log:
   remove the #define __EXTENSIONS__ here as autoconf should does this
