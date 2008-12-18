@@ -306,7 +306,7 @@ set_modes_from_table(int *modes, const char *whatis, struct mode_table *tab, con
 		mode = find_umode(tab, umode);
 		if(mode == -1)
 		{
-			conf_report_warning_nl("Warning -- unknown flag %s %s", whatis,
+			conf_report_warning_nl("Unknown flag %s %s", whatis,
 					       sub->string);
 			continue;
 		}
@@ -984,7 +984,7 @@ conf_set_serverinfo_vhost6(confentry_t * entry, conf_t * conf, struct conf_items
 	ServerInfo.ip6.sin6_family = AF_INET6;
 #else
 	conf_report_warning_nl
-		("Warning -- ignoring serverinfo::vhost6 -- IPv6 support not available.");
+		("Ignoring serverinfo::vhost6 -- IPv6 support not available.");
 #endif
 }
 
@@ -995,7 +995,7 @@ conf_set_serverinfo_vhost_dns(confentry_t * entry, conf_t * conf, struct conf_it
 	if(rb_inet_pton(AF_INET, (char *)entry->string, &addr) <= 0)
 	{
 		conf_report_warning_nl
-			("Warning -- ignoring serverinfo::vhost_dns -- Invalid vhost (%s)",
+			("Ignoring serverinfo::vhost_dns -- Invalid vhost (%s)",
 			 entry->string);
 		return;
 	}
@@ -1011,7 +1011,7 @@ conf_set_serverinfo_vhost6_dns(confentry_t * entry, conf_t * conf, struct conf_i
 	if(rb_inet_pton(AF_INET6, (char *)entry->string, &addr) <= 0)
 	{
 		conf_report_warning_nl
-			("Warning -- ignoring serverinfo::vhost6_dns -- Invalid vhost (%s)",
+			("Ignoring serverinfo::vhost6_dns -- Invalid vhost (%s)",
 			 entry->string);
 		return;
 	}
@@ -1505,7 +1505,7 @@ conf_set_oper_rsa_public_key_file(confentry_t * entry, conf_t * conf, struct con
 	t_oper->rsa_pubkey_file = rb_strdup(entry->string);
 #else
 	conf_report_warning_nl
-		("Warning -- ignoring rsa_public_key_file (OpenSSL support not available)");
+		("Ignoring rsa_public_key_file (OpenSSL support not available)");
 #endif
 }
 
