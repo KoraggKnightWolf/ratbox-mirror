@@ -890,10 +890,11 @@ mo_info(struct Client *client_p, struct Client *source_p, int parc, const char *
 		SetCork(source_p);
 		send_info_text(source_p);
 
-		if(IsOper(source_p)) {
+		if(IsOper(source_p))
+		{
 			send_conf_options(source_p);
-                        sendto_one(source_p, ":%s %d %s :%s",  
-                                   get_id(&me, source_p), RPL_INFO, get_id(source_p, source_p), rb_lib_version());                                                 
+			sendto_one_numeric(source_p, RPL_INFO, ":%s",
+					rb_lib_version());
                 }
 		send_birthdate_online_time(source_p);
 		ClearCork(source_p);
