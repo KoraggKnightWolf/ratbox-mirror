@@ -1,3 +1,11 @@
+androsyn    2008/12/22 21:17:33 UTC	(20081222_1-26355)
+  Log:
+  get rid if unused version stuff that included libratbox info
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_version.c (File Modified) 
+
+
 androsyn    2008/12/22 00:03:34 UTC	(20081222_0-26349)
   Log:
   change instances of mkpasswd to ratbox-mkpasswd
