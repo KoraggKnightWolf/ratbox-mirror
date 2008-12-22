@@ -59,7 +59,7 @@ static int
 m_version(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	static time_t last_used = 0L;
-	char version[64];
+
 	if(parc > 1)
 	{
 		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
@@ -75,7 +75,6 @@ m_version(struct Client *client_p, struct Client *source_p, int parc, const char
 		if(hunt_server(client_p, source_p, ":%s VERSION :%s", 1, parc, parv) != HUNTED_ISME)
 			return 0;
 	}
-	rb_snprintf(version, sizeof(version), "%s+%s", ircd_version, rb_lib_version());
 	sendto_one_numeric(source_p, RPL_VERSION, form_str(RPL_VERSION),
 			   ircd_version, serno, me.name, confopts(), TS_CURRENT, ServerInfo.sid);
 
