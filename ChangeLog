@@ -1,3 +1,12 @@
+androsyn    2008/12/22 00:03:34 UTC	(20081222_0-26349)
+  Log:
+  change instances of mkpasswd to ratbox-mkpasswd
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 androsyn    2008/12/18 16:53:13 UTC	(20081218_1-26343)
   Log:
   fix Warning: Warning type messages
