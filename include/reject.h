@@ -32,6 +32,7 @@
 void init_reject(void);
 int check_reject(rb_fde_t *F, struct sockaddr *addr);
 void add_reject(struct Client *);
+int is_reject_ip(struct sockaddr *addr);
 void flush_reject(void);
 int remove_reject(const char *ip);
 struct ConfItem *find_dline(struct sockaddr *addr);
@@ -45,6 +46,7 @@ void report_elines(struct Client *);
 unsigned long delay_exit_length(void);
 
 int throttle_add(struct sockaddr *addr);
+int is_throttle_ip(struct sockaddr *addr);
 unsigned long throttle_size(void);
 
 int inc_global_cidr_count(struct Client *client_p);
