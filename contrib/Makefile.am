@@ -20,6 +20,7 @@ m_ojoin.c       \
 m_okick.c       \
 m_olist.c       \
 m_opme.c        \
+m_webirc.c      \
 spy_admin_notice.c      \
 spy_info_notice.c       \
 spy_links_notice.c      \
