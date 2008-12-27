@@ -1,3 +1,13 @@
+jilles      2008/12/27 22:41:32 UTC	(20081227_0-26365)
+  Log:
+  Add m_webirc.c to contrib/Makefile.am.
+  Autotools need to be rerun.
+  
+
+  Modified:
+	ircd-ratbox/trunk/contrib/Makefile.am (File Modified) 
+
+
 jilles      2008/12/23 23:52:17 UTC	(20081223_1-26363)
   Log:
   Show rejectcache/throttle in /testline output.
