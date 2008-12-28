@@ -1,3 +1,12 @@
+jilles      2008/12/28 19:21:23 UTC	(20081228_1-26369)
+  Log:
+  Allow opers and shide_exempt users to see hopcounts even if flatten_links is on.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_who.c (File Modified) 
+
+
 jilles      2008/12/28 17:48:44 UTC	(20081228_0-26367)
   Log:
   Remove redundant check.
