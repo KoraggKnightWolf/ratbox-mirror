@@ -1,3 +1,13 @@
+jilles      2008/12/28 17:48:44 UTC	(20081228_0-26367)
+  Log:
+  Remove redundant check.
+  Surely, if source_p == target_p, then target_p->from == source_p->from.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 jilles      2008/12/27 22:41:32 UTC	(20081227_0-26365)
   Log:
   Add m_webirc.c to contrib/Makefile.am.
