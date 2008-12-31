@@ -83,7 +83,7 @@ static void stats_p_spy(struct Client *);
 struct StatsStruct
 {
 	char letter;
-	void (*handler) ();
+	void (*handler) (struct Client *source_p);
 	int need_oper;
 	int need_admin;
 };
@@ -147,8 +147,8 @@ static struct StatsStruct stats_cmd_table[] = {
 	{'I', stats_auth, 0, 0,},
 	{'k', stats_tklines, 0, 0,},
 	{'K', stats_klines, 0, 0,},
-	{'l', stats_ltrace, 0, 0,},
-	{'L', stats_ltrace, 0, 0,},
+	{'l', NULL /* special */, 0, 0,},
+	{'L', NULL /* special */, 0, 0,},
 	{'m', stats_messages, 0, 0,},
 	{'M', stats_messages, 0, 0,},
 	{'o', stats_oper, 0, 0,},
@@ -215,7 +215,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if((statchar != 'L') && (statchar != 'l'))
 		stats_spy(source_p, statchar, NULL);
 
-	for(i = 0; stats_cmd_table[i].handler; i++)
+	for(i = 0; stats_cmd_table[i].letter; i++)
 	{
 		if(stats_cmd_table[i].letter == statchar)
 		{
@@ -233,7 +233,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 			SetCork(source_p);
 			/* Blah, stats L needs the parameters, none of the others do.. */
 			if(statchar == 'L' || statchar == 'l')
-				stats_cmd_table[i].handler(source_p, parc, parv);
+				stats_ltrace(source_p, parc, parv);
 			else
 				stats_cmd_table[i].handler(source_p);
 			ClearCork(source_p);
