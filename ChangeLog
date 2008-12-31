@@ -1,3 +1,14 @@
+jilles      2008/12/31 21:48:13 UTC	(20081231_0-26371)
+  Log:
+  m_stats: get rid of function pointers with unspecified parameter lists
+  stats l/L is now more a special case than before
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 jilles      2008/12/28 19:21:23 UTC	(20081228_1-26369)
   Log:
   Allow opers and shide_exempt users to see hopcounts even if flatten_links is on.
