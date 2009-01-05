@@ -58,9 +58,9 @@ struct Message cnotice_msgtab = {
 	{mg_ignore, {m_cnotice, 4}, mg_ignore, mg_ignore, mg_ignore, {m_cnotice, 4}}
 };
 
-mapi_clist_av1 cmessage_clist[] = { &cprivmsg_msgtab, &cnotice_msgtab, NULL };
+mapi_clist_av2 cmessage_clist[] = { &cprivmsg_msgtab, &cnotice_msgtab, NULL };
 
-DECLARE_MODULE_AV1(cmessage, NULL, NULL, cmessage_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(cmessage, NULL, NULL, cmessage_clist, NULL, NULL, "$Revision$");
 
 #define PRIVMSG 0
 #define NOTICE 1

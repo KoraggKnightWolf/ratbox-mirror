@@ -52,9 +52,9 @@ struct Message cap_msgtab = {
 	{{m_cap, 2}, {m_cap, 2}, mg_ignore, mg_ignore, mg_ignore, {m_cap, 2}}
 };
 
-mapi_clist_av1 cap_clist[] = { &cap_msgtab, NULL };
+mapi_clist_av2 cap_clist[] = { &cap_msgtab, NULL };
 
-DECLARE_MODULE_AV1(cap, modinit, NULL, cap_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(cap, modinit, NULL, cap_clist, NULL, NULL, "$Revision$");
 
 #define _CLICAP(name, capserv, capclient, flags)	\
 	{ (name), (capserv), (capclient), (flags), sizeof(name) - 1 }

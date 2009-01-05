@@ -91,31 +91,31 @@ struct Message test_msgtab = {
  */
 
 
-/* The mapi_clist_av1 indicates which commands (struct Message)
+/* The mapi_clist_av2 indicates which commands (struct Message)
  * should be loaded from the module. The list should be terminated
  * by a NULL.
  */
-mapi_clist_av1 test_clist[] = { &test_msgtab, NULL };
+mapi_clist_av2 test_clist[] = { &test_msgtab, NULL };
 
-/* The mapi_hlist_av1 indicates which hook functions we need to be able to
+/* The mapi_hlist_av2 indicates which hook functions we need to be able to
  * call.  We need to declare an integer, then add the name of the hook
  * function to call and a pointer to this integer.  The list should be
  * terminated with NULLs.
  */
 int doing_example_hook;
-mapi_hlist_av1 test_hlist[] = {
+mapi_hlist_av2 test_hlist[] = {
 	{"doing_example_hook", &doing_example_hook,},
 	{NULL, NULL}
 };
 
-/* The mapi_hfn_list_av1 declares the hook functions which other modules can
+/* The mapi_hfn_list_av2 declares the hook functions which other modules can
  * call.  The first parameter is the name of the hook, the second is a void
  * returning function, with arbitrary parameters casted to (hookfn).  This
  * list must be terminated with NULLs.
  */
 static void show_example_hook(void *unused);
 
-mapi_hfn_list_av1 test_hfnlist[] = {
+mapi_hfn_list_av2 test_hfnlist[] = {
 	{"doing_example_hook", (hookfn) show_example_hook},
 	{NULL, NULL}
 };
@@ -138,8 +138,8 @@ moddeinit(void)
 	/* Again, nothing to do. */
 }
 
-/* DECLARE_MODULE_AV1() actually declare the MAPI header. */
-DECLARE_MODULE_AV1(
+/* DECLARE_MODULE_AV2() actually declare the MAPI header. */
+DECLARE_MODULE_AV2(
 			  /* The first argument is the name */
 			  example,
 			  /* The second argument is the function to call on load */

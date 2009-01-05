@@ -51,14 +51,14 @@ struct Message admin_msgtab = {
 
 int doing_admin_hook;
 
-mapi_clist_av1 admin_clist[] = { &admin_msgtab, NULL };
+mapi_clist_av2 admin_clist[] = { &admin_msgtab, NULL };
 
-mapi_hlist_av1 admin_hlist[] = {
+mapi_hlist_av2 admin_hlist[] = {
 	{"doing_admin", &doing_admin_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(admin, NULL, NULL, admin_clist, admin_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV2(admin, NULL, NULL, admin_clist, admin_hlist, NULL, "$Revision$");
 
 /*
  * mr_admin - ADMIN command handler

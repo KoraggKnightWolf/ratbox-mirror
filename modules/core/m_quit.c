@@ -42,9 +42,9 @@ struct Message quit_msgtab = {
 	{{mr_quit, 0}, {m_quit, 0}, {ms_quit, 0}, mg_ignore, mg_ignore, {m_quit, 0}}
 };
 
-mapi_clist_av1 quit_clist[] = { &quit_msgtab, NULL };
+mapi_clist_av2 quit_clist[] = { &quit_msgtab, NULL };
 
-DECLARE_MODULE_AV1(quit, NULL, NULL, quit_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(quit, NULL, NULL, quit_clist, NULL, NULL, "$Revision$");
 
 
 static int

@@ -68,9 +68,9 @@ struct Message notice_msgtab = {
 	{mg_unreg, {m_notice, 0}, {m_notice, 0}, {m_notice, 0}, mg_ignore, {m_notice, 0}}
 };
 
-mapi_clist_av1 message_clist[] = { &privmsg_msgtab, &notice_msgtab, NULL };
+mapi_clist_av2 message_clist[] = { &privmsg_msgtab, &notice_msgtab, NULL };
 
-DECLARE_MODULE_AV1(message, modinit, moddeinit, message_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(message, modinit, moddeinit, message_clist, NULL, NULL, "$Revision$");
 
 struct entity
 {

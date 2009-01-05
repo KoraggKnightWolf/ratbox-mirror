@@ -46,9 +46,9 @@ struct Message squit_msgtab = {
 	{mg_unreg, mg_not_oper, {ms_squit, 0}, {ms_squit, 0}, mg_ignore, {mo_squit, 2}}
 };
 
-mapi_clist_av1 squit_clist[] = { &squit_msgtab, NULL };
+mapi_clist_av2 squit_clist[] = { &squit_msgtab, NULL };
 
-DECLARE_MODULE_AV1(squit, NULL, NULL, squit_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(squit, NULL, NULL, squit_clist, NULL, NULL, "$Revision$");
 
 struct squit_parms
 {

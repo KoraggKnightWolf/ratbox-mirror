@@ -554,7 +554,7 @@ unload_one_module(const char *name, int warn)
 	{
 	case 1:
 		{
-			struct mapi_mheader_av1 *mheader = modlist[modindex]->mapi_header;
+			struct mapi_mheader_av2 *mheader = modlist[modindex]->mapi_header;
 			if(mheader->mapi_command_list)
 			{
 				struct Message **m;
@@ -567,7 +567,7 @@ unload_one_module(const char *name, int warn)
 			 */
 			if(mheader->mapi_hfn_list)
 			{
-				mapi_hfn_list_av1 *m;
+				mapi_hfn_list_av2 *m;
 				for(m = mheader->mapi_hfn_list; m->hapi_name; ++m)
 					remove_hook(m->hapi_name, m->hookfn);
 			}
@@ -664,9 +664,9 @@ load_a_module(const char *path, int warn, int core)
 
 	switch (MAPI_VERSION(*mapi_version))
 	{
-	case 1:
+	case 2:
 		{
-			struct mapi_mheader_av1 *mheader = mapi_base;	/* see above */
+			struct mapi_mheader_av2 *mheader = mapi_base;	/* see above */
 			if(mheader->mapi_register && (mheader->mapi_register() == -1))
 			{
 				ilog(L_MAIN, "Module %s indicated failure during load.",
@@ -678,6 +678,12 @@ load_a_module(const char *path, int warn, int core)
 				rb_free(mod_basename);
 				return -1;
 			}
+			
+			if(mheader->patchlevel != PATCHLEVEL_NUM)
+			{
+				ilog(L_MAIN, "Warning: patchlevel mismatch for module: %s, module patchlevel %s(%x) ircd %s(%x)", 
+					path, mheader->patchlevel_string, mheader->patchlevel, PATCHLEVEL, PATCHLEVEL_NUM);
+			}
 			if(mheader->mapi_command_list)
 			{
 				struct Message **m;
@@ -687,14 +693,14 @@ load_a_module(const char *path, int warn, int core)
 
 			if(mheader->mapi_hook_list)
 			{
-				mapi_hlist_av1 *m;
+				mapi_hlist_av2 *m;
 				for(m = mheader->mapi_hook_list; m->hapi_name; ++m)
 					*m->hapi_id = register_hook(m->hapi_name);
 			}
 
 			if(mheader->mapi_hfn_list)
 			{
-				mapi_hfn_list_av1 *m;
+				mapi_hfn_list_av2 *m;
 				for(m = mheader->mapi_hfn_list; m->hapi_name; ++m)
 					add_hook(m->hapi_name, m->hookfn);
 			}
@@ -760,7 +766,7 @@ increase_modlist(void)
 
 
 #ifdef STATIC_MODULES
-extern const struct mapi_header_av1 *static_mapi_headers[];
+extern const struct mapi_header_av2 *static_mapi_headers[];
 void
 load_static_modules(void)
 {
@@ -780,8 +786,13 @@ load_static_modules(void)
 		{
 		case 1:
 			{
-				const struct mapi_mheader_av1 *mheader =
-					(const struct mapi_mheader_av1 *)mapi_version;
+				ilog(L_MAIN, "Error: MAPI V1 modules are no longer supportered");
+				exit(70);
+			}
+		case 2:
+			{
+				const struct mapi_mheader_av2 *mheader =
+					(const struct mapi_mheader_av2 *)mapi_version;
 				if(mheader->mapi_register && (mheader->mapi_register() == -1))
 				{
 					ilog(L_MAIN,
@@ -798,14 +809,14 @@ load_static_modules(void)
 
 				if(mheader->mapi_hook_list)
 				{
-					mapi_hlist_av1 *m;
+					mapi_hlist_av2 *m;
 					for(m = mheader->mapi_hook_list; m->hapi_name; ++m)
 						*m->hapi_id = register_hook(m->hapi_name);
 				}
 
 				if(mheader->mapi_hfn_list)
 				{
-					mapi_hfn_list_av1 *m;
+					mapi_hfn_list_av2 *m;
 					for(m = mheader->mapi_hfn_list; m->hapi_name; ++m)
 						add_hook(m->hapi_name, m->hookfn);
 

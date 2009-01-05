@@ -45,9 +45,9 @@ struct Message mkpasswd_msgtab = {
 	{mg_unreg, {m_mkpasswd, 2}, mg_ignore, mg_ignore, mg_ignore, {mo_mkpasswd, 2}}
 };
 
-mapi_clist_av1 mkpasswd_clist[] = { &mkpasswd_msgtab, NULL };
+mapi_clist_av2 mkpasswd_clist[] = { &mkpasswd_msgtab, NULL };
 
-DECLARE_MODULE_AV1(mkpasswd, NULL, NULL, mkpasswd_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(mkpasswd, NULL, NULL, mkpasswd_clist, NULL, NULL, "$Revision$");
 
 
 static int

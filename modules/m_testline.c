@@ -58,9 +58,9 @@ struct Message testgecos_msgtab = {
 	{mg_unreg, mg_ignore, mg_ignore, mg_ignore, mg_ignore, {mo_testgecos, 2}}
 };
 
-mapi_clist_av1 testline_clist[] = { &testline_msgtab, &testgecos_msgtab, NULL };
+mapi_clist_av2 testline_clist[] = { &testline_msgtab, &testgecos_msgtab, NULL };
 
-DECLARE_MODULE_AV1(testline, NULL, NULL, testline_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(testline, NULL, NULL, testline_clist, NULL, NULL, "$Revision$");
 
 static int
 mo_testline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])

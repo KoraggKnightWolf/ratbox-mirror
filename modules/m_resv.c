@@ -62,9 +62,9 @@ struct Message unresv_msgtab = {
 	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_unresv, 2}, {mo_unresv, 2}}
 };
 
-mapi_clist_av1 resv_clist[] = { &resv_msgtab, &adminresv_msgtab, &unresv_msgtab, NULL };
+mapi_clist_av2 resv_clist[] = { &resv_msgtab, &adminresv_msgtab, &unresv_msgtab, NULL };
 
-DECLARE_MODULE_AV1(resv, NULL, NULL, resv_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(resv, NULL, NULL, resv_clist, NULL, NULL, "$Revision$");
 
 static void parse_resv(struct Client *source_p, const char *name,
 		       const char *reason, int temp_time, int perm);

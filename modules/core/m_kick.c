@@ -45,9 +45,9 @@ struct Message kick_msgtab = {
 	{mg_unreg, mg_kick, mg_kick, mg_kick, mg_ignore, mg_kick}
 };
 
-mapi_clist_av1 kick_clist[] = { &kick_msgtab, NULL };
+mapi_clist_av2 kick_clist[] = { &kick_msgtab, NULL };
 
-DECLARE_MODULE_AV1(kick, NULL, NULL, kick_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(kick, NULL, NULL, kick_clist, NULL, NULL, "$Revision$");
 
 /*
 ** m_kick

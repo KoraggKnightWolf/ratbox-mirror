@@ -45,9 +45,9 @@ struct Message operspy_msgtab = {
 	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {ms_operspy, 2}, mg_ignore}
 };
 
-mapi_clist_av1 operspy_clist[] = { &operspy_msgtab, NULL };
+mapi_clist_av2 operspy_clist[] = { &operspy_msgtab, NULL };
 
-DECLARE_MODULE_AV1(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision$");
 
 /* ms_operspy()
  *

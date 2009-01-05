@@ -103,14 +103,14 @@ foreach my $sname (@services) {
 	print FILE "};\n";
 };
 
-print FILE "mapi_clist_av1 rsshortcut_clist[] = {\n";
+print FILE "mapi_clist_av2 rsshortcut_clist[] = {\n";
 
 foreach my $sname (@services) {
 	print FILE "\t\&" . $sname . "_msgtab,\n";
 }
 
 print FILE "\tNULL\n};\n\n";
-print FILE "DECLARE_MODULE_AV1(rsshortcut, NULL, NULL, rsshortcut_clist, NULL, NULL, \"1.0\");\n\n";
+print FILE "DECLARE_MODULE_AV2(rsshortcut, NULL, NULL, rsshortcut_clist, NULL, NULL, \"1.0\");\n\n";
 
 foreach my $sname (@services) {
 	print FILE << ".EOF.";

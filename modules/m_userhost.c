@@ -43,9 +43,9 @@ struct Message userhost_msgtab = {
 	{mg_unreg, {m_userhost, 2}, mg_ignore, mg_ignore, mg_ignore, {m_userhost, 2}}
 };
 
-mapi_clist_av1 userhost_clist[] = { &userhost_msgtab, NULL };
+mapi_clist_av2 userhost_clist[] = { &userhost_msgtab, NULL };
 
-DECLARE_MODULE_AV1(userhost, NULL, NULL, userhost_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(userhost, NULL, NULL, userhost_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_userhost added by Darren Reed 13/8/91 to aid clients and reduce

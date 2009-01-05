@@ -78,9 +78,9 @@ struct Message save_msgtab = {
 	{mg_ignore, mg_ignore, mg_ignore, {ms_save, 3}, mg_ignore, mg_ignore}
 };
 
-mapi_clist_av1 nick_clist[] = { &nick_msgtab, &uid_msgtab, &save_msgtab, NULL };
+mapi_clist_av2 nick_clist[] = { &nick_msgtab, &uid_msgtab, &save_msgtab, NULL };
 
-DECLARE_MODULE_AV1(nick, NULL, NULL, nick_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(nick, NULL, NULL, nick_clist, NULL, NULL, "$Revision$");
 
 static int change_remote_nick(struct Client *, struct Client *, time_t, const char *, int);
 

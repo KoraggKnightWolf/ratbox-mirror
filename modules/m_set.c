@@ -47,9 +47,9 @@ struct Message set_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_set, 0}}
 };
 
-mapi_clist_av1 set_clist[] = { &set_msgtab, NULL };
+mapi_clist_av2 set_clist[] = { &set_msgtab, NULL };
 
-DECLARE_MODULE_AV1(set, NULL, NULL, set_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(set, NULL, NULL, set_clist, NULL, NULL, "$Revision$");
 
 /* Structure used for the SET table itself */
 struct SetStruct

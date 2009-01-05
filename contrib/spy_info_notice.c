@@ -32,12 +32,12 @@
 
 void show_info(hook_data *);
 
-mapi_hfn_list_av1 info_hfnlist[] = {
+mapi_hfn_list_av2 info_hfnlist[] = {
 	{"doing_info", (hookfn) show_info},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(info_spy, NULL, NULL, NULL, NULL, info_hfnlist, "$Revision$");
+DECLARE_MODULE_AV2(info_spy, NULL, NULL, NULL, NULL, info_hfnlist, "$Revision$");
 
 void
 show_info(hook_data * data)

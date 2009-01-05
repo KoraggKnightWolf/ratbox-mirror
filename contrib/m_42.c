@@ -32,10 +32,10 @@ struct Message kilroy_msgtab = {
 };
 
 
-mapi_clist_av1 hgtg_clist[] = { &hgtg_msgtab, &kilroy_msgtab, NULL };
+mapi_clist_av2 hgtg_clist[] = { &hgtg_msgtab, &kilroy_msgtab, NULL };
 
 
-DECLARE_MODULE_AV1(42, NULL, NULL, hgtg_clist, NULL, NULL, "Revision 0.42");
+DECLARE_MODULE_AV2(42, NULL, NULL, hgtg_clist, NULL, NULL, "Revision 0.42");
 
 
 static int

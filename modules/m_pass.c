@@ -42,9 +42,9 @@ struct Message pass_msgtab = {
 	{{mr_pass, 2}, mg_reg, mg_ignore, mg_ignore, mg_ignore, mg_reg}
 };
 
-mapi_clist_av1 pass_clist[] = { &pass_msgtab, NULL };
+mapi_clist_av2 pass_clist[] = { &pass_msgtab, NULL };
 
-DECLARE_MODULE_AV1(pass, NULL, NULL, pass_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(pass, NULL, NULL, pass_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_pass() - Added Sat, 4 March 1989

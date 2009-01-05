@@ -44,9 +44,9 @@ struct Message knock_msgtab = {
 	{mg_unreg, {m_knock, 2}, {m_knock, 2}, mg_ignore, mg_ignore, {m_knock, 2}}
 };
 
-mapi_clist_av1 knock_clist[] = { &knock_msgtab, NULL };
+mapi_clist_av2 knock_clist[] = { &knock_msgtab, NULL };
 
-DECLARE_MODULE_AV1(knock, NULL, NULL, knock_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(knock, NULL, NULL, knock_clist, NULL, NULL, "$Revision$");
 
 /* m_knock
  *    parv[0] = sender prefix

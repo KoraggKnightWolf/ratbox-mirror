@@ -32,12 +32,12 @@
 
 void show_whois(hook_data_client *);
 
-mapi_hfn_list_av1 whois_hfnlist[] = {
+mapi_hfn_list_av2 whois_hfnlist[] = {
 	{"doing_whois", (hookfn) show_whois},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(whois_spy, NULL, NULL, NULL, NULL, whois_hfnlist, "$Revision$");
+DECLARE_MODULE_AV2(whois_spy, NULL, NULL, NULL, NULL, whois_hfnlist, "$Revision$");
 
 void
 show_whois(hook_data_client * data)

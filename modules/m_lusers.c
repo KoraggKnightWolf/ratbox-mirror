@@ -49,9 +49,9 @@ struct Message users_msgtab = {
 	{mg_unreg, {m_users, 0}, {m_users, 0}, mg_ignore, mg_ignore, {m_users, 0}}
 };
 
-mapi_clist_av1 lusers_clist[] = { &lusers_msgtab, &users_msgtab, NULL };
+mapi_clist_av2 lusers_clist[] = { &lusers_msgtab, &users_msgtab, NULL };
 
-DECLARE_MODULE_AV1(lusers, NULL, NULL, lusers_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(lusers, NULL, NULL, lusers_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_lusers - LUSERS message handler

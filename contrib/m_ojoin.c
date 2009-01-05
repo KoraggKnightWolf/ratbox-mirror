@@ -45,9 +45,9 @@ struct Message ojoin_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_ojoin, 2}}
 };
 
-mapi_clist_av1 ojoin_clist[] = { &ojoin_msgtab, NULL };
+mapi_clist_av2 ojoin_clist[] = { &ojoin_msgtab, NULL };
 
-DECLARE_MODULE_AV1(ojoin, NULL, NULL, ojoin_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(ojoin, NULL, NULL, ojoin_clist, NULL, NULL, "$Revision$");
 
 /*
 ** mo_ojoin

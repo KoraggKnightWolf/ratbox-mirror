@@ -44,9 +44,9 @@ struct Message topic_msgtab = {
 	{mg_unreg, {m_topic, 2}, {m_topic, 2}, mg_ignore, mg_ignore, {m_topic, 2}}
 };
 
-mapi_clist_av1 topic_clist[] = { &topic_msgtab, NULL };
+mapi_clist_av2 topic_clist[] = { &topic_msgtab, NULL };
 
-DECLARE_MODULE_AV1(topic, NULL, NULL, topic_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(topic, NULL, NULL, topic_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_topic

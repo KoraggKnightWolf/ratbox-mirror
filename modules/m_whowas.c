@@ -44,9 +44,9 @@ struct Message whowas_msgtab = {
 	{mg_unreg, {m_whowas, 2}, mg_ignore, mg_ignore, mg_ignore, {m_whowas, 2}}
 };
 
-mapi_clist_av1 whowas_clist[] = { &whowas_msgtab, NULL };
+mapi_clist_av2 whowas_clist[] = { &whowas_msgtab, NULL };
 
-DECLARE_MODULE_AV1(whowas, NULL, NULL, whowas_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(whowas, NULL, NULL, whowas_clist, NULL, NULL, "$Revision$");
 
 /*
 ** m_whowas

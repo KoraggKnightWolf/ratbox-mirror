@@ -62,9 +62,9 @@ struct Message unkline_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unkline, 3}, {mo_unkline, 2}}
 };
 
-mapi_clist_av1 kline_clist[] = { &kline_msgtab, &unkline_msgtab, &adminkline_msgtab, NULL };
+mapi_clist_av2 kline_clist[] = { &kline_msgtab, &unkline_msgtab, &adminkline_msgtab, NULL };
 
-DECLARE_MODULE_AV1(kline, NULL, NULL, kline_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(kline, NULL, NULL, kline_clist, NULL, NULL, "$Revision$");
 
 /* Local function prototypes */
 static int find_user_host(struct Client *source_p, const char *userhost, char *user, char *host);

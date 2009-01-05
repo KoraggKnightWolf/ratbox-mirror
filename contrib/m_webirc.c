@@ -64,9 +64,9 @@ struct Message webirc_msgtab = {
 	{{mr_webirc, 5}, mg_reg, mg_ignore, mg_ignore, mg_ignore, mg_reg}
 };
 
-mapi_clist_av1 webirc_clist[] = { &webirc_msgtab, NULL };
+mapi_clist_av2 webirc_clist[] = { &webirc_msgtab, NULL };
 
-DECLARE_MODULE_AV1(webirc, NULL, NULL, webirc_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(webirc, NULL, NULL, webirc_clist, NULL, NULL, "$Revision$");
 
 /*
  * mr_webirc - webirc message handler

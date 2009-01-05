@@ -61,9 +61,9 @@ struct Message test_msgtab = {
 };
 
 
-mapi_clist_av1 test_clist[] = { &test_msgtab, NULL };
+mapi_clist_av2 test_clist[] = { &test_msgtab, NULL };
 
-DECLARE_MODULE_AV1(test, NULL, NULL, test_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(test, NULL, NULL, test_clist, NULL, NULL, "$Revision$");
 
 
 /* FLAGS requires it's own mini parser, since the last parameter in it can

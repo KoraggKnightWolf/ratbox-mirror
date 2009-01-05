@@ -57,15 +57,15 @@ struct Message whois_msgtab = {
 int doing_whois_hook;
 int doing_whois_global_hook;
 
-mapi_clist_av1 whois_clist[] = { &whois_msgtab, NULL };
+mapi_clist_av2 whois_clist[] = { &whois_msgtab, NULL };
 
-mapi_hlist_av1 whois_hlist[] = {
+mapi_hlist_av2 whois_hlist[] = {
 	{"doing_whois", &doing_whois_hook},
 	{"doing_whois_global", &doing_whois_global_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(whois, NULL, NULL, whois_clist, whois_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV2(whois, NULL, NULL, whois_clist, whois_hlist, NULL, "$Revision$");
 
 /*
  * m_whois

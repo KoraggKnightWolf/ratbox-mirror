@@ -41,9 +41,9 @@ struct Message time_msgtab = {
 	{mg_unreg, {m_time, 0}, {m_time, 2}, mg_ignore, mg_ignore, {m_time, 0}}
 };
 
-mapi_clist_av1 time_clist[] = { &time_msgtab, NULL };
+mapi_clist_av2 time_clist[] = { &time_msgtab, NULL };
 
-DECLARE_MODULE_AV1(time, NULL, NULL, time_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(time, NULL, NULL, time_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_time

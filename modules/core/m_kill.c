@@ -51,9 +51,9 @@ struct Message kill_msgtab = {
 	{mg_unreg, mg_not_oper, {ms_kill, 2}, {ms_kill, 2}, mg_ignore, {mo_kill, 2}}
 };
 
-mapi_clist_av1 kill_clist[] = { &kill_msgtab, NULL };
+mapi_clist_av2 kill_clist[] = { &kill_msgtab, NULL };
 
-DECLARE_MODULE_AV1(kill, NULL, NULL, kill_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(kill, NULL, NULL, kill_clist, NULL, NULL, "$Revision$");
 
 /*
 ** mo_kill

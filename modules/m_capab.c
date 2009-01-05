@@ -45,9 +45,9 @@ struct Message gcap_msgtab = {
 	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_gcap, 2}, mg_ignore}
 };
 
-mapi_clist_av1 capab_clist[] = { &capab_msgtab, &gcap_msgtab, NULL };
+mapi_clist_av2 capab_clist[] = { &capab_msgtab, &gcap_msgtab, NULL };
 
-DECLARE_MODULE_AV1(capab, NULL, NULL, capab_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(capab, NULL, NULL, capab_clist, NULL, NULL, "$Revision$");
 
 /*
  * mr_capab - CAPAB message handler

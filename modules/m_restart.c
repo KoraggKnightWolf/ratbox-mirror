@@ -44,9 +44,9 @@ struct Message restart_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_restart, 0}}
 };
 
-mapi_clist_av1 restart_clist[] = { &restart_msgtab, NULL };
+mapi_clist_av2 restart_clist[] = { &restart_msgtab, NULL };
 
-DECLARE_MODULE_AV1(restart, NULL, NULL, restart_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(restart, NULL, NULL, restart_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_restart

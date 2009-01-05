@@ -43,9 +43,9 @@ struct Message away_msgtab = {
 	{mg_unreg, {m_away, 0}, {m_away, 0}, mg_ignore, mg_ignore, {m_away, 0}}
 };
 
-mapi_clist_av1 away_clist[] = { &away_msgtab, NULL };
+mapi_clist_av2 away_clist[] = { &away_msgtab, NULL };
 
-DECLARE_MODULE_AV1(away, NULL, NULL, away_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(away, NULL, NULL, away_clist, NULL, NULL, "$Revision$");
 
 /***********************************************************************
  * m_away() - Added 14 Dec 1988 by jto. 

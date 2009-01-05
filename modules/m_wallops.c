@@ -49,9 +49,9 @@ struct Message operwall_msgtab = {
 	{mg_unreg, mg_not_oper, {ms_operwall, 2}, mg_ignore, mg_ignore, {mo_operwall, 2}}
 };
 
-mapi_clist_av1 wallops_clist[] = { &wallops_msgtab, &operwall_msgtab, NULL };
+mapi_clist_av2 wallops_clist[] = { &wallops_msgtab, &operwall_msgtab, NULL };
 
-DECLARE_MODULE_AV1(wallops, NULL, NULL, wallops_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(wallops, NULL, NULL, wallops_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_operwall (write to *all* opers currently online)

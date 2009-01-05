@@ -32,12 +32,12 @@
 
 void show_motd(hook_data *);
 
-mapi_hfn_list_av1 motd_hfnlist[] = {
+mapi_hfn_list_av2 motd_hfnlist[] = {
 	{"doing_motd", (hookfn) show_motd},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(motd_spy, NULL, NULL, NULL, NULL, motd_hfnlist, "$Revision$");
+DECLARE_MODULE_AV2(motd_spy, NULL, NULL, NULL, NULL, motd_hfnlist, "$Revision$");
 
 void
 show_motd(hook_data * data)

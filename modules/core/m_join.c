@@ -53,9 +53,9 @@ struct Message sjoin_msgtab = {
 	{mg_unreg, mg_ignore, mg_ignore, {ms_sjoin, 0}, mg_ignore, mg_ignore}
 };
 
-mapi_clist_av1 join_clist[] = { &join_msgtab, &sjoin_msgtab, NULL };
+mapi_clist_av2 join_clist[] = { &join_msgtab, &sjoin_msgtab, NULL };
 
-DECLARE_MODULE_AV1(join, NULL, NULL, join_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(join, NULL, NULL, join_clist, NULL, NULL, "$Revision$");
 
 static void do_join_0(struct Client *client_p, struct Client *source_p);
 static int check_channel_name_loc(struct Client *source_p, const char *name);

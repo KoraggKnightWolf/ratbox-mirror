@@ -45,9 +45,9 @@ struct Message ping_msgtab = {
 	{mg_unreg, {m_ping, 2}, {ms_ping, 2}, {ms_ping, 2}, mg_ignore, {m_ping, 2}}
 };
 
-mapi_clist_av1 ping_clist[] = { &ping_msgtab, NULL };
+mapi_clist_av2 ping_clist[] = { &ping_msgtab, NULL };
 
-DECLARE_MODULE_AV1(ping, NULL, NULL, ping_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(ping, NULL, NULL, ping_clist, NULL, NULL, "$Revision$");
 
 /*
 ** m_ping

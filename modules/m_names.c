@@ -44,9 +44,9 @@ struct Message names_msgtab = {
 	{mg_unreg, {m_names, 0}, mg_ignore, mg_ignore, mg_ignore, {m_names, 0}}
 };
 
-mapi_clist_av1 names_clist[] = { &names_msgtab, NULL };
+mapi_clist_av2 names_clist[] = { &names_msgtab, NULL };
 
-DECLARE_MODULE_AV1(names, NULL, NULL, names_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(names, NULL, NULL, names_clist, NULL, NULL, "$Revision$");
 
 static void names_global(struct Client *source_p);
 

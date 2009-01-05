@@ -46,9 +46,9 @@ struct Message version_msgtab = {
 	{mg_unreg, {m_version, 0}, {mo_version, 0}, {mo_version, 0}, mg_ignore, {mo_version, 0}}
 };
 
-mapi_clist_av1 version_clist[] = { &version_msgtab, NULL };
+mapi_clist_av2 version_clist[] = { &version_msgtab, NULL };
 
-DECLARE_MODULE_AV1(version, NULL, NULL, version_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(version, NULL, NULL, version_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_version - VERSION command handler

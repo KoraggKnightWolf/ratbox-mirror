@@ -46,9 +46,9 @@ struct Message encap_msgtab = {
 	{mg_ignore, mg_ignore, {ms_encap, 3}, {ms_encap, 3}, mg_ignore, mg_ignore}
 };
 
-mapi_clist_av1 encap_clist[] = { &encap_msgtab, NULL };
+mapi_clist_av2 encap_clist[] = { &encap_msgtab, NULL };
 
-DECLARE_MODULE_AV1(encap, NULL, NULL, encap_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(encap, NULL, NULL, encap_clist, NULL, NULL, "$Revision$");
 
 /* ms_encap()
  *

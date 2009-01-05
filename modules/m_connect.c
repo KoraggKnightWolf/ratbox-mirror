@@ -47,9 +47,9 @@ struct Message connect_msgtab = {
 	{mg_unreg, mg_not_oper, {ms_connect, 4}, {ms_connect, 4}, mg_ignore, {mo_connect, 2}}
 };
 
-mapi_clist_av1 connect_clist[] = { &connect_msgtab, NULL };
+mapi_clist_av2 connect_clist[] = { &connect_msgtab, NULL };
 
-DECLARE_MODULE_AV1(connect, NULL, NULL, connect_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(connect, NULL, NULL, connect_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_connect - CONNECT command handler

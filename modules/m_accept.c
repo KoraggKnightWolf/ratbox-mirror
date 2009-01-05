@@ -46,11 +46,11 @@ struct Message accept_msgtab = {
 	{mg_unreg, {m_accept, 2}, mg_ignore, mg_ignore, mg_ignore, {m_accept, 2}}
 };
 
-mapi_clist_av1 accept_clist[] = {
+mapi_clist_av2 accept_clist[] = {
 	&accept_msgtab, NULL
 };
 
-DECLARE_MODULE_AV1(accept, NULL, NULL, accept_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(accept, NULL, NULL, accept_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_accept - ACCEPT command handler

@@ -43,9 +43,9 @@ struct Message locops_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_locops, 2}, {m_locops, 2}}
 };
 
-mapi_clist_av1 locops_clist[] = { &locops_msgtab, NULL };
+mapi_clist_av2 locops_clist[] = { &locops_msgtab, NULL };
 
-DECLARE_MODULE_AV1(locops, NULL, NULL, locops_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(locops, NULL, NULL, locops_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_locops - LOCOPS message handler

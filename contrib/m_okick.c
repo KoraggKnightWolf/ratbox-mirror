@@ -46,9 +46,9 @@ struct Message okick_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_okick, 4}}
 };
 
-mapi_clist_av1 okick_clist[] = { &okick_msgtab, NULL };
+mapi_clist_av2 okick_clist[] = { &okick_msgtab, NULL };
 
-DECLARE_MODULE_AV1(okick, NULL, NULL, okick_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(okick, NULL, NULL, okick_clist, NULL, NULL, "$Revision$");
 
 /*
 ** m_okick

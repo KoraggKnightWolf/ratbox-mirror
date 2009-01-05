@@ -46,9 +46,9 @@ struct Message list_msgtab = {
 	{mg_unreg, {m_list, 0}, mg_ignore, mg_ignore, mg_ignore, {mo_list, 0}}
 };
 
-mapi_clist_av1 list_clist[] = { &list_msgtab, NULL };
+mapi_clist_av2 list_clist[] = { &list_msgtab, NULL };
 
-DECLARE_MODULE_AV1(list, NULL, NULL, list_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(list, NULL, NULL, list_clist, NULL, NULL, "$Revision$");
 
 static void list_all_channels(struct Client *source_p);
 static void list_limit_channels(struct Client *source_p, const char *param);

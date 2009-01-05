@@ -82,14 +82,14 @@ static const char *spoofed_sockhost = "0";
 
 int doing_trace_hook;
 
-mapi_clist_av1 trace_clist[] =
+mapi_clist_av2 trace_clist[] =
 	{ &trace_msgtab, &etrace_msgtab, &chantrace_msgtab, &masktrace_msgtab, NULL };
-mapi_hlist_av1 trace_hlist[] = {
+mapi_hlist_av2 trace_hlist[] = {
 	{"doing_trace", &doing_trace_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(trace, NULL, NULL, trace_clist, trace_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV2(trace, NULL, NULL, trace_clist, trace_hlist, NULL, "$Revision$");
 
 
 /*

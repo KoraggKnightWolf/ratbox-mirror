@@ -46,14 +46,14 @@ struct Message motd_msgtab = {
 
 int doing_motd_hook;
 
-mapi_clist_av1 motd_clist[] = { &motd_msgtab, NULL };
+mapi_clist_av2 motd_clist[] = { &motd_msgtab, NULL };
 
-mapi_hlist_av1 motd_hlist[] = {
+mapi_hlist_av2 motd_hlist[] = {
 	{"doing_motd", &doing_motd_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(motd, NULL, NULL, motd_clist, motd_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV2(motd, NULL, NULL, motd_clist, motd_hlist, NULL, "$Revision$");
 
 static void motd_spy(struct Client *);
 

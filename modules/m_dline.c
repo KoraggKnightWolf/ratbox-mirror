@@ -60,9 +60,9 @@ struct Message undline_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_undline, 2}}
 };
 
-mapi_clist_av1 dline_clist[] = { &dline_msgtab, &admindline_msgtab, &undline_msgtab, NULL };
+mapi_clist_av2 dline_clist[] = { &dline_msgtab, &admindline_msgtab, &undline_msgtab, NULL };
 
-DECLARE_MODULE_AV1(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision$");
 
 static int valid_dline(struct Client *source_p, const char *dlhost);
 static int already_placed_dline(struct Client *source_p, const char *dlhost);

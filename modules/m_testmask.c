@@ -52,9 +52,9 @@ struct Message testmask_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_testmask, 2}}
 };
 
-mapi_clist_av1 testmask_clist[] = { &testmask_msgtab, NULL };
+mapi_clist_av2 testmask_clist[] = { &testmask_msgtab, NULL };
 
-DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision$");
 
 static const char *empty_sockhost = "255.255.255.255";
 static const char *spoofed_sockhost = "0";

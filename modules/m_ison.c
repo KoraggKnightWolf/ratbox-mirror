@@ -43,9 +43,9 @@ struct Message ison_msgtab = {
 	{mg_unreg, {m_ison, 2}, mg_ignore, mg_ignore, mg_ignore, {m_ison, 2}}
 };
 
-mapi_clist_av1 ison_clist[] = { &ison_msgtab, NULL };
+mapi_clist_av2 ison_clist[] = { &ison_msgtab, NULL };
 
-DECLARE_MODULE_AV1(ison, NULL, NULL, ison_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(ison, NULL, NULL, ison_clist, NULL, NULL, "$Revision$");
 
 static char buf[BUFSIZE];
 static char buf2[BUFSIZE];

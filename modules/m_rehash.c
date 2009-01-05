@@ -52,9 +52,9 @@ struct Message rehash_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_rehash, 0}}
 };
 
-mapi_clist_av1 rehash_clist[] = { &rehash_msgtab, NULL };
+mapi_clist_av2 rehash_clist[] = { &rehash_msgtab, NULL };
 
-DECLARE_MODULE_AV1(rehash, NULL, NULL, rehash_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(rehash, NULL, NULL, rehash_clist, NULL, NULL, "$Revision$");
 
 struct hash_commands
 {

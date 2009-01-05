@@ -60,9 +60,9 @@ struct Message sid_msgtab = {
 	{mg_ignore, mg_reg, mg_ignore, {ms_sid, 5}, mg_ignore, mg_reg}
 };
 
-mapi_clist_av1 server_clist[] = { &server_msgtab, &sid_msgtab, NULL };
+mapi_clist_av2 server_clist[] = { &server_msgtab, &sid_msgtab, NULL };
 
-DECLARE_MODULE_AV1(server, NULL, NULL, server_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(server, NULL, NULL, server_clist, NULL, NULL, "$Revision$");
 
 static struct Client *server_exists(const char *);
 static int set_server_gecos(struct Client *, const char *);

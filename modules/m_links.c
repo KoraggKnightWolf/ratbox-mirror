@@ -51,14 +51,14 @@ struct Message links_msgtab = {
 
 int doing_links_hook;
 
-mapi_clist_av1 links_clist[] = { &links_msgtab, NULL };
+mapi_clist_av2 links_clist[] = { &links_msgtab, NULL };
 
-mapi_hlist_av1 links_hlist[] = {
+mapi_hlist_av2 links_hlist[] = {
 	{"doing_links", &doing_links_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(links, NULL, NULL, links_clist, links_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV2(links, NULL, NULL, links_clist, links_hlist, NULL, "$Revision$");
 
 static void send_links_cache(struct Client *source_p);
 

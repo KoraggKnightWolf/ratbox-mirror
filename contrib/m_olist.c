@@ -52,9 +52,9 @@ struct Message olist_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_olist, 1}}
 };
 
-mapi_clist_av1 olist_clist[] = { &olist_msgtab, NULL };
+mapi_clist_av2 olist_clist[] = { &olist_msgtab, NULL };
 
-DECLARE_MODULE_AV1(okick, NULL, NULL, olist_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(okick, NULL, NULL, olist_clist, NULL, NULL, "$Revision$");
 
 #endif
 

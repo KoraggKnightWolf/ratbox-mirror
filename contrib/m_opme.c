@@ -42,9 +42,9 @@ struct Message opme_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_opme, 2}}
 };
 
-mapi_clist_av1 opme_clist[] = { &opme_msgtab, NULL };
+mapi_clist_av2 opme_clist[] = { &opme_msgtab, NULL };
 
-DECLARE_MODULE_AV1(opme, NULL, NULL, opme_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(opme, NULL, NULL, opme_clist, NULL, NULL, "$Revision$");
 
 
 /*

@@ -72,11 +72,11 @@ struct Message rsfnc_msgtab = {
 	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_rsfnc, 3}, mg_ignore}
 };
 
-mapi_clist_av1 services_clist[] = {
+mapi_clist_av2 services_clist[] = {
 	&su_msgtab, &login_msgtab, &rsfnc_msgtab, NULL
 };
 
-mapi_hfn_list_av1 services_hfnlist[] = {
+mapi_hfn_list_av2 services_hfnlist[] = {
 	{"doing_stats", (hookfn) h_svc_stats},
 	{"doing_whois", (hookfn) h_svc_whois},
 	{"doing_whois_global", (hookfn) h_svc_whois},
@@ -85,7 +85,7 @@ mapi_hfn_list_av1 services_hfnlist[] = {
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(services, NULL, NULL, services_clist, NULL, services_hfnlist,
+DECLARE_MODULE_AV2(services, NULL, NULL, services_clist, NULL, services_hfnlist,
 		   "$Revision$");
 
 static int

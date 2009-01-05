@@ -62,15 +62,15 @@ struct Message stats_msgtab = {
 int doing_stats_hook;
 int doing_stats_p_hook;
 
-mapi_clist_av1 stats_clist[] = { &stats_msgtab, NULL };
+mapi_clist_av2 stats_clist[] = { &stats_msgtab, NULL };
 
-mapi_hlist_av1 stats_hlist[] = {
+mapi_hlist_av2 stats_hlist[] = {
 	{"doing_stats", &doing_stats_hook},
 	{"doing_stats_p", &doing_stats_p_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(stats, NULL, NULL, stats_clist, stats_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV2(stats, NULL, NULL, stats_clist, stats_hlist, NULL, "$Revision$");
 
 
 static void stats_l_list(struct Client *s, const char *, int, int, rb_dlink_list *, char);

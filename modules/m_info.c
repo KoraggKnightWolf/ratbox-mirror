@@ -53,14 +53,14 @@ struct Message info_msgtab = {
 
 int doing_info_hook;
 
-mapi_clist_av1 info_clist[] = { &info_msgtab, NULL };
+mapi_clist_av2 info_clist[] = { &info_msgtab, NULL };
 
-mapi_hlist_av1 info_hlist[] = {
+mapi_hlist_av2 info_hlist[] = {
 	{"doing_info", &doing_info_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(info, NULL, NULL, info_clist, info_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV2(info, NULL, NULL, info_clist, info_hlist, NULL, "$Revision$");
 
 /*
  * jdc -- Structure for our configuration value table

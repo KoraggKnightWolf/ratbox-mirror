@@ -40,9 +40,9 @@ struct Message close_msgtab = {
 	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_close, 0}}
 };
 
-mapi_clist_av1 close_clist[] = { &close_msgtab, NULL };
+mapi_clist_av2 close_clist[] = { &close_msgtab, NULL };
 
-DECLARE_MODULE_AV1(close, NULL, NULL, close_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(close, NULL, NULL, close_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_close - CLOSE message handler

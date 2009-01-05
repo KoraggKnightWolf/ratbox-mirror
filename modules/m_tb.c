@@ -50,9 +50,9 @@ struct Message tb_msgtab = {
 	{mg_unreg, mg_ignore, mg_ignore, {ms_tb, 4}, mg_ignore, mg_ignore}
 };
 
-mapi_clist_av1 tb_clist[] = { &tb_msgtab, NULL };
+mapi_clist_av2 tb_clist[] = { &tb_msgtab, NULL };
 
-DECLARE_MODULE_AV1(tb, NULL, NULL, tb_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(tb, NULL, NULL, tb_clist, NULL, NULL, "$Revision$");
 
 /* m_tb()
  *

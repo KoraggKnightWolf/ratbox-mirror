@@ -52,9 +52,9 @@ struct Message uhelp_msgtab = {
 	{mg_unreg, {m_help, 0}, mg_ignore, mg_ignore, mg_ignore, {mo_uhelp, 0}}
 };
 
-mapi_clist_av1 help_clist[] = { &help_msgtab, &uhelp_msgtab, NULL };
+mapi_clist_av2 help_clist[] = { &help_msgtab, &uhelp_msgtab, NULL };
 
-DECLARE_MODULE_AV1(help, NULL, NULL, help_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(help, NULL, NULL, help_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_help - HELP message handler

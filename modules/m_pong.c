@@ -45,9 +45,9 @@ struct Message pong_msgtab = {
 	{{mr_pong, 0}, mg_ignore, mg_ignore, {ms_pong, 2}, mg_ignore, mg_ignore}
 };
 
-mapi_clist_av1 pong_clist[] = { &pong_msgtab, NULL };
+mapi_clist_av2 pong_clist[] = { &pong_msgtab, NULL };
 
-DECLARE_MODULE_AV1(pong, NULL, NULL, pong_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(pong, NULL, NULL, pong_clist, NULL, NULL, "$Revision$");
 
 static int
 ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])

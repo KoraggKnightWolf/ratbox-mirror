@@ -73,9 +73,9 @@ struct Message challenge_msgtab = {
 	{mg_unreg, {m_challenge, 2}, mg_ignore, mg_ignore, mg_ignore, {m_challenge, 2}}
 };
 
-mapi_clist_av1 oper_clist[] = { &oper_msgtab, &challenge_msgtab, NULL };
+mapi_clist_av2 oper_clist[] = { &oper_msgtab, &challenge_msgtab, NULL };
 
-DECLARE_MODULE_AV1(oper, NULL, NULL, oper_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(oper, NULL, NULL, oper_clist, NULL, NULL, "$Revision$");
 
 
 /*

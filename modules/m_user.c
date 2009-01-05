@@ -43,9 +43,9 @@ struct Message user_msgtab = {
 	{{mr_user, 5}, mg_reg, mg_ignore, mg_ignore, mg_ignore, mg_reg}
 };
 
-mapi_clist_av1 user_clist[] = { &user_msgtab, NULL };
+mapi_clist_av2 user_clist[] = { &user_msgtab, NULL };
 
-DECLARE_MODULE_AV1(user, NULL, NULL, user_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(user, NULL, NULL, user_clist, NULL, NULL, "$Revision$");
 
 static int do_local_user(struct Client *client_p, struct Client *source_p,
 			 const char *username, const char *realname);

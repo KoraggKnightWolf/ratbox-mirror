@@ -32,12 +32,12 @@
 
 void show_links(hook_data *);
 
-mapi_hfn_list_av1 links_hfnlist[] = {
+mapi_hfn_list_av2 links_hfnlist[] = {
 	{"doing_links", (hookfn) show_links},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(links_spy, NULL, NULL, NULL, NULL, links_hfnlist, "$Revision$");
+DECLARE_MODULE_AV2(links_spy, NULL, NULL, NULL, NULL, links_hfnlist, "$Revision$");
 
 void
 show_links(hook_data * data)

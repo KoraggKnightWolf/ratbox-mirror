@@ -32,12 +32,12 @@
 
 void show_admin(hook_data *);
 
-mapi_hfn_list_av1 admin_hfnlist[] = {
+mapi_hfn_list_av2 admin_hfnlist[] = {
 	{"doing_admin", (hookfn) show_admin},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV1(admin_spy, NULL, NULL, NULL, NULL, admin_hfnlist, "$Revision$");
+DECLARE_MODULE_AV2(admin_spy, NULL, NULL, NULL, NULL, admin_hfnlist, "$Revision$");
 
 void
 show_admin(hook_data * data)

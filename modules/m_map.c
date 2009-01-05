@@ -43,9 +43,9 @@ struct Message map_msgtab = {
 	{mg_unreg, {m_map, 0}, mg_ignore, mg_ignore, mg_ignore, {mo_map, 0}}
 };
 
-mapi_clist_av1 map_clist[] = { &map_msgtab, NULL };
+mapi_clist_av2 map_clist[] = { &map_msgtab, NULL };
 
-DECLARE_MODULE_AV1(map, NULL, NULL, map_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(map, NULL, NULL, map_clist, NULL, NULL, "$Revision$");
 
 static void dump_map(struct Client *client_p, struct Client *root, char *pbuf);
 

@@ -41,9 +41,9 @@ struct Message svinfo_msgtab = {
 	{mg_unreg, mg_ignore, mg_ignore, {ms_svinfo, 5}, mg_ignore, mg_ignore}
 };
 
-mapi_clist_av1 svinfo_clist[] = { &svinfo_msgtab, NULL };
+mapi_clist_av2 svinfo_clist[] = { &svinfo_msgtab, NULL };
 
-DECLARE_MODULE_AV1(svinfo, NULL, NULL, svinfo_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV2(svinfo, NULL, NULL, svinfo_clist, NULL, NULL, "$Revision$");
 
 /*
  * ms_svinfo - SVINFO message handler
