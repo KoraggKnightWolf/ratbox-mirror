@@ -1,3 +1,11 @@
+androsyn    2009/01/05 18:49:44 UTC	(20090105_0-26375)
+  Log:
+  update patchlevel.h for trunk
+
+  Modified:
+	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
+
+
 jilles      2008/12/31 21:48:13 UTC	(20081231_0-26371)
   Log:
   m_stats: get rid of function pointers with unspecified parameter lists
