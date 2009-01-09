@@ -1,3 +1,20 @@
+jilles      2009/01/09 19:21:17 UTC	(20090109_3-26385)
+  Log:
+  Add mask_match(), like ircu mmatch().
+  This compares two masks and returns whether the "new" is
+  more specific than or equal to the "old". The difference
+  with match() is that a '?' in "old" does not match a '*' in
+  "new".
+  The idea is as in charybdis, but this is a modified
+  version of ratbox's match(), not of charybdis's ircu-like
+  match().
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/match.h (File Modified) 
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 jilles      2009/01/09 17:29:09 UTC	(20090109_2-26383)
   Log:
   Remove '*' from valid server name characters.
