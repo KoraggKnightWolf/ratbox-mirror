@@ -1,3 +1,12 @@
+jilles      2009/01/09 19:36:02 UTC	(20090109_5-26389)
+  Log:
+  Remove some dead code.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+
+
 jilles      2009/01/09 19:22:08 UTC	(20090109_4-26387)
   Log:
   Use mask_match() to check bans from local clients for redundancy.
