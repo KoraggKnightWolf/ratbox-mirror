@@ -118,6 +118,82 @@ match(const char *mask, const char *name)
 	return 0;
 }
 
+/** Check a mask against a mask.
+ * The difference between mask_match() and match() is that in mask_match()
+ * a '?' in mask does not match a '*' in name.
+ */
+int
+mask_match(const char *mask, const char *name)
+{
+	const unsigned char *m = (const unsigned char *)mask;
+	const unsigned char *n = (const unsigned char *)name;
+	const unsigned char *ma = (const unsigned char *)mask;
+	const unsigned char *na = (const unsigned char *)name;
+	int wild = 0;
+	int calls = 0;
+
+	s_assert(mask != NULL);
+	s_assert(name != NULL);
+
+	if(!mask || !name)
+		return 0;
+
+	/* if the mask is "*", it matches everything */
+	if((*m == '*') && (*(m + 1) == '\0'))
+		return 1;
+
+	while(calls++ < MATCH_MAX_CALLS)
+	{
+		if(*m == '*')
+		{
+			/*
+			 * XXX - shouldn't need to spin here, the mask should have been
+			 * collapsed before match is called
+			 */
+			while(*m == '*')
+				m++;
+			wild = 1;
+			ma = m;
+			na = n;
+		}
+
+		if(!*m)
+		{
+			if(!*n)
+				return 1;
+			if(!wild)
+				return 0;
+			m = ma;
+			n = ++na;
+		}
+		else if(!*n)
+		{
+			/*
+			 * XXX - shouldn't need to spin here, the mask should have been
+			 * collapsed before match is called
+			 */
+			while(*m == '*')
+				m++;
+			return (*m == 0);
+		}
+		if(ToLower(*m) != ToLower(*n) && (*m != '?' || *n == '*'))
+		{
+			if(!wild)
+				return 0;
+			m = ma;
+			n = ++na;
+		}
+		else
+		{
+			if(*m)
+				m++;
+			if(*n)
+				n++;
+		}
+	}
+	return 0;
+}
+
 /* match_esc()
  *
  * The match() function with support for escaping characters such

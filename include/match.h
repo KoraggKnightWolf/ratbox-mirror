@@ -31,11 +31,13 @@
  * match - compare name with mask, mask may contain * and ? as wildcards
  * match - returns 1 on successful match, 0 otherwise
  *
+ * mask_match - compare one mask to another
  * match_esc - compare with support for escaping chars
  * match_cidr - compares u!h@addr with u!h@addr/cidr
  * match_ips - comapres addr with addr/cidr in ascii form
  */
 int match(const char *mask, const char *name);
+int mask_match(const char *oldmask, const char *newmask);
 int match_esc(const char *mask, const char *name);
 int match_cidr(const char *mask, const char *name);
 int match_ips(const char *mask, const char *addr);
