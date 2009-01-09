@@ -236,15 +236,8 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 	char *t;
 	int tlen;
 	hook_data_client hdata;
-	const char *name;
-	char quest[] = "?";
 	int visible;
 	int extra_space = 0;
-
-	if(target_p->name)
-		name = quest;
-	else
-		name = target_p->name;
 
 	if(target_p->user == NULL)
 	{
