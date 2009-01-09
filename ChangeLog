@@ -1,3 +1,13 @@
+jilles      2009/01/09 15:16:14 UTC	(20090109_1-26381)
+  Log:
+  m_set: get rid of function pointers with unspecified parameter lists
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
+
+
 jilles      2009/01/09 15:07:44 UTC	(20090109_0-26379)
   Log:
   Some const stuff for m_set.
