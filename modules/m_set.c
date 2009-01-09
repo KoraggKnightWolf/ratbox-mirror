@@ -55,7 +55,7 @@ DECLARE_MODULE_AV2(set, NULL, NULL, set_clist, NULL, NULL, "$Revision$");
 struct SetStruct
 {
 	const char *name;
-	void (*handler) ();
+	void (*handler)(struct Client *source_p, const char *chararg, int intarg);
 	int wants_char;		/* 1 if it expects (char *, [int]) */
 	int wants_int;		/* 1 if it expects ([char *], int) */
 
@@ -64,18 +64,19 @@ struct SetStruct
 };
 
 
-static void quote_adminstring(struct Client *, const char *);
+static void quote_adminstring(struct Client *, const char *, int);
 static void quote_autoconn(struct Client *, const char *, int);
-static void quote_autoconnall(struct Client *, int);
-static void quote_floodcount(struct Client *, int);
-static void quote_identtimeout(struct Client *, int);
-static void quote_max(struct Client *, int);
-static void quote_operstring(struct Client *, const char *);
-static void quote_spamnum(struct Client *, int);
-static void quote_spamtime(struct Client *, int);
-static void quote_splitmode(struct Client *, const char *);
-static void quote_splitnum(struct Client *, int);
-static void quote_splitusers(struct Client *, int);
+static void quote_autoconnall(struct Client *, const char *, int);
+static void quote_floodcount(struct Client *, const char *, int);
+static void quote_identtimeout(struct Client *, const char *, int);
+static void quote_max(struct Client *, const char *, int);
+static void quote_operstring(struct Client *, const char *, int);
+static void quote_spamnum(struct Client *, const char *, int);
+static void quote_spamtime(struct Client *, const char *, int);
+static void quote_splitmode(struct Client *, const char *, int);
+static void quote_splitnum(struct Client *, const char *, int);
+static void quote_splitusers(struct Client *, const char *, int);
+
 static void list_quote_commands(struct Client *);
 
 
@@ -104,7 +105,7 @@ static struct SetStruct set_cmd_table[] = {
 	{"SPLITNUM", quote_splitnum, 0, 1},
 	{"SPLITUSERS", quote_splitusers, 0, 1},
 	/* -------------------------------------------------------- */
-	{(char *)0, (void (*)())0, 0, 0}
+	{(char *)0, (void (*)(struct Client *, const char *, int))0, 0, 0}
 };
 
 
@@ -151,7 +152,7 @@ quote_autoconn(struct Client *source_p, const char *arg, int newval)
 
 /* SET AUTOCONNALL */
 static void
-quote_autoconnall(struct Client *source_p, int newval)
+quote_autoconnall(struct Client *source_p, const char *arg, int newval)
 {
 	if(newval >= 0)
 	{
@@ -170,7 +171,7 @@ quote_autoconnall(struct Client *source_p, int newval)
 
 /* SET FLOODCOUNT */
 static void
-quote_floodcount(struct Client *source_p, int newval)
+quote_floodcount(struct Client *source_p, const char *arg, int newval)
 {
 	if(newval >= 0)
 	{
@@ -188,7 +189,7 @@ quote_floodcount(struct Client *source_p, int newval)
 
 /* SET IDENTTIMEOUT */
 static void
-quote_identtimeout(struct Client *source_p, int newval)
+quote_identtimeout(struct Client *source_p, const char *arg, int newval)
 {
 	if(!IsOperAdmin(source_p))
 	{
@@ -210,7 +211,7 @@ quote_identtimeout(struct Client *source_p, int newval)
 
 /* SET MAX */
 static void
-quote_max(struct Client *source_p, int newval)
+quote_max(struct Client *source_p, const char *arg, int newval)
 {
 	if(newval > 0)
 	{
@@ -249,7 +250,7 @@ quote_max(struct Client *source_p, int newval)
 
 /* SET OPERSTRING */
 static void
-quote_operstring(struct Client *source_p, const char *arg)
+quote_operstring(struct Client *source_p, const char *arg, int newval)
 {
 	if(EmptyString(arg))
 	{
@@ -268,7 +269,7 @@ quote_operstring(struct Client *source_p, const char *arg)
 
 /* SET ADMINSTRING */
 static void
-quote_adminstring(struct Client *source_p, const char *arg)
+quote_adminstring(struct Client *source_p, const char *arg, int newval)
 {
 	if(EmptyString(arg))
 	{
@@ -287,7 +288,7 @@ quote_adminstring(struct Client *source_p, const char *arg)
 
 /* SET SPAMNUM */
 static void
-quote_spamnum(struct Client *source_p, int newval)
+quote_spamnum(struct Client *source_p, const char *arg, int newval)
 {
 	if(newval > 0)
 	{
@@ -317,7 +318,7 @@ quote_spamnum(struct Client *source_p, int newval)
 
 /* SET SPAMTIME */
 static void
-quote_spamtime(struct Client *source_p, int newval)
+quote_spamtime(struct Client *source_p, const char *arg, int newval)
 {
 	if(newval > 0)
 	{
@@ -358,7 +359,7 @@ static const char *splitmode_status[] = {
 
 /* SET SPLITMODE */
 static void
-quote_splitmode(struct Client *source_p, const char *charval)
+quote_splitmode(struct Client *source_p, const char *charval, int intval)
 {
 	if(charval)
 	{
@@ -418,7 +419,7 @@ quote_splitmode(struct Client *source_p, const char *charval)
 
 /* SET SPLITNUM */
 static void
-quote_splitnum(struct Client *source_p, int newval)
+quote_splitnum(struct Client *source_p, const char *arg, int newval)
 {
 	if(newval >= 0)
 	{
@@ -435,7 +436,7 @@ quote_splitnum(struct Client *source_p, int newval)
 
 /* SET SPLITUSERS */
 static void
-quote_splitusers(struct Client *source_p, int newval)
+quote_splitusers(struct Client *source_p, const char *arg, int newval)
 {
 	if(newval >= 0)
 	{
@@ -535,24 +536,8 @@ mo_set(struct Client *client_p, struct Client *source_p, int parc, const char *p
 				else
 					newval = -1;
 
-				if(set_cmd_table[i].wants_char)
-				{
-					if(set_cmd_table[i].wants_int)
-						set_cmd_table[i].handler(source_p, arg, newval);
-					else
-						set_cmd_table[i].handler(source_p, arg);
-					return 0;
-				}
-				else
-				{
-					if(set_cmd_table[i].wants_int)
-						set_cmd_table[i].handler(source_p, newval);
-					else
-						/* Just in case someone actually wants a
-						 * set function that takes no args.. *shrug* */
-						set_cmd_table[i].handler(source_p);
-					return 0;
-				}
+				set_cmd_table[i].handler(source_p, arg, newval);
+				return 0;
 			}
 		}
 
