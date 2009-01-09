@@ -410,7 +410,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 		RB_DLINK_FOREACH(ptr, list->head)
 		{
 			actualBan = ptr->data;
-			if(match(actualBan->banstr, realban))
+			if(mask_match(actualBan->banstr, realban))
 				return 0;
 		}
 	}
