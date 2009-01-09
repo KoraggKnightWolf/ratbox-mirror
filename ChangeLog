@@ -1,3 +1,16 @@
+jilles      2009/01/09 17:29:09 UTC	(20090109_2-26383)
+  Log:
+  Remove '*' from valid server name characters.
+  This makes it impossible to connect hostmasked
+  servers to the network.
+  (This support didn't work well anyway, was incompatible
+  with TS6 and we never masked ourselves.)
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 jilles      2009/01/09 15:16:14 UTC	(20090109_1-26381)
   Log:
   m_set: get rid of function pointers with unspecified parameter lists
