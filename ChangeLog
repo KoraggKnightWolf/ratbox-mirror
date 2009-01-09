@@ -1,3 +1,12 @@
+jilles      2009/01/09 20:14:33 UTC	(20090109_6-26391)
+  Log:
+  hunt_server(): Send 402 for wildcard strings starting with a digit.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 jilles      2009/01/09 19:36:02 UTC	(20090109_5-26389)
   Log:
   Remove some dead code.
