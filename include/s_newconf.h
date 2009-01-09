@@ -227,7 +227,7 @@ struct server_conf *find_server_conf(const char *name);
 
 void attach_server_conf(struct Client *, struct server_conf *);
 void detach_server_conf(struct Client *);
-void set_server_conf_autoconn(struct Client *source_p, char *name, int newval);
+void set_server_conf_autoconn(struct Client *source_p, const char *name, int newval);
 
 
 struct ConfItem *find_xline(const char *, int);
