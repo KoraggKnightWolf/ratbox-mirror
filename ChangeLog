@@ -1,3 +1,11 @@
+androsyn    2009/01/15 23:14:45 UTC	(20090115_1-26399)
+  Log:
+  change strlcpy to rb_strlcpy
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_webirc.c (File Modified) 
+
+
 jilles      2009/01/15 00:16:39 UTC	(20090115_0-26397)
   Log:
   Make it more likely that error messages on ssld connections get through.
