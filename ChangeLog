@@ -1,3 +1,13 @@
+jilles      2009/01/16 23:50:16 UTC	(20090116_6-26417)
+  Log:
+  Remove another remnant of server hostmasking.
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 jilles      2009/01/16 23:43:33 UTC	(20090116_5-26415)
   Log:
   More helpful ERROR server notices:
