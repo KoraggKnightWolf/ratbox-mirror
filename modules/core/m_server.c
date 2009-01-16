@@ -64,7 +64,6 @@ mapi_clist_av2 server_clist[] = { &server_msgtab, &sid_msgtab, NULL };
 
 DECLARE_MODULE_AV2(server, NULL, NULL, server_clist, NULL, NULL, "$Revision$");
 
-static struct Client *server_exists(const char *);
 static int set_server_gecos(struct Client *, const char *);
 
 static int check_server(const char *name, struct Client *client_p);
@@ -189,7 +188,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		return 0;
 	}
 
-	if((target_p = server_exists(name)))
+	if((target_p = find_server(NULL, name)))
 	{
 		/*
 		 * This link is trying feed me a server that I already have
@@ -264,7 +263,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	hop = atoi(parv[2]);
 	rb_strlcpy(info, parv[3], sizeof(info));
 
-	if((target_p = server_exists(name)))
+	if((target_p = find_server(NULL, name)))
 	{
 		/*
 		 * This link is trying feed me a server that I already have
@@ -438,7 +437,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	hop = atoi(parv[2]);
 
 	/* collision on the name? */
-	if((target_p = server_exists(parv[1])) != NULL)
+	if((target_p = find_server(NULL, parv[1])) != NULL)
 	{
 		sendto_one(client_p, "ERROR :Server %s already exists", parv[1]);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -635,29 +634,6 @@ set_server_gecos(struct Client *client_p, const char *info)
 	rb_strlcpy(client_p->info, "(Unknown Location)", sizeof(client_p->info));
 
 	return 1;
-}
-
-/*
- * server_exists()
- * 
- * inputs	- servername
- * output	- 1 if server exists, 0 if doesnt exist
- */
-static struct Client *
-server_exists(const char *servername)
-{
-	struct Client *target_p;
-	rb_dlink_node *ptr;
-
-	RB_DLINK_FOREACH(ptr, global_serv_list.head)
-	{
-		target_p = ptr->data;
-
-		if(match(target_p->name, servername) || match(servername, target_p->name))
-			return target_p;
-	}
-
-	return NULL;
 }
 
 
