@@ -1,3 +1,16 @@
+jilles      2009/01/16 23:00:29 UTC	(20090116_3-26411)
+  Log:
+  Do not try find_server() on a name find_client() has
+  returned NULL for, as this will always return NULL
+  since the removal of hostmasking.
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_pong.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 jilles      2009/01/16 22:47:18 UTC	(20090116_2-26409)
   Log:
   Remove server_exists() which checked whether the
