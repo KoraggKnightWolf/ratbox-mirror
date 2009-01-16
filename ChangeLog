@@ -1,3 +1,16 @@
+jilles      2009/01/16 23:05:38 UTC	(20090116_4-26413)
+  Log:
+  Change two occurances like match(userinput, target_p->name) ||
+  match(target_p->name, userinput) to just match(userinput,
+  target_p->name). No client name can contain * or ? now.
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 jilles      2009/01/16 23:00:29 UTC	(20090116_3-26411)
   Log:
   Do not try find_server() on a name find_client() has
