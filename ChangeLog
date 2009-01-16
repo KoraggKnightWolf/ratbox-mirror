@@ -1,3 +1,18 @@
+jilles      2009/01/16 23:43:33 UTC	(20090116_5-26415)
+  Log:
+  More helpful ERROR server notices:
+  - Do not use hide_error_messages for certain "safe" ERRORs.
+  - If hide_error_messages hides an ERROR from a handshake,
+    send a server notice anyway, but without the message
+    text.
+  from charybdis (jilles) (not the entire commit, netwide snotes left out)
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_error.c (File Modified) 
+
+
 jilles      2009/01/16 23:05:38 UTC	(20090116_4-26413)
   Log:
   Change two occurances like match(userinput, target_p->name) ||
