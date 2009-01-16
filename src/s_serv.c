@@ -142,10 +142,6 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		if(target_p->from == source_p->from && !MyConnect(target_p))
 			target_p = NULL;
 
-	if(target_p == NULL && (target_p = find_server(source_p, new)))
-		if(target_p->from == source_p->from && !MyConnect(target_p))
-			target_p = NULL;
-
 	collapse(new);
 
 	wilds = (strpbrk(new, "?*") != NULL);
