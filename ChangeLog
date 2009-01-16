@@ -1,3 +1,17 @@
+jilles      2009/01/16 21:38:41 UTC	(20090116_1-26405)
+  Log:
+  Remove hash_find_masked_server(), which made it possible
+  to specify the full (unmasked) name of a server behind
+  a hostmask. As a result find_any_client() (for prefixes)
+  becomes equal to find_client(), so remove that too.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 jilles      2009/01/16 21:26:29 UTC	(20090116_0-26403)
   Log:
   Remove user@server messages to local users.
