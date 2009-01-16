@@ -122,8 +122,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 	 * Assume it's me, if no server
 	 */
 	if(parc <= server || EmptyString(parv[server]) ||
-	   match(me.name, parv[server]) || match(parv[server], me.name) ||
-	   (strcmp(parv[server], me.id) == 0))
+	   match(parv[server], me.name) || (strcmp(parv[server], me.id) == 0))
 		return (HUNTED_ISME);
 
 	new = LOCAL_COPY(parv[server]);
