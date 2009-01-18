@@ -49,7 +49,6 @@ DECLARE_MODULE_AV2(opme, NULL, NULL, opme_clist, NULL, NULL, "$Revision$");
 
 /*
 ** mo_opme
-**      parv[0] = sender prefix
 **      parv[1] = channel
 */
 static int

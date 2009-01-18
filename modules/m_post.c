@@ -59,7 +59,6 @@ DECLARE_MODULE_AV2(post, NULL, NULL, post_clist, NULL, NULL, "$Revision$");
 
 /*
 ** mr_dumb_proxy
-**      parv[0] = sender prefix
 **      parv[1] = comment
 */
 static int

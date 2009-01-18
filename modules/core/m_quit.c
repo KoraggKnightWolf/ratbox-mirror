@@ -56,7 +56,6 @@ mr_quit(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 /*
 ** m_quit
-**      parv[0] = sender prefix
 **      parv[1] = comment
 */
 static int
@@ -88,7 +87,6 @@ m_quit(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 /*
 ** ms_quit
-**      parv[0] = sender prefix
 **      parv[1] = comment
 */
 static int

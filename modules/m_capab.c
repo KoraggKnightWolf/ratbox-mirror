@@ -51,7 +51,6 @@ DECLARE_MODULE_AV2(capab, NULL, NULL, capab_clist, NULL, NULL, "$Revision$");
 
 /*
  * mr_capab - CAPAB message handler
- *      parv[0] = sender prefix
  *      parv[1] = space-separated list of capabilities
  *
  */

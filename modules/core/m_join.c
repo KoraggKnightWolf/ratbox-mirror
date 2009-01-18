@@ -69,7 +69,6 @@ static void remove_ban_list(struct Channel *chptr, struct Client *source_p,
 
 /*
  * m_join
- *      parv[0] = sender prefix
  *      parv[1] = channel
  *      parv[2] = channel password (key)
  */
@@ -407,7 +406,6 @@ ms_join(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 /*
  * ms_sjoin
- * parv[0] - sender
  * parv[1] - TS
  * parv[2] - channel
  * parv[3] - modes + n arguments (key and/or limit)

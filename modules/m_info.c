@@ -846,7 +846,6 @@ static struct InfoStruct info_table[] = {
 
 /*
 ** m_info
-**  parv[0] = sender prefix
 **  parv[1] = servername
 */
 static int
@@ -878,7 +877,6 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 /*
 ** mo_info
-**  parv[0] = sender prefix
 **  parv[1] = servername
 */
 static int

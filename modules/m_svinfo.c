@@ -47,7 +47,6 @@ DECLARE_MODULE_AV2(svinfo, NULL, NULL, svinfo_clist, NULL, NULL, "$Revision$");
 
 /*
  * ms_svinfo - SVINFO message handler
- *      parv[0] = sender prefix
  *      parv[1] = TS_CURRENT for the server
  *      parv[2] = TS_MIN for the server
  *      parv[3] = unused, send 0

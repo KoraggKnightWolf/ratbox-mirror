@@ -51,7 +51,6 @@ DECLARE_MODULE_AV2(clearchan, NULL, NULL, clearchan_clist, NULL, NULL, "$Revisio
 
 /*
 ** mo_clearchan
-**      parv[0] = sender prefix
 **      parv[1] = channel
 */
 static int

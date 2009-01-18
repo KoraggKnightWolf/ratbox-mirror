@@ -134,7 +134,6 @@ static struct FlagTable flag_table[] = {
 
 /*
 ** m_flags
-**      parv[0] = sender prefix
 **      parv[1] = parameter
 */
 static int
@@ -235,7 +234,6 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 /*
 ** mo_flags
-**      parv[0] = sender prefix
 **      parv[1] = parameter
 */
 static int

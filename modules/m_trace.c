@@ -94,7 +94,6 @@ DECLARE_MODULE_AV2(trace, NULL, NULL, trace_clist, trace_hlist, NULL, "$Revision
 
 /*
  * m_trace
- *      parv[0] = sender prefix
  *      parv[1] = servername
  */
 static int
@@ -463,7 +462,6 @@ trace_spy(struct Client *source_p, struct Client *target_p)
 
 /*
  * m_etrace
- *      parv[0] = sender prefix
  *      parv[1] = options [or target]
  *	parv[2] = [target]
  */

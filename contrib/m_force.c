@@ -71,7 +71,6 @@ DECLARE_MODULE_AV2(force, NULL, NULL, force_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_forcejoin
- *      parv[0] = sender prefix
  *      parv[1] = user to force
  *      parv[2] = channel to force them into
  */

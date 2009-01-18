@@ -101,7 +101,6 @@ static int perform_nickchange_collides(struct Client *, struct Client *,
 				       struct Client *, time_t, const char *);
 
 /* mr_nick()
- *       parv[0] = sender prefix
  *       parv[1] = nickname
  */
 static int
@@ -162,7 +161,6 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 }
 
 /* m_nick()
- *     parv[0] = sender prefix
  *     parv[1] = nickname
  */
 static int
@@ -245,12 +243,10 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 /* ms_nick()
  *      
  * server -> server nick change
- *    parv[0] = sender prefix
  *    parv[1] = nickname
  *    parv[2] = TS when nick change
  *
  * server introducing new nick
- *    parv[0] = sender prefix
  *    parv[1] = nickname
  *    parv[2] = hop count
  *    parv[3] = TS

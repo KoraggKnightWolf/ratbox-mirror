@@ -89,7 +89,6 @@ static int mask_pos;
 
 /*
  * m_mode - MODE command handler
- * parv[0] - sender
  * parv[1] - channel
  */
 static int

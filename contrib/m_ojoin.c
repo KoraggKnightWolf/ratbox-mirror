@@ -51,7 +51,6 @@ DECLARE_MODULE_AV2(ojoin, NULL, NULL, ojoin_clist, NULL, NULL, "$Revision$");
 
 /*
 ** mo_ojoin
-**      parv[0] = sender prefix
 **      parv[1] = channel
 */
 static int

@@ -383,7 +383,6 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 /* mo_ungline()
  *
- *      parv[0] = sender nick
  *      parv[1] = gline to remove
  */
 static int

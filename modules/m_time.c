@@ -47,7 +47,6 @@ DECLARE_MODULE_AV2(time, NULL, NULL, time_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_time
- *      parv[0] = sender prefix
  *      parv[1] = servername
  */
 static int

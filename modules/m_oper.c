@@ -80,7 +80,6 @@ DECLARE_MODULE_AV2(oper, NULL, NULL, oper_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_oper
- *      parv[0] = sender prefix
  *      parv[1] = oper name
  *      parv[2] = oper password
  */
@@ -310,7 +309,6 @@ cleanup_challenge(struct Client *target_p)
 
 /*
  * m_challenge - generate RSA challenge for wouldbe oper
- * parv[0] = sender prefix
  * parv[1] = operator to challenge for, or +response
  *
  */
