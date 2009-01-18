@@ -1,3 +1,22 @@
+jilles      2009/01/18 16:22:07 UTC	(20090118_0-26419)
+  Log:
+  Replace parv[0] with source_p->name.
+  
+
+  Modified:
+	ircd-ratbox/trunk/contrib/m_clearchan.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_flags.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_force.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_mkpasswd.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_okick.c (File Modified) 
+	ircd-ratbox/trunk/contrib/m_opme.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_squit.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_connect.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_userhost.c (File Modified) 
+
+
 jilles      2009/01/16 23:50:16 UTC	(20090116_6-26417)
   Log:
   Remove another remnant of server hostmasking.
