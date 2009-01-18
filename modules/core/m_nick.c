@@ -132,7 +132,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(!clean_nick(nick, 1))
 	{
 		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME),
-			   me.name, EmptyString(parv[0]) ? "*" : parv[0], parv[1]);
+			   me.name, EmptyString(source_p->name) ? "*" : source_p->name, parv[1]);
 		return 0;
 	}
 
@@ -195,7 +195,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	/* check the nickname is ok */
 	if(!clean_nick(nick, 1))
 	{
-		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME), me.name, parv[0], nick);
+		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME), me.name, source_p->name, nick);
 		return 0;
 	}
 
@@ -232,7 +232,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			change_local_nick(client_p, source_p, nick, 1);
 		}
 		else
-			sendto_one(source_p, form_str(ERR_NICKNAMEINUSE), me.name, parv[0], nick);
+			sendto_one(source_p, form_str(ERR_NICKNAMEINUSE), me.name, source_p->name, nick);
 
 		return 0;
 	}

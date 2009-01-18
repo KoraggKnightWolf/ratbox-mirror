@@ -258,7 +258,7 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 	if((msptr = find_channel_membership(chptr, target_p)) == NULL)
 	{
 		sendto_one(source_p, form_str(ERR_USERNOTINCHANNEL),
-			   me.name, parv[0], parv[1], parv[2]);
+			   me.name, source_p->name, parv[1], parv[2]);
 		return 0;
 	}
 

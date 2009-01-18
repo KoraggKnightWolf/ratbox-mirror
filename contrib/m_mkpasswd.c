@@ -59,7 +59,7 @@ m_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const cha
 	if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
-		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, parv[0], "MKPASSWD");
+		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "MKPASSWD");
 		return 0;
 	}
 	else
@@ -82,20 +82,19 @@ m_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const cha
 		}
 		else
 		{
-			sendto_one(source_p,
-				   ":%s NOTICE %s :MKPASSWD syntax error:  MKPASSWD pass [DES|MD5]",
-				   me.name, parv[0]);
+			sendto_one_notice(source_p,
+				   ":MKPASSWD syntax error:  MKPASSWD pass [DES|MD5]");
 			return 0;
 		}
 	}
 
 	if(parc == 1)
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, parv[0], "MKPASSWD");
+		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name, "MKPASSWD");
 	else
-		sendto_one(source_p, ":%s NOTICE %s :Encryption for [%s]:  %s",
-			   me.name, parv[0], parv[1], crypt(parv[1],
-							    is_md5 ? make_md5_salt() :
-							    make_salt()));
+		sendto_one_notice(source_p, ":Encryption for [%s]:  %s",
+				parv[1], crypt(parv[1],
+					is_md5 ? make_md5_salt() :
+					make_salt()));
 
 	return 0;
 }
@@ -125,20 +124,19 @@ mo_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const ch
 		}
 		else
 		{
-			sendto_one(source_p,
-				   ":%s NOTICE %s :MKPASSWD syntax error:  MKPASSWD pass [DES|MD5]",
-				   me.name, parv[0]);
+			sendto_one_notice(source_p,
+				   ":MKPASSWD syntax error:  MKPASSWD pass [DES|MD5]");
 			return 0;
 		}
 	}
 
 	if(parc == 1)
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, parv[0], "MKPASSWD");
+		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name, "MKPASSWD");
 	else
-		sendto_one(source_p, ":%s NOTICE %s :Encryption for [%s]:  %s",
-			   me.name, parv[0], parv[1], crypt(parv[1],
-							    is_md5 ? make_md5_salt() :
-							    make_salt()));
+		sendto_one_notice(source_p, ":Encryption for [%s]:  %s",
+				parv[1], crypt(parv[1],
+					is_md5 ? make_md5_salt() :
+					make_salt()));
 
 	return 0;
 }

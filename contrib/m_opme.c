@@ -79,8 +79,8 @@ mo_opme(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		if(is_chanop(msptr))
 		{
-			sendto_one(source_p, ":%s NOTICE %s :%s Channel is not opless",
-				   me.name, parv[0], parv[1]);
+			sendto_one_notice(source_p, ":%s Channel is not opless",
+				   parv[1]);
 			return 0;
 		}
 	}

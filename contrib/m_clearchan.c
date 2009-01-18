@@ -66,7 +66,7 @@ mo_clearchan(struct Client *client_p, struct Client *source_p, int parc, const c
 	/* admins only */
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, ":%s NOTICE %s :You have no A flag", me.name, parv[0]);
+		sendto_one_notice(source_p, ":You have no A flag");
 		return 0;
 	}
 
