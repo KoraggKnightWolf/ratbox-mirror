@@ -1,3 +1,17 @@
+jilles      2009/01/21 22:30:34 UTC	(20090121_1-26425)
+  Log:
+  Make remote numerics to channels work.
+  Note that +D clients do not get these.  This is consistent
+  with how ircu treats remote numerics and with how we treat
+  server notices from other servers, but not with how locally
+  generated notices and numerics are sent also to +D clients.
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 jilles      2009/01/21 19:58:06 UTC	(20090121_0-26423)
   Log:
   Cut down user@server description in opers help file.
