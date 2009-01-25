@@ -1,3 +1,12 @@
+jilles      2009/01/25 16:32:34 UTC	(20090125_1-26429)
+  Log:
+  WHOIS 330 (services login name) does not need a remote whois.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/services.txt (File Modified) 
+
+
 jilles      2009/01/25 16:02:50 UTC	(20090125_0-26427)
   Log:
   Show oper reasons in /testline, use get_printable_kline().
