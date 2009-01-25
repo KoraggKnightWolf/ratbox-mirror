@@ -1,3 +1,13 @@
+jilles      2009/01/25 16:02:50 UTC	(20090125_0-26427)
+  Log:
+  Show oper reasons in /testline, use get_printable_kline().
+  from ircd-seven (spb)
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+
+
 jilles      2009/01/21 22:30:34 UTC	(20090121_1-26425)
   Log:
   Make remote numerics to channels work.
