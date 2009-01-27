@@ -1,3 +1,12 @@
+jilles      2009/01/27 20:25:28 UTC	(20090127_1-26433)
+  Log:
+  Const fixes.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+
+
 jilles      2009/01/27 20:23:09 UTC	(20090127_0-26431)
   Log:
   Show D:line oper reason in /testline.
