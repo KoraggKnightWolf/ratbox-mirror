@@ -76,7 +76,7 @@ mo_testline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	int host_mask;
 	int type;
 	int duration;
-	char *puser, *phost, *reason, *operreason;
+	const char *puser, *phost, *reason, *operreason;
 	char reasonbuf[BUFSIZE];
 
 	mask = LOCAL_COPY(parv[1]);
