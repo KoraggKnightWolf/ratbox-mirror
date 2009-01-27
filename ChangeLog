@@ -1,3 +1,12 @@
+jilles      2009/01/27 20:23:09 UTC	(20090127_0-26431)
+  Log:
+  Show D:line oper reason in /testline.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
+
+
 jilles      2009/01/25 16:32:34 UTC	(20090125_1-26429)
   Log:
   WHOIS 330 (services login name) does not need a remote whois.
