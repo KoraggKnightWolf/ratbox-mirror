@@ -1,3 +1,12 @@
+jilles      2009/01/30 16:12:37 UTC	(20090130_0-26435)
+  Log:
+  Add some more complete server protocol documentation.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/technical/ts6-protocol.txt (File Added) 
+
+
 jilles      2009/01/27 20:25:28 UTC	(20090127_1-26433)
   Log:
   Const fixes.
