@@ -54,8 +54,6 @@
 static void report_and_set_user_flags(struct Client *, struct ConfItem *);
 void user_welcome(struct Client *source_p);
 
-extern char *crypt();
-
 /* table of ascii char letters to corresponding bitmask */
 
 struct flag_item

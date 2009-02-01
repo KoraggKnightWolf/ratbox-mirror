@@ -18,6 +18,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "ratbox_lib.h"
+#ifndef __MINGW32__
+#include <pwd.h>
+#endif
 
 #define FLAG_MD5      0x00000001
 #define FLAG_DES      0x00000002
@@ -53,12 +56,9 @@ static char saltChars[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmno
        /* 0 .. 63, ascii - 64 */
 
 extern char *optarg;
-extern char *crypt();
 
 
-#ifndef __MINGW32__
-extern char *getpass();
-#else
+#ifdef __MINGW32__
 #include <conio.h>
 #ifdef PASS_MAX
 #undef PASS_MAX

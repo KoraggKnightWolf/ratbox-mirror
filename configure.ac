@@ -443,7 +443,7 @@ fi
 WARNFLAGS="-Wall"
 AC_ARG_ENABLE(warnings,
 AC_HELP_STRING([--enable-warnings],[Enable all sorts of warnings for debugging.]),
-[WARNFLAGS="-Wall -Werror -Wcast-qual -Wcast-align -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wwrite-strings -W -Wno-unused -Wunused-function -Wunused-variable"],[])
+[WARNFLAGS="-Wall -Werror -Wcast-qual -Wcast-align -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wwrite-strings -W -Wno-unused -Wunused-function -Wunused-variable -Wstrict-prototypes -Wmissing-prototypes"],[])
 
 AC_SUBST(WARNFLAGS)
 dnl Server Tweaks

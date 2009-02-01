@@ -51,8 +51,6 @@
 #include "parse.h"
 #include "sslproc.h"
 
-extern char *crypt();
-
 #define MIN_CONN_FREQ 300
 
 int MaxConnectionCount = 1;

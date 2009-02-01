@@ -93,8 +93,8 @@
 
 #define YY_NO_UNPUT
 
-int yyparse();
-int yylex();
+int yyparse(void);
+int yylex(void);
 
 static time_t conf_find_time(char*);
 

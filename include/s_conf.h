@@ -350,7 +350,7 @@ void flush_expired_ips(void *);
 
 const char *get_oper_name(struct Client *client_p);
 const char *get_class_name(struct ConfItem *aconf);
-void set_default_conf();
+void set_default_conf(void);
 
 
 #define NOT_AUTHORISED  (-1)

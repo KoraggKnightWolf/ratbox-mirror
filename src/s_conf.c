@@ -54,7 +54,6 @@
 
 struct config_server_hide ConfigServerHide;
 
-extern int yyparse();		/* defined in y.tab.c */
 extern char linebuf[];
 
 static rb_bh *confitem_heap = NULL;
@@ -67,7 +66,6 @@ rb_dlink_list service_list;
 #endif
 
 /* internally defined functions */
-void set_default_conf(void);
 static void clear_out_old_conf(void);
 
 static void expire_temp_kd(void *list);
