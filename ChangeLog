@@ -1,3 +1,23 @@
+jilles      2009/02/01 15:27:24 UTC	(20090201_0-26439)
+  Log:
+  Add -Wstrict-prototypes -Wmissing-prototypes to --enable-warnings
+  and fix things so it compiles with that.
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.y (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/tools/mkpasswd.c (File Modified) 
+
+
 jilles      2009/01/30 16:12:37 UTC	(20090130_0-26435)
   Log:
   Add some more complete server protocol documentation.
