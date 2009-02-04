@@ -1,3 +1,12 @@
+jilles      2009/02/04 23:15:03 UTC	(20090204_0-26441)
+  Log:
+  Fix trouble when unloading modules because it still wanted mapi_version 1.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 jilles      2009/02/01 15:27:24 UTC	(20090201_0-26439)
   Log:
   Add -Wstrict-prototypes -Wmissing-prototypes to --enable-warnings
