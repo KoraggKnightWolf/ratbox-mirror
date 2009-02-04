@@ -552,7 +552,7 @@ unload_one_module(const char *name, int warn)
 
 	switch (modlist[modindex]->mapi_version)
 	{
-	case 1:
+	case 2:
 		{
 			struct mapi_mheader_av2 *mheader = modlist[modindex]->mapi_header;
 			if(mheader->mapi_command_list)
