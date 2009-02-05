@@ -30,6 +30,7 @@
 #include "ircd.h"
 #include "send.h"
 #include "s_conf.h"
+#include "s_newconf.h"
 #include "s_log.h"
 #include "parse.h"
 #include "modules.h"
@@ -91,6 +92,7 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 		     " (my TS=%ld, their TS=%ld, delta=%d)",
 		     log_client_name(source_p, SHOW_IP), (long)rb_current_time(), (long)theirtime,
 		     deltat);
+		disable_server_conf_autoconn(source_p->name);
 		exit_client(source_p, source_p, source_p, "Excessive TS delta");
 		return 0;
 	}

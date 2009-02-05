@@ -532,6 +532,24 @@ set_server_conf_autoconn(struct Client *source_p, const char *name, int newval)
 		sendto_one_notice(source_p, ":Can't find %s", name);
 }
 
+void
+disable_server_conf_autoconn(const char *name)
+{
+	struct server_conf *server_p;
+
+	server_p = find_server_conf(name);
+	if(server_p != NULL && server_p->flags & SERVER_AUTOCONN)
+	{
+		server_p->flags &= ~SERVER_AUTOCONN;
+
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				"Disabling AUTOCONN for %s because of error",
+				name);
+		ilog(L_SERVER, "Disabling AUTOCONN for %s because of error",
+				name);
+	}
+}
+
 struct ConfItem *
 find_xline(const char *gecos, int counter)
 {
