@@ -1,3 +1,21 @@
+jilles      2009/02/05 23:14:55 UTC	(20090205_0-26443)
+  Log:
+  Disable autoconnect for a server with excessive TS delta.
+  Note that in some cases (different TS delta settings,
+  heavy lag) it is possible only one of the servers
+  detects the problem and autoconnect may be left enabled.
+  The mechanism used for disabling is the same as
+  /quote set autoconn <server> 0; the A flag in /stats c
+  disappears and a rehash or /quote set autoconn can put
+  it back.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_svinfo.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 jilles      2009/02/04 23:15:03 UTC	(20090204_0-26441)
   Log:
   Fix trouble when unloading modules because it still wanted mapi_version 1.
