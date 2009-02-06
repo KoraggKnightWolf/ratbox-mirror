@@ -1,3 +1,15 @@
+jilles      2009/02/06 13:11:10 UTC	(20090206_0-26445)
+  Log:
+  Disallow invites to juped channels.
+  In particular, this is checked when the source is
+  local and not resv_exempt, or the target is local and
+  not resv_exempt.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_invite.c (File Modified) 
+
+
 jilles      2009/02/05 23:14:55 UTC	(20090205_0-26443)
   Log:
   Disable autoconnect for a server with excessive TS delta.
