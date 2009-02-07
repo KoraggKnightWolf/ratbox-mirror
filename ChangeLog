@@ -1,3 +1,11 @@
+androsyn    2009/02/07 18:57:48 UTC	(20090207_0-26447)
+  Log:
+  fix an off by one error with zipstats processing
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 jilles      2009/02/06 13:11:10 UTC	(20090206_0-26445)
   Log:
   Disallow invites to juped channels.
