@@ -1,3 +1,17 @@
+jilles      2009/02/08 15:32:02 UTC	(20090208_0-26451)
+  Log:
+  Various updates to TS6 protocol document:
+  - Add description for LOCOPS message.
+  - Add more information about propagation.
+  - Clarify propagation of JOIN and SJOIN.
+  - Numerics are also server-server messages.
+  - Clarify some PRIVMSG/NOTICE restrictions.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/technical/ts6-protocol.txt (File Modified) 
+
+
 androsyn    2009/02/07 18:57:48 UTC	(20090207_0-26447)
   Log:
   fix an off by one error with zipstats processing
