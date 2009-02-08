@@ -21,13 +21,27 @@ the function hunt_server(). Any rate limiting should be done locally.
 duration: a parameter type used for ban durations. It is a duration in seconds.
 A value of 0 means a permanent ban.
 
-propagation: to which other servers the command is sent. For all commands
-with a hunted parameter, the propagation is determined by that, and not
-otherwise specified. Propagation broadcast means the command is sent to all
-servers. Propagation one-to-one means the command is only sent to the target
-or the server the target is on. Propagation none means the command is never
-sent to another server if it is received. For some other commands, the
-propagation depends on the parameters and is described in text.
+propagation: to which other servers the command is sent
+
+For all commands with a hunted parameter, the propagation is determined by
+that, and not otherwise specified.
+
+For all commands with a target server mask parameter, the propagation is
+determined by that, and not otherwise specified. The command is sent to all
+servers with names matching the given mask (for example '*', '*.example.com',
+'irc.example.com'). Those servers do not have to be directly connected.
+Targets cannot be SIDs.
+
+Propagation broadcast means the command is sent to all servers.
+
+Propagation one-to-one means the command is only sent to the target or the
+server the target is on.
+
+Propagation none means the command is never sent to another server if it is
+received.
+
+For some other commands, the propagation depends on the parameters and is
+described in text.
 
 services server: server mentioned in a service{} block. There are no services
 servers on EFnet.
@@ -93,6 +107,29 @@ type D
 +c (strip colours)
 +g (allow any member to /invite)
 +z (send messages blocked by +m to chanops)
+
+<numeric>
+source: server
+parameters: target, any...
+
+The command name should be three decimal ASCII digits.
+
+Propagates a "numeric" command reply, such as from a remote WHOIS request.
+
+If the first digit is 0 (indicating a reply about the local connection), it
+should be changed to 1 before propagation or sending to a user.
+
+Numerics to the local server may be sent to opers.
+
+To avoid infinite loops, servers should not send any replies to numerics.
+
+The target can be:
+- a client
+  propagation: one-to-one
+- a channel name
+  propagation: all servers with -D users on the channel
+
+Numerics to channels are broken in some older servers.
 
 ADMIN
 source: user
@@ -172,11 +209,10 @@ ENCAP
 source: any
 parameters: target server mask, subcommand, opt. parameters...
 
-Sends a command to all servers with names matching the given mask (for example
-'*', '*.example.com', 'irc.example.com'). Those servers do not have to be
-directly connected. Targets cannot be SIDs.
+Sends a command to matching servers. Propagation is independent of
+understanding the subcommand.
 
-Propagation is independent of understanding the subcommand.
+Subcommands are listed elsewhere with "encap only".
 
 ERROR
 source: server or unregistered server
@@ -257,6 +293,8 @@ exists and has a greater (newer) TS, wipe all simple modes and statuses and
 change the TS, notifying local users of this but not servers (note that
 ban-like modes remain intact; invites may or may not be cleared).
 
+A JOIN is propagated with the new TS of the channel.
+
 KICK
 source: any
 parameters: channel, target user, opt. reason
@@ -311,6 +349,22 @@ source: user
 parameters: hunted, server mask
 
 Remote LINKS request. The server mask limits which servers are listed.
+
+LOCOPS
+1.
+encap only
+source: user
+parameters: text
+
+Sends a message to operators (with umode +l set). This is intended to be
+used for strict subsets of the network.
+
+2.
+capab: CLUSTER
+source: user
+parameters: target server mask, text
+
+As form 1, deprecated.
 
 LOGIN
 encap only
@@ -388,6 +442,9 @@ parameters: msgtarget, message
 As PRIVMSG, except NOTICE messages are sent out, server sources are permitted
 and most error messages are suppressed.
 
+Servers may not send '$$', '$#' and opers@server notices. Older servers may
+not allow servers to send to specific statuses on a channel.
+
 OPERSPY
 encap only
 encap target: *
@@ -458,9 +515,14 @@ The target can be:
   propagation: one-to-one
 - a message to all users on server names matching a mask ('$$' followed by mask)
   propagation: broadcast
+  Only allowed to IRC operators.
 - a message to all users with hostnames matching a mask ('$#' followed by mask).
   Note that this is often implemented poorly.
   propagation: broadcast
+  Only allowed to IRC operators.
+
+In charybdis TS6, services may send to any channel and to statuses on any
+channel.
 
 PRIVS
 charybdis TS6
@@ -618,6 +680,9 @@ is lower (older), wipe all modes and change the TS, notifying local users of
 this but not servers (invites may be cleared). In the latter case, kick on
 split riding may happen: if the key (+k) differs or the incoming simple modes
 include +i, kick all local users, sending KICK messages to servers.
+
+An SJOIN is propagated with the new TS and modes of the channel. The statuses
+are propagated if and only if they were accepted.
 
 SJOIN must be used to propagate channel creation and in netbursts. For regular
 users joining channels, JOIN must be used. Pseudoservers may use SJOIN to join
@@ -883,7 +948,6 @@ GET
 HELP
 ISON
 LIST
-LOCOPS
 MAP
 MASKTRACE
 MODLIST
