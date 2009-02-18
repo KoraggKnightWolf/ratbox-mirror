@@ -41,9 +41,12 @@
 #include "parse.h"
 #include "modules.h"
 #include "s_log.h"
+#include "hook.h"
 
 static int mo_gungline(struct Client *, struct Client *, int, const char **);
 static int me_gungline(struct Client *, struct Client *, int, const char **);
+
+static void h_gungline_stats(hook_data_int *);
 
 static int modinit(void);
 static void moddeinit(void);
@@ -55,7 +58,12 @@ struct Message gungline_msgtab = {
 
 mapi_clist_av2 gungline_clist[] = { &gungline_msgtab, NULL };
 
-DECLARE_MODULE_AV2(gungline, modinit, moddeinit, gungline_clist, NULL, NULL, "$Revision: 26421 $");
+mapi_hfn_list_av2 gungline_hfnlist[] = {
+	{"doing_stats", (hookfn) h_gungline_stats},
+	{NULL, NULL}
+};
+
+DECLARE_MODULE_AV2(gungline, modinit, moddeinit, gungline_clist, NULL, gungline_hfnlist, "$Revision: 26421 $");
 
 static int majority_ungline(struct Client *source_p, const char *user,
 			  const char *host, const char *reason);
@@ -390,6 +398,49 @@ remove_temp_gline(const char *user, const char *host)
 	return NO;
 }
 
+static void
+h_gungline_stats(hook_data_int * data)
+{
+	char statchar = (char)data->arg2;
+
+	if(ConfigFileEntry.glines && statchar == 'g' && IsOper(data->client))
+	{
+		rb_dlink_node *pending_node;
+		struct gline_pending *glp_ptr;
+		char timebuffer[MAX_DATE_STRING];
+		struct tm *tmptr;
+
+		RB_DLINK_FOREACH(pending_node, pending_gunglines.head)
+		{
+			glp_ptr = pending_node->data;
+
+			tmptr = gmtime(&glp_ptr->time_request1);
+			strftime(timebuffer, MAX_DATE_STRING, "%Y/%m/%d %H:%M:%S", tmptr);
+
+			sendto_one_notice(data->client,
+					  ":1) %s!%s@%s on %s requested ungline at %s for %s@%s [%s]",
+					  glp_ptr->oper_nick1,
+					  glp_ptr->oper_user1, glp_ptr->oper_host1,
+					  glp_ptr->oper_server1, timebuffer,
+					  glp_ptr->user, glp_ptr->host, glp_ptr->reason1);
+
+			if(glp_ptr->oper_nick2[0])
+			{
+				tmptr = gmtime(&glp_ptr->time_request2);
+				strftime(timebuffer, MAX_DATE_STRING, "%Y/%m/%d %H:%M:%S", tmptr);
+				sendto_one_notice(data->client,
+						  ":2) %s!%s@%s on %s requested ungline at %s for %s@%s [%s]",
+						  glp_ptr->oper_nick2,
+						  glp_ptr->oper_user2, glp_ptr->oper_host2,
+						  glp_ptr->oper_server2, timebuffer,
+						  glp_ptr->user, glp_ptr->host, glp_ptr->reason2);
+			}
+		}
+
+		if(rb_dlink_list_length(&pending_gunglines) > 0)
+			sendto_one_notice(data->client, ":End of Pending G-line Removals");
+	}
+}
 /*
  * expire_pending_gunglines
  * 
