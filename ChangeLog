@@ -1,3 +1,12 @@
+jilles      2009/02/18 23:04:34 UTC	(20090218_1-26457)
+  Log:
+  Remove the pending gungline when it is triggered.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_gungline.c (File Modified) 
+
+
 jilles      2009/02/18 22:56:46 UTC	(20090218_0-26455)
   Log:
   Add a global ungline following 3 vote system.
