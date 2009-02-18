@@ -1,3 +1,12 @@
+jilles      2009/02/18 23:12:01 UTC	(20090218_2-26459)
+  Log:
+  Add pending gunglines to /stats g.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_gungline.c (File Modified) 
+
+
 jilles      2009/02/18 23:04:34 UTC	(20090218_1-26457)
   Log:
   Remove the pending gungline when it is triggered.
