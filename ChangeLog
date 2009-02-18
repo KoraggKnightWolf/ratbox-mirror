@@ -1,3 +1,13 @@
+jilles      2009/02/18 22:56:46 UTC	(20090218_0-26455)
+  Log:
+  Add a global ungline following 3 vote system.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/m_gungline.c (File Added) 
+
+
 jilles      2009/02/15 22:52:33 UTC	(20090215_0-26453)
   Log:
   Remove comment related to (removed) ability to disable TS6.
