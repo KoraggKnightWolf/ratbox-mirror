@@ -304,7 +304,7 @@ majority_ungline(struct Client *source_p, const char *user, const char *host, co
 				/* trigger the gline using the original reason --fl */
 				remove_local_gline(source_p, user, host, pending->reason1);
 
-				expire_pending_gunglines(NULL);
+				expire_pending_gunglines(pending);
 				return YES;
 			}
 			else
@@ -401,7 +401,7 @@ remove_temp_gline(const char *user, const char *host)
  * enough "votes" in the time period allowed
  */
 static void
-expire_pending_gunglines(void *unused)
+expire_pending_gunglines(void *vptr)
 {
 	rb_dlink_node *pending_node;
 	rb_dlink_node *next_node;
@@ -412,7 +412,7 @@ expire_pending_gunglines(void *unused)
 		glp_ptr = pending_node->data;
 
 		if((glp_ptr->last_gline_time + GLINE_PENDING_EXPIRE) <=
-		    rb_current_time())
+		    rb_current_time() || vptr == glp_ptr)
 
 		{
 			rb_free(glp_ptr->reason1);
