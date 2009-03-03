@@ -1048,8 +1048,9 @@ mod_write_ctl(rb_fde_t *F, void *data)
 		if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 			exit(0);
 
-		rb_setselect(ctl->F, RB_SELECT_WRITE, mod_write_ctl, ctl);
 	}
+	if(rb_dlink_list_length(&ctl->writeq) > 0)
+		rb_setselect(ctl->F, RB_SELECT_WRITE, mod_write_ctl, ctl);
 }
 
 
@@ -1092,7 +1093,6 @@ main(int argc, char **argv)
 	pipefd = atoi(s_pipe);
 	ppid = atoi(s_pid);
 	x = 0;
-
 #ifndef _WIN32
 	for(x = 0; x < maxfd; x++)
 	{
@@ -1100,6 +1100,7 @@ main(int argc, char **argv)
 			close(x);
 	}
 	x = open("/dev/null", O_RDWR);
+
 	if(x >= 0)
 	{
 		if(ctlfd != 0 && pipefd != 0)
@@ -1112,7 +1113,6 @@ main(int argc, char **argv)
 			close(x);
 	}
 #endif
-
 	setup_signals();
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd, 1024, 4096);
 	rb_init_rawbuffers(1024);
