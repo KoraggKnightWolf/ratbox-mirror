@@ -1,3 +1,11 @@
+androsyn    2009/03/03 16:20:50 UTC	(20090303_0-26463)
+  Log:
+  i believe this fixes the ssld issues on solaris
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2009/02/21 23:58:11 UTC	(20090221_0-26461)
   Log:
   rerun autotools
