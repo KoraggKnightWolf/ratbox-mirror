@@ -187,7 +187,7 @@ if test "$cf_enable_openssl" != "no" ; then
 	if test ! -z "$cf_openssl_basedir"; then
 		if test -f "${cf_openssl_basedir}/include/openssl/opensslv.h" ; then
 			SSL_INCLUDES="-I${cf_openssl_basedir}/include"
-			SSL_LIBS="-L${cf_openssl_basedir}/lib"
+			SSL_LIBS="-L${cf_openssl_basedir}/lib $lt_cv_dlopen_libs"
 		else
 		dnl OpenSSL wasn't found in the directory specified.  Naughty
 		dnl administrator...
@@ -251,7 +251,7 @@ fi
 if test "$cf_openssl_version_ok" != no; then
 	CPPFLAGS="$CPPFLAGS $SSL_LIBS"
 	AC_CHECK_LIB(crypto, RSA_free, 
-		[SSL_LIBS="$SSL_LIBS -lcrypto"], 
+		[SSL_LIBS="$SSL_LIBS -lcrypto $lt_cv_dlopen_libs"], 
 		[cf_enable_openssl=no]  
 	)
 fi

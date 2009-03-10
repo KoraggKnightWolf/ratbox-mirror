@@ -24073,7 +24073,7 @@ if test "$cf_enable_openssl" != "no" ; then
 		if test ! -z "$cf_openssl_basedir"; then
 		if test -f "${cf_openssl_basedir}/include/openssl/opensslv.h" ; then
 			SSL_INCLUDES="-I${cf_openssl_basedir}/include"
-			SSL_LIBS="-L${cf_openssl_basedir}/lib"
+			SSL_LIBS="-L${cf_openssl_basedir}/lib $lt_cv_dlopen_libs"
 		else
 						cf_openssl_basedir=""
 		fi
@@ -24243,7 +24243,7 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_RSA_free" >&5
 $as_echo "$ac_cv_lib_crypto_RSA_free" >&6; }
 if test "x$ac_cv_lib_crypto_RSA_free" = x""yes; then
-  SSL_LIBS="$SSL_LIBS -lcrypto"
+  SSL_LIBS="$SSL_LIBS -lcrypto $lt_cv_dlopen_libs"
 else
   cf_enable_openssl=no
 
