@@ -1,3 +1,14 @@
+jilles      2009/04/17 12:38:42 UTC	(20090417_0-26493)
+  Log:
+  Add in ts6-protocol changes from charybdis:
+  - Add description for TB and TOPIC messages.
+  - Enhanced charybdis op-moderate (+z) mode.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/technical/ts6-protocol.txt (File Modified) 
+
+
 jilles      2009/03/24 23:37:28 UTC	(20090324_0-26481)
   Log:
   Add gline and gungline to protocol document.
