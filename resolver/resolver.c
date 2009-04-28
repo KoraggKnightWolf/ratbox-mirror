@@ -176,7 +176,7 @@ send_answer(void *vptr, struct DNSReply *reply)
 				if(GET_SS_FAMILY(&reply->addr) == AF_INET6)
 				{
 					char tmpres[65];
-					rb_inet_ntop(AF_INET6, (struct sockaddr *)&reply->addr,
+					rb_inet_ntop_sock((struct sockaddr *)&reply->addr,
 						     tmpres, sizeof(tmpres) - 1);
 					aftype = 6;
 					if(*tmpres == ':')
@@ -195,7 +195,7 @@ send_answer(void *vptr, struct DNSReply *reply)
 				{
 					result = 1;
 					aftype = 4;
-					rb_inet_ntop(AF_INET, (struct sockaddr *)&reply->addr,
+					rb_inet_ntop_sock((struct sockaddr *)&reply->addr,
 						     response, sizeof(response));
 					break;
 				}
