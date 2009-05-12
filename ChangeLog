@@ -1,3 +1,14 @@
+androsyn    2009/05/12 13:27:37 UTC	(20090512_0-26503)
+  Log:
+  Forward port r26501 from 3_0 branch
+    - report errors and close the incoming connection if socketpair fails on ssl connections
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 jilles      2009/04/28 21:19:11 UTC	(20090428_0-26497)
   Log:
   Fix forward DNS resolution, only used by connect::host with hostnames in it.
