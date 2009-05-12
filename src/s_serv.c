@@ -547,7 +547,7 @@ serv_connect_ssl_callback(rb_fde_t *F, int status, void *data)
 	{
                 report_error("rb_socketpair failed for server %s:%s",
 			      client_p->name, log_client_name(client_p, SHOW_IP), errno);
-		serv_connect_calback(F, RB_ERROR, data);
+		serv_connect_callback(F, RB_ERROR, data);
 		return;
 		
 	}
