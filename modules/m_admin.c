@@ -173,5 +173,5 @@ admin_spy(struct Client *source_p)
 	hd.client = source_p;
 	hd.arg1 = hd.arg2 = NULL;
 
-	call_hook(doing_admin_hook, &hd);
+	call_hook(doing_admin_hook, &(hook_data){.client = source_p, .arg1 = NULL, .arg2 = NULL});
 }
