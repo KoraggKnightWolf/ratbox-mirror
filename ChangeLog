@@ -1,3 +1,13 @@
+androsyn    2009/05/12 13:58:28 UTC	(20090512_1-26507)
+  Log:
+  backport r26505 to check the return values on rb_socketpair
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_admin.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2009/05/12 13:27:37 UTC	(20090512_0-26503)
   Log:
   Forward port r26501 from 3_0 branch
