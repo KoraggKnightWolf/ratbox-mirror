@@ -1,3 +1,11 @@
+androsyn    2009/05/13 15:09:20 UTC	(20090513_1-26515)
+  Log:
+  check the return value on rb_pipe
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2009/05/13 01:27:23 UTC	(20090513_0-26511)
   Log:
   add checks for enabling -fstack-protector where available
