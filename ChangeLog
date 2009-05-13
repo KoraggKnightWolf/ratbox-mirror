@@ -1,3 +1,14 @@
+androsyn    2009/05/13 01:27:23 UTC	(20090513_0-26511)
+  Log:
+  add checks for enabling -fstack-protector where available
+
+  Modified:
+	ircd-ratbox/trunk/acinclude.m4 (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+
+
 jilles      2009/05/12 21:26:03 UTC	(20090512_2-26509)
   Log:
   Unbreak compile.
