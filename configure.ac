@@ -55,6 +55,9 @@ AC_PROG_GCC_TRADITIONAL
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 
+GCC_STACK_PROTECT_LIB
+GCC_STACK_PROTECT_CC
+
 srcpwd=`cd ${srcdir} ; ${PWDCMD-pwd}`
 
 # We pase INSTALL explicitly to sub-makes.  Make sure that it is not

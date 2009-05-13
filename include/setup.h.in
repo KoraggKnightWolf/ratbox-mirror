@@ -38,6 +38,9 @@
 /* ratbox-services compatibility code */
 #undef ENABLE_SERVICES
 
+/* Define if SSP C support is enabled. */
+#undef ENABLE_SSP_CC
+
 /* Prefix where config files are installed. */
 #undef ETC_DIR
 
