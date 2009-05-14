@@ -300,9 +300,9 @@ cleanup_challenge(struct Client *target_p)
 	if(target_p->localClient == NULL)
 		return;
 
-	rb_free(target_p->localClient->passwd);
+	rb_free(target_p->localClient->chal_resp);
 	rb_free(target_p->localClient->opername);
-	target_p->localClient->passwd = NULL;
+	target_p->localClient->chal_resp = NULL;
 	target_p->localClient->opername = NULL;
 	target_p->localClient->chal_time = 0;
 }
@@ -332,7 +332,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(*parv[1] == '+')
 	{
-		if(source_p->localClient->passwd == NULL)
+		if(source_p->localClient->chal_resp == NULL)
 			return 0;
 
 		if((rb_current_time() - source_p->localClient->chal_time) > CHALLENGE_EXPIRES)
@@ -355,7 +355,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 			rb_base64_decode((const unsigned char *)++parv[1], strlen(parv[1]), &len);
 
 		if(len != SHA_DIGEST_LENGTH
-		   || memcmp(source_p->localClient->passwd, b_response, SHA_DIGEST_LENGTH))
+		   || memcmp(source_p->localClient->chal_resp, b_response, SHA_DIGEST_LENGTH))
 		{
 			sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
 			ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
@@ -443,7 +443,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 	}
 
 
-	if(!generate_challenge(&challenge, &(source_p->localClient->passwd), oper_p->rsa_pubkey))
+	if(!generate_challenge(&challenge, &(source_p->localClient->chal_resp), oper_p->rsa_pubkey))
 	{
 		char *chal = challenge;
 		source_p->localClient->chal_time = rb_current_time();
