@@ -171,7 +171,7 @@ struct LocalUser
 
 	/* challenge stuff */
 	time_t chal_time;
-	void *chal_resp;
+	char *chal_resp;
 	
 	/* clients allowed to talk through +g */
 	rb_dlink_list allow_list;
