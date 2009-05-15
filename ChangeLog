@@ -1,3 +1,12 @@
+androsyn    2009/05/15 22:07:00 UTC	(20090515_0-26543)
+  Log:
+  remove check for libssp
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2009/05/14 22:33:28 UTC	(20090514_0-26537)
   Log:
   fix a CHALLENGE related core
