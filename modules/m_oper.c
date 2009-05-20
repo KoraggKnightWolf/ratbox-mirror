@@ -292,7 +292,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 #else
 
-static int generate_challenge(char **r_challenge, char **r_response, RSA * rsa);
+static int generate_challenge(uint8_t **r_challenge, uint8_t **r_response, RSA * rsa);
 
 static void
 cleanup_challenge(struct Client *target_p)
@@ -317,7 +317,7 @@ static int
 m_challenge(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct oper_conf *oper_p;
-	char *challenge = NULL;
+	uint8_t *challenge = NULL;
 	char chal_line[CHALLENGE_WIDTH];
 	uint8_t *b_response;
 	int len = 0;
@@ -443,9 +443,9 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 	}
 
 
-	if(!generate_challenge(&challenge, &(source_p->localClient->chal_resp), oper_p->rsa_pubkey))
+	if(!generate_challenge(&challenge, &source_p->localClient->chal_resp, oper_p->rsa_pubkey))
 	{
-		char *chal = challenge;
+		char *chal = (char *)challenge;
 		source_p->localClient->chal_time = rb_current_time();
 		SetCork(source_p);
 		for(;;)
@@ -473,10 +473,10 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 
 static int
-generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
+generate_challenge(uint8_t **r_challenge, uint8_t **r_response, RSA * rsa)
 {
 	SHA_CTX ctx;
-	unsigned char secret[CHALLENGE_SECRET_LENGTH], *tmp;
+	uint8_t secret[CHALLENGE_SECRET_LENGTH], *tmp;
 	unsigned long length;
 	unsigned long e = 0;
 	unsigned long cnt = 0;
@@ -487,7 +487,7 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 	if(rb_get_random(secret, CHALLENGE_SECRET_LENGTH))
 	{
 		SHA1_Init(&ctx);
-		SHA1_Update(&ctx, (uint8_t *)secret, CHALLENGE_SECRET_LENGTH);
+		SHA1_Update(&ctx, secret, CHALLENGE_SECRET_LENGTH);
 		*r_response = rb_malloc(SHA_DIGEST_LENGTH);
 		SHA1_Final((uint8_t *)*r_response, &ctx);
 
@@ -498,7 +498,7 @@ generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 
 		if(ret >= 0)
 		{
-			*r_challenge = (char *)rb_base64_encode(tmp, ret);
+			*r_challenge = rb_base64_encode(tmp, ret);
 			rb_free(tmp);
 			return 0;
 		}
