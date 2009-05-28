@@ -1,3 +1,33 @@
+androsyn    2009/05/28 14:30:34 UTC	(20090528_0-26574)
+  Log:
+  very initial first pass at TS5 removal...i'm sure there are a lot of pieces left around of it everywhere
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_kick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_part.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_squit.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_away.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_connect.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_gline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_knock.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_map.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_tb.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_topic.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_wallops.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2009/05/20 21:16:01 UTC	(20090520_0-26555)
   Log:
   change type for chal_resp to uint8_t and eliminate some type casts
