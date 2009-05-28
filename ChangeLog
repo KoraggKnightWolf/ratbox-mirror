@@ -1,3 +1,12 @@
+jilles      2009/05/28 19:12:21 UTC	(20090528_3-26582)
+  Log:
+  Unbreak sending cmode +l and +k to servers.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+
+
 androsyn    2009/05/28 16:27:55 UTC	(20090528_2-26578)
   Log:
   drop servers introduced with TS5 SERVER.  This means that most JUPES type services need fixed somehow...
