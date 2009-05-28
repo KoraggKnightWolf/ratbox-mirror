@@ -1,3 +1,14 @@
+jilles      2009/05/28 19:24:52 UTC	(20090528_6-26588)
+  Log:
+  Simplify checking if a connect block matches a server.
+  Without server hostmasking, a string comparison suffices,
+  no match() is needed.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 jilles      2009/05/28 19:20:14 UTC	(20090528_5-26586)
   Log:
   Remove more TS5 remnants.
