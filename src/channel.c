@@ -990,7 +990,7 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 		nocap = chcap_combos[j].cap_no;
 
 		mbl = preflen = rb_sprintf(modebuf, ":%s TMODE %ld %s ",
-						   use_id(source_p), (long)chptr->channelts,
+						   source_p->id, (long)chptr->channelts,
 						   chptr->chname);
 
 		/* loop the list of - modes we have */

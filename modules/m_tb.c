@@ -104,7 +104,7 @@ ms_tb(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 				     source_p->name, chptr->chname, newtopic);
 		sendto_server(client_p, chptr, CAP_TB | CAP_TS6, NOCAPS,
 			      ":%s TB %s %ld %s%s:%s",
-			      use_id(source_p), chptr->chname, (long)chptr->topic->topic_time,
+			      source_p->id, chptr->chname, (long)chptr->topic->topic_time,
 			      ConfigChannel.burst_topicwho ? chptr->topic->topic_info : "",
 			      ConfigChannel.burst_topicwho ? " " : "", chptr->topic->topic);
 	}

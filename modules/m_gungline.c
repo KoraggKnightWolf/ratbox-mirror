@@ -167,7 +167,7 @@ mo_gungline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	majority_ungline(source_p, user, host, reason);
 
 	sendto_server(client_p, NULL, CAP_ENCAP | CAP_TS6, NOCAPS,
-		      ":%s ENCAP * GUNGLINE %s %s :%s", use_id(source_p), user, host, reason);
+		      ":%s ENCAP * GUNGLINE %s %s :%s", source_p->id, user, host, reason);
 	return 0;
 }
 

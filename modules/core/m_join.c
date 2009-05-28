@@ -269,7 +269,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		{
 			sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
 				      ":%s JOIN %ld %s +",
-				      use_id(source_p), (long)chptr->channelts, chptr->chname);
+				      source_p->id, (long)chptr->channelts, chptr->chname);
 		}
 
 		del_invite(chptr, source_p);
@@ -407,7 +407,6 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 {
 	static char modebuf[MODEBUFLEN];
 	static char *mbuf;
-	static char buf_nick[BUFSIZE];
 	static char buf_uid[BUFSIZE];
 	static const char *para[MAXMODEPARAMS];
 	static const char empty_modes[] = "0";
@@ -422,13 +421,11 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	int keep_new_modes = 1;
 	int fl;
 	int isnew;
-	int mlen_nick, mlen_uid;
-	int len_nick;
+	int mlen_uid;
 	int len_uid;
 	int len;
 	int joins = 0;
 	const char *s;
-	char *ptr_nick;
 	char *ptr_uid;
 	char *p;
 	int i;
@@ -571,21 +568,17 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	else
 		modes = empty_modes;
 
-	mlen_nick = rb_sprintf(buf_nick, ":%s SJOIN %ld %s %s :",
-			       source_p->name, (long)chptr->channelts, parv[2], modes);
-	ptr_nick = buf_nick + mlen_nick;
-
 	/* working on the presumption eventually itll be more efficient to
 	 * build a TS6 buffer without checking its needed..
 	 */
 	mlen_uid = rb_sprintf(buf_uid, ":%s SJOIN %ld %s %s :",
-			      use_id(source_p), (long)chptr->channelts, parv[2], modes);
+			      source_p->id, (long)chptr->channelts, parv[2], modes);
 	ptr_uid = buf_uid + mlen_uid;
 
 	mbuf = modebuf;
 	para[0] = para[1] = para[2] = para[3] = empty;
 	pargs = 0;
-	len_nick = len_uid = 0;
+	len_uid = 0;
 
 	*mbuf++ = '+';
 
@@ -637,25 +630,17 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		{
 			if(fl & CHFL_CHANOP)
 			{
-				*ptr_nick++ = '@';
 				*ptr_uid++ = '@';
-				len_nick++;
 				len_uid++;
 			}
 			if(fl & CHFL_VOICE)
 			{
-				*ptr_nick++ = '+';
 				*ptr_uid++ = '+';
-				len_nick++;
 				len_uid++;
 			}
 		}
 
-		/* copy the nick to the two buffers */
-		len = rb_sprintf(ptr_nick, "%s ", target_p->name);
-		ptr_nick += len;
-		len_nick += len;
-		len = rb_sprintf(ptr_uid, "%s ", use_id(target_p));
+		len = rb_sprintf(ptr_uid, "%s ", target_p->id);
 		ptr_uid += len;
 		len_uid += len;
 
@@ -764,7 +749,6 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 	}
 
-	*(ptr_nick - 1) = '\0';
 	*(ptr_uid - 1) = '\0';
 
 	sendto_server(client_p->from, NULL, CAP_TS6, NOCAPS, "%s", buf_uid);
@@ -816,7 +800,7 @@ do_join_0(struct Client *client_p, struct Client *source_p)
 		flood_endgrace(source_p);
 
 
-	sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s JOIN 0", use_id(source_p));
+	sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s JOIN 0", source_p->id);
 
 	if(source_p->user->channel.head && MyConnect(source_p) &&
 	   !IsOper(source_p) && !IsExemptSpambot(source_p))

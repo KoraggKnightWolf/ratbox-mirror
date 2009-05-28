@@ -103,7 +103,7 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 			sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
 				      ":%s TOPIC %s :%s",
-				      use_id(source_p), chptr->chname,
+				      source_p->id, chptr->chname,
 				      chptr->topic == NULL ? "" : chptr->topic->topic);
 			sendto_channel_local(ALL_MEMBERS,
 					     chptr, ":%s!%s@%s TOPIC %s :%s",

@@ -199,7 +199,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	/* 4 param version for hyb-7 servers */
 	sendto_server(NULL, NULL, CAP_GLN | CAP_TS6, NOCAPS,
-		      ":%s GLINE %s %s :%s", use_id(source_p), user, host, reason);
+		      ":%s GLINE %s %s :%s", source_p->id, user, host, reason);
 
 #if 0
 	/* hybrid 6 doesn't support TS6 at all so... */
@@ -238,7 +238,7 @@ mc_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 
 	sendto_server(client_p, NULL, CAP_GLN | CAP_TS6, NOCAPS,
-		      ":%s GLINE %s %s :%s", use_id(acptr), user, host, reason);
+		      ":%s GLINE %s %s :%s", acptr->id, user, host, reason);
 
 	if(!ConfigFileEntry.glines)
 		return 0;
@@ -340,7 +340,7 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 
 	sendto_server(client_p, NULL, CAP_GLN | CAP_TS6, NOCAPS,
-		      ":%s GLINE %s %s :%s", use_id(acptr), user, host, reason);
+		      ":%s GLINE %s %s :%s", acptr->id, user, host, reason);
 
 	if(!ConfigFileEntry.glines)
 		return 0;

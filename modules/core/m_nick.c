@@ -691,7 +691,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick, 
 		if(dosend)
 		{
 			sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
-				      use_id(source_p), nick, (long)source_p->tsinfo);
+				      source_p->id, nick, (long)source_p->tsinfo);
 		}
 	}
 
@@ -747,7 +747,7 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 		if(dosend)
 		{
 			sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
-				      use_id(source_p), nick, (long)source_p->tsinfo);
+				      source_p->id, nick, (long)source_p->tsinfo);
 		}
 	}
 

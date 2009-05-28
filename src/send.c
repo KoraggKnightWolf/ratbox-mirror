@@ -531,7 +531,7 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 				  ":%s!%s@%s %s",
 				  source_p->name, source_p->username, source_p->host, buf);
 
-	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
+	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", source_p->id, buf);
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->members.head)
 	{
@@ -699,7 +699,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p,
 				  ":%s!%s@%s %s",
 				  source_p->name, source_p->username, source_p->host, buf);
 
-	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
+	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", source_p->id, buf);
 
 	if(what == MATCH_HOST)
 	{
@@ -760,7 +760,7 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap,
 	rb_vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
-	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
+	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", source_p->id, buf);
 
 	current_serial++;
 
@@ -1005,7 +1005,7 @@ kill_client_serv_butone(struct Client *one, struct Client *target_p, const char 
 	va_end(args);
 
 	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s KILL %s :%s",
-			  use_id(&me), use_id(target_p), buf);
+			  use_id(&me), target_p->id, buf);
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, serv_list.head)
 	{

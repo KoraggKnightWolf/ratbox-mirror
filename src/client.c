@@ -1143,7 +1143,7 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
 	if((source_p->flags & FLAGS_KILLED) == 0)
 	{
 		sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
-			      ":%s QUIT :%s", use_id(source_p), comment);
+			      ":%s QUIT :%s", source_p->id, comment);
 		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
 			      ":%s QUIT :%s", source_p->name, comment);
 	}
@@ -1279,7 +1279,7 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 		    from == source_p ? me.name : from->name, comment);
 #if 0				/* let's not do this for now -- jilles */
 	if(!IsIOError(source_p))
-		sendto_one(source_p, "SQUIT %s :%s", use_id(source_p), newcomment);
+		sendto_one(source_p, "SQUIT %s :%s", source_p->id, newcomment);
 #endif
 	if(client_p != NULL && source_p != client_p && !IsIOError(source_p))
 	{
@@ -1388,7 +1388,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	if((source_p->flags & FLAGS_KILLED) == 0)
 	{
 		sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
-			      ":%s QUIT :%s", use_id(source_p), comment);
+			      ":%s QUIT :%s", source_p->id, comment);
 		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
 			      ":%s QUIT :%s", source_p->name, comment);
 	}
