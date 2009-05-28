@@ -246,11 +246,11 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 static int
 ms_server(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	char *name = parv[1];
+	const char *name = parv[1];
 
 	sendto_one(client_p, "ERROR :Introduced server %s is not TS6", name);
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Link %s cancelled, introduced server %s is not TS6", client_p->name, name);
-	exit_client(client_p, client_p, &me, "Introduced erver not TS6");
+	exit_client(client_p, client_p, &me, "Introduced server not TS6");
 	return 0;
 }
 
