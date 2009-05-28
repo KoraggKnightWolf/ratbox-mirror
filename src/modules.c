@@ -165,8 +165,7 @@ mod_add_path(const char *path)
 		return;
 
 	pathst = rb_malloc(sizeof(struct module_path));
-
-	strcpy(pathst->path, path);
+	rb_strlcpy(pathst->path, path, sizeof(pathst->path));	
 	rb_dlinkAddAlloc(pathst, &mod_paths);
 }
 

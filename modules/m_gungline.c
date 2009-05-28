@@ -168,9 +168,6 @@ mo_gungline(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	sendto_server(client_p, NULL, CAP_ENCAP | CAP_TS6, NOCAPS,
 		      ":%s ENCAP * GUNGLINE %s %s :%s", use_id(source_p), user, host, reason);
-	sendto_server(client_p, NULL, CAP_ENCAP, CAP_TS6,
-		      ":%s ENCAP * GUNGLINE %s %s :%s", source_p->name, user, host, reason);
-
 	return 0;
 }
 

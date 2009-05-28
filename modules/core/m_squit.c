@@ -144,10 +144,6 @@ ms_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 			      ":%s WALLOPS :Remote SQUIT %s from %s (%s)",
 			      me.id, target_p->name, source_p->name, comment);
 
-		sendto_server(NULL, NULL, NOCAPS, CAP_TS6,
-			      ":%s WALLOPS :Remote SQUIT %s from %s (%s)",
-			      me.name, target_p->name, source_p->name, comment);
-
 		ilog(L_SERVER, "SQUIT From %s : %s (%s)", source_p->name, target_p->name, comment);
 
 	}

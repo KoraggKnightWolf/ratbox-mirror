@@ -200,14 +200,16 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* 4 param version for hyb-7 servers */
 	sendto_server(NULL, NULL, CAP_GLN | CAP_TS6, NOCAPS,
 		      ":%s GLINE %s %s :%s", use_id(source_p), user, host, reason);
-	sendto_server(NULL, NULL, CAP_GLN, CAP_TS6,
-		      ":%s GLINE %s %s :%s", source_p->name, user, host, reason);
 
+#if 0
+	/* hybrid 6 doesn't support TS6 at all so... */
 	/* 8 param for hyb-6 */
 	sendto_server(NULL, NULL, NOCAPS, CAP_GLN,
 		      ":%s GLINE %s %s %s %s %s %s :%s",
 		      me.name, source_p->name, source_p->username,
 		      source_p->host, source_p->servptr->name, user, host, reason);
+#endif
+
 	return 0;
 }
 
@@ -237,12 +239,6 @@ mc_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	sendto_server(client_p, NULL, CAP_GLN | CAP_TS6, NOCAPS,
 		      ":%s GLINE %s %s :%s", use_id(acptr), user, host, reason);
-	sendto_server(client_p, NULL, CAP_GLN, CAP_TS6,
-		      ":%s GLINE %s %s :%s", acptr->name, user, host, reason);
-	sendto_server(client_p, NULL, NOCAPS, CAP_GLN,
-		      ":%s GLINE %s %s %s %s %s %s :%s",
-		      acptr->servptr->name, acptr->name,
-		      acptr->username, acptr->host, acptr->servptr->name, user, host, reason);
 
 	if(!ConfigFileEntry.glines)
 		return 0;
@@ -345,12 +341,6 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	sendto_server(client_p, NULL, CAP_GLN | CAP_TS6, NOCAPS,
 		      ":%s GLINE %s %s :%s", use_id(acptr), user, host, reason);
-	sendto_server(client_p, NULL, CAP_GLN, CAP_TS6,
-		      ":%s GLINE %s %s :%s", acptr->name, user, host, reason);
-	sendto_server(client_p, NULL, NOCAPS, CAP_GLN,
-		      ":%s GLINE %s %s %s %s %s %s :%s",
-		      acptr->servptr->name, acptr->name,
-		      acptr->username, acptr->host, acptr->servptr->name, user, host, reason);
 
 	if(!ConfigFileEntry.glines)
 		return 0;

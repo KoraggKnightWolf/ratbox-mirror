@@ -211,7 +211,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		return 0;
 	}
 
-	if(has_id(client_p) && (target_p = find_id(client_p->id)) != NULL)
+	if((target_p = find_id(client_p->id)) != NULL)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Attempt to re-introduce SID %s from %s[@255.255.255.255]",
@@ -538,10 +538,6 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		      ":%s SID %s %d %s :%s%s",
 		      source_p->id, target_p->name, target_p->hopcount + 1,
 		      target_p->id, IsHidden(target_p) ? "(H) " : "", target_p->info);
-	sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
-		      ":%s SERVER %s %d :%s%s",
-		      source_p->name, target_p->name, target_p->hopcount + 1,
-		      IsHidden(target_p) ? "(H) " : "", target_p->info);
 
 	sendto_realops_flags(UMODE_EXTERNAL, L_ALL,
 			     "Server %s being introduced by %s", target_p->name, source_p->name);
@@ -724,63 +720,6 @@ check_server(const char *name, struct Client *client_p)
 	return 0;
 }
 
-/* burst_modes_TS5()
- *
- * input	- client to burst to, channel name, list to burst, mode flag
- * output	-
- * side effects - client is sent a list of +b, or +e, or +I modes
- */
-static void
-burst_modes_TS5(struct Client *client_p, char *chname, rb_dlink_list *list, char flag)
-{
-	char buf[BUFSIZE];
-	char mbuf[MODEBUFLEN];
-	char pbuf[BUFSIZE];
-	struct Ban *banptr;
-	rb_dlink_node *ptr;
-	int tlen;
-	int mlen;
-	int cur_len;
-	char *mp;
-	char *pp;
-	int count = 0;
-
-	mlen = rb_sprintf(buf, ":%s MODE %s +", me.name, chname);
-	cur_len = mlen;
-
-	mp = mbuf;
-	pp = pbuf;
-
-	RB_DLINK_FOREACH(ptr, list->head)
-	{
-		banptr = ptr->data;
-		tlen = strlen(banptr->banstr) + 3;
-
-		/* uh oh */
-		if(tlen > MODEBUFLEN)
-			continue;
-
-		if((count >= MAXMODEPARAMS) || ((cur_len + tlen + 2) > (BUFSIZE - 3)))
-		{
-			sendto_one(client_p, "%s%s %s", buf, mbuf, pbuf);
-
-			mp = mbuf;
-			pp = pbuf;
-			cur_len = mlen;
-			count = 0;
-		}
-
-		*mp++ = flag;
-		*mp = '\0';
-		pp += rb_sprintf(pp, "%s ", banptr->banstr);
-		cur_len += tlen;
-		count++;
-	}
-
-	if(count != 0)
-		sendto_one(client_p, "%s%s %s", buf, mbuf, pbuf);
-}
-
 /* burst_modes_TS6()
  *
  * input	- client to burst to, channel name, list to burst, mode flag
@@ -837,128 +776,6 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr, rb_dlink_list *l
 	sendto_one_buffer(client_p, buf);
 }
 
-/*
- * burst_TS5
- * 
- * inputs	- client (server) to send nick towards
- * 		- client to send nick for
- * output	- NONE
- * side effects	- NICK message is sent towards given client_p
- */
-static void
-burst_TS5(struct Client *client_p)
-{
-	static char ubuf[12];
-	char buf[BUFSIZE];
-	struct Client *target_p;
-	struct Channel *chptr;
-	struct membership *msptr;
-	hook_data_client hclientinfo;
-	hook_data_channel hchaninfo;
-	rb_dlink_node *ptr;
-	rb_dlink_node *uptr;
-	char *t;
-	int tlen, mlen;
-	int cur_len = 0;
-
-	hclientinfo.client = hchaninfo.client = client_p;
-
-	RB_DLINK_FOREACH(ptr, global_client_list.head)
-	{
-		target_p = ptr->data;
-
-		if(!IsClient(target_p))
-			continue;
-
-		send_umode(NULL, target_p, 0, SEND_UMODES, ubuf);
-		if(!*ubuf)
-		{
-			ubuf[0] = '+';
-			ubuf[1] = '\0';
-		}
-
-		sendto_one(client_p, "NICK %s %d %ld %s %s %s %s :%s",
-			   target_p->name, target_p->hopcount + 1,
-			   (long)target_p->tsinfo, ubuf,
-			   target_p->username, target_p->host,
-			   target_p->servptr->name, target_p->info);
-
-		if(ConfigFileEntry.burst_away && !EmptyString(target_p->user->away))
-			sendto_one(client_p, ":%s AWAY :%s", target_p->name, target_p->user->away);
-
-		hclientinfo.target = target_p;
-		call_hook(h_burst_client, &hclientinfo);
-	}
-
-	RB_DLINK_FOREACH(ptr, global_channel_list.head)
-	{
-		chptr = ptr->data;
-
-		s_assert(rb_dlink_list_length(&chptr->members) > 0);
-		if(rb_dlink_list_length(&chptr->members) <= 0)
-			continue;
-
-		if(*chptr->chname != '#')
-			continue;
-
-		cur_len = mlen = rb_sprintf(buf, ":%s SJOIN %ld %s %s :", me.name,
-					    (long)chptr->channelts, chptr->chname,
-					    channel_modes(chptr, client_p));
-
-		t = buf + mlen;
-
-		RB_DLINK_FOREACH(uptr, chptr->members.head)
-		{
-			msptr = uptr->data;
-
-			tlen = strlen(msptr->client_p->name) + 1;
-			if(is_chanop(msptr))
-				tlen++;
-			if(is_voiced(msptr))
-				tlen++;
-
-			if(cur_len + tlen >= BUFSIZE - 3)
-			{
-				t--;
-				*t = '\0';
-				sendto_one_buffer(client_p, buf);
-				cur_len = mlen;
-				t = buf + mlen;
-			}
-
-			rb_sprintf(t, "%s%s ", find_channel_status(msptr, 1),
-				   msptr->client_p->name);
-
-			cur_len += tlen;
-			t += tlen;
-		}
-
-		/* remove trailing space */
-		t--;
-		*t = '\0';
-		sendto_one_buffer(client_p, buf);
-
-		burst_modes_TS5(client_p, chptr->chname, &chptr->banlist, 'b');
-
-		if(IsCapable(client_p, CAP_EX))
-			burst_modes_TS5(client_p, chptr->chname, &chptr->exceptlist, 'e');
-
-		if(IsCapable(client_p, CAP_IE))
-			burst_modes_TS5(client_p, chptr->chname, &chptr->invexlist, 'I');
-
-		if(IsCapable(client_p, CAP_TB) && chptr->topic != NULL)
-			sendto_one(client_p, ":%s TB %s %ld %s%s:%s",
-				   me.name, chptr->chname, (long)chptr->topic->topic_time,
-				   ConfigChannel.burst_topicwho ? chptr->topic->topic_info : "",
-				   ConfigChannel.burst_topicwho ? " " : "", chptr->topic->topic);
-
-		hchaninfo.chptr = chptr;
-		call_hook(h_burst_channel, &hchaninfo);
-	}
-
-	hclientinfo.target = NULL;
-	call_hook(h_burst_finished, &hclientinfo);
-}
 
 /*
  * burst_TS6
@@ -1000,22 +817,13 @@ burst_TS6(struct Client *client_p)
 			ubuf[1] = '\0';
 		}
 
-		if(has_id(target_p))
-			sendto_one(client_p, ":%s UID %s %d %ld %s %s %s %s %s :%s",
-				   target_p->servptr->id, target_p->name,
-				   target_p->hopcount + 1,
-				   (long)target_p->tsinfo, ubuf,
-				   target_p->username, target_p->host,
-				   IsIPSpoof(target_p) ? "0" : target_p->sockhost,
-				   target_p->id, target_p->info);
-		else
-			sendto_one(client_p, "NICK %s %d %ld %s %s %s %s :%s",
-				   target_p->name,
-				   target_p->hopcount + 1,
-				   (long)target_p->tsinfo,
-				   ubuf,
-				   target_p->username, target_p->host,
-				   target_p->servptr->name, target_p->info);
+		sendto_one(client_p, ":%s UID %s %d %ld %s %s %s %s %s :%s",
+			   target_p->servptr->id, target_p->name,
+			   target_p->hopcount + 1,
+			   (long)target_p->tsinfo, ubuf,
+			   target_p->username, target_p->host,
+			   IsIPSpoof(target_p) ? "0" : target_p->sockhost,
+			   target_p->id, target_p->info);
 
 		if(ConfigFileEntry.burst_away && !EmptyString(target_p->user->away))
 			sendto_one(client_p, ":%s AWAY :%s",
@@ -1208,8 +1016,7 @@ server_estab(struct Client *client_p)
 	rb_dlinkMoveNode(&client_p->localClient->tnode, &unknown_list, &serv_list);
 	rb_dlinkAddTailAlloc(client_p, &global_serv_list);
 
-	if(has_id(client_p))
-		add_to_hash(HASH_ID, client_p->id, client_p);
+	add_to_hash(HASH_ID, client_p->id, client_p);
 
 	add_to_hash(HASH_CLIENT, client_p->name, client_p);
 	/* doesnt duplicate client_p->serv if allocated this struct already */
@@ -1266,26 +1073,13 @@ server_estab(struct Client *client_p)
 		if(target_p == client_p)
 			continue;
 
-		if(has_id(target_p) && has_id(client_p))
-		{
-			sendto_one(target_p, ":%s SID %s 2 %s :%s%s",
-				   me.id, client_p->name, client_p->id,
-				   IsHidden(client_p) ? "(H) " : "", client_p->info);
+		sendto_one(target_p, ":%s SID %s 2 %s :%s%s",
+			   me.id, client_p->name, client_p->id,
+			   IsHidden(client_p) ? "(H) " : "", client_p->info);
 
-			if(IsCapable(target_p, CAP_ENCAP) && !EmptyString(client_p->serv->fullcaps))
-				sendto_one(target_p, ":%s ENCAP * GCAP :%s",
-					   client_p->id, client_p->serv->fullcaps);
-		}
-		else
-		{
-			sendto_one(target_p, ":%s SERVER %s 2 :%s%s",
-				   me.name, client_p->name,
-				   IsHidden(client_p) ? "(H) " : "", client_p->info);
-
-			if(IsCapable(target_p, CAP_ENCAP) && !EmptyString(client_p->serv->fullcaps))
-				sendto_one(target_p, ":%s ENCAP * GCAP :%s",
-					   client_p->name, client_p->serv->fullcaps);
-		}
+		if(IsCapable(target_p, CAP_ENCAP) && !EmptyString(client_p->serv->fullcaps))
+			sendto_one(target_p, ":%s ENCAP * GCAP :%s",
+				   client_p->id, client_p->serv->fullcaps);
 	}
 
 	/*
@@ -1315,26 +1109,17 @@ server_estab(struct Client *client_p)
 			continue;
 
 		/* presumption, if target has an id, so does its uplink */
-		if(has_id(client_p) && has_id(target_p))
-			sendto_one(client_p, ":%s SID %s %d %s :%s%s",
-				   target_p->servptr->id, target_p->name,
-				   target_p->hopcount + 1, target_p->id,
-				   IsHidden(target_p) ? "(H) " : "", target_p->info);
-		else
-			sendto_one(client_p, ":%s SERVER %s %d :%s%s",
-				   target_p->servptr->name,
-				   target_p->name, target_p->hopcount + 1,
-				   IsHidden(target_p) ? "(H) " : "", target_p->info);
+		sendto_one(client_p, ":%s SID %s %d %s :%s%s",
+			   target_p->servptr->id, target_p->name,
+			   target_p->hopcount + 1, target_p->id,
+			   IsHidden(target_p) ? "(H) " : "", target_p->info);
 
 		if(IsCapable(client_p, CAP_ENCAP) && !EmptyString(target_p->serv->fullcaps))
 			sendto_one(client_p, ":%s ENCAP * GCAP :%s",
 				   get_id(target_p, client_p), target_p->serv->fullcaps);
 	}
 
-	if(has_id(client_p))
-		burst_TS6(client_p);
-	else
-		burst_TS5(client_p);
+	burst_TS6(client_p);
 
 	/* Always send a PING after connect burst is done */
 	sendto_one(client_p, "PING :%s", get_id(&me, client_p));

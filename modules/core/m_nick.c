@@ -692,8 +692,6 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick, 
 		{
 			sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
 				      use_id(source_p), nick, (long)source_p->tsinfo);
-			sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%ld",
-				      source_p->name, nick, (long)source_p->tsinfo);
 		}
 	}
 
@@ -750,8 +748,6 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 		{
 			sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
 				      use_id(source_p), nick, (long)source_p->tsinfo);
-			sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%ld",
-				      source_p->name, nick, (long)source_p->tsinfo);
 		}
 	}
 
@@ -1165,8 +1161,7 @@ can_save(struct Client *target_p)
 
 	if(MyClient(target_p))
 		return 1;
-	if(!has_id(target_p))
-		return 0;
+
 	serv_p = IsServer(target_p) ? target_p : target_p->servptr;
 	while(serv_p != NULL && serv_p != &me)
 	{
@@ -1180,7 +1175,7 @@ can_save(struct Client *target_p)
 static void
 save_user(struct Client *client_p, struct Client *source_p, struct Client *target_p)
 {
-	if(!MyConnect(target_p) && (!has_id(target_p) || !IsCapable(target_p->from, CAP_SAVE)))
+	if(!MyConnect(target_p) && !IsCapable(target_p->from, CAP_SAVE))
 	{
 		/* This shouldn't happen */
 		/* Note we only need SAVE support in this direction */
@@ -1200,8 +1195,6 @@ save_user(struct Client *client_p, struct Client *source_p, struct Client *targe
 		      source_p->id, target_p->id, (long)target_p->tsinfo);
 	sendto_server(client_p, NULL, CAP_TS6, CAP_SAVE, ":%s NICK %s :%ld",
 		      target_p->id, target_p->id, (long)SAVE_NICKTS);
-	sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%ld",
-		      target_p->name, target_p->id, (long)SAVE_NICKTS);
 	if(!IsMe(client_p))
 		sendto_realops_flags(UMODE_SKILL, L_ALL,
 				     "Received SAVE message for %s from %s",
