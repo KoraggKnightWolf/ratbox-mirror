@@ -489,7 +489,7 @@ check_server(const char *name, struct Client *client_p)
 		if(ServerConfIllegal(tmp_p))
 			continue;
 
-		if(!match(name, tmp_p->name))
+		if(irccmp(name, tmp_p->name))
 			continue;
 
 		error = INVALID_HOST;
