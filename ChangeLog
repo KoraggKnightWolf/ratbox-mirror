@@ -1,3 +1,14 @@
+jilles      2009/05/28 19:20:14 UTC	(20090528_5-26586)
+  Log:
+  Remove more TS5 remnants.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 jilles      2009/05/28 19:19:34 UTC	(20090528_4-26584)
   Log:
   Fix compile error with --enable-warnings and typo.
