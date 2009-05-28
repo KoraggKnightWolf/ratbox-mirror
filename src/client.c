@@ -1144,8 +1144,6 @@ exit_remote_client(struct Client *client_p, struct Client *source_p, struct Clie
 	{
 		sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
 			      ":%s QUIT :%s", source_p->id, comment);
-		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
-			      ":%s QUIT :%s", source_p->name, comment);
 	}
 
 	SetDead(source_p);
@@ -1389,8 +1387,6 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	{
 		sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
 			      ":%s QUIT :%s", source_p->id, comment);
-		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
-			      ":%s QUIT :%s", source_p->name, comment);
 	}
 
 	SetDead(source_p);

@@ -549,9 +549,6 @@ introduce_client(struct Client *client_p, struct Client *source_p)
 		ubuf[1] = '\0';
 	}
 
-	/* if it has an ID, introduce it with its id to TS6 servers,
-	 * otherwise introduce it normally to all.
-	 */
 	sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
 		      ":%s UID %s %d %ld %s %s %s %s %s :%s",
 		      source_p->servptr->id, source_p->name,
