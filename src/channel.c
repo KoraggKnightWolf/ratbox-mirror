@@ -1005,7 +1005,10 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 			   || ((nocap & mode_changes[i].nocaps) != mode_changes[i].nocaps))
 				continue;
 
-			arg = mode_changes[i].id;
+			if(!EmptyString(mode_changes[i].id))
+				arg = mode_changes[i].id;
+			else
+				arg = mode_changes[i].arg;
 
 			if(arg)
 			{
