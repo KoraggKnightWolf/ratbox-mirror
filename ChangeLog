@@ -1,3 +1,14 @@
+androsyn    2009/06/12 15:38:09 UTC	(20090612_0-26594)
+  Log:
+  merge r26592 from 3.0 - fix /rehash tdlines and /rehash bans so that both deal with dlines correctly
+
+  Modified:
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+
+
 jilles      2009/05/28 19:24:52 UTC	(20090528_6-26588)
   Log:
   Simplify checking if a connect block matches a server.
