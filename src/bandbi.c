@@ -326,7 +326,8 @@ bandb_handle_finish(void)
 
 	clear_out_address_conf_bans();
 	clear_s_newconf_bans();
-
+	remove_perm_dlines();
+	
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, bandb_pending.head)
 	{
 		aconf = ptr->data;

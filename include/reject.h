@@ -53,6 +53,6 @@ int inc_global_cidr_count(struct Client *client_p);
 void dec_global_cidr_count(struct Client *client_p);
 int check_global_cidr_count(struct Client *client_p);
 void rehash_global_cidr_tree(void);
-
+void remove_perm_dlines(void);
 
 #endif
