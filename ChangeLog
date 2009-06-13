@@ -1,3 +1,12 @@
+jilles      2009/06/13 16:54:32 UTC	(20090613_0-26596)
+  Log:
+  Close the local link when a TS5 nick introduction is sent.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+
+
 androsyn    2009/06/12 15:38:09 UTC	(20090612_0-26594)
   Log:
   merge r26592 from 3.0 - fix /rehash tdlines and /rehash bans so that both deal with dlines correctly
