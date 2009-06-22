@@ -141,7 +141,15 @@ typedef unsigned int flex_uint32_t;
 
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k.
+ * Moreover, YY_BUF_SIZE is 2*YY_READ_BUF_SIZE in the general case.
+ * Ditto for the __ia64__ case accordingly.
+ */
+#define YY_BUF_SIZE 32768
+#else
 #define YY_BUF_SIZE 16384
+#endif /* __ia64__ */
 #endif
 
 /* The state buf must be large enough to hold one state per character in the main buffer.
@@ -563,7 +571,7 @@ char linebuf[512];
 
 #define YY_INPUT(buf,result,max_size) \
 	(result = conf_fgets(buf, max_size, conf_fbfile_in))
-#line 567 "ircd_lexer.c"
+#line 575 "ircd_lexer.c"
 
 #define INITIAL 0
 
@@ -750,7 +758,7 @@ YY_DECL
     
 #line 82 "ircd_lexer.l"
 
-#line 754 "ircd_lexer.c"
+#line 762 "ircd_lexer.c"
 
 	if ( !(yy_init) )
 		{
@@ -950,7 +958,7 @@ YY_RULE_SETUP
 #line 146 "ircd_lexer.l"
 ECHO;
 	YY_BREAK
-#line 954 "ircd_lexer.c"
+#line 962 "ircd_lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1977,7 +1985,7 @@ void cinclude(void)
 			/* wasnt found there either.. error. */
 			if(tmp_fbfile_in == NULL)
 			{
-				conf_report_error("Include %s: %s.", c, strerror(errno));
+				conf_report_error("Include %s: %m.", c);
 				return;
 			}
 		}
