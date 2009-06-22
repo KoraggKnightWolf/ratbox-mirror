@@ -289,7 +289,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key,
 		ssl_ctl_t *ctl;
 		if(rb_socketpair(AF_UNIX, SOCK_DGRAM, 0, &F1, &F2, "SSL/TLS handle passing socket") == -1)
 		{
-			ilog(L_MAIN, "Unable to create ssld - rb_socketpair failed: %s", strerror(errno));
+			ilog(L_MAIN, "Unable to create ssld - rb_socketpair failed: %m");
 			return started;
 		}
 		
@@ -299,7 +299,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key,
 		rb_setenv("CTL_FD", fdarg, 1);
 		if(rb_pipe(&P1, &P2, "SSL/TLS pipe") == -1)
 		{
-			ilog(L_MAIN, "Unable to create ssld - rb_pipe failed: %s", strerror(errno));
+			ilog(L_MAIN, "Unable to create ssld - rb_pipe failed: %m");
 			return started;
 		}
 		rb_snprintf(fdarg, sizeof(fdarg), "%d", rb_get_fd(P1));
@@ -314,7 +314,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key,
 		pid = rb_spawn_process(ssld_path, (const char **)parv);
 		if(pid == -1)
 		{
-			ilog(L_MAIN, "Unable to create ssld: %s\n", strerror(errno));
+			ilog(L_MAIN, "Unable to create ssld: %m\n");
 			rb_close(F1);
 			rb_close(F2);
 			rb_close(P1);
@@ -765,8 +765,8 @@ start_zlib_session(void *data)
 	*buf = 'Z';
 	if(rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF1, &xF2, "Initial zlib socketpairs") == -1)
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Error creating zlib socketpair - %s", strerror(errno));
-		ilog(L_MAIN, "Error creating zlib socketpairs - %s", strerror(errno));
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Error creating zlib socketpair - %m");
+		ilog(L_MAIN, "Error creating zlib socketpairs - %m");
 		exit_client(server, server, server, "Error creating zlib socketpair");
 		return;
 	}

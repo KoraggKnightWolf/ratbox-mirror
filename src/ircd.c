@@ -391,8 +391,8 @@ write_pidfile(const char *filename)
 		rb_snprintf(buff, sizeof(buff), "%u\n", pid);
 		if((fputs(buff, fb) == -1))
 		{
-			ilog(L_MAIN, "Error writing %u to pid file %s (%s)",
-			     pid, filename, strerror(errno));
+			ilog(L_MAIN, "Error writing %u to pid file %s (%m)",
+			     pid, filename);
 		}
 		fclose(fb);
 		return;
@@ -557,7 +557,7 @@ ratbox_main(int argc, char *argv[])
 
 	if(chdir(basedir))
 	{
-		fprintf(stderr, "Unable to chdir to %s: %s\n", basedir, strerror(errno));
+		fprintf(stderr, "Unable to chdir to %s: %m\n", basedir);
 		exit(EXIT_FAILURE);
 	}
 

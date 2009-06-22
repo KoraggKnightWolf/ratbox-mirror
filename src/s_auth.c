@@ -266,10 +266,8 @@ start_auth_query(struct AuthRequest *auth)
 
 	if((auth->authF = rb_socket(family, SOCK_STREAM, 0, "ident")) == NULL)
 	{
-		sendto_realops_flags(UMODE_DEBUG, L_ALL, "Error creating auth stream socket: %s",
-				     strerror(errno));
-		ilog(L_IOERROR, "creating auth stream socket %s: %s", auth->client->sockhost,
-		     strerror(errno));
+		sendto_realops_flags(UMODE_DEBUG, L_ALL, "Error creating auth stream socket: %m");
+		ilog(L_IOERROR, "creating auth stream socket %s: %m", auth->client->sockhost);
 		auth_error(auth);
 		return;
 	}

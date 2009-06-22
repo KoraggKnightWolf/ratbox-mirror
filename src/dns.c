@@ -218,9 +218,8 @@ start_resolver(void)
 
 	if(dns_helper == NULL)
 	{
-		ilog(L_MAIN, "Unable to start resolver helper: %s", strerror(errno));
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to start resolver helper: %s",
-				     strerror(errno));
+		ilog(L_MAIN, "Unable to start resolver helper: %m");
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to start resolver helper: %m");
 		return 1;
 	}
 	ilog(L_MAIN, "resolver helper started");
@@ -327,7 +326,7 @@ init_resolver(void)
 {
 	if(start_resolver())
 	{
-		ilog(L_MAIN, "Unable to start resolver helper: %s", strerror(errno));
+		ilog(L_MAIN, "Unable to start resolver helper: %m");
 		exit(0);
 	}
 }

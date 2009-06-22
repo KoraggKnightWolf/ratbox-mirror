@@ -66,7 +66,7 @@ init_bandb(void)
 {
 	if(start_bandb())
 	{
-		ilog(L_MAIN, "Unable to start bandb helper: %s", strerror(errno));
+		ilog(L_MAIN, "Unable to start bandb helper: %m");
 		exit(0);
 	}
 }
@@ -109,9 +109,8 @@ start_bandb(void)
 
 	if(bandb_helper == NULL)
 	{
-		ilog(L_MAIN, "Unable to start bandb: %s", strerror(errno));
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to start bandb: %s",
-				     strerror(errno));
+		ilog(L_MAIN, "Unable to start bandb: %m");
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to start bandb: %m");
 		return 1;
 	}
 

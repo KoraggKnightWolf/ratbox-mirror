@@ -242,7 +242,7 @@ load_all_modules(int warn)
 
 	if(system_module_dir == NULL)
 	{
-		ilog(L_MAIN, "Could not load modules from %s: %s", AUTOMODPATH, strerror(errno));
+		ilog(L_MAIN, "Could not load modules from %s: %m", AUTOMODPATH);
 		return;
 	}
 

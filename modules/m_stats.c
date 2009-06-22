@@ -850,7 +850,7 @@ stats_usage(struct Client *source_p)
 
 	if(getrusage(RUSAGE_SELF, &rus) == -1)
 	{
-		sendto_one_notice(source_p, ":Getruseage error: %s.", strerror(errno));
+		sendto_one_notice(source_p, ":Getruseage error: %m.");
 		return;
 	}
 	secs = rus.ru_utime.tv_sec + rus.ru_stime.tv_sec;

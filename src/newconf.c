@@ -667,7 +667,7 @@ read_config_file(const char *filename)
 	rb_strlcpy(conffilebuf, filename, sizeof(conffilebuf));
 	if((conf_fbfile_in = fopen(filename, "r")) == NULL)
 	{
-		conf_report_error_nl("Unable to open file %s %s", filename, strerror(errno));
+		conf_report_error_nl("Unable to open file %s %m", filename);
 		return 1;
 	}
 	yyparse();
@@ -1051,13 +1051,13 @@ conf_set_serverinfo_bandb_path(confentry_t * entry, conf_t * conf, struct conf_i
 
 		if(access(dirname, W_OK) == -1)
 		{
-			conf_report_error_nl("Unable to access bandb %s: %s ignoring...", path, rb_strerror(errno));
+			conf_report_error_nl("Unable to access bandb %s: %m ignoring...", path);
 			return;
 		}
 	} else {
 		if(access(path, W_OK) == -1)
 		{
-			conf_report_error_nl("Unable to access bandb %s: %s ignoring...", path, rb_strerror(errno));
+			conf_report_error_nl("Unable to access bandb %s: %m ignoring...", path);
 			return;
 		}
 	}		

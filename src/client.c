@@ -1088,7 +1088,7 @@ dead_link(struct Client *client_p, int sendqex)
 	if(sendqex)
 		rb_strlcpy(abt->notice, "Max SendQ exceeded", sizeof(abt->notice));
 	else
-		rb_snprintf(abt->notice, sizeof(abt->notice), "Write error: %s", strerror(errno));
+		rb_snprintf(abt->notice, sizeof(abt->notice), "Write error: %m");
 
 	abt->client = client_p;
 	SetIOError(client_p);

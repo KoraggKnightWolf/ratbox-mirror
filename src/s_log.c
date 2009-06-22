@@ -96,8 +96,8 @@ verify_logfile_access(const char *filename)
 	{
 		if(access(dirname, W_OK) == -1)
 		{
-			rb_snprintf(buf, sizeof(buf), "WARNING: Unable to access logfile %s - access to parent directory %s failed: %s", 
-				    filename, dirname, strerror(errno));
+			rb_snprintf(buf, sizeof(buf), "WARNING: Unable to access logfile %s - access to parent directory %s failed: %m", 
+				    filename, dirname);
 			if(testing_conf || server_state_foreground)
 				fprintf(stderr, "%s\n", buf);
 			sendto_realops_flags(UMODE_ALL, L_ALL, "%s", buf);
@@ -107,7 +107,7 @@ verify_logfile_access(const char *filename)
 	
 	if(access(filename, W_OK) == -1)
 	{
-		rb_snprintf(buf, sizeof(buf), "WARNING: Access denied for logfile %s: %s", filename, strerror(errno));
+		rb_snprintf(buf, sizeof(buf), "WARNING: Access denied for logfile %s: %m", filename);
 		if(testing_conf || server_state_foreground)
 			fprintf(stderr, "%s\n", buf);	
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s", buf);
@@ -193,8 +193,8 @@ ilog(ilogfile dest, const char *format, ...)
 #endif
 	if(fputs(buf2, logfile) < 0)
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Closing logfile: %s (%s)",
-				     *log_table[dest].name, strerror(errno));
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Closing logfile: %s (%m)",
+				     *log_table[dest].name);
 		fclose(logfile);
 		*log_table[dest].logfile = NULL;
 		return;

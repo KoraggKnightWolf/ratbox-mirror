@@ -209,7 +209,7 @@ void cinclude(void)
 			/* wasnt found there either.. error. */
 			if(tmp_fbfile_in == NULL)
 			{
-				conf_report_error("Include %s: %s.", c, strerror(errno));
+				conf_report_error("Include %s: %m.", c);
 				return;
 			}
 		}
