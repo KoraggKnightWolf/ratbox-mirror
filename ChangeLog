@@ -1,3 +1,11 @@
+androsyn    2009/06/22 03:34:08 UTC	(20090622_1-26608)
+  Log:
+  rebuild ircd_lexer.c
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd_lexer.c (File Modified) 
+
+
 androsyn    2009/06/22 03:32:44 UTC	(20090622_0-26606)
   Log:
   use the new %m format string stuff instead of %s and strerror(errno) in a bunch of places
