@@ -1,3 +1,11 @@
+androsyn    2009/06/29 15:16:24 UTC	(20090629_0-26610)
+  Log:
+  remove an unneeded ifdef
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2009/06/22 03:34:08 UTC	(20090622_1-26608)
   Log:
   rebuild ircd_lexer.c
