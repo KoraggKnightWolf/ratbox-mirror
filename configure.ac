@@ -54,8 +54,7 @@ AC_C_INLINE
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
-
-GCC_STACK_PROTECT_CC
+AC_PROG_YACC
 
 srcpwd=`cd ${srcdir} ; ${PWDCMD-pwd}`
 
@@ -65,23 +64,45 @@ if test "$INSTALL" = "${srcdir}/install-sh -c"; then
   INSTALL="${srcpwd}/install-sh -c"
 fi
 
-AC_PATH_PROG(AUTOMAKE, automake)
-AC_PATH_PROG(ACLOCAL, aclocal)
-AC_PATH_PROG(AUTOHEADER, autoheader)
-AC_PATH_PROG(AS, as)
-AC_PATH_PROG(RM, rm)
-AC_PATH_PROG(CP, cp)
-AC_PATH_PROG(MV, mv)
-AC_PATH_PROG(LN, ln)
-AC_PATH_PROG(TOUCH, touch)
-AC_PATH_PROG(PKG_CONFIG, pkg-config)
-#AC_PATH_PROG(LEX, flex, [no])
-AC_PROG_YACC
-AC_PROG_SED
 AC_LANG(C)
 
 AM_CONDITIONAL([STATIC_MODULES], test "$enable_static" = "yes")
 AC_PROG_LIBTOOL
+
+GCC_STACK_PROTECT_CC
+
+cc_accepts_flag()
+{
+	local CFLAGS="$@"
+	AC_MSG_CHECKING([whether $CC accepts $@])
+	AC_COMPILE_IFELSE([int main(){return 0;}] ,
+	[RC=0; AC_MSG_RESULT([yes])],
+	[RC=1; AC_MSG_RESULT([no])])
+	return $RC
+}
+
+if cc_accepts_flag -fno-strict-aliasing; then
+	CFLAGS="$CFLAGS -fno-strict-aliasing"
+fi
+
+WARNLIST="  
+	all  
+	error
+	cast-qual
+	missing-declarations
+	missing-prototypes
+	nested-externs
+	shadow
+	write-strings
+	no-unused
+	unused-function
+	unused-variable" 
+
+for x in $WARNLIST; do 
+	if cc_accepts_flag -W$x; then
+		WARNFLAGS="$WARNFLAGS -W$x";
+	fi
+done
 
 LIBTOOL="$LIBTOOL --silent"
 
@@ -442,12 +463,8 @@ if test "$profile" = yes; then
 else
 	AC_MSG_RESULT(no)
 fi
-WARNFLAGS="-Wall"
-AC_ARG_ENABLE(warnings,
-AC_HELP_STRING([--enable-warnings],[Enable all sorts of warnings for debugging.]),
-[WARNFLAGS="-Wall -Werror -Wcast-qual -Wcast-align -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wshadow -Wwrite-strings -W -Wno-unused -Wunused-function -Wunused-variable -Wstrict-prototypes -Wmissing-prototypes"],[])
 
-AC_SUBST(WARNFLAGS)
+
 dnl Server Tweaks
 dnl =============
 
@@ -528,11 +545,12 @@ AC_DEFINE_UNQUOTED(RATBOX_CONFIGURE_OPTS, "$ac_configure_args", [configure argum
 
 AC_SUBST(SSL_INCLUDES)
 AC_SUBST(SSL_LIBS)
-
 AC_SUBST(LDFLAGS)
 AC_SUBST(PICFLAGS)
 AC_SUBST(CFLAGS)
 AC_SUBST(SEDOBJ)
+AC_SUBST(WARNFLAGS)
+
 
 if test "$prefix" = "NONE"; then 
 	AC_DEFINE_UNQUOTED(IRCD_PREFIX, "$ac_default_prefix", [Prefix where the ircd is installed.])

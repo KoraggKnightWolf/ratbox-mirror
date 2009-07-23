@@ -147,6 +147,10 @@
 /* Prefix where to write logfiles. */
 #undef LOG_DIR
 
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
 /* Sizeof member heap. */
 #undef MEMBER_HEAP_SIZE
 
