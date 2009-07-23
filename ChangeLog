@@ -1,3 +1,34 @@
+androsyn    2009/07/23 18:35:16 UTC	(20090723_0-26618)
+  Log:
+  - Check to see if certain warning flags are supported by the compiler and use them all the time
+  - Add -fno-strict-aliasing to the list of flags passed, this seems to be needed for gcc 4.4 now
+    as we end up breaking strict aliasing rules when doing a lot of things
+  - Remove unneeded checks for rm etc as autoconf already checks these anyways
+  - Rerun libtoolize to get a newer version of libtool
+  - Rerun autotools
+  
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/aclocal.m4 (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/help/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/ltmain.sh (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2009/06/29 15:16:24 UTC	(20090629_0-26610)
   Log:
   remove an unneeded ifdef
