@@ -55,6 +55,7 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CP = @CP@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -99,6 +100,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 MODULE_DIR = @MODULE_DIR@
+MV = @MV@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -114,6 +116,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PICFLAGS = @PICFLAGS@
 RANLIB = @RANLIB@
+RB_RM = @RB_RM@
 SED = @SED@
 SEDOBJ = @SEDOBJ@
 SET_MAKE = @SET_MAKE@
@@ -395,7 +398,7 @@ uninstall-am:
 all: $(S_OBJS) $(S_CORE_OBJS) 
 
 clean-generic:
-	$(LIBTOOL) --mode=clean $(RM) -f $(S_OBJS) $(S_CORE_OBJS)  $(ST_OBJS)
+	$(LIBTOOL) --mode=clean $(RB_RM) -f $(S_OBJS) $(S_CORE_OBJS)  $(ST_OBJS)
 
 install_modules: $(S_OBJS)
 	-@@$(MKDIR_P) $(contribdir); \

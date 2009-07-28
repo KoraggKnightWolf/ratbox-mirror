@@ -45,7 +45,7 @@ SUFFIXES = .c .so .lo .la
 all: $(S_OBJS) $(S_CORE_OBJS) 
 
 clean-generic:
-	$(LIBTOOL) --mode=clean $(RM) -f $(S_OBJS) $(S_CORE_OBJS)  $(ST_OBJS)
+	$(LIBTOOL) --mode=clean $(RB_RM) -f $(S_OBJS) $(S_CORE_OBJS)  $(ST_OBJS)
 
 install_modules: $(S_OBJS)
 	-@@$(MKDIR_P) $(contribdir); \

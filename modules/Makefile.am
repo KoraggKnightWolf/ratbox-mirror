@@ -334,7 +334,7 @@ move-old-modules:
 # move the old module directory out of the way, stale modules cause massive
 # amounts of problems.
 	-@if test -d $(DESTDIR)$(moduledir)-old; then \
-		$(RM) -rf $(DESTDIR)$(moduledir)-old; \
+		$(RB_RM) -rf $(DESTDIR)$(moduledir)-old; \
 	fi
 	-@if test -d $(DESTDIR)$(moduledir); then \
 		echo "ircd: backing up modules"; \

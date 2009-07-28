@@ -101,6 +101,7 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+CP = @CP@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -145,6 +146,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 MODULE_DIR = @MODULE_DIR@
+MV = @MV@
 NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
@@ -160,6 +162,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PICFLAGS = @PICFLAGS@
 RANLIB = @RANLIB@
+RB_RM = @RB_RM@
 SED = @SED@
 SEDOBJ = @SEDOBJ@
 SET_MAKE = @SET_MAKE@
@@ -627,7 +630,7 @@ version.lo: version.c ../include/patchlevel.h ../include/serno.h
 	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 install-exec-hook: install-libcoreLTLIBRARIES
-	$(RM) version.c
+	@RB_RM@ version.c
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
