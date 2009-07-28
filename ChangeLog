@@ -1,3 +1,16 @@
+jilles      2009/07/28 21:31:08 UTC	(20090728_1-26648)
+  Log:
+  Hide servers in /stats l and /trace if flatten_links is enabled.
+  This applies to non-opers without exempt_shide flag.
+  Note that exempt_shide is not propagated so non-opers with
+  exempt_shide can only see servers locally.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+
+
 androsyn    2009/07/28 15:08:28 UTC	(20090728_0-26640)
   Log:
   fix some build issues
