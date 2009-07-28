@@ -1549,7 +1549,9 @@ stats_ltrace(struct Client *source_p, int parc, const char *parv[])
 			stats_l_list(source_p, name, doall, wilds, &oper_list, statchar);
 		}
 
-		stats_l_list(source_p, name, doall, wilds, &serv_list, statchar);
+		if (!ConfigServerHide.flatten_links || IsOper(source_p) ||
+				IsExemptShide(source_p))
+			stats_l_list(source_p, name, doall, wilds, &serv_list, statchar);
 
 		return;
 	}

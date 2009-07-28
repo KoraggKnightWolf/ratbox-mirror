@@ -234,14 +234,17 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 			report_this_status(source_p, target_p);
 		}
 
-		RB_DLINK_FOREACH(ptr, serv_list.head)
+		if (IsExemptShide(source_p) || !ConfigServerHide.flatten_links)
 		{
-			target_p = ptr->data;
+			RB_DLINK_FOREACH(ptr, serv_list.head)
+			{
+				target_p = ptr->data;
 
-			if(!doall && wilds && !match(tname, target_p->name))
-				continue;
+				if(!doall && wilds && !match(tname, target_p->name))
+					continue;
 
-			report_this_status(source_p, target_p);
+				report_this_status(source_p, target_p);
+			}
 		}
 		ClearCork(source_p);
 		sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), tname);
