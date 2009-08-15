@@ -1,3 +1,18 @@
+jilles      2009/08/15 20:53:49 UTC	(20090815_1-26654)
+  Log:
+  Remove -Werror, add -Wformat -Wno-format-security.
+  
+  -Werror is a support nightmare. It is useful for
+  development but not for users.
+  -Wformat is useful, but -Wformat-security as enabled by
+  default by Ubuntu is not useful for ircd-ratbox.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 jilles      2009/08/15 19:12:12 UTC	(20090815_0-26652)
   Log:
   Do not use 'local' as some shells (ksh93, solaris /bin/sh) do not have it.
