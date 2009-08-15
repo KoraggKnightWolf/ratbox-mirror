@@ -94,8 +94,9 @@ fi
 
 WARNLIST="  
 	all  
-	error
 	cast-qual
+	format
+	no-format-security
 	missing-declarations
 	missing-prototypes
 	nested-externs
