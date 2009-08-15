@@ -1,3 +1,14 @@
+jilles      2009/08/15 19:12:12 UTC	(20090815_0-26652)
+  Log:
+  Do not use 'local' as some shells (ksh93, solaris /bin/sh) do not have it.
+  Functions (name() { commands; } syntax) should be OK.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 jilles      2009/07/28 21:31:08 UTC	(20090728_1-26648)
   Log:
   Hide servers in /stats l and /trace if flatten_links is enabled.
