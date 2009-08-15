@@ -12783,7 +12783,8 @@ _ACEOF
 
 cc_accepts_flag()
 {
-	local CFLAGS="$@"
+	cc_accepts_flag_CFLAGS="$CFLAGS"
+	CFLAGS="$*"
 	{ $as_echo "$as_me:$LINENO: checking whether $CC accepts $@" >&5
 $as_echo_n "checking whether $CC accepts $@... " >&6; }
 	cat >conftest.$ac_ext <<_ACEOF
@@ -12818,6 +12819,7 @@ $as_echo "no" >&6; }
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+	CFLAGS="$cc_accepts_flag_CFLAGS"
 	return $RC
 }
 

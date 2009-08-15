@@ -78,11 +78,13 @@ GCC_STACK_PROTECT_CC
 
 cc_accepts_flag()
 {
-	local CFLAGS="$@"
+	cc_accepts_flag_CFLAGS="$CFLAGS"
+	CFLAGS="$*"
 	AC_MSG_CHECKING([whether $CC accepts $@])
 	AC_COMPILE_IFELSE([int main(){return 0;}] ,
 	[RC=0; AC_MSG_RESULT([yes])],
 	[RC=1; AC_MSG_RESULT([no])])
+	CFLAGS="$cc_accepts_flag_CFLAGS"
 	return $RC
 }
 
