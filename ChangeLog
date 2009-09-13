@@ -1,3 +1,23 @@
+jilles      2009/09/13 21:11:40 UTC	(20090913_0-26660)
+  Log:
+  Force part local users (not resv_exempt) on channel resv.
+  A notice will be sent to any force parted users that the channel
+  is temporarily/permanently unavailable on the server.
+  A new config option channel::resv_forcepart can be used to disable this.
+  
+  Submitted by: dubkat
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 jilles      2009/08/15 20:53:49 UTC	(20090815_1-26654)
   Log:
   Remove -Werror, add -Wformat -Wno-format-security.
