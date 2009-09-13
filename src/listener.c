@@ -431,14 +431,6 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 
 	rb_strlcpy(new_client->host, new_client->sockhost, sizeof(new_client->host));
 
-#ifdef RB_IPV6
-	if(GET_SS_FAMILY(&new_client->localClient->ip) == AF_INET6
-	   && ConfigFileEntry.dot_in_ip6_addr == 1)
-	{
-		rb_strlcat(new_client->host, ".", sizeof(new_client->host));
-	}
-#endif
-
 	new_client->localClient->F = F;
 	add_to_cli_fd_hash(new_client);
 	new_client->localClient->listener = listener;
