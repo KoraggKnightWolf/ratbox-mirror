@@ -2427,6 +2427,7 @@ static struct conf_items conf_channel_table[] =
 	{ "use_knock",		CF_YESNO, NULL, 0, &ConfigChannel.use_knock		},
 	{ "use_sslonly",	CF_YESNO, NULL, 0, &ConfigChannel.use_sslonly		},
 	{ "topiclen",		CF_INT,	  NULL, 0, &ConfigChannel.topiclen		},
+	{ "resv_forcepart",     CF_YESNO, NULL, 0, &ConfigChannel.resv_forcepart	},
 	{ "\0", 		0, 	  NULL, 0, NULL }
 };
 
