@@ -1,3 +1,21 @@
+jilles      2009/09/13 21:17:44 UTC	(20090913_1-26662)
+  Log:
+  Remove general::dot_in_ip6_addr conf option, forcing it off (old default).
+  Apart from the fact that the servers this was needed for are way obsolete,
+  they are not even permitted on the network anymore because they do not
+  support TS6.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 jilles      2009/09/13 21:11:40 UTC	(20090913_0-26660)
   Log:
   Force part local users (not resv_exempt) on channel resv.
