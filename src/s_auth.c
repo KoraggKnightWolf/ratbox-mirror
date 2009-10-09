@@ -176,7 +176,9 @@ auth_dns_callback(const char *res, int status, int aftype, void *data)
 	struct AuthRequest *auth = data;
 	ClearDNS(auth);
 	auth->dns_query = 0;
-	/* The resolver won't return us anything > HOSTLEN */
+	/* The resolver has a higher limit. */
+	if(status == 1 && strlen(res) >= sizeof(auth->client->host))
+		status = 0, res = "HOSTTOOLONG";
 	if(status == 1)
 	{
 		rb_strlcpy(auth->client->host, res, sizeof(auth->client->host));

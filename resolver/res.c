@@ -75,7 +75,7 @@ struct reslist
 	int sent;		/* number of requests sent */
 	time_t ttl;
 	char type;
-	char queryname[128];	/* name currently being queried */
+	char queryname[IRCD_RES_HOSTLEN + 1]; /* name currently being queried */
 	char retries;		/* retry counter */
 	char sends;		/* number of sends (>1 means resent) */
 	time_t sentat;
@@ -520,10 +520,10 @@ gethost_byaddr(const struct rb_sockaddr_storage *addr, struct DNSQuery *query)
 static void
 do_query_name(struct DNSQuery *query, const char *name, struct reslist *request, int type)
 {
-	char host_name[HOSTLEN + 1];
+	char host_name[IRCD_RES_HOSTLEN + 1];
 
 	rb_strlcpy(host_name, name, sizeof(host_name));
-//      add_local_domain(host_name, HOSTLEN);
+//      add_local_domain(host_name, IRCD_RES_HOSTLEN);
 
 	if(request == NULL)
 	{
@@ -549,7 +549,7 @@ do_query_number(struct DNSQuery *query, const struct rb_sockaddr_storage *addr,
 	{
 		request = make_request(query);
 		memcpy(&request->addr, addr, sizeof(struct rb_sockaddr_storage));
-		request->name = (char *)rb_malloc(HOSTLEN + 1);
+		request->name = (char *)rb_malloc(IRCD_RES_HOSTLEN + 1);
 	}
 
 	if(GET_SS_FAMILY(addr) == AF_INET)
@@ -650,7 +650,7 @@ resend_query(struct reslist *request)
 static int
 check_question(struct reslist *request, HEADER * header, char *buf, char *eob)
 {
-	char hostbuf[128];	/* working buffer */
+	char hostbuf[IRCD_RES_HOSTLEN + 1];	/* working buffer */
 	unsigned char *current;	/* current position in buf */
 	int n;			/* temp count */
 
@@ -672,7 +672,7 @@ check_question(struct reslist *request, HEADER * header, char *buf, char *eob)
 static int
 proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 {
-	char hostbuf[HOSTLEN + 100];	/* working buffer */
+	char hostbuf[IRCD_RES_HOSTLEN + 100];	/* working buffer */
 	unsigned char *current;	/* current position in buf */
 	int query_class;	/* answer class */
 	int type;		/* answer type */
@@ -717,7 +717,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			return (0);
 		}
 
-		hostbuf[HOSTLEN] = '\0';
+		hostbuf[IRCD_RES_HOSTLEN] = '\0';
 
 		/* With Address arithmetic you have to be very anal
 		 * this code was not working on alpha due to that
@@ -783,7 +783,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			else if(n == 0)
 				return (0);	/* no more answers left */
 
-			rb_strlcpy(request->name, hostbuf, HOSTLEN + 1);
+			rb_strlcpy(request->name, hostbuf, IRCD_RES_HOSTLEN + 1);
 
 			return (1);
 			break;
