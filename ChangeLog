@@ -1,3 +1,19 @@
+jilles      2009/10/09 23:14:04 UTC	(20091009_0-26690)
+  Log:
+  Increase the length of hostnames the resolver works with.
+  This is necessary because 63 is not enough for certain DNSBLs such as the
+  "TorDNSEL service".
+  
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+	ircd-ratbox/trunk/resolver/res.h (File Modified) 
+	ircd-ratbox/trunk/resolver/reslib.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 jilles      2009/09/24 19:17:14 UTC	(20090924_1-26674)
   Log:
   contrib olist: do not send operspy notices for nonexistent channels
