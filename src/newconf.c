@@ -52,6 +52,7 @@
 #include "channel.h"
 #include "hash.h"
 #include "sslproc.h"
+#include "blacklist.h"
 
 #define CF_TYPE(x) ((x) & CF_MTYPE)
 
@@ -181,6 +182,7 @@ static struct mode_table auth_table[] = {
 	{"need_ident",		CONF_FLAGS_NEED_IDENTD	},
 	{"have_ident",		CONF_FLAGS_NEED_IDENTD	},
 	{"need_ssl", 		CONF_FLAGS_NEED_SSL	},
+	{"dnsbl_exempt",	CONF_FLAGS_EXEMPTDNSBL	},
 	{NULL, 0}
 };
 
@@ -2053,6 +2055,36 @@ conf_set_shared_flags(confentry_t * entry, conf_t * conf, struct conf_items *ite
 	t_shared = NULL;
 }
 
+static char *blacklist_host;
+
+static void
+conf_set_blacklist_cleanup(conf_t * conf)
+{
+	rb_free(blacklist_host);
+	blacklist_host = NULL;
+}
+
+static void
+conf_set_blacklist_host(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	rb_free(blacklist_host);
+	blacklist_host = rb_strdup(entry->string);
+}
+
+static void
+conf_set_blacklist_reason(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	if (blacklist_host == NULL) {
+		conf_report_warning_nl("Ignoring blacklist::reason at %s:%d -- Missing host",
+				       entry->filename, entry->line);
+		return;
+	}
+	new_blacklist(blacklist_host, entry->string);
+	rb_free(blacklist_host);
+	blacklist_host = NULL;
+}
+
+
 #ifdef ENABLE_SERVICES
 static void
 conf_set_service_start(conf_t * conf)
@@ -2468,6 +2500,13 @@ static struct conf_items conf_cluster_table[] =
 	{ "\0",	0, NULL, 0, NULL }
 };
 
+static struct conf_items conf_blacklist_table[] =
+{
+	{ "host",   CF_QSTRING,		  conf_set_blacklist_host,   0, NULL },
+	{ "reason", CF_QSTRING,		  conf_set_blacklist_reason, 0, NULL },
+	{ "\0",	0, NULL, 0, NULL }
+};
+
 #ifdef ENABLE_SERVICES
 static struct conf_items conf_service_table[] =
 {
@@ -2502,6 +2541,7 @@ static struct top_conf_table_t top_conf_table[] =
 	{ "connect",	conf_set_start_connect,  conf_set_end_connect,	conf_connect_table,	1},
 	{ "shared",	conf_set_shared_cleanup, conf_set_shared_cleanup,conf_shared_table,	0},
 	{ "cluster",	conf_set_cluster_cleanup,conf_set_cluster_cleanup,conf_cluster_table,	0},
+	{ "blacklist",	conf_set_blacklist_cleanup, conf_set_blacklist_cleanup, conf_blacklist_table,	0},
 #ifdef ENABLE_SERVICES
 	{ "service",	conf_set_service_start,  NULL,			conf_service_table,	0},
 #endif

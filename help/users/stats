@@ -14,6 +14,7 @@ LETTER
   L - Shows IP and generic info about [nick]
   l - Shows hostname and generic info about [nick]
   m - Shows commands and their usage
+  n - Shows DNS blacklists
 ^ o - Shows O/o lines
 ^ P - Shows configured ports
   p - Shows opers connected and their idle times

@@ -52,6 +52,7 @@
 #include "monitor.h"
 #include "parse.h"
 #include "sslproc.h"
+#include "blacklist.h"
 
 #define DEBUG_EXITED_CLIENTS
 
@@ -165,6 +166,8 @@ make_client(struct Client *from)
 static void
 free_local_client(struct Client *client_p)
 {
+	struct Blacklist *blptr;
+
 	s_assert(NULL != client_p);
 	s_assert(&me != client_p);
 
@@ -206,6 +209,11 @@ free_local_client(struct Client *client_p)
 		ssld_decrement_clicount(client_p->localClient->z_ctl);
 	/* not needed per-se, but in case start_auth_query never gets called... */
 	rb_free(client_p->localClient->lip);
+
+	blptr = client_p->localClient->dnsbl_listed;
+	if (blptr != NULL)
+		unref_blacklist(blptr);
+	abort_blacklist_queries(client_p);
 
 	rb_bh_free(lclient_heap, client_p->localClient);
 	client_p->localClient = NULL;
@@ -347,6 +355,11 @@ check_unknowns_list(rb_dlink_list *list)
 		client_p = ptr->data;
 
 		if(IsDead(client_p) || IsClosing(client_p))
+			continue;
+
+		/* still has DNSbls to validate against */
+		if(client_p->localClient != NULL &&
+				rb_dlink_list_length(&client_p->localClient->dnsbl_queries) > 0)
 			continue;
 
 		/*

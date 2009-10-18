@@ -51,6 +51,7 @@
 #include "operhash.h"
 #include "bandbi.h"
 #include "newconf.h"
+#include "blacklist.h"
 
 struct config_server_hide ConfigServerHide;
 
@@ -1193,6 +1194,8 @@ clear_out_old_conf(void)
 	/* clean out general */
 	rb_free(ConfigFileEntry.kline_reason);
 	ConfigFileEntry.kline_reason = NULL;
+
+	destroy_blacklists();
 
 #ifdef ENABLE_SERVICES
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)

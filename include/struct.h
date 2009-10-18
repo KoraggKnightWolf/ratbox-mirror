@@ -113,6 +113,7 @@ struct Client
 };
 
 struct _ssl_ctl;
+struct Blacklist;
 
 struct LocalUser
 {
@@ -205,6 +206,9 @@ struct LocalUser
 	struct ZipStats *zipstats;	/* zipstats */
 	uint16_t cork_count;	/* used for corking/uncorking connections */
 	struct ev_entry *event;	/* used for associated events */
+	/* XXX These two are only meaningful during registration. */
+	rb_dlink_list dnsbl_queries; /* list of struct BlacklistClient * */
+	struct Blacklist *dnsbl_listed; /* first dnsbl where it's listed */
 };
 
 

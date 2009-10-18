@@ -23,6 +23,7 @@ endif
 libcore_la_SOURCES =			\
 	dns.c				\
 	bandbi.c			\
+	blacklist.c			\
 	cache.c				\
 	channel.c			\
 	class.c				\

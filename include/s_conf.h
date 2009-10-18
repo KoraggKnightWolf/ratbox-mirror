@@ -89,6 +89,7 @@ struct ConfItem
 #define CONF_FLAGS_EXEMPTSHIDE		0x00000800
 #define CONF_FLAGS_EXEMPTJUPE		0x00001000	/* exempt from resv generating warnings */
 #define CONF_FLAGS_NEED_SSL		0x00002000
+#define CONF_FLAGS_EXEMPTDNSBL		0x00080000
 /* server flags */
 #define CONF_FLAGS_ENCRYPTED            0x00004000
 #define CONF_FLAGS_COMPRESSED           0x00008000
@@ -117,6 +118,7 @@ struct ConfItem
 #define IsConfTburst(x)		((x)->flags & CONF_FLAGS_TB)
 #define IsConfLocked(x)		((x)->flags & CONF_FLAGS_LOCKED)
 #define IsConfSSLNeeded(x)	((x)->flags & CONF_FLAGS_NEED_SSL)
+#define IsConfExemptDNSBL(x)	((x)->flags & CONF_FLAGS_EXEMPTDNSBL)
 
 /* flag definitions for opers now in client.h */
 

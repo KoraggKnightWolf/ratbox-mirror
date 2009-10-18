@@ -50,6 +50,7 @@
 #include "cache.h"
 #include "hook.h"
 #include "monitor.h"
+#include "blacklist.h"
 
 static void report_and_set_user_flags(struct Client *, struct ConfItem *);
 void user_welcome(struct Client *source_p);
@@ -285,6 +286,10 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(source_p->flags & FLAGS_CLICAP)
 		return -1;
 
+	/* still has DNSbls to validate against */
+	if(rb_dlink_list_length(&source_p->localClient->dnsbl_queries) > 0)
+		return -1;
+
 	client_p->localClient->last = rb_current_time();
 	/* Straight up the maximum rate of flooding... */
 	source_p->localClient->allow_read = MAX_FLOOD_BURST;
@@ -445,6 +450,29 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		add_reject(source_p);
 		exit_client(client_p, source_p, &me, "Bad user info");
 		return CLIENT_EXITED;
+	}
+
+	/* dnsbl check */
+	if (source_p->localClient->dnsbl_listed != NULL)
+	{
+		if (IsExemptKline(source_p) || IsConfExemptDNSBL(aconf))
+			sendto_one_notice(source_p, ":*** Your IP address %s is listed in %s, but you are exempt",
+					source_p->sockhost, source_p->localClient->dnsbl_listed->host);
+		else
+		{
+			ServerStats.is_ref++;
+
+			sendto_one(source_p, form_str(ERR_YOUREBANNEDCREEP),
+					me.name, source_p->name,
+					source_p->localClient->dnsbl_listed->reject_reason);
+
+			sendto_one_notice(source_p, ":*** Your IP address %s is listed in %s",
+					source_p->sockhost, source_p->localClient->dnsbl_listed->host);
+			source_p->localClient->dnsbl_listed->hits++;
+			add_reject(source_p);
+			exit_client(client_p, source_p, &me, "*** Banned (DNS blacklist)");
+			return CLIENT_EXITED;
+		}
 	}
 
 	if(IsAnyDead(client_p))

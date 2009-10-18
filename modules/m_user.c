@@ -35,6 +35,7 @@
 #include "parse.h"
 #include "modules.h"
 #include "s_log.h"
+#include "blacklist.h"
 
 static int mr_user(struct Client *, struct Client *, int, const char **);
 
@@ -82,8 +83,12 @@ do_local_user(struct Client *client_p, struct Client *source_p,
 	s_assert(NULL != source_p);
 	s_assert(source_p->username != username);
 
-	SetSentUser(source_p);
 	user = make_user(source_p);
+	if (!HasSentUser(source_p))
+	{
+		lookup_blacklists(source_p);
+		SetSentUser(source_p);
+	}
 
 	rb_strlcpy(source_p->info, realname, sizeof(source_p->info));
 

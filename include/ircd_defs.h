@@ -82,6 +82,7 @@
 
 #define HOSTLEN         63	/* Length of hostname.  Updated to         */
 				/* comply with RFC1123                     */
+#define IRCD_RES_HOSTLEN 255	/* Must match with resolver/res.h          */
 
 #define USERLEN         10
 #define REALLEN         50

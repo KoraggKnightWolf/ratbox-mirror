@@ -51,6 +51,7 @@
 #include "whowas.h"
 #include "scache.h"
 #include "s_log.h"
+#include "blacklist.h"
 
 static int m_stats(struct Client *, struct Client *, int, const char **);
 
@@ -103,6 +104,7 @@ static void stats_auth(struct Client *);
 static void stats_tklines(struct Client *);
 static void stats_klines(struct Client *);
 static void stats_messages(struct Client *);
+static void stats_dnsbl(struct Client *);
 static void stats_oper(struct Client *);
 static void stats_operedup(struct Client *);
 static void stats_ports(struct Client *);
@@ -151,6 +153,7 @@ static struct StatsStruct stats_cmd_table[] = {
 	{'L', NULL /* special */, 0, 0,},
 	{'m', stats_messages, 0, 0,},
 	{'M', stats_messages, 0, 0,},
+	{'n', stats_dnsbl, 0, 0,},
 	{'o', stats_oper, 0, 0,},
 	{'O', stats_oper, 0, 0,},
 	{'p', stats_operedup, 0, 0,},
@@ -697,6 +700,25 @@ stats_messages(struct Client *source_p)
 		}
 	}
 	send_pop_queue(source_p);
+}
+
+static void
+stats_dnsbl(struct Client *source_p)
+{
+	rb_dlink_node *ptr;
+	struct Blacklist *blptr;
+
+	RB_DLINK_FOREACH(ptr, blacklist_list.head)
+	{
+		blptr = ptr->data;
+
+		/* use RPL_STATSDEBUG for now -- jilles */
+		sendto_one_numeric(source_p, RPL_STATSDEBUG, "n :%d %s %s (%d)",
+				blptr->hits,
+				blptr->host,
+				blptr->status & CONF_ILLEGAL ? "disabled" : "active",
+				blptr->refcount);
+	}
 }
 
 static void
