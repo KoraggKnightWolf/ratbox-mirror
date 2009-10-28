@@ -615,6 +615,11 @@ report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
 			sendto_one_notice(source_p, ":*** You are exempt from G lines");
 	}
 
+	if(IsConfExemptDNSBL(aconf))
+		/* kline exempt implies this, don't send both */
+		if(!IsConfExemptKline(aconf))
+			sendto_one_notice(source_p, ":*** You are exempt from DNS blacklists");
+
 	/* If this user is exempt from user limits set it F lined" */
 	if(IsConfExemptLimits(aconf))
 	{
