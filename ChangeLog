@@ -1,3 +1,13 @@
+jilles      2009/11/15 22:10:00 UTC	(20091115_0-26704)
+  Log:
+  ssld: Do not crash if not all fds in a message could be received.
+  Actually fill the mod_ctl_buf_t.nfds field.
+  
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 jilles      2009/10/28 22:09:42 UTC	(20091028_0-26702)
   Log:
   Add DNSBL exempt notice, similar to other auth{} flags.
