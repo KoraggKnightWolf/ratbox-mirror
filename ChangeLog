@@ -1,3 +1,13 @@
+jilles      2009/11/22 13:41:08 UTC	(20091122_1-26708)
+  Log:
+  Add two more reasons why ssld_count>1 can be useful: bugs and fd limits.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 jilles      2009/11/22 13:38:39 UTC	(20091122_0-26706)
   Log:
   ssld: Fix an fd leak when closing connections.
