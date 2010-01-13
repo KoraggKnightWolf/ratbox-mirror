@@ -198,6 +198,7 @@ struct config_file_entry
 	int use_whois_actually;
 	int disable_auth;
 	int connect_timeout;
+	int post_registration_delay;
 	int burst_away;
 	int reject_after_count;
 	int reject_duration;

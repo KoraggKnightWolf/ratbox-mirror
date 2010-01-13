@@ -774,6 +774,7 @@ set_default_conf(void)
 	ConfigFileEntry.pace_wait_simple = 1;
 	ConfigFileEntry.short_motd = NO;
 	ConfigFileEntry.no_oper_flood = NO;
+	ConfigFileEntry.post_registration_delay = 0;
 	ConfigFileEntry.default_invisible = NO;
 	ConfigFileEntry.fname_userlog = NULL;
 	ConfigFileEntry.fname_fuserlog = NULL;
