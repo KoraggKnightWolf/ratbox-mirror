@@ -1,3 +1,23 @@
+jilles      2010/01/13 23:56:41 UTC	(20100113_0-26724)
+  Log:
+  forward port r26688: post_registration_delay
+  
+  This stops us parsing anything from clients until that delay has completed.
+  
+  This is an ugly hack; I'm only committing this to trunk to avoid a
+  regression when moving from 3.0 to 3.1.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/packet.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 jilles      2009/11/22 13:41:08 UTC	(20091122_1-26708)
   Log:
   Add two more reasons why ssld_count>1 can be useful: bugs and fd limits.
