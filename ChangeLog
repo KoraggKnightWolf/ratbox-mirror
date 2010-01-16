@@ -1,3 +1,20 @@
+jilles      2010/01/16 19:59:28 UTC	(20100116_0-26726)
+  Log:
+  Do not send kills for unknown prefixes which are nicks.
+  This can happen harmlessly in particular if a SAVE
+  and a nick-prefixed command crossed; then, due to
+  nick changes and nick chasing, it easily causes
+  ghosts that need a kill or split to disappear.
+  Most commands use UID as prefix which does not have
+  this problem and will destroy real ghosts soon enough.
+  
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 jilles      2010/01/13 23:56:41 UTC	(20100113_0-26724)
   Log:
   forward port r26688: post_registration_delay
