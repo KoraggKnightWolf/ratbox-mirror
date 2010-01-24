@@ -213,7 +213,6 @@ free_local_client(struct Client *client_p)
 	blptr = client_p->localClient->dnsbl_listed;
 	if (blptr != NULL)
 		unref_blacklist(blptr);
-	abort_blacklist_queries(client_p);
 
 	rb_bh_free(lclient_heap, client_p->localClient);
 	client_p->localClient = NULL;
@@ -1176,6 +1175,8 @@ static int
 exit_unknown_client(struct Client *client_p, struct Client *source_p, const char *comment)
 {
 	delete_auth_queries(source_p);
+	abort_blacklist_queries(client_p);
+
 	rb_dlinkDelete(&source_p->localClient->tnode, &unknown_list);
 
 	if(!IsIOError(source_p))
