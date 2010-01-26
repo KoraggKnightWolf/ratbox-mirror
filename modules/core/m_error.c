@@ -136,10 +136,6 @@ ms_error(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		sendto_realops_flags(UMODE_ALL, hideit ? L_ADMIN : L_ALL, "ERROR :from %s -- %s",
 				     client_p->name, para);
-
-		if(!ConfigFileEntry.hide_error_messages)
-			sendto_realops_flags(UMODE_ALL, L_OPER,
-					     "ERROR :from %s -- %s", client_p->name, para);
 	}
 	else
 	{
