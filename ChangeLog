@@ -1,3 +1,12 @@
+jilles      2010/01/26 23:57:17 UTC	(20100126_0-26763)
+  Log:
+  Fix duplicate ERROR notices to opers (not admins) if hide_error_messages=no.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_error.c (File Modified) 
+
+
 jilles      2010/01/24 20:29:21 UTC	(20100124_1-26744)
   Log:
   Abort blacklist queries when an unknown exits, do not postpone until LocalUser is freed.
