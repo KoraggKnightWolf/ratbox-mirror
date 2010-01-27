@@ -1,3 +1,32 @@
+jilles      2010/01/27 21:59:37 UTC	(20100127_1-26767)
+  Log:
+  Add WHOX support from charybdis.
+  
+  This adds the extended formatting codes, which are useful for
+  requesting only the necessary information (e.g. done by xchat/conspire
+  for away status updates), and allow requesting the IP address
+  (respecting usual rules) and services account name.
+  
+  As in charybdis, the oplevel (o) formatting code is supported in some
+  way (only showing 999 or n/a) but not documented.
+  
+  Different from charybdis, the idle time (l) formatting code always
+  returns 0 and is not documented. This is to ensure idle time hiding
+  patches do not have to be changed.
+  
+  The extended selection flags and multiple nicks/channels are not
+  supported; I consider these less useful and in practice they do not
+  seem to be used much.
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/who (File Modified) 
+	ircd-ratbox/trunk/include/numeric.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_who.c (File Modified) 
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+	ircd-ratbox/trunk/src/supported.c (File Modified) 
+
+
 jilles      2010/01/27 21:47:28 UTC	(20100127_0-26765)
   Log:
   Apply links fix to 3.1.
