@@ -721,8 +721,6 @@ start_zlib_session(void *data)
 	size_t len;
 	int cpylen, left;
 
-	server->localClient->event = NULL;
-
 	recvqlen = rb_linebuf_len(&server->localClient->buf_recvq);
 
 	len = recvqlen + hdr;
