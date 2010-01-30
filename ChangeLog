@@ -1,3 +1,16 @@
+jilles      2010/01/30 14:50:11 UTC	(20100130_0-26771)
+  Log:
+  Remove unused LocalUser.event.
+  
+  It was only still freed for servers, but no longer actually used.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 jilles      2010/01/27 21:59:37 UTC	(20100127_1-26767)
   Log:
   Add WHOX support from charybdis.
