@@ -1,3 +1,11 @@
+androsyn    2010/02/08 17:37:24 UTC	(20100208_0-26779)
+  Log:
+  test commit
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+
+
 jilles      2010/02/07 17:01:23 UTC	(20100207_0-26777)
   Log:
   testline/testgecos: Send "not an oper" message if appropriate.
