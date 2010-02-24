@@ -7,7 +7,7 @@ with reason [reason].
 
 If an oper reason is added (the pipe must be specified
 to seperate the fields) this will be added into the
-kline.conf but will not be shown to the user when they
+database but will not be shown to the user when they
 are given the kline reason.
 
 KLINE <user@ip.ip.ip.ip> :[reason] [| oper reason]
