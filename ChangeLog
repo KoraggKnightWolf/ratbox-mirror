@@ -1,3 +1,17 @@
+jilles      2010/02/24 22:35:54 UTC	(20100224_0-26929)
+  Log:
+  help: Remove references to old ban .confs,
+  calling bandb "the database" instead.
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/dline (File Modified) 
+	ircd-ratbox/trunk/help/opers/kline (File Modified) 
+	ircd-ratbox/trunk/help/opers/rehash (File Modified) 
+	ircd-ratbox/trunk/help/opers/resv (File Modified) 
+	ircd-ratbox/trunk/help/opers/xline (File Modified) 
+
+
 androsyn    2010/02/08 17:37:24 UTC	(20100208_0-26779)
   Log:
   test commit
