@@ -605,8 +605,7 @@ clear_out_address_conf(void)
 			/* We keep the temporary K-lines and destroy the
 			 * permanent ones, just to be confusing :) -A1kmm */
 			if(arec->aconf->flags & CONF_FLAGS_TEMPORARY ||
-			   ((arec->type & ~CONF_SKIPUSER) != CONF_CLIENT &&
-			    (arec->type & ~CONF_SKIPUSER) != CONF_EXEMPTDLINE))
+			   (arec->type & ~CONF_SKIPUSER) != CONF_CLIENT)
 			{
 				*store_next = arec;
 				store_next = &arec->next;
@@ -639,8 +638,7 @@ clear_out_address_conf_bans(void)
 			/* We keep the temporary K-lines and destroy the
 			 * permanent ones, just to be confusing :) -A1kmm */
 			if(arec->aconf->flags & CONF_FLAGS_TEMPORARY ||
-			   ((arec->type & ~CONF_SKIPUSER) == CONF_CLIENT ||
-			    (arec->type & ~CONF_SKIPUSER) == CONF_EXEMPTDLINE))
+			   (arec->type & ~CONF_SKIPUSER) == CONF_CLIENT)
 			{
 				*store_next = arec;
 				store_next = &arec->next;

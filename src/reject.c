@@ -369,6 +369,20 @@ remove_perm_dlines(void)
 }
 
 void
+remove_elines(void)
+{
+	rb_patricia_node_t *pnode;
+	struct ConfItem *aconf;
+	RB_PATRICIA_WALK(eline_tree->head, pnode)
+	{
+		aconf = pnode->data;
+		if(!(aconf->flags & CONF_FLAGS_TEMPORARY))
+			delete_ipline(aconf, eline_tree);
+	}
+	RB_PATRICIA_WALK_END;
+}
+
+void
 report_dlines(struct Client *source_p)
 {
 	rb_patricia_node_t *pnode;

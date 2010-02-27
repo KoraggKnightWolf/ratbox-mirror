@@ -1150,6 +1150,7 @@ clear_out_old_conf(void)
 	}
 
 	clear_out_address_conf();
+	remove_elines();
 	clear_s_newconf();
 
 	/* clean out module paths */
