@@ -28,7 +28,7 @@ static  const char *  replies[] = {
 /* 005  RPL_ISUPPORT, */ "%s :are supported by this server",
 /* 006 */       NULL,
 /* 007 */       NULL,
-/* 008 */       NULL,
+/* 008  RPL_SNOMASK, */       NULL, /* charybdis */
 /* 009 */       NULL,
 /* 010  RPL_REDIR, */ ":%s 010 %s %s %d :Please use this Server/Port instead",
 /* 011 */       NULL,
@@ -292,13 +292,13 @@ static  const char *  replies[] = {
 /* 267 */       NULL,
 /* 268 */       NULL,
 /* 269 */       NULL,
-/* 270 */       NULL,
+/* 270 RPL_PRIVS, */       NULL, /* charybdis */
 /* 271 */       NULL,
 /* 272 */       NULL,
 /* 273 */       NULL,
 /* 274 */       NULL,
 /* 275 */       NULL,
-/* 276 */       NULL,
+/* 276 RPL_WHOISCERTFP */       NULL, /* charybdis */
 /* 277 */       NULL,
 /* 278 */       NULL,
 /* 279 */       NULL,
@@ -350,7 +350,7 @@ static  const char *  replies[] = {
 /* 325 */       NULL,
 /* 326 */       NULL,
 /* 327 */       NULL,
-/* 328 */       NULL,
+/* 328 RPL_CHANNELURL, */       NULL,
 /* 329 RPL_CREATIONTIME, */	":%s 329 %s %s %lu", 
 /* 330 RPL_WHOISLOGGEDIN */	":%s 330 %s %s %s :is logged in as",
 /* 331 RPL_NOTOPIC, */          ":%s 331 %s %s :No topic is set.",
@@ -400,7 +400,7 @@ static  const char *  replies[] = {
 /* 375 RPL_MOTDSTART, */        ":%s 375 %s :- %s Message of the Day - ",
 /* 376 RPL_ENDOFMOTD, */        ":%s 376 %s :End of /MOTD command.",
 /* 377 */       NULL,
-/* 378 */       NULL,
+/* 378 RPL_WHOISHOST, */       NULL, /* charybdis */
 /* 379 */       NULL,
 /* 380 */       NULL,
 /* 381 RPL_YOUREOPER, */        ":%s 381 %s :You have entered... the PANTS FREE ZONE!",
@@ -462,7 +462,7 @@ static  const char *  replies[] = {
 /* 437 ERR_UNAVAILRESOURCE, */	":%s 437 %s %s :Nick/channel is temporarily unavailable",
 /* 438 ERR_NICKTOOFAST */       ":%s 438 %s %s %s :Nick change too fast. Please wait %d seconds.",
 /* 439 */       NULL,
-/* 440 */       NULL,
+/* 440 ERR_SERVICESDOWN, */       NULL,
 /* 441 ERR_USERNOTINCHANNEL, */ "%s %s :They aren't on that channel",
 /* 442 ERR_NOTONCHANNEL, */     "%s :You're not on that channel",
 /* 443 ERR_USERONCHANNEL, */    "%s %s :is already on channel",
@@ -492,7 +492,7 @@ static  const char *  replies[] = {
 /* 467 ERR_KEYSET, */		NULL,
 /* 468 */       NULL,
 /* 469 */       NULL,
-/* 470 */       NULL,
+/* 470 ERR_LINKCHANNEL, */       NULL,
 /* 471 ERR_CHANNELISFULL, */    ":%s 471 %s %s :Cannot join channel (+l)",
 /* 472 ERR_UNKNOWNMODE  , */    ":%s 472 %s %c :is unknown mode char to me",
 /* 473 ERR_INVITEONLYCHAN, */   ":%s 473 %s %s :Cannot join channel (+i)",
@@ -508,7 +508,7 @@ static  const char *  replies[] = {
 /* 483 ERR_CANTKILLSERVER, */   ":You can't kill a server!",
 /* 484 ERR_ISCHANSERVICE */     ":%s 484 %s %s %s :Cannot kick or deop a network service",
 /* 485 ERR_BANNEDNICK, */	NULL,
-/* 486 */       NULL,
+/* 486 ERR_NONONREG, */       NULL,
 /* 487 */       NULL,
 /* 488 */       NULL,
 /* 489 ERR_VOICENEEDED */	":%s 489 %s %s :You're neither voiced nor channel operator",
@@ -539,7 +539,7 @@ static  const char *  replies[] = {
 /* 514 */	NULL,
 /* 515 */	NULL,
 /* 516 */	NULL,
-/* 517 */	NULL,
+/* 517 ERR_DISABLED, */	NULL,
 /* 518 */	NULL,
 /* 519 */	NULL,
 /* 520 */	NULL,
@@ -750,8 +750,8 @@ static  const char *  replies[] = {
 /* 725 RPL_TESTLINE */		":%s 725 %s %c %ld %s :%s",
 /* 726 RPL_NOTESTLINE */	":%s 726 %s %s :No matches",
 /* 727 RPL_TESTMASKGECOS */     ":%s 727 %s %d %d %s!%s@%s %s :Local/remote clients match",
-/* 728 */	NULL,
-/* 729 */	NULL,
+/* 728 RPL_QUIETLIST */	NULL, /* charybdis */
+/* 729 RPL_ENDOFQUIETLIST */	NULL, /* charybdis */
 /* 730 RPL_MONONLINE */		":%s 730 %s :%s",
 /* 731 RPL_MONOFFLINE */	":%s 731 %s :%s",
 /* 732 RPL_MONLIST */		":%s 732 %s :%s",
@@ -773,8 +773,8 @@ static  const char *  replies[] = {
 /* 747 */	NULL,
 /* 748 */	NULL,
 /* 749 */	NULL,
-/* 750 */	NULL,
-/* 751 */	NULL,
+/* 750 RPL_SCANMATCHED */	NULL, /* charybdis */
+/* 751 RPL_SCANUMODES */	NULL, /* charybdis */
 /* 752 */	NULL,
 /* 753 */	NULL,
 /* 754 */	NULL,
@@ -923,14 +923,14 @@ static  const char *  replies[] = {
 /* 897 */	NULL,
 /* 898 */	NULL,
 /* 899 */	NULL,
-/* 900 */	NULL,
-/* 901 */	NULL,
-/* 902 */	NULL,
-/* 903 */	NULL,
-/* 904 */	NULL,
-/* 905 */	NULL,
-/* 906 */	NULL,
-/* 907 */	NULL,
+/* 900 RPL_LOGGEDIN */	NULL, /* charybdis */
+/* 901 RPL_LOGGEDOUT */	NULL, /* charybdis */
+/* 902 ERR_NICKLOCKED */	NULL, /* charybdis */
+/* 903 RPL_SASLSUCCESS */	NULL, /* charybdis */
+/* 904 ERR_SASLFAIL */	NULL, /* charybdis */
+/* 905 ERR_SASLTOOLONG */	NULL, /* charybdis */
+/* 906 ERR_SASLABORTED */	NULL, /* charybdis */
+/* 907 ERR_SASLALREADY */	NULL, /* charybdis */
 /* 908 */	NULL,
 /* 909 */	NULL,
 /* 910 */	NULL,
