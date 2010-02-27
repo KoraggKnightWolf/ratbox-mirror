@@ -1,3 +1,15 @@
+jilles      2010/02/27 10:32:17 UTC	(20100227_0-26949)
+  Log:
+  Properly remove exempt{}s removed from ircd.conf on rehash.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/reject.h (File Modified) 
+	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 jilles      2010/02/24 22:35:54 UTC	(20100224_0-26929)
   Log:
   help: Remove references to old ban .confs,
