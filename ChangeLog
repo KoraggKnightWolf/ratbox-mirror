@@ -1,3 +1,13 @@
+jilles      2010/02/27 22:58:14 UTC	(20100227_1-26951)
+  Log:
+  Add comments for various charybdis numerics to src/messages.tab.
+  This should lessen potential for collisions.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/messages.tab (File Modified) 
+
+
 jilles      2010/02/27 10:32:17 UTC	(20100227_0-26949)
   Log:
   Properly remove exempt{}s removed from ircd.conf on rehash.
