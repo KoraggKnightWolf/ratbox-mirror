@@ -1,3 +1,13 @@
+jilles      2010/03/01 23:17:50 UTC	(20100301_0-26981)
+  Log:
+  Make struct operhash_entry private.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/operhash.h (File Modified) 
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 jilles      2010/02/27 22:58:14 UTC	(20100227_1-26951)
   Log:
   Add comments for various charybdis numerics to src/messages.tab.
