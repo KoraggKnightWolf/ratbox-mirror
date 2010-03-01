@@ -42,6 +42,12 @@
 
 #define hash_opername(x) fnv_hash_upper((const unsigned char *)(x), OPERHASH_MAX_BITS, 0)
 
+struct operhash_entry
+{
+	char *name;
+	int refcount;
+};
+
 static rb_dlink_list operhash_table[OPERHASH_MAX];
 
 const char *
