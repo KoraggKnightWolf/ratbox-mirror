@@ -1,3 +1,21 @@
+jilles      2010/03/03 22:07:46 UTC	(20100303_0-26993)
+  Log:
+  bandb: Group writes in transactions to reduce load on heavy kline activity.
+  
+  When a ban is added or removed, open a transaction and
+  close it after 3 seconds; any bans in the 3 seconds
+  will not trigger another transaction (= 4 fsyncs with
+  sqlite).
+  
+  The transaction is also committed if ircd closes the
+  connection, but not if bandb itself is terminated with
+  a signal.
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+
+
 jilles      2010/03/01 23:17:50 UTC	(20100301_0-26981)
   Log:
   Make struct operhash_entry private.
