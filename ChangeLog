@@ -1,3 +1,17 @@
+androsyn    2010/06/23 11:39:59 UTC	(20100623_0-27047)
+  Log:
+  remove network_desc, the only thing that used it was /info
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/trunk/include/defaults.h (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 jilles      2010/03/03 22:07:46 UTC	(20100303_0-26993)
   Log:
   bandb: Group writes in transactions to reduce load on heavy kline activity.
