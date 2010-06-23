@@ -2208,9 +2208,6 @@ load_conf_settings(void)
 	if(ServerInfo.network_name == NULL)
 		ServerInfo.network_name = rb_strdup(NETWORK_NAME_DEFAULT);
 
-	if(ServerInfo.network_desc == NULL)
-		ServerInfo.network_desc = rb_strdup(NETWORK_DESC_DEFAULT);
-
 	if(ServerInfo.ssld_count < 1)
 		ServerInfo.ssld_count = 1;
 
@@ -2263,7 +2260,6 @@ static struct conf_items conf_modules_table[] =
 static struct conf_items conf_serverinfo_table[] =
 {
         { "description",        CF_QSTRING, NULL, 0, &ServerInfo.description    },
-        { "network_desc",       CF_QSTRING, NULL, 0, &ServerInfo.network_desc   },
         { "hub",                CF_YESNO,   NULL, 0, &ServerInfo.hub            },
         { "default_max_clients",CF_INT,     NULL, 0, &ServerInfo.default_max_clients },
         { "network_name",       CF_QSTRING, conf_set_serverinfo_network_name,   0, NULL },

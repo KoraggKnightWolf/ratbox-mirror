@@ -254,7 +254,6 @@ struct server_info
 	char sid[4];
 	char *description;
 	char *network_name;
-	char *network_desc;
 	int hub;
 	int default_max_clients;
 	struct sockaddr_in ip;
