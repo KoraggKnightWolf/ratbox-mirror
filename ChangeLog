@@ -1,3 +1,12 @@
+androsyn    2010/08/01 15:23:02 UTC	(20100801_0-27061)
+  Log:
+  eww a sscanf! kill it!
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/blacklist.c (File Modified) 
+
+
 androsyn    2010/06/23 11:39:59 UTC	(20100623_0-27047)
   Log:
   remove network_desc, the only thing that used it was /info
