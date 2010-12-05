@@ -1,3 +1,15 @@
+jilles      2010/12/05 15:50:57 UTC	(20101205_0-27155)
+  Log:
+  Change max_bans in example.conf from 25 to 100.
+  
+  Most networks seem to have moved to a higher max_bans, and EFnet's
+  setting seems a good default for networks in general.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 androsyn    2010/08/01 15:23:02 UTC	(20100801_0-27061)
   Log:
   eww a sscanf! kill it!
