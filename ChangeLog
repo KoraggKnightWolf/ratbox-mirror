@@ -1,3 +1,12 @@
+jilles      2010/12/20 19:57:25 UTC	(20101220_0-27159)
+  Log:
+  Only show cmode +S in 005 if it is enabled (ircd.conf channel::use_sslonly).
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/supported.c (File Modified) 
+
+
 jilles      2010/12/05 15:50:57 UTC	(20101205_0-27155)
   Log:
   Change max_bans in example.conf from 25 to 100.
