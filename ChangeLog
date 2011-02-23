@@ -1,3 +1,14 @@
+jilles      2011/02/23 22:21:04 UTC	(20110223_0-27167)
+  Log:
+  challenge: Fix undefined behaviour (dependency on order of evaluation,
+  or also "value [parv[1]] read other than to determine new value to be
+  stored")
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
+
+
 jilles      2010/12/20 19:57:25 UTC	(20101220_0-27159)
   Log:
   Only show cmode +S in 005 if it is enabled (ircd.conf channel::use_sslonly).
