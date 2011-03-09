@@ -1,3 +1,15 @@
+jilles      2011/03/09 22:15:06 UTC	(20110309_0-27169)
+  Log:
+  Remove comments describing network_desc (which was removed recently).
+  
+  Reported by jackal^.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 jilles      2011/02/23 22:21:04 UTC	(20110223_0-27167)
   Log:
   challenge: Fix undefined behaviour (dependency on order of evaluation,
