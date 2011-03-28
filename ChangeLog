@@ -1,3 +1,15 @@
+jilles      2011/03/28 21:57:47 UTC	(20110328_1-27179)
+  Log:
+  xline/resv wildcard checking:
+  accept strings without wilds no matter how short they are
+  
+  from charybdis (jilles) 9d355efefa69
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 moggie      2011/03/28 18:24:39 UTC	(20110328_0-27173)
   Log:
   - Rename rb_current_time() as rb_time() and rb_current_time_tv()
