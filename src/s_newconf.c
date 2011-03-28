@@ -672,6 +672,7 @@ valid_wild_card_simple(const char *data)
 	const char *p;
 	char tmpch;
 	int nonwild = 0;
+	int wild = 0;
 
 	/* check the string for minimum number of nonwildcard chars */
 	p = data;
@@ -693,9 +694,12 @@ valid_wild_card_simple(const char *data)
 			if(++nonwild >= ConfigFileEntry.min_nonwildcard_simple)
 				return 1;
 		}
+		else
+			wild++;
 	}
 
-	return 0;
+	/* strings without wilds are also ok */
+	return wild == 0;
 }
 
 time_t
