@@ -250,7 +250,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key,
 	if(ssld_wait)
 		return 0;
 
-	if(ssld_spin_count > 20 && (rb_current_time() - last_spin < 5))
+	if(ssld_spin_count > 20 && (rb_time() - last_spin < 5))
 	{
 		ilog(L_MAIN, "ssld helper is spinning - will attempt to restart in 1 minute");
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -261,7 +261,7 @@ start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key,
 	}
 
 	ssld_spin_count++;
-	last_spin = rb_current_time();
+	last_spin = rb_time();
 	if(ssld_path == NULL)
 	{
 		rb_snprintf(fullpath, sizeof(fullpath), "%s/ssld%s", LIBEXEC_DIR, suffix);

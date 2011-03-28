@@ -466,12 +466,12 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 		/*
 		 * slow down the whining to opers bit
 		 */
-		if((last_oper_notice + 20) <= rb_current_time())
+		if((last_oper_notice + 20) <= rb_time())
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "All connections in use. (%s)",
 					     get_listener_name(listener));
-			last_oper_notice = rb_current_time();
+			last_oper_notice = rb_time();
 		}
 
 		rb_write(F, "ERROR :All connections in use\r\n", 32);

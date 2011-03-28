@@ -322,8 +322,8 @@ majority_ungline(struct Client *source_p, const char *user, const char *host, co
 					   sizeof(pending->oper_host2));
 				pending->reason2 = rb_strdup(reason);
 				pending->oper_server2 = scache_add(source_p->servptr->name);
-				pending->last_gline_time = rb_current_time();
-				pending->time_request2 = rb_current_time();
+				pending->last_gline_time = rb_time();
+				pending->time_request2 = rb_time();
 				return NO;
 			}
 		}
@@ -343,8 +343,8 @@ majority_ungline(struct Client *source_p, const char *user, const char *host, co
 	pending->reason1 = rb_strdup(reason);
 	pending->reason2 = NULL;
 
-	pending->last_gline_time = rb_current_time();
-	pending->time_request1 = rb_current_time();
+	pending->last_gline_time = rb_time();
+	pending->time_request1 = rb_time();
 
 	rb_dlinkAddAlloc(pending, &pending_gunglines);
 
@@ -460,7 +460,7 @@ expire_pending_gunglines(void *vptr)
 		glp_ptr = pending_node->data;
 
 		if((glp_ptr->last_gline_time + GLINE_PENDING_EXPIRE) <=
-		    rb_current_time() || vptr == glp_ptr)
+		    rb_time() || vptr == glp_ptr)
 
 		{
 			rb_free(glp_ptr->reason1);

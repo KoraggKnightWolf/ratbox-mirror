@@ -123,7 +123,7 @@ make_auth_request(struct Client *client)
 	request->client = client;
 	request->dns_query = 0;
 	request->authF = NULL;
-	request->timeout = rb_current_time() + ConfigFileEntry.connect_timeout;
+	request->timeout = rb_time() + ConfigFileEntry.connect_timeout;
 	return request;
 }
 
@@ -418,7 +418,7 @@ timeout_auth_queries_event(void *notused)
 	{
 		auth = ptr->data;
 
-		if(auth->timeout < rb_current_time())
+		if(auth->timeout < rb_time())
 		{
 			if(auth->authF != NULL)
 			{
@@ -439,7 +439,7 @@ timeout_auth_queries_event(void *notused)
 				sendheader(auth->client, REPORT_FAIL_DNS);
 			}
 
-			auth->client->localClient->lasttime = rb_current_time();
+			auth->client->localClient->lasttime = rb_time();
 			release_auth_client(auth);
 		}
 	}

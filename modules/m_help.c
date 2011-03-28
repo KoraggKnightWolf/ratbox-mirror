@@ -65,7 +65,7 @@ m_help(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	static time_t last_used = 0;
 
 	/* HELP is always local */
-	if((last_used + ConfigFileEntry.pace_wait_simple) > rb_current_time())
+	if((last_used + ConfigFileEntry.pace_wait_simple) > rb_time())
 	{
 		/* safe enough to give this on a local connect only */
 		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "HELP");
@@ -76,7 +76,7 @@ m_help(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	}
 	else
 	{
-		last_used = rb_current_time();
+		last_used = rb_time();
 	}
 
 	dohelp(source_p, HELP_USER, parc > 1 ? parv[1] : NULL);

@@ -114,7 +114,7 @@ parse_client_queued(struct Client *client_p)
 			 */
 			if(!tested && 
 			   (client_p->localClient->firsttime + ConfigFileEntry.post_registration_delay) > 
-			    rb_current_time())
+			    rb_time())
 				break;
 			else
 				tested = 1;
@@ -199,7 +199,7 @@ flood_recalc(void *unused)
 			continue;
 
 		if(!IsFloodDone(client_p)
-		   && ((client_p->localClient->firsttime + 30) < rb_current_time()))
+		   && ((client_p->localClient->firsttime + 30) < rb_time()))
 			flood_endgrace(client_p);
 	}
 
@@ -275,8 +275,8 @@ read_packet(rb_fde_t *F, void *data)
 		call_hook(h_iorecv_id, &hdata);
 #endif
 
-		if(client_p->localClient->lasttime < rb_current_time())
-			client_p->localClient->lasttime = rb_current_time();
+		if(client_p->localClient->lasttime < rb_time())
+			client_p->localClient->lasttime = rb_time();
 		client_p->flags &= ~FLAGS_PINGSENT;
 
 		/*

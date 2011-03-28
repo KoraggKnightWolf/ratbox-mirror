@@ -214,7 +214,7 @@ timeout_query_list(time_t now)
 static void
 timeout_resolver(void *notused)
 {
-	timeout_query_list(rb_current_time());
+	timeout_query_list(rb_time());
 }
 
 static struct ev_entry *timeout_resolver_ev = NULL;
@@ -301,7 +301,7 @@ make_request(struct DNSQuery *query)
 {
 	struct reslist *request = rb_malloc(sizeof(struct reslist));
 
-	request->sentat = rb_current_time();
+	request->sentat = rb_time();
 	request->retries = 3;
 	request->timeout = 4;	/* start at 4 and exponential inc. */
 	request->query = query;

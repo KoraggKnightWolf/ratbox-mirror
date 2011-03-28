@@ -332,7 +332,7 @@ set_kline(struct Client *source_p, const char *user, const char *host, const cha
 		return;
 
 	rb_set_time();
-	current_date = smalldate(rb_current_time());
+	current_date = smalldate(rb_time());
 	aconf = make_conf();
 	aconf->status = CONF_KILL;
 	aconf->user = rb_strdup(user);
@@ -390,7 +390,7 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	const char *oper = get_oper_name(source_p);
 
 	aconf->info.oper = operhash_add(oper);
-	aconf->hold = rb_current_time();
+	aconf->hold = rb_time();
 	if(locked)
 		aconf->flags |= CONF_FLAGS_LOCKED;
 
@@ -422,7 +422,7 @@ apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 	const char *oper = get_oper_name(source_p);
 
 	aconf->info.oper = operhash_add(oper);
-	aconf->hold = rb_current_time() + tkline_time;
+	aconf->hold = rb_time() + tkline_time;
 	add_temp_kline(aconf);
 
 	sendto_realops_flags(UMODE_ALL, L_ALL,

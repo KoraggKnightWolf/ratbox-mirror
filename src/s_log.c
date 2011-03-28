@@ -183,7 +183,7 @@ ilog(ilogfile dest, const char *format, ...)
 	rb_vsnprintf(buf, sizeof(buf), format, args);
 	va_end(args);
 
-	rb_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(rb_current_time()), buf);
+	rb_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(rb_time()), buf);
 #ifdef _WIN32
 	fputs(buf2, stderr);
 	fflush(stderr);

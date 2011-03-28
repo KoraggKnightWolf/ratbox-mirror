@@ -236,7 +236,7 @@ expire_glines(void *unused)
 		aconf = ptr->data;
 
 		/* if gline_time changes, these could end up out of order */
-		if(aconf->hold > rb_current_time())
+		if(aconf->hold > rb_time())
 			continue;
 
 		delete_one_address_conf(aconf->host, aconf);
@@ -733,7 +733,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -748,7 +748,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -763,7 +763,7 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -793,7 +793,7 @@ add_nd_entry(const char *name)
 	nd = rb_bh_alloc(nd_heap);
 
 	rb_strlcpy(nd->name, name, sizeof(nd->name));
-	nd->expire = rb_current_time() + ConfigFileEntry.nick_delay;
+	nd->expire = rb_time() + ConfigFileEntry.nick_delay;
 
 	/* this list is ordered */
 	rb_dlinkAddTail(nd, &nd->lnode, &nd_list);
@@ -822,7 +822,7 @@ expire_nd_entries(void *unused)
 		/* this list is ordered - we can stop when we hit the first
 		 * entry that doesnt expire..
 		 */
-		if(nd->expire > rb_current_time())
+		if(nd->expire > rb_time())
 			return;
 
 		free_nd_entry(nd);
@@ -845,7 +845,7 @@ add_tgchange(const char *host)
 	target->pnode = pnode;
 
 	target->ip = rb_strdup(host);
-	target->expiry = rb_current_time() + (60 * 60 * 12);
+	target->expiry = rb_time() + (60 * 60 * 12);
 
 	rb_dlinkAdd(target, &target->node, &tgchange_list);
 }

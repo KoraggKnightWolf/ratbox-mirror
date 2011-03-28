@@ -305,7 +305,7 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 	reason = LOCAL_COPY_N(lreason, REASONLEN);
 
 	rb_set_time();
-	current_date = smalldate(rb_current_time());
+	current_date = smalldate(rb_time());
 
 	aconf = make_conf();
 	aconf->status = CONF_DLINE;
@@ -333,7 +333,7 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 			    "Temporary D-line %d min. - %s (%s)",
 			    (int)(tdline_time / 60), reason, current_date);
 		aconf->passwd = rb_strdup(dlbuffer);
-		aconf->hold = rb_current_time() + tdline_time;
+		aconf->hold = rb_time() + tdline_time;
 		add_temp_dline(aconf);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,

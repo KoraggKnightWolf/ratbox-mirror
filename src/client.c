@@ -144,7 +144,7 @@ make_client(struct Client *from)
 		client_p->localClient = localClient;
 
 		client_p->localClient->lasttime = client_p->localClient->firsttime =
-			rb_current_time();
+			rb_time();
 
 		client_p->localClient->F = NULL;
 
@@ -292,13 +292,13 @@ check_pings_list(rb_dlink_list *list)
 		else
 			ping = get_client_ping(client_p);
 
-		if(ping < (rb_current_time() - client_p->localClient->lasttime))
+		if(ping < (rb_time() - client_p->localClient->lasttime))
 		{
 			/*
 			 * If the client/server hasnt talked to us in 2*ping seconds
 			 * and it has a ping time, then close its connection.
 			 */
-			if(((rb_current_time() - client_p->localClient->lasttime) >= (2 * ping)
+			if(((rb_time() - client_p->localClient->lasttime) >= (2 * ping)
 			    && (client_p->flags & FLAGS_PINGSENT)))
 			{
 				if(IsAnyServer(client_p))
@@ -312,7 +312,7 @@ check_pings_list(rb_dlink_list *list)
 				}
 				(void)rb_snprintf(scratch, sizeof(scratch),
 						  "Ping timeout: %d seconds",
-						  (int)(rb_current_time() -
+						  (int)(rb_time() -
 							client_p->localClient->lasttime));
 
 				exit_client(client_p, client_p, &me, scratch);
@@ -327,7 +327,7 @@ check_pings_list(rb_dlink_list *list)
 				 */
 				client_p->flags |= FLAGS_PINGSENT;
 				/* not nice but does the job */
-				client_p->localClient->lasttime = rb_current_time() - ping;
+				client_p->localClient->lasttime = rb_time() - ping;
 				sendto_one(client_p, "PING :%s", me.name);
 			}
 		}
@@ -366,7 +366,7 @@ check_unknowns_list(rb_dlink_list *list)
 		 * for > 30s, close them.
 		 */
 
-		if((rb_current_time() - client_p->localClient->firsttime) > 30)
+		if((rb_time() - client_p->localClient->firsttime) > 30)
 			exit_client(client_p, client_p, &me, "Connection timed out");
 	}
 }
@@ -1322,11 +1322,11 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s was connected"
 			     " for %ld seconds.  %llu/%llu send/recv.",
 			     source_p->name,
-			     (long int)(rb_current_time() - source_p->localClient->firsttime),
+			     (long int)(rb_time() - source_p->localClient->firsttime),
 			     sendb, recvb);
 
 	ilog(L_SERVER, "%s was connected for %ld seconds.  %llu/%llu send/recv.",
-	     source_p->name, (long int)(rb_current_time() - source_p->localClient->firsttime),
+	     source_p->name, (long int)(rb_time() - source_p->localClient->firsttime),
 	     sendb, recvb);
 
 	del_from_hash(HASH_ID, source_p->id, source_p);
@@ -1380,10 +1380,10 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 			     show_ip(NULL, source_p) ? source_p->sockhost : "255.255.255.255",
 			     comment);
 
-	on_for = rb_current_time() - source_p->localClient->firsttime;
+	on_for = rb_time() - source_p->localClient->firsttime;
 
 	ilog(L_USER, "%s (%3lu:%02lu:%02lu): %s!%s@%s %s %llu/%llu",
-	     rb_ctime(rb_current_time(), tbuf, sizeof(tbuf)), on_for / 3600,
+	     rb_ctime(rb_time(), tbuf, sizeof(tbuf)), on_for / 3600,
 	     (on_for % 3600) / 60, on_for % 60,
 	     source_p->name, source_p->username, source_p->host, source_p->sockhost,
 	     source_p->localClient->sendB, source_p->localClient->receiveB);
@@ -1756,7 +1756,7 @@ close_connection(struct Client *client_p)
 		ServerStats.is_sv++;
 		ServerStats.is_sbs += client_p->localClient->sendB;
 		ServerStats.is_sbr += client_p->localClient->receiveB;
-		ServerStats.is_sti += (unsigned long long)(rb_current_time() - client_p->localClient->firsttime);
+		ServerStats.is_sti += (unsigned long long)(rb_time() - client_p->localClient->firsttime);
 
 		/*
 		 * If the connection has been up for a long amount of time, schedule
@@ -1782,7 +1782,7 @@ close_connection(struct Client *client_p)
 		ServerStats.is_cl++;
 		ServerStats.is_cbs += client_p->localClient->sendB;
 		ServerStats.is_cbr += client_p->localClient->receiveB;
-		ServerStats.is_cti += (unsigned long long)(rb_current_time() - client_p->localClient->firsttime);
+		ServerStats.is_cti += (unsigned long long)(rb_time() - client_p->localClient->firsttime);
 	}
 	else
 		ServerStats.is_ni++;
@@ -1830,7 +1830,7 @@ error_exit_client(struct Client *client_p, int error)
 
 	if(IsServer(client_p) || IsHandshake(client_p))
 	{
-		int connected = rb_current_time() - client_p->localClient->firsttime;
+		int connected = rb_time() - client_p->localClient->firsttime;
 
 		if(error == 0)
 		{

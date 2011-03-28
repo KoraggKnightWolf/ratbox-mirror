@@ -507,7 +507,7 @@ seed_with_clock(void)
 {
 	const struct timeval *tv;
 	rb_set_time();
-	tv = rb_current_time_tv();
+	tv = rb_time_tv();
 	srand(tv->tv_sec ^ (tv->tv_usec | (getpid() << 20)));
 }
 
@@ -750,7 +750,7 @@ ratbox_main(int argc, char *argv[])
 	me.servptr = &me;
 	SetMe(&me);
 	make_server(&me);
-	startup_time = rb_current_time();
+	startup_time = rb_time();
 	add_to_hash(HASH_CLIENT, me.name, &me);
 	add_to_hash(HASH_ID, me.id, &me);
 

@@ -121,7 +121,7 @@ part_one_client(struct Client *client_p, struct Client *source_p, char *name, ch
 				    ((can_send(chptr, source_p, msptr) > 0 &&
 				      (source_p->localClient->firsttime +
 				       ConfigFileEntry.anti_spam_exit_message_time) <
-				      rb_current_time()))))
+				      rb_time()))))
 	{
 		sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
 			      ":%s PART %s :%s", source_p->id, chptr->chname, reason);

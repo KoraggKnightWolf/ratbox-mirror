@@ -149,7 +149,7 @@ reject_expires(void *unused)
 		pnode = ptr->data;
 		rdata = pnode->data;
 
-		if(rdata->time + ConfigFileEntry.reject_duration > rb_current_time())
+		if(rdata->time + ConfigFileEntry.reject_duration > rb_time())
 			continue;
 
 		rb_dlinkDelete(ptr, &reject_list);
@@ -186,7 +186,7 @@ add_reject(struct Client *client_p)
 	    rb_match_ip(reject_tree, (struct sockaddr *)&client_p->localClient->ip)) != NULL)
 	{
 		rdata = pnode->data;
-		rdata->time = rb_current_time();
+		rdata->time = rb_time();
 		rdata->count++;
 	}
 	else
@@ -200,7 +200,7 @@ add_reject(struct Client *client_p)
 					   (struct sockaddr *)&client_p->localClient->ip, bitlen);
 		pnode->data = rdata = rb_malloc(sizeof(reject_t));
 		rb_dlinkAddTail(pnode, &rdata->rnode, &reject_list);
-		rdata->time = rb_current_time();
+		rdata->time = rb_time();
 		rdata->count = 1;
 	}
 }
@@ -221,7 +221,7 @@ check_reject(rb_fde_t *F, struct sockaddr *addr)
 	{
 		rdata = pnode->data;
 
-		rdata->time = rb_current_time();
+		rdata->time = rb_time();
 		if(rdata->count > (unsigned long)ConfigFileEntry.reject_after_count)
 		{
 			ddata = rb_malloc(sizeof(delay_t));
@@ -254,7 +254,7 @@ is_reject_ip(struct sockaddr *addr)
 
 		if(rdata->count > (unsigned long)ConfigFileEntry.reject_after_count)
 		{
-			duration = rdata->time + ConfigFileEntry.reject_duration - rb_current_time();
+			duration = rdata->time + ConfigFileEntry.reject_duration - rb_time();
 			return duration > 0 ? duration : 1;
 		}
 	}	
@@ -482,7 +482,7 @@ throttle_add(struct sockaddr *addr)
 			return 1;
 		}
 		/* Stop penalizing them after they've been throttled */
-		t->last = rb_current_time();
+		t->last = rb_time();
 		t->count++;
 	}
 	else
@@ -493,7 +493,7 @@ throttle_add(struct sockaddr *addr)
 			bitlen = 128;
 #endif
 		t = rb_malloc(sizeof(throttle_t));
-		t->last = rb_current_time();
+		t->last = rb_time();
 		t->count = 1;
 		pnode = make_and_lookup_ip(throttle_tree, addr, bitlen);
 		pnode->data = t;
@@ -514,7 +514,7 @@ is_throttle_ip(struct sockaddr *addr)
 		t = pnode->data;
 		if(t->count > ConfigFileEntry.throttle_count)
 		{
-			duration = t->last + ConfigFileEntry.throttle_duration - rb_current_time();
+			duration = t->last + ConfigFileEntry.throttle_duration - rb_time();
 			return duration > 0 ? duration : 1;
 		}
 	}
@@ -533,7 +533,7 @@ throttle_expires(void *unused)
 		pnode = ptr->data;
 		t = pnode->data;
 
-		if(t->last + ConfigFileEntry.throttle_duration > rb_current_time())
+		if(t->last + ConfigFileEntry.throttle_duration > rb_time())
 			continue;
 
 		rb_dlinkDelete(ptr, &throttle_list);

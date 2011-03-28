@@ -78,7 +78,7 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 	 */
 	rb_set_time();
 	theirtime = atol(parv[4]);
-	deltat = abs(theirtime - rb_current_time());
+	deltat = abs(theirtime - rb_time());
 
 	if(deltat > ConfigFileEntry.ts_max_delta)
 	{
@@ -86,11 +86,11 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 				     "Link %s dropped, excessive TS delta"
 				     " (my TS=%ld, their TS=%ld, delta=%d)",
 				     source_p->name,
-				     (long)rb_current_time(), (long)theirtime, deltat);
+				     (long)rb_time(), (long)theirtime, deltat);
 		ilog(L_SERVER,
 		     "Link %s dropped, excessive TS delta"
 		     " (my TS=%ld, their TS=%ld, delta=%d)",
-		     log_client_name(source_p, SHOW_IP), (long)rb_current_time(), (long)theirtime,
+		     log_client_name(source_p, SHOW_IP), (long)rb_time(), (long)theirtime,
 		     deltat);
 		disable_server_conf_autoconn(source_p->name);
 		exit_client(source_p, source_p, source_p, "Excessive TS delta");
@@ -102,7 +102,7 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s notable TS delta"
 				     " (my TS=%ld, their TS=%ld, delta=%d)",
-				     source_p->name, (long)rb_current_time(), (long)theirtime,
+				     source_p->name, (long)rb_time(), (long)theirtime,
 				     deltat);
 	}
 

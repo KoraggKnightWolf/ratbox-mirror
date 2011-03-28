@@ -132,13 +132,13 @@ m_knock(struct Client *client_p, struct Client *source_p, int parc, const char *
 		 */
 		if(!IsOper(source_p) &&
 		   (source_p->localClient->last_knock + ConfigChannel.knock_delay) >
-		   rb_current_time())
+		   rb_time())
 		{
 			sendto_one(source_p, form_str(ERR_TOOMANYKNOCK),
 				   me.name, source_p->name, name, "user");
 			return 0;
 		}
-		else if((chptr->last_knock + ConfigChannel.knock_delay_channel) > rb_current_time())
+		else if((chptr->last_knock + ConfigChannel.knock_delay_channel) > rb_time())
 		{
 			sendto_one(source_p, form_str(ERR_TOOMANYKNOCK),
 				   me.name, source_p->name, name, "channel");
@@ -146,12 +146,12 @@ m_knock(struct Client *client_p, struct Client *source_p, int parc, const char *
 		}
 
 		/* ok, we actually can send the knock, tell client */
-		source_p->localClient->last_knock = rb_current_time();
+		source_p->localClient->last_knock = rb_time();
 
 		sendto_one(source_p, form_str(RPL_KNOCKDLVR), me.name, source_p->name, name);
 	}
 
-	chptr->last_knock = rb_current_time();
+	chptr->last_knock = rb_time();
 
 	if(ConfigChannel.use_knock)
 		sendto_channel_local(ONLY_CHANOPS, chptr, form_str(RPL_KNOCK),

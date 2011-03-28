@@ -198,7 +198,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(MyClient(source_p) && !IsOper(source_p))
 	{
 		/* Check the user is actually allowed to do /stats, and isnt flooding */
-		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
+		if((last_used + ConfigFileEntry.pace_wait) > rb_time())
 		{
 			/* safe enough to give this on a local connect only */
 			sendto_one(source_p, form_str(RPL_LOAD2HI),
@@ -208,7 +208,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 			return 0;
 		}
 		else
-			last_used = rb_current_time();
+			last_used = rb_time();
 	}
 
 	if(hunt_server(client_p, source_p, ":%s STATS %s :%s", 2, parc, parv) != HUNTED_ISME)
@@ -774,7 +774,7 @@ stats_operedup(struct Client *source_p)
 					   IsAdmin(target_p) ? 'A' : 'O',
 					   get_oper_privs(target_p->operflags),
 					   target_p->name, target_p->username, target_p->host,
-					   (long)(rb_current_time() - target_p->localClient->last));
+					   (long)(rb_time() - target_p->localClient->last));
 		}
 		else
 		{
@@ -782,7 +782,7 @@ stats_operedup(struct Client *source_p)
 					   "p :[%c] %s (%s@%s) Idle: %ld",
 					   IsAdmin(target_p) ? 'A' : 'O',
 					   target_p->name, target_p->username, target_p->host,
-					   (long)(rb_current_time() - target_p->localClient->last));
+					   (long)(rb_time() - target_p->localClient->last));
 		}
 	}
 
@@ -879,7 +879,7 @@ stats_usage(struct Client *source_p)
 	if(0 == secs)
 		secs = 1;
 
-	rup = (rb_current_time() - startup_time) * hzz;
+	rup = (rb_time() - startup_time) * hzz;
 	if(0 == rup)
 		rup = 1;
 
@@ -921,7 +921,7 @@ stats_tstats(struct Client *source_p)
 
 		sp.is_sbs += target_p->localClient->sendB;
 		sp.is_sbr += target_p->localClient->receiveB;
-		sp.is_sti += (unsigned long long)(rb_current_time() - target_p->localClient->firsttime);
+		sp.is_sti += (unsigned long long)(rb_time() - target_p->localClient->firsttime);
 		sp.is_sv++;
 	}
 
@@ -931,7 +931,7 @@ stats_tstats(struct Client *source_p)
 
 		sp.is_cbs += target_p->localClient->sendB;
 		sp.is_cbr += target_p->localClient->receiveB;
-		sp.is_cti += (unsigned long long)(rb_current_time() - target_p->localClient->firsttime);
+		sp.is_cti += (unsigned long long)(rb_time() - target_p->localClient->firsttime);
 		sp.is_cl++;
 	}
 
@@ -967,7 +967,7 @@ stats_uptime(struct Client *source_p)
 {
 	time_t now;
 
-	now = rb_current_time() - startup_time;
+	now = rb_time() - startup_time;
 	sendto_one_numeric(source_p, RPL_STATSUPTIME,
 			   form_str(RPL_STATSUPTIME),
 			   now / 86400, (now / 3600) % 24, (now / 60) % 60, now % 60);
@@ -1072,7 +1072,7 @@ stats_servers(struct Client *source_p)
 		target_p = ptr->data;
 
 		j++;
-		seconds = (long)(rb_current_time() - target_p->localClient->firsttime);
+		seconds = (long)(rb_time() - target_p->localClient->firsttime);
 
 		days = seconds / 86400;
 		seconds %= 86400;
@@ -1086,7 +1086,7 @@ stats_servers(struct Client *source_p)
 				   "Connected: %ld day%s, %ld:%02ld:%02ld",
 				   target_p->name,
 				   (target_p->serv->by[0] ? target_p->serv->by : "Remote."),
-				   (long)(rb_current_time() - target_p->localClient->lasttime),
+				   (long)(rb_time() - target_p->localClient->lasttime),
 				   rb_linebuf_len(&target_p->localClient->buf_sendq),
 				   days, (days == 1) ? "" : "s", hours, minutes, seconds);
 	}
@@ -1462,9 +1462,9 @@ stats_servlinks(struct Client *source_p)
 			   target_p->localClient->sendB / 1024,
 			   target_p->localClient->receiveM,
 			   target_p->localClient->receiveB / 1024,
-			   (long)(rb_current_time() - target_p->localClient->firsttime),
-			   (long)((rb_current_time() > target_p->localClient->lasttime) ?
-				  (rb_current_time() - target_p->localClient->lasttime) : 0),
+			   (long)(rb_time() - target_p->localClient->firsttime),
+			   (long)((rb_time() > target_p->localClient->lasttime) ?
+				  (rb_time() - target_p->localClient->lasttime) : 0),
 			   IsOper(source_p) ? show_capabilities(target_p) : "TS");
 	}
 
@@ -1478,7 +1478,7 @@ stats_servlinks(struct Client *source_p)
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "? :Recv total : %s %s", buf, _GMKs((receive / 1024)));
 
-	uptime = (rb_current_time() - startup_time);
+	uptime = (rb_time() - startup_time);
 #ifdef HAVE_SNPRINTF
 	snprintf(buf, sizeof(buf),
 #else
@@ -1623,9 +1623,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p, char statchar)
 				   target_p->localClient->sendB / 1024,
 				   target_p->localClient->receiveM,
 				   target_p->localClient->receiveB / 1024,
-				   (long)rb_current_time() - target_p->localClient->firsttime,
-				   (long)(rb_current_time() > target_p->localClient->lasttime) ?
-				   (long)(rb_current_time() - target_p->localClient->lasttime) : 0,
+				   (long)rb_time() - target_p->localClient->firsttime,
+				   (long)(rb_time() > target_p->localClient->lasttime) ?
+				   (long)(rb_time() - target_p->localClient->lasttime) : 0,
 				   IsOper(source_p) ? show_capabilities(target_p) : "-");
 	}
 
@@ -1638,9 +1638,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p, char statchar)
 				   target_p->localClient->sendB / 1024,
 				   target_p->localClient->receiveM,
 				   target_p->localClient->receiveB / 1024,
-				   (long)(rb_current_time() - target_p->localClient->firsttime),
-				   (long)(rb_current_time() > target_p->localClient->lasttime) ?
-				   (long)(rb_current_time() - target_p->localClient->lasttime) : 0,
+				   (long)(rb_time() - target_p->localClient->firsttime),
+				   (long)(rb_time() > target_p->localClient->lasttime) ?
+				   (long)(rb_time() - target_p->localClient->lasttime) : 0,
 				   "-");
 	}
 
@@ -1655,9 +1655,9 @@ stats_l_client(struct Client *source_p, struct Client *target_p, char statchar)
 				   target_p->localClient->sendB / 1024,
 				   target_p->localClient->receiveM,
 				   target_p->localClient->receiveB / 1024,
-				   (long)rb_current_time() - target_p->localClient->firsttime,
-				   (long)(rb_current_time() > target_p->localClient->lasttime) ?
-				   (long)(rb_current_time() - target_p->localClient->lasttime) : 0,
+				   (long)rb_time() - target_p->localClient->firsttime,
+				   (long)(rb_time() > target_p->localClient->lasttime) ?
+				   (long)(rb_time() - target_p->localClient->lasttime) : 0,
 				   "-");
 	}
 }

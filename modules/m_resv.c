@@ -263,13 +263,13 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		if(temp_time > 0)
 		{
 			aconf->flags |= CONF_FLAGS_TEMPORARY;
-			aconf->hold = rb_current_time() + temp_time;
+			aconf->hold = rb_time() + temp_time;
 		}
 		else
 		{
 			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL,
 				  locked);
-			aconf->hold = rb_current_time();
+			aconf->hold = rb_time();
 		}
 	}
 	else if(clean_resv_nick(name))
@@ -312,13 +312,13 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		if(temp_time > 0)
 		{
 			aconf->flags |= CONF_FLAGS_TEMPORARY;
-			aconf->hold = rb_current_time() + temp_time;
+			aconf->hold = rb_time() + temp_time;
 		}
 		else
 		{
 			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL,
 				  locked);
-			aconf->hold = rb_current_time();
+			aconf->hold = rb_time();
 		}
 
 	}

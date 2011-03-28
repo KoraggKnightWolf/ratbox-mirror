@@ -86,12 +86,12 @@ static void blacklist_dns_callback(const char *res, int status, int aftype,
 		/* only accept 127.x.y.z as a listing */
 		if (!strncmp(res, "127.", 4))
 			listed = TRUE;
-		else if (blcptr->blacklist->lastwarning + 3600 < rb_current_time())
+		else if (blcptr->blacklist->lastwarning + 3600 < rb_time())
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					"Garbage reply from blacklist %s",
 					blcptr->blacklist->host);
-			blcptr->blacklist->lastwarning = rb_current_time();
+			blcptr->blacklist->lastwarning = rb_time();
 		}
 	}
 

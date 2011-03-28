@@ -907,17 +907,17 @@ make_ban_reason(const char *reason, const char *oper_reason)
 void
 add_temp_kline(struct ConfItem *aconf)
 {
-	if(aconf->hold >= rb_current_time() + (10080 * 60))
+	if(aconf->hold >= rb_time() + (10080 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
-	else if(aconf->hold >= rb_current_time() + (1440 * 60))
+	else if(aconf->hold >= rb_time() + (1440 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
-	else if(aconf->hold >= rb_current_time() + (60 * 60))
+	else if(aconf->hold >= rb_time() + (60 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
@@ -941,17 +941,17 @@ add_temp_kline(struct ConfItem *aconf)
 void
 add_temp_dline(struct ConfItem *aconf)
 {
-	if(aconf->hold >= rb_current_time() + (10080 * 60))
+	if(aconf->hold >= rb_time() + (10080 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
-	else if(aconf->hold >= rb_current_time() + (1440 * 60))
+	else if(aconf->hold >= rb_time() + (1440 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
-	else if(aconf->hold >= rb_current_time() + (60 * 60))
+	else if(aconf->hold >= rb_time() + (60 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
@@ -984,7 +984,7 @@ expire_temp_kd(void *list)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold <= rb_current_time())
+		if(aconf->hold <= rb_time())
 		{
 			/* Alert opers that a TKline expired - Hwy */
 			if(ConfigFileEntry.tkline_expire_notices)
@@ -1012,7 +1012,7 @@ reorganise_temp_kd(void *list)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold < (rb_current_time() + (60 * 60)))
+		if(aconf->hold < (rb_time() + (60 * 60)))
 		{
 			rb_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ?
 					 &temp_klines[TEMP_MIN] : &temp_dlines[TEMP_MIN]);
@@ -1020,14 +1020,14 @@ reorganise_temp_kd(void *list)
 		}
 		else if(aconf->port > TEMP_HOUR)
 		{
-			if(aconf->hold < (rb_current_time() + (1440 * 60)))
+			if(aconf->hold < (rb_time() + (1440 * 60)))
 			{
 				rb_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ?
 						 &temp_klines[TEMP_HOUR] : &temp_dlines[TEMP_HOUR]);
 				aconf->port = TEMP_HOUR;
 			}
 			else if(aconf->port > TEMP_DAY &&
-				(aconf->hold < (rb_current_time() + (10080 * 60))))
+				(aconf->hold < (rb_time() + (10080 * 60))))
 			{
 				rb_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ?
 						 &temp_klines[TEMP_DAY] : &temp_dlines[TEMP_DAY]);

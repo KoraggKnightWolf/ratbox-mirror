@@ -481,7 +481,7 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 
 	rb_dlinkAdd(chptr, &chptr->node, &global_channel_list);
 
-	chptr->channelts = rb_current_time();	/* doesn't hurt to set it here */
+	chptr->channelts = rb_time();	/* doesn't hurt to set it here */
 
 	rb_dlinkAddAlloc(chptr, &channelTable[hashv]);
 
