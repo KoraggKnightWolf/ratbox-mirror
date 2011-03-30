@@ -1,3 +1,15 @@
+jilles      2011/03/30 22:59:28 UTC	(20110330_1-27183)
+  Log:
+  Forward port r27119 from 3.0 by androsyn:
+  Clear out logfile names before rehashing the server.
+  Without this, if an admin comments out a logfile and rehashes,
+  the server keeps logging to that file.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 jilles      2011/03/30 22:08:41 UTC	(20110330_0-27181)
   Log:
   Reject ASCII code 29 for disable_fake_channels as new mIRC uses this for italics.
