@@ -1,3 +1,12 @@
+jilles      2011/03/30 22:08:41 UTC	(20110330_0-27181)
+  Log:
+  Reject ASCII code 29 for disable_fake_channels as new mIRC uses this for italics.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 jilles      2011/03/28 21:57:47 UTC	(20110328_1-27179)
   Log:
   xline/resv wildcard checking:
