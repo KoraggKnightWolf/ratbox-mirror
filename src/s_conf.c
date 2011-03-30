@@ -1176,6 +1176,28 @@ clear_out_old_conf(void)
 	rb_free(AdminInfo.description);
 	AdminInfo.description = NULL;
 
+	/* clean out log file names  */
+	rb_free(ConfigFileEntry.fname_userlog);
+	ConfigFileEntry.fname_userlog = NULL;
+	rb_free(ConfigFileEntry.fname_fuserlog);
+	ConfigFileEntry.fname_fuserlog = NULL;
+	rb_free(ConfigFileEntry.fname_operlog);
+	ConfigFileEntry.fname_operlog = NULL;
+	rb_free(ConfigFileEntry.fname_foperlog);
+	ConfigFileEntry.fname_foperlog = NULL;
+	rb_free(ConfigFileEntry.fname_serverlog);
+	ConfigFileEntry.fname_serverlog = NULL;
+	rb_free(ConfigFileEntry.fname_killlog);
+	ConfigFileEntry.fname_killlog = NULL;
+	rb_free(ConfigFileEntry.fname_glinelog);
+	ConfigFileEntry.fname_glinelog = NULL;
+	rb_free(ConfigFileEntry.fname_klinelog);
+	ConfigFileEntry.fname_klinelog = NULL;
+	rb_free(ConfigFileEntry.fname_operspylog);
+	ConfigFileEntry.fname_operspylog = NULL;
+	rb_free(ConfigFileEntry.fname_ioerrorlog);
+	ConfigFileEntry.fname_ioerrorlog = NULL;
+
 	rb_free(ServerInfo.vhost_dns);
 	ServerInfo.vhost_dns = NULL;
 #ifdef IPV6
