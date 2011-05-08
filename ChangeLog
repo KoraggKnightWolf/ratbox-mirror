@@ -1,3 +1,12 @@
+jilles      2011/05/08 23:43:27 UTC	(20110508_0-27189)
+  Log:
+  doc/example.conf is not executable.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf  (Property Modified)
+
+
 jilles      2011/03/30 22:59:28 UTC	(20110330_1-27183)
   Log:
   Forward port r27119 from 3.0 by androsyn:
