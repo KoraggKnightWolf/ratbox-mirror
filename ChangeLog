@@ -1,3 +1,19 @@
+jilles      2011/08/30 22:52:08 UTC	(20110830_0-27203)
+  Log:
+  Ensure all signals keep working after a SIGINT restart.
+  
+  After setting up signal handlers, unmask the signals we care about
+  (installed handlers for).
+  
+  When handling SIGINT, the kernel adds SIGHUP and SIGINT to the signal
+  mask (as requested in sigaction()); if execve() is called from the
+  signal handler, this change is persistent.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd_signal.c (File Modified) 
+
+
 jilles      2011/05/08 23:43:27 UTC	(20110508_0-27189)
   Log:
   doc/example.conf is not executable.
