@@ -1,3 +1,11 @@
+androsyn    2011/10/08 03:04:08 UTC	(20111008_0-27207)
+  Log:
+  copy dubkat's updated INSTALL from 3.0
+
+  Modified:
+	ircd-ratbox/trunk/INSTALL (File Modified) 
+
+
 jilles      2011/08/30 22:52:08 UTC	(20110830_0-27203)
   Log:
   Ensure all signals keep working after a SIGINT restart.
