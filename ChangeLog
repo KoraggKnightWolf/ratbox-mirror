@@ -1,3 +1,20 @@
+jilles      2011/10/11 22:43:30 UTC	(20111011_0-27209)
+  Log:
+  Disable Id keyword on the sqlite3 amalgamation.
+  
+  The file contains many $Id: tags for the various source files comprising the
+  amalgamation; overwriting them all with our own has no point and causes
+  problems with patches.
+  
+  The original $Id: tags from sqlite3 are still lost but patch should work
+  normally now and a new version can have proper sqlite3 $Id:.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.c (File Modified) (Property Modified)
+
+
 androsyn    2011/10/08 03:04:08 UTC	(20111008_0-27207)
   Log:
   copy dubkat's updated INSTALL from 3.0
