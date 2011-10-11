@@ -1,3 +1,13 @@
+jilles      2011/10/11 22:49:42 UTC	(20111011_1-27213)
+  Log:
+  Disable keyword expansion for two more files from sqlite3.
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/sqlite3/shell.c (File Modified) (Property Modified)
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.h (File Modified) (Property Modified)
+
+
 jilles      2011/10/11 22:43:30 UTC	(20111011_0-27209)
   Log:
   Disable Id keyword on the sqlite3 amalgamation.
