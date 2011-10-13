@@ -4,8 +4,7 @@
  *
  *  Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
  *  Copyright (C) 1996-2002 Hybrid Development Team
- *  Copyright (C) 2002-2008 ircd-ratbox development team
- *  Copyright (C) 2008 Daniel J Reidy <dubkat@gmail.com>
+ *  Copyright (C) 2002-2011 ircd-ratbox development team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,9 +21,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id$
- *
- *
  * The following server admins have either contributed various configs to test against,
  * or helped with debugging and feature requests. Many thanks to them.
  * stevoo / efnet.port80.se
@@ -32,9 +28,7 @@
  * Salvation / irc.blessed.net
  * JamesOff / efnet.demon.co.uk
  *
- * Thanks to AndroSyn for challenging me to learn C on the fly :)
- * BUGS Direct Question, Bug Reports, and Feature Requests to #ratbox on EFnet.
- * BUGS Complaints >/dev/null
+ *  $Id$
  *
  */
 
@@ -42,13 +36,13 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "serno.h"
+#include "patchlevel.h"
 #include "stdinc.h"
 #include "rsdb.h"
 
 #define EmptyString(x) ((x == NULL) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
-
-#define BT_VERSION "0.4.1"
 
 typedef enum
 {
@@ -207,8 +201,8 @@ main(int argc, char *argv[])
 		rb_strlcpy(etc, ETCPATH, sizeof(ETCPATH));
 
 	fprintf(stdout,
-		"* ircd-ratbox bantool v.%s ($Id$)\n",
-		BT_VERSION);
+		"* bantool v.%s built for %s ($Id$)\n",
+		SERIALNUM, PATCHLEVEL);
 
 	if(flag.pretend == NO)
 	{
@@ -873,8 +867,8 @@ void
 print_help(int i_exit)
 {
 	/* *INDENT-OFF* */
-	fprintf(stderr, "bantool v.%s - the ircd-ratbox database tool.\n", BT_VERSION);
-	fprintf(stderr, "Copyright (C) 2008 Daniel J Reidy <dubkat@gmail.com>\n");
+	fprintf(stderr, "bantool v.%s - the %s database tool.\n", SERIALNUM, PATCHLEVEL);
+	fprintf(stderr, "Copyright (C) 2008-2011 ircd-ratbox development team\n");
 	fprintf(stderr, "$Id$\n\n");
 	fprintf(stderr, "This program is distributed in the hope that it will be useful,\n"
 		"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
