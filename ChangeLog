@@ -1,3 +1,11 @@
+dubkat      2011/10/13 05:51:10 UTC	(20111013_1-27229)
+  Log:
+  make bantool have a more meaningful version number
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 dubkat      2011/10/13 04:53:29 UTC	(20111013_0-27225)
   Log:
   tabs here, spaces there. let's clean up the configs a bit so everything aligns nice and neat.
