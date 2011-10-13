@@ -1,3 +1,15 @@
+dubkat      2011/10/13 04:53:29 UTC	(20111013_0-27225)
+  Log:
+  tabs here, spaces there. let's clean up the configs a bit so everything aligns nice and neat.
+  add cconnext to the oper only umodes, since it does nothing for lusers.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 dubkat      2011/10/12 01:25:49 UTC	(20111012_1-27221)
   Log:
   Cleanup the INSTALL file.
