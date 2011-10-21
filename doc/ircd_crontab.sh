@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # IRCD-RATBOX Crontab Script
 # Copyright (C) 2009-2011 ircd-ratbox development team
@@ -24,13 +24,15 @@ PID_FILE="etc/ircd.pid"
 
 # Leave the rest alone.
 
+test -x "${IRCD_PATH}/bin/ircd" || exit 1
+
 if [ -f "${IRCD_PATH}/${PID_FILE}" ] ; then
-	PID="$(<${IRCD_PATH}/${PID_FILE})"
-	if `kill -CHLD $PID >/dev/null 2>&1`; then
+	PID=`cat "${IRCD_PATH}/${PID_FILE}"`
+	if kill -0 $PID >/dev/null 2>&1 ; then
 		exit 0;
 	fi
-	rm -f ${IRCD_PATH}/${PID_FILE}
+	rm -f "${IRCD_PATH}/${PID_FILE}"
 fi
 
-test -x ${IRCD_PATH}/bin/ircd && ${IRCD_PATH}/bin/ircd -conftest &>/dev/null && ${IRCD_PATH}/bin/ircd
+${IRCD_PATH}/bin/ircd -conftest &>/dev/null && ${IRCD_PATH}/bin/ircd
 exit $?;
