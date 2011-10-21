@@ -1,3 +1,14 @@
+jilles      2011/10/21 15:45:40 UTC	(20111021_5-27265)
+  Log:
+  Add AC_LANG_SOURCE where new autoconf wants it, quote AC_LANG_PROGRAM.
+  
+  Note that this does not fix new autotools, there is other breakage.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 jilles      2011/10/21 15:07:29 UTC	(20111021_4-27261)
   Log:
   Substitute the prefix into ircd_crontab.sh and install it to bin/.
