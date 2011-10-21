@@ -81,7 +81,7 @@ cc_accepts_flag()
 	cc_accepts_flag_CFLAGS="$CFLAGS"
 	CFLAGS="$*"
 	AC_MSG_CHECKING([whether $CC accepts $@])
-	AC_COMPILE_IFELSE([int main(){return 0;}] ,
+	AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])] ,
 	[RC=0; AC_MSG_RESULT([yes])],
 	[RC=1; AC_MSG_RESULT([no])])
 	CFLAGS="$cc_accepts_flag_CFLAGS"
@@ -167,9 +167,10 @@ dnl See whether we can include both string.h and strings.h.
 AC_CACHE_CHECK([whether string.h and strings.h may both be included],
 gcc_cv_header_string,
 [
-	AC_COMPILE_IFELSE(
+	AC_COMPILE_IFELSE([AC_LANG_SOURCE(
 	[#include <string.h>
-	#include <strings.h>], 
+	#include <strings.h>
+	])], 
 	[gcc_cv_header_string=yes],
 	[gcc_cv_header_string=no])
 ])
@@ -261,12 +262,12 @@ LIBS="$LIBS $SSL_LIBS"
 if test "$cf_enable_openssl" != no; then
 	dnl Check OpenSSL version (must be 0.9.7 or above!)
 	AC_MSG_CHECKING(for OpenSSL 0.9.7 or above)
-	AC_RUN_IFELSE(
+	AC_RUN_IFELSE([
 		AC_LANG_PROGRAM(
 	    	[#include <openssl/opensslv.h>
 		#include <stdlib.h>],
 		[[if (OPENSSL_VERSION_NUMBER >= 0x00907000)
-		exit(0); else exit(1);]]),
+		exit(0); else exit(1);]])],
 	cf_enable_openssl=yes,
 	cf_enable_openssl=no,
 	cf_enable_openssl=no)
