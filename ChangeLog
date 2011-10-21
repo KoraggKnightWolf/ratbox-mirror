@@ -1,3 +1,12 @@
+jilles      2011/10/21 21:30:46 UTC	(20111021_7-27269)
+  Log:
+  Add a missing .m4 file.
+  
+
+  Modified:
+	ircd-ratbox/trunk/m4/ratbox-file.m4 (File Added) 
+
+
 jilles      2011/10/21 21:30:05 UTC	(20111021_6-27267)
   Log:
   Use an m4 directory instead of acinclude.m4.
