@@ -1,3 +1,21 @@
+jilles      2011/10/21 21:30:05 UTC	(20111021_6-27267)
+  Log:
+  Use an m4 directory instead of acinclude.m4.
+  
+
+  Modified:
+	ircd-ratbox/trunk/acinclude.m4 (File Deleted) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/m4/ (File Added) 
+	ircd-ratbox/trunk/m4/libtool.m4 (File Added) 
+	ircd-ratbox/trunk/m4/ltoptions.m4 (File Added) 
+	ircd-ratbox/trunk/m4/ltsugar.m4 (File Added) 
+	ircd-ratbox/trunk/m4/ltversion.m4 (File Added) 
+	ircd-ratbox/trunk/m4/lt~obsolete.m4 (File Added) 
+	ircd-ratbox/trunk/m4/sqlite3.m4 (File Added) 
+	ircd-ratbox/trunk/m4/ssp.m4 (File Added) 
+
+
 jilles      2011/10/21 15:45:40 UTC	(20111021_5-27265)
   Log:
   Add AC_LANG_SOURCE where new autoconf wants it, quote AC_LANG_PROGRAM.
