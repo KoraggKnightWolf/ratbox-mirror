@@ -1,3 +1,12 @@
+jilles      2011/10/21 21:47:39 UTC	(20111021_8-27271)
+  Log:
+  Point automake/aclocal to the m4 directory as well.
+  
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+
+
 jilles      2011/10/21 21:30:46 UTC	(20111021_7-27269)
   Log:
   Add a missing .m4 file.
