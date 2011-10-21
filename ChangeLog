@@ -1,3 +1,11 @@
+dubkat      2011/10/21 01:57:09 UTC	(20111021_1-27251)
+  Log:
+  Add a working crontab script in docs
+
+  Modified:
+	ircd-ratbox/trunk/doc/ircd_crontab.sh (File Added) 
+
+
 dubkat      2011/10/21 00:04:02 UTC	(20111021_0-27247)
   Log:
   genssl.sh now accepts a second optional argument, the number of days ssl keys
