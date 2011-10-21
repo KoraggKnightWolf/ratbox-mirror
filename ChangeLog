@@ -1,3 +1,18 @@
+jilles      2011/10/21 22:24:08 UTC	(20111021_13-27281)
+  Log:
+  Add various generated files to svn:ignore properties.
+  
+
+  Modified:
+	ircd-ratbox/trunk/  (Property Modified)
+	ircd-ratbox/trunk/bandb/  (Property Modified)
+	ircd-ratbox/trunk/bandb/sqlite3/  (Property Modified)
+	ircd-ratbox/trunk/modules/core/  (Property Modified)
+	ircd-ratbox/trunk/resolver/  (Property Modified)
+	ircd-ratbox/trunk/ssld/  (Property Modified)
+	ircd-ratbox/trunk/tools/  (Property Modified)
+
+
 jilles      2011/10/21 22:15:11 UTC	(20111021_12-27279)
   Log:
   Add a missing file.
