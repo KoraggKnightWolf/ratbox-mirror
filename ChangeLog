@@ -1,3 +1,12 @@
+jilles      2011/10/21 14:28:34 UTC	(20111021_2-27257)
+  Log:
+  Apply androsyn changes to trunk as well (r27255).
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/ircd_crontab.sh (File Modified) 
+
+
 dubkat      2011/10/21 01:57:09 UTC	(20111021_1-27251)
   Log:
   Add a working crontab script in docs
