@@ -5,6 +5,7 @@
 # on each other now..
 
 AUTOMAKE_OPTIONS = foreign subdir-objects 
+ACLOCAL_AMFLAGS = -I m4
 
 prefix		= @prefix@
 libcoredir 	= @libdir@
