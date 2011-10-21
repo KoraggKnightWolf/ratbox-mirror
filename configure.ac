@@ -12,6 +12,7 @@ AC_COPYRIGHT([$Id$])
 AC_INIT([ircd-ratbox],[devel])
 AM_INIT_AUTOMAKE
 
+AC_CONFIG_MACRO_DIR([m4])
 AM_CONFIG_HEADER(include/setup.h)
 
 AC_PREFIX_DEFAULT(/usr/local/ircd)
