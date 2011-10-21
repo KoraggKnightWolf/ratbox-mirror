@@ -611,7 +611,8 @@ AC_CONFIG_FILES(		\
 	help/Makefile		\
 	modules/Makefile	\
 	src/Makefile		\
-	install-mod.sh
+	install-mod.sh		\
+	tools/ircd_crontab.sh
 )
 
 AC_OUTPUT
