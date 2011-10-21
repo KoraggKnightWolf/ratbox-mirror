@@ -1,3 +1,12 @@
+jilles      2011/10/21 22:01:21 UTC	(20111021_11-27277)
+  Log:
+  Don't pretend to support any autoconf older than 2.68.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 jilles      2011/10/21 21:57:58 UTC	(20111021_10-27275)
   Log:
   Rerun autotools (newer version).
