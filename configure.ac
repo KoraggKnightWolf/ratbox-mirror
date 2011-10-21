@@ -35,18 +35,13 @@ AM_PROG_LEX
 
 AC_PROG_INSTALL
 AC_PROG_EGREP
-if test "$enable_static" = "yes"; then
-	AM_DISABLE_SHARED
-	AM_ENABLE_STATIC	
-        AC_DEFINE([STATIC_MODULES], 1, [Define to 1 if dynamic modules cant be used.])
-else
-	enable_static="no"
-fi
 
 F77=no
 GCJ=no
 
-AC_LIBLTDL_CONVENIENCE
+LT_INIT
+LT_CONFIG_LTDL_DIR([libltdl])
+LTDL_INIT([convenience])
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
@@ -54,6 +49,14 @@ AM_PROG_CC_C_O
 AM_DISABLE_STATIC
 AM_ENABLE_SHARED
 AM_MAINTAINER_MODE
+
+if test "$enable_static" = "yes"; then
+	AM_DISABLE_SHARED
+	AM_ENABLE_STATIC	
+        AC_DEFINE([STATIC_MODULES], 1, [Define to 1 if dynamic modules cant be used.])
+else
+	enable_static="no"
+fi
 
 AC_ISC_POSIX
 AC_C_INLINE
@@ -73,7 +76,6 @@ fi
 AC_LANG(C)
 
 AM_CONDITIONAL([STATIC_MODULES], test "$enable_static" = "yes")
-AC_PROG_LIBTOOL
 
 GCC_STACK_PROTECT_CC
 
@@ -115,7 +117,7 @@ done
 
 LIBTOOL="$LIBTOOL --silent"
 
-AC_CONFIG_SUBDIRS(libltdl libratbox)
+AC_CONFIG_SUBDIRS(libratbox)
 
 case "$host_os" in
 *cygwin*)
