@@ -1,3 +1,15 @@
+dubkat      2011/10/21 00:04:02 UTC	(20111021_0-27247)
+  Log:
+  genssl.sh now accepts a second optional argument, the number of days ssl keys
+  will remain vaild.  also make genssl.sh spit out better instructions once the 
+  keys are generated.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/genssl.sh (File Modified) (Property Modified)
+
+
 dubkat      2011/10/14 03:58:46 UTC	(20111014_0-27237)
   Log:
   update SVN-Access with the corrected links
