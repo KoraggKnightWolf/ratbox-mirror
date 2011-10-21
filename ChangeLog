@@ -1,3 +1,18 @@
+jilles      2011/10/21 15:07:29 UTC	(20111021_4-27261)
+  Log:
+  Substitute the prefix into ircd_crontab.sh and install it to bin/.
+  
+  The script should now just work, without needing to edit it.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/doc/ircd_crontab.sh (File Deleted) 
+	ircd-ratbox/trunk/tools/  (Property Modified)
+	ircd-ratbox/trunk/tools/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/tools/ircd_crontab.sh.in (File Added) 
+
+
 jilles      2011/10/21 14:30:13 UTC	(20111021_3-27259)
   Log:
   Fix another bashism.
