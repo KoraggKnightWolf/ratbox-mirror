@@ -5,7 +5,7 @@ dnl TODO: clean up all the OpenSSL and shared module checking stuff;
 dnl the most major changes have already been made and it looks like
 dnl said functions need to be just about as complex as they already are.
 
-AC_PREREQ(2.63)
+AC_PREREQ(2.68)
 AUTOMAKE_OPTIONS = 1.10
 dnl Sneaky way to get an Id tag into the configure script
 AC_COPYRIGHT([$Id$])
