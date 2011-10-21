@@ -34,5 +34,5 @@ if [ -f "${IRCD_PATH}/${PID_FILE}" ] ; then
 	rm -f "${IRCD_PATH}/${PID_FILE}"
 fi
 
-${IRCD_PATH}/bin/ircd -conftest &>/dev/null && ${IRCD_PATH}/bin/ircd
+${IRCD_PATH}/bin/ircd -conftest >/dev/null 2>&1 && ${IRCD_PATH}/bin/ircd
 exit $?;
