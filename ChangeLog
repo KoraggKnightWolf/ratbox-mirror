@@ -1,3 +1,16 @@
+jilles      2011/10/24 22:11:47 UTC	(20111024_0-27283)
+  Log:
+  Change the default back to loadable modules.
+  
+  Not having loadable modules disallows loading modules (duh) but also
+  causes some subtle breakage like not seeing service{} blocks in
+  /stats U.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 jilles      2011/10/21 22:24:08 UTC	(20111021_13-27281)
   Log:
   Add various generated files to svn:ignore properties.
