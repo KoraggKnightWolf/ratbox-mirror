@@ -39,17 +39,8 @@ AC_PROG_EGREP
 F77=no
 GCJ=no
 
-LT_INIT
-LT_CONFIG_LTDL_DIR([libltdl])
-LTDL_INIT([convenience])
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
-AC_LIBTOOL_DLOPEN
-AM_PROG_CC_C_O
 AM_DISABLE_STATIC
 AM_ENABLE_SHARED
-AM_MAINTAINER_MODE
-
 if test "$enable_static" = "yes"; then
 	AM_DISABLE_SHARED
 	AM_ENABLE_STATIC	
@@ -57,6 +48,15 @@ if test "$enable_static" = "yes"; then
 else
 	enable_static="no"
 fi
+
+LT_INIT
+LT_CONFIG_LTDL_DIR([libltdl])
+LTDL_INIT([convenience])
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+AC_LIBTOOL_DLOPEN
+AM_PROG_CC_C_O
+AM_MAINTAINER_MODE
 
 AC_ISC_POSIX
 AC_C_INLINE
