@@ -1,3 +1,12 @@
+jilles      2011/10/24 22:12:09 UTC	(20111024_1-27285)
+  Log:
+  Rerun autotools.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+
+
 jilles      2011/10/24 22:11:47 UTC	(20111024_0-27283)
   Log:
   Change the default back to loadable modules.
