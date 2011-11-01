@@ -1204,6 +1204,13 @@ chm_regonly(struct Client *source_p, struct Channel *chptr,
 	   ((dir == MODE_DEL) && !(chptr->mode.mode & MODE_REGONLY)))
 		return;
 
+	/* do not allow our clients to set +r if there are no service{}s
+	 * we do however allow them to remove it if it gets set 
+	 */
+	if(dir == MODE_ADD && MyClient(source_p) &&
+	   rb_dlink_list_length(&service_list) == 0)
+		return;
+
 	if(dir == MODE_ADD)
 		chptr->mode.mode |= MODE_REGONLY;
 	else
