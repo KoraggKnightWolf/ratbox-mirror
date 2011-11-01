@@ -1,3 +1,26 @@
+jilles      2011/11/01 21:24:10 UTC	(20111101_2-27293)
+  Log:
+  Add channel::only_ascii_channels config option
+  to restrict channel names to printable ascii only.
+  
+  Like disable_fake_channels this only applies to joins
+  by local users; unlike disable_fake_channels it applies
+  to opers as well.
+  (This is because this option is intended to be enabled
+  or disabled network wide.)
+  
+  from charybdis (jilles)
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 jilles      2011/11/01 21:02:12 UTC	(20111101_1-27291)
   Log:
   Do not allow cmode +r by local users if there are no service{} blocks.
