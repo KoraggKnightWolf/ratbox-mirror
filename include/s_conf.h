@@ -236,6 +236,7 @@ struct config_channel_entry
 	int burst_topicwho;
 	int invite_ops_only;
 	int topiclen;
+	int only_ascii_channels;
 	int resv_forcepart;
 };
 

@@ -812,6 +812,7 @@ set_default_conf(void)
 	ConfigChannel.knock_delay_channel = 60;
 	ConfigChannel.max_chans_per_user = 15;
 	ConfigChannel.max_bans = 25;
+	ConfigChannel.only_ascii_channels = NO;
 	ConfigChannel.burst_topicwho = YES;
 	ConfigChannel.invite_ops_only = YES;
 
