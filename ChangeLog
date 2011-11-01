@@ -1,3 +1,15 @@
+jilles      2011/11/01 21:02:12 UTC	(20111101_1-27291)
+  Log:
+  Do not allow cmode +r by local users if there are no service{} blocks.
+  
+  If there are no service{} blocks, noone can get a login name and +r
+  will prevent any joins at all.
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+
+
 jilles      2011/11/01 20:36:13 UTC	(20111101_0-27289)
   Log:
   Update contrib/README.
