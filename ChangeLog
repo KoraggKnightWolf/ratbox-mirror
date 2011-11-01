@@ -1,3 +1,12 @@
+jilles      2011/11/01 20:36:13 UTC	(20111101_0-27289)
+  Log:
+  Update contrib/README.
+  
+
+  Modified:
+	ircd-ratbox/trunk/contrib/README (File Modified) 
+
+
 jilles      2011/10/24 22:12:09 UTC	(20111024_1-27285)
   Log:
   Rerun autotools.
