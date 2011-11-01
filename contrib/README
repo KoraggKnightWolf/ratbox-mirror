@@ -21,17 +21,6 @@ m_force.c      - FORCE - forces a user to either part or join a channel with
                  Syntax: FORCEJOIN <nick> [status]<channel>
                          FORCEPART <nick> <channel>
 
-m_jupe.c       - JUPE - Server juping command
-                 Syntax:  JUPE juped.server.name :Reason
-
-m_ltrace.c     - LTRACE - Limited trace.  Similar to TRACE except only reports
-                          current opers and servers.
-                 Syntax: LTRACE [nick|mask [server]]
-
-m_map.c        - MAP - Display the server routing graph in a visually pleasing
-                       format
-                 Syntax:  MAP
-		 
 m_mkpasswd.c   - MKPASSWD - generate a DES or MD5 encryption of a password
                  Syntax:  MKPASSWD <plaintext> [MD5|DES]
 
@@ -39,20 +28,17 @@ m_ojoin.c      - OJOIN - Join a channel through any modes or limits with
                          an optional status (@%+)
                  Syntax: OJOIN [status]<channel>
 
+m_okick.c      - OKICK - Kick from a channel without op status
+                 Syntax: OKICK <channel> <nick>
+
 m_olist.c      - OLIST - Lists channels like LIST, but shows hidden
                          channels. Oper only of course.
 
 m_opme.c       - OPME - Allows an admin to op themselves in an opless channel
                  Syntax: OPME <channel>
 
-m_owho.c       - OWHO -  Just like WHO but doesn't hide things from opers
-
-m_owhois.c     - OWHOIS - Allows an oper to do a whois on any user and see
-		          all channels they are in. The syntax is the same
-			  as WHOIS
-
-m_tburst.c     - TBURST - module that will make servers send channel topics
-                          to each other after a netsplit/restart.
+m_webirc.c     - Makes CGI:IRC users appear as coming from their real host
+                 See m_webirc.c for configuration information.
 
 m_42.c		- 42 - The Answer to Life, the Universe, and Everything.
 
@@ -71,7 +57,6 @@ spy_links_notice.c   - Spy on clients doing LINKS
 spy_motd_notice.c    - Spy on clients doing MOTD
 spy_stats_notice.c   - Spy on clients doing all STATS
 spy_stats_p_notice.c - Spy on clients doing STATS p only
-spy_trace_notice.c   - Spy on clients doing TRACE/LTRACE
 spy_whois_notice.c   - Spy on local clients who WHOIS you.
 spy_whois_notice_global.c - Spy on remote clients who WHOIS you.
 
