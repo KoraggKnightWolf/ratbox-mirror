@@ -1,3 +1,16 @@
+androsyn    2011/11/07 23:06:12 UTC	(20111107_0-27303)
+  Log:
+  Do away with this enum and struct for holding the sendheader responses. 
+  Just have the messages as #defines.  No need to be clever. Most modern
+  compilers will optimize the duplicate constants away anyways
+  (gcc does at least).
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 jilles      2011/11/01 21:24:10 UTC	(20111101_2-27293)
   Log:
   Add channel::only_ascii_channels config option
