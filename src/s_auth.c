@@ -63,34 +63,16 @@ struct AuthRequest
 	int rport;
 };
 
-/*
- * a bit different approach
- * this replaces the original sendheader macros
- */
 
-static const char *HeaderMessages[] = {
-	"NOTICE AUTH :*** Looking up your hostname...",
-	"NOTICE AUTH :*** Found your hostname",
-	"NOTICE AUTH :*** Couldn't look up your hostname",
-	"NOTICE AUTH :*** Checking Ident",
-	"NOTICE AUTH :*** Got Ident response",
-	"NOTICE AUTH :*** No Ident response",
-	"NOTICE AUTH :*** Your hostname is too long, ignoring hostname"
-};
+#define REPORT_DO_DNS	"NOTICE AUTH :*** Looking up your hostname..."
+#define REPORT_FIN_DNS	"NOTICE AUTH :*** Found your hostname"
+#define REPORT_FAIL_DNS "NOTICE AUTH :*** Couldn't look up your hostname"
+#define REPORT_DO_ID	"NOTICE AUTH :*** Checking Ident"
+#define REPORT_FIN_ID	"NOTICE AUTH :*** Got Ident response"
+#define REPORT_FAIL_ID	"NOTICE AUTH :*** No Ident response"
+#define REPORT_HOST_TOOLONG	"NOTICE AUTH :*** Your hostname is too long, ignoring hostname"
 
-typedef enum
-{
-	REPORT_DO_DNS,
-	REPORT_FIN_DNS,
-	REPORT_FAIL_DNS,
-	REPORT_DO_ID,
-	REPORT_FIN_ID,
-	REPORT_FAIL_ID,
-	REPORT_HOST_TOOLONG
-}
-ReportType;
-
-#define sendheader(c, r) sendto_one(c, HeaderMessages[(r)])
+#define sendheader(c, r) sendto_one(c, r)
 
 static rb_dlink_list auth_poll_list;
 static rb_bh *auth_heap;
