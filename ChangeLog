@@ -1,3 +1,31 @@
+jilles      2011/11/12 22:24:31 UTC	(20111112_3-27317)
+  Log:
+  Enable -Wformat checking on numerics.
+  
+  The replies array is gone, all the texts are now #defines in a new file
+  include/messages.h. The form_str() function is now a macro that returns
+  one of the strings. It only accepts constants (usually a RPL_* or ERR_*
+  define from numeric.h).
+  
+  The three places that passed a variable to form_str() are a bit uglier
+  now.
+  
+  Various problems are now visible in -Wformat; this commit does not fix
+  them.
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/messages.h (File Added) 
+	ircd-ratbox/trunk/include/numeric.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/messages.tab (File Deleted) 
+	ircd-ratbox/trunk/src/numeric.c (File Deleted) 
+
+
 dubkat      2011/11/12 21:38:02 UTC	(20111112_2-27311)
   Log:
   revert some previous changes made in r27309
