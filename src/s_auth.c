@@ -72,7 +72,7 @@ struct AuthRequest
 #define REPORT_FAIL_ID	"NOTICE AUTH :*** No Ident response"
 #define REPORT_HOST_TOOLONG	"NOTICE AUTH :*** Your hostname is too long, ignoring hostname"
 
-#define sendheader(c, r) sendto_one(c, r)
+#define sendheader(c, r) sendto_one(c, "%s", r)
 
 static rb_dlink_list auth_poll_list;
 static rb_bh *auth_heap;
