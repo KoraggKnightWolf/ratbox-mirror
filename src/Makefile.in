@@ -77,7 +77,7 @@ am__DEPENDENCIES_1 =
 am_libcore_la_OBJECTS = dns.lo bandbi.lo blacklist.lo cache.lo \
 	channel.lo class.lo client.lo getopt.lo hash.lo hook.lo \
 	hostmask.lo ircd.lo ircd_signal.lo listener.lo match.lo \
-	modules.lo monitor.lo newconf.lo numeric.lo operhash.lo \
+	modules.lo monitor.lo newconf.lo operhash.lo \
 	packet.lo parse.lo reject.lo restart.lo s_auth.lo s_conf.lo \
 	s_newconf.lo s_log.lo s_serv.lo s_user.lo scache.lo send.lo \
 	sslproc.lo supported.lo whowas.lo version.lo ircd_parser.lo \
@@ -300,7 +300,6 @@ libcore_la_SOURCES = \
 	modules.c			\
 	monitor.c			\
 	newconf.c			\
-	numeric.c			\
 	operhash.c			\
 	packet.c			\
 	parse.c				\
@@ -427,7 +426,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modules.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/monitor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newconf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/numeric.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/operhash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse.Plo@am__quote@

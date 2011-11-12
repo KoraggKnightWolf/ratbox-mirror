@@ -61,6 +61,7 @@ static void do_join_0(struct Client *client_p, struct Client *source_p);
 static int check_channel_name_loc(struct Client *source_p, const char *name);
 
 static int can_join(struct Client *source_p, struct Channel *chptr, char *key);
+static void send_join_error(struct Client *source_p, int numeric, const char *name);
 
 static void set_final_mode(struct Client *, struct Channel *, struct Mode *, struct Mode *);
 static void remove_our_modes(struct Channel *chptr);
@@ -231,7 +232,7 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		/* can_join checks for +i key, bans etc */
 		if((i = can_join(source_p, chptr, key)))
 		{
-			sendto_one(source_p, form_str(i), me.name, source_p->name, name);
+			send_join_error(source_p, i, name);
 			if(successful_join_count > 0)
 				successful_join_count--;
 			continue;
@@ -913,6 +914,42 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 		return ERR_SSLONLYCHAN;
 
 	return 0;
+}
+
+/* send_join_error()
+ *
+ * input	- client to send to, reason, channel name
+ * output	- none
+ * side effects - error message sent to client
+ */
+static void
+send_join_error(struct Client *source_p, int numeric, const char *name)
+{
+	/* This stuff is necessary because the form_str macro only
+	 * accepts constants.
+	 */
+	switch (numeric)
+	{
+#define NORMAL_NUMERIC(i)						\
+		case i:							\
+			sendto_one(source_p, form_str(i),		\
+					me.name, source_p->name, name);	\
+			break
+
+		NORMAL_NUMERIC(ERR_BANNEDFROMCHAN);
+		NORMAL_NUMERIC(ERR_INVITEONLYCHAN);
+		NORMAL_NUMERIC(ERR_BADCHANNELKEY);
+		NORMAL_NUMERIC(ERR_CHANNELISFULL);
+		NORMAL_NUMERIC(ERR_SSLONLYCHAN);
+#ifdef ENABLE_SERVICES
+		NORMAL_NUMERIC(ERR_NEEDREGGEDNICK);
+#endif
+
+		default:
+			sendto_one_numeric(source_p, numeric,
+					"%s :Cannot join channel", name);
+			break;
+	}
 }
 
 static struct mode_letter

@@ -725,8 +725,8 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 	rb_dlink_node *ptr;
 	struct Ban *banptr;
 	int errorval;
-	int rpl_list;
-	int rpl_endlist;
+	int fmt_list;
+	int fmt_endlist;
 	int caps;
 	int mems;
 
@@ -735,8 +735,8 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 	case CHFL_BAN:
 		list = &chptr->banlist;
 		errorval = SM_ERR_RPL_B;
-		rpl_list = RPL_BANLIST;
-		rpl_endlist = RPL_ENDOFBANLIST;
+		fmt_list = form_str(RPL_BANLIST);
+		fmt_endlist = form_str(RPL_ENDOFBANLIST);
 		mems = ALL_MEMBERS;
 		caps = 0;
 		break;
@@ -749,8 +749,8 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 
 		list = &chptr->exceptlist;
 		errorval = SM_ERR_RPL_E;
-		rpl_list = RPL_EXCEPTLIST;
-		rpl_endlist = RPL_ENDOFEXCEPTLIST;
+		fmt_list = form_str(RPL_EXCEPTLIST);
+		fmt_endlist = form_str(RPL_ENDOFEXCEPTLIST);
 		caps = CAP_EX;
 
 		if(ConfigChannel.use_except || (dir == MODE_DEL))
@@ -767,8 +767,8 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 
 		list = &chptr->invexlist;
 		errorval = SM_ERR_RPL_I;
-		rpl_list = RPL_INVITELIST;
-		rpl_endlist = RPL_ENDOFINVITELIST;
+		fmt_list = form_str(RPL_INVITELIST);
+		fmt_endlist = form_str(RPL_ENDOFINVITELIST);
 		caps = CAP_IE;
 
 		if(ConfigChannel.use_invex || (dir == MODE_DEL))
@@ -802,11 +802,11 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 		RB_DLINK_FOREACH(ptr, list->head)
 		{
 			banptr = ptr->data;
-			sendto_one(source_p, form_str(rpl_list),
+			sendto_one(source_p, fmt_list,
 				   me.name, source_p->name, chptr->chname,
 				   banptr->banstr, banptr->who, banptr->when);
 		}
-		sendto_one(source_p, form_str(rpl_endlist), me.name, source_p->name, chptr->chname);
+		sendto_one(source_p, fmt_endlist, me.name, source_p->name, chptr->chname);
 		return;
 	}
 

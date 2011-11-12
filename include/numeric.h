@@ -27,22 +27,19 @@
 #ifndef INCLUDED_numeric_h
 #define INCLUDED_numeric_h
 
-/*
- * form_str - return a format string for a message number
- * messages are defined below
- */
-const char *form_str(int);
+/* Pull in message texts. */
+#include "messages.h"
 
 /*
  * Reserve numerics 000-099 for server-client connections where the client
  * is local to the server. If any server is passed a numeric in this range
  * from another server then it is remapped to 100-199. -avalon
  */
-#define RPL_WELCOME          001
-#define RPL_YOURHOST         002
-#define RPL_CREATED          003
-#define RPL_MYINFO           004
-#define RPL_ISUPPORT         005
+#define RPL_WELCOME          1
+#define RPL_YOURHOST         2
+#define RPL_CREATED          3
+#define RPL_MYINFO           4
+#define RPL_ISUPPORT         5
 
 #define RPL_REDIR            10
 #define RPL_MAP		     15	/* Undernet extension */

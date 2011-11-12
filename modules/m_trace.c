@@ -402,18 +402,14 @@ report_this_status(struct Client *source_p, struct Client *target_p)
 		break;
 
 	case STAT_CLIENT:
-		{
-			int tnumeric = RPL_TRACEUSER;
-			if(IsOper(target_p))
-				tnumeric = RPL_TRACEOPERATOR;
-
-			sendto_one_numeric(source_p, tnumeric, form_str(tnumeric),
-					   class_name, name,
-					   show_ip(source_p, target_p) ? ip : empty_sockhost,
-					   rb_time() - target_p->localClient->lasttime,
-					   rb_time() - target_p->localClient->last);
-			cnt++;
-		}
+		sendto_one_numeric(source_p,
+				   IsOper(target_p) ? RPL_TRACEOPERATOR : RPL_TRACEUSER,
+				   IsOper(target_p) ? form_str(RPL_TRACEOPERATOR) : form_str(RPL_TRACEUSER),
+				   class_name, name,
+				   show_ip(source_p, target_p) ? ip : empty_sockhost,
+				   rb_time() - target_p->localClient->lasttime,
+				   rb_time() - target_p->localClient->last);
+		cnt++;
 		break;
 
 

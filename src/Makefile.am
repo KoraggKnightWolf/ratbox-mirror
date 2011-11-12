@@ -39,7 +39,6 @@ libcore_la_SOURCES =			\
 	modules.c			\
 	monitor.c			\
 	newconf.c			\
-	numeric.c			\
 	operhash.c			\
 	packet.c			\
 	parse.c				\
