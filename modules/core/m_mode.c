@@ -725,8 +725,8 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 	rb_dlink_node *ptr;
 	struct Ban *banptr;
 	int errorval;
-	int fmt_list;
-	int fmt_endlist;
+	const char *fmt_list;
+	const char *fmt_endlist;
 	int caps;
 	int mems;
 
