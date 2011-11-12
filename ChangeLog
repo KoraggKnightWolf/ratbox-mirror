@@ -1,3 +1,17 @@
+jilles      2011/11/12 20:15:24 UTC	(20111112_0-27305)
+  Log:
+  Add only_ascii_channels to example.efnet.conf as well.
+  
+  This is disabled by default, like it is in example.conf and definitely
+  should be on EFnet.
+  
+  Reported by jackal.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 androsyn    2011/11/07 23:06:12 UTC	(20111107_0-27303)
   Log:
   Do away with this enum and struct for holding the sendheader responses. 
