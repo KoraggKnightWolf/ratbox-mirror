@@ -99,7 +99,7 @@ WARNLIST="
 	all  
 	cast-qual
 	format
-	no-format-security
+	format-security
 	missing-declarations
 	missing-prototypes
 	nested-externs
