@@ -1,3 +1,13 @@
+jilles      2011/11/12 22:32:33 UTC	(20111112_5-27321)
+  Log:
+  Rerun autoconf and automake.
+  
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+
+
 jilles      2011/11/12 22:32:11 UTC	(20111112_4-27319)
   Log:
   We can enable -Wformat-security now.
