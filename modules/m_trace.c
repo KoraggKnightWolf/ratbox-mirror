@@ -407,8 +407,8 @@ report_this_status(struct Client *source_p, struct Client *target_p)
 				   IsOper(target_p) ? form_str(RPL_TRACEOPERATOR) : form_str(RPL_TRACEUSER),
 				   class_name, name,
 				   show_ip(source_p, target_p) ? ip : empty_sockhost,
-				   rb_time() - target_p->localClient->lasttime,
-				   rb_time() - target_p->localClient->last);
+				   (unsigned long)(rb_time() - target_p->localClient->lasttime),
+				   (unsigned long)(rb_time() - target_p->localClient->last));
 		cnt++;
 		break;
 
@@ -424,7 +424,7 @@ report_this_status(struct Client *source_p, struct Client *target_p)
 					   class_name, servcount, usercount, name,
 					   *(target_p->serv->by) ? target_p->serv->by : "*", "*",
 					   me.name,
-					   rb_time() - target_p->localClient->lasttime);
+					   (unsigned long)(rb_time() - target_p->localClient->lasttime));
 			cnt++;
 
 		}
@@ -432,7 +432,7 @@ report_this_status(struct Client *source_p, struct Client *target_p)
 
 	default:		/* ...we actually shouldn't come here... --msa */
 		sendto_one_numeric(source_p, RPL_TRACENEWTYPE,
-				   form_str(RPL_TRACENEWTYPE), me.name, source_p->name, name);
+				   form_str(RPL_TRACENEWTYPE), name);
 		cnt++;
 		break;
 	}

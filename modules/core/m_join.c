@@ -282,7 +282,8 @@ m_join(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 			sendto_one(source_p, form_str(RPL_TOPICWHOTIME),
 				   me.name, source_p->name, chptr->chname,
-				   chptr->topic->topic_info, chptr->topic->topic_time);
+				   chptr->topic->topic_info,
+				   (unsigned long)chptr->topic->topic_time);
 		}
 
 		channel_member_names(chptr, source_p, 1);

@@ -149,7 +149,8 @@ m_mode(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			   operspy ? channel_modes(chptr, &me) : channel_modes(chptr, source_p));
 
 		sendto_one(source_p, form_str(RPL_CREATIONTIME),
-			   me.name, source_p->name, parv[1], chptr->channelts);
+			   me.name, source_p->name, parv[1],
+			   (unsigned long)chptr->channelts);
 	}
 	else
 	{
