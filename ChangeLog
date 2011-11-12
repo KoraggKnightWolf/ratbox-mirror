@@ -1,3 +1,20 @@
+dubkat      2011/11/12 20:48:41 UTC	(20111112_1-27309)
+  Log:
+  GCC Format security fix Patch supplied by Marc Dequ?\195?\168nes from debian.
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/CREDITS (File Modified) 
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 jilles      2011/11/12 20:15:24 UTC	(20111112_0-27305)
   Log:
   Add only_ascii_channels to example.efnet.conf as well.
