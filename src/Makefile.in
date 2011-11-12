@@ -77,11 +77,10 @@ am__DEPENDENCIES_1 =
 am_libcore_la_OBJECTS = dns.lo bandbi.lo blacklist.lo cache.lo \
 	channel.lo class.lo client.lo getopt.lo hash.lo hook.lo \
 	hostmask.lo ircd.lo ircd_signal.lo listener.lo match.lo \
-	modules.lo monitor.lo newconf.lo operhash.lo \
-	packet.lo parse.lo reject.lo restart.lo s_auth.lo s_conf.lo \
-	s_newconf.lo s_log.lo s_serv.lo s_user.lo scache.lo send.lo \
-	sslproc.lo supported.lo whowas.lo version.lo ircd_parser.lo \
-	ircd_lexer.lo
+	modules.lo monitor.lo newconf.lo operhash.lo packet.lo \
+	parse.lo reject.lo restart.lo s_auth.lo s_conf.lo s_newconf.lo \
+	s_log.lo s_serv.lo s_user.lo scache.lo send.lo sslproc.lo \
+	supported.lo whowas.lo version.lo ircd_parser.lo ircd_lexer.lo
 libcore_la_OBJECTS = $(am_libcore_la_OBJECTS)
 libcore_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
