@@ -1,3 +1,13 @@
+dubkat      2011/11/15 03:44:15 UTC	(20111115_1-27335)
+  Log:
+  fix building with -pedantic aka ISO C
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.c (File Modified) 
+
+
 dubkat      2011/11/15 03:43:11 UTC	(20111115_0-27333)
   Log:
   Update SQLite to version 3.7.9, which claims bug fixes, optimizations, and enhancements.
