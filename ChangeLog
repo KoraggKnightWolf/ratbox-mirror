@@ -1,3 +1,16 @@
+dubkat      2011/11/15 03:43:11 UTC	(20111115_0-27333)
+  Log:
+  Update SQLite to version 3.7.9, which claims bug fixes, optimizations, and enhancements.
+  SQLite Release notes located at: http://www.sqlite.org/releaselog/3_7_9.html
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/sqlite3/shell.c (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.c (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.h (File Modified) 
+
+
 jilles      2011/11/12 22:57:45 UTC	(20111112_7-27325)
   Log:
   Fix -Wformat warnings.
