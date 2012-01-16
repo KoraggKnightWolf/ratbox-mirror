@@ -1,3 +1,16 @@
+dubkat      2012/01/16 05:41:50 UTC	(20120116_0-27339)
+  Log:
+  fix typo in example.conf and example.efnet.conf
+  
+  reported by Brad Smith <brad@comstyle.com>
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 dubkat      2011/11/15 03:44:15 UTC	(20111115_1-27335)
   Log:
   fix building with -pedantic aka ISO C
