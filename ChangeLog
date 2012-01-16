@@ -1,3 +1,17 @@
+dubkat      2012/01/16 21:30:30 UTC	(20120116_1-27343)
+  Log:
+  Update SQLite to version 3.7.10
+  
+  SQLite 3.7.10 release information can be read at: http://www.sqlite.org/releaselog/3_7_10.html
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/sqlite3/shell.c (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.c (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.h (File Modified) 
+
+
 dubkat      2012/01/16 05:41:50 UTC	(20120116_0-27339)
   Log:
   fix typo in example.conf and example.efnet.conf
