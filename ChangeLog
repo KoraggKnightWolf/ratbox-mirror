@@ -1,3 +1,14 @@
+jilles      2012/03/11 20:07:13 UTC	(20120311_0-27359)
+  Log:
+  Fix bad grammar in challenge help file.
+  
+  Reported by "burek".
+  
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/challenge (File Modified) 
+
+
 dubkat      2012/01/16 22:13:30 UTC	(20120116_2-27351)
   Log:
   test
