@@ -1,3 +1,15 @@
+jilles      2012/03/11 20:19:00 UTC	(20120311_1-27361)
+  Log:
+  Add in ts6-protocol changes from charybdis:
+  - Mention meaning of capabs EX, IE, SERVICES, KNOCK.
+  - Add BAN and MLOCK protocols (charybdis only).
+  - Fix parameter order for RSFNC.
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/technical/ts6-protocol.txt (File Modified) 
+
+
 jilles      2012/03/11 20:07:13 UTC	(20120311_0-27359)
   Log:
   Fix bad grammar in challenge help file.
