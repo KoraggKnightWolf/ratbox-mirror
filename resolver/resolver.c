@@ -4,7 +4,7 @@
  * and ircd-ratbox itself and who knows what else
  *
  * Copyright (C) 2003-2005 Lee Hardy <leeh@leeh.co.uk>
- * Copyright (C) 2003-2008 ircd-ratbox development team
+ * Copyright (C) 2003-2012 ircd-ratbox development team
  * Copyright (C) 2005-2008 Aaron Sethman <androsyn@ratbox.org>
  *
  * $Id$

@@ -2,7 +2,7 @@
  * res.c: resolver related code
  *
  * Portions are:
- * Copyright (C) 2008 ircd-ratbox development team
+ * Copyright (C) 2008-2012 ircd-ratbox development team
  * Copyright (C) 2005,2008 Aaron Sethman <androsyn@ratbox.org>
  *
  * $Id$

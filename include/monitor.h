@@ -3,7 +3,7 @@
  * monitor.h: Code for server-side notify lists.
  *
  * Copyright (C) 2005 Lee Hardy <lee -at- leeh.co.uk>
- * Copyright (C) 2005 ircd-ratbox development team
+ * Copyright (C) 2005-2012 ircd-ratbox development team
  *
  * $Id$
  */

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004-2005 Lee Hardy <lee -at- leeh.co.uk>
- * Copyright (C) 2004-2005 ircd-ratbox development team
+ * Copyright (C) 2004-2012 ircd-ratbox development team
  *
  * $Id$
  */

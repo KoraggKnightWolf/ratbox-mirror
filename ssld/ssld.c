@@ -1,7 +1,7 @@
 /*
  *  ssld.c: The ircd-ratbox ssl/zlib helper daemon thingy
  *  Copyright (C) 2007 Aaron Sethman <androsyn@ratbox.org>
- *  Copyright (C) 2007 ircd-ratbox development team
+ *  Copyright (C) 2007-2012 ircd-ratbox development team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

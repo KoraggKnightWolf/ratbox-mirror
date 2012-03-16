@@ -1,6 +1,6 @@
 #!/bin/sh
 # Simple and straight forward openssl cert generator for ircd-ratbox
-# Copyright (C) 2008-2011 ircd-ratbox development team
+# Copyright (C) 2008-2012 ircd-ratbox development team
 # $Id$
 
 if [ $# -eq 0 ]; then

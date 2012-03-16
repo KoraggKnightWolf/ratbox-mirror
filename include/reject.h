@@ -3,7 +3,7 @@
  *  reject.h: header to a file which rejects users with prejudice
  *
  *  Copyright (C) 2003 Aaron Sethman <androsyn@ratbox.org>
- *  Copyright (C) 2003-2005 ircd-ratbox development team
+ *  Copyright (C) 2003-2012 ircd-ratbox development team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

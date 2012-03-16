@@ -2,7 +2,7 @@
  * An interface to the ban db.
  *
  * Copyright (C) 2006 Lee Hardy <lee -at- leeh.co.uk>
- * Copyright (C) 2006 ircd-ratbox development team
+ * Copyright (C) 2006-2012 ircd-ratbox development team
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are

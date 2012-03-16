@@ -33,7 +33,7 @@
 
 /* From the old supported.h which is
  *  Copyright (C) 1996-2002 Hybrid Development Team
- *  Copyright (C) 2002-2004 ircd-ratbox development team
+ *  Copyright (C) 2002-2012 ircd-ratbox development team
  */
 /*
  * - from mirc's versions.txt
