@@ -1,3 +1,11 @@
+dubkat      2012/03/16 03:47:37 UTC	(20120316_0-27367)
+  Log:
+  Add additional documentation instructing the user that issuing a --prefix to configure is highly advised.
+
+  Modified:
+	ircd-ratbox/trunk/INSTALL (File Modified) 
+
+
 jilles      2012/03/11 20:19:00 UTC	(20120311_1-27361)
   Log:
   Add in ts6-protocol changes from charybdis:
