@@ -3,7 +3,7 @@
    $Id$
 
    Copyright (c) 2001 by ircd-hybrid team
-   Copyright (c) 2002-2011 ircd-ratbox development team
+   Copyright (c) 2002-2012 ircd-ratbox development team
 
      ----------------------------------------------------------------------
 
@@ -31,6 +31,12 @@
   > QUICK START
 
    1. Configure (see below under CONFIGURE OPTIONS for more details):
+     
+     * IMPORTANT:
+     * At a minimum, you really ought to use the --prefix=/some/place option.
+     * By default, configure will select /usr/local/ircd -- YOU DO *NOT* WANT THAT!
+     * You may *NOT* run the ircd as root, and the ircd user needs to be able to write to
+     * it's own directories. You have been warned.
 
      I.   Large networks (with thousands of users):
           ./configure --prefix=/home/user/ircd
