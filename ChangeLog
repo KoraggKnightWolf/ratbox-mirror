@@ -1,3 +1,11 @@
+androsyn    2012/04/15 21:46:11 UTC	(20120415_0-27393)
+  Log:
+  fix sizeof() typo
+
+  Modified:
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+
+
 dubkat      2012/03/16 06:09:33 UTC	(20120316_1-27373)
   Log:
   House cleaning - update our copyright notices
