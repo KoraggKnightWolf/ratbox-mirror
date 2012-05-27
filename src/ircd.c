@@ -567,7 +567,7 @@ ratbox_main(int argc, char *argv[])
 	if(r > 0)
 	{
 		fprintf(stderr,
-			"ERROR: Unable to start ircd: found %d syntax error(s) whlist loading config file.  Try running with -conftest\n",
+			"ERROR: Unable to start ircd: found %d syntax error(s) whilst loading config file.  Try running with -conftest\n",
 			r);
 		return 1;
 	}
