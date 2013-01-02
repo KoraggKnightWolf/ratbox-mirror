@@ -1,3 +1,11 @@
+androsyn    2013/01/02 00:57:42 UTC	(20130102_0-27429)
+  Log:
+  fix CAPAB parameter count bug
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_capab.c (File Modified) 
+
+
 jilles      2012/05/27 13:01:16 UTC	(20120527_0-27397)
   Log:
   Fix typo, reported by Scott MacDonald.
