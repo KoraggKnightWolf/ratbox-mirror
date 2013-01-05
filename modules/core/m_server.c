@@ -94,6 +94,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	const char *name;
 	struct Client *target_p;
 	int hop;
+	const char *missing;
 
 	name = parv[1];
 	hop = atoi(parv[2]);
@@ -176,6 +177,30 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		return 0;
 	default:
 		break;
+	}
+
+	if(!IsCapable(client_p, (CAP_QS | CAP_ENCAP)))
+	{
+		if(IsCapable(client_p, CAP_QS))
+			missing = "ENCAP";
+		else if(IsCapable(client_p, CAP_ENCAP))
+			missing = "QS";
+		else
+			missing = "QS ENCAP";
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+					"Link %s dropped, required CAPABs [%s] are missing",
+					name, missing);
+		ilog(L_SERVER, "Link %s%s dropped, required CAPABs [%s] are missing",
+				EmptyString(client_p->name) ? name : "",
+				log_client_name(client_p, SHOW_IP), missing);
+		/* Do not use '[' in the below message because it would cause
+		 * it to be considered potentially unsafe (might disclose IP
+		 * addresses)
+		 */
+		sendto_one(client_p, "ERROR :Missing required CAPABs (%s)", missing);
+		exit_client(client_p, client_p, client_p, "Missing required CAPABs");
+
+		return 0;
 	}
 
 	/* require TS6 for direct links */
