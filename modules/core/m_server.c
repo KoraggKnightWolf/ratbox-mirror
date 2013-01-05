@@ -941,7 +941,7 @@ server_estab(struct Client *client_p)
 			   me.id, client_p->name, client_p->id,
 			   IsHidden(client_p) ? "(H) " : "", client_p->info);
 
-		if(IsCapable(target_p, CAP_ENCAP) && !EmptyString(client_p->serv->fullcaps))
+		if(!EmptyString(client_p->serv->fullcaps))
 			sendto_one(target_p, ":%s ENCAP * GCAP :%s",
 				   client_p->id, client_p->serv->fullcaps);
 	}
@@ -978,7 +978,7 @@ server_estab(struct Client *client_p)
 			   target_p->hopcount + 1, target_p->id,
 			   IsHidden(target_p) ? "(H) " : "", target_p->info);
 
-		if(IsCapable(client_p, CAP_ENCAP) && !EmptyString(target_p->serv->fullcaps))
+		if(!EmptyString(target_p->serv->fullcaps))
 			sendto_one(client_p, ":%s ENCAP * GCAP :%s",
 				   get_id(target_p, client_p), target_p->serv->fullcaps);
 	}
