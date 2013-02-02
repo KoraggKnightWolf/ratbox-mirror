@@ -48,8 +48,8 @@ clean-generic:
 	$(LIBTOOL) --mode=clean $(RB_RM) -f $(S_OBJS) $(S_CORE_OBJS)  $(ST_OBJS)
 
 install_modules: $(S_OBJS)
-	-@@$(MKDIR_P) $(contribdir); \
-	for x in $(S_OBJS); do $(SHELL) ../install-mod.sh $$x $(contribdir);done
+	-@@$(MKDIR_P) $(DESTDIR)$(contribdir); \
+	for x in $(S_OBJS); do $(SHELL) ../install-mod.sh $$x $(DESTDIR)$(contribdir);done
 
 #install-mkdirs:
 #	@echo "ircd: setting up modular directory structure"
