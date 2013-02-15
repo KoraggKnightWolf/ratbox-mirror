@@ -185,10 +185,7 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 		nick++;
 	}
 
-	if(MyClient(source_p))
-		target_p = find_named_person(nick);
-	else
-		target_p = find_person(nick);
+	target_p = find_named_person(nick);
 	SetCork(source_p);
 	if(target_p != NULL)
 	{
