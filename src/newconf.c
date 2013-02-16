@@ -2501,6 +2501,10 @@ static struct conf_items conf_cluster_table[] =
 static struct conf_items conf_blacklist_table[] =
 {
 	{ "host",   CF_QSTRING,		  conf_set_blacklist_host,   0, NULL },
+	{ "reject_reason", CF_QSTRING,	  conf_set_blacklist_reason, 0, NULL },
+	/* The reject_reason field was erroneously named "reason" in the
+	 * ratbox port. Keep accepting the old name.
+	 */
 	{ "reason", CF_QSTRING,		  conf_set_blacklist_reason, 0, NULL },
 	{ "\0",	0, NULL, 0, NULL }
 };
