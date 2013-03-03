@@ -93,7 +93,7 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 				sendto_one(source_p, form_str(RPL_LOAD2HI),
 					   me.name, source_p->name, "WHOIS");
 				sendto_one_numeric(source_p, RPL_ENDOFWHOIS,
-						   form_str(RPL_ENDOFWHOIS), parv[1]);
+						   form_str(RPL_ENDOFWHOIS), parv[2]);
 				return 0;
 			}
 			else
@@ -176,7 +176,7 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	int operspy = 0;
 
 	nick = LOCAL_COPY(parv[1]);
-	if((p = strchr(parv[1], ',')))
+	if((p = strchr(nick, ',')))
 		*p = '\0';
 
 	if(IsOperSpy(source_p) && *nick == '!')
@@ -203,7 +203,7 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 	else
 		sendto_one_numeric(source_p, ERR_NOSUCHNICK,
-				   form_str(ERR_NOSUCHNICK), IsDigit(*nick) ? "*" : parv[1]);
+				   form_str(ERR_NOSUCHNICK), nick);
 	ClearCork(source_p);
 	sendto_one_numeric(source_p, RPL_ENDOFWHOIS, form_str(RPL_ENDOFWHOIS), parv[1]);
 	return;
