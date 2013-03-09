@@ -965,7 +965,7 @@ stats_tstats(struct Client *source_p)
 static void
 stats_uptime(struct Client *source_p)
 {
-	time_t now;
+	long now;
 
 	now = rb_time() - startup_time;
 	sendto_one_numeric(source_p, RPL_STATSUPTIME,

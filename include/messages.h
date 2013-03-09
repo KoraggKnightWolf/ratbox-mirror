@@ -43,7 +43,7 @@
 #define NUMERIC_STR_200 "Link %s %s %s"
 #define NUMERIC_STR_201 "Try. %s %s"
 #define NUMERIC_STR_202 "H.S. %s %s"
-#define NUMERIC_STR_203 "???? %s %s (%s) %ld"
+#define NUMERIC_STR_203 "???? %s %s (%s) %lu"
 #define NUMERIC_STR_204 "Oper %s %s (%s) %lu %lu"
 #define NUMERIC_STR_205 "User %s %s (%s) %lu %lu"
 #define NUMERIC_STR_206 "Serv %s %dS %dC %s %s!%s@%s %lu"
