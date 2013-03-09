@@ -323,8 +323,8 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 
 		sendto_one_numeric(source_p, RPL_WHOISIDLE, form_str(RPL_WHOISIDLE),
 				   target_p->name,
-				   rb_time() - target_p->localClient->last,
-				   target_p->localClient->firsttime);
+				   (long)(rb_time() - target_p->localClient->last),
+				   (unsigned long)target_p->localClient->firsttime);
 	}
 	else
 	{
