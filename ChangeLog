@@ -1,3 +1,18 @@
+jilles      2013/03/23 15:16:25 UTC	(20130323_0-27451)
+  Log:
+  Always send ERR_NICKCOLLISION to a user that will be killed.
+  
+  There was one situation with a nick change collision where
+  ERR_NICKCOLLISION was sent to the user that would not be killed
+  instead of to the user that would be killed.
+  
+  Reported by:	jackal
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+
+
 androsyn    2013/01/02 00:57:42 UTC	(20130102_0-27429)
   Log:
   fix CAPAB parameter count bug
