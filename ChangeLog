@@ -1,3 +1,12 @@
+jilles      2013/04/06 20:35:06 UTC	(20130406_0-27453)
+  Log:
+  Suppress compiler warning about const on parv array.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 jilles      2013/03/23 15:16:25 UTC	(20130323_0-27451)
   Log:
   Always send ERR_NICKCOLLISION to a user that will be killed.
