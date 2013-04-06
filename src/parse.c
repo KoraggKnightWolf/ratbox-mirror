@@ -262,7 +262,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 	}
 
 	if(handle_command(mptr, client_p, from, i,	/* XXX discards const!!! */
-			  (const char **)para) < -1)
+			  (const char **)(uintptr_t)para) < -1)
 	{
 		char *p;
 		for(p = pbuffer; p <= end; p += 8)
