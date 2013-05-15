@@ -1,3 +1,15 @@
+jilles      2013/05/15 21:26:01 UTC	(20130515_0-27455)
+  Log:
+  example confs: Correct description of general::client_exit.
+  
+  It prefixes with "Quit: ", not "Client exit: ".
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+
+
 jilles      2013/04/06 20:35:06 UTC	(20130406_0-27453)
   Log:
   Suppress compiler warning about const on parv array.
