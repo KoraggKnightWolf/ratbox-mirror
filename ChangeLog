@@ -1,3 +1,14 @@
+jilles      2013/06/15 20:05:22 UTC	(20130615_0-27457)
+  Log:
+  m_info: Correct description of general::client_exit like in example confs.
+  
+  Reported by:	jackal
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+
+
 jilles      2013/05/15 21:26:01 UTC	(20130515_0-27455)
   Log:
   example confs: Correct description of general::client_exit.
