@@ -1,11 +1,17 @@
-DLINE [duration] <ip> :[reason]
+DLINE [duration] <ip> :[reason] [| oper reason]
 
 Adds a DLINE to the database which will deny any
 connections from the IP address of the banned client.
 The banned client will receive a message saying
 he/she is banned with reason [reason].
 
-Duration is optional, and is in minutes.
+Duration is optional, and is in minutes. If specified,
+the DLINE will not be saved to the database.
+
+If an oper reason is added (the pipe must be specified
+to separate the fields), this will be added into the
+database but will not be shown to the user when they
+are given the dline reason.
 
 Administrators can also add a DLINE that can only be removed by
 other administrators with the ADMINDLINE command.
