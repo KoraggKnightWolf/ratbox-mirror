@@ -1,3 +1,15 @@
+dubkat      2015/01/16 02:04:10 UTC	(20150116_0-27560)
+  Log:
+  Update to SQLite 3.8.7.4. 
+  Incorporating changes from 2012-01-16 to 2014-12-09
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/sqlite3/shell.c (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.c (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.h (File Modified) 
+
+
 jilles      2013/06/15 20:05:22 UTC	(20130615_0-27457)
   Log:
   m_info: Correct description of general::client_exit like in example confs.
