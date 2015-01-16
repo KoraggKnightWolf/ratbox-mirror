@@ -1,3 +1,11 @@
+dubkat      2015/01/16 06:44:14 UTC	(20150116_1-27562)
+  Log:
+  add -fstack-protector-strong if supported by gcc (gcc >= 4.9)
+
+  Modified:
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 dubkat      2015/01/16 02:04:10 UTC	(20150116_0-27560)
   Log:
   Update to SQLite 3.8.7.4. 
