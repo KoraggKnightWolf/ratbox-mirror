@@ -1,3 +1,11 @@
+dubkat      2015/01/16 06:52:56 UTC	(20150116_2-27568)
+  Log:
+  rerun autoconf to reflect configure.ac changes
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+
+
 dubkat      2015/01/16 06:44:14 UTC	(20150116_1-27562)
   Log:
   add -fstack-protector-strong if supported by gcc (gcc >= 4.9)
