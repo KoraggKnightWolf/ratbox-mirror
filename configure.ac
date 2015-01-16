@@ -91,6 +91,13 @@ cc_accepts_flag()
 	return $RC
 }
 
+dnl This is kinda hackish since i couldn't find the documentation for proper
+dnl -fstack-protector-strong -- dubkat
+if cc_accepts_flag -fstack-protector-strong; then
+        dnl CFLAGS="${CFLAGS#-fstack-protector}"
+        CFLAGS="$CFLAGS -fstack-protector-strong"
+fi
+
 if cc_accepts_flag -fno-strict-aliasing; then
 	CFLAGS="$CFLAGS -fno-strict-aliasing"
 fi
