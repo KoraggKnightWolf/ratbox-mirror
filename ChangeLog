@@ -1,3 +1,12 @@
+dubkat      2015/01/26 03:58:47 UTC	(20150126_0-27570)
+  Log:
+  fixed some bad grammar and vagueness in help text
+
+  Modified:
+	ircd-ratbox/trunk/help/opers/umode (File Modified) 
+	ircd-ratbox/trunk/help/users/umode (File Modified) 
+
+
 dubkat      2015/01/16 06:52:56 UTC	(20150116_2-27568)
   Log:
   rerun autoconf to reflect configure.ac changes
