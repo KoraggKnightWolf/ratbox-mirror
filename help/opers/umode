@@ -5,7 +5,8 @@ Usermodes: (* designates that the umode is oper only)
      USERMODE     DESCRIPTION
 -----------------------------------------------------------------
          +i     - Designates this client 'invisible'.
-         +g     - "caller id" mode only allow accept clients to message you
+         +g     - "caller id" mode. Accept messages only from clients you allow.
+                  See /help ACCEPT for more info.
          +o     - Designates this client is an IRC Operator.
                   Use the /oper command to attain this.
        * +a     - Is marked as a server admin in whois.
@@ -13,6 +14,7 @@ Usermodes: (* designates that the umode is oper only)
        * +c     - Can see client connections and exits.
        * +C     - Can see extended client connections and exits.
        * +d     - Can see server debug messages.
+         +D     - Deaf - ignores all channel messages.
        * +f     - Can see 'I-line is full' notices.
        * +k     - Can see server kill messages.
        * +l     - Can see oper locops (local wallops).
@@ -25,4 +27,3 @@ Usermodes: (* designates that the umode is oper only)
        * +y     - Can see stats/links/admin requests to name a few.
        * +z     - Can see oper wallops.
        * +Z     - Can see operspy notices
-         +D     - Deaf - ignores all channel messages.
