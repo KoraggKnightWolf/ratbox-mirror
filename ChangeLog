@@ -1,3 +1,12 @@
+androsyn    2015/08/10 21:41:17 UTC	(20150810_7-28543)
+  Log:
+  Copy ircd-ratbox-clean to trunk.  This will be used for further development
+  
+
+  Modified:
+	ircd-ratbox/trunk/ (File Added) 
+
+
 androsyn    2015/08/10 19:47:37 UTC	(20150810_6-28539)
   Log:
   second half of module changes
