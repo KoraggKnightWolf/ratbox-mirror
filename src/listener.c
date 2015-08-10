@@ -41,6 +41,7 @@
 #include "s_log.h"
 #include "sslproc.h"
 #include "hash.h"
+#include "ipv4_from_ipv6.h"
 
 #define log_listener(str, name, err) do { sendto_realops_flags(UMODE_DEBUG, L_ALL, str, name, err); ilog(L_IOERROR, str, name, err); } while(0)
 
@@ -460,11 +461,25 @@ add_connection(struct Listener *listener, rb_fde_t * F, struct sockaddr *sai, st
 	 * copy address to 'sockhost' as a string, copy it to host too
 	 * so we have something valid to put into error messages...
 	 */
+	
+	/* map teredo and 6to4 to their IPv4 addresses */
+	if(ConfigFileEntry.ipv6_tun_remap == true)
+	{
+		struct sockaddr_in ip4;
+		if(ipv4_from_ipv6((struct sockaddr_in6 *)&new_client->localClient->ip, &ip4) == true)
+		{
+			memcpy(&new_client->localClient->ip, &ip4, sizeof(struct sockaddr_in));	
+		}			
+	} 
+	 
 	rb_inet_ntop_sock((struct sockaddr *)&new_client->localClient->ip, new_client->sockhost,
 			  sizeof(new_client->sockhost));
 
 
 	rb_strlcpy(new_client->host, new_client->sockhost, sizeof(new_client->host));
+
+	
+
 
 #ifdef RB_IPV6
 	if(GET_SS_FAMILY(&new_client->localClient->ip) == AF_INET6 && ConfigFileEntry.dot_in_ip6_addr == 1)

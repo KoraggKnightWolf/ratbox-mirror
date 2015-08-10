@@ -206,6 +206,7 @@ struct config_file_entry
 	int global_cidr;
 	int nicklen;
 	int delayed_exit_time;
+	int ipv6_tun_remap;
 };
 
 struct config_channel_entry

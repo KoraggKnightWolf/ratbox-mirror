@@ -2540,6 +2540,7 @@ static struct conf_items conf_general_table[] =
 	{ "global_cidr", 	CF_YESNO,  NULL, 0, &ConfigFileEntry.global_cidr },
 	{ "motd_path", 		CF_QSTRING, NULL, 0, &ConfigFileEntry.motd_path },
 	{ "oper_motd_path", 	CF_QSTRING, NULL, 0, &ConfigFileEntry.oper_motd_path },
+	{ "ipv6_tun_remap",	CF_YESNO, NULL, 0, &ConfigFileEntry.ipv6_tun_remap },
 	{ "\0",			0,	  NULL, 0, NULL }
 };
 
