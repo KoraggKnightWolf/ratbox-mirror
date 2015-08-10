@@ -27,9 +27,6 @@
 #ifndef INCLUDED_s_gline_h
 #define INCLUDED_s_gline_h
 
-struct Client;
-struct ConfItem;
-
 void cleanup_glines(void *unused);
 
 typedef struct gline_pending

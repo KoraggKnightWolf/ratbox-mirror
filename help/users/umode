@@ -7,6 +7,5 @@ Usermodes:
          +o     - Designates this client is an IRC Operator.
                   Use the /oper command to attain this.
          +i     - Designates this client 'invisible'.
-         +g     - "caller id" mode. Accept messages only from clients you allow.
-                  See /help ACCEPT for more info.
+         +g     - "caller id" mode only allow accept clients to message you
          +D     - Deaf - ignores all channel messages.

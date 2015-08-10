@@ -27,8 +27,10 @@
 #ifndef INCLUDED_hash_h
 #define INCLUDED_hash_h
 
+#include "cache.h"
+#include "s_newconf.h"
+
 extern rb_dlink_list resvTable[];
-extern rb_dlink_list ndTable[];
 
 /* Magic value for FNV hash functions */
 #define FNV1_32_INIT 0x811c9dc5UL
@@ -37,8 +39,8 @@ extern rb_dlink_list ndTable[];
 #define U_MAX_BITS 17
 #define U_MAX (1<<U_MAX_BITS)
 
-/* Client fd hash table size, used in hash.c */
-#define CLI_FD_MAX 4096
+/* Client connid hash table size, used in hash.c */
+#define CLI_CONNID_MAX 4096
 
 /* Channel hash table size, hash.c/s_debug.c */
 #define CH_MAX_BITS 16
@@ -66,12 +68,6 @@ typedef enum
 	HASH_RESV
 } hash_type;
 
-struct Client;
-struct Channel;
-struct ConfItem;
-struct cachefile;
-struct nd_entry;
-
 uint32_t fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused);
 uint32_t fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused);
 uint32_t fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len);
@@ -82,6 +78,7 @@ void init_hash(void);
 void add_to_hash(hash_type, const char *, void *);
 void del_from_hash(hash_type, const char *, void *);
 
+struct Client *find_any_client(const char *name);
 struct Client *find_client(const char *name);
 struct Client *find_named_client(const char *name);
 struct Client *find_server(struct Client *source_p, const char *name);
@@ -102,10 +99,15 @@ struct cachefile *hash_find_help(const char *name, int flags);
 
 void add_to_nd_hash(const char *name, struct nd_entry *nd);
 struct nd_entry *hash_find_nd(const char *name);
+void del_from_nd_hash(struct nd_entry *nd);
+void list_nd_entries(struct Client *);
 
-void add_to_cli_fd_hash(struct Client *client_p);
-void del_from_cli_fd_hash(struct Client *client_p);
-struct Client *find_cli_fd_hash(int fd);
+void add_to_cli_connid_hash(struct Client *client_p);
+void del_from_cli_connid_hash(struct Client *client_p);
+struct Client *find_cli_connid_hash(uint32_t connid);
+
+void add_to_zconnid_hash(struct Client *client_p);
+void del_from_zconnid_hash(struct Client *client_p);
 
 void hash_stats(struct Client *);
 

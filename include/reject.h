@@ -27,12 +27,11 @@
 #define INCLUDED_reject_h
 
 /* amount of time to delay a rejected clients exit */
-#define DELAYED_EXIT_TIME	10
+#define DEFAULT_DELAYED_EXIT_TIME	15
 
 void init_reject(void);
 int check_reject(rb_fde_t *F, struct sockaddr *addr);
 void add_reject(struct Client *);
-int is_reject_ip(struct sockaddr *addr);
 void flush_reject(void);
 int remove_reject(const char *ip);
 struct ConfItem *find_dline(struct sockaddr *addr);
@@ -44,9 +43,9 @@ void report_dlines(struct Client *);
 void report_tdlines(struct Client *);
 void report_elines(struct Client *);
 unsigned long delay_exit_length(void);
+void add_delay_exit(rb_fde_t *F, const char *reason);
 
 int throttle_add(struct sockaddr *addr);
-int is_throttle_ip(struct sockaddr *addr);
 unsigned long throttle_size(void);
 
 int inc_global_cidr_count(struct Client *client_p);
@@ -54,6 +53,5 @@ void dec_global_cidr_count(struct Client *client_p);
 int check_global_cidr_count(struct Client *client_p);
 void rehash_global_cidr_tree(void);
 void remove_perm_dlines(void);
-void remove_elines(void);
 
 #endif

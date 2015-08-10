@@ -51,27 +51,31 @@
 #include "whowas.h"
 #include "scache.h"
 #include "s_log.h"
-#include "blacklist.h"
 
 static int m_stats(struct Client *, struct Client *, int, const char **);
 
 struct Message stats_msgtab = {
-	"STATS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_stats, 2}, {m_stats, 3}, mg_ignore, mg_ignore, {m_stats, 2}}
+	.cmd = "STATS", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },			     
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_stats, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = m_stats, .min_para = 3 },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_stats, .min_para = 2 },
 };
 
 int doing_stats_hook;
 int doing_stats_p_hook;
 
-mapi_clist_av2 stats_clist[] = { &stats_msgtab, NULL };
+mapi_clist_av1 stats_clist[] = { &stats_msgtab, NULL };
 
-mapi_hlist_av2 stats_hlist[] = {
+mapi_hlist_av1 stats_hlist[] = {
 	{"doing_stats", &doing_stats_hook},
 	{"doing_stats_p", &doing_stats_p_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV2(stats, NULL, NULL, stats_clist, stats_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV1(stats, NULL, NULL, stats_clist, stats_hlist, NULL, "$Revision$");
 
 
 static void stats_l_list(struct Client *s, const char *, int, int, rb_dlink_list *, char);
@@ -84,7 +88,7 @@ static void stats_p_spy(struct Client *);
 struct StatsStruct
 {
 	char letter;
-	void (*handler) (struct Client *source_p);
+	void (*handler) ();
 	int need_oper;
 	int need_admin;
 };
@@ -104,7 +108,6 @@ static void stats_auth(struct Client *);
 static void stats_tklines(struct Client *);
 static void stats_klines(struct Client *);
 static void stats_messages(struct Client *);
-static void stats_dnsbl(struct Client *);
 static void stats_oper(struct Client *);
 static void stats_operedup(struct Client *);
 static void stats_ports(struct Client *);
@@ -128,7 +131,7 @@ static void stats_comm(struct Client *);
  * case only matters in the stats letter column.. -- fl_
  */
 static struct StatsStruct stats_cmd_table[] = {
-	/* letter     function        need_oper need_admin */
+	/* letter     function	      need_oper need_admin */
 	{'a', stats_dns_servers, 1, 1,},
 	{'A', stats_dns_servers, 1, 1,},
 	{'b', stats_delay, 1, 1,},
@@ -149,11 +152,10 @@ static struct StatsStruct stats_cmd_table[] = {
 	{'I', stats_auth, 0, 0,},
 	{'k', stats_tklines, 0, 0,},
 	{'K', stats_klines, 0, 0,},
-	{'l', NULL /* special */, 0, 0,},
-	{'L', NULL /* special */, 0, 0,},
+	{'l', stats_ltrace, 0, 0,},
+	{'L', stats_ltrace, 0, 0,},
 	{'m', stats_messages, 0, 0,},
 	{'M', stats_messages, 0, 0,},
-	{'n', stats_dnsbl, 0, 0,},
 	{'o', stats_oper, 0, 0,},
 	{'O', stats_oper, 0, 0,},
 	{'p', stats_operedup, 0, 0,},
@@ -175,16 +177,17 @@ static struct StatsStruct stats_cmd_table[] = {
 	{'z', stats_memory, 1, 0,},
 	{'Z', stats_ziplinks, 1, 0,},
 	{'?', stats_servlinks, 0, 0,},
-	{(char)0, (void (*)())0, 0, 0,}
+	{(char) 0, (void (*)()) 0, 0, 0,}
 };
 
 /*
  * m_stats by fl_
- *      parv[1] = stat letter/command
- *      parv[2] = (if present) server/mask in stats L, or target
+ *	parv[0] = sender prefix
+ *	parv[1] = stat letter/command
+ *	parv[2] = (if present) server/mask in stats L, or target
  *
  * This will search the tables for the appropriate stats letter,
- * if found execute it.  
+ * if found execute it.	 
  */
 static int
 m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -198,17 +201,16 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(MyClient(source_p) && !IsOper(source_p))
 	{
 		/* Check the user is actually allowed to do /stats, and isnt flooding */
-		if((last_used + ConfigFileEntry.pace_wait) > rb_time())
+		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
 			/* safe enough to give this on a local connect only */
-			sendto_one(source_p, form_str(RPL_LOAD2HI),
-				   me.name, source_p->name, "STATS");
+			sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "STATS");
 			sendto_one_numeric(source_p, RPL_ENDOFSTATS,
 					   form_str(RPL_ENDOFSTATS), statchar);
 			return 0;
 		}
 		else
-			last_used = rb_time();
+			last_used = rb_current_time();
 	}
 
 	if(hunt_server(client_p, source_p, ":%s STATS %s :%s", 2, parc, parv) != HUNTED_ISME)
@@ -217,7 +219,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if((statchar != 'L') && (statchar != 'l'))
 		stats_spy(source_p, statchar, NULL);
 
-	for(i = 0; stats_cmd_table[i].letter; i++)
+	for(i = 0; stats_cmd_table[i].handler; i++)
 	{
 		if(stats_cmd_table[i].letter == statchar)
 		{
@@ -235,7 +237,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 			SetCork(source_p);
 			/* Blah, stats L needs the parameters, none of the others do.. */
 			if(statchar == 'L' || statchar == 'l')
-				stats_ltrace(source_p, parc, parv);
+				stats_cmd_table[i].handler(source_p, parc, parv);
 			else
 				stats_cmd_table[i].handler(source_p);
 			ClearCork(source_p);
@@ -244,7 +246,7 @@ m_stats(struct Client *client_p, struct Client *source_p, int parc, const char *
 	}
 
 	/* Send the end of stats notice */
-	sendto_one_numeric(source_p, RPL_ENDOFSTATS, form_str(RPL_ENDOFSTATS), statchar);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFSTATS), statchar);
 
 	return 0;
 }
@@ -258,16 +260,8 @@ stats_dns_servers(struct Client *source_p)
 static void
 stats_delay(struct Client *source_p)
 {
-	struct nd_entry *nd;
-	rb_dlink_node *ptr;
-	int i;
-
-	HASH_WALK(i, U_MAX, ptr, ndTable)
-	{
-		nd = ptr->data;
-		sendto_one_notice(source_p, "Delaying: %s for %ld", nd->name, (long)nd->expire);
-	}
-HASH_WALK_END}
+	list_nd_entries(source_p);
+}
 
 static void
 stats_hash(struct Client *source_p)
@@ -278,7 +272,7 @@ stats_hash(struct Client *source_p)
 static void
 stats_connect(struct Client *source_p)
 {
-	static char buf[5];
+	char buf[5];
 	struct server_conf *server_p;
 	char *s;
 	rb_dlink_node *ptr;
@@ -507,7 +501,7 @@ stats_auth(struct Client *source_p)
 	{
 		if(MyConnect(source_p))
 			aconf = find_auth(source_p->host, source_p->sockhost,
-					  (struct sockaddr *)&source_p->localClient->ip,
+					  (struct sockaddr *) &source_p->localClient->ip,
 					  GET_SS_FAMILY(&source_p->localClient->ip),
 					  source_p->username);
 		else
@@ -518,7 +512,7 @@ stats_auth(struct Client *source_p)
 
 		get_printable_conf(aconf, &name, &host, &pass, &user, &port, &classname);
 
-		sendto_one_numeric(source_p, RPL_STATSILINE, form_str(RPL_STATSILINE),
+		sendto_one_numeric(source_p, s_RPL(RPL_STATSILINE),
 				   name, show_iline_prefix(source_p, aconf, user),
 				   host, port, classname);
 	}
@@ -566,7 +560,7 @@ stats_tklines(struct Client *source_p)
 
 		if(MyConnect(source_p))
 			aconf = find_conf_by_address(source_p->host, source_p->sockhost,
-						     (struct sockaddr *)&source_p->localClient->ip,
+						     (struct sockaddr *) &source_p->localClient->ip,
 						     CONF_KILL,
 						     GET_SS_FAMILY(&source_p->localClient->ip),
 						     source_p->username);
@@ -632,7 +626,7 @@ stats_klines(struct Client *source_p)
 		/* search for a kline */
 		if(MyConnect(source_p))
 			aconf = find_conf_by_address(source_p->host, source_p->sockhost,
-						     (struct sockaddr *)&source_p->localClient->ip,
+						     (struct sockaddr *) &source_p->localClient->ip,
 						     CONF_KILL,
 						     GET_SS_FAMILY(&source_p->localClient->ip),
 						     source_p->username);
@@ -649,7 +643,7 @@ stats_klines(struct Client *source_p)
 
 		get_printable_kline(source_p, aconf, &host, &pass, &user, &oper_reason);
 
-		sendto_one_numeric(source_p, RPL_STATSKLINE, form_str(RPL_STATSKLINE),
+		sendto_one_numeric(source_p, s_RPL(RPL_STATSKLINE),
 				   'K', host, user, pass, oper_reason ? "|" : "",
 				   oper_reason ? oper_reason : "");
 	}
@@ -703,25 +697,6 @@ stats_messages(struct Client *source_p)
 }
 
 static void
-stats_dnsbl(struct Client *source_p)
-{
-	rb_dlink_node *ptr;
-	struct Blacklist *blptr;
-
-	RB_DLINK_FOREACH(ptr, blacklist_list.head)
-	{
-		blptr = ptr->data;
-
-		/* use RPL_STATSDEBUG for now -- jilles */
-		sendto_one_numeric(source_p, RPL_STATSDEBUG, "n :%d %s %s (%d)",
-				blptr->hits,
-				blptr->host,
-				blptr->status & CONF_ILLEGAL ? "disabled" : "active",
-				blptr->refcount);
-	}
-}
-
-static void
 stats_oper(struct Client *source_p)
 {
 	struct oper_conf *oper_p;
@@ -770,19 +745,19 @@ stats_operedup(struct Client *source_p)
 		if(MyClient(source_p) && IsOper(source_p))
 		{
 			sendto_one_numeric(source_p, RPL_STATSDEBUG,
-					   "p :[%c][%s] %s (%s@%s) Idle: %ld",
+					   "p :[%c][%s] %s (%s@%s) Idle: %" RBTT_FMT,
 					   IsAdmin(target_p) ? 'A' : 'O',
 					   get_oper_privs(target_p->operflags),
 					   target_p->name, target_p->username, target_p->host,
-					   (long)(rb_time() - target_p->localClient->last));
+					   (rb_current_time() - target_p->localClient->last));
 		}
 		else
 		{
 			sendto_one_numeric(source_p, RPL_STATSDEBUG,
-					   "p :[%c] %s (%s@%s) Idle: %ld",
+					   "p :[%c] %s (%s@%s) Idle: %" RBTT_FMT,
 					   IsAdmin(target_p) ? 'A' : 'O',
 					   target_p->name, target_p->username, target_p->host,
-					   (long)(rb_time() - target_p->localClient->last));
+					   (rb_current_time() - target_p->localClient->last));
 		}
 	}
 
@@ -860,48 +835,45 @@ stats_usage(struct Client *source_p)
 	struct rusage rus;
 	time_t secs;
 	time_t rup;
-#ifdef  hz
-# define hzz hz
+#ifdef	hz
+#define hzz hz
 #else
-# ifdef HZ
-#  define hzz HZ
-# else
+#ifdef HZ
+#define hzz HZ
+#else
 	int hzz = 1;
-# endif
+#endif
 #endif
 
 	if(getrusage(RUSAGE_SELF, &rus) == -1)
 	{
-		sendto_one_notice(source_p, ":Getruseage error: %m.");
+		sendto_one_notice(source_p, ":Getruseage error: %s.", strerror(errno));
 		return;
 	}
 	secs = rus.ru_utime.tv_sec + rus.ru_stime.tv_sec;
 	if(0 == secs)
 		secs = 1;
 
-	rup = (rb_time() - startup_time) * hzz;
+	rup = (rb_current_time() - startup_time) * hzz;
 	if(0 == rup)
 		rup = 1;
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "R :CPU Secs %ld:%02ld User %ld:%02ld System %ld:%02ld",
-			   (long)(secs / 60), (long)(secs % 60),
-			   (long)(rus.ru_utime.tv_sec / 60),
-			   (long)(rus.ru_utime.tv_sec % 60),
-			   (long)(rus.ru_stime.tv_sec / 60), (long)(rus.ru_stime.tv_sec % 60));
+			   "R :CPU Secs %" RBTT_FMT ":%" RBTT_FMT " User %" RBTT_FMT ":%" RBTT_FMT
+			   " System %" RBTT_FMT ":%" RBTT_FMT, (secs / 60), (secs % 60),
+			   (rus.ru_utime.tv_sec / 60), (rus.ru_utime.tv_sec % 60),
+			   (rus.ru_stime.tv_sec / 60), (rus.ru_stime.tv_sec % 60));
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "R :RSS %ld ShMem %ld Data %ld Stack %ld",
-			   rus.ru_maxrss, (rus.ru_ixrss / rup),
-			   (rus.ru_idrss / rup), (rus.ru_isrss / rup));
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "R :Swaps %ld Reclaims %ld Faults %ld",
+			   rus.ru_maxrss, (rus.ru_ixrss / rup), (rus.ru_idrss / rup),
+			   (rus.ru_isrss / rup));
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "R :Swaps %ld Reclaims %ld Faults %ld",
 			   rus.ru_nswap, rus.ru_minflt, rus.ru_majflt);
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "R :Block in %ld out %ld", rus.ru_inblock, rus.ru_oublock);
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "R :Msg Rcv %ld Send %ld", rus.ru_msgrcv, rus.ru_msgsnd);
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "R :Signals %ld Context Vol. %ld Invol %ld",
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "R :Block in %ld out %ld", rus.ru_inblock,
+			   rus.ru_oublock);
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "R :Msg Rcv %ld Send %ld", rus.ru_msgrcv,
+			   rus.ru_msgsnd);
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "R :Signals %ld Context Vol. %ld Invol %ld",
 			   rus.ru_nsignals, rus.ru_nvcsw, rus.ru_nivcsw);
 #endif
 }
@@ -921,7 +893,7 @@ stats_tstats(struct Client *source_p)
 
 		sp.is_sbs += target_p->localClient->sendB;
 		sp.is_sbr += target_p->localClient->receiveB;
-		sp.is_sti += (unsigned long long)(rb_time() - target_p->localClient->firsttime);
+		sp.is_sti += (uint64_t) (rb_current_time() - target_p->localClient->firsttime);
 		sp.is_sv++;
 	}
 
@@ -931,7 +903,7 @@ stats_tstats(struct Client *source_p)
 
 		sp.is_cbs += target_p->localClient->sendB;
 		sp.is_cbr += target_p->localClient->receiveB;
-		sp.is_cti += (unsigned long long)(rb_time() - target_p->localClient->firsttime);
+		sp.is_cti += (uint64_t) (rb_current_time() - target_p->localClient->firsttime);
 		sp.is_cl++;
 	}
 
@@ -940,7 +912,8 @@ stats_tstats(struct Client *source_p)
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "T :rejected %u delaying %lu", sp.is_rej, delay_exit_length());
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "T :throttled refused %u throttle list size %lu", sp.is_thr, throttle_size());
+			   "T :throttled refused %u throttle list size %lu", sp.is_thr,
+			   throttle_size());
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "T :nicks being delayed %lu", get_nd_count());
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "T :unknown commands %u prefixes %u", sp.is_unco, sp.is_unpf);
@@ -955,19 +928,20 @@ stats_tstats(struct Client *source_p)
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "T :Client Server");
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "T :connected %u %u", sp.is_cl, sp.is_sv);
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "T :bytes sent %lluK %lluK", sp.is_cbs / 1024, sp.is_sbs / 1024);
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "T :bytes recv %lluK %lluK", sp.is_cbr / 1024, sp.is_sbr / 1024);
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "T :time connected %llu %llu", sp.is_cti, sp.is_sti);
+			   "T :bytes sent %" PRIu64 "K %" PRIu64 "K", sp.is_cbs / 1024,
+			   sp.is_sbs / 1024);
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "T :bytes recv %" PRIu64 "K %" PRIu64 "K",
+			   sp.is_cbr / 1024, sp.is_sbr / 1024);
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "T :time connected %" PRIu64 " %" PRIu64 "",
+			   sp.is_cti, sp.is_sti);
 }
 
 static void
 stats_uptime(struct Client *source_p)
 {
-	long now;
+	time_t now;
 
-	now = rb_time() - startup_time;
+	now = rb_current_time() - startup_time;
 	sendto_one_numeric(source_p, RPL_STATSUPTIME,
 			   form_str(RPL_STATSUPTIME),
 			   now / 86400, (now / 3600) % 24, (now / 60) % 60, now % 60);
@@ -1058,7 +1032,7 @@ stats_servers(struct Client *source_p)
 {
 	struct Client *target_p;
 	rb_dlink_node *ptr;
-	long days, hours, minutes, seconds;
+	time_t days, hours, minutes, seconds;
 	int j = 0;
 
 	if(ConfigServerHide.flatten_links && !IsOper(source_p) && !IsExemptShide(source_p))
@@ -1072,7 +1046,7 @@ stats_servers(struct Client *source_p)
 		target_p = ptr->data;
 
 		j++;
-		seconds = (long)(rb_time() - target_p->localClient->firsttime);
+		seconds = (rb_current_time() - target_p->localClient->firsttime);
 
 		days = seconds / 86400;
 		seconds %= 86400;
@@ -1082,13 +1056,13 @@ stats_servers(struct Client *source_p)
 		seconds %= 60;
 
 		sendto_one_numeric(source_p, RPL_STATSDEBUG,
-				   "V :%s (%s!*@*) Idle: %ld SendQ: %d "
-				   "Connected: %ld day%s, %ld:%02ld:%02ld",
-				   target_p->name,
+				   "V :%s (%s!*@*) Idle: %" RBTT_FMT " SendQ: %zu "
+				   "Connected: %" RBTT_FMT " day%s, %" RBTT_FMT ":%02" RBTT_FMT
+				   ":%02" RBTT_FMT, target_p->name,
 				   (target_p->serv->by[0] ? target_p->serv->by : "Remote."),
-				   (long)(rb_time() - target_p->localClient->lasttime),
-				   rb_linebuf_len(&target_p->localClient->buf_sendq),
-				   days, (days == 1) ? "" : "s", hours, minutes, seconds);
+				   (rb_current_time() - target_p->localClient->lasttime),
+				   rb_linebuf_len(target_p->localClient->buf_sendq), days,
+				   (days == 1) ? "" : "s", hours, minutes, seconds);
 	}
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "V :%d Server(s)", j);
@@ -1154,7 +1128,7 @@ stats_class(struct Client *source_p)
 	}
 
 	/* also output the default class */
-	sendto_one_numeric(source_p, RPL_STATSYLINE, form_str(RPL_STATSYLINE),
+	sendto_one_numeric(source_p, s_RPL(RPL_STATSYLINE),
 			   ClassName(default_class), PingFreq(default_class),
 			   ConFreq(default_class), MaxUsers(default_class),
 			   MaxSendq(default_class),
@@ -1164,17 +1138,6 @@ stats_class(struct Client *source_p)
 	send_pop_queue(source_p);
 }
 
-static void
-stats_bh_callback(size_t bused, size_t bfree, size_t bmemusage, size_t heapalloc, const char *desc,
-		  void *data)
-{
-	struct Client *source_p = (struct Client *)data;
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "z :blockheap %s elements used: %zu elements free: %zu memory in use: %zu total memory: %zu",
-			   desc, bused, bfree, bmemusage, heapalloc);
-
-	return;
-}
 
 static void
 stats_memory(struct Client *source_p)
@@ -1194,7 +1157,6 @@ stats_memory(struct Client *source_p)
 	int channel_except = 0;
 	int channel_invex = 0;
 
-	size_t wwu = 0;		/* whowas users */
 	int class_count = 0;	/* classes */
 	int conf_count = 0;	/* conf lines */
 	int users_invited_count = 0;	/* users invited */
@@ -1208,7 +1170,6 @@ stats_memory(struct Client *source_p)
 	size_t channel_invex_memory = 0;
 
 	size_t away_memory = 0;	/* memory used by aways */
-	size_t wwm = 0;		/* whowas array memory used */
 	size_t conf_memory = 0;	/* memory used by conf lines */
 	size_t mem_servers_cached;	/* memory used by scache */
 
@@ -1216,7 +1177,6 @@ stats_memory(struct Client *source_p)
 	size_t rb_linebuf_memory_used = 0;
 
 	size_t total_channel_memory = 0;
-	size_t totww = 0;
 
 	size_t local_client_count = 0;
 	size_t local_client_memory_used = 0;
@@ -1224,17 +1184,13 @@ stats_memory(struct Client *source_p)
 	size_t remote_client_count = 0;
 	size_t remote_client_memory_used = 0;
 
+	size_t whowas_memory = 0;
+	size_t whowas_count = 0;
+
 	size_t total_memory = 0;
-	size_t bh_total, bh_used;
-	rb_bh_usage_all(stats_bh_callback, (void *)source_p);
-	rb_bh_total_usage(&bh_total, &bh_used);
 
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "z :blockheap Total Allocated: %zu Total Used: %zu", bh_total, bh_used);
-
-	count_whowas_memory(&wwu, &wwm);
-
-
+	whowas_memory_usage(&whowas_count, &whowas_memory);
+	
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		target_p = ptr->data;
@@ -1267,13 +1223,13 @@ stats_memory(struct Client *source_p)
 
 		channel_users += rb_dlink_list_length(&chptr->members);
 		channel_invites += rb_dlink_list_length(&chptr->invites);
-
+#define ban_size(b) sizeof(struct Ban) + strlen(b->banstr)+ 1 + strlen(b->who) + 1;
 		RB_DLINK_FOREACH(dlink, chptr->banlist.head)
 		{
 			actualBan = dlink->data;
 			channel_bans++;
 
-			channel_ban_memory += sizeof(rb_dlink_node) + sizeof(struct Ban);
+			channel_ban_memory += ban_size(actualBan);
 		}
 
 		RB_DLINK_FOREACH(dlink, chptr->exceptlist.head)
@@ -1281,7 +1237,7 @@ stats_memory(struct Client *source_p)
 			actualBan = dlink->data;
 			channel_except++;
 
-			channel_except_memory += (sizeof(rb_dlink_node) + sizeof(struct Ban));
+			channel_except_memory += ban_size(actualBan);
 		}
 
 		RB_DLINK_FOREACH(dlink, chptr->invexlist.head)
@@ -1289,8 +1245,9 @@ stats_memory(struct Client *source_p)
 			actualBan = dlink->data;
 			channel_invex++;
 
-			channel_invex_memory += (sizeof(rb_dlink_node) + sizeof(struct Ban));
+			channel_invex_memory += ban_size(actualBan);
 		}
+#undef ban_size
 	}
 
 	/* count up all classes */
@@ -1343,13 +1300,9 @@ stats_memory(struct Client *source_p)
 		channel_ban_memory +
 		channel_users * sizeof(rb_dlink_node) + channel_invites * sizeof(rb_dlink_node);
 
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "z :Whowas users %zu(%zu)", wwu, (wwu * sizeof(struct User)));
 
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "z :Whowas array %u(%zu)", NICKNAMEHISTORYLENGTH, wwm);
-
-	totww = wwu * sizeof(struct User) + wwm;
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "z :Whowas entries: %zu, memory used: %zu",
+		 whowas_count, whowas_memory);
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :Hash: client %u(%zu) chan %u(%zu)",
@@ -1363,19 +1316,19 @@ stats_memory(struct Client *source_p)
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :scache %ld(%ld)",
-			   (long)number_servers_cached, (long)mem_servers_cached);
+			   (long) number_servers_cached, (long) mem_servers_cached);
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :hostname hash %d(%ld)",
-			   HOST_MAX, (long)HOST_MAX * sizeof(rb_dlink_list));
+			   HOST_MAX, (long) HOST_MAX * sizeof(rb_dlink_list));
 
-	total_memory = totww + total_channel_memory + conf_memory +
+	total_memory = total_channel_memory + conf_memory +
 		class_count * sizeof(struct Class);
 
 	total_memory += mem_servers_cached;
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "z :Total: whowas %zu channel %zu conf %zu",
-			   totww, total_channel_memory, conf_memory);
+			   "z :Total: channel %zu conf %zu",
+			   total_channel_memory, conf_memory);
 
 	count_local_client_memory(&local_client_count, &local_client_memory_used);
 	total_memory += local_client_memory_used;
@@ -1404,22 +1357,18 @@ stats_ziplinks(struct Client *source_p)
 	struct Client *target_p;
 	struct ZipStats *zipstats;
 	int sent_data = 0;
-	char buf[128], buf1[128];
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
 		target_p = ptr->data;
 		if(IsCapable(target_p, CAP_ZIP))
 		{
 			zipstats = target_p->localClient->zipstats;
-			sprintf(buf, "%.2f%%", zipstats->out_ratio);
-			sprintf(buf1, "%.2f%%", zipstats->in_ratio);
 			sendto_one_numeric(source_p, RPL_STATSDEBUG,
-					   "Z :ZipLinks stats for %s send[%s compression "
-					   "(%llu kB data/%llu kB wire)] recv[%s compression "
-					   "(%llu kB data/%llu kB wire)]",
-					   target_p->name,
-					   buf, zipstats->out >> 10,
-					   zipstats->out_wire >> 10, buf1,
+					   "Z :ZipLinks stats for %s send[%.2f%% compression "
+					   "(%" PRIu64 " kB data/%" PRIu64
+					   " kB wire)] recv[%.2f%% compression " "(%" PRIu64
+					   " kB data/%" PRIu64 " kB wire)]", target_p->name, zipstats->out_ratio,
+					   zipstats->out >> 10, zipstats->out_wire >> 10, zipstats->in_ratio,
 					   zipstats->in >> 10, zipstats->in_wire >> 10);
 			sent_data++;
 		}
@@ -1432,9 +1381,8 @@ static void
 stats_servlinks(struct Client *source_p)
 {
 	long uptime;
-	unsigned long long int sent, receive;
+	uint64_t sent, receive;
 	struct Client *target_p;
-	static char buf[512];
 	rb_dlink_node *ptr;
 	int j = 0;
 
@@ -1454,51 +1402,36 @@ stats_servlinks(struct Client *source_p)
 		sent += target_p->localClient->sendB;
 		receive += target_p->localClient->receiveB;
 
-		sendto_one(source_p, ":%s %d %s %s %u %u %llu %u %llu :%lu %lu %s",
-			   get_id(&me, source_p), RPL_STATSLINKINFO, get_id(source_p, source_p),
-			   target_p->name,
-			   rb_linebuf_len(&target_p->localClient->buf_sendq),
-			   target_p->localClient->sendM,
-			   target_p->localClient->sendB / 1024,
-			   target_p->localClient->receiveM,
-			   target_p->localClient->receiveB / 1024,
-			   (long)(rb_time() - target_p->localClient->firsttime),
-			   (long)((rb_time() > target_p->localClient->lasttime) ?
-				  (rb_time() - target_p->localClient->lasttime) : 0),
+		sendto_one_numeric(source_p, s_RPL(RPL_STATSLINKINFO),
+			   target_p->name, rb_linebuf_len(target_p->localClient->buf_sendq),
+			   target_p->localClient->sendM, target_p->localClient->sendB / 1024,
+			   target_p->localClient->receiveM, target_p->localClient->receiveB / 1024,
+			   (rb_current_time() - target_p->localClient->firsttime),
+			   ((rb_current_time() >
+			     target_p->localClient->lasttime) ? (rb_current_time() -
+								 target_p->localClient->
+								 lasttime) : 0),
 			   IsOper(source_p) ? show_capabilities(target_p) : "TS");
 	}
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "? :%u total server(s)", j);
 
-	sprintf(buf, "%7.2f", _GMKv((sent / 1024)));
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "? :Sent total : %s %s", buf, _GMKs((sent / 1024)));
+			   "? :Sent total : %7.2f %s", _GMKv((sent / 1024)), _GMKs((sent / 1024)));
 
-	sprintf(buf, "%7.2f", _GMKv((receive / 1024)));
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "? :Recv total : %s %s", buf, _GMKs((receive / 1024)));
+			   "? :Recv total : %7.2f %s", _GMKv((sent / 1024)), _GMKs((receive / 1024)));
 
-	uptime = (rb_time() - startup_time);
-#ifdef HAVE_SNPRINTF
-	snprintf(buf, sizeof(buf),
-#else
-	sprintf(buf,
-#endif
-		"%7.2f %s (%4.1f K/s)", _GMKv(me.localClient->sendB / 1024),
-		_GMKs((me.localClient->sendB / 1024)),
-		(float)((float)(me.localClient->sendB / 1024) / (float)uptime));
+	uptime = (rb_current_time() - startup_time);
 
-	sendto_one_numeric(source_p, RPL_STATSDEBUG, "? :Server send: %s", buf);
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "? :Server send: %7.2f %s (%4.1f K/s) ", 
+		_GMKv(me.localClient->sendB / 1024), _GMKs((me.localClient->sendB / 1024)),
+		 (float) ((float) (me.localClient->sendB / 1024) / (float) uptime));
 
-#ifdef HAVE_SNPRINTF
-	snprintf(buf, sizeof(buf),
-#else
-	sprintf(buf,
-#endif
-		"%7.2f %s (%4.1f K/s)", _GMKv((me.localClient->receiveB / 1024)),
-		_GMKs((me.localClient->receiveB / 1024)),
-		(float)((float)(me.localClient->receiveB / 1024) / (float)uptime));
-	sendto_one_numeric(source_p, RPL_STATSDEBUG, "? :Server recv: %s", buf);
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "? :Server recv: %7.2f %s (%4.1f K/s)",
+		_GMKv((me.localClient->receiveB / 1024)), _GMKs((me.localClient->receiveB / 1024)),
+		(float) ((float) (me.localClient->receiveB / 1024) / (float) uptime));
+
 }
 
 static void
@@ -1571,9 +1504,7 @@ stats_ltrace(struct Client *source_p, int parc, const char *parv[])
 			stats_l_list(source_p, name, doall, wilds, &oper_list, statchar);
 		}
 
-		if (!ConfigServerHide.flatten_links || IsOper(source_p) ||
-				IsExemptShide(source_p))
-			stats_l_list(source_p, name, doall, wilds, &serv_list, statchar);
+		stats_l_list(source_p, name, doall, wilds, &serv_list, statchar);
 
 		return;
 	}
@@ -1589,7 +1520,7 @@ stats_ltrace(struct Client *source_p, int parc, const char *parv[])
 
 static void
 stats_l_list(struct Client *source_p, const char *name, int doall, int wilds,
-	     rb_dlink_list *list, char statchar)
+	     rb_dlink_list * list, char statchar)
 {
 	rb_dlink_node *ptr;
 	struct Client *target_p;
@@ -1609,56 +1540,52 @@ stats_l_list(struct Client *source_p, const char *name, int doall, int wilds,
 	}
 }
 
-#define Lformat "%s %u %u %llu %u %llu :%ld %ld %s"
-
 void
 stats_l_client(struct Client *source_p, struct Client *target_p, char statchar)
 {
 	if(IsAnyServer(target_p))
 	{
-		sendto_one_numeric(source_p, RPL_STATSLINKINFO, Lformat,
+		sendto_one_numeric(source_p, s_RPL(RPL_STATSLINKINFO),
 				   target_p->name,
-				   rb_linebuf_len(&target_p->localClient->buf_sendq),
+				   rb_linebuf_len(target_p->localClient->buf_sendq),
 				   target_p->localClient->sendM,
 				   target_p->localClient->sendB / 1024,
 				   target_p->localClient->receiveM,
 				   target_p->localClient->receiveB / 1024,
-				   (long)rb_time() - target_p->localClient->firsttime,
-				   (long)(rb_time() > target_p->localClient->lasttime) ?
-				   (long)(rb_time() - target_p->localClient->lasttime) : 0,
+				   rb_current_time() - target_p->localClient->firsttime,
+				   (rb_current_time() > target_p->localClient->lasttime) ?
+				   (rb_current_time() - target_p->localClient->lasttime) : 0,
 				   IsOper(source_p) ? show_capabilities(target_p) : "-");
 	}
 
 	else if(!show_ip(source_p, target_p))
 	{
-		sendto_one_numeric(source_p, RPL_STATSLINKINFO, Lformat,
+		sendto_one_numeric(source_p, s_RPL(RPL_STATSLINKINFO),
 				   get_client_name(target_p, MASK_IP),
-				   rb_linebuf_len(&target_p->localClient->buf_sendq),
+				   rb_linebuf_len(target_p->localClient->buf_sendq),
 				   target_p->localClient->sendM,
 				   target_p->localClient->sendB / 1024,
 				   target_p->localClient->receiveM,
 				   target_p->localClient->receiveB / 1024,
-				   (long)(rb_time() - target_p->localClient->firsttime),
-				   (long)(rb_time() > target_p->localClient->lasttime) ?
-				   (long)(rb_time() - target_p->localClient->lasttime) : 0,
-				   "-");
+				   (rb_current_time() - target_p->localClient->firsttime),
+				   (rb_current_time() > target_p->localClient->lasttime) ?
+				   (rb_current_time() - target_p->localClient->lasttime) : 0, "-");
 	}
 
 	else
 	{
-		sendto_one_numeric(source_p, RPL_STATSLINKINFO, Lformat,
+		sendto_one_numeric(source_p, s_RPL(RPL_STATSLINKINFO),
 				   IsUpper(statchar) ?
 				   get_client_name(target_p, SHOW_IP) :
 				   get_client_name(target_p, HIDE_IP),
-				   rb_linebuf_len(&target_p->localClient->buf_sendq),
+				   rb_linebuf_len(target_p->localClient->buf_sendq),
 				   target_p->localClient->sendM,
 				   target_p->localClient->sendB / 1024,
 				   target_p->localClient->receiveM,
 				   target_p->localClient->receiveB / 1024,
-				   (long)rb_time() - target_p->localClient->firsttime,
-				   (long)(rb_time() > target_p->localClient->lasttime) ?
-				   (long)(rb_time() - target_p->localClient->lasttime) : 0,
-				   "-");
+				   rb_current_time() - target_p->localClient->firsttime,
+				   (rb_current_time() > target_p->localClient->lasttime) ?
+				   (rb_current_time() - target_p->localClient->lasttime) : 0, "-");
 	}
 }
 
@@ -1696,7 +1623,7 @@ stats_spy(struct Client *source_p, char statchar, const char *name)
 
 	data.client = source_p;
 	data.arg1 = name;
-	data.arg2 = (int)statchar;
+	data.arg2 = (int) statchar;
 
 	call_hook(doing_stats_hook, &data);
 }

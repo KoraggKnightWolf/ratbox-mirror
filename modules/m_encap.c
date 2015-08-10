@@ -42,13 +42,18 @@
 static int ms_encap(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 
 struct Message encap_msgtab = {
-	"ENCAP", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, {ms_encap, 3}, {ms_encap, 3}, mg_ignore, mg_ignore}
+	.cmd = "ENCAP",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },
+	.handlers[CLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = ms_encap, .min_para = 3 },	 
+	.handlers[SERVER_HANDLER] =		{ .handler = ms_encap, .min_para = 3 },	 
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },	
+	.handlers[OPER_HANDLER] =		{ mm_ignore },
 };
 
-mapi_clist_av2 encap_clist[] = { &encap_msgtab, NULL };
+mapi_clist_av1 encap_clist[] = { &encap_msgtab, NULL };
 
-DECLARE_MODULE_AV2(encap, NULL, NULL, encap_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(encap, NULL, NULL, encap_clist, NULL, NULL, "$Revision$");
 
 /* ms_encap()
  *
@@ -59,7 +64,7 @@ DECLARE_MODULE_AV2(encap, NULL, NULL, encap_clist, NULL, NULL, "$Revision$");
 static int
 ms_encap(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	char buffer[BUFSIZE];
+	char buffer[IRCD_BUFSIZE];
 	char *ptr;
 	int cur_len = 0;
 	int len;
@@ -72,10 +77,10 @@ ms_encap(struct Client *client_p, struct Client *source_p, int parc, const char 
 		len = strlen(parv[i]) + 1;
 
 		/* ugh, not even at the last parameter, just bail --fl */
-		if((size_t)(cur_len + len) >= sizeof(buffer))
+		if((size_t) (cur_len + len) >= sizeof(buffer))
 			return 0;
 
-		rb_snprintf(ptr, sizeof(buffer) - cur_len, "%s ", parv[i]);
+		snprintf(ptr, sizeof(buffer) - cur_len, "%s ", parv[i]);
 		cur_len += len;
 		ptr += len;
 	}
@@ -84,13 +89,13 @@ ms_encap(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	/* if its a command without parameters, dont prepend a ':' */
 	if(parc == 3)
-		rb_snprintf(ptr, sizeof(buffer) - cur_len, "%s", parv[2]);
+		snprintf(ptr, sizeof(buffer) - cur_len, "%s", parv[2]);
 	else
-		rb_snprintf(ptr, sizeof(buffer) - cur_len, ":%s", parv[parc - 1]);
+		snprintf(ptr, sizeof(buffer) - cur_len, ":%s", parv[parc - 1]);
 
 	/* add a trailing \0 if it was too long */
-	if((cur_len + len) >= BUFSIZE)
-		buffer[BUFSIZE - 1] = '\0';
+	if((cur_len + len) >= IRCD_BUFSIZE)
+		buffer[IRCD_BUFSIZE - 1] = '\0';
 
 	sendto_match_servs(source_p, parv[1], CAP_ENCAP, NOCAPS, "ENCAP %s", buffer);
 

@@ -20,22 +20,30 @@ static int mclient_kilroy(struct Client *client_p, struct Client *source_p, int 
 			  const char *parv[]);
 
 struct Message hgtg_msgtab = {
-	"42", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, {mclient_42, 0}, mg_ignore, mg_ignore, mg_ignore, {mclient_42, 0}
-	 }
+	.cmd = "42",
+	.handlers[UNREGISTERED_HANDLER] =       { mm_ignore },
+	.handlers[CLIENT_HANDLER] =             { mclient_42 },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { mclient_42 },
 };
 
 struct Message kilroy_msgtab = {
-	"KILROY", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, {mclient_kilroy, 0}, mg_ignore, mg_ignore, mg_ignore, {mclient_kilroy, 0}
-	 }
+	.cmd = "KILROY",
+	.handlers[UNREGISTERED_HANDLER] =       { mm_ignore },
+	.handlers[CLIENT_HANDLER] =             { mclient_kilroy },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { mclient_kilroy },
 };
 
 
-mapi_clist_av2 hgtg_clist[] = { &hgtg_msgtab, &kilroy_msgtab, NULL };
+mapi_clist_av1 hgtg_clist[] = { &hgtg_msgtab, &kilroy_msgtab, NULL };
 
 
-DECLARE_MODULE_AV2(42, NULL, NULL, hgtg_clist, NULL, NULL, "Revision 0.42");
+DECLARE_MODULE_AV1(42, NULL, NULL, hgtg_clist, NULL, NULL, "Revision 0.42");
 
 
 static int

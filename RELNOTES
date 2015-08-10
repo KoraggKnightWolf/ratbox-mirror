@@ -1,14 +1,71 @@
 
-This is the current release version of the 'testing' tree of ircd-ratbox.
+Please note as of this release, the 3.0 branch is now marked as 'stable'. 
+The 2.2 branch will no longer be maintained.
 
-NOTE: Whilst every effort has been made to make sure this code is usable, it
-      is still not classified as a stable release.  You assume full
-      responsibility for running this on a production network.
+This is the current release version of the 'stable' tree of ircd-ratbox.
 
 If you are upgrading from 2.2, you must read doc/whats-new-3.0.txt
 If you are upgrading from 2.1, you must read doc/whats-new-2.2.txt
 If you are upgrading from 2.0, you must also read doc/whats-new-2.1.txt
 If you are upgrading from 1.x, you must also read doc/whats-new-2.0.txt
+
+-- ircd-ratbox-3.0.9
+- Some code modernization
+- Runtime nicklen support, no more recompile needed, just restart
+- Format security cleanups
+- Fix 64bit time_t on 32 bit operating systems(OpenBSD in particular)
+- Add libevent support for i/o loops
+  
+
+-- ircd-ratbox-3.0.8
+- fix embarrassing CAPAB crash - All admins should upgrade immediately
+- various doc cleanups
+
+
+-- ircd-ratbox-3.0.7
+- remove sigio code. its buggyness makes it more trouble than its worth
+- stop logging to files when they are commented out in the ircd.conf
+- add help for GUNGLINE
+- make cross compiles work again 
+- fix error handling with GNUTLS
+- update included sqlite3 code to something recent
+- documentation cleanups/updates
+
+-- ircd-ratbox-3.0.6
+- fix a user-triggerable crash in /links handling when flatten_links is
+  disabled 
+-- ircd-ratbox-3.0.5
+- fix a bug with reading help files
+- add debugging in for dealing with a kline removal bug
+- fix /rehash tdlines and /rehash bans so they actually do something with
+  dlines
+- compute the number of file descriptors passed correctly on freebsd/amd64
+  (and probably others) 
+- check for compiler support for various warning flags and add them
+- add -fno-strict-aliasing as this is now needed for gcc 4.4
+- GNUTLS code now picks up new keys/certificates on rehash
+
+-- ircd-ratbox-3.0.4
+- Actually release from the right branch.  Oops.
+
+-- ircd-ratbox-3.0.3
+- fix forward dns resolution, only used by connect::host with hostnames
+- check return values on rb_socketpair that can cause a crash if 
+  socketpair fails
+- add autoconf checks for -fstack-protector
+- add warnings for certain functions who's return values should always 
+  be checked
+- fix a CHALLENGE related core dump
+
+-- ircd-ratbox-3.0.2
+- fix ssl+zip close detection
+- fix openssl detection when openssl is a static library
+- add gungline support
+- fix a problem with ssl connections not being accepted on solaris
+  and perhaps other platforms as well
+- attempt to report the real network errors on ssl connections a bit better
+- actually update the internal timekeeping when using sigio 
+- fix an off by one error in ziplink stats processing  
 
 -- ircd-ratbox-3.0.1
 - call rb_helper_close on bandb errors to kill off old bandb processes

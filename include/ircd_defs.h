@@ -25,8 +25,9 @@
  */
 
 /*
- * NOTE: NICKLEN and TOPICLEN do not live here anymore. Set it with configure
- * Otherwise there are no user servicable part here. 
+ * NOTE: NICKLEN and TOPICLEN do not live here anymore. Set it with 
+ * the configuration file. Otherwise there are no user servicable part 
+ * here. 
  *
  */
  /* ircd_defs.h - Global size definitions for record entries used
@@ -45,14 +46,20 @@
 #define AFP(a,b)
 #endif
 
+#ifdef __GNUC__
+#define RB_noreturn __attribute__ ((noreturn))
+#else
+#define RB_noreturn
+#endif
+
 
 #ifdef __GNUC__
 #define ss_assert(expr)	do								\
 			if(!(expr)) {							\
-				ilog(L_MAIN, 						\
+				ilog(L_MAIN,						\
 				"file: %s line: %d (%s): Assertion failed: (%s)",	\
-				__FILE__, __LINE__, __PRETTY_FUNCTION__, #expr); 	\
-				sendto_realops_flags(UMODE_ALL, L_ALL, 			\
+				__FILE__, __LINE__, __PRETTY_FUNCTION__, #expr);	\
+				sendto_realops_flags(UMODE_ALL, L_ALL,			\
 				"file: %s line: %d (%s): Assertion failed: (%s)",	\
 				__FILE__, __LINE__, __PRETTY_FUNCTION__, #expr);	\
 			}								\
@@ -60,9 +67,9 @@
 #else
 #define ss_assert(expr)	do								\
 			if(!(expr)) {							\
-				ilog(L_MAIN, 						\
+				ilog(L_MAIN,						\
 				"file: %s line: %d: Assertion failed: (%s)",		\
-				__FILE__, __LINE__, #expr); 				\
+				__FILE__, __LINE__, #expr);				\
 				sendto_realops_flags(UMODE_ALL, L_ALL,			\
 				"file: %s line: %d: Assertion failed: (%s)"		\
 				__FILE__, __LINE__, #expr);				\
@@ -76,18 +83,16 @@
 #define s_assert(expr)	do { ss_assert(expr); assert(expr); } while(0)
 #endif
 
-#if !defined(CONFIG_RATBOX_LEVEL_3)
-#  error Incorrect config.h for this revision of ircd.
-#endif
 
-#define HOSTLEN         63	/* Length of hostname.  Updated to         */
-				/* comply with RFC1123                     */
-#define IRCD_RES_HOSTLEN 255	/* Must match with resolver/res.h          */
+#define NICKLEN		30
+#define DEFAULT_NICKLEN 9
+#define HOSTLEN		63	/* Length of hostname.	Updated to	   */
+				/* comply with RFC1123			   */
 
-#define USERLEN         10
-#define REALLEN         50
-#define KILLLEN         90
-#define CHANNELLEN      200
+#define USERLEN		10
+#define REALLEN		50
+#define KILLLEN		90
+#define CHANNELLEN	200
 #define LOC_CHANNELLEN	50
 #define IDLEN		10
 
@@ -100,22 +105,21 @@
 #define AWAYLEN		90
 
 /* 23+1 for \0 */
-#define KEYLEN          24
-#define BUFSIZE         512	/* WARNING: *DONT* CHANGE THIS!!!! */
-#define MAXRECIPIENTS   20
-#define MAXBANLENGTH    1024
-#define OPERNICKLEN     NICKLEN*2	/* Length of OPERNICKs. */
+#define KEYLEN		24
+#define MAXRECIPIENTS	20
+#define MAXBANLENGTH	1024
+#define OPERNICKLEN	NICKLEN*2	/* Length of OPERNICKs. */
 
-#define USERHOST_REPLYLEN       (NICKLEN+HOSTLEN+USERLEN+5)
+#define USERHOST_REPLYLEN	(NICKLEN+HOSTLEN+USERLEN+5)
 #define MAX_DATE_STRING 32	/* maximum string length for a date string */
 
-#define HELPLEN         400
+#define HELPLEN		400
 #define DEFAULT_TOPICLEN	160	/* Default topiclen */
 #define MAX_TOPICLEN		390	/* Max topiclen */
 /* 
  * message return values 
  */
-#define CLIENT_EXITED    -2
+#define CLIENT_EXITED	 -2
 #define CLIENT_PARSE_ERROR -1
 #define CLIENT_OK	1
 
@@ -126,5 +130,19 @@
 #endif
 
 
+/* Just blindly define our own MIN/MAX macro */
+
+#define IRCD_MAX(a, b)	((a) > (b) ? (a) : (b))
+#define IRCD_MIN(a, b)	((a) < (b) ? (a) : (b))
+
+/* Right out of the RFC */
+#define IRCD_BUFSIZE 512
+
+/* readbuf size */
+#define READBUF_SIZE 16384
+
+
 
 #endif /* INCLUDED_ircd_defs_h */
+
+

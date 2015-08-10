@@ -39,7 +39,6 @@
 #include "hostmask.h"
 #include "numeric.h"
 #include "parse.h"
-#include "restart.h"
 #include "s_auth.h"
 #include "s_conf.h"
 #include "s_log.h"
@@ -96,7 +95,7 @@ static unsigned long initialVMTop = 0;	/* top of virtual memory at init */
 const char *logFileName = LPATH;
 const char *pidFileName = PPATH;
 
-char **myargv;
+static char **myargv;
 int dorehash = 0;
 int dorehashbans = 0;
 int doremotd = 0;
@@ -131,8 +130,7 @@ ircd_shutdown(const char *reason)
 	{
 		target_p = ptr->data;
 
-		sendto_one(target_p, ":%s NOTICE %s :Server Terminating. %s",
-			   me.name, target_p->name, reason);
+		sendto_one(target_p, ":%s NOTICE %s :Server Terminating. %s", me.name, target_p->name, reason);
 	}
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
@@ -219,8 +217,7 @@ init_sys(void)
 		{
 			fprintf(stderr, "ERROR: Shell FD limits are too low.\n");
 			fprintf(stderr,
-				"ERROR: ircd-ratbox reserves %d FDs, shell limits must be above this\n",
-				MAX_BUFFER);
+				"ERROR: ircd-ratbox reserves %d FDs, shell limits must be above this\n", MAX_BUFFER);
 			exit(EXIT_FAILURE);
 		}
 		return;
@@ -300,9 +297,9 @@ check_rehash(void *unusued)
 
 	if(doremotd)
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Got signal SIGUSR1, reloading ircd motd file");
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Got signal SIGUSR1, reloading ircd motd file");
 		cache_user_motd();
+		cache_oper_motd();
 		doremotd = 0;
 	}
 }
@@ -310,8 +307,8 @@ check_rehash(void *unusued)
 /*
  * initalialize_global_set_options
  *
- * inputs       - none
- * output       - none
+ * inputs	- none
+ * output	- none
  * side effects - This sets all global set options needed 
  */
 static void
@@ -322,8 +319,7 @@ initialize_global_set_options(void)
 
 	GlobalSetOptions.maxclients = ServerInfo.default_max_clients;
 
-	if(GlobalSetOptions.maxclients > (maxconnections - MAX_BUFFER)
-	   || (GlobalSetOptions.maxclients <= 0))
+	if(GlobalSetOptions.maxclients > (maxconnections - MAX_BUFFER) || (GlobalSetOptions.maxclients <= 0))
 		GlobalSetOptions.maxclients = maxconnections - MAX_BUFFER;
 
 	GlobalSetOptions.autoconn = 1;
@@ -339,8 +335,7 @@ initialize_global_set_options(void)
 	split_servers = ConfigChannel.default_split_server_count;
 	split_users = ConfigChannel.default_split_user_count;
 
-	if(split_users && split_servers
-	   && (ConfigChannel.no_create_on_split || ConfigChannel.no_join_on_split))
+	if(split_users && split_servers && (ConfigChannel.no_create_on_split || ConfigChannel.no_join_on_split))
 	{
 		splitmode = 1;
 		splitchecking = 1;
@@ -362,8 +357,8 @@ initialize_global_set_options(void)
 /*
  * initialize_server_capabs
  *
- * inputs       - none
- * output       - none
+ * inputs	- none
+ * output	- none
  */
 static void
 initialize_server_capabs(void)
@@ -375,8 +370,8 @@ initialize_server_capabs(void)
 /*
  * write_pidfile
  *
- * inputs       - filename+path of pid file
- * output       - none
+ * inputs	- filename+path of pid file
+ * output	- none
  * side effects - write the pid of the ircd to filename
  */
 static void
@@ -388,11 +383,10 @@ write_pidfile(const char *filename)
 	{
 		unsigned int pid = (unsigned int)getpid();
 
-		rb_snprintf(buff, sizeof(buff), "%u\n", pid);
+		snprintf(buff, sizeof(buff), "%u\n", pid);
 		if((fputs(buff, fb) == -1))
 		{
-			ilog(L_MAIN, "Error writing %u to pid file %s (%m)",
-			     pid, filename);
+			ilog(L_MAIN, "Error writing %u to pid file %s (%s)", pid, filename, strerror(errno));
 		}
 		fclose(fb);
 		return;
@@ -406,10 +400,10 @@ write_pidfile(const char *filename)
 /*
  * check_pidfile
  *
- * inputs       - filename+path of pid file
- * output       - none
+ * inputs	- filename+path of pid file
+ * output	- none
  * side effects - reads pid from pidfile and checks if ircd is in process
- *                list. if it is, gracefully exits
+ *		  list. if it is, gracefully exits
  * -kre
  */
 static void
@@ -422,7 +416,7 @@ check_pidfile(const char *filename)
 	/* Don't do logging here, since we don't have log() initialised */
 	if((fb = fopen(filename, "r")))
 	{
-		if(fgets(buff, 20, fb) != NULL)
+		if(fgets(buff, sizeof(buff), fb) != NULL)
 		{
 			pidfromfile = atoi(buff);
 			if(!rb_kill(pidfromfile, 0))
@@ -438,8 +432,8 @@ check_pidfile(const char *filename)
 /*
  * setup_corefile
  *
- * inputs       - nothing
- * output       - nothing
+ * inputs	- nothing
+ * output	- nothing
  * side effects - setups corefile to system limits.
  * -kre
  */
@@ -464,12 +458,16 @@ ilogcb(const char *buf)
 	ilog(L_MAIN, "libratbox reports: %s", buf);
 }
 
+static void restartcb(const char *) RB_noreturn;
+
 static void
 restartcb(const char *buf)
 {
 	ilog(L_MAIN, "libratbox has called the restart callback: %s", buf);
 	restart(buf);
 }
+
+static void diecb(const char *buf) RB_noreturn;
 
 static void
 diecb(const char *buf)
@@ -481,50 +479,6 @@ diecb(const char *buf)
 	abort();
 }
 
-#ifndef _WIN32
-static int
-seed_with_urandom(void)
-{
-	unsigned int seed;
-	int fd;
-
-	fd = open("/dev/urandom", O_RDONLY);
-	if(fd >= 0)
-	{
-		if(read(fd, &seed, sizeof(seed)) == sizeof(seed))
-		{
-			close(fd);
-			srand(seed);
-			return 1;
-		}
-	}
-	return 0;
-}
-#endif
-
-static void
-seed_with_clock(void)
-{
-	const struct timeval *tv;
-	rb_set_time();
-	tv = rb_time_tv();
-	srand(tv->tv_sec ^ (tv->tv_usec | (getpid() << 20)));
-}
-
-static void
-seed_random(void *unused)
-{
-	unsigned int seed;
-	if(rb_get_random(&seed, sizeof(seed)) == -1)
-	{
-#ifndef _WIN32
-		if(!seed_with_urandom())
-#endif
-			seed_with_clock();
-		return;
-	}
-	srand(seed);
-}
 
 int
 ratbox_main(int argc, char *argv[])
@@ -554,10 +508,11 @@ ratbox_main(int argc, char *argv[])
 		puts(RATBOX_CONFIGURE_OPTS);
 		exit(EXIT_SUCCESS);
 	}
+	rb_set_time();
 
 	if(chdir(basedir))
 	{
-		fprintf(stderr, "Unable to chdir to %s: %m\n", basedir);
+		fprintf(stderr, "Unable to chdir to %s: %s\n", basedir, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
@@ -603,11 +558,10 @@ ratbox_main(int argc, char *argv[])
 	}
 
 	/* This must be after we daemonize.. */
-	rb_lib_init(ilogcb, restartcb, diecb, 1, maxconnections, DNODE_HEAP_SIZE, FD_HEAP_SIZE);
-	rb_linebuf_init(LINEBUF_HEAP_SIZE);
+	rb_lib_init(ilogcb, restartcb, diecb, 1, maxconnections);
+	rb_linebuf_init();
 
 	set_default_conf();
-	rb_set_time();
 	setup_corefile();
 	initialVMTop = get_vm_top();
 
@@ -654,13 +608,7 @@ ratbox_main(int argc, char *argv[])
 	else
 		ConfigServerHide.links_disabled = 1;
 
-	if(ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
-	{
-		rb_init_prng(ConfigFileEntry.egdpool_path, RB_PRNG_EGD);
-	}
-	else
-		rb_init_prng(NULL, RB_PRNG_DEFAULT);
-	seed_random(NULL);
+	rb_init_prng(NULL, RB_PRNG_DEFAULT);
 
 	init_main_logfile(logFileName);
 	init_hash();
@@ -672,9 +620,8 @@ ratbox_main(int argc, char *argv[])
 	initwhowas();
 	init_hook();
 	init_reject();
-	init_cache();
 	init_monitor();
-	init_isupport();
+
 #ifdef STATIC_MODULES
 	load_static_modules();
 #else
@@ -686,10 +633,13 @@ ratbox_main(int argc, char *argv[])
 
 	load_conf_settings();
 	if(ServerInfo.bandb_path == NULL)
-	        ServerInfo.bandb_path = rb_strdup(DBPATH);
+		ServerInfo.bandb_path = rb_strdup(DBPATH);
 
 	init_bandb();
 	rehash_bans(0);
+
+	init_cache();
+
 
 #ifndef STATIC_MODULES
 	mod_add_path(MODULE_DIR);
@@ -719,7 +669,7 @@ ratbox_main(int argc, char *argv[])
 	strcpy(me.id, ServerInfo.sid);
 	init_uid();
 
-	/* serverinfo{} description must exist.  If not, error out. */
+	/* serverinfo{} description must exist.	 If not, error out. */
 	if(ServerInfo.description == NULL)
 	{
 		fprintf(stderr, "ERROR: No server description specified in serverinfo block.\n");
@@ -728,29 +678,18 @@ ratbox_main(int argc, char *argv[])
 	}
 	rb_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
 
-	if(ServerInfo.ssl_cert != NULL && ServerInfo.ssl_private_key != NULL)
-	{
-		/* just do the rb_setup_ssl_server to validate the config */
-		if(!rb_setup_ssl_server
-		   (ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params))
-		{
-			ilog(L_MAIN, "WARNING: Unable to setup SSL.");
-			ircd_ssl_ok = 0;
-		}
-		else
-			ircd_ssl_ok = 1;
-	}
-
 	if(testing_conf)
 	{
 		exit(conf_parse_failure ? 1 : 0);
 	}
 
+	init_isupport();
+
 	me.from = &me;
 	me.servptr = &me;
 	SetMe(&me);
 	make_server(&me);
-	startup_time = rb_time();
+	startup_time = rb_current_time();
 	add_to_hash(HASH_CLIENT, me.name, &me);
 	add_to_hash(HASH_ID, me.id, &me);
 
@@ -765,17 +704,73 @@ ratbox_main(int argc, char *argv[])
 
 	/* We want try_connections to be called as soon as possible now! -- adrian */
 	/* No, 'cause after a restart it would cause all sorts of nick collides */
-	/* um.  by waiting even longer, that just means we have even *more*
+	/* um.	by waiting even longer, that just means we have even *more*
 	 * nick collisions.  what a stupid idea. set an event for the IO loop --fl
 	 */
 	rb_event_addish("try_connections", try_connections, NULL, STARTUP_CONNECTIONS_TIME);
 	rb_event_addonce("try_connections_startup", try_connections, NULL, 2);
 	rb_event_add("check_rehash", check_rehash, NULL, 3);
-	rb_event_addish("reseed_srand", seed_random, NULL, 300);	/* reseed every 10 minutes */
 
 	if(splitmode)
 		rb_event_add("check_splitmode", check_splitmode, NULL, 5);
 
 	rb_lib_loop(0);		/* we'll never return from here */
-	return 0;
+}
+
+void
+restart(const char *mesg)
+{
+	static bool was_here = false;	/* redundant due to restarting flag below */
+
+	if(was_here == true)
+		abort();
+	was_here = true;
+
+	ilog(L_MAIN, "Restarting Server because: %s, memory data limit: %ld", mesg, get_maxrss());
+
+	server_reboot();
+}
+
+void
+server_reboot(void)
+{
+	char path[PATH_MAX + 1];
+
+	sendto_realops_flags(UMODE_ALL, L_ALL, "Restarting server...");
+
+	ilog(L_MAIN, "Restarting server...");
+
+	/* set all the signal handlers to a dummy */
+	setup_reboot_signals();
+	/*
+	 * XXX we used to call flush_connections() here. But since this routine
+	 * doesn't exist anymore, we won't be flushing. This is ok, since 
+	 * when close handlers come into existance, rb_close() will be called
+	 * below, and the data flushing will be implicit.
+	 *    -- adrian
+	 *
+	 * bah, for now, the program ain't coming back to here, so forcibly
+	 * close everything the "wrong" way for now, and just LEAVE...
+	 */
+#ifndef _WIN32
+	int i;
+	for(i = 0; i < maxconnections; ++i)
+		close(i);
+#endif
+
+	unlink(pidFileName);
+#ifndef _WIN32
+	int fd = open("/dev/null", O_RDWR);
+	dup2(fd, 0);
+	dup2(fd, 1);
+	dup2(fd, 2);
+#endif
+
+	execv(SPATH, (void *)myargv);
+
+	/* use this if execv of SPATH fails */
+	snprintf(path, sizeof(path), "%s/bin/ircd", ConfigFileEntry.dpath);
+
+	execv(path, (void *)myargv);
+	exit(-1);
 }

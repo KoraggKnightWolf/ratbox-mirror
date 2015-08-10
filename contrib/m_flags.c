@@ -35,7 +35,6 @@
 #include "ratbox_lib.h"
 #include "struct.h"
 #include "client.h"
-#include "common.h"
 #include "ircd.h"
 #include "match.h"
 #include "numeric.h"
@@ -56,14 +55,19 @@ static char *unset_flags_to_string(struct Client *client_p);
 
 
 struct Message test_msgtab = {
-	"FLAGS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_flags, 0}, {m_flags, 0}, mg_ignore, mg_ignore, {mo_flags, 0}}
+	.cmd = "FLAGS", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { .handler = m_flags },
+	.handlers[RCLIENT_HANDLER] =            { .handler = m_flags },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_flags },
 };
 
 
-mapi_clist_av2 test_clist[] = { &test_msgtab, NULL };
+mapi_clist_av1 test_clist[] = { &test_msgtab, NULL };
 
-DECLARE_MODULE_AV2(test, NULL, NULL, test_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(test, NULL, NULL, test_clist, NULL, NULL, "$Revision$");
 
 
 /* FLAGS requires it's own mini parser, since the last parameter in it can
@@ -134,6 +138,7 @@ static struct FlagTable flag_table[] = {
 
 /*
 ** m_flags
+**      parv[0] = sender prefix
 **      parv[1] = parameter
 */
 static int
@@ -152,9 +157,9 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 		 ** and send it to the user
 		 */
 		sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
-			   me.name, source_p->name, set_flags_to_string(source_p));
+			   me.name, parv[0], set_flags_to_string(source_p));
 		sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
-			   me.name, source_p->name, unset_flags_to_string(source_p));
+			   me.name, parv[0], unset_flags_to_string(source_p));
 		return 1;
 	}
 
@@ -191,9 +196,9 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 				else
 					source_p->umodes &= ~FL_ALL_USER_FLAGS;
 				sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
-					   me.name, source_p->name, set_flags_to_string(source_p));
+					   me.name, parv[0], set_flags_to_string(source_p));
 				sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
-					   me.name, source_p->name, unset_flags_to_string(source_p));
+					   me.name, parv[0], unset_flags_to_string(source_p));
 				send_umode_out(client_p, source_p, setflags);
 				return 1;
 			}
@@ -216,7 +221,7 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 			 */
 			if(!isgood)
 				sendto_one(source_p, ":%s NOTICE %s :Invalid FLAGS: %s (IGNORING)",
-					   me.name, source_p->name, flag);
+					   me.name, parv[0], flag);
 		}
 	}
 
@@ -224,9 +229,9 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 	 ** telling what flags they have and what flags they are missing
 	 */
 	sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
-		   me.name, source_p->name, set_flags_to_string(source_p));
+		   me.name, parv[0], set_flags_to_string(source_p));
 	sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
-		   me.name, source_p->name, unset_flags_to_string(source_p));
+		   me.name, parv[0], unset_flags_to_string(source_p));
 
 	send_umode_out(client_p, source_p, setflags);
 	return 0;
@@ -234,6 +239,7 @@ m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 /*
 ** mo_flags
+**      parv[0] = sender prefix
 **      parv[1] = parameter
 */
 static int
@@ -252,9 +258,9 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 		 ** and send it to the user
 		 */
 		sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
-			   me.name, source_p->name, set_flags_to_string(source_p));
+			   me.name, parv[0], set_flags_to_string(source_p));
 		sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
-			   me.name, source_p->name, unset_flags_to_string(source_p));
+			   me.name, parv[0], unset_flags_to_string(source_p));
 		return 1;
 	}
 
@@ -291,9 +297,9 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 				else
 					source_p->umodes &= ~FL_ALL_OPER_FLAGS;
 				sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
-					   me.name, source_p->name, set_flags_to_string(source_p));
+					   me.name, parv[0], set_flags_to_string(source_p));
 				sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
-					   me.name, source_p->name, unset_flags_to_string(source_p));
+					   me.name, parv[0], unset_flags_to_string(source_p));
 				send_umode_out(client_p, source_p, setflags);
 				return 1;
 			}
@@ -304,7 +310,7 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 				{
 					sendto_one(source_p,
 						   ":%s NOTICE %s :*** You need oper and N flag for +n",
-						   me.name, source_p->name);
+						   me.name, parv[0]);
 					continue;
 				}
 				if(isadd)
@@ -320,7 +326,7 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 				{
 					sendto_one(source_p,
 						   ":%s NOTICE %s :*** You need oper and operwall flag for +z",
-						   me.name, source_p->name);
+						   me.name, parv[0]);
 					continue;
 				}
 				if(isadd)
@@ -349,7 +355,7 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 			 */
 			if(!isgood)
 				sendto_one(source_p, ":%s NOTICE %s :Invalid FLAGS: %s (IGNORING)",
-					   me.name, source_p->name, flag);
+					   me.name, parv[0], flag);
 		}
 	}
 
@@ -357,9 +363,9 @@ mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char 
 	 ** telling what flags they have and what flags they are missing
 	 */
 	sendto_one(source_p, ":%s NOTICE %s :Current flags:%s",
-		   me.name, source_p->name, set_flags_to_string(source_p));
+		   me.name, parv[0], set_flags_to_string(source_p));
 	sendto_one(source_p, ":%s NOTICE %s :Current missing flags:%s",
-		   me.name, source_p->name, unset_flags_to_string(source_p));
+		   me.name, parv[0], unset_flags_to_string(source_p));
 
 	send_umode_out(client_p, source_p, setflags);
 	return 0;
@@ -369,10 +375,10 @@ static char *
 set_flags_to_string(struct Client *client_p)
 {
 	/* XXX - list all flags that we have set on the client */
-	static char setflags[BUFSIZE + 1];
+	static char setflags[IRCD_BUFSIZE + 1];
 	int i;
 
-	/* Clear it to begin with, we'll be doing a lot of rb_sprintf's */
+	/* Clear it to begin with, we'll be doing a lot of sprintf's */
 	setflags[0] = '\0';
 
 	/* Unlike unset_flags_to_string(), we don't have to care about oper
@@ -381,14 +387,14 @@ set_flags_to_string(struct Client *client_p)
 
 	if(client_p->umodes & UMODE_OPERWALL)
 	{
-		rb_sprintf(setflags, "%s %s", setflags, "OWALLOPS");
+		sprintf(setflags, "%s %s", setflags, "OWALLOPS");
 	}
 
 	for(i = 0; flag_table[i].name; i++)
 	{
 		if(client_p->umodes & flag_table[i].mode)
 		{
-			rb_sprintf(setflags, "%s %s", setflags, flag_table[i].name);
+			sprintf(setflags, "%s %s", setflags, flag_table[i].name);
 		}
 	}
 
@@ -401,7 +407,7 @@ set_flags_to_string(struct Client *client_p)
 		 */
 		if(client_p->umodes & UMODE_NCHANGE)
 		{
-			rb_sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
+			sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
 		}
 #if 0
 	}
@@ -415,10 +421,10 @@ unset_flags_to_string(struct Client *client_p)
 {
 	/* Inverse of above */
 	/* XXX - list all flags that we do NOT have set on the client */
-	static char setflags[BUFSIZE + 1];
+	static char setflags[IRCD_BUFSIZE + 1];
 	int i, isoper;
 
-	/* Clear it to begin with, we'll be doing a lot of rb_sprintf's */
+	/* Clear it to begin with, we'll be doing a lot of sprintf's */
 	setflags[0] = '\0';
 
 	if(IsOper(client_p))
@@ -430,7 +436,7 @@ unset_flags_to_string(struct Client *client_p)
 	{
 		if(!(client_p->umodes & UMODE_OPERWALL))
 		{
-			rb_sprintf(setflags, "%s %s", setflags, "OWALLOPS");
+			sprintf(setflags, "%s %s", setflags, "OWALLOPS");
 		}
 	}
 
@@ -440,7 +446,7 @@ unset_flags_to_string(struct Client *client_p)
 		{
 			if(!isoper && flag_table[i].oper)
 				continue;
-			rb_sprintf(setflags, "%s %s", setflags, flag_table[i].name);
+			sprintf(setflags, "%s %s", setflags, flag_table[i].name);
 		}
 	}
 
@@ -448,7 +454,7 @@ unset_flags_to_string(struct Client *client_p)
 	{
 		if(!(client_p->umodes & UMODE_NCHANGE))
 		{
-			rb_sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
+			sprintf(setflags, "%s %s", setflags, "NICKCHANGES");
 		}
 	}
 

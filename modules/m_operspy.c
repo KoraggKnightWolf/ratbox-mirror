@@ -41,13 +41,19 @@ static int ms_operspy(struct Client *client_p, struct Client *source_p,
 		      int parc, const char *parv[]);
 
 struct Message operspy_msgtab = {
-	"OPERSPY", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {ms_operspy, 2}, mg_ignore}
+	.cmd = "OPERSPY", 
+
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = ms_operspy, .min_para = 2 },
+	.handlers[OPER_HANDLER] =		{  mm_ignore },
 };
 
-mapi_clist_av2 operspy_clist[] = { &operspy_msgtab, NULL };
+mapi_clist_av1 operspy_clist[] = { &operspy_msgtab, NULL };
 
-DECLARE_MODULE_AV2(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision$");
 
 /* ms_operspy()
  *
@@ -57,7 +63,7 @@ DECLARE_MODULE_AV2(operspy, NULL, NULL, operspy_clist, NULL, NULL, "$Revision$")
 static int
 ms_operspy(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	static char buffer[BUFSIZE];
+	char buffer[IRCD_BUFSIZE];
 	char *ptr;
 	int cur_len = 0;
 	int len, i;
@@ -76,10 +82,10 @@ ms_operspy(struct Client *client_p, struct Client *source_p, int parc, const cha
 		{
 			len = strlen(parv[i]) + 1;
 
-			if((size_t)(cur_len + len) >= sizeof(buffer))
+			if((size_t) (cur_len + len) >= sizeof(buffer))
 				return 0;
 
-			rb_snprintf(ptr, sizeof(buffer) - cur_len, "%s ", parv[i]);
+			snprintf(ptr, sizeof(buffer) - cur_len, "%s ", parv[i]);
 			ptr += len;
 			cur_len += len;
 		}

@@ -1,323 +1,4672 @@
-dubkat      2015/01/26 03:58:47 UTC	(20150126_0-27570)
+androsyn    2015/08/10 19:47:37 UTC	(20150810_6-28539)
   Log:
-  fixed some bad grammar and vagueness in help text
+  second half of module changes
 
   Modified:
-	ircd-ratbox/trunk/help/opers/umode (File Modified) 
-	ircd-ratbox/trunk/help/users/umode (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
 
 
-dubkat      2015/01/16 06:52:56 UTC	(20150116_2-27568)
+androsyn    2015/08/10 19:42:54 UTC	(20150810_5-28537)
   Log:
-  rerun autoconf to reflect configure.ac changes
+  remove dead code
 
   Modified:
-	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
 
 
-dubkat      2015/01/16 06:44:14 UTC	(20150116_1-27562)
+androsyn    2015/08/10 19:36:57 UTC	(20150810_4-28535)
   Log:
-  add -fstack-protector-strong if supported by gcc (gcc >= 4.9)
+  convert module code to use rb_dlink_list instead of a hand rolled array
 
   Modified:
-	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/modules.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
 
 
-dubkat      2015/01/16 02:04:10 UTC	(20150116_0-27560)
+androsyn    2015/08/10 18:59:28 UTC	(20150810_3-28533)
   Log:
-  Update to SQLite 3.8.7.4. 
-  Incorporating changes from 2012-01-16 to 2014-12-09
+  use memmove for overlapping memory
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+
+
+androsyn    2015/08/10 18:49:18 UTC	(20150810_2-28531)
+  Log:
+  free rbl lists correctly
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+
+
+androsyn    2015/08/10 17:02:12 UTC	(20150810_1-28527)
+  Log:
+  fix missing )
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/08/10 16:47:30 UTC	(20150810_0-28525)
+  Log:
+  change back to comment
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/08/07 17:30:54 UTC	(20150807_7-28523)
+  Log:
+  fix formatting
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+
+
+androsyn    2015/08/07 16:17:10 UTC	(20150807_6-28521)
+  Log:
+  don't leak an rb_ssl_ctx when parsing the config
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+
+
+androsyn    2015/08/07 16:16:51 UTC	(20150807_5-28519)
+  Log:
+  fix example config
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+
+
+androsyn    2015/08/07 12:49:52 UTC	(20150807_4-28515)
+  Log:
+  fix double free that resulted from a half of a code cleanup
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/08/07 03:53:11 UTC	(20150807_3-28513)
+  Log:
+  cleanup the rest of the fprintfs
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+
+
+androsyn    2015/08/07 03:46:23 UTC	(20150807_2-28511)
+  Log:
+  no you are match_other_answer
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+
+
+androsyn    2015/08/07 03:46:04 UTC	(20150807_1-28509)
+  Log:
+  remove some fprintfs and generally tidy up
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+
+
+androsyn    2015/08/07 03:37:31 UTC	(20150807_0-28507)
+  Log:
+  More RBL related changes.
+  
+  Delay the exit of RBL banned clients by generalizing the delayed exit code from the reject cache.
+  REHASH seems to work now and update the RBL lists etc
   
 
   Modified:
-	ircd-ratbox/trunk/bandb/sqlite3/shell.c (File Modified) 
-	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.c (File Modified) 
-	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_auth.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/reject.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
 
 
-jilles      2013/06/15 20:05:22 UTC	(20130615_0-27457)
+androsyn    2015/08/06 17:16:39 UTC	(20150806_9-28505)
   Log:
-  m_info: Correct description of general::client_exit like in example confs.
+  make delayed_exit_time configurable from ircd.conf
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/reject.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/reject.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+
+
+androsyn    2015/08/06 17:10:20 UTC	(20150806_8-28503)
+  Log:
+  update example.conf to reflex the new blacklist conifg
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+
+
+androsyn    2015/08/06 16:39:52 UTC	(20150806_7-28501)
+  Log:
+  More RBL related changes.  Also add delayed exiting for RBL banned clients
   
-  Reported by:	jackal
   
 
   Modified:
-	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/client.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/reject.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_auth.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/reject.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
 
 
-jilles      2013/05/15 21:26:01 UTC	(20130515_0-27455)
+androsyn    2015/08/06 16:38:55 UTC	(20150806_6-28499)
   Log:
-  example confs: Correct description of general::client_exit.
+  remove fprintf debugging
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/resolver.c (File Modified) 
+
+
+androsyn    2015/08/06 03:35:41 UTC	(20150806_5-28497)
+  Log:
+  add update make
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+
+
+androsyn    2015/08/06 03:35:22 UTC	(20150806_4-28495)
+  Log:
+  let me just borrow this here file from charbydis as well
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ipv4_from_ipv6.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ipv4_from_ipv6.c (File Added) 
+
+
+androsyn    2015/08/06 03:16:39 UTC	(20150806_3-28493)
+  Log:
+  Add substitution.c
   
-  It prefixes with "Quit: ", not "Client exit: ".
+  Thanks to the charybdis guys and neonlod in particular for writing some rather handy code :)
+  
   
 
   Modified:
-	ircd-ratbox/trunk/doc/example.conf (File Modified) 
-	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/substitution.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/substitution.c (File Added) 
 
 
-jilles      2013/04/06 20:35:06 UTC	(20130406_0-27453)
+androsyn    2015/08/06 02:51:35 UTC	(20150806_2-28491)
   Log:
-  Suppress compiler warning about const on parv array.
+  handle longer hostnames to deal with rbls
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/res.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/res.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/reslib.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+
+
+androsyn    2015/08/06 02:45:00 UTC	(20150806_1-28489)
+  Log:
+  rbl function name cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_auth.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+
+
+androsyn    2015/08/06 02:43:39 UTC	(20150806_0-28487)
+  Log:
+  check if handler is NULL for a module, use m_ignore instead of dereferencing a null pointer
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+
+
+androsyn    2015/08/05 20:41:34 UTC	(20150805_0-28485)
+  Log:
+  First pass at RBL support.  RBL checks seem to work, there is still a lot of debugging to go here though
   
 
   Modified:
-	ircd-ratbox/trunk/src/parse.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/client.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/dns.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_auth.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/resolver.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/dns.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
 
 
-jilles      2013/03/23 15:16:25 UTC	(20130323_0-27451)
+androsyn    2015/08/03 16:07:59 UTC	(20150803_0-28483)
   Log:
-  Always send ERR_NICKCOLLISION to a user that will be killed.
-  
-  There was one situation with a nick change collision where
-  ERR_NICKCOLLISION was sent to the user that would not be killed
-  instead of to the user that would be killed.
-  
-  Reported by:	jackal
+  initialize the rest of the handlers
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_reportssl.c (File Modified) 
+
+
+androsyn    2015/08/02 18:40:52 UTC	(20150802_0-28481)
+  Log:
+  fix end of whowas formatting
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/31 19:08:10 UTC	(20150731_3-28477)
+  Log:
+  fix typo on install-data-local
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.in (File Modified) 
+
+
+androsyn    2015/07/31 18:46:18 UTC	(20150731_2-28475)
+  Log:
+  bleh..fix namespace conflicts on mingw
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/getaddrinfo.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/getaddrinfo.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/getnameinfo.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/getnameinfo.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/reslib.c (File Modified) 
+
+
+androsyn    2015/07/31 16:55:04 UTC	(20150731_1-28465)
+  Log:
+  update the stable tree related info. i'll figure out what to do with trunk soon
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/SVN-Access (File Modified) 
+
+
+androsyn    2015/07/31 15:51:16 UTC	(20150731_0-28463)
+  Log:
+  update libltdl
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/aclocal.m4 (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/compile (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/depcomp (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/install-sh (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/missing (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/ylwrap (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/configure (File Modified) 
+
+
+androsyn    2015/07/29 19:02:42 UTC	(20150729_4-28459)
+  Log:
+  oops fix merge issue
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+
+
+androsyn    2015/07/29 19:01:22 UTC	(20150729_3-28457)
+  Log:
+  fix configure
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/07/29 18:50:50 UTC	(20150729_2-28453)
+  Log:
+  add cygwin to have_win
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/07/29 18:24:44 UTC	(20150729_1-28451)
+  Log:
+  Fix oper_motd_path
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+
+
+androsyn    2015/07/29 17:44:03 UTC	(20150729_0-28449)
+  Log:
+  fix a missing ;
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+
+
+androsyn    2015/07/28 20:21:12 UTC	(20150728_8-28447)
+  Log:
+  fix memset swap error
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/mkpasswd.c (File Modified) 
+
+
+androsyn    2015/07/28 19:46:49 UTC	(20150728_7-28445)
+  Log:
+  i hate autoconf
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/aclocal.m4 (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/dlopen.Plo (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/libltdlc_la-preopen.Plo (File Modified) 
+
+
+androsyn    2015/07/28 19:42:36 UTC	(20150728_6-28443)
+  Log:
+  fix RBTT_FMT for mingw
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/stdinc.h (File Modified) 
+
+
+androsyn    2015/07/28 19:11:30 UTC	(20150728_5-28441)
+  Log:
+  add back rb_inet_pton
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/resolver.c (File Modified) 
+
+
+androsyn    2015/07/28 18:37:20 UTC	(20150728_4-28435)
+  Log:
+  continue to include rb_inet_ntop as well
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+
+
+androsyn    2015/07/28 18:19:49 UTC	(20150728_3-28431)
+  Log:
+  change inet_pton to rb_inet_pton
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/match.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+
+
+androsyn    2015/07/28 17:29:58 UTC	(20150728_2-28421)
+  Log:
+  cast ptr->data to struct Channel
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/07/28 16:48:08 UTC	(20150728_1-28419)
+  Log:
+  update sqlite3
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/shell.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/sqlite3.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/sqlite3.h (File Modified) 
+
+
+androsyn    2015/07/28 16:45:55 UTC	(20150728_0-28417)
+  Log:
+  Fix building/not building libltdl if its installed or not
   
 
   Modified:
-	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/aclocal.m4 (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/help/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
 
 
-androsyn    2013/01/02 00:57:42 UTC	(20130102_0-27429)
+androsyn    2015/07/27 03:10:58 UTC	(20150727_3-28415)
   Log:
-  fix CAPAB parameter count bug
+  err nm
 
   Modified:
-	ircd-ratbox/trunk/modules/m_capab.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
 
 
-jilles      2012/05/27 13:01:16 UTC	(20120527_0-27397)
+androsyn    2015/07/27 03:10:10 UTC	(20150727_2-28413)
   Log:
-  Fix typo, reported by Scott MacDonald.
+  further allocation increases
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/27 03:07:47 UTC	(20150727_1-28411)
+  Log:
+  no really, we don't need to default everyones ssld to use select
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/27 03:05:22 UTC	(20150727_0-28409)
+  Log:
+  use larger size for SO_SNDBUF for the unix sockets for ssld
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/26 22:52:44 UTC	(20150726_6-28403)
+  Log:
+  fix sslproc too
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/07/26 22:47:53 UTC	(20150726_5-28401)
+  Log:
+  rework generating the K command for ssld
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/07/26 21:45:00 UTC	(20150726_4-28399)
+  Log:
+  use some of our new string handling functions
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/26 20:05:09 UTC	(20150726_3-28395)
+  Log:
+  rework ssld setup handling a little bit
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/26 07:01:22 UTC	(20150726_2-28393)
+  Log:
+  move bandb_del_letter up higher into the file and make it const char as well
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+
+
+androsyn    2015/07/26 06:58:12 UTC	(20150726_1-28391)
+  Log:
+  odd, bandb_letter was not const char
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+
+
+androsyn    2015/07/26 06:46:45 UTC	(20150726_0-28389)
+  Log:
+  close everything but fd 0-2 for now in ssld, but actually close everything else
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/24 19:25:52 UTC	(20150724_6-28385)
+  Log:
+  remove unneeded code to test the ssl setup, it gets tested in newconf.c
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+
+
+androsyn    2015/07/24 19:25:36 UTC	(20150724_5-28383)
+  Log:
+  minor cleanup
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+
+
+androsyn    2015/07/24 19:24:42 UTC	(20150724_4-28381)
+  Log:
+  use sizeof(readBuf) instead of READBUF_SIZE directly
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/packet.c (File Modified) 
+
+
+androsyn    2015/07/24 18:26:09 UTC	(20150724_3-28379)
+  Log:
+  fix printf style formatting warnings on 32bit freebsd
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+
+
+androsyn    2015/07/24 18:11:56 UTC	(20150724_2-28377)
+  Log:
+  add m_reportssl.c to contrib
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_reportssl.c (File Added) 
+
+
+androsyn    2015/07/24 18:01:46 UTC	(20150724_1-28375)
+  Log:
+  fix formatting
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_mallinfo.c (File Modified) 
+
+
+androsyn    2015/07/24 17:51:19 UTC	(20150724_0-28373)
+  Log:
+  add m_mallinfo.c to get malloc arena info on gnu libc systems. does not get built by default
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_mallinfo.c (File Added) 
+
+
+androsyn    2015/07/21 17:37:12 UTC	(20150721_0-28353)
+  Log:
+  remove static variables from rsdb_sqlite3 and pass a pointer down through for the sqlite3 database "connection"
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_sqlite3.c (File Modified) 
+
+
+androsyn    2015/07/17 17:58:04 UTC	(20150717_5-28351)
+  Log:
+  Of all of the interfaces to emulate, clicap_find uses the strtok model? Yikes.  Convert clicap_find to at least use a strtok_r model
   
 
   Modified:
-	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
 
 
-androsyn    2012/04/15 21:46:11 UTC	(20120415_0-27393)
+androsyn    2015/07/17 17:30:31 UTC	(20150717_4-28349)
   Log:
-  fix sizeof() typo
+  well i think that static char really needed to be there...
 
   Modified:
-	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
 
 
-dubkat      2012/03/16 06:09:33 UTC	(20120316_1-27373)
+androsyn    2015/07/17 03:49:04 UTC	(20150717_3-28347)
+  Log:
+  handle not having a ca cert correctly
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/17 03:48:46 UTC	(20150717_2-28345)
+  Log:
+  increment patchlevel
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/patchlevel.h (File Modified) 
+
+
+androsyn    2015/07/17 02:04:08 UTC	(20150717_1-28343)
+  Log:
+  remove debug fprintfs
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/17 01:55:09 UTC	(20150717_0-28341)
+  Log:
+  collect certfp, we don't do anything with it yet
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/16 20:23:12 UTC	(20150716_12-28335)
+  Log:
+  fix tls_min_version handling
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+
+
+androsyn    2015/07/16 20:10:25 UTC	(20150716_11-28333)
+  Log:
+  actually load the ca certificate
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/sslproc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/16 19:45:04 UTC	(20150716_10-28327)
+  Log:
+  display cipher string in whois a bit differently
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+
+
+androsyn    2015/07/16 18:54:17 UTC	(20150716_9-28323)
+  Log:
+  report TLS version on server connection/stats ?
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_serv.c (File Modified) 
+
+
+androsyn    2015/07/16 18:53:59 UTC	(20150716_8-28321)
+  Log:
+  actually send the cipher
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/16 18:27:28 UTC	(20150716_7-28317)
+  Log:
+  complete rb_ssl*sctx to rb_ssl*ctx change
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/16 18:01:11 UTC	(20150716_6-28309)
+  Log:
+  support setting minimum TLS version
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/sslproc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/16 18:00:22 UTC	(20150716_5-28307)
+  Log:
+  update example.conf for new tls stuff
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+
+
+androsyn    2015/07/16 08:03:12 UTC	(20150716_4-28305)
+  Log:
+  more ssl api related cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/16 04:31:50 UTC	(20150716_3-28299)
+  Log:
+  lets do the math right and let them handshake at least once more
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/16 04:25:34 UTC	(20150716_2-28297)
+  Log:
+  rework ssl handshake detection
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/16 01:38:38 UTC	(20150716_1-28293)
+  Log:
+  remove an unneeded if block
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_sqlite3.c (File Modified) 
+
+
+androsyn    2015/07/16 01:34:26 UTC	(20150716_0-28291)
+  Log:
+  adjust handshake flood parameters
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/15 21:00:47 UTC	(20150715_14-28289)
+  Log:
+  make bantool use unquoted %Qs
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+
+
+androsyn    2015/07/15 20:56:45 UTC	(20150715_13-28287)
+  Log:
+  Make bandb use the sqlite3_vsnprintf formatter to format the exec strings, this supports the %Q modifier, making life so muche asier...
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_sqlite3.c (File Modified) 
+
+
+androsyn    2015/07/15 20:31:10 UTC	(20150715_12-28285)
+  Log:
+  add a missing line feed
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/bandb_defs.h (File Modified) 
+
+
+androsyn    2015/07/15 19:53:29 UTC	(20150715_11-28283)
+  Log:
+  fix formatting
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+
+
+androsyn    2015/07/15 19:53:11 UTC	(20150715_10-28281)
+  Log:
+  fix rehashing ssl
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/07/15 18:51:10 UTC	(20150715_9-28279)
+  Log:
+  use RBTT_FMT for connected times
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/07/15 18:33:39 UTC	(20150715_8-28275)
+  Log:
+  fix the time_t formatting clusterfsck
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/stdinc.h (File Modified) 
+
+
+androsyn    2015/07/15 16:55:03 UTC	(20150715_7-28273)
+  Log:
+  more type cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/15 16:49:39 UTC	(20150715_6-28271)
+  Log:
+  have level be signed
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/07/15 16:49:24 UTC	(20150715_5-28269)
+  Log:
+  Fix compile error
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+
+
+androsyn    2015/07/15 16:48:03 UTC	(20150715_4-28267)
+  Log:
+  more minor cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/15 16:39:48 UTC	(20150715_3-28265)
+  Log:
+  use ssize_t and uintptr_t in a few spots
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/15 01:46:39 UTC	(20150715_2-28261)
+  Log:
+  make toofast like everything else
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+
+
+androsyn    2015/07/15 01:44:25 UTC	(20150715_1-28259)
+  Log:
+  add bandb_defs.h
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/bandb_defs.h (File Added) 
+
+
+androsyn    2015/07/15 01:34:41 UTC	(20150715_0-28257)
+  Log:
+  use ptrdiff_t for have
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/14 18:22:16 UTC	(20150714_6-28255)
+  Log:
+  use uintptr_t for doing pointer math
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/07/14 18:08:10 UTC	(20150714_5-28253)
+  Log:
+  use sizeof(listener->addr)
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+
+
+androsyn    2015/07/14 18:06:49 UTC	(20150714_4-28251)
+  Log:
+  rb_init_rawbuffers has been removed
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/14 17:26:07 UTC	(20150714_3-28243)
+  Log:
+  Add support for setting ecdh parameters.  Disable support for SSLv3 and TLS compression as well
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/sslproc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/14 16:17:03 UTC	(20150714_2-28233)
+  Log:
+  finish up the merge of BUFSIZE/IRCD_BUFSIZE
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_sqlite3.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd_defs.h (File Modified) 
+
+
+androsyn    2015/07/14 16:16:46 UTC	(20150714_1-28231)
+  Log:
+  make contrib compile
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_flags.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_force.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_mkpasswd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_okick.c (File Modified) 
+
+
+androsyn    2015/07/14 15:42:43 UTC	(20150714_0-28229)
+  Log:
+  move bandb_type enums into a common file that can be included in both bandb/bandb.c and src/bandbi.c
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/bandbi.h (File Modified) 
+
+
+androsyn    2015/07/13 17:17:07 UTC	(20150713_0-28223)
+  Log:
+  Remove srand/rand crap
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+
+
+androsyn    2015/07/11 02:02:45 UTC	(20150711_1-28221)
+  Log:
+  remove unnecessary breaks
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+
+
+androsyn    2015/07/11 01:59:06 UTC	(20150711_0-28219)
+  Log:
+  have entity flags use an enum.
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+
+
+androsyn    2015/07/10 17:59:41 UTC	(20150710_24-28217)
+  Log:
+  add guard defines for stdinc.h
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/stdinc.h (File Modified) 
+
+
+androsyn    2015/07/10 17:58:39 UTC	(20150710_23-28215)
+  Log:
+  missed a FALSE
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+
+
+androsyn    2015/07/10 17:49:53 UTC	(20150710_22-28209)
+  Log:
+  How many ways to we need to have #defines for YES/TRUE/1 etc...use C99 true/false for these...
+  
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd_defs.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/match.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_user.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_who.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_lexer.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_lexer.l (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/match.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+
+
+androsyn    2015/07/10 17:34:10 UTC	(20150710_21-28207)
+  Log:
+  Cleanup BUFSIZE/IRCD_BUFSIZE.  I'm not sure why both BUFSIZE and IRCD_BUFSIZE were defined, so we'll just use IRCD_BUFSIZE for all.
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/common.h (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd_defs.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/stdinc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_kick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_encap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ison.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_knock.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_map.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_operspy.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_restart.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_services.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_userhost.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/cache.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/match.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_log.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_serv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+
+
+androsyn    2015/07/10 17:33:35 UTC	(20150710_20-28205)
+  Log:
+  change was_here to bool
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+
+
+androsyn    2015/07/10 17:22:17 UTC	(20150710_19-28203)
+  Log:
+  replace some instances of a magic value of 512 with IRCD_BUFSIZE as these were likely set to match
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_log.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+
+
+androsyn    2015/07/10 17:18:27 UTC	(20150710_18-28201)
+  Log:
+  Wow..report_error() is a really, really terrible function.  Remove it and replace it with sendto_realops_flags/ilog in the approriate places
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_log.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_log.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_serv.c (File Modified) 
+
+
+androsyn    2015/07/10 16:46:29 UTC	(20150710_17-28199)
+  Log:
+  use designated initializers for bandb_add_letter
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+
+
+androsyn    2015/07/10 16:40:23 UTC	(20150710_16-28197)
+  Log:
+  mark several functions with noreturn
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_die.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_signal.c (File Modified) 
+
+
+androsyn    2015/07/10 16:40:00 UTC	(20150710_15-28195)
+  Log:
+  remove unused flag
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd_getopt.h (File Modified) 
+
+
+androsyn    2015/07/10 16:39:35 UTC	(20150710_14-28193)
+  Log:
+  comment out unused defines
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/class.c (File Modified) 
+
+
+androsyn    2015/07/10 16:39:03 UTC	(20150710_13-28191)
+  Log:
+  remove dead code
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/getopt.c (File Modified) 
+
+
+androsyn    2015/07/10 16:38:19 UTC	(20150710_12-28189)
+  Log:
+  set nicklen to UNSET instead of a magic -1
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+
+
+androsyn    2015/07/10 16:37:56 UTC	(20150710_11-28187)
+  Log:
+  remove unused LOG_BUFSIZE
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+
+
+androsyn    2015/07/10 16:37:35 UTC	(20150710_10-28185)
+  Log:
+  allocate start_zlib_session buffer from heap
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/07/10 04:44:49 UTC	(20150710_9-28183)
+  Log:
+  commit the include file too
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+
+
+androsyn    2015/07/10 04:44:28 UTC	(20150710_8-28181)
+  Log:
+  use an enum for verify_access reasons instead of defines
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+
+
+androsyn    2015/07/10 04:43:40 UTC	(20150710_7-28179)
+  Log:
+  init some more variables
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
+
+
+androsyn    2015/07/10 04:43:14 UTC	(20150710_6-28177)
+  Log:
+  remove unused macro
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+
+
+androsyn    2015/07/10 04:42:54 UTC	(20150710_5-28175)
+  Log:
+  add RB_noreturn and use it in bandbi
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd_defs.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+
+
+androsyn    2015/07/10 04:42:03 UTC	(20150710_4-28173)
+  Log:
+  init arglen for sanity sake
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+
+
+androsyn    2015/07/10 03:56:59 UTC	(20150710_3-28167)
+  Log:
+  init cmintime/tmintime
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+
+
+androsyn    2015/07/10 03:49:45 UTC	(20150710_2-28165)
+  Log:
+  more rb_inet_pton removal
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/resolver.c (File Modified) 
+
+
+androsyn    2015/07/10 03:31:38 UTC	(20150710_1-28159)
+  Log:
+  remove remains of rb_inet_pton..it is 2015, we can rely on rb_inet_pton.  There are no vax left out there anymore
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/CIDR.txt (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/Hybrid-team (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/old/CIDR.txt (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/old/Hybrid-team (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/match.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+
+
+androsyn    2015/07/10 03:31:08 UTC	(20150710_0-28157)
+  Log:
+  format cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+
+
+androsyn    2015/07/08 18:43:34 UTC	(20150708_3-28153)
+  Log:
+  one more sendto_one_numeric change
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_who.c (File Modified) 
+
+
+androsyn    2015/07/08 18:40:18 UTC	(20150708_2-28151)
+  Log:
+  more sendto_one_numeric conversions still...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_close.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+
+
+androsyn    2015/07/08 18:35:40 UTC	(20150708_1-28149)
+  Log:
+  yet more sendto_one_numeric conversions
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_invite.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+
+
+androsyn    2015/07/08 18:29:23 UTC	(20150708_0-28147)
+  Log:
+  more sendto_one_numeric conversions and fixups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_kick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cmessage.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_invite.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_knock.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pong.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_topic.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+
+
+androsyn    2015/07/07 16:37:00 UTC	(20150707_7-28145)
+  Log:
+  more RPL_/sendto_one_numeric changes
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_knock.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+
+
+androsyn    2015/07/07 16:16:53 UTC	(20150707_6-28143)
+  Log:
+  More sendto_one_numeric updates
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_help.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_motd.c (File Modified) 
+
+
+androsyn    2015/07/07 16:12:32 UTC	(20150707_5-28141)
+  Log:
+  fix motd formatting
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+
+
+androsyn    2015/07/07 16:08:39 UTC	(20150707_4-28139)
+  Log:
+  Update MOTD/OMOTD to use sendto_one_numeric
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/cache.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+
+
+androsyn    2015/07/07 16:00:06 UTC	(20150707_3-28137)
+  Log:
+  use size_t for the length parameter in ircncmp
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/match.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/match.c (File Modified) 
+
+
+androsyn    2015/07/07 15:51:52 UTC	(20150707_2-28135)
+  Log:
+  use ptrdiff_t when doing pointer math
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/07/07 15:47:33 UTC	(20150707_1-28133)
+  Log:
+  Update sqlite3 amalgmation
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/shell.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/sqlite3.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/sqlite3.h (File Modified) 
+
+
+androsyn    2015/07/07 15:38:34 UTC	(20150707_0-28131)
+  Log:
+  eliminate needless snprintfs as mlog can do the printf formatting just fine
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_sqlite3.c (File Modified) 
+
+
+androsyn    2015/06/23 15:02:40 UTC	(20150623_0-28127)
+  Log:
+  whitespace cleanup
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+
+
+androsyn    2015/06/10 16:53:00 UTC	(20150610_1-28125)
+  Log:
+  free who when shrinking the whowas list
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/06/10 15:50:52 UTC	(20150610_0-28123)
+  Log:
+  use rb_strlcpy instead of strcpy
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/06/04 15:35:26 UTC	(20150604_1-28121)
+  Log:
+  remove operhash_find nothing used it
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/operhash.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/operhash.c (File Modified) 
+
+
+androsyn    2015/06/04 15:28:26 UTC	(20150604_0-28119)
+  Log:
+  use sizeof(buff) not a magic value
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+
+
+androsyn    2015/05/28 01:31:21 UTC	(20150528_0-28117)
+  Log:
+  make saltChars const
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/mkpasswd.c (File Modified) 
+
+
+androsyn    2015/05/27 18:36:17 UTC	(20150527_2-28113)
+  Log:
+  check if s2 is null as well
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+
+
+androsyn    2015/05/27 17:54:16 UTC	(20150527_1-28111)
+  Log:
+  add ELIST T support
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+
+
+androsyn    2015/05/27 17:39:31 UTC	(20150527_0-28109)
+  Log:
+  store hash values in a uint32_t rather than unsigned int.  functionally its no different on most platforms
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_newconf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/whowas.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/operhash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/scache.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/26 18:29:05 UTC	(20150526_4-28107)
+  Log:
+  convert ERR_NEEDMOREPARAMS to use sendto_one_numeric
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_resv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_xline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+
+
+androsyn    2015/05/26 17:59:35 UTC	(20150526_3-28105)
+  Log:
+  detect strtoul/strtol conversion errors correctly
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+
+
+androsyn    2015/05/26 17:45:01 UTC	(20150526_2-28103)
+  Log:
+  add support for the channel creation search variant of ELIST, aka LIST C<min C>max
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+
+
+androsyn    2015/05/26 16:23:28 UTC	(20150526_1-28101)
+  Log:
+  allocate dnsBuf on the stack
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/dns.c (File Modified) 
+
+
+androsyn    2015/05/26 16:20:13 UTC	(20150526_0-28099)
+  Log:
+  style cleanup mostly. use stdbool true/false and bool type
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/05/14 02:44:15 UTC	(20150514_7-28097)
+  Log:
+  Make mkpasswd consistent with its usage of stderr and return values.  Also verify the password for the user.
+  
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/mkpasswd.c (File Modified) 
+
+
+androsyn    2015/05/14 02:21:17 UTC	(20150514_6-28095)
+  Log:
+  make client_dopacket static, like it's protoype said it was
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/packet.c (File Modified) 
+
+
+androsyn    2015/05/14 02:17:05 UTC	(20150514_5-28093)
+  Log:
+  update autoconf
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2015/05/14 02:06:47 UTC	(20150514_4-28091)
+  Log:
+  I'm pretty certain static module builds have been broken for quite a while.  Broken no more!
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/modules.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/setup.h.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/static_modules.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/static_modules.c.SH (File Modified) 
+
+
+androsyn    2015/05/14 01:31:56 UTC	(20150514_3-28089)
+  Log:
+  move whowas macros/defines into whowas.c
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/whowas.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/14 01:25:37 UTC	(20150514_2-28087)
+  Log:
+  no reason for mod_ctl to be a defined in a global scope
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/05/14 01:15:56 UTC	(20150514_1-28085)
+  Log:
+  tidy up things a little with named initializers
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+
+
+androsyn    2015/05/14 00:55:51 UTC	(20150514_0-28083)
+  Log:
+  reduce the dns table size a little
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/dns.c (File Modified) 
+
+
+androsyn    2015/05/13 17:17:07 UTC	(20150513_4-28081)
+  Log:
+  remove iodebug hooks. i never liked these anyways
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_info.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hook.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/packet.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+
+
+androsyn    2015/05/13 02:38:58 UTC	(20150513_3-28079)
+  Log:
+  comment that one should not change the bandb_type enum without making the same changes in bandb/bandb.c - i should fix this some day
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/bandbi.h (File Modified) 
+
+
+androsyn    2015/05/13 02:35:06 UTC	(20150513_2-28077)
+  Log:
+  Merge restart.c into ircd.c no reason for that code to be split from the rest of ircd.c..really
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/restart.h (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_restart.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_signal.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/restart.c (File Deleted) 
+
+
+androsyn    2015/05/13 02:32:49 UTC	(20150513_1-28075)
+  Log:
+  rebuild autoconf
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.in (File Modified) 
+
+
+androsyn    2015/05/13 02:15:47 UTC	(20150513_0-28071)
+  Log:
+  blarg..make autoconf stop shoving -O2 everywhere.  Sometimes I want to debug things damnit
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/05/12 18:04:19 UTC	(20150512_4-28065)
+  Log:
+  change struct ev_entry to rb_ev_entry
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/channel.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/res.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+
+
+androsyn    2015/05/12 17:51:17 UTC	(20150512_3-28063)
+  Log:
+  change rawbuf types to rb_rawbuf
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/05/12 17:38:19 UTC	(20150512_2-28059)
+  Log:
+  rename linebuf related structs to be prefixed with rb_
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+
+
+androsyn    2015/05/12 17:30:11 UTC	(20150512_1-28053)
+  Log:
+  get some more variables for the linebuf changes
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+
+
+androsyn    2015/05/12 17:27:40 UTC	(20150512_0-28051)
+  Log:
+  make buf_line_t and buf_head_t from linebufs be opaque structures
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/packet.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/05/08 01:34:24 UTC	(20150508_0-28043)
+  Log:
+  fix a memory leak
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/07 22:10:20 UTC	(20150507_23-28041)
+  Log:
+  useful messages
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/05/07 21:57:38 UTC	(20150507_22-28039)
+  Log:
+  fix tab
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+
+
+androsyn    2015/05/07 21:02:08 UTC	(20150507_21-28035)
+  Log:
+  don't spew ERR_NOT_REGISTERED at an unregistered server
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+
+
+androsyn    2015/05/07 21:01:20 UTC	(20150507_20-28033)
+  Log:
+  whitespace fixes
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/05/07 19:23:14 UTC	(20150507_19-28031)
+  Log:
+  get rid of the double 0x on module load
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+
+
+androsyn    2015/05/07 19:21:31 UTC	(20150507_18-28029)
+  Log:
+  Log to stderr if running the ircd in the foreground.  I am not sure why this wasn't the case previously to be honest.  
+  
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_log.c (File Modified) 
+
+
+androsyn    2015/05/07 19:11:03 UTC	(20150507_17-28027)
+  Log:
+  make current_serial static
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+
+
+androsyn    2015/05/07 19:10:52 UTC	(20150507_16-28025)
+  Log:
+  make bandb_pending static
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+
+
+androsyn    2015/05/07 19:01:16 UTC	(20150507_15-28023)
+  Log:
+  comment the who->servername pointer assignment being safe
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/07 18:51:14 UTC	(20150507_14-28021)
+  Log:
+  make whowas_list_length unsigned
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/07 17:10:44 UTC	(20150507_13-28019)
+  Log:
+  remove testing value
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/07 17:06:21 UTC	(20150507_12-28017)
+  Log:
+  make the motd and oper motd files config file configurable
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/cache.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+
+
+androsyn    2015/05/07 16:46:08 UTC	(20150507_11-28015)
+  Log:
+  some cache.c changes to make things more consistent
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/cache.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_links.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/cache.c (File Modified) 
+
+
+androsyn    2015/05/07 15:21:20 UTC	(20150507_10-28013)
+  Log:
+  change _mheader to _rb_mheader to make the symbol a little more unique and also makes it harder for old modules to be loaded by accident
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/modules.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/static_modules.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+
+
+androsyn    2015/05/07 15:20:29 UTC	(20150507_9-28011)
+  Log:
+  the %p format specifier does not need a leading 0x as it providers that
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+
+
+androsyn    2015/05/07 14:40:53 UTC	(20150507_8-28009)
+  Log:
+  add newline to the end of whowas.c
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/07 13:21:38 UTC	(20150507_7-28007)
+  Log:
+  style fixes
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/07 05:25:14 UTC	(20150507_6-28005)
+  Log:
+  use rb_strlcat instead of rb_snprintf_append when a more complex format string was not  required
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ison.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_rehash.c (File Modified) 
+
+
+androsyn    2015/05/07 05:15:53 UTC	(20150507_5-28003)
+  Log:
+  more rb_snprintf floating point cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+
+
+androsyn    2015/05/07 03:50:13 UTC	(20150507_4-28001)
+  Log:
+  change spoof flag to bool in whowas and remove the unused used flag
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/stdinc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/whowas.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/07 03:24:07 UTC	(20150507_3-27999)
+  Log:
+  report whowas memory stats again that reflect the real world
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/whowas.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/07 03:22:27 UTC	(20150507_2-27997)
+  Log:
+  i hate autotools
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+
+
+androsyn    2015/05/07 03:22:05 UTC	(20150507_1-27995)
+  Log:
+  i hate autotools
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2015/05/07 03:18:58 UTC	(20150507_0-27991)
+  Log:
+  update configure to pass -q to grep
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/05/06 17:41:50 UTC	(20150506_3-27989)
+  Log:
+  more sendto_one_numeric conversions
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+
+
+androsyn    2015/05/06 17:38:19 UTC	(20150506_2-27987)
+  Log:
+  ERR_TOOMANYTARGETS gets treated to sendto_one_numeric now
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+
+
+androsyn    2015/05/06 17:32:14 UTC	(20150506_1-27985)
+  Log:
+  allocate buffer on the stack for start_zlib_session, eliminates a very minor possibility of a memory leak on server error
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/05/06 17:28:33 UTC	(20150506_0-27983)
+  Log:
+  deal with clang being weird about flags
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	libratbox/branches/libratbox-cleanup/configure (File Modified) 
+	libratbox/branches/libratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/05/05 19:29:56 UTC	(20150505_1-27981)
+  Log:
+  use whowas_list_length instead of the testing value of 5
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/05 18:46:46 UTC	(20150505_0-27979)
+  Log:
+  make whowas history length configurable from the config file
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/whowas.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/01 03:47:52 UTC	(20150501_2-27977)
+  Log:
+  A little bit more WHOWAS changes
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/whowas.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whowas.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/05/01 03:06:28 UTC	(20150501_1-27975)
+  Log:
+  err reg/unreg get the sendto_one_numeric treatment too
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+
+
+androsyn    2015/05/01 03:05:48 UTC	(20150501_0-27973)
+  Log:
+  other half of the yy_linebuf change
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/newconf.h (File Modified) 
+
+
+androsyn    2015/04/30 21:29:32 UTC	(20150430_3-27971)
+  Log:
+  whitespace tidying
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/04/30 21:29:21 UTC	(20150430_2-27969)
+  Log:
+  change linebuf variable name in ircd_lexer from linebuf to yy_linebuf, to avoid confusion with the linebuf buffering system
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_lexer.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_lexer.l (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+
+
+androsyn    2015/04/30 21:27:23 UTC	(20150430_1-27967)
+  Log:
+  remove yyparse/linebuf references from s_conf.c
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+
+
+androsyn    2015/04/30 20:12:54 UTC	(20150430_0-27965)
+  Log:
+  WHOWAS now uses the standard rb_dlink_lists instead of handrolled lists like everything else has stopped using...
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/whowas.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whowas.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/04/29 19:24:51 UTC	(20150429_13-27963)
+  Log:
+  increment module api version..modules need to be at least recompiled
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/modules.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+
+
+androsyn    2015/04/29 19:16:54 UTC	(20150429_12-27961)
+  Log:
+  expand whitespace to hard tabs.  yes i prefer hard tabs...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/getaddrinfo.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/getnameinfo.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/res.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/reslib.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/reslist.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/resolver.c (File Modified) 
+
+
+androsyn    2015/04/29 19:15:29 UTC	(20150429_11-27959)
+  Log:
+  expand whitespace to hard tabs.  yes i prefer hard tabs...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/channel.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/class.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/client.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/common.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/config.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/defaults.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd_defs.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/match.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/modules.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/parse.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_auth.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_newconf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_serv.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_stats.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/send.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/stdinc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/whowas.h (File Modified) 
+
+
+androsyn    2015/04/29 19:13:37 UTC	(20150429_10-27953)
+  Log:
+  expand whitespace to hard tabs.  yes i prefer hard tabs...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/class.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/dns.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hook.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hostmask.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_signal.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/match.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/packet.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_log.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_serv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+
+
+androsyn    2015/04/29 19:10:38 UTC	(20150429_9-27951)
+  Log:
+  expand whitespace to hard tabs.  yes i prefer hard tabs...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_admin.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_adminwall.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_away.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_capab.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_close.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cmessage.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_connect.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_encap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_help.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_info.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_invite.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ison.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_knock.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_links.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_locops.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_lusers.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_map.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_motd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_operspy.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pass.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ping.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pong.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_post.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_restart.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_resv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_services.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_set.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_svinfo.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_tb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_time.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_topic.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_unreject.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_userhost.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_version.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_wallops.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_who.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whowas.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_xline.c (File Modified) 
+
+
+androsyn    2015/04/29 18:56:24 UTC	(20150429_8-27949)
+  Log:
+  update version.c.SH
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/version.c.SH (File Modified) 
+
+
+androsyn    2015/04/29 18:10:33 UTC	(20150429_7-27947)
+  Log:
+  make contrib compile again
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/example_module.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_42.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_clearchan.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_flags.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_force.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_mkpasswd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_ojoin.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_okick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_olist.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_opme.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_webirc.c (File Modified) 
+
+
+androsyn    2015/04/29 17:55:59 UTC	(20150429_6-27945)
+  Log:
+  MFLG_UNREG and MFLG_SLOW removal...this pretty much breaks all old modules...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/parse.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_die.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_error.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_kick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_part.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_quit.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_squit.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_admin.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_capab.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pass.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pong.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_post.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_xline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+
+
+androsyn    2015/04/29 17:27:12 UTC	(20150429_5-27943)
+  Log:
+  more MFLG_SLOW removal
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_admin.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_adminwall.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_away.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_capab.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_close.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cmessage.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_connect.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_encap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_help.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_info.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_invite.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ison.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_knock.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_links.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_locops.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_lusers.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_map.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_motd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_operspy.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pass.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pong.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_post.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_restart.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_resv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_services.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_set.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_svinfo.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_tb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_time.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_topic.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+
+
+androsyn    2015/04/29 17:24:29 UTC	(20150429_4-27941)
+  Log:
+  more struct Message fun
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_services.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_unreject.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_userhost.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_version.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_wallops.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_who.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whowas.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_xline.c (File Modified) 
+
+
+androsyn    2015/04/29 03:26:23 UTC	(20150429_3-27939)
+  Log:
+  some more struct message changes..yay...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_time.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_topic.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+
+
+androsyn    2015/04/29 02:59:31 UTC	(20150429_2-27937)
+  Log:
+  another batch of struct Message changes
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_resv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_set.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_svinfo.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_tb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+
+
+androsyn    2015/04/29 02:43:12 UTC	(20150429_1-27935)
+  Log:
+  more struct message stuff
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_locops.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_restart.c (File Modified) 
+
+
+androsyn    2015/04/29 02:42:14 UTC	(20150429_0-27933)
+  Log:
+  woops..remove that
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+
+
+androsyn    2015/04/28 19:14:51 UTC	(20150428_11-27931)
+  Log:
+  more c99 style changes to struct Messages
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_close.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_motd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_operspy.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pass.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ping.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pong.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_post.c (File Modified) 
+
+
+androsyn    2015/04/28 19:01:54 UTC	(20150428_10-27929)
+  Log:
+  more c99 style changes to struct Messages
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_knock.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_links.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_locops.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_lusers.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_map.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+
+
+androsyn    2015/04/28 18:53:34 UTC	(20150428_9-27927)
+  Log:
+  more c99 style changes to struct Messages
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_encap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_help.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_info.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_invite.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ison.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+
+
+androsyn    2015/04/28 18:25:46 UTC	(20150428_8-27925)
+  Log:
+  minor cleanups in notify_banned_client.  get rid of the mess of static const chars etc
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/04/28 15:05:19 UTC	(20150428_7-27923)
+  Log:
+  make the unknown_list timeout use connect_timeout..i think that makes sense
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/04/28 03:43:45 UTC	(20150428_6-27921)
+  Log:
+  more struct Message modernization
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_admin.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_adminwall.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_away.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_capab.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_close.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cmessage.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_connect.c (File Modified) 
+
+
+androsyn    2015/04/28 03:25:39 UTC	(20150428_5-27919)
+  Log:
+  no need to set count/rcount/bytes now. it will be zeroed and we dont need to rely on position of the struct
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/example_module.c (File Modified) 
+
+
+androsyn    2015/04/28 03:19:14 UTC	(20150428_4-27917)
+  Log:
+  convert a few modules to use c99 struct initialization
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_admin.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_adminwall.c (File Modified) 
+
+
+androsyn    2015/04/28 03:02:09 UTC	(20150428_3-27915)
+  Log:
+  initialize struct Message with c99 type named initializers
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/parse.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+
+
+androsyn    2015/04/28 03:01:33 UTC	(20150428_2-27913)
+  Log:
+  initialize struct Message with c99 type named initializers
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/example_module.c (File Modified) 
+
+
+androsyn    2015/04/28 02:19:22 UTC	(20150428_1-27911)
+  Log:
+  whitespace cleanup
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/packet.c (File Modified) 
+
+
+androsyn    2015/04/28 02:18:12 UTC	(20150428_0-27909)
+  Log:
+  remove unnecessary cast
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_kill.c (File Modified) 
+
+
+androsyn    2015/04/22 03:04:36 UTC	(20150422_0-27903)
+  Log:
+  Fix Id property
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/help/Makefile.am (File Modified) (Property Modified)
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gungline.c (File Modified) (Property Modified)
+
+
+androsyn    2015/04/18 05:23:16 UTC	(20150418_5-27895)
+  Log:
+  yay autotools...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/setup.h.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2015/04/18 05:20:22 UTC	(20150418_4-27893)
+  Log:
+  add id tags
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.am (File Modified) (Property Modified)
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.am (File Modified) (Property Modified)
+
+
+androsyn    2015/04/18 04:37:31 UTC	(20150418_3-27891)
+  Log:
+  only set keywords id on Makefile.am
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.am  (Property Modified)
+
+
+androsyn    2015/04/18 04:35:06 UTC	(20150418_2-27889)
+  Log:
+  id tags for contrib makefile stuff
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+
+
+androsyn    2015/04/18 01:45:56 UTC	(20150418_1-27887)
+  Log:
+  update the helpful help message that resolver gives when you run it directly ;)
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/resolver.c (File Modified) 
+
+
+androsyn    2015/04/18 01:43:24 UTC	(20150418_0-27885)
+  Log:
+  got a few more missing Id tags
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/bandbi.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/operhash.h (File Modified) 
+
+
+androsyn    2015/04/17 17:29:43 UTC	(20150417_0-27881)
+  Log:
+  update INSTALL from jackal@EFnet
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/INSTALL (File Modified) 
+
+
+androsyn    2015/04/10 18:43:50 UTC	(20150410_4-27879)
+  Log:
+  check for ssl_cipher_list == NULL
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/04/10 18:30:49 UTC	(20150410_3-27877)
+  Log:
+  more indent fun
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_away.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_encap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_info.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_invite.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_knock.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_links.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_map.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_operspy.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pong.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_services.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_set.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_svinfo.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_topic.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_userhost.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_version.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_who.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whowas.c (File Modified) 
+
+
+androsyn    2015/04/10 18:08:24 UTC	(20150410_2-27865)
+  Log:
+  make_and_lookup to rb_make_and_lookup changes
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/sslproc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/reject.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_newconf.c (File Modified) 
+
+
+androsyn    2015/04/10 18:06:02 UTC	(20150410_1-27859)
+  Log:
+  run through indent
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/cache.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/dns.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/getopt.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hook.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hostmask.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_signal.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/match.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/packet.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/reject.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_log.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_serv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/scache.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/whowas.c (File Modified) 
+
+
+androsyn    2015/04/10 17:41:44 UTC	(20150410_0-27857)
+  Log:
+  comment removal
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+
+
+androsyn    2015/04/09 01:19:08 UTC	(20150409_1-27845)
+  Log:
+  topic gets the sendto_one_numeric stuff too
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_topic.c (File Modified) 
+
+
+androsyn    2015/04/09 01:10:13 UTC	(20150409_0-27843)
+  Log:
+  get ERR_TOOMANYMATCHES and RPL_LIST using _numeric stuff
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_who.c (File Modified) 
+
+
+androsyn    2015/04/08 21:07:51 UTC	(20150408_23-27841)
+  Log:
+  tabomatic!
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+
+
+androsyn    2015/04/08 21:04:49 UTC	(20150408_22-27839)
+  Log:
+  RPL RPL my eyeballs...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_who.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whowas.c (File Modified) 
+
+
+androsyn    2015/04/08 20:34:57 UTC	(20150408_21-27837)
+  Log:
+  more sendto_one_numeric stuff..make ison even more sane
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ison.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+
+
+androsyn    2015/04/08 20:23:04 UTC	(20150408_20-27835)
+  Log:
+  Merge messages.h/numeric.h comment the format strings with their RPL/ERR versions
+  
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+
+
+androsyn    2015/04/08 19:03:17 UTC	(20150408_19-27833)
+  Log:
+  ERR_NOPRIVS gets the sendto_one_numeric way
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_die.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_squit.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_adminwall.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_connect.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_restart.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_resv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_set.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_wallops.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_xline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+
+
+androsyn    2015/04/08 18:46:53 UTC	(20150408_18-27831)
+  Log:
+  accept gets the sendto_one_numeric treatment as well
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+
+
+androsyn    2015/04/08 18:41:54 UTC	(20150408_17-27829)
+  Log:
+  make RPL_LOAD2HI use sendto_one_numeric as well
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_admin.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_help.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_info.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_lusers.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_motd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_version.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_who.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whowas.c (File Modified) 
+
+
+androsyn    2015/04/08 18:35:46 UTC	(20150408_16-27827)
+  Log:
+  have sendto_one_numeric deal with unregistered clients correctly
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+
+
+androsyn    2015/04/08 18:25:47 UTC	(20150408_15-27825)
+  Log:
+  more sendto_one_numeric conversions
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_admin.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_map.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+
+
+androsyn    2015/04/08 18:17:58 UTC	(20150408_14-27823)
+  Log:
+  convert 001-004 to use sendto_one_numeric
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+
+
+androsyn    2015/04/08 18:12:23 UTC	(20150408_13-27821)
+  Log:
+  convert away/unaway to use sendto_one_numeric
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_away.c (File Modified) 
+
+
+androsyn    2015/04/08 18:03:00 UTC	(20150408_12-27819)
+  Log:
+  really should have the type cast from void here too
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+
+
+androsyn    2015/04/08 18:02:31 UTC	(20150408_11-27817)
+  Log:
+  formatting cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+
+
+androsyn    2015/04/08 17:41:15 UTC	(20150408_10-27815)
+  Log:
+  change a few sprintfs to snprintfs
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+
+
+androsyn    2015/04/08 15:34:20 UTC	(20150408_9-27811)
+  Log:
+  get rid of intermediate buffer for floating point formatting, rb_snprintf is gone..we use a normal libc snprintf now
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+
+
+androsyn    2015/04/08 15:32:17 UTC	(20150408_8-27809)
+  Log:
+  erm..we require snprintf with c99 now
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+
+
+androsyn    2015/04/08 15:31:36 UTC	(20150408_7-27807)
+  Log:
+  erm..we require snprintf with c99 now
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+
+
+androsyn    2015/04/08 15:28:00 UTC	(20150408_6-27805)
+  Log:
+  fix formatting
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_newconf.c (File Modified) 
+
+
+androsyn    2015/04/08 15:27:27 UTC	(20150408_5-27803)
+  Log:
+  fix formatting
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+
+
+androsyn    2015/04/08 05:54:53 UTC	(20150408_4-27801)
+  Log:
+  remove dead prototype
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/04/08 05:54:22 UTC	(20150408_3-27799)
+  Log:
+  get rid of init_prng code
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/04/08 05:49:59 UTC	(20150408_2-27797)
+  Log:
+  introduce connection ids in struct client for tracking zip stats with ssld.  we can have more than one session associated with ssld if we're using both zip and ssl...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/hash.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/04/08 05:47:45 UTC	(20150408_1-27795)
+  Log:
+  remove change_connid code
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/04/08 05:09:17 UTC	(20150408_0-27793)
+  Log:
+  simplify some code
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+
+
+androsyn    2015/04/04 01:52:39 UTC	(20150404_0-27791)
+  Log:
+  revert change connid stuff for now...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/04/03 23:18:02 UTC	(20150403_5-27789)
+  Log:
+  Remove generated file
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config.h (File Deleted) 
+
+
+androsyn    2015/04/03 23:17:26 UTC	(20150403_4-27787)
+  Log:
+  remove connid change code in the ircd side too...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/04/03 23:14:24 UTC	(20150403_3-27785)
+  Log:
+  remove change connid code and some other minor cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/04/03 21:12:00 UTC	(20150403_2-27783)
+  Log:
+  more %Q cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb.h (File Modified) 
+
+
+androsyn    2015/04/03 21:04:42 UTC	(20150403_1-27781)
+  Log:
+  get rid of rs_snprintf, replace instances that were using %Q with rsdb_quote(via a few macros)
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_snprintf.c (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_sqlite3.c (File Modified) 
+
+
+androsyn    2015/04/03 20:11:44 UTC	(20150403_0-27779)
+  Log:
+  remove traces of NICKNAMEHISTORYLENGTH from configure and move it back to include/config.h nobody cares about adjusting this anyways...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/config.h (File Modified) 
+
+
+androsyn    2015/03/31 17:34:19 UTC	(20150331_3-27767)
+  Log:
+  stop exporting ndTable and add functions in hash.c to make up for it
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/hash.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_newconf.c (File Modified) 
+
+
+androsyn    2015/03/31 17:16:00 UTC	(20150331_2-27765)
+  Log:
+  use CLI_CONNID_MAX for the connid table size
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+
+
+androsyn    2015/03/31 17:12:13 UTC	(20150331_1-27763)
+  Log:
+  i\'m not sure config.h.dist is needed anymore. nobody edits config.h by hand for the most part now
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/config.h.dist (File Deleted) 
+
+
+androsyn    2015/03/31 17:10:07 UTC	(20150331_0-27761)
+  Log:
+  change connid to be uint32_t and fix an issue with ssl_cipher_list being unset
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/sslproc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/03/29 17:21:51 UTC	(20150329_8-27759)
+  Log:
+  arg..missed client.c
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/03/29 17:21:35 UTC	(20150329_7-27757)
+  Log:
+  update hash.h too
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/hash.h (File Modified) 
+
+
+androsyn    2015/03/29 17:17:16 UTC	(20150329_6-27755)
+  Log:
+  connid is signed, using abs() before hashing
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+
+
+androsyn    2015/03/29 03:08:16 UTC	(20150329_5-27753)
+  Log:
+  get rid of small net remainders
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/03/29 03:06:13 UTC	(20150329_4-27751)
+  Log:
+  maybe not on -Wstack-protector
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	libratbox/branches/libratbox-cleanup/configure (File Modified) 
+	libratbox/branches/libratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/03/29 02:48:32 UTC	(20150329_3-27747)
+  Log:
+  Tweak some cflags detection
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/03/29 02:41:41 UTC	(20150329_2-27745)
+  Log:
+  move rb_set_time to earlier in the code
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+
+
+androsyn    2015/03/29 00:24:57 UTC	(20150329_1-27742)
+  Log:
+  Generate connection ids to pass to ssld instead of using file descriptors
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/hash.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_serv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/03/29 00:24:21 UTC	(20150329_0-27740)
+  Log:
+  remove a pointless macro in configure
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/03/28 21:18:02 UTC	(20150328_17-27734)
+  Log:
+  introduce s_RPL macro do replace instances of "RPL_WHOISOPERATOR, form_str(RPL_WHOISOPERATOR) with s_RPL(RPL_WHOISOPERATOR) for example
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_info.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_invite.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_links.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_time.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_userhost.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_version.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+
+
+androsyn    2015/03/28 20:56:50 UTC	(20150328_16-27732)
+  Log:
+  remove scratch float formatting. this is no longer needed since we use OS provided snprintf now
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_map.c (File Modified) 
+
+
+androsyn    2015/03/28 20:56:19 UTC	(20150328_15-27730)
+  Log:
+  use form_str
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_userhost.c (File Modified) 
+
+
+androsyn    2015/03/28 20:50:34 UTC	(20150328_14-27728)
+  Log:
+  more static char removals
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+
+
+androsyn    2015/03/28 20:49:47 UTC	(20150328_13-27726)
+  Log:
+  more static char removals
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+
+
+androsyn    2015/03/28 20:48:42 UTC	(20150328_12-27724)
+  Log:
+  make confopts const char as it should be
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_version.c (File Modified) 
+
+
+androsyn    2015/03/28 20:48:18 UTC	(20150328_11-27722)
+  Log:
+  remove NICKLEN remnants from configure
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+
+
+androsyn    2015/03/28 20:37:00 UTC	(20150328_10-27720)
+  Log:
+  wow..userhost was all sorts of brain damaged.  refactor into something resembling sane code
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_userhost.c (File Modified) 
+
+
+androsyn    2015/03/28 20:36:19 UTC	(20150328_9-27718)
+  Log:
+  yay autotools
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+
+
+androsyn    2015/03/28 20:35:57 UTC	(20150328_8-27716)
+  Log:
+  make accept compile
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+
+
+androsyn    2015/03/28 18:33:47 UTC	(20150328_7-27714)
+  Log:
+  ergh..more manual string building removal.  i think this code is right ;)
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+
+
+androsyn    2015/03/28 17:58:09 UTC	(20150328_6-27712)
+  Log:
+  cleanup the mess that was ison by using rb_snprintf_append
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ison.c (File Modified) 
+
+
+androsyn    2015/03/28 17:44:32 UTC	(20150328_5-27710)
+  Log:
+  de-sprintf m_stats.c and remove another static char buf...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+
+
+androsyn    2015/03/28 17:39:39 UTC	(20150328_4-27708)
+  Log:
+  more unnecessary static chars
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_user.c (File Modified) 
+
+
+androsyn    2015/03/28 17:38:40 UTC	(20150328_3-27706)
+  Log:
+  more unnecessary static chars
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_operspy.c (File Modified) 
+
+
+androsyn    2015/03/28 17:36:05 UTC	(20150328_2-27704)
+  Log:
+  i\'m not sure why these were static char either
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
+
+
+androsyn    2015/03/28 17:32:25 UTC	(20150328_1-27702)
+  Log:
+  again, more buffers that can be on the stack
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+
+
+androsyn    2015/03/28 17:30:35 UTC	(20150328_0-27700)
+  Log:
+  sure we can allocate 1k off the stack these days
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ison.c (File Modified) 
+
+
+androsyn    2015/03/27 22:40:26 UTC	(20150327_0-27698)
+  Log:
+  remove IDLETIME from set
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/help/opers/set (File Modified) 
+
+
+androsyn    2015/03/23 15:47:47 UTC	(20150323_0-27696)
+  Log:
+  where did that space come from
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+
+
+androsyn    2015/03/21 00:33:15 UTC	(20150321_1-27694)
+  Log:
+  remove more static char allocations that aren't necessary
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+
+
+androsyn    2015/03/21 00:30:27 UTC	(20150321_0-27692)
+  Log:
+  really stack allocation is okay
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/packet.c (File Modified) 
+
+
+androsyn    2015/03/20 18:59:26 UTC	(20150320_10-27690)
+  Log:
+  fix formatting
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/03/20 18:57:47 UTC	(20150320_9-27688)
+  Log:
+  make sqlite3 detection work as well as the local build of sqlite3
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/help/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2015/03/20 16:10:51 UTC	(20150320_8-27686)
+  Log:
+  check argument counts for zipstats
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/03/20 16:10:27 UTC	(20150320_7-27684)
+  Log:
+  dead assignment removal
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/03/20 15:44:57 UTC	(20150320_6-27682)
+  Log:
+  remove unused initializations
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/03/20 03:18:32 UTC	(20150320_5-27680)
+  Log:
+  more unused variables
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+
+
+androsyn    2015/03/20 03:07:03 UTC	(20150320_4-27678)
+  Log:
+  nothing really uses the return value of make_user so stop returning it
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/client.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/03/20 00:37:52 UTC	(20150320_3-27676)
+  Log:
+  remove pointless variable and unused initialization
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+
+
+androsyn    2015/03/20 00:37:15 UTC	(20150320_2-27674)
+  Log:
+  calculate bans a bit more accurately
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+
+
+androsyn    2015/03/20 00:26:14 UTC	(20150320_1-27672)
+  Log:
+  more useless variables
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+
+
+androsyn    2015/03/20 00:24:03 UTC	(20150320_0-27670)
+  Log:
+  remove unused variable
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+
+
+androsyn    2015/03/19 23:43:34 UTC	(20150319_3-27668)
+  Log:
+  yay autotools!
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_parser.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_parser.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2015/03/19 23:43:15 UTC	(20150319_2-27666)
+  Log:
+  change type to size_t and remove a useless assignment
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/hash.c (File Modified) 
+
+
+androsyn    2015/03/19 23:17:00 UTC	(20150319_1-27664)
+  Log:
+  remove CONFIG_RATBOX_LEVEL_3 stuff. nobody edits the .h file anymore
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/client.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/config.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/defaults.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd_defs.h (File Modified) 
+
+
+androsyn    2015/03/19 23:16:33 UTC	(20150319_0-27662)
+  Log:
+  declare prototypes
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/03/17 02:20:33 UTC	(20150317_0-27660)
+  Log:
+  use named initializers for HeaderMessages
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+
+
+androsyn    2015/03/16 01:18:22 UTC	(20150316_0-27656)
+  Log:
+  commit the printable_name changes for the header too
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/listener.h (File Modified) 
+
+
+androsyn    2015/03/15 02:54:18 UTC	(20150315_6-27654)
+  Log:
+  more static allocation cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+
+
+androsyn    2015/03/15 02:34:00 UTC	(20150315_5-27652)
+  Log:
+  lets initialize printable_name to NULL for good measure
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+
+
+androsyn    2015/03/15 02:24:34 UTC	(20150315_4-27650)
+  Log:
+  have get_listener_name return a cached malloc()ed buffer instead of a static buffer
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+
+
+androsyn    2015/03/15 02:11:53 UTC	(20150315_3-27648)
+  Log:
+  revert last change..turns out we do
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+
+
+androsyn    2015/03/15 02:08:05 UTC	(20150315_2-27646)
+  Log:
+  surely we don't need to allocate everything static these days
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+
+
+androsyn    2015/03/15 01:33:03 UTC	(20150315_1-27644)
+  Log:
+  remove commented out blockheap code
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+
+
+androsyn    2015/03/15 01:32:39 UTC	(20150315_0-27642)
+  Log:
+  fix memory stats in client.c
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+
+
+androsyn    2015/03/12 22:06:16 UTC	(20150312_5-27638)
+  Log:
+  add new sqlite version
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/shell.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/sqlite3.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/sqlite3.h (File Modified) 
+
+
+androsyn    2015/03/12 22:01:06 UTC	(20150312_4-27636)
+  Log:
+  remove references to egd
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.efnet.conf (File Modified) 
+
+
+androsyn    2015/03/12 22:00:36 UTC	(20150312_3-27634)
+  Log:
+  fix isupport display issues
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+
+
+androsyn    2015/03/12 21:04:56 UTC	(20150312_2-27632)
+  Log:
+  remove egd
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/03/12 20:57:27 UTC	(20150312_1-27630)
+  Log:
+  add support for ssl_cipher_list
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/sslproc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2015/03/12 20:56:36 UTC	(20150312_0-27626)
+  Log:
+  remove some generated files that shouldn't be in svn
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config.log (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config.status (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libtool (File Deleted) 
+
+
+androsyn    2015/03/09 22:25:01 UTC	(20150309_15-27624)
+  Log:
+  remove old comment
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/03/09 22:24:28 UTC	(20150309_14-27622)
+  Log:
+  make nul const
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+
+
+androsyn    2015/03/09 22:16:58 UTC	(20150309_13-27620)
+  Log:
+  use pkg-config for sqlite3 as well
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/RELNOTES (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/aclocal.m4 (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/help/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2015/03/09 21:56:26 UTC	(20150309_12-27616)
+  Log:
+  update config.sub
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/config.sub (File Modified) 
+
+
+androsyn    2015/03/09 21:43:42 UTC	(20150309_11-27612)
+  Log:
+  update ylwarp..
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/ylwrap (File Added) 
+
+
+androsyn    2015/03/09 20:34:19 UTC	(20150309_10-27602)
+  Log:
+  rerun configure
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.in (File Modified) 
+
+
+androsyn    2015/03/09 20:33:24 UTC	(20150309_9-27600)
+  Log:
+  apply log earlier patch from debian
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_log.c (File Modified) 
+
+
+androsyn    2015/03/09 20:29:59 UTC	(20150309_8-27598)
+  Log:
+  add crypt null pointer reference patch from debian
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/mkpasswd.c (File Modified) 
+
+
+androsyn    2015/03/09 20:22:30 UTC	(20150309_7-27592)
+  Log:
+  Update autoconf.
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/aclocal.m4 (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/help/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/setup.h.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config.log (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2015/03/09 20:20:53 UTC	(20150309_6-27589)
+  Log:
+  update propset
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/  (Property Modified)
+
+
+androsyn    2015/03/09 20:20:25 UTC	(20150309_5-27587)
+  Log:
+  update propset
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/  (Property Modified)
+
+
+androsyn    2015/03/09 20:06:54 UTC	(20150309_4-27585)
+  Log:
+  cleanup libltdl
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/autom4te.cache/ (File Deleted) 
+
+
+androsyn    2015/03/09 20:00:29 UTC	(20150309_3-27583)
+  Log:
+  readd libltdl
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/ (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/COPYING.LIB (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.am (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/Makefile.in (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/README (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/aclocal.m4 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/argz.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/argz_.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/autom4te.cache/ (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/autom4te.cache/output.0 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/autom4te.cache/output.1 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/autom4te.cache/requests (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/autom4te.cache/traces.0 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/autom4te.cache/traces.1 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/ (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/compile (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/config.guess (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/config.sub (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/depcomp (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/install-sh (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/ltmain.sh (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config/missing (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config-h.in (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config.log (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/config.status (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/configure (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/configure.ac (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/ (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/lt__alloc.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/lt__dirent.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/lt__glibc.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/lt__private.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/lt__strl.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/lt_dlloader.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/lt_error.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/lt_system.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libltdl/slist.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/libtool (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/ (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/ (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/dld_link.Plo (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/dlopen.Plo (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/dyld.Plo (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/libltdl_la-preopen.Plo (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/libltdlc_la-preopen.Plo (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/load_add_on.Plo (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/loadlibrary.Plo (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/.deps/shl_load.Plo (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/dld_link.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/dlopen.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/dyld.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/load_add_on.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/loadlibrary.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/preopen.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/loaders/shl_load.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/lt__alloc.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/lt__dirent.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/lt__strl.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/lt_dlloader.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/lt_error.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/ltdl.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/ltdl.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/m4/ (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/m4/argz.m4 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/m4/libtool.m4 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/m4/ltdl.m4 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/m4/ltoptions.m4 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/m4/ltsugar.m4 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/m4/ltversion.m4 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/m4/lt~obsolete.m4 (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/slist.c (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/stamp-h1 (File Added) 
+
+
+androsyn    2015/03/09 20:00:00 UTC	(20150309_2-27581)
+  Log:
+  fix type conversion issues
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_svinfo.c (File Modified) 
+
+
+androsyn    2015/03/09 19:59:48 UTC	(20150309_1-27579)
+  Log:
+  revert last change
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+
+
+androsyn    2015/03/09 18:51:38 UTC	(20150309_0-27577)
+  Log:
+  remove libltdl
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/aclocal.m4 (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/help/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/setup.h.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/ (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/packet.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2015/03/04 22:30:45 UTC	(20150304_2-27575)
+  Log:
+  move init_isupport down a bit
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+
+
+androsyn    2015/03/04 21:01:11 UTC	(20150304_1-27573)
+  Log:
+  runtime nicklen change support
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd_defs.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/setup.h.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+
+
+androsyn    2015/03/04 20:22:21 UTC	(20150304_0-27572)
+  Log:
+  some type cleanups and modernization
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/cache.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/channel.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/class.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/client.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/dns.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/hash.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/listener.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/monitor.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/parse.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_auth.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_gline.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_log.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_newconf.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_stats.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_user.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/send.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/struct.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_invite.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/cache.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/dns.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_lexer.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_lexer.l (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2014/09/04 16:27:40 UTC	(20140904_2-27558)
+  Log:
+  more static variable cleanup
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2014/09/04 16:22:06 UTC	(20140904_1-27556)
+  Log:
+  some global/static variable cleanups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_sqlite3.c (File Modified) 
+
+
+androsyn    2014/09/04 15:59:18 UTC	(20140904_0-27554)
+  Log:
+  use parsed nick in whois ERR_NOSUCHNICK and and RPL_ENDOFWHOIS if commas are passed - we only handle one nick on whois anyways
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+
+
+androsyn    2014/08/07 16:53:48 UTC	(20140807_0-27552)
+  Log:
+  remove redundant (void)s
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_close.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_xline.c (File Modified) 
+
+
+androsyn    2014/08/05 19:42:00 UTC	(20140805_14-27542)
+  Log:
+  Regenerate lexer/parser files for in-tree
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_lexer.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_parser.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_parser.h (File Modified) 
+
+
+androsyn    2014/08/05 19:10:59 UTC	(20140805_13-27540)
+  Log:
+  More sizeof(time_t) > sizeof(long) cleanups
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_tb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+
+
+androsyn    2014/08/05 18:53:52 UTC	(20140805_12-27538)
+  Log:
+  fixup services too
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_services.c (File Modified) 
+
+
+androsyn    2014/08/05 18:48:21 UTC	(20140805_11-27536)
+  Log:
+  get rid of some more (long) casts on time_t
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+
+
+androsyn    2014/08/05 18:44:11 UTC	(20140805_10-27534)
+  Log:
+  correctly fix formats
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_svinfo.c (File Modified) 
+
+
+androsyn    2014/08/05 18:40:54 UTC	(20140805_9-27532)
+  Log:
+  I think these are all of the time_t == 64 and long == 32 printf type issues.
+  This *should* fix openbsd 5.5 on 32bit now
+  
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/stdinc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_svinfo.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+
+
+androsyn    2014/08/05 18:38:00 UTC	(20140805_8-27530)
+  Log:
+  fix typo
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_parser.y (File Modified) 
+
+
+androsyn    2014/08/05 16:39:47 UTC	(20140805_7-27520)
+  Log:
+  quiet you...
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_sqlite3.c (File Modified) 
+
+
+androsyn    2014/08/05 16:38:56 UTC	(20140805_6-27518)
+  Log:
+  Update sqlite3 amalgamation
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/shell.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/sqlite3.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/sqlite3.h (File Modified) 
+
+
+androsyn    2014/08/05 16:34:52 UTC	(20140805_5-27516)
+  Log:
+  add m_webirc to makefile
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+
+
+androsyn    2014/08/05 16:28:03 UTC	(20140805_4-27514)
+  Log:
+  pass AM_CFLAGS too
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+
+
+androsyn    2014/08/05 16:22:59 UTC	(20140805_3-27512)
+  Log:
+  tweak contrib build flags
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+
+
+androsyn    2014/08/05 16:18:59 UTC	(20140805_2-27510)
+  Log:
+  Update automake copied addons
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/compile (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/config.guess (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/config.sub (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/depcomp (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/install-sh (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/missing (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/mkinstalldirs (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ylwrap (File Modified) 
+
+
+androsyn    2014/08/05 16:17:00 UTC	(20140805_1-27508)
+  Log:
+  change INCLUDES to AM_CPPFLAGS in Makefile.am files
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2014/08/05 16:16:32 UTC	(20140805_0-27506)
+  Log:
+  Make everything compile in contrib at least...
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_flags.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_force.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/m_okick.c (File Modified) 
+
+
+androsyn    2014/08/04 21:08:18 UTC	(20140804_9-27504)
+  Log:
+  RBTT_FMT svinfo
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_svinfo.c (File Modified) 
+
+
+androsyn    2014/08/04 21:03:51 UTC	(20140804_8-27502)
+  Log:
+  fix time_t formatting for whois idle at least..
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/setup.h.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/stdinc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+
+
+androsyn    2014/08/04 20:22:18 UTC	(20140804_7-27500)
+  Log:
+  format string fixups
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/ircd.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/messages.h (File Added) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/s_serv.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_pong.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_serv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2014/08/04 19:46:58 UTC	(20140804_6-27498)
+  Log:
+  suppress clangs empty loop warnings...we know this is an empty loop ;)
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/match.c (File Modified) 
+
+
+androsyn    2014/08/04 19:41:58 UTC	(20140804_5-27496)
+  Log:
+  Port messages.tab to messages.h changes from Charybdis.  Next stop..fix the 64bit time_t issues...
+  
+  
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/aclocal.m4 (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/configure.ac (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/help/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/setup.h.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/stdinc.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_trace.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.am (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/messages.tab (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/numeric.c (File Deleted) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/tools/Makefile.in (File Modified) 
+
+
+androsyn    2014/08/04 18:49:55 UTC	(20140804_4-27494)
+  Log:
+  fix compiler warning
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/reslib.c (File Modified) 
+
+
+androsyn    2014/08/04 18:18:49 UTC	(20140804_3-27490)
+  Log:
+  backport r27451 - Always send ERR_NICKCOLLISION to a user that will be killed.
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+
+
+androsyn    2014/08/04 18:04:29 UTC	(20140804_2-27488)
+  Log:
+  backport r25473 fix compiler warning
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+
+
+androsyn    2014/08/04 18:03:19 UTC	(20140804_1-27486)
+  Log:
+  backport r27457 and r27455
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_info.c (File Modified) 
+
+
+androsyn    2014/08/04 17:34:18 UTC	(20140804_0-27480)
+  Log:
+  backport die notice fix
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_die.c (File Modified) 
+
+
+androsyn    2014/07/30 18:02:52 UTC	(20140730_3-27476)
+  Log:
+  get out of the business of maintaining snprintf/sprintf
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bantool.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/rsdb_sqlite3.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_quit.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_away.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_cap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_dline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_encap.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_gline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_ison.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_kline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_map.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_operspy.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_restart.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_testline.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_topic.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_userhost.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_who.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_whois.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/res.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/bandbi.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/cache.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/dns.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_lexer.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd_lexer.l (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/listener.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/modules.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/parse.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/restart.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_log.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_serv.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_user.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/send.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/supported.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2014/07/30 16:51:02 UTC	(20140730_2-27472)
+  Log:
+  remove blockheap and use rb_malloc/rb_free
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/bandb/bandb.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/include/client.h (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/libltdl/configure (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/modules/m_away.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/resolver/resolver.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/channel.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/client.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/monitor.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_auth.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/src/s_newconf.c (File Modified) 
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ssld/ssld.c (File Modified) 
+
+
+androsyn    2014/07/30 15:51:08 UTC	(20140730_1-27466)
+  Log:
+  update external
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/  (Property Modified)
+
+
+androsyn    2014/07/30 15:49:21 UTC	(20140730_0-27464)
+  Log:
+  branch libratbox-cleanup second try
+
+  Modified:
+	ircd-ratbox/branches/ircd-ratbox-cleanup/ (File Added) 
+
+
+androsyn    2013/01/28 23:38:59 UTC	(20130128_0-27433)
+  Log:
+  Reject cidr masks that are too large to make sense, assume they are nonsense and skip cidr checking for these
+  
+
+  Modified:
+	ircd-ratbox/branches/RATBOX_3_0/src/match.c (File Modified) 
+
+
+androsyn    2012/12/31 21:34:15 UTC	(20121231_1-27414)
+  Log:
+  update release version
+
+  Modified:
+	ircd-ratbox/branches/RATBOX_3_0/INSTALL (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/patchlevel.h (File Modified) 
+
+
+androsyn    2012/12/31 21:31:20 UTC	(20121231_0-27412)
+  Log:
+  update relnotes
+
+  Modified:
+	ircd-ratbox/branches/RATBOX_3_0/RELNOTES (File Modified) 
+
+
+jilles      2012/05/27 13:09:42 UTC	(20120527_0-27399)
+  Log:
+  Backport trunk r27397: Fix typo, reported by Scott MacDonald.
+  
+
+  Modified:
+	ircd-ratbox/branches/RATBOX_3_0/src/ircd.c (File Modified) 
+
+
+androsyn    2012/04/15 21:41:07 UTC	(20120415_0-27391)
+  Log:
+  Fix another case of sizeof() returning the pointer size instead of the variable size
+
+  Modified:
+	ircd-ratbox/branches/RATBOX_3_0/resolver/resolver.c (File Modified) 
+
+
+dubkat      2012/03/16 23:10:29 UTC	(20120316_2-27381)
+  Log:
+  more copyright changes
+
+  Modified:
+	ircd-ratbox/branches/RATBOX_3_0/contrib/m_clearchan.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/contrib/m_force.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/contrib/m_ojoin.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/contrib/m_okick.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/contrib/m_olist.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/doc/server-version-info (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/version.c.SH (File Modified) 
+
+
+dubkat      2012/03/16 05:33:15 UTC	(20120316_1-27371)
   Log:
   House cleaning - update our copyright notices
 
   Modified:
-	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
-	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
-	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
-	ircd-ratbox/trunk/contrib/ircd-shortcut.pl (File Modified) 
-	ircd-ratbox/trunk/contrib/m_opme.c (File Modified) 
-	ircd-ratbox/trunk/contrib/m_webirc.c (File Modified) 
-	ircd-ratbox/trunk/doc/challenge.txt (File Modified) 
-	ircd-ratbox/trunk/doc/example.conf (File Modified) 
-	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
-	ircd-ratbox/trunk/doc/genssl.sh (File Modified) 
-	ircd-ratbox/trunk/include/channel.h (File Modified) 
-	ircd-ratbox/trunk/include/class.h (File Modified) 
-	ircd-ratbox/trunk/include/client.h (File Modified) 
-	ircd-ratbox/trunk/include/common.h (File Modified) 
-	ircd-ratbox/trunk/include/config.h (File Modified) 
-	ircd-ratbox/trunk/include/config.h.dist (File Modified) 
-	ircd-ratbox/trunk/include/defaults.h (File Modified) 
-	ircd-ratbox/trunk/include/dns.h (File Modified) 
-	ircd-ratbox/trunk/include/hash.h (File Modified) 
-	ircd-ratbox/trunk/include/hook.h (File Modified) 
-	ircd-ratbox/trunk/include/hostmask.h (File Modified) 
-	ircd-ratbox/trunk/include/ircd.h (File Modified) 
-	ircd-ratbox/trunk/include/ircd_defs.h (File Modified) 
-	ircd-ratbox/trunk/include/ircd_getopt.h (File Modified) 
-	ircd-ratbox/trunk/include/ircd_signal.h (File Modified) 
-	ircd-ratbox/trunk/include/listener.h (File Modified) 
-	ircd-ratbox/trunk/include/match.h (File Modified) 
-	ircd-ratbox/trunk/include/modules.h (File Modified) 
-	ircd-ratbox/trunk/include/monitor.h (File Modified) 
-	ircd-ratbox/trunk/include/numeric.h (File Modified) 
-	ircd-ratbox/trunk/include/packet.h (File Modified) 
-	ircd-ratbox/trunk/include/parse.h (File Modified) 
-	ircd-ratbox/trunk/include/patchlevel.h (File Modified) 
-	ircd-ratbox/trunk/include/reject.h (File Modified) 
-	ircd-ratbox/trunk/include/restart.h (File Modified) 
-	ircd-ratbox/trunk/include/s_auth.h (File Modified) 
-	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
-	ircd-ratbox/trunk/include/s_gline.h (File Modified) 
-	ircd-ratbox/trunk/include/s_log.h (File Modified) 
-	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
-	ircd-ratbox/trunk/include/s_serv.h (File Modified) 
-	ircd-ratbox/trunk/include/s_stats.h (File Modified) 
-	ircd-ratbox/trunk/include/s_user.h (File Modified) 
-	ircd-ratbox/trunk/include/scache.h (File Modified) 
-	ircd-ratbox/trunk/include/send.h (File Modified) 
-	ircd-ratbox/trunk/include/sslproc.h (File Modified) 
-	ircd-ratbox/trunk/include/struct.h (File Modified) 
-	ircd-ratbox/trunk/include/whowas.h (File Modified) 
-	ircd-ratbox/trunk/main.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_die.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_error.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_kick.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_kill.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_message.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_part.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_quit.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
-	ircd-ratbox/trunk/modules/core/m_squit.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_accept.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_admin.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_adminwall.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_away.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_cap.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_capab.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_close.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_cmessage.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_connect.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_encap.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_gline.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_gungline.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_help.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_invite.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_ison.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_knock.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_links.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_list.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_locops.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_lusers.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_motd.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_names.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_oper.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_operspy.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_pass.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_ping.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_pong.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_post.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_rehash.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_restart.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_resv.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_svinfo.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_tb.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_testline.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_time.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_topic.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_unreject.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_user.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_userhost.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_version.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_wallops.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_who.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_whowas.c (File Modified) 
-	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
-	ircd-ratbox/trunk/resolver/res.c (File Modified) 
-	ircd-ratbox/trunk/resolver/reslist.c (File Modified) 
-	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
-	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
-	ircd-ratbox/trunk/src/cache.c (File Modified) 
-	ircd-ratbox/trunk/src/channel.c (File Modified) 
-	ircd-ratbox/trunk/src/class.c (File Modified) 
-	ircd-ratbox/trunk/src/client.c (File Modified) 
-	ircd-ratbox/trunk/src/dns.c (File Modified) 
-	ircd-ratbox/trunk/src/getopt.c (File Modified) 
-	ircd-ratbox/trunk/src/hash.c (File Modified) 
-	ircd-ratbox/trunk/src/hook.c (File Modified) 
-	ircd-ratbox/trunk/src/hostmask.c (File Modified) 
-	ircd-ratbox/trunk/src/ircd.c (File Modified) 
-	ircd-ratbox/trunk/src/listener.c (File Modified) 
-	ircd-ratbox/trunk/src/modules.c (File Modified) 
-	ircd-ratbox/trunk/src/monitor.c (File Modified) 
-	ircd-ratbox/trunk/src/newconf.c (File Modified) 
-	ircd-ratbox/trunk/src/operhash.c (File Modified) 
-	ircd-ratbox/trunk/src/packet.c (File Modified) 
-	ircd-ratbox/trunk/src/parse.c (File Modified) 
-	ircd-ratbox/trunk/src/reject.c (File Modified) 
-	ircd-ratbox/trunk/src/restart.c (File Modified) 
-	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
-	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
-	ircd-ratbox/trunk/src/s_log.c (File Modified) 
-	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
-	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
-	ircd-ratbox/trunk/src/s_user.c (File Modified) 
-	ircd-ratbox/trunk/src/scache.c (File Modified) 
-	ircd-ratbox/trunk/src/send.c (File Modified) 
-	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
-	ircd-ratbox/trunk/src/supported.c (File Modified) 
-	ircd-ratbox/trunk/src/whowas.c (File Modified) 
-	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
-	ircd-ratbox/trunk/tools/ircd_crontab.sh.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/bandb/bandb.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/bandb/bantool.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/bandb/rsdb_sqlite3.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/contrib/ircd-shortcut.pl (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/contrib/m_opme.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/contrib/m_webirc.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/doc/challenge.txt (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/doc/genssl.sh (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/doc/ircd_crontab.sh (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/channel.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/class.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/client.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/common.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/config.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/config.h.dist (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/defaults.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/dns.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/hash.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/hook.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/hostmask.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/ircd.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/ircd_defs.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/ircd_getopt.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/ircd_signal.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/listener.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/match.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/modules.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/monitor.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/numeric.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/packet.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/parse.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/patchlevel.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/reject.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/restart.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/s_auth.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/s_conf.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/s_gline.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/s_log.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/s_newconf.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/s_serv.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/s_stats.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/s_user.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/scache.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/send.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/sslproc.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/struct.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/include/whowas.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/main.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_die.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_error.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_kick.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_part.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_quit.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/core/m_squit.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_accept.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_admin.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_adminwall.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_away.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_cap.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_capab.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_close.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_cmessage.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_connect.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_dline.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_encap.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_gline.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_help.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_info.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_invite.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_ison.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_kline.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_knock.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_links.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_list.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_locops.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_lusers.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_motd.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_names.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_oper.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_operspy.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_pass.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_ping.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_pong.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_post.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_restart.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_resv.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_services.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_set.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_stats.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_svinfo.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_tb.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_testline.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_time.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_topic.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_trace.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_unreject.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_user.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_userhost.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_version.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_wallops.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_who.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_whois.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_whowas.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/m_xline.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/resolver/res.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/resolver/reslist.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/resolver/resolver.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/bandbi.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/cache.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/channel.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/class.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/client.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/dns.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/getopt.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/hash.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/hook.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/hostmask.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/ircd.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/listener.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/modules.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/monitor.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/newconf.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/numeric.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/operhash.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/packet.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/parse.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/reject.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/restart.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/s_auth.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/s_conf.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/s_log.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/s_newconf.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/s_serv.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/s_user.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/scache.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/send.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/sslproc.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/supported.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/whowas.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/ssld/ssld.c (File Modified) 
 
 
-dubkat      2012/03/16 03:47:37 UTC	(20120316_0-27367)
+dubkat      2012/03/16 03:49:19 UTC	(20120316_0-27369)
   Log:
   Add additional documentation instructing the user that issuing a --prefix to configure is highly advised.
 
   Modified:
-	ircd-ratbox/trunk/INSTALL (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/INSTALL (File Modified) 
 
 
-jilles      2012/03/11 20:19:00 UTC	(20120311_1-27361)
+androsyn    2012/03/11 00:34:21 UTC	(20120311_1-27357)
   Log:
-  Add in ts6-protocol changes from charybdis:
-  - Mention meaning of capabs EX, IE, SERVICES, KNOCK.
-  - Add BAN and MLOCK protocols (charybdis only).
-  - Fix parameter order for RSFNC.
+  Rerun autoconf/libtoolize again...
   
 
   Modified:
-	ircd-ratbox/trunk/doc/technical/ts6-protocol.txt (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/configure (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/configure.ac (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/ltmain.sh (File Modified) 
 
 
-jilles      2012/03/11 20:07:13 UTC	(20120311_0-27359)
+androsyn    2012/03/11 00:12:06 UTC	(20120311_0-27353)
   Log:
-  Fix bad grammar in challenge help file.
-  
-  Reported by "burek".
+  Rerun autoreconf...
   
 
   Modified:
-	ircd-ratbox/trunk/help/opers/challenge (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/aclocal.m4 (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/configure (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/help/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/libltdl/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/libltdl/aclocal.m4 (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/libltdl/configure (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/modules/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/src/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/tools/Makefile.in (File Modified) 
 
 
-dubkat      2012/01/16 22:13:30 UTC	(20120116_2-27351)
+androsyn    2012/01/16 22:05:21 UTC	(20120116_2-27348)
   Log:
   test
 
   Modified:
-	ircd-ratbox/trunk/CREDITS (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/CREDITS (File Modified) 
 
 
-dubkat      2012/01/16 21:30:30 UTC	(20120116_1-27343)
+dubkat      2012/01/16 21:35:50 UTC	(20120116_1-27345)
   Log:
-  Update SQLite to version 3.7.10
-  
-  SQLite 3.7.10 release information can be read at: http://www.sqlite.org/releaselog/3_7_10.html
+  Update SQLite to 3.7.10. release information can be read at: http://www.sqlite.org/releaselog/3_7_10.html
   
   
 
   Modified:
-	ircd-ratbox/trunk/bandb/sqlite3/shell.c (File Modified) 
-	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.c (File Modified) 
-	ircd-ratbox/trunk/bandb/sqlite3/sqlite3.h (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/bandb/sqlite3/shell.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/bandb/sqlite3/sqlite3.c (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/bandb/sqlite3/sqlite3.h (File Modified) 
 
 
-dubkat      2012/01/16 05:41:50 UTC	(20120116_0-27339)
+dubkat      2012/01/16 05:43:30 UTC	(20120116_0-27341)
   Log:
   fix typo in example.conf and example.efnet.conf
   
@@ -326,6 +4675,7 @@ dubkat      2012/01/16 05:41:50 UTC	(20120116_0-27339)
   
 
   Modified:
-	ircd-ratbox/trunk/doc/example.conf (File Modified) 
-	ircd-ratbox/trunk/doc/example.efnet.conf (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/doc/example.conf (File Modified) 
+	ircd-ratbox/branches/RATBOX_3_0/doc/example.efnet.conf (File Modified) 
+
 

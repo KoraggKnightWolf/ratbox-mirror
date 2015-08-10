@@ -64,23 +64,38 @@ static int can_save(struct Client *);
 static void save_user(struct Client *, struct Client *, struct Client *);
 
 struct Message nick_msgtab = {
-	"NICK", 0, 0, 0, MFLG_SLOW,
-	{{mr_nick, 0}, {m_nick, 0}, {mc_nick, 3}, {ms_nick, 0}, mg_ignore, {m_nick, 0}}
+	.cmd = "NICK", 
+	.handlers[UNREGISTERED_HANDLER] =       { .handler = mr_nick },
+	.handlers[CLIENT_HANDLER] =             { .handler = m_nick},
+	.handlers[RCLIENT_HANDLER] =            { .handler = mc_nick, .min_para = 3 },
+	.handlers[SERVER_HANDLER] =             { .handler = ms_nick, .min_para = 8 },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = m_nick },
 };
 
 struct Message uid_msgtab = {
-	"UID", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, mg_ignore, {ms_uid, 9}, mg_ignore, mg_ignore}
+	.cmd = "UID", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_ignore },
+	.handlers[CLIENT_HANDLER] =             { mm_ignore },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { .handler = ms_uid, .min_para = 9 },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { mm_ignore },
 };
 
 struct Message save_msgtab = {
-	"SAVE", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, mg_ignore, {ms_save, 3}, mg_ignore, mg_ignore}
+	.cmd = "SAVE",
+	.handlers[UNREGISTERED_HANDLER] =       { mm_ignore },
+	.handlers[CLIENT_HANDLER] =             { mm_ignore },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { .handler = ms_save, .min_para = 3 },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { mm_ignore },
 };
 
-mapi_clist_av2 nick_clist[] = { &nick_msgtab, &uid_msgtab, &save_msgtab, NULL };
+mapi_clist_av1 nick_clist[] = { &nick_msgtab, &uid_msgtab, &save_msgtab, NULL };
 
-DECLARE_MODULE_AV2(nick, NULL, NULL, nick_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(nick, NULL, NULL, nick_clist, NULL, NULL, "$Revision$");
 
 static int change_remote_nick(struct Client *, struct Client *, time_t, const char *, int);
 
@@ -101,6 +116,7 @@ static int perform_nickchange_collides(struct Client *, struct Client *,
 				       struct Client *, time_t, const char *);
 
 /* mr_nick()
+ *       parv[0] = sender prefix
  *       parv[1] = nickname
  */
 static int
@@ -112,8 +128,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(parc < 2 || EmptyString(parv[1]) || (parv[1][0] == '~'))
 	{
-		sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
-			   me.name, EmptyString(source_p->name) ? "*" : source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_NONICKNAMEGIVEN));
 		return 0;
 	}
 
@@ -125,28 +140,25 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 		*s = '\0';
 
 	/* copy the nick and terminate it */
-	rb_strlcpy(nick, parv[1], sizeof(nick));
+	rb_strlcpy(nick, parv[1], ServerInfo.nicklen);
 
 	/* check the nickname is ok */
 	if(!clean_nick(nick, 1))
 	{
-		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME),
-			   me.name, EmptyString(source_p->name) ? "*" : source_p->name, parv[1]);
+		sendto_one_numeric(source_p, s_RPL(ERR_ERRONEUSNICKNAME), parv[1]);
 		return 0;
 	}
 
 	/* check if the nick is resv'd */
 	if(!IsExemptResv(source_p) && find_nick_resv(nick))
 	{
-		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME),
-			   me.name, EmptyString(source_p->name) ? "*" : source_p->name, nick);
+		sendto_one_numeric(source_p, s_RPL(ERR_ERRONEUSNICKNAME), nick);
 		return 0;
 	}
 
 	if(hash_find_nd(nick))
 	{
-		sendto_one(source_p, form_str(ERR_UNAVAILRESOURCE),
-			   me.name, EmptyString(source_p->name) ? "*" : source_p->name, nick);
+		sendto_one_numeric(source_p, s_RPL(ERR_UNAVAILRESOURCE), nick);
 		return 0;
 	}
 
@@ -155,12 +167,13 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	else if(source_p == target_p)
 		strcpy(source_p->user->name, nick);
 	else
-		sendto_one(source_p, form_str(ERR_NICKNAMEINUSE), me.name, "*", nick);
+		sendto_one_numeric(source_p, s_RPL(ERR_NICKNAMEINUSE), nick);
 
 	return 0;
 }
 
 /* m_nick()
+ *     parv[0] = sender prefix
  *     parv[1] = nickname
  */
 static int
@@ -172,7 +185,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(parc < 2 || EmptyString(parv[1]) || (parv[1][0] == '~'))
 	{
-		sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_NONICKNAMEGIVEN));
 		return 0;
 	}
 
@@ -188,25 +201,24 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		flood_endgrace(source_p);
 
 	/* terminate nick to NICKLEN, we dont want clean_nick() to error! */
-	rb_strlcpy(nick, parv[1], sizeof(nick));
+	rb_strlcpy(nick, parv[1], ServerInfo.nicklen);
 
 	/* check the nickname is ok */
 	if(!clean_nick(nick, 1))
 	{
-		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME), me.name, source_p->name, nick);
+		sendto_one_numeric(source_p, s_RPL(ERR_ERRONEUSNICKNAME), nick);
 		return 0;
 	}
 
 	if(find_nick_resv(nick))
 	{
-		sendto_one(source_p, form_str(ERR_ERRONEUSNICKNAME), me.name, source_p->name, nick);
+		sendto_one_numeric(source_p, s_RPL(ERR_ERRONEUSNICKNAME), nick);
 		return 0;
 	}
 
 	if(hash_find_nd(nick))
 	{
-		sendto_one(source_p, form_str(ERR_UNAVAILRESOURCE),
-			   me.name, EmptyString(source_p->name) ? "*" : source_p->name, nick);
+		sendto_one_numeric(source_p, s_RPL(ERR_UNAVAILRESOURCE), nick);
 		return 0;
 	}
 
@@ -230,7 +242,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 			change_local_nick(client_p, source_p, nick, 1);
 		}
 		else
-			sendto_one(source_p, form_str(ERR_NICKNAMEINUSE), me.name, source_p->name, nick);
+			sendto_one_numeric(source_p, s_RPL(ERR_NICKNAMEINUSE), nick);
 
 		return 0;
 	}
@@ -240,11 +252,23 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	return 0;
 }
 
-/* mc_nick()
+/* ms_nick()
  *      
  * server -> server nick change
+ *    parv[0] = sender prefix
  *    parv[1] = nickname
  *    parv[2] = TS when nick change
+ *
+ * server introducing new nick
+ *    parv[0] = sender prefix
+ *    parv[1] = nickname
+ *    parv[2] = hop count
+ *    parv[3] = TS
+ *    parv[4] = umode
+ *    parv[5] = username
+ *    parv[6] = hostname
+ *    parv[7] = server
+ *    parv[8] = ircname
  */
 static int
 mc_nick(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -299,21 +323,78 @@ mc_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 static int
 ms_nick(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	const char *nick, *server;
+	struct Client *target_p;
+	time_t newts = 0;
 
-	nick = parc > 1 ? parv[1] : "?";
-	server = parc > 7 ? parv[7] : "?";
+	if(parc != 9)
+	{
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "Dropping server %s due to (invalid) command 'NICK' "
+				     "with %d arguments (expecting 9)", client_p->name, parc);
+		ilog(L_SERVER, "Excess parameters (%d) for command 'NICK' from %s.",
+		     parc, client_p->name);
+		exit_client(client_p, client_p, client_p, "Excess parameters to NICK command");
+		return 0;
+	}
 
-	sendto_wallops_flags(UMODE_WALLOP, &me,
-			"Link %s cancelled, TS5 nickname %s on %s introduced (old server?)",
-			client_p->name, nick, server);
-	sendto_server(NULL, NULL, CAP_TS6, NOCAPS,
-			":%s WALLOPS :Link %s cancelled, TS5 nickname %s on %s introduced (old server?)",
-			me.id, client_p->name, nick, server);
-	ilog(L_SERVER, "Link %s cancelled, TS5 nickname %s on %s introduced (old server?)",
-			client_p->name, nick, server);
+	/* if nicks empty, erroneous, or too long, kill */
+	if(!clean_nick(parv[1], 0))
+	{
+		ServerStats.is_kill++;
+		sendto_realops_flags(UMODE_DEBUG, L_ALL,
+				     "Bad Nick: %s From: %s(via %s)",
+				     parv[1], parv[7], client_p->name);
+		sendto_one(client_p, ":%s KILL %s :%s (Bad Nickname)", me.name, parv[1], me.name);
+		return 0;
+	}
 
-	exit_client(client_p, client_p, &me, "TS5 nickname introduced");
+	/* invalid username or host? */
+	if(!clean_username(parv[5]) || !clean_host(parv[6]))
+	{
+		ServerStats.is_kill++;
+		sendto_realops_flags(UMODE_DEBUG, L_ALL,
+				     "Bad user@host: %s@%s From: %s(via %s)",
+				     parv[5], parv[6], parv[7], client_p->name);
+		sendto_one(client_p, ":%s KILL %s :%s (Bad user@host)", me.name, parv[1], me.name);
+		return 0;
+	}
+
+	/* check the length of the clients gecos */
+	if(strlen(parv[8]) > REALLEN)
+	{
+		parv[8] = LOCAL_COPY_N(parv[8], REALLEN);
+		/* why exactly do we care? --fl */
+		/* sendto_realops_flags(UMODE_ALL, L_ALL,
+		 *              "Long realname from server %s for %s", parv[7],
+		 *              parv[1]);
+		 * i don't care, nobody else does. --androsyn 
+		 */
+	}
+
+	newts = atol(parv[3]);
+
+	target_p = find_client(parv[1]);
+
+	/* if the nick doesnt exist, allow it and process like normal */
+	if(target_p == NULL)
+	{
+		register_client(client_p, NULL, parv[1], newts, parc, parv);
+	}
+	else if(IsUnknown(target_p))
+	{
+		exit_client(NULL, target_p, &me, "Overridden");
+		register_client(client_p, NULL, parv[1], newts, parc, parv);
+	}
+	else if(target_p == source_p)
+	{
+		/* client changing case of nick */
+		if(strcmp(target_p->name, parv[1]))
+			register_client(client_p, NULL, parv[1], newts, parc, parv);
+	}
+	/* we've got a collision! */
+	else
+		perform_nick_collides(source_p, client_p, target_p, parc, parv,
+				      newts, parv[1], NULL);
 
 	return 0;
 }
@@ -459,7 +540,7 @@ clean_nick(const char *nick, int loc_client)
 	}
 
 	/* nicklen is +1 */
-	if(len >= NICKLEN)
+	if(len >= ServerInfo.nicklen)
 		return 0;
 
 	return 1;
@@ -543,7 +624,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	char buf[USERLEN + 1];
 	char note[NICKLEN + 10];
 	/* This had to be copied here to avoid problems.. */
-	source_p->tsinfo = rb_time();
+	source_p->tsinfo = rb_current_time();
 	if(!EmptyString(source_p->name))
 		del_from_hash(HASH_CLIENT, source_p->name, source_p);
 
@@ -552,7 +633,7 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	source_p->name = source_p->user->name;
 	add_to_hash(HASH_CLIENT, nick, source_p);
 
-	rb_snprintf(note, sizeof(note), "Nick: %s", nick);
+	snprintf(note, sizeof(note), "Nick: %s", nick);
 	rb_note(client_p->localClient->F, note);
 
 	if(HasSentUser(source_p))
@@ -576,19 +657,19 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick, 
 	if(dosend)
 	{
 		if((source_p->localClient->last_nick_change + ConfigFileEntry.max_nick_time) <
-		   rb_time())
+		   rb_current_time())
 			source_p->localClient->number_of_nick_changes = 0;
 
 		if(ConfigFileEntry.anti_nick_flood && !IsOper(source_p) &&
 		   source_p->localClient->number_of_nick_changes > ConfigFileEntry.max_nick_changes)
 		{
-			sendto_one(source_p, form_str(ERR_NICKTOOFAST),
-				   me.name, source_p->name, source_p->name,
+			sendto_one_numeric(source_p, s_RPL(ERR_NICKTOOFAST),
+				   source_p->name,
 				   nick, ConfigFileEntry.max_nick_time);
 			return;
 		}
 
-		source_p->localClient->last_nick_change = rb_time();
+		source_p->localClient->last_nick_change = rb_current_time();
 		source_p->localClient->number_of_nick_changes++;
 	}
 
@@ -598,10 +679,10 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick, 
 	if(!samenick)
 	{
 		/* force the TS to increase -- jilles */
-		if(source_p->tsinfo >= rb_time())
+		if(source_p->tsinfo >= rb_current_time())
 			source_p->tsinfo++;
 		else
-			source_p->tsinfo = rb_time();
+			source_p->tsinfo = rb_current_time();
 		monitor_signoff(source_p);
 		/* we only do bancache for local users -- jilles */
 		if(source_p->user)
@@ -623,8 +704,10 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick, 
 
 		if(dosend)
 		{
-			sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
-				      source_p->id, nick, (long)source_p->tsinfo);
+			sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%" RBTT_FMT,
+				      use_id(source_p), nick, source_p->tsinfo);
+			sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%" RBTT_FMT,
+				      source_p->name, nick, source_p->tsinfo);
 		}
 	}
 
@@ -648,7 +731,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick, 
 		rb_dlinkDestroy(ptr, &source_p->on_allow_list);
 	}
 
-	rb_snprintf(note, sizeof(note), "Nick: %s", nick);
+	snprintf(note, sizeof(note), "Nick: %s", nick);
 	rb_note(client_p->localClient->F, note);
 
 	return;
@@ -667,7 +750,7 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 	/* client changing their nick - dont reset ts if its same */
 	if(!samenick)
 	{
-		source_p->tsinfo = newts ? newts : rb_time();
+		source_p->tsinfo = newts ? newts : rb_current_time();
 		monitor_signoff(source_p);
 	}
 
@@ -679,8 +762,10 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 		add_history(source_p, 1);
 		if(dosend)
 		{
-			sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
-				      source_p->id, nick, (long)source_p->tsinfo);
+			sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%" RBTT_FMT,
+				      use_id(source_p), nick, source_p->tsinfo);
+			sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%" RBTT_FMT,
+				      source_p->name, nick, source_p->tsinfo);
 		}
 	}
 
@@ -726,7 +811,7 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 		{
 			save_user(&me, &me, target_p);
 			ServerStats.is_save++;
-			sendto_one(client_p, ":%s SAVE %s %ld", me.id, uid, (long)newts);
+			sendto_one(client_p, ":%s SAVE %s %" RBTT_FMT, me.id, uid, newts);
 			register_client(client_p, source_p, uid, SAVE_NICKTS, parc, parv);
 		}
 		else
@@ -766,7 +851,7 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 			 */
 			if(use_save)
 			{
-				sendto_one(client_p, ":%s SAVE %s %ld", me.id, uid, (long)newts);
+				sendto_one(client_p, ":%s SAVE %s %" RBTT_FMT, me.id, uid, newts);
 				register_client(client_p, source_p, uid, SAVE_NICKTS, parc, parv);
 			}
 			else if(uid)
@@ -804,7 +889,7 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 							"%s (Nick collision (new))", me.name);
 
 				target_p->flags |= FLAGS_KILLED;
-				(void)exit_client(client_p, target_p, &me, "Nick collision");
+				exit_client(client_p, target_p, &me, "Nick collision");
 			}
 
 			register_client(client_p, parc == 10 ? source_p : NULL,
@@ -839,7 +924,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 		{
 			ServerStats.is_save += 2;
 			save_user(&me, &me, target_p);
-			sendto_one(client_p, ":%s SAVE %s %ld", me.id, source_p->id, (long)newts);
+			sendto_one(client_p, ":%s SAVE %s %" RBTT_FMT, me.id, source_p->id, newts);
 			/* don't send a redundant nick change */
 			if(!IsDigit(source_p->name[0]))
 				change_remote_nick(client_p, source_p, SAVE_NICKTS, source_p->id,
@@ -891,8 +976,8 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 				/* can't broadcast a SAVE because the
 				 * nickchange has happened at client_p
 				 * but not in other directions -- jilles */
-				sendto_one(client_p, ":%s SAVE %s %ld", me.id,
-					   source_p->id, (long)newts);
+				sendto_one(client_p, ":%s SAVE %s %" RBTT_FMT, me.id,
+					   source_p->id, newts);
 				/* send a :<id> NICK <id> <ts> (!) */
 				if(!IsDigit(source_p->name[0]))
 					change_remote_nick(client_p, source_p, SAVE_NICKTS,
@@ -948,7 +1033,7 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 				ServerStats.is_kill++;
 
 				target_p->flags |= FLAGS_KILLED;
-				(void)exit_client(client_p, target_p, &me, "Nick collision");
+				exit_client(client_p, target_p, &me, "Nick collision");
 			}
 		}
 	}
@@ -963,13 +1048,12 @@ register_client(struct Client *client_p, struct Client *server,
 		const char *nick, time_t newts, int parc, const char *parv[])
 {
 	struct Client *source_p;
-	struct User *user;
 	struct nd_entry *nd;
 	const char *m;
 	int flag;
 
 	source_p = make_client(client_p);
-	user = make_user(source_p);
+	make_user(source_p);
 
 	source_p->hopcount = atoi(parv[2]);
 	source_p->tsinfo = newts;
@@ -1032,7 +1116,7 @@ register_client(struct Client *client_p, struct Client *server,
 
 			RB_DLINK_FOREACH(ptr, service_list.head)
 			{
-				if(!irccmp((const char *)ptr->data, source_p->servptr->name))
+				if(!irccmp((const char *) ptr->data, source_p->servptr->name))
 				{
 					hit++;
 					break;
@@ -1094,7 +1178,8 @@ can_save(struct Client *target_p)
 
 	if(MyClient(target_p))
 		return 1;
-
+	if(!has_id(target_p))
+		return 0;
 	serv_p = IsServer(target_p) ? target_p : target_p->servptr;
 	while(serv_p != NULL && serv_p != &me)
 	{
@@ -1108,7 +1193,7 @@ can_save(struct Client *target_p)
 static void
 save_user(struct Client *client_p, struct Client *source_p, struct Client *target_p)
 {
-	if(!MyConnect(target_p) && !IsCapable(target_p->from, CAP_SAVE))
+	if(!MyConnect(target_p) && (!has_id(target_p) || !IsCapable(target_p->from, CAP_SAVE)))
 	{
 		/* This shouldn't happen */
 		/* Note we only need SAVE support in this direction */
@@ -1121,20 +1206,22 @@ save_user(struct Client *client_p, struct Client *source_p, struct Client *targe
 		ServerStats.is_kill++;
 
 		target_p->flags |= FLAGS_KILLED;
-		(void)exit_client(NULL, target_p, &me, "Nick collision (no SAVE support)");
+		exit_client(NULL, target_p, &me, "Nick collision (no SAVE support)");
 		return;
 	}
-	sendto_server(client_p, NULL, CAP_SAVE | CAP_TS6, NOCAPS, ":%s SAVE %s %ld",
-		      source_p->id, target_p->id, (long)target_p->tsinfo);
-	sendto_server(client_p, NULL, CAP_TS6, CAP_SAVE, ":%s NICK %s :%ld",
-		      target_p->id, target_p->id, (long)SAVE_NICKTS);
+	sendto_server(client_p, NULL, CAP_SAVE | CAP_TS6, NOCAPS, ":%s SAVE %s %" RBTT_FMT,
+		      source_p->id, target_p->id, target_p->tsinfo);
+	sendto_server(client_p, NULL, CAP_TS6, CAP_SAVE, ":%s NICK %s :%" RBTT_FMT,
+		      target_p->id, target_p->id, (time_t) SAVE_NICKTS);
+	sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%" RBTT_FMT,
+		      target_p->name, target_p->id, (time_t) SAVE_NICKTS);
 	if(!IsMe(client_p))
 		sendto_realops_flags(UMODE_SKILL, L_ALL,
 				     "Received SAVE message for %s from %s",
 				     target_p->name, source_p->name);
 	if(MyClient(target_p))
 	{
-		sendto_one_numeric(target_p, RPL_SAVENICK, form_str(RPL_SAVENICK), target_p->id);
+		sendto_one_numeric(target_p, s_RPL(RPL_SAVENICK), target_p->id);
 		change_local_nick(target_p, target_p, target_p->id, 0);
 		target_p->tsinfo = SAVE_NICKTS;
 	}

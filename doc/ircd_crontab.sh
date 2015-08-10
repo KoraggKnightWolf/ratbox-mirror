@@ -4,8 +4,8 @@
 # Copyright (C) 2009-2012 ircd-ratbox development team
 # $Id$
 
-# The root directory your IRCD runs from
-IRCD_PATH="@prefix@"
+# You will want to change this to the root directory your IRCD runs from
+IRCD_PATH="/home/user/ircd"
 
 # The location of your pid file, relative to IRCD_PATH (you can probably leave this alone)
 PID_FILE="etc/ircd.pid"
@@ -15,10 +15,10 @@ PID_FILE="etc/ircd.pid"
 #
 # To have the script run every minute, type this:
 #
-#      * * * * * @prefix@/bin/ircd_crontab.sh
+#      * * * * * /path/to/ircd_crontab.sh
 #
 # To have the script run every 5 minutes, type this:
-#      */5 * * * * @prefix@/bin/ircd_crontab.sh
+#      */5 * * * * ~/path/to/ircd_crontab.sh
 #
 
 
@@ -34,5 +34,5 @@ if [ -f "${IRCD_PATH}/${PID_FILE}" ] ; then
 	rm -f "${IRCD_PATH}/${PID_FILE}"
 fi
 
-${IRCD_PATH}/bin/ircd -conftest >/dev/null 2>&1 && ${IRCD_PATH}/bin/ircd
+${IRCD_PATH}/bin/ircd -conftest &>/dev/null && ${IRCD_PATH}/bin/ircd
 exit $?;

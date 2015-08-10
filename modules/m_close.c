@@ -36,13 +36,18 @@
 static int mo_close(struct Client *, struct Client *, int, const char **);
 
 struct Message close_msgtab = {
-	"CLOSE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_close, 0}}
+	.cmd = "CLOSE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },			     
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_close },
 };
 
-mapi_clist_av2 close_clist[] = { &close_msgtab, NULL };
+mapi_clist_av1 close_clist[] = { &close_msgtab, NULL };
 
-DECLARE_MODULE_AV2(close, NULL, NULL, close_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(close, NULL, NULL, close_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_close - CLOSE message handler
@@ -60,13 +65,13 @@ mo_close(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		target_p = ptr->data;
 
-		sendto_one(source_p, form_str(RPL_CLOSING), me.name, source_p->name,
+		sendto_one_numeric(source_p, s_RPL(RPL_CLOSING),
 			   get_client_name(target_p, SHOW_IP), target_p->status);
 
-		(void)exit_client(target_p, target_p, target_p, "Oper Closing");
+		exit_client(target_p, target_p, target_p, "Oper Closing");
 		closed++;
 	}
 
-	sendto_one(source_p, form_str(RPL_CLOSEEND), me.name, source_p->name, closed);
+	sendto_one_numeric(source_p, s_RPL(RPL_CLOSEEND), closed);
 	return 0;
 }

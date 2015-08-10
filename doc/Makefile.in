@@ -4,7 +4,6 @@ INSTALL		= @INSTALL@
 INSTALL_BIN	= @INSTALL_PROGRAM@
 INSTALL_DATA	= @INSTALL_DATA@
 INSTALL_SUID	= @INSTALL_PROGRAM@ -o root -m 4755
-RM		= @RM@
 MV		= @MV@
 RM		= @RB_RM@
 CP		= @CP@
@@ -17,9 +16,6 @@ bindir		= @bindir@
 libexecdir	= @libexecdir@
 confdir		= @confdir@
 localstatedir	= @localstatedir@
-# Change this later! -- adrian
-moduledir	= @moduledir@
-automoduledir	= @moduledir@/autoload
 
 CONFS		= example.conf example.efnet.conf
 
@@ -59,4 +55,4 @@ depend:
 lint:
 
 distclean:
-	${RM} -f Makefile
+	$(RM) -f Makefile

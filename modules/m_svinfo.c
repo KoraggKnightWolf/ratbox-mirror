@@ -30,7 +30,6 @@
 #include "ircd.h"
 #include "send.h"
 #include "s_conf.h"
-#include "s_newconf.h"
 #include "s_log.h"
 #include "parse.h"
 #include "modules.h"
@@ -38,25 +37,31 @@
 static int ms_svinfo(struct Client *, struct Client *, int, const char **);
 
 struct Message svinfo_msgtab = {
-	"SVINFO", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_ignore, mg_ignore, {ms_svinfo, 5}, mg_ignore, mg_ignore}
+	.cmd = "SVINFO",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },			     
+	.handlers[CLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ .handler = ms_svinfo, .min_para = 5 },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ mm_ignore },
 };
 
-mapi_clist_av2 svinfo_clist[] = { &svinfo_msgtab, NULL };
+mapi_clist_av1 svinfo_clist[] = { &svinfo_msgtab, NULL };
 
-DECLARE_MODULE_AV2(svinfo, NULL, NULL, svinfo_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(svinfo, NULL, NULL, svinfo_clist, NULL, NULL, "$Revision$");
 
 /*
  * ms_svinfo - SVINFO message handler
- *      parv[1] = TS_CURRENT for the server
- *      parv[2] = TS_MIN for the server
- *      parv[3] = unused, send 0
- *      parv[4] = server's idea of UTC time
+ *	parv[0] = sender prefix
+ *	parv[1] = TS_CURRENT for the server
+ *	parv[2] = TS_MIN for the server
+ *	parv[3] = unused, send 0
+ *	parv[4] = server's idea of UTC time
  */
 static int
 ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	signed int deltat;
+	long int deltat;
 	time_t theirtime;
 
 	/* SVINFO isnt remote. */
@@ -78,21 +83,18 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 	 */
 	rb_set_time();
 	theirtime = atol(parv[4]);
-	deltat = abs(theirtime - rb_time());
+	deltat = labs(theirtime - rb_current_time());
 
 	if(deltat > ConfigFileEntry.ts_max_delta)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s dropped, excessive TS delta"
-				     " (my TS=%ld, their TS=%ld, delta=%d)",
-				     source_p->name,
-				     (long)rb_time(), (long)theirtime, deltat);
+				     " (my TS=%" RBTT_FMT ", their TS=%" RBTT_FMT " delta=%ld)",
+				     source_p->name, rb_current_time(), theirtime, deltat);
 		ilog(L_SERVER,
 		     "Link %s dropped, excessive TS delta"
-		     " (my TS=%ld, their TS=%ld, delta=%d)",
-		     log_client_name(source_p, SHOW_IP), (long)rb_time(), (long)theirtime,
-		     deltat);
-		disable_server_conf_autoconn(source_p->name);
+		     " (my TS=%" RBTT_FMT ", their TS=%" RBTT_FMT ", delta=%ld)",
+		     log_client_name(source_p, SHOW_IP), rb_current_time(), theirtime, deltat);
 		exit_client(source_p, source_p, source_p, "Excessive TS delta");
 		return 0;
 	}
@@ -101,9 +103,8 @@ ms_svinfo(struct Client *client_p, struct Client *source_p, int parc, const char
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Link %s notable TS delta"
-				     " (my TS=%ld, their TS=%ld, delta=%d)",
-				     source_p->name, (long)rb_time(), (long)theirtime,
-				     deltat);
+				     " (my TS=% " RBTT_FMT ", their TS=%" RBTT_FMT ", delta=%ld)",
+				     source_p->name, rb_current_time(), theirtime, deltat);
 	}
 
 	return 0;

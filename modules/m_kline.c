@@ -47,24 +47,40 @@ static int mo_adminkline(struct Client *, struct Client *, int, const char **);
 static int mo_unkline(struct Client *, struct Client *, int, const char **);
 static int me_unkline(struct Client *, struct Client *, int, const char **);
 
+
 struct Message kline_msgtab = {
-	"KLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_kline, 5}, {mo_kline, 3}}
+	.cmd = "KLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{  mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_kline, .min_para = 5 },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_kline, .min_para = 3 },
 };
 
 struct Message adminkline_msgtab = {
-	"ADMINKLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminkline, 3}}
+	.cmd = "ADMINKLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{  mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_adminkline, .min_para = 3 },
 };
 
 struct Message unkline_msgtab = {
-	"UNKLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unkline, 3}, {mo_unkline, 2}}
+	.cmd = "UNKLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{  mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_unkline, .min_para = 3 },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_unkline, .min_para = 2 },
 };
 
-mapi_clist_av2 kline_clist[] = { &kline_msgtab, &unkline_msgtab, &adminkline_msgtab, NULL };
+mapi_clist_av1 kline_clist[] = { &kline_msgtab, &unkline_msgtab, &adminkline_msgtab, NULL };
 
-DECLARE_MODULE_AV2(kline, NULL, NULL, kline_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(kline, NULL, NULL, kline_clist, NULL, NULL, "$Revision$");
 
 /* Local function prototypes */
 static int find_user_host(struct Client *source_p, const char *userhost, char *user, char *host);
@@ -94,17 +110,16 @@ static void remove_perm_kline(struct Client *, const char *, const char *);
 static int
 mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char **parv)
 {
-	char def[] = "No Reason";
 	char user[USERLEN + 2];
 	char host[HOSTLEN + 2];
-	char *reason = def;
+	char *reason;
 	const char *target_server = NULL;
 	int tkline_time = 0;
 	int loc = 1;
 
 	if(!IsOperK(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "kline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "kline");
 		return 0;
 	}
 
@@ -123,8 +138,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		if(!IsOperRemoteBan(source_p))
 		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "remoteban");
+			sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "remoteban");
 			return 0;
 		}
 
@@ -134,8 +148,7 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(parc <= loc || EmptyString(parv[loc]))
 	{
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-			   me.name, source_p->name, "KLINE");
+		sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "KLINE");
 		return 0;
 	}
 	reason = LOCAL_COPY(parv[loc]);
@@ -195,13 +208,13 @@ mo_adminkline(struct Client *client_p, struct Client *source_p, int parc, const 
 
 	if(!IsOperK(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "kline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "kline");
 		return 0;
 	}
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "admin");
 		return 0;
 	}
 
@@ -230,7 +243,7 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(!IsOperUnkline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "unkline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "unkline");
 		return 0;
 	}
 
@@ -269,8 +282,7 @@ mo_unkline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		if(!IsOperRemoteBan(source_p))
 		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "remoteban");
+			sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "remoteban");
 			return 0;
 		}
 
@@ -332,7 +344,7 @@ set_kline(struct Client *source_p, const char *user, const char *host, const cha
 		return;
 
 	rb_set_time();
-	current_date = smalldate(rb_time());
+	current_date = smalldate(rb_current_time());
 	aconf = make_conf();
 	aconf->status = CONF_KILL;
 	aconf->user = rb_strdup(user);
@@ -350,15 +362,15 @@ set_kline(struct Client *source_p, const char *user, const char *host, const cha
 
 	if(tkline_time > 0)
 	{
-		rb_snprintf(buffer, sizeof(buffer),
-			    "Temporary K-line %d min. - %s (%s)",
-			    (int)(tkline_time / 60), reason, current_date);
+		snprintf(buffer, sizeof(buffer),
+			 "Temporary K-line %d min. - %s (%s)",
+			 (int) (tkline_time / 60), reason, current_date);
 		aconf->passwd = rb_strdup(buffer);
 		apply_tkline(source_p, aconf, reason, oper_reason, current_date, tkline_time);
 	}
 	else
 	{
-		rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
+		snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
 		aconf->passwd = rb_strdup(buffer);
 		apply_kline(source_p, aconf, reason, oper_reason, current_date, admin);
 	}
@@ -390,7 +402,7 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
 	const char *oper = get_oper_name(source_p);
 
 	aconf->info.oper = operhash_add(oper);
-	aconf->hold = rb_time();
+	aconf->hold = rb_current_time();
 	if(locked)
 		aconf->flags |= CONF_FLAGS_LOCKED;
 
@@ -422,7 +434,7 @@ apply_tkline(struct Client *source_p, struct ConfItem *aconf,
 	const char *oper = get_oper_name(source_p);
 
 	aconf->info.oper = operhash_add(oper);
-	aconf->hold = rb_time() + tkline_time;
+	aconf->hold = rb_current_time() + tkline_time;
 	add_temp_kline(aconf);
 
 	sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -476,7 +488,7 @@ mangle_wildcard_to_cidr(const char *text)
 	{
 		if(n3 == NULL || (!strcmp(n3, splat) && (n4 == NULL || !strcmp(n4, splat))))
 		{
-			rb_snprintf(buf, sizeof(buf), "%s.0.0.0/8", n1);
+			snprintf(buf, sizeof(buf), "%s.0.0.0/8", n1);
 			return buf;
 		}
 	}
@@ -488,7 +500,7 @@ mangle_wildcard_to_cidr(const char *text)
 	{
 		if(n4 == NULL || !strcmp(n4, splat))
 		{
-			rb_snprintf(buf, sizeof(buf), "%s.%s.0.0/16", n1, n2);
+			snprintf(buf, sizeof(buf), "%s.%s.0.0/16", n1, n2);
 			return buf;
 		}
 	}
@@ -498,7 +510,7 @@ mangle_wildcard_to_cidr(const char *text)
 
 	if(n4 == NULL || !strcmp(n4, splat))
 	{
-		rb_snprintf(buf, sizeof(buf), "%s.%s.%s.0/24", n1, n2, n3);
+		snprintf(buf, sizeof(buf), "%s.%s.%s.0/24", n1, n2, n3);
 		return buf;
 	}
 
@@ -563,7 +575,7 @@ find_user_host(struct Client *source_p, const char *userhost, char *luser, char 
 
 /* valid_user_host()
  *
- * inputs       - user buffer, host buffer
+ * inputs	- user buffer, host buffer
  * output	- 0 if invalid, 1 if valid
  * side effects -
  */
@@ -595,8 +607,8 @@ valid_user_host(struct Client *source_p, const char *luser, const char *lhost)
 
 /* valid_wild_card()
  * 
- * input        - user buffer, host buffer
- * output       - 0 if invalid, 1 if valid
+ * input	- user buffer, host buffer
+ * output	- 0 if invalid, 1 if valid
  * side effects -
  */
 static int
@@ -636,14 +648,14 @@ valid_wild_card(struct Client *source_p, const char *luser, const char *lhost)
 
 /* already_placed_kline()
  *
- * inputs       - source to notify, user@host to check, tkline time
- * outputs      - 1 if a perm kline or a tkline when a tkline is being
- *                set exists, else 0
+ * inputs	- source to notify, user@host to check, tkline time
+ * outputs	- 1 if a perm kline or a tkline when a tkline is being
+ *		  set exists, else 0
  * side effects - notifies source_p kline exists
  */
 /* Note: This currently works if the new K-line is a special case of an
- *       existing K-line, but not the other way round. To do that we would
- *       have to walk the hash and check every existing K-line. -A1kmm.
+ *	 existing K-line, but not the other way round. To do that we would
+ *	 have to walk the hash and check every existing K-line. -A1kmm.
  */
 static int
 already_placed_kline(struct Client *source_p, const char *luser, const char *lhost, int tkline)
@@ -654,7 +666,7 @@ already_placed_kline(struct Client *source_p, const char *luser, const char *lho
 	int t;
 	if(ConfigFileEntry.non_redundant_klines)
 	{
-		if((t = parse_netmask(lhost, (struct sockaddr *)&iphost, NULL)) != HM_HOST)
+		if((t = parse_netmask(lhost, (struct sockaddr *) &iphost, NULL)) != HM_HOST)
 		{
 #ifdef RB_IPV6
 			if(t == HM_IPV6)
@@ -669,7 +681,7 @@ already_placed_kline(struct Client *source_p, const char *luser, const char *lho
 			piphost = NULL;
 
 		if((aconf =
-		    find_conf_by_address(lhost, NULL, (struct sockaddr *)piphost, CONF_KILL, t,
+		    find_conf_by_address(lhost, NULL, (struct sockaddr *) piphost, CONF_KILL, t,
 					 luser)))
 		{
 			/* setting a tkline, or existing one is perm */
@@ -738,8 +750,8 @@ remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 
 /* remove_temp_kline()
  *
- * inputs       - username, hostname to unkline
- * outputs      -
+ * inputs	- username, hostname to unkline
+ * outputs	-
  * side effects - tries to unkline anything that matches
  */
 static int
@@ -771,9 +783,9 @@ remove_temp_kline(struct Client *source_p, const char *user, const char *host)
 					     get_oper_name(source_p), user, host);
 			ilog(L_KLINE, "UK %s %s %s", get_oper_name(source_p), user, host);
 
-			return YES;
+			return true;
 		}
 	}
 
-	return NO;
+	return false;
 }

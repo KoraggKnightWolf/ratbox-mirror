@@ -1,7 +1,7 @@
 /*
  *  ircd-ratbox: an advanced Internet Relay Chat Daemon(ircd).
  *  m_cmessage.c: Handles CPRIVMSG/CNOTICE, target change limitation free
- *                PRIVMSG/NOTICE implementations.
+ *		  PRIVMSG/NOTICE implementations.
  *
  *  Copyright (C) 2005 Lee Hardy <lee -at- leeh.co.uk>
  *  Copyright (C) 2005-2012 ircd-ratbox development team
@@ -49,18 +49,29 @@ static int m_cprivmsg(struct Client *, struct Client *, int, const char **);
 static int m_cnotice(struct Client *, struct Client *, int, const char **);
 
 struct Message cprivmsg_msgtab = {
-	"CPRIVMSG", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, {m_cprivmsg, 4}, mg_ignore, mg_ignore, mg_ignore, {m_cprivmsg, 4}}
+	.cmd = "CPRIVMSG",
+
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },			      
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_cprivmsg, .min_para = 4 },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_cprivmsg, .min_para = 4 },
 };
 
 struct Message cnotice_msgtab = {
-	"CNOTICE", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, {m_cnotice, 4}, mg_ignore, mg_ignore, mg_ignore, {m_cnotice, 4}}
+	.cmd = "CNOTICE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },			      
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_cnotice, .min_para = 4 },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_cnotice, .min_para = 4 },
 };
 
-mapi_clist_av2 cmessage_clist[] = { &cprivmsg_msgtab, &cnotice_msgtab, NULL };
+mapi_clist_av1 cmessage_clist[] = { &cprivmsg_msgtab, &cnotice_msgtab, NULL };
 
-DECLARE_MODULE_AV2(cmessage, NULL, NULL, cmessage_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(cmessage, NULL, NULL, cmessage_clist, NULL, NULL, "$Revision$");
 
 #define PRIVMSG 0
 #define NOTICE 1
@@ -115,8 +126,7 @@ m_cmessage(int p_or_n, const char *command,
 	if(!is_chanop_voiced(msptr))
 	{
 		if(p_or_n != NOTICE)
-			sendto_one(source_p, form_str(ERR_VOICENEEDED),
-				   me.name, source_p->name, chptr->chname);
+			sendto_one_numeric(source_p, s_RPL(ERR_VOICENEEDED), chptr->chname);
 		return 0;
 	}
 
@@ -137,24 +147,24 @@ m_cmessage(int p_or_n, const char *command,
 					   form_str(ERR_TARGUMODEG), target_p->name);
 
 		if((target_p->localClient->last_caller_id_time +
-		    ConfigFileEntry.caller_id_wait) < rb_time())
+		    ConfigFileEntry.caller_id_wait) < rb_current_time())
 		{
 			if(p_or_n != NOTICE)
 				sendto_one_numeric(source_p, RPL_TARGNOTIFY,
 						   form_str(RPL_TARGNOTIFY), target_p->name);
 
-			sendto_one(target_p, form_str(RPL_UMODEGMSG),
-				   me.name, target_p->name, source_p->name,
+			sendto_one_numeric(target_p, s_RPL(RPL_UMODEGMSG),
+				   source_p->name,
 				   source_p->username, source_p->host);
 
-			target_p->localClient->last_caller_id_time = rb_time();
+			target_p->localClient->last_caller_id_time = rb_current_time();
 		}
 
 		return 0;
 	}
 
 	if(p_or_n != NOTICE)
-		source_p->localClient->last = rb_time();
+		source_p->localClient->last = rb_current_time();
 
 	sendto_anywhere(target_p, source_p, command, ":%s", parv[3]);
 	return 0;

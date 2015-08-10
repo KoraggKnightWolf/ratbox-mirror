@@ -36,13 +36,18 @@
 static int mo_unreject(struct Client *, struct Client *, int, const char **);
 
 struct Message unreject_msgtab = {
-	"UNREJECT", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_unreject, 2}}
+	.cmd = "UNREJECT", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_unreject, .min_para = 2 },
 };
 
-mapi_clist_av2 unreject_clist[] = { &unreject_msgtab, NULL };
+mapi_clist_av1 unreject_clist[] = { &unreject_msgtab, NULL };
 
-DECLARE_MODULE_AV2(unreject, NULL, NULL, unreject_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(unreject, NULL, NULL, unreject_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_unreject

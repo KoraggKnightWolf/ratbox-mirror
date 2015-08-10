@@ -41,18 +41,25 @@ static int m_ping(struct Client *, struct Client *, int, const char **);
 static int ms_ping(struct Client *, struct Client *, int, const char **);
 
 struct Message ping_msgtab = {
-	"PING", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_ping, 2}, {ms_ping, 2}, {ms_ping, 2}, mg_ignore, {m_ping, 2}}
+	.cmd = "PING", 
+
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_ping, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = ms_ping, .min_para = 2 },
+	.handlers[SERVER_HANDLER] =		{ .handler = ms_ping, .min_para = 2 },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_ping, .min_para = 2 },
 };
 
-mapi_clist_av2 ping_clist[] = { &ping_msgtab, NULL };
+mapi_clist_av1 ping_clist[] = { &ping_msgtab, NULL };
 
-DECLARE_MODULE_AV2(ping, NULL, NULL, ping_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(ping, NULL, NULL, ping_clist, NULL, NULL, "$Revision$");
 
 /*
 ** m_ping
-**      parv[1] = origin
-**      parv[2] = destination
+**	parv[0] = sender prefix
+**	parv[1] = origin
+**	parv[2] = destination
 */
 static int
 m_ping(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])

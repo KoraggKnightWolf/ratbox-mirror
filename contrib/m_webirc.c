@@ -60,16 +60,22 @@
 static int mr_webirc(struct Client *, struct Client *, int, const char **);
 
 struct Message webirc_msgtab = {
-	"WEBIRC", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_webirc, 5}, mg_reg, mg_ignore, mg_ignore, mg_ignore, mg_reg}
+	.cmd = "WEBIRC", 
+	.handlers[UNREGISTERED_HANDLER] =       { .handler = mr_webirc, .min_para = 5 },
+	.handlers[CLIENT_HANDLER] =             { mm_reg },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { mm_reg },
 };
 
-mapi_clist_av2 webirc_clist[] = { &webirc_msgtab, NULL };
+mapi_clist_av1 webirc_clist[] = { &webirc_msgtab, NULL };
 
-DECLARE_MODULE_AV2(webirc, NULL, NULL, webirc_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(webirc, NULL, NULL, webirc_clist, NULL, NULL, "$Revision$");
 
 /*
  * mr_webirc - webirc message handler
+ *      parv[0] = sender prefix
  *      parv[1] = password
  *      parv[2] = fake username (we ignore this)
  *	parv[3] = fake hostname 

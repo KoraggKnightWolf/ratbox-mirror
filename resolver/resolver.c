@@ -10,7 +10,7 @@
  * $Id$
  */
 
-#define READBUF_SIZE    16384
+#define READBUF_SIZE	16384
 
 #include "setup.h"
 #include <ratbox_lib.h>
@@ -69,7 +69,7 @@ rehash(int sig)
 #endif
 
 static void
-setup_signals(void)
+setup_signals()
 {
 #ifndef WINDOWS
 	struct sigaction act;
@@ -116,6 +116,7 @@ send_answer(void *vptr, struct DNSReply *reply)
 	int result = 0;
 	int aftype = 0;
 	strcpy(response, "FAILED");
+
 	if(reply != NULL)
 	{
 		switch (req->revfwd)
@@ -209,7 +210,6 @@ send_answer(void *vptr, struct DNSReply *reply)
 		}
 
 	}
-
 	rb_helper_write(res_helper, "R %s %d %d %s\n", req->reqid, result, aftype, response);
 	rb_free(req);
 }
@@ -240,7 +240,7 @@ request protocol:
 
 INPUTS:
 
-IPTYPE:    4, 5,  6, ipv4, ipv6.int/arpa, ipv6 respectively
+IPTYPE:	   4, 5,  6, ipv4, ipv6.int/arpa, ipv6 respectively
 requestid: identifier of the request
  
 
@@ -401,15 +401,15 @@ check_rehash(void *unused)
 int
 main(int argc, char **argv)
 {
-	res_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 1024, 256, 256);	/* XXX fix me */
+	res_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256);	/* XXX fix me */
 
 	if(res_helper == NULL)
 	{
 		fprintf(stderr,
-			"This is ircd-ratbox resolver.  You know you aren't supposed to run me directly?\n");
+			"This is ircd-ratbox resolver.	You know you aren't supposed to run me directly?\n");
 		fprintf(stderr,
 			"You get an Id tag for this: $Id$\n");
-		fprintf(stderr, "Have a nice life\n");
+		fprintf(stderr, "Bleep blorp.\n");
 		exit(1);
 	}
 	rb_set_time();

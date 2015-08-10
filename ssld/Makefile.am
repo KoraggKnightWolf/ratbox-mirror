@@ -4,7 +4,7 @@
 libexec_PROGRAMS = ssld
 AM_CFLAGS=$(WARNFLAGS)
 
-INCLUDES = -I../include -I../libratbox/include 
+AM_CPPFLAGS = -I../include -I../libratbox/include 
 
 
 ssld_SOURCES = ssld.c

@@ -1,3 +1,9 @@
+#
+# Makefile.am: stuff for automake to vomit back up in a digested form
+# $Id$ 
+#
+
+
 AUTOMAKE_OPTIONS = foreign
 
 prefix		= @prefix@
@@ -5,7 +11,7 @@ libcoredir	= @libdir@
 
 AM_YFLAGS = -d
 AM_CFLAGS = $(WARNFLAGS)
-INCLUDES = -I../libratbox/include -I../libltdl @SSL_INCLUDES@
+AM_CPPFLAGS = -I../libratbox/include $(LTDLINCL) @OpenSSL_CFLAGS@ @PICFLAGS@
 
 BUILT_SOURCES = version.c
 
@@ -21,56 +27,56 @@ EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-re
 endif
 
 libcore_la_SOURCES =			\
-	dns.c				\
-	bandbi.c			\
-	blacklist.c			\
-	cache.c				\
-	channel.c			\
-	class.c				\
-	client.c			\
-	getopt.c			\
-	hash.c				\
-	hook.c				\
-	hostmask.c			\
-	ircd.c				\
-	ircd_signal.c			\
-	listener.c			\
-	match.c				\
-	modules.c			\
-	monitor.c			\
-	newconf.c			\
-	operhash.c			\
-	packet.c			\
-	parse.c				\
-	reject.c			\
-	restart.c			\
-	s_auth.c			\
-	s_conf.c			\
-	s_newconf.c			\
-	s_log.c				\
-	s_serv.c			\
-	s_user.c			\
-	scache.c			\
-	send.c				\
-	sslproc.c			\
-	supported.c			\
-	whowas.c			\
-	version.c			\
-	ircd_parser.y			\
-	ircd_lexer.l                       
+        bandbi.c                        \
+        cache.c                         \
+        channel.c                       \
+        class.c                         \
+        client.c                        \
+	dns.c                           \
+        getopt.c                        \
+        hash.c                          \
+        hook.c                          \
+        hostmask.c                      \
+        ipv4_from_ipv6.c                \
+        ircd.c                          \
+        ircd_lexer.l			\
+        ircd_parser.y                   \
+        ircd_signal.c                   \
+        listener.c                      \
+        match.c                         \
+        modules.c                       \
+        monitor.c                       \
+        newconf.c                       \
+        operhash.c                      \
+        packet.c                        \
+        parse.c                         \
+        reject.c                        \
+        s_auth.c                        \
+        scache.c                        \
+        s_conf.c                        \
+        send.c                          \
+        s_log.c                         \
+        s_newconf.c                     \
+        s_serv.c                        \
+        sslproc.c                       \
+        substitution.c                  \
+        supported.c                     \
+        s_user.c                        \
+        version.c                       \
+        whowas.c                        
                         
 libcore_LTLIBRARIES = libcore.la
 libcore_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version
 
 if MINGW
 libcore_la_DEPENDENCIES = $(LIBLTDL) ../libratbox/src/libratbox.la
-libcore_la_LIBADD = ../libratbox/src/libratbox.la $(LIBLTDL) @SSL_LIBS@
+libcore_la_LIBADD = ../libratbox/src/libratbox.la $(LIBLTDL) @OpenSSL_LIBS@
 else
 libcore_la_DEPENDENCIES = ../libratbox/src/libratbox.la
-libcore_la_LIBADD = ../libratbox/src/libratbox.la $(LIBLTDL) @SSL_LIBS@
+libcore_la_LIBADD = ../libratbox/src/libratbox.la $(LIBLTDL) @OpenSSL_LIBS@
 endif
 
 
 install-exec-hook: install-libcoreLTLIBRARIES
-	@RB_RM@ version.c
+	$(RB_RM) -f version.c
 

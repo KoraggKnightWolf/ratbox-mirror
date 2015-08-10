@@ -41,13 +41,18 @@ static int mr_pong(struct Client *, struct Client *, int, const char **);
 static int ms_pong(struct Client *, struct Client *, int, const char **);
 
 struct Message pong_msgtab = {
-	"PONG", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_pong, 0}, mg_ignore, mg_ignore, {ms_pong, 2}, mg_ignore, mg_ignore}
+	.cmd = "PONG", 
+	.handlers[UNREGISTERED_HANDLER] =	{ .handler = mr_pong },
+	.handlers[CLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ .handler = ms_pong, .min_para = 2 },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{  mm_ignore },
 };
 
-mapi_clist_av2 pong_clist[] = { &pong_msgtab, NULL };
+mapi_clist_av1 pong_clist[] = { &pong_msgtab, NULL };
 
-DECLARE_MODULE_AV2(pong, NULL, NULL, pong_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(pong, NULL, NULL, pong_clist, NULL, NULL, "$Revision$");
 
 static int
 ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -60,13 +65,14 @@ ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	/* Now attempt to route the PONG, comstud pointed out routable PING
 	 * is used for SPING.  routable PING should also probably be left in
-	 *        -Dianora
+	 *	  -Dianora
 	 * That being the case, we will route, but only for registered clients (a
 	 * case can be made to allow them only from servers). -Shadowfax
 	 */
 	if(!EmptyString(destination) && !match(destination, me.name) && irccmp(destination, me.id))
 	{
-		if((target_p = find_client(destination)))
+		if((target_p = find_client(destination)) ||
+		   (target_p = find_server(NULL, destination)))
 			sendto_one(target_p, ":%s PONG %s %s",
 				   get_id(source_p, target_p), parv[1], get_id(target_p, target_p));
 		else
@@ -85,8 +91,8 @@ ms_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "End of burst (emulated) from %s (%d seconds)",
 					     source_p->name,
-					     (signed int)(rb_time() -
-							  source_p->localClient->firsttime));
+					     (signed int) (rb_current_time() -
+							   source_p->localClient->firsttime));
 		SetEob(source_p);
 		eob_count++;
 	}
@@ -114,9 +120,8 @@ mr_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 				}
 				else
 				{
-					sendto_one(source_p, form_str(ERR_WRONGPONG),
-						   me.name, source_p->name,
-						   source_p->localClient->random_ping);
+					sendto_one_numeric(source_p, s_RPL(ERR_WRONGPONG),
+						   (unsigned long) source_p->localClient->random_ping);
 					return 0;
 				}
 			}
@@ -124,8 +129,7 @@ mr_pong(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	}
 	else
-		sendto_one(source_p, form_str(ERR_NOORIGIN), me.name,
-			   EmptyString(source_p->name) ? "*" : source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOORIGIN));
 
 	source_p->flags &= ~FLAGS_PINGSENT;
 

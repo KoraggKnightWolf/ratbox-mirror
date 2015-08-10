@@ -52,23 +52,43 @@ static void trace_spy(struct Client *, struct Client *);
 
 
 struct Message chantrace_msgtab = {
-	"CHANTRACE", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_chantrace, 2}}
+	.cmd = "CHANTRACE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore }, 
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_chantrace, .min_para = 2 },
 };
 
 struct Message masktrace_msgtab = {
-	"MASKTRACE", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_masktrace, 2}}
+	.cmd = "MASKTRACE", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore }, 
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_masktrace, .min_para = 2 },
 };
 
 struct Message etrace_msgtab = {
-	"ETRACE", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_etrace, 0}, {mo_etrace, 0}}
+	.cmd = "ETRACE", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore }, 
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_etrace, .min_para = 0 },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_etrace, .min_para = 0 },
 };
 
 struct Message trace_msgtab = {
-	"TRACE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_trace, 0}, {m_trace, 0}, mg_ignore, mg_ignore, {m_trace, 0}}
+	.cmd = "TRACE", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg }, 
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_trace, .min_para = 0 },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = m_trace, .min_para = 0 },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore},
+	.handlers[OPER_HANDLER] =		{ .handler = m_trace, .min_para = 0 },
 };
 
 static void do_etrace(struct Client *source_p, int ipv4, int ipv6);
@@ -82,19 +102,20 @@ static const char *spoofed_sockhost = "0";
 
 int doing_trace_hook;
 
-mapi_clist_av2 trace_clist[] =
+mapi_clist_av1 trace_clist[] =
 	{ &trace_msgtab, &etrace_msgtab, &chantrace_msgtab, &masktrace_msgtab, NULL };
-mapi_hlist_av2 trace_hlist[] = {
+mapi_hlist_av1 trace_hlist[] = {
 	{"doing_trace", &doing_trace_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV2(trace, NULL, NULL, trace_clist, trace_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV1(trace, NULL, NULL, trace_clist, trace_hlist, NULL, "$Revision$");
 
 
 /*
  * m_trace
- *      parv[1] = servername
+ *	parv[0] = sender prefix
+ *	parv[1] = servername
  */
 static int
 m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -120,7 +141,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 	else
 		tname = me.name;
 
-	/* if we have 3 parameters, then the command is directed at us.  So
+	/* if we have 3 parameters, then the command is directed at us.	 So
 	 * we shouldnt be forwarding it anywhere. --anfl
 	 */
 	if(parc < 3)
@@ -142,7 +163,8 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 					{
 						ac2ptr = ptr->data;
 
-						if(match(tname, ac2ptr->name))
+						if(match(tname, ac2ptr->name)
+						   || match(ac2ptr->name, tname))
 							break;
 						else
 							ac2ptr = NULL;
@@ -206,7 +228,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		trace_spy(source_p, target_p);
 
-		sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), tname);
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), tname);
 		return 0;
 	}
 
@@ -234,20 +256,17 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 			report_this_status(source_p, target_p);
 		}
 
-		if (IsExemptShide(source_p) || !ConfigServerHide.flatten_links)
+		RB_DLINK_FOREACH(ptr, serv_list.head)
 		{
-			RB_DLINK_FOREACH(ptr, serv_list.head)
-			{
-				target_p = ptr->data;
+			target_p = ptr->data;
 
-				if(!doall && wilds && !match(tname, target_p->name))
-					continue;
+			if(!doall && wilds && !match(tname, target_p->name))
+				continue;
 
-				report_this_status(source_p, target_p);
-			}
+			report_this_status(source_p, target_p);
 		}
 		ClearCork(source_p);
-		sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), tname);
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), tname);
 		return 0;
 	}
 
@@ -302,7 +321,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 		/* let the user have some idea that its at the end of the
 		 * trace
 		 */
-		sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), tname);
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), tname);
 		return 0;
 	}
 
@@ -321,7 +340,7 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 		ClearCork(source_p);
 	}
 
-	sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), tname);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), tname);
 
 	return 0;
 }
@@ -351,7 +370,7 @@ count_downlinks(struct Client *server_p, int *pservcount, int *pusercount)
  * report_this_status
  *
  * inputs	- pointer to client to report to
- * 		- pointer to client to report about
+ *		- pointer to client to report about
  * output	- counter of number of hits
  * side effects - NONE
  */
@@ -367,7 +386,7 @@ report_this_status(struct Client *source_p, struct Client *target_p)
 	if(!MyConnect(target_p))
 		return 0;
 
-	rb_inet_ntop_sock((struct sockaddr *)&target_p->localClient->ip, ip, sizeof(ip));
+	rb_inet_ntop_sock((struct sockaddr *) &target_p->localClient->ip, ip, sizeof(ip));
 	class_name = get_client_class(target_p);
 
 	if(IsAnyServer(target_p))
@@ -397,19 +416,21 @@ report_this_status(struct Client *source_p, struct Client *target_p)
 		sendto_one_numeric(source_p, RPL_TRACEUNKNOWN,
 				   form_str(RPL_TRACEUNKNOWN),
 				   class_name, name, ip,
-				   (unsigned long)(rb_time() - target_p->localClient->firsttime));
+				   rb_current_time() - target_p->localClient->firsttime);
 		cnt++;
 		break;
 
 	case STAT_CLIENT:
-		sendto_one_numeric(source_p,
-				   IsOper(target_p) ? RPL_TRACEOPERATOR : RPL_TRACEUSER,
-				   IsOper(target_p) ? form_str(RPL_TRACEOPERATOR) : form_str(RPL_TRACEUSER),
-				   class_name, name,
-				   show_ip(source_p, target_p) ? ip : empty_sockhost,
-				   (unsigned long)(rb_time() - target_p->localClient->lasttime),
-				   (unsigned long)(rb_time() - target_p->localClient->last));
-		cnt++;
+		{
+			sendto_one_numeric(source_p,
+					   IsOper(target_p) ? RPL_TRACEOPERATOR : RPL_TRACEUSER,
+					   IsOper(target_p) ? form_str(RPL_TRACEOPERATOR) :
+					   form_str(RPL_TRACEUSER), class_name, name,
+					   show_ip(source_p, target_p) ? ip : empty_sockhost,
+					   rb_current_time() - target_p->localClient->lasttime,
+					   rb_current_time() - target_p->localClient->last);
+			cnt++;
+		}
 		break;
 
 
@@ -420,19 +441,18 @@ report_this_status(struct Client *source_p, struct Client *target_p)
 
 			count_downlinks(target_p, &servcount, &usercount);
 
-			sendto_one_numeric(source_p, RPL_TRACESERVER, form_str(RPL_TRACESERVER),
+			sendto_one_numeric(source_p, s_RPL(RPL_TRACESERVER),
 					   class_name, servcount, usercount, name,
 					   *(target_p->serv->by) ? target_p->serv->by : "*", "*",
 					   me.name,
-					   (unsigned long)(rb_time() - target_p->localClient->lasttime));
+					   rb_current_time() - target_p->localClient->lasttime);
 			cnt++;
 
 		}
 		break;
 
 	default:		/* ...we actually shouldn't come here... --msa */
-		sendto_one_numeric(source_p, RPL_TRACENEWTYPE,
-				   form_str(RPL_TRACENEWTYPE), name);
+		sendto_one_numeric(source_p, RPL_TRACENEWTYPE, form_str(RPL_TRACENEWTYPE), me.name);
 		cnt++;
 		break;
 	}
@@ -442,8 +462,8 @@ report_this_status(struct Client *source_p, struct Client *target_p)
 
 /* trace_spy()
  *
- * input        - pointer to client
- * output       - none
+ * input	- pointer to client
+ * output	- none
  * side effects - hook event doing_trace is called
  */
 static void
@@ -461,7 +481,8 @@ trace_spy(struct Client *source_p, struct Client *target_p)
 
 /*
  * m_etrace
- *      parv[1] = options [or target]
+ *	parv[0] = sender prefix
+ *	parv[1] = options [or target]
  *	parv[2] = [target]
  */
 static int
@@ -514,8 +535,7 @@ me_etrace(struct Client *client_p, struct Client *source_p, int parc, const char
 	if((target_p = find_person(parv[1])) && MyClient(target_p))
 		do_single_etrace(source_p, target_p);
 
-	sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE),
-			   target_p ? target_p->name : parv[1]);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), target_p ? target_p->name : parv[1]);
 
 	return 0;
 }
@@ -538,8 +558,7 @@ do_etrace(struct Client *source_p, int ipv4, int ipv6)
 			continue;
 #endif
 
-		sendto_one(source_p, form_str(RPL_ETRACE),
-			   me.name, source_p->name,
+		sendto_one_numeric(source_p, s_RPL(RPL_ETRACE),
 			   IsOper(target_p) ? "Oper" : "User",
 			   get_client_class(target_p),
 			   target_p->name, target_p->username, target_p->host,
@@ -547,7 +566,7 @@ do_etrace(struct Client *source_p, int ipv4, int ipv6)
 			   target_p->info);
 	}
 	ClearCork(source_p);
-	sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), me.name);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), me.name);
 }
 
 static void
@@ -560,13 +579,13 @@ do_etrace_full(struct Client *source_p)
 		do_single_etrace(source_p, ptr->data);
 	}
 	ClearCork(source_p);
-	sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), me.name);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), me.name);
 }
 
 /*
  * do_single_etrace  - searches local clients and displays those matching
- *                     a pattern
- * input             - source client, target client
+ *		       a pattern
+ * input	     - source client, target client
  * output	     - etrace results
  * side effects	     - etrace results are displayed
  */
@@ -577,15 +596,13 @@ do_single_etrace(struct Client *source_p, struct Client *target_p)
 	 * advertise its internal ip address in the field --fl
 	 */
 	if(!show_ip(source_p, target_p))
-		sendto_one(source_p, form_str(RPL_ETRACEFULL),
-			   me.name, source_p->name,
+		sendto_one_numeric(source_p, s_RPL(RPL_ETRACEFULL),
 			   IsOper(target_p) ? "Oper" : "User",
 			   get_client_class(target_p),
 			   target_p->name, target_p->username, target_p->host,
 			   empty_sockhost, "<hidden> <hidden>", target_p->info);
 	else
-		sendto_one(source_p, form_str(RPL_ETRACEFULL),
-			   me.name, source_p->name,
+		sendto_one_numeric(source_p, s_RPL(RPL_ETRACEFULL),
 			   IsOper(target_p) ? "Oper" : "User",
 			   get_client_class(target_p),
 			   target_p->name, target_p->username,
@@ -612,9 +629,7 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 		operspy = 1;
 		if(EmptyString(name))
 		{
-			sendto_one_numeric(source_p, ERR_NEEDMOREPARAMS,
-					   form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name,
-					   "CHANTRACE");
+			sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "CHANTRACE");
 			return 0;
 		}
 	}
@@ -648,20 +663,20 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 		else
 			sockhost = target_p->sockhost;
 
-		sendto_one(source_p, form_str(RPL_ETRACE),
-			   me.name, source_p->name, IsOper(target_p) ? "Oper" : "User",
+		sendto_one_numeric(source_p, s_RPL(RPL_ETRACE),
+			   IsOper(target_p) ? "Oper" : "User",
 			   /* class field -- pretend its server.. */
 			   target_p->servptr->name,
 			   target_p->name, target_p->username, target_p->host,
 			   sockhost, target_p->info);
 	}
 	ClearCork(source_p);
-	sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), me.name);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), me.name);
 	return 0;
 }
 
 static void
-match_masktrace(struct Client *source_p, rb_dlink_list *list, const char *username,
+match_masktrace(struct Client *source_p, rb_dlink_list * list, const char *username,
 		const char *hostname, const char *name, const char *gecos)
 {
 	struct Client *target_p;
@@ -690,8 +705,8 @@ match_masktrace(struct Client *source_p, rb_dlink_list *list, const char *userna
 			if(gecos != NULL && !match_esc(gecos, target_p->info))
 				continue;
 
-			sendto_one(source_p, form_str(RPL_ETRACE),
-				   me.name, source_p->name, IsOper(target_p) ? "Oper" : "User",
+			sendto_one_numeric(source_p, s_RPL(RPL_ETRACE),
+				   IsOper(target_p) ? "Oper" : "User",
 				   /* class field -- pretend its server.. */
 				   target_p->servptr->name,
 				   target_p->name, target_p->username, target_p->host,
@@ -752,7 +767,7 @@ mo_masktrace(struct Client *client_p, struct Client *source_p, int parc, const c
 	SetCork(source_p);
 	if(operspy)
 	{
-		char buf[512];
+		char buf[IRCD_BUFSIZE];
 		rb_strlcpy(buf, mask, sizeof(buf));
 		if(!EmptyString(gecos))
 		{
@@ -766,6 +781,6 @@ mo_masktrace(struct Client *client_p, struct Client *source_p, int parc, const c
 	else
 		match_masktrace(source_p, &lclient_list, username, hostname, name, gecos);
 	ClearCork(source_p);
-	sendto_one_numeric(source_p, RPL_ENDOFTRACE, form_str(RPL_ENDOFTRACE), me.name);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), me.name);
 	return 0;
 }

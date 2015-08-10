@@ -51,13 +51,24 @@
 #include "operhash.h"
 #include "bandbi.h"
 #include "newconf.h"
-#include "blacklist.h"
+#include "s_auth.h"
+
+
+typedef enum _cfc
+{
+	SUCCESS			= 0,
+	NOT_AUTHORISED		= -1,	
+	I_SOCKET_ERROR		= -2, 	 
+	I_LINE_FULL		= -3,
+	BANNED_CLIENT		= -4,
+	TOO_MANY_LOCAL		= -5,
+	TOO_MANY_GLOBAL 	= -6,
+	TOO_MANY_IDENT		= -7,
+	TOO_MANY_GLOBAL_CIDR = -8,
+} chk_res;
+
 
 struct config_server_hide ConfigServerHide;
-
-extern char linebuf[];
-
-static rb_bh *confitem_heap = NULL;
 
 rb_dlink_list temp_klines[LAST_TEMP_TYPE];
 rb_dlink_list temp_dlines[LAST_TEMP_TYPE];
@@ -67,6 +78,7 @@ rb_dlink_list service_list;
 #endif
 
 /* internally defined functions */
+void set_default_conf(void);
 static void clear_out_old_conf(void);
 
 static void expire_temp_kd(void *list);
@@ -74,29 +86,22 @@ static void reorganise_temp_kd(void *list);
 
 extern char yytext[];
 
-static int verify_access(struct Client *client_p, const char *username);
+static chk_res verify_access(struct Client *client_p, const char *username);
 static int attach_iline(struct Client *, struct ConfItem *);
 
 void
 init_s_conf(void)
 {
-	confitem_heap = rb_bh_create(sizeof(struct ConfItem), CONFITEM_HEAP_SIZE, "confitem_heap");
 
 	rb_event_addish("expire_temp_klines", expire_temp_kd, &temp_klines[TEMP_MIN], 60);
 	rb_event_addish("expire_temp_dlines", expire_temp_kd, &temp_dlines[TEMP_MIN], 60);
 
-	rb_event_addish("expire_temp_klines_hour", reorganise_temp_kd,
-			&temp_klines[TEMP_HOUR], 3600);
-	rb_event_addish("expire_temp_dlines_hour", reorganise_temp_kd,
-			&temp_dlines[TEMP_HOUR], 3600);
-	rb_event_addish("expire_temp_klines_day", reorganise_temp_kd,
-			&temp_klines[TEMP_DAY], 86400);
-	rb_event_addish("expire_temp_dlines_day", reorganise_temp_kd,
-			&temp_dlines[TEMP_DAY], 86400);
-	rb_event_addish("expire_temp_klines_week", reorganise_temp_kd,
-			&temp_klines[TEMP_WEEK], 604800);
-	rb_event_addish("expire_temp_dlines_week", reorganise_temp_kd,
-			&temp_dlines[TEMP_WEEK], 604800);
+	rb_event_addish("expire_temp_klines_hour", reorganise_temp_kd, &temp_klines[TEMP_HOUR], 3600);
+	rb_event_addish("expire_temp_dlines_hour", reorganise_temp_kd, &temp_dlines[TEMP_HOUR], 3600);
+	rb_event_addish("expire_temp_klines_day", reorganise_temp_kd, &temp_klines[TEMP_DAY], 86400);
+	rb_event_addish("expire_temp_dlines_day", reorganise_temp_kd, &temp_dlines[TEMP_DAY], 86400);
+	rb_event_addish("expire_temp_klines_week", reorganise_temp_kd, &temp_klines[TEMP_WEEK], 604800);
+	rb_event_addish("expire_temp_dlines_week", reorganise_temp_kd, &temp_dlines[TEMP_WEEK], 604800);
 }
 
 /*
@@ -111,7 +116,7 @@ make_conf()
 {
 	struct ConfItem *aconf;
 
-	aconf = rb_bh_alloc(confitem_heap);
+	aconf = rb_malloc(sizeof(struct ConfItem));
 	aconf->status = CONF_ILLEGAL;
 	return (aconf);
 }
@@ -146,7 +151,7 @@ free_conf(struct ConfItem *aconf)
 	else
 		rb_free(aconf->info.name);
 
-	rb_bh_free(confitem_heap, aconf);
+	rb_free(aconf);
 }
 
 /*
@@ -154,19 +159,19 @@ free_conf(struct ConfItem *aconf)
  *
  * inputs	- pointer to client
  * output	- 0 = Success
- * 		  NOT_AUTHORISED (-1) = Access denied (no I line match)
- * 		  I_SOCKET_ERROR   (-2) = Bad socket.
- * 		  I_LINE_FULL    (-3) = I-line is full
- *		  TOO_MANY       (-4) = Too many connections from hostname
- * 		  BANNED_CLIENT  (-5) = K-lined
+ *		  NOT_AUTHORISED (-1) = Access denied (no I line match)
+ *		  I_SOCKET_ERROR   (-2) = Bad socket.
+ *		  I_LINE_FULL	 (-3) = I-line is full
+ *		  TOO_MANY	 (-4) = Too many connections from hostname
+ *		  BANNED_CLIENT	 (-5) = K-lined
  * side effects - Ordinary client access check.
  *		  Look for conf lines which have the same
- * 		  status as the flags passed.
+ *		  status as the flags passed.
  */
-int
+chk_res
 check_client(struct Client *client_p, struct Client *source_p, const char *username)
 {
-	int i;
+	chk_res i;
 
 	if((i = verify_access(source_p, username)))
 	{
@@ -183,13 +188,10 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		sendto_realops_flags(UMODE_FULL, L_ALL,
 				     "Too many local connections for %s!%s%s@%s",
 				     source_p->name, IsGotId(source_p) ? "" : "~",
-				     source_p->username, show_ip(NULL,
-								 source_p) ? source_p->sockhost :
-				     source_p->host);
+				     source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
 
 		ilog(L_FUSER, "Too many local connections from %s!%s%s@%s",
-		     source_p->name, IsGotId(source_p) ? "" : "~",
-		     source_p->username, source_p->sockhost);
+		     source_p->name, IsGotId(source_p) ? "" : "~", source_p->username, source_p->sockhost);
 
 		ServerStats.is_ref++;
 		exit_client(client_p, source_p, &me, "Too many host connections (local)");
@@ -199,9 +201,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		sendto_realops_flags(UMODE_FULL, L_ALL,
 				     "Too many global connections for %s!%s%s@%s",
 				     source_p->name, IsGotId(source_p) ? "" : "~",
-				     source_p->username, show_ip(NULL,
-								 source_p) ? source_p->sockhost :
-				     source_p->host);
+				     source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
 		ilog(L_FUSER, "Too many global connections from %s!%s%s@%s", source_p->name,
 		     IsGotId(source_p) ? "" : "~", source_p->username, source_p->sockhost);
 
@@ -213,9 +213,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		sendto_realops_flags(UMODE_FULL, L_ALL,
 				     "Too many global connections(cidr) for %s!%s%s@%s",
 				     source_p->name, IsGotId(source_p) ? "" : "~",
-				     source_p->username, show_ip(NULL,
-								 source_p) ? source_p->sockhost :
-				     source_p->host);
+				     source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
 		ilog(L_FUSER, "Too many global connections(cidr) from %s!%s%s@%s", source_p->name,
 		     IsGotId(source_p) ? "" : "~", source_p->username, source_p->sockhost);
 
@@ -228,9 +226,7 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		sendto_realops_flags(UMODE_FULL, L_ALL,
 				     "Too many user connections for %s!%s%s@%s",
 				     source_p->name, IsGotId(source_p) ? "" : "~",
-				     source_p->username, show_ip(NULL,
-								 source_p) ? source_p->sockhost :
-				     source_p->host);
+				     source_p->username, show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
 		ilog(L_FUSER, "Too many user connections from %s!%s%s@%s", source_p->name,
 		     IsGotId(source_p) ? "" : "~", source_p->username, source_p->sockhost);
 
@@ -246,12 +242,10 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 				     show_ip(NULL, source_p) ? source_p->sockhost : source_p->host);
 
 		ilog(L_FUSER, "Too many connections from %s!%s%s@%s.",
-		     source_p->name, IsGotId(source_p) ? "" : "~",
-		     source_p->username, source_p->sockhost);
+		     source_p->name, IsGotId(source_p) ? "" : "~", source_p->username, source_p->sockhost);
 
 		ServerStats.is_ref++;
-		exit_client(client_p, source_p, &me,
-			    "No more connections allowed in your connection class");
+		exit_client(client_p, source_p, &me, "No more connections allowed in your connection class");
 		break;
 
 	case NOT_AUTHORISED:
@@ -259,33 +253,29 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 			int port = -1;
 #ifdef RB_IPV6
 			if(GET_SS_FAMILY(&source_p->localClient->ip) == AF_INET6)
-				port = ntohs(((struct sockaddr_in6 *)&source_p->
-					      localClient->listener->addr)->sin6_port);
+				port = ntohs(((struct sockaddr_in6 *)&source_p->localClient->listener->
+					      addr)->sin6_port);
 			else
 #endif
-				port = ntohs(((struct sockaddr_in *)&source_p->
-					      localClient->listener->addr)->sin_port);
+				port = ntohs(((struct sockaddr_in *)&source_p->localClient->listener->addr)->sin_port);
 
 			ServerStats.is_ref++;
 			/* jdc - lists server name & port connections are on */
-			/*       a purely cosmetical change */
+			/*	 a purely cosmetical change */
 
 			sendto_realops_flags(UMODE_UNAUTH, L_ALL,
 					     "Unauthorised client connection from "
 					     "%s!%s%s@%s [%s] on [%s/%u].",
 					     source_p->name, IsGotId(source_p) ? "" : "~",
 					     source_p->username, source_p->host,
-					     source_p->sockhost,
-					     source_p->localClient->listener->name, port);
+					     source_p->sockhost, source_p->localClient->listener->name, port);
 
 			ilog(L_FUSER,
 			     "Unauthorised client connection from %s!%s%s@%s on [%s/%u].",
 			     source_p->name, IsGotId(source_p) ? "" : "~",
-			     source_p->username, source_p->sockhost,
-			     source_p->localClient->listener->name, port);
+			     source_p->username, source_p->sockhost, source_p->localClient->listener->name, port);
 			add_reject(client_p);
-			exit_client(client_p, source_p, &me,
-				    "You are not authorised to use this server");
+			exit_client(client_p, source_p, &me, "You are not authorised to use this server");
 			break;
 		}
 	case BANNED_CLIENT:
@@ -295,7 +285,6 @@ check_client(struct Client *client_p, struct Client *source_p, const char *usern
 		break;
 
 	case 0:
-	default:
 		break;
 	}
 	return (i);
@@ -339,9 +328,8 @@ verify_access(struct Client *client_p, const char *username)
 	{
 		if(aconf->flags & CONF_FLAGS_REDIR)
 		{
-			sendto_one(client_p, form_str(RPL_REDIR),
-				   me.name, client_p->name,
-				   aconf->info.name ? aconf->info.name : "", aconf->port);
+			sendto_one_numeric(client_p, s_RPL(RPL_REDIR),
+					   aconf->info.name ? aconf->info.name : "", aconf->port);
 			return (NOT_AUTHORISED);
 		}
 
@@ -356,8 +344,8 @@ verify_access(struct Client *client_p, const char *username)
 						     "%s spoofing: %s as %s",
 						     client_p->name,
 						     show_ip(NULL,
-							     client_p) ? client_p->
-						     host : aconf->info.name, aconf->info.name);
+							     client_p) ? client_p->host : aconf->info.name,
+						     aconf->info.name);
 			}
 
 			/* user@host spoof */
@@ -366,14 +354,12 @@ verify_access(struct Client *client_p, const char *username)
 				char *host = p + 1;
 				*p = '\0';
 
-				rb_strlcpy(client_p->username, aconf->info.name,
-					   sizeof(client_p->username));
+				rb_strlcpy(client_p->username, aconf->info.name, sizeof(client_p->username));
 				rb_strlcpy(client_p->host, host, sizeof(client_p->host));
 				*p = '@';
 			}
 			else
-				rb_strlcpy(client_p->host, aconf->info.name,
-					   sizeof(client_p->host));
+				rb_strlcpy(client_p->host, aconf->info.name, sizeof(client_p->host));
 		}
 		return (attach_iline(client_p, aconf));
 	}
@@ -412,8 +398,7 @@ add_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 	rb_patricia_node_t *pnode;
 	int bitlen;
 	/* If the limits are 0 don't do anything.. */
-	if(ConfCidrAmount(aconf) == 0
-	   || (ConfCidrIpv4Bitlen(aconf) == 0 && ConfCidrIpv6Bitlen(aconf) == 0))
+	if(ConfCidrAmount(aconf) == 0 || (ConfCidrIpv4Bitlen(aconf) == 0 && ConfCidrIpv6Bitlen(aconf) == 0))
 		return -1;
 
 	pnode = rb_match_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip);
@@ -424,24 +409,23 @@ add_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 		bitlen = ConfCidrIpv6Bitlen(aconf);
 
 	if(pnode == NULL)
-		pnode = make_and_lookup_ip(ConfIpLimits(aconf),
-					   (struct sockaddr *)&client_p->localClient->ip, bitlen);
+		pnode = rb_make_and_lookup_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip, bitlen);
 
 	s_assert(pnode != NULL);
 
 	if(pnode != NULL)
 	{
-		if(((intptr_t)pnode->data) >= ConfCidrAmount(aconf) && !IsConfExemptLimits(aconf))
+		if(((intptr_t) pnode->data) >= ConfCidrAmount(aconf) && !IsConfExemptLimits(aconf))
 		{
 			/* This should only happen if the limits are set to 0 */
-			if((intptr_t)pnode->data == 0)
+			if((intptr_t) pnode->data == 0)
 			{
 				rb_patricia_remove(ConfIpLimits(aconf), pnode);
 			}
 			return (0);
 		}
 
-		pnode->data = (void *)(((intptr_t)pnode->data) + 1);
+		pnode->data = (void *)(((intptr_t) pnode->data) + 1);
 	}
 	return 1;
 }
@@ -452,16 +436,15 @@ remove_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 	rb_patricia_node_t *pnode;
 
 	/* If the limits are 0 don't do anything.. */
-	if(ConfCidrAmount(aconf) == 0
-	   || (ConfCidrIpv4Bitlen(aconf) == 0 && ConfCidrIpv6Bitlen(aconf) == 0))
+	if(ConfCidrAmount(aconf) == 0 || (ConfCidrIpv4Bitlen(aconf) == 0 && ConfCidrIpv6Bitlen(aconf) == 0))
 		return;
 
 	pnode = rb_match_ip(ConfIpLimits(aconf), (struct sockaddr *)&client_p->localClient->ip);
 	if(pnode == NULL)
 		return;
 
-	pnode->data = (void *)(((intptr_t)pnode->data) - 1);
-	if(((intptr_t)pnode->data) == 0)
+	pnode->data = (void *)(((intptr_t) pnode->data) - 1);
+	if(((intptr_t) pnode->data) == 0)
 	{
 		rb_patricia_remove(ConfIpLimits(aconf), pnode);
 	}
@@ -573,12 +556,12 @@ detach_conf(struct Client *client_p)
  * attach_conf
  * 
  * inputs	- client pointer
- * 		- conf pointer
+ *		- conf pointer
  * output	-
  * side effects - Associate a specific configuration entry to a *local*
- *                client (this is the one which used in accepting the
- *                connection). Note, that this automatically changes the
- *                attachment if there was an old one...
+ *		  client (this is the one which used in accepting the
+ *		  connection). Note, that this automatically changes the
+ *		  attachment if there was an old one...
  */
 int
 attach_conf(struct Client *client_p, struct ConfItem *aconf)
@@ -592,8 +575,7 @@ attach_conf(struct Client *client_p, struct ConfItem *aconf)
 			return (TOO_MANY_LOCAL);
 	}
 
-	if((aconf->status & CONF_CLIENT) &&
-	   ConfCurrUsers(aconf) >= ConfMaxUsers(aconf) && ConfMaxUsers(aconf) > 0)
+	if((aconf->status & CONF_CLIENT) && ConfCurrUsers(aconf) >= ConfMaxUsers(aconf) && ConfMaxUsers(aconf) > 0)
 	{
 		if(!IsConfExemptLimits(aconf))
 		{
@@ -601,8 +583,7 @@ attach_conf(struct Client *client_p, struct ConfItem *aconf)
 		}
 		else
 		{
-			sendto_one_notice(client_p,
-					  ":*** I: line is full, but you have an >I: line!");
+			sendto_one_notice(client_p, ":*** I: line is full, but you have an >I: line!");
 			SetExemptLimits(client_p);
 		}
 
@@ -633,11 +614,10 @@ rehash(int sig)
 	int old_global_ipv4_cidr = ConfigFileEntry.global_cidr_ipv4_bitlen;
 	int old_global_ipv6_cidr = ConfigFileEntry.global_cidr_ipv6_bitlen;
 	char *old_bandb_path = LOCAL_COPY(ServerInfo.bandb_path);
-	
+
 	if(sig != 0)
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Got signal SIGHUP, reloading ircd conf. file");
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Got signal SIGHUP, reloading ircd conf. file");
 	}
 
 	filename = ConfigFileEntry.configfile;
@@ -647,8 +627,7 @@ rehash(int sig)
 	if(r > 0)
 	{
 		ilog(L_MAIN, "Config file %s has %d error(s) - aborting rehash", filename, r);
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Config file %s has %d error(s) aborting rehash", filename, r);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Config file %s has %d error(s) aborting rehash", filename, r);
 		return;
 	}
 
@@ -656,8 +635,7 @@ rehash(int sig)
 
 	if(r > 0)
 	{
-		ilog(L_MAIN, "Config file %s reports %d error(s) on second pass - aborting rehash",
-		     filename, r);
+		ilog(L_MAIN, "Config file %s reports %d error(s) on second pass - aborting rehash", filename, r);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "Config file %s reports %d error(s) on second pass - aborting rehash",
 				     filename, r);
@@ -671,7 +649,7 @@ rehash(int sig)
 		rb_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
 	else
 		rb_strlcpy(me.info, "unknown", sizeof(me.info));
-		
+
 	if(ServerInfo.bandb_path == NULL)
 		ServerInfo.bandb_path = rb_strdup(DBPATH);
 
@@ -707,8 +685,8 @@ rehash_bans(int sig)
  *		  of values later, put them in validate_conf().
  */
 
-#define YES     1
-#define NO      0
+#define YES	1
+#define NO	0
 #define UNSET  -1
 
 void
@@ -716,8 +694,12 @@ set_default_conf(void)
 {
 	/* ServerInfo.name is not rehashable */
 	/* ServerInfo.name = ServerInfo.name; */
+	/* ServerInfo.nicklen is not rehashable */
+
 	ServerInfo.description = NULL;
 	ServerInfo.network_name = rb_strdup(NETWORK_NAME_DEFAULT);
+	ServerInfo.network_desc = rb_strdup(NETWORK_DESC_DEFAULT);
+	ServerInfo.nicklen = UNSET;
 	ServerInfo.bandb_path = NULL;
 	memset(&ServerInfo.ip, 0, sizeof(ServerInfo.ip));
 	ServerInfo.specific_ipv4_vhost = 0;
@@ -784,15 +766,15 @@ set_default_conf(void)
 	ConfigFileEntry.fname_klinelog = NULL;
 	ConfigFileEntry.fname_operspylog = NULL;
 	ConfigFileEntry.fname_ioerrorlog = NULL;
+	ConfigFileEntry.motd_path = rb_strdup(MPATH);
+	ConfigFileEntry.oper_motd_path = rb_strdup(OPATH);
 	ConfigFileEntry.glines = NO;
-	ConfigFileEntry.use_egd = NO;
 	ConfigFileEntry.gline_time = 12 * 3600;
 	ConfigFileEntry.gline_min_cidr = 16;
 	ConfigFileEntry.gline_min_cidr6 = 48;
 	ConfigFileEntry.hide_error_messages = 1;
 	ConfigFileEntry.dots_in_ident = 0;
 	ConfigFileEntry.max_targets = MAX_TARGETS_DEFAULT;
-	ConfigFileEntry.egdpool_path = NULL;
 	ConfigFileEntry.use_whois_actually = YES;
 	ConfigFileEntry.burst_away = NO;
 	ConfigFileEntry.hide_spoof_ips = YES;
@@ -800,8 +782,7 @@ set_default_conf(void)
 	ConfigFileEntry.compression_level = 4;
 #endif
 
-	ConfigFileEntry.oper_umodes = UMODE_LOCOPS | UMODE_SERVNOTICE |
-		UMODE_OPERWALL | UMODE_WALLOP;
+	ConfigFileEntry.oper_umodes = UMODE_LOCOPS | UMODE_SERVNOTICE | UMODE_OPERWALL | UMODE_WALLOP;
 	ConfigFileEntry.oper_only_umodes = UMODE_DEBUG | UMODE_OPERSPY;
 
 	ConfigChannel.use_except = YES;
@@ -812,7 +793,6 @@ set_default_conf(void)
 	ConfigChannel.knock_delay_channel = 60;
 	ConfigChannel.max_chans_per_user = 15;
 	ConfigChannel.max_bans = 25;
-	ConfigChannel.only_ascii_channels = NO;
 	ConfigChannel.burst_topicwho = YES;
 	ConfigChannel.invite_ops_only = YES;
 
@@ -821,7 +801,6 @@ set_default_conf(void)
 	ConfigChannel.no_join_on_split = NO;
 	ConfigChannel.no_create_on_split = YES;
 	ConfigChannel.topiclen = DEFAULT_TOPICLEN;
-	ConfigChannel.resv_forcepart = YES;
 
 	ConfigServerHide.flatten_links = 0;
 	ConfigServerHide.links_delay = 300;
@@ -843,6 +822,8 @@ set_default_conf(void)
 	ConfigFileEntry.global_cidr_ipv6_bitlen = 64;
 	ConfigFileEntry.global_cidr_ipv6_count = 128;
 	ConfigFileEntry.global_cidr = YES;
+	ConfigFileEntry.delayed_exit_time = DEFAULT_DELAYED_EXIT_TIME;
+
 }
 
 #undef YES
@@ -882,7 +863,7 @@ conf_connect_allowed(struct sockaddr *addr, int aftype)
  * inputs	- reason, oper reason
  * outputs	-
  * side effects	- returns a single reason, combining the two fields if
- * 		  appropriate
+ *		  appropriate
  */
 const char *
 make_ban_reason(const char *reason, const char *oper_reason)
@@ -900,25 +881,25 @@ make_ban_reason(const char *reason, const char *oper_reason)
 
 /* add_temp_kline()
  *
- * inputs        - pointer to struct ConfItem
- * output        - none
- * Side effects  - links in given struct ConfItem into 
- *                 temporary kline link list
+ * inputs	 - pointer to struct ConfItem
+ * output	 - none
+ * Side effects	 - links in given struct ConfItem into 
+ *		   temporary kline link list
  */
 void
 add_temp_kline(struct ConfItem *aconf)
 {
-	if(aconf->hold >= rb_time() + (10080 * 60))
+	if(aconf->hold >= rb_current_time() + (10080 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
-	else if(aconf->hold >= rb_time() + (1440 * 60))
+	else if(aconf->hold >= rb_current_time() + (1440 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
-	else if(aconf->hold >= rb_time() + (60 * 60))
+	else if(aconf->hold >= rb_current_time() + (60 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_klines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
@@ -942,17 +923,17 @@ add_temp_kline(struct ConfItem *aconf)
 void
 add_temp_dline(struct ConfItem *aconf)
 {
-	if(aconf->hold >= rb_time() + (10080 * 60))
+	if(aconf->hold >= rb_current_time() + (10080 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_WEEK]);
 		aconf->port = TEMP_WEEK;
 	}
-	else if(aconf->hold >= rb_time() + (1440 * 60))
+	else if(aconf->hold >= rb_current_time() + (1440 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_DAY]);
 		aconf->port = TEMP_DAY;
 	}
-	else if(aconf->hold >= rb_time() + (60 * 60))
+	else if(aconf->hold >= rb_current_time() + (60 * 60))
 	{
 		rb_dlinkAddAlloc(aconf, &temp_dlines[TEMP_HOUR]);
 		aconf->port = TEMP_HOUR;
@@ -969,9 +950,9 @@ add_temp_dline(struct ConfItem *aconf)
 
 /* expire_tkline()
  *
- * inputs       - list pointer
- * 		- type
- * output       - NONE
+ * inputs	- list pointer
+ *		- type
+ * output	- NONE
  * side effects - expire tklines and moves them between lists
  */
 static void
@@ -981,11 +962,11 @@ expire_temp_kd(void *list)
 	rb_dlink_node *next_ptr;
 	struct ConfItem *aconf;
 
-	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, ((rb_dlink_list *)list)->head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, ((rb_dlink_list *) list)->head)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold <= rb_time())
+		if(aconf->hold <= rb_current_time())
 		{
 			/* Alert opers that a TKline expired - Hwy */
 			if(ConfigFileEntry.tkline_expire_notices)
@@ -993,8 +974,34 @@ expire_temp_kd(void *list)
 						     "Temporary K-line for [%s@%s] expired",
 						     (aconf->user) ? aconf->user : "*",
 						     (aconf->host) ? aconf->host : "*");
-
-			if(aconf->status & CONF_DLINE)
+			if(aconf->status & CONF_DLINE && aconf->pnode == NULL)
+			{
+				/* XXX this shouldn't be happening...I'm not sure why it does, but it only seems to happen 
+				 * on one server...add debugging code to look at it -androsyn
+				 */
+#define a_string(x) ((aconf->x) ? aconf->x : "*")
+#define a_x(x) (aconf->x)
+				ilog(L_MAIN, "WARNING: DLINE with aconf->status & CONF_DLINE but aconf->pnode == NULL! "
+				     "status:%x flags:%x clients:%d info.name:%s info.oper:%s host:%s passwd:%s spasswd:%s user:%s port:%d "
+				     "hold:%" RBTT_FMT ", class:%p pnode:%p", a_x(status), a_x(flags), a_x(clients),
+				     a_string(info.name), a_string(info.oper), a_string(host), a_string(passwd),
+				     a_string(spasswd), a_string(user), a_x(port), a_x(hold), a_x(c_class), a_x(pnode));
+				sendto_realops_flags(UMODE_ALL, L_ALL,
+						     "WARNING: DLINE with aconf->status & CONF_DLINE but aconf->pnode == NULL! "
+						     "status:%x flags:%x clients:%d info.name:%s info.oper:%s host:%s passwd:%s spasswd:%s user:%s port:%d "
+						     "hold:%" RBTT_FMT ", class:%p pnode:%p", a_x(status), a_x(flags),
+						     a_x(clients), a_string(info.name), a_string(info.oper),
+						     a_string(host), a_string(passwd), a_string(spasswd),
+						     a_string(user), a_x(port), a_x(hold), a_x(c_class), a_x(pnode));
+#undef a_string
+#undef a_x
+				ilog(L_MAIN,
+				     "WARNING: Calling delete_one_address_conf() on this and hoping for the best");
+				sendto_realops_flags(UMODE_ALL, L_ALL,
+						     "WARNING: Calling delete_one_address_conf() on this and hoping for the best");
+				delete_one_address_conf(aconf->host, aconf);
+			}
+			else if(aconf->status & CONF_DLINE)
 				remove_dline(aconf);
 			else
 				delete_one_address_conf(aconf->host, aconf);
@@ -1009,11 +1016,11 @@ reorganise_temp_kd(void *list)
 	struct ConfItem *aconf;
 	rb_dlink_node *ptr, *next_ptr;
 
-	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, ((rb_dlink_list *)list)->head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, ((rb_dlink_list *) list)->head)
 	{
 		aconf = ptr->data;
 
-		if(aconf->hold < (rb_time() + (60 * 60)))
+		if(aconf->hold < (rb_current_time() + (60 * 60)))
 		{
 			rb_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ?
 					 &temp_klines[TEMP_MIN] : &temp_dlines[TEMP_MIN]);
@@ -1021,14 +1028,13 @@ reorganise_temp_kd(void *list)
 		}
 		else if(aconf->port > TEMP_HOUR)
 		{
-			if(aconf->hold < (rb_time() + (1440 * 60)))
+			if(aconf->hold < (rb_current_time() + (1440 * 60)))
 			{
 				rb_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ?
 						 &temp_klines[TEMP_HOUR] : &temp_dlines[TEMP_HOUR]);
 				aconf->port = TEMP_HOUR;
 			}
-			else if(aconf->port > TEMP_DAY &&
-				(aconf->hold < (rb_time() + (10080 * 60))))
+			else if(aconf->port > TEMP_DAY && (aconf->hold < (rb_current_time() + (10080 * 60))))
 			{
 				rb_dlinkMoveNode(ptr, list, (aconf->status == CONF_KILL) ?
 						 &temp_klines[TEMP_DAY] : &temp_dlines[TEMP_DAY]);
@@ -1042,7 +1048,7 @@ reorganise_temp_kd(void *list)
 /* const char* get_oper_name(struct Client *client_p)
  * Input: A client to find the active oper{} name for.
  * Output: The nick!user@host{oper} of the oper.
- *         "oper" is server name for remote opers
+ *	   "oper" is server name for remote opers
  * Side effects: None.
  */
 const char *
@@ -1053,14 +1059,13 @@ get_oper_name(struct Client *client_p)
 
 	if(MyOper(client_p))
 	{
-		rb_snprintf(buffer, sizeof(buffer), "%s!%s@%s{%s}",
-			    client_p->name, client_p->username,
-			    client_p->host, client_p->localClient->opername);
+		snprintf(buffer, sizeof(buffer), "%s!%s@%s{%s}",
+			 client_p->name, client_p->username, client_p->host, client_p->localClient->opername);
 		return buffer;
 	}
 
-	rb_snprintf(buffer, sizeof(buffer), "%s!%s@%s{%s}",
-		    client_p->name, client_p->username, client_p->host, client_p->servptr->name);
+	snprintf(buffer, sizeof(buffer), "%s!%s@%s{%s}",
+		 client_p->name, client_p->username, client_p->host, client_p->servptr->name);
 	return buffer;
 }
 
@@ -1079,15 +1084,15 @@ get_class_name(struct ConfItem *aconf)
 /*
  * get_printable_conf
  *
- * inputs        - struct ConfItem
+ * inputs	 - struct ConfItem
  *
- * output         - name 
- *                - host
- *                - pass
- *                - user
- *                - port
+ * output	  - name 
+ *		  - host
+ *		  - pass
+ *		  - user
+ *		  - port
  *
- * side effects        -
+ * side effects	       -
  * Examine the struct struct ConfItem, setting the values
  * of name, host, pass, user to values either
  * in aconf, or "<NULL>" port is set to aconf->port in all cases.
@@ -1103,13 +1108,12 @@ get_printable_conf(struct ConfItem *aconf, const char **name, const char **host,
 	*pass = EmptyString(aconf->passwd) ? null : aconf->passwd;
 	*user = EmptyString(aconf->user) ? null : aconf->user;
 	*classname = get_class_name(aconf);
-	*port = (int)aconf->port;
+	*port = aconf->port;
 }
 
 void
 get_printable_kline(struct Client *source_p, struct ConfItem *aconf,
-		    const char **host, const char **reason,
-		    const char **user, const char **oper_reason)
+		    const char **host, const char **reason, const char **user, const char **oper_reason)
 {
 	static const char *null = "<NULL>";
 
@@ -1126,8 +1130,8 @@ get_printable_kline(struct Client *source_p, struct ConfItem *aconf,
 /*
  * clear_out_old_conf
  *
- * inputs       - none
- * output       - none
+ * inputs	- none
+ * output	- none
  * side effects - Clear out the old configuration
  */
 static void
@@ -1150,7 +1154,6 @@ clear_out_old_conf(void)
 	}
 
 	clear_out_address_conf();
-	remove_elines();
 	clear_s_newconf();
 
 	/* clean out module paths */
@@ -1165,10 +1168,12 @@ clear_out_old_conf(void)
 	ServerInfo.description = NULL;
 	rb_free(ServerInfo.network_name);
 	ServerInfo.network_name = NULL;
+	rb_free(ServerInfo.network_desc);
+	ServerInfo.network_desc = NULL;
 
 	rb_free(ServerInfo.bandb_path);
 	ServerInfo.bandb_path = NULL;
-	
+
 	/* clean out AdminInfo */
 	rb_free(AdminInfo.name);
 	AdminInfo.name = NULL;
@@ -1199,6 +1204,13 @@ clear_out_old_conf(void)
 	rb_free(ConfigFileEntry.fname_ioerrorlog);
 	ConfigFileEntry.fname_ioerrorlog = NULL;
 
+	
+	rb_free(ConfigFileEntry.motd_path);
+	ConfigFileEntry.motd_path;
+	
+	rb_free(ConfigFileEntry.oper_motd_path);
+	ConfigFileEntry.oper_motd_path = NULL;
+
 	rb_free(ServerInfo.vhost_dns);
 	ServerInfo.vhost_dns = NULL;
 #ifdef IPV6
@@ -1216,8 +1228,9 @@ clear_out_old_conf(void)
 	/* clean out general */
 	rb_free(ConfigFileEntry.kline_reason);
 	ConfigFileEntry.kline_reason = NULL;
-
-	destroy_blacklists();
+	
+	/* clear the rbl lists */
+	rbl_clear_rbllists();
 
 #ifdef ENABLE_SERVICES
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
@@ -1232,8 +1245,8 @@ clear_out_old_conf(void)
 
 /*
  * conf_add_class_to_conf
- * inputs       - pointer to config item
- * output       - NONE
+ * inputs	- pointer to config item
+ * output	- NONE
  * side effects - Add a class pointer to a conf 
  */
 
@@ -1269,8 +1282,8 @@ conf_add_class_to_conf(struct ConfItem *aconf, const char *classname)
 
 /*
  * conf_add_d_conf
- * inputs       - pointer to config item
- * output       - NONE
+ * inputs	- pointer to config item
+ * output	- NONE
  * side effects - Add a d/D line
  */
 void
@@ -1282,7 +1295,7 @@ conf_add_d_conf(struct ConfItem *aconf)
 	aconf->user = NULL;
 
 	/* XXX - Should 'd' ever be in the old conf? For new conf we don't
-	 *       need this anyway, so I will disable it for now... -A1kmm
+	 *	 need this anyway, so I will disable it for now... -A1kmm
 	 */
 
 	if(!add_dline(aconf))

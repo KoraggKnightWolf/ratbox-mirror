@@ -3,7 +3,7 @@
  *  m_okick.c: Kicks a user from a channel with much prejudice.
  *
  *  Copyright (C) 2002 by the past and present ircd coders, and others.
- *  Copyright (C) 2004 ircd-ratbox Development Team
+ *  Copyright (C) 2004-2012 ircd-ratbox Development Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,16 +42,22 @@ static int mo_okick(struct Client *client_p, struct Client *source_p, int parc, 
 
 
 struct Message okick_msgtab = {
-	"OKICK", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_okick, 4}}
+	.cmd = "OKICK", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_okick, .min_para = 4 },
 };
 
-mapi_clist_av2 okick_clist[] = { &okick_msgtab, NULL };
+mapi_clist_av1 okick_clist[] = { &okick_msgtab, NULL };
 
-DECLARE_MODULE_AV2(okick, NULL, NULL, okick_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(okick, NULL, NULL, okick_clist, NULL, NULL, "$Revision$");
 
 /*
 ** m_okick
+**      parv[0] = sender prefix
 **      parv[1] = channel
 **      parv[2] = client to kick
 **      parv[3] = kick comment
@@ -68,11 +74,11 @@ mo_okick(struct Client *client_p, struct Client *source_p, int parc, const char 
 	char *name;
 	char *p = NULL;
 	char *user;
-	static char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 
 	if(*parv[2] == '\0')
 	{
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name, "KICK");
+		sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "OKICK");
 		return 0;
 	}
 
@@ -107,14 +113,13 @@ mo_okick(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if((target_p = find_client(user)) == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_NOSUCHNICK), me.name, source_p->name, user);
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK, form_str(ERR_NOSUCHNICK), user);
 		return 0;
 	}
 
 	if((msptr = find_channel_membership(chptr, target_p)) == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_USERNOTINCHANNEL),
-			   me.name, source_p->name, parv[1], parv[2]);
+		sendto_one_numeric(source_p, ERR_USERNOTINCHANNEL,  form_str(ERR_USERNOTINCHANNEL), parv[1], user);
 		return 0;
 	}
 

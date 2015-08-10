@@ -47,20 +47,25 @@ static int m_info(struct Client *, struct Client *, int, const char **);
 static int mo_info(struct Client *, struct Client *, int, const char **);
 
 struct Message info_msgtab = {
-	"INFO", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_info, 0}, {mo_info, 0}, mg_ignore, mg_ignore, {mo_info, 0}}
+	.cmd = "INFO",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_info },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = mo_info },	 
+	.handlers[SERVER_HANDLER] =		{ mm_ignore},  
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },	
+	.handlers[OPER_HANDLER] =		{ .handler = mo_info },
 };
 
 int doing_info_hook;
 
-mapi_clist_av2 info_clist[] = { &info_msgtab, NULL };
+mapi_clist_av1 info_clist[] = { &info_msgtab, NULL };
 
-mapi_hlist_av2 info_hlist[] = {
+mapi_hlist_av1 info_hlist[] = {
 	{"doing_info", &doing_info_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV2(info, NULL, NULL, info_clist, info_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV1(info, NULL, NULL, info_clist, info_hlist, NULL, "$Revision$");
 
 /*
  * jdc -- Structure for our configuration value table
@@ -80,11 +85,11 @@ struct InfoStruct
 	const char *desc;	/* ASCII description of the variable */
 };
 /* Types for output_type in InfoStruct */
-#define OUTPUT_STRING      0x0001	/* Output option as %s w/ dereference */
+#define OUTPUT_STRING	   0x0001	/* Output option as %s w/ dereference */
 #define OUTPUT_STRING_PTR  0x0002	/* Output option as %s w/out deference */
-#define OUTPUT_DECIMAL     0x0004	/* Output option as decimal (%d) */
+#define OUTPUT_DECIMAL	   0x0004	/* Output option as decimal (%d) */
 #define OUTPUT_DECIMAL_RAW 0x0008	/* Output option as decimal (%d) w/out dereference */
-#define OUTPUT_BOOLEAN     0x0010	/* Output option as "ON" or "OFF" */
+#define OUTPUT_BOOLEAN	   0x0010	/* Output option as "ON" or "OFF" */
 #define OUTPUT_BOOLEAN_YN  0x0020	/* Output option as "YES" or "NO" */
 #define OUTPUT_BOOLEAN_RAW     0x0040	/* Output option as "ON" or "OFF" */
 #define OUTPUT_BOOLEAN_RAW_YN  0x0080	/* Output option as "YES" or "NO" */
@@ -290,16 +295,6 @@ static struct InfoStruct info_table[] = {
 		"Maximum Allowed TS Delta from another Server"
 	},
 	{
-		"USE_IODEBUG_HOOKS", 
-		OUTPUT_BOOLEAN_RAW_YN,
-#ifdef USE_IODEBUG_HOOKS
-		{ (void *)1 },
-#else
-		{ (void *)0 },
-#endif
-		"IO Debugging support"
-	},
-	{
 		"anti_nick_flood",
 		OUTPUT_BOOLEAN,
 		{ &ConfigFileEntry.anti_nick_flood }, 
@@ -382,6 +377,12 @@ static struct InfoStruct info_table[] = {
 		OUTPUT_BOOLEAN_YN,
 		{ &ConfigFileEntry.disable_fake_channels }, 
 		"Controls whether bold etc are disabled for JOIN"
+	},
+	{
+		"dot_in_ip6_addr",
+		OUTPUT_BOOLEAN,
+		{ &ConfigFileEntry.dot_in_ip6_addr }, 
+		"Suffix a . to ip6 addresses",
 	},
 	{
 		"dots_in_ident",
@@ -516,7 +517,7 @@ static struct InfoStruct info_table[] = {
 		{ &ConfigFileEntry.kline_with_reason }, 
 		"Display K-line reason to client on disconnect"
 	},
- 	{
+	{
 		"map_oper_only",
 		OUTPUT_BOOLEAN_YN,
 		{ &ConfigFileEntry.map_oper_only },
@@ -528,7 +529,7 @@ static struct InfoStruct info_table[] = {
 		{ &ConfigFileEntry.max_accept }, 
 		"Maximum nicknames on accept list",
 	},
- 	{
+	{
 		"max_monitor",
 		OUTPUT_DECIMAL,
 		{ &ConfigFileEntry.max_monitor },
@@ -569,6 +570,12 @@ static struct InfoStruct info_table[] = {
 		OUTPUT_STRING,
 		{ &ServerInfo.network_name }, 
 		"Network name"
+	},
+	{
+		"network_desc",
+		OUTPUT_STRING,
+		{ &ServerInfo.network_desc }, 
+		"Network description"
 	},
 	{
 		"nick_delay",
@@ -787,12 +794,6 @@ static struct InfoStruct info_table[] = {
 		"Banned users may not send text to a channel"
 	},
 	{
-		"only_ascii_channels",
-		OUTPUT_BOOLEAN_YN,
-		{ &ConfigChannel.only_ascii_channels },
-		"Controls whether non-ASCII is disabled for JOIN"
-	},
-	{
 		"use_except",
 		OUTPUT_BOOLEAN_YN,
 		{ &ConfigChannel.use_except }, 
@@ -809,12 +810,6 @@ static struct InfoStruct info_table[] = {
 		OUTPUT_BOOLEAN_YN,
 		{ &ConfigChannel.use_knock }, 
 		"Enable /KNOCK",
-	},
-	{
-		"resv_forcepart",
-		OUTPUT_BOOLEAN_YN,
-		{ &ConfigChannel.resv_forcepart },
-		"Force-part local users on channel RESV"
 	},
 	{
 		"disable_hidden",
@@ -846,6 +841,7 @@ static struct InfoStruct info_table[] = {
 
 /*
 ** m_info
+**  parv[0] = sender prefix
 **  parv[1] = servername
 */
 static int
@@ -853,15 +849,15 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 {
 	static time_t last_used = 0L;
 
-	if((last_used + ConfigFileEntry.pace_wait) > rb_time())
+	if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
-		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "INFO");
-		sendto_one_numeric(source_p, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
+		sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "INFO");
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFINFO));
 		return 0;
 	}
 	else
-		last_used = rb_time();
+		last_used = rb_current_time();
 
 	if(hunt_server(client_p, source_p, ":%s INFO :%s", 1, parc, parv) != HUNTED_ISME)
 		return 0;
@@ -871,12 +867,13 @@ m_info(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	send_info_text(source_p);
 	send_birthdate_online_time(source_p);
 	ClearCork(source_p);
-	sendto_one_numeric(source_p, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFINFO));
 	return 0;
 }
 
 /*
 ** mo_info
+**  parv[0] = sender prefix
 **  parv[1] = servername
 */
 static int
@@ -891,12 +888,13 @@ mo_info(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(IsOper(source_p))
 		{
 			send_conf_options(source_p);
-			sendto_one_numeric(source_p, RPL_INFO, ":%s",
-					rb_lib_version());
-                }
+			sendto_one(source_p, ":%s %d %s :%s",
+				   get_id(&me, source_p), RPL_INFO, get_id(source_p, source_p),
+				   rb_lib_version());
+		}
 		send_birthdate_online_time(source_p);
 		ClearCork(source_p);
-		sendto_one_numeric(source_p, RPL_ENDOFINFO, form_str(RPL_ENDOFINFO));
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFINFO));
 	}
 
 	return 0;
@@ -916,10 +914,10 @@ send_info_text(struct Client *source_p)
 
 	while(*text)
 	{
-		sendto_one_numeric(source_p, RPL_INFO, form_str(RPL_INFO), *text++);
+		sendto_one_numeric(source_p, s_RPL(RPL_INFO), *text++);
 	}
 
-	sendto_one_numeric(source_p, RPL_INFO, form_str(RPL_INFO), "");
+	sendto_one_numeric(source_p, s_RPL(RPL_INFO), "");
 }
 
 /*
@@ -1113,13 +1111,13 @@ send_conf_options(struct Client *source_p)
 	 ** in order for it to show up properly to opers who issue INFO
 	 */
 
-	sendto_one_numeric(source_p, RPL_INFO, form_str(RPL_INFO), "");
+	sendto_one_numeric(source_p, s_RPL(RPL_INFO), "");
 }
 
 /* info_spy()
  * 
- * input        - pointer to client
- * output       - none
+ * input	- pointer to client
+ * output	- none
  * side effects - hook doing_info is called
  */
 static void

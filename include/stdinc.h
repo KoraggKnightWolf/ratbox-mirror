@@ -23,12 +23,15 @@
  *
  */
 
+#ifndef INCLUDED_stdinc_h
+#define INCLUDE_stdinc_h 1
+
 #include "setup.h"
 #include "config.h"		/* Gotta pull in the autoconf stuff */
 
 /* we include common.h and ircd_defs.h down at bottom */
 
-/* AIX requires this to be the first thing in the file.  */
+/* AIX requires this to be the first thing in the file.	 */
 #ifdef __GNUC__
 #undef alloca
 #define alloca __builtin_alloca
@@ -56,19 +59,13 @@ char *alloca();
 #include <stdlib.h>
 #endif
 
-#ifdef STRING_WITH_STRINGS
+#ifdef HAVE_STRING_H
 # include <string.h>
-# include <strings.h>
-#else
-# ifdef HAVE_STRING_H
-#  include <string.h>
-# else
-#  ifdef HAVE_STRINGS_H
-#   include <strings.h>
-#  endif
-# endif
 #endif
 
+#ifdef HAVE_STRINGS_H
+# include <strings.h>
+#endif
 
 #ifdef HAVE_STDDEF_H
 #include <stddef.h>
@@ -85,6 +82,10 @@ char *alloca();
 #include <stdarg.h>
 #include <signal.h>
 #include <ctype.h>
+
+/* yeah..we require c99 and this is standard..i hope */
+#include <stdbool.h>
+
 
 #include <limits.h>
 
@@ -209,6 +210,23 @@ xc_strlcpy(char *dest, const char *src, size_t size)
 # define INADDR_LOOPBACK ((in_addr_t) 0x7f000001)
 #endif
 
+#if SIZEOF_TIME_T == 4
+#define RBTT_FMT "d"
+#else
+#if SIZEOF_TIME_T > 4 && SIZEOF_LONG == SIZEOF_TIME_T
+#define RBTT_FMT "ld"
+#else
+#define RBTT_FMT "lld"
+#endif
+#endif          
+
+#ifdef MINGW
+#undef RBTT_FMT
+#define RBTT_FMT "ld"
+#endif
+
+
 #include "ratbox_lib.h"
 #include "ircd_defs.h"
-#include "common.h"
+
+#endif

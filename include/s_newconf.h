@@ -39,7 +39,6 @@
 #include <openssl/rsa.h>
 #endif
 
-struct ConfItem;
 
 extern rb_dlink_list cluster_conf_list;
 extern rb_dlink_list shared_conf_list;
@@ -152,23 +151,23 @@ void cluster_generic(struct Client *, const char *, int cltype, const char *form
 #define IsOperConfEncrypted(x)	((x)->flags & OPER_ENCRYPTED)
 #define IsOperConfNeedSSL(x)	((x)->flags & OPER_NEEDSSL)
 
-#define IsOperGlobalKill(x)     ((x)->operflags & OPER_GLOBKILL)
-#define IsOperLocalKill(x)      ((x)->operflags & OPER_LOCKILL)
-#define IsOperRemote(x)         ((x)->operflags & OPER_REMOTE)
-#define IsOperUnkline(x)        ((x)->operflags & OPER_UNKLINE)
-#define IsOperGline(x)          ((x)->operflags & OPER_GLINE)
-#define IsOperN(x)              ((x)->operflags & OPER_NICKS)
-#define IsOperK(x)              ((x)->operflags & OPER_KLINE)
-#define IsOperXline(x)          ((x)->operflags & OPER_XLINE)
-#define IsOperResv(x)           ((x)->operflags & OPER_RESV)
-#define IsOperDie(x)            ((x)->operflags & OPER_DIE)
-#define IsOperRehash(x)         ((x)->operflags & OPER_REHASH)
-#define IsOperHiddenAdmin(x)    ((x)->operflags & OPER_HADMIN)
-#define IsOperAdmin(x)          (((x)->operflags & OPER_ADMIN) || \
+#define IsOperGlobalKill(x)	((x)->operflags & OPER_GLOBKILL)
+#define IsOperLocalKill(x)	((x)->operflags & OPER_LOCKILL)
+#define IsOperRemote(x)		((x)->operflags & OPER_REMOTE)
+#define IsOperUnkline(x)	((x)->operflags & OPER_UNKLINE)
+#define IsOperGline(x)		((x)->operflags & OPER_GLINE)
+#define IsOperN(x)		((x)->operflags & OPER_NICKS)
+#define IsOperK(x)		((x)->operflags & OPER_KLINE)
+#define IsOperXline(x)		((x)->operflags & OPER_XLINE)
+#define IsOperResv(x)		((x)->operflags & OPER_RESV)
+#define IsOperDie(x)		((x)->operflags & OPER_DIE)
+#define IsOperRehash(x)		((x)->operflags & OPER_REHASH)
+#define IsOperHiddenAdmin(x)	((x)->operflags & OPER_HADMIN)
+#define IsOperAdmin(x)		(((x)->operflags & OPER_ADMIN) || \
 					((x)->operflags & OPER_HADMIN))
-#define IsOperOperwall(x)       ((x)->operflags & OPER_OPERWALL)
-#define IsOperSpy(x)            ((x)->operflags & OPER_SPY)
-#define IsOperInvis(x)          ((x)->operflags & OPER_INVIS)
+#define IsOperOperwall(x)	((x)->operflags & OPER_OPERWALL)
+#define IsOperSpy(x)		((x)->operflags & OPER_SPY)
+#define IsOperInvis(x)		((x)->operflags & OPER_INVIS)
 #define IsOperRemoteBan(x)	((x)->operflags & OPER_REMOTEBAN)
 
 struct oper_conf *make_oper_conf(void);
@@ -227,8 +226,7 @@ struct server_conf *find_server_conf(const char *name);
 
 void attach_server_conf(struct Client *, struct server_conf *);
 void detach_server_conf(struct Client *);
-void set_server_conf_autoconn(struct Client *source_p, const char *name, int newval);
-void disable_server_conf_autoconn(const char *name);
+void set_server_conf_autoconn(struct Client *source_p, char *name, int newval);
 
 
 struct ConfItem *find_xline(const char *, int);
@@ -244,7 +242,7 @@ struct nd_entry
 {
 	char name[NICKLEN + 1];
 	time_t expire;
-	unsigned int hashv;
+	uint32_t hashv;
 
 	rb_dlink_node hnode;	/* node in hash */
 	rb_dlink_node lnode;	/* node in ll */

@@ -99,7 +99,7 @@ struct flags
 	int wipe;
 	int dupes_ok;
 	char *path;
-} flag = {YES, NO, NO, NO, NO, NO, NO, NO, NO, NULL};
+} flag = {true, false, false, false, false, false, false, false, false, NULL};
 /* *INDENT-ON* */
 
 static int table_has_rows(const char *table);
@@ -112,7 +112,7 @@ static char *strip_quotes(const char *string);
 static char *mangle_reason(const char *string);
 static char *escape_quotes(const char *string);
 
-static void db_error_cb(const char *errstr);
+static void db_error_cb(const char *errstr, void *data);
 static void db_reclaim_slack(void);
 static void export_config(const char *conf, int id);
 static void import_config(const char *conf, int id);
@@ -120,6 +120,8 @@ static void check_schema(void);
 static void print_help(int i_exit);
 static void wipe_schema(void);
 static void drop_dupes(const char *user, const char *host, const char *t);
+
+static rsdb_conn_t *dbconn;
 
 /**
  *  swing your pants 
@@ -142,32 +144,32 @@ main(int argc, char *argv[])
 			print_help(EXIT_SUCCESS);
 			break;
 		case 'i':
-			flag.none = NO;
-			flag.import = YES;
+			flag.none = false;
+			flag.import = true;
 			break;
 		case 'e':
-			flag.none = NO;
-			flag.export = YES;
+			flag.none = false;
+			flag.export = true;
 			break;
 		case 'u':
-			flag.none = NO;
-			flag.verify = YES;
+			flag.none = false;
+			flag.verify = true;
 			break;
 		case 's':
-			flag.none = NO;
-			flag.vacuum = YES;
+			flag.none = false;
+			flag.vacuum = true;
 			break;
 		case 'p':
-			flag.pretend = YES;
+			flag.pretend = true;
 			break;
 		case 'v':
-			flag.verbose = YES;
+			flag.verbose = true;
 			break;
 		case 'w':
-			flag.wipe = YES;
+			flag.wipe = true;
 			break;
 		case 'd':
-			flag.dupes_ok = YES;
+			flag.dupes_ok = true;
 			break;
 		case 'f':
 			flag.path = rb_strdup(optarg);
@@ -204,9 +206,9 @@ main(int argc, char *argv[])
 		"* bantool v.%s built for %s ($Id$)\n",
 		SERIALNUM, PATCHLEVEL);
 
-	if(flag.pretend == NO)
+	if(flag.pretend == false)
 	{
-		if(rsdb_init(flag.path, db_error_cb) == -1)
+		if((dbconn = rsdb_init(flag.path, db_error_cb, NULL)) == NULL)
 		{
 			fprintf(stderr, "* Error: Unable to open database\n");
 			exit(EXIT_FAILURE);
@@ -218,7 +220,7 @@ main(int argc, char *argv[])
 
 		if(flag.import && flag.wipe)
 		{
-			flag.dupes_ok = YES;	/* dont check for dupes if we are wiping the db clean */
+			flag.dupes_ok = true;	/* dont check for dupes if we are wiping the db clean */
 			for(i = 0; i < 3; i++)
 				fprintf(stdout,
 					"* WARNING: YOU ARE ABOUT TO WIPE YOUR DATABASE!\n");
@@ -230,17 +232,17 @@ main(int argc, char *argv[])
 			wipe_schema();
 		}
 	}
-	if(flag.verbose && flag.dupes_ok == YES)
+	if(flag.verbose && flag.dupes_ok == true)
 		fprintf(stdout, "* Allowing duplicate bans...\n");
 
 	/* checking for our files to import or export */
 	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
-		rb_snprintf(conf, sizeof(conf), "%s/%s.conf%s",
+		snprintf(conf, sizeof(conf), "%s/%s.conf%s",
 			    etc, bandb_table[i], bandb_suffix[i]);
 
-		if(flag.import && flag.pretend == NO)
-			rsdb_transaction(RSDB_TRANS_START);
+		if(flag.import && flag.pretend == false)
+			rsdb_transaction(dbconn, RSDB_TRANS_START);
 
 		if(flag.import)
 			import_config(conf, i);
@@ -248,8 +250,8 @@ main(int argc, char *argv[])
 		if(flag.export)
 			export_config(conf, i);
 
-		if(flag.import && flag.pretend == NO)
-			rsdb_transaction(RSDB_TRANS_END);
+		if(flag.import && flag.pretend == false)
+			rsdb_transaction(dbconn, RSDB_TRANS_END);
 	}
 
 	if(flag.import)
@@ -280,7 +282,7 @@ static void
 export_config(const char *conf, int id)
 {
 	struct rsdb_table table;
-	static char sql[BUFSIZE * 2];
+	static char sql[IRCD_BUFSIZE * 2];
 	static char buf[512];
 	FILE *fd = NULL;
 	int j;
@@ -297,18 +299,18 @@ export_config(const char *conf, int id)
 		return;
 
 	if(strstr(conf, ".perm") != 0)
-		rb_snprintf(sql, sizeof(sql),
+		snprintf(sql, sizeof(sql),
 			    "SELECT DISTINCT mask1,mask2,reason,oper,time FROM %s WHERE perm = 1 ORDER BY time",
 			    bandb_table[id]);
 	else
-		rb_snprintf(sql, sizeof(sql),
+		snprintf(sql, sizeof(sql),
 			    "SELECT DISTINCT mask1,mask2,reason,oper,time FROM %s WHERE perm = 0 ORDER BY time",
 			    bandb_table[id]);
 
-	rsdb_exec_fetch(&table, sql);
+	rsdb_exec_fetch(dbconn, &table, sql);
 	if(table.row_count <= 0)
 	{
-		rsdb_exec_fetch_end(&table);
+		rsdb_exec_fetch_end(dbconn, &table);
 		return;
 	}
 
@@ -330,7 +332,7 @@ export_config(const char *conf, int id)
 		{
 		case BANDB_DLINE:
 		case BANDB_DLINE_PERM:
-			rb_snprintf(buf, sizeof(buf),
+			snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"\",\"%s\",\"%s\",%s\n",
 				    table.row[j][mask1],
 				    mangle_reason(table.row[j][reason]),
@@ -340,7 +342,7 @@ export_config(const char *conf, int id)
 
 		case BANDB_XLINE:
 		case BANDB_XLINE_PERM:
-			rb_snprintf(buf, sizeof(buf),
+			snprintf(buf, sizeof(buf),
 				    "\"%s\",\"0\",\"%s\",\"%s\",%s\n",
 				    escape_quotes(table.row[j][mask1]),
 				    mangle_reason(table.row[j][reason]),
@@ -349,7 +351,7 @@ export_config(const char *conf, int id)
 
 		case BANDB_RESV:
 		case BANDB_RESV_PERM:
-			rb_snprintf(buf, sizeof(buf),
+			snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"%s\",%s\n",
 				    table.row[j][mask1],
 				    mangle_reason(table.row[j][reason]),
@@ -358,7 +360,7 @@ export_config(const char *conf, int id)
 
 
 		default:	/* Klines */
-			rb_snprintf(buf, sizeof(buf),
+			snprintf(buf, sizeof(buf),
 				    "\"%s\",\"%s\",\"%s\",\"\",\"%s\",\"%s\",%s\n",
 				    table.row[j][mask1], table.row[j][mask2],
 				    mangle_reason(table.row[j][reason]),
@@ -370,7 +372,7 @@ export_config(const char *conf, int id)
 		fprintf(fd, "%s", buf);
 	}
 
-	rsdb_exec_fetch_end(&table);
+	rsdb_exec_fetch_end(dbconn, &table);
 	if(flag.verbose)
 		fprintf(stdout, "\twritten.\n");
 	fclose(fd);
@@ -384,7 +386,7 @@ import_config(const char *conf, int id)
 {
 	FILE *fd;
 
-	char line[BUFSIZE];
+	char line[IRCD_BUFSIZE];
 	char *p;
 	int i = 0;
 
@@ -495,17 +497,17 @@ import_config(const char *conf, int id)
 
 		/* append operreason_field to reason_field */
 		if(!EmptyString(f_oreason))
-			rb_snprintf(newreason, sizeof(newreason), "%s | %s", f_reason, f_oreason);
+			snprintf(newreason, sizeof(newreason), "%s | %s", f_reason, f_oreason);
 		else
-			rb_snprintf(newreason, sizeof(newreason), "%s", f_reason);
+			snprintf(newreason, sizeof(newreason), "%s", f_reason);
 
-		if(flag.pretend == NO)
+		if(flag.pretend == false)
 		{
-			if(flag.dupes_ok == NO)
+			if(flag.dupes_ok == false)
 				drop_dupes(f_mask1, f_mask2, bandb_table[id]);
 
-			rsdb_exec(NULL,
-				  "INSERT INTO %s (mask1, mask2, oper, time, perm, reason) VALUES('%Q','%Q','%Q','%Q','%d','%Q')",
+			rsdb_exec(dbconn, NULL,
+				  "INSERT INTO %s (mask1, mask2, oper, time, perm, reason) VALUES(%Q,%Q,%Q,%Q,'%d',%Q)",
 				  bandb_table[id], f_mask1, f_mask2, f_oper, f_time, f_perm,
 				  newreason);
 		}
@@ -638,7 +640,7 @@ strip_quotes(const char *string)
 static char *
 escape_quotes(const char *string)
 {
-	static char buf[BUFSIZE * 2];
+	static char buf[IRCD_BUFSIZE * 2];
 	char *str = buf;
 
 	if(string == NULL)
@@ -665,7 +667,7 @@ escape_quotes(const char *string)
 static char *
 mangle_reason(const char *string)
 {
-	static char buf[BUFSIZE * 2];
+	static char buf[IRCD_BUFSIZE * 2];
 	char *str = buf;
 
 	if(string == NULL)
@@ -699,7 +701,7 @@ mangle_reason(const char *string)
 static const char *
 clean_gecos_field(const char *gecos)
 {
-	static char buf[BUFSIZE * 2];
+	static char buf[IRCD_BUFSIZE * 2];
 	char *str = buf;
 
 	if(gecos == NULL)
@@ -746,7 +748,7 @@ check_schema(void)
 	{
 		if(!table_exists(bandb_table[i]))
 		{
-			rsdb_exec(NULL,
+			rsdb_exec(dbconn, NULL,
 				  "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, perm INTEGER, reason TEXT)",
 				  bandb_table[i]);
 		}
@@ -765,7 +767,7 @@ check_schema(void)
 					rb_strlcpy(type, "TEXT", sizeof(type));
 
 				/* attempt to add a column with extreme prejudice, errors are ignored */
-				rsdb_exec(NULL, "ALTER TABLE %s ADD COLUMN %s %s", bandb_table[i],
+				rsdb_exec(dbconn, NULL, "ALTER TABLE %s ADD COLUMN %s %s", bandb_table[i],
 					  columns[j], type);
 			}
 		}
@@ -778,7 +780,7 @@ static void
 db_reclaim_slack(void)
 {
 	fprintf(stdout, "* Reclaiming free space.\n");
-	rsdb_exec(NULL, "VACUUM");
+	rsdb_exec(dbconn, NULL, "VACUUM");
 }
 
 
@@ -789,9 +791,9 @@ static int
 table_exists(const char *dbtab)
 {
 	struct rsdb_table table;
-	rsdb_exec_fetch(&table, "SELECT name FROM sqlite_master WHERE type='table' AND name='%s'",
+	rsdb_exec_fetch(dbconn, &table, "SELECT name FROM sqlite_master WHERE type='table' AND name='%s'",
 			dbtab);
-	rsdb_exec_fetch_end(&table);
+	rsdb_exec_fetch_end(dbconn, &table);
 	return table.row_count;
 }
 
@@ -802,8 +804,8 @@ static int
 table_has_rows(const char *dbtab)
 {
 	struct rsdb_table table;
-	rsdb_exec_fetch(&table, "SELECT * FROM %s", dbtab);
-	rsdb_exec_fetch_end(&table);
+	rsdb_exec_fetch(dbconn, &table, "SELECT * FROM %s", dbtab);
+	rsdb_exec_fetch_end(dbconn, &table);
 	return table.row_count;
 }
 
@@ -814,13 +816,13 @@ static void
 wipe_schema(void)
 {
 	int i;
-	rsdb_transaction(RSDB_TRANS_START);
+	rsdb_transaction(dbconn, RSDB_TRANS_START);
 	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
-		rsdb_exec(NULL, "DROP TABLE %s", bandb_table[i]);
+		rsdb_exec(dbconn, NULL, "DROP TABLE %s", bandb_table[i]);
 		i++;		/* double increment to skip over .perm */
 	}
-	rsdb_transaction(RSDB_TRANS_END);
+	rsdb_transaction(dbconn, RSDB_TRANS_END);
 
 	check_schema();
 }
@@ -832,11 +834,11 @@ wipe_schema(void)
 void
 drop_dupes(const char *user, const char *host, const char *t)
 {
-	rsdb_exec(NULL, "DELETE FROM %s WHERE mask1='%Q' AND mask2='%Q'", t, user, host);
+	rsdb_exec(dbconn, NULL, "DELETE FROM %s WHERE mask1=%Q AND mask2=%Q", t, user, host);
 }
 
 static void
-db_error_cb(const char *errstr)
+db_error_cb(const char *errstr, void *data)
 {
 	return;
 }
@@ -855,7 +857,7 @@ smalldate(const char *string)
 	lt = gmtime(&t);
 	if(lt == NULL)
 		return NULL;
-	rb_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
+	snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
 		    lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min);
 	return buf;
 }

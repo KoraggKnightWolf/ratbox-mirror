@@ -47,13 +47,15 @@
 #include "parse.h"
 #include "sslproc.h"
 
+extern char *crypt();
+
 #define MIN_CONN_FREQ 300
 
-int MaxConnectionCount = 1;
-int MaxClientCount = 1;
+unsigned long MaxConnectionCount = 1;
+unsigned long MaxClientCount = 1;
 int refresh_user_links = 0;
 
-static char buf[BUFSIZE];
+static char buf[IRCD_BUFSIZE];
 
 /*
  * list of recognized server capabilities.  "TS" is not on the list
@@ -85,22 +87,22 @@ static CNCB serv_connect_ssl_callback;
 
 /*
  * hunt_server - Do the basic thing in delivering the message (command)
- *      across the relays to the specific server (server) for
- *      actions.
+ *	across the relays to the specific server (server) for
+ *	actions.
  *
- *      Note:   The command is a format string and *MUST* be
- *              of prefixed style (e.g. ":%s COMMAND %s ...").
- *              Command can have only max 8 parameters.
+ *	Note:	The command is a format string and *MUST* be
+ *		of prefixed style (e.g. ":%s COMMAND %s ...").
+ *		Command can have only max 8 parameters.
  *
- *      server  parv[server] is the parameter identifying the
- *              target server.
+ *	server	parv[server] is the parameter identifying the
+ *		target server.
  *
- *      *WARNING*
- *              parv[server] is replaced with the pointer to the
- *              real servername from the matched client (I'm lazy
- *              now --msa).
+ *	*WARNING*
+ *		parv[server] is replaced with the pointer to the
+ *		real servername from the matched client (I'm lazy
+ *		now --msa).
  *
- *      returns: (see #defines)
+ *	returns: (see #defines)
  */
 int
 hunt_server(struct Client *client_p, struct Client *source_p,
@@ -116,7 +118,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 	 * Assume it's me, if no server
 	 */
 	if(parc <= server || EmptyString(parv[server]) ||
-	   match(parv[server], me.name) || (strcmp(parv[server], me.id) == 0))
+	   match(me.name, parv[server]) || match(parv[server], me.name) || (strcmp(parv[server], me.id) == 0))
 		return (HUNTED_ISME);
 
 	new = LOCAL_COPY(parv[server]);
@@ -132,6 +134,10 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		target_p = find_client(new);
 
 	if(target_p)
+		if(target_p->from == source_p->from && !MyConnect(target_p))
+			target_p = NULL;
+
+	if(target_p == NULL && (target_p = find_server(source_p, new)))
 		if(target_p->from == source_p->from && !MyConnect(target_p))
 			target_p = NULL;
 
@@ -171,8 +177,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 	{
 		if(!IsRegistered(target_p))
 		{
-			sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
-					   form_str(ERR_NOSUCHSERVER), parv[server]);
+			sendto_one_numeric(source_p, ERR_NOSUCHSERVER, form_str(ERR_NOSUCHSERVER), parv[server]);
 			return HUNTED_NOSUCH;
 		}
 
@@ -188,9 +193,8 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		return (HUNTED_PASS);
 	}
 
-	if(MyClient(source_p) || !IsDigit(parv[server][0]))
-		sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
-				   form_str(ERR_NOSUCHSERVER), parv[server]);
+	if(!IsDigit(parv[server][0]))
+		sendto_one_numeric(source_p, ERR_NOSUCHSERVER, form_str(ERR_NOSUCHSERVER), parv[server]);
 	return (HUNTED_NOSUCH);
 }
 
@@ -208,7 +212,7 @@ try_connections(void *unused)
 	struct server_conf *tmp_p;
 	struct Class *cltmp;
 	rb_dlink_node *ptr;
-	int connecting = FALSE;
+	bool connecting = false;
 	int confrq;
 	time_t next = 0;
 
@@ -232,7 +236,7 @@ try_connections(void *unused)
 		 * made one successfull connection... [this algorithm is
 		 * a bit fuzzy... -- msa >;) ]
 		 */
-		if(tmp_p->hold > rb_time())
+		if(tmp_p->hold > rb_current_time())
 		{
 			if(next > tmp_p->hold || next == 0)
 				next = tmp_p->hold;
@@ -242,19 +246,19 @@ try_connections(void *unused)
 		if((confrq = get_con_freq(cltmp)) < MIN_CONN_FREQ)
 			confrq = MIN_CONN_FREQ;
 
-		tmp_p->hold = rb_time() + confrq;
+		tmp_p->hold = rb_current_time() + confrq;
 		/*
 		 * Found a CONNECT config with port specified, scan clients
 		 * and see if this server is already connected?
 		 */
 		client_p = find_server(NULL, tmp_p->name);
 
-		if(!client_p && (CurrUsers(cltmp) < MaxUsers(cltmp)) && !connecting)
+		if(!client_p && (CurrUsers(cltmp) < MaxUsers(cltmp)) && connecting == false)
 		{
 			server_p = tmp_p;
 
 			/* We connect only one at time... */
-			connecting = TRUE;
+			connecting = true;
 		}
 
 		if((next > tmp_p->hold) || (next == 0))
@@ -265,7 +269,7 @@ try_connections(void *unused)
 	if(GlobalSetOptions.autoconn == 0)
 		return;
 
-	if(!connecting)
+	if(connecting == false)
 		return;
 
 	/* move this connect entry to end.. */
@@ -300,7 +304,7 @@ void
 send_capabilities(struct Client *client_p, int cap_can_send)
 {
 	struct Capability *cap;
-	char msgbuf[BUFSIZE];
+	char msgbuf[IRCD_BUFSIZE];
 	char *t;
 	int tl;
 
@@ -310,7 +314,7 @@ send_capabilities(struct Client *client_p, int cap_can_send)
 	{
 		if(cap->cap & cap_can_send)
 		{
-			tl = rb_sprintf(t, "%s ", cap->name);
+			tl = sprintf(t, "%s ", cap->name);
 			t += tl;
 		}
 	}
@@ -324,22 +328,29 @@ send_capabilities(struct Client *client_p, int cap_can_send)
 /*
  * show_capabilities - show current server capabilities
  *
- * inputs       - pointer to an struct Client
- * output       - pointer to static string
+ * inputs	- pointer to an struct Client
+ * output	- pointer to static string
  * side effects - build up string representing capabilities of server listed
  */
 const char *
 show_capabilities(struct Client *target_p)
 {
-	static char msgbuf[BUFSIZE];
+	static char msgbuf[IRCD_BUFSIZE];
 	struct Capability *cap;
 
-	/* we are always TS6 */
-	rb_strlcpy(msgbuf, " TS6", sizeof(msgbuf));
+	if(has_id(target_p))
+		rb_strlcpy(msgbuf, " TS6", sizeof(msgbuf));
+	else
+		rb_strlcpy(msgbuf, " TS", sizeof(msgbuf));
 
-	if(IsSSL(target_p))
+	if(IsSSL(target_p)) {
 		rb_strlcat(msgbuf, " SSL", sizeof(msgbuf));
 
+		if(target_p->localClient->cipher_string != NULL)
+		{
+			rb_snprintf_append(msgbuf, sizeof(msgbuf), "[%s]", target_p->localClient->cipher_string);
+		}
+	}
 	if(!IsServer(target_p) || !target_p->serv->caps)	/* short circuit if no caps */
 		return msgbuf + 1;
 
@@ -397,25 +408,24 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	if((client_p = find_server(NULL, server_p->name)))
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "Server %s already present from %s",
-				     server_p->name, client_p->name);
+				     "Server %s already present from %s", server_p->name, client_p->name);
 		if(by && IsClient(by) && !MyClient(by))
-			sendto_one_notice(by, ":Server %s already present from %s",
-					  server_p->name, client_p->name);
+			sendto_one_notice(by, ":Server %s already present from %s", server_p->name, client_p->name);
 		return 0;
 	}
 
 	/* create a socket for the server connection */
 	if((F = rb_socket(GET_SS_FAMILY(&server_p->ipnum), SOCK_STREAM, 0, NULL)) == NULL)
 	{
+		int saved_errno = errno;
 		/* Eek, failure to create the socket */
-		report_error("opening stream socket to %s: %s",
-			     server_p->name, server_p->name, errno);
+	        sendto_realops_flags(UMODE_DEBUG, L_ALL, "opening stream socket to %s: %s", server_p->name, strerror(saved_errno));
+                ilog(L_IOERROR, "opening stream socket to %s: %s", server_p->name, strerror(saved_errno));
 		return 0;
 	}
 
 	/* servernames are always guaranteed under HOSTLEN chars */
-	rb_snprintf(note, sizeof(note), "Server: %s", server_p->name);
+	snprintf(note, sizeof(note), "Server: %s", server_p->name);
 	rb_note(F, note);
 
 	/* Create a local client */
@@ -426,7 +436,7 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	rb_strlcpy(client_p->host, server_p->host, sizeof(client_p->host));
 	rb_strlcpy(client_p->sockhost, buf, sizeof(client_p->sockhost));
 	client_p->localClient->F = F;
-	add_to_cli_fd_hash(client_p);
+
 	/* shove the port number into the sockaddr */
 #ifdef RB_IPV6
 	if(GET_SS_FAMILY(&server_p->ipnum) == AF_INET6)
@@ -443,8 +453,9 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 
 	if(!rb_set_buffers(client_p->localClient->F, READBUF_SIZE))
 	{
-		report_error("rb_set_buffers failed for server %s:%s",
-			     client_p->name, log_client_name(client_p, SHOW_IP), errno);
+		int saved_errno = errno;
+		sendto_realops_flags(UMODE_DEBUG, L_ALL, "rb_set_buffers failed for server %s:%s", client_p->name, strerror(saved_errno));
+		ilog(L_IOERROR, "rb_set_buffers failed for server %s:%s", log_client_name(client_p, SHOW_IP), strerror(saved_errno));
 	}
 
 	/*
@@ -499,14 +510,12 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 		{
 			rb_connect_tcp(client_p->localClient->F,
 				       (struct sockaddr *)&server_p->ipnum, NULL, 0,
-				       serv_connect_ssl_callback, client_p,
-				       ConfigFileEntry.connect_timeout);
+				       serv_connect_ssl_callback, client_p, ConfigFileEntry.connect_timeout);
 		}
 		else
 			rb_connect_tcp(client_p->localClient->F,
 				       (struct sockaddr *)&server_p->ipnum, NULL, 0,
-				       serv_connect_callback, client_p,
-				       ConfigFileEntry.connect_timeout);
+				       serv_connect_callback, client_p, ConfigFileEntry.connect_timeout);
 
 		return 1;
 	}
@@ -518,19 +527,17 @@ serv_connect(struct server_conf *server_p, struct Client *by)
 	else
 		rb_connect_tcp(client_p->localClient->F, (struct sockaddr *)&server_p->ipnum,
 			       (struct sockaddr *)&myipnum,
-			       GET_SS_LEN(&myipnum), serv_connect_callback, client_p,
-			       ConfigFileEntry.connect_timeout);
+			       GET_SS_LEN(&myipnum), serv_connect_callback, client_p, ConfigFileEntry.connect_timeout);
 
 	return 1;
 }
 
 static void
-serv_connect_ssl_callback(rb_fde_t *F, int status, void *data)
+serv_connect_ssl_callback(rb_fde_t * F, int status, void *data)
 {
 	struct Client *client_p = data;
 	rb_fde_t *xF[2];
-	rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip,
-			    sizeof(client_p->localClient->ip));
+	rb_connect_sockaddr(F, (struct sockaddr *)&client_p->localClient->ip, sizeof(client_p->localClient->ip));
 	if(status != RB_OK)
 	{
 		/* Print error message, just like non-SSL. */
@@ -539,17 +546,17 @@ serv_connect_ssl_callback(rb_fde_t *F, int status, void *data)
 	}
 	if(rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF[0], &xF[1], "Outgoing ssld connection") == -1)
 	{
-                report_error("rb_socketpair failed for server %s:%s",
-			      client_p->name, log_client_name(client_p, SHOW_IP), errno);
+		int saved_errno = errno;
+
+	        sendto_realops_flags(UMODE_DEBUG, L_ALL, "rb_socketpair failed for server %s:%s", client_p->name, strerror(saved_errno));
+                ilog(L_IOERROR, "rb_socketpair failed for server %s:%s", log_client_name(client_p, SHOW_IP), strerror(saved_errno));
 		serv_connect_callback(F, RB_ERROR, data);
 		return;
-		
-	}
-	del_from_cli_fd_hash(client_p);
-	client_p->localClient->F = xF[0];
-	add_to_cli_fd_hash(client_p);
 
-	client_p->localClient->ssl_ctl = start_ssld_connect(F, xF[1], rb_get_fd(xF[0]));
+	}
+	client_p->localClient->F = xF[0];
+
+	client_p->localClient->ssl_ctl = start_ssld_connect(F, xF[1], client_p->localClient->connid);
 	SetSSL(client_p);
 	serv_connect_callback(client_p->localClient->F, RB_OK, client_p);
 }
@@ -564,7 +571,7 @@ serv_connect_ssl_callback(rb_fde_t *F, int status, void *data)
  * marked for reading.
  */
 static void
-serv_connect_callback(rb_fde_t *F, int status, void *data)
+serv_connect_callback(rb_fde_t * F, int status, void *data)
 {
 	struct Client *client_p = data;
 	struct server_conf *server_p;
@@ -598,8 +605,7 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Error connecting to %s[255.255.255.255]: %s",
 					     client_p->name, rb_errstr(status));
-			ilog(L_SERVER, "Error connecting to %s: %s", client_p->name,
-			     rb_errstr(status));
+			ilog(L_SERVER, "Error connecting to %s: %s", client_p->name, rb_errstr(status));
 		}
 		else
 		{
@@ -607,8 +613,7 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Error connecting to %s[255.255.255.255]: %s (%s)",
 					     client_p->name, rb_errstr(status), errstr);
-			ilog(L_SERVER, "Error connecting to %s: %s (%s)", client_p->name,
-			     rb_errstr(status), errstr);
+			ilog(L_SERVER, "Error connecting to %s: %s (%s)", client_p->name, rb_errstr(status), errstr);
 		}
 		exit_client(client_p, client_p, &me, rb_errstr(status));
 		return;
@@ -618,8 +623,7 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 	/* Get the C/N lines */
 	if((server_p = client_p->localClient->att_sconf) == NULL)
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Lost connect{} block for %s",
-				     client_p->name);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Lost connect{} block for %s", client_p->name);
 		ilog(L_SERVER, "Lost connect{} block for %s", client_p->name);
 		exit_client(client_p, client_p, &me, "Lost connect{} block");
 		return;
@@ -640,8 +644,7 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 
 
 
-	sendto_one(client_p, "SERVER %s 1 :%s%s", me.name,
-		   ConfigServerHide.hidden ? "(H) " : "", me.info);
+	sendto_one(client_p, "SERVER %s 1 :%s%s", me.name, ConfigServerHide.hidden ? "(H) " : "", me.info);
 
 	/* 
 	 * If we've been marked dead because a send failed, just exit
@@ -649,8 +652,7 @@ serv_connect_callback(rb_fde_t *F, int status, void *data)
 	 */
 	if(IsAnyDead(client_p))
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s went dead during handshake", client_p->name);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "%s went dead during handshake", client_p->name);
 		ilog(L_SERVER, "%s went dead during handshake", client_p->name);
 		exit_client(client_p, client_p, &me, "Went dead during handshake");
 		return;

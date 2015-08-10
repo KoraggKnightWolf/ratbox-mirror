@@ -38,20 +38,29 @@
 static int m_map(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int mo_map(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 
+
+
+
 struct Message map_msgtab = {
-	"MAP", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_map, 0}, mg_ignore, mg_ignore, mg_ignore, {mo_map, 0}}
+	.cmd = "MAP",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_map },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_map },
 };
 
-mapi_clist_av2 map_clist[] = { &map_msgtab, NULL };
+mapi_clist_av1 map_clist[] = { &map_msgtab, NULL };
 
-DECLARE_MODULE_AV2(map, NULL, NULL, map_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(map, NULL, NULL, map_clist, NULL, NULL, "$Revision$");
 
 static void dump_map(struct Client *client_p, struct Client *root, char *pbuf);
 
-static char buf[BUFSIZE];
+static char buf[IRCD_BUFSIZE];
 
 /* m_map
+**	parv[0] = sender prefix
 */
 static int
 m_map(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -65,12 +74,13 @@ m_map(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	SetCork(source_p);
 	dump_map(source_p, &me, buf);
 	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_MAPEND), me.name, source_p->name);
+	sendto_one_numeric(source_p, s_RPL(RPL_MAPEND));
 	return 0;
 }
 
 /*
 ** mo_map
+**	parv[0] = sender prefix
 */
 static int
 mo_map(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -78,7 +88,7 @@ mo_map(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	SetCork(source_p);
 	dump_map(source_p, &me, buf);
 	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_MAPEND), me.name, source_p->name);
+	sendto_one_numeric(source_p, s_RPL(RPL_MAPEND));
 
 	return 0;
 }
@@ -93,16 +103,16 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 {
 	int cnt = 0, i = 0, len;
 	struct Client *server_p;
-	char scratch[128];
 	rb_dlink_node *ptr;
 	*pbuf = '\0';
 
-	rb_strlcat(pbuf, root_p->name, BUFSIZE);
-
-	rb_strlcat(pbuf, "[", BUFSIZE);
-	rb_strlcat(pbuf, root_p->id, BUFSIZE);
-	rb_strlcat(pbuf, "]", BUFSIZE);
-
+	rb_strlcat(pbuf, root_p->name, IRCD_BUFSIZE);
+	if(has_id(root_p))
+	{
+		rb_strlcat(pbuf, "[", IRCD_BUFSIZE);
+		rb_strlcat(pbuf, root_p->id, IRCD_BUFSIZE);
+		rb_strlcat(pbuf, "]", IRCD_BUFSIZE);
+	}
 	len = strlen(buf);
 	buf[len] = ' ';
 
@@ -113,14 +123,13 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 			buf[i] = '-';
 		}
 	}
-	sprintf(scratch, "%4.1f%%",
-		(float)100 * (float)rb_dlink_list_length(&root_p->serv->users) /
-		(float)Count.total);
 
-	rb_snprintf(buf + USER_COL, BUFSIZE - USER_COL,
-		    " | Users: %5lu (%s)", rb_dlink_list_length(&root_p->serv->users), scratch);
+	snprintf(buf + USER_COL, IRCD_BUFSIZE - USER_COL,
+		 " | Users: %5lu (%4.1f%%)", rb_dlink_list_length(&root_p->serv->users),
+		 (float) 100 * (float) rb_dlink_list_length(&root_p->serv->users) /
+		 (float) Count.total);
 
-	sendto_one(client_p, form_str(RPL_MAP), me.name, client_p->name, buf);
+	sendto_one_numeric(client_p, s_RPL(RPL_MAP), buf);
 
 	if(root_p->serv->servers.head != NULL)
 	{

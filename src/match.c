@@ -35,8 +35,8 @@
  *  mask (which can contain wild cards: '*' - match any
  *  number of chars, '?' - match any single character.
  *
- *      return  1, if match
- *              0, if no match
+ *	return	1, if match
+ *		0, if no match
  *
  *  Originally by Douglas A Lewis (dalewis@acsu.buffalo.edu)
  */
@@ -101,82 +101,6 @@ match(const char *mask, const char *name)
 			return (*m == 0);
 		}
 		if(ToLower(*m) != ToLower(*n) && *m != '?')
-		{
-			if(!wild)
-				return 0;
-			m = ma;
-			n = ++na;
-		}
-		else
-		{
-			if(*m)
-				m++;
-			if(*n)
-				n++;
-		}
-	}
-	return 0;
-}
-
-/** Check a mask against a mask.
- * The difference between mask_match() and match() is that in mask_match()
- * a '?' in mask does not match a '*' in name.
- */
-int
-mask_match(const char *mask, const char *name)
-{
-	const unsigned char *m = (const unsigned char *)mask;
-	const unsigned char *n = (const unsigned char *)name;
-	const unsigned char *ma = (const unsigned char *)mask;
-	const unsigned char *na = (const unsigned char *)name;
-	int wild = 0;
-	int calls = 0;
-
-	s_assert(mask != NULL);
-	s_assert(name != NULL);
-
-	if(!mask || !name)
-		return 0;
-
-	/* if the mask is "*", it matches everything */
-	if((*m == '*') && (*(m + 1) == '\0'))
-		return 1;
-
-	while(calls++ < MATCH_MAX_CALLS)
-	{
-		if(*m == '*')
-		{
-			/*
-			 * XXX - shouldn't need to spin here, the mask should have been
-			 * collapsed before match is called
-			 */
-			while(*m == '*')
-				m++;
-			wild = 1;
-			ma = m;
-			na = n;
-		}
-
-		if(!*m)
-		{
-			if(!*n)
-				return 1;
-			if(!wild)
-				return 0;
-			m = ma;
-			n = ++na;
-		}
-		else if(!*n)
-		{
-			/*
-			 * XXX - shouldn't need to spin here, the mask should have been
-			 * collapsed before match is called
-			 */
-			while(*m == '*')
-				m++;
-			return (*m == 0);
-		}
-		if(ToLower(*m) != ToLower(*n) && (*m != '?' || *n == '*'))
 		{
 			if(!wild)
 				return 0;
@@ -321,7 +245,7 @@ comp_with_mask(void *addr, void *dest, unsigned int mask)
 	{
 		int n = mask / 8;
 		int m = ((-1) << (8 - (mask % 8)));
-		if(mask % 8 == 0 || (((uint8_t *)addr)[n] & m) == (((uint8_t *)dest)[n] & m))
+		if(mask % 8 == 0 || (((uint8_t *) addr)[n] & m) == (((uint8_t *) dest)[n] & m))
 			return 1;
 	}
 	return 0;
@@ -359,7 +283,7 @@ int
 match_ips(const char *s1, const char *s2)
 {
 	struct rb_sockaddr_storage ipaddr, maskaddr;
-	char mask[BUFSIZE];
+	char mask[IRCD_BUFSIZE];
 	char address[HOSTLEN + 1];
 	char *len;
 	void *ipptr, *maskptr;
@@ -415,7 +339,7 @@ int
 match_cidr(const char *s1, const char *s2)
 {
 	struct rb_sockaddr_storage ipaddr, maskaddr;
-	char mask[BUFSIZE];
+	char mask[IRCD_BUFSIZE];
 	char address[NICKLEN + USERLEN + HOSTLEN + 6];
 	char *ipmask;
 	char *ip;
@@ -453,7 +377,7 @@ match_cidr(const char *s1, const char *s2)
 	{
 		if(cidrlen > 128)
 			return 0;
-	
+
 		aftype = AF_INET6;
 		ipptr = &((struct sockaddr_in6 *)&ipaddr)->sin6_addr;
 		maskptr = &((struct sockaddr_in6 *)&maskaddr)->sin6_addr;
@@ -464,7 +388,7 @@ match_cidr(const char *s1, const char *s2)
 	{
 		if(cidrlen > 32)
 			return 0;
-			
+
 		aftype = AF_INET;
 		ipptr = &((struct sockaddr_in *)&ipaddr)->sin_addr;
 		maskptr = &((struct sockaddr_in *)&maskaddr)->sin_addr;
@@ -553,9 +477,9 @@ collapse_esc(char *pattern)
 /*
  * irccmp - case insensitive comparison of two 0 terminated strings.
  *
- *      returns  0, if s1 equal to s2
- *              <0, if s1 lexicographically less than s2
- *              >0, if s1 lexicographically greater than s2
+ *	returns	 0, if s1 equal to s2
+ *		<0, if s1 lexicographically less than s2
+ *		>0, if s1 lexicographically greater than s2
  */
 int
 irccmp(const char *s1, const char *s2)
@@ -578,7 +502,7 @@ irccmp(const char *s1, const char *s2)
 }
 
 int
-ircncmp(const char *s1, const char *s2, int n)
+ircncmp(const char *s1, const char *s2, size_t n)
 {
 	const unsigned char *str1 = (const unsigned char *)s1;
 	const unsigned char *str2 = (const unsigned char *)s2;
@@ -601,14 +525,14 @@ ircncmp(const char *s1, const char *s2, int n)
 /* 
  * valid_hostname - check hostname for validity
  *
- * Inputs       - pointer to user
- * Output       - YES if valid, NO if not
+ * Inputs	- pointer to user
+ * Output	- YES if valid, NO if not
  * Side effects - NONE
  *
  * NOTE: this doesn't allow a hostname to begin with a dot and
  * will not allow more dots than chars.
  */
-int
+bool
 valid_hostname(const char *hostname)
 {
 	const char *p = hostname;
@@ -617,31 +541,31 @@ valid_hostname(const char *hostname)
 	s_assert(NULL != p);
 
 	if(hostname == NULL)
-		return NO;
+		return false;
 
 	if('.' == *p || ':' == *p)
-		return NO;
+		return false;
 
 	while(*p)
 	{
 		if(!IsHostChar(*p))
-			return NO;
+			return false;
 		if(*p == '.' || *p == ':')
 			found_sep++;
 		p++;
 	}
 
 	if(found_sep == 0)
-		return (NO);
+		return (false);
 
-	return (YES);
+	return (true);
 }
 
 /* 
  * valid_username - check username for validity
  *
- * Inputs       - pointer to user
- * Output       - YES if valid, NO if not
+ * Inputs	- pointer to user
+ * Output	- YES if valid, NO if not
  * Side effects - NONE
  * 
  * Absolutely always reject any '*' '!' '?' '@' in an user name
@@ -649,7 +573,7 @@ valid_hostname(const char *hostname)
  * Allow '.' in username to allow for "first.last"
  * style of username
  */
-int
+bool
 valid_username(const char *username)
 {
 	int dots = 0;
@@ -658,7 +582,7 @@ valid_username(const char *username)
 	s_assert(NULL != p);
 
 	if(username == NULL)
-		return NO;
+		return false;
 
 	if('~' == *p)
 		++p;
@@ -668,7 +592,7 @@ valid_username(const char *username)
 	 * or "-hi-@somehost", "h-----@somehost" would still be accepted.
 	 */
 	if(!IsAlNum(*p))
-		return NO;
+		return false;
 
 	while(*++p)
 	{
@@ -676,17 +600,17 @@ valid_username(const char *username)
 		{
 			dots++;
 			if(dots > ConfigFileEntry.dots_in_ident)
-				return NO;
+				return false;
 			if(!IsUserChar(p[1]))
-				return NO;
+				return false;
 		}
 		else if(!IsUserChar(*p))
-			return NO;
+			return false;
 	}
-	return YES;
+	return true;
 }
 
-int
+bool
 valid_servername(const char *servername)
 {
 	const char *s;
@@ -696,16 +620,16 @@ valid_servername(const char *servername)
 	{
 		if(!IsServChar(*s))
 		{
-			return NO;
+			return false;
 		}
 		if(*s == '.')
 			dots++;
 	}
 	if(dots == 0)
 	{
-		return NO;
+		return false;
 	}
-	return YES;
+	return true;
 }
 
 
@@ -816,7 +740,7 @@ const unsigned int CharAttrs[] = {
 /* 26 */ CNTRL_C | CHAN_C | NONEOS_C,
 /* 27 */ CNTRL_C | CHAN_C | NONEOS_C,
 /* 28 */ CNTRL_C | CHAN_C | NONEOS_C,
-/* 29 */ CNTRL_C | CHAN_C | FCHAN_C | NONEOS_C,
+/* 29 */ CNTRL_C | CHAN_C | NONEOS_C,
 /* 30 */ CNTRL_C | CHAN_C | NONEOS_C,
 /* 31 */ CNTRL_C | CHAN_C | FCHAN_C | NONEOS_C,
 /* SP */ PRINT_C | SPACE_C,
@@ -829,7 +753,7 @@ const unsigned int CharAttrs[] = {
 /* ' */ PRINT_C | CHAN_C | NONEOS_C,
 /* ( */ PRINT_C | CHAN_C | NONEOS_C,
 /* ) */ PRINT_C | CHAN_C | NONEOS_C,
-/* * */ PRINT_C | KWILD_C | MWILD_C | CHAN_C | NONEOS_C,
+/* * */ PRINT_C | KWILD_C | MWILD_C | CHAN_C | NONEOS_C | SERV_C,
 /* + */ PRINT_C | CHAN_C | NONEOS_C,
 /* , */ PRINT_C | NONEOS_C,
 /* - */ PRINT_C | NICK_C | CHAN_C | NONEOS_C | USER_C | HOST_C,
@@ -914,7 +838,7 @@ const unsigned int CharAttrs[] = {
 /* | */ PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
 /* } */ PRINT_C | ALPHA_C | NICK_C | CHAN_C | NONEOS_C | USER_C,
 /* ~ */ PRINT_C | ALPHA_C | CHAN_C | NONEOS_C | USER_C,
-/* del  */ CHAN_C | NONEOS_C,
+/* del	*/ CHAN_C | NONEOS_C,
 /* 0x80 */ CHAN_C | NONEOS_C,
 /* 0x81 */ CHAN_C | NONEOS_C,
 /* 0x82 */ CHAN_C | NONEOS_C,

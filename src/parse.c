@@ -44,7 +44,7 @@
  */
 static char *sender;
 
-/* parv[0] is not used, and parv[LAST] == NULL */
+/* parv[0] == source, and parv[LAST] == NULL */
 static char *para[MAXPARA + 2];
 
 static void cancel_clients(struct Client *, struct Client *);
@@ -102,7 +102,7 @@ string_to_array(char *string, char **parv)
 		if(*buf == '\0')
 			return x;
 	}
-	/* we can go upto parv[MAXPARA], as parv[0] is skipped */
+	/* we can go upto parv[MAXPARA], as parv[0] is taken by source */
 	while(x < MAXPARA);
 
 	if(*p == ':')
@@ -156,7 +156,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 
 		if(*sender && IsServer(client_p))
 		{
-			from = find_client(sender);
+			from = find_any_client(sender);
 
 			/* didnt find any matching client, issue a kill */
 			if(from == NULL)
@@ -191,7 +191,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 	/*
 	 * Extract the command code from the packet.  Point s to the end
 	 * of the command code and calculate the length using pointer
-	 * arithmetic.  Note: only need length for numerics and *all*
+	 * arithmetic.	Note: only need length for numerics and *all*
 	 * numerics must have parameters and thus a space after the command
 	 * code. -avalon
 	 */
@@ -226,15 +226,14 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 			 * equivalent to each other at full blast....
 			 * If it has got to person state, it at least
 			 * seems to be well behaving. Perhaps this message
-			 * should never be generated, though...  --msa
+			 * should never be generated, though...	 --msa
 			 * Hm, when is the buffer empty -- if a command
 			 * code has been found ?? -Armin
 			 */
 			if(pbuffer[0] != '\0')
 			{
 				if(IsClient(from))
-					sendto_one(from, form_str(ERR_UNKNOWNCOMMAND),
-						   me.name, from->name, ch);
+					sendto_one_numeric(from, s_RPL(ERR_UNKNOWNCOMMAND), ch);
 			}
 			ServerStats.is_unco++;
 			return;
@@ -262,7 +261,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 	}
 
 	if(handle_command(mptr, client_p, from, i,	/* XXX discards const!!! */
-			  (const char **)(uintptr_t)para) < -1)
+			  (const char **)(uintptr_t) para) < -1)
 	{
 		char *p;
 		for(p = pbuffer; p <= end; p += 8)
@@ -300,8 +299,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
  * side effects	-
  */
 static int
-handle_command(struct Message *mptr, struct Client *client_p,
-	       struct Client *from, int i, const char **hpara)
+handle_command(struct Message *mptr, struct Client *client_p, struct Client *from, int i, const char **hpara)
 {
 	struct MessageEntry ehandler;
 	MessageHandler handler = 0;
@@ -315,31 +313,15 @@ handle_command(struct Message *mptr, struct Client *client_p,
 
 	mptr->count++;
 
-	/* New patch to avoid server flooding from unregistered connects
-	   - Pie-Man 07/27/2000 */
-
-	if(!IsRegistered(client_p))
-	{
-		/* if its from a possible server connection
-		 * ignore it.. more than likely its a header thats sneaked through
-		 */
-
-		if(IsAnyServer(client_p) && !(mptr->flags & MFLG_UNREG))
-			return (1);
-	}
-
 	ehandler = mptr->handlers[from->handler];
 	handler = ehandler.handler;
 
 	/* check right amount of params is passed... --is */
-	if(i < ehandler.min_para ||
-	   (ehandler.min_para && EmptyString(hpara[ehandler.min_para - 1])))
+	if(i < ehandler.min_para || (ehandler.min_para && EmptyString(hpara[ehandler.min_para - 1])))
 	{
 		if(!IsServer(client_p))
 		{
-			sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
-				   me.name,
-				   EmptyString(client_p->name) ? "*" : client_p->name, mptr->cmd);
+			sendto_one_numeric(client_p, s_RPL(ERR_NEEDMOREPARAMS), mptr->cmd);
 			if(MyClient(client_p))
 				return (1);
 			else
@@ -350,24 +332,24 @@ handle_command(struct Message *mptr, struct Client *client_p,
 				     "Dropping server %s due to (invalid) command '%s'"
 				     " with only %d arguments (expecting %d).",
 				     client_p->name, mptr->cmd, i, ehandler.min_para);
-		ilog(L_SERVER,
-		     "Insufficient parameters (%d) for command '%s' from %s.",
-		     i, mptr->cmd, client_p->name);
+		ilog(L_SERVER, "Insufficient parameters (%d) for command '%s' from %s.", i, mptr->cmd, client_p->name);
 
-		exit_client(client_p, client_p, client_p,
-			    "Not enough arguments to server command.");
+		exit_client(client_p, client_p, client_p, "Not enough arguments to server command.");
 		return (-1);
 	}
+
+	if(handler == NULL) /* module hasn't set a handler, just use m_ignore */
+		handler = m_ignore; 
 
 	(*handler) (client_p, from, i, hpara);
 	if(!IsAnyDead(client_p) && IsCork(client_p) && !IsCapable(client_p, CAP_ZIP))
 	{
-		if(last_warning + 300 <= rb_time())
+		if(last_warning + 300 <= rb_current_time())
 		{
 			sendto_realops_flags(UMODE_DEBUG, L_ALL,
 					     "Bug: client %s was left corked after command %s",
 					     client_p->name, mptr->cmd);
-			last_warning = rb_time();
+			last_warning = rb_current_time();
 		}
 		client_p->localClient->cork_count = 0;
 		send_pop_queue(client_p);
@@ -376,8 +358,7 @@ handle_command(struct Message *mptr, struct Client *client_p,
 }
 
 void
-handle_encap(struct Client *client_p, struct Client *source_p,
-	     const char *command, int parc, const char *parv[])
+handle_encap(struct Client *client_p, struct Client *source_p, const char *command, int parc, const char *parv[])
 {
 	struct Message *mptr;
 	struct MessageEntry ehandler;
@@ -393,8 +374,7 @@ handle_encap(struct Client *client_p, struct Client *source_p,
 	ehandler = mptr->handlers[ENCAP_HANDLER];
 	handler = ehandler.handler;
 
-	if(parc < ehandler.min_para ||
-	   (ehandler.min_para && EmptyString(parv[ehandler.min_para - 1])))
+	if(parc < ehandler.min_para || (ehandler.min_para && EmptyString(parv[ehandler.min_para - 1])))
 		return;
 
 	(*handler) (client_p, source_p, parc, parv);
@@ -403,10 +383,10 @@ handle_encap(struct Client *client_p, struct Client *source_p,
 /*
  * clear_hash_parse()
  *
- * inputs       -
- * output       - NONE
+ * inputs	-
+ * output	- NONE
  * side effects - MUST MUST be called at startup ONCE before
- *                any other keyword hash routine is used.
+ *		  any other keyword hash routine is used.
  *
  */
 void
@@ -568,8 +548,7 @@ cancel_clients(struct Client *client_p, struct Client *source_p)
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
 				     "Message for %s[%s@%s!%s] from %s (TS, ignored)",
 				     source_p->name,
-				     source_p->username,
-				     source_p->host, source_p->from->name, client_p->name);
+				     source_p->username, source_p->host, source_p->from->name, client_p->name);
 	}
 }
 
@@ -584,39 +563,38 @@ remove_unknown(struct Client *client_p, char *lsender, char *lbuffer)
 {
 	int slen = strlen(lsender);
 
-	/* meepfoo      is a nickname (ignore)
-	 * #XXXXXXXX    is a UID (KILL)
-	 * #XX          is a SID (SQUIT)
-	 * meep.foo     is a server (SQUIT)
+	/* meepfoo	is a nickname (KILL)
+	 * #XXXXXXXX	is a UID (KILL)
+	 * #XX		is a SID (SQUIT)
+	 * meep.foo	is a server (SQUIT)
 	 */
 	if((IsDigit(lsender[0]) && slen == 3) || (strchr(lsender, '.') != NULL))
 	{
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
-				     "Unknown prefix (%s) from %s, Squitting %s",
-				     lbuffer, client_p->name, lsender);
+				     "Unknown prefix (%s) from %s, Squitting %s", lbuffer, client_p->name, lsender);
 
 		sendto_one(client_p, ":%s SQUIT %s :(Unknown prefix (%s) from %s)",
 			   get_id(&me, client_p), lsender, lbuffer, client_p->name);
 	}
-	else if(IsDigit(lsender[0]))
-		sendto_one(client_p, ":%s KILL %s :%s (Unknown Client)",
-			   get_id(&me, client_p), lsender, me.name);
+	else
+		sendto_one(client_p, ":%s KILL %s :%s (Unknown Client)", get_id(&me, client_p), lsender, me.name);
 }
 
 
 
 /*
  *
- *      parc    number of arguments ('sender' counted as one!)
- *      parv[1]..parv[parc-1]
- *              pointers to additional parameters, this is a NULL
- *              terminated list (parv[parc] == NULL).
+ *	parc	number of arguments ('sender' counted as one!)
+ *	parv[0] pointer to 'sender' (may point to empty string) (not used)
+ *	parv[1]..parv[parc-1]
+ *		pointers to additional parameters, this is a NULL
+ *		terminated list (parv[parc] == NULL).
  *
  * *WARNING*
- *      Numerics are mostly error reports. If there is something
- *      wrong with the message, just *DROP* it! Don't even think of
- *      sending back a neat error message -- big danger of creating
- *      a ping pong error message...
+ *	Numerics are mostly error reports. If there is something
+ *	wrong with the message, just *DROP* it! Don't even think of
+ *	sending back a neat error message -- big danger of creating
+ *	a ping pong error message...
  */
 static void
 do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int parc, char *parv[])
@@ -645,10 +623,10 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 		int tl;		/* current length of presently being built string in t */
 		for(i = 2; i < (parc - 1); i++)
 		{
-			tl = rb_sprintf(t, " %s", parv[i]);
+			tl = sprintf(t, " %s", parv[i]);
 			t += tl;
 		}
-		rb_sprintf(t, " :%s", parv[parc - 1]);
+		sprintf(t, " :%s", parv[parc - 1]);
 	}
 
 	if((target_p = find_client(parv[1])) != NULL)
@@ -659,7 +637,7 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 			 * We shouldn't get numerics sent to us,
 			 * any numerics we do get indicate a bug somewhere..
 			 */
-			/* ugh.  this is here because of nick collisions.  when two servers
+			/* ugh.	 this is here because of nick collisions.  when two servers
 			 * relink, they burst each other their nicks, then perform collides.
 			 * if there is a nick collision, BOTH servers will kill their own
 			 * nicks, and BOTH will kill the other servers nick, which wont exist,
@@ -679,8 +657,7 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 			if(atoi(numeric) != ERR_NOSUCHNICK && atoi(numeric) != ERR_NOSUCHSERVER)
 				sendto_realops_flags(UMODE_ALL, L_ADMIN,
 						     "*** %s(via %s) sent a %s numeric to me: %s",
-						     source_p->name,
-						     client_p->name, numeric, buffer);
+						     source_p->name, client_p->name, numeric, buffer);
 			return;
 		}
 		else if(target_p->from == client_p)
@@ -701,9 +678,8 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 		return;
 	}
 	else if((chptr = find_channel(parv[1])) != NULL)
-		sendto_channel_flags(client_p, ALL_MEMBERS, source_p, chptr,
-				     "%s %s%s",
-				     numeric, chptr->chname, buffer);
+		sendto_channel_local(ALL_MEMBERS, chptr,
+				     ":%s %s %s %s", source_p->name, numeric, chptr->chname, buffer);
 }
 
 
@@ -722,9 +698,12 @@ m_unregistered(struct Client *client_p, struct Client *source_p, int parc, const
 	 * number_of_nick_changes is only really valid after the client
 	 * is fully registered..
 	 */
+	if(IsAnyServer(client_p)) 
+		return 0;
+		
 	if(client_p->localClient->number_of_nick_changes == 0)
 	{
-		sendto_one(client_p, form_str(ERR_NOTREGISTERED), me.name);
+		sendto_one_numeric(client_p, s_RPL(ERR_NOTREGISTERED));
 		client_p->localClient->number_of_nick_changes++;
 	}
 
@@ -734,7 +713,7 @@ m_unregistered(struct Client *client_p, struct Client *source_p, int parc, const
 int
 m_registered(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	sendto_one(client_p, form_str(ERR_ALREADYREGISTRED), me.name, source_p->name);
+	sendto_one_numeric(client_p, s_RPL(ERR_ALREADYREGISTRED));
 	return 0;
 }
 

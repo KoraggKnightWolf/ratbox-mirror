@@ -35,23 +35,36 @@
 static int mr_capab(struct Client *, struct Client *, int, const char **);
 static int me_gcap(struct Client *, struct Client *, int, const char **);
 
+
+
 struct Message capab_msgtab = {
-	"CAPAB", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_capab, 2}, mg_ignore, mg_ignore, mg_ignore, mg_ignore, mg_ignore}
+	.cmd = "CAPAB",
+	.handlers[UNREGISTERED_HANDLER] =	{ .handler = mr_capab, .min_para = 2},
+	.handlers[CLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ mm_ignore },
 };
 
 struct Message gcap_msgtab = {
-	"GCAP", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_gcap, 2}, mg_ignore}
+	.cmd = "GCAP",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },
+	.handlers[CLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ me_gcap, .min_para = 2 },
+	.handlers[OPER_HANDLER] =		{ mm_ignore },
 };
 
-mapi_clist_av2 capab_clist[] = { &capab_msgtab, &gcap_msgtab, NULL };
+mapi_clist_av1 capab_clist[] = { &capab_msgtab, &gcap_msgtab, NULL };
 
-DECLARE_MODULE_AV2(capab, NULL, NULL, capab_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(capab, NULL, NULL, capab_clist, NULL, NULL, "$Revision$");
 
 /*
  * mr_capab - CAPAB message handler
- *      parv[1] = space-separated list of capabilities
+ *	parv[0] = sender prefix
+ *	parv[1] = space-separated list of capabilities
  *
  */
 static int

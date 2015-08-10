@@ -35,31 +35,47 @@
 static int mr_dumb_proxy(struct Client *, struct Client *, int, const char **);
 
 struct Message post_msgtab = {
-	"POST", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_dumb_proxy, 0}, mg_ignore, mg_ignore, mg_ignore, mg_ignore, mg_ignore}
+	.cmd = "POST",
+	.handlers[UNREGISTERED_HANDLER] =	{ .handler = mr_dumb_proxy },
+	.handlers[CLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{  mm_ignore },
 };
 
 struct Message get_msgtab = {
-	"GET", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_dumb_proxy, 0}, mg_ignore, mg_ignore, mg_ignore, mg_ignore, mg_ignore}
+	.cmd = "GET",
+	.handlers[UNREGISTERED_HANDLER] =	{ .handler = mr_dumb_proxy },
+	.handlers[CLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{  mm_ignore },
 };
 
 struct Message put_msgtab = {
-	"PUT", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_dumb_proxy, 0}, mg_ignore, mg_ignore, mg_ignore, mg_ignore, mg_ignore}
+	.cmd = "PUT", 
+	.handlers[UNREGISTERED_HANDLER] =	{ .handler = mr_dumb_proxy },
+	.handlers[CLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{  mm_ignore },
 };
 
 
-mapi_clist_av2 post_clist[] = {
+mapi_clist_av1 post_clist[] = {
 	&post_msgtab, &get_msgtab, &put_msgtab, NULL
 };
 
-DECLARE_MODULE_AV2(post, NULL, NULL, post_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(post, NULL, NULL, post_clist, NULL, NULL, "$Revision$");
 
 
 /*
 ** mr_dumb_proxy
-**      parv[1] = comment
+**	parv[0] = sender prefix
+**	parv[1] = comment
 */
 static int
 mr_dumb_proxy(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])

@@ -42,19 +42,13 @@
 
 #define hash_opername(x) fnv_hash_upper((const unsigned char *)(x), OPERHASH_MAX_BITS, 0)
 
-struct operhash_entry
-{
-	char *name;
-	int refcount;
-};
-
 static rb_dlink_list operhash_table[OPERHASH_MAX];
 
 const char *
 operhash_add(const char *name)
 {
 	struct operhash_entry *ohash;
-	unsigned int hashv;
+	uint32_t hashv;
 	rb_dlink_node *ptr;
 
 	if(EmptyString(name))
@@ -82,34 +76,11 @@ operhash_add(const char *name)
 	return ohash->name;
 }
 
-const char *
-operhash_find(const char *name)
-{
-	struct operhash_entry *ohash;
-	unsigned int hashv;
-	rb_dlink_node *ptr;
-
-	if(EmptyString(name))
-		return NULL;
-
-	hashv = hash_opername(name);
-
-	RB_DLINK_FOREACH(ptr, operhash_table[hashv].head)
-	{
-		ohash = ptr->data;
-
-		if(!irccmp(ohash->name, name))
-			return ohash->name;
-	}
-
-	return NULL;
-}
-
 void
 operhash_delete(const char *name)
 {
 	struct operhash_entry *ohash;
-	unsigned int hashv;
+	uint32_t hashv;
 	rb_dlink_node *ptr;
 
 	if(EmptyString(name))

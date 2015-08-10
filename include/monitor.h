@@ -10,8 +10,6 @@
 #ifndef INCLUDED_monitor_h
 #define INCLUDED_monitor_h
 
-struct BlockHeap;
-
 struct monitor
 {
 	struct monitor *hnext;

@@ -38,17 +38,23 @@
 static int mo_opme(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 
 struct Message opme_msgtab = {
-	"OPME", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_opme, 2}}
+	.cmd = "OPME", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_opme, .min_para = 2 },
 };
 
-mapi_clist_av2 opme_clist[] = { &opme_msgtab, NULL };
+mapi_clist_av1 opme_clist[] = { &opme_msgtab, NULL };
 
-DECLARE_MODULE_AV2(opme, NULL, NULL, opme_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(opme, NULL, NULL, opme_clist, NULL, NULL, "$Revision$");
 
 
 /*
 ** mo_opme
+**      parv[0] = sender prefix
 **      parv[1] = channel
 */
 static int
@@ -61,7 +67,7 @@ mo_opme(struct Client *client_p, struct Client *source_p, int parc, const char *
 	/* admins only */
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "opme");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "opme");
 		return 0;
 	}
 
@@ -78,8 +84,8 @@ mo_opme(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		if(is_chanop(msptr))
 		{
-			sendto_one_notice(source_p, ":%s Channel is not opless",
-				   parv[1]);
+			sendto_one(source_p, ":%s NOTICE %s :%s Channel is not opless",
+				   me.name, parv[0], parv[1]);
 			return 0;
 		}
 	}

@@ -32,43 +32,32 @@
 #include "setup.h"
 #include <ratbox_lib.h>
 #include "config.h"
+#include "ircd_defs.h"
+#include "bandb_defs.h"
 #include "rsdb.h"
-#include "common.h"
-
 
 #define MAXPARA 10
 
-#define COMMIT_INTERVAL 3 /* seconds */
+static rsdb_conn_t *dbconn;
 
-typedef enum
-{
-	BANDB_KLINE,
-	BANDB_DLINE,
-	BANDB_XLINE,
-	BANDB_RESV,
-	LAST_BANDB_TYPE
-} bandb_type;
-
-static char bandb_letter[LAST_BANDB_TYPE] = {
-	'K', 'D', 'X', 'R'
+static const char bandb_letter[] =  {
+	[BANDB_KLINE] = 'K', 
+	[BANDB_DLINE] = 'D', 
+	[BANDB_XLINE] = 'X', 
+	[BANDB_RESV] = 'R',
+	[LAST_BANDB_TYPE] = '\0'
 };
 
-static const char *bandb_table[LAST_BANDB_TYPE] = {
-	"kline", "dline", "xline", "resv"
+static const char *bandb_table[] = {
+	[BANDB_KLINE] = "kline", 
+	[BANDB_DLINE] = "dline", 
+	[BANDB_XLINE] = "xline", 
+	[BANDB_RESV] = "resv",
+	[LAST_BANDB_TYPE] = NULL
 };
 
-
-static rb_helper *bandb_helper;
-static int in_transaction;
 
 static void check_schema(void);
-
-static void
-bandb_commit(void *unused)
-{
-	rsdb_transaction(RSDB_TRANS_END);
-	in_transaction = 0;
-}
 
 static void
 parse_ban(bandb_type type, char *parv[], int parc)
@@ -99,24 +88,19 @@ parse_ban(bandb_type type, char *parv[], int parc)
 	perm = parv[para++];
 	reason = parv[para++];
 
-	if(!in_transaction)
-	{
-		rsdb_transaction(RSDB_TRANS_START);
-		in_transaction = 1;
-		rb_event_addonce("bandb_commit", bandb_commit, NULL,
-				COMMIT_INTERVAL);
-	}
+	rsdb_exec(dbconn, NULL,
+		  "INSERT INTO %s (mask1, mask2, oper, time, perm, reason) VALUES(%Q, %Q, %Q, %s, %s, %Q)",
+		  bandb_table[type], mask1, mask2, oper, curtime, perm, reason);
 
-	rsdb_exec(NULL,
-		  "INSERT INTO %s (mask1, mask2, oper, time, perm, reason) VALUES('%Q', '%Q', '%Q', %s, %s, '%Q')",
-		  bandb_table[type], mask1, mask2 ? mask2 : "", oper, curtime, perm, reason);
+
+
 }
 
 static void
 parse_unban(bandb_type type, char *parv[], int parc)
 {
-	const char *mask1 = NULL;
-	const char *mask2 = NULL;
+	char *mask1 = NULL;
+	char *mask2 = NULL;
 
 	if(type == BANDB_KLINE)
 	{
@@ -131,60 +115,53 @@ parse_unban(bandb_type type, char *parv[], int parc)
 	if(type == BANDB_KLINE)
 		mask2 = parv[2];
 
-	if(!in_transaction)
-	{
-		rsdb_transaction(RSDB_TRANS_START);
-		in_transaction = 1;
-		rb_event_addonce("bandb_commit", bandb_commit, NULL,
-				COMMIT_INTERVAL);
-	}
-
-	rsdb_exec(NULL, "DELETE FROM %s WHERE mask1='%Q' AND mask2='%Q'",
+	rsdb_exec(dbconn, NULL, "DELETE FROM %s WHERE mask1=%Q AND mask2=%Q",
 		  bandb_table[type], mask1, mask2 ? mask2 : "");
+
 }
 
 static void
-list_bans(void)
+list_bans(rb_helper *helper)
 {
-	static char buf[512];
+	char buf[512];
 	struct rsdb_table table;
 	int i, j;
 
 	/* schedule a clear of anything already pending */
-	rb_helper_write_queue(bandb_helper, "C");
+	rb_helper_write_queue(helper, "C");
 
 	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
-		rsdb_exec_fetch(&table, "SELECT mask1,mask2,oper,reason FROM %s WHERE 1",
+		rsdb_exec_fetch(dbconn, &table, "SELECT mask1,mask2,oper,reason FROM %s WHERE 1",
 				bandb_table[i]);
 
 		for(j = 0; j < table.row_count; j++)
 		{
 			if(i == BANDB_KLINE)
-				rb_snprintf(buf, sizeof(buf), "%c %s %s %s :%s",
+				snprintf(buf, sizeof(buf), "%c %s %s %s :%s",
 					    bandb_letter[i], table.row[j][0],
 					    table.row[j][1], table.row[j][2], table.row[j][3]);
 			else
-				rb_snprintf(buf, sizeof(buf), "%c %s %s :%s",
+				snprintf(buf, sizeof(buf), "%c %s %s :%s",
 					    bandb_letter[i], table.row[j][0],
 					    table.row[j][2], table.row[j][3]);
 
-			rb_helper_write_queue(bandb_helper, "%s", buf);
+			rb_helper_write_queue(helper, "%s", buf);
 		}
 
-		rsdb_exec_fetch_end(&table);
+		rsdb_exec_fetch_end(dbconn, &table);
 	}
 
-	rb_helper_write(bandb_helper, "F");
+	rb_helper_write(helper, "F");
 }
 
 static void
 parse_request(rb_helper *helper)
 {
-	static char *parv[MAXPARA + 1];
-	static char readbuf[READBUF_SIZE];
 	int parc;
 	int len;
+	char *parv[MAXPARA + 1];
+	char readbuf[READBUF_SIZE];
 
 
 	while((len = rb_helper_read(helper, readbuf, sizeof(readbuf))) > 0)
@@ -229,7 +206,7 @@ parse_request(rb_helper *helper)
 			break;
 
 		case 'L':
-			list_bans();
+			list_bans(helper);
 			break;
 		default:
 			break;
@@ -241,8 +218,6 @@ parse_request(rb_helper *helper)
 static void
 error_cb(rb_helper *helper)
 {
-	if(in_transaction)
-		rsdb_transaction(RSDB_TRANS_END);
 	exit(1);
 }
 
@@ -255,7 +230,7 @@ dummy_handler(int sig)
 #endif
 
 static void
-setup_signals(void)
+setup_signals()
 {
 #ifndef WINDOWS
 	struct sigaction act;
@@ -285,11 +260,12 @@ setup_signals(void)
 
 
 static void
-db_error_cb(const char *errstr)
+db_error_cb(const char *errstr, void *data)
 {
+	rb_helper *helper = (rb_helper *)data;
 	char buf[256];
-	rb_snprintf(buf, sizeof(buf), "! :%s", errstr);
-	rb_helper_write(bandb_helper, "%s", buf);
+	snprintf(buf, sizeof(buf), "! :%s", errstr);
+	rb_helper_write(helper, "%s", buf);
 	rb_sleep(2 << 30, 0);
 	exit(1);
 }
@@ -298,8 +274,9 @@ int
 main(int argc, char *argv[])
 {
 	const char *dbpath;
+	rb_helper *bandb_helper;
 	setup_signals();
-	bandb_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256, 256, 256, 256);	/* XXX fix me */
+	bandb_helper = rb_helper_child(parse_request, error_cb, NULL, NULL, NULL, 256);	
 	if(bandb_helper == NULL)
 	{
 		fprintf(stderr,
@@ -313,7 +290,12 @@ main(int argc, char *argv[])
 	if(dbpath == NULL)
 		dbpath = DBPATH;
 
-	rsdb_init(dbpath, db_error_cb);
+	dbconn = rsdb_init(dbpath, db_error_cb, bandb_helper);
+	if(dbconn == NULL)
+	{
+	        fprintf(stderr, "ircd-ratbox bandb reports it cannot open the database, giving up\n");
+	        exit(1);
+        }
 	check_schema();
 	rb_helper_loop(bandb_helper, 0);
 
@@ -328,14 +310,14 @@ check_schema(void)
 
 	for(i = 0; i < LAST_BANDB_TYPE; i++)
 	{
-		rsdb_exec_fetch(&table,
+		rsdb_exec_fetch(dbconn, &table,
 				"SELECT name FROM sqlite_master WHERE type='table' AND name='%s'",
 				bandb_table[i]);
 
-		rsdb_exec_fetch_end(&table);
+		rsdb_exec_fetch_end(dbconn, &table);
 
 		if(!table.row_count)
-			rsdb_exec(NULL,
+			rsdb_exec(dbconn, NULL,
 				  "CREATE TABLE %s (mask1 TEXT, mask2 TEXT, oper TEXT, time INTEGER, perm INTEGER, reason TEXT)",
 				  bandb_table[i]);
 	}

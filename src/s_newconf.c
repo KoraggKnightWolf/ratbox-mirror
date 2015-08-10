@@ -64,7 +64,6 @@ rb_dlink_list tgchange_list;
 
 rb_patricia_tree_t *tgchange_tree;
 
-static rb_bh *nd_heap = NULL;
 
 static void expire_temp_rxlines(void *unused);
 static void expire_nd_entries(void *unused);
@@ -74,7 +73,6 @@ void
 init_s_newconf(void)
 {
 	tgchange_tree = rb_new_patricia(PATRICIA_BITS);
-	nd_heap = rb_bh_create(sizeof(struct nd_entry), ND_HEAP_SIZE, "nd_heap");
 	rb_event_addish("expire_nd_entries", expire_nd_entries, NULL, 30);
 	rb_event_addish("expire_temp_rxlines", expire_temp_rxlines, NULL, 60);
 	rb_event_addish("expire_glines", expire_glines, NULL, CLEANUP_GLINES_TIME);
@@ -192,25 +190,25 @@ find_shared_conf(const char *username, const char *host, const char *server, int
 		   match(shared_p->host, host) && match(shared_p->server, server))
 		{
 			if(shared_p->flags & flags)
-				return YES;
+				return true;
 			else
-				return NO;
+				return false;
 		}
 	}
 
-	return NO;
+	return false;
 }
 
 void
 cluster_generic(struct Client *source_p, const char *command, int cltype, const char *format, ...)
 {
-	char buffer[BUFSIZE];
+	char buffer[IRCD_BUFSIZE];
 	struct remote_conf *shared_p;
 	va_list args;
 	rb_dlink_node *ptr;
 
 	va_start(args, format);
-	rb_vsnprintf(buffer, sizeof(buffer), format, args);
+	vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
 
 	RB_DLINK_FOREACH(ptr, cluster_conf_list.head)
@@ -236,7 +234,7 @@ expire_glines(void *unused)
 		aconf = ptr->data;
 
 		/* if gline_time changes, these could end up out of order */
-		if(aconf->hold > rb_time())
+		if(aconf->hold > rb_current_time())
 			continue;
 
 		delete_one_address_conf(aconf->host, aconf);
@@ -302,8 +300,7 @@ find_oper_conf(const char *username, const char *host, const char *locip, const 
 		if(parse_netmask(addr, (struct sockaddr *)&ip, &bits) != HM_HOST)
 		{
 			if(GET_SS_FAMILY(&ip) == GET_SS_FAMILY(&cip) &&
-			   comp_with_mask_sock((struct sockaddr *)&ip, (struct sockaddr *)&cip,
-					       bits))
+			   comp_with_mask_sock((struct sockaddr *)&ip, (struct sockaddr *)&cip, bits))
 				return oper_p;
 		}
 
@@ -446,8 +443,7 @@ add_server_conf(struct server_conf *server_p)
 		return;
 
 	server_p->dns_query =
-		lookup_hostname(server_p->host, GET_SS_FAMILY(&server_p->ipnum), conf_dns_callback,
-				server_p);
+		lookup_hostname(server_p->host, GET_SS_FAMILY(&server_p->ipnum), conf_dns_callback, server_p);
 }
 
 struct server_conf *
@@ -513,7 +509,7 @@ detach_server_conf(struct Client *client_p)
 }
 
 void
-set_server_conf_autoconn(struct Client *source_p, const char *name, int newval)
+set_server_conf_autoconn(struct Client *source_p, char *name, int newval)
 {
 	struct server_conf *server_p;
 
@@ -525,29 +521,10 @@ set_server_conf_autoconn(struct Client *source_p, const char *name, int newval)
 			server_p->flags &= ~SERVER_AUTOCONN;
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s has changed AUTOCONN for %s to %i",
-				     get_oper_name(source_p), name, newval);
+				     "%s has changed AUTOCONN for %s to %i", get_oper_name(source_p), name, newval);
 	}
 	else
 		sendto_one_notice(source_p, ":Can't find %s", name);
-}
-
-void
-disable_server_conf_autoconn(const char *name)
-{
-	struct server_conf *server_p;
-
-	server_p = find_server_conf(name);
-	if(server_p != NULL && server_p->flags & SERVER_AUTOCONN)
-	{
-		server_p->flags &= ~SERVER_AUTOCONN;
-
-		sendto_realops_flags(UMODE_ALL, L_ALL,
-				"Disabling AUTOCONN for %s because of error",
-				name);
-		ilog(L_SERVER, "Disabling AUTOCONN for %s because of error",
-				name);
-	}
 }
 
 struct ConfItem *
@@ -672,7 +649,6 @@ valid_wild_card_simple(const char *data)
 	const char *p;
 	char tmpch;
 	int nonwild = 0;
-	int wild = 0;
 
 	/* check the string for minimum number of nonwildcard chars */
 	p = data;
@@ -694,12 +670,9 @@ valid_wild_card_simple(const char *data)
 			if(++nonwild >= ConfigFileEntry.min_nonwildcard_simple)
 				return 1;
 		}
-		else
-			wild++;
 	}
 
-	/* strings without wilds are also ok */
-	return wild == 0;
+	return 0;
 }
 
 time_t
@@ -737,27 +710,25 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_time())
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
-				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Temporary RESV for [%s] expired",
-						     aconf->host);
+				sendto_realops_flags(UMODE_ALL, L_ALL, "Temporary RESV for [%s] expired", aconf->host);
 
 			free_conf(aconf);
 			rb_dlinkDestroy(ptr, &resvTable[i]);
 		}
 	}
-	HASH_WALK_END RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
+	HASH_WALK_END;
+
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_time())
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
-				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Temporary RESV for [%s] expired",
-						     aconf->host);
+				sendto_realops_flags(UMODE_ALL, L_ALL, "Temporary RESV for [%s] expired", aconf->host);
 			free_conf(aconf);
 			rb_dlinkDestroy(ptr, &resv_conf_list);
 		}
@@ -767,12 +738,11 @@ expire_temp_rxlines(void *unused)
 	{
 		aconf = ptr->data;
 
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_time())
+		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
 		{
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Temporary X-line for [%s] expired",
-						     aconf->host);
+						     "Temporary X-line for [%s] expired", aconf->host);
 			free_conf(aconf);
 			rb_dlinkDestroy(ptr, &xline_conf_list);
 		}
@@ -794,10 +764,10 @@ add_nd_entry(const char *name)
 	if(hash_find_nd(name) != NULL)
 		return;
 
-	nd = rb_bh_alloc(nd_heap);
+	nd = rb_malloc(sizeof(struct nd_entry));
 
 	rb_strlcpy(nd->name, name, sizeof(nd->name));
-	nd->expire = rb_time() + ConfigFileEntry.nick_delay;
+	nd->expire = rb_current_time() + ConfigFileEntry.nick_delay;
 
 	/* this list is ordered */
 	rb_dlinkAddTail(nd, &nd->lnode, &nd_list);
@@ -808,8 +778,8 @@ void
 free_nd_entry(struct nd_entry *nd)
 {
 	rb_dlinkDelete(&nd->lnode, &nd_list);
-	rb_dlinkDelete(&nd->hnode, &ndTable[nd->hashv]);
-	rb_bh_free(nd_heap, nd);
+	del_from_nd_hash(nd);
+	rb_free(nd);
 }
 
 void
@@ -826,7 +796,7 @@ expire_nd_entries(void *unused)
 		/* this list is ordered - we can stop when we hit the first
 		 * entry that doesnt expire..
 		 */
-		if(nd->expire > rb_time())
+		if(nd->expire > rb_current_time())
 			return;
 
 		free_nd_entry(nd);
@@ -843,13 +813,13 @@ add_tgchange(const char *host)
 		return;
 
 	target = rb_malloc(sizeof(tgchange));
-	pnode = make_and_lookup(tgchange_tree, host);
+	pnode = rb_make_and_lookup(tgchange_tree, host);
 
 	pnode->data = target;
 	target->pnode = pnode;
 
 	target->ip = rb_strdup(host);
-	target->expiry = rb_time() + (60 * 60 * 12);
+	target->expiry = rb_current_time() + (60 * 60 * 12);
 
 	rb_dlinkAdd(target, &target->node, &tgchange_list);
 }

@@ -58,23 +58,38 @@ static int me_unxline(struct Client *client_p, struct Client *source_p, int parc
 		      const char *parv[]);
 
 struct Message xline_msgtab = {
-	"XLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_xline, 5}, {mo_xline, 3}}
+	.cmd = "XLINE", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_xline, .min_para = 5 },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_xline, .min_para = 3 },
 };
 
 struct Message adminxline_msgtab = {
-	"ADMINXLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminxline, 3}}
+	.cmd = "ADMINXLINE", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_adminxline, .min_para = 3 },
 };
 
 struct Message unxline_msgtab = {
-	"UNXLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_unxline, 2}, {mo_unxline, 2}}
+	.cmd = "UNXLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_unxline, .min_para = 2 },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_unxline, .min_para = 2 },
 };
 
-mapi_clist_av2 xline_clist[] = { &xline_msgtab, &unxline_msgtab, NULL };
+mapi_clist_av1 xline_clist[] = { &xline_msgtab, &unxline_msgtab, NULL };
 
-DECLARE_MODULE_AV2(xline, NULL, NULL, xline_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(xline, NULL, NULL, xline_clist, NULL, NULL, "$Revision$");
 
 static int valid_xline(struct Client *, const char *, const char *, int temp);
 static void apply_xline(struct Client *client_p, const char *name,
@@ -101,7 +116,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(!IsOperXline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "xline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "xline");
 		return 0;
 	}
 
@@ -119,8 +134,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		if(!IsOperRemoteBan(source_p))
 		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "remoteban");
+			sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "remoteban");
 			return 0;
 		}
 
@@ -130,8 +144,7 @@ mo_xline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(parc <= loc || EmptyString(parv[loc]))
 	{
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-			   me.name, source_p->name, "XLINE");
+		sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "XLINE");
 		return 0;
 	}
 
@@ -208,13 +221,13 @@ mo_adminxline(struct Client *client_p, struct Client *source_p, int parc, const 
 
 	if(!IsOperXline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "xline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "xline");
 		return 0;
 	}
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "admin");
 		return 0;
 	}
 
@@ -243,8 +256,7 @@ valid_xline(struct Client *source_p, const char *gecos, const char *reason, int 
 {
 	if(EmptyString(reason))
 	{
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-			   get_id(&me, source_p), get_id(source_p, source_p), "XLINE");
+		sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "XLINE");
 		return 0;
 	}
 
@@ -262,8 +274,8 @@ valid_xline(struct Client *source_p, const char *gecos, const char *reason, int 
 
 /* check_xlines
  *
- * inputs       -
- * outputs      -
+ * inputs	-
+ * outputs	-
  * side effects - all clients will be checked for xlines
  */
 static void
@@ -294,7 +306,7 @@ check_xlines(void)
 			sendto_realops_flags(UMODE_ALL, L_ALL, "XLINE active for %s",
 					     get_client_name(client_p, HIDE_IP));
 
-			(void)exit_client(client_p, client_p, &me, "Bad user info");
+			exit_client(client_p, client_p, &me, "Bad user info");
 			continue;
 		}
 	}
@@ -321,7 +333,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason, int t
 	if(temp_time > 0)
 	{
 		aconf->flags |= CONF_FLAGS_TEMPORARY;
-		aconf->hold = rb_time() + temp_time;
+		aconf->hold = rb_current_time() + temp_time;
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s added temporary %d min. X-Line for [%s] [%s]",
@@ -332,7 +344,7 @@ apply_xline(struct Client *source_p, const char *name, const char *reason, int t
 	}
 	else
 	{
-		aconf->hold = rb_time();
+		aconf->hold = rb_current_time();
 		bandb_add(BANDB_XLINE, source_p, aconf->host, NULL, reason, NULL, locked);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s added X-Line for [%s] [%s]",
@@ -355,7 +367,7 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 {
 	if(!IsOperXline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "xline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "xline");
 		return 0;
 	}
 
@@ -363,8 +375,7 @@ mo_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	{
 		if(!IsOperRemoteBan(source_p))
 		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "remoteban");
+			sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "remoteban");
 			return 0;
 		}
 

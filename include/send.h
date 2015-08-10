@@ -27,10 +27,8 @@
 #ifndef INCLUDED_send_h
 #define INCLUDED_send_h
 
-struct Client;
-struct Channel;
-struct rb_dlink_list;
-struct monitor;
+#include "monitor.h"
+#include "channel.h"
 
 void send_pop_queue(struct Client *);
 void
@@ -71,11 +69,11 @@ AFP(2, 3);
      void kill_client_serv_butone(struct Client *one, struct Client *source_p,
 				  const char *pattern, ...) AFP(3, 4);
 
-#define L_ALL 	0
-#define L_OPER 	1
+#define L_ALL	0
+#define L_OPER	1
 #define L_ADMIN	2
 
-#define NOCAPS          0	/* no caps */
+#define NOCAPS		0	/* no caps */
 
 /* used when sending to #mask or $mask */
 #define MATCH_SERVER  1

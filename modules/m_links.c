@@ -45,29 +45,35 @@ static int mo_links(struct Client *, struct Client *, int, const char **);
 static char *clean_string(char *dest, const unsigned char *src, size_t len);
 
 struct Message links_msgtab = {
-	"LINKS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_links, 0}, {mo_links, 0}, mg_ignore, mg_ignore, {mo_links, 0}}
+	.cmd = "LINKS", 
+
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_links },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = mo_links },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_links },
 };
 
 int doing_links_hook;
 
-mapi_clist_av2 links_clist[] = { &links_msgtab, NULL };
+mapi_clist_av1 links_clist[] = { &links_msgtab, NULL };
 
-mapi_hlist_av2 links_hlist[] = {
+mapi_hlist_av1 links_hlist[] = {
 	{"doing_links", &doing_links_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV2(links, NULL, NULL, links_clist, links_hlist, NULL, "$Revision$");
-
-static void send_links_cache(struct Client *source_p);
+DECLARE_MODULE_AV1(links, NULL, NULL, links_clist, links_hlist, NULL, "$Revision$");
 
 /*
  * m_links - LINKS message handler
- *      parv[1] = servername mask
+ *	parv[0] = sender prefix
+ *	parv[1] = servername mask
  * or
- *      parv[1] = server to query 
- *      parv[2] = servername mask
+ *	parv[0] = sender prefix
+ *	parv[1] = server to query 
+ *	parv[2] = servername mask
  */
 static int
 m_links(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -104,7 +110,8 @@ mo_links(struct Client *client_p, struct Client *source_p, int parc, const char 
 		mask = parv[1];
 
 	if(*mask)		/* only necessary if there is a mask */
-		mask = collapse(clean_string(clean_mask, (const unsigned char *)mask, 2 * HOSTLEN));
+		mask = collapse(clean_string
+				(clean_mask, (const unsigned char *) mask, 2 * HOSTLEN));
 
 	hd.client = source_p;
 	hd.arg1 = mask;
@@ -120,40 +127,17 @@ mo_links(struct Client *client_p, struct Client *source_p, int parc, const char 
 			continue;
 
 		/* We just send the reply, as if theyre here theres either no SHIDE,
-		 * or theyre an oper..  
+		 * or theyre an oper..	
 		 */
-		sendto_one_numeric(source_p, RPL_LINKS, form_str(RPL_LINKS),
+		sendto_one_numeric(source_p, s_RPL(RPL_LINKS),
 				   target_p->name, target_p->servptr->name,
 				   target_p->hopcount,
 				   target_p->info[0] ? target_p->info : "(Unknown Location)");
 	}
 	ClearCork(source_p);
-	sendto_one_numeric(source_p, RPL_ENDOFLINKS, form_str(RPL_ENDOFLINKS),
-			   EmptyString(mask) ? "*" : mask);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFLINKS), EmptyString(mask) ? "*" : mask);
 
 	return 0;
-}
-
-/* send_links_cache()
- *
- * inputs	- client to send to
- * outputs	- the cached links, us, and RPL_ENDOFLINKS
- * side effects	-
- */
-static void
-send_links_cache(struct Client *source_p)
-{
-	rb_dlink_node *ptr;
-	SetCork(source_p);
-	RB_DLINK_FOREACH(ptr, links_cache_list.head)
-	{
-		sendto_one(source_p, ":%s 364 %s %s",
-			   me.name, source_p->name, (const char *)ptr->data);
-	}
-
-	sendto_one_numeric(source_p, RPL_LINKS, form_str(RPL_LINKS), me.name, me.name, 0, me.info);
-	ClearCork(source_p);
-	sendto_one_numeric(source_p, RPL_ENDOFLINKS, form_str(RPL_ENDOFLINKS), "*");
 }
 
 static char *

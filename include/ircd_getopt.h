@@ -32,14 +32,14 @@ struct lgetopt
 	const char *opt;	/* name of the argument */
 	void *argloc;		/* where we store the argument to it (-option argument) */
 	enum
-	{ INTEGER, YESNO, ISTRING, USAGE, ENDEBUG }
+	{ INTEGER, YESNO, ISTRING, USAGE }
 	argtype;
 	const char *desc;	/* description of the argument, usage for printing help */
 };
 
 extern struct lgetopt myopts[];
 
-void usage(char *);
+void usage(char *) RB_noreturn;
 void parseargs(int *, char ***, struct lgetopt *);
 
 #endif /* __GETOPT_H_INCLUDED__ */

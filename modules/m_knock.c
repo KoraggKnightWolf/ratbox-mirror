@@ -40,15 +40,22 @@
 static int m_knock(struct Client *, struct Client *, int, const char **);
 
 struct Message knock_msgtab = {
-	"KNOCK", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_knock, 2}, {m_knock, 2}, mg_ignore, mg_ignore, {m_knock, 2}}
+	.cmd = "KNOCK",
+
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_knock, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = m_knock, .min_para = 2 },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_knock, .min_para = 2 },
 };
 
-mapi_clist_av2 knock_clist[] = { &knock_msgtab, NULL };
+mapi_clist_av1 knock_clist[] = { &knock_msgtab, NULL };
 
-DECLARE_MODULE_AV2(knock, NULL, NULL, knock_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(knock, NULL, NULL, knock_clist, NULL, NULL, "$Revision$");
 
 /* m_knock
+ *    parv[0] = sender prefix
  *    parv[1] = channel
  *
  *  The KNOCK command has the following syntax:
@@ -69,7 +76,7 @@ m_knock(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(MyClient(source_p) && ConfigChannel.use_knock == 0)
 	{
-		sendto_one(source_p, form_str(ERR_KNOCKDISABLED), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_KNOCKDISABLED));
 		return 0;
 	}
 
@@ -94,14 +101,13 @@ m_knock(struct Client *client_p, struct Client *source_p, int parc, const char *
 	if(IsMember(source_p, chptr))
 	{
 		if(MyClient(source_p))
-			sendto_one(source_p, form_str(ERR_KNOCKONCHAN),
-				   me.name, source_p->name, name);
+			sendto_one_numeric(source_p, s_RPL(ERR_KNOCKONCHAN), name);
 		return 0;
 	}
 
 	if(!((chptr->mode.mode & MODE_INVITEONLY) || (*chptr->mode.key) ||
 	     (chptr->mode.limit &&
-	      rb_dlink_list_length(&chptr->members) >= (unsigned long)chptr->mode.limit)))
+	      rb_dlink_list_length(&chptr->members) >= (unsigned long) chptr->mode.limit)))
 	{
 		sendto_one_numeric(source_p, ERR_CHANOPEN, form_str(ERR_CHANOPEN), name);
 		return 0;
@@ -132,33 +138,37 @@ m_knock(struct Client *client_p, struct Client *source_p, int parc, const char *
 		 */
 		if(!IsOper(source_p) &&
 		   (source_p->localClient->last_knock + ConfigChannel.knock_delay) >
-		   rb_time())
+		   rb_current_time())
 		{
-			sendto_one(source_p, form_str(ERR_TOOMANYKNOCK),
-				   me.name, source_p->name, name, "user");
+			sendto_one_numeric(source_p, s_RPL(ERR_TOOMANYKNOCK),
+				   name, "user");
 			return 0;
 		}
-		else if((chptr->last_knock + ConfigChannel.knock_delay_channel) > rb_time())
+		else if((chptr->last_knock + ConfigChannel.knock_delay_channel) > rb_current_time())
 		{
-			sendto_one(source_p, form_str(ERR_TOOMANYKNOCK),
-				   me.name, source_p->name, name, "channel");
+			sendto_one_numeric(source_p, s_RPL(ERR_TOOMANYKNOCK),
+				   name, "channel");
 			return 0;
 		}
 
 		/* ok, we actually can send the knock, tell client */
-		source_p->localClient->last_knock = rb_time();
+		source_p->localClient->last_knock = rb_current_time();
 
-		sendto_one(source_p, form_str(RPL_KNOCKDLVR), me.name, source_p->name, name);
+		sendto_one_numeric(source_p, s_RPL(RPL_KNOCKDLVR), name);
 	}
 
-	chptr->last_knock = rb_time();
+	chptr->last_knock = rb_current_time();
+	                                     
 
-	if(ConfigChannel.use_knock)
-		sendto_channel_local(ONLY_CHANOPS, chptr, form_str(RPL_KNOCK),
-				     me.name, name, name, source_p->name,
-				     source_p->username, source_p->host);
-
+	if(ConfigChannel.use_knock) 
+	{
+        	char buf[IRCD_BUFSIZE];
+        	snprintf(buf, sizeof(buf), ":%s %03d %s " form_str(RPL_KNOCK), me.name, RPL_KNOCK, name, name, source_p->name,
+	                                     source_p->username, source_p->host);
+		sendto_channel_local(ONLY_CHANOPS, chptr, "%s", buf);
+        }
 	sendto_server(client_p, chptr, CAP_KNOCK | CAP_TS6, NOCAPS,
-		      ":%s KNOCK %s", source_p->id, name);
+		      ":%s KNOCK %s", use_id(source_p), name);
+	sendto_server(client_p, chptr, CAP_KNOCK, CAP_TS6, ":%s KNOCK %s", source_p->name, name);
 	return 0;
 }

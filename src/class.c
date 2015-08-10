@@ -35,9 +35,9 @@
 #include "send.h"
 #include "match.h"
 
-#define BAD_CONF_CLASS          -1
-#define BAD_PING                -2
-#define BAD_CLIENT_CLASS        -3
+// #define BAD_CONF_CLASS		-1
+#define BAD_PING		-2
+// #define BAD_CLIENT_CLASS	-3
 
 rb_dlink_list class_list;
 struct Class *default_class;
@@ -164,7 +164,7 @@ get_con_freq(struct Class *clptr)
  * input	- class to add
  * output	-
  * side effects - class is added to class_list if new, else old class
- *                is updated with new values.
+ *		  is updated with new values.
  */
 void
 add_class(struct Class *classptr)

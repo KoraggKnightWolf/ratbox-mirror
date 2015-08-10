@@ -2,7 +2,7 @@
  * ircd-ratbox: an advanced Internet Relay Chat Daemon(ircd).
  * hook.c - code for dealing with the hook system
  *
- * This code is basically a slow leaking array.  Events are simply just a
+ * This code is basically a slow leaking array.	 Events are simply just a
  * position in this array.  When hooks are added, events will be created if
  * they dont exist - this means modules with hooks can be loaded in any
  * order, and events are preserved through module reloads.
@@ -44,7 +44,7 @@
 struct hook_info
 {
 	rb_dlink_node node;
-	hookfn fn;	
+	hookfn fn;
 };
 
 hook *hooks;
@@ -55,11 +55,6 @@ int num_hooks = 0;
 int last_hook = 0;
 int max_hooks = HOOK_INCREMENT;
 
-#ifdef USE_IODEBUG_HOOKS
-int h_iosend_id;
-int h_iorecv_id;
-int h_iorecvctrl_id;
-#endif
 int h_burst_client;
 int h_burst_channel;
 int h_burst_finished;
@@ -69,12 +64,6 @@ void
 init_hook(void)
 {
 	hooks = rb_malloc(sizeof(hook) * HOOK_INCREMENT);
-
-#ifdef USE_IODEBUG_HOOKS
-	h_iosend_id = register_hook("iosend");
-	h_iorecv_id = register_hook("iorecv");
-	h_iorecvctrl_id = register_hook("iorecvctrl");
-#endif
 
 	h_burst_client = register_hook("burst_client");
 	h_burst_channel = register_hook("burst_channel");
@@ -195,8 +184,8 @@ remove_hook(const char *name, hookfn fn)
 		{
 			rb_dlinkDelete(&info->node, &hooks[i].hooks);
 			rb_free(info);
-			return;		
-		}				
+			return;
+		}
 	}
 }
 

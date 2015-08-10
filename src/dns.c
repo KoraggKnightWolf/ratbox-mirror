@@ -31,18 +31,20 @@
 #include "s_log.h"
 #include "s_conf.h"
 #include "client.h"
+#include "monitor.h"
+#include "channel.h"
 #include "send.h"
 #include "numeric.h"
 
-#define IDTABLE 0xffff
+#define DNS_IDTABLE_SIZE 0x2000
 
-#define DNS_HOST 	((char)'H')
-#define DNS_REVERSE 	((char)'I')
+#define DNS_HOST	((char)'H')
+#define DNS_REVERSE	((char)'I')
 
-static void submit_dns(const char, int id, int aftype, const char *addr);
+static void submit_dns(const char, uint16_t id, int aftype, const char *addr);
 static int start_resolver(void);
-static void parse_dns_reply(rb_helper *helper);
-static void restart_resolver_cb(rb_helper *helper);
+static void parse_dns_reply(rb_helper * helper);
+static void restart_resolver_cb(rb_helper * helper);
 
 static rb_helper *dns_helper;
 
@@ -52,7 +54,7 @@ struct dnsreq
 	void *data;
 };
 
-static struct dnsreq querytable[IDTABLE];
+static struct dnsreq querytable[DNS_IDTABLE_SIZE];
 static uint16_t id = 1;
 
 static uint16_t
@@ -60,7 +62,7 @@ assign_dns_id(void)
 {
 	while(1)
 	{
-		if(id < IDTABLE - 1)
+		if(id < DNS_IDTABLE_SIZE - 1)
 			id++;
 		else
 			id = 1;
@@ -191,12 +193,12 @@ start_resolver(void)
 #endif
 	if(resolver_path == NULL)
 	{
-		rb_snprintf(fullpath, sizeof(fullpath), "%s/resolver%s", LIBEXEC_DIR, suffix);
+		snprintf(fullpath, sizeof(fullpath), "%s/resolver%s", LIBEXEC_DIR, suffix);
 
 		if(access(fullpath, X_OK) == -1)
 		{
-			rb_snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/resolver%s",
-				    ConfigFileEntry.dpath, suffix);
+			snprintf(fullpath, sizeof(fullpath), "%s/libexec/ircd-ratbox/resolver%s",
+				 ConfigFileEntry.dpath, suffix);
 			if(access(fullpath, X_OK) == -1)
 			{
 				ilog(L_MAIN,
@@ -213,13 +215,12 @@ start_resolver(void)
 		resolver_path = rb_strdup(fullpath);
 	}
 
-	dns_helper =
-		rb_helper_start("resolver", resolver_path, parse_dns_reply, restart_resolver_cb);
+	dns_helper = rb_helper_start("resolver", resolver_path, parse_dns_reply, restart_resolver_cb);
 
 	if(dns_helper == NULL)
 	{
-		ilog(L_MAIN, "Unable to start resolver helper: %m");
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to start resolver helper: %m");
+		ilog(L_MAIN, "Unable to start resolver helper: %s", strerror(errno));
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Unable to start resolver helper: %s", strerror(errno));
 		return 1;
 	}
 	ilog(L_MAIN, "resolver helper started");
@@ -262,10 +263,10 @@ report_dns_servers(struct Client *source_p)
 
 
 static void
-parse_dns_reply(rb_helper *helper)
+parse_dns_reply(rb_helper * helper)
 {
 	int len, parc;
-	static char dnsBuf[READBUF_SIZE];
+	char dnsBuf[READBUF_SIZE];
 
 	char *parv[MAXPARA + 1];
 	while((len = rb_helper_read(helper, dnsBuf, sizeof(dnsBuf))) > 0)
@@ -276,8 +277,7 @@ parse_dns_reply(rb_helper *helper)
 		{
 			if(parc != 6)
 			{
-				ilog(L_MAIN,
-				     "Resolver sent a result with wrong number of arguments");
+				ilog(L_MAIN, "Resolver sent a result with wrong number of arguments");
 				restart_resolver();
 				return;
 			}
@@ -297,7 +297,7 @@ parse_dns_reply(rb_helper *helper)
 }
 
 static void
-submit_dns(char type, int nid, int aftype, const char *addr)
+submit_dns(char type, uint16_t nid, int aftype, const char *addr)
 {
 	if(dns_helper == NULL)
 	{
@@ -326,18 +326,17 @@ init_resolver(void)
 {
 	if(start_resolver())
 	{
-		ilog(L_MAIN, "Unable to start resolver helper: %m");
+		ilog(L_MAIN, "Unable to start resolver helper: %s", strerror(errno));
 		exit(0);
 	}
 }
 
 
 static void
-restart_resolver_cb(rb_helper *helper)
+restart_resolver_cb(rb_helper * helper)
 {
 	ilog(L_MAIN, "resolver - restart_resolver_cb called, resolver helper died?");
-	sendto_realops_flags(UMODE_ALL, L_ALL,
-			     "resolver - restart_resolver_cb called, resolver helper died?");
+	sendto_realops_flags(UMODE_ALL, L_ALL, "resolver - restart_resolver_cb called, resolver helper died?");
 	if(helper != NULL)
 	{
 		rb_helper_close(helper);
@@ -358,3 +357,4 @@ rehash_resolver(void)
 {
 	rb_helper_write(dns_helper, "R");
 }
+

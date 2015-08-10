@@ -36,45 +36,49 @@
 #include "parse.h"
 #include "modules.h"
 
-static char *confopts(void);
+static const char *confopts(void);
 
 static int m_version(struct Client *, struct Client *, int, const char **);
 static int mo_version(struct Client *, struct Client *, int, const char **);
 
 struct Message version_msgtab = {
-	"VERSION", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_version, 0}, {mo_version, 0}, {mo_version, 0}, mg_ignore, {mo_version, 0}}
+	.cmd = "VERSION", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_version },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = mo_version },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_version },
 };
 
-mapi_clist_av2 version_clist[] = { &version_msgtab, NULL };
+mapi_clist_av1 version_clist[] = { &version_msgtab, NULL };
 
-DECLARE_MODULE_AV2(version, NULL, NULL, version_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(version, NULL, NULL, version_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_version - VERSION command handler
- *      parv[1] = remote server
+ *	parv[0] = sender prefix
+ *	parv[1] = remote server
  */
 static int
 m_version(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	static time_t last_used = 0L;
-
 	if(parc > 1)
 	{
-		if((last_used + ConfigFileEntry.pace_wait) > rb_time())
+		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
 			/* safe enough to give this on a local connect only */
-			sendto_one(source_p, form_str(RPL_LOAD2HI),
-				   me.name, source_p->name, "VERSION");
+			sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "VERSION");
 			return 0;
 		}
 		else
-			last_used = rb_time();
+			last_used = rb_current_time();
 
 		if(hunt_server(client_p, source_p, ":%s VERSION :%s", 1, parc, parv) != HUNTED_ISME)
 			return 0;
 	}
-	sendto_one_numeric(source_p, RPL_VERSION, form_str(RPL_VERSION),
+	sendto_one_numeric(source_p, s_RPL(RPL_VERSION),
 			   ircd_version, serno, me.name, confopts(), TS_CURRENT, ServerInfo.sid);
 
 	show_isupport(source_p);
@@ -84,14 +88,15 @@ m_version(struct Client *client_p, struct Client *source_p, int parc, const char
 
 /*
  * mo_version - VERSION command handler
- *      parv[1] = remote server
+ *	parv[0] = sender prefix
+ *	parv[1] = remote server
  */
 static int
 mo_version(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	if(hunt_server(client_p, source_p, ":%s VERSION :%s", 1, parc, parv) == HUNTED_ISME)
 	{
-		sendto_one_numeric(source_p, RPL_VERSION, form_str(RPL_VERSION),
+		sendto_one_numeric(source_p, s_RPL(RPL_VERSION),
 				   ircd_version, serno,
 				   me.name, confopts(), TS_CURRENT, ServerInfo.sid);
 		show_isupport(source_p);
@@ -105,7 +110,7 @@ mo_version(struct Client *client_p, struct Client *source_p, int parc, const cha
  * output - ircd.conf option string
  * side effects - none
  */
-static char *
+static const char *
 confopts(void)
 {
 	static char result[15];
@@ -144,5 +149,5 @@ confopts(void)
 
 	*p = '\0';
 
-	return result;
+	return (const char *) result;
 }

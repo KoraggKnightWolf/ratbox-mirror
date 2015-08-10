@@ -51,19 +51,29 @@ static int modinit(void);
 static void moddeinit(void);
 
 struct Message gline_msgtab = {
-	"GLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, {mc_gline, 3}, {ms_gline, 7}, mg_ignore, {mo_gline, 3}}
+	.cmd = "GLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = mc_gline, .min_para = 3 },	 
+	.handlers[SERVER_HANDLER] =		{ .handler = ms_gline, .min_para = 7 },	 
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },	
+	.handlers[OPER_HANDLER] =		{ .handler = mo_gline, .min_para = 3 },
 };
 
 struct Message ungline_msgtab = {
-	"UNGLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_ungline, 2}}
+	.cmd = "UNGLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },	
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },	
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },	
+	.handlers[OPER_HANDLER] =		{ .handler = mo_ungline, .min_para = 2 },
 };
 
 
-mapi_clist_av2 gline_clist[] = { &gline_msgtab, &ungline_msgtab, NULL };
+mapi_clist_av1 gline_clist[] = { &gline_msgtab, &ungline_msgtab, NULL };
 
-DECLARE_MODULE_AV2(gline, modinit, moddeinit, gline_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(gline, modinit, moddeinit, gline_clist, NULL, NULL, "$Revision$");
 
 static int majority_gline(struct Client *source_p, const char *user,
 			  const char *host, const char *reason);
@@ -73,7 +83,7 @@ static int invalid_gline(struct Client *, const char *, char *);
 
 static int remove_temp_gline(const char *, const char *);
 static void expire_pending_glines(void *unused);
-static struct ev_entry *pending_gline_ev;
+static rb_ev_entry *pending_gline_ev;
 
 static int
 modinit(void)
@@ -91,8 +101,8 @@ moddeinit(void)
 
 /* mo_gline()
  *
- * inputs       - The usual for a m_ function
- * output       -
+ * inputs	- The usual for a m_ function
+ * output	-
  * side effects - place a gline if 3 opers agree
  */
 static int
@@ -112,7 +122,7 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(!IsOperGline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "gline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "gline");
 		return 0;
 	}
 
@@ -199,17 +209,15 @@ mo_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	/* 4 param version for hyb-7 servers */
 	sendto_server(NULL, NULL, CAP_GLN | CAP_TS6, NOCAPS,
-		      ":%s GLINE %s %s :%s", source_p->id, user, host, reason);
+		      ":%s GLINE %s %s :%s", use_id(source_p), user, host, reason);
+	sendto_server(NULL, NULL, CAP_GLN, CAP_TS6,
+		      ":%s GLINE %s %s :%s", source_p->name, user, host, reason);
 
-#if 0
-	/* hybrid 6 doesn't support TS6 at all so... */
 	/* 8 param for hyb-6 */
 	sendto_server(NULL, NULL, NOCAPS, CAP_GLN,
 		      ":%s GLINE %s %s %s %s %s %s :%s",
 		      me.name, source_p->name, source_p->username,
 		      source_p->host, source_p->servptr->name, user, host, reason);
-#endif
-
 	return 0;
 }
 
@@ -238,7 +246,13 @@ mc_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 
 	sendto_server(client_p, NULL, CAP_GLN | CAP_TS6, NOCAPS,
-		      ":%s GLINE %s %s :%s", acptr->id, user, host, reason);
+		      ":%s GLINE %s %s :%s", use_id(acptr), user, host, reason);
+	sendto_server(client_p, NULL, CAP_GLN, CAP_TS6,
+		      ":%s GLINE %s %s :%s", acptr->name, user, host, reason);
+	sendto_server(client_p, NULL, NOCAPS, CAP_GLN,
+		      ":%s GLINE %s %s %s %s %s %s :%s",
+		      acptr->servptr->name, acptr->name,
+		      acptr->username, acptr->host, acptr->servptr->name, user, host, reason);
 
 	if(!ConfigFileEntry.glines)
 		return 0;
@@ -306,8 +320,8 @@ mc_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 /* ms_gline()
  *
- * inputs       - The usual for a m_ function
- * output       -
+ * inputs	- The usual for a m_ function
+ * output	-
  * side effects - attempts to place a gline, if 3 opers agree
  */
 static int
@@ -340,7 +354,13 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 
 	sendto_server(client_p, NULL, CAP_GLN | CAP_TS6, NOCAPS,
-		      ":%s GLINE %s %s :%s", acptr->id, user, host, reason);
+		      ":%s GLINE %s %s :%s", use_id(acptr), user, host, reason);
+	sendto_server(client_p, NULL, CAP_GLN, CAP_TS6,
+		      ":%s GLINE %s %s :%s", acptr->name, user, host, reason);
+	sendto_server(client_p, NULL, NOCAPS, CAP_GLN,
+		      ":%s GLINE %s %s %s %s %s %s :%s",
+		      acptr->servptr->name, acptr->name,
+		      acptr->username, acptr->host, acptr->servptr->name, user, host, reason);
 
 	if(!ConfigFileEntry.glines)
 		return 0;
@@ -373,7 +393,8 @@ ms_gline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 /* mo_ungline()
  *
- *      parv[1] = gline to remove
+ *	parv[0] = sender nick
+ *	parv[1] = gline to remove
  */
 static int
 mo_ungline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -391,7 +412,7 @@ mo_ungline(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(!IsOperUnkline(source_p) || !IsOperGline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "unkline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "unkline");
 		return 0;
 	}
 
@@ -445,8 +466,8 @@ mo_ungline(struct Client *client_p, struct Client *source_p, int parc, const cha
 /*
  * check_wild_gline
  *
- * inputs       - user, host of gline
- * output       - 1 if not enough non-wildchar char's, 0 if ok
+ * inputs	- user, host of gline
+ * output	- 1 if not enough non-wildchar char's, 0 if ok
  * side effects - NONE
  */
 static int
@@ -510,8 +531,8 @@ invalid_gline(struct Client *source_p, const char *luser, char *lreason)
 
 /* find_is_glined()
  * 
- * inputs       - hostname and username to search for
- * output       - pointer to struct ConfItem if user@host glined
+ * inputs	- hostname and username to search for
+ * output	- pointer to struct ConfItem if user@host glined
  * side effects -
  */
 static struct ConfItem *
@@ -533,8 +554,8 @@ find_is_glined(const char *host, const char *user)
 
 /* check_glines()
  *
- * inputs       -
- * outputs      -
+ * inputs	-
+ * outputs	-
  * side effects - all clients will be checked for glines
  */
 static void
@@ -584,7 +605,7 @@ check_glines(void)
  * set_local_gline
  *
  * inputs	- pointer to oper nick/username/host/server,
- * 		  victim user/host and reason
+ *		  victim user/host and reason
  * output	- NONE
  * side effects	-
  */
@@ -597,7 +618,7 @@ set_local_gline(struct Client *source_p, const char *user, const char *host, con
 	char *my_reason;
 	char *oper_reason;
 
-	current_date = smalldate(rb_time());
+	current_date = smalldate(rb_current_time());
 
 	my_reason = LOCAL_COPY(reason);
 
@@ -617,12 +638,12 @@ set_local_gline(struct Client *source_p, const char *user, const char *host, con
 			aconf->spasswd = rb_strdup(oper_reason);
 	}
 
-	rb_snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
+	snprintf(buffer, sizeof(buffer), "%s (%s)", reason, current_date);
 
 	aconf->passwd = rb_strdup(buffer);
 	aconf->user = rb_strdup(user);
 	aconf->host = rb_strdup(host);
-	aconf->hold = rb_time() + ConfigFileEntry.gline_time;
+	aconf->hold = rb_current_time() + ConfigFileEntry.gline_time;
 
 	rb_dlinkAddTailAlloc(aconf, &glines);
 	add_conf_by_address(aconf->host, CONF_GLINE, aconf->user, aconf);
@@ -641,7 +662,7 @@ set_local_gline(struct Client *source_p, const char *user, const char *host, con
 /* majority_gline()
  *
  * input	- client doing gline, user, host and reason of gline
- * output       - YES if there are 3 different opers/servers agree, else NO
+ * output	- YES if there are 3 different opers/servers agree, else NO
  * side effects -
  */
 static int
@@ -655,7 +676,7 @@ majority_gline(struct Client *source_p, const char *user, const char *host, cons
 
 	/* if its already glined, why bother? :) -- fl_ */
 	if(find_is_glined(host, user))
-		return NO;
+		return false;
 
 	RB_DLINK_FOREACH(pending_node, pending_glines.head)
 	{
@@ -668,12 +689,12 @@ majority_gline(struct Client *source_p, const char *user, const char *host, cons
 			    (irccmp(pending->oper_host1, source_p->host) == 0)))
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL, "oper has already voted");
-				return NO;
+				return false;
 			}
 			else if(irccmp(pending->oper_server1, source_p->servptr->name) == 0)
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL, "server has already voted");
-				return NO;
+				return false;
 			}
 
 			if(pending->oper_user2[0] != '\0')
@@ -684,20 +705,20 @@ majority_gline(struct Client *source_p, const char *user, const char *host, cons
 				{
 					sendto_realops_flags(UMODE_ALL, L_ALL,
 							     "oper has already voted");
-					return NO;
+					return false;
 				}
 				else if(irccmp(pending->oper_server2, source_p->servptr->name) == 0)
 				{
 					sendto_realops_flags(UMODE_ALL, L_ALL,
 							     "server has already voted");
-					return NO;
+					return false;
 				}
 
 				/* trigger the gline using the original reason --fl */
 				set_local_gline(source_p, user, host, pending->reason1);
 
 				expire_pending_glines(NULL);
-				return YES;
+				return true;
 			}
 			else
 			{
@@ -709,15 +730,15 @@ majority_gline(struct Client *source_p, const char *user, const char *host, cons
 					   sizeof(pending->oper_host2));
 				pending->reason2 = rb_strdup(reason);
 				pending->oper_server2 = scache_add(source_p->servptr->name);
-				pending->last_gline_time = rb_time();
-				pending->time_request2 = rb_time();
-				return NO;
+				pending->last_gline_time = rb_current_time();
+				pending->time_request2 = rb_current_time();
+				return false;
 			}
 		}
 	}
 
 	/* no pending gline, create a new one */
-	pending = (struct gline_pending *)rb_malloc(sizeof(struct gline_pending));
+	pending = (struct gline_pending *) rb_malloc(sizeof(struct gline_pending));
 
 	rb_strlcpy(pending->oper_nick1, source_p->name, sizeof(pending->oper_nick1));
 	rb_strlcpy(pending->oper_user1, source_p->username, sizeof(pending->oper_user1));
@@ -730,18 +751,18 @@ majority_gline(struct Client *source_p, const char *user, const char *host, cons
 	pending->reason1 = rb_strdup(reason);
 	pending->reason2 = NULL;
 
-	pending->last_gline_time = rb_time();
-	pending->time_request1 = rb_time();
+	pending->last_gline_time = rb_current_time();
+	pending->time_request1 = rb_current_time();
 
 	rb_dlinkAddAlloc(pending, &pending_glines);
 
-	return NO;
+	return false;
 }
 
 /* remove_temp_gline()
  *
- * inputs       - username, hostname to ungline
- * outputs      -
+ * inputs	- username, hostname to ungline
+ * outputs	-
  * side effects - tries to ungline anything that matches
  */
 static int
@@ -753,13 +774,13 @@ remove_temp_gline(const char *user, const char *host)
 	int bits, cbits;
 	int mtype, gtype;
 
-	mtype = parse_netmask(host, (struct sockaddr *)&addr, &bits);
+	mtype = parse_netmask(host, (struct sockaddr *) &addr, &bits);
 
 	RB_DLINK_FOREACH(ptr, glines.head)
 	{
 		aconf = ptr->data;
 
-		gtype = parse_netmask(aconf->host, (struct sockaddr *)&caddr, &cbits);
+		gtype = parse_netmask(aconf->host, (struct sockaddr *) &caddr, &cbits);
 
 		if(gtype != mtype || (user && irccmp(user, aconf->user)))
 			continue;
@@ -770,23 +791,23 @@ remove_temp_gline(const char *user, const char *host)
 				continue;
 		}
 		else if(bits != cbits ||
-			!comp_with_mask_sock((struct sockaddr *)&addr,
-					     (struct sockaddr *)&caddr, bits))
+			!comp_with_mask_sock((struct sockaddr *) &addr,
+					     (struct sockaddr *) &caddr, bits))
 			continue;
 
 		rb_dlinkDestroy(ptr, &glines);
 		delete_one_address_conf(aconf->host, aconf);
-		return YES;
+		return true;
 	}
 
-	return NO;
+	return false;
 }
 
 /*
  * expire_pending_glines
  * 
- * inputs       - NONE
- * output       - NONE
+ * inputs	- NONE
+ * output	- NONE
  * side effects -
  *
  * Go through the pending gline list, expire any that haven't had
@@ -804,7 +825,7 @@ expire_pending_glines(void *unused)
 		glp_ptr = pending_node->data;
 
 		if(((glp_ptr->last_gline_time + GLINE_PENDING_EXPIRE) <=
-		    rb_time()) || find_is_glined(glp_ptr->host, glp_ptr->user))
+		    rb_current_time()) || find_is_glined(glp_ptr->host, glp_ptr->user))
 
 		{
 			rb_free(glp_ptr->reason1);

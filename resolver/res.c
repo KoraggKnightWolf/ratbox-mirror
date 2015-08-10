@@ -49,16 +49,16 @@ static PF res_readreply;
 #define MAXPACKET      1024	/* rfc sez 512 but we expand names so ... */
 #define RES_MAXALIASES 35	/* maximum aliases allowed */
 #define RES_MAXADDRS   35	/* maximum addresses allowed */
-#define AR_TTL         600	/* TTL in seconds for dns cache entries */
+#define AR_TTL	       600	/* TTL in seconds for dns cache entries */
 
 /* RFC 1104/1105 wasn't very helpful about what these fields
  * should be named, so for now, we'll just name them this way.
  * we probably should look at what named calls them or something.
  */
-#define TYPE_SIZE         (size_t)2
-#define CLASS_SIZE        (size_t)2
-#define TTL_SIZE          (size_t)4
-#define RDLENGTH_SIZE     (size_t)2
+#define TYPE_SIZE	  (size_t)2
+#define CLASS_SIZE	  (size_t)2
+#define TTL_SIZE	  (size_t)4
+#define RDLENGTH_SIZE	  (size_t)2
 #define ANSWER_FIXED_SIZE (TYPE_SIZE + CLASS_SIZE + TTL_SIZE + RDLENGTH_SIZE)
 
 #ifdef RB_IPV6
@@ -75,7 +75,7 @@ struct reslist
 	int sent;		/* number of requests sent */
 	time_t ttl;
 	char type;
-	char queryname[IRCD_RES_HOSTLEN + 1]; /* name currently being queried */
+	char queryname[128];	/* name currently being queried */
 	char retries;		/* retry counter */
 	char sends;		/* number of sends (>1 means resent) */
 	time_t sentat;
@@ -107,13 +107,13 @@ static int generate_random_port(void);
 /*
  * int
  * res_ourserver(inp)
- *      looks up "inp" in irc_nsaddr_list[]
+ *	looks up "inp" in irc_nsaddr_list[]
  * returns:
- *      0  : not found
- *      >0 : found
+ *	0  : not found
+ *	>0 : found
  * author:
- *      paul vixie, 29may94
- *      revised for ircd, cryogen(stu) may03
+ *	paul vixie, 29may94
+ *	revised for ircd, cryogen(stu) may03
  */
 static int
 res_ourserver(const struct rb_sockaddr_storage *inp)
@@ -214,10 +214,10 @@ timeout_query_list(time_t now)
 static void
 timeout_resolver(void *notused)
 {
-	timeout_query_list(rb_time());
+	timeout_query_list(rb_current_time());
 }
 
-static struct ev_entry *timeout_resolver_ev = NULL;
+static rb_ev_entry *timeout_resolver_ev = NULL;
 
 /*
  * start_resolver - do everything we need to read the resolv.conf file
@@ -301,7 +301,7 @@ make_request(struct DNSQuery *query)
 {
 	struct reslist *request = rb_malloc(sizeof(struct reslist));
 
-	request->sentat = rb_time();
+	request->sentat = rb_current_time();
 	request->retries = 3;
 	request->timeout = 4;	/* start at 4 and exponential inc. */
 	request->query = query;
@@ -520,10 +520,10 @@ gethost_byaddr(const struct rb_sockaddr_storage *addr, struct DNSQuery *query)
 static void
 do_query_name(struct DNSQuery *query, const char *name, struct reslist *request, int type)
 {
-	char host_name[IRCD_RES_HOSTLEN + 1];
+	char host_name[RESOLVER_HOSTLEN + 1];
 
 	rb_strlcpy(host_name, name, sizeof(host_name));
-//      add_local_domain(host_name, IRCD_RES_HOSTLEN);
+//	add_local_domain(host_name, RESOLVER_HOSTLEN);
 
 	if(request == NULL)
 	{
@@ -549,7 +549,7 @@ do_query_number(struct DNSQuery *query, const struct rb_sockaddr_storage *addr,
 	{
 		request = make_request(query);
 		memcpy(&request->addr, addr, sizeof(struct rb_sockaddr_storage));
-		request->name = (char *)rb_malloc(IRCD_RES_HOSTLEN + 1);
+		request->name = (char *)rb_malloc(RESOLVER_HOSTLEN + 1);
 	}
 
 	if(GET_SS_FAMILY(addr) == AF_INET)
@@ -557,7 +557,7 @@ do_query_number(struct DNSQuery *query, const struct rb_sockaddr_storage *addr,
 		const struct sockaddr_in *v4 = (const struct sockaddr_in *)addr;
 		cp = (const unsigned char *)&v4->sin_addr.s_addr;
 
-		rb_sprintf(request->queryname, "%u.%u.%u.%u.in-addr.arpa", (unsigned int)(cp[3]),
+		sprintf(request->queryname, "%u.%u.%u.%u.in-addr.arpa", (unsigned int)(cp[3]),
 			   (unsigned int)(cp[2]), (unsigned int)(cp[1]), (unsigned int)(cp[0]));
 	}
 #ifdef RB_IPV6
@@ -566,7 +566,7 @@ do_query_number(struct DNSQuery *query, const struct rb_sockaddr_storage *addr,
 		const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)addr;
 		cp = (const unsigned char *)&v6->sin6_addr.s6_addr;
 
-		rb_sprintf(request->queryname,
+		sprintf(request->queryname,
 			   "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x."
 			   "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.ip6.arpa",
 			   (unsigned int)(cp[15] & 0xf), (unsigned int)(cp[15] >> 4),
@@ -650,7 +650,7 @@ resend_query(struct reslist *request)
 static int
 check_question(struct reslist *request, HEADER * header, char *buf, char *eob)
 {
-	char hostbuf[IRCD_RES_HOSTLEN + 1];	/* working buffer */
+	char hostbuf[128];	/* working buffer */
 	unsigned char *current;	/* current position in buf */
 	int n;			/* temp count */
 
@@ -672,7 +672,7 @@ check_question(struct reslist *request, HEADER * header, char *buf, char *eob)
 static int
 proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 {
-	char hostbuf[IRCD_RES_HOSTLEN + 100];	/* working buffer */
+	char hostbuf[RESOLVER_HOSTLEN + 100];	/* working buffer */
 	unsigned char *current;	/* current position in buf */
 	int query_class;	/* answer class */
 	int type;		/* answer type */
@@ -717,7 +717,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			return (0);
 		}
 
-		hostbuf[IRCD_RES_HOSTLEN] = '\0';
+		hostbuf[RESOLVER_HOSTLEN] = '\0';
 
 		/* With Address arithmetic you have to be very anal
 		 * this code was not working on alpha due to that
@@ -783,7 +783,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			else if(n == 0)
 				return (0);	/* no more answers left */
 
-			rb_strlcpy(request->name, hostbuf, IRCD_RES_HOSTLEN + 1);
+			rb_strlcpy(request->name, hostbuf, RESOLVER_HOSTLEN + 1);
 
 			return (1);
 			break;
@@ -797,7 +797,7 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			 * but its possible its just a broken nameserver with still
 			 * valid answers. But lets do some rudimentary logging for now...
 			 */
-//                      ilog(L_MAIN, "irc_res.c bogus type %d", type);
+//			ilog(L_MAIN, "irc_res.c bogus type %d", type);
 			break;
 		}
 	}

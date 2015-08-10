@@ -42,13 +42,19 @@ static int ms_squit(struct Client *, struct Client *, int, const char **);
 static int mo_squit(struct Client *, struct Client *, int, const char **);
 
 struct Message squit_msgtab = {
-	"SQUIT", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, {ms_squit, 0}, {ms_squit, 0}, mg_ignore, {mo_squit, 2}}
+	.cmd = "SQUIT", 
+
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =            { .handler = ms_squit },
+	.handlers[SERVER_HANDLER] =             { .handler = ms_squit },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_squit, .min_para = 2 },
 };
 
-mapi_clist_av2 squit_clist[] = { &squit_msgtab, NULL };
+mapi_clist_av1 squit_clist[] = { &squit_msgtab, NULL };
 
-DECLARE_MODULE_AV2(squit, NULL, NULL, squit_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(squit, NULL, NULL, squit_clist, NULL, NULL, "$Revision$");
 
 struct squit_parms
 {
@@ -62,6 +68,7 @@ static struct squit_parms *find_squit(struct Client *client_p,
 
 /*
  * mo_squit - SQUIT message handler
+ *      parv[0] = sender prefix
  *      parv[1] = server name
  *      parv[2] = comment
  */
@@ -85,8 +92,7 @@ mo_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 		}
 		else if(!IsOperRemote(source_p))
 		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "remote");
+			sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "remote");
 			return 0;
 		}
 
@@ -103,6 +109,7 @@ mo_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 /*
  * ms_squit - SQUIT message handler
+ *      parv[0] = sender prefix
  *      parv[1] = server name
  *      parv[2] = comment
  */
@@ -144,7 +151,11 @@ ms_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 			      ":%s WALLOPS :Remote SQUIT %s from %s (%s)",
 			      me.id, target_p->name, source_p->name, comment);
 
-		ilog(L_SERVER, "SQUIT From %s : %s (%s)", source_p->name, target_p->name, comment);
+		sendto_server(NULL, NULL, NOCAPS, CAP_TS6,
+			      ":%s WALLOPS :Remote SQUIT %s from %s (%s)",
+			      me.name, target_p->name, source_p->name, comment);
+
+		ilog(L_SERVER, "SQUIT From %s : %s (%s)", parv[0], target_p->name, comment);
 
 	}
 	exit_client(client_p, target_p, source_p, comment);

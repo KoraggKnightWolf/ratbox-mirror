@@ -1,7 +1,7 @@
 /*
  *  sslproc.h: An interface to the ratbox ssld helper daemon
  *  Copyright (C) 2007 Aaron Sethman <androsyn@ratbox.org>
- *  Copyright (C) 2007-2012 ircd-ratbox development team
+ *  Copyright (C) 2007-2015 ircd-ratbox development team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,13 +28,15 @@ struct _ssl_ctl;
 typedef struct _ssl_ctl ssl_ctl_t;
 
 void init_ssld(void);
-int start_ssldaemon(int count, const char *ssl_cert, const char *ssl_private_key,
-		    const char *ssl_dh_params);
-ssl_ctl_t *start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, int id);
-ssl_ctl_t *start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, int id);
+int start_ssldaemon(int count, const char *ssl_ca_cert, const char *ssl_cert, const char *ssl_private_key,
+		    const char *ssl_dh_params, const char *ssl_cipher_string, 
+		    const char *ecdh_named_curve, int tls_min_ver);
+ssl_ctl_t *start_ssld_accept(rb_fde_t *sslF, rb_fde_t *plainF, uint32_t id);
+ssl_ctl_t *start_ssld_connect(rb_fde_t *sslF, rb_fde_t *plainF, uint32_t id);
 void start_zlib_session(void *data);
-void send_new_ssl_certs(const char *ssl_cert, const char *ssl_private_key,
-			const char *ssl_dh_params);
+void send_new_ssl_certs(const char *ssl_ca_cert, const char *ssl_cert, const char *ssl_private_key,
+			const char *ssl_dh_params, const char *ssl_cipher_list, 
+			const char *ecdh_named_curve, int tls_min_ver);
 void ssld_decrement_clicount(ssl_ctl_t * ctl);
 int get_ssld_count(void);
 

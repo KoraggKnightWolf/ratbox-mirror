@@ -31,7 +31,6 @@
 #include "ircd.h"
 #include "numeric.h"
 #include "s_newconf.h"
-#include "restart.h"
 #include "s_log.h"
 #include "send.h"
 #include "parse.h"
@@ -40,13 +39,18 @@
 static int mo_restart(struct Client *, struct Client *, int, const char **);
 
 struct Message restart_msgtab = {
-	"RESTART", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_restart, 0}}
+	.cmd = "RESTART", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },			     
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_restart },
 };
 
-mapi_clist_av2 restart_clist[] = { &restart_msgtab, NULL };
+mapi_clist_av1 restart_clist[] = { &restart_msgtab, NULL };
 
-DECLARE_MODULE_AV2(restart, NULL, NULL, restart_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(restart, NULL, NULL, restart_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_restart
@@ -55,13 +59,13 @@ DECLARE_MODULE_AV2(restart, NULL, NULL, restart_clist, NULL, NULL, "$Revision$")
 static int
 mo_restart(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	rb_dlink_node *ptr;
 	struct Client *target_p;
 
 	if(!IsOperDie(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "die");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "die");
 		return 0;
 	}
 
@@ -92,7 +96,7 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 			   me.name, get_client_name(source_p, HIDE_IP));
 	}
 
-	rb_sprintf(buf, "Server RESTART by %s", get_client_name(source_p, HIDE_IP));
+	snprintf(buf, sizeof(buf), "Server RESTART by %s", get_client_name(source_p, HIDE_IP));
 	restart(buf);
 
 	return 0;

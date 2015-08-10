@@ -41,12 +41,12 @@
 #include "send.h"
 
 struct monitor *monitorTable[MONITOR_HASH_SIZE];
-static rb_bh *monitor_heap;
 
 void
 init_monitor(void)
 {
-	monitor_heap = rb_bh_create(sizeof(struct monitor), MONITOR_HEAP_SIZE, "monitor_heap");
+	/* nothing to do here now */
+	return;
 }
 
 static inline unsigned int
@@ -60,7 +60,7 @@ find_monitor(const char *name, int add)
 {
 	struct monitor *monptr;
 
-	unsigned int hashv = hash_monitor_nick(name);
+	uint32_t hashv = hash_monitor_nick(name);
 
 	for(monptr = monitorTable[hashv]; monptr; monptr = monptr->hnext)
 	{
@@ -70,7 +70,7 @@ find_monitor(const char *name, int add)
 
 	if(add)
 	{
-		monptr = rb_bh_alloc(monitor_heap);
+		monptr = rb_malloc(sizeof(struct monitor));
 		rb_strlcpy(monptr->name, name, sizeof(monptr->name));
 
 		monptr->hnext = monitorTable[hashv];
@@ -85,7 +85,7 @@ find_monitor(const char *name, int add)
 void
 free_monitor(struct monitor *monptr)
 {
-	rb_bh_free(monitor_heap, monptr);
+	rb_free(monptr);
 }
 
 
@@ -94,7 +94,7 @@ free_monitor(struct monitor *monptr)
  * inputs	- client who has just connected
  * outputs	-
  * side effects	- notifies any clients monitoring this nickname that it has
- * 		  connected to the network
+ *		  connected to the network
  */
 void
 monitor_signon(struct Client *client_p)
@@ -106,8 +106,7 @@ monitor_signon(struct Client *client_p)
 	if(monptr == NULL)
 		return;
 
-	rb_snprintf(buf, sizeof(buf), "%s!%s@%s", client_p->name, client_p->username,
-		    client_p->host);
+	snprintf(buf, sizeof(buf), "%s!%s@%s", client_p->name, client_p->username, client_p->host);
 
 	sendto_monitor(monptr, form_str(RPL_MONONLINE), me.name, "*", buf);
 }
@@ -117,7 +116,7 @@ monitor_signon(struct Client *client_p)
  * inputs	- client who is exiting
  * outputs	-
  * side effects	- notifies any clients monitoring this nickname that it has
- * 		  left the network
+ *		  left the network
  */
 void
 monitor_signoff(struct Client *client_p)

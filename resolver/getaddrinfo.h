@@ -29,7 +29,7 @@
  *  $Id$
  */
 
-struct addrinfo {
+struct rb_addrinfo {
 	int ai_flags;
 	int ai_family;
 	int ai_socktype;
@@ -37,7 +37,7 @@ struct addrinfo {
 	size_t ai_addrlen;
 	char *ai_canonname;
 	struct sockaddr *ai_addr;
-	struct addrinfo *ai_next;
+	struct rb_addrinfo *ai_next;
 };
 
 #ifndef AI_PASSIVE
@@ -88,9 +88,9 @@ struct addrinfo {
 #define INADDR_NONE ((unsigned int) 0xffffffff)
 #endif /* INADDR_NONE */
 
-int getaddrinfo(const char *hostname, const char *servname,
-                           const struct addrinfo *hints, struct addrinfo **res);
-void freeaddrinfo(struct addrinfo *ai);
+int rb_getaddrinfo(const char *hostname, const char *servname,
+                           const struct rb_addrinfo *hints, struct rb_addrinfo **res);
+void rb_freeaddrinfo(struct rb_addrinfo *ai);
 
 #define SUCCESS 0
 #define ANY 0

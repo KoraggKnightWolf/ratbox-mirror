@@ -35,9 +35,6 @@
  */
 #define	AUTH_BLOCK_SIZE		64
 
-struct Client;
-
-/* defined in s_auth.c now */
 struct AuthRequest;
 
 
@@ -45,8 +42,9 @@ struct AuthRequest;
  * flag values for AuthRequest
  * NAMESPACE: AM_xxx - Authentication Module
  */
-#define AM_AUTH_PENDING      0x1
-#define AM_DNS_PENDING       0x2
+#define AM_AUTH_PENDING	     0x1
+#define AM_DNS_PENDING	     0x2
+#define AM_RBL_PENDING   0x4
 
 #define SetDNS(x)     ((x)->flags |= AM_DNS_PENDING)
 #define ClearDNS(x)   ((x)->flags &= ~AM_DNS_PENDING)
@@ -56,10 +54,32 @@ struct AuthRequest;
 #define ClearAuth(x)  ((x)->flags &= ~AM_AUTH_PENDING)
 #define IsAuth(x)     ((x)->flags & AM_AUTH_PENDING)
 
+#define SetRBL(x) ((x)->flags |= AM_RBL_PENDING)
+#define ClearRBL(x) ((x)->flags &= ~AM_RBL_PENDING)
+#define IsRBL(x)	((x)->flags & AM_RBL_PENDING)
 
 void start_auth(struct Client *);
 void send_auth_query(struct AuthRequest *req);
 void remove_auth_request(struct AuthRequest *req);
 void init_auth(void);
 void delete_auth_queries(struct Client *);
+
+
+
+struct _rbl;
+typedef struct _rbl rbl_t;
+
+
+rbl_t *rbl_create(const char *zonename);
+void rbl_destroy(rbl_t *t, bool freeing);
+
+void rbl_add_rbl_to_rbllists(rbl_t *rbl);
+void rbl_del_rbl_from_rblists(rbl_t *rbl);
+void rbl_clear_rbllists(void);
+void rbl_set_aftype(rbl_t *rbl, bool isv4, bool isv6);
+void rbl_add_answer(rbl_t *t, const char *mask, const char *response);
+void rbl_add_other_answer(rbl_t *t, const char *answer);
+void rbl_set_match_other(rbl_t *t, bool other_reply);
+
+
 #endif /* INCLUDED_s_auth_h */

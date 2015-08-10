@@ -41,13 +41,18 @@
 static int m_part(struct Client *, struct Client *, int, const char **);
 
 struct Message part_msgtab = {
-	"PART", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_part, 2}, {m_part, 2}, mg_ignore, mg_ignore, {m_part, 2}}
+	.cmd = "PART", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { .handler = m_part, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =            { .handler = m_part, .min_para = 2 },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = m_part, .min_para = 2 },
 };
 
-mapi_clist_av2 part_clist[] = { &part_msgtab, NULL };
+mapi_clist_av1 part_clist[] = { &part_msgtab, NULL };
 
-DECLARE_MODULE_AV2(part, NULL, NULL, part_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(part, NULL, NULL, part_clist, NULL, NULL, "$Revision$");
 
 static void part_one_client(struct Client *client_p,
 			    struct Client *source_p, char *name, char *reason);
@@ -55,6 +60,7 @@ static void part_one_client(struct Client *client_p,
 
 /*
 ** m_part
+**      parv[0] = sender prefix
 **      parv[1] = channel
 **      parv[2] = reason
 */
@@ -121,10 +127,12 @@ part_one_client(struct Client *client_p, struct Client *source_p, char *name, ch
 				    ((can_send(chptr, source_p, msptr) > 0 &&
 				      (source_p->localClient->firsttime +
 				       ConfigFileEntry.anti_spam_exit_message_time) <
-				      rb_time()))))
+				      rb_current_time()))))
 	{
 		sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
-			      ":%s PART %s :%s", source_p->id, chptr->chname, reason);
+			      ":%s PART %s :%s", use_id(source_p), chptr->chname, reason);
+		sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
+			      ":%s PART %s :%s", source_p->name, chptr->chname, reason);
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s PART %s :%s",
 				     source_p->name, source_p->username,
 				     source_p->host, chptr->chname, reason);
@@ -132,7 +140,9 @@ part_one_client(struct Client *client_p, struct Client *source_p, char *name, ch
 	else
 	{
 		sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
-			      ":%s PART %s", source_p->id, chptr->chname);
+			      ":%s PART %s", use_id(source_p), chptr->chname);
+		sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
+			      ":%s PART %s", source_p->name, chptr->chname);
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s PART %s",
 				     source_p->name, source_p->username,
 				     source_p->host, chptr->chname);

@@ -1,10 +1,8 @@
 # $Id$ 
 
 bin_PROGRAMS = ratbox-mkpasswd
-bin_SCRIPTS = ircd_crontab.sh
 AM_CFLAGS=$(WARNFLAGS)
-
-INCLUDES = $(DEFAULT_INCLUDES) -I../libratbox/include -I.
+AM_CPPFLAGS = $(DEFAULT_INCLUDES) -I../libratbox/include -I.
 
 
 ratbox_mkpasswd_SOURCES = mkpasswd.c

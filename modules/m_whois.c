@@ -50,26 +50,36 @@ static int m_whois(struct Client *, struct Client *, int, const char **);
 static int ms_whois(struct Client *, struct Client *, int, const char **);
 
 struct Message whois_msgtab = {
-	"WHOIS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_whois, 2}, {ms_whois, 2}, mg_ignore, mg_ignore, {m_whois, 2}}
+	.cmd = "WHOIS",
+	.count = 0,
+	.rcount = 0,
+	.bytes = 0,
+
+	.handlers[UNREGISTERED_HANDLER]	=	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_whois,		.min_para = 2 },	
+	.handlers[RCLIENT_HANDLER] =		{ .handler = ms_whois,		.min_para = 2 },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore }, 
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_whois,		.min_para = 2 },
 };
 
 int doing_whois_hook;
 int doing_whois_global_hook;
 
-mapi_clist_av2 whois_clist[] = { &whois_msgtab, NULL };
+mapi_clist_av1 whois_clist[] = { &whois_msgtab, NULL };
 
-mapi_hlist_av2 whois_hlist[] = {
+mapi_hlist_av1 whois_hlist[] = {
 	{"doing_whois", &doing_whois_hook},
 	{"doing_whois_global", &doing_whois_global_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV2(whois, NULL, NULL, whois_clist, whois_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV1(whois, NULL, NULL, whois_clist, whois_hlist, NULL, "$Revision$");
 
 /*
  * m_whois
- *      parv[1] = nickname masklist
+ *	parv[0] = sender prefix
+ *	parv[1] = nickname masklist
  */
 static int
 m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -80,24 +90,22 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		if(EmptyString(parv[2]))
 		{
-			sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN),
-				   me.name, source_p->name);
+			sendto_one_numeric(source_p, s_RPL(ERR_NONICKNAMEGIVEN));
 			return 0;
 		}
 
 		if(!IsOper(source_p))
 		{
 			/* seeing as this is going across servers, we should limit it */
-			if((last_used + ConfigFileEntry.pace_wait_simple) > rb_time())
+			if((last_used + ConfigFileEntry.pace_wait_simple) > rb_current_time())
 			{
-				sendto_one(source_p, form_str(RPL_LOAD2HI),
-					   me.name, source_p->name, "WHOIS");
+				sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "WHOIS");
 				sendto_one_numeric(source_p, RPL_ENDOFWHOIS,
-						   form_str(RPL_ENDOFWHOIS), parv[2]);
+						   form_str(RPL_ENDOFWHOIS), parv[1]);
 				return 0;
 			}
 			else
-				last_used = rb_time();
+				last_used = rb_current_time();
 		}
 
 		if(hunt_server(client_p, source_p, ":%s WHOIS %s :%s", 1, parc, parv) !=
@@ -114,8 +122,9 @@ m_whois(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 /*
  * ms_whois
- *      parv[1] = server to reply
- *      parv[2] = nickname to whois
+ *	parv[0] = sender prefix
+ *	parv[1] = server to reply
+ *	parv[2] = nickname to whois
  */
 static int
 ms_whois(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -128,7 +137,7 @@ ms_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	 */
 	if(parc < 3 || EmptyString(parv[2]))
 	{
-		sendto_one(source_p, form_str(ERR_NONICKNAMEGIVEN), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_NONICKNAMEGIVEN));
 		return 0;
 	}
 
@@ -136,8 +145,7 @@ ms_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* check if parv[1] exists */
 	if((target_p = find_client(parv[1])) == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHSERVER,
-				   form_str(ERR_NOSUCHSERVER), IsDigit(parv[1][0]) ? "*" : parv[1]);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOSUCHSERVER), IsDigit(parv[1][0]) ? "*" : parv[1]);
 		return 0;
 	}
 
@@ -176,7 +184,7 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	int operspy = 0;
 
 	nick = LOCAL_COPY(parv[1]);
-	if((p = strchr(nick, ',')))
+	if((p = strchr(parv[1], ',')))
 		*p = '\0';
 
 	if(IsOperSpy(source_p) && *nick == '!')
@@ -191,11 +199,11 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	{
 		if(operspy)
 		{
-			char buffer[BUFSIZE];
+			char buffer[IRCD_BUFSIZE];
 
-			rb_snprintf(buffer, sizeof(buffer), "%s!%s@%s %s",
-				    target_p->name, target_p->username,
-				    target_p->host, target_p->servptr->name);
+			snprintf(buffer, sizeof(buffer), "%s!%s@%s %s",
+				 target_p->name, target_p->username,
+				 target_p->host, target_p->servptr->name);
 			report_operspy(source_p, "WHOIS", buffer);
 		}
 
@@ -203,9 +211,9 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 	else
 		sendto_one_numeric(source_p, ERR_NOSUCHNICK,
-				   form_str(ERR_NOSUCHNICK), nick);
+				   form_str(ERR_NOSUCHNICK), IsDigit(*nick) ? "*" : nick);
 	ClearCork(source_p);
-	sendto_one_numeric(source_p, RPL_ENDOFWHOIS, form_str(RPL_ENDOFWHOIS), parv[1]);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFWHOIS), nick);
 	return;
 }
 
@@ -216,12 +224,12 @@ do_whois(struct Client *client_p, struct Client *source_p, int parc, const char 
  *		- target_p client to report on
  * Output	- if found return 1
  * Side Effects	- do a single whois on given client
- * 		  writing results to source_p
+ *		  writing results to source_p
  */
 static void
 single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 {
-	char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	rb_dlink_node *ptr;
 	struct Client *a2client_p;
 	struct membership *msptr;
@@ -242,12 +250,11 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 
 	a2client_p = target_p->servptr;
 
-	sendto_one_numeric(source_p, RPL_WHOISUSER, form_str(RPL_WHOISUSER),
+	sendto_one_numeric(source_p, s_RPL(RPL_WHOISUSER),
 			   target_p->name, target_p->username, target_p->host, target_p->info);
 
-	cur_len = mlen = rb_sprintf(buf, form_str(RPL_WHOISCHANNELS),
-				    get_id(&me, source_p), get_id(source_p, source_p),
-				    target_p->name);
+	cur_len = mlen = sprintf(buf, form_str(RPL_WHOISCHANNELS),
+				 get_id(&me, source_p), get_id(source_p, source_p), target_p->name);
 	/* Make sure it won't overflow when sending it to the client
 	 * in full names; note that serverhiding may require more space
 	 * for a different server name (not done here) -- jilles */
@@ -275,16 +282,16 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 
 			if(visible || operspy)
 			{
-				if((cur_len + strlen(chptr->chname) + 3) > (BUFSIZE - 5))
+				if((cur_len + strlen(chptr->chname) + 3) > (IRCD_BUFSIZE - 5))
 				{
 					sendto_one_buffer(source_p, buf);
 					cur_len = mlen + extra_space;
 					t = buf + mlen;
 				}
 
-				tlen = rb_sprintf(t, "%s%s%s ",
-						  visible ? "" : "!",
-						  find_channel_status(msptr, 1), chptr->chname);
+				tlen = sprintf(t, "%s%s%s ",
+					       visible ? "" : "!",
+					       find_channel_status(msptr, 1), chptr->chname);
 				t += tlen;
 				cur_len += tlen;
 			}
@@ -294,17 +301,16 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 	if(cur_len > mlen + extra_space)
 		sendto_one_buffer(source_p, buf);
 
-	sendto_one_numeric(source_p, RPL_WHOISSERVER, form_str(RPL_WHOISSERVER),
+	sendto_one_numeric(source_p, s_RPL(RPL_WHOISSERVER),
 			   target_p->name, target_p->servptr->name,
 			   a2client_p ? a2client_p->info : "*Not On This Net*");
 
 	if(target_p->user->away)
-		sendto_one_numeric(source_p, RPL_AWAY, form_str(RPL_AWAY),
-				   target_p->name, target_p->user->away);
+		sendto_one_numeric(source_p, s_RPL(RPL_AWAY), target_p->name, target_p->user->away);
 
 	if(IsOper(target_p))
 	{
-		sendto_one_numeric(source_p, RPL_WHOISOPERATOR, form_str(RPL_WHOISOPERATOR),
+		sendto_one_numeric(source_p, s_RPL(RPL_WHOISOPERATOR),
 				   target_p->name,
 				   IsAdmin(target_p) ? GlobalSetOptions.adminstring :
 				   GlobalSetOptions.operstring);
@@ -313,18 +319,25 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 	if(MyClient(target_p))
 	{
 		if(IsSSL(target_p))
+		{
+			char cbuf[256] = "is using a secure connection";
+				
+			if((target_p == source_p || IsOper(source_p)) && (target_p->localClient->cipher_string != NULL))
+			{
+				rb_snprintf_append(cbuf, sizeof(cbuf), " [%s]", target_p->localClient->cipher_string);	
+			}
 			sendto_one_numeric(source_p, RPL_WHOISSECURE,
-					   form_str(RPL_WHOISSECURE), target_p->name);
-
+					   form_str(RPL_WHOISSECURE), target_p->name, cbuf);
+		}
 		if(ConfigFileEntry.use_whois_actually && show_ip(source_p, target_p))
 			sendto_one_numeric(source_p, RPL_WHOISACTUALLY,
 					   form_str(RPL_WHOISACTUALLY),
 					   target_p->name, target_p->sockhost);
 
-		sendto_one_numeric(source_p, RPL_WHOISIDLE, form_str(RPL_WHOISIDLE),
+		sendto_one_numeric(source_p, s_RPL(RPL_WHOISIDLE),
 				   target_p->name,
-				   (long)(rb_time() - target_p->localClient->last),
-				   (unsigned long)target_p->localClient->firsttime);
+				   rb_current_time() - target_p->localClient->last,
+				   target_p->localClient->firsttime);
 	}
 	else
 	{

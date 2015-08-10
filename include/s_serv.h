@@ -51,13 +51,13 @@ struct Capability
 	unsigned int cap;	/* mask value */
 };
 
-#define CAP_CAP         0x00001	/* received a CAP to begin with */
-#define CAP_QS          0x00002	/* Can handle quit storm removal */
-#define CAP_EX          0x00004	/* Can do channel +e exemptions */
-#define CAP_CHW         0x00008	/* Can do channel wall @# */
-#define CAP_IE          0x00010	/* Can do invite exceptions */
-#define CAP_GLN	        0x00080	/* Can do GLINE message */
-#define CAP_ZIP         0x00100	/* Can do ZIPlinks */
+#define CAP_CAP		0x00001	/* received a CAP to begin with */
+#define CAP_QS		0x00002	/* Can handle quit storm removal */
+#define CAP_EX		0x00004	/* Can do channel +e exemptions */
+#define CAP_CHW		0x00008	/* Can do channel wall @# */
+#define CAP_IE		0x00010	/* Can do invite exceptions */
+#define CAP_GLN		0x00080	/* Can do GLINE message */
+#define CAP_ZIP		0x00100	/* Can do ZIPlinks */
 #define CAP_KNOCK	0x00400	/* supports KNOCK */
 #define CAP_TB		0x00800	/* supports TBURST */
 #define CAP_ENCAP	0x04000	/* supports ENCAP */
@@ -67,17 +67,17 @@ struct Capability
 #define CAP_SAVE	0x40000	/* supports SAVE (nick collision FNC) */
 #define CAP_SAVETS_100	0x80000	/* supports SAVE at TS 100 */
 
-#define CAP_MASK        (CAP_QS  | CAP_EX   | CAP_CHW  | \
-			 CAP_IE  | CAP_SERVICE |\
+#define CAP_MASK	(CAP_QS	 | CAP_EX   | CAP_CHW  | \
+			 CAP_IE	 | CAP_SERVICE |\
 			 CAP_GLN | CAP_ENCAP | \
 			 CAP_ZIP  | CAP_KNOCK  | \
 			 CAP_RSFNC | CAP_SAVE | CAP_SAVETS_100)
 /*
  * Capability macros.
  */
-#define IsCapable(x, cap)       (((x)->localClient->caps & (cap)) == cap)
+#define IsCapable(x, cap)	(((x)->localClient->caps & (cap)) == cap)
 #define NotCapable(x, cap)	(((x)->localClient->caps & (cap)) == 0)
-#define ClearCap(x, cap)        ((x)->localClient->caps &= ~(cap))
+#define ClearCap(x, cap)	((x)->localClient->caps &= ~(cap))
 
 /*
  * Globals
@@ -89,17 +89,17 @@ struct Capability
  */
 extern struct Capability captab[];
 
-extern int MaxClientCount;	/* GLOBAL - highest number of clients */
-extern int MaxConnectionCount;	/* GLOBAL - highest number of connections */
+extern unsigned long MaxClientCount;	/* GLOBAL - highest number of clients */
+extern unsigned long MaxConnectionCount;	/* GLOBAL - highest number of connections */
 
 extern int refresh_user_links;
 
 /*
  * return values for hunt_server() 
  */
-#define HUNTED_NOSUCH   (-1)	/* if the hunted server is not found */
-#define HUNTED_ISME     0	/* if this server should execute the command */
-#define HUNTED_PASS     1	/* if message passed onwards successfully */
+#define HUNTED_NOSUCH	(-1)	/* if the hunted server is not found */
+#define HUNTED_ISME	0	/* if this server should execute the command */
+#define HUNTED_PASS	1	/* if message passed onwards successfully */
 
 
 int hunt_server(struct Client *client_pt,

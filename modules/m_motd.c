@@ -40,41 +40,47 @@ static int m_motd(struct Client *, struct Client *, int, const char **);
 static int mo_motd(struct Client *, struct Client *, int, const char **);
 
 struct Message motd_msgtab = {
-	"MOTD", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_motd, 0}, {mo_motd, 0}, mg_ignore, mg_ignore, {mo_motd, 0}}
+	.cmd = "MOTD", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_motd },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = mo_motd },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_motd },
 };
 
 int doing_motd_hook;
 
-mapi_clist_av2 motd_clist[] = { &motd_msgtab, NULL };
+mapi_clist_av1 motd_clist[] = { &motd_msgtab, NULL };
 
-mapi_hlist_av2 motd_hlist[] = {
+mapi_hlist_av1 motd_hlist[] = {
 	{"doing_motd", &doing_motd_hook},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV2(motd, NULL, NULL, motd_clist, motd_hlist, NULL, "$Revision$");
+DECLARE_MODULE_AV1(motd, NULL, NULL, motd_clist, motd_hlist, NULL, "$Revision$");
 
 static void motd_spy(struct Client *);
 
 /*
 ** m_motd
-**      parv[1] = servername
+**	parv[0] = sender prefix
+**	parv[1] = servername
 */
 static int
 m_motd(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	static time_t last_used = 0;
 
-	if((last_used + ConfigFileEntry.pace_wait) > rb_time())
+	if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
-		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "MOTD");
-		sendto_one(source_p, form_str(RPL_ENDOFMOTD), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "MOTD");
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFMOTD));
 		return 0;
 	}
 	else
-		last_used = rb_time();
+		last_used = rb_current_time();
 
 	if(hunt_server(client_p, source_p, ":%s MOTD :%s", 1, parc, parv) != HUNTED_ISME)
 		return 0;
@@ -87,7 +93,8 @@ m_motd(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 /*
 ** mo_motd
-**      parv[1] = servername
+**	parv[0] = sender prefix
+**	parv[1] = servername
 */
 static int
 mo_motd(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -103,8 +110,8 @@ mo_motd(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 /* motd_spy()
  *
- * input        - pointer to client
- * output       - none
+ * input	- pointer to client
+ * output	- none
  * side effects - hook doing_motd is called
  */
 static void

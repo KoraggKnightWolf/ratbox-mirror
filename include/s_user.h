@@ -27,13 +27,10 @@
 #ifndef INCLUDED_s_user_h
 #define INCLUDED_s_user_h
 
-struct Client;
-struct User;
-struct oper_conf;
-extern time_t LastUsedWallops;
+#include "struct.h"
+#include "client.h"
 
-int valid_hostname(const char *hostname);
-int valid_username(const char *username);
+extern time_t LastUsedWallops;
 
 int user_mode(struct Client *, struct Client *, int, const char **);
 void send_umode(struct Client *, struct Client *, int, int, char *);

@@ -32,7 +32,7 @@
  * - Thread safe-ness must be checked
  * - RFC2553 says that we should raise error on short buffer.  X/Open says
  *   we need to truncate the result.  We obey RFC2553 (and X/Open should be
- *   modified).  ipngwg rough consensus seems to follow RFC2553.
+ *   modified).	 ipngwg rough consensus seems to follow RFC2553.
  * - What is "local" in NI_FQDN?
  * - NI_NAMEREQD and NI_NUMERICHOST conflict with each other.
  * - (KAME extension) always attach textual scopeid (fe80::1%lo0), if
@@ -55,10 +55,10 @@ static const struct afd {
 } afdl [] = {
 #ifdef IPV6
     {PF_INET6, sizeof(struct in6_addr), sizeof(struct sockaddr_in6),
-             offsetof(struct sockaddr_in6, sin6_addr)},
+	     offsetof(struct sockaddr_in6, sin6_addr)},
 #endif
     {PF_INET, sizeof(struct in_addr), sizeof(struct sockaddr_in),
-            offsetof(struct sockaddr_in, sin_addr)},
+	    offsetof(struct sockaddr_in, sin_addr)},
     {0, 0, 0, 0},
 };
 
@@ -75,8 +75,8 @@ static int ip6_parsenumeric(const struct sockaddr *, const char *, char *,
 #endif
 
 int
-getnameinfo(const struct sockaddr *sa, rb_socklen_t salen, char *host,
-                size_t hostlen, char *serv, size_t servlen, int flags)
+rb_getnameinfo(const struct sockaddr *sa, rb_socklen_t salen, char *host,
+		size_t hostlen, char *serv, size_t servlen, int flags)
 {
   const struct afd *afd;
   struct servent *sp;
@@ -214,7 +214,7 @@ getnameinfo(const struct sockaddr *sa, rb_socklen_t salen, char *host,
 #ifdef IPV6
 static int
 ip6_parsenumeric(const struct sockaddr *sa, const char *addr,
-                 char *host, size_t hostlen, int flags)
+		 char *host, size_t hostlen, int flags)
 {
   size_t numaddrlen;
   char numaddr[512];

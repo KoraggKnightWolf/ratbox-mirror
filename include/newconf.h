@@ -40,7 +40,7 @@ conf_parm_t;
 struct _confentry;
 
 extern int lineno;
-extern char linebuf[];
+extern char yy_linebuf[];
 
 extern int yyparse(void);
 

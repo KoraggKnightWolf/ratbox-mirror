@@ -31,11 +31,6 @@
 #include <openssl/rsa.h>
 #endif
 
-
-struct Client;
-struct DNSReply;
-struct hostent;
-
 struct ConfItem
 {
 	unsigned int status;	/* If CONF_ILLEGAL, delete when no clients */
@@ -58,42 +53,41 @@ struct ConfItem
 	rb_patricia_node_t *pnode;
 };
 
-#define CONF_ILLEGAL            0x80000000
+#define CONF_ILLEGAL		0x80000000
 #define CONF_SKIPUSER		0x0001	/* skip username checks (ie, *@x) */
-#define CONF_CLIENT             0x0002
-#define CONF_KILL               0x0040
+#define CONF_CLIENT		0x0002
+#define CONF_KILL		0x0040
 #define CONF_XLINE		0x0080
 #define CONF_RESV_CHANNEL	0x0100
 #define CONF_RESV_NICK		0x0200
-#define CONF_GLINE             0x10000
-#define CONF_DLINE             0x20000
+#define CONF_GLINE	       0x10000
+#define CONF_DLINE	       0x20000
 #define CONF_EXEMPTDLINE      0x100000
 
-#define IsIllegal(x)    ((x)->status & CONF_ILLEGAL)
+#define IsIllegal(x)	((x)->status & CONF_ILLEGAL)
 
 /* aConfItem->flags */
 
 /* Generic flags... */
 /* access flags... */
-#define CONF_FLAGS_NO_TILDE             0x00000001
-#define CONF_FLAGS_NEED_IDENTD          0x00000002
-#define CONF_FLAGS_EXEMPTKLINE          0x00000004
-#define CONF_FLAGS_NOLIMIT              0x00000008
-#define CONF_FLAGS_SPOOF_IP             0x00000010
+#define CONF_FLAGS_NO_TILDE		0x00000001
+#define CONF_FLAGS_NEED_IDENTD		0x00000002
+#define CONF_FLAGS_EXEMPTKLINE		0x00000004
+#define CONF_FLAGS_NOLIMIT		0x00000008
+#define CONF_FLAGS_SPOOF_IP		0x00000010
 #define CONF_FLAGS_SPOOF_NOTICE		0x00000020
-#define CONF_FLAGS_REDIR                0x00000040
-#define CONF_FLAGS_EXEMPTGLINE          0x00000080
+#define CONF_FLAGS_REDIR		0x00000040
+#define CONF_FLAGS_EXEMPTGLINE		0x00000080
 #define CONF_FLAGS_EXEMPTRESV		0x00000100	/* exempt from resvs */
-#define CONF_FLAGS_EXEMPTFLOOD          0x00000200
+#define CONF_FLAGS_EXEMPTFLOOD		0x00000200
 #define CONF_FLAGS_EXEMPTSPAMBOT	0x00000400
 #define CONF_FLAGS_EXEMPTSHIDE		0x00000800
 #define CONF_FLAGS_EXEMPTJUPE		0x00001000	/* exempt from resv generating warnings */
 #define CONF_FLAGS_NEED_SSL		0x00002000
-#define CONF_FLAGS_EXEMPTDNSBL		0x00080000
 /* server flags */
-#define CONF_FLAGS_ENCRYPTED            0x00004000
-#define CONF_FLAGS_COMPRESSED           0x00008000
-#define CONF_FLAGS_TEMPORARY            0x00010000
+#define CONF_FLAGS_ENCRYPTED		0x00004000
+#define CONF_FLAGS_COMPRESSED		0x00008000
+#define CONF_FLAGS_TEMPORARY		0x00010000
 #define CONF_FLAGS_TB			0x00020000
 #define CONF_FLAGS_LOCKED		0x00040000
 
@@ -101,24 +95,23 @@ struct ConfItem
 #define IsConfBan(x)		((x)->status & (CONF_KILL|CONF_XLINE|CONF_DLINE|\
 						CONF_RESV_CHANNEL|CONF_RESV_NICK))
 
-#define IsNoTilde(x)            ((x)->flags & CONF_FLAGS_NO_TILDE)
-#define IsNeedIdentd(x)         ((x)->flags & CONF_FLAGS_NEED_IDENTD)
-#define IsConfExemptKline(x)    ((x)->flags & CONF_FLAGS_EXEMPTKLINE)
-#define IsConfExemptLimits(x)   ((x)->flags & CONF_FLAGS_NOLIMIT)
-#define IsConfExemptGline(x)    ((x)->flags & CONF_FLAGS_EXEMPTGLINE)
-#define IsConfExemptFlood(x)    ((x)->flags & CONF_FLAGS_EXEMPTFLOOD)
+#define IsNoTilde(x)		((x)->flags & CONF_FLAGS_NO_TILDE)
+#define IsNeedIdentd(x)		((x)->flags & CONF_FLAGS_NEED_IDENTD)
+#define IsConfExemptKline(x)	((x)->flags & CONF_FLAGS_EXEMPTKLINE)
+#define IsConfExemptLimits(x)	((x)->flags & CONF_FLAGS_NOLIMIT)
+#define IsConfExemptGline(x)	((x)->flags & CONF_FLAGS_EXEMPTGLINE)
+#define IsConfExemptFlood(x)	((x)->flags & CONF_FLAGS_EXEMPTFLOOD)
 #define IsConfExemptSpambot(x)	((x)->flags & CONF_FLAGS_EXEMPTSPAMBOT)
 #define IsConfExemptShide(x)	((x)->flags & CONF_FLAGS_EXEMPTSHIDE)
 #define IsConfExemptJupe(x)	((x)->flags & CONF_FLAGS_EXEMPTJUPE)
 #define IsConfExemptResv(x)	((x)->flags & CONF_FLAGS_EXEMPTRESV)
-#define IsConfDoSpoofIp(x)      ((x)->flags & CONF_FLAGS_SPOOF_IP)
-#define IsConfSpoofNotice(x)    ((x)->flags & CONF_FLAGS_SPOOF_NOTICE)
-#define IsConfEncrypted(x)      ((x)->flags & CONF_FLAGS_ENCRYPTED)
-#define IsConfCompressed(x)     ((x)->flags & CONF_FLAGS_COMPRESSED)
+#define IsConfDoSpoofIp(x)	((x)->flags & CONF_FLAGS_SPOOF_IP)
+#define IsConfSpoofNotice(x)	((x)->flags & CONF_FLAGS_SPOOF_NOTICE)
+#define IsConfEncrypted(x)	((x)->flags & CONF_FLAGS_ENCRYPTED)
+#define IsConfCompressed(x)	((x)->flags & CONF_FLAGS_COMPRESSED)
 #define IsConfTburst(x)		((x)->flags & CONF_FLAGS_TB)
 #define IsConfLocked(x)		((x)->flags & CONF_FLAGS_LOCKED)
 #define IsConfSSLNeeded(x)	((x)->flags & CONF_FLAGS_NEED_SSL)
-#define IsConfExemptDNSBL(x)	((x)->flags & CONF_FLAGS_EXEMPTDNSBL)
 
 /* flag definitions for opers now in client.h */
 
@@ -126,8 +119,6 @@ struct config_file_entry
 {
 	const char *dpath;	/* DPATH if set from command line */
 	const char *configfile;
-
-	char *egdpool_path;
 
 	char *default_operstring;
 	char *default_adminstring;
@@ -143,9 +134,11 @@ struct config_file_entry
 	char *fname_klinelog;
 	char *fname_operspylog;
 	char *fname_ioerrorlog;
-
+	char *motd_path;
+	char *oper_motd_path;
 	unsigned char compression_level;
 	int disable_fake_channels;
+	int dot_in_ip6_addr;
 	int dots_in_ident;
 	int failed_oper_notice;
 	int anti_nick_flood;
@@ -192,7 +185,6 @@ struct config_file_entry
 	int min_nonwildcard_simple;
 	int default_floodcount;
 	int client_flood;
-	int use_egd;
 	int ping_cookie;
 	int tkline_expire_notices;
 	int use_whois_actually;
@@ -212,32 +204,29 @@ struct config_file_entry
 	int global_cidr_ipv6_bitlen;
 	int global_cidr_ipv6_count;
 	int global_cidr;
-#ifdef RB_IPV6
-	int fallback_to_ip6_int;
-#endif
+	int nicklen;
+	int delayed_exit_time;
 };
 
 struct config_channel_entry
 {
-	int use_except;
-	int use_invex;
-	int use_knock;
-	int use_sslonly;
-	int knock_delay;
-	int knock_delay_channel;
-	int max_bans;
-	int max_chans_per_user;
-	int no_create_on_split;
-	int no_join_on_split;
-	int quiet_on_ban;
-	int default_split_server_count;
-	int default_split_user_count;
-	int no_oper_resvs;
-	int burst_topicwho;
-	int invite_ops_only;
-	int topiclen;
-	int only_ascii_channels;
-	int resv_forcepart;
+	unsigned int use_except;
+	unsigned int use_invex;
+	unsigned int use_knock;
+	unsigned int use_sslonly;
+	unsigned int knock_delay;
+	unsigned int knock_delay_channel;
+	unsigned int max_bans;
+	unsigned int max_chans_per_user;
+	unsigned int no_create_on_split;
+	unsigned int no_join_on_split;
+	unsigned int quiet_on_ban;
+	unsigned int default_split_server_count;
+	unsigned int default_split_user_count;
+	unsigned int no_oper_resvs;
+	unsigned int burst_topicwho;
+	unsigned int invite_ops_only;
+	unsigned int topiclen;
 };
 
 struct config_server_hide
@@ -248,6 +237,7 @@ struct config_server_hide
 	int hidden;
 	int disable_hidden;
 };
+                                                                                
 
 struct server_info
 {
@@ -255,6 +245,8 @@ struct server_info
 	char sid[4];
 	char *description;
 	char *network_name;
+	char *network_desc;
+	int nicklen;
 	int hub;
 	int default_max_clients;
 	struct sockaddr_in ip;
@@ -268,13 +260,17 @@ struct server_info
 	char *ssl_private_key;
 	char *ssl_ca_cert;
 	char *ssl_cert;
+	char *ssl_cipher_list;
 	char *ssl_dh_params;
+	char *ssl_ecdh_named_curve;
+	rb_tls_ver_t tls_min_ver;
 	int ssld_count;
 	char *vhost_dns;
 #ifdef RB_IPV6
 	char *vhost6_dns;
 #endif
 	char *bandb_path;
+
 };
 
 struct admin_info
@@ -353,16 +349,8 @@ void flush_expired_ips(void *);
 
 const char *get_oper_name(struct Client *client_p);
 const char *get_class_name(struct ConfItem *aconf);
-void set_default_conf(void);
+void set_default_conf();
 
 
-#define NOT_AUTHORISED  (-1)
-#define I_SOCKET_ERROR    (-2)
-#define I_LINE_FULL     (-3)
-#define BANNED_CLIENT   (-4)
-#define TOO_MANY_LOCAL	(-6)
-#define TOO_MANY_GLOBAL (-7)
-#define TOO_MANY_IDENT	(-8)
-#define TOO_MANY_GLOBAL_CIDR (-9)
 
 #endif /* INCLUDED_s_conf_h */

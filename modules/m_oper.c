@@ -51,37 +51,49 @@
 #include "cache.h"
 
 
-#define CHALLENGE_WIDTH BUFSIZE - (NICKLEN + HOSTLEN + 12)
+#define CHALLENGE_WIDTH IRCD_BUFSIZE - (NICKLEN + HOSTLEN + 12)
 #define CHALLENGE_EXPIRES	180	/* 180 seconds should be more than long enough */
 #define CHALLENGE_SECRET_LENGTH	128	/* how long our challenge secret should be */
 
 static int m_oper(struct Client *, struct Client *, int, const char **);
 static int oper_up(struct Client *source_p, struct oper_conf *oper_p);
 static int match_oper_password(const char *password, struct oper_conf *oper_p);
-static void send_oper_motd(struct Client *source_p);
 
 struct Message oper_msgtab = {
-	"OPER", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_oper, 3}, mg_ignore, mg_ignore, mg_ignore, {m_oper, 3}}
+	.cmd = "OPER",
+
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_oper, .min_para = 3 },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_oper, .min_para = 3 },
 };
 
 
 static int m_challenge(struct Client *, struct Client *, int, const char **);
 
 struct Message challenge_msgtab = {
-	"CHALLENGE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_challenge, 2}, mg_ignore, mg_ignore, mg_ignore, {m_challenge, 2}}
+	.cmd = "CHALLENGE",
+
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_challenge, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_challenge, .min_para = 2 },
 };
 
-mapi_clist_av2 oper_clist[] = { &oper_msgtab, &challenge_msgtab, NULL };
+mapi_clist_av1 oper_clist[] = { &oper_msgtab, &challenge_msgtab, NULL };
 
-DECLARE_MODULE_AV2(oper, NULL, NULL, oper_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(oper, NULL, NULL, oper_clist, NULL, NULL, "$Revision$");
 
 
 /*
  * m_oper
- *      parv[1] = oper name
- *      parv[2] = oper password
+ *	parv[0] = sender prefix
+ *	parv[1] = oper name
+ *	parv[2] = oper password
  */
 static int
 m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -95,7 +107,7 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(IsOper(source_p))
 	{
-		sendto_one(source_p, form_str(RPL_YOUREOPER), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(RPL_YOUREOPER));
 		send_oper_motd(source_p);
 		return 0;
 	}
@@ -108,7 +120,7 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(oper_p == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOOPERHOST));
 		ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 		     name, source_p->name, source_p->username, source_p->host);
 
@@ -123,7 +135,7 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	}
 	if(IsOperConfNeedSSL(oper_p) && !IsSSL(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOOPERHOST));
 		ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s) -- requires SSL/TLS",
 		     name, source_p->name, source_p->username, source_p->host);
 
@@ -146,7 +158,7 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	}
 	else
 	{
-		sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_PASSWDMISMATCH));
 
 		ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 		     name, source_p->name, source_p->username, source_p->host);
@@ -163,39 +175,12 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 }
 
 
-/* send_oper_motd()
- *
- * inputs	- client to send motd to
- * outputs	- client is sent oper motd if exists
- * side effects -
- */
-static void
-send_oper_motd(struct Client *source_p)
-{
-	struct cacheline *lineptr;
-	rb_dlink_node *ptr;
-
-	if(oper_motd == NULL || rb_dlink_list_length(&oper_motd->contents) == 0)
-		return;
-	SetCork(source_p);
-	sendto_one(source_p, form_str(RPL_OMOTDSTART), me.name, source_p->name);
-
-	RB_DLINK_FOREACH(ptr, oper_motd->contents.head)
-	{
-		lineptr = ptr->data;
-		sendto_one(source_p, form_str(RPL_OMOTD), me.name, source_p->name, lineptr->data);
-	}
-	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_ENDOFOMOTD), me.name, source_p->name);
-}
-
-
 /*
  * match_oper_password
  *
- * inputs       - pointer to given password
- *              - pointer to Conf 
- * output       - YES or NO if match
+ * inputs	- pointer to given password
+ *		- pointer to Conf 
+ * output	- YES or NO if match
  * side effects - none
  */
 static int
@@ -205,7 +190,7 @@ match_oper_password(const char *password, struct oper_conf *oper_p)
 
 	/* passwd may be NULL pointer. Head it off at the pass... */
 	if(EmptyString(oper_p->passwd))
-		return NO;
+		return false;
 
 	if(IsOperConfEncrypted(oper_p))
 	{
@@ -223,10 +208,10 @@ match_oper_password(const char *password, struct oper_conf *oper_p)
 	else
 		encr = password;
 
-	if(strcmp(encr, oper_p->passwd) == 0)
-		return YES;
+	if(encr && strcmp(encr, oper_p->passwd) == 0)
+		return true;
 	else
-		return NO;
+		return false;
 }
 
 /* oper_up()
@@ -274,7 +259,7 @@ oper_up(struct Client *source_p, struct oper_conf *oper_p)
 	if((old & UMODE_INVISIBLE) && !IsInvisible(source_p))
 		--Count.invisi;
 	send_umode_out(source_p, source_p, old);
-	sendto_one(source_p, form_str(RPL_YOUREOPER), me.name, source_p->name);
+	sendto_one_numeric(source_p, s_RPL(RPL_YOUREOPER));
 	sendto_one_notice(source_p, ":*** Oper privs are %s", get_oper_privs(oper_p->flags));
 	send_oper_motd(source_p);
 
@@ -292,7 +277,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 #else
 
-static int generate_challenge(uint8_t **r_challenge, uint8_t **r_response, RSA * rsa);
+static int generate_challenge(uint8_t ** r_challenge, uint8_t ** r_response, RSA * rsa);
 
 static void
 cleanup_challenge(struct Client *target_p)
@@ -309,6 +294,7 @@ cleanup_challenge(struct Client *target_p)
 
 /*
  * m_challenge - generate RSA challenge for wouldbe oper
+ * parv[0] = sender prefix
  * parv[1] = operator to challenge for, or +response
  *
  */
@@ -320,12 +306,12 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 	uint8_t *challenge = NULL;
 	char chal_line[CHALLENGE_WIDTH];
 	uint8_t *b_response;
-	int len = 0;
+	ssize_t len = 0;
 	size_t cnt;
 
 	if(IsOper(source_p))
 	{
-		sendto_one(source_p, form_str(RPL_YOUREOPER), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(RPL_YOUREOPER));
 		send_oper_motd(source_p);
 		return 0;
 	}
@@ -335,9 +321,9 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 		if(source_p->localClient->chal_resp == NULL)
 			return 0;
 
-		if((rb_time() - source_p->localClient->chal_time) > CHALLENGE_EXPIRES)
+		if((rb_current_time() - source_p->localClient->chal_time) > CHALLENGE_EXPIRES)
 		{
-			sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
+			sendto_one_numeric(source_p, s_RPL(ERR_PASSWDMISMATCH));
 			ilog(L_FOPER, "EXPIRED CHALLENGE (%s) by (%s!%s@%s)",
 			     source_p->localClient->opername, source_p->name,
 			     source_p->username, source_p->host);
@@ -353,12 +339,12 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		parv[1]++;
 		b_response =
-			rb_base64_decode((const unsigned char *)parv[1], strlen(parv[1]), &len);
+			rb_base64_decode((const unsigned char *) parv[1], strlen(parv[1]), &len);
 
 		if(len != SHA_DIGEST_LENGTH
 		   || memcmp(source_p->localClient->chal_resp, b_response, SHA_DIGEST_LENGTH))
 		{
-			sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
+			sendto_one_numeric(source_p, s_RPL(ERR_PASSWDMISMATCH));
 			ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
 			     source_p->localClient->opername, source_p->name,
 			     source_p->username, source_p->host);
@@ -381,7 +367,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		if(oper_p == NULL)
 		{
-			sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
+			sendto_one_numeric(source_p, s_RPL(ERR_NOOPERHOST));
 			ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s)",
 			     source_p->localClient->opername, source_p->name,
 			     source_p->username, source_p->host);
@@ -410,7 +396,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(oper_p == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOOPERHOST));
 		ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s)",
 		     parv[1], source_p->name, source_p->username, source_p->host);
 
@@ -430,7 +416,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(IsOperConfNeedSSL(oper_p) && !IsSSL(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOOPERHOST));
 		ilog(L_FOPER, "FAILED CHALLENGE (%s) by (%s!%s@%s) -- requires SSL/TLS",
 		     parv[1], source_p->name, source_p->username, source_p->host);
 
@@ -446,13 +432,13 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(!generate_challenge(&challenge, &source_p->localClient->chal_resp, oper_p->rsa_pubkey))
 	{
-		char *chal = (char *)challenge;
-		source_p->localClient->chal_time = rb_time();
+		char *chal = (char *) challenge;
+		source_p->localClient->chal_time = rb_current_time();
 		SetCork(source_p);
 		for(;;)
 		{
 			cnt = rb_strlcpy(chal_line, chal, CHALLENGE_WIDTH);
-			sendto_one(source_p, form_str(RPL_RSACHALLENGE2), me.name, source_p->name,
+			sendto_one_numeric(source_p, s_RPL(RPL_RSACHALLENGE2),
 				   chal_line);
 			if(cnt > CHALLENGE_WIDTH)
 				chal += CHALLENGE_WIDTH - 1;
@@ -461,7 +447,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 		}
 		ClearCork(source_p);
-		sendto_one(source_p, form_str(RPL_ENDOFRSACHALLENGE2), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFRSACHALLENGE2));
 
 		source_p->localClient->opername = rb_strdup(oper_p->name);
 		rb_free(challenge);
@@ -474,7 +460,7 @@ m_challenge(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 
 static int
-generate_challenge(uint8_t **r_challenge, uint8_t **r_response, RSA * rsa)
+generate_challenge(uint8_t ** r_challenge, uint8_t ** r_response, RSA * rsa)
 {
 	SHA_CTX ctx;
 	uint8_t secret[CHALLENGE_SECRET_LENGTH], *tmp;
@@ -490,7 +476,7 @@ generate_challenge(uint8_t **r_challenge, uint8_t **r_response, RSA * rsa)
 		SHA1_Init(&ctx);
 		SHA1_Update(&ctx, secret, CHALLENGE_SECRET_LENGTH);
 		*r_response = rb_malloc(SHA_DIGEST_LENGTH);
-		SHA1_Final((uint8_t *)*r_response, &ctx);
+		SHA1_Final((uint8_t *) * r_response, &ctx);
 
 		length = RSA_size(rsa);
 		tmp = rb_malloc(length);

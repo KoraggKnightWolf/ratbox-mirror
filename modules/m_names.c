@@ -40,13 +40,19 @@
 static int m_names(struct Client *, struct Client *, int, const char **);
 
 struct Message names_msgtab = {
-	"NAMES", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_names, 0}, mg_ignore, mg_ignore, mg_ignore, {m_names, 0}}
+	.cmd = "NAMES", 
+
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_names },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_names },
 };
 
-mapi_clist_av2 names_clist[] = { &names_msgtab, NULL };
+mapi_clist_av1 names_clist[] = { &names_msgtab, NULL };
 
-DECLARE_MODULE_AV2(names, NULL, NULL, names_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(names, NULL, NULL, names_clist, NULL, NULL, "$Revision$");
 
 static void names_global(struct Client *source_p);
 
@@ -56,7 +62,8 @@ static void names_global(struct Client *source_p);
 
 /*
  * m_names
- *      parv[1] = channel
+ *	parv[0] = sender prefix
+ *	parv[1] = channel
  */
 static int
 m_names(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -73,34 +80,31 @@ m_names(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		if(!check_channel_name(p))
 		{
-			sendto_one_numeric(source_p, ERR_BADCHANNAME,
-					   form_str(ERR_BADCHANNAME), (unsigned char *)p);
+			sendto_one_numeric(source_p, ERR_BADCHANNAME, form_str(ERR_BADCHANNAME), p);
 			return 0;
 		}
 
 		if((chptr = find_channel(p)) != NULL)
 			channel_member_names(chptr, source_p, 1);
 		else
-			sendto_one(source_p, form_str(RPL_ENDOFNAMES), me.name, source_p->name, p);
+			sendto_one_numeric(source_p, s_RPL(RPL_ENDOFNAMES), p);
 	}
 	else
 	{
 		if(!IsOper(source_p))
 		{
-			if((last_used + ConfigFileEntry.pace_wait) > rb_time())
+			if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 			{
-				sendto_one(source_p, form_str(RPL_LOAD2HI),
-					   me.name, source_p->name, "NAMES");
-				sendto_one(source_p, form_str(RPL_ENDOFNAMES),
-					   me.name, source_p->name, "*");
+				sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "NAMES");
+				sendto_one_numeric(source_p, s_RPL(RPL_ENDOFNAMES), "*");
 				return 0;
 			}
 			else
-				last_used = rb_time();
+				last_used = rb_current_time();
 		}
 
 		names_global(source_p);
-		sendto_one(source_p, form_str(RPL_ENDOFNAMES), me.name, source_p->name, "*");
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFNAMES), "*");
 	}
 
 	return 0;
@@ -109,8 +113,8 @@ m_names(struct Client *client_p, struct Client *source_p, int parc, const char *
 /*
  * names_global
  *
- * inputs       - pointer to client struct requesting names
- * output       - none
+ * inputs	- pointer to client struct requesting names
+ * output	- none
  * side effects - lists all non public non secret channels
  */
 static void
@@ -119,12 +123,12 @@ names_global(struct Client *source_p)
 	int mlen;
 	int tlen;
 	int cur_len;
-	int dont_show = NO;
+	bool dont_show = false;
 	rb_dlink_node *lp, *ptr;
 	struct Client *target_p;
 	struct Channel *chptr = NULL;
 	struct membership *msptr;
-	char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	char *t;
 
 	/* first do all visible channels */
@@ -133,14 +137,14 @@ names_global(struct Client *source_p)
 		chptr = ptr->data;
 		channel_member_names(chptr, source_p, 0);
 	}
-	cur_len = mlen = rb_sprintf(buf, form_str(RPL_NAMREPLY), me.name, source_p->name, "*", "*");
+	cur_len = mlen = sprintf(buf, form_str(RPL_NAMREPLY), me.name, source_p->name, "*", "*");
 	t = buf + mlen;
 
 	/* Second, do all clients in one big sweep */
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
 		target_p = ptr->data;
-		dont_show = NO;
+		dont_show = false;
 
 		if(!IsClient(target_p) || IsInvisible(target_p))
 			continue;
@@ -149,7 +153,7 @@ names_global(struct Client *source_p)
 		 *   a) not on any channels
 		 *   b) only on +p channels
 		 *
-		 * both were missed out above.  if the target is on a
+		 * both were missed out above.	if the target is on a
 		 * common channel with source, its already been shown.
 		 */
 		RB_DLINK_FOREACH(lp, target_p->user->channel.head)
@@ -159,22 +163,22 @@ names_global(struct Client *source_p)
 
 			if(PubChannel(chptr) || IsMember(source_p, chptr) || SecretChannel(chptr))
 			{
-				dont_show = YES;
+				dont_show = true;
 				break;
 			}
 		}
 
-		if(dont_show)
+		if(dont_show == true)
 			continue;
 
-		if((cur_len + NICKLEN + 2) > (BUFSIZE - 3))
+		if((cur_len + NICKLEN + 2) > (IRCD_BUFSIZE - 3))
 		{
 			sendto_one_buffer(source_p, buf);
 			cur_len = mlen;
 			t = buf + mlen;
 		}
 
-		tlen = rb_sprintf(t, "%s ", target_p->name);
+		tlen = sprintf(t, "%s ", target_p->name);
 		cur_len += tlen;
 		t += tlen;
 	}

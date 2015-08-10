@@ -1,6 +1,6 @@
 /* contrib/m_force.c
  * Copyright (C) 1996-2002 Hybrid Development Team
- * Copyright (C) 2004 ircd-ratbox Development Team
+ * Copyright (C) 2004-2012 ircd-ratbox Development Team
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are
@@ -35,7 +35,6 @@
 #include "channel.h"
 #include "class.h"
 #include "client.h"
-#include "common.h"
 #include "match.h"
 #include "ircd.h"
 #include "hostmask.h"
@@ -56,21 +55,32 @@ static int mo_forcepart(struct Client *client_p, struct Client *source_p,
 			int parc, const char *parv[]);
 
 struct Message forcejoin_msgtab = {
-	"FORCEJOIN", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_forcejoin, 3}}
+	.cmd = "FORCEJOIN", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_forcejoin, .min_para = 3 },
 };
 
 struct Message forcepart_msgtab = {
-	"FORCEPART", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_forcepart, 3}}
+	.cmd = "FORCEPART", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_forcepart, .min_para = 3 },
 };
 
-mapi_clist_av2 force_clist[] = { &forcejoin_msgtab, &forcepart_msgtab, NULL };
+mapi_clist_av1 force_clist[] = { &forcejoin_msgtab, &forcepart_msgtab, NULL };
 
-DECLARE_MODULE_AV2(force, NULL, NULL, force_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(force, NULL, NULL, force_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_forcejoin
+ *      parv[0] = sender prefix
  *      parv[1] = user to force
  *      parv[2] = channel to force them into
  */
@@ -86,7 +96,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "forcejoin");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "forcejoin");
 		return 0;
 	}
 
@@ -98,7 +108,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 	 */
 	if((target_p = find_client(parv[1])) == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_NOSUCHNICK), me.name, source_p->name, parv[1]);
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK, form_str(ERR_NOSUCHNICK), parv[1]);
 		return 0;
 	}
 
@@ -154,10 +164,9 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 
 		if(chptr->topic != NULL)
 		{
-			sendto_one(target_p, form_str(RPL_TOPIC), me.name,
-				   target_p->name, chptr->chname, chptr->topic->topic);
-			sendto_one(target_p, form_str(RPL_TOPICWHOTIME),
-				   me.name, source_p->name, chptr->chname,
+			sendto_one_numeric(target_p, s_RPL(RPL_TOPIC), chptr->chname, chptr->topic->topic);
+			sendto_one_numeric(target_p, s_RPL(RPL_TOPICWHOTIME),
+				   chptr->chname,
 				   chptr->topic->topic_info, chptr->topic->topic_time);
 		}
 
@@ -168,16 +177,14 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		newch = LOCAL_COPY(parv[2]);
 		if(!check_channel_name(newch))
 		{
-			sendto_one(source_p, form_str(ERR_BADCHANNAME), me.name,
-				   source_p->name, (unsigned char *)newch);
+			sendto_one_numeric(source_p, ERR_BADCHANNAME, form_str(ERR_BADCHANNAME), newch);
 			return 0;
 		}
 
 		/* channel name must begin with & or # */
 		if(!IsChannelName(newch))
 		{
-			sendto_one(source_p, form_str(ERR_BADCHANNAME), me.name,
-				   source_p->name, (unsigned char *)newch);
+			sendto_one_numeric(source_p, ERR_BADCHANNAME, form_str(ERR_BADCHANNAME), newch);
 			return 0;
 		}
 
@@ -206,7 +213,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 
 		sendto_channel_local(ALL_MEMBERS, chptr, ":%s MODE %s +nt", me.name, chptr->chname);
 
-		target_p->localClient->last_join_time = rb_time();
+		target_p->localClient->last_join_time = rb_current_time();
 		channel_member_names(chptr, target_p, 1);
 
 		/* we do this to let the oper know that a channel was created, this will be
@@ -229,7 +236,7 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "forcepart");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "forcepart");
 		return 0;
 	}
 
@@ -239,7 +246,7 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 	/* if target_p == NULL then let the oper know */
 	if((target_p = find_client(parv[1])) == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_NOSUCHNICK), me.name, source_p->name, parv[1]);
+		sendto_one_numeric(source_p, ERR_NOSUCHNICK, form_str(ERR_NOSUCHNICK), parv[1]);
 		return 0;
 	}
 
@@ -256,8 +263,8 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	if((msptr = find_channel_membership(chptr, target_p)) == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_USERNOTINCHANNEL),
-			   me.name, source_p->name, parv[1], parv[2]);
+		sendto_one_numeric(source_p, ERR_USERNOTINCHANNEL, form_str(ERR_USERNOTINCHANNEL),
+			   parv[1], parv[2]);
 		return 0;
 	}
 

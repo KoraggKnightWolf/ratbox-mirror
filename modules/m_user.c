@@ -35,38 +35,42 @@
 #include "parse.h"
 #include "modules.h"
 #include "s_log.h"
-#include "blacklist.h"
 
 static int mr_user(struct Client *, struct Client *, int, const char **);
 
 struct Message user_msgtab = {
-	"USER", 0, 0, 0, MFLG_SLOW,
-	{{mr_user, 5}, mg_reg, mg_ignore, mg_ignore, mg_ignore, mg_reg}
+	.cmd = "USER", 
+	.handlers[UNREGISTERED_HANDLER] =	{ .handler = mr_user, .min_para = 5 },
+	.handlers[CLIENT_HANDLER] =		{ mm_reg },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ mm_reg },
 };
 
-mapi_clist_av2 user_clist[] = { &user_msgtab, NULL };
+mapi_clist_av1 user_clist[] = { &user_msgtab, NULL };
 
-DECLARE_MODULE_AV2(user, NULL, NULL, user_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(user, NULL, NULL, user_clist, NULL, NULL, "$Revision$");
 
 static int do_local_user(struct Client *client_p, struct Client *source_p,
 			 const char *username, const char *realname);
 
 /* mr_user()
- *      parv[1] = username (login name, account)
- *      parv[2] = client host name (ignored)
- *      parv[3] = server host name (ignored)
- *      parv[4] = users gecos
+ *	parv[1] = username (login name, account)
+ *	parv[2] = client host name (ignored)
+ *	parv[3] = server host name (ignored)
+ *	parv[4] = users gecos
  */
 static int
 mr_user(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	static char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	char *p;
 
 	if((p = strchr(parv[1], '@')))
 		*p = '\0';
 
-	rb_snprintf(buf, sizeof(buf), "%s %s", parv[2], parv[3]);
+	snprintf(buf, sizeof(buf), "%s %s", parv[2], parv[3]);
 	rb_free(source_p->localClient->fullcaps);
 	source_p->localClient->fullcaps = rb_strdup(buf);
 
@@ -78,17 +82,11 @@ static int
 do_local_user(struct Client *client_p, struct Client *source_p,
 	      const char *username, const char *realname)
 {
-	struct User *user;
-
 	s_assert(NULL != source_p);
 	s_assert(source_p->username != username);
 
-	user = make_user(source_p);
-	if (!HasSentUser(source_p))
-	{
-		lookup_blacklists(source_p);
-		SetSentUser(source_p);
-	}
+	SetSentUser(source_p);
+	make_user(source_p);
 
 	rb_strlcpy(source_p->info, realname, sizeof(source_p->info));
 

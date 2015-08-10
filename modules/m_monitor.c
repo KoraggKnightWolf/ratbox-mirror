@@ -49,17 +49,22 @@ static void moddeinit(void);
 static void cleanup_monitor(void *unused);
 
 struct Message monitor_msgtab = {
-	"MONITOR", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_monitor, 2}, mg_ignore, mg_ignore, mg_ignore, {m_monitor, 2}}
+	.cmd = "MONITOR",
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_monitor, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_monitor, .min_para = 2 },
 };
 
 
 
-mapi_clist_av2 monitor_clist[] = { &monitor_msgtab, NULL };
+mapi_clist_av1 monitor_clist[] = { &monitor_msgtab, NULL };
 
-DECLARE_MODULE_AV2(monitor, modinit, moddeinit, monitor_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(monitor, modinit, moddeinit, monitor_clist, NULL, NULL, "$Revision$");
 
-static struct ev_entry *cleanup_monitor_ev;
+static rb_ev_entry *cleanup_monitor_ev;
 static int
 modinit(void)
 {
@@ -77,7 +82,7 @@ moddeinit(void)
 static void
 add_monitor(struct Client *client_p, const char *nicks)
 {
-	char onbuf[BUFSIZE], offbuf[BUFSIZE];
+	char onbuf[IRCD_BUFSIZE], offbuf[IRCD_BUFSIZE];
 	struct Client *target_p;
 	struct monitor *monptr;
 	const char *name;
@@ -88,9 +93,9 @@ add_monitor(struct Client *client_p, const char *nicks)
 	int cur_onlen, cur_offlen;
 
 	/* these two are same length, just diff numeric */
-	cur_offlen = cur_onlen = mlen = rb_sprintf(onbuf, form_str(RPL_MONONLINE),
-						   me.name, client_p->name, "");
-	rb_sprintf(offbuf, form_str(RPL_MONOFFLINE), me.name, client_p->name, "");
+	cur_offlen = cur_onlen = mlen = sprintf(onbuf, form_str(RPL_MONONLINE),
+						me.name, client_p->name, "");
+	sprintf(offbuf, form_str(RPL_MONOFFLINE), me.name, client_p->name, "");
 
 	onptr = onbuf + mlen;
 	offptr = offbuf + mlen;
@@ -99,10 +104,10 @@ add_monitor(struct Client *client_p, const char *nicks)
 
 	for(name = rb_strtok_r(tmp, ",", &p); name; name = rb_strtok_r(NULL, ",", &p))
 	{
-		if(EmptyString(name) || strlen(name) > NICKLEN - 1)
+		if(EmptyString(name) || strlen(name) > ServerInfo.nicklen - 1)
 			continue;
 
-		if((int)rb_dlink_list_length(&client_p->localClient->monitor_list) >=
+		if((int) rb_dlink_list_length(&client_p->localClient->monitor_list) >=
 		   ConfigFileEntry.max_monitor)
 		{
 			char buf[100];
@@ -113,12 +118,12 @@ add_monitor(struct Client *client_p, const char *nicks)
 				sendto_one_buffer(client_p, offbuf);
 
 			if(p)
-				rb_snprintf(buf, sizeof(buf), "%s,%s", name, p);
+				snprintf(buf, sizeof(buf), "%s,%s", name, p);
 			else
-				rb_snprintf(buf, sizeof(buf), "%s", name);
+				snprintf(buf, sizeof(buf), "%s", name);
 
-			sendto_one(client_p, form_str(ERR_MONLISTFULL),
-				   me.name, client_p->name, ConfigFileEntry.max_monitor, buf);
+			sendto_one_numeric(client_p, s_RPL(ERR_MONLISTFULL),
+				   ConfigFileEntry.max_monitor, buf);
 			return;
 		}
 
@@ -134,7 +139,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 		if((target_p = find_named_person(name)) != NULL)
 		{
 			if(cur_onlen + strlen(target_p->name) +
-			   strlen(target_p->username) + strlen(target_p->host) + 3 >= BUFSIZE - 3)
+			   strlen(target_p->username) + strlen(target_p->host) + 3 >= IRCD_BUFSIZE - 3)
 			{
 				sendto_one_buffer(client_p, onbuf);
 				cur_onlen = mlen;
@@ -146,14 +151,14 @@ add_monitor(struct Client *client_p, const char *nicks)
 				*onptr++ = ',';
 				cur_onlen++;
 			}
-			arglen = rb_sprintf(onptr, "%s!%s@%s",
-					    target_p->name, target_p->username, target_p->host);
+			arglen = sprintf(onptr, "%s!%s@%s",
+					 target_p->name, target_p->username, target_p->host);
 			onptr += arglen;
 			cur_onlen += arglen;
 		}
 		else
 		{
-			if(cur_offlen + strlen(name) + 1 >= BUFSIZE - 3)
+			if(cur_offlen + strlen(name) + 1 >= IRCD_BUFSIZE - 3)
 			{
 				sendto_one_buffer(client_p, offbuf);
 				cur_offlen = mlen;
@@ -165,7 +170,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 				*offptr++ = ',';
 				cur_offlen++;
 			}
-			arglen = rb_sprintf(offptr, "%s", name);
+			arglen = sprintf(offptr, "%s", name);
 			offptr += arglen;
 			cur_offlen += arglen;
 		}
@@ -207,7 +212,7 @@ del_monitor(struct Client *client_p, const char *nicks)
 static void
 list_monitor(struct Client *client_p)
 {
-	char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	struct monitor *monptr;
 	char *nbuf;
 	rb_dlink_node *ptr;
@@ -215,18 +220,18 @@ list_monitor(struct Client *client_p)
 
 	if(!rb_dlink_list_length(&client_p->localClient->monitor_list))
 	{
-		sendto_one(client_p, form_str(RPL_ENDOFMONLIST), me.name, client_p->name);
+		sendto_one_numeric(client_p, s_RPL(RPL_ENDOFMONLIST));
 		return;
 	}
 
-	cur_len = mlen = rb_sprintf(buf, form_str(RPL_MONLIST), me.name, client_p->name, "");
+	cur_len = mlen = sprintf(buf, form_str(RPL_MONLIST), me.name, client_p->name, "");
 	nbuf = buf + mlen;
 	SetCork(client_p);
 	RB_DLINK_FOREACH(ptr, client_p->localClient->monitor_list.head)
 	{
 		monptr = ptr->data;
 
-		if(cur_len + strlen(monptr->name) + 1 >= BUFSIZE - 3)
+		if(cur_len + strlen(monptr->name) + 1 >= IRCD_BUFSIZE - 3)
 		{
 			sendto_one_buffer(client_p, buf);
 			nbuf = buf + mlen;
@@ -238,20 +243,20 @@ list_monitor(struct Client *client_p)
 			*nbuf++ = ',';
 			cur_len++;
 		}
-		arglen = rb_sprintf(nbuf, "%s", monptr->name);
+		arglen = sprintf(nbuf, "%s", monptr->name);
 		cur_len += arglen;
 		nbuf += arglen;
 	}
 
 	sendto_one_buffer(client_p, buf);
 	ClearCork(client_p);
-	sendto_one(client_p, form_str(RPL_ENDOFMONLIST), me.name, client_p->name);
+	sendto_one_numeric(client_p, s_RPL(RPL_ENDOFMONLIST));
 }
 
 static void
 show_monitor_status(struct Client *client_p)
 {
-	char onbuf[BUFSIZE], offbuf[BUFSIZE];
+	char onbuf[IRCD_BUFSIZE], offbuf[IRCD_BUFSIZE];
 	struct Client *target_p;
 	struct monitor *monptr;
 	char *onptr, *offptr;
@@ -259,8 +264,8 @@ show_monitor_status(struct Client *client_p)
 	int mlen, arglen;
 	rb_dlink_node *ptr;
 
-	mlen = cur_onlen = rb_sprintf(onbuf, form_str(RPL_MONONLINE), me.name, client_p->name, "");
-	cur_offlen = rb_sprintf(offbuf, form_str(RPL_MONOFFLINE), me.name, client_p->name, "");
+	mlen = cur_onlen = sprintf(onbuf, form_str(RPL_MONONLINE), me.name, client_p->name, "");
+	cur_offlen = sprintf(offbuf, form_str(RPL_MONOFFLINE), me.name, client_p->name, "");
 
 	onptr = onbuf + mlen;
 	offptr = offbuf + mlen;
@@ -272,7 +277,7 @@ show_monitor_status(struct Client *client_p)
 		if((target_p = find_named_person(monptr->name)) != NULL)
 		{
 			if(cur_onlen + strlen(target_p->name) +
-			   strlen(target_p->username) + strlen(target_p->host) + 3 >= BUFSIZE - 3)
+			   strlen(target_p->username) + strlen(target_p->host) + 3 >= IRCD_BUFSIZE - 3)
 			{
 				sendto_one_buffer(client_p, onbuf);
 				cur_onlen = mlen;
@@ -284,14 +289,14 @@ show_monitor_status(struct Client *client_p)
 				*onptr++ = ',';
 				cur_onlen++;
 			}
-			arglen = rb_sprintf(onptr, "%s!%s@%s",
-					    target_p->name, target_p->username, target_p->host);
+			arglen = sprintf(onptr, "%s!%s@%s",
+					 target_p->name, target_p->username, target_p->host);
 			onptr += arglen;
 			cur_onlen += arglen;
 		}
 		else
 		{
-			if(cur_offlen + strlen(monptr->name) + 1 >= BUFSIZE - 3)
+			if(cur_offlen + strlen(monptr->name) + 1 >= IRCD_BUFSIZE - 3)
 			{
 				sendto_one_buffer(client_p, offbuf);
 				cur_offlen = mlen;
@@ -304,7 +309,7 @@ show_monitor_status(struct Client *client_p)
 				cur_offlen++;
 			}
 
-			arglen = rb_sprintf(offptr, "%s", monptr->name);
+			arglen = sprintf(offptr, "%s", monptr->name);
 			offptr += arglen;
 			cur_offlen += arglen;
 		}
@@ -356,8 +361,7 @@ m_monitor(struct Client *client_p, struct Client *source_p, int parc, const char
 	case '+':
 		if(parc < 3 || EmptyString(parv[2]))
 		{
-			sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
-				   me.name, source_p->name, "MONITOR");
+			sendto_one_numeric(client_p, s_RPL(ERR_NEEDMOREPARAMS), "MONITOR");
 			return 0;
 		}
 
@@ -366,8 +370,7 @@ m_monitor(struct Client *client_p, struct Client *source_p, int parc, const char
 	case '-':
 		if(parc < 3 || EmptyString(parv[2]))
 		{
-			sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
-				   me.name, source_p->name, "MONITOR");
+			sendto_one_numeric(client_p, s_RPL(ERR_NEEDMOREPARAMS),"MONITOR");
 			return 0;
 		}
 

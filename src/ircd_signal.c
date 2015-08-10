@@ -1,7 +1,7 @@
 /************************************************************************
  *   IRC - Internet Relay Chat, src/ircd_signal.c
  *   Copyright (C) 1990 Jarkko Oikarinen and
- *                      University of Oulu, Computing Center
+ *			University of Oulu, Computing Center
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 #include "ratbox_lib.h"
 #include "ircd_signal.h"
 #include "ircd.h"		/* dorehash */
-#include "restart.h"		/* server_reboot */
 #include "s_log.h"
 #include "s_conf.h"
 #include "dns.h"
@@ -56,6 +55,9 @@ sigchld_handler(int sig)
 /*
  * sigterm_handler - exit the server
  */
+
+static void sigterm_handler(int sig) RB_noreturn;
+
 static void
 sigterm_handler(int sig)
 {
@@ -116,10 +118,8 @@ sigint_handler(int sig)
 void
 setup_signals()
 {
-	sigset_t sigs;
 	struct sigaction act;
 
-	sigemptyset(&sigs);
 	act.sa_flags = 0;
 	act.sa_handler = SIG_IGN;
 	sigemptyset(&act.sa_mask);
@@ -129,10 +129,10 @@ setup_signals()
 	sigaddset(&act.sa_mask, SIGTRAP);
 #endif
 
-# ifdef SIGWINCH
+#ifdef SIGWINCH
 	sigaddset(&act.sa_mask, SIGWINCH);
 	sigaction(SIGWINCH, &act, 0);
-# endif
+#endif
 	sigaction(SIGPIPE, &act, 0);
 #ifdef SIGTRAP
 	sigaction(SIGTRAP, &act, 0);
@@ -140,40 +140,32 @@ setup_signals()
 
 	act.sa_handler = dummy_handler;
 	sigaction(SIGALRM, &act, 0);
-	sigaddset(&sigs, SIGALRM);
 
 	act.sa_handler = sighup_handler;
 	sigemptyset(&act.sa_mask);
 	sigaddset(&act.sa_mask, SIGHUP);
 	sigaction(SIGHUP, &act, 0);
-	sigaddset(&sigs, SIGHUP);
 
 	act.sa_handler = sigint_handler;
 	sigaddset(&act.sa_mask, SIGINT);
 	sigaction(SIGINT, &act, 0);
-	sigaddset(&sigs, SIGINT);
 
 	act.sa_handler = sigterm_handler;
 	sigaddset(&act.sa_mask, SIGTERM);
 	sigaction(SIGTERM, &act, 0);
-	sigaddset(&sigs, SIGTERM);
 
 	act.sa_handler = sigusr1_handler;
 	sigaddset(&act.sa_mask, SIGUSR1);
 	sigaction(SIGUSR1, &act, 0);
-	sigaddset(&sigs, SIGUSR1);
 
 	act.sa_handler = sigusr2_handler;
 	sigaddset(&act.sa_mask, SIGUSR2);
 	sigaction(SIGUSR2, &act, 0);
-	sigaddset(&sigs, SIGUSR2);
 
 	act.sa_handler = sigchld_handler;
 	sigaddset(&act.sa_mask, SIGCHLD);
 	sigaction(SIGCHLD, &act, 0);
-	sigaddset(&sigs, SIGCHLD);
 
-	sigprocmask(SIG_UNBLOCK, &sigs, NULL);
 }
 
 /*
@@ -194,10 +186,10 @@ setup_reboot_signals()
 	sigaction(SIGTRAP, &act, 0);
 #endif
 
-# ifdef SIGWINCH
+#ifdef SIGWINCH
 	sigaddset(&act.sa_mask, SIGWINCH);
 	sigaction(SIGWINCH, &act, 0);
-# endif
+#endif
 	sigaddset(&act.sa_mask, SIGALRM);
 	sigaddset(&act.sa_mask, SIGPIPE);
 	sigaddset(&act.sa_mask, SIGHUP);

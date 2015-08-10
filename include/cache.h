@@ -12,35 +12,36 @@
 #define HELP_USER	0x001
 #define HELP_OPER	0x002
 
-struct Client;
-
 struct cachefile
 {
-	char name[CACHEFILELEN];
 	rb_dlink_list contents;
+	char name[CACHEFILELEN];
 	int flags;
 };
 
 struct cacheline
 {
-	char data[CACHELINELEN];
 	rb_dlink_node linenode;
+	char data[CACHELINELEN];
 };
-
-extern struct cachefile *user_motd;
-extern struct cachefile *oper_motd;
-extern struct cacheline *emptyline;
-
-extern char user_motd_changed[MAX_DATE_STRING];
-extern rb_dlink_list links_cache_list;
 
 void init_cache(void);
 struct cachefile *cache_file(const char *, const char *, int);
 void cache_links(void *unused);
+
+void send_links_cache(struct Client *source_p);
+
+
 void free_cachefile(struct cachefile *);
+const char *cache_user_motd_updated(void);
+
 
 void load_help(void);
 
 void send_user_motd(struct Client *);
 void cache_user_motd(void);
+
+void send_oper_motd(struct Client *);
+void cache_oper_motd(void);
+
 #endif

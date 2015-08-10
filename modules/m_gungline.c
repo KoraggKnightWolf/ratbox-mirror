@@ -21,7 +21,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  *  USA
  *
- *  $Id: m_gline.c 26421 2009-01-18 17:38:16Z jilles $
+ *  $Id$
  */
 
 #include "stdinc.h"
@@ -52,27 +52,33 @@ static int modinit(void);
 static void moddeinit(void);
 
 struct Message gungline_msgtab = {
-	"GUNGLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_gungline, 4}, {mo_gungline, 3}}
+	.cmd = "GUNGLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },	
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },	
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_gungline, .min_para = 4 },  
+	.handlers[OPER_HANDLER] =		{ .handler = mo_gungline, .min_para = 3 },
 };
 
-mapi_clist_av2 gungline_clist[] = { &gungline_msgtab, NULL };
+mapi_clist_av1 gungline_clist[] = { &gungline_msgtab, NULL };
 
-mapi_hfn_list_av2 gungline_hfnlist[] = {
+mapi_hfn_list_av1 gungline_hfnlist[] = {
 	{"doing_stats", (hookfn) h_gungline_stats},
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV2(gungline, modinit, moddeinit, gungline_clist, NULL, gungline_hfnlist, "$Revision: 26421 $");
+DECLARE_MODULE_AV1(gungline, modinit, moddeinit, gungline_clist, NULL, gungline_hfnlist,
+		   "$Revision: 26421 $");
 
 static int majority_ungline(struct Client *source_p, const char *user,
-			  const char *host, const char *reason);
+			    const char *host, const char *reason);
 
 static int invalid_gline(struct Client *, const char *, char *);
 
 static int remove_temp_gline(const char *, const char *);
 static void expire_pending_gunglines(void *unused);
-static struct ev_entry *pending_gungline_ev;
+static rb_ev_entry *pending_gungline_ev;
 static void flush_pending_gunglines(void);
 
 static rb_dlink_list pending_gunglines;
@@ -80,8 +86,9 @@ static rb_dlink_list pending_gunglines;
 static int
 modinit(void)
 {
-	pending_gungline_ev = rb_event_addish("expire_pending_gunglines", expire_pending_gunglines, NULL,
-					   CLEANUP_GLINES_TIME);
+	pending_gungline_ev =
+		rb_event_addish("expire_pending_gunglines", expire_pending_gunglines, NULL,
+				CLEANUP_GLINES_TIME);
 	return 0;
 }
 
@@ -89,16 +96,16 @@ static void
 moddeinit(void)
 {
 	rb_event_delete(pending_gungline_ev);
-	if (rb_dlink_list_length(&pending_gunglines) > 0)
+	if(rb_dlink_list_length(&pending_gunglines) > 0)
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				"Discarding pending gunglines because of module unload");
+				     "Discarding pending gunglines because of module unload");
 	flush_pending_gunglines();
 }
 
 /* mo_gungline()
  *
- * inputs       - The usual for a m_ function
- * output       -
+ * inputs	- The usual for a m_ function
+ * output	-
  * side effects - remove a gline if 3 opers agree
  */
 static int
@@ -117,7 +124,7 @@ mo_gungline(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	if(!IsOperUnkline(source_p) || !IsOperGline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "ungline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "ungline");
 		return 0;
 	}
 
@@ -167,7 +174,10 @@ mo_gungline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	majority_ungline(source_p, user, host, reason);
 
 	sendto_server(client_p, NULL, CAP_ENCAP | CAP_TS6, NOCAPS,
-		      ":%s ENCAP * GUNGLINE %s %s :%s", source_p->id, user, host, reason);
+		      ":%s ENCAP * GUNGLINE %s %s :%s", use_id(source_p), user, host, reason);
+	sendto_server(client_p, NULL, CAP_ENCAP, CAP_TS6,
+		      ":%s ENCAP * GUNGLINE %s %s :%s", source_p->name, user, host, reason);
+
 	return 0;
 }
 
@@ -181,7 +191,7 @@ me_gungline(struct Client *client_p, struct Client *source_p, int parc, const ch
 	const char *host;
 	char *reason;
 
-	if (!IsClient(source_p))
+	if(!IsClient(source_p))
 		return 0;
 
 	acptr = source_p;
@@ -237,14 +247,14 @@ invalid_gline(struct Client *source_p, const char *luser, char *lreason)
  * remove_local_gline
  *
  * inputs	- pointer to oper nick/username/host/server,
- * 		  victim user/host and reason
+ *		  victim user/host and reason
  * output	- NONE
  * side effects	-
  */
 static void
 remove_local_gline(struct Client *source_p, const char *user, const char *host, const char *reason)
 {
-	if (!remove_temp_gline(user, host))
+	if(!remove_temp_gline(user, host))
 		return;
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s!%s@%s on %s has triggered ungline for [%s@%s] [%s]",
@@ -258,7 +268,7 @@ remove_local_gline(struct Client *source_p, const char *user, const char *host, 
 /* majority_ungline()
  *
  * input	- client doing gline, user, host and reason of gline
- * output       - YES if there are 3 different opers/servers agree, else NO
+ * output	- YES if there are 3 different opers/servers agree, else NO
  * side effects -
  */
 static int
@@ -281,12 +291,12 @@ majority_ungline(struct Client *source_p, const char *user, const char *host, co
 			    (irccmp(pending->oper_host1, source_p->host) == 0)))
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL, "oper has already voted");
-				return NO;
+				return false;
 			}
 			else if(irccmp(pending->oper_server1, source_p->servptr->name) == 0)
 			{
 				sendto_realops_flags(UMODE_ALL, L_ALL, "server has already voted");
-				return NO;
+				return false;
 			}
 
 			if(pending->oper_user2[0] != '\0')
@@ -297,20 +307,20 @@ majority_ungline(struct Client *source_p, const char *user, const char *host, co
 				{
 					sendto_realops_flags(UMODE_ALL, L_ALL,
 							     "oper has already voted");
-					return NO;
+					return false;
 				}
 				else if(irccmp(pending->oper_server2, source_p->servptr->name) == 0)
 				{
 					sendto_realops_flags(UMODE_ALL, L_ALL,
 							     "server has already voted");
-					return NO;
+					return false;
 				}
 
 				/* trigger the gline using the original reason --fl */
 				remove_local_gline(source_p, user, host, pending->reason1);
 
 				expire_pending_gunglines(pending);
-				return YES;
+				return true;
 			}
 			else
 			{
@@ -322,15 +332,15 @@ majority_ungline(struct Client *source_p, const char *user, const char *host, co
 					   sizeof(pending->oper_host2));
 				pending->reason2 = rb_strdup(reason);
 				pending->oper_server2 = scache_add(source_p->servptr->name);
-				pending->last_gline_time = rb_time();
-				pending->time_request2 = rb_time();
-				return NO;
+				pending->last_gline_time = rb_current_time();
+				pending->time_request2 = rb_current_time();
+				return false;
 			}
 		}
 	}
 
 	/* no pending ungline, create a new one */
-	pending = (struct gline_pending *)rb_malloc(sizeof(struct gline_pending));
+	pending = (struct gline_pending *) rb_malloc(sizeof(struct gline_pending));
 
 	rb_strlcpy(pending->oper_nick1, source_p->name, sizeof(pending->oper_nick1));
 	rb_strlcpy(pending->oper_user1, source_p->username, sizeof(pending->oper_user1));
@@ -343,18 +353,18 @@ majority_ungline(struct Client *source_p, const char *user, const char *host, co
 	pending->reason1 = rb_strdup(reason);
 	pending->reason2 = NULL;
 
-	pending->last_gline_time = rb_time();
-	pending->time_request1 = rb_time();
+	pending->last_gline_time = rb_current_time();
+	pending->time_request1 = rb_current_time();
 
 	rb_dlinkAddAlloc(pending, &pending_gunglines);
 
-	return NO;
+	return false;
 }
 
 /* remove_temp_gline()
  *
- * inputs       - username, hostname to ungline
- * outputs      -
+ * inputs	- username, hostname to ungline
+ * outputs	-
  * side effects - tries to ungline anything that matches
  */
 static int
@@ -366,13 +376,13 @@ remove_temp_gline(const char *user, const char *host)
 	int bits, cbits;
 	int mtype, gtype;
 
-	mtype = parse_netmask(host, (struct sockaddr *)&addr, &bits);
+	mtype = parse_netmask(host, (struct sockaddr *) &addr, &bits);
 
 	RB_DLINK_FOREACH(ptr, glines.head)
 	{
 		aconf = ptr->data;
 
-		gtype = parse_netmask(aconf->host, (struct sockaddr *)&caddr, &cbits);
+		gtype = parse_netmask(aconf->host, (struct sockaddr *) &caddr, &cbits);
 
 		if(gtype != mtype || (user && irccmp(user, aconf->user)))
 			continue;
@@ -383,22 +393,22 @@ remove_temp_gline(const char *user, const char *host)
 				continue;
 		}
 		else if(bits != cbits ||
-			!comp_with_mask_sock((struct sockaddr *)&addr,
-					     (struct sockaddr *)&caddr, bits))
+			!comp_with_mask_sock((struct sockaddr *) &addr,
+					     (struct sockaddr *) &caddr, bits))
 			continue;
 
 		rb_dlinkDestroy(ptr, &glines);
 		delete_one_address_conf(aconf->host, aconf);
-		return YES;
+		return true;
 	}
 
-	return NO;
+	return false;
 }
 
 static void
 h_gungline_stats(hook_data_int * data)
 {
-	char statchar = (char)data->arg2;
+	char statchar = (char) data->arg2;
 
 	if(ConfigFileEntry.glines && statchar == 'g' && IsOper(data->client))
 	{
@@ -438,11 +448,12 @@ h_gungline_stats(hook_data_int * data)
 			sendto_one_notice(data->client, ":End of Pending G-line Removals");
 	}
 }
+
 /*
  * expire_pending_gunglines
  * 
- * inputs       - NONE
- * output       - NONE
+ * inputs	- NONE
+ * output	- NONE
  * side effects -
  *
  * Go through the pending gungline list, expire any that haven't had
@@ -460,7 +471,7 @@ expire_pending_gunglines(void *vptr)
 		glp_ptr = pending_node->data;
 
 		if((glp_ptr->last_gline_time + GLINE_PENDING_EXPIRE) <=
-		    rb_time() || vptr == glp_ptr)
+		   rb_current_time() || vptr == glp_ptr)
 
 		{
 			rb_free(glp_ptr->reason1);

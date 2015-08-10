@@ -43,40 +43,44 @@
 static int mo_set(struct Client *, struct Client *, int, const char **);
 
 struct Message set_msgtab = {
-	"SET", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_set, 0}}
+	.cmd = "SET",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },			     
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_set },
 };
 
-mapi_clist_av2 set_clist[] = { &set_msgtab, NULL };
+mapi_clist_av1 set_clist[] = { &set_msgtab, NULL };
 
-DECLARE_MODULE_AV2(set, NULL, NULL, set_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(set, NULL, NULL, set_clist, NULL, NULL, "$Revision$");
 
 /* Structure used for the SET table itself */
 struct SetStruct
 {
 	const char *name;
-	void (*handler)(struct Client *source_p, const char *chararg, int intarg);
+	void (*handler) ();
 	int wants_char;		/* 1 if it expects (char *, [int]) */
 	int wants_int;		/* 1 if it expects ([char *], int) */
 
-	/* eg:  0, 1 == only an int arg
-	 * eg:  1, 1 == char and int args */
+	/* eg:	0, 1 == only an int arg
+	 * eg:	1, 1 == char and int args */
 };
 
 
-static void quote_adminstring(struct Client *, const char *, int);
-static void quote_autoconn(struct Client *, const char *, int);
-static void quote_autoconnall(struct Client *, const char *, int);
-static void quote_floodcount(struct Client *, const char *, int);
-static void quote_identtimeout(struct Client *, const char *, int);
-static void quote_max(struct Client *, const char *, int);
-static void quote_operstring(struct Client *, const char *, int);
-static void quote_spamnum(struct Client *, const char *, int);
-static void quote_spamtime(struct Client *, const char *, int);
-static void quote_splitmode(struct Client *, const char *, int);
-static void quote_splitnum(struct Client *, const char *, int);
-static void quote_splitusers(struct Client *, const char *, int);
-
+static void quote_adminstring(struct Client *, const char *);
+static void quote_autoconn(struct Client *, char *, int);
+static void quote_autoconnall(struct Client *, int);
+static void quote_floodcount(struct Client *, int);
+static void quote_identtimeout(struct Client *, int);
+static void quote_max(struct Client *, int);
+static void quote_operstring(struct Client *, const char *);
+static void quote_spamnum(struct Client *, int);
+static void quote_spamtime(struct Client *, int);
+static void quote_splitmode(struct Client *, char *);
+static void quote_splitnum(struct Client *, int);
+static void quote_splitusers(struct Client *, int);
 static void list_quote_commands(struct Client *);
 
 
@@ -89,7 +93,7 @@ static void list_quote_commands(struct Client *);
  */
 
 static struct SetStruct set_cmd_table[] = {
-	/* name               function      string arg  int arg */
+	/* name		      function	    string arg	int arg */
 	/* -------------------------------------------------------- */
 	{"ADMINSTRING", quote_adminstring, 1, 0},
 	{"AUTOCONN", quote_autoconn, 1, 1},
@@ -105,7 +109,7 @@ static struct SetStruct set_cmd_table[] = {
 	{"SPLITNUM", quote_splitnum, 0, 1},
 	{"SPLITUSERS", quote_splitusers, 0, 1},
 	/* -------------------------------------------------------- */
-	{(char *)0, (void (*)(struct Client *, const char *, int))0, 0, 0}
+	{(char *) 0, (void (*)()) 0, 0, 0}
 };
 
 
@@ -145,14 +149,14 @@ list_quote_commands(struct Client *source_p)
 
 /* SET AUTOCONN */
 static void
-quote_autoconn(struct Client *source_p, const char *arg, int newval)
+quote_autoconn(struct Client *source_p, char *arg, int newval)
 {
 	set_server_conf_autoconn(source_p, arg, newval);
 }
 
 /* SET AUTOCONNALL */
 static void
-quote_autoconnall(struct Client *source_p, const char *arg, int newval)
+quote_autoconnall(struct Client *source_p, int newval)
 {
 	if(newval >= 0)
 	{
@@ -171,7 +175,7 @@ quote_autoconnall(struct Client *source_p, const char *arg, int newval)
 
 /* SET FLOODCOUNT */
 static void
-quote_floodcount(struct Client *source_p, const char *arg, int newval)
+quote_floodcount(struct Client *source_p, int newval)
 {
 	if(newval >= 0)
 	{
@@ -189,11 +193,11 @@ quote_floodcount(struct Client *source_p, const char *arg, int newval)
 
 /* SET IDENTTIMEOUT */
 static void
-quote_identtimeout(struct Client *source_p, const char *arg, int newval)
+quote_identtimeout(struct Client *source_p, int newval)
 {
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "admin");
 		return;
 	}
 
@@ -211,7 +215,7 @@ quote_identtimeout(struct Client *source_p, const char *arg, int newval)
 
 /* SET MAX */
 static void
-quote_max(struct Client *source_p, const char *arg, int newval)
+quote_max(struct Client *source_p, int newval)
 {
 	if(newval > 0)
 	{
@@ -250,7 +254,7 @@ quote_max(struct Client *source_p, const char *arg, int newval)
 
 /* SET OPERSTRING */
 static void
-quote_operstring(struct Client *source_p, const char *arg, int newval)
+quote_operstring(struct Client *source_p, const char *arg)
 {
 	if(EmptyString(arg))
 	{
@@ -269,7 +273,7 @@ quote_operstring(struct Client *source_p, const char *arg, int newval)
 
 /* SET ADMINSTRING */
 static void
-quote_adminstring(struct Client *source_p, const char *arg, int newval)
+quote_adminstring(struct Client *source_p, const char *arg)
 {
 	if(EmptyString(arg))
 	{
@@ -288,7 +292,7 @@ quote_adminstring(struct Client *source_p, const char *arg, int newval)
 
 /* SET SPAMNUM */
 static void
-quote_spamnum(struct Client *source_p, const char *arg, int newval)
+quote_spamnum(struct Client *source_p, int newval)
 {
 	if(newval > 0)
 	{
@@ -318,7 +322,7 @@ quote_spamnum(struct Client *source_p, const char *arg, int newval)
 
 /* SET SPAMTIME */
 static void
-quote_spamtime(struct Client *source_p, const char *arg, int newval)
+quote_spamtime(struct Client *source_p, int newval)
 {
 	if(newval > 0)
 	{
@@ -359,7 +363,7 @@ static const char *splitmode_status[] = {
 
 /* SET SPLITMODE */
 static void
-quote_splitmode(struct Client *source_p, const char *charval, int intval)
+quote_splitmode(struct Client *source_p, char *charval)
 {
 	if(charval)
 	{
@@ -419,7 +423,7 @@ quote_splitmode(struct Client *source_p, const char *charval, int intval)
 
 /* SET SPLITNUM */
 static void
-quote_splitnum(struct Client *source_p, const char *arg, int newval)
+quote_splitnum(struct Client *source_p, int newval)
 {
 	if(newval >= 0)
 	{
@@ -436,7 +440,7 @@ quote_splitnum(struct Client *source_p, const char *arg, int newval)
 
 /* SET SPLITUSERS */
 static void
-quote_splitusers(struct Client *source_p, const char *arg, int newval)
+quote_splitusers(struct Client *source_p, int newval)
 {
 	if(newval >= 0)
 	{
@@ -536,8 +540,24 @@ mo_set(struct Client *client_p, struct Client *source_p, int parc, const char *p
 				else
 					newval = -1;
 
-				set_cmd_table[i].handler(source_p, arg, newval);
-				return 0;
+				if(set_cmd_table[i].wants_char)
+				{
+					if(set_cmd_table[i].wants_int)
+						set_cmd_table[i].handler(source_p, arg, newval);
+					else
+						set_cmd_table[i].handler(source_p, arg);
+					return 0;
+				}
+				else
+				{
+					if(set_cmd_table[i].wants_int)
+						set_cmd_table[i].handler(source_p, newval);
+					else
+						/* Just in case someone actually wants a
+						 * set function that takes no args.. *shrug* */
+						set_cmd_table[i].handler(source_p);
+					return 0;
+				}
 			}
 		}
 

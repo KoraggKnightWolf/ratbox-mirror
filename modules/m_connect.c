@@ -43,13 +43,18 @@ static int mo_connect(struct Client *, struct Client *, int, const char **);
 static int ms_connect(struct Client *, struct Client *, int, const char **);
 
 struct Message connect_msgtab = {
-	"CONNECT", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, {ms_connect, 4}, {ms_connect, 4}, mg_ignore, {mo_connect, 2}}
+	.cmd = "CONNECT",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },			     
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = ms_connect, .min_para = 4 },
+	.handlers[SERVER_HANDLER] =		{ .handler = ms_connect, .min_para = 4 },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_connect, .min_para = 2 },
 };
 
-mapi_clist_av2 connect_clist[] = { &connect_msgtab, NULL };
+mapi_clist_av1 connect_clist[] = { &connect_msgtab, NULL };
 
-DECLARE_MODULE_AV2(connect, NULL, NULL, connect_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(connect, NULL, NULL, connect_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_connect - CONNECT command handler
@@ -57,9 +62,10 @@ DECLARE_MODULE_AV2(connect, NULL, NULL, connect_clist, NULL, NULL, "$Revision$")
  * Added by Jto 11 Feb 1989
  *
  * m_connect
- *      parv[1] = servername
- *      parv[2] = port number
- *      parv[3] = remote server
+ *	parv[0] = sender prefix
+ *	parv[1] = servername
+ *	parv[2] = port number
+ *	parv[3] = remote server
  */
 static int
 mo_connect(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -73,7 +79,7 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	if(MyConnect(source_p) && !IsOperRemote(source_p) && parc > 3)
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "remote");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "remote");
 		return 0;
 	}
 
@@ -127,7 +133,7 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	 * Notify all operators about remote connect requests
 	 */
 
-	ilog(L_SERVER, "CONNECT From %s : %s %s", source_p->name, parv[1], parc > 2 ? parv[2] : "");
+	ilog(L_SERVER, "CONNECT From %s : %s %s", parv[0], parv[1], parc > 2 ? parv[2] : "");
 
 	server_p->port = port;
 	/*
@@ -160,9 +166,10 @@ mo_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
  * Added by Jto 11 Feb 1989
  *
  * m_connect
- *      parv[1] = servername
- *      parv[2] = port number
- *      parv[3] = remote server
+ *	parv[0] = sender prefix
+ *	parv[1] = servername
+ *	parv[2] = port number
+ *	parv[3] = remote server
  */
 static int
 ms_connect(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -226,6 +233,9 @@ ms_connect(struct Client *client_p, struct Client *source_p, int parc, const cha
 	sendto_server(NULL, NULL, CAP_TS6, NOCAPS,
 		      ":%s WALLOPS :Remote CONNECT %s %d from %s",
 		      me.id, parv[1], port, source_p->name);
+	sendto_server(NULL, NULL, NOCAPS, CAP_TS6,
+		      ":%s WALLOPS :Remote CONNECT %s %d from %s",
+		      me.name, parv[1], port, source_p->name);
 
 	ilog(L_SERVER, "CONNECT From %s : %s %d", source_p->name, parv[1], port);
 

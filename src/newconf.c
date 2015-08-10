@@ -20,7 +20,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  *  USA
  *
- *  $Id$               
+ *  $Id$	       
  * 
  */
 
@@ -52,7 +52,8 @@
 #include "channel.h"
 #include "hash.h"
 #include "sslproc.h"
-#include "blacklist.h"
+#include "whowas.h"
+#include "s_auth.h"
 
 #define CF_TYPE(x) ((x) & CF_MTYPE)
 
@@ -181,8 +182,7 @@ static struct mode_table auth_table[] = {
 	{"no_tilde",		CONF_FLAGS_NO_TILDE	},
 	{"need_ident",		CONF_FLAGS_NEED_IDENTD	},
 	{"have_ident",		CONF_FLAGS_NEED_IDENTD	},
-	{"need_ssl", 		CONF_FLAGS_NEED_SSL	},
-	{"dnsbl_exempt",	CONF_FLAGS_EXEMPTDNSBL	},
+	{"need_ssl",		CONF_FLAGS_NEED_SSL	},
 	{NULL, 0}
 };
 
@@ -237,7 +237,7 @@ conf_report_error_nl(const char *fmt, ...)
 	char msg[IRCD_BUFSIZE + 1];
 
 	va_start(ap, fmt);
-	rb_vsnprintf(msg, sizeof(msg), fmt, ap);
+	vsnprintf(msg, sizeof(msg), fmt, ap);
 	va_end(ap);
 
 	conf_parse_failure++;
@@ -258,7 +258,7 @@ conf_report_warning_nl(const char *fmt, ...)
 	char msg[IRCD_BUFSIZE + 1];
 
 	va_start(ap, fmt);
-	rb_vsnprintf(msg, sizeof(msg), fmt, ap);
+	vsnprintf(msg, sizeof(msg), fmt, ap);
 	va_end(ap);
 
 	if(testing_conf)
@@ -308,8 +308,7 @@ set_modes_from_table(int *modes, const char *whatis, struct mode_table *tab, con
 		mode = find_umode(tab, umode);
 		if(mode == -1)
 		{
-			conf_report_warning_nl("Unknown flag %s %s", whatis,
-					       sub->string);
+			conf_report_warning_nl("Unknown flag %s %s", whatis, sub->string);
 			continue;
 		}
 
@@ -484,7 +483,7 @@ yyerror(const char *msg)
 {
 	char newlinebuf[IRCD_BUFSIZE];
 
-	strip_tabs(newlinebuf, linebuf, sizeof(newlinebuf));
+	strip_tabs(newlinebuf, yy_linebuf, sizeof(newlinebuf));
 	conf_parse_failure++;
 
 	if(testing_conf)
@@ -493,8 +492,7 @@ yyerror(const char *msg)
 		return;
 	}
 
-	sendto_realops_flags(UMODE_ALL, L_ALL, "\"%s\", line %d: %s at '%s'", conffilebuf,
-			     lineno + 1, msg, newlinebuf);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "\"%s\", line %d: %s at '%s'", conffilebuf, lineno + 1, msg, newlinebuf);
 
 	ilog(L_MAIN, "\"%s\", line %d: %s at '%s'", conffilebuf, lineno + 1, msg, newlinebuf);
 }
@@ -530,7 +528,7 @@ conf_report_error(const char *fmt, ...)
 	char msg[IRCD_BUFSIZE + 1];
 
 	va_start(ap, fmt);
-	rb_vsnprintf(msg, sizeof(msg), fmt, ap);
+	vsnprintf(msg, sizeof(msg), fmt, ap);
 	va_end(ap);
 
 	conf_parse_failure++;
@@ -541,8 +539,7 @@ conf_report_error(const char *fmt, ...)
 	}
 
 	ilog(L_MAIN, "\"%s\", line %d: %s", current_file, lineno + 1, msg);
-	sendto_realops_flags(UMODE_ALL, L_ALL, "\"%s\", line %d: %s", current_file, lineno + 1,
-			     msg);
+	sendto_realops_flags(UMODE_ALL, L_ALL, "\"%s\", line %d: %s", current_file, lineno + 1, msg);
 }
 
 
@@ -552,8 +549,7 @@ conf_start_block(char *block, char *name)
 	conf_t *conf;
 	if(curconf != NULL)
 	{
-		conf_report_error("\"%s\", Previous block \"%s\" never closed", conffilebuf,
-				  curconf->confname);
+		conf_report_error("\"%s\", Previous block \"%s\" never closed", conffilebuf, curconf->confname);
 		return 1;
 	}
 	conf = make_conf_block(block);
@@ -648,7 +644,7 @@ conf_call_set(char *item, conf_parm_t * value, int type)
 		case CF_TIME:
 		case CF_INT:
 		case CF_YESNO:
-			add_entry(curconf, item, (void *)(unsigned long)cp->v.number, cp->type);
+			add_entry(curconf, item, (void *)(uintptr_t) cp->v.number, cp->type);
 			break;
 		case CF_LIST:
 			break;
@@ -669,7 +665,7 @@ read_config_file(const char *filename)
 	rb_strlcpy(conffilebuf, filename, sizeof(conffilebuf));
 	if((conf_fbfile_in = fopen(filename, "r")) == NULL)
 	{
-		conf_report_error_nl("Unable to open file %s %m", filename);
+		conf_report_error_nl("Unable to open file %s %s", filename, strerror(errno));
 		return 1;
 	}
 	yyparse();
@@ -763,8 +759,7 @@ check_valid_entry(valid_block_t * vt, conf_t * conf, confentry_t * entry)
 			{
 				conf_report_error_nl
 					("Option %s:%s at %s:%d does not take a list of values",
-					 conf->confname, entry->entryname, entry->filename,
-					 entry->line);
+					 conf->confname, entry->entryname, entry->filename, entry->line);
 				return 0;
 			}
 
@@ -789,12 +784,10 @@ check_valid_entry(valid_block_t * vt, conf_t * conf, confentry_t * entry)
 			if(CF_TYPE(entry->type) != CF_TYPE(ve->type))
 			{
 				if((CF_TYPE(entry->type) == CF_INT && CF_TYPE(ve->type) == CF_TIME)
-				   || (CF_TYPE(entry->type) == CF_TIME
-				       && CF_TYPE(ve->type) == CF_INT))
+				   || (CF_TYPE(entry->type) == CF_TIME && CF_TYPE(ve->type) == CF_INT))
 					return 1;
 
-				if(CF_TYPE(entry->type) == CF_YESNO
-				   && CF_TYPE(ve->type) == CF_STRING)
+				if(CF_TYPE(entry->type) == CF_YESNO && CF_TYPE(ve->type) == CF_STRING)
 				{
 					return 1;
 				}
@@ -882,8 +875,8 @@ conf_set_modules_module(confentry_t * entry, conf_t * conf, struct conf_items *i
 
 	m_bn = rb_basename(entry->string);
 
-	if(findmodule_byname(m_bn) != -1)
-		return;
+	if(mod_find_name(m_bn) != NULL)
+		return;	
 
 	load_one_module(entry->string, 0);
 
@@ -919,6 +912,28 @@ conf_set_generic_value_cb(confentry_t * entry, conf_t * conf, struct conf_items 
 	}
 }
 
+static void
+conf_set_serverinfo_nicklen(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	int nicklen;
+
+	if(ServerInfo.nicklen <= 0)
+	{
+		nicklen = entry->number;
+		if(nicklen > NICKLEN)
+		{
+			conf_report_error_nl
+				("serverinfo::nicklen -- Nicklen cannot exceed %u(set to %u) - modify #define NICKLEN in include/ircd_defs.h to increase and recompile",
+				 NICKLEN, nicklen);
+		}
+		else if(nicklen < 9)
+		{
+			conf_report_error_nl("serverinfo::nicklen -- Invalid nicklen %u, must be at least 9", nicklen);
+		}
+		ServerInfo.nicklen = nicklen + 1;
+	}
+
+}
 
 static void
 conf_set_serverinfo_name(confentry_t * entry, conf_t * conf, struct conf_items *item)
@@ -927,14 +942,16 @@ conf_set_serverinfo_name(confentry_t * entry, conf_t * conf, struct conf_items *
 	{
 		if(!valid_servername(entry->string))
 		{
-			conf_report_error_nl("serverinfo::name -- Invalid servername at %s:%d", conf->filename, conf->line);
+			conf_report_error_nl("serverinfo::name -- Invalid servername at %s:%d", conf->filename,
+					     conf->line);
 			conf_report_error_nl("cannot continue without a valid servername");
 			exit(1);
 		}
 
 		if(IsDigit(*entry->string))
 		{
-			conf_report_error_nl("serverinfo::name -- cannot begin with digit at %s:%d", conf->filename, conf->line);
+			conf_report_error_nl("serverinfo::name -- cannot begin with digit at %s:%d", conf->filename,
+					     conf->line);
 			conf_report_error_nl("cannot continue without a valid servername");
 			exit(1);
 		}
@@ -985,8 +1002,7 @@ conf_set_serverinfo_vhost6(confentry_t * entry, conf_t * conf, struct conf_items
 	ServerInfo.specific_ipv6_vhost = 1;
 	ServerInfo.ip6.sin6_family = AF_INET6;
 #else
-	conf_report_warning_nl
-		("Ignoring serverinfo::vhost6 -- IPv6 support not available.");
+	conf_report_warning_nl("Ignoring serverinfo::vhost6 -- IPv6 support not available.");
 #endif
 }
 
@@ -996,9 +1012,7 @@ conf_set_serverinfo_vhost_dns(confentry_t * entry, conf_t * conf, struct conf_it
 	struct rb_sockaddr_storage addr;
 	if(rb_inet_pton(AF_INET, (char *)entry->string, &addr) <= 0)
 	{
-		conf_report_warning_nl
-			("Ignoring serverinfo::vhost_dns -- Invalid vhost (%s)",
-			 entry->string);
+		conf_report_warning_nl("Ignoring serverinfo::vhost_dns -- Invalid vhost (%s)", entry->string);
 		return;
 	}
 	rb_free(ServerInfo.vhost_dns);
@@ -1012,9 +1026,7 @@ conf_set_serverinfo_vhost6_dns(confentry_t * entry, conf_t * conf, struct conf_i
 	struct rb_sockaddr_storage addr;
 	if(rb_inet_pton(AF_INET6, (char *)entry->string, &addr) <= 0)
 	{
-		conf_report_warning_nl
-			("Ignoring serverinfo::vhost6_dns -- Invalid vhost (%s)",
-			 entry->string);
+		conf_report_warning_nl("Ignoring serverinfo::vhost6_dns -- Invalid vhost (%s)", entry->string);
 		return;
 	}
 	rb_free(ServerInfo.vhost6_dns);
@@ -1032,7 +1044,8 @@ conf_set_serverinfo_sid(confentry_t * entry, conf_t * conf, struct conf_items *i
 	{
 		if(!IsDigit(sid[0]) || !IsIdChar(sid[1]) || !IsIdChar(sid[2]) || sid[3] != '\0')
 		{
-			conf_report_error_nl("Error serverinfo::sid -- invalid sid at %s:%d", conf->filename, conf->line);
+			conf_report_error_nl("Error serverinfo::sid -- invalid sid at %s:%d", conf->filename,
+					     conf->line);
 			return;
 		}
 
@@ -1044,7 +1057,7 @@ static void
 conf_set_serverinfo_bandb_path(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	char *path = entry->string;
-	
+
 	if(access(path, F_OK) == -1)
 	{
 		char *dirname, *d = rb_dirname(path);
@@ -1053,19 +1066,63 @@ conf_set_serverinfo_bandb_path(confentry_t * entry, conf_t * conf, struct conf_i
 
 		if(access(dirname, W_OK) == -1)
 		{
-			conf_report_error_nl("Unable to access bandb %s: %m ignoring...", path);
+			conf_report_error_nl("Unable to access bandb %s: %s ignoring...", path, rb_strerror(errno));
 			return;
 		}
-	} else {
+	}
+	else
+	{
 		if(access(path, W_OK) == -1)
 		{
-			conf_report_error_nl("Unable to access bandb %s: %m ignoring...", path);
+			conf_report_error_nl("Unable to access bandb %s: %s ignoring...", path, rb_strerror(errno));
 			return;
 		}
-	}		
+	}
 	rb_free(ServerInfo.bandb_path);
 	ServerInfo.bandb_path = rb_strdup(path);
 }
+
+static void
+conf_set_serverinfo_whowas_length(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	int len;
+	len = entry->number;
+	if(len < 50)
+	{
+		conf_report_error_nl("serverinfo::whowas_length -- Invalid WHOWAS length %u, must be at least 50", len);
+	} else
+		set_whowas_size(len);
+}
+
+
+static const char *ver_table[] = {
+	[RB_TLS_VER_SSL3] = "ssl3",
+	[RB_TLS_VER_TLS1] = "tls1.0",
+	[RB_TLS_VER_TLS1_1] = "tls1.1",
+	[RB_TLS_VER_TLS1_2] = "tls1.2",
+	[RB_TLS_VER_LAST] = NULL,
+};
+
+static void
+conf_set_serverinfo_tls_min_ver(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	char *val = entry->string;
+	int x;
+	for(x = 0; x < RB_TLS_VER_LAST; x++)
+	{
+		if(strcasecmp(ver_table[x], val) == 0)
+		{
+			ServerInfo.tls_min_ver = x;
+			return;
+		}
+	}
+	ServerInfo.tls_min_ver = 0;
+	conf_report_warning_nl("Invalid setting '%s' for serverinfo::tls_min_ver at %s:%d", val,
+				       conf->filename, conf->line);
+}
+
+
+
 
 static struct Class *t_class;
 static void
@@ -1180,8 +1237,7 @@ conf_set_auth_end(conf_t * conf)
 
 	if(EmptyString(t_aconf->host))
 	{
-		conf_report_error_nl("auth block at %s:%d  -- missing user@host", conf->filename,
-				     conf->line);
+		conf_report_error_nl("auth block at %s:%d  -- missing user@host", conf->filename, conf->line);
 		return;
 	}
 
@@ -1283,22 +1339,22 @@ conf_set_auth_spoof(confentry_t * entry, conf_t * conf, struct conf_items *item)
 		host = p + 1;
 		if(EmptyString(user))
 		{
-			conf_report_warning_nl("Invalid spoof (ident empty): %s::%s at %s:%d", 
-						conf->confname, entry->entryname, entry->filename, entry->line);
+			conf_report_warning_nl("Invalid spoof (ident empty): %s::%s at %s:%d",
+					       conf->confname, entry->entryname, entry->filename, entry->line);
 			return;
 		}
 
 		if(strlen(user) > USERLEN)
 		{
-			conf_report_warning_nl("Invalid spoof (username too long): %s::%s at %s:%d", 
-						conf->confname, entry->entryname, entry->filename, entry->line);
+			conf_report_warning_nl("Invalid spoof (username too long): %s::%s at %s:%d",
+					       conf->confname, entry->entryname, entry->filename, entry->line);
 			return;
 		}
 
 		if(!valid_username(user))
 		{
-			conf_report_warning_nl("Invalid spoof (invalid username): %s::%s at %s:%d", 
-						conf->confname, entry->entryname, entry->filename, entry->line);
+			conf_report_warning_nl("Invalid spoof (invalid username): %s::%s at %s:%d",
+					       conf->confname, entry->entryname, entry->filename, entry->line);
 			return;
 		}
 
@@ -1308,22 +1364,22 @@ conf_set_auth_spoof(confentry_t * entry, conf_t * conf, struct conf_items *item)
 
 	if(EmptyString(host))
 	{
-		conf_report_warning_nl("Invalid spoof (empty hostname): %s::%s at %s:%d", 
-				conf->confname, entry->entryname, entry->filename, entry->line);
+		conf_report_warning_nl("Invalid spoof (empty hostname): %s::%s at %s:%d",
+				       conf->confname, entry->entryname, entry->filename, entry->line);
 		return;
 	}
 
 	if(strlen(host) > HOSTLEN)
 	{
-		conf_report_warning_nl("Invalid spoof (hostname too long): %s::%s at %s:%d", 
-				conf->confname, entry->entryname, entry->filename, entry->line);
+		conf_report_warning_nl("Invalid spoof (hostname too long): %s::%s at %s:%d",
+				       conf->confname, entry->entryname, entry->filename, entry->line);
 		return;
 	}
 
 	if(!valid_hostname(host))
 	{
-		conf_report_warning_nl("Invalid spoof (invalid hostname): %s::%s at %s:%d", 
-				conf->confname, entry->entryname, entry->filename, entry->line);
+		conf_report_warning_nl("Invalid spoof (invalid hostname): %s::%s at %s:%d",
+				       conf->confname, entry->entryname, entry->filename, entry->line);
 		return;
 	}
 
@@ -1363,6 +1419,10 @@ conf_set_auth_class(confentry_t * entry, conf_t * conf, struct conf_items *item)
 	t_aconf_class = rb_strdup(entry->string);
 }
 
+
+
+
+
 static struct oper_conf *t_oper;
 static rb_dlink_list t_oper_list;
 
@@ -1395,8 +1455,7 @@ conf_set_end_operator(conf_t * conf)
 
 	if(EmptyString(t_oper->name))
 	{
-		conf_report_error_nl("operator block at %s:%d -- missing name", conf->filename,
-				     conf->line);
+		conf_report_error_nl("operator block at %s:%d -- missing name", conf->filename, conf->line);
 		return;
 	}
 
@@ -1407,8 +1466,7 @@ conf_set_end_operator(conf_t * conf)
 		)
 #endif
 	{
-		conf_report_error_nl("operator block at %s:%d -- missing password", conf->filename,
-				     conf->line);
+		conf_report_error_nl("operator block at %s:%d -- missing password", conf->filename, conf->line);
 		return;
 	}
 
@@ -1480,8 +1538,7 @@ conf_set_oper_user(confentry_t * entry, conf_t * conf, struct conf_items *item)
 
 	if(EmptyString(tmp_oper->username) || EmptyString(tmp_oper->host))
 	{
-		conf_report_error_nl("operator at %s:%d -- missing username/host", entry->filename,
-				     entry->line);
+		conf_report_error_nl("operator at %s:%d -- missing username/host", entry->filename, entry->line);
 		free_oper_conf(tmp_oper);
 		return;
 	}
@@ -1506,8 +1563,7 @@ conf_set_oper_rsa_public_key_file(confentry_t * entry, conf_t * conf, struct con
 	rb_free(t_oper->rsa_pubkey_file);
 	t_oper->rsa_pubkey_file = rb_strdup(entry->string);
 #else
-	conf_report_warning_nl
-		("Ignoring rsa_public_key_file (OpenSSL support not available)");
+	conf_report_warning_nl("Ignoring rsa_public_key_file (OpenSSL support not available)");
 #endif
 }
 
@@ -1516,6 +1572,7 @@ conf_set_oper_umodes(confentry_t * entry, conf_t * conf, struct conf_items *item
 {
 	set_modes_from_table(&t_oper->umodes, "umode", umode_table, entry);
 }
+
 
 
 static char *listener_address;
@@ -1547,8 +1604,7 @@ conf_set_listen_aftype(confentry_t * entry, conf_t * conf, struct conf_items *it
 		listener_aftype = AF_INET6;
 #endif
 	else
-		conf_report_warning_nl("listen::aftype '%s' at %s:%d is unknown", aft,
-				       entry->filename, entry->line);
+		conf_report_warning_nl("listen::aftype '%s' at %s:%d is unknown", aft, entry->filename, entry->line);
 }
 
 
@@ -1594,7 +1650,7 @@ conf_set_listen_sslport(confentry_t * entry, conf_t * conf, struct conf_items *i
 	conf_set_listen_port_both(entry, conf, item, 1);
 }
 
-static struct ev_entry *cache_links_ev;
+static rb_ev_entry *cache_links_ev;
 static void
 conf_set_serverhide_links_delay(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
@@ -1679,7 +1735,8 @@ conf_set_general_stats_k_oper_only(confentry_t * entry, conf_t * conf, struct co
 	else if(strcasecmp(val, "no") == 0)
 		ConfigFileEntry.stats_k_oper_only = 0;
 	else
-		conf_report_warning_nl("Invalid setting '%s' for general::stats_k_oper_only at %s:%d", val, conf->filename, conf->line);
+		conf_report_warning_nl("Invalid setting '%s' for general::stats_k_oper_only at %s:%d", val,
+				       conf->filename, conf->line);
 }
 
 static void
@@ -1694,7 +1751,8 @@ conf_set_general_stats_i_oper_only(confentry_t * entry, conf_t * conf, struct co
 	else if(strcasecmp(val, "no") == 0)
 		ConfigFileEntry.stats_i_oper_only = 0;
 	else
-		conf_report_warning_nl("Invalid setting '%s' for general::stats_i_oper_only at %s:%d", val, conf->filename, conf->line);
+		conf_report_warning_nl("Invalid setting '%s' for general::stats_i_oper_only at %s:%d", val,
+				       conf->filename, conf->line);
 }
 
 static void
@@ -1712,8 +1770,7 @@ conf_set_general_compression_level(confentry_t * entry, conf_t * conf, struct co
 	}
 #else
 	conf_report_warning_nl
-		("Ignoring general::compression_level at %s:%d -- zlib not available.",
-		 entry->filename, entry->line);
+		("Ignoring general::compression_level at %s:%d -- zlib not available.", entry->filename, entry->line);
 #endif
 
 }
@@ -1724,10 +1781,8 @@ conf_set_general_havent_read_conf(confentry_t * entry, conf_t * conf, struct con
 	if(entry->number)
 	{
 		conf_report_error_nl("You haven't read your config file properly.");
-		conf_report_error_nl
-			("There is a line in the example conf that will kill your server if not removed.");
-		conf_report_error_nl
-			("Consider actually reading/editing the conf file, and removing this line.");
+		conf_report_error_nl("There is a line in the example conf that will kill your server if not removed.");
+		conf_report_error_nl("Consider actually reading/editing the conf file, and removing this line.");
 		if(!testing_conf)
 			exit(0);
 	}
@@ -1751,8 +1806,7 @@ conf_set_end_connect(conf_t * conf)
 {
 	if(EmptyString(t_server->name))
 	{
-		conf_report_warning_nl("Ignoring connect block at %s:%d -- missing name",
-				       conf->filename, conf->line);
+		conf_report_warning_nl("Ignoring connect block at %s:%d -- missing name", conf->filename, conf->line);
 		return;
 	}
 
@@ -1794,7 +1848,8 @@ conf_set_connect_vhost(confentry_t * entry, conf_t * conf, struct conf_items *it
 {
 	if(rb_inet_pton_sock(entry->string, (struct sockaddr *)&t_server->my_ipnum) <= 0)
 	{
-		conf_report_warning_nl("Invalid netmask for server vhost (%s) at %s:%d", entry->string, conf->filename, conf->line);
+		conf_report_warning_nl("Invalid netmask for server vhost (%s) at %s:%d", entry->string, conf->filename,
+				       conf->line);
 		return;
 	}
 
@@ -1844,8 +1899,7 @@ conf_set_connect_aftype(confentry_t * entry, conf_t * conf, struct conf_items *i
 		SET_SS_FAMILY(&t_server->ipnum, AF_INET6);
 #endif
 	else
-		conf_report_warning_nl("connect::aftype '%s' at %s:%d is unknown", aft,
-				       entry->filename, entry->line);
+		conf_report_warning_nl("connect::aftype '%s' at %s:%d is unknown", aft, entry->filename, entry->line);
 }
 
 static void
@@ -1977,8 +2031,7 @@ conf_set_shared_oper(confentry_t * entry, conf_t * conf, struct conf_items *item
 
 	if(len > 2)
 	{
-		conf_report_error_nl("Too many options for shared::oper at %s:%d", entry->filename,
-				     entry->line);
+		conf_report_error_nl("Too many options for shared::oper at %s:%d", entry->filename, entry->line);
 		return;
 	}
 
@@ -2006,8 +2059,7 @@ conf_set_shared_oper(confentry_t * entry, conf_t * conf, struct conf_items *item
 
 	if((p = strchr(username, '@')) == NULL)
 	{
-		conf_report_error_nl("shared::oper at %s:%d -- oper is not a user@host",
-				     entry->filename, entry->line);
+		conf_report_error_nl("shared::oper at %s:%d -- oper is not a user@host", entry->filename, entry->line);
 		return;
 	}
 
@@ -2055,36 +2107,6 @@ conf_set_shared_flags(confentry_t * entry, conf_t * conf, struct conf_items *ite
 	t_shared = NULL;
 }
 
-static char *blacklist_host;
-
-static void
-conf_set_blacklist_cleanup(conf_t * conf)
-{
-	rb_free(blacklist_host);
-	blacklist_host = NULL;
-}
-
-static void
-conf_set_blacklist_host(confentry_t * entry, conf_t * conf, struct conf_items *item)
-{
-	rb_free(blacklist_host);
-	blacklist_host = rb_strdup(entry->string);
-}
-
-static void
-conf_set_blacklist_reason(confentry_t * entry, conf_t * conf, struct conf_items *item)
-{
-	if (blacklist_host == NULL) {
-		conf_report_warning_nl("Ignoring blacklist::reason at %s:%d -- Missing host",
-				       entry->filename, entry->line);
-		return;
-	}
-	new_blacklist(blacklist_host, entry->string);
-	rb_free(blacklist_host);
-	blacklist_host = NULL;
-}
-
-
 #ifdef ENABLE_SERVICES
 static void
 conf_set_service_start(conf_t * conf)
@@ -2116,6 +2138,65 @@ conf_set_service_name(confentry_t * entry, conf_t * conf, struct conf_items *ite
 		target_p->flags |= FLAGS_SERVICE;
 }
 #endif
+
+
+static rbl_t *t_rbl;
+static char *t_match;
+static char *t_answer;
+
+static void
+conf_set_blacklist_start(conf_t * conf)
+{
+	t_rbl = NULL;
+	if(t_answer != NULL)
+	{
+		rb_free(t_answer);
+		t_answer = NULL;
+	}
+	t_rbl = rbl_create(conf->subname);
+	rbl_set_aftype(t_rbl, true, false);	
+}
+
+static void
+conf_set_blacklist_end(conf_t * conf)
+{
+	rbl_add_rbl_to_rbllists(t_rbl);
+
+	if(t_answer != NULL)
+	{
+		rb_free(t_answer);
+		t_answer = NULL;
+	}
+	
+	if(t_rbl != NULL)
+		t_rbl = NULL;
+}
+
+static void
+conf_set_blacklist_match(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	t_match = rb_strdup(entry->string);
+}
+
+static void
+conf_set_blacklist_answer(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	t_answer = rb_strdup(entry->string);
+	rbl_add_answer(t_rbl, t_match, t_answer);
+}
+
+static void
+conf_set_blacklist_match_other(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	rbl_set_match_other(t_rbl, entry->number);
+}
+
+static void
+conf_set_blacklist_match_other_answer(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	rbl_add_other_answer(t_rbl, entry->string);
+}
+
 
 
 static void
@@ -2196,6 +2277,7 @@ register_top_confs(void)
 void
 load_conf_settings(void)
 {
+	rb_ssl_ctx *ctx;
 	register_top_confs();
 
 	/* sanity check things */
@@ -2208,38 +2290,45 @@ load_conf_settings(void)
 	if(ServerInfo.network_name == NULL)
 		ServerInfo.network_name = rb_strdup(NETWORK_NAME_DEFAULT);
 
+	if(ServerInfo.network_desc == NULL)
+		ServerInfo.network_desc = rb_strdup(NETWORK_DESC_DEFAULT);
+
+	if(ServerInfo.nicklen <= 0)
+		ServerInfo.nicklen = DEFAULT_NICKLEN + 1;
+
 	if(ServerInfo.ssld_count < 1)
 		ServerInfo.ssld_count = 1;
 
-	if((ConfigFileEntry.client_flood < CLIENT_FLOOD_MIN)
-	   || (ConfigFileEntry.client_flood > CLIENT_FLOOD_MAX))
+	if((ConfigFileEntry.client_flood < CLIENT_FLOOD_MIN) || (ConfigFileEntry.client_flood > CLIENT_FLOOD_MAX))
 		ConfigFileEntry.client_flood = CLIENT_FLOOD_MAX;
 
-	if(ConfigChannel.topiclen > MAX_TOPICLEN || ConfigChannel.topiclen < 0)
+	if(ConfigChannel.topiclen > MAX_TOPICLEN || ConfigChannel.topiclen == 0)
 		ConfigChannel.topiclen = DEFAULT_TOPICLEN;
 
-	if(!rb_setup_ssl_server
-	   (ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params))
+	if((ctx = rb_setup_ssl_server(
+			ServerInfo.ssl_ca_cert, ServerInfo.ssl_cert, ServerInfo.ssl_private_key, ServerInfo.ssl_dh_params, 
+			ServerInfo.ssl_cipher_list, ServerInfo.ssl_ecdh_named_curve, ServerInfo.tls_min_ver)) == NULL)
 	{
 		ilog(L_MAIN, "WARNING: Unable to setup SSL.");
 		ircd_ssl_ok = 0;
 	}
 	else
 	{
+		ilog(L_MAIN, "SSL tests okay.");
 		ircd_ssl_ok = 1;
-		send_new_ssl_certs(ServerInfo.ssl_cert, ServerInfo.ssl_private_key,
-				   ServerInfo.ssl_dh_params);
+		rb_ssl_ctx_free(ctx);
+		send_new_ssl_certs(ServerInfo.ssl_ca_cert, ServerInfo.ssl_cert, ServerInfo.ssl_private_key,
+				   ServerInfo.ssl_dh_params, ServerInfo.ssl_cipher_list, ServerInfo.ssl_ecdh_named_curve, ServerInfo.tls_min_ver);
 	}
 	if(ServerInfo.ssld_count > get_ssld_count())
 	{
 		int start = ServerInfo.ssld_count - get_ssld_count();
 		/* start up additional ssld if needed */
-		start_ssldaemon(start, ServerInfo.ssl_cert, ServerInfo.ssl_private_key,
-				ServerInfo.ssl_dh_params);
+		start_ssldaemon(start, ServerInfo.ssl_ca_cert,  ServerInfo.ssl_cert, ServerInfo.ssl_private_key,
+				ServerInfo.ssl_dh_params, ServerInfo.ssl_cipher_list, ServerInfo.ssl_ecdh_named_curve, ServerInfo.tls_min_ver);
 
 	}
-	if(!split_users || !split_servers
-	   || (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
+	if(!split_users || !split_servers || (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
 	{
 		rb_event_delete(cache_links_ev);
 		splitmode = 0;
@@ -2252,32 +2341,38 @@ load_conf_settings(void)
 /* *INDENT-OFF* */
 static struct conf_items conf_modules_table[] =
 {
-	{ "path",	CF_QSTRING,	conf_set_modules_path, 		0, NULL },
+	{ "path",	CF_QSTRING,	conf_set_modules_path,		0, NULL },
 	{ "module",	CF_QSTRING,	conf_set_modules_module,	0, NULL },
 	{ NULL,		0,		NULL,				0, NULL }
 };
 
 static struct conf_items conf_serverinfo_table[] =
 {
-        { "description",        CF_QSTRING, NULL, 0, &ServerInfo.description    },
-        { "hub",                CF_YESNO,   NULL, 0, &ServerInfo.hub            },
-        { "default_max_clients",CF_INT,     NULL, 0, &ServerInfo.default_max_clients },
-        { "network_name",       CF_QSTRING, conf_set_serverinfo_network_name,   0, NULL },
-        { "name",               CF_QSTRING, conf_set_serverinfo_name,   0, NULL },
-        { "sid",                CF_QSTRING, conf_set_serverinfo_sid,    0, NULL },
-        { "bandb",		CF_QSTRING, conf_set_serverinfo_bandb_path,  0, NULL },
-        { "vhost",              CF_QSTRING, conf_set_serverinfo_vhost,  0, NULL },
-        { "vhost6",             CF_QSTRING, conf_set_serverinfo_vhost6, 0, NULL },
-        { "ssl_private_key",    CF_QSTRING, NULL, 0, &ServerInfo.ssl_private_key },
-        { "ssl_ca_cert",        CF_QSTRING, NULL, 0, &ServerInfo.ssl_ca_cert },
-        { "ssl_cert",           CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },   
-        { "ssl_dh_params",      CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
-        { "ssld_count",		CF_INT,	    NULL, 0, &ServerInfo.ssld_count },
-        { "vhost_dns",		CF_QSTRING, conf_set_serverinfo_vhost_dns, 0, NULL },
+	{ "description",	CF_QSTRING, NULL, 0, &ServerInfo.description	},
+	{ "network_desc",	CF_QSTRING, NULL, 0, &ServerInfo.network_desc	},
+	{ "hub",		CF_YESNO,   NULL, 0, &ServerInfo.hub		},
+	{ "default_max_clients",CF_INT,	    NULL, 0, &ServerInfo.default_max_clients },
+	{ "network_name",	CF_QSTRING, conf_set_serverinfo_network_name,	0, NULL },
+	{ "name",		CF_QSTRING, conf_set_serverinfo_name,	0, NULL },
+	{ "nicklen",		CF_INT,	    conf_set_serverinfo_nicklen, 0, NULL },
+	{ "sid",		CF_QSTRING, conf_set_serverinfo_sid,	0, NULL },
+	{ "bandb",		CF_QSTRING, conf_set_serverinfo_bandb_path,  0, NULL },
+	{ "vhost",		CF_QSTRING, conf_set_serverinfo_vhost,	0, NULL },
+	{ "vhost6",		CF_QSTRING, conf_set_serverinfo_vhost6, 0, NULL },
+	{ "ssl_private_key",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_private_key },
+	{ "ssl_ca_cert",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_ca_cert },
+	{ "ssl_cert",		CF_QSTRING, NULL, 0, &ServerInfo.ssl_cert },   
+	{ "ssl_dh_params",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_dh_params },
+	{ "ssl_cipher_list",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_cipher_list },
+	{ "ssl_ecdh_named_curve",	CF_QSTRING, NULL, 0, &ServerInfo.ssl_ecdh_named_curve },
+	{ "ssld_count",		CF_INT,	    NULL, 0, &ServerInfo.ssld_count },
+	{ "tls_min_ver",	CF_QSTRING, conf_set_serverinfo_tls_min_ver, 0, NULL },
+	{ "vhost_dns",		CF_QSTRING, conf_set_serverinfo_vhost_dns, 0, NULL },
+	{ "whowas_length",	CF_INT,     conf_set_serverinfo_whowas_length, 0, NULL },
 #ifdef RB_IPV6
-        { "vhost6_dns",		CF_QSTRING, conf_set_serverinfo_vhost6_dns, 0, NULL },
+	{ "vhost6_dns",		CF_QSTRING, conf_set_serverinfo_vhost6_dns, 0, NULL },
 #endif
-        { "\0", 0, NULL, 0, NULL }
+	{ "\0", 0, NULL, 0, NULL }
 };
 
 static struct conf_items conf_admin_table[] =
@@ -2290,33 +2385,33 @@ static struct conf_items conf_admin_table[] =
 
 static struct conf_items conf_log_table[] =
 {
-	{ "fname_userlog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_userlog	},
-	{ "fname_fuserlog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_fuserlog	},
-	{ "fname_operlog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_operlog	},
-	{ "fname_foperlog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_foperlog	},
-	{ "fname_serverlog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_serverlog	},
-	{ "fname_killlog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_killlog	},
-	{ "fname_glinelog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_glinelog	},
-	{ "fname_klinelog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_klinelog	},
-	{ "fname_operspylog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_operspylog	},
-	{ "fname_ioerrorlog", 	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_ioerrorlog },
-	{ "\0",			0,	    NULL, 0,          NULL }
+	{ "fname_userlog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_userlog	},
+	{ "fname_fuserlog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_fuserlog	},
+	{ "fname_operlog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_operlog	},
+	{ "fname_foperlog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_foperlog	},
+	{ "fname_serverlog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_serverlog	},
+	{ "fname_killlog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_killlog	},
+	{ "fname_glinelog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_glinelog	},
+	{ "fname_klinelog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_klinelog	},
+	{ "fname_operspylog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_operspylog	},
+	{ "fname_ioerrorlog",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.fname_ioerrorlog },
+	{ "\0",			0,	    NULL, 0,	      NULL }
 };
 
 static struct conf_items conf_class_table[] =
 {
-	{ "ping_time", 		CF_TIME, conf_set_class_ping_time,			0, NULL },
-	{ "cidr_ipv4_bitlen",	CF_INT,  conf_set_class_cidr_ipv4_bitlen,		0, NULL },
+	{ "ping_time",		CF_TIME, conf_set_class_ping_time,			0, NULL },
+	{ "cidr_ipv4_bitlen",	CF_INT,	 conf_set_class_cidr_ipv4_bitlen,		0, NULL },
 #ifdef RB_IPV6
-	{ "cidr_ipv6_bitlen",	CF_INT,  conf_set_class_cidr_ipv6_bitlen,		0, NULL },
+	{ "cidr_ipv6_bitlen",	CF_INT,	 conf_set_class_cidr_ipv6_bitlen,		0, NULL },
 #endif
-	{ "number_per_cidr",	CF_INT,  conf_set_class_number_per_cidr,		0, NULL },
-	{ "number_per_ip",	CF_INT,  conf_set_class_number_per_ip,		0, NULL },
+	{ "number_per_cidr",	CF_INT,	 conf_set_class_number_per_cidr,		0, NULL },
+	{ "number_per_ip",	CF_INT,	 conf_set_class_number_per_ip,		0, NULL },
 	{ "number_per_ip_global",CF_INT, conf_set_class_number_per_ip_global,	0, NULL },
-	{ "number_per_ident", 	CF_INT,  conf_set_class_number_per_ident,		0, NULL },
-	{ "connectfreq", 	CF_TIME, conf_set_class_connectfreq,		0, NULL },
-	{ "max_number", 	CF_INT,  conf_set_class_max_number,			0, NULL },
-	{ "sendq", 		CF_TIME, conf_set_class_sendq,			0, NULL },
+	{ "number_per_ident",	CF_INT,	 conf_set_class_number_per_ident,		0, NULL },
+	{ "connectfreq",	CF_TIME, conf_set_class_connectfreq,		0, NULL },
+	{ "max_number",		CF_INT,	 conf_set_class_max_number,			0, NULL },
+	{ "sendq",		CF_TIME, conf_set_class_sendq,			0, NULL },
 	{ "\0",	0, NULL, 0, NULL }
 };
 
@@ -2327,7 +2422,7 @@ static struct conf_items conf_auth_table[] =
 	{ "class",	CF_QSTRING, conf_set_auth_class,	0, NULL },
 	{ "spoof",	CF_QSTRING, conf_set_auth_spoof,	0, NULL },
 	{ "redirserv",	CF_QSTRING, conf_set_auth_redirserv,	0, NULL },
-	{ "redirport",	CF_INT,     conf_set_auth_redirport,	0, NULL },
+	{ "redirport",	CF_INT,	    conf_set_auth_redirport,	0, NULL },
 	{ "flags",	CF_STRING | CF_FLIST, conf_set_auth_flags,	0, NULL },
 	{ "\0",	0, NULL, 0, NULL }
 };
@@ -2336,16 +2431,25 @@ static struct conf_items conf_listen_table[] =
 {
 	{ "host",    CF_QSTRING, conf_set_listen_address, 0, NULL },
 	{ "ip",	     CF_QSTRING, conf_set_listen_address, 0, NULL },
-	{ "port",    CF_INT | CF_FLIST, conf_set_listen_port,    0, NULL},
+	{ "port",    CF_INT | CF_FLIST, conf_set_listen_port,	 0, NULL},
 	{ "sslport", CF_INT | CF_FLIST, conf_set_listen_sslport, 0, NULL},
 	{ "aftype",  CF_STRING, conf_set_listen_aftype,	0, NULL},
-	{ "\0", 	0, 	NULL, 0, NULL}
+	{ "\0",		0,	NULL, 0, NULL}
 };
 
 static struct conf_items conf_exempt_table[] = 
 {
 	{ "ip",	CF_QSTRING, conf_set_exempt_ip, 0, NULL },
-	{ "\0", 	0, 	NULL, 0, NULL}
+	{ "\0",		0,	NULL, 0, NULL}
+};
+
+static struct conf_items conf_blacklist_table[] = 
+{
+	{ "match",	CF_QSTRING, conf_set_blacklist_match, 0, NULL },
+	{ "answer",	CF_QSTRING, conf_set_blacklist_answer, 0, NULL},
+	{ "match_other", CF_YESNO,  conf_set_blacklist_match_other, 0, NULL},
+	{ "match_other_answer", CF_QSTRING, conf_set_blacklist_match_other_answer, 0, NULL}, 
+	{ "\0",		0, NULL, 0, NULL}
 };
 
 static struct conf_items conf_operator_table[] =
@@ -2360,17 +2464,17 @@ static struct conf_items conf_operator_table[] =
 
 static struct conf_items conf_general_table[] =
 {
-	{ "oper_only_umodes", 	CF_STRING | CF_FLIST, conf_set_general_oper_only_umodes, 0, NULL },
-	{ "oper_umodes", 	CF_STRING | CF_FLIST, conf_set_general_oper_umodes,	 0, NULL },
-	{ "compression_level", 	CF_INT,    conf_set_general_compression_level,	0, NULL },
-	{ "havent_read_conf", 	CF_YESNO,  conf_set_general_havent_read_conf,	0, NULL },
-	{ "stats_k_oper_only", 	CF_STRING, conf_set_general_stats_k_oper_only,	0, NULL },
-	{ "stats_i_oper_only", 	CF_STRING, conf_set_general_stats_i_oper_only,	0, NULL },
+	{ "delayed_exit_time",	CF_TIME,    NULL, 0, &ConfigFileEntry.delayed_exit_time }, 
+	{ "oper_only_umodes",	CF_STRING | CF_FLIST, conf_set_general_oper_only_umodes, 0, NULL },
+	{ "oper_umodes",	CF_STRING | CF_FLIST, conf_set_general_oper_umodes,	 0, NULL },
+	{ "compression_level",	CF_INT,	   conf_set_general_compression_level,	0, NULL },
+	{ "havent_read_conf",	CF_YESNO,  conf_set_general_havent_read_conf,	0, NULL },
+	{ "stats_k_oper_only",	CF_STRING, conf_set_general_stats_k_oper_only,	0, NULL },
+	{ "stats_i_oper_only",	CF_STRING, conf_set_general_stats_i_oper_only,	0, NULL },
 	{ "hide_error_messages",CF_STRING, conf_set_general_hide_error_messages,0, NULL },
-	{ "kline_delay", 	CF_TIME,   conf_set_general_kline_delay,	0, NULL },
+	{ "kline_delay",	CF_TIME,   conf_set_general_kline_delay,	0, NULL },
 	{ "default_operstring",	CF_QSTRING, NULL, REALLEN,    &ConfigFileEntry.default_operstring },
 	{ "default_adminstring",CF_QSTRING, NULL, REALLEN,    &ConfigFileEntry.default_adminstring },
-	{ "egdpool_path",	CF_QSTRING, NULL, MAXPATHLEN, &ConfigFileEntry.egdpool_path },
 	{ "kline_reason",	CF_QSTRING, NULL, REALLEN, &ConfigFileEntry.kline_reason },
 
 	{ "anti_spam_exit_message_time", CF_TIME,  NULL, 0, &ConfigFileEntry.anti_spam_exit_message_time },
@@ -2383,36 +2487,37 @@ static struct conf_items conf_general_table[] =
 	{ "burst_away",		CF_YESNO, NULL, 0, &ConfigFileEntry.burst_away		},
 	{ "caller_id_wait",	CF_TIME,  NULL, 0, &ConfigFileEntry.caller_id_wait	},
 	{ "client_exit",	CF_YESNO, NULL, 0, &ConfigFileEntry.client_exit		},
-	{ "client_flood",	CF_INT,   NULL, 0, &ConfigFileEntry.client_flood	},
+	{ "client_flood",	CF_INT,	  NULL, 0, &ConfigFileEntry.client_flood	},
 	{ "connect_timeout",	CF_TIME,  NULL, 0, &ConfigFileEntry.connect_timeout	},
 	{ "default_invisible",	CF_YESNO, NULL, 0, &ConfigFileEntry.default_invisible	},
-	{ "default_floodcount", CF_INT,   NULL, 0, &ConfigFileEntry.default_floodcount	},
+	{ "default_floodcount", CF_INT,	  NULL, 0, &ConfigFileEntry.default_floodcount	},
 	{ "disable_auth",	CF_YESNO, NULL, 0, &ConfigFileEntry.disable_auth	},
-	{ "dots_in_ident",	CF_INT,   NULL, 0, &ConfigFileEntry.dots_in_ident	},
+	{ "dot_in_ip6_addr",	CF_YESNO, NULL, 0, &ConfigFileEntry.dot_in_ip6_addr	},
+	{ "dots_in_ident",	CF_INT,	  NULL, 0, &ConfigFileEntry.dots_in_ident	},
 	{ "failed_oper_notice",	CF_YESNO, NULL, 0, &ConfigFileEntry.failed_oper_notice	},
-	{ "hide_spoof_ips",     CF_YESNO, NULL, 0, &ConfigFileEntry.hide_spoof_ips      },
+	{ "hide_spoof_ips",	CF_YESNO, NULL, 0, &ConfigFileEntry.hide_spoof_ips	},
 	{ "glines",		CF_YESNO, NULL, 0, &ConfigFileEntry.glines		},
-	{ "gline_min_cidr",	CF_INT,   NULL, 0, &ConfigFileEntry.gline_min_cidr	},
-	{ "gline_min_cidr6",	CF_INT,   NULL, 0, &ConfigFileEntry.gline_min_cidr6	},
+	{ "gline_min_cidr",	CF_INT,	  NULL, 0, &ConfigFileEntry.gline_min_cidr	},
+	{ "gline_min_cidr6",	CF_INT,	  NULL, 0, &ConfigFileEntry.gline_min_cidr6	},
 	{ "gline_time",		CF_TIME,  NULL, 0, &ConfigFileEntry.gline_time		},
 	{ "dline_with_reason",	CF_YESNO, NULL, 0, &ConfigFileEntry.dline_with_reason	},
 	{ "kline_with_reason",	CF_YESNO, NULL, 0, &ConfigFileEntry.kline_with_reason	},
 	{ "map_oper_only",	CF_YESNO, NULL, 0, &ConfigFileEntry.map_oper_only	},
-	{ "max_accept",		CF_INT,   NULL, 0, &ConfigFileEntry.max_accept		},
-	{ "max_monitor",	CF_INT,   NULL, 0, &ConfigFileEntry.max_monitor		},
+	{ "max_accept",		CF_INT,	  NULL, 0, &ConfigFileEntry.max_accept		},
+	{ "max_monitor",	CF_INT,	  NULL, 0, &ConfigFileEntry.max_monitor		},
 	{ "max_nick_time",	CF_TIME,  NULL, 0, &ConfigFileEntry.max_nick_time	},
-	{ "max_nick_changes",	CF_INT,   NULL, 0, &ConfigFileEntry.max_nick_changes	},
-	{ "max_targets",	CF_INT,   NULL, 0, &ConfigFileEntry.max_targets		},
-	{ "min_nonwildcard",	CF_INT,   NULL, 0, &ConfigFileEntry.min_nonwildcard	},
+	{ "max_nick_changes",	CF_INT,	  NULL, 0, &ConfigFileEntry.max_nick_changes	},
+	{ "max_targets",	CF_INT,	  NULL, 0, &ConfigFileEntry.max_targets		},
+	{ "min_nonwildcard",	CF_INT,	  NULL, 0, &ConfigFileEntry.min_nonwildcard	},
 	{ "nick_delay",		CF_TIME,  NULL, 0, &ConfigFileEntry.nick_delay		},
 	{ "no_oper_flood",	CF_YESNO, NULL, 0, &ConfigFileEntry.no_oper_flood	},
 	{ "operspy_admin_only",	CF_YESNO, NULL, 0, &ConfigFileEntry.operspy_admin_only	},
 	{ "pace_wait",		CF_TIME,  NULL, 0, &ConfigFileEntry.pace_wait		},
 	{ "pace_wait_simple",	CF_TIME,  NULL, 0, &ConfigFileEntry.pace_wait_simple	},
 	{ "ping_cookie",	CF_YESNO, NULL, 0, &ConfigFileEntry.ping_cookie		},
-	{ "reject_after_count",	CF_INT,   NULL, 0, &ConfigFileEntry.reject_after_count	},
+	{ "reject_after_count",	CF_INT,	  NULL, 0, &ConfigFileEntry.reject_after_count	},
 	{ "reject_duration",	CF_TIME,  NULL, 0, &ConfigFileEntry.reject_duration	},
-	{ "throttle_count",	CF_INT,   NULL, 0, &ConfigFileEntry.throttle_count	},
+	{ "throttle_count",	CF_INT,	  NULL, 0, &ConfigFileEntry.throttle_count	},
 	{ "throttle_duration",	CF_TIME,  NULL, 0, &ConfigFileEntry.throttle_duration	},
 	{ "post_registration_delay", CF_TIME, NULL, 0, &ConfigFileEntry.post_registration_delay },
 	{ "short_motd",		CF_YESNO, NULL, 0, &ConfigFileEntry.short_motd		},
@@ -2425,7 +2530,6 @@ static struct conf_items conf_general_table[] =
 	{ "target_change",	CF_YESNO, NULL, 0, &ConfigFileEntry.target_change	},
 	{ "collision_fnc",	CF_YESNO, NULL, 0, &ConfigFileEntry.collision_fnc	},
 	{ "ts_max_delta",	CF_TIME,  NULL, 0, &ConfigFileEntry.ts_max_delta	},
-	{ "use_egd",		CF_YESNO, NULL, 0, &ConfigFileEntry.use_egd		},
 	{ "ts_warn_delta",	CF_TIME,  NULL, 0, &ConfigFileEntry.ts_warn_delta	},
 	{ "use_whois_actually", CF_YESNO, NULL, 0, &ConfigFileEntry.use_whois_actually	},
 	{ "warn_no_nline",	CF_YESNO, NULL, 0, &ConfigFileEntry.warn_no_nline	},
@@ -2433,31 +2537,31 @@ static struct conf_items conf_general_table[] =
 	{ "global_cidr_ipv4_count", CF_INT,  NULL, 0, &ConfigFileEntry.global_cidr_ipv4_count },
 	{ "global_cidr_ipv6_bitlen", CF_INT,  NULL, 0, &ConfigFileEntry.global_cidr_ipv6_bitlen },
 	{ "global_cidr_ipv6_count", CF_INT,  NULL, 0, &ConfigFileEntry.global_cidr_ipv6_count },
-	{ "global_cidr", CF_YESNO,  NULL, 0, &ConfigFileEntry.global_cidr },
-	{ "\0", 		0, 	  NULL, 0, NULL }
+	{ "global_cidr", 	CF_YESNO,  NULL, 0, &ConfigFileEntry.global_cidr },
+	{ "motd_path", 		CF_QSTRING, NULL, 0, &ConfigFileEntry.motd_path },
+	{ "oper_motd_path", 	CF_QSTRING, NULL, 0, &ConfigFileEntry.oper_motd_path },
+	{ "\0",			0,	  NULL, 0, NULL }
 };
 
 static struct conf_items conf_channel_table[] =
 {
-	{ "default_split_user_count",	CF_INT,  NULL, 0, &ConfigChannel.default_split_user_count	 },
+	{ "default_split_user_count",	CF_INT,	 NULL, 0, &ConfigChannel.default_split_user_count	 },
 	{ "default_split_server_count",	CF_INT,	 NULL, 0, &ConfigChannel.default_split_server_count },
 	{ "burst_topicwho",	CF_YESNO, NULL, 0, &ConfigChannel.burst_topicwho	},
 	{ "invite_ops_only",	CF_YESNO, NULL, 0, &ConfigChannel.invite_ops_only	},
 	{ "knock_delay",	CF_TIME,  NULL, 0, &ConfigChannel.knock_delay		},
 	{ "knock_delay_channel",CF_TIME,  NULL, 0, &ConfigChannel.knock_delay_channel	},
-	{ "max_bans",		CF_INT,   NULL, 0, &ConfigChannel.max_bans		},
-	{ "max_chans_per_user", CF_INT,   NULL, 0, &ConfigChannel.max_chans_per_user 	},
-	{ "no_create_on_split", CF_YESNO, NULL, 0, &ConfigChannel.no_create_on_split 	},
+	{ "max_bans",		CF_INT,	  NULL, 0, &ConfigChannel.max_bans		},
+	{ "max_chans_per_user", CF_INT,	  NULL, 0, &ConfigChannel.max_chans_per_user	},
+	{ "no_create_on_split", CF_YESNO, NULL, 0, &ConfigChannel.no_create_on_split	},
 	{ "no_join_on_split",	CF_YESNO, NULL, 0, &ConfigChannel.no_join_on_split	},
-	{ "only_ascii_channels",CF_YESNO, NULL, 0, &ConfigChannel.only_ascii_channels	},
 	{ "quiet_on_ban",	CF_YESNO, NULL, 0, &ConfigChannel.quiet_on_ban		},
 	{ "use_except",		CF_YESNO, NULL, 0, &ConfigChannel.use_except		},
 	{ "use_invex",		CF_YESNO, NULL, 0, &ConfigChannel.use_invex		},
 	{ "use_knock",		CF_YESNO, NULL, 0, &ConfigChannel.use_knock		},
 	{ "use_sslonly",	CF_YESNO, NULL, 0, &ConfigChannel.use_sslonly		},
 	{ "topiclen",		CF_INT,	  NULL, 0, &ConfigChannel.topiclen		},
-	{ "resv_forcepart",     CF_YESNO, NULL, 0, &ConfigChannel.resv_forcepart	},
-	{ "\0", 		0, 	  NULL, 0, NULL }
+	{ "\0",			0,	  NULL, 0, NULL }
 };
 
 static struct conf_items conf_serverhide_table[] =
@@ -2465,8 +2569,8 @@ static struct conf_items conf_serverhide_table[] =
 	{ "disable_hidden",	CF_YESNO, NULL, 0, &ConfigServerHide.disable_hidden	},
 	{ "flatten_links",	CF_YESNO, NULL, 0, &ConfigServerHide.flatten_links	},
 	{ "hidden",		CF_YESNO, NULL, 0, &ConfigServerHide.hidden		},
-	{ "links_delay",        CF_TIME,  conf_set_serverhide_links_delay, 0, NULL      },
-	{ "\0", 		0, 	  NULL, 0, NULL }
+	{ "links_delay",	CF_TIME,  conf_set_serverhide_links_delay, 0, NULL	},
+	{ "\0",			0,	  NULL, 0, NULL }
 };
 
 static struct conf_items conf_connect_table[] =
@@ -2476,7 +2580,7 @@ static struct conf_items conf_connect_table[] =
 	{ "flags",	CF_STRING | CF_FLIST, conf_set_connect_flags,	0, NULL },
 	{ "host",	CF_QSTRING, conf_set_connect_host,	0, NULL },
 	{ "vhost",	CF_QSTRING, conf_set_connect_vhost,	0, NULL },
-	{ "port",	CF_INT,     conf_set_connect_port,	0, NULL },
+	{ "port",	CF_INT,	    conf_set_connect_port,	0, NULL },
 	{ "aftype",	CF_STRING,  conf_set_connect_aftype,	0, NULL },
 	{ "hub_mask",	CF_QSTRING, conf_set_connect_hub_mask,	0, NULL },
 	{ "leaf_mask",	CF_QSTRING, conf_set_connect_leaf_mask,	0, NULL },
@@ -2486,7 +2590,7 @@ static struct conf_items conf_connect_table[] =
 
 static struct conf_items conf_shared_table[] =
 {
-	{ "oper",  CF_QSTRING | CF_FLIST, conf_set_shared_oper,  0, NULL },
+	{ "oper",  CF_QSTRING | CF_FLIST, conf_set_shared_oper,	 0, NULL },
 	{ "flags", CF_STRING | CF_FLIST,  conf_set_shared_flags, 0, NULL },
 	{ "\0",	0, NULL, 0, NULL }
 };
@@ -2495,17 +2599,6 @@ static struct conf_items conf_cluster_table[] =
 {
 	{ "name",  CF_QSTRING,		  conf_set_cluster_name,  0, NULL },
 	{ "flags", CF_STRING | CF_FLIST,  conf_set_cluster_flags, 0, NULL },
-	{ "\0",	0, NULL, 0, NULL }
-};
-
-static struct conf_items conf_blacklist_table[] =
-{
-	{ "host",   CF_QSTRING,		  conf_set_blacklist_host,   0, NULL },
-	{ "reject_reason", CF_QSTRING,	  conf_set_blacklist_reason, 0, NULL },
-	/* The reject_reason field was erroneously named "reason" in the
-	 * ratbox port. Keep accepting the old name.
-	 */
-	{ "reason", CF_QSTRING,		  conf_set_blacklist_reason, 0, NULL },
 	{ "\0",	0, NULL, 0, NULL }
 };
 
@@ -2528,24 +2621,24 @@ struct top_conf_table_t
 
 static struct top_conf_table_t top_conf_table[] =
 {
-	{ "modules", 	NULL,			 NULL,			conf_modules_table, 	0},
+	{ "modules",	NULL,			 NULL,			conf_modules_table,	0},
 	{ "serverinfo",	NULL,			 NULL,			conf_serverinfo_table,	0},
-	{ "admin",	NULL,			 NULL,			conf_admin_table, 	0},
+	{ "admin",	NULL,			 NULL,			conf_admin_table,	0},
 	{ "log",	NULL,			 NULL,			conf_log_table,		0},
 	{ "general",	NULL,			 NULL,			conf_general_table,	0},
-	{ "class",	conf_set_class_start,	 conf_set_class_end, 	conf_class_table,	1},
+	{ "class",	conf_set_class_start,	 conf_set_class_end,	conf_class_table,	1},
 	{ "auth",	conf_set_auth_start,	 conf_set_auth_end,	conf_auth_table,	0},
 	{ "channel",	NULL,			 NULL,			conf_channel_table,	0},
 	{ "serverhide",	NULL,			 NULL,			conf_serverhide_table,	0},
 	{ "listen",	conf_set_listen_init,	 conf_set_listen_init,	conf_listen_table,	0},
 	{ "exempt",	NULL,			 NULL,			conf_exempt_table,	0},
 	{ "operator",	conf_set_start_operator, conf_set_end_operator,	conf_operator_table,	1},
-	{ "connect",	conf_set_start_connect,  conf_set_end_connect,	conf_connect_table,	1},
+	{ "connect",	conf_set_start_connect,	 conf_set_end_connect,	conf_connect_table,	1},
 	{ "shared",	conf_set_shared_cleanup, conf_set_shared_cleanup,conf_shared_table,	0},
 	{ "cluster",	conf_set_cluster_cleanup,conf_set_cluster_cleanup,conf_cluster_table,	0},
-	{ "blacklist",	conf_set_blacklist_cleanup, conf_set_blacklist_cleanup, conf_blacklist_table,	0},
+	{ "blacklist",  conf_set_blacklist_start, conf_set_blacklist_end, conf_blacklist_table, 1},
 #ifdef ENABLE_SERVICES
-	{ "service",	conf_set_service_start,  NULL,			conf_service_table,	0},
+	{ "service",	conf_set_service_start,	 NULL,			conf_service_table,	0},
 #endif
 	{ NULL,		NULL,			 NULL,			NULL,			0},
 };

@@ -48,13 +48,18 @@
 static int mo_rehash(struct Client *, struct Client *, int, const char **);
 
 struct Message rehash_msgtab = {
-	"REHASH", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_rehash, 0}}
+	.cmd = "REHASH",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_rehash },
 };
 
-mapi_clist_av2 rehash_clist[] = { &rehash_msgtab, NULL };
+mapi_clist_av1 rehash_clist[] = { &rehash_msgtab, NULL };
 
-DECLARE_MODULE_AV2(rehash, NULL, NULL, rehash_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(rehash, NULL, NULL, rehash_clist, NULL, NULL, "$Revision$");
 
 struct hash_commands
 {
@@ -93,8 +98,7 @@ rehash_omotd(struct Client *source_p)
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s is forcing re-reading of OPER MOTD file", get_oper_name(source_p));
 
-	free_cachefile(oper_motd);
-	oper_motd = cache_file(OPATH, "opers.motd", 0);
+	cache_oper_motd();
 }
 
 static void
@@ -255,18 +259,18 @@ rehash_help(struct Client *source_p)
 static struct hash_commands rehash_commands[] =
 {
 	{"BANS",	rehash_bans_loc		},
-	{"DNS", 	rehash_dns		},
-	{"MOTD", 	rehash_motd		},
-	{"OMOTD", 	rehash_omotd		},
-	{"GLINES", 	rehash_glines		},
-	{"PGLINES", 	rehash_pglines		},
-	{"TKLINES", 	rehash_tklines		},
-	{"TDLINES", 	rehash_tdlines		},
+	{"DNS",		rehash_dns		},
+	{"MOTD",	rehash_motd		},
+	{"OMOTD",	rehash_omotd		},
+	{"GLINES",	rehash_glines		},
+	{"PGLINES",	rehash_pglines		},
+	{"TKLINES",	rehash_tklines		},
+	{"TDLINES",	rehash_tdlines		},
 	{"TXLINES",	rehash_txlines		},
 	{"TRESVS",	rehash_tresvs		},
 	{"REJECTCACHE",	rehash_rejectcache	},
-	{"HELP", 	rehash_help		},
-	{NULL, 		NULL 			}
+	{"HELP",	rehash_help		},
+	{NULL,		NULL			}
 };
 /* *INDENT-ON* */
 
@@ -279,7 +283,7 @@ mo_rehash(struct Client *client_p, struct Client *source_p, int parc, const char
 {
 	if(!IsOperRehash(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "rehash");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "rehash");
 		return 0;
 	}
 
@@ -293,8 +297,7 @@ mo_rehash(struct Client *client_p, struct Client *source_p, int parc, const char
 		{
 			if(irccmp(parv[1], rehash_commands[x].cmd) == 0)
 			{
-				sendto_one(source_p, form_str(RPL_REHASHING), me.name,
-					   source_p->name, rehash_commands[x].cmd);
+				sendto_one_numeric(source_p, s_RPL(RPL_REHASHING), rehash_commands[x].cmd);
 				rehash_commands[x].handler(source_p);
 				ilog(L_MAIN, "REHASH %s From %s[%s]", parv[1],
 				     get_oper_name(source_p), source_p->sockhost);
@@ -307,14 +310,14 @@ mo_rehash(struct Client *client_p, struct Client *source_p, int parc, const char
 		for(x = 0; rehash_commands[x].cmd != NULL && rehash_commands[x].handler != NULL;
 		    x++)
 		{
-			rb_snprintf_append(cmdbuf, sizeof(cmdbuf), " %s", rehash_commands[x].cmd);
+			rb_strlcat(cmdbuf, " ", sizeof(cmdbuf));
+			rb_strlcat(cmdbuf, rehash_commands[x].cmd, sizeof(cmdbuf));
 		}
 		sendto_one_notice(source_p, ":rehash one of:%s", cmdbuf);
 	}
 	else
 	{
-		sendto_one(source_p, form_str(RPL_REHASHING), me.name, source_p->name,
-			   ConfigFileEntry.configfile);
+		sendto_one_numeric(source_p, s_RPL(RPL_REHASHING), ConfigFileEntry.configfile);
 		sendto_realops_flags(UMODE_ALL, L_ALL,
 				     "%s is rehashing server config file", get_oper_name(source_p));
 		ilog(L_MAIN, "REHASH From %s[%s]", get_oper_name(source_p), source_p->sockhost);

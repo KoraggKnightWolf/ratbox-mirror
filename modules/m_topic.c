@@ -40,17 +40,23 @@
 static int m_topic(struct Client *, struct Client *, int, const char **);
 
 struct Message topic_msgtab = {
-	"TOPIC", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_topic, 2}, {m_topic, 2}, mg_ignore, mg_ignore, {m_topic, 2}}
+	.cmd = "TOPIC",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg }, 
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_topic, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = m_topic, .min_para = 2 },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_topic, .min_para = 2 },
 };
 
-mapi_clist_av2 topic_clist[] = { &topic_msgtab, NULL };
+mapi_clist_av1 topic_clist[] = { &topic_msgtab, NULL };
 
-DECLARE_MODULE_AV2(topic, NULL, NULL, topic_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(topic, NULL, NULL, topic_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_topic
- *      parv[1] = channel name
+ *	parv[0] = sender prefix
+ *	parv[1] = channel name
  *	parv[2] = new topic, if setting topic
  */
 static int
@@ -68,8 +74,7 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(!IsChannelName(parv[1]))
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
 
@@ -77,8 +82,7 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(chptr == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
 
@@ -89,21 +93,24 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 		if(msptr == NULL)
 		{
-			sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
-					   form_str(ERR_NOTONCHANNEL), parv[1]);
+			sendto_one_numeric(source_p, s_RPL(ERR_NOTONCHANNEL), parv[1]);
 			return 0;
 		}
 
 		if((chptr->mode.mode & MODE_TOPICLIMIT) == 0 || is_chanop(msptr))
 		{
 			char topic_info[USERHOST_REPLYLEN];
-			rb_sprintf(topic_info, "%s!%s@%s",
-				   source_p->name, source_p->username, source_p->host);
-			set_channel_topic(chptr, parv[2], topic_info, rb_time());
+			snprintf(topic_info, sizeof(topic_info), "%s!%s@%s",
+				 source_p->name, source_p->username, source_p->host);
+			set_channel_topic(chptr, parv[2], topic_info, rb_current_time());
 
 			sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
 				      ":%s TOPIC %s :%s",
-				      source_p->id, chptr->chname,
+				      use_id(source_p), chptr->chname,
+				      chptr->topic == NULL ? "" : chptr->topic->topic);
+			sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
+				      ":%s TOPIC %s :%s",
+				      source_p->name, chptr->chname,
 				      chptr->topic == NULL ? "" : chptr->topic->topic);
 			sendto_channel_local(ALL_MEMBERS,
 					     chptr, ":%s!%s@%s TOPIC %s :%s",
@@ -112,29 +119,25 @@ m_topic(struct Client *client_p, struct Client *source_p, int parc, const char *
 					     chptr->topic == NULL ? "" : chptr->topic->topic);
 		}
 		else
-			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-				   me.name, source_p->name, parv[1]);
+			sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED), parv[1]);
 	}
 	else if(MyClient(source_p))
 	{
 		if(!IsMember(source_p, chptr) && SecretChannel(chptr))
 		{
-			sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
-					   form_str(ERR_NOTONCHANNEL), parv[1]);
+			sendto_one_numeric(source_p, s_RPL(ERR_NOTONCHANNEL), parv[1]);
 			return 0;
 		}
 		if(chptr->topic == NULL)
-			sendto_one(source_p, form_str(RPL_NOTOPIC),
-				   me.name, source_p->name, parv[1]);
+			sendto_one_numeric(source_p, s_RPL(RPL_NOTOPIC), parv[1]);
 		else
 		{
-			sendto_one(source_p, form_str(RPL_TOPIC),
-				   me.name, source_p->name, chptr->chname, chptr->topic->topic);
+			sendto_one_numeric(source_p, s_RPL(RPL_TOPIC),
+					   chptr->chname, chptr->topic->topic);
 
-			sendto_one(source_p, form_str(RPL_TOPICWHOTIME),
-				   me.name, source_p->name, chptr->chname,
-				   chptr->topic->topic_info,
-				   (unsigned long)chptr->topic->topic_time);
+			sendto_one_numeric(source_p, s_RPL(RPL_TOPICWHOTIME),
+					   chptr->chname,
+					   chptr->topic->topic_info, chptr->topic->topic_time);
 		}
 	}
 

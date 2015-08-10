@@ -36,7 +36,6 @@
 #include "send.h"
 #include "s_log.h"
 
-static char readBuf[READBUF_SIZE];
 static void client_dopacket(struct Client *client_p, char *buffer, size_t length);
 
 
@@ -46,6 +45,7 @@ static void client_dopacket(struct Client *client_p, char *buffer, size_t length
 static void
 parse_client_queued(struct Client *client_p)
 {
+	char readBuf[READBUF_SIZE];
 	int tested = 0;
 	int dolen = 0;
 	int checkflood = 1;
@@ -60,8 +60,8 @@ parse_client_queued(struct Client *client_p)
 			if(client_p->localClient->sent_parsed >= client_p->localClient->allow_read)
 				break;
 
-			dolen = rb_linebuf_get(&client_p->localClient->buf_recvq, readBuf,
-					       READBUF_SIZE, LINEBUF_COMPLETE, LINEBUF_PARSED);
+			dolen = rb_linebuf_get(client_p->localClient->buf_recvq, readBuf,
+					       sizeof(readBuf), LINEBUF_COMPLETE, LINEBUF_PARSED);
 
 			if(dolen <= 0 || IsDead(client_p))
 				break;
@@ -73,7 +73,7 @@ parse_client_queued(struct Client *client_p)
 			if(IsAnyDead(client_p))
 				return;
 			/* if theyve dropped out of the unknown state, break and move
-			 * to the parsing for their appropriate status.  --fl
+			 * to the parsing for their appropriate status.	 --fl
 			 */
 			if(!IsUnknown(client_p))
 			{
@@ -90,7 +90,7 @@ parse_client_queued(struct Client *client_p)
 	{
 		while(!IsAnyDead(client_p)
 		      && (dolen =
-			  rb_linebuf_get(&client_p->localClient->buf_recvq, readBuf, READBUF_SIZE,
+			  rb_linebuf_get(client_p->localClient->buf_recvq, readBuf, sizeof(readBuf),
 					 LINEBUF_COMPLETE, LINEBUF_PARSED)) > 0)
 		{
 			client_dopacket(client_p, readBuf, dolen);
@@ -112,9 +112,9 @@ parse_client_queued(struct Client *client_p)
 			 * the delay has passed.. Everything else will continue to be queued, 
 			 * so just hope the queue is big enough for them.. --anfl
 			 */
-			if(!tested && 
-			   (client_p->localClient->firsttime + ConfigFileEntry.post_registration_delay) > 
-			    rb_time())
+			if(!tested &&
+			   (client_p->localClient->firsttime + ConfigFileEntry.post_registration_delay) >
+			   rb_current_time())
 				break;
 			else
 				tested = 1;
@@ -134,20 +134,18 @@ parse_client_queued(struct Client *client_p)
 			 */
 			if(checkflood)
 			{
-				if(client_p->localClient->sent_parsed >=
-				   client_p->localClient->allow_read)
+				if(client_p->localClient->sent_parsed >= client_p->localClient->allow_read)
 					break;
 			}
 
 			/* allow opers 4 times the amount of messages as users. why 4?
 			 * why not. :) --fl_
 			 */
-			else if(client_p->localClient->sent_parsed >=
-				(4 * client_p->localClient->allow_read))
+			else if(client_p->localClient->sent_parsed >= (4 * client_p->localClient->allow_read))
 				break;
 
-			dolen = rb_linebuf_get(&client_p->localClient->buf_recvq, readBuf,
-					       READBUF_SIZE, LINEBUF_COMPLETE, LINEBUF_PARSED);
+			dolen = rb_linebuf_get(client_p->localClient->buf_recvq, readBuf,
+					       sizeof(readBuf), LINEBUF_COMPLETE, LINEBUF_PARSED);
 
 			if(!dolen)
 				break;
@@ -198,8 +196,7 @@ flood_recalc(void *unused)
 		if(rb_unlikely(IsAnyDead(client_p)))
 			continue;
 
-		if(!IsFloodDone(client_p)
-		   && ((client_p->localClient->firsttime + 30) < rb_time()))
+		if(!IsFloodDone(client_p) && ((client_p->localClient->firsttime + 30) < rb_current_time()))
 			flood_endgrace(client_p);
 	}
 
@@ -227,21 +224,20 @@ flood_recalc(void *unused)
  * read_packet - Read a 'packet' of data from a connection and process it.
  */
 void
-read_packet(rb_fde_t *F, void *data)
+read_packet(rb_fde_t * F, void *data)
 {
 	struct Client *client_p = data;
 	struct LocalUser *lclient_p = client_p->localClient;
+	char readBuf[READBUF_SIZE];
 	int length = 0;
 	int lbuf_len;
 
 	int binary = 0;
-#ifdef USE_IODEBUG_HOOKS
-	hook_data_int hdata;
-#endif
 
-
-	while(1)		/* note..for things like rt sigio to work you *must* loop on read until you get EAGAIN */
+	while(1)		
 	{
+		/* note..for things like rt sigio to work you *must* loop on read until you get EAGAIN */
+
 		if(IsAnyDead(client_p))
 			return;
 
@@ -250,13 +246,12 @@ read_packet(rb_fde_t *F, void *data)
 		 * I personally think it makes the code too hairy to make sane.
 		 *     -- adrian
 		 */
-		length = rb_read(client_p->localClient->F, readBuf, READBUF_SIZE);
+		length = rb_read(client_p->localClient->F, readBuf, sizeof(readBuf));
 		if(length < 0)
 		{
 			if(rb_ignore_errno(errno))
 			{
-				rb_setselect(client_p->localClient->F,
-					     RB_SELECT_READ, read_packet, client_p);
+				rb_setselect(client_p->localClient->F, RB_SELECT_READ, read_packet, client_p);
 			}
 			else
 				error_exit_client(client_p, length);
@@ -268,15 +263,8 @@ read_packet(rb_fde_t *F, void *data)
 			return;
 		}
 
-#ifdef USE_IODEBUG_HOOKS
-		hdata.client = client_p;
-		hdata.arg1 = readBuf;
-		hdata.arg2 = length;
-		call_hook(h_iorecv_id, &hdata);
-#endif
-
-		if(client_p->localClient->lasttime < rb_time())
-			client_p->localClient->lasttime = rb_time();
+		if(client_p->localClient->lasttime < rb_current_time())
+			client_p->localClient->lasttime = rb_current_time();
 		client_p->flags &= ~FLAGS_PINGSENT;
 
 		/*
@@ -287,9 +275,7 @@ read_packet(rb_fde_t *F, void *data)
 		if(IsHandshake(client_p) || IsUnknown(client_p))
 			binary = 1;
 
-		lbuf_len =
-			rb_linebuf_parse(&client_p->localClient->buf_recvq, readBuf, length,
-					 binary);
+		lbuf_len = rb_linebuf_parse(client_p->localClient->buf_recvq, readBuf, length, binary);
 
 		lclient_p->actually_read += lbuf_len;
 
@@ -304,8 +290,7 @@ read_packet(rb_fde_t *F, void *data)
 
 		/* Check to make sure we're not flooding */
 		if(!IsAnyServer(client_p) &&
-		   (rb_linebuf_alloclen(&client_p->localClient->buf_recvq) >
-		    ConfigFileEntry.client_flood))
+		   (rb_linebuf_alloclen(client_p->localClient->buf_recvq) > ConfigFileEntry.client_flood))
 		{
 			if(!(ConfigFileEntry.no_oper_flood && IsOper(client_p)))
 			{
@@ -316,10 +301,9 @@ read_packet(rb_fde_t *F, void *data)
 		}
 
 		/* bail if short read */
-		if(length < READBUF_SIZE)
+		if(length < sizeof(readBuf))
 		{
-			rb_setselect(client_p->localClient->F, RB_SELECT_READ, read_packet,
-				     client_p);
+			rb_setselect(client_p->localClient->F, RB_SELECT_READ, read_packet, client_p);
 			return;
 		}
 	}
@@ -327,17 +311,17 @@ read_packet(rb_fde_t *F, void *data)
 
 /*
  * client_dopacket - copy packet to client buf and parse it
- *      client_p - pointer to client structure for which the buffer data
- *             applies.
- *      buffer - pointr to the buffer containing the newly read data
- *      length - number of valid bytes of data in the buffer
+ *	client_p - pointer to client structure for which the buffer data
+ *	       applies.
+ *	buffer - pointr to the buffer containing the newly read data
+ *	length - number of valid bytes of data in the buffer
  *
  * Note:
- *      It is implicitly assumed that dopacket is called only
- *      with client_p of "local" variation, which contains all the
- *      necessary fields (buffer etc..)
+ *	It is implicitly assumed that dopacket is called only
+ *	with client_p of "local" variation, which contains all the
+ *	necessary fields (buffer etc..)
  */
-void
+static void
 client_dopacket(struct Client *client_p, char *buffer, size_t length)
 {
 	s_assert(client_p != NULL);

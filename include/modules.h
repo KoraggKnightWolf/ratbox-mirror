@@ -29,11 +29,12 @@
 
 #define MAPI_RATBOX 1
 
+#include "setup.h"
 #include "ltdl.h"
-#include "patchlevel.h"
 
 struct module
 {
+	rb_dlink_node node;
 	char *name;
 	const char *version;
 	void *address;
@@ -54,40 +55,39 @@ struct module_path
 #define MAPI_MAGIC(x)	((x) & 0xffff0000)
 #define MAPI_VERSION(x)	((x) & 0x0000ffff)
 
-typedef struct Message *mapi_clist_av2;
+typedef struct Message *mapi_clist_av1;
 
 typedef struct
 {
 	const char *hapi_name;
 	int *hapi_id;
-} mapi_hlist_av2;
+} mapi_hlist_av1;
 
 typedef struct
 {
 	const char *hapi_name;
 	void (*hookfn) (void *);
-} mapi_hfn_list_av2;
+} mapi_hfn_list_av1;
 
-struct mapi_mheader_av2
+struct mapi_mheader_av1
 {
-	int mapi_version;	/* Module API version           */
+	int mapi_version;	/* Module API version		*/
 	int (*mapi_register) (void);	/* Register function;
-					   ret -1 = failure (unload)    */
-	void (*mapi_unregister) (void);	/* Unregister function.         */
-	mapi_clist_av2 *mapi_command_list;	/* List of commands to add.     */
-	mapi_hlist_av2 *mapi_hook_list;	/* List of hooks to add.        */
-	mapi_hfn_list_av2 *mapi_hfn_list;	/* List of hook_add_hook's to do */
-	const char *mapi_module_version;	/* Module's version (freeform)  */
-	int patchlevel;
-	const char *patchlevel_string;
+					   ret -1 = failure (unload)	*/
+	void (*mapi_unregister) (void);	/* Unregister function.		*/
+	mapi_clist_av1 *mapi_command_list;	/* List of commands to add.	*/
+	mapi_hlist_av1 *mapi_hook_list;	/* List of hooks to add.	*/
+	mapi_hfn_list_av1 *mapi_hfn_list;	/* List of hook_add_hook's to do */
+	const char *mapi_module_version;	/* Module's version (freeform)	*/
 };
 
 #ifndef STATIC_MODULES
-# define DECLARE_MODULE_AV2(name,reg,unreg,cl,hl,hfnlist, v) \
-	struct mapi_mheader_av2 _mheader = { MAPI_V2, reg, unreg, cl, hl, hfnlist, v, PATCHLEVEL_NUM, PATCHLEVEL}
+
+# define DECLARE_MODULE_AV1(name,reg,unreg,cl,hl,hfnlist, v) \
+	struct mapi_mheader_av1 _rb_mheader = { MAPI_V2, reg, unreg, cl, hl, hfnlist, v}
 #else
-# define DECLARE_MODULE_AV2(name,reg,unreg,cl,hl,hfnlist, v) \
-	struct mapi_mheader_av2 m_ ## name ## _mheader = { MAPI_V2, reg, unreg, cl, hl, hfnlist, v, PATCHLEVEL_NUM, PATCHLEVEL}
+# define DECLARE_MODULE_AV1(name,reg,unreg,cl,hl,hfnlist, v) \
+	struct mapi_mheader_av1 m_ ## name ## _rb_mheader = { MAPI_V2, reg, unreg, cl, hl, hfnlist, v}
 void load_static_modules(void);
 #endif
 
@@ -103,11 +103,11 @@ void load_all_modules(int warn);
 
 /* load core modules */
 void load_core_modules(int);
-
-int unload_one_module(const char *, int);
-int load_one_module(const char *, int);
-int load_a_module(const char *, int, int);
-int findmodule_byname(const char *);
 void modules_init(void);
+
+
+int load_one_module(const char *path, int coremodule);
+struct module *mod_find_name(const char *name);
+
 
 #endif /* INCLUDED_modules_h */

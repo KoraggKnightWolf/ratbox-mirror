@@ -53,10 +53,10 @@ struct Server
 
 struct ZipStats
 {
-	unsigned long long in;
-	unsigned long long in_wire;
-	unsigned long long out;
-	unsigned long long out_wire;
+	uint64_t in;
+	uint64_t in_wire;
+	uint64_t out;
+	uint64_t out_wire;
 	double in_ratio;
 	double out_ratio;
 };
@@ -70,7 +70,7 @@ struct Client
 	struct Client *servptr;	/* Points to server this Client is on */
 	struct Client *from;	/* == self, if Local Client, *NEVER* NULL! */
 
-	struct Whowas *whowas;	/* Pointers to whowas structs */
+	rb_dlink_list whowas_clist;
 	time_t tsinfo;		/* TS on the nick, SVINFO on server */
 	uint32_t umodes;	/* opers, normal users subset */
 	uint32_t flags;		/* client flags */
@@ -82,7 +82,7 @@ struct Client
 
 	/* client->name is the unique name for a client nick or host */
 	const char *name;
-
+	char *certfp;
 	/* 
 	 * client->username is the username from ident or the USER message, 
 	 * If the client is idented the USER message is ignored, otherwise 
@@ -113,7 +113,6 @@ struct Client
 };
 
 struct _ssl_ctl;
-struct Blacklist;
 
 struct LocalUser
 {
@@ -142,11 +141,11 @@ struct LocalUser
 	uint32_t serial;	/* used to enforce 1 send per nick */
 
 	/* Send and receive linebuf queues .. */
-	buf_head_t buf_sendq;
-	buf_head_t buf_recvq;
+	rb_buf_head_t *buf_sendq;
+	rb_buf_head_t *buf_recvq;
 
-	unsigned long long int sendB;	/* Statistics: total bytes sent */
-	unsigned long long int receiveB;	/* Statistics: total bytes received */
+	uint64_t sendB;	/* Statistics: total bytes sent */
+	uint64_t receiveB;	/* Statistics: total bytes received */
 	uint32_t sendM;		/* Statistics: protocol messages send */
 	uint32_t receiveM;	/* Statistics: protocol messages received */
 	struct Listener *listener;	/* listener accepted from */
@@ -164,10 +163,10 @@ struct LocalUser
 	char *passwd;
 	char *opername;
 	char *fullcaps;
-
+	char *cipher_string;
 	int caps;		/* capabilities bit-field */
 	rb_fde_t *F;
-
+	uint32_t connid;
 	time_t last;
 
 	/* challenge stuff */
@@ -194,7 +193,7 @@ struct LocalUser
 	time_t last_knock;	/* time of last knock */
 	uint32_t random_ping;
 	struct AuthRequest *auth_request;
-
+	char *rblreason;
 	/* target change stuff */
 	void *targets[10];	/* targets were aware of */
 	uint8_t targinfo[2];	/* cyclic array, no in use */
@@ -202,12 +201,11 @@ struct LocalUser
 	struct rb_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
 	struct _ssl_ctl *ssl_ctl;	/* which ssl daemon we're associate with */
 	struct _ssl_ctl *z_ctl;		/* second ctl for ssl+zlib */
+	uint32_t zconnid;
 	uint32_t localflags;
 	struct ZipStats *zipstats;	/* zipstats */
 	uint16_t cork_count;	/* used for corking/uncorking connections */
-	/* XXX These two are only meaningful during registration. */
-	rb_dlink_list dnsbl_queries; /* list of struct BlacklistClient * */
-	struct Blacklist *dnsbl_listed; /* first dnsbl where it's listed */
+	rb_ev_entry *event;	/* used for associated events */
 };
 
 

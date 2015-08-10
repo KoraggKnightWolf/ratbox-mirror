@@ -39,31 +39,37 @@
 static int m_away(struct Client *, struct Client *, int, const char **);
 
 struct Message away_msgtab = {
-	"AWAY", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_away, 0}, {m_away, 0}, mg_ignore, mg_ignore, {m_away, 0}}
+	.cmd = "AWAY",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_away, .min_para = 0 },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = m_away, .min_para = 0  },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_away, .min_para = 0 },
 };
 
-mapi_clist_av2 away_clist[] = { &away_msgtab, NULL };
+mapi_clist_av1 away_clist[] = { &away_msgtab, NULL };
 
-DECLARE_MODULE_AV2(away, NULL, NULL, away_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(away, NULL, NULL, away_clist, NULL, NULL, "$Revision$");
 
 /***********************************************************************
  * m_away() - Added 14 Dec 1988 by jto. 
- *            Not currently really working, I don't like this
- *            call at all...
+ *	      Not currently really working, I don't like this
+ *	      call at all...
  *
- *            ...trying to make it work. I don't like it either,
- *            but perhaps it's worth the load it causes to net.
- *            This requires flooding of the whole net like NICK,
- *            USER, MODE, etc messages...  --msa
+ *	      ...trying to make it work. I don't like it either,
+ *	      but perhaps it's worth the load it causes to net.
+ *	      This requires flooding of the whole net like NICK,
+ *	      USER, MODE, etc messages...  --msa
  *		
- *            The above comments have long since irrelvant, but
- *            are kept for historical purposes now ;)
+ *	      The above comments have long since irrelvant, but
+ *	      are kept for historical purposes now ;)
  ***********************************************************************/
 
 /*
 ** m_away
-**      parv[1] = away message
+**	parv[0] = sender prefix
+**	parv[1] = away message
 */
 static int
 m_away(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -81,30 +87,34 @@ m_away(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		{
 			/* we now send this only if they were away before --is */
 			sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
-				      ":%s AWAY", source_p->id);
-			free_away(source_p);
+				      ":%s AWAY", use_id(source_p));
+			sendto_server(client_p, NULL, NOCAPS, CAP_TS6, ":%s AWAY", source_p->name);
+			rb_free(source_p->user->away);
+			source_p->user->away = NULL;
 		}
 		if(MyConnect(source_p))
-			sendto_one(source_p, form_str(RPL_UNAWAY), me.name, source_p->name);
+			sendto_one_numeric(source_p, s_RPL(RPL_UNAWAY));
 		return 0;
 	}
 
 
 	if(source_p->user->away == NULL)
 	{
-		allocate_away(source_p);
-		rb_strlcpy(source_p->user->away, parv[1], AWAYLEN);
+		source_p->user->away = rb_strndup(parv[1], AWAYLEN);
 		sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
-			      ":%s AWAY :%s", source_p->id, source_p->user->away);
+			      ":%s AWAY :%s", use_id(source_p), source_p->user->away);
+		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
+			      ":%s AWAY :%s", source_p->name, source_p->user->away);
 
 	}
 	else
 	{
-		rb_strlcpy(source_p->user->away, parv[1], AWAYLEN);
+		rb_free(source_p->user->away);
+		source_p->user->away = rb_strndup(parv[1], AWAYLEN);
 	}
 
 	if(MyConnect(source_p))
-		sendto_one(source_p, form_str(RPL_NOWAWAY), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(RPL_NOWAWAY));
 
 	return 0;
 }

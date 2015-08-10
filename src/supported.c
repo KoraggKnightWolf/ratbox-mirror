@@ -55,19 +55,19 @@
  *  by a channel, where:
  *
  *    A = modes that take a parameter, and add or remove nicks
- *        or addresses to a list, such as +bIe for the ban,
- *        invite, and exception lists.
+ *	  or addresses to a list, such as +bIe for the ban,
+ *	  invite, and exception lists.
  *
  *    B = modes that change channel settings, but which take
- *        a parameter when they are set and unset, such as
- *        +k key, and -k key.
+ *	  a parameter when they are set and unset, such as
+ *	  +k key, and -k key.
  *
  *    C = modes that change channel settings, but which take
- *        a parameter only when they are set, such as +l N,
- *        and -l.
+ *	  a parameter only when they are set, such as +l N,
+ *	  and -l.
  *
  *    D = modes that change channel settings, such as +imnpst
- *        and take no parameters.
+ *	  and take no parameters.
  *
  *  All unknown/unlisted modes are treated as type D.
  */
@@ -83,7 +83,6 @@
 #include "stdinc.h"
 #include "struct.h"
 #include "client.h"
-#include "common.h"
 #include "numeric.h"
 #include "ircd.h"
 #include "s_conf.h"
@@ -139,7 +138,7 @@ show_isupport(struct Client *client_p)
 	rb_dlink_node *ptr;
 	struct isupportitem *item;
 	const char *value;
-	char buf[512];
+	char buf[IRCD_BUFSIZE];
 	int extra_space;
 	unsigned int nchars, nparams;
 	int l;
@@ -187,7 +186,7 @@ const char *
 isupport_intptr(const void *ptr)
 {
 	static char buf[15];
-	rb_snprintf(buf, sizeof buf, "%d", *(const int *)ptr);
+	snprintf(buf, sizeof buf, "%d", *(const int *)ptr);
 	return buf;
 }
 
@@ -216,13 +215,12 @@ isupport_chanmodes(const void *ptr)
 {
 	static char result[80];
 
-	rb_snprintf(result, sizeof result, "%s%sb,k,l,imnpst%s%s",
-		    ConfigChannel.use_except ? "e" : "", ConfigChannel.use_invex ? "I" : "",
-		    ConfigChannel.use_sslonly ? "S" : "",
+	snprintf(result, sizeof result, "%s%sb,k,l,imnpstS%s",
+		 ConfigChannel.use_except ? "e" : "", ConfigChannel.use_invex ? "I" : "",
 #ifdef ENABLE_SERVICES
-		    rb_dlink_list_length(&service_list) ? "r" : ""
+		 rb_dlink_list_length(&service_list) ? "r" : ""
 #else
-		    ""
+		 ""
 #endif
 		);
 	return result;
@@ -233,7 +231,7 @@ isupport_chanlimit(const void *ptr)
 {
 	static char result[30];
 
-	rb_snprintf(result, sizeof result, "&#:%i", ConfigChannel.max_chans_per_user);
+	snprintf(result, sizeof result, "&#:%i", ConfigChannel.max_chans_per_user);
 	return result;
 }
 
@@ -242,9 +240,8 @@ isupport_maxlist(const void *ptr)
 {
 	static char result[30];
 
-	rb_snprintf(result, sizeof result, "b%s%s:%i",
-		    ConfigChannel.use_except ? "e" : "",
-		    ConfigChannel.use_invex ? "I" : "", ConfigChannel.max_bans);
+	snprintf(result, sizeof result, "b%s%s:%i",
+		 ConfigChannel.use_except ? "e" : "", ConfigChannel.use_invex ? "I" : "", ConfigChannel.max_bans);
 	return result;
 }
 
@@ -253,19 +250,22 @@ isupport_targmax(const void *ptr)
 {
 	static char result[200];
 
-	rb_snprintf(result, sizeof result,
-		    "NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:%d,NOTICE:%d,ACCEPT:,MONITOR:",
-		    ConfigFileEntry.max_targets, ConfigFileEntry.max_targets);
+	snprintf(result, sizeof result,
+		 "NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:%d,NOTICE:%d,ACCEPT:,MONITOR:",
+		 ConfigFileEntry.max_targets, ConfigFileEntry.max_targets);
 	return result;
 }
 
 void
 init_isupport(void)
 {
-	static int maxmodes = MAXMODEPARAMS;
-	static int nicklen = NICKLEN - 1;
-	static int channellen = LOC_CHANNELLEN;
+	/* These need to be static so they're saved outside of the scope of this function..
+	   the int pointers get used in show_isupport..bleh */
 
+	static int maxmodes = MAXMODEPARAMS;
+	static int channellen = LOC_CHANNELLEN;
+	static int nicklen;
+	nicklen = ServerInfo.nicklen - 1;
 	add_isupport("CHANTYPES", isupport_string, "&#");
 	add_isupport("EXCEPTS", isupport_boolean, &ConfigChannel.use_except);
 	add_isupport("INVEX", isupport_boolean, &ConfigChannel.use_invex);
@@ -279,7 +279,7 @@ init_isupport(void)
 	add_isupport("STATUSMSG", isupport_string, "@+");
 	add_isupport("CALLERID", isupport_string, "g");
 	add_isupport("SAFELIST", isupport_string, "");
-	add_isupport("ELIST", isupport_string, "U");
+	add_isupport("ELIST", isupport_string, "CTU");
 	add_isupport("CASEMAPPING", isupport_string, "rfc1459");
 	add_isupport("CHARSET", isupport_string, "ascii");
 	add_isupport("NICKLEN", isupport_intptr, &nicklen);
@@ -292,5 +292,4 @@ init_isupport(void)
 	add_isupport("MONITOR", isupport_intptr, &ConfigFileEntry.max_monitor);
 	add_isupport("FNC", isupport_string, "");
 	add_isupport("TARGMAX", isupport_targmax, NULL);
-	add_isupport("WHOX", isupport_string, "");
 }

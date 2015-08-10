@@ -40,42 +40,46 @@
 static int m_whowas(struct Client *, struct Client *, int, const char **);
 
 struct Message whowas_msgtab = {
-	"WHOWAS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_whowas, 2}, mg_ignore, mg_ignore, mg_ignore, {m_whowas, 2}}
+	.cmd = "WHOWAS", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_whowas, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_whowas, .min_para = 2 },
 };
 
-mapi_clist_av2 whowas_clist[] = { &whowas_msgtab, NULL };
+mapi_clist_av1 whowas_clist[] = { &whowas_msgtab, NULL };
 
-DECLARE_MODULE_AV2(whowas, NULL, NULL, whowas_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(whowas, NULL, NULL, whowas_clist, NULL, NULL, "$Revision$");
 
 /*
 ** m_whowas
-**      parv[1] = nickname queried
+**	parv[0] = sender prefix
+**	parv[1] = nickname queried
 */
 static int
 m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	struct Whowas *temp;
 	int cur = 0;
-	int max = -1, found = 0;
+	int max = -1;
 	char *p;
 	const char *nick;
 	char tbuf[26];
-
+	rb_dlink_list whowas_list;
+	rb_dlink_node *ptr;
 	static time_t last_used = 0L;
 
 	if(!IsOper(source_p))
 	{
-		if((last_used + ConfigFileEntry.pace_wait_simple) > rb_time())
+		if((last_used + ConfigFileEntry.pace_wait_simple) > rb_current_time())
 		{
-			sendto_one(source_p, form_str(RPL_LOAD2HI),
-				   me.name, source_p->name, "WHOWAS");
-			sendto_one(source_p, form_str(RPL_ENDOFWHOWAS),
-				   me.name, source_p->name, parv[1]);
+			sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "WHOWAS");
+			sendto_one_numeric(source_p, s_RPL(RPL_ENDOFWHOWAS), parv[1]);
 			return 0;
 		}
 		else
-			last_used = rb_time();
+			last_used = rb_current_time();
 	}
 
 
@@ -93,40 +97,43 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	nick = parv[1];
 
-	temp = WHOWASHASH[hash_whowas_name(nick)];
-	found = 0;
-	SetCork(source_p);
-	for(; temp; temp = temp->next)
+
+	memset(&whowas_list, 0, sizeof(whowas_list));
+	get_nickhistory_list(nick, &whowas_list);
+
+	if(rb_dlink_list_length(&whowas_list) == 0)
 	{
-		if(!irccmp(nick, temp->name))
-		{
-			sendto_one(source_p, form_str(RPL_WHOWASUSER),
-				   me.name, source_p->name, temp->name,
+		sendto_one_numeric(source_p, s_RPL(ERR_WASNOSUCHNICK), nick);
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFWHOWAS), parv[1]);
+		return 0;
+	
+	}
+	
+	RB_DLINK_FOREACH(ptr, whowas_list.head)
+	{
+		whowas_t *temp = ptr->data;
+
+		sendto_one_numeric(source_p, s_RPL(RPL_WHOWASUSER), temp->name,
 				   temp->username, temp->hostname, temp->realname);
 
-			if(ConfigFileEntry.use_whois_actually && !EmptyString(temp->sockhost))
-			{
-				if(!temp->spoof
-				   || (temp->spoof && !ConfigFileEntry.hide_spoof_ips
-				       && MyOper(source_p)))
-					sendto_one_numeric(source_p, RPL_WHOISACTUALLY,
-							   form_str(RPL_WHOISACTUALLY), temp->name,
-							   temp->sockhost);
-			}
+		if(ConfigFileEntry.use_whois_actually && !EmptyString(temp->sockhost))
+		{
+			if(!temp->spoof
+			   || (temp->spoof && !ConfigFileEntry.hide_spoof_ips
+			       && MyOper(source_p)))
+				sendto_one_numeric(source_p, s_RPL(RPL_WHOISACTUALLY),
+						   temp->name, temp->sockhost);
+		}
 
-			sendto_one_numeric(source_p, RPL_WHOISSERVER,
-					   form_str(RPL_WHOISSERVER),
+		sendto_one_numeric(source_p, s_RPL(RPL_WHOISSERVER),
 					   temp->name, temp->servername,
 					   rb_ctime(temp->logoff, tbuf, sizeof(tbuf)));
-			cur++;
-			found++;
-		}
+		
+		cur++;
 		if(max > 0 && cur >= max)
 			break;
 	}
-	if(!found)
-		sendto_one(source_p, form_str(ERR_WASNOSUCHNICK), me.name, source_p->name, nick);
-	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_ENDOFWHOWAS), me.name, source_p->name, parv[1]);
+	free_nickhistory_list(&whowas_list);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFWHOWAS), parv[1]);
 	return 0;
 }

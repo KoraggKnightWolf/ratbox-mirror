@@ -48,34 +48,49 @@ static int mo_unresv(struct Client *, struct Client *, int, const char **);
 static int me_unresv(struct Client *, struct Client *, int, const char **);
 
 struct Message resv_msgtab = {
-	"RESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_resv, 5}, {mo_resv, 3}}
+	.cmd = "RESV",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },			      
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_resv, .min_para = 5 },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_resv, .min_para = 3 },
 };
 
 struct Message adminresv_msgtab = {
-	"ADMINRESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_adminresv, 3}}
+	.cmd = "ADMINRESV", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },			      
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_adminresv, .min_para = 3 },
 };
 
 struct Message unresv_msgtab = {
-	"UNRESV", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{mg_ignore, mg_not_oper, mg_ignore, mg_ignore, {me_unresv, 2}, {mo_unresv, 2}}
+	.cmd = "UNRESV",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },			      
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_unresv, .min_para = 2 },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_unresv, .min_para = 2 },
 };
 
-mapi_clist_av2 resv_clist[] = { &resv_msgtab, &adminresv_msgtab, &unresv_msgtab, NULL };
+mapi_clist_av1 resv_clist[] = { &resv_msgtab, &adminresv_msgtab, &unresv_msgtab, NULL };
 
-DECLARE_MODULE_AV2(resv, NULL, NULL, resv_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(resv, NULL, NULL, resv_clist, NULL, NULL, "$Revision$");
 
 static void parse_resv(struct Client *source_p, const char *name,
 		       const char *reason, int temp_time, int perm);
 
 static void remove_resv(struct Client *source_p, const char *name);
-static void resv_chan_forcepart(const char *name, const char *reason, int temp_time);
 
 /*
  * mo_resv()
- *      parv[1] = channel/nick to forbid
- *      parv[2] = reason
+ *	parv[0] = sender prefix
+ *	parv[1] = channel/nick to forbid
+ *	parv[2] = reason
  */
 static int
 mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -88,7 +103,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(!IsOperResv(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "resv");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "resv");
 		return 0;
 	}
 
@@ -107,8 +122,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		if(!IsOperRemoteBan(source_p))
 		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "remoteban");
+			sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "remoteban");
 			return 0;
 		}
 
@@ -118,7 +132,7 @@ mo_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 	if(parc <= loc || EmptyString(parv[loc]))
 	{
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name, "RESV");
+		sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "RESV");
 		return 0;
 	}
 
@@ -148,13 +162,13 @@ mo_adminresv(struct Client *client_p, struct Client *source_p, int parc, const c
 {
 	if(!IsOperResv(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "resv");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "resv");
 		return 0;
 	}
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "admin");
 		return 0;
 	}
 
@@ -172,7 +186,6 @@ me_resv(struct Client *client_p, struct Client *source_p, int parc, const char *
 		return 0;
 
 	parse_resv(source_p, parv[2], parv[4], atoi(parv[1]), 0);
-
 	return 0;
 }
 
@@ -202,9 +215,9 @@ notify_resv(struct Client *source_p, const char *name, const char *reason, int t
 
 /* parse_resv()
  *
- * inputs       - source_p if error messages wanted
- * 		- thing to resv
- * 		- reason for resv
+ * inputs	- source_p if error messages wanted
+ *		- thing to resv
+ *		- reason for resv
  * outputs	-
  * side effects - will parse the resv and create it if valid
  */
@@ -258,18 +271,17 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		add_to_hash(HASH_RESV, aconf->host, aconf);
 
 		notify_resv(source_p, aconf->host, aconf->passwd, temp_time);
-		resv_chan_forcepart(aconf->host, aconf->passwd, temp_time);
 
 		if(temp_time > 0)
 		{
 			aconf->flags |= CONF_FLAGS_TEMPORARY;
-			aconf->hold = rb_time() + temp_time;
+			aconf->hold = rb_current_time() + temp_time;
 		}
 		else
 		{
 			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL,
 				  locked);
-			aconf->hold = rb_time();
+			aconf->hold = rb_current_time();
 		}
 	}
 	else if(clean_resv_nick(name))
@@ -312,13 +324,13 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		if(temp_time > 0)
 		{
 			aconf->flags |= CONF_FLAGS_TEMPORARY;
-			aconf->hold = rb_time() + temp_time;
+			aconf->hold = rb_current_time() + temp_time;
 		}
 		else
 		{
 			bandb_add(BANDB_RESV, source_p, aconf->host, NULL, aconf->passwd, NULL,
 				  locked);
-			aconf->hold = rb_time();
+			aconf->hold = rb_current_time();
 		}
 
 	}
@@ -328,6 +340,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 
 /*
  * mo_unresv()
+ *     parv[0] = sender prefix
  *     parv[1] = channel/nick to unforbid
  */
 static int
@@ -335,7 +348,7 @@ mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 {
 	if(!IsOperResv(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "resv");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "resv");
 		return 0;
 	}
 
@@ -343,8 +356,7 @@ mo_unresv(struct Client *client_p, struct Client *source_p, int parc, const char
 	{
 		if(!IsOperRemoteBan(source_p))
 		{
-			sendto_one(source_p, form_str(ERR_NOPRIVS),
-				   me.name, source_p->name, "remoteban");
+			sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "remoteban");
 			return 0;
 		}
 
@@ -446,55 +458,3 @@ remove_resv(struct Client *source_p, const char *name)
 			     "%s has removed the RESV for: [%s]", get_oper_name(source_p), name);
 	ilog(L_KLINE, "UR %s %s", get_oper_name(source_p), name);
 }
-
-static void 
-resv_chan_forcepart(const char *name, const char *reason, int temp_time)
-{
-	rb_dlink_node *ptr;
-	rb_dlink_node *next_ptr;
-	struct Channel *chptr;
-	struct membership *msptr;
-	struct Client *target_p;
-
-	if(!ConfigChannel.resv_forcepart)
-		return;
-
-	/* for each user on our server in the channel list
-	 * send them a PART, and notify opers.
-	 */
-	chptr = find_channel(name);
-	if(chptr != NULL)
-	{
-		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->locmembers.head)
-		{
-			msptr = ptr->data;
-			target_p = msptr->client_p;
-
-			if(IsExemptResv(target_p))
-				continue;
-
-			sendto_server(target_p, chptr, CAP_TS6, NOCAPS,
-			              ":%s PART %s", target_p->id, chptr->chname);
-
-			sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s PART %s :%s",
-			                     target_p->name, target_p->username,
-			                     target_p->host, chptr->chname, target_p->name);
-
-			remove_user_from_channel(msptr);
-
-			/* notify opers & user they were removed from the channel */
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-			                     "Forced PART for %s!%s@%s from %s (%s)",
-			                     target_p->name, target_p->username, 
-			                     target_p->host, name, reason);
-
-			if(temp_time > 0)
-				sendto_one_notice(target_p, ":*** Channel %s is temporarily unavailable on this server.",
-				           name);
-			else
-				sendto_one_notice(target_p, ":*** Channel %s is no longer available on this server.",
-				           name);
-		}
-	}
-}
-

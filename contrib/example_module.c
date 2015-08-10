@@ -51,30 +51,28 @@ static int mrclient_test(struct Client *client_p, struct Client *source_p, int p
 static int moper_test(struct Client *client_p, struct Client *source_p, int parc,
 		      const char *parv[]);
 
+
 /* Show the commands this module can handle in a msgtab
  * and give the msgtab a name, here its test_msgtab
  */
 
 struct Message test_msgtab = {
-	"TEST",			/* the /COMMAND you want */
-	0,			/* SET TO ZERO -- number of times command used by clients */
-	0,			/* SET TO ZERO -- number of times command used by clients */
-	0,			/* SET TO ZERO -- number of times command used by clients */
-	MFLG_SLOW,		/* ALWAYS SET TO MFLG_SLOW */
+	.cmd = "TEST",			/* the /COMMAND you want */
 
 	/* the functions to call for each handler.  If not using the generic
 	 * handlers, the first param is the function to call, the second is the
 	 * required number of parameters.  NOTE: If you specify a min para of 2,
 	 * then parv[1] must *also* be non-empty.
-	 */
-	{
-	 {munreg_test, 0},	/* function call for unregistered clients, 0 parms required */
-	 {mclient_test, 0},	/* function call for local clients, 0 parms required */
-	 {mrclient_test, 0},	/* function call for remote clients, 0 parms required */
-	 {mserver_test, 0},	/* function call for servers, 0 parms required */
-	 mg_ignore,		/* function call for ENCAP, unused in this test */
-	 {moper_test, 0}	/* function call for operators, 0 parms required */
-	 }
+	 * 
+	 * You can also omit defining the .min_para field if it is zero
+ 	 */
+
+	.handlers[UNREGISTERED_HANDLER]	=	{ .handler = munreg_test, 	.min_para = 0 },
+	.handlers[CLIENT_HANDLER] =		{ .handler = mclient_test, 	.min_para = 0 },	
+	.handlers[RCLIENT_HANDLER] =		{ .handler = mrclient_test,	.min_para = 0 },
+	.handlers[SERVER_HANDLER] =		{ .handler = mserver_test,	.min_para = 0 }, 
+	.handlers[ENCAP_HANDLER] = 		{ .handler = m_ignore, 		.min_para = 0 },
+	.handlers[OPER_HANDLER] = 		{ .handler = moper_test,	.min_para = 0 },
 };
 
 /*
@@ -91,32 +89,32 @@ struct Message test_msgtab = {
  */
 
 
-/* The mapi_clist_av2 indicates which commands (struct Message)
+/* The mapi_clist_av1 indicates which commands (struct Message)
  * should be loaded from the module. The list should be terminated
  * by a NULL.
  */
-mapi_clist_av2 test_clist[] = { &test_msgtab, NULL };
+mapi_clist_av1 test_clist[] = { &test_msgtab, NULL };
 
-/* The mapi_hlist_av2 indicates which hook functions we need to be able to
+/* The mapi_hlist_av1 indicates which hook functions we need to be able to
  * call.  We need to declare an integer, then add the name of the hook
  * function to call and a pointer to this integer.  The list should be
  * terminated with NULLs.
  */
 int doing_example_hook;
-mapi_hlist_av2 test_hlist[] = {
-	{"doing_example_hook", &doing_example_hook,},
+mapi_hlist_av1 test_hlist[] = {
+	{ .hapi_name = "doing_example_hook", .hapi_id = &doing_example_hook,},
 	{NULL, NULL}
 };
 
-/* The mapi_hfn_list_av2 declares the hook functions which other modules can
+/* The mapi_hfn_list_av1 declares the hook functions which other modules can
  * call.  The first parameter is the name of the hook, the second is a void
  * returning function, with arbitrary parameters casted to (hookfn).  This
  * list must be terminated with NULLs.
  */
 static void show_example_hook(void *unused);
 
-mapi_hfn_list_av2 test_hfnlist[] = {
-	{"doing_example_hook", (hookfn) show_example_hook},
+mapi_hfn_list_av1 test_hfnlist[] = {
+	{ .hapi_name = "doing_example_hook", .hookfn = (hookfn) show_example_hook},
 	{NULL, NULL}
 };
 
@@ -138,8 +136,8 @@ moddeinit(void)
 	/* Again, nothing to do. */
 }
 
-/* DECLARE_MODULE_AV2() actually declare the MAPI header. */
-DECLARE_MODULE_AV2(
+/* DECLARE_MODULE_AV1() actually declare the MAPI header. */
+DECLARE_MODULE_AV1(
 			  /* The first argument is the name */
 			  example,
 			  /* The second argument is the function to call on load */
@@ -160,6 +158,7 @@ DECLARE_MODULE_AV2(
 
 /*
  * mr_test
+ *      parv[0] = sender prefix
  *      parv[1] = parameter
  */
 
@@ -188,6 +187,7 @@ munreg_test(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 /*
  * mclient_test
+ *      parv[0] = sender prefix
  *      parv[1] = parameter
  */
 static int
@@ -213,6 +213,7 @@ mclient_test(struct Client *client_p, struct Client *source_p, int parc, const c
 
 /*
  * mrclient_test
+ *      parv[0] = sender prefix
  *      parv[1] = parameter
  */
 static int
@@ -235,6 +236,7 @@ mrclient_test(struct Client *client_p, struct Client *source_p, int parc, const 
 
 /*
  * mserver_test
+ *      parv[0] = sender prefix
  *      parv[1] = parameter
  */
 static int
@@ -257,6 +259,7 @@ mserver_test(struct Client *client_p, struct Client *source_p, int parc, const c
 
 /*
  * moper_test
+ *      parv[0] = sender prefix
  *      parv[1] = parameter
  */
 static int

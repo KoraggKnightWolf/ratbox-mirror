@@ -39,18 +39,24 @@ static int m_locops(struct Client *, struct Client *, int, const char **);
 static int me_locops(struct Client *, struct Client *, int, const char **);
 
 struct Message locops_msgtab = {
-	"LOCOPS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_locops, 2}, {m_locops, 2}}
+	.cmd = "LOCOPS", 
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{  mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_locops, .min_para = 2 },
+	.handlers[OPER_HANDLER] =		{ .handler = m_locops, .min_para = 2 },
 };
 
-mapi_clist_av2 locops_clist[] = { &locops_msgtab, NULL };
+mapi_clist_av1 locops_clist[] = { &locops_msgtab, NULL };
 
-DECLARE_MODULE_AV2(locops, NULL, NULL, locops_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(locops, NULL, NULL, locops_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_locops - LOCOPS message handler
  * (write to *all* local opers currently online)
- *      parv[1] = message text
+ *	parv[0] = sender prefix
+ *	parv[1] = message text
  */
 static int
 m_locops(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])

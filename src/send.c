@@ -30,7 +30,6 @@
 #include "channel.h"
 #include "class.h"
 #include "client.h"
-#include "common.h"
 #include "match.h"
 #include "ircd.h"
 #include "numeric.h"
@@ -41,10 +40,9 @@
 #include "hook.h"
 #include "monitor.h"
 
-#define LOG_BUFSIZE 2048
 
-uint32_t current_serial = 0L;
-static void send_queued_write(rb_fde_t *F, void *data);
+static uint32_t current_serial = 0L;
+static void send_queued_write(rb_fde_t * F, void *data);
 static void send_queued(struct Client *to);
 
 
@@ -55,7 +53,7 @@ static void send_queued(struct Client *to);
  * side effects - linebuf is attached to client
  */
 static int
-send_linebuf(struct Client *to, buf_head_t * linebuf)
+send_linebuf(struct Client *to, rb_buf_head_t * linebuf)
 {
 	if(IsMe(to))
 	{
@@ -66,19 +64,16 @@ send_linebuf(struct Client *to, buf_head_t * linebuf)
 	if(!MyConnect(to) || IsIOError(to))
 		return 0;
 
-	if(rb_linebuf_len(&to->localClient->buf_sendq) > get_sendq(to))
+	if(rb_linebuf_len(to->localClient->buf_sendq) > get_sendq(to))
 	{
 		if(IsServer(to))
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "Max SendQ limit exceeded for %s: %u > %lu",
-					     to->name,
-					     rb_linebuf_len(&to->localClient->buf_sendq),
-					     get_sendq(to));
+					     "Max SendQ limit exceeded for %s: %zu > %lu",
+					     to->name, rb_linebuf_len(to->localClient->buf_sendq), get_sendq(to));
 
-			ilog(L_SERVER, "Max SendQ limit exceeded for %s: %u > %lu",
-			     log_client_name(to, SHOW_IP),
-			     rb_linebuf_len(&to->localClient->buf_sendq), get_sendq(to));
+			ilog(L_SERVER, "Max SendQ limit exceeded for %s: %zu > %lu",
+			     log_client_name(to, SHOW_IP), rb_linebuf_len(to->localClient->buf_sendq), get_sendq(to));
 		}
 
 		dead_link(to, 1);
@@ -89,7 +84,7 @@ send_linebuf(struct Client *to, buf_head_t * linebuf)
 		/* just attach the linebuf to the sendq instead of
 		 * generating a new one
 		 */
-		rb_linebuf_attach(&to->localClient->buf_sendq, linebuf);
+		rb_linebuf_attach(to->localClient->buf_sendq, linebuf);
 	}
 
 	/*
@@ -100,7 +95,7 @@ send_linebuf(struct Client *to, buf_head_t * linebuf)
 	to->localClient->sendM += 1;
 	me.localClient->sendM += 1;
 
-	if(rb_linebuf_len(&to->localClient->buf_sendq) > 0)
+	if(rb_linebuf_len(to->localClient->buf_sendq) > 0)
 		send_queued(to);
 	return 0;
 }
@@ -112,7 +107,7 @@ send_pop_queue(struct Client *to)
 		to = to->from;
 	if(!MyConnect(to) || IsIOError(to))
 		return;
-	if(rb_linebuf_len(&to->localClient->buf_sendq) > 0)
+	if(rb_linebuf_len(to->localClient->buf_sendq) > 0)
 		send_queued(to);
 }
 
@@ -123,7 +118,7 @@ send_pop_queue(struct Client *to)
  * side effects - client has linebuf attached
  */
 static void
-send_rb_linebuf_remote(struct Client *to, struct Client *from, buf_head_t * linebuf)
+send_rb_linebuf_remote(struct Client *to, struct Client *from, rb_buf_head_t * linebuf)
 {
 	if(to->from)
 		to = to->from;
@@ -160,9 +155,7 @@ static void
 send_queued(struct Client *to)
 {
 	int retlen;
-#ifdef USE_IODEBUG_HOOKS
-	hook_data_int hd;
-#endif
+
 	/* cant write anything to a dead socket. */
 	if(IsIOError(to))
 		return;
@@ -175,29 +168,11 @@ send_queued(struct Client *to)
 	if(IsFlush(to))
 		return;
 
-#ifdef USE_IODEBUG_HOOKS
-	hd.client = to;
-	if(to->localClient->buf_sendq.list.head)
-		hd.arg1 = ((buf_line_t *) to->localClient->buf_sendq.list.head->data)->buf +
-			to->localClient->buf_sendq.writeofs;
-#endif
-
-	if(rb_linebuf_len(&to->localClient->buf_sendq))
+	if(rb_linebuf_len(to->localClient->buf_sendq))
 	{
-		while((retlen =
-		       rb_linebuf_flush(to->localClient->F, &to->localClient->buf_sendq)) > 0)
+		while((retlen = rb_linebuf_flush(to->localClient->F, to->localClient->buf_sendq)) > 0)
 		{
 			/* We have some data written .. update counters */
-#ifdef USE_IODEBUG_HOOKS
-			hd.arg2 = retlen;
-			call_hook(h_iosend_id, &hd);
-
-			if(to->localClient->buf_sendq.list.head)
-				hd.arg1 =
-					((buf_line_t *) to->localClient->buf_sendq.list.
-					 head->data)->buf + to->localClient->buf_sendq.writeofs;
-#endif
-
 			ClearFlush(to);
 
 			to->localClient->sendB += retlen;
@@ -210,7 +185,7 @@ send_queued(struct Client *to)
 			return;
 		}
 	}
-	if(rb_linebuf_len(&to->localClient->buf_sendq))
+	if(rb_linebuf_len(to->localClient->buf_sendq))
 	{
 		SetFlush(to);
 		rb_setselect(to->localClient->F, RB_SELECT_WRITE, send_queued_write, to);
@@ -227,7 +202,7 @@ send_queued(struct Client *to)
  * side effects - write is scheduled if queue isnt emptied
  */
 static void
-send_queued_write(rb_fde_t *F, void *data)
+send_queued_write(rb_fde_t * F, void *data)
 {
 	struct Client *to = data;
 	ClearFlush(to);
@@ -242,7 +217,7 @@ send_queued_write(rb_fde_t *F, void *data)
 void
 sendto_one_buffer(struct Client *target_p, const char *buffer)
 {
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 
 	if(target_p->from != NULL)
 		target_p = target_p->from;
@@ -250,10 +225,10 @@ sendto_one_buffer(struct Client *target_p, const char *buffer)
 	if(IsIOError(target_p))
 		return;
 
-	rb_linebuf_newbuf(&linebuf);
-	rb_linebuf_putbuf(&linebuf, buffer);
-	send_linebuf(target_p, &linebuf);
-	rb_linebuf_donebuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
+	rb_linebuf_putbuf(linebuf, buffer);
+	send_linebuf(target_p, linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /* sendto_one()
@@ -266,7 +241,7 @@ void
 sendto_one(struct Client *target_p, const char *pattern, ...)
 {
 	va_list args;
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 
 	/* send remote if to->from non NULL */
 	if(target_p->from != NULL)
@@ -275,15 +250,15 @@ sendto_one(struct Client *target_p, const char *pattern, ...)
 	if(IsIOError(target_p))
 		return;
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 
 	va_start(args, pattern);
-	rb_linebuf_putmsg(&linebuf, pattern, &args, NULL);
+	rb_linebuf_putmsg(linebuf, pattern, &args, NULL);
 	va_end(args);
 
-	send_linebuf(target_p, &linebuf);
+	send_linebuf(target_p, linebuf);
 
-	rb_linebuf_donebuf(&linebuf);
+	rb_linebuf_donebuf(linebuf);
 
 }
 
@@ -295,13 +270,11 @@ sendto_one(struct Client *target_p, const char *pattern, ...)
  * side effects - source(us)/target is chosen based on TS6 capability
  */
 void
-sendto_one_prefix(struct Client *target_p, struct Client *source_p,
-		  const char *command, const char *pattern, ...)
+sendto_one_prefix(struct Client *target_p, struct Client *source_p, const char *command, const char *pattern, ...)
 {
 	struct Client *dest_p;
 	va_list args;
-	buf_head_t linebuf;
-
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 	/* send remote if to->from non NULL */
 	if(target_p->from != NULL)
 		dest_p = target_p->from;
@@ -317,15 +290,14 @@ sendto_one_prefix(struct Client *target_p, struct Client *source_p,
 		return;
 	}
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 	va_start(args, pattern);
-	rb_linebuf_putmsg(&linebuf, pattern, &args,
-			  ":%s %s %s ",
-			  get_id(source_p, target_p), command, get_id(target_p, target_p));
+	rb_linebuf_putmsg(linebuf, pattern, &args,
+			  ":%s %s %s ", get_id(source_p, target_p), command, get_id(target_p, target_p));
 	va_end(args);
 
-	send_linebuf(dest_p, &linebuf);
-	rb_linebuf_donebuf(&linebuf);
+	send_linebuf(dest_p, linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /*
@@ -337,11 +309,11 @@ sendto_one_prefix(struct Client *target_p, struct Client *source_p,
 static void
 sendto_one_notice_local(struct Client *target_p, const char *pattern, va_list * ap)
 {
-	buf_head_t linebuf;
-	rb_linebuf_newbuf(&linebuf);
-	rb_linebuf_putmsg(&linebuf, pattern, ap, ":%s NOTICE %s ", me.name, target_p->name);
-	send_linebuf(target_p, &linebuf);
-	rb_linebuf_donebuf(&linebuf);
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
+	rb_linebuf_newbuf(linebuf);
+	rb_linebuf_putmsg(linebuf, pattern, ap, ":%s NOTICE %s ", me.name, target_p->name);
+	send_linebuf(target_p, linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /* sendto_one_notice()
@@ -355,8 +327,8 @@ sendto_one_notice(struct Client *target_p, const char *pattern, ...)
 {
 	struct Client *dest_p;
 	va_list args;
-	buf_head_t linebuf;
-
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
+	
 	if(MyConnect(target_p))
 	{
 		if(IsIOError(target_p))
@@ -378,14 +350,14 @@ sendto_one_notice(struct Client *target_p, const char *pattern, ...)
 		return;
 	}
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 	va_start(args, pattern);
-	rb_linebuf_putmsg(&linebuf, pattern, &args,
+	rb_linebuf_putmsg(linebuf, pattern, &args,
 			  ":%s NOTICE %s ", get_id(&me, target_p), get_id(target_p, target_p));
 	va_end(args);
 
-	send_linebuf(dest_p, &linebuf);
-	rb_linebuf_donebuf(&linebuf);
+	send_linebuf(dest_p, linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 
@@ -400,7 +372,8 @@ sendto_one_numeric(struct Client *target_p, int numeric, const char *pattern, ..
 {
 	struct Client *dest_p;
 	va_list args;
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
+	const char *name;
 
 	/* send remote if to->from non NULL */
 	if(target_p->from != NULL)
@@ -417,30 +390,33 @@ sendto_one_numeric(struct Client *target_p, int numeric, const char *pattern, ..
 		return;
 	}
 
-	rb_linebuf_newbuf(&linebuf);
+	name = get_id(target_p, target_p);
+	if(EmptyString(name))
+	{
+		name = "*";
+	}
+	rb_linebuf_newbuf(linebuf);
 	va_start(args, pattern);
-	rb_linebuf_putmsg(&linebuf, pattern, &args,
-			  ":%s %03d %s ",
-			  get_id(&me, target_p), numeric, get_id(target_p, target_p));
+	rb_linebuf_putmsg(linebuf, pattern, &args, ":%s %03d %s ", get_id(&me, target_p), numeric, name);
 	va_end(args);
 
-	send_linebuf(dest_p, &linebuf);
-	rb_linebuf_donebuf(&linebuf);
+	send_linebuf(dest_p, linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /*
  * sendto_server
  * 
- * inputs       - pointer to client to NOT send to
- *              - caps or'd together which must ALL be present
- *              - caps or'd together which must ALL NOT be present
- *              - printf style format string
- *              - args to format string
- * output       - NONE
+ * inputs	- pointer to client to NOT send to
+ *		- caps or'd together which must ALL be present
+ *		- caps or'd together which must ALL NOT be present
+ *		- printf style format string
+ *		- args to format string
+ * output	- NONE
  * side effects - Send a message to all connected servers, except the
- *                client 'one' (if non-NULL), as long as the servers
- *                support ALL capabs in 'caps', and NO capabs in 'nocaps'.
- *            
+ *		  client 'one' (if non-NULL), as long as the servers
+ *		  support ALL capabs in 'caps', and NO capabs in 'nocaps'.
+ *	      
  * This function was written in an attempt to merge together the other
  * billion sendto_*serv*() functions, which sprung up with capabs, uids etc
  * -davidt
@@ -453,13 +429,7 @@ sendto_server(struct Client *one, struct Channel *chptr, unsigned long caps,
 	struct Client *target_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	buf_head_t linebuf;
-
-	if(nocaps & CAP_TS6)
-	{
-		/* nothing should do this now */
-		abort();
-	}
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 
 	/* noone to send to.. */
 	if(rb_dlink_list_length(&serv_list) == 0)
@@ -468,9 +438,9 @@ sendto_server(struct Client *one, struct Channel *chptr, unsigned long caps,
 	if(chptr != NULL && *chptr->chname != '#')
 		return;
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 	va_start(args, format);
-	rb_linebuf_putmsg(&linebuf, format, &args, NULL);
+	rb_linebuf_putmsg(linebuf, format, &args, NULL);
 	va_end(args);
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, serv_list.head)
@@ -489,10 +459,10 @@ sendto_server(struct Client *one, struct Channel *chptr, unsigned long caps,
 		if(!NotCapable(target_p, nocaps))
 			continue;
 
-		send_linebuf(target_p, &linebuf);
+		send_linebuf(target_p, linebuf);
 	}
 
-	rb_linebuf_donebuf(&linebuf);
+	rb_linebuf_donebuf(linebuf);
 
 }
 
@@ -506,32 +476,34 @@ void
 sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 		     struct Channel *chptr, const char *pattern, ...)
 {
-	static char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	va_list args;
-	buf_head_t rb_linebuf_local;
-	buf_head_t rb_linebuf_id;
+	rb_buf_head_t *rb_linebuf_local = alloca(rb_linebuf_bufhead_size());
+	rb_buf_head_t *rb_linebuf_name = alloca(rb_linebuf_bufhead_size());
+	rb_buf_head_t *rb_linebuf_id = alloca(rb_linebuf_bufhead_size());;
 	struct Client *target_p;
 	struct membership *msptr;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
-	rb_linebuf_newbuf(&rb_linebuf_local);
-	rb_linebuf_newbuf(&rb_linebuf_id);
+	rb_linebuf_newbuf(rb_linebuf_local);
+	rb_linebuf_newbuf(rb_linebuf_name);
+	rb_linebuf_newbuf(rb_linebuf_id);
 
 	current_serial++;
 
 	va_start(args, pattern);
-	rb_vsnprintf(buf, sizeof(buf), pattern, args);
+	vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
 	if(IsServer(source_p))
-		rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL, ":%s %s", source_p->name, buf);
+		rb_linebuf_putmsg(rb_linebuf_local, NULL, NULL, ":%s %s", source_p->name, buf);
 	else
-		rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL,
-				  ":%s!%s@%s %s",
-				  source_p->name, source_p->username, source_p->host, buf);
+		rb_linebuf_putmsg(rb_linebuf_local, NULL, NULL,
+				  ":%s!%s@%s %s", source_p->name, source_p->username, source_p->host, buf);
 
-	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", source_p->id, buf);
+	rb_linebuf_putmsg(rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
+	rb_linebuf_putmsg(rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->members.head)
 	{
@@ -557,16 +529,21 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 
 			if(target_p->from->localClient->serial != current_serial)
 			{
-				send_rb_linebuf_remote(target_p, source_p, &rb_linebuf_id);
+				if(has_id(target_p->from))
+					send_rb_linebuf_remote(target_p, source_p, rb_linebuf_id);
+				else
+					send_rb_linebuf_remote(target_p, source_p, rb_linebuf_name);
+
 				target_p->from->localClient->serial = current_serial;
 			}
 		}
 		else
-			send_linebuf(target_p, &rb_linebuf_local);
+			send_linebuf(target_p, rb_linebuf_local);
 	}
 
-	rb_linebuf_donebuf(&rb_linebuf_local);
-	rb_linebuf_donebuf(&rb_linebuf_id);
+	rb_linebuf_donebuf(rb_linebuf_local);
+	rb_linebuf_donebuf(rb_linebuf_name);
+	rb_linebuf_donebuf(rb_linebuf_id);
 }
 
 
@@ -580,16 +557,16 @@ void
 sendto_channel_local(int type, struct Channel *chptr, const char *pattern, ...)
 {
 	va_list args;
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 	struct membership *msptr;
 	struct Client *target_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 
 	va_start(args, pattern);
-	rb_linebuf_putmsg(&linebuf, pattern, &args, NULL);
+	rb_linebuf_putmsg(linebuf, pattern, &args, NULL);
 	va_end(args);
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->locmembers.head)
@@ -603,10 +580,10 @@ sendto_channel_local(int type, struct Channel *chptr, const char *pattern, ...)
 		if(type && ((msptr->flags & type) == 0))
 			continue;
 
-		send_linebuf(target_p, &linebuf);
+		send_linebuf(target_p, linebuf);
 	}
 
-	rb_linebuf_donebuf(&linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /*
@@ -616,7 +593,7 @@ sendto_channel_local(int type, struct Channel *chptr, const char *pattern, ...)
  *		- pattern to send
  * output	- NONE
  * side effects	- Sends a message to all people on local server who are
- * 		  in same channel with user. 
+ *		  in same channel with user. 
  *		  used by m_nick.c and exit_one_client.
  */
 void
@@ -631,11 +608,11 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 	struct Client *target_p;
 	struct membership *msptr;
 	struct membership *mscptr;
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());;
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 	va_start(args, pattern);
-	rb_linebuf_putmsg(&linebuf, pattern, &args, NULL);
+	rb_linebuf_putmsg(linebuf, pattern, &args, NULL);
 	va_end(args);
 
 	++current_serial;
@@ -654,7 +631,7 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 				continue;
 
 			target_p->localClient->serial = current_serial;
-			send_linebuf(target_p->from ? target_p->from : target_p, &linebuf);
+			send_linebuf(target_p->from ? target_p->from : target_p, linebuf);
 		}
 	}
 
@@ -662,9 +639,9 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 	 * need to send them the data, ie a nick change
 	 */
 	if(MyConnect(user) && (user->localClient->serial != current_serial))
-		send_linebuf(user->from ? user->from : user, &linebuf);
+		send_linebuf(user->from ? user->from : user, linebuf);
 
-	rb_linebuf_donebuf(&linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /* sendto_match_butone()
@@ -674,32 +651,34 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
  * side effects - message is sent to matching clients
  */
 void
-sendto_match_butone(struct Client *one, struct Client *source_p,
-		    const char *mask, int what, const char *pattern, ...)
+sendto_match_butone(struct Client *one, struct Client *source_p, const char *mask, int what, const char *pattern, ...)
 {
-	static char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	va_list args;
 	struct Client *target_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	buf_head_t rb_linebuf_local;
-	buf_head_t rb_linebuf_id;
+	size_t bz = rb_linebuf_bufhead_size();
+	rb_buf_head_t *rb_linebuf_local = alloca(bz);
+	rb_buf_head_t *rb_linebuf_name = alloca(bz);
+	rb_buf_head_t *rb_linebuf_id = alloca(bz);
 
-	rb_linebuf_newbuf(&rb_linebuf_local);
-	rb_linebuf_newbuf(&rb_linebuf_id);
+	rb_linebuf_newbuf(rb_linebuf_local);
+	rb_linebuf_newbuf(rb_linebuf_name);
+	rb_linebuf_newbuf(rb_linebuf_id);
 
 	va_start(args, pattern);
-	rb_vsnprintf(buf, sizeof(buf), pattern, args);
+	vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
 	if(IsServer(source_p))
-		rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL, ":%s %s", source_p->name, buf);
+		rb_linebuf_putmsg(rb_linebuf_local, NULL, NULL, ":%s %s", source_p->name, buf);
 	else
-		rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL,
-				  ":%s!%s@%s %s",
-				  source_p->name, source_p->username, source_p->host, buf);
+		rb_linebuf_putmsg(rb_linebuf_local, NULL, NULL,
+				  ":%s!%s@%s %s", source_p->name, source_p->username, source_p->host, buf);
 
-	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", source_p->id, buf);
+	rb_linebuf_putmsg(rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
+	rb_linebuf_putmsg(rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
 
 	if(what == MATCH_HOST)
 	{
@@ -708,7 +687,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p,
 			target_p = ptr->data;
 
 			if(match(mask, target_p->host))
-				send_linebuf(target_p, &rb_linebuf_local);
+				send_linebuf(target_p, rb_linebuf_local);
 		}
 	}
 	/* what = MATCH_SERVER, if it doesnt match us, just send remote */
@@ -717,7 +696,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p,
 		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 		{
 			target_p = ptr->data;
-			send_linebuf(target_p, &rb_linebuf_local);
+			send_linebuf(target_p, rb_linebuf_local);
 		}
 	}
 
@@ -728,39 +707,46 @@ sendto_match_butone(struct Client *one, struct Client *source_p,
 		if(target_p == one)
 			continue;
 
-		send_rb_linebuf_remote(target_p, source_p, &rb_linebuf_id);
+		if(has_id(target_p))
+			send_rb_linebuf_remote(target_p, source_p, rb_linebuf_id);
+		else
+			send_rb_linebuf_remote(target_p, source_p, rb_linebuf_name);
 	}
 
-	rb_linebuf_donebuf(&rb_linebuf_local);
-	rb_linebuf_donebuf(&rb_linebuf_id);
+	rb_linebuf_donebuf(rb_linebuf_local);
+	rb_linebuf_donebuf(rb_linebuf_id);
+	rb_linebuf_donebuf(rb_linebuf_name);
 }
 
 /* sendto_match_servs()
  *
- * inputs       - source, mask to send to, caps needed, va_args
- * outputs      - 
+ * inputs	- source, mask to send to, caps needed, va_args
+ * outputs	- 
  * side effects - message is sent to matching servers with caps.
  */
 void
-sendto_match_servs(struct Client *source_p, const char *mask, int cap,
-		   int nocap, const char *pattern, ...)
+sendto_match_servs(struct Client *source_p, const char *mask, int cap, int nocap, const char *pattern, ...)
 {
-	static char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	va_list args;
 	rb_dlink_node *ptr;
 	struct Client *target_p;
-	buf_head_t rb_linebuf_id;
+	size_t bz = rb_linebuf_bufhead_size();
+	rb_buf_head_t *rb_linebuf_id = alloca(bz);
+	rb_buf_head_t *rb_linebuf_name = alloca(bz);
 
 	if(EmptyString(mask))
 		return;
 
-	rb_linebuf_newbuf(&rb_linebuf_id);
+	rb_linebuf_newbuf(rb_linebuf_id);
+	rb_linebuf_newbuf(rb_linebuf_name);
 
 	va_start(args, pattern);
-	rb_vsnprintf(buf, sizeof(buf), pattern, args);
+	vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
-	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", source_p->id, buf);
+	rb_linebuf_putmsg(rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
+	rb_linebuf_putmsg(rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
 
 	current_serial++;
 
@@ -788,11 +774,15 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap,
 			if(nocap && !NotCapable(target_p->from, nocap))
 				continue;
 
-			send_linebuf(target_p->from, &rb_linebuf_id);
+			if(has_id(target_p->from))
+				send_linebuf(target_p->from, rb_linebuf_id);
+			else
+				send_linebuf(target_p->from, rb_linebuf_name);
 		}
 	}
 
-	rb_linebuf_donebuf(&rb_linebuf_id);
+	rb_linebuf_donebuf(rb_linebuf_id);
+	rb_linebuf_donebuf(rb_linebuf_name);
 }
 
 /* sendto_monitor()
@@ -805,15 +795,15 @@ void
 sendto_monitor(struct monitor *monptr, const char *pattern, ...)
 {
 	va_list args;
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 	struct Client *target_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 
 	va_start(args, pattern);
-	rb_linebuf_putmsg(&linebuf, pattern, &args, NULL);
+	rb_linebuf_putmsg(linebuf, pattern, &args, NULL);
 	va_end(args);
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, monptr->users.head)
@@ -823,10 +813,10 @@ sendto_monitor(struct monitor *monptr, const char *pattern, ...)
 		if(IsIOError(target_p))
 			continue;
 
-		send_linebuf(target_p, &linebuf);
+		send_linebuf(target_p, linebuf);
 	}
 
-	rb_linebuf_donebuf(&linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /* sendto_anywhere()
@@ -836,38 +826,36 @@ sendto_monitor(struct monitor *monptr, const char *pattern, ...)
  * side effects - client is sent message with correct prefix.
  */
 void
-sendto_anywhere(struct Client *target_p, struct Client *source_p,
-		const char *command, const char *pattern, ...)
+sendto_anywhere(struct Client *target_p, struct Client *source_p, const char *command, const char *pattern, ...)
 {
 	va_list args;
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());;
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 
 	va_start(args, pattern);
 
 	if(MyClient(target_p))
 	{
 		if(IsServer(source_p))
-			rb_linebuf_putmsg(&linebuf, pattern, &args, ":%s %s %s ",
+			rb_linebuf_putmsg(linebuf, pattern, &args, ":%s %s %s ",
 					  source_p->name, command, target_p->name);
 		else
-			rb_linebuf_putmsg(&linebuf, pattern, &args,
+			rb_linebuf_putmsg(linebuf, pattern, &args,
 					  ":%s!%s@%s %s %s ",
-					  source_p->name, source_p->username,
-					  source_p->host, command, target_p->name);
+					  source_p->name, source_p->username, source_p->host, command, target_p->name);
 	}
 	else
-		rb_linebuf_putmsg(&linebuf, pattern, &args, ":%s %s %s ",
+		rb_linebuf_putmsg(linebuf, pattern, &args, ":%s %s %s ",
 				  get_id(source_p, target_p), command, get_id(target_p, target_p));
 	va_end(args);
 
 	if(MyClient(target_p))
-		send_linebuf(target_p, &linebuf);
+		send_linebuf(target_p, linebuf);
 	else
-		send_rb_linebuf_remote(target_p, source_p, &linebuf);
+		send_rb_linebuf_remote(target_p, source_p, linebuf);
 
-	rb_linebuf_donebuf(&linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /* sendto_realops_flags()
@@ -883,15 +871,15 @@ sendto_realops_flags(int flags, int level, const char *pattern, ...)
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	va_list args;
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 
 	if(EmptyString(me.name))
 		return;
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 
 	va_start(args, pattern);
-	rb_linebuf_putmsg(&linebuf, pattern, &args, ":%s NOTICE * :*** Notice -- ", me.name);
+	rb_linebuf_putmsg(linebuf, pattern, &args, ":%s NOTICE * :*** Notice -- ", me.name);
 	va_end(args);
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, oper_list.head)
@@ -901,24 +889,23 @@ sendto_realops_flags(int flags, int level, const char *pattern, ...)
 		/* If we're sending it to opers and theyre an admin, skip.
 		 * If we're sending it to admins, and theyre not, skip.
 		 */
-		if(((level == L_ADMIN) && !IsAdmin(client_p)) ||
-		   ((level == L_OPER) && IsAdmin(client_p)))
+		if(((level == L_ADMIN) && !IsAdmin(client_p)) || ((level == L_OPER) && IsAdmin(client_p)))
 			continue;
 
 		if(client_p->umodes & flags)
-			send_linebuf(client_p, &linebuf);
+			send_linebuf(client_p, linebuf);
 	}
 
-	rb_linebuf_donebuf(&linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /*
  * sendto_wallops_flags
  *
- * inputs       - flag types of messages to show to real opers
- *              - client sending request
- *              - var args input message
- * output       - NONE
+ * inputs	- flag types of messages to show to real opers
+ *		- client sending request
+ *		- var args input message
+ * output	- NONE
  * side effects - Send a wallops to local opers
  */
 void
@@ -928,18 +915,17 @@ sendto_wallops_flags(int flags, struct Client *source_p, const char *pattern, ..
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	va_list args;
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 
 	va_start(args, pattern);
 
 	if(IsClient(source_p))
-		rb_linebuf_putmsg(&linebuf, pattern, &args,
-				  ":%s!%s@%s WALLOPS :", source_p->name,
-				  source_p->username, source_p->host);
+		rb_linebuf_putmsg(linebuf, pattern, &args,
+				  ":%s!%s@%s WALLOPS :", source_p->name, source_p->username, source_p->host);
 	else
-		rb_linebuf_putmsg(&linebuf, pattern, &args, ":%s WALLOPS :", source_p->name);
+		rb_linebuf_putmsg(linebuf, pattern, &args, ":%s WALLOPS :", source_p->name);
 
 	va_end(args);
 
@@ -947,10 +933,10 @@ sendto_wallops_flags(int flags, struct Client *source_p, const char *pattern, ..
 	{
 		client_p = ptr->data;
 		if(client_p->umodes & flags)
-			send_linebuf(client_p, &linebuf);
+			send_linebuf(client_p, linebuf);
 	}
 
-	rb_linebuf_donebuf(&linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 /* kill_client()
@@ -963,17 +949,16 @@ void
 kill_client(struct Client *target_p, struct Client *diedie, const char *pattern, ...)
 {
 	va_list args;
-	buf_head_t linebuf;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 
-	rb_linebuf_newbuf(&linebuf);
+	rb_linebuf_newbuf(linebuf);
 
 	va_start(args, pattern);
-	rb_linebuf_putmsg(&linebuf, pattern, &args, ":%s KILL %s :",
-			  get_id(&me, target_p), get_id(diedie, target_p));
+	rb_linebuf_putmsg(linebuf, pattern, &args, ":%s KILL %s :", get_id(&me, target_p), get_id(diedie, target_p));
 	va_end(args);
 
-	send_linebuf(target_p->from ? target_p->from : target_p, &linebuf);
-	rb_linebuf_donebuf(&linebuf);
+	send_linebuf(target_p->from ? target_p->from : target_p, linebuf);
+	rb_linebuf_donebuf(linebuf);
 }
 
 
@@ -985,27 +970,30 @@ kill_client(struct Client *target_p, struct Client *diedie, const char *pattern,
  * output	- NONE
  * side effects	- Send a KILL for the given client
  *		  message to all connected servers
- *                except the client 'one'. Also deal with
+ *		  except the client 'one'. Also deal with
  *		  client being unknown to leaf, as in lazylink...
  */
 void
 kill_client_serv_butone(struct Client *one, struct Client *target_p, const char *pattern, ...)
 {
-	static char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	va_list args;
 	struct Client *client_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	buf_head_t rb_linebuf_id;
+	size_t bz = rb_linebuf_bufhead_size();
+	rb_buf_head_t *rb_linebuf_id = alloca(bz);
+	rb_buf_head_t *rb_linebuf_name = alloca(bz);
 
-	rb_linebuf_newbuf(&rb_linebuf_id);
+	rb_linebuf_newbuf(rb_linebuf_name);
+	rb_linebuf_newbuf(rb_linebuf_id);
 
 	va_start(args, pattern);
-	rb_vsnprintf(buf, sizeof(buf), pattern, args);
+	vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
-	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s KILL %s :%s",
-			  use_id(&me), target_p->id, buf);
+	rb_linebuf_putmsg(rb_linebuf_name, NULL, NULL, ":%s KILL %s :%s", me.name, target_p->name, buf);
+	rb_linebuf_putmsg(rb_linebuf_id, NULL, NULL, ":%s KILL %s :%s", use_id(&me), use_id(target_p), buf);
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, serv_list.head)
 	{
@@ -1014,12 +1002,15 @@ kill_client_serv_butone(struct Client *one, struct Client *target_p, const char 
 		/* ok, if the client we're supposed to not send to has an
 		 * ID, then we still want to issue the kill there..
 		 */
-		if(one != NULL && (client_p == one->from) &&
-		   (!has_id(client_p) || !has_id(target_p)))
+		if(one != NULL && (client_p == one->from) && (!has_id(client_p) || !has_id(target_p)))
 			continue;
 
-		send_linebuf(client_p, &rb_linebuf_id);
+		if(has_id(client_p))
+			send_linebuf(client_p, rb_linebuf_id);
+		else
+			send_linebuf(client_p, rb_linebuf_name);
 	}
 
-	rb_linebuf_donebuf(&rb_linebuf_id);
+	rb_linebuf_donebuf(rb_linebuf_id);
+	rb_linebuf_donebuf(rb_linebuf_name);
 }

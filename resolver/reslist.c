@@ -37,13 +37,13 @@
 const char *get_windows_nameservers(void);
 
 
-#define IS_NT()        ((int)GetVersion() > 0)
+#define IS_NT()	       ((int)GetVersion() > 0)
 #define WIN_NS_9X      "System\\CurrentControlSet\\Services\\VxD\\MSTCP"
 #define WIN_NS_NT_KEY  "System\\CurrentControlSet\\Services\\Tcpip\\Parameters"
 #define NAMESERVER     "NameServer"
 #define DHCPNAMESERVER "DhcpNameServer"
 #define DATABASEPATH   "DatabasePath"
-#define WIN_PATH_HOSTS  "\\hosts"
+#define WIN_PATH_HOSTS	"\\hosts"
 
 static int
 get_iphlpapi_dns_info(char *ret_buf, size_t ret_size)

@@ -32,7 +32,7 @@
 
 /*  $Id$ */
 
-static const char in_addrany[]  = { 0, 0, 0, 0 };
+static const char in_addrany[]	= { 0, 0, 0, 0 };
 static const char in_loopback[] = { 127, 0, 0, 1 };
 static const char in6_addrany[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -94,33 +94,33 @@ static const struct explore explore[] = {
 #define PTON_MAX	16
 
 static int str_isnumber(const char *);
-static int explore_null(const struct addrinfo *,
-	const char *, struct addrinfo **);
-static int explore_numeric(const struct addrinfo *, const char *,
-	const char *, struct addrinfo **);
-static struct addrinfo *get_ai(const struct addrinfo *,
+static int explore_null(const struct rb_addrinfo *,
+	const char *, struct rb_addrinfo **);
+static int explore_numeric(const struct rb_addrinfo *, const char *,
+	const char *, struct rb_addrinfo **);
+static struct rb_addrinfo *get_ai(const struct rb_addrinfo *,
 	const struct afd *, const char *);
-static int get_portmatch(const struct addrinfo *, const char *);
-static int get_port(struct addrinfo *, const char *, int);
+static int get_portmatch(const struct rb_addrinfo *, const char *);
+static int get_port(struct rb_addrinfo *, const char *, int);
 static const struct afd *find_afd(int);
 #if 0
 /* We will need this should we ever want gai_strerror() */
 static char *ai_errlist[] = {
 	"Success",
 	"Address family for hostname not supported",	/* EAI_ADDRFAMILY */
-	"Temporary failure in name resolution",		/* EAI_AGAIN      */
-	"Invalid value for ai_flags",		       	/* EAI_BADFLAGS   */
-	"Non-recoverable failure in name resolution", 	/* EAI_FAIL       */
-	"ai_family not supported",			/* EAI_FAMILY     */
-	"Memory allocation failure", 			/* EAI_MEMORY     */
-	"No address associated with hostname", 		/* EAI_NODATA     */
-	"hostname nor servname provided, or not known",	/* EAI_NONAME     */
-	"servname not supported for ai_socktype",	/* EAI_SERVICE    */
-	"ai_socktype not supported", 			/* EAI_SOCKTYPE   */
-	"System error returned in errno", 		/* EAI_SYSTEM     */
+	"Temporary failure in name resolution",		/* EAI_AGAIN	  */
+	"Invalid value for ai_flags",			/* EAI_BADFLAGS	  */
+	"Non-recoverable failure in name resolution",	/* EAI_FAIL	  */
+	"ai_family not supported",			/* EAI_FAMILY	  */
+	"Memory allocation failure",			/* EAI_MEMORY	  */
+	"No address associated with hostname",		/* EAI_NODATA	  */
+	"hostname nor servname provided, or not known",	/* EAI_NONAME	  */
+	"servname not supported for ai_socktype",	/* EAI_SERVICE	  */
+	"ai_socktype not supported",			/* EAI_SOCKTYPE	  */
+	"System error returned in errno",		/* EAI_SYSTEM	  */
 	"Invalid value for hints",			/* EAI_BADHINTS	  */
-	"Resolved protocol is unknown",			/* EAI_PROTOCOL   */
-	"Unknown error", 				/* EAI_MAX        */
+	"Resolved protocol is unknown",			/* EAI_PROTOCOL	  */
+	"Unknown error",				/* EAI_MAX	  */
 };
 #endif
 /* XXX macros that make external reference is BAD. */
@@ -168,9 +168,9 @@ gai_strerror(int ecode)
 #endif
 
 void
-freeaddrinfo(struct addrinfo *ai)
+rb_freeaddrinfo(struct rb_addrinfo *ai)
 {
-	struct addrinfo *next;
+	struct rb_addrinfo *next;
 
 	do {
 		next = ai->ai_next;
@@ -199,15 +199,15 @@ str_isnumber(const char *p)
 }
 
 int
-getaddrinfo(const char *hostname, const char *servname,
-                const struct addrinfo *hints, struct addrinfo **res)
+rb_getaddrinfo(const char *hostname, const char *servname,
+		const struct rb_addrinfo *hints, struct rb_addrinfo **res)
 {
-  struct addrinfo sentinel;
-  struct addrinfo *cur;
+  struct rb_addrinfo sentinel;
+  struct rb_addrinfo *cur;
   int error = 0;
-  struct addrinfo ai;
-  struct addrinfo ai0;
-  struct addrinfo *pai;
+  struct rb_addrinfo ai;
+  struct rb_addrinfo ai0;
+  struct rb_addrinfo *pai;
   const struct explore *ex;
 
   memset(&sentinel, 0, sizeof(sentinel));
@@ -355,7 +355,7 @@ getaddrinfo(const char *hostname, const char *servname,
  free:
  bad:
 	if (sentinel.ai_next)
-		freeaddrinfo(sentinel.ai_next);
+		rb_freeaddrinfo(sentinel.ai_next);
 	*res = NULL;
 	return error;
 }
@@ -366,12 +366,12 @@ getaddrinfo(const char *hostname, const char *servname,
  * non-passive socket -> localhost (127.0.0.1 or ::1)
  */
 static int
-explore_null(const struct addrinfo *pai, const char *servname, struct addrinfo **res)
+explore_null(const struct rb_addrinfo *pai, const char *servname, struct rb_addrinfo **res)
 {
   int s;
   const struct afd *afd;
-  struct addrinfo *cur;
-  struct addrinfo sentinel;
+  struct rb_addrinfo *cur;
+  struct rb_addrinfo sentinel;
   int error;
 
 	*res = NULL;
@@ -385,13 +385,13 @@ explore_null(const struct addrinfo *pai, const char *servname, struct addrinfo *
 	s = socket(pai->ai_family, SOCK_DGRAM, 0);
 	if (s < 0) {
 #ifdef _WIN32
-                errno = WSAGetLastError();
+		errno = WSAGetLastError();
 #endif
 		if (errno != EMFILE)
 			return 0;
 	} else
 #ifdef _WIN32
-                closesocket(s);
+		closesocket(s);
 #else
 		close(s);
 #endif
@@ -420,7 +420,7 @@ explore_null(const struct addrinfo *pai, const char *servname, struct addrinfo *
 
 free:
 	if (sentinel.ai_next)
-		freeaddrinfo(sentinel.ai_next);
+		rb_freeaddrinfo(sentinel.ai_next);
 	return error;
 }
 
@@ -428,12 +428,12 @@ free:
  * numeric hostname
  */
 static int
-explore_numeric(const struct addrinfo *pai, const char *hostname,
-                const char *servname, struct addrinfo **res)
+explore_numeric(const struct rb_addrinfo *pai, const char *hostname,
+		const char *servname, struct rb_addrinfo **res)
 {
   const struct afd *afd;
-  struct addrinfo *cur;
-  struct addrinfo sentinel;
+  struct rb_addrinfo *cur;
+  struct rb_addrinfo sentinel;
   int error;
   char pton[PTON_MAX];
 
@@ -454,7 +454,7 @@ explore_numeric(const struct addrinfo *pai, const char *hostname,
 	switch (afd->a_af) {
 #if 0 /*X/Open spec*/
 	case AF_INET:
-	        if (rb_inet_pton
+		if (rb_inet_pton
 		if (inet_aton(hostname, (struct in_addr *)pton) == 1) {
 			if (pai->ai_family == afd->a_af ||
 			    pai->ai_family == PF_UNSPEC /*?*/) {
@@ -487,22 +487,22 @@ explore_numeric(const struct addrinfo *pai, const char *hostname,
 free:
 bad:
 	if (sentinel.ai_next)
-		freeaddrinfo(sentinel.ai_next);
+		rb_freeaddrinfo(sentinel.ai_next);
 	return error;
 }
 
-static struct addrinfo *
-get_ai(const struct addrinfo *pai, const struct afd *afd, const char *addr)
+static struct rb_addrinfo *
+get_ai(const struct rb_addrinfo *pai, const struct afd *afd, const char *addr)
 {
   char *p;
-  struct addrinfo *ai;
+  struct rb_addrinfo *ai;
 	
-    ai = (struct addrinfo *)rb_malloc(sizeof(struct addrinfo)
+    ai = (struct rb_addrinfo *)rb_malloc(sizeof(struct rb_addrinfo)
 		+ (afd->a_socklen));
 	if (ai == NULL)
 		return NULL;
 
-	memcpy(ai, pai, sizeof(struct addrinfo));
+	memcpy(ai, pai, sizeof(struct rb_addrinfo));
 	ai->ai_addr = (struct sockaddr *)(void *)(ai + 1);
 	memset(ai->ai_addr, 0, (size_t)afd->a_socklen);
 	ai->ai_addrlen = afd->a_socklen;
@@ -513,15 +513,15 @@ get_ai(const struct addrinfo *pai, const struct afd *afd, const char *addr)
 }
 
 static int
-get_portmatch(const struct addrinfo *ai, const char *servname)
+get_portmatch(const struct rb_addrinfo *ai, const char *servname)
 {
-  struct addrinfo xai;
-  memcpy(&xai, ai, sizeof(struct addrinfo)); 
+  struct rb_addrinfo xai;
+  memcpy(&xai, ai, sizeof(struct rb_addrinfo)); 
   return(get_port(&xai, servname, 1));
 }
 
 static int
-get_port(struct addrinfo *ai, const char *servname, int matchonly)
+get_port(struct rb_addrinfo *ai, const char *servname, int matchonly)
 {
   const char *proto;
   struct servent *sp;

@@ -1,6 +1,6 @@
 /*   contrib/m_ojoin.c
  *   Copyright (C) 2002 Hybrid Development Team
- *   Copyright (C) 2004 ircd-ratbox Development Team
+ *   Copyright (C) 2004-2012 ircd-ratbox Development Team
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -41,16 +41,22 @@ static int mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, 
 
 
 struct Message ojoin_msgtab = {
-	"OJOIN", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_ojoin, 2}}
+	.cmd = "OJOIN",
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_ojoin, .min_para = 2 },
 };
 
-mapi_clist_av2 ojoin_clist[] = { &ojoin_msgtab, NULL };
+mapi_clist_av1 ojoin_clist[] = { &ojoin_msgtab, NULL };
 
-DECLARE_MODULE_AV2(ojoin, NULL, NULL, ojoin_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(ojoin, NULL, NULL, ojoin_clist, NULL, NULL, "$Revision$");
 
 /*
 ** mo_ojoin
+**      parv[0] = sender prefix
 **      parv[1] = channel
 */
 static int
@@ -62,14 +68,12 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* admins only */
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "ojoin");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "ojoin");
 		return 0;
 	}
 
-	/* XXX - we might not have CBURSTed this channel if we are a lazylink
-	 * yet. */
 
-	if(*parv[1] == '@' || *parv[1] == '%' || *parv[1] == '+')
+	if(*parv[1] == '@' || *parv[1] == '+')
 	{
 		parv[1]++;
 		move_me = 1;
@@ -77,8 +81,7 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if((chptr = find_channel(parv[1])) == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-				   form_str(ERR_NOSUCHCHANNEL), parv[1]);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
 
@@ -131,14 +134,13 @@ mo_ojoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 	/* send the topic... */
 	if(chptr->topic != NULL)
 	{
-		sendto_one(source_p, form_str(RPL_TOPIC), me.name,
-			   source_p->name, chptr->chname, chptr->topic->topic);
-		sendto_one(source_p, form_str(RPL_TOPICWHOTIME), me.name,
-			   source_p->name, chptr->chname, chptr->topic->topic_info,
+		sendto_one_numeric(source_p, s_RPL(RPL_TOPIC), chptr->chname, chptr->topic->topic);
+		sendto_one_numeric(source_p, s_RPL(RPL_TOPICWHOTIME),
+			   chptr->chname, chptr->topic->topic_info,
 			   chptr->topic->topic_time);
 	}
 
-	source_p->localClient->last_join_time = rb_time();
+	source_p->localClient->last_join_time = rb_current_time();
 	channel_member_names(chptr, source_p, 1);
 
 	return 0;

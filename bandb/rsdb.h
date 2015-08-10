@@ -3,7 +3,7 @@
 #define INCLUDED_rsdb_h
 
 /* error handler callback */
-typedef void rsdb_error_cb(const char *);
+typedef void rsdb_error_cb(const char *, void *data);
 
 typedef int (*rsdb_callback) (int, const char **);
 
@@ -22,21 +22,23 @@ struct rsdb_table
 	void *arg;
 };
 
-int rsdb_init(const char *path, rsdb_error_cb *);
-void rsdb_shutdown(void);
+typedef struct _rsdb_conn
+{
+	struct sqlite3 *ptr;
+	rsdb_error_cb *error_cb;
+	void *error_cb_data;
 
-const char *rsdb_quote(const char *src);
+} rsdb_conn_t;
 
-void rsdb_exec(rsdb_callback cb, const char *format, ...);
+rsdb_conn_t *rsdb_init(const char *path, rsdb_error_cb *, void *data);
+void rsdb_shutdown(rsdb_conn_t *);
 
-void rsdb_exec_fetch(struct rsdb_table *data, const char *format, ...);
-void rsdb_exec_fetch_end(struct rsdb_table *data);
 
-void rsdb_transaction(rsdb_transtype type);
-/* rsdb_snprintf.c */
+void rsdb_exec(rsdb_conn_t *, rsdb_callback cb, const char *format, ...);
+void rsdb_exec_fetch(rsdb_conn_t *, struct rsdb_table *data, const char *format, ...);
+void rsdb_exec_fetch_end(rsdb_conn_t *,struct rsdb_table *data);
 
-int rs_vsnprintf(char *dest, const size_t bytes, const char *format, va_list args);
-int rs_snprintf(char *dest, const size_t bytes, const char *format, ...);
+void rsdb_transaction(rsdb_conn_t *, rsdb_transtype type);
 
 
 #endif

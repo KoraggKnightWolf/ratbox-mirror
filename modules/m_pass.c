@@ -38,22 +38,28 @@
 static int mr_pass(struct Client *, struct Client *, int, const char **);
 
 struct Message pass_msgtab = {
-	"PASS", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_pass, 2}, mg_reg, mg_ignore, mg_ignore, mg_ignore, mg_reg}
+	.cmd = "PASS", 
+	.handlers[UNREGISTERED_HANDLER] =	{ .handler =  mr_pass, .min_para = 2 },
+	.handlers[CLIENT_HANDLER] =		{  mm_reg },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{  mm_reg },
 };
 
-mapi_clist_av2 pass_clist[] = { &pass_msgtab, NULL };
+mapi_clist_av1 pass_clist[] = { &pass_msgtab, NULL };
 
-DECLARE_MODULE_AV2(pass, NULL, NULL, pass_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(pass, NULL, NULL, pass_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_pass() - Added Sat, 4 March 1989
  *
  *
  * mr_pass - PASS message handler
- *      parv[1] = password
- *      parv[2] = "TS" if this server supports TS.
- *      parv[3] = optional TS version field -- needed for TS6
+ *	parv[0] = sender prefix
+ *	parv[1] = password
+ *	parv[2] = "TS" if this server supports TS.
+ *	parv[3] = optional TS version field -- needed for TS6
  */
 static int
 mr_pass(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -79,6 +85,9 @@ mr_pass(struct Client *client_p, struct Client *source_p, int parc, const char *
 		if(irccmp(parv[2], "TS") == 0 && client_p->tsinfo == 0)
 			client_p->tsinfo = TS_DOESTS;
 
+		/* kludge, if we're not using ts6, dont ever mark a server
+		 * as TS6 capable, that way we'll never send them TS6 data.
+		 */
 		if(parc == 5 && atoi(parv[3]) >= 6)
 		{
 			/* only mark as TS6 if the SID is valid.. */

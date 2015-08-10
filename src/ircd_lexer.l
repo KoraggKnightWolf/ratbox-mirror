@@ -25,12 +25,16 @@
 
 #include "ratbox_lib.h"
 #include "stdinc.h"
+#include "struct.h"
+#include "client.h"
 #include "newconf.h"
 #include "ircd_parser.h"
-#include "common.h"
 #include "s_log.h"
 
+
+
 int conf_fgets(char *lbuf, int max_size, FILE * fb);
+
 
 int yylex(void);
 
@@ -38,7 +42,7 @@ int yylex(void);
 int yyget_lineno(void);
 FILE *yyget_in(void);
 FILE *yyget_out(void);
-int yyget_leng(void);
+yy_size_t yyget_leng (void );
 char *yyget_text(void);
 void yyset_lineno(int  line_number);
 void yyset_in(FILE *  in_str);
@@ -64,7 +68,7 @@ char *current_file = conffilebuf;
 
 FILE *inc_fbfile_in[MAX_INCLUDE_DEPTH];
 
-char linebuf[512];
+char yy_linebuf[512];
 
 #undef YY_INPUT
 
@@ -82,7 +86,7 @@ include   \.include{ws}(\<.*\>|\".*\")
 %%
 {include}       { cinclude(); }
 "/*"            { ccomment(); }
-\n.*            { strcpy(linebuf, yytext+1); lineno++; yyless(1); }
+\n.*            { strcpy(yy_linebuf, yytext+1); lineno++; yyless(1); }
 
 {ws}            ;
 {comment}       { hashcomment(); }
@@ -203,13 +207,13 @@ void cinclude(void)
 			/* if its not found in PREFIX, look in ETCPATH */
 			char fnamebuf[IRCD_BUFSIZE];
 
-			rb_snprintf(fnamebuf, sizeof(fnamebuf), "%s/%s", ETCPATH, c);
+			snprintf(fnamebuf, sizeof(fnamebuf), "%s/%s", ETCPATH, c);
 			tmp_fbfile_in = fopen(fnamebuf, "r");
 
 			/* wasnt found there either.. error. */
 			if(tmp_fbfile_in == NULL)
 			{
-				conf_report_error("Include %s: %m.", c);
+				conf_report_error("Include %s: %s.", c, strerror(errno));
 				return;
 			}
 		}

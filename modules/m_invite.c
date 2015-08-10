@@ -39,19 +39,27 @@
 
 static int m_invite(struct Client *, struct Client *, int, const char **);
 
-struct Message invite_msgtab = {
-	"INVITE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_invite, 3}, {m_invite, 3}, mg_ignore, mg_ignore, {m_invite, 3}}
-};
-mapi_clist_av2 invite_clist[] = { &invite_msgtab, NULL };
 
-DECLARE_MODULE_AV2(invite, NULL, NULL, invite_clist, NULL, NULL, "$Revision$");
+struct Message invite_msgtab = {
+	.cmd = "INVITE",
+
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_invite, .min_para = 3 },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = m_invite, .min_para = 3 },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_invite, .min_para = 3 },
+};
+mapi_clist_av1 invite_clist[] = { &invite_msgtab, NULL };
+
+DECLARE_MODULE_AV1(invite, NULL, NULL, invite_clist, NULL, NULL, "$Revision$");
 
 static void add_invite(struct Channel *, struct Client *);
 
 /* m_invite()
- *      parv[1] - user to invite
- *      parv[2] - channel name
+ *	parv[0] - sender prefix
+ *	parv[1] - user to invite
+ *	parv[2] - channel name
  */
 static int
 m_invite(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -94,25 +102,13 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 	 */
 	if(parv[2][0] == '&' && !MyConnect(target_p))
 	{
-		sendto_one(source_p, form_str(ERR_USERNOTONSERV),
-			   me.name, source_p->name, target_p->name);
-		return 0;
-	}
-
-	if(((MyConnect(source_p) && !IsExemptResv(source_p)) ||
-			(MyConnect(target_p) && !IsExemptResv(target_p))) &&
-		hash_find_resv(parv[2]))
-	{
-		sendto_one_numeric(source_p, ERR_BADCHANNAME,
-				   form_str(ERR_BADCHANNAME),
-				   parv[2]);
+		sendto_one_numeric(source_p, s_RPL(ERR_USERNOTONSERV), target_p->name);
 		return 0;
 	}
 
 	if((chptr = find_channel(parv[2])) == NULL)
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-				   form_str(ERR_NOSUCHCHANNEL), parv[2]);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOSUCHCHANNEL), parv[2]);
 		return 0;
 	}
 
@@ -136,8 +132,7 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 		/* treat remote clients as chanops */
 		if(MyClient(source_p) && !is_chanop(msptr))
 		{
-			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-				   me.name, source_p->name, parv[2]);
+			sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED), parv[2]);
 			return 0;
 		}
 
@@ -147,18 +142,11 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(MyConnect(source_p))
 	{
-		sendto_one(source_p, form_str(RPL_INVITING),
-			   me.name, source_p->name, target_p->name, parv[2]);
+		sendto_one_numeric(source_p, s_RPL(RPL_INVITING),
+			   target_p->name, parv[2]);
 		if(target_p->user->away)
-			sendto_one_numeric(source_p, RPL_AWAY, form_str(RPL_AWAY),
+			sendto_one_numeric(source_p, s_RPL(RPL_AWAY),
 					   target_p->name, target_p->user->away);
-	}
-	/* invite timestamp */
-	else if(parc > 3 && !EmptyString(parv[3]))
-	{
-		/* this should never be less than */
-		if(atol(parv[3]) > chptr->channelts)
-			return 0;
 	}
 
 	if(MyConnect(target_p))
@@ -172,8 +160,7 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 	}
 	else if(target_p->from != client_p)
 	{
-		sendto_one_prefix(target_p, source_p, "INVITE", "%s %lu",
-				chptr->chname, (unsigned long) chptr->channelts);
+		sendto_one_prefix(target_p, source_p, "INVITE", ":%s", chptr->chname);
 	}
 
 	return 0;
@@ -198,8 +185,7 @@ add_invite(struct Channel *chptr, struct Client *who)
 	}
 
 	/* ok, if their invite list is too long, remove the tail */
-	if((int)rb_dlink_list_length(&who->localClient->invited) >=
-	   ConfigChannel.max_chans_per_user)
+	if(rb_dlink_list_length(&who->localClient->invited) >= ConfigChannel.max_chans_per_user)
 	{
 		ptr = who->localClient->invited.tail;
 		del_invite(ptr->data, who);

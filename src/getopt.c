@@ -28,7 +28,7 @@
 
 #include "ircd_getopt.h"
 
-# define OPTCHAR '-'
+#define OPTCHAR '-'
 
 void
 parseargs(int *argc, char ***argv, struct lgetopt *opts)
@@ -102,11 +102,7 @@ parseargs(int *argc, char ***argv, struct lgetopt *opts)
 
 				case USAGE:
 					usage(progname);
-				 /*NOTREACHED*/ default:
-					fprintf(stderr,
-						"Error: internal error in parseargs() at %s:%d\n",
-						__FILE__, __LINE__);
-					exit(EXIT_FAILURE);
+				 /*NOTREACHED*/ 
 				}
 			}
 		}

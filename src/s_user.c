@@ -50,10 +50,11 @@
 #include "cache.h"
 #include "hook.h"
 #include "monitor.h"
-#include "blacklist.h"
 
 static void report_and_set_user_flags(struct Client *, struct ConfItem *);
 void user_welcome(struct Client *source_p);
+
+extern char *crypt();
 
 /* table of ascii char letters to corresponding bitmask */
 
@@ -180,48 +181,38 @@ show_lusers(struct Client *source_p)
 {
 	SetCork(source_p);
 	sendto_one_numeric(source_p, RPL_LUSERCLIENT, form_str(RPL_LUSERCLIENT),
-			   (Count.total - Count.invisi),
-			   Count.invisi,
-			   (int)rb_dlink_list_length(&global_serv_list));
+			   (Count.total - Count.invisi), Count.invisi, rb_dlink_list_length(&global_serv_list));
 
 	if(Count.oper > 0)
 		sendto_one_numeric(source_p, RPL_LUSEROP, form_str(RPL_LUSEROP), Count.oper);
 
 	if(rb_dlink_list_length(&unknown_list) > 0)
 		sendto_one_numeric(source_p, RPL_LUSERUNKNOWN,
-				   form_str(RPL_LUSERUNKNOWN),
-				   (int)rb_dlink_list_length(&unknown_list));
+				   form_str(RPL_LUSERUNKNOWN), rb_dlink_list_length(&unknown_list));
 
 	if(rb_dlink_list_length(&global_channel_list) > 0)
 		sendto_one_numeric(source_p, RPL_LUSERCHANNELS,
-				   form_str(RPL_LUSERCHANNELS),
-				   rb_dlink_list_length(&global_channel_list));
+				   form_str(RPL_LUSERCHANNELS), rb_dlink_list_length(&global_channel_list));
 
 	sendto_one_numeric(source_p, RPL_LUSERME, form_str(RPL_LUSERME),
-			   (int)rb_dlink_list_length(&lclient_list),
-			   (int)rb_dlink_list_length(&serv_list));
+			   rb_dlink_list_length(&lclient_list), rb_dlink_list_length(&serv_list));
 
 	sendto_one_numeric(source_p, RPL_LOCALUSERS,
 			   form_str(RPL_LOCALUSERS),
-			   (int)rb_dlink_list_length(&lclient_list),
-			   Count.max_loc,
-			   (int)rb_dlink_list_length(&lclient_list),
-			   Count.max_loc);
+			   rb_dlink_list_length(&lclient_list),
+			   Count.max_loc, rb_dlink_list_length(&lclient_list), Count.max_loc);
 
 	sendto_one_numeric(source_p, RPL_GLOBALUSERS, form_str(RPL_GLOBALUSERS),
 			   Count.total, Count.max_tot, Count.total, Count.max_tot);
 
 	sendto_one_numeric(source_p, RPL_STATSCONN,
-			   form_str(RPL_STATSCONN),
-			   MaxConnectionCount, MaxClientCount, Count.totalrestartcount);
+			   form_str(RPL_STATSCONN), MaxConnectionCount, MaxClientCount, Count.totalrestartcount);
 
-	if(rb_dlink_list_length(&lclient_list) > (unsigned long)MaxClientCount)
+	if(rb_dlink_list_length(&lclient_list) > MaxClientCount)
 		MaxClientCount = rb_dlink_list_length(&lclient_list);
 
-	if((rb_dlink_list_length(&lclient_list) + rb_dlink_list_length(&serv_list)) >
-	   (unsigned long)MaxConnectionCount)
-		MaxConnectionCount = rb_dlink_list_length(&lclient_list) +
-			rb_dlink_list_length(&serv_list);
+	if((rb_dlink_list_length(&lclient_list) + rb_dlink_list_length(&serv_list)) > MaxConnectionCount)
+		MaxConnectionCount = rb_dlink_list_length(&lclient_list) + rb_dlink_list_length(&serv_list);
 	ClearCork(source_p);
 	send_pop_queue(source_p);
 
@@ -230,26 +221,26 @@ show_lusers(struct Client *source_p)
 
 /*
 ** register_local_user
-**      This function is called when both NICK and USER messages
-**      have been accepted for the client, in whatever order. Only
-**      after this, is the USER message propagated.
+**	This function is called when both NICK and USER messages
+**	have been accepted for the client, in whatever order. Only
+**	after this, is the USER message propagated.
 **
-**      NICK's must be propagated at once when received, although
-**      it would be better to delay them too until full info is
-**      available. Doing it is not so simple though, would have
-**      to implement the following:
+**	NICK's must be propagated at once when received, although
+**	it would be better to delay them too until full info is
+**	available. Doing it is not so simple though, would have
+**	to implement the following:
 **
-**      (actually it has been implemented already for a while) -orabidoo
+**	(actually it has been implemented already for a while) -orabidoo
 **
-**      1) user telnets in and gives only "NICK foobar" and waits
-**      2) another user far away logs in normally with the nick
-**         "foobar" (quite legal, as this server didn't propagate
-**         it).
-**      3) now this server gets nick "foobar" from outside, but
-**         has alread the same defined locally. Current server
-**         would just issue "KILL foobar" to clean out dups. But,
-**         this is not fair. It should actually request another
-**         nick from local user or kill him/her...
+**	1) user telnets in and gives only "NICK foobar" and waits
+**	2) another user far away logs in normally with the nick
+**	   "foobar" (quite legal, as this server didn't propagate
+**	   it).
+**	3) now this server gets nick "foobar" from outside, but
+**	   has alread the same defined locally. Current server
+**	   would just issue "KILL foobar" to clean out dups. But,
+**	   this is not fair. It should actually request another
+**	   nick from local user or kill him/her...
 */
 
 int
@@ -275,9 +266,8 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	{
 		if(!(source_p->flags & FLAGS_PINGSENT) && source_p->localClient->random_ping == 0)
 		{
-			source_p->localClient->random_ping = (uint32_t)(rand() * rand()) << 1;
-			sendto_one(source_p, "PING :%08X",
-				   (unsigned int)source_p->localClient->random_ping);
+			rb_get_pseudo_random(&source_p->localClient->random_ping, sizeof(source_p->localClient->random_ping));
+			sendto_one(source_p, "PING :%08X", source_p->localClient->random_ping);
 			source_p->flags |= FLAGS_PINGSENT;
 			return -1;
 		}
@@ -291,11 +281,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(source_p->flags & FLAGS_CLICAP)
 		return -1;
 
-	/* still has DNSbls to validate against */
-	if(rb_dlink_list_length(&source_p->localClient->dnsbl_queries) > 0)
-		return -1;
-
-	client_p->localClient->last = rb_time();
+	client_p->localClient->last = rb_current_time();
 	/* Straight up the maximum rate of flooding... */
 	source_p->localClient->allow_read = MAX_FLOOD_BURST;
 
@@ -326,6 +312,11 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		sendto_one_notice(source_p, ":*** Notice -- You have an invalid hostname");
 
 		rb_strlcpy(source_p->host, source_p->sockhost, sizeof(source_p->host));
+
+#ifdef RB_IPV6
+		if(ConfigFileEntry.dot_in_ip6_addr == 1 && (GET_SS_FAMILY(&source_p->localClient->ip) == AF_INET6))
+			rb_strlcat(source_p->host, ".", sizeof(source_p->host));
+#endif
 	}
 
 
@@ -340,8 +331,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(IsConfSSLNeeded(aconf) && !IsSSL(source_p))
 	{
 		ServerStats.is_ref++;
-		sendto_one_notice(source_p,
-				  ":*** Notice -- You need to use SSL/TLS to use this server");
+		sendto_one_notice(source_p, ":*** Notice -- You need to use SSL/TLS to use this server");
 		exit_client(client_p, source_p, &me, "Use SSL/TLS");
 		return (CLIENT_EXITED);
 	}
@@ -354,8 +344,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		if(IsNeedIdentd(aconf))
 		{
 			ServerStats.is_ref++;
-			sendto_one_notice(source_p,
-					  ":*** Notice -- You need to install identd to use this server");
+			sendto_one_notice(source_p, ":*** Notice -- You need to install identd to use this server");
 			exit_client(client_p, source_p, &me, "Install identd");
 			return (CLIENT_EXITED);
 		}
@@ -391,10 +380,10 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		else
 			encr = source_p->localClient->passwd;
 
-		if(strcmp(encr, aconf->passwd))
+		if(encr && strcmp(encr, aconf->passwd))
 		{
 			ServerStats.is_ref++;
-			sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, source_p->name);
+			sendto_one_numeric(source_p, s_RPL(ERR_PASSWDMISMATCH));
 			exit_client(client_p, source_p, &me, "Bad Password");
 			return (CLIENT_EXITED);
 		}
@@ -420,15 +409,15 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	 */
 	/* Except "F:" clients */
 	if(((rb_dlink_list_length(&lclient_list) + 1) >=
-	    ((unsigned long)GlobalSetOptions.maxclients + MAX_BUFFER) ||
+	    GlobalSetOptions.maxclients + MAX_BUFFER ||
 	    (rb_dlink_list_length(&lclient_list) + 1) >=
-	    ((unsigned long)GlobalSetOptions.maxclients - 5)) && !(IsExemptLimits(source_p)))
+	    GlobalSetOptions.maxclients - 5) && !(IsExemptLimits(source_p)))
 	{
 		sendto_realops_flags(UMODE_FULL, L_ALL,
-				     "Too many clients, rejecting %s[%s].", source_p->name,
-				     source_p->host);
+				     "Too many clients, rejecting %s[%s].", source_p->name, source_p->host);
 
 		ServerStats.is_ref++;
+		SetDelayExit(client_p);
 		exit_client(client_p, source_p, &me, "Sorry, server is full - try later");
 		return (CLIENT_EXITED);
 	}
@@ -437,11 +426,12 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 
 	if(!valid_username(source_p->username))
 	{
+		SetDelayExit(client_p);
 		sendto_realops_flags(UMODE_REJ, L_ALL,
 				     "Invalid username: %s (%s@%s)",
 				     source_p->name, source_p->username, source_p->host);
 		ServerStats.is_ref++;
-		rb_sprintf(tmpstr2, "Invalid username [%s]", source_p->username);
+		snprintf(tmpstr2, sizeof(tmpstr2), "Invalid username [%s]", source_p->username);
 		exit_client(client_p, source_p, &me, tmpstr2);
 		return (CLIENT_EXITED);
 	}
@@ -453,32 +443,25 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	{
 		ServerStats.is_ref++;
 		add_reject(source_p);
+		SetDelayExit(client_p);
 		exit_client(client_p, source_p, &me, "Bad user info");
 		return CLIENT_EXITED;
 	}
 
-	/* dnsbl check */
-	if (source_p->localClient->dnsbl_listed != NULL)
+	if(!IsExemptKline(source_p) && IsRBLBanned(source_p))
 	{
-		if (IsExemptKline(source_p) || IsConfExemptDNSBL(aconf))
-			sendto_one_notice(source_p, ":*** Your IP address %s is listed in %s, but you are exempt",
-					source_p->sockhost, source_p->localClient->dnsbl_listed->host);
+		const char *reason;
+		ServerStats.is_ref++;
+		add_reject(source_p);
+		SetDelayExit(client_p);
+		if(EmptyString(source_p->localClient->rblreason))
+			reason = "Banned";
 		else
-		{
-			ServerStats.is_ref++;
-
-			sendto_one(source_p, form_str(ERR_YOUREBANNEDCREEP),
-					me.name, source_p->name,
-					source_p->localClient->dnsbl_listed->reject_reason);
-
-			sendto_one_notice(source_p, ":*** Your IP address %s is listed in %s",
-					source_p->sockhost, source_p->localClient->dnsbl_listed->host);
-			source_p->localClient->dnsbl_listed->hits++;
-			add_reject(source_p);
-			exit_client(client_p, source_p, &me, "*** Banned (DNS blacklist)");
-			return CLIENT_EXITED;
-		}
+			reason = source_p->localClient->rblreason;
+		sendto_realops_flags(UMODE_REJ, L_ALL, "RBLBAN %s %s %s %s :%s", source_p->name, source_p->username, source_p->host, source_p->sockhost, reason);	
+		exit_client(client_p, source_p, &me, reason);
 	}
+
 
 	if(IsAnyDead(client_p))
 		return CLIENT_EXITED;
@@ -494,12 +477,10 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	sendto_realops_flags(UMODE_CCONNEXT, L_ALL,
 			     "CLICONN %s %s %s %s %s %s 0 %s",
 			     source_p->name, source_p->username, source_p->host,
-			     show_ip(NULL, source_p) ? ipaddr : "255.255.255.255",
-			     get_client_class(source_p),
+			     show_ip(NULL, source_p) ? ipaddr : "255.255.255.255", get_client_class(source_p),
 			     /* mirc sometimes puts IPs in here */
 			     show_ip(NULL,
-				     source_p) ? source_p->
-			     localClient->fullcaps : "<hidden> <hidden>", source_p->info);
+				     source_p) ? source_p->localClient->fullcaps : "<hidden> <hidden>", source_p->info);
 
 	/* If they have died in send_* don't do anything. */
 	if(IsAnyDead(source_p))
@@ -528,18 +509,17 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		Count.max_tot = Count.total;
 	source_p->localClient->allow_read = MAX_FLOOD_BURST;
 
-	source_p->localClient->firsttime = rb_time();
+	source_p->localClient->firsttime = rb_current_time();
 
 	Count.totalrestartcount++;
 
 	s_assert(source_p->localClient != NULL);
 
-	if(rb_dlink_list_length(&lclient_list) > (unsigned long)Count.max_loc)
+	if(rb_dlink_list_length(&lclient_list) > Count.max_loc)
 	{
 		Count.max_loc = rb_dlink_list_length(&lclient_list);
 		if(!(Count.max_loc % 10))
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "New Max Local Clients: %d", Count.max_loc);
+			sendto_realops_flags(UMODE_ALL, L_ALL, "New Max Local Clients: %lu", Count.max_loc);
 	}
 
 	/* they get a reduced limit */
@@ -565,7 +545,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 void
 introduce_client(struct Client *client_p, struct Client *source_p)
 {
-	static char ubuf[12];
+	char ubuf[IRCD_BUFSIZE];
 
 	if(MyClient(source_p))
 		send_umode(source_p, source_p, 0, SEND_UMODES, ubuf);
@@ -578,21 +558,38 @@ introduce_client(struct Client *client_p, struct Client *source_p)
 		ubuf[1] = '\0';
 	}
 
-	sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
-		      ":%s UID %s %d %ld %s %s %s %s %s :%s",
-		      source_p->servptr->id, source_p->name,
-		      source_p->hopcount + 1,
-		      (long)source_p->tsinfo, ubuf,
-		      source_p->username, source_p->host,
-		      IsIPSpoof(source_p) ? "0" : source_p->sockhost,
-		      source_p->id, source_p->info);
+	/* if it has an ID, introduce it with its id to TS6 servers,
+	 * otherwise introduce it normally to all.
+	 */
+	if(has_id(source_p))
+	{
+		sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
+			      ":%s UID %s %d %" RBTT_FMT " %s %s %s %s %s :%s",
+			      source_p->servptr->id, source_p->name,
+			      source_p->hopcount + 1,
+			      source_p->tsinfo, ubuf,
+			      source_p->username, source_p->host,
+			      IsIPSpoof(source_p) ? "0" : source_p->sockhost, source_p->id, source_p->info);
+
+		sendto_server(client_p, NULL, NOCAPS, CAP_TS6,
+			      "NICK %s %d %" RBTT_FMT " %s %s %s %s :%s",
+			      source_p->name, source_p->hopcount + 1,
+			      source_p->tsinfo,
+			      ubuf, source_p->username, source_p->host, source_p->servptr->name, source_p->info);
+	}
+	else
+		sendto_server(client_p, NULL, NOCAPS, NOCAPS,
+			      "NICK %s %d %" RBTT_FMT " %s %s %s %s :%s",
+			      source_p->name, source_p->hopcount + 1,
+			      source_p->tsinfo,
+			      ubuf, source_p->username, source_p->host, source_p->servptr->name, source_p->info);
 }
 
 /* report_and_set_user_flags
  *
- * Inputs       - pointer to source_p
- *              - pointer to aconf for this user
- * Output       - NONE
+ * Inputs	- pointer to source_p
+ *		- pointer to aconf for this user
+ * Output	- NONE
  * Side effects -
  * Report to user any special flags they are getting, and set them.
  */
@@ -621,11 +618,6 @@ report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
 		if(!IsConfExemptKline(aconf))
 			sendto_one_notice(source_p, ":*** You are exempt from G lines");
 	}
-
-	if(IsConfExemptDNSBL(aconf))
-		/* kline exempt implies this, don't send both */
-		if(!IsConfExemptKline(aconf))
-			sendto_one_notice(source_p, ":*** You are exempt from DNS blacklists");
 
 	/* If this user is exempt from user limits set it F lined" */
 	if(IsConfExemptLimits(aconf))
@@ -671,6 +663,7 @@ report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
  * user_mode - set get current users mode
  *
  * m_umode() added 15/10/91 By Darren Reed.
+ * parv[0] - sender
  * parv[1] - username to change mode for
  * parv[2] - modes to change
  */
@@ -684,22 +677,21 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 	const char *pm;
 	struct Client *target_p;
 	int what, setflags;
-	int badflag = NO;	/* Only send one bad flag notice */
-	char buf[BUFSIZE];
+	bool badflag = false;	/* Only send one bad flag notice */
+	char buf[IRCD_BUFSIZE];
 
 	what = MODE_ADD;
 
 	if(parc < 2)
 	{
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name, "MODE");
+		sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "MODE");
 		return 0;
 	}
 
 	if((target_p = find_person(parv[1])) == NULL)
 	{
 		if(MyConnect(source_p))
-			sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-					   form_str(ERR_NOSUCHCHANNEL), parv[1]);
+			sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL, form_str(ERR_NOSUCHCHANNEL), parv[1]);
 		return 0;
 	}
 
@@ -709,14 +701,13 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	if(IsServer(source_p))
 	{
-		sendto_realops_flags(UMODE_ALL, L_ADMIN,
-				     "*** Mode for User %s from %s", parv[1], source_p->name);
+		sendto_realops_flags(UMODE_ALL, L_ADMIN, "*** Mode for User %s from %s", parv[1], source_p->name);
 		return 0;
 	}
 
-	if(source_p != target_p)
+	if(source_p != target_p || target_p->from != source_p->from)
 	{
-		sendto_one(source_p, form_str(ERR_USERSDONTMATCH), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(ERR_USERSDONTMATCH));
 		return 0;
 	}
 
@@ -726,11 +717,11 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 		m = buf;
 		*m++ = '+';
 
-		for(i = 0; user_modes[i].letter && (m - buf < BUFSIZE - 4); i++)
+		for(i = 0; user_modes[i].letter && (m - buf < IRCD_BUFSIZE - 4); i++)
 			if(source_p->umodes & user_modes[i].mode)
 				*m++ = user_modes[i].letter;
 		*m = '\0';
-		sendto_one(source_p, form_str(RPL_UMODEIS), me.name, source_p->name, buf);
+		sendto_one_numeric(source_p, s_RPL(RPL_UMODEIS), buf);
 		return 0;
 	}
 
@@ -775,8 +766,7 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 
 					if(MyConnect(source_p))
 					{
-						source_p->umodes &=
-							~ConfigFileEntry.oper_only_umodes;
+						source_p->umodes &= ~ConfigFileEntry.oper_only_umodes;
 						source_p->operflags &= ~OPER_FLAGS;
 
 						rb_free(source_p->localClient->opername);
@@ -805,10 +795,9 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 				if((flag = UserModeBitmask(*pm)))
 				{
 					if(MyConnect(source_p)
-					   && !IsOper(source_p)
-					   && (ConfigFileEntry.oper_only_umodes & flag))
+					   && !IsOper(source_p) && (ConfigFileEntry.oper_only_umodes & flag))
 					{
-						badflag = YES;
+						badflag = true;
 					}
 					else
 					{
@@ -821,13 +810,13 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc, const char
 				else
 				{
 					if(MyConnect(source_p))
-						badflag = YES;
+						badflag = true;
 				}
 				break;
 			}
 
-	if(badflag)
-		sendto_one(source_p, form_str(ERR_UMODEUNKNOWNFLAG), me.name, source_p->name);
+	if(badflag == true)
+		sendto_one_numeric(source_p, s_RPL(ERR_UMODEUNKNOWNFLAG));
 
 	if((source_p->umodes & UMODE_OPERWALL) && !IsOperOperwall(source_p))
 	{
@@ -926,7 +915,7 @@ void
 send_umode_out(struct Client *client_p, struct Client *source_p, int old)
 {
 	struct Client *target_p;
-	char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	rb_dlink_node *ptr;
 
 	send_umode(NULL, source_p, old, SEND_UMODES, buf);
@@ -957,14 +946,12 @@ void
 user_welcome(struct Client *source_p)
 {
 	SetCork(source_p);
-	sendto_one(source_p, form_str(RPL_WELCOME), me.name, source_p->name,
-		   ServerInfo.network_name, source_p->name);
-	sendto_one(source_p, form_str(RPL_YOURHOST), me.name,
-		   source_p->name,
-		   get_listener_name(source_p->localClient->listener), ircd_version);
+	sendto_one_numeric(source_p, s_RPL(RPL_WELCOME), ServerInfo.network_name, source_p->name);
+	sendto_one_numeric(source_p, s_RPL(RPL_YOURHOST), get_listener_name(source_p->localClient->listener),
+			   ircd_version);
 
-	sendto_one(source_p, form_str(RPL_CREATED), me.name, source_p->name, creation);
-	sendto_one(source_p, form_str(RPL_MYINFO), me.name, source_p->name, me.name, ircd_version);
+	sendto_one_numeric(source_p, s_RPL(RPL_CREATED), creation);
+	sendto_one_numeric(source_p, s_RPL(RPL_MYINFO), me.name, ircd_version);
 	show_isupport(source_p);
 
 	show_lusers(source_p);
@@ -972,19 +959,16 @@ user_welcome(struct Client *source_p)
 	if(ConfigFileEntry.short_motd)
 	{
 		sendto_one(source_p,
-			   "NOTICE %s :*** Notice -- motd was last changed at %s",
-			   source_p->name, user_motd_changed);
+			   "NOTICE %s :*** Notice -- motd was last changed at %s", source_p->name, cache_user_motd_updated());
 
 		sendto_one(source_p,
-			   "NOTICE %s :*** Notice -- Please read the motd if you haven't read it",
-			   source_p->name);
+			   "NOTICE %s :*** Notice -- Please read the motd if you haven't read it", source_p->name);
 
-		sendto_one(source_p, form_str(RPL_MOTDSTART), me.name, source_p->name, me.name);
+		sendto_one_numeric(source_p, s_RPL(RPL_MOTDSTART), me.name);
 
-		sendto_one(source_p, form_str(RPL_MOTD),
-			   me.name, source_p->name, "*** This is the short motd ***");
+		sendto_one_numeric(source_p, s_RPL(RPL_MOTD), "*** This is the short motd ***");
 		ClearCork(source_p);
-		sendto_one(source_p, form_str(RPL_ENDOFMOTD), me.name, source_p->name);
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFMOTD));
 	}
 	else
 	{

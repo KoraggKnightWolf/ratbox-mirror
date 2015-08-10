@@ -27,9 +27,6 @@
 #ifndef INCLUDED_class_h
 #define INCLUDED_class_h
 
-struct ConfItem;
-struct Client;
-
 struct Class
 {
 	struct Class *next;
@@ -53,29 +50,29 @@ extern rb_dlink_list class_list;
 extern struct Class *default_class;
 
 #define ClassName(x)	((x)->class_name)
-#define ConFreq(x)      ((x)->con_freq)
+#define ConFreq(x)	((x)->con_freq)
 #define MaxLocal(x)	((x)->max_local)
 #define MaxGlobal(x)	((x)->max_global)
 #define MaxIdent(x)	((x)->max_ident)
 #define MaxUsers(x)	((x)->max_total)
-#define PingFreq(x)     ((x)->ping_freq)
-#define MaxSendq(x)     ((x)->max_sendq)
-#define CurrUsers(x)    ((x)->total)
-#define IpLimits(x)     ((x)->ip_limits)
-#define CidrBitlen(x)   ((x)->cidr_bitlen)
+#define PingFreq(x)	((x)->ping_freq)
+#define MaxSendq(x)	((x)->max_sendq)
+#define CurrUsers(x)	((x)->total)
+#define IpLimits(x)	((x)->ip_limits)
+#define CidrBitlen(x)	((x)->cidr_bitlen)
 #define CidrIpv4Bitlen(x)   ((x)->cidr_ipv4_bitlen)
 #define CidrIpv6Bitlen(x)   ((x)->cidr_ipv6_bitlen)
 #define CidrAmount(x)	((x)->cidr_amount)
-#define ClassPtr(x)      ((x)->c_class)
+#define ClassPtr(x)	 ((x)->c_class)
 
 #define ConfClassName(x) (ClassPtr(x)->class_name)
-#define ConfConFreq(x)   (ClassPtr(x)->con_freq)
-#define ConfMaxLocal(x)  (ClassPtr(x)->max_local)
+#define ConfConFreq(x)	 (ClassPtr(x)->con_freq)
+#define ConfMaxLocal(x)	 (ClassPtr(x)->max_local)
 #define ConfMaxGlobal(x) (ClassPtr(x)->max_global)
-#define ConfMaxIdent(x)  (ClassPtr(x)->max_ident)
-#define ConfMaxUsers(x)  (ClassPtr(x)->max_total)
-#define ConfPingFreq(x)  (ClassPtr(x)->ping_freq)
-#define ConfMaxSendq(x)  (ClassPtr(x)->max_sendq)
+#define ConfMaxIdent(x)	 (ClassPtr(x)->max_ident)
+#define ConfMaxUsers(x)	 (ClassPtr(x)->max_total)
+#define ConfPingFreq(x)	 (ClassPtr(x)->ping_freq)
+#define ConfMaxSendq(x)	 (ClassPtr(x)->max_sendq)
 #define ConfCurrUsers(x) (ClassPtr(x)->total)
 #define ConfIpLimits(x) (ClassPtr(x)->ip_limits)
 #define ConfCidrAmount(x) (ClassPtr(x)->cidr_amount)

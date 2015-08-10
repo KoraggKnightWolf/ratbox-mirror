@@ -37,17 +37,23 @@
 static int m_time(struct Client *, struct Client *, int, const char **);
 
 struct Message time_msgtab = {
-	"TIME", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_time, 0}, {m_time, 2}, mg_ignore, mg_ignore, {m_time, 0}}
+	.cmd = "TIME", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg }, 
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_time, .min_para = 0 },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = m_time, .min_para = 2 },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_time, .min_para = 0 },
 };
 
-mapi_clist_av2 time_clist[] = { &time_msgtab, NULL };
+mapi_clist_av1 time_clist[] = { &time_msgtab, NULL };
 
-DECLARE_MODULE_AV2(time, NULL, NULL, time_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(time, NULL, NULL, time_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_time
- *      parv[1] = servername
+ *	parv[0] = sender prefix
+ *	parv[1] = servername
  */
 static int
 m_time(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -60,8 +66,8 @@ m_time(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(hunt_server(client_p, source_p, ":%s TIME :%s", 1, parc, parv) == HUNTED_ISME)
 	{
-		sendto_one_numeric(source_p, RPL_TIME, form_str(RPL_TIME),
-				   me.name, rb_date(rb_time(), buf, sizeof(buf)));
+		sendto_one_numeric(source_p, s_RPL(RPL_TIME),
+				   me.name, rb_date(rb_current_time(), buf, sizeof(buf)));
 	}
 	return 0;
 }

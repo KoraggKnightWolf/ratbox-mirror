@@ -78,14 +78,15 @@ static void
 verify_logfile_access(const char *filename)
 {
 	char *dirname, *d;
-	char buf[512];
+	char buf[IRCD_BUFSIZE];
 	d = rb_dirname(filename);
 	dirname = LOCAL_COPY(d);
 	rb_free(d);
-	
+
 	if(access(dirname, F_OK) == -1)
 	{
-		rb_snprintf(buf, sizeof(buf), "WARNING: Unable to access logfile %s - parent directory %s does not exist", filename, dirname);
+		snprintf(buf, sizeof(buf), "WARNING: Unable to access logfile %s - parent directory %s does not exist",
+			 filename, dirname);
 		if(testing_conf || server_state_foreground)
 			fprintf(stderr, "%s\n", buf);
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s", buf);
@@ -96,20 +97,21 @@ verify_logfile_access(const char *filename)
 	{
 		if(access(dirname, W_OK) == -1)
 		{
-			rb_snprintf(buf, sizeof(buf), "WARNING: Unable to access logfile %s - access to parent directory %s failed: %m", 
-				    filename, dirname);
+			snprintf(buf, sizeof(buf),
+				 "WARNING: Unable to access logfile %s - access to parent directory %s failed: %s",
+				 filename, dirname, strerror(errno));
 			if(testing_conf || server_state_foreground)
 				fprintf(stderr, "%s\n", buf);
 			sendto_realops_flags(UMODE_ALL, L_ALL, "%s", buf);
 		}
 		return;
 	}
-	
+
 	if(access(filename, W_OK) == -1)
 	{
-		rb_snprintf(buf, sizeof(buf), "WARNING: Access denied for logfile %s: %m", filename);
+		snprintf(buf, sizeof(buf), "WARNING: Access denied for logfile %s: %s", filename, strerror(errno));
 		if(testing_conf || server_state_foreground)
-			fprintf(stderr, "%s\n", buf);	
+			fprintf(stderr, "%s\n", buf);
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s", buf);
 		return;
 	}
@@ -170,31 +172,32 @@ void
 ilog(ilogfile dest, const char *format, ...)
 {
 	FILE *logfile = *log_table[dest].logfile;
-	char buf[BUFSIZE];
-	char buf2[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
+	char buf2[IRCD_BUFSIZE];
 	va_list args;
 
-#ifndef _WIN32
-
-	if(logfile == NULL)
-		return;
-#endif
 	va_start(args, format);
-	rb_vsnprintf(buf, sizeof(buf), format, args);
+	vsnprintf(buf, sizeof(buf), format, args);
 	va_end(args);
 
-	rb_snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(rb_time()), buf);
-#ifdef _WIN32
-	fputs(buf2, stderr);
-	fflush(stderr);
+	snprintf(buf2, sizeof(buf2), "%s %s\n", smalldate(rb_current_time()), buf);
+#ifndef _WIN32
+	if(logfile == NULL || server_state_foreground)
+	{
+#endif
+		fputs(buf2, stderr);
+		fflush(stderr);
+#ifndef _WIN32
+	}
+#endif
 
 	if(logfile == NULL)
 		return;
-#endif
+
 	if(fputs(buf2, logfile) < 0)
 	{
-		sendto_realops_flags(UMODE_ALL, L_ALL, "Closing logfile: %s (%m)",
-				     *log_table[dest].name);
+		sendto_realops_flags(UMODE_ALL, L_ALL, "Closing logfile: %s (%s)",
+				     *log_table[dest].name, strerror(errno));
 		fclose(logfile);
 		*log_table[dest].logfile = NULL;
 		return;
@@ -208,8 +211,7 @@ report_operspy(struct Client *source_p, const char *token, const char *arg)
 {
 	/* if its not my client its already propagated */
 	if(MyClient(source_p))
-		sendto_match_servs(source_p, "*", CAP_ENCAP, NOCAPS,
-				   "ENCAP * OPERSPY %s %s", token, arg ? arg : "");
+		sendto_match_servs(source_p, "*", CAP_ENCAP, NOCAPS, "ENCAP * OPERSPY %s %s", token, arg ? arg : "");
 
 	sendto_realops_flags(UMODE_OPERSPY,
 			     ConfigFileEntry.operspy_admin_only ? L_ADMIN : L_ALL,
@@ -226,38 +228,10 @@ smalldate(time_t ltime)
 
 	lt = gmtime(&ltime);
 
-	rb_snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
-		    lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min);
+	snprintf(buf, sizeof(buf), "%d/%d/%d %02d.%02d",
+		 lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min);
 
 	return buf;
 }
 
-/*
- * report_error - report an error from an errno. 
- * Record error to log and also send a copy to all *LOCAL* opers online.
- *
- *        text        is a *format* string for outputing error. It must
- *                contain only two '%s', the first will be replaced
- *                by the sockhost from the client_p, and the latter will
- *                be taken from sys_errlist[errno].
- *
- *        client_p        if not NULL, is the *LOCAL* client associated with
- *                the error.
- *
- * Cannot use perror() within daemon. stderr is closed in
- * ircd and cannot be used. And, worse yet, it might have
- * been reassigned to a normal connection...
- * 
- * Actually stderr is still there IFF ircd was run with -s --Rodder
- */
 
-void
-report_error(const char *text, const char *who, const char *wholog, int error)
-{
-	who = (who) ? who : "";
-	wholog = (wholog) ? wholog : "";
-
-	sendto_realops_flags(UMODE_DEBUG, L_ALL, text, who, strerror(error));
-
-	ilog(L_IOERROR, text, wholog, strerror(error));
-}

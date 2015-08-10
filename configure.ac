@@ -5,14 +5,18 @@ dnl TODO: clean up all the OpenSSL and shared module checking stuff;
 dnl the most major changes have already been made and it looks like
 dnl said functions need to be just about as complex as they already are.
 
-AC_PREREQ(2.68)
+AC_PREREQ(2.63)
 AUTOMAKE_OPTIONS = 1.10
+
 dnl Sneaky way to get an Id tag into the configure script
 AC_COPYRIGHT([$Id$])
 AC_INIT([ircd-ratbox],[devel])
-AM_INIT_AUTOMAKE
+AC_CONFIG_AUX_DIR([libltdl/config])
+AC_CONFIG_MACRO_DIR([libltdl/m4])
 
-AC_CONFIG_MACRO_DIR([m4])
+
+AM_INIT_AUTOMAKE([subdir-objects])
+
 AM_CONFIG_HEADER(include/setup.h)
 
 AC_PREFIX_DEFAULT(/usr/local/ircd)
@@ -23,13 +27,17 @@ AC_PATH_PROG(CP, cp)
 AC_PATH_PROG(MV, mv)
 AC_PATH_PROG(RB_RM, rm)
 
-
+dnl autoconf likes to put -O2 everywhere...like a jerk
 AC_PROG_CC_C99
+
+
 
 if test x"$ac_cv_prog_cc_c99" = "xno"; then
 	AC_ERROR([ircd-ratbox requires a C99 capable compiler])
 fi
 
+
+AC_CANONICAL_HOST
 
 AM_PROG_LEX
 
@@ -41,29 +49,13 @@ GCJ=no
 
 AM_DISABLE_STATIC
 AM_ENABLE_SHARED
-if test "$enable_static" = "yes"; then
-	AM_DISABLE_SHARED
-	AM_ENABLE_STATIC	
-        AC_DEFINE([STATIC_MODULES], 1, [Define to 1 if dynamic modules cant be used.])
-else
-	enable_static="no"
-fi
-
-LT_INIT
-LT_CONFIG_LTDL_DIR([libltdl])
-LTDL_INIT([convenience])
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
-AC_LIBTOOL_DLOPEN
-AM_PROG_CC_C_O
-AM_MAINTAINER_MODE
+AM_MAINTAINER_MODE([disable])
 
 AC_ISC_POSIX
 AC_C_INLINE
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
-AC_PROG_YACC
 
 srcpwd=`cd ${srcdir} ; ${PWDCMD-pwd}`
 
@@ -73,42 +65,62 @@ if test "$INSTALL" = "${srcdir}/install-sh -c"; then
   INSTALL="${srcpwd}/install-sh -c"
 fi
 
+AC_PROG_YACC
 AC_LANG(C)
 
 AM_CONDITIONAL([STATIC_MODULES], test "$enable_static" = "yes")
 
-GCC_STACK_PROTECT_CC
+if test x"$enable_static" = "xyes"; then
+	AC_DEFINE(STATIC_MODULES, 1, "Use static modules")
+fi 
 
 cc_accepts_flag()
 {
-	cc_accepts_flag_CFLAGS="$CFLAGS"
-	CFLAGS="$*"
-	AC_MSG_CHECKING([whether $CC accepts $@])
-	AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])] ,
-	[RC=0; AC_MSG_RESULT([yes])],
-	[RC=1; AC_MSG_RESULT([no])])
-	CFLAGS="$cc_accepts_flag_CFLAGS"
-	return $RC
+        cc_accepts_flag_CFLAGS="$CFLAGS"
+        CFLAGS="$*" 
+        AC_MSG_CHECKING([whether $CC accepts $@])
+        AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])] ,
+        [RC=0; AC_MSG_RESULT([yes])],
+        [RC=1; AC_MSG_RESULT([no])])
+        CFLAGS="$cc_accepts_flag_CFLAGS"
+        return $RC
 }
 
-dnl This is kinda hackish since i couldn't find the documentation for proper
-dnl -fstack-protector-strong -- dubkat
-if cc_accepts_flag -fstack-protector-strong; then
-        dnl CFLAGS="${CFLAGS#-fstack-protector}"
-        CFLAGS="$CFLAGS -fstack-protector-strong"
-fi
+have_win=no 
+case "$host_os" in
+        mingw*)
+                have_win=yes
+        ;;
+        cygwin*)
+        	have_win=yes
+        ;;
+esac
+        
 
-if cc_accepts_flag -fno-strict-aliasing; then
-	CFLAGS="$CFLAGS -fno-strict-aliasing"
-fi
+if test xyes != x"$have_win"; then
 
+
+${CC} -v 2>&1 | grep -q clang
+
+if test $? -eq 0 ; then
+	CFLAGS="$CFLAGS -fstack-protector -D_FORTIFY_SOURCE=2"
+else if cc_accepts_flag -fstack-protector-strong; then
+	CFLAGS="$CFLAGS -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+else if cc_accepts_flag -fstack-protector-all; then
+	CFLAGS="$CFLAGS -fstack-protector-all -D_FORTIFY_SOURCE=2"
+else if cc_accepts_flag -fstack-protector; then
+	CFLAGS="$CFLAGS -fstack-protector -D_FORTIFY_SOURCE=2"
+fi
+fi
+fi
+fi
+fi
+  
 WARNLIST="  
 	all  
 	cast-qual
-	format
-	format-security
 	missing-declarations
-	missing-prototypes
+	missing-prototypes  
 	nested-externs
 	shadow
 	write-strings
@@ -121,6 +133,19 @@ for x in $WARNLIST; do
 		WARNFLAGS="$WARNFLAGS -W$x";
 	fi
 done
+
+
+LT_CONFIG_LTDL_DIR([libltdl])
+
+LT_INIT([dlopen])
+
+LTDL_INIT([subproject])
+
+if test xyes = x"$with_included_ltdl"; then
+	AC_SUBST(LTDL_SUBDIR, libltdl)
+else
+	AC_SUBST(LTDL_SUBDIR, '')
+fi
 
 LIBTOOL="$LIBTOOL --silent"
 
@@ -151,7 +176,7 @@ if test "$LEX" != flex; then
 fi
 
 # backwards support for IRC_CFLAGS
-CFLAGS="$IRC_CFLAGS $CFLAGS"
+CFLAGS="$CFLAGS $IRC_CFLAGS"
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -159,10 +184,11 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
 
-AC_CHECK_HEADERS([sys/types.h sys/resource.h sys/param.h sys/stat.h sys/socket.h netinet/in.h arpa/inet.h errno.h stddef.h ])
+AC_CHECK_HEADERS([sys/types.h sys/resource.h sys/param.h sys/stat.h sys/socket.h netinet/in.h arpa/inet.h errno.h stddef.h strings.h string.h])
 AC_HEADER_TIME
 
-AC_CHECK_FUNCS([snprintf])
+AC_CHECK_FUNCS([snprintf vasprintf asprintf lstat stat])
+
 
 dnl Networking Functions
 dnl ====================
@@ -173,22 +199,6 @@ dnl this gets passed on to the libratbox configure
 AC_ARG_ENABLE(ipv6,AC_HELP_STRING([--disable-ipv6],[Disable IPv6 support (not recommended)]),[ipv6=$enableval],[ipv6=yes])
         
 
-dnl See whether we can include both string.h and strings.h.
-AC_CACHE_CHECK([whether string.h and strings.h may both be included],
-gcc_cv_header_string,
-[
-	AC_COMPILE_IFELSE([AC_LANG_SOURCE(
-	[#include <string.h>
-	#include <strings.h>
-	])], 
-	[gcc_cv_header_string=yes],
-	[gcc_cv_header_string=no])
-])
-
-if test "$gcc_cv_header_string" = "yes"; then
-	AC_DEFINE(STRING_WITH_STRINGS, 1, [Define to 1 if string.h may be included along with strings.h])
-fi
-
 AC_C_BIGENDIAN
 
 dnl Check for stdarg.h - if we can't find it, halt configure
@@ -196,127 +206,35 @@ AC_CHECK_HEADER(stdarg.h, , [AC_MSG_ERROR([** stdarg.h could not be found - ircd
 
 AC_FUNC_ALLOCA
 
+AC_CHECK_SIZEOF(time_t,,[
+AC_INCLUDES_DEFAULT
+#ifdef TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# ifdef HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
+])
+
+AC_CHECK_SIZEOF(long)
+
 dnl Specialized functions checks
 dnl ============================
 
+PKG_CHECK_MODULES([sqlite3], [sqlite3], [cf_enable_sqlite3=yes], [cf_enable_sqlite3=no])
 
-dnl OpenSSL support
-AC_MSG_CHECKING(for OpenSSL)
-AC_ARG_ENABLE(openssl,
-[AC_HELP_STRING([--enable-openssl[=DIR]],[Enable OpenSSL support (DIR optional).])
-AC_HELP_STRING([--disable-openssl],[Disable OpenSSL support.])],
-[cf_enable_openssl=$enableval],
-[cf_enable_openssl="auto"])
-
-if test "$cf_enable_openssl" != "no" ; then
-	cf_openssl_basedir=""
-	if test "$cf_enable_openssl" != "auto" &&
-	test "$cf_enable_openssl" != "yes" ; then
-		dnl Support for --enable-openssl=/some/place
-		cf_openssl_basedir="`echo ${cf_enable_openssl} | sed 's/\/$//'`"
-	else
-	dnl Do the auto-probe here.  Check some common directory paths.
-		for dirs in /usr/local/ssl /usr/pkg /usr/local \
-		/usr/local/openssl ; do
-			if test -f "${dirs}/include/openssl/opensslv.h" ; then
-				cf_openssl_basedir="${dirs}"
-			break
-			fi
-		done
-		unset dirs
-	fi
-	dnl Now check cf_openssl_found to see if we found anything.
-	if test ! -z "$cf_openssl_basedir"; then
-		if test -f "${cf_openssl_basedir}/include/openssl/opensslv.h" ; then
-			SSL_INCLUDES="-I${cf_openssl_basedir}/include"
-			SSL_LIBS="-L${cf_openssl_basedir}/lib $lt_cv_dlopen_libs"
-		else
-		dnl OpenSSL wasn't found in the directory specified.  Naughty
-		dnl administrator...
-		cf_openssl_basedir=""
-		fi
-	else
-	dnl Check for stock FreeBSD 4.x and 5.x systems, since their files
-	dnl are in /usr/include and /usr/lib.  In this case, we don't want to
-	dnl change INCLUDES or LIBS, but still want to enable OpenSSL.
-	dnl We can't do this check above, because some people want two versions
-	dnl of OpenSSL installed (stock FreeBSD 4.x/5.x and /usr/local/ssl)
-	dnl and they want /usr/local/ssl to have preference.
-		if test -f "/usr/include/openssl/opensslv.h" ; then
-			cf_openssl_basedir="/usr"
-		fi
-	fi
-
-	dnl If we have a basedir defined, then everything is okay.  Otherwise,
-	dnl we have a problem.
-	if test ! -z "$cf_openssl_basedir"; then
-		AC_MSG_RESULT($cf_openssl_basedir)
-		cf_enable_openssl="yes"
-	else
-		AC_MSG_RESULT([not found. Specify a correct path?])
-		cf_enable_openssl="no"
-	fi
-	unset cf_openssl_basedir
-else
-	dnl If --disable-openssl was specified
-	AC_MSG_RESULT(disabled)
-fi
-
-save_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $SSL_INCLUDES"
-save_LIBS="$LIBS"
-LIBS="$LIBS $SSL_LIBS"
-
-
-
-if test "$cf_enable_openssl" != no; then
-	dnl Check OpenSSL version (must be 0.9.7 or above!)
-	AC_MSG_CHECKING(for OpenSSL 0.9.7 or above)
-	AC_RUN_IFELSE([
-		AC_LANG_PROGRAM(
-	    	[#include <openssl/opensslv.h>
-		#include <stdlib.h>],
-		[[if (OPENSSL_VERSION_NUMBER >= 0x00907000)
-		exit(0); else exit(1);]])],
-	cf_enable_openssl=yes,
-	cf_enable_openssl=no,
-	cf_enable_openssl=no)
-
-	if test "$cf_enable_openssl" = yes; then
-		AC_MSG_RESULT(found)
-	else
-		cf_enable_openssl=no
-		AC_MSG_RESULT(not found - OpenSSL support disabled)
-	fi
-fi
-
-if test "$cf_openssl_version_ok" != no; then
-	CPPFLAGS="$CPPFLAGS $SSL_LIBS"
-	AC_CHECK_LIB(crypto, RSA_free, 
-		[SSL_LIBS="$SSL_LIBS -lcrypto $lt_cv_dlopen_libs"], 
-		[cf_enable_openssl=no]  
-	)
-fi
-
-if test "$cf_enable_openssl" != no; then
-	AC_DEFINE(USE_CHALLENGE, 1, [Define to enable CHALLENGE support, requires OpenSSL])
-fi
-
-CPPFLAGS="$save_CPPFLAGS"
-LIBS="$save_LIBS"
-
-dnl End OpenSSL detection
 
 ac_cv_build_sqlite3=no
 
-AC_CHECK_SQLITE3
-
-
-if test x"$ac_sqlite3" != xyes; then
+if test x"$cf_enable_sqlite3" != xyes; then
 	ac_cv_build_sqlite3=yes
 	SQLITE_SUBDIR=sqlite3
 	AC_SUBST(SQLITE_SUBDIR)
-	SQLITE3_CFLAGS="-Isqlite3"
+	sqlite3_CFLAGS="-Isqlite3"
 	save_LIBS=$LIBS
 	AC_SEARCH_LIBS(fdatasync, [rt],,)
 	FDATASYNCLIB=$ac_cv_search_fdatasync
@@ -330,8 +248,8 @@ if test x"$ac_sqlite3" != xyes; then
 		unset FDATASYNCLIB
 	fi
         	
-	SQLITE3_LIBS="$FDATASYNCLIB sqlite3/libsqlite3.a"
-	AC_SUBST(SQLITE3_LIBS, $SQLITE3_LIBS)
+	sqlite3_LIBS="$FDATASYNCLIB sqlite3/libsqlite3.a"
+	AC_SUBST(sqlite3_LIBS, $sqlite3_LIBS)
 	
 fi
 
@@ -339,6 +257,26 @@ dnl AC_SUBST(SQLITE3_LIBS, $SQLITE3_LIBS)
 dnl AC_SUBST(SQLITE3_CFLAGS, $SQLITE3_CFLAGS)
 
 AM_CONDITIONAL([BUILD_SQLITE], [test "$ac_cv_build_sqlite3" = yes])
+
+
+AC_ARG_ENABLE(openssl,
+[AC_HELP_STRING([--enable-openssl],[Enable OpenSSL support.])
+AC_HELP_STRING([--disable-openssl],[Disable OpenSSL support.])],
+[cf_enable_openssl=$enableval],
+[cf_enable_openssl="auto"])
+
+
+if test "$cf_enable_openssl" != "no"; then
+	PKG_CHECK_MODULES([OpenSSL], [openssl >= 0.9.8], [cf_enable_openssl=yes], [cf_enable_openssl=no])
+fi
+
+if test "$cf_enable_openssl" != no; then
+	AC_DEFINE(USE_CHALLENGE, 1, [Define to enable CHALLENGE support, requires OpenSSL])
+fi
+
+
+
+dnl End OpenSSL detection
 
 
 
@@ -453,19 +391,6 @@ elif test "$assert" = yes; then
 	assert = "hard";
 fi
 
-AC_MSG_CHECKING(if you want IO Debugging hooks)
-AC_ARG_ENABLE(iodebug,
-AC_HELP_STRING([--enable-iodebug],[Enable IO Debugging hooks]),
-[iodebug=$enableval], [iodebug=no])
-
-if test "$iodebug" = yes; then
-	AC_DEFINE(USE_IODEBUG_HOOKS, 1, [Define this to enable IO Debug hooks.])
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-
-
 AC_MSG_CHECKING(if you want to do a profile build)
 AC_ARG_ENABLE(profile,
 AC_HELP_STRING([--enable-profile],[Enable profiling]),
@@ -483,7 +408,6 @@ else
 	AC_MSG_RESULT(no)
 fi
 
-
 dnl Server Tweaks
 dnl =============
 
@@ -500,76 +424,18 @@ fi
 
 AM_CONDITIONAL([ENABLE_SERVICES], [test x"$M_SERVICES" != "x"])
 
-AC_ARG_ENABLE(small-net,
-AC_HELP_STRING([--enable-small-net],[Enable small network support.]),
-[small_net=$enableval], [small_net=no])
 
-if test "$small_net" = yes; then
-dnl	AC_DEFINE([HASHSIZE], 4096, [Max number of buckets in hash tables.])
-	AC_DEFINE([NICKNAMEHISTORYLENGTH], 1500, [Size of the WHOWAS array.])
-	AC_DEFINE([CHANNEL_HEAP_SIZE], 256, [Size of the channel heap.])
-	AC_DEFINE([BAN_HEAP_SIZE], 128, [Size of the ban heap.])
-	AC_DEFINE([CLIENT_HEAP_SIZE], 256, [Size of the client heap.])
-	AC_DEFINE([LCLIENT_HEAP_SIZE], 128, [Size of the local client heap.])
-	AC_DEFINE([USER_HEAP_SIZE], 128, [Size of the user heap.])
-	AC_DEFINE([DNODE_HEAP_SIZE], 512, [Size of the dlink_node heap.])
-	AC_DEFINE([TOPIC_HEAP_SIZE], 256, [Size of the topic heap.])
-	AC_DEFINE([LINEBUF_HEAP_SIZE], 128, [Size of the linebuf heap.])
-	AC_DEFINE([MEMBER_HEAP_SIZE], 256, [Sizeof member heap.])
-	AC_DEFINE([ND_HEAP_SIZE], 128, [Size of the nick delay heap.])
-	AC_DEFINE([CONFITEM_HEAP_SIZE], 128, [Size of the confitem heap.])
-	AC_DEFINE([MONITOR_HEAP_SIZE], 128, [Size of the monitor heap.])
-	AC_DEFINE([AUTH_HEAP_SIZE], 128, [Size of the auth heap.])
-	AC_DEFINE([FD_HEAP_SIZE], 128, [Size of fd heap.])
-	AC_DEFINE([AWAY_HEAP_SIZE], 128, [Size of away heap.])
-else
-dnl These settings are for a large network like efnet..they will use lots of memory
-dnl so enable small net unless you really need this much support
-        AC_DEFINE([NICKNAMEHISTORYLENGTH], 30000, [Size of the WHOWAS array.])
-        AC_DEFINE([CHANNEL_HEAP_SIZE], 8192, [Size of the channel heap.])
-        AC_DEFINE([BAN_HEAP_SIZE], 4096, [Size of the ban heap.])
-        AC_DEFINE([CLIENT_HEAP_SIZE], 8192, [Size of the client heap.])
-        AC_DEFINE([LCLIENT_HEAP_SIZE], 1024, [Size of the local client heap.])
-        AC_DEFINE([USER_HEAP_SIZE], 8192, [Size of the user heap.])
-        AC_DEFINE([DNODE_HEAP_SIZE], 8192, [Size of the dlink_node heap.])
-        AC_DEFINE([TOPIC_HEAP_SIZE], 4096, [Size of the topic heap.])
-        AC_DEFINE([LINEBUF_HEAP_SIZE], 2048, [Size of the linebuf heap.])
-        AC_DEFINE([MEMBER_HEAP_SIZE], 32768, [Sizeof member heap.])
-        AC_DEFINE([ND_HEAP_SIZE], 512, [Size of the nick delay heap.])
-        AC_DEFINE([CONFITEM_HEAP_SIZE], 1024, [Size of the confitem heap.])
-	AC_DEFINE([MONITOR_HEAP_SIZE], 1024, [Size of the monitor heap.])
-	AC_DEFINE([AUTH_HEAP_SIZE], 256, [Size of the auth heap.])
-	AC_DEFINE([FD_HEAP_SIZE], 1024, [Size of fd heap.])
-	AC_DEFINE([AWAY_HEAP_SIZE], 512, [Size of away heap.])
-
-fi
-
-AC_ARG_WITH(nicklen,
-AC_HELP_STRING([--with-nicklen=LENGTH],[Set the nick length to LENGTH (default 9, max 50)]),
-[
-  if ! expr "$withval" + 0 >/dev/null 2>&1; then 
-	AC_ERROR([NICKLEN must be a numeric value])
-  fi 
-  if test $withval -ge 50; then
-	NICKLEN=50
-	AC_MSG_WARN([NICKLEN has a hard limit of 50. Setting NICKLEN=50])
-  else
-	NICKLEN="$withval"
-  fi
-], [NICKLEN=9])
-
-AC_DEFINE_UNQUOTED(NICKLEN, (${NICKLEN}+1), [Nickname length])
 AC_DEFINE_UNQUOTED(RATBOX_CONFIGURE_OPTS, "$ac_configure_args", [configure arguments])
 
 
 AC_SUBST(SSL_INCLUDES)
 AC_SUBST(SSL_LIBS)
+
 AC_SUBST(LDFLAGS)
 AC_SUBST(PICFLAGS)
 AC_SUBST(CFLAGS)
 AC_SUBST(SEDOBJ)
 AC_SUBST(WARNFLAGS)
-
 
 if test "$prefix" = "NONE"; then 
 	AC_DEFINE_UNQUOTED(IRCD_PREFIX, "$ac_default_prefix", [Prefix where the ircd is installed.])
@@ -622,8 +488,7 @@ AC_CONFIG_FILES(		\
 	help/Makefile		\
 	modules/Makefile	\
 	src/Makefile		\
-	install-mod.sh		\
-	tools/ircd_crontab.sh
+	install-mod.sh
 )
 
 AC_OUTPUT
@@ -649,10 +514,6 @@ fi
 echo "Modules ........................ $tmpresult"
 echo "IO Debugging hooks ............. $iodebug"
 echo "Assert debugging ............... $assert"
-echo "Small network .................. $small_net"
 echo "ratbox-services compatibility .. $ratbox_services"
-echo
-echo "Configured limits:"
-echo "NICKLEN ................. $NICKLEN"
 echo
 

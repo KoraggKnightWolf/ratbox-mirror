@@ -1,3 +1,10 @@
+#
+# Makefile.am: stuff for automake to vomit back up in a digested form
+# $Id$ 
+#
+
+
+
 prefix          = @prefix@
 libcoredir      = @libdir@
 modulesdir      = @moduledir@/autoload
@@ -6,8 +13,17 @@ servicesdir     = @moduledir@/autoload
 libmodulesdir   = @moduledir@
 contribdir	= @moduledir@/contrib
 
-INCLUDES = -I../include -I../libratbox/include $(INCLTDL)
+AM_CPPFLAGS = -I../include -I../libratbox/include $(INCLTDL)
 AM_CFLAGS=$(WARNFLAGS)
+
+if MINGW
+EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
+endif
+
+
+MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
+
+
 
 SRCS = \
 example_module.c        \
@@ -20,7 +36,7 @@ m_ojoin.c       \
 m_okick.c       \
 m_olist.c       \
 m_opme.c        \
-m_webirc.c      \
+m_webirc.c	\
 spy_admin_notice.c      \
 spy_info_notice.c       \
 spy_links_notice.c      \
@@ -37,10 +53,10 @@ ST_OBJS = $(ALL_SRCS:.c=.lo) $(CORE_SRCS:.c=.lo)
 SUFFIXES = .c .so .lo .la
 
 .c.lo:
-	$(LIBTOOL) --mode=compile $(CC) -prefer-pic -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(CFLAGS) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CC) -prefer-pic -DHAVE_CONFIG_H $(INCLUDES) $(AM_CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
 
 .lo.la:
-	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -module -avoid-version $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS) 
+	$(LIBTOOL) --mode=link  $(CC) -rpath $(moduledir) -module -avoid-version $(AM_CFLAGS) $(CFLAGS) -o $@ $< $(LIBS) $(LDFLAGS) 
 
 all: $(S_OBJS) $(S_CORE_OBJS) 
 

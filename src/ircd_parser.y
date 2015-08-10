@@ -11,8 +11,8 @@
 
 #define YY_NO_UNPUT
 
-int yyparse(void);
-int yylex(void);
+int yyparse();
+int yylex();
 
 static time_t conf_find_time(char*);
 
@@ -34,7 +34,7 @@ static struct {
 	{"byte",	"bytes",	1},
 	{"kb",		NULL,		1024},
 	{"kbyte",	"kbytes",	1024},
-	{"kilobyte",	"kilebytes",	1024},
+	{"kilobyte",	"kilobytes",	1024},
 	{"mb",		NULL,		1024 * 1024},
 	{"mbyte",	"mbytes",	1024 * 1024},
 	{"megabyte",	"megabytes",	1024 * 1024},

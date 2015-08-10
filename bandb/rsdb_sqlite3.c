@@ -35,104 +35,87 @@
 
 #include <sqlite3.h>
 
-struct sqlite3 *rb_bandb;
-
-rsdb_error_cb *error_cb;
 
 static void
-mlog(const char *errstr, ...)
+mlog(rsdb_conn_t *dbconn, const char *errstr, ...)
 {
-	if(error_cb != NULL)
+	if(dbconn != NULL && dbconn->error_cb != NULL)
 	{
 		char buf[256];
 		va_list ap;
 		va_start(ap, errstr);
-		rb_vsnprintf(buf, sizeof(buf), errstr, ap);
+		vsnprintf(buf, sizeof(buf), errstr, ap);
 		va_end(ap);
-		error_cb(buf);
+		dbconn->error_cb(buf, dbconn->error_cb_data);
 	}
 	else
 		exit(1);
 }
 
-int
-rsdb_init(const char *dbpath, rsdb_error_cb * ecb)
-{
-	char errbuf[128];
-	error_cb = ecb;
 
-	if(sqlite3_open(dbpath, &rb_bandb) != SQLITE_OK)
+
+rsdb_conn_t *
+rsdb_init(const char *dbpath, rsdb_error_cb * ecb, void *data)
+{
+	rsdb_conn_t *conn;
+	conn = rb_malloc(sizeof(rsdb_conn_t));
+
+
+	if(sqlite3_open(dbpath, &conn->ptr) != SQLITE_OK)
 	{
-		rb_snprintf(errbuf, sizeof(errbuf), "Unable to open sqlite database: %s",
-			    sqlite3_errmsg(rb_bandb));
-		mlog(errbuf);
-		return -1;
+		mlog(conn, "Unable to open sqlite database: %s", sqlite3_errmsg(conn->ptr));
+		rb_free(conn->ptr);
+		rb_free(conn);
+		return NULL;
 	}
 	if(access(dbpath, W_OK))
 	{
-		rb_snprintf(errbuf, sizeof(errbuf),  "Unable to open sqlite database for write: %s", strerror(errno));
-		mlog(errbuf);
-		return -1;			
+		mlog(conn, "Unable to open sqlite database for write: %s", strerror(errno));
+		rb_free(conn->ptr);
+		rb_free(conn);
+		return NULL;			
 	}
-	return 0;
+	conn->error_cb = ecb;
+	conn->error_cb_data = data;
+	return conn;
 }
 
 void
-rsdb_shutdown(void)
+rsdb_shutdown(rsdb_conn_t *dbconn)
 {
-	if(rb_bandb)
-		sqlite3_close(rb_bandb);
+	if(dbconn->ptr != NULL)
+		sqlite3_close(dbconn->ptr);
 }
 
-const char *
-rsdb_quote(const char *src)
-{
-	static char buf[BUFSIZE * 4];
-	char *p = buf;
-
-	/* cheap and dirty length check.. */
-	if(strlen(src) >= (sizeof(buf) / 2))
-		return NULL;
-
-	while(*src)
-	{
-		if(*src == '\'')
-			*p++ = '\'';
-
-		*p++ = *src++;
-	}
-
-	*p = '\0';
-	return buf;
-}
 
 static int
 rsdb_callback_func(void *cbfunc, int argc, char **argv, char **colnames)
 {
 	rsdb_callback cb = (rsdb_callback)((uintptr_t)cbfunc);
-	(cb) (argc, (const char **)argv);
+	(cb) (argc, (const char **)(uintptr_t)argv);
 	return 0;
 }
 
 void
-rsdb_exec(rsdb_callback cb, const char *format, ...)
+rsdb_exec(rsdb_conn_t *dbconn, rsdb_callback cb, const char *format, ...)
 {
-	static char buf[BUFSIZE * 4];
+	char buf[IRCD_BUFSIZE*4];
 	va_list args;
 	char *errmsg;
 	unsigned int i;
 	int j;
+	char *retval;
 
 	va_start(args, format);
-	i = rs_vsnprintf(buf, sizeof(buf), format, args);
+	retval = sqlite3_vsnprintf(sizeof(buf), buf, format, args);
 	va_end(args);
 
-	if(i >= sizeof(buf))
-	{
-		mlog("fatal error: length problem with compiling sql");
-	}
+        if(strlen(retval) >= sizeof(buf)-1)
+        {
+                mlog(dbconn, "fatal error: length problem with compiling sql");
+        }
 
-	if((i = sqlite3_exec(rb_bandb, buf, (cb ? rsdb_callback_func : NULL), (void *)((uintptr_t)cb), &errmsg)))
+	if((i = sqlite3_exec(dbconn->ptr, buf, (cb ? rsdb_callback_func : NULL), (void *)((uintptr_t)cb), &errmsg)))
 	{
 		switch (i)
 		{
@@ -141,43 +124,44 @@ rsdb_exec(rsdb_callback cb, const char *format, ...)
 			{
 				rb_sleep(0, 500000);
 				if(!sqlite3_exec
-				   (rb_bandb, buf, (cb ? rsdb_callback_func : NULL), (void *)((uintptr_t)cb), &errmsg))
+				   (dbconn->ptr, buf, (cb ? rsdb_callback_func : NULL), (void *)((uintptr_t)cb), &errmsg))
 					return;
 			}
 
 			/* failed, fall through to default */
-			mlog("fatal error: problem with db file: %s", errmsg);
+			mlog(dbconn, "fatal error: problem with db file: %s", errmsg);
 			break;
 
 		default:
-			mlog("fatal error: problem with db file: %s", errmsg);
+			mlog(dbconn, "fatal error: problem with db file: %s", errmsg);
 			break;
 		}
 	}
 }
 
 void
-rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
+rsdb_exec_fetch(rsdb_conn_t *dbconn, struct rsdb_table *table, const char *format, ...)
 {
-	static char buf[BUFSIZE * 4];
+	char buf[IRCD_BUFSIZE * 4];
 	va_list args;
 	char *errmsg;
 	char **data;
 	int pos;
-	unsigned int retval;
+	int retval;
+	char *p;
 	int i, j;
 
 	va_start(args, format);
-	retval = rs_vsnprintf(buf, sizeof(buf), format, args);
+	p = sqlite3_vsnprintf(sizeof(buf), buf, format, args);
 	va_end(args);
 
-	if(retval >= sizeof(buf))
+	if(strlen(p) >= sizeof(buf) - 1)
 	{
-		mlog("fatal error: length problem with compiling sql");
+		mlog(dbconn, "fatal error: length problem with compiling sql");
 	}
 
 	if((retval =
-	    sqlite3_get_table(rb_bandb, buf, &data, &table->row_count, &table->col_count, &errmsg)))
+	    sqlite3_get_table(dbconn->ptr, buf, &data, &table->row_count, &table->col_count, &errmsg)))
 	{
 		int success = 0;
 
@@ -188,7 +172,7 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 			{
 				rb_sleep(0, 500000);
 				if(!sqlite3_get_table
-				   (rb_bandb, buf, &data, &table->row_count, &table->col_count,
+				   (dbconn->ptr, buf, &data, &table->row_count, &table->col_count,
 				    &errmsg))
 				{
 					success++;
@@ -199,11 +183,11 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 			if(success)
 				break;
 
-			mlog("fatal error: problem with db file: %s", errmsg);
+			mlog(dbconn, "fatal error: problem with db file: %s", errmsg);
 			break;
 
 		default:
-			mlog("fatal error: problem with db file: %s", errmsg);
+			mlog(dbconn, "fatal error: problem with db file: %s", errmsg);
 			break;
 		}
 	}
@@ -232,7 +216,7 @@ rsdb_exec_fetch(struct rsdb_table *table, const char *format, ...)
 }
 
 void
-rsdb_exec_fetch_end(struct rsdb_table *table)
+rsdb_exec_fetch_end(rsdb_conn_t *dbconn, struct rsdb_table *table)
 {
 	int i;
 
@@ -246,10 +230,10 @@ rsdb_exec_fetch_end(struct rsdb_table *table)
 }
 
 void
-rsdb_transaction(rsdb_transtype type)
+rsdb_transaction(rsdb_conn_t *dbconn, rsdb_transtype type)
 {
 	if(type == RSDB_TRANS_START)
-		rsdb_exec(NULL, "BEGIN TRANSACTION");
+		rsdb_exec(dbconn, NULL, "BEGIN TRANSACTION");
 	else if(type == RSDB_TRANS_END)
-		rsdb_exec(NULL, "COMMIT TRANSACTION");
+		rsdb_exec(dbconn, NULL, "COMMIT TRANSACTION");
 }

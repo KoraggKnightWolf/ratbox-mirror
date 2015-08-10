@@ -18,9 +18,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "ratbox_lib.h"
-#ifndef __MINGW32__
-#include <pwd.h>
-#endif
 
 #define FLAG_MD5      0x00000001
 #define FLAG_DES      0x00000002
@@ -52,18 +49,20 @@ static char *generate_poor_salt(char *, int);
 static void full_usage(void);
 static void brief_usage(void);
 
-static char saltChars[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+static const char saltChars[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
        /* 0 .. 63, ascii - 64 */
 
 extern char *optarg;
+extern char *crypt();
 
-
-#ifdef __MINGW32__
-#include <conio.h>
-#ifdef PASS_MAX
-#undef PASS_MAX
-#endif
+#ifndef PASS_MAX
 #define PASS_MAX 256
+#endif
+
+#ifndef __MINGW32__
+extern char *getpass();
+#else
+#include <conio.h>
 static char getpassbuf[PASS_MAX + 1];
 
 static char *
@@ -72,7 +71,7 @@ getpass(const char *prompt)
 	int c;
 	int i = 0;
 
-	memset(getpassbuf, sizeof(getpassbuf), 0);
+	memset(getpassbuf, 0, sizeof(getpassbuf));
 	fputs(prompt, stderr);
 	for(;;)
 	{
@@ -98,6 +97,8 @@ int
 main(int argc, char *argv[])
 {
 	char *plaintext = NULL;
+	char *repeat_plaintext = NULL;
+	char *crypt_passwd = NULL;
 	int c;
 	char *saltpara = NULL;
 	char *salt;
@@ -158,7 +159,7 @@ main(int argc, char *argv[])
 			/* NOT REACHED */
 			break;
 		default:
-			printf("Invalid Option: -%c\n", c);
+			fprintf(stderr, "Invalid Option: -%c\n", c);
 			break;
 		}
 	}
@@ -210,7 +211,7 @@ main(int argc, char *argv[])
 			}
 			else
 			{
-				printf("Invalid salt, please enter 4 alphanumeric characters\n");
+				fprintf(stderr, "Invalid salt, please enter 4 alphanumeric characters\n");
 				exit(1);
 			}
 		}
@@ -229,7 +230,7 @@ main(int argc, char *argv[])
 			}
 			else
 			{
-				printf("Invalid salt, please enter 2 alphanumeric characters\n");
+				fprintf(stderr, "Invalid salt, please enter 2 alphanumeric characters\n");
 				exit(1);
 			}
 		}
@@ -242,14 +243,27 @@ main(int argc, char *argv[])
 	if(flag & FLAG_PASS)
 	{
 		if(!plaintext)
-			printf("Please enter a valid password\n");
+			fprintf(stderr, "Please enter a valid password\n");
 	}
 	else
 	{
-		plaintext = getpass("plaintext: ");
+		plaintext = rb_strdup(getpass("Password: "));
+		repeat_plaintext = getpass("Repeat Password: ");
+		if(strcmp(plaintext, repeat_plaintext) != 0)
+		{
+			fprintf(stderr, "Password mismatch\n");
+			return 1;
+		}
 	}
 
-	printf("%s\n", rb_crypt(plaintext, salt));
+	crypt_passwd = rb_crypt(plaintext, salt);
+	if(!crypt_passwd)
+	{
+		fprintf(stderr, "Error while encryting password\n");
+		return 1;
+	}
+
+	printf("%s\n", crypt_passwd);
 	return 0;
 }
 
@@ -285,7 +299,7 @@ make_ext_salt(int rounds)
 {
 	static char salt[10];
 
-	sprintf(salt, "_%s", int_to_base64(rounds));
+	snprintf(salt, sizeof(salt), "_%s", int_to_base64(rounds));
 	generate_random_salt(&salt[5], 4);
 	salt[9] = '\0';
 	return salt;
@@ -296,7 +310,7 @@ make_ext_salt_para(int rounds, char *saltpara)
 {
 	static char salt[10];
 
-	sprintf(salt, "_%s%s", int_to_base64(rounds), saltpara);
+	snprintf(salt, sizeof(salt), "_%s%s", int_to_base64(rounds), saltpara);
 	return salt;
 }
 
@@ -306,17 +320,11 @@ make_md5_salt_para(char *saltpara)
 	static char salt[21];
 	if(saltpara && (strlen(saltpara) <= 16))
 	{
-		/* sprintf used because of portability requirements, the length
-		 ** is checked above, so it should not be too much of a concern
-		 */
-		sprintf(salt, "$1$%s$", saltpara);
+		snprintf(salt, sizeof(salt), "$1$%s$", saltpara);
 		return salt;
 	}
-	printf("Invalid Salt, please use up to 16 random alphanumeric characters\n");
+	fprintf(stderr, "Invalid Salt, please use up to 16 random alphanumeric characters\n");
 	exit(1);
-
-	/* NOT REACHED */
-	return NULL;
 }
 
 char *
@@ -325,7 +333,7 @@ make_md5_salt(int length)
 	static char salt[21];
 	if(length > 16)
 	{
-		printf("MD5 salt length too long\n");
+		fprintf(stderr, "MD5 salt length too long\n");
 		exit(0);
 	}
 	salt[0] = '$';
@@ -343,17 +351,11 @@ make_sha256_salt_para(char *saltpara)
 	static char salt[21];
 	if(saltpara && (strlen(saltpara) <= 16))
 	{
-		/* sprintf used because of portability requirements, the length
-		 ** is checked above, so it should not be too much of a concern
-		 */
-		sprintf(salt, "$5$%s$", saltpara);
+		snprintf(salt, sizeof(salt), "$5$%s$", saltpara);
 		return salt;
 	}
-	printf("Invalid Salt, please use up to 16 random alphanumeric characters\n");
+	fprintf(stderr, "Invalid Salt, please use up to 16 random alphanumeric characters\n");
 	exit(1);
-
-	/* NOT REACHED */
-	return NULL;
 }
 
 char *
@@ -362,17 +364,11 @@ make_sha512_salt_para(char *saltpara)
 	static char salt[21];
 	if(saltpara && (strlen(saltpara) <= 16))
 	{
-		/* sprintf used because of portability requirements, the length
-		 ** is checked above, so it should not be too much of a concern
-		 */
-		sprintf(salt, "$6$%s$", saltpara);
+		snprintf(salt, sizeof(salt), "$6$%s$", saltpara);
 		return salt;
 	}
-	printf("Invalid Salt, please use up to 16 random alphanumeric characters\n");
+	fprintf(stderr, "Invalid Salt, please use up to 16 random alphanumeric characters\n");
 	exit(1);
-
-	/* NOT REACHED */
-	return NULL;
 }
 
 
@@ -382,8 +378,8 @@ make_sha256_salt(int length)
 	static char salt[21];
 	if(length > 16)
 	{
-		printf("SHA256 salt length too long\n");
-		exit(0);
+		fprintf(stderr, "SHA256 salt length too long\n");
+		exit(1);
 	}
 	salt[0] = '$';
 	salt[1] = '5';
@@ -400,8 +396,8 @@ make_sha512_salt(int length)
 	static char salt[21];
 	if(length > 16)
 	{
-		printf("SHA512 salt length too long\n");
-		exit(0);
+		fprintf(stderr, "SHA512 salt length too long\n");
+		exit(1);
 	}
 	salt[0] = '$';
 	salt[1] = '6';
@@ -419,18 +415,12 @@ make_bf_salt_para(int rounds, char *saltpara)
 	char tbuf[3];
 	if(saltpara && (strlen(saltpara) <= 22))
 	{
-		/* sprintf used because of portability requirements, the length
-		 ** is checked above, so it should not be too much of a concern
-		 */
-		sprintf(tbuf, "%02d", rounds);
-		sprintf(salt, "$2a$%s$%s$", tbuf, saltpara);
+		snprintf(tbuf, sizeof(tbuf), "%02d", rounds);
+		snprintf(salt, sizeof(salt), "$2a$%s$%s$", tbuf, saltpara);
 		return salt;
 	}
-	printf("Invalid Salt, please use up to 22 random alphanumeric characters\n");
+	fprintf(stderr, "Invalid Salt, please use up to 22 random alphanumeric characters\n");
 	exit(1);
-
-	/* NOT REACHED */
-	return NULL;
 }
 
 char *
@@ -443,8 +433,8 @@ make_bf_salt(int rounds, int length)
 		printf("BlowFish salt length too long\n");
 		exit(0);
 	}
-	sprintf(tbuf, "%02d", rounds);
-	sprintf(salt, "$2a$%s$", tbuf);
+	snprintf(tbuf, sizeof(tbuf), "%02d", rounds);
+	snprintf(salt, sizeof(salt), "$2a$%s$", tbuf);
 	generate_random_salt(&salt[7], length);
 	salt[length + 7] = '$';
 	salt[length + 8] = '\0';
@@ -489,34 +479,33 @@ generate_random_salt(char *salt, int length)
 
 void
 full_usage()
-{
-	printf("mkpasswd [-m|-d|-b|-e] [-l saltlength] [-r rounds] [-s salt] [-p plaintext]\n");
-	printf("-x Generate a SHA256 password\n");
-	printf("-y Generate a SHA512 password\n");
-	printf("-m Generate an MD5 password\n");
-	printf("-d Generate a DES password\n");
-	printf("-b Generate a BlowFish password\n");
-	printf("-e Generate an Extended DES password\n");
-	printf("-l Specify a length for a random MD5 or BlowFish salt\n");
-	printf("-r Specify a number of rounds for a BlowFish or Extended DES password\n");
-	printf("   BlowFish:  default 4, no more than 6 recommended\n");
-	printf("   Extended DES:  default 25\n");
-	printf("-s Specify a salt, 2 alphanumeric characters for DES, up to 16 for MD5,\n");
-	printf("   up to 22 for BlowFish, and 4 for Extended DES\n");
-	printf("-p Specify a plaintext password to use\n");
-	printf("Example: mkpasswd -m -s 3dr -p test\n");
-	exit(0);
+{	fprintf(stderr, "mkpasswd [-m|-d|-b|-e] [-l saltlength] [-r rounds] [-s salt] [-p plaintext]\n");
+	fprintf(stderr, "-x Generate a SHA256 password\n");
+	fprintf(stderr, "-y Generate a SHA512 password\n");
+	fprintf(stderr, "-m Generate an MD5 password\n");
+	fprintf(stderr, "-d Generate a DES password\n");
+	fprintf(stderr, "-b Generate a BlowFish password\n");
+	fprintf(stderr, "-e Generate an Extended DES password\n");
+	fprintf(stderr, "-l Specify a length for a random MD5 or BlowFish salt\n");
+	fprintf(stderr, "-r Specify a number of rounds for a BlowFish or Extended DES password\n");
+	fprintf(stderr, "   BlowFish:  default 4, no more than 6 recommended\n");
+	fprintf(stderr, "   Extended DES:  default 25\n");
+	fprintf(stderr, "-s Specify a salt, 2 alphanumeric characters for DES, up to 16 for MD5,\n");
+	fprintf(stderr, "   up to 22 for BlowFish, and 4 for Extended DES\n");
+	fprintf(stderr, "-p Specify a plaintext password to use\n");
+	fprintf(stderr, "Example: mkpasswd -m -s 3dr -p test\n");
+	exit(1);
 }
 
 void
 brief_usage()
 {
-	printf("mkpasswd - password hash generator\n");
-	printf("Standard DES:  mkpasswd [-d] [-s salt] [-p plaintext]\n");
-	printf("Extended DES:  mkpasswd -e [-r rounds] [-s salt] [-p plaintext]\n");
-	printf("         MD5:  mkpasswd -m [-l saltlength] [-s salt] [-p plaintext]\n");
-	printf("    BlowFish:  mkpasswd -b [-r rounds] [-l saltlength] [-s salt]\n");
-	printf("                           [-p plaintext]\n");
-	printf("Use -h for full usage\n");
-	exit(0);
+	fprintf(stderr, "mkpasswd - password hash generator\n");
+	fprintf(stderr, "Standard DES:  mkpasswd [-d] [-s salt] [-p plaintext]\n");
+	fprintf(stderr, "Extended DES:  mkpasswd -e [-r rounds] [-s salt] [-p plaintext]\n");
+	fprintf(stderr, "         MD5:  mkpasswd -m [-l saltlength] [-s salt] [-p plaintext]\n");
+	fprintf(stderr, "    BlowFish:  mkpasswd -b [-r rounds] [-l saltlength] [-s salt]\n");
+	fprintf(stderr, "                           [-p plaintext]\n");
+	fprintf(stderr, "Use -h for full usage\n");
+	exit(1);
 }

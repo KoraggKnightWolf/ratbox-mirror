@@ -40,13 +40,18 @@
 static int mo_die(struct Client *, struct Client *, int, const char **);
 
 static struct Message die_msgtab = {
-	"DIE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_die, 0}}
+	.cmd = "DIE",
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_die },
 };
 
-mapi_clist_av2 die_clist[] = { &die_msgtab, NULL };
+mapi_clist_av1 die_clist[] = { &die_msgtab, NULL };
 
-DECLARE_MODULE_AV2(die, NULL, NULL, die_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(die, NULL, NULL, die_clist, NULL, NULL, "$Revision$");
 
 /*
  * mo_die - DIE command handler
@@ -56,7 +61,7 @@ mo_die(struct Client *client_p __unused, struct Client *source_p, int parc, cons
 {
 	if(!IsOperDie(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "die");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "die");
 		return 0;
 	}
 
@@ -67,12 +72,10 @@ mo_die(struct Client *client_p __unused, struct Client *source_p, int parc, cons
 	}
 	else if(irccmp(parv[1], me.name))
 	{
-		sendto_one(source_p, ":Mismatch on /die %s", me.name);
+		sendto_one_notice(source_p, ":Mismatch on /die %s", me.name);
 		return 0;
 	}
 
 	ircd_shutdown(get_client_name(source_p, HIDE_IP));
-
-	/* NOT REACHED */
 	return 0;
 }

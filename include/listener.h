@@ -27,12 +27,11 @@
 #ifndef INCLUDED_listener_h
 #define INCLUDED_listener_h
 
-struct Client;
-
 struct Listener
 {
 	rb_dlink_node node;
 	const char *name;	/* listener name */
+	char *printable_name;	/* printable listener name */
 	rb_fde_t *F;		/* file descriptor */
 	int ref_count;		/* number of connection references */
 	int active;		/* current state of listener */

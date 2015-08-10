@@ -27,14 +27,13 @@
 #ifndef INCLUDED_channel_h
 #define INCLUDED_channel_h
 
-#define MODEBUFLEN      200
+#define MODEBUFLEN	200
 
 /* Maximum mode changes allowed per client, per server is different */
-#define MAXMODEPARAMS   4
+#define MAXMODEPARAMS	4
 #define MAXMODEPARAMSSERV 10
 
-extern struct ev_entry *checksplit_ev;
-struct Client;
+extern rb_ev_entry *checksplit_ev;
 
 /* mode structure for channels */
 struct Mode
@@ -119,14 +118,14 @@ struct ChCapCombo
 
 /* can_send results */
 #define CAN_SEND_NO	0
-#define CAN_SEND_NONOP  1
+#define CAN_SEND_NONOP	1
 #define CAN_SEND_OPV	2
 
 /* channel status flags */
 #define CHFL_PEON		0x0000	/* normal member of channel */
-#define CHFL_CHANOP     	0x0001	/* Channel operator */
-#define CHFL_VOICE      	0x0002	/* the power to speak */
-#define CHFL_DEOPPED    	0x0004	/* deopped on sjoin, bounce modes */
+#define CHFL_CHANOP		0x0001	/* Channel operator */
+#define CHFL_VOICE		0x0002	/* the power to speak */
+#define CHFL_DEOPPED		0x0004	/* deopped on sjoin, bounce modes */
 #define CHFL_BANNED		0x0008	/* cached as banned */
 #define ONLY_SERVERS		0x0010
 #define ALL_MEMBERS		CHFL_PEON
@@ -140,30 +139,30 @@ struct ChCapCombo
 #define can_send_banned(x) ((x) && (x)->flags & CHFL_BANNED)
 
 /* channel modes ONLY */
-#define MODE_PRIVATE    0x0001
-#define MODE_SECRET     0x0002
-#define MODE_MODERATED  0x0004
+#define MODE_PRIVATE	0x0001
+#define MODE_SECRET	0x0002
+#define MODE_MODERATED	0x0004
 #define MODE_TOPICLIMIT 0x0008
 #define MODE_INVITEONLY 0x0010
 #define MODE_NOPRIVMSGS 0x0020
 #define MODE_REGONLY	0x0040
 #define MODE_SSLONLY	0x0080
-#define CHFL_BAN        0x0100	/* ban channel flag */
-#define CHFL_EXCEPTION  0x0200	/* exception to ban channel flag */
-#define CHFL_INVEX      0x0400
+#define CHFL_BAN	0x0100	/* ban channel flag */
+#define CHFL_EXCEPTION	0x0200	/* exception to ban channel flag */
+#define CHFL_INVEX	0x0400
 
 /* mode flags for direction indication */
 #define MODE_QUERY     0
 #define MODE_ADD       1
 #define MODE_DEL       -1
 
-#define SecretChannel(x)        ((x) && ((x)->mode.mode & MODE_SECRET))
-#define HiddenChannel(x)        ((x) && ((x)->mode.mode & MODE_PRIVATE))
-#define PubChannel(x)           ((!x) || ((x)->mode.mode &\
+#define SecretChannel(x)	((x) && ((x)->mode.mode & MODE_SECRET))
+#define HiddenChannel(x)	((x) && ((x)->mode.mode & MODE_PRIVATE))
+#define PubChannel(x)		((!x) || ((x)->mode.mode &\
 				 (MODE_PRIVATE | MODE_SECRET)) == 0)
 
 /* channel visible */
-#define ShowChannel(v,c)        (PubChannel(c) || IsMember((v),(c)))
+#define ShowChannel(v,c)	(PubChannel(c) || IsMember((v),(c)))
 
 #define IsMember(who, chan) ((who && who->user && \
 		find_channel_membership(chan, who)) ? 1 : 0)

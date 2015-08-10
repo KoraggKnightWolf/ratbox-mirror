@@ -6,7 +6,7 @@
  *             somebody will likely need it.
  *
  *  Copyright (C) 2002 by the past and present ircd coders, and others.
- *  Copyright (C) 2004 ircd-ratbox Development Team
+ *  Copyright (C) 2004-2012 ircd-ratbox Development Team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -48,13 +48,18 @@ static int mo_olist(struct Client *, struct Client *, int parc, const char *parv
 #ifndef STATIC_MODULES
 
 struct Message olist_msgtab = {
-	"OLIST", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_olist, 1}}
+	.cmd = "OLIST", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_olist, .min_para = 1 },
 };
 
-mapi_clist_av2 olist_clist[] = { &olist_msgtab, NULL };
+mapi_clist_av1 olist_clist[] = { &olist_msgtab, NULL };
 
-DECLARE_MODULE_AV2(okick, NULL, NULL, olist_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(okick, NULL, NULL, olist_clist, NULL, NULL, "$Revision$");
 
 #endif
 
@@ -63,27 +68,28 @@ static void list_named_channel(struct Client *source_p, const char *name);
 
 /*
 ** mo_olist
+**      parv[0] = sender prefix
 **      parv[1] = channel
 */
 static int
 mo_olist(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	if(!IsOperSpy(source_p))
+	if(IsOperSpy(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS),
-				me.name, source_p->name, "oper_spy");
-		sendto_one(source_p, form_str(RPL_LISTEND),
-				me.name, source_p->name);
-		return 0;
+		/* If no arg, do all channels *whee*, else just one channel */
+		if(parc < 2 || EmptyString(parv[1]))
+		{
+			report_operspy(source_p, "LIST", NULL);
+			list_all_channels(source_p);
+		}
+		else
+		{
+			report_operspy(source_p, "LIST", parv[1]);
+			list_named_channel(source_p, parv[1]);
+		}
 	}
 
-	/* If no arg, do all channels *whee*, else just one channel */
-	if(parc < 2 || EmptyString(parv[1]))
-		list_all_channels(source_p);
-	else
-		list_named_channel(source_p, parv[1]);
-
-	sendto_one(source_p, form_str(RPL_LISTEND), me.name, source_p->name);
+	sendto_one_numeric(source_p, s_RPL(RPL_LISTEND));
 	return 0;
 }
 
@@ -99,16 +105,14 @@ list_all_channels(struct Client *source_p)
 {
 	struct Channel *chptr;
 	rb_dlink_node *ptr;
-
-	report_operspy(source_p, "LIST", NULL);
-	sendto_one(source_p, form_str(RPL_LISTSTART), me.name, source_p->name);
+	sendto_one_numeric(source_p, s_RPL(RPL_LISTSTART));
 
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
 		chptr = ptr->data;
 
-		sendto_one(source_p, form_str(RPL_LIST),
-			   me.name, source_p->name, chptr->chname,
+		sendto_one_numeric(source_p, s_RPL(RPL_LIST),
+			   chptr->chname,
 			   rb_dlink_list_length(&chptr->members),
 			   chptr->topic == NULL ? "" : chptr->topic->topic);
 	}
@@ -129,24 +133,21 @@ list_named_channel(struct Client *source_p, const char *name)
 	char *p;
 	char *n = LOCAL_COPY(name);
 
+	sendto_one_numeric(source_p, s_RPL(RPL_LISTSTART));
+
 	if((p = strchr(n, ',')))
 		*p = '\0';
 
-	/* Put operspy notice before any output, but only if channel exists */
-	chptr = EmptyString(n) ? NULL : find_channel(n);
-	if(chptr != NULL)
-		report_operspy(source_p, "LIST", chptr->chname);
-
-	sendto_one(source_p, form_str(RPL_LISTSTART), me.name, source_p->name);
-
 	if(EmptyString(n))
+	{
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL, form_str(ERR_NOSUCHCHANNEL), n);
 		return;
+	}
 
-	if(chptr == NULL)
-		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL,
-				form_str(ERR_NOSUCHCHANNEL), n);
+	if((chptr = find_channel(n)) == NULL)
+		sendto_one_numeric(source_p, ERR_NOSUCHCHANNEL, form_str(ERR_NOSUCHCHANNEL), n);
 	else
-		sendto_one(source_p, form_str(RPL_LIST), me.name, source_p->name,
+		sendto_one_numeric(source_p, s_RPL(RPL_LIST),
 			   chptr->chname, rb_dlink_list_length(&chptr->members),
 			   chptr->topic ? chptr->topic->topic : "");
 }

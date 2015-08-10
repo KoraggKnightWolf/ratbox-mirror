@@ -29,7 +29,7 @@
  *  $Id$
  */
 
-int getnameinfo(const struct sockaddr *sa, rb_socklen_t salen, char *host,
+int rb_getnameinfo(const struct sockaddr *sa, rb_socklen_t salen, char *host,
                            size_t hostlen, char *serv, size_t servlen, int flags);
 
 #ifndef IN_MULTICAST

@@ -27,10 +27,7 @@
 #ifndef _DNS_H_INCLUDED
 #define _DNS_H_INCLUDED 1
 
-struct Client;
-
 typedef void DNSCB(const char *res, int status, int aftype, void *data);
-
 
 void init_resolver(void);
 void restart_resolver(void);
@@ -40,6 +37,7 @@ uint16_t lookup_ip(const char *hostname, int aftype, DNSCB * callback, void *dat
 void cancel_lookup(uint16_t xid);
 void report_dns_servers(struct Client *);
 void rehash_dns_vhost(void);
+
 
 
 #endif

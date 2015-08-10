@@ -42,10 +42,12 @@
 #include "sslproc.h"
 #include "hash.h"
 
+#define log_listener(str, name, err) do { sendto_realops_flags(UMODE_DEBUG, L_ALL, str, name, err); ilog(L_IOERROR, str, name, err); } while(0)
+
+
 static rb_dlink_list listener_list;
-static int accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, void *data);
-static void accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t addrlen,
-			    void *data);
+static int accept_precallback(rb_fde_t * F, struct sockaddr *addr, rb_socklen_t addrlen, void *data);
+static void accept_callback(rb_fde_t * F, int status, struct sockaddr *addr, rb_socklen_t addrlen, void *data);
 
 
 
@@ -56,7 +58,8 @@ make_listener(struct rb_sockaddr_storage *addr)
 	s_assert(0 != listener);
 	listener->name = ServerInfo.name;	/* me.name may not be valid yet -- jilles */
 	listener->F = NULL;
-	memcpy(&listener->addr, addr, sizeof(struct rb_sockaddr_storage));
+	listener->printable_name = NULL;
+	memcpy(&listener->addr, addr, sizeof(listener->addr));
 	return listener;
 }
 
@@ -67,6 +70,8 @@ free_listener(struct Listener *listener)
 	if(listener == NULL)
 		return;
 
+	if(listener->printable_name != NULL)
+		rb_free(listener->printable_name);
 	rb_dlinkDelete(&listener->node, &listener_list);
 	rb_free(listener);
 }
@@ -80,28 +85,35 @@ free_listener(struct Listener *listener)
 const char *
 get_listener_name(struct Listener *listener)
 {
-	static char buf[HOSTLEN + HOSTLEN + PORTNAMELEN + 4];
 	int port = 0;
+	const size_t listener_len = HOSTLEN + HOSTLEN + PORTNAMELEN + 5;
 
 	s_assert(NULL != listener);
+
 	if(listener == NULL)
 		return NULL;
 
-#ifdef RB_IPV6
-	if(GET_SS_FAMILY(&listener->addr) == AF_INET6)
-		port = ntohs(((const struct sockaddr_in6 *)&listener->addr)->sin6_port);
-	else
-#endif
-		port = ntohs(((const struct sockaddr_in *)&listener->addr)->sin_port);
+	if(listener->printable_name == NULL)
+	{
 
-	rb_snprintf(buf, sizeof(buf), "%s[%s/%u]", me.name, listener->name, port);
-	return buf;
+		listener->printable_name = rb_malloc(listener_len);
+
+#ifdef RB_IPV6
+		if(GET_SS_FAMILY(&listener->addr) == AF_INET6)
+			port = ntohs(((const struct sockaddr_in6 *)&listener->addr)->sin6_port);
+		else
+#endif
+			port = ntohs(((const struct sockaddr_in *)&listener->addr)->sin_port);
+
+		snprintf(listener->printable_name, listener_len, "%s[%s/%u]", me.name, listener->name, port);
+	}
+	return listener->printable_name;
 }
 
 /*
  * show_ports - send port listing to a client
- * inputs       - pointer to client to show ports to
- * output       - none
+ * inputs	- pointer to client to show ports to
+ * output	- none
  * side effects - show ports
  */
 void
@@ -117,8 +129,7 @@ show_ports(struct Client *source_p)
 #ifdef RB_IPV6
 				   ntohs(GET_SS_FAMILY(&listener->addr) ==
 					 AF_INET ? ((struct sockaddr_in *)&listener->addr)->
-					 sin_port : ((struct sockaddr_in6 *)&listener->addr)->
-					 sin6_port),
+					 sin_port : ((struct sockaddr_in6 *)&listener->addr)->sin6_port),
 #else
 				   ntohs(((struct sockaddr_in *)&listener->addr)->sin_port),
 #endif
@@ -146,7 +157,8 @@ inetport(struct Listener *listener)
 {
 	rb_fde_t *F;
 	int ret;
-
+	int opt = 1;
+	int saved_errno;
 	/*
 	 * At first, open a new socket
 	 */
@@ -159,8 +171,7 @@ inetport(struct Listener *listener)
 		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)&listener->addr;
 		if(!IN6_ARE_ADDR_EQUAL(&in6->sin6_addr, &in6addr_any))
 		{
-			rb_inet_ntop(AF_INET6, &in6->sin6_addr, listener->vhost,
-				     sizeof(listener->vhost));
+			rb_inet_ntop(AF_INET6, &in6->sin6_addr, listener->vhost, sizeof(listener->vhost));
 			listener->name = listener->vhost;
 		}
 	}
@@ -170,8 +181,7 @@ inetport(struct Listener *listener)
 		struct sockaddr_in *in = (struct sockaddr_in *)&listener->addr;
 		if(in->sin_addr.s_addr != INADDR_ANY)
 		{
-			rb_inet_ntop(AF_INET, &in->sin_addr, listener->vhost,
-				     sizeof(listener->vhost));
+			rb_inet_ntop(AF_INET, &in->sin_addr, listener->vhost, sizeof(listener->vhost));
 			listener->name = listener->vhost;
 		}
 	}
@@ -179,14 +189,15 @@ inetport(struct Listener *listener)
 
 	if(F == NULL)
 	{
-		report_error("opening listener socket %s:%s",
-			     get_listener_name(listener), get_listener_name(listener), errno);
+	        saved_errno = errno;
+	        log_listener("opening listener socket %s:%s", get_listener_name(listener), strerror(saved_errno));
 		return 0;
 	}
 	else if((maxconnections - 10) < rb_get_fd(F))	/* XXX this is kinda bogus */
 	{
-		report_error("no more connections left for listener %s:%s",
-			     get_listener_name(listener), get_listener_name(listener), errno);
+	        saved_errno = errno;
+		log_listener("no more connections left for listener %s:%s",
+			     get_listener_name(listener), strerror(errno));
 		rb_close(F);
 		return 0;
 	}
@@ -194,10 +205,11 @@ inetport(struct Listener *listener)
 	 * XXX - we don't want to do all this crap for a listener
 	 * set_sock_opts(listener);
 	 */
-	if(setsockopt(rb_get_fd(F), SOL_SOCKET, SO_REUSEADDR, &(const int){1}, sizeof(int)))
+	if(setsockopt(rb_get_fd(F), SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)))
 	{
-		report_error("setting SO_REUSEADDR for listener %s:%s",
-			     get_listener_name(listener), get_listener_name(listener), errno);
+	        saved_errno = errno;
+		log_listener("setting SO_REUSEADDR for listener %s:%s",
+			     get_listener_name(listener), strerror(saved_errno));
 		rb_close(F);
 		return 0;
 	}
@@ -209,16 +221,16 @@ inetport(struct Listener *listener)
 
 	if(bind(rb_get_fd(F), (struct sockaddr *)&listener->addr, GET_SS_LEN(&listener->addr)))
 	{
-		report_error("binding listener socket %s:%s",
-			     get_listener_name(listener), get_listener_name(listener), errno);
+		log_listener("binding listener socket %s:%s",
+			     get_listener_name(listener), strerror(errno));
 		rb_close(F);
 		return 0;
 	}
 
 	if((ret = rb_listen(F, RATBOX_SOMAXCONN)))
 	{
-		report_error("listen failed for %s:%s",
-			     get_listener_name(listener), get_listener_name(listener), errno);
+		log_listener("listen failed for %s:%s",
+			     get_listener_name(listener), strerror(errno));
 		rb_close(F);
 		return 0;
 	}
@@ -248,8 +260,7 @@ find_listener(struct rb_sockaddr_storage *addr)
 			{
 				struct sockaddr_in *in4 = (struct sockaddr_in *)addr;
 				struct sockaddr_in *lin4 = (struct sockaddr_in *)&listener->addr;
-				if(in4->sin_addr.s_addr == lin4->sin_addr.s_addr &&
-				   in4->sin_port == lin4->sin_port)
+				if(in4->sin_addr.s_addr == lin4->sin_addr.s_addr && in4->sin_port == lin4->sin_port)
 				{
 					if(listener->F == NULL)
 						last_closed = listener;
@@ -318,8 +329,7 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 			break;
 #ifdef RB_IPV6
 		case AF_INET6:
-			memcpy(&((struct sockaddr_in6 *)&vaddr)->sin6_addr, &in6addr_any,
-			       sizeof(struct in6_addr));
+			memcpy(&((struct sockaddr_in6 *)&vaddr)->sin6_addr, &in6addr_any, sizeof(struct in6_addr));
 			break;
 #endif
 		default:
@@ -406,8 +416,7 @@ close_listeners()
  * any client list yet.
  */
 static void
-add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, struct sockaddr *lai,
-	       void *ssl_ctl)
+add_connection(struct Listener *listener, rb_fde_t * F, struct sockaddr *sai, struct sockaddr *lai)
 {
 	struct Client *new_client;
 	s_assert(NULL != listener);
@@ -416,6 +425,32 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 	 * the client has already been checked out in accept_connection
 	 */
 	new_client = make_client(NULL);
+
+
+	if(listener->ssl)
+	{
+		rb_fde_t *xF[2];
+		if(rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF[0], &xF[1], "Incoming ssld Connection") == -1)
+		{
+		        int saved_errno = errno;
+			log_listener("creating SSL/TLS socket pairs %s:%s",
+				     get_listener_name(listener), strerror(saved_errno));
+			free_client(new_client);
+			return;
+		}
+		new_client->localClient->ssl_ctl = start_ssld_accept(F, xF[1], new_client->localClient->connid);	/* this will close F for us */
+		if(new_client->localClient->ssl_ctl == NULL)
+		{
+			free_client(new_client);
+			return;
+		}
+		F = xF[0];
+		SetSSL(new_client);
+	}
+
+	if(rb_fd_ssl(F))	/* if you happen to have disabled ssld in the source code... ;) */
+		SetSSL(new_client);
+
 
 	memcpy(&new_client->localClient->ip, sai, sizeof(struct rb_sockaddr_storage));
 	new_client->localClient->lip = rb_malloc(sizeof(struct rb_sockaddr_storage));
@@ -431,12 +466,15 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 
 	rb_strlcpy(new_client->host, new_client->sockhost, sizeof(new_client->host));
 
+#ifdef RB_IPV6
+	if(GET_SS_FAMILY(&new_client->localClient->ip) == AF_INET6 && ConfigFileEntry.dot_in_ip6_addr == 1)
+	{
+		rb_strlcat(new_client->host, ".", sizeof(new_client->host));
+	}
+#endif
+
 	new_client->localClient->F = F;
-	add_to_cli_fd_hash(new_client);
 	new_client->localClient->listener = listener;
-	new_client->localClient->ssl_ctl = ssl_ctl;
-	if(ssl_ctl != NULL || rb_fd_ssl(F))
-		SetSSL(new_client);
 
 	++listener->ref_count;
 
@@ -445,13 +483,11 @@ add_connection(struct Listener *listener, rb_fde_t *F, struct sockaddr *sai, str
 
 static time_t last_oper_notice = 0;
 
-static const char *toofast = "ERROR :Reconnecting too fast, throttled.\r\n";
-
 static int
-accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, void *data)
+accept_precallback(rb_fde_t * F, struct sockaddr *addr, rb_socklen_t addrlen, void *data)
 {
 	struct Listener *listener = (struct Listener *)data;
-	char buf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
 	struct ConfItem *aconf;
 
 	if(listener->ssl && (!ircd_ssl_ok || !get_ssld_count()))
@@ -466,12 +502,11 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 		/*
 		 * slow down the whining to opers bit
 		 */
-		if((last_oper_notice + 20) <= rb_time())
+		if((last_oper_notice + 20) <= rb_current_time())
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "All connections in use. (%s)",
-					     get_listener_name(listener));
-			last_oper_notice = rb_time();
+					     "All connections in use. (%s)", get_listener_name(listener));
+			last_oper_notice = rb_current_time();
 		}
 
 		rb_write(F, "ERROR :All connections in use\r\n", 32);
@@ -492,7 +527,7 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 
 		if(ConfigFileEntry.dline_with_reason)
 		{
-			if(rb_snprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd)
+			if(snprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd)
 			   >= (int)(sizeof(buf) - 1))
 			{
 				buf[sizeof(buf) - 3] = '\r';
@@ -513,7 +548,8 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 
 	if(throttle_add(addr))
 	{
-		rb_write(F, toofast, strlen(toofast));
+		strcpy(buf, "ERROR :Reconnecting too fast, throttled.\r\n");
+		rb_write(F, buf, strlen(buf));
 		rb_close(F);
 		return 0;
 	}
@@ -522,23 +558,7 @@ accept_precallback(rb_fde_t *F, struct sockaddr *addr, rb_socklen_t addrlen, voi
 }
 
 static void
-accept_ssld(rb_fde_t *F, struct sockaddr *addr, struct sockaddr *laddr, struct Listener *listener)
-{
-	ssl_ctl_t *ctl;
-	rb_fde_t *xF[2];
-	if(rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF[0], &xF[1], "Incoming ssld Connection") == -1)
-	{
-                report_error("creating SSL/TLS socket pairs %s:%s",
-			     get_listener_name(listener), get_listener_name(listener), errno);
-		rb_close(F);
-		return;
-	} 
-	ctl = start_ssld_accept(F, xF[1], rb_get_fd(xF[0]));	/* this will close F for us */
-	add_connection(listener, xF[0], addr, laddr, ctl);
-}
-
-static void
-accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t addrlen, void *data)
+accept_callback(rb_fde_t * F, int status, struct sockaddr *addr, rb_socklen_t addrlen, void *data)
 {
 	struct Listener *listener = data;
 	struct rb_sockaddr_storage lip;
@@ -551,8 +571,5 @@ accept_callback(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen_t add
 		rb_close(F);
 		return;
 	}
-	if(listener->ssl)
-		accept_ssld(F, addr, (struct sockaddr *)&lip, listener);
-	else
-		add_connection(listener, F, addr, (struct sockaddr *)&lip, NULL);
+	add_connection(listener, F, addr, (struct sockaddr *)&lip);
 }

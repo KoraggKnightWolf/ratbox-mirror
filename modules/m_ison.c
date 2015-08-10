@@ -39,16 +39,18 @@
 static int m_ison(struct Client *, struct Client *, int, const char **);
 
 struct Message ison_msgtab = {
-	"ISON", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_ison, 2}, mg_ignore, mg_ignore, mg_ignore, {m_ison, 2}}
+	.cmd = "ISON",
+	.handlers[UNREGISTERED_HANDLER] =	{  mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_ison, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =		{  mm_ignore },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_ison, .min_para = 2 },
 };
 
-mapi_clist_av2 ison_clist[] = { &ison_msgtab, NULL };
+mapi_clist_av1 ison_clist[] = { &ison_msgtab, NULL };
 
-DECLARE_MODULE_AV2(ison, NULL, NULL, ison_clist, NULL, NULL, "$Revision$");
-
-static char buf[BUFSIZE];
-static char buf2[BUFSIZE];
+DECLARE_MODULE_AV1(ison, NULL, NULL, ison_clist, NULL, NULL, "$Revision$");
 
 
 /*
@@ -60,27 +62,19 @@ static char buf2[BUFSIZE];
  * format:
  * ISON :nicklist
  */
+
+
 static int
 m_ison(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
 	char *nick;
 	char *p;
-	char *current_insert_point, *current_insert_point2;
-	int len;
+	char buf[IRCD_BUFSIZE];
 	int i;
-	int done = 0;
 
-	current_insert_point2 = buf2;
-	*buf2 = '\0';
+	memset(buf, 0, sizeof(buf));
 
-	rb_sprintf(buf, form_str(RPL_ISON), me.name, source_p->name);
-	len = strlen(buf);
-	current_insert_point = buf + len;
-
-	/* rfc1489 is ambigious about how to handle ISON
-	 * this should handle both interpretations.
-	 */
 	for(i = 1; i < parc; i++)
 	{
 		char *cs = LOCAL_COPY(parv[i]);
@@ -90,32 +84,12 @@ m_ison(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 			if(target_p != NULL)
 			{
-				len = strlen(target_p->name);
-				if((current_insert_point + (len + 5)) < (buf + sizeof(buf)))
-				{
-					memcpy(current_insert_point, target_p->name, len);
-					current_insert_point += len;
-					*current_insert_point++ = ' ';
-				}
-				else
-				{
-					done = 1;
-					break;
-				}
+				rb_strlcat(buf, target_p->name, sizeof(buf));
+				rb_strlcat(buf, " ", sizeof(buf));
 			}
 		}
-		if(done)
-			break;
 	}
-
-	/*  current_insert_point--;
-	 *  Do NOT take out the trailing space, it breaks ircII
-	 *  --Rodder */
-
-	*current_insert_point = '\0';
-	*current_insert_point2 = '\0';
-
-	sendto_one_buffer(source_p, buf);
-
+	sendto_one_numeric(source_p, s_RPL(RPL_ISON), buf);
 	return 0;
+
 }

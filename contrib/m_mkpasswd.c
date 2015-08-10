@@ -14,7 +14,6 @@
 #include "ratbox_lib.h"
 #include "struct.h"
 #include "client.h"
-#include "common.h"
 #include "ircd.h"
 #include "match.h"
 #include "numeric.h"
@@ -41,13 +40,18 @@ static char saltChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0
 
 
 struct Message mkpasswd_msgtab = {
-	"MKPASSWD", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_mkpasswd, 2}, mg_ignore, mg_ignore, mg_ignore, {mo_mkpasswd, 2}}
+	.cmd = "MKPASSWD",
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { .handler = m_mkpasswd, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_mkpasswd, .min_para = 2 },
 };
 
-mapi_clist_av2 mkpasswd_clist[] = { &mkpasswd_msgtab, NULL };
+mapi_clist_av1 mkpasswd_clist[] = { &mkpasswd_msgtab, NULL };
 
-DECLARE_MODULE_AV2(mkpasswd, NULL, NULL, mkpasswd_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(mkpasswd, NULL, NULL, mkpasswd_clist, NULL, NULL, "$Revision$");
 
 
 static int
@@ -56,15 +60,15 @@ m_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const cha
 	static time_t last_used = 0;
 	int is_md5 = 0;
 
-	if((last_used + ConfigFileEntry.pace_wait) > rb_time())
+	if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
-		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "MKPASSWD");
+		sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "MKPASSWD");
 		return 0;
 	}
 	else
 	{
-		last_used = rb_time();
+		last_used = rb_current_time();
 	}
 
 	if(parc == 3)
@@ -82,25 +86,27 @@ m_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const cha
 		}
 		else
 		{
-			sendto_one_notice(source_p,
-				   ":MKPASSWD syntax error:  MKPASSWD pass [DES|MD5]");
+			sendto_one(source_p,
+				   ":%s NOTICE %s :MKPASSWD syntax error:  MKPASSWD pass [DES|MD5]",
+				   me.name, parv[0]);
 			return 0;
 		}
 	}
 
 	if(parc == 1)
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name, "MKPASSWD");
+		sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "MKPASSWD");
 	else
-		sendto_one_notice(source_p, ":Encryption for [%s]:  %s",
-				parv[1], crypt(parv[1],
-					is_md5 ? make_md5_salt() :
-					make_salt()));
+		sendto_one(source_p, ":%s NOTICE %s :Encryption for [%s]:  %s",
+			   me.name, parv[0], parv[1], crypt(parv[1],
+							    is_md5 ? make_md5_salt() :
+							    make_salt()));
 
 	return 0;
 }
 
 /*
 ** mo_test
+**      parv[0] = sender prefix
 **      parv[1] = parameter
 */
 static int
@@ -123,19 +129,20 @@ mo_mkpasswd(struct Client *client_p, struct Client *source_p, int parc, const ch
 		}
 		else
 		{
-			sendto_one_notice(source_p,
-				   ":MKPASSWD syntax error:  MKPASSWD pass [DES|MD5]");
+			sendto_one(source_p,
+				   ":%s NOTICE %s :MKPASSWD syntax error:  MKPASSWD pass [DES|MD5]",
+				   me.name, parv[0]);
 			return 0;
 		}
 	}
 
 	if(parc == 1)
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS), me.name, source_p->name, "MKPASSWD");
+		sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "MKPASSWD");
 	else
-		sendto_one_notice(source_p, ":Encryption for [%s]:  %s",
-				parv[1], crypt(parv[1],
-					is_md5 ? make_md5_salt() :
-					make_salt()));
+		sendto_one(source_p, ":%s NOTICE %s :Encryption for [%s]:  %s",
+			   me.name, parv[0], parv[1], crypt(parv[1],
+							    is_md5 ? make_md5_salt() :
+							    make_salt()));
 
 	return 0;
 }

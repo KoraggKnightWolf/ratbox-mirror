@@ -36,19 +36,21 @@
 #include "ratbox_lib.h"
 #include "struct.h"
 #include "s_conf.h"
+#include "s_newconf.h"
 #include "client.h"
-#include "hash.h"
 #include "cache.h"
+#include "hash.h"
 #include "match.h"
 #include "ircd.h"
 #include "numeric.h"
+#include "monitor.h"
 #include "send.h"
 
-struct cachefile *user_motd = NULL;
-struct cachefile *oper_motd = NULL;
-struct cacheline *emptyline = NULL;
-rb_dlink_list links_cache_list;
-char user_motd_changed[MAX_DATE_STRING];
+static struct cachefile *user_motd = NULL;
+static struct cachefile *oper_motd = NULL;
+static struct cacheline *emptyline = NULL;
+static rb_dlink_list links_cache_list;
+static char user_motd_changed[MAX_DATE_STRING];
 
 /* init_cache()
  *
@@ -65,8 +67,8 @@ init_cache(void)
 	emptyline->data[1] = '\0';
 	user_motd_changed[0] = '\0';
 
-	user_motd = cache_file(MPATH, "ircd.motd", 0);
-	oper_motd = cache_file(OPATH, "opers.motd", 0);
+	cache_user_motd();
+	cache_oper_motd();
 	memset(&links_cache_list, 0, sizeof(links_cache_list));
 }
 
@@ -113,26 +115,28 @@ cache_file(const char *filename, const char *shortname, int flags)
 	FILE *in;
 	struct cachefile *cacheptr;
 	struct cacheline *lineptr;
-	char line[BUFSIZE];
+	char line[IRCD_BUFSIZE];
 	struct stat st;
-
 	char *p;
+
+	if(filename == NULL || shortname == NULL)
+		return NULL;
 
 	if((in = fopen(filename, "r")) == NULL)
 		return NULL;
 
-        /* check and make sure we have something that is a file... */
+	/* check and make sure we have something that is a file... */
 	if(fstat(fileno(in), &st) == -1)
 	{
 		fclose(in);
 		return NULL;
-	}    
+	}
 	if(!S_ISREG(st.st_mode))
 	{
 		fclose(in);
-		return NULL;	
+		return NULL;
 	}
-    
+
 	cacheptr = rb_malloc(sizeof(struct cachefile));
 
 	rb_strlcpy(cacheptr->name, shortname, sizeof(cacheptr->name));
@@ -189,9 +193,8 @@ cache_links(void *unused)
 
 		/* if the below is ever modified, change LINKSLINELEN */
 		links_line = rb_malloc(LINKSLINELEN);
-		rb_snprintf(links_line, LINKSLINELEN, "%s %s :1 %s",
-			    target_p->name, me.name,
-			    target_p->info[0] ? target_p->info : "(Unknown Location)");
+		snprintf(links_line, LINKSLINELEN, "%s %s :1 %s",
+			 target_p->name, me.name, target_p->info[0] ? target_p->info : "(Unknown Location)");
 
 		rb_dlinkAddTailAlloc(links_line, &links_cache_list);
 	}
@@ -248,7 +251,7 @@ load_help(void)
 
 	while((ldirent = readdir(helpfile_dir)) != NULL)
 	{
-		rb_snprintf(filename, sizeof(filename), "%s/%s", HPATH, ldirent->d_name);
+		snprintf(filename, sizeof(filename), "%s/%s", HPATH, ldirent->d_name);
 		cacheptr = cache_file(filename, ldirent->d_name, HELP_OPER);
 		if(cacheptr != NULL)
 			add_to_help_hash(cacheptr->name, cacheptr);
@@ -262,7 +265,7 @@ load_help(void)
 
 	while((ldirent = readdir(helpfile_dir)) != NULL)
 	{
-		rb_snprintf(filename, sizeof(filename), "%s/%s", UHPATH, ldirent->d_name);
+		snprintf(filename, sizeof(filename), "%s/%s", UHPATH, ldirent->d_name);
 
 #if defined(S_ISLNK) && defined(HAVE_LSTAT)
 		if(lstat(filename, &sb) < 0)
@@ -302,24 +305,68 @@ send_user_motd(struct Client *source_p)
 {
 	struct cacheline *lineptr;
 	rb_dlink_node *ptr;
-	const char *myname = get_id(&me, source_p);
-	const char *nick = get_id(source_p, source_p);
 	if(user_motd == NULL || rb_dlink_list_length(&user_motd->contents) == 0)
 	{
-		sendto_one(source_p, form_str(ERR_NOMOTD), myname, nick);
+		sendto_one_numeric(source_p, s_RPL(ERR_NOMOTD));
 		return;
 	}
 	SetCork(source_p);
-	sendto_one(source_p, form_str(RPL_MOTDSTART), myname, nick, me.name);
+	sendto_one_numeric(source_p, s_RPL(RPL_MOTDSTART), me.name);
 
 	RB_DLINK_FOREACH(ptr, user_motd->contents.head)
 	{
 		lineptr = ptr->data;
-		sendto_one(source_p, form_str(RPL_MOTD), myname, nick, lineptr->data);
+		sendto_one_numeric(source_p, s_RPL(RPL_MOTD), lineptr->data);
 	}
 	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_ENDOFMOTD), myname, nick);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFMOTD));
 }
+
+/* send_oper_motd()
+ *
+ * inputs	- client to send motd to
+ * outputs	- client is sent oper motd if exists
+ * side effects -
+ */
+void
+send_oper_motd(struct Client *source_p)
+{
+	struct cacheline *lineptr;
+	rb_dlink_node *ptr;
+
+	if(oper_motd == NULL || rb_dlink_list_length(&oper_motd->contents) == 0)
+		return;
+	SetCork(source_p);
+	sendto_one_numeric(source_p, s_RPL(RPL_OMOTDSTART));
+
+	RB_DLINK_FOREACH(ptr, oper_motd->contents.head)
+	{
+		lineptr = ptr->data;
+		sendto_one_numeric(source_p, s_RPL(RPL_OMOTD), lineptr->data);
+	}
+	ClearCork(source_p);
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFOMOTD));
+}
+
+
+void 
+send_links_cache(struct Client *source_p)
+{
+        rb_dlink_node *ptr;
+        SetCork(source_p);
+        RB_DLINK_FOREACH(ptr, links_cache_list.head)
+        {
+        	
+                sendto_one(source_p, ":%s 364 %s %s",
+                           me.name, source_p->name, (const char *) ptr->data); 
+        }
+
+        sendto_one_numeric(source_p, s_RPL(RPL_LINKS), me.name, me.name, 0, me.info);
+        ClearCork(source_p);
+        sendto_one_numeric(source_p, s_RPL(RPL_ENDOFLINKS), "*");
+}
+
+
 
 void
 cache_user_motd(void)
@@ -333,12 +380,28 @@ cache_user_motd(void)
 
 		if(local_tm != NULL)
 		{
-			rb_snprintf(user_motd_changed, sizeof(user_motd_changed),
-				    "%d/%d/%d %d:%d",
-				    local_tm->tm_mday, local_tm->tm_mon + 1,
-				    1900 + local_tm->tm_year, local_tm->tm_hour, local_tm->tm_min);
+			snprintf(user_motd_changed, sizeof(user_motd_changed),
+				 "%d/%d/%d %d:%d",
+				 local_tm->tm_mday, local_tm->tm_mon + 1,
+				 1900 + local_tm->tm_year, local_tm->tm_hour, local_tm->tm_min);
 		}
 	}
 	free_cachefile(user_motd);
-	user_motd = cache_file(MPATH, "ircd.motd", 0);
+	user_motd = cache_file(ConfigFileEntry.motd_path, "ircd.motd", 0);
 }
+
+
+void
+cache_oper_motd(void)
+{
+	free_cachefile(oper_motd);
+	oper_motd = cache_file(ConfigFileEntry.oper_motd_path, "oper.motd", 0);
+}
+
+
+const char *
+cache_user_motd_updated(void)
+{
+	return user_motd_changed;
+}
+

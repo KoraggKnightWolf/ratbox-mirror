@@ -27,19 +27,16 @@
 #ifndef INCLUDED_ircd_h
 #define INCLUDED_ircd_h
 
-struct Client;
-struct rb_dlink_list;
-
 struct SetOptions
 {
-	int maxclients;		/* max clients allowed */
-	int autoconn;		/* autoconn enabled for all servers? */
+	unsigned int maxclients;		/* max clients allowed */
+	unsigned int autoconn;		/* autoconn enabled for all servers? */
 
-	int floodcount;		/* Number of messages in 1 second */
-	int ident_timeout;	/* timeout for identd lookups */
+	unsigned int floodcount;		/* Number of messages in 1 second */
+	unsigned int ident_timeout;	/* timeout for identd lookups */
 
-	int spam_num;
-	int spam_time;
+	unsigned int spam_num;
+	unsigned int spam_time;
 
 	char operstring[REALLEN];
 	char adminstring[REALLEN];
@@ -47,11 +44,11 @@ struct SetOptions
 
 struct Counter
 {
-	int oper;		/* Opers */
-	int total;		/* total clients */
-	int invisi;		/* invisible clients */
-	int max_loc;		/* MAX local clients */
-	int max_tot;		/* MAX global clients */
+	unsigned long oper;		/* Opers */
+	unsigned long total;		/* total clients */
+	unsigned long invisi;		/* invisible clients */
+	unsigned long max_loc;		/* MAX local clients */
+	unsigned long max_tot;		/* MAX global clients */
 	unsigned long totalrestartcount;	/* Total client count ever */
 };
 
@@ -95,7 +92,7 @@ extern rb_dlink_list dead_list;
 
 void get_current_bandwidth(struct Client *source_p, struct Client *target_p);
 
-void ircd_shutdown(const char *reason);
+void ircd_shutdown(const char *reason) RB_noreturn;
 
 unsigned long get_maxrss(void);
 void set_time(void);
@@ -105,5 +102,8 @@ extern int conf_parse_failure;
 extern int maxconnections;
 extern int ircd_ssl_ok;
 extern int zlib_ok;
+
+void restart(const char *) RB_noreturn;
+void server_reboot(void) RB_noreturn;
 
 #endif

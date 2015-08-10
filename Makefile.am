@@ -5,7 +5,6 @@
 # on each other now..
 
 AUTOMAKE_OPTIONS = foreign subdir-objects 
-ACLOCAL_AMFLAGS = -I m4
 
 prefix		= @prefix@
 libcoredir 	= @libdir@
@@ -25,14 +24,14 @@ endif
 
 if !STATIC_MODULES
 
-SUBDIRS = libratbox libltdl src modules tools doc help bandb ssld resolver
+SUBDIRS = @LTDL_SUBDIR@ libratbox src modules tools doc help bandb ssld resolver
 
 ircd_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
 ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
 else
 
-SUBDIRS = libratbox libltdl modules src tools doc help bandb ssld resolver
+SUBDIRS = @LTDL_SUBDIR@ libratbox modules src tools doc help bandb ssld resolver
 ircd_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)
 
 
@@ -43,7 +42,13 @@ build_contrib:
 
 install_contrib: build_contrib
 	cd contrib && $(MAKE) install
-	
+
+install-data-local:
+	-@if test ! -d @logdir@; then mkdir @logdir@;fi
+
+distclean_contrib: build_contrib
+	cd contrib && $(MAKE) distclean
+
 contrib: build_contrib
 
 

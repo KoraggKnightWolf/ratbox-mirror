@@ -10,11 +10,7 @@
 /* set MAXNS to 5, which matches with adns did in the past. */
 
 #define IRCD_MAXNS 5
-
-/* Longest hostname we're willing to work with.
- * Due to DNSBLs this is more than HOSTLEN.
- */
-#define IRCD_RES_HOSTLEN 255
+#define RESOLVER_HOSTLEN 255
 
 
 struct DNSReply

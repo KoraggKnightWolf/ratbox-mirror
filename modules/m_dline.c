@@ -45,24 +45,40 @@ static int mo_dline(struct Client *, struct Client *, int, const char **);
 static int mo_admindline(struct Client *, struct Client *, int, const char **);
 static int mo_undline(struct Client *, struct Client *, int, const char **);
 
+
 struct Message dline_msgtab = {
-	"DLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_dline, 2}}
+	.cmd = "DLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_dline, .min_para = 2 },
 };
 
 struct Message admindline_msgtab = {
-	"ADMINDLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_admindline, 3}}
+	.cmd = "ADMINDLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_admindline, .min_para = 3 },
 };
 
 struct Message undline_msgtab = {
-	"UNDLINE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_undline, 2}}
+	.cmd = "UNDLINE",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_undline, .min_para = 2 },
 };
 
-mapi_clist_av2 dline_clist[] = { &dline_msgtab, &admindline_msgtab, &undline_msgtab, NULL };
+mapi_clist_av1 dline_clist[] = { &dline_msgtab, &admindline_msgtab, &undline_msgtab, NULL };
 
-DECLARE_MODULE_AV2(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(dline, NULL, NULL, dline_clist, NULL, NULL, "$Revision$");
 
 static int valid_dline(struct Client *source_p, const char *dlhost);
 static int already_placed_dline(struct Client *source_p, const char *dlhost);
@@ -86,7 +102,7 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(!IsOperK(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "kline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "kline");
 		return 0;
 	}
 
@@ -96,8 +112,7 @@ mo_dline(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(parc < loc + 1)
 	{
-		sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-			   me.name, source_p->name, "DLINE");
+		sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "DLINE");
 		return 0;
 	}
 
@@ -125,13 +140,13 @@ mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const 
 {
 	if(!IsOperK(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "kline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "kline");
 		return 0;
 	}
 
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "admin");
 		return 0;
 	}
 
@@ -150,7 +165,7 @@ mo_admindline(struct Client *client_p, struct Client *source_p, int parc, const 
 
 /* mo_undline()
  *
- *      parv[1] = dline to remove
+ *	parv[1] = dline to remove
  */
 static int
 mo_undline(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -162,17 +177,17 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 	const char *host;
 	if(!IsOperUnkline(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "unkline");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "unkline");
 		return 0;
 	}
 
-	if((ty = parse_netmask(cidr, (struct sockaddr *)&daddr, &b)) == HM_HOST)
+	if((ty = parse_netmask(cidr, (struct sockaddr *) &daddr, &b)) == HM_HOST)
 	{
 		sendto_one_notice(source_p, ":Invalid D-Line");
 		return 0;
 	}
 
-	aconf = find_dline_exact((struct sockaddr *)&daddr, b);
+	aconf = find_dline_exact((struct sockaddr *) &daddr, b);
 
 	if(aconf == NULL)
 	{
@@ -218,7 +233,7 @@ mo_undline(struct Client *client_p, struct Client *source_p, int parc, const cha
 static int
 valid_dline(struct Client *source_p, const char *dlhost)
 {
-	static char cidr_form_host[HOSTLEN + 1];
+	char cidr_form_host[HOSTLEN + 1];
 	int bits;
 
 	rb_strlcpy(cidr_form_host, dlhost, sizeof(cidr_form_host));
@@ -259,16 +274,11 @@ already_placed_dline(struct Client *source_p, const char *dlhost)
 		struct ConfItem *aconf;
 		struct rb_sockaddr_storage daddr;
 		const char *creason;
-		int t = AF_INET, ty, b;
-		ty = parse_netmask(dlhost, (struct sockaddr *)&daddr, &b);
-#ifdef RB_IPV6
-		if(ty == HM_IPV6)
-			t = AF_INET6;
-		else
-#endif
-			t = AF_INET;
+		int b;
 
-		if((aconf = find_dline((struct sockaddr *)&daddr)) != NULL)
+		parse_netmask(dlhost, (struct sockaddr *) &daddr, &b);
+
+		if((aconf = find_dline((struct sockaddr *) &daddr)) != NULL)
 		{
 			int bx;
 			parse_netmask(aconf->host, NULL, &bx);
@@ -305,7 +315,7 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 	reason = LOCAL_COPY_N(lreason, REASONLEN);
 
 	rb_set_time();
-	current_date = smalldate(rb_time());
+	current_date = smalldate(rb_current_time());
 
 	aconf = make_conf();
 	aconf->status = CONF_DLINE;
@@ -329,11 +339,11 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 
 	if(tdline_time > 0)
 	{
-		rb_snprintf(dlbuffer, sizeof(dlbuffer),
-			    "Temporary D-line %d min. - %s (%s)",
-			    (int)(tdline_time / 60), reason, current_date);
+		snprintf(dlbuffer, sizeof(dlbuffer),
+			 "Temporary D-line %d min. - %s (%s)",
+			 tdline_time / 60, reason, current_date);
 		aconf->passwd = rb_strdup(dlbuffer);
-		aconf->hold = rb_time() + tdline_time;
+		aconf->hold = rb_current_time() + tdline_time;
 		add_temp_dline(aconf);
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -349,7 +359,7 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 	}
 	else
 	{
-		rb_snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
+		snprintf(dlbuffer, sizeof(dlbuffer), "%s (%s)", reason, current_date);
 		aconf->passwd = rb_strdup(dlbuffer);
 		add_dline(aconf);
 
@@ -370,8 +380,8 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 
 /* check_dlines()
  *
- * inputs       -
- * outputs      -
+ * inputs	-
+ * outputs	-
  * side effects - all clients will be checked for dlines
  */
 static void
@@ -389,7 +399,7 @@ check_dlines(void)
 		if(IsMe(client_p))
 			continue;
 
-		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)) != NULL)
+		if((aconf = find_dline((struct sockaddr *) &client_p->localClient->ip)) != NULL)
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;
@@ -408,7 +418,7 @@ check_dlines(void)
 	{
 		client_p = ptr->data;
 
-		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)) != NULL)
+		if((aconf = find_dline((struct sockaddr *) &client_p->localClient->ip)) != NULL)
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
 				continue;

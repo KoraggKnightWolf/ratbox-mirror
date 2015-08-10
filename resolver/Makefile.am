@@ -3,7 +3,7 @@
 #
 libexec_PROGRAMS = resolver
 
-INCLUDES = -I../include -I. -I../libratbox/include 
+AM_CPPFLAGS = -I../include -I. -I../libratbox/include 
 AM_CFLAGS=$(WARNFLAGS)
 
 if MINGW

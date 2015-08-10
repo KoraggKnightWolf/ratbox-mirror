@@ -40,21 +40,32 @@ static int ms_lusers(struct Client *, struct Client *, int, const char **);
 static int m_users(struct Client *, struct Client *, int, const char **);
 
 struct Message lusers_msgtab = {
-	"LUSERS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_lusers, 0}, {ms_lusers, 0}, mg_ignore, mg_ignore, {ms_lusers, 0}}
+	.cmd = "LUSERS",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_lusers },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = ms_lusers },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = ms_lusers },
 };
 
 struct Message users_msgtab = {
-	"USERS", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_users, 0}, {m_users, 0}, mg_ignore, mg_ignore, {m_users, 0}}
+	.cmd = "USERS",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_users },
+	.handlers[RCLIENT_HANDLER] =		{ .handler = m_users },
+	.handlers[SERVER_HANDLER] =		{  mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{  mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = m_users },
 };
 
-mapi_clist_av2 lusers_clist[] = { &lusers_msgtab, &users_msgtab, NULL };
+mapi_clist_av1 lusers_clist[] = { &lusers_msgtab, &users_msgtab, NULL };
 
-DECLARE_MODULE_AV2(lusers, NULL, NULL, lusers_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(lusers, NULL, NULL, lusers_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_lusers - LUSERS message handler
+ * parv[0] = sender
  * parv[1] = host/server mask.
  * parv[2] = server to query
  * 
@@ -68,15 +79,14 @@ m_lusers(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if(parc > 2)
 	{
-		if((last_used + ConfigFileEntry.pace_wait) > rb_time())
+		if((last_used + ConfigFileEntry.pace_wait) > rb_current_time())
 		{
 			/* safe enough to give this on a local connect only */
-			sendto_one(source_p, form_str(RPL_LOAD2HI),
-				   me.name, source_p->name, "LUSERS");
+			sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "LUSERS");
 			return 0;
 		}
 		else
-			last_used = rb_time();
+			last_used = rb_current_time();
 
 		if(hunt_server(client_p, source_p, ":%s LUSERS %s :%s", 2, parc, parv) !=
 		   HUNTED_ISME)
@@ -90,6 +100,7 @@ m_lusers(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 /*
  * ms_lusers - LUSERS message handler for servers and opers
+ * parv[0] = sender
  * parv[1] = host/server mask.
  * parv[2] = server to query
  * 
@@ -114,7 +125,8 @@ ms_lusers(struct Client *client_p, struct Client *source_p, int parc, const char
 
 /*
  * m_users
- *      parv[1] = servername
+ *	parv[0] = sender prefix
+ *	parv[1] = servername
  */
 static int
 m_users(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -123,10 +135,9 @@ m_users(struct Client *client_p, struct Client *source_p, int parc, const char *
 	{
 		sendto_one_numeric(source_p, RPL_LOCALUSERS,
 				   form_str(RPL_LOCALUSERS),
-				   (int)rb_dlink_list_length(&lclient_list),
+				   rb_dlink_list_length(&lclient_list),
 				   Count.max_loc,
-				   (int)rb_dlink_list_length(&lclient_list),
-				   Count.max_loc);
+				   rb_dlink_list_length(&lclient_list), Count.max_loc);
 
 		sendto_one_numeric(source_p, RPL_GLOBALUSERS,
 				   form_str(RPL_GLOBALUSERS),

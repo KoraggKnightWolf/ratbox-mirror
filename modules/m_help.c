@@ -43,21 +43,34 @@ static int mo_uhelp(struct Client *, struct Client *, int, const char **);
 static void dohelp(struct Client *, int, const char *);
 
 struct Message help_msgtab = {
-	"HELP", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_help, 0}, mg_ignore, mg_ignore, mg_ignore, {mo_help, 0}}
+	.cmd = "HELP",
+
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_help },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },	
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },	
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },	
+	.handlers[OPER_HANDLER] =		{ .handler = mo_help },
 };
 
 struct Message uhelp_msgtab = {
-	"UHELP", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_help, 0}, mg_ignore, mg_ignore, mg_ignore, {mo_uhelp, 0}}
+	.cmd = "UHELP",
+
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_help },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },	
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },	
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },	
+	.handlers[OPER_HANDLER] =		{ .handler = mo_uhelp },
 };
 
-mapi_clist_av2 help_clist[] = { &help_msgtab, &uhelp_msgtab, NULL };
+mapi_clist_av1 help_clist[] = { &help_msgtab, &uhelp_msgtab, NULL };
 
-DECLARE_MODULE_AV2(help, NULL, NULL, help_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(help, NULL, NULL, help_clist, NULL, NULL, "$Revision$");
 
 /*
  * m_help - HELP message handler
+ *	parv[0] = sender prefix
  */
 static int
 m_help(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -65,18 +78,16 @@ m_help(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	static time_t last_used = 0;
 
 	/* HELP is always local */
-	if((last_used + ConfigFileEntry.pace_wait_simple) > rb_time())
+	if((last_used + ConfigFileEntry.pace_wait_simple) > rb_current_time())
 	{
 		/* safe enough to give this on a local connect only */
-		sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name, "HELP");
-		sendto_one(source_p, form_str(RPL_ENDOFHELP),
-			   me.name, source_p->name,
-			   (parc > 1 && !EmptyString(parv[1])) ? parv[1] : "index");
+		sendto_one_numeric(source_p, s_RPL(RPL_LOAD2HI), "HELP");
+		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFHELP), "index");
 		return 0;
 	}
 	else
 	{
-		last_used = rb_time();
+		last_used = rb_current_time();
 	}
 
 	dohelp(source_p, HELP_USER, parc > 1 ? parv[1] : NULL);
@@ -86,6 +97,7 @@ m_help(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 /*
  * mo_help - HELP message handler
+ *	parv[0] = sender prefix
  */
 static int
 mo_help(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -97,6 +109,7 @@ mo_help(struct Client *client_p, struct Client *source_p, int parc, const char *
 /*
  * mo_uhelp - HELP message handler
  * This is used so that opers can view the user help file without deopering
+ *	parv[0] = sender prefix
  */
 static int
 mo_uhelp(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -121,25 +134,22 @@ dohelp(struct Client *source_p, int flags, const char *topic)
 
 	if(hptr == NULL)
 	{
-		sendto_one(source_p, form_str(ERR_HELPNOTFOUND), me.name, source_p->name, topic);
+		sendto_one_numeric(source_p, s_RPL(ERR_HELPNOTFOUND), topic);
 		return;
 	}
 
 	fptr = hptr->contents.head;
 	lineptr = fptr->data;
 	SetCork(source_p);
+
 	/* first line cant be empty */
-	sendto_one(source_p, form_str(RPL_HELPSTART),
-		   me.name, source_p->name, topic, lineptr->data);
+	sendto_one_numeric(source_p, s_RPL(RPL_HELPSTART), topic, lineptr->data);
 
 	RB_DLINK_FOREACH(ptr, fptr->next)
 	{
 		lineptr = ptr->data;
-
-		sendto_one(source_p, form_str(RPL_HELPTXT),
-			   me.name, source_p->name, topic, lineptr->data);
+		sendto_one_numeric(source_p, s_RPL(RPL_HELPTXT), topic, lineptr->data);
 	}
 	ClearCork(source_p);
-	sendto_one(source_p, form_str(RPL_ENDOFHELP), me.name, source_p->name, topic);
-	return;
+	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFHELP), topic);
 }

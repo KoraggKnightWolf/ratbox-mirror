@@ -47,23 +47,38 @@ static int ms_tmode(struct Client *, struct Client *, int, const char **);
 static int ms_bmask(struct Client *, struct Client *, int, const char **);
 
 struct Message mode_msgtab = {
-	"MODE", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, {m_mode, 2}, {m_mode, 3}, {ms_mode, 3}, mg_ignore, {m_mode, 2}}
+	.cmd = "MODE",
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { .handler = m_mode, .min_para = 2 },
+	.handlers[RCLIENT_HANDLER] =            { .handler = m_mode, .min_para = 3 },
+	.handlers[SERVER_HANDLER] =             { .handler = ms_mode, .min_para = 3 },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = m_mode, .min_para = 2 },
 };
 
 struct Message tmode_msgtab = {
-	"TMODE", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, {ms_tmode, 4}, {ms_tmode, 4}, mg_ignore, mg_ignore}
+	.cmd = "TMODE",
+	.handlers[UNREGISTERED_HANDLER] =       { mm_ignore },
+	.handlers[CLIENT_HANDLER] =             { mm_ignore },
+	.handlers[RCLIENT_HANDLER] =            { .handler = ms_tmode, .min_para = 4 },
+	.handlers[SERVER_HANDLER] =             { .handler = ms_tmode, .min_para = 4 },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { mm_ignore },
 };
 
 struct Message bmask_msgtab = {
-	"BMASK", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, mg_ignore, {ms_bmask, 5}, mg_ignore, mg_ignore}
+	.cmd = "BMASK", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_ignore },
+	.handlers[CLIENT_HANDLER] =             { mm_ignore },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { .handler = ms_bmask, .min_para = 5 },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { mm_ignore },
 };
 
-mapi_clist_av2 mode_clist[] = { &mode_msgtab, &tmode_msgtab, &bmask_msgtab, NULL };
+mapi_clist_av1 mode_clist[] = { &mode_msgtab, &tmode_msgtab, &bmask_msgtab, NULL };
 
-DECLARE_MODULE_AV2(mode, NULL, NULL, mode_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(mode, NULL, NULL, mode_clist, NULL, NULL, "$Revision$");
 
 /* bitmasks for error returns, so we send once per call */
 #define SM_ERR_NOTS             0x00000001	/* No TS on channel */
@@ -80,15 +95,16 @@ static void set_channel_mode(struct Client *, struct Client *,
 			     struct Channel *, struct membership *, int, const char **);
 
 static int add_id(struct Client *source_p, struct Channel *chptr,
-		  const char *banid, rb_dlink_list *list, long mode_type);
+		  const char *banid, rb_dlink_list * list, long mode_type);
 
-static struct ChModeChange mode_changes[BUFSIZE];
+static struct ChModeChange mode_changes[IRCD_BUFSIZE];
 static int mode_count;
 static int mode_limit;
 static int mask_pos;
 
 /*
  * m_mode - MODE command handler
+ * parv[0] - sender
  * parv[1] - channel
  */
 static int
@@ -109,8 +125,7 @@ m_mode(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 		if(EmptyString(dest))
 		{
-			sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-				   me.name, source_p->name, "MODE");
+			sendto_one_numeric(source_p, s_RPL(ERR_NEEDMOREPARAMS), "MODE");
 			return 0;
 		}
 	}
@@ -144,13 +159,12 @@ m_mode(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		if(operspy)
 			report_operspy(source_p, "MODE", chptr->chname);
 
-		sendto_one(source_p, form_str(RPL_CHANNELMODEIS),
-			   me.name, source_p->name, parv[1],
-			   operspy ? channel_modes(chptr, &me) : channel_modes(chptr, source_p));
+		sendto_one_numeric(source_p, s_RPL(RPL_CHANNELMODEIS),
+				   parv[1], operspy ? channel_modes(chptr,
+								    &me) : channel_modes(chptr,
+											 source_p));
 
-		sendto_one(source_p, form_str(RPL_CREATIONTIME),
-			   me.name, source_p->name, parv[1],
-			   (unsigned long)chptr->channelts);
+		sendto_one_numeric(source_p, s_RPL(RPL_CREATIONTIME), parv[1], chptr->channelts);
 	}
 	else
 	{
@@ -238,8 +252,8 @@ ms_tmode(struct Client *client_p, struct Client *source_p, int parc, const char 
 static int
 ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	static char modebuf[BUFSIZE];
-	static char parabuf[BUFSIZE];
+	static char modebuf[IRCD_BUFSIZE];
+	static char parabuf[IRCD_BUFSIZE];
 	struct Channel *chptr;
 	rb_dlink_list *banlist;
 	const char *s;
@@ -295,7 +309,7 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 	parabuf[0] = '\0';
 	s = LOCAL_COPY(parv[4]);
 
-	mlen = rb_sprintf(modebuf, ":%s MODE %s +", source_p->name, chptr->chname);
+	mlen = sprintf(modebuf, ":%s MODE %s +", source_p->name, chptr->chname);
 	mbuf = modebuf + mlen;
 	pbuf = parabuf;
 
@@ -328,19 +342,22 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(add_id(source_p, chptr, s, banlist, mode_type))
 		{
 			/* this new one wont fit.. */
-			if(mlen + MAXMODEPARAMS + plen + tlen > BUFSIZE - 5 ||
+			if(mlen + MAXMODEPARAMS + plen + tlen > IRCD_BUFSIZE - 5 ||
 			   modecount >= MAXMODEPARAMS)
 			{
 				*mbuf = '\0';
 				*(pbuf - 1) = '\0';
 				sendto_channel_local(mems, chptr, "%s %s", modebuf, parabuf);
+				sendto_server(client_p, chptr, needcap, CAP_TS6,
+					      "%s %s", modebuf, parabuf);
+
 				mbuf = modebuf + mlen;
 				pbuf = parabuf;
 				plen = modecount = 0;
 			}
 
 			*mbuf++ = parv[3][0];
-			arglen = rb_sprintf(pbuf, "%s ", s);
+			arglen = sprintf(pbuf, "%s ", s);
 			pbuf += arglen;
 			plen += arglen;
 			modecount++;
@@ -366,10 +383,12 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
 		*mbuf = '\0';
 		*(pbuf - 1) = '\0';
 		sendto_channel_local(mems, chptr, "%s %s", modebuf, parabuf);
+		sendto_server(client_p, chptr, needcap, CAP_TS6, "%s %s", modebuf, parabuf);
 	}
 
-	sendto_server(client_p, chptr, CAP_TS6 | needcap, NOCAPS, ":%s BMASK %ld %s %s :%s",
-		      source_p->id, (long)chptr->channelts, chptr->chname, parv[3], parv[4]);
+	sendto_server(client_p, chptr, CAP_TS6 | needcap, NOCAPS,
+		      ":%s BMASK %" RBTT_FMT " %s %s :%s", source_p->id, chptr->channelts,
+		      chptr->chname, parv[3], parv[4]);
 	return 0;
 }
 
@@ -381,7 +400,7 @@ ms_bmask(struct Client *client_p, struct Client *source_p, int parc, const char 
  */
 static int
 add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
-       rb_dlink_list *list, long mode_type)
+       rb_dlink_list * list, long mode_type)
 {
 	struct Ban *actualBan;
 	static char who[BANLEN];
@@ -396,17 +415,17 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 		if((rb_dlink_list_length(&chptr->banlist) +
 		    rb_dlink_list_length(&chptr->exceptlist) +
 		    rb_dlink_list_length(&chptr->invexlist)) >=
-		   (unsigned long)ConfigChannel.max_bans)
+		   (unsigned long) ConfigChannel.max_bans)
 		{
-			sendto_one(source_p, form_str(ERR_BANLISTFULL),
-				   me.name, source_p->name, chptr->chname, realban);
+			sendto_one_numeric(source_p, s_RPL(ERR_BANLISTFULL),
+				   chptr->chname, realban);
 			return 0;
 		}
 
 		RB_DLINK_FOREACH(ptr, list->head)
 		{
 			actualBan = ptr->data;
-			if(mask_match(actualBan->banstr, realban))
+			if(match(actualBan->banstr, realban))
 				return 0;
 		}
 	}
@@ -423,12 +442,12 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
 
 
 	if(IsClient(source_p))
-		rb_sprintf(who, "%s!%s@%s", source_p->name, source_p->username, source_p->host);
+		sprintf(who, "%s!%s@%s", source_p->name, source_p->username, source_p->host);
 	else
 		rb_strlcpy(who, source_p->name, sizeof(who));
 
 	actualBan = allocate_ban(realban, who);
-	actualBan->when = rb_time();
+	actualBan->when = rb_current_time();
 
 	rb_dlinkAdd(actualBan, &actualBan->node, list);
 
@@ -446,7 +465,7 @@ add_id(struct Client *source_p, struct Channel *chptr, const char *banid,
  * side effects - given id is removed from the appropriate list
  */
 static int
-del_id(struct Channel *chptr, const char *banid, rb_dlink_list *list, long mode_type)
+del_id(struct Channel *chptr, const char *banid, rb_dlink_list * list, long mode_type)
 {
 	rb_dlink_node *ptr;
 	struct Ban *banptr;
@@ -513,7 +532,7 @@ check_string(char *s)
 static char *
 pretty_mask(const char *idmask)
 {
-	static char mask_buf[BUFSIZE];
+	static char mask_buf[IRCD_BUFSIZE];
 	int old_mask_pos;
 	char *nick, *user, *host;
 	char splat[] = "*";
@@ -527,7 +546,7 @@ pretty_mask(const char *idmask)
 
 	nick = user = host = splat;
 
-	if((size_t)BUFSIZE - mask_pos < strlen(mask) + 5)
+	if((size_t) IRCD_BUFSIZE - mask_pos < strlen(mask) + 5)
 		return NULL;
 
 	old_mask_pos = mask_pos;
@@ -592,7 +611,7 @@ pretty_mask(const char *idmask)
 		host[HOSTLEN] = '\0';
 	}
 
-	mask_pos += rb_sprintf(mask_buf + mask_pos, "%s!%s@%s", nick, user, host) + 1;
+	mask_pos += sprintf(mask_buf + mask_pos, "%s!%s@%s", nick, user, host) + 1;
 
 	/* restore mask, since we may need to use it again later */
 	if(at)
@@ -667,7 +686,7 @@ chm_nosuch(struct Client *source_p, struct Channel *chptr,
 	if(*errors & SM_ERR_UNKNOWN)
 		return;
 	*errors |= SM_ERR_UNKNOWN;
-	sendto_one(source_p, form_str(ERR_UNKNOWNMODE), me.name, source_p->name, c);
+	sendto_one_numeric(source_p, s_RPL(ERR_UNKNOWNMODE), c);
 }
 
 static void
@@ -678,8 +697,8 @@ chm_simple(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-				   me.name, source_p->name, chptr->chname);
+			sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED),
+				   chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
 	}
@@ -715,6 +734,57 @@ chm_simple(struct Client *source_p, struct Channel *chptr,
 	}
 }
 
+
+
+static void
+send_banlist(long mode_type, struct Client *source_p, struct Channel *chptr, rb_dlink_list *list)
+{
+        struct Ban *banptr;
+        rb_dlink_node *ptr;
+        
+#define send_bl(source, num, chptr, banptr) sendto_one_numeric(source, s_RPL(num), chptr->chname, banptr->banstr, banptr->who, banptr->when)
+
+        RB_DLINK_FOREACH(ptr, list->head)
+        {
+                banptr = ptr->data;
+
+                switch(mode_type)
+                {
+                        case CHFL_BAN:
+                        	send_bl(source_p, RPL_BANLIST, chptr, banptr);
+                                break;
+                        case CHFL_EXCEPTION:
+                        	send_bl(source_p, RPL_EXCEPTLIST, chptr, banptr);
+                                break;
+                        case CHFL_INVEX:
+                        	send_bl(source_p, RPL_INVITELIST, chptr, banptr);
+                                break;
+                        default:
+                		sendto_realops_flags(UMODE_ALL, L_ALL, "chm_ban() called with unknown type!");
+                		return;
+                
+                }
+        }
+#undef send_bl
+
+
+        switch(mode_type)
+        {
+        	case CHFL_BAN:
+			sendto_one_numeric(source_p, s_RPL(RPL_ENDOFBANLIST), chptr->chname);
+			break;
+                case CHFL_EXCEPTION:
+			sendto_one_numeric(source_p, s_RPL(RPL_ENDOFEXCEPTLIST), chptr->chname);
+			break;
+                case CHFL_INVEX:
+			sendto_one_numeric(source_p, s_RPL(RPL_ENDOFINVITELIST), chptr->chname);
+			break;
+		default:
+			return;
+	}
+}
+
+
 static void
 chm_ban(struct Client *source_p, struct Channel *chptr,
 	int alevel, int parc, int *parn,
@@ -723,11 +793,7 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 	const char *mask;
 	const char *raw_mask;
 	rb_dlink_list *list;
-	rb_dlink_node *ptr;
-	struct Ban *banptr;
 	int errorval;
-	const char *fmt_list;
-	const char *fmt_endlist;
 	int caps;
 	int mems;
 
@@ -736,8 +802,6 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 	case CHFL_BAN:
 		list = &chptr->banlist;
 		errorval = SM_ERR_RPL_B;
-		fmt_list = form_str(RPL_BANLIST);
-		fmt_endlist = form_str(RPL_ENDOFBANLIST);
 		mems = ALL_MEMBERS;
 		caps = 0;
 		break;
@@ -750,8 +814,6 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 
 		list = &chptr->exceptlist;
 		errorval = SM_ERR_RPL_E;
-		fmt_list = form_str(RPL_EXCEPTLIST);
-		fmt_endlist = form_str(RPL_ENDOFEXCEPTLIST);
 		caps = CAP_EX;
 
 		if(ConfigChannel.use_except || (dir == MODE_DEL))
@@ -768,8 +830,6 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 
 		list = &chptr->invexlist;
 		errorval = SM_ERR_RPL_I;
-		fmt_list = form_str(RPL_INVITELIST);
-		fmt_endlist = form_str(RPL_ENDOFINVITELIST);
 		caps = CAP_IE;
 
 		if(ConfigChannel.use_invex || (dir == MODE_DEL))
@@ -779,9 +839,7 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 		break;
 
 	default:
-		sendto_realops_flags(UMODE_ALL, L_ALL, "chm_ban() called with unknown type!");
 		return;
-		break;
 	}
 
 	if(dir == 0 || parc <= *parn)
@@ -794,28 +852,21 @@ chm_ban(struct Client *source_p, struct Channel *chptr,
 		if(alevel != CHFL_CHANOP && mode_type != CHFL_BAN)
 		{
 			if(!(*errors & SM_ERR_NOOPS))
-				sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-					   me.name, source_p->name, chptr->chname);
+				sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED),
+					   chptr->chname);
 			*errors |= SM_ERR_NOOPS;
 			return;
 		}
 
-		RB_DLINK_FOREACH(ptr, list->head)
-		{
-			banptr = ptr->data;
-			sendto_one(source_p, fmt_list,
-				   me.name, source_p->name, chptr->chname,
-				   banptr->banstr, banptr->who, banptr->when);
-		}
-		sendto_one(source_p, fmt_endlist, me.name, source_p->name, chptr->chname);
+		send_banlist(mode_type, source_p, chptr, list);
 		return;
 	}
 
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-				   me.name, source_p->name, chptr->chname);
+			sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED),
+				   chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
 	}
@@ -892,8 +943,7 @@ chm_op(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-				   me.name, source_p->name, chptr->chname);
+			sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED), chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
 	}
@@ -983,8 +1033,7 @@ chm_voice(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-				   me.name, source_p->name, chptr->chname);
+			sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED), chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
 	}
@@ -998,7 +1047,7 @@ chm_voice(struct Client *source_p, struct Channel *chptr,
 	/* empty nick */
 	if(EmptyString(opnick))
 	{
-		sendto_one_numeric(source_p, ERR_NOSUCHNICK, form_str(ERR_NOSUCHNICK), "*");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOSUCHNICK), "*");
 		return;
 	}
 
@@ -1061,8 +1110,8 @@ chm_limit(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-				   me.name, source_p->name, chptr->chname);
+			sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED),
+				   chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
 	}
@@ -1078,7 +1127,7 @@ chm_limit(struct Client *source_p, struct Channel *chptr,
 		if(EmptyString(lstr) || (limit = atoi(lstr)) <= 0)
 			return;
 
-		rb_sprintf(limitstr, "%d", limit);
+		sprintf(limitstr, "%d", limit);
 
 		mode_changes[mode_count].letter = c;
 		mode_changes[mode_count].dir = MODE_ADD;
@@ -1117,8 +1166,8 @@ chm_key(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-				   me.name, source_p->name, chptr->chname);
+			sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED),
+				   chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
 	}
@@ -1205,13 +1254,6 @@ chm_regonly(struct Client *source_p, struct Channel *chptr,
 	   ((dir == MODE_DEL) && !(chptr->mode.mode & MODE_REGONLY)))
 		return;
 
-	/* do not allow our clients to set +r if there are no service{}s
-	 * we do however allow them to remove it if it gets set 
-	 */
-	if(dir == MODE_ADD && MyClient(source_p) &&
-	   rb_dlink_list_length(&service_list) == 0)
-		return;
-
 	if(dir == MODE_ADD)
 		chptr->mode.mode |= MODE_REGONLY;
 	else
@@ -1236,8 +1278,7 @@ chm_sslonly(struct Client *source_p, struct Channel *chptr,
 	if(alevel != CHFL_CHANOP)
 	{
 		if(!(*errors & SM_ERR_NOOPS))
-			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-				   me.name, source_p->name, chptr->chname);
+			sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED), chptr->chname);
 		*errors |= SM_ERR_NOOPS;
 		return;
 	}
@@ -1252,7 +1293,7 @@ chm_sslonly(struct Client *source_p, struct Channel *chptr,
 	/* do not allow our clients to set use_sslonly if it is disabled
 	 * we do however allow them to remove it if it gets set 
 	 */
-	if(dir == MODE_ADD && MyClient(source_p) && ConfigChannel.use_sslonly == FALSE)
+	if(dir == MODE_ADD && MyClient(source_p) && ConfigChannel.use_sslonly == false)
 		return;
 
 	if(dir == MODE_ADD)
@@ -1366,8 +1407,8 @@ void
 set_channel_mode(struct Client *client_p, struct Client *source_p,
 		 struct Channel *chptr, struct membership *msptr, int parc, const char *parv[])
 {
-	static char modebuf[BUFSIZE];
-	static char parabuf[BUFSIZE];
+	static char modebuf[IRCD_BUFSIZE];
+	static char parabuf[IRCD_BUFSIZE];
 	char *mbuf;
 	char *pbuf;
 	int cur_len, mlen, paralen, paracount, arglen, len;
@@ -1417,11 +1458,10 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 		return;
 
 	if(IsServer(source_p))
-		mlen = rb_sprintf(modebuf, ":%s MODE %s ", source_p->name, chptr->chname);
+		mlen = sprintf(modebuf, ":%s MODE %s ", source_p->name, chptr->chname);
 	else
-		mlen = rb_sprintf(modebuf, ":%s!%s@%s MODE %s ",
-				  source_p->name, source_p->username,
-				  source_p->host, chptr->chname);
+		mlen = sprintf(modebuf, ":%s!%s@%s MODE %s ",
+			       source_p->name, source_p->username, source_p->host, chptr->chname);
 
 	for(j = 0, flags = ALL_MEMBERS; j < 2; j++, flags = ONLY_CHANOPS)
 	{
@@ -1452,7 +1492,7 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 			 */
 			if(mode_changes[i].arg != NULL &&
 			   ((paracount == MAXMODEPARAMSSERV) ||
-			    ((cur_len + paralen + arglen + 4) > (BUFSIZE - 3))))
+			    ((cur_len + paralen + arglen + 4) > (IRCD_BUFSIZE - 3))))
 			{
 				*mbuf = '\0';
 
@@ -1483,7 +1523,7 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
 			if(mode_changes[i].arg != NULL)
 			{
 				paracount++;
-				len = rb_sprintf(pbuf, "%s ", mode_changes[i].arg);
+				len = sprintf(pbuf, "%s ", mode_changes[i].arg);
 				pbuf += len;
 				paralen += len;
 			}

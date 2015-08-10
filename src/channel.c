@@ -35,6 +35,7 @@
 #include "numeric.h"
 #include "s_serv.h"		/* captab */
 #include "s_user.h"
+#include "monitor.h"
 #include "send.h"
 #include "whowas.h"
 #include "s_conf.h"		/* ConfigFileEntry, ConfigChannel */
@@ -43,11 +44,8 @@
 
 struct config_channel_entry ConfigChannel;
 rb_dlink_list global_channel_list;
-static rb_bh *channel_heap;
-static rb_bh *ban_heap;
-static rb_bh *topic_heap;
-static rb_bh *member_heap;
-struct ev_entry *checksplit_ev;
+
+rb_ev_entry *checksplit_ev;
 
 static int channel_capabs[] = { CAP_EX, CAP_IE,
 #ifdef ENABLE_SERVICES
@@ -56,8 +54,8 @@ static int channel_capabs[] = { CAP_EX, CAP_IE,
 	CAP_TS6
 };
 
-#define NCHCAPS         (sizeof(channel_capabs)/sizeof(int))
-#define NCHCAP_COMBOS   (1 << NCHCAPS)
+#define NCHCAPS		(sizeof(channel_capabs)/sizeof(int))
+#define NCHCAP_COMBOS	(1 << NCHCAPS)
 
 static struct ChCapCombo chcap_combos[NCHCAP_COMBOS];
 
@@ -72,10 +70,7 @@ static void free_topic(struct Channel *chptr);
 void
 init_channels(void)
 {
-	channel_heap = rb_bh_create(sizeof(struct Channel), CHANNEL_HEAP_SIZE, "channel_heap");
-	ban_heap = rb_bh_create(sizeof(struct Ban), BAN_HEAP_SIZE, "ban_heap");
-	topic_heap = rb_bh_create(sizeof(struct topic_info), TOPIC_HEAP_SIZE, "topic_heap");
-	member_heap = rb_bh_create(sizeof(struct membership), MEMBER_HEAP_SIZE, "member_heap");
+	/* nothing to do anymore..for now */
 }
 
 /*
@@ -85,7 +80,7 @@ struct Channel *
 allocate_channel(const char *chname)
 {
 	struct Channel *chptr;
-	chptr = rb_bh_alloc(channel_heap);
+	chptr = rb_malloc(sizeof(struct Channel));
 	chptr->chname = rb_strndup(chname, CHANNELLEN);
 	return (chptr);
 }
@@ -94,14 +89,14 @@ void
 free_channel(struct Channel *chptr)
 {
 	rb_free(chptr->chname);
-	rb_bh_free(channel_heap, chptr);
+	rb_free(chptr);
 }
 
 struct Ban *
 allocate_ban(const char *banstr, const char *who)
 {
 	struct Ban *bptr;
-	bptr = rb_bh_alloc(ban_heap);
+	bptr = rb_malloc(sizeof(struct Ban));
 	bptr->banstr = rb_strndup(banstr, BANLEN);
 	bptr->who = rb_strndup(who, BANLEN);
 
@@ -113,7 +108,7 @@ free_ban(struct Ban *bptr)
 {
 	rb_free(bptr->banstr);
 	rb_free(bptr->who);
-	rb_bh_free(ban_heap, bptr);
+	rb_free(bptr);
 }
 
 
@@ -202,7 +197,7 @@ add_user_to_channel(struct Channel *chptr, struct Client *client_p, int flags)
 	if(client_p->user == NULL)
 		return;
 
-	msptr = rb_bh_alloc(member_heap);
+	msptr = rb_malloc(sizeof(struct membership));
 
 	msptr->chptr = chptr;
 	msptr->client_p = client_p;
@@ -242,15 +237,15 @@ remove_user_from_channel(struct membership *msptr)
 	if(rb_dlink_list_length(&chptr->members) <= 0)
 		destroy_channel(chptr);
 
-	rb_bh_free(member_heap, msptr);
+	rb_free(msptr);
 
 	return;
 }
 
 /* remove_user_from_channels()
  *
- * input        - user to remove from all channels
- * output       -
+ * input	- user to remove from all channels
+ * output	-
  * side effects - user is removed from all channels
  */
 void
@@ -277,7 +272,7 @@ remove_user_from_channels(struct Client *client_p)
 		if(rb_dlink_list_length(&chptr->members) <= 0)
 			destroy_channel(chptr);
 
-		rb_bh_free(member_heap, msptr);
+		rb_free(msptr);
 	}
 
 	client_p->user->channel.head = client_p->user->channel.tail = NULL;
@@ -289,7 +284,7 @@ remove_user_from_channels(struct Client *client_p)
  * input	- user to invalidate ban cache for
  * output	-
  * side effects - ban cache is invalidated for all memberships of that user
- *                to be used after a nick change
+ *		  to be used after a nick change
  */
 void
 invalidate_bancache_user(struct Client *client_p)
@@ -337,7 +332,7 @@ check_channel_name(const char *name)
  * side effects - list of b/e/I modes is cleared
  */
 void
-free_channel_list(rb_dlink_list *list)
+free_channel_list(rb_dlink_list * list)
 {
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
@@ -410,7 +405,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 	struct membership *msptr;
 	struct Client *target_p;
 	rb_dlink_node *ptr;
-	char lbuf[BUFSIZE];
+	char lbuf[IRCD_BUFSIZE];
 	char *t;
 	int mlen;
 	int tlen;
@@ -422,9 +417,8 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 	{
 		is_member = IsMember(client_p, chptr);
 
-		cur_len = mlen = rb_sprintf(lbuf, form_str(RPL_NAMREPLY),
-					    me.name, client_p->name,
-					    channel_pub_or_secret(chptr), chptr->chname);
+		cur_len = mlen = sprintf(lbuf, form_str(RPL_NAMREPLY),
+					 me.name, client_p->name, channel_pub_or_secret(chptr), chptr->chname);
 
 		t = lbuf + cur_len;
 
@@ -437,7 +431,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 				continue;
 
 			/* space, possible "@+" prefix */
-			if(cur_len + strlen(target_p->name) + 3 >= BUFSIZE - 3)
+			if(cur_len + strlen(target_p->name) + 3 >= IRCD_BUFSIZE - 3)
 			{
 				*(t - 1) = '\0';
 				sendto_one_buffer(client_p, lbuf);
@@ -445,8 +439,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 				t = lbuf + mlen;
 			}
 
-			tlen = rb_sprintf(t, "%s%s ", find_channel_status(msptr, stack),
-					  target_p->name);
+			tlen = sprintf(t, "%s%s ", find_channel_status(msptr, stack), target_p->name);
 
 			cur_len += tlen;
 			t += tlen;
@@ -455,7 +448,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 		/* The old behaviour here was to always output our buffer,
 		 * even if there are no clients we can show.  This happens
 		 * when a client does "NAMES" with no parameters, and all
-		 * the clients on a -sp channel are +i.  I dont see a good
+		 * the clients on a -sp channel are +i.	 I dont see a good
 		 * reason for keeping that behaviour, as it just wastes
 		 * bandwidth.  --anfl
 		 */
@@ -467,8 +460,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 	}
 
 	if(show_eon)
-		sendto_one(client_p, form_str(RPL_ENDOFNAMES),
-			   me.name, client_p->name, chptr->chname);
+		sendto_one_numeric(client_p, s_RPL(RPL_ENDOFNAMES), chptr->chname);
 	ClearCork(client_p);
 	send_pop_queue(client_p);
 }
@@ -489,13 +481,12 @@ del_invite(struct Channel *chptr, struct Client *who)
 /* is_banned()
  *
  * input	- channel to check bans for, user to check bans against
- *                optional prebuilt buffers
+ *		  optional prebuilt buffers
  * output	- 1 if banned, else 0
  * side effects -
  */
 int
-is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
-	  const char *s, const char *s2)
+is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr, const char *s, const char *s2)
 {
 	char src_host[NICKLEN + USERLEN + HOSTLEN + 6];
 	char src_iphost[NICKLEN + USERLEN + HOSTLEN + 6];
@@ -507,10 +498,10 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 		return 0;
 
 	/* if the buffers havent been built, do it here */
-	if(s == NULL)
+	if(s == NULL || s2 == NULL)
 	{
-		rb_sprintf(src_host, "%s!%s@%s", who->name, who->username, who->host);
-		rb_sprintf(src_iphost, "%s!%s@%s", who->name, who->username, who->sockhost);
+		snprintf(src_host, sizeof(src_host), "%s!%s@%s", who->name, who->username, who->host);
+		snprintf(src_iphost, sizeof(src_iphost), "%s!%s@%s", who->name, who->username, who->sockhost);
 
 		s = src_host;
 		s2 = src_iphost;
@@ -519,8 +510,7 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr,
 	RB_DLINK_FOREACH(ptr, chptr->banlist.head)
 	{
 		actualBan = ptr->data;
-		if(match(actualBan->banstr, s) ||
-		   match(actualBan->banstr, s2) || match_cidr(actualBan->banstr, s2))
+		if(match(actualBan->banstr, s) || match(actualBan->banstr, s2) || match_cidr(actualBan->banstr, s2))
 			break;
 		else
 			actualBan = NULL;
@@ -580,8 +570,7 @@ can_send(struct Channel *chptr, struct Client *source_p, struct membership *mspt
 	if(IsServer(source_p))
 		return CAN_SEND_OPV;
 
-	if(MyClient(source_p) && hash_find_resv(chptr->chname) &&
-	   !IsOper(source_p) && !IsExemptResv(source_p))
+	if(MyClient(source_p) && hash_find_resv(chptr->chname) && !IsOper(source_p) && !IsExemptResv(source_p))
 		return CAN_SEND_NO;
 
 	if(msptr == NULL)
@@ -634,8 +623,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
 {
 	int t_delta;
 	int decrement_count;
-	if((GlobalSetOptions.spam_num &&
-	    (source_p->localClient->join_leave_count >= GlobalSetOptions.spam_num)))
+	if((GlobalSetOptions.spam_num && (source_p->localClient->join_leave_count >= GlobalSetOptions.spam_num)))
 	{
 		if(source_p->localClient->oper_warn_count_down > 0)
 			source_p->localClient->oper_warn_count_down--;
@@ -647,21 +635,18 @@ check_spambot_warning(struct Client *source_p, const char *name)
 			if(name != NULL)
 				sendto_realops_flags(UMODE_BOTS, L_ALL,
 						     "User %s (%s@%s) trying to join %s is a possible spambot",
-						     source_p->name,
-						     source_p->username, source_p->host, name);
+						     source_p->name, source_p->username, source_p->host, name);
 			else
 				sendto_realops_flags(UMODE_BOTS, L_ALL,
 						     "User %s (%s@%s) is a possible spambot",
-						     source_p->name,
-						     source_p->username, source_p->host);
+						     source_p->name, source_p->username, source_p->host);
 			source_p->localClient->oper_warn_count_down = OPER_SPAM_COUNTDOWN;
 		}
 	}
 	else
 	{
 		if((t_delta =
-		    (rb_time() - source_p->localClient->last_leave_time)) >
-		   JOIN_LEAVE_COUNT_EXPIRE_TIME)
+		    (rb_current_time() - source_p->localClient->last_leave_time)) > JOIN_LEAVE_COUNT_EXPIRE_TIME)
 		{
 			decrement_count = (t_delta / JOIN_LEAVE_COUNT_EXPIRE_TIME);
 			if(decrement_count > source_p->localClient->join_leave_count)
@@ -671,17 +656,16 @@ check_spambot_warning(struct Client *source_p, const char *name)
 		}
 		else
 		{
-			if((rb_time() -
-			    (source_p->localClient->last_join_time)) < GlobalSetOptions.spam_time)
+			if((rb_current_time() - (source_p->localClient->last_join_time)) < GlobalSetOptions.spam_time)
 			{
 				/* oh, its a possible spambot */
 				source_p->localClient->join_leave_count++;
 			}
 		}
 		if(name != NULL)
-			source_p->localClient->last_join_time = rb_time();
+			source_p->localClient->last_join_time = rb_current_time();
 		else
-			source_p->localClient->last_leave_time = rb_time();
+			source_p->localClient->last_leave_time = rb_current_time();
 	}
 }
 
@@ -690,7 +674,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
  * input	-
  * output	-
  * side effects - compares usercount and servercount against their split
- *                values and adjusts splitmode accordingly
+ *		  values and adjusts splitmode accordingly
  */
 void
 check_splitmode(void *unused)
@@ -705,11 +689,8 @@ check_splitmode(void *unused)
 			if(eob_count < split_servers || Count.total < split_users)
 			{
 				splitmode = 1;
-				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "Network split, activating splitmode");
-				checksplit_ev =
-					rb_event_addish("check_splitmode", check_splitmode, NULL,
-							5);
+				sendto_realops_flags(UMODE_ALL, L_ALL, "Network split, activating splitmode");
+				checksplit_ev = rb_event_addish("check_splitmode", check_splitmode, NULL, 5);
 			}
 		}
 		/* in splitmode, check whether its finished */
@@ -717,8 +698,7 @@ check_splitmode(void *unused)
 		{
 			splitmode = 0;
 
-			sendto_realops_flags(UMODE_ALL, L_ALL,
-					     "Network rejoined, deactivating splitmode");
+			sendto_realops_flags(UMODE_ALL, L_ALL, "Network rejoined, deactivating splitmode");
 
 			rb_event_delete(checksplit_ev);
 			checksplit_ev = NULL;
@@ -739,7 +719,7 @@ allocate_topic(struct Channel *chptr)
 	if(chptr == NULL)
 		return;
 
-	chptr->topic = rb_bh_alloc(topic_heap);
+	chptr->topic = rb_malloc(sizeof(struct topic_info));
 }
 
 /* free_topic()
@@ -758,7 +738,7 @@ free_topic(struct Channel *chptr)
 	 * MUST change this as well
 	 */
 	rb_free(chptr->topic->topic);
-	rb_bh_free(topic_heap, chptr->topic);
+	rb_free(chptr->topic);
 	chptr->topic = NULL;
 }
 
@@ -794,12 +774,12 @@ set_channel_topic(struct Channel *chptr, const char *topic, const char *topic_in
  * input	- channel, client to build for, modebufs to build to
  * output	-
  * side effects - user gets list of "simple" modes based on channel access.
- *                NOTE: m_join.c depends on trailing spaces in pbuf
+ *		  NOTE: m_join.c depends on trailing spaces in pbuf
  */
 const char *
 channel_modes(struct Channel *chptr, struct Client *client_p)
 {
-	static char buf[BUFSIZE];
+	static char buf[IRCD_BUFSIZE];
 	char *mbuf = buf;
 
 	*mbuf++ = '+';
@@ -826,21 +806,21 @@ channel_modes(struct Channel *chptr, struct Client *client_p)
 	if(chptr->mode.limit && *chptr->mode.key)
 	{
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))
-			rb_sprintf(mbuf, "lk %d %s", chptr->mode.limit, chptr->mode.key);
+			sprintf(mbuf, "lk %d %s", chptr->mode.limit, chptr->mode.key);
 		else
 			strcpy(mbuf, "lk");
 	}
 	else if(chptr->mode.limit)
 	{
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))
-			rb_sprintf(mbuf, "l %d", chptr->mode.limit);
+			sprintf(mbuf, "l %d", chptr->mode.limit);
 		else
 			strcpy(mbuf, "l");
 	}
 	else if(*chptr->mode.key)
 	{
 		if(IsMe(client_p) || !MyClient(client_p) || IsMember(client_p, chptr))
-			rb_sprintf(mbuf, "k %s", chptr->mode.key);
+			sprintf(mbuf, "k %s", chptr->mode.key);
 		else
 			strcpy(mbuf, "k");
 	}
@@ -866,7 +846,7 @@ channel_modes(struct Channel *chptr, struct Client *client_p)
  * Inputs	- none
  * Output	- none
  * Side-effects	- Initialises the usage counts to zero. Fills in the
- *                chcap_yes and chcap_no combination tables.
+ *		  chcap_yes and chcap_no combination tables.
  */
 void
 init_chcap_usage_counts(void)
@@ -895,7 +875,7 @@ init_chcap_usage_counts(void)
  * Input: serv_p; The client whose capabs to register.
  * Output: none
  * Side-effects: Increments the usage counts for the correct capab
- *               combination.
+ *		 combination.
  */
 void
 set_chcap_usage_counts(struct Client *serv_p)
@@ -904,8 +884,7 @@ set_chcap_usage_counts(struct Client *serv_p)
 
 	for(n = 0; n < NCHCAP_COMBOS; n++)
 	{
-		if(IsCapable(serv_p, chcap_combos[n].cap_yes) &&
-		   NotCapable(serv_p, chcap_combos[n].cap_no))
+		if(IsCapable(serv_p, chcap_combos[n].cap_yes) && NotCapable(serv_p, chcap_combos[n].cap_no))
 		{
 			chcap_combos[n].count++;
 			return;
@@ -921,7 +900,7 @@ set_chcap_usage_counts(struct Client *serv_p)
  * Inputs	- serv_p; The client whose capabs to register.
  * Output	- none
  * Side-effects	- Decrements the usage counts for the correct capab
- *                combination.
+ *		  combination.
  */
 void
 unset_chcap_usage_counts(struct Client *serv_p)
@@ -930,8 +909,7 @@ unset_chcap_usage_counts(struct Client *serv_p)
 
 	for(n = 0; n < NCHCAP_COMBOS; n++)
 	{
-		if(IsCapable(serv_p, chcap_combos[n].cap_yes) &&
-		   NotCapable(serv_p, chcap_combos[n].cap_no))
+		if(IsCapable(serv_p, chcap_combos[n].cap_yes) && NotCapable(serv_p, chcap_combos[n].cap_no))
 		{
 			/* Hopefully capabs can't change dynamically or anything... */
 			s_assert(chcap_combos[n].count > 0);
@@ -947,10 +925,10 @@ unset_chcap_usage_counts(struct Client *serv_p)
 }
 
 /* void send_cap_mode_changes(struct Client *client_p,
- *                        struct Client *source_p,
- *                        struct Channel *chptr, int cap, int nocap)
+ *			  struct Client *source_p,
+ *			  struct Channel *chptr, int cap, int nocap)
  * Input: The client sending(client_p), the source client(source_p),
- *        the channel to send mode changes for(chptr)
+ *	  the channel to send mode changes for(chptr)
  * Output: None.
  * Side-effects: Sends the appropriate mode changes to capable servers.
  *
@@ -962,8 +940,8 @@ void
 send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 		      struct Channel *chptr, struct ChModeChange mode_changes[], int mode_count)
 {
-	static char modebuf[BUFSIZE];
-	static char parabuf[BUFSIZE];
+	static char modebuf[IRCD_BUFSIZE];
+	static char parabuf[IRCD_BUFSIZE];
 	int i, mbl, pbl, nc, mc, preflen, len;
 	char *pbuf;
 	const char *arg;
@@ -971,7 +949,7 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 	int j;
 	int cap;
 	int nocap;
-	int arglen;
+	int arglen = 0;
 
 	/* Now send to servers... */
 	for(j = 0; j < NCHCAP_COMBOS; j++)
@@ -989,9 +967,11 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 		cap = chcap_combos[j].cap_yes;
 		nocap = chcap_combos[j].cap_no;
 
-		mbl = preflen = rb_sprintf(modebuf, ":%s TMODE %ld %s ",
-						   source_p->id, (long)chptr->channelts,
-						   chptr->chname);
+		if(cap & CAP_TS6)
+			mbl = preflen = sprintf(modebuf, ":%s TMODE %" RBTT_FMT " %s ",
+						use_id(source_p), chptr->channelts, chptr->chname);
+		else
+			mbl = preflen = sprintf(modebuf, ":%s MODE %s ", source_p->name, chptr->chname);
 
 		/* loop the list of - modes we have */
 		for(i = 0; i < mode_count; i++)
@@ -1005,7 +985,7 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 			   || ((nocap & mode_changes[i].nocaps) != mode_changes[i].nocaps))
 				continue;
 
-			if(!EmptyString(mode_changes[i].id))
+			if((cap & CAP_TS6) && !EmptyString(mode_changes[i].id))
 				arg = mode_changes[i].id;
 			else
 				arg = mode_changes[i].arg;
@@ -1026,12 +1006,10 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 			 * them as if they were the longest of the nick or uid at all times,
 			 * which even then won't work as we don't always know the uid -A1kmm.
 			 */
-			if(arg && ((mc == MAXMODEPARAMSSERV) ||
-				   ((mbl + pbl + arglen + 4) > (BUFSIZE - 3))))
+			if(arg && ((mc == MAXMODEPARAMSSERV) || ((mbl + pbl + arglen + 4) > (IRCD_BUFSIZE - 3))))
 			{
 				if(nc != 0)
-					sendto_server(client_p, chptr, cap, nocap,
-						      "%s %s", modebuf, parabuf);
+					sendto_server(client_p, chptr, cap, nocap, "%s %s", modebuf, parabuf);
 				nc = 0;
 				mc = 0;
 
@@ -1054,7 +1032,7 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 
 			if(arg != NULL)
 			{
-				len = rb_sprintf(pbuf, "%s ", arg);
+				len = sprintf(pbuf, "%s ", arg);
 				pbuf += len;
 				pbl += len;
 				mc++;

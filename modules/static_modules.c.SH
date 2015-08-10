@@ -28,6 +28,7 @@ cat > static_modules.c <<EOF
  *  
  */
 #include "stdinc.h"
+#include "struct.h"
 #include "modules.h"
 #include "hash.h"
 #include "s_log.h"
@@ -35,15 +36,15 @@ cat > static_modules.c <<EOF
 EOF
 
 for x in $SYMS; do 
-	echo extern struct mapi_header_av1 "$x"_mheader\;
+	echo extern struct mapi_header_av1 "$x"_rb_mheader\;
 done >> static_modules.c
 
 
 echo const struct mapi_header_av1 *static_mapi_headers[] = { >> static_modules.c 
 for x in $SYMS; do 
-	echo \&"$x"_mheader,
+	echo \&"$x"_rb_mheader,
 done >> static_modules.c
 
 echo NULL }\; >> static_modules.c
-
-cat >> static_modules.c <<EOF
+echo >> static_modules.c
+#cat >> static_modules.c <<EOF

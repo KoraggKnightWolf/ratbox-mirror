@@ -57,7 +57,7 @@ const char *
 scache_add(const char *name)
 {
 	struct scache_entry *sc;
-	unsigned int hashv;
+	uint32_t hashv;
 	rb_dlink_node *ptr;
 
 	if(EmptyString(name))
@@ -79,7 +79,7 @@ scache_add(const char *name)
 }
 
 void
-count_scache(size_t *number, size_t *mem)
+count_scache(size_t * number, size_t * mem)
 {
 	int i;
 	rb_dlink_node *ptr;

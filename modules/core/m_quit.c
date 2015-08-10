@@ -38,13 +38,18 @@ static int mr_quit(struct Client *, struct Client *, int, const char **);
 static int ms_quit(struct Client *, struct Client *, int, const char **);
 
 struct Message quit_msgtab = {
-	"QUIT", 0, 0, 0, MFLG_SLOW | MFLG_UNREG,
-	{{mr_quit, 0}, {m_quit, 0}, {ms_quit, 0}, mg_ignore, mg_ignore, {m_quit, 0}}
+	.cmd = "QUIT", 
+	.handlers[UNREGISTERED_HANDLER] =       { .handler = mr_quit },
+	.handlers[CLIENT_HANDLER] =             { .handler = m_quit },
+	.handlers[RCLIENT_HANDLER] =            { .handler = ms_quit },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = m_quit },
 };
 
-mapi_clist_av2 quit_clist[] = { &quit_msgtab, NULL };
+mapi_clist_av1 quit_clist[] = { &quit_msgtab, NULL };
 
-DECLARE_MODULE_AV2(quit, NULL, NULL, quit_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(quit, NULL, NULL, quit_clist, NULL, NULL, "$Revision$");
 
 
 static int
@@ -56,6 +61,7 @@ mr_quit(struct Client *client_p, struct Client *source_p, int parc, const char *
 
 /*
 ** m_quit
+**      parv[0] = sender prefix
 **      parv[1] = comment
 */
 static int
@@ -68,13 +74,13 @@ m_quit(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	if(ConfigFileEntry.client_exit && comment[0])
 	{
-		rb_snprintf(reason, sizeof(reason), "Quit: %s", comment);
+		snprintf(reason, sizeof(reason), "Quit: %s", comment);
 		comment = reason;
 	}
 
 	if(!IsOper(source_p) &&
 	   (source_p->localClient->firsttime + ConfigFileEntry.anti_spam_exit_message_time) >
-	   rb_time())
+	   rb_current_time())
 	{
 		exit_client(client_p, source_p, source_p, "Client Quit");
 		return 0;
@@ -87,6 +93,7 @@ m_quit(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 /*
 ** ms_quit
+**      parv[0] = sender prefix
 **      parv[1] = comment
 */
 static int

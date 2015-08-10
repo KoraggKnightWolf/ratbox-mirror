@@ -1,6 +1,6 @@
 /*
  *  m_testmask.c: Shows the number of matching local and global clients
- *                for a user@host mask, helpful when setting GLINE's
+ *		  for a user@host mask, helpful when setting GLINE's
  *
  *  Copyright (C) 2003 by W. Campbell
  *  Coypright (C) 2004 ircd-ratbox development team
@@ -47,17 +47,22 @@
 static int mo_testmask(struct Client *client_p, struct Client *source_p,
 		       int parc, const char *parv[]);
 
+
 struct Message testmask_msgtab = {
-	"TESTMASK", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_testmask, 2}}
+	.cmd = "TESTMASK",
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg }, 
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_testmask, .min_para = 2 },
 };
 
-mapi_clist_av2 testmask_clist[] = { &testmask_msgtab, NULL };
 
-DECLARE_MODULE_AV2(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision$");
+mapi_clist_av1 testmask_clist[] = { &testmask_msgtab, NULL };
 
-static const char *empty_sockhost = "255.255.255.255";
-static const char *spoofed_sockhost = "0";
+DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision$");
+
 
 static int
 mo_testmask(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
@@ -111,9 +116,9 @@ mo_testmask(struct Client *client_p, struct Client *source_p, int parc, const ch
 			continue;
 
 		if(EmptyString(target_p->sockhost))
-			sockhost = empty_sockhost;
+			sockhost = "255.255.255.255";
 		else if(!show_ip(source_p, target_p))
-			sockhost = spoofed_sockhost;
+			sockhost = "0";
 		else
 			sockhost = target_p->sockhost;
 
@@ -134,8 +139,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p, int parc, const ch
 		}
 	}
 
-	sendto_one(source_p, form_str(RPL_TESTMASKGECOS),
-		   me.name, source_p->name,
+	sendto_one_numeric(source_p, s_RPL(RPL_TESTMASKGECOS),
 		   lcount, gcount, name ? name : "*", username, hostname, gecos ? gecos : "*");
 	return 0;
 }

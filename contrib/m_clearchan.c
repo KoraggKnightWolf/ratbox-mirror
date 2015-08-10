@@ -1,7 +1,7 @@
 /*
  *   IRC - Internet Relay Chat, contrib/m_clearchan.c
  *   Copyright (C) 2002 Hybrid Development Team
- *   Copyright (C) 2004 ircd-ratbox Development Team
+ *   Copyright (C) 2004-2012 ircd-ratbox Development Team
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -41,16 +41,22 @@ static int mo_clearchan(struct Client *client_p, struct Client *source_p,
 			int parc, const char *parv[]);
 
 struct Message clearchan_msgtab = {
-	"CLEARCHAN", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, mg_ignore, {mo_clearchan, 2}}
+	.cmd = "CLEARCHAN",
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =            { mm_ignore },
+	.handlers[SERVER_HANDLER] =             { mm_ignore },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = mo_clearchan, .min_para = 2 },
 };
 
-mapi_clist_av2 clearchan_clist[] = { &clearchan_msgtab, NULL };
+mapi_clist_av1 clearchan_clist[] = { &clearchan_msgtab, NULL };
 
-DECLARE_MODULE_AV2(clearchan, NULL, NULL, clearchan_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(clearchan, NULL, NULL, clearchan_clist, NULL, NULL, "$Revision$");
 
 /*
 ** mo_clearchan
+**      parv[0] = sender prefix
 **      parv[1] = channel
 */
 static int
@@ -65,7 +71,7 @@ mo_clearchan(struct Client *client_p, struct Client *source_p, int parc, const c
 	/* admins only */
 	if(!IsOperAdmin(source_p))
 	{
-		sendto_one_notice(source_p, ":You have no A flag");
+		sendto_one(source_p, ":%s NOTICE %s :You have no A flag", me.name, parv[0]);
 		return 0;
 	}
 

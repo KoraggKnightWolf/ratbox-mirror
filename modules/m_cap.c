@@ -48,13 +48,18 @@ static int m_cap(struct Client *, struct Client *, int, const char **);
 static int modinit(void);
 
 struct Message cap_msgtab = {
-	"CAP", 0, 0, 0, MFLG_SLOW,
-	{{m_cap, 2}, {m_cap, 2}, mg_ignore, mg_ignore, mg_ignore, {m_cap, 2}}
+	.cmd = "CAP",
+	.handlers[UNREGISTERED_HANDLER] =	{ .handler = m_cap, .min_para = 2 },	
+	.handlers[CLIENT_HANDLER] =		{ .handler = m_cap, .min_para = 2 },	    
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },	      
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },	      
+	.handlers[ENCAP_HANDLER] =		{ mm_ignore },			   
+	.handlers[OPER_HANDLER] =		{ .handler = m_cap, .min_para = 2 },	
 };
 
-mapi_clist_av2 cap_clist[] = { &cap_msgtab, NULL };
+mapi_clist_av1 cap_clist[] = { &cap_msgtab, NULL };
 
-DECLARE_MODULE_AV2(cap, modinit, NULL, cap_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(cap, modinit, NULL, cap_clist, NULL, NULL, "$Revision$");
 
 #define _CLICAP(name, capserv, capclient, flags)	\
 	{ (name), (capserv), (capclient), (flags), sizeof(name) - 1 }
@@ -99,32 +104,32 @@ clicap_compare(const char *name, struct clicap *cap)
  *   Used iteratively over a buffer, extracts individual cap tokens.
  *
  * Inputs: buffer to start iterating over (NULL to iterate over existing buf)
- *         int pointer to whether the cap token is negated
- *         int pointer to whether we finish with success
+ *	   int pointer to whether the cap token is negated
+ *	   int pointer to whether we finish with success
  * Ouputs: Cap entry if found, NULL otherwise.
  */
 static struct clicap *
-clicap_find(const char *data, int *negate, int *finished)
+clicap_find(const char *data, int *negate, int *finished, char **p)
 {
-	static char buf[BUFSIZE];
-	static char *p;
+	char buf[IRCD_BUFSIZE];
+//	static char *p = NULL;
 	struct clicap *cap;
 	char *s;
 
 	*negate = 0;
 
-	if(data)
+	if(data != NULL)
 	{
 		rb_strlcpy(buf, data, sizeof(buf));
-		p = buf;
-	}
+		*p = buf;
+	} 
 
 	if(*finished)
 		return NULL;
 
 	/* skip any whitespace */
-	while(*p && IsSpace(*p))
-		p++;
+	while(**p && IsSpace(**p))
+		(*p)++;
 
 	if(EmptyString(p))
 	{
@@ -132,24 +137,24 @@ clicap_find(const char *data, int *negate, int *finished)
 		return NULL;
 	}
 
-	if(*p == '-')
+	if(**p == '-')
 	{
 		*negate = 1;
-		p++;
+		(*p)++;
 
 		/* someone sent a '-' without a parameter.. */
-		if(*p == '\0')
+		if(**p == '\0')
 			return NULL;
 	}
 
-	if((s = strchr(p, ' ')))
+	if((s = strchr(*p, ' ')))
 		*s++ = '\0';
 
-	if((cap = bsearch(p, clicap_list, CLICAP_LIST_LEN,
+	if((cap = bsearch(*p, clicap_list, CLICAP_LIST_LEN,
 			  sizeof(struct clicap), (bqcmp) clicap_compare)))
 	{
 		if(s)
-			p = s;
+			*p = s;
 		else
 			*finished = 1;
 	}
@@ -161,22 +166,22 @@ clicap_find(const char *data, int *negate, int *finished)
  *   Generates a list of capabilities.
  *
  * Inputs: client to send to, subcmd to send,
- *         flags to match against: 0 to do none, -1 if client has no flags,
- *         int to whether we are doing CAP CLEAR
+ *	   flags to match against: 0 to do none, -1 if client has no flags,
+ *	   int to whether we are doing CAP CLEAR
  * Outputs: None
  */
 static void
 clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clear)
 {
-	char buf[BUFSIZE];
-	char capbuf[BUFSIZE];
+	char buf[IRCD_BUFSIZE];
+	char capbuf[IRCD_BUFSIZE];
 	char *p;
 	int buflen = 0;
 	int curlen, mlen;
 	unsigned int i;
 	SetCork(source_p);
-	mlen = rb_sprintf(buf, ":%s CAP %s %s",
-			  me.name, EmptyString(source_p->name) ? "*" : source_p->name, subcmd);
+	mlen = sprintf(buf, ":%s CAP %s %s",
+		       me.name, EmptyString(source_p->name) ? "*" : source_p->name, subcmd);
 
 	p = capbuf;
 	buflen = mlen;
@@ -201,7 +206,7 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 		}
 
 		/* \r\n\0, possible "-~=", space, " *" */
-		if(buflen + clicap_list[i].namelen >= BUFSIZE - 10)
+		if(buflen + clicap_list[i].namelen >= IRCD_BUFSIZE - 10)
 		{
 			/* remove our trailing space -- if buflen == mlen
 			 * here, we didnt even succeed in adding one.
@@ -247,7 +252,7 @@ clicap_generate(struct Client *source_p, const char *subcmd, int flags, int clea
 			}
 		}
 
-		curlen = rb_sprintf(p, "%s ", clicap_list[i].name);
+		curlen = sprintf(p, "%s ", clicap_list[i].name);
 		p += curlen;
 		buflen += curlen;
 	}
@@ -267,12 +272,12 @@ cap_ack(struct Client *source_p, const char *arg)
 	struct clicap *cap;
 	int capadd = 0, capdel = 0;
 	int finished = 0, negate;
-
+	char *p = NULL;
 	if(EmptyString(arg))
 		return;
 
-	for(cap = clicap_find(arg, &negate, &finished); cap;
-	    cap = clicap_find(NULL, &negate, &finished))
+	for(cap = clicap_find(arg, &negate, &finished, &p); cap;
+	    cap = clicap_find(NULL, &negate, &finished, &p))
 	{
 		/* sent an ACK for something they havent REQd */
 		if(!IsCapable(source_p, cap->cap_serv))
@@ -345,8 +350,9 @@ cap_ls(struct Client *source_p, const char *arg)
 static void
 cap_req(struct Client *source_p, const char *arg)
 {
-	char buf[BUFSIZE];
-	char pbuf[2][BUFSIZE];
+	char buf[IRCD_BUFSIZE];
+	char pbuf[2][IRCD_BUFSIZE];
+	char *p = NULL;
 	struct clicap *cap;
 	int buflen, plen;
 	int i = 0;
@@ -359,20 +365,20 @@ cap_req(struct Client *source_p, const char *arg)
 	if(EmptyString(arg))
 		return;
 
-	buflen = rb_snprintf(buf, sizeof(buf), ":%s CAP %s ACK",
-			     me.name, EmptyString(source_p->name) ? "*" : source_p->name);
+	buflen = snprintf(buf, sizeof(buf), ":%s CAP %s ACK",
+			  me.name, EmptyString(source_p->name) ? "*" : source_p->name);
 
 	pbuf[0][0] = '\0';
 	plen = 0;
 
-	for(cap = clicap_find(arg, &negate, &finished); cap;
-	    cap = clicap_find(NULL, &negate, &finished))
+	for(cap = clicap_find(arg, &negate, &finished, &p); cap;
+	    cap = clicap_find(NULL, &negate, &finished, &p))
 	{
 		/* filled the first array, but cant send it in case the
 		 * request fails.  one REQ should never fill more than two
 		 * buffers --fl
 		 */
-		if(buflen + plen + cap->namelen + 6 >= BUFSIZE)
+		if(buflen + plen + cap->namelen + 6 >= IRCD_BUFSIZE)
 		{
 			pbuf[1][0] = '\0';
 			plen = 0;
@@ -468,8 +474,7 @@ m_cap(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 			   sizeof(clicap_cmdlist) / sizeof(struct clicap_cmd),
 			   sizeof(struct clicap_cmd), (bqcmp) clicap_cmd_search)))
 	{
-		sendto_one(source_p, form_str(ERR_INVALIDCAPCMD),
-			   me.name, EmptyString(source_p->name) ? "*" : source_p->name, parv[1]);
+		sendto_one_numeric(source_p, s_RPL(ERR_INVALIDCAPCMD), parv[1]);
 		return 0;
 	}
 

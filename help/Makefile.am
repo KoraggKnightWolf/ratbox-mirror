@@ -1,4 +1,4 @@
-# $Id: Makefile.in 23020 2006-09-01 18:20:19Z androsyn $
+# $Id$
 
 AUTOMAKE_OPTIONS = foreign 
 

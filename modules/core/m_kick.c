@@ -38,19 +38,24 @@
 #include "s_serv.h"
 
 static int m_kick(struct Client *, struct Client *, int, const char **);
-#define mg_kick { m_kick, 3 }
 
 struct Message kick_msgtab = {
-	"KICK", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_kick, mg_kick, mg_kick, mg_ignore, mg_kick}
+	.cmd = "KICK", 
+	.handlers[UNREGISTERED_HANDLER] =       { mm_unreg },
+	.handlers[CLIENT_HANDLER] =             { .handler = m_kick, .min_para = 3 },
+	.handlers[RCLIENT_HANDLER] =            { .handler = m_kick, .min_para = 3 },
+	.handlers[SERVER_HANDLER] =             { .handler = m_kick, .min_para = 3 },
+	.handlers[ENCAP_HANDLER] =              { mm_ignore },
+	.handlers[OPER_HANDLER] =               { .handler = m_kick, .min_para = 3 },
 };
 
-mapi_clist_av2 kick_clist[] = { &kick_msgtab, NULL };
+mapi_clist_av1 kick_clist[] = { &kick_msgtab, NULL };
 
-DECLARE_MODULE_AV2(kick, NULL, NULL, kick_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(kick, NULL, NULL, kick_clist, NULL, NULL, "$Revision$");
 
 /*
 ** m_kick
+**      parv[0] = sender prefix
 **      parv[1] = channel
 **      parv[2] = client to kick
 **      parv[3] = kick comment
@@ -66,7 +71,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	const char *name;
 	char *p = NULL;
 	const char *user;
-	static char buf[BUFSIZE];
+	static char buf[IRCD_BUFSIZE];
 
 	if(MyClient(source_p) && !IsFloodDone(source_p))
 		flood_endgrace(source_p);
@@ -90,8 +95,7 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 		if((msptr == NULL) && MyConnect(source_p))
 		{
-			sendto_one_numeric(source_p, ERR_NOTONCHANNEL,
-					   form_str(ERR_NOTONCHANNEL), name);
+			sendto_one_numeric(source_p, s_RPL(ERR_NOTONCHANNEL), name);
 			return 0;
 		}
 
@@ -99,16 +103,14 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		{
 			if(MyConnect(source_p))
 			{
-				sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-					   me.name, source_p->name, name);
+				sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED), name);
 				return 0;
 			}
 
 			/* If its a TS 0 channel, do it the old way */
 			if(chptr->channelts == 0)
 			{
-				sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
-					   get_id(&me, source_p), get_id(source_p, source_p), name);
+				sendto_one_numeric(source_p, s_RPL(ERR_CHANOPRIVSNEEDED), name);
 				return 0;
 			}
 		}
@@ -178,7 +180,10 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 		sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
 			      ":%s KICK %s %s :%s",
-			      source_p->id, chptr->chname, who->id, comment);
+			      use_id(source_p), chptr->chname, use_id(who), comment);
+		sendto_server(client_p, chptr, NOCAPS, CAP_TS6,
+			      ":%s KICK %s %s :%s",
+			      source_p->name, chptr->chname, who->name, comment);
 		remove_user_from_channel(msptr);
 	}
 	else if(MyClient(source_p))

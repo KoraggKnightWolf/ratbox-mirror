@@ -39,19 +39,25 @@ static int mo_adminwall(struct Client *, struct Client *, int, const char **);
 static int me_adminwall(struct Client *, struct Client *, int, const char **);
 
 struct Message adminwall_msgtab = {
-	"ADMINWALL", 0, 0, 0, MFLG_SLOW,
-	{mg_unreg, mg_not_oper, mg_ignore, mg_ignore, {me_adminwall, 2}, {mo_adminwall, 2}}
+	.cmd = "ADMINWALL", 
+
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_unreg },
+	.handlers[CLIENT_HANDLER] =		{ mm_not_oper },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_adminwall, .min_para = 2 },
+	.handlers[OPER_HANDLER] =		{ .handler = mo_adminwall, .min_para = 2 },
 };
 
 
-mapi_clist_av2 adminwall_clist[] = { &adminwall_msgtab, NULL };
+mapi_clist_av1 adminwall_clist[] = { &adminwall_msgtab, NULL };
 
-DECLARE_MODULE_AV2(adminwall, NULL, NULL, adminwall_clist, NULL, NULL, "$Revision: 20702 $");
+DECLARE_MODULE_AV1(adminwall, NULL, NULL, adminwall_clist, NULL, NULL, "$Revision: 20702 $");
 
 
 /*
  * mo_adminwall (write to *all* admins currently online)
- *      parv[1] = message text
+ *	parv[1] = message text
  */
 
 static int
@@ -59,7 +65,7 @@ mo_adminwall(struct Client *client_p, struct Client *source_p, int parc, const c
 {
 	if(!IsAdmin(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "adminwall");
+		sendto_one_numeric(source_p, s_RPL(ERR_NOPRIVS), "adminwall");
 		return 0;
 	}
 	sendto_wallops_flags(UMODE_ADMIN, source_p, "ADMINWALL - %s", parv[1]);

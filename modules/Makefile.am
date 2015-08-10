@@ -1,3 +1,8 @@
+#
+# Makefile.am: stuff for automake to vomit back up in a digested form
+# $Id$ 
+#
+
 
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
@@ -7,7 +12,7 @@ modulesdir      = @moduledir@/autoload
 coredir         = @moduledir@
 servicesdir     = @moduledir@/autoload
 libmodulesdir	= @moduledir@
-INCLUDES = -I../libratbox/include -I../include -I../libltdl @SSL_INCLUDES@
+AM_CPPFLAGS = -I../libratbox/include -I../include $(LTDLINCL) @SSL_INCLUDES@
 
 AM_CFLAGS = $(WARNFLAGS)
 

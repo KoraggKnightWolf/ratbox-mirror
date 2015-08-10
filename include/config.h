@@ -33,8 +33,8 @@
  * The other defaults should be fine.
  *
  * NOTE: CHANGING THESE WILL NOT ALTER THE DIRECTORY THAT FILES WILL
- *       BE INSTALLED TO.  IF YOU CHANGE THESE, DO NOT USE MAKE INSTALL,
- *       BUT COPY THE FILES MANUALLY TO WHERE YOU WANT THEM.
+ *	 BE INSTALLED TO.  IF YOU CHANGE THESE, DO NOT USE MAKE INSTALL,
+ *	 BUT COPY THE FILES MANUALLY TO WHERE YOU WANT THEM.
  *
  * IRCD_PREFIX = prefix for all directories,
  * DPATH       = root directory of installation,
@@ -46,23 +46,23 @@
  */
 
 /* dirs */
-#define DPATH   IRCD_PREFIX
+#define DPATH	IRCD_PREFIX
 #define BINPATH IRCD_PREFIX "/bin/"
 #define MODPATH MODULE_DIR
 #define AUTOMODPATH MODULE_DIR "/autoload/"
 #define ETCPATH ETC_DIR
 #define LOGPATH LOG_DIR
-#define UHPATH   HELP_DIR "/users"
+#define UHPATH	 HELP_DIR "/users"
 #define HPATH  HELP_DIR "/opers"
 
 /* files */
-#define SPATH    BINPATH "/ircd"	/* ircd executable */
-#define CPATH    ETCPATH "/ircd.conf"	/* ircd.conf file */
-#define DBPATH   ETCPATH "/ban.db"
-#define MPATH    ETCPATH "/ircd.motd"	/* MOTD file */
-#define LPATH    LOGPATH "/ircd.log"	/* ircd logfile */
-#define PPATH    ETCPATH "/ircd.pid"	/* pid file */
-#define OPATH    ETCPATH "/opers.motd"	/* oper MOTD file */
+#define SPATH	 BINPATH "/ircd"	/* ircd executable */
+#define CPATH	 ETCPATH "/ircd.conf"	/* ircd.conf file */
+#define DBPATH	 ETCPATH "/ban.db"
+#define MPATH	 ETCPATH "/ircd.motd"	/* MOTD file */
+#define LPATH	 LOGPATH "/ircd.log"	/* ircd logfile */
+#define PPATH	 ETCPATH "/ircd.pid"	/* pid file */
+#define OPATH	 ETCPATH "/opers.motd"	/* oper MOTD file */
 
 /* HANGONGOODLINK and HANGONGOODLINK
  * Often net breaks for a short time and it's useful to try to
@@ -89,6 +89,12 @@
  */
 #define RATBOX_SOMAXCONN 25
 
+/* NICKNAMEHISTORYLENGTH
+ * length of the /whowas history table
+ */
+ 
+#define NICKNAMEHISTORYLENGTH 30000
+
 /* ----------------------------------------------------------------
  * STOPSTOPSTOPSTOPSTOPSTOPSTOPSTOPSTOPSTOPSTOPSTOPSTOPSTOPSTOPSTOP
  * ----------------------------------------------------------------
@@ -100,9 +106,7 @@
  * The amount of fds to reserve for clients exempt from limits
  * and dns lookups.
  */
-#define MAX_BUFFER      60
-
-#define CONFIG_RATBOX_LEVEL_3
+#define MAX_BUFFER	60
 
 #include "defaults.h"
 #endif /* INCLUDED_config_h */

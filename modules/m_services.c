@@ -58,25 +58,40 @@ static void h_svc_whois(hook_data_client *);
 static void h_svc_stats(hook_data_int *);
 
 struct Message su_msgtab = {
-	"SU", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_su, 2}, mg_ignore}
+	.cmd = "SU", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },
+	.handlers[CLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_su, .min_para = 2 },
+	.handlers[OPER_HANDLER] =		{ mm_ignore },
 };
 
 struct Message login_msgtab = {
-	"LOGIN", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_login, 2}, mg_ignore}
+	.cmd = "LOGIN", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },
+	.handlers[CLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_login, .min_para = 2 },
+	.handlers[OPER_HANDLER] =		{ mm_ignore },
 };
 
 struct Message rsfnc_msgtab = {
-	"RSFNC", 0, 0, 0, MFLG_SLOW,
-	{mg_ignore, mg_ignore, mg_ignore, mg_ignore, {me_rsfnc, 3}, mg_ignore}
+	.cmd = "RSFNC", 
+	.handlers[UNREGISTERED_HANDLER] =	{ mm_ignore },
+	.handlers[CLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
+	.handlers[SERVER_HANDLER] =		{ mm_ignore },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_rsfnc, .min_para = 3 },
+	.handlers[OPER_HANDLER] =		{ mm_ignore },
 };
 
-mapi_clist_av2 services_clist[] = {
+mapi_clist_av1 services_clist[] = {
 	&su_msgtab, &login_msgtab, &rsfnc_msgtab, NULL
 };
 
-mapi_hfn_list_av2 services_hfnlist[] = {
+mapi_hfn_list_av1 services_hfnlist[] = {
 	{"doing_stats", (hookfn) h_svc_stats},
 	{"doing_whois", (hookfn) h_svc_whois},
 	{"doing_whois_global", (hookfn) h_svc_whois},
@@ -85,7 +100,7 @@ mapi_hfn_list_av2 services_hfnlist[] = {
 	{NULL, NULL}
 };
 
-DECLARE_MODULE_AV2(services, NULL, NULL, services_clist, NULL, services_hfnlist,
+DECLARE_MODULE_AV1(services, NULL, NULL, services_clist, NULL, services_hfnlist,
 		   "$Revision$");
 
 static int
@@ -162,7 +177,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if((exist_p = find_named_client(parv[2])))
 	{
-		char buf[BUFSIZE];
+		char buf[IRCD_BUFSIZE];
 
 		/* this would be one hell of a race condition to trigger
 		 * this one given the tsinfo check above, but its here for 
@@ -181,16 +196,15 @@ me_rsfnc(struct Client *client_p, struct Client *source_p, int parc, const char 
 			kill_client_serv_butone(NULL, exist_p, "%s (Nickname regained by services)",
 						me.name);
 
-		rb_snprintf(buf, sizeof(buf), "Killed (%s (Nickname regained by services))",
-			    me.name);
+		snprintf(buf, sizeof(buf), "Killed (%s (Nickname regained by services))", me.name);
 		exit_client(NULL, exist_p, &me, buf);
 	}
 
 	newts = atol(parv[3]);
 
 	/* timestamp is older than 15mins, ignore it */
-	if(newts < (rb_time() - 900))
-		newts = rb_time() - 900;
+	if(newts < (rb_current_time() - 900))
+		newts = rb_current_time() - 900;
 
 	target_p->tsinfo = newts;
 
@@ -206,8 +220,10 @@ me_rsfnc(struct Client *client_p, struct Client *source_p, int parc, const char 
 				     target_p->name, target_p->username, target_p->host, parv[2]);
 
 	add_history(target_p, 1);
-	sendto_server(NULL, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%ld",
-		      target_p->id, parv[2], (long)target_p->tsinfo);
+	sendto_server(NULL, NULL, CAP_TS6, NOCAPS, ":%s NICK %s :%" RBTT_FMT,
+		      use_id(target_p), parv[2], target_p->tsinfo);
+	sendto_server(NULL, NULL, NOCAPS, CAP_TS6, ":%s NICK %s :%" RBTT_FMT,
+		      target_p->name, parv[2], target_p->tsinfo);
 
 	del_from_hash(HASH_CLIENT, target_p->name, target_p);
 	strcpy(target_p->user->name, parv[2]);
@@ -216,7 +232,7 @@ me_rsfnc(struct Client *client_p, struct Client *source_p, int parc, const char 
 	monitor_signon(target_p);
 
 	del_all_accepts(target_p);
-	rb_snprintf(note, sizeof(note), "Nick: %s", target_p->name);
+	snprintf(note, sizeof(note), "Nick: %s", target_p->name);
 	rb_note(target_p->localClient->F, note);
 	return 0;
 }
@@ -252,7 +268,7 @@ h_svc_server_introduced(hook_data_client * hdata)
 
 	RB_DLINK_FOREACH(ptr, service_list.head)
 	{
-		if(!irccmp((const char *)ptr->data, hdata->target->name))
+		if(!irccmp((const char *) ptr->data, hdata->target->name))
 		{
 			hdata->target->flags |= FLAGS_SERVICE;
 			return;
@@ -275,7 +291,7 @@ h_svc_whois(hook_data_client * data)
 static void
 h_svc_stats(hook_data_int * data)
 {
-	char statchar = (char)data->arg2;
+	char statchar = (char) data->arg2;
 	rb_dlink_node *ptr;
 
 	if(statchar == 'U' && IsOper(data->client))
@@ -283,8 +299,8 @@ h_svc_stats(hook_data_int * data)
 		RB_DLINK_FOREACH(ptr, service_list.head)
 		{
 			sendto_one_numeric(data->client, RPL_STATSULINE,
-					   form_str(RPL_STATSULINE),
-					   (const char *)ptr->data, "*", "*", "s");
+					   form_str(RPL_STATSULINE), (char *) ptr->data, "*", "*",
+					   "s");
 		}
 	}
 }

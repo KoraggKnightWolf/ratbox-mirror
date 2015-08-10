@@ -3,24 +3,6 @@
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
-/* Size of the auth heap. */
-#undef AUTH_HEAP_SIZE
-
-/* Size of away heap. */
-#undef AWAY_HEAP_SIZE
-
-/* Size of the ban heap. */
-#undef BAN_HEAP_SIZE
-
-/* Size of the channel heap. */
-#undef CHANNEL_HEAP_SIZE
-
-/* Size of the client heap. */
-#undef CLIENT_HEAP_SIZE
-
-/* Size of the confitem heap. */
-#undef CONFITEM_HEAP_SIZE
-
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
    */
@@ -32,20 +14,11 @@
 /* Define to 1 if using `alloca.c'. */
 #undef C_ALLOCA
 
-/* Size of the dlink_node heap. */
-#undef DNODE_HEAP_SIZE
-
 /* ratbox-services compatibility code */
 #undef ENABLE_SERVICES
 
-/* Define if SSP C support is enabled. */
-#undef ENABLE_SSP_CC
-
 /* Prefix where config files are installed. */
 #undef ETC_DIR
-
-/* Size of fd heap. */
-#undef FD_HEAP_SIZE
 
 /* Define to 1 if you have `alloca', as a function or macro. */
 #undef HAVE_ALLOCA
@@ -80,6 +53,9 @@
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
+
+/* Define to 1 if you have the `asprintf' function. */
+#undef HAVE_ASPRINTF
 
 /* Define to 1 if you have the `closedir' function. */
 #undef HAVE_CLOSEDIR
@@ -125,6 +101,9 @@
 /* Define if libdlloader will be built on this platform */
 #undef HAVE_LIBDLLOADER
 
+/* Define to 1 if you have the `lstat' function. */
+#undef HAVE_LSTAT
+
 /* Define this if a modern libltdl is already installed */
 #undef HAVE_LTDL
 
@@ -154,6 +133,9 @@
 
 /* Define to 1 if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
+
+/* Define to 1 if you have the `stat' function. */
+#undef HAVE_STAT
 
 /* Define to 1 if you have the <stddef.h> header file. */
 #undef HAVE_STDDEF_H
@@ -208,6 +190,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to 1 if you have the `vasprintf' function. */
+#undef HAVE_VASPRINTF
+
 /* This value is set to 1 to indicate that the system argz facility works */
 #undef HAVE_WORKING_ARGZ
 
@@ -220,14 +205,8 @@
 /* Prefix where the ircd is installed. */
 #undef IRCD_PREFIX
 
-/* Size of the local client heap. */
-#undef LCLIENT_HEAP_SIZE
-
 /* Prefix where to install non-user executables. */
 #undef LIBEXEC_DIR
-
-/* Size of the linebuf heap. */
-#undef LINEBUF_HEAP_SIZE
 
 /* Prefix where to write logfiles. */
 #undef LOG_DIR
@@ -255,8 +234,8 @@
    */
 #undef LT_OBJDIR
 
-/* Sizeof member heap. */
-#undef MEMBER_HEAP_SIZE
+/* Define to the shared library suffix, say, ".dylib". */
+#undef LT_SHARED_EXT
 
 /* This is a MinGW system */
 #undef MINGW
@@ -264,26 +243,11 @@
 /* Prefix where modules are installed. */
 #undef MODULE_DIR
 
-/* Size of the monitor heap. */
-#undef MONITOR_HEAP_SIZE
-
 /* Define this to disable debugging support. */
 #undef NDEBUG
 
-/* Size of the nick delay heap. */
-#undef ND_HEAP_SIZE
-
 /* Define if dlsym() requires a leading underscore in symbol names. */
 #undef NEED_USCORE
-
-/* Nickname length */
-#undef NICKLEN
-
-/* Size of the WHOWAS array. */
-#undef NICKNAMEHISTORYLENGTH
-
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-#undef NO_MINUS_C_MINUS_O
 
 /* Name of package */
 #undef PACKAGE
@@ -315,6 +279,12 @@
 /* Extension that shared libs use */
 #undef SHLIBEXT
 
+/* The size of `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of `time_t', as computed by sizeof. */
+#undef SIZEOF_TIME_T
+
 /* Define this to enable soft asserts. */
 #undef SOFT_ASSERT
 
@@ -326,29 +296,17 @@
 	STACK_DIRECTION = 0 => direction of growth unknown */
 #undef STACK_DIRECTION
 
-/* Define to 1 if dynamic modules cant be used. */
+/* "Use static modules" */
 #undef STATIC_MODULES
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* Define to 1 if string.h may be included along with strings.h */
-#undef STRING_WITH_STRINGS
-
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
 
-/* Size of the topic heap. */
-#undef TOPIC_HEAP_SIZE
-
-/* Size of the user heap. */
-#undef USER_HEAP_SIZE
-
 /* Define to enable CHALLENGE support, requires OpenSSL */
 #undef USE_CHALLENGE
-
-/* Define this to enable IO Debug hooks. */
-#undef USE_IODEBUG_HOOKS
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
