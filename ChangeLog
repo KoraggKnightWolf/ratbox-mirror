@@ -1,3 +1,11 @@
+androsyn    2015/08/10 22:02:36 UTC	(20150810_9-28549)
+  Log:
+  well, the ipv6_tun_remap code went in with the last commit by accident, just noting the change in the next commit
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 androsyn    2015/08/10 22:01:39 UTC	(20150810_8-28547)
   Log:
   update svn:externals for libratbox
