@@ -36,6 +36,7 @@
 #include "client.h"
 #include "send.h"
 #include "packet.h"
+#include "match.h"
 
 #define ZIPSTATS_TIME		60
 
@@ -350,7 +351,7 @@ ssl_process_cipher_string(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
         connid = buf_to_uint32(&ctl_buf->buf[1]);
 	cstring = (const char *)&ctl_buf->buf[5];
 
-	if(cstring <= 0)
+	if(EmptyString(cstring))
 		return;
 		
         client_p = find_cli_connid_hash(connid);
@@ -376,7 +377,7 @@ ssl_process_certfp(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
         connid = buf_to_uint32(&ctl_buf->buf[1]);
 	certfp = (const char *)&ctl_buf->buf[5];
 
-	if(certfp <= 0)
+	if(EmptyString(certfp))
 		return;
 		
         client_p = find_cli_connid_hash(connid);
