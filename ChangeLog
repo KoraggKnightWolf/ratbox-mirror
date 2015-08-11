@@ -1,3 +1,11 @@
+androsyn    2015/08/11 03:09:14 UTC	(20150811_2-28567)
+  Log:
+  use empty string on certfp/cstring
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2015/08/11 03:08:50 UTC	(20150811_1-28565)
   Log:
   * When converting incoming request ids, verify that the id is below sized DNS_IDTABLE_SIZE before trying to do anything with it.
