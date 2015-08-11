@@ -1,3 +1,14 @@
+androsyn    2015/08/11 03:08:50 UTC	(20150811_1-28565)
+  Log:
+  * When converting incoming request ids, verify that the id is below sized DNS_IDTABLE_SIZE before trying to do anything with it.
+  * When looking to assign the DNS request id, if all slots are full, give up, don't keep spinning
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 androsyn    2015/08/11 03:06:52 UTC	(20150811_0-28563)
   Log:
   add must checks for lookup_hostname and lookup_ip, a return of 0 is failure
