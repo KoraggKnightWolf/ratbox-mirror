@@ -55,14 +55,17 @@ struct dnsreq
 };
 
 static struct dnsreq querytable[DNS_IDTABLE_SIZE];
-static uint16_t id = 1;
 
 static uint16_t
 assign_dns_id(void)
 {
+	static uint16_t id = 1;
+	int loopcnt = 0;
 	while(1)
 	{
-		if(id < DNS_IDTABLE_SIZE - 1)
+		if(++loopcnt > DNS_IDTABLE_SIZE)
+			return 0;
+		if(id < DNS_IDTABLE_SIZE - 1 || id == 0)
 			id++;
 		else
 			id = 1;
@@ -108,6 +111,9 @@ lookup_hostname(const char *hostname, int aftype, DNSCB * callback, void *data)
 	uint16_t nid;
 	check_resolver();
 	nid = assign_dns_id();
+	if((nid = assign_dns_id()) == 0)
+		return 0;
+
 	req = &querytable[nid];
 
 	req->callback = callback;
@@ -121,7 +127,7 @@ lookup_hostname(const char *hostname, int aftype, DNSCB * callback, void *data)
 		aft = 4;
 
 	submit_dns(DNS_HOST, nid, aft, hostname);
-	return (id);
+	return (nid);
 }
 
 uint16_t
@@ -132,7 +138,9 @@ lookup_ip(const char *addr, int aftype, DNSCB * callback, void *data)
 	uint16_t nid;
 	check_resolver();
 
-	nid = assign_dns_id();
+	if((nid = assign_dns_id()) == 0)
+		return 0;
+		
 	req = &querytable[nid];
 
 	req->callback = callback;
@@ -149,7 +157,6 @@ lookup_ip(const char *addr, int aftype, DNSCB * callback, void *data)
 	return (nid);
 }
 
-
 static void
 results_callback(const char *callid, const char *status, const char *aftype, const char *results)
 {
@@ -157,7 +164,11 @@ results_callback(const char *callid, const char *status, const char *aftype, con
 	uint16_t nid;
 	int st;
 	int aft;
-	nid = strtol(callid, NULL, 16);
+	long lnid = strtol(callid, NULL, 16);
+
+	if(lnid > DNS_IDTABLE_SIZE || lnid == 0)
+		return;
+	nid = (uint16_t)lnid;
 	req = &querytable[nid];
 	st = atoi(status);
 	aft = atoi(aftype);
@@ -265,7 +276,8 @@ report_dns_servers(struct Client *source_p)
 static void
 parse_dns_reply(rb_helper * helper)
 {
-	int len, parc;
+	ssize_t len;
+	int parc;
 	char dnsBuf[READBUF_SIZE];
 
 	char *parv[MAXPARA + 1];
