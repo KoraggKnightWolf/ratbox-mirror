@@ -1,3 +1,11 @@
+androsyn    2015/08/11 03:06:52 UTC	(20150811_0-28563)
+  Log:
+  add must checks for lookup_hostname and lookup_ip, a return of 0 is failure
+
+  Modified:
+	ircd-ratbox/trunk/include/dns.h (File Modified) 
+
+
 androsyn    2015/08/10 22:02:36 UTC	(20150810_9-28549)
   Log:
   well, the ipv6_tun_remap code went in with the last commit by accident, just noting the change in the next commit
