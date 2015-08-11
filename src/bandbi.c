@@ -413,11 +413,11 @@ bandb_parse(rb_helper * helper)
 {
 	char buf[READBUF_SIZE];
 	char *parv[MAXPARA + 1];
-	int len, parc;
+	ssize_t len; 
 
 	while((len = rb_helper_read(helper, buf, sizeof(buf))))
 	{
-		parc = rb_string_to_array(buf, parv, MAXPARA);
+		int parc = rb_string_to_array(buf, parv, MAXPARA);
 
 		if(parc < 1)
 			continue;

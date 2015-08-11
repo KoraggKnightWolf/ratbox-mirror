@@ -83,8 +83,7 @@ struct membership
 
 	struct Channel *chptr;
 	struct Client *client_p;
-	uint8_t flags;
-
+	int flags;
 	uint32_t ban_serial;
 };
 

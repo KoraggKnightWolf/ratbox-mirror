@@ -759,7 +759,6 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			v4->sin_family = AF_INET;
 			memcpy(&v4->sin_addr, current, sizeof(struct in_addr));
 			return (1);
-			break;
 #ifdef RB_IPV6
 		case T_AAAA:
 			if(request->type != T_AAAA)
@@ -771,7 +770,6 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			v6->sin6_family = AF_INET6;
 			memcpy(&v6->sin6_addr, current, sizeof(struct in6_addr));
 			return (1);
-			break;
 #endif
 		case T_PTR:
 			if(request->type != T_PTR)
@@ -786,7 +784,6 @@ proc_answer(struct reslist *request, HEADER * header, char *buf, char *eob)
 			rb_strlcpy(request->name, hostbuf, RESOLVER_HOSTLEN + 1);
 
 			return (1);
-			break;
 		case T_CNAME:
 			/* real answer will follow */
 			current += rd_length;

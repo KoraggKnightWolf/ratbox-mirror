@@ -98,6 +98,4 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	snprintf(buf, sizeof(buf), "Server RESTART by %s", get_client_name(source_p, HIDE_IP));
 	restart(buf);
-
-	return 0;
 }

@@ -1797,7 +1797,7 @@ error_exit_client(struct Client *client_p, int error)
 
 	if(IsServer(client_p) || IsHandshake(client_p))
 	{
-		int connected = rb_current_time() - client_p->localClient->firsttime;
+		time_t connected = rb_current_time() - client_p->localClient->firsttime;
 
 		if(error == 0)
 		{
@@ -1813,8 +1813,8 @@ error_exit_client(struct Client *client_p, int error)
 		}
 
 		sendto_realops_flags(UMODE_ALL, L_ALL,
-				     "%s had been connected for %d day%s, %2d:%02d:%02d",
-				     client_p->name, connected / 86400,
+				     "%s had been connected for % " RBTT_FMT " day%s, %2" RBTT_FMT "%02" RBTT_FMT "%02" RBTT_FMT,
+				     client_p->name, (connected / 86400),
 				     (connected / 86400 == 1) ? "" : "s",
 				     (connected % 86400) / 3600, (connected % 3600) / 60, connected % 60);
 	}

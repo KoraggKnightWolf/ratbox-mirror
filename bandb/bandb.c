@@ -266,7 +266,7 @@ db_error_cb(const char *errstr, void *data)
 	char buf[256];
 	snprintf(buf, sizeof(buf), "! :%s", errstr);
 	rb_helper_write(helper, "%s", buf);
-	rb_sleep(2 << 30, 0);
+	rb_sleep(INT_MAX-1, 0);
 	exit(1);
 }
 
@@ -298,8 +298,6 @@ main(int argc, char *argv[])
         }
 	check_schema();
 	rb_helper_loop(bandb_helper, 0);
-
-	return 0;
 }
 
 static void

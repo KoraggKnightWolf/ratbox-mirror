@@ -198,7 +198,7 @@ find_shared_conf(const char *username, const char *host, const char *server, int
 
 	return false;
 }
-
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 void
 cluster_generic(struct Client *source_p, const char *command, int cltype, const char *format, ...)
 {

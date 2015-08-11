@@ -77,5 +77,4 @@ mo_die(struct Client *client_p __unused, struct Client *source_p, int parc, cons
 	}
 
 	ircd_shutdown(get_client_name(source_p, HIDE_IP));
-	return 0;
 }

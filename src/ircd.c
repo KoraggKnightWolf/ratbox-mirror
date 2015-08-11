@@ -212,7 +212,7 @@ init_sys(void)
 
 	if(!getrlimit(RLIMIT_NOFILE, &limit))
 	{
-		maxconnections = limit.rlim_cur;
+		maxconnections = (int)limit.rlim_cur;
 		if(maxconnections <= MAX_BUFFER)
 		{
 			fprintf(stderr, "ERROR: Shell FD limits are too low.\n");

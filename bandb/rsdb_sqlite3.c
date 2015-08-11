@@ -35,7 +35,8 @@
 
 #include <sqlite3.h>
 
-
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
 static void
 mlog(rsdb_conn_t *dbconn, const char *errstr, ...)
 {
@@ -51,7 +52,7 @@ mlog(rsdb_conn_t *dbconn, const char *errstr, ...)
 	else
 		exit(1);
 }
-
+#pragma GCC diagnostic pop
 
 
 rsdb_conn_t *

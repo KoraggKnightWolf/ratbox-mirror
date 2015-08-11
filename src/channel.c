@@ -621,7 +621,7 @@ can_send(struct Channel *chptr, struct Client *source_p, struct membership *mspt
 void
 check_spambot_warning(struct Client *source_p, const char *name)
 {
-	int t_delta;
+	time_t t_delta;
 	int decrement_count;
 	if((GlobalSetOptions.spam_num && (source_p->localClient->join_leave_count >= GlobalSetOptions.spam_num)))
 	{
@@ -648,7 +648,7 @@ check_spambot_warning(struct Client *source_p, const char *name)
 		if((t_delta =
 		    (rb_current_time() - source_p->localClient->last_leave_time)) > JOIN_LEAVE_COUNT_EXPIRE_TIME)
 		{
-			decrement_count = (t_delta / JOIN_LEAVE_COUNT_EXPIRE_TIME);
+			decrement_count = (int)(t_delta / JOIN_LEAVE_COUNT_EXPIRE_TIME);
 			if(decrement_count > source_p->localClient->join_leave_count)
 				source_p->localClient->join_leave_count = 0;
 			else
@@ -866,8 +866,8 @@ init_chcap_usage_counts(void)
 			else
 				y |= channel_capabs[c];
 		}
-		chcap_combos[m].cap_yes = y;
-		chcap_combos[m].cap_no = n;
+		chcap_combos[m].cap_yes = (int)y;
+		chcap_combos[m].cap_no = (int)n;
 	}
 }
 
@@ -949,7 +949,7 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 	int j;
 	int cap;
 	int nocap;
-	int arglen = 0;
+	size_t arglen = 0;
 
 	/* Now send to servers... */
 	for(j = 0; j < NCHCAP_COMBOS; j++)

@@ -85,6 +85,8 @@ struct Capability captab[] = {
 static CNCB serv_connect_callback;
 static CNCB serv_connect_ssl_callback;
 
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
 /*
  * hunt_server - Do the basic thing in delivering the message (command)
  *	across the relays to the specific server (server) for
@@ -93,6 +95,14 @@ static CNCB serv_connect_ssl_callback;
  *	Note:	The command is a format string and *MUST* be
  *		of prefixed style (e.g. ":%s COMMAND %s ...").
  *		Command can have only max 8 parameters.
+ *
+ *
+ * 	XXX This crap needs fixed.  Seriously, this is terrible code
+ *	    Non-fixed format string, passing parv[0] ... [8] to sendto_one
+ *          and hoping sprintf will sort it out.  The pragma above shuts up
+ *          warnings with higher debugging levels, this code is generally safe, 
+ *          it's just ugly.  
+ *
  *
  *	server	parv[server] is the parameter identifying the
  *		target server.
@@ -197,6 +207,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		sendto_one_numeric(source_p, ERR_NOSUCHSERVER, form_str(ERR_NOSUCHSERVER), parv[server]);
 	return (HUNTED_NOSUCH);
 }
+#pragma GCC diagnostic pop
 
 /*
  * try_connections - scan through configuration and try new connections.

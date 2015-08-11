@@ -419,5 +419,4 @@ main(int argc, char **argv)
 	rb_event_add("check_rehash", check_rehash, NULL, 5);
 	report_nameservers();
 	rb_helper_loop(res_helper, 0);
-	return 1;
 }

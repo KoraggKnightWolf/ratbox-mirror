@@ -229,7 +229,8 @@ static struct mode_table shared_table[] =
 };
 /* *INDENT-ON* */
 
-
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
 static void
 conf_report_error_nl(const char *fmt, ...)
 {
@@ -270,7 +271,7 @@ conf_report_warning_nl(const char *fmt, ...)
 	ilog(L_MAIN, "Warning: %s", msg);
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Warning: %s", msg);
 }
-
+#pragma GCC diagnostic pop
 
 static int
 find_umode(struct mode_table *tab, const char *name)

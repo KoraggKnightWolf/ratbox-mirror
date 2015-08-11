@@ -743,7 +743,7 @@ find_cli_connid_hash(uint32_t connid)
 }
 
 static void
-output_hash(struct Client *source_p, const char *name, int length, int *counts, int deepest)
+output_hash(struct Client *source_p, const char *name, int length, int *counts, unsigned long deepest)
 {
 	unsigned long total = 0;
 	int i;
@@ -762,7 +762,7 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 	if(counts[0] != length)
 	{
 		sendto_one_numeric(source_p, RPL_STATSDEBUG,
-				   "B :Average depth: %.3f%%/%.3f%% Highest depth: %d",
+				   "B :Average depth: %.3f%%/%.3f%% Highest depth: %lu",
 				   (float)(total / (length - counts[0])), (float)(total / length), deepest);
 	}
 	for(i = 0; i < 11; i++)

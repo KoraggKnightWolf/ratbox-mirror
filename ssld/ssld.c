@@ -251,7 +251,8 @@ clean_dead_conns(void *unused)
 	dead_list.tail = dead_list.head = NULL;
 }
 
-
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
 static void
 close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 {
@@ -288,6 +289,8 @@ close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 	len = (strlen(reason) + 1) + 5;
 	mod_cmd_write_queue(conn->ctl, buf, len);
 }
+#pragma GCC diagnostic pop
+
 
 static conn_t *
 make_conn(mod_ctl_t * ctl, rb_fde_t *mod_fd, rb_fde_t *plain_fd)
@@ -1332,7 +1335,7 @@ main(int argc, char **argv)
 		/* this is really useless... */
 		send_i_am_useless(mod_ctl);
 		/* sleep until the ircd kills us */
-		rb_sleep(2 << 30, 0);
+		rb_sleep(INT_MAX-1, 0);
 		exit(1);
 	}
 
@@ -1341,7 +1344,6 @@ main(int argc, char **argv)
 	if(!ssl_ok)
 		send_nossl_support(mod_ctl, NULL);
 	rb_lib_loop(0);
-	return 0;
 }
 
 
