@@ -1,3 +1,12 @@
+androsyn    2015/08/13 18:53:58 UTC	(20150813_4-28581)
+  Log:
+  use bool for ipv4_from_ipv6 and fix types
+
+  Modified:
+	ircd-ratbox/trunk/include/ipv4_from_ipv6.h (File Modified) 
+	ircd-ratbox/trunk/src/ipv4_from_ipv6.c (File Modified) 
+
+
 androsyn    2015/08/13 17:24:11 UTC	(20150813_3-28577)
   Log:
   more sizeof style changes
