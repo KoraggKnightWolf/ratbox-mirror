@@ -51,6 +51,28 @@
 #include "dns.h"
 #include "substitution.h"
 
+#define RBL_FLAG_ISV4 0x1	
+#define RBL_FLAG_ISV6 0x2
+#define RBL_FLAG_FREEING 0x4
+#define RBL_FLAG_MATCH_OTHER 0x8
+
+#define rbl_setv4(x) ((x)->flags |= RBL_FLAG_ISV4)
+#define rbl_clearv4(x) ((x)->flags &= ~RBL_FLAG_ISV4)
+#define rbl_isv4(x) ((x)->flags & RBL_FLAG_ISV4)
+
+#define rbl_setv6(x) ((x)->flags |= RBL_FLAG_ISV6)
+#define rbl_clearv6(x) ((x)->flags &= ~RBL_FLAG_ISV6)
+#define rbl_isv6(x) ((x)->flags & RBL_FLAG_ISV6)
+
+#define rbl_setfreeing(x) ((x)->flags |= RBL_FLAG_FREEING)
+#define rbl_clearfreeing(x) ((x)->flags &= ~RBL_FLAG_FREEING)
+#define rbl_isfreeing(x) ((x)->flags & RBL_FLAG_FREEING)
+
+#define rbl_setmatchother(x) ((x)->flags |= RBL_FLAG_MATCH_OTHER)
+#define rbl_clearmatchother(x) ((x)->flags &= ~RBL_FLAG_MATCH_OTHER)
+#define rbl_ismatchother(x) ((x)->flags & RBL_FLAG_MATCH_OTHER)
+
+
 struct AuthRequest
 {
 	rb_dlink_node node;
@@ -81,30 +103,6 @@ typedef struct _rbl_answer
 } rbl_answer_t;
 
 
-void rbl_add_answer(rbl_t *t, const char *mask, const char *answer);
-static void rbl_free_answer(rbl_answer_t *res);
-
-
-#define RBL_FLAG_ISV4 0x1	
-#define RBL_FLAG_ISV6 0x2
-#define RBL_FLAG_FREEING 0x4
-#define RBL_FLAG_MATCH_OTHER 0x8
-
-#define rbl_setv4(x) ((x)->flags |= RBL_FLAG_ISV4)
-#define rbl_clearv4(x) ((x)->flags &= ~RBL_FLAG_ISV4)
-#define rbl_isv4(x) ((x)->flags & RBL_FLAG_ISV4)
-
-#define rbl_setv6(x) ((x)->flags |= RBL_FLAG_ISV6)
-#define rbl_clearv6(x) ((x)->flags &= ~RBL_FLAG_ISV6)
-#define rbl_isv6(x) ((x)->flags & RBL_FLAG_ISV6)
-
-#define rbl_setfreeing(x) ((x)->flags |= RBL_FLAG_FREEING)
-#define rbl_clearfreeing(x) ((x)->flags &= ~RBL_FLAG_FREEING)
-#define rbl_isfreeing(x) ((x)->flags & RBL_FLAG_FREEING)
-
-#define rbl_setmatchother(x) ((x)->flags |= RBL_FLAG_MATCH_OTHER)
-#define rbl_clearmatchother(x) ((x)->flags &= ~RBL_FLAG_MATCH_OTHER)
-#define rbl_ismatchother(x) ((x)->flags & RBL_FLAG_MATCH_OTHER)
 
 struct _rbl
 {
@@ -116,7 +114,6 @@ struct _rbl
 	uint8_t flags;
 	unsigned long matches;
 };
-
 
 typedef enum
 {
@@ -134,7 +131,6 @@ typedef enum
 }
 ReportType;
 
-
 static const char *HeaderMessages[] = {
 	[REPORT_DO_DNS] = "NOTICE AUTH :*** Looking up your hostname...",
 	[REPORT_FIN_DNS] = "NOTICE AUTH :*** Found your hostname",
@@ -148,7 +144,6 @@ static const char *HeaderMessages[] = {
         [REPORT_FIN_RBL] = "NOTICE AUTH :*** RBL checks finished"
 };
 
-
 #define sendheader(c, r) sendto_one(c, "%s", HeaderMessages[(r)])
 
 static rb_dlink_list auth_poll_list;
@@ -158,6 +153,7 @@ static EVH timeout_auth_queries_event;
 static void read_auth(rb_fde_t * F, void *data);
 static void rbl_check_rbls(struct AuthRequest *auth);
 static void rbl_cancel_lookups(struct AuthRequest *);
+static void rbl_free_answer(rbl_answer_t *res);
 
 /*
  * init_auth()
@@ -186,7 +182,6 @@ make_auth_request(struct Client *client)
 	request->timeout = rb_current_time() + ConfigFileEntry.connect_timeout;
 	return request;
 }
-
 
 /*
  * release_auth_client - release auth client from auth system
@@ -261,8 +256,6 @@ auth_error(struct AuthRequest *auth)
 	sendheader(auth->client, REPORT_FAIL_ID);
 	release_auth_client(auth);
 }
-
-
 
 static void
 auth_connect_callback(rb_fde_t * F, int status, void *data)
@@ -508,9 +501,6 @@ timeout_auth_queries_event(void *notused)
 	return;
 }
 
-
-
-
 #define AUTH_BUFSIZ 128
 static void
 read_auth(rb_fde_t * F, void *data)
@@ -678,9 +668,6 @@ rbl_destroy(rbl_t *t, bool freeing)
 	
 }
 
-
-
-
 static char *
 rbl_string_v4(struct sockaddr *addr, const char *domain, char *dst, size_t dstsz)
 {
@@ -734,7 +721,8 @@ rbl_string_v6(struct sockaddr *addr, const char *domain, char *dst, size_t dstsz
 }
 
 
-static char *rbl_string(struct sockaddr *addr, const char *domain, char *dst, size_t dstsz)
+static char *
+rbl_string(struct sockaddr *addr, const char *domain, char *dst, size_t dstsz)
 {
 	switch(addr->sa_family)
 	{
@@ -746,8 +734,6 @@ static char *rbl_string(struct sockaddr *addr, const char *domain, char *dst, si
 			return NULL;
 	}
 }
-
-
 
 static void
 rbl_release_auth(struct AuthRequest *auth)
@@ -893,7 +879,6 @@ rbl_check_rbls(struct AuthRequest *auth)
         	ClearRBL(auth);
 	}
 }
-
 
 void
 rbl_add_rbl_to_rbllists(rbl_t *rbl)
