@@ -1,3 +1,11 @@
+androsyn    2015/08/13 17:22:50 UTC	(20150813_2-28575)
+  Log:
+  replace sizeof result with sizeof(result)
+
+  Modified:
+	ircd-ratbox/trunk/src/supported.c (File Modified) 
+
+
 androsyn    2015/08/13 17:21:54 UTC	(20150813_1-28573)
   Log:
   rework the ipv6 tunnel remap code to only check against k/d lines and channel bans
