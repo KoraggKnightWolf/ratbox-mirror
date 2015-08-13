@@ -33,6 +33,7 @@
 #include "numeric.h"
 #include "send.h"
 #include "match.h"
+#include "ipv4_from_ipv6.h"
 
 #ifdef RB_IPV6
 static uint32_t hash_ipv6(struct sockaddr *, int);
@@ -467,6 +468,15 @@ find_address_conf(const char *host, const char *sockhost, const char *user, stru
 
 		if((kconf != NULL) && !IsConfExemptGline(iconf))
 			return kconf;
+	}
+	
+	if(ConfigFileEntry.ipv6_tun_remap == true && ip != NULL && GET_SS_FAMILY(&ip) == AF_INET6) 
+	{
+                struct sockaddr_in in;
+                ipv4_from_ipv6((struct sockaddr_in6 *)ip, &in);
+                kconf = find_conf_by_address(NULL, NULL, (struct sockaddr *)&in, CONF_KILL, AF_INET, user);
+                if((kconf != NULL) && !IsConfExemptKline(iconf))
+                        return kconf;
 	}
 
 	return iconf;

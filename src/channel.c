@@ -41,6 +41,7 @@
 #include "s_conf.h"		/* ConfigFileEntry, ConfigChannel */
 #include "s_newconf.h"
 #include "s_log.h"
+#include "ipv4_from_ipv6.h"
 
 struct config_channel_entry ConfigChannel;
 rb_dlink_list global_channel_list;
@@ -493,6 +494,11 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr, c
 	rb_dlink_node *ptr;
 	struct Ban *actualBan = NULL;
 	struct Ban *actualExcept = NULL;
+#ifdef RB_IPV6
+	char src_tunv4[NICKLEN + USERLEN + HOSTLEN + 6];
+	char *s_tunv4 = NULL;
+#endif
+
 
 	if(!MyClient(who))
 		return 0;
@@ -507,11 +513,36 @@ is_banned(struct Channel *chptr, struct Client *who, struct membership *msptr, c
 		s2 = src_iphost;
 	}
 
+#ifdef RB_IPV6
+	if(ConfigFileEntry.ipv6_tun_remap == true && GET_SS_FAMILY(&who->localClient->ip) == AF_INET6)
+	{
+		struct sockaddr_in in;
+		char ipv4[HOSTIPLEN];
+		
+		if(ipv4_from_ipv6_p((const struct sockaddr_in6 *)&who->localClient->ip, ipv4, sizeof(ipv4)) != NULL)
+		{
+			rb_inet_ntop_sock((struct sockaddr *)&in, ipv4, sizeof(ipv4));
+			snprintf(src_tunv4, sizeof(src_tunv4), "%s!%s@%s", who->name, who->username, ipv4);
+			s_tunv4 = src_tunv4;
+		}
+	}
+#endif
+
 	RB_DLINK_FOREACH(ptr, chptr->banlist.head)
 	{
+		const char *banstr;
 		actualBan = ptr->data;
-		if(match(actualBan->banstr, s) || match(actualBan->banstr, s2) || match_cidr(actualBan->banstr, s2))
+		banstr = actualBan->banstr;
+		
+		if(match(banstr, s) || match(banstr, s2) || match_cidr(banstr, s2)   
+#ifdef RB_IPv6
+		|| ((s_tunv4 != NULL) && (match(banstr, s_tunv4) || match_cidr(banstr, s_tunv4)))
+#endif
+		)
+		{		
+						
 			break;
+		}
 		else
 			actualBan = NULL;
 	}

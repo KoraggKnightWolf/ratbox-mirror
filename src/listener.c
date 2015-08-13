@@ -41,6 +41,7 @@
 #include "s_log.h"
 #include "sslproc.h"
 #include "hash.h"
+#include "ipv4_from_ipv6.h"
 
 #define log_listener(str, name, err) do { sendto_realops_flags(UMODE_DEBUG, L_ALL, str, name, err); ilog(L_IOERROR, str, name, err); } while(0)
 
@@ -491,14 +492,11 @@ static int
 accept_precallback(rb_fde_t * F, struct sockaddr *addr, rb_socklen_t addrlen, void *data)
 {
 	struct Listener *listener = (struct Listener *)data;
-	char buf[IRCD_BUFSIZE];
+	char reason[IRCD_BUFSIZE] = "ERROR :Connection failed\r\n";
 	struct ConfItem *aconf;
 
 	if(listener->ssl && (!ircd_ssl_ok || !get_ssld_count()))
-	{
-		rb_close(F);
-		return 0;
-	}
+	        goto send_error;
 
 	if((maxconnections - 10) < rb_get_fd(F))	/* XXX this is kinda bogus */
 	{
@@ -512,16 +510,28 @@ accept_precallback(rb_fde_t * F, struct sockaddr *addr, rb_socklen_t addrlen, vo
 					     "All connections in use. (%s)", get_listener_name(listener));
 			last_oper_notice = rb_current_time();
 		}
-
-		rb_write(F, "ERROR :All connections in use\r\n", 32);
-		rb_close(F);
-		/* Re-register a new IO request for the next accept .. */
-		return 0;
+		rb_strlcpy(reason, "ERROR :All connections in use\r\n", sizeof(reason));
+		goto send_error;
 	}
 
 	aconf = find_dline(addr);
 	if(aconf != NULL && (aconf->status & CONF_EXEMPTDLINE))
 		return 1;
+
+#ifdef RB_IPV6
+        if(aconf == NULL && ConfigFileEntry.ipv6_tun_remap == true && GET_SS_FAMILY(addr) == AF_INET6) 
+        {
+                struct sockaddr_in in;
+                struct ConfItem *dconf;
+                if(ipv4_from_ipv6((const struct sockaddr_in6 *)addr, &in) == true)
+                {
+                        dconf = find_dline((struct sockaddr *)&in);
+                        if(dconf != NULL && dconf->status & CONF_DLINE)
+                                aconf = dconf;
+                }
+        }
+
+#endif
 
 	/* Do an initial check we aren't connecting too fast or with too many
 	 * from this IP... */
@@ -530,35 +540,30 @@ accept_precallback(rb_fde_t * F, struct sockaddr *addr, rb_socklen_t addrlen, vo
 		ServerStats.is_ref++;
 
 		if(ConfigFileEntry.dline_with_reason)
-		{
-			if(snprintf(buf, sizeof(buf), "ERROR :*** Banned: %s\r\n", aconf->passwd)
-			   >= (int)(sizeof(buf) - 1))
-			{
-				buf[sizeof(buf) - 3] = '\r';
-				buf[sizeof(buf) - 2] = '\n';
-				buf[sizeof(buf) - 1] = '\0';
-			}
-		}
+		        snprintf(reason, sizeof(reason), "ERROR :*** Banned: %100s\r\n", aconf->passwd);
 		else
-			strcpy(buf, "ERROR :You have been D-lined.\r\n");
-
-		rb_write(F, buf, strlen(buf));
-		rb_close(F);
-		return 0;
+			rb_strlcpy(reason, "ERROR :You have been D-lined.\r\n", sizeof(reason));
+                goto send_error;
 	}
 
-	if(check_reject(F, addr))
+	if(check_reject(F, addr)) /* no need to send the error message here */
 		return 0;
 
 	if(throttle_add(addr))
 	{
-		strcpy(buf, "ERROR :Reconnecting too fast, throttled.\r\n");
-		rb_write(F, buf, strlen(buf));
-		rb_close(F);
-		return 0;
+		rb_strlcpy(reason, "ERROR :Reconnecting too fast, throttled.\r\n", sizeof(reason));
+	        goto send_error;
 	}
 
 	return 1;
+
+send_error:
+        rb_write(F, reason, strlen(reason));
+        rb_close(F);
+        return 0;
+        
+
+
 }
 
 static void

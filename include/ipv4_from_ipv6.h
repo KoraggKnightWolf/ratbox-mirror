@@ -39,6 +39,8 @@
 #ifdef RB_IPV6
 int ipv4_from_ipv6(const struct sockaddr_in6 *restrict ip6,
 		struct sockaddr_in *restrict ip4);
+char *ipv4_from_ipv6_p(const struct sockaddr_in6 *restrict ip6, char *buf, size_t bufsiz);
+
 #endif
 
 #endif
