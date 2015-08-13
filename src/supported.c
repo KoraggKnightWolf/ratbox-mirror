@@ -215,7 +215,7 @@ isupport_chanmodes(const void *ptr)
 {
 	static char result[80];
 
-	snprintf(result, sizeof result, "%s%sb,k,l,imnpstS%s",
+	snprintf(result, sizeof(result), "%s%sb,k,l,imnpstS%s",
 		 ConfigChannel.use_except ? "e" : "", ConfigChannel.use_invex ? "I" : "",
 #ifdef ENABLE_SERVICES
 		 rb_dlink_list_length(&service_list) ? "r" : ""
@@ -231,7 +231,7 @@ isupport_chanlimit(const void *ptr)
 {
 	static char result[30];
 
-	snprintf(result, sizeof result, "&#:%i", ConfigChannel.max_chans_per_user);
+	snprintf(result, sizeof(result), "&#:%i", ConfigChannel.max_chans_per_user);
 	return result;
 }
 
@@ -240,7 +240,7 @@ isupport_maxlist(const void *ptr)
 {
 	static char result[30];
 
-	snprintf(result, sizeof result, "b%s%s:%i",
+	snprintf(result, sizeof(result), "b%s%s:%i",
 		 ConfigChannel.use_except ? "e" : "", ConfigChannel.use_invex ? "I" : "", ConfigChannel.max_bans);
 	return result;
 }
@@ -250,7 +250,7 @@ isupport_targmax(const void *ptr)
 {
 	static char result[200];
 
-	snprintf(result, sizeof result,
+	snprintf(result, sizeof(result),
 		 "NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:%d,NOTICE:%d,ACCEPT:,MONITOR:",
 		 ConfigFileEntry.max_targets, ConfigFileEntry.max_targets);
 	return result;
