@@ -159,18 +159,18 @@ show_isupport(struct Client *client_p)
 		if(value == NULL)
 			continue;
 		l = strlen(item->name) + (EmptyString(value) ? 0 : 1 + strlen(value));
-		if(nchars + l + (nparams > 0) >= sizeof buf || nparams + 1 > 12)
+		if(nchars + l + (nparams > 0) >= sizeof(buf) || nparams + 1 > 12)
 		{
 			sendto_one_numeric(client_p, RPL_ISUPPORT, form_str(RPL_ISUPPORT), buf);
 			nchars = extra_space, nparams = 0, buf[0] = '\0';
 		}
 		if(nparams > 0)
-			rb_strlcat(buf, " ", sizeof buf), nchars++;
-		rb_strlcat(buf, item->name, sizeof buf);
+			rb_strlcat(buf, " ", sizeof(buf)), nchars++;
+		rb_strlcat(buf, item->name, sizeof(buf));
 		if(!EmptyString(value))
 		{
-			rb_strlcat(buf, "=", sizeof buf);
-			rb_strlcat(buf, value, sizeof buf);
+			rb_strlcat(buf, "=", sizeof(buf));
+			rb_strlcat(buf, value, sizeof(buf));
 		}
 		nchars += l;
 		nparams++;
@@ -186,7 +186,7 @@ const char *
 isupport_intptr(const void *ptr)
 {
 	static char buf[15];
-	snprintf(buf, sizeof buf, "%d", *(const int *)ptr);
+	snprintf(buf, sizeof(buf), "%d", *(const int *)ptr);
 	return buf;
 }
 
