@@ -1,3 +1,12 @@
+androsyn    2015/08/13 15:21:14 UTC	(20150813_0-28571)
+  Log:
+  remove the existing ipv6_tun_remap code, need to rework it
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2015/08/11 03:11:43 UTC	(20150811_3-28569)
   Log:
   add more #pragmas to turn of some warnings, minor cleanups
