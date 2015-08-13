@@ -355,7 +355,7 @@ start_auth_query(struct AuthRequest *auth)
 }
 
 static char *
-GetValidIdent(char *xbuf)
+get_valid_ident(char *xbuf)
 {
 	int remp = 0;
 	int locp = 0;
@@ -531,7 +531,7 @@ read_auth(rb_fde_t * F, void *data)
 	if(len > 0)
 	{
 		buf[len] = '\0';
-		if((s = GetValidIdent(buf)))
+		if((s = get_valid_ident(buf)))
 		{
 			t = auth->client->username;
 			while(*s == '~' || *s == '^')
