@@ -493,9 +493,9 @@ ratbox_main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 #endif
+	initialVMTop = get_vm_top();
+
 	init_sys();
-
-
 
 	myargv = argv;
 	parseargs(&argc, &argv, myopts);
@@ -563,7 +563,6 @@ ratbox_main(int argc, char *argv[])
 
 	set_default_conf();
 	setup_corefile();
-	initialVMTop = get_vm_top();
 
 	memset(&me, 0, sizeof(me));
 	me.name = emptyname;
