@@ -1,3 +1,11 @@
+androsyn    2015/08/19 15:54:06 UTC	(20150819_2-28591)
+  Log:
+  move get_vm_top to be one of the earliest functions called, to not miss any allocations
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2015/08/19 15:44:34 UTC	(20150819_1-28589)
   Log:
   fix logic inversion with mod_find_name on module reload
