@@ -675,6 +675,7 @@ PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
 ALLOCA
+ac_cv_have_struct_mallinfo
 MINGW_FALSE
 MINGW_TRUE
 LTDL_SUBDIR
@@ -14354,6 +14355,26 @@ fi
 done
 
 
+ac_fn_c_check_type "$LINENO" "struct mallinfo" "ac_cv_type_struct_mallinfo" "#include <malloc.h>
+"
+if test "x$ac_cv_type_struct_mallinfo" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_MALLINFO 1
+_ACEOF
+
+
+fi
+
+
+
+if test "$ac_cv_type_struct_mallinfo" = yes; then
+  ac_cv_have_struct_mallinfo=1
+
+else
+  ac_cv_have_struct_mallinfo=0
+
+fi
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing socket" >&5

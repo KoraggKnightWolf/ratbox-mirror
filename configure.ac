@@ -189,6 +189,14 @@ AC_HEADER_TIME
 
 AC_CHECK_FUNCS([snprintf vasprintf asprintf lstat stat])
 
+AC_CHECK_TYPES([struct mallinfo],,, [#include <malloc.h>])
+
+
+if test "$ac_cv_type_struct_mallinfo" = yes; then
+  AC_SUBST(ac_cv_have_struct_mallinfo, 1)  
+else
+  AC_SUBST(ac_cv_have_struct_mallinfo, 0)
+fi
 
 dnl Networking Functions
 dnl ====================

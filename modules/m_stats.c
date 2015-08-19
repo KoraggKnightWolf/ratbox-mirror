@@ -52,6 +52,11 @@
 #include "scache.h"
 #include "s_log.h"
 
+#ifdef HAVE_STRUCT_MALLINFO
+#include <malloc.h>
+#endif
+
+
 static int m_stats(struct Client *, struct Client *, int, const char **);
 
 struct Message stats_msgtab = {
@@ -1348,6 +1353,12 @@ stats_memory(struct Client *source_p)
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :TOTAL: %zu Available:  Current max RSS: %" PRIuPTR,
 			   total_memory, get_maxrss());
+#ifdef HAVE_STRUCT_MALLINFO
+	struct mallinfo mi;
+	mi = mallinfo();
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "z :Malloc allocated: %i free: %i arena: %i mmap blocks: %i mmap bytes: %i", mi.uordblks, mi.fordblks, mi.arena, mi.hblks, mi.hblkhd);
+#endif
+
 
 }
 
