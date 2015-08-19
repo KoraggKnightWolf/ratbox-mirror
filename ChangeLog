@@ -1,3 +1,14 @@
+androsyn    2015/08/19 23:03:14 UTC	(20150819_3-28593)
+  Log:
+  show information from mallinfo on platforms that have it(glibc mainly)
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2015/08/19 15:54:06 UTC	(20150819_2-28591)
   Log:
   move get_vm_top to be one of the earliest functions called, to not miss any allocations
