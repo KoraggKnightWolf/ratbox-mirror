@@ -1,3 +1,11 @@
+androsyn    2015/08/19 15:44:34 UTC	(20150819_1-28589)
+  Log:
+  fix logic inversion with mod_find_name on module reload
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2015/08/19 15:23:58 UTC	(20150819_0-28587)
   Log:
   have get_maxrss use uintptr_t
