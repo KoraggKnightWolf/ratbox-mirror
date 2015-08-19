@@ -1,3 +1,13 @@
+androsyn    2015/08/19 15:23:58 UTC	(20150819_0-28587)
+  Log:
+  have get_maxrss use uintptr_t
+
+  Modified:
+	ircd-ratbox/trunk/include/ircd.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2015/08/13 19:04:08 UTC	(20150813_6-28585)
   Log:
   whitespace/style cleanups
