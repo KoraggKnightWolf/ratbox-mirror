@@ -467,7 +467,7 @@ mo_modreload(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	m_bn = rb_basename(parv[1]);
 
-	if((mod = mod_find_name(m_bn)) != NULL)
+	if((mod = mod_find_name(m_bn)) == NULL)
 	{
 		sendto_one_notice(source_p, ":Module %s is not loaded", m_bn);
 		rb_free(m_bn);
