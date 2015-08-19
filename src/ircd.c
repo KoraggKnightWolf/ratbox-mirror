@@ -150,7 +150,7 @@ ircd_shutdown(const char *reason)
 /*
  * get_vm_top - get the operating systems notion of the resident set size
  */
-static unsigned long
+static uintptr_t
 get_vm_top(void)
 {
 	/*
@@ -167,14 +167,14 @@ get_vm_top(void)
 	void *vptr = sbrk(0);
 	return (unsigned long)vptr;
 #else
-	return -1;
+	return 0;
 #endif
 }
 
 /*
  * get_maxrss - get the operating systems notion of the resident set size
  */
-unsigned long
+uintptr_t
 get_maxrss(void)
 {
 	return get_vm_top() - initialVMTop;

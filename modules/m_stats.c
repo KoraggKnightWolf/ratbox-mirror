@@ -1346,8 +1346,9 @@ stats_memory(struct Client *source_p)
 			   remote_client_count, remote_client_memory_used);
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "z :TOTAL: %zu Available:  Current max RSS: %lu",
+			   "z :TOTAL: %zu Available:  Current max RSS: %" PRIuPTR,
 			   total_memory, get_maxrss());
+
 }
 
 static void

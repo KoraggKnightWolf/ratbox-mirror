@@ -94,8 +94,8 @@ void get_current_bandwidth(struct Client *source_p, struct Client *target_p);
 
 void ircd_shutdown(const char *reason) RB_noreturn;
 
-unsigned long get_maxrss(void);
-void set_time(void);
+uintptr_t get_maxrss(void);
+
 int ratbox_main(int argc, char **argv);
 extern int testing_conf;
 extern int conf_parse_failure;
