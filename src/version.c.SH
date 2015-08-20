@@ -87,7 +87,7 @@ $spitshell >>version.c <<!SUB!THISTOO!
 void 
 ratbox_version(const char **pver, const char **pserno, const char **pgeneration, const char **pplatform, const char **pcreation)
 {
-	if(ircd_version != NULL)
+	if(pver != NULL)
 		*pver = ircd_version;
 	if(pserno != NULL)
 		*pserno = serno;
