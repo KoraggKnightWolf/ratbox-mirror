@@ -15,8 +15,8 @@ servicesdir	= @moduledir@/autoload
 
 AM_CFLAGS = $(WARNFLAGS)
 
-ircd_SOURCES = main.c
-bin_PROGRAMS = ircd
+ircd_ratbox_SOURCES = main.c
+bin_PROGRAMS = ircd-ratbox
 
 if MINGW
 EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
@@ -26,13 +26,13 @@ if !STATIC_MODULES
 
 SUBDIRS = @LTDL_SUBDIR@ libratbox src modules tools doc help bandb ssld resolver
 
-ircd_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
-ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
+ircd_ratbox_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
+ircd_ratbox_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
 else
 
 SUBDIRS = @LTDL_SUBDIR@ libratbox modules src tools doc help bandb ssld resolver
-ircd_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)
+ircd_ratbox_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)
 
 
 endif

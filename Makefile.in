@@ -94,7 +94,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = ircd$(EXEEXT)
+bin_PROGRAMS = ircd-ratbox$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/libltdl/m4/argz.m4 \
@@ -117,12 +117,14 @@ CONFIG_CLEAN_FILES = doc/Makefile install-mod.sh
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_ircd_OBJECTS = main.$(OBJEXT)
-ircd_OBJECTS = $(am_ircd_OBJECTS)
+am_ircd_ratbox_OBJECTS = main.$(OBJEXT)
+ircd_ratbox_OBJECTS = $(am_ircd_ratbox_OBJECTS)
 am__DEPENDENCIES_1 =
-@STATIC_MODULES_FALSE@ircd_DEPENDENCIES = libratbox/src/libratbox.la \
+@STATIC_MODULES_FALSE@ircd_ratbox_DEPENDENCIES =  \
+@STATIC_MODULES_FALSE@	libratbox/src/libratbox.la \
 @STATIC_MODULES_FALSE@	src/libcore.la $(am__DEPENDENCIES_1)
-@STATIC_MODULES_TRUE@ircd_DEPENDENCIES = libratbox/src/libratbox.la \
+@STATIC_MODULES_TRUE@ircd_ratbox_DEPENDENCIES =  \
+@STATIC_MODULES_TRUE@	libratbox/src/libratbox.la \
 @STATIC_MODULES_TRUE@	modules/libmodules.la src/libcore.la \
 @STATIC_MODULES_TRUE@	modules/static_modules.o \
 @STATIC_MODULES_TRUE@	$(am__DEPENDENCIES_1)
@@ -130,9 +132,9 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-ircd_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+ircd_ratbox_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(ircd_LDFLAGS) $(LDFLAGS) -o $@
+	$(ircd_ratbox_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -167,8 +169,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(ircd_SOURCES)
-DIST_SOURCES = $(ircd_SOURCES)
+SOURCES = $(ircd_ratbox_SOURCES)
+DIST_SOURCES = $(ircd_ratbox_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -444,13 +446,13 @@ modulesdir = @moduledir@/autoload
 coredir = @moduledir@
 servicesdir = @moduledir@/autoload
 AM_CFLAGS = $(WARNFLAGS)
-ircd_SOURCES = main.c
+ircd_ratbox_SOURCES = main.c
 @MINGW_TRUE@EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
 @STATIC_MODULES_FALSE@SUBDIRS = @LTDL_SUBDIR@ libratbox src modules tools doc help bandb ssld resolver
 @STATIC_MODULES_TRUE@SUBDIRS = @LTDL_SUBDIR@ libratbox modules src tools doc help bandb ssld resolver
-@STATIC_MODULES_FALSE@ircd_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
-@STATIC_MODULES_TRUE@ircd_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)
-@STATIC_MODULES_FALSE@ircd_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
+@STATIC_MODULES_FALSE@ircd_ratbox_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
+@STATIC_MODULES_TRUE@ircd_ratbox_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)
+@STATIC_MODULES_FALSE@ircd_ratbox_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 all: all-recursive
 
 .SUFFIXES:
@@ -557,9 +559,9 @@ clean-binPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
-ircd$(EXEEXT): $(ircd_OBJECTS) $(ircd_DEPENDENCIES) $(EXTRA_ircd_DEPENDENCIES) 
-	@rm -f ircd$(EXEEXT)
-	$(AM_V_CCLD)$(ircd_LINK) $(ircd_OBJECTS) $(ircd_LDADD) $(LIBS)
+ircd-ratbox$(EXEEXT): $(ircd_ratbox_OBJECTS) $(ircd_ratbox_DEPENDENCIES) $(EXTRA_ircd_ratbox_DEPENDENCIES) 
+	@rm -f ircd-ratbox$(EXEEXT)
+	$(AM_V_CCLD)$(ircd_ratbox_LINK) $(ircd_ratbox_OBJECTS) $(ircd_ratbox_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
