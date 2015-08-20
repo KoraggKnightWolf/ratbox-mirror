@@ -1092,7 +1092,7 @@ conf_set_serverinfo_whowas_length(confentry_t * entry, conf_t * conf, struct con
 	{
 		conf_report_error_nl("serverinfo::whowas_length -- Invalid WHOWAS length %u, must be at least 50", len);
 	} else
-		set_whowas_size(len);
+		whowas_set_size(len);
 }
 
 

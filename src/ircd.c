@@ -616,7 +616,7 @@ ratbox_main(int argc, char *argv[])
 	init_client();
 	init_channels();
 	initclass();
-	initwhowas();
+	whowas_init();
 	init_hook();
 	init_reject();
 	init_monitor();

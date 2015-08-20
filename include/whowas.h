@@ -49,7 +49,7 @@ typedef struct _whowas
 /*
 ** initwhowas
 */
-void initwhowas(void);
+void whowas_init(void);
 
 /*
 ** add_history
@@ -58,31 +58,31 @@ void initwhowas(void);
 **	Client must be a fully registered user (specifically,
 **	the user structure must have been allocated).
 */
-void add_history(struct Client *, int);
+void whowas_add_history(struct Client *, int);
 
 /*
-** off_history
+** whowas_off_history
 **	This must be called when the client structure is about to
 **	be released. History mechanism keeps pointers to client
 **	structures and it must know when they cease to exist. This
 **	also implicitly calls AddHistory.
 */
-void off_history(struct Client *);
+void whowas_off_history(struct Client *);
 
 /*
-** get_history
+** whowas_get_history
 **	Return the current client that was using the given
 **	nickname within the timelimit. Returns NULL, if no
 **	one found...
 */
-struct Client *get_history(const char *, time_t);
+struct Client *whowas_get_history(const char *, time_t);
 					/* Nick name */
 					/* Time limit in seconds */
 
-void get_nickhistory_list(const char *nick, rb_dlink_list *list);
-void free_nickhistory_list(rb_dlink_list *list);
+void whowas_get_list(const char *nick, rb_dlink_list *list);
+void whowas_free_list(rb_dlink_list *list);
 
-void set_whowas_size(int whowas_length);
+void whowas_set_size(int whowas_length);
 void whowas_memory_usage(size_t *count, size_t *memused);
 
 

@@ -99,7 +99,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 
 	memset(&whowas_list, 0, sizeof(whowas_list));
-	get_nickhistory_list(nick, &whowas_list);
+	whowas_get_list(nick, &whowas_list);
 
 	if(rb_dlink_list_length(&whowas_list) == 0)
 	{
@@ -133,7 +133,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(max > 0 && cur >= max)
 			break;
 	}
-	free_nickhistory_list(&whowas_list);
+	whowas_free_list(&whowas_list);
 	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFWHOWAS), parv[1]);
 	return 0;
 }

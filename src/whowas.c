@@ -53,7 +53,7 @@ static unsigned int whowas_list_length = NICKNAMEHISTORYLENGTH;
 
 
 void
-get_nickhistory_list(const char *nick, rb_dlink_list *list)
+whowas_get_list(const char *nick, rb_dlink_list *list)
 {
 	uint32_t hashv;
 	rb_dlink_node *ptr;
@@ -75,7 +75,7 @@ get_nickhistory_list(const char *nick, rb_dlink_list *list)
 }
 
 void
-free_nickhistory_list(rb_dlink_list *list)
+whowas_free_list(rb_dlink_list *list)
 {
 	rb_dlink_node *ptr, *next;
 	if(list == NULL)
@@ -90,7 +90,7 @@ free_nickhistory_list(rb_dlink_list *list)
 
 
 void
-add_history(struct Client *client_p, int online)
+whowas_add_history(struct Client *client_p, int online)
 {
         whowas_t *who;
 	s_assert(NULL != client_p);
@@ -151,7 +151,7 @@ add_history(struct Client *client_p, int online)
 }
 
 void
-off_history(struct Client *client_p)
+whowas_off_history(struct Client *client_p)
 {
 	rb_dlink_node *ptr, *next;
 
@@ -164,7 +164,7 @@ off_history(struct Client *client_p)
 }
 
 struct Client *
-get_history(const char *nick, time_t timelimit)
+whowas_get_history(const char *nick, time_t timelimit)
 {
 	uint32_t hashv;
 	rb_dlink_node *ptr;
@@ -186,7 +186,7 @@ get_history(const char *nick, time_t timelimit)
 }
 
 void
-initwhowas()
+whowas_init()
 {
         whowas_list = rb_malloc(sizeof(rb_dlink_list));
 	whowas_hash = rb_malloc(sizeof(rb_dlink_list) * WW_MAX);
@@ -198,7 +198,7 @@ initwhowas()
 }
 
 void 
-set_whowas_size(int len)
+whowas_set_size(int len)
 {
         int i;
 

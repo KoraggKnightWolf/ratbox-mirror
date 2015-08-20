@@ -700,7 +700,7 @@ find_chasing(struct Client *source_p, const char *user, int *chasing)
 	if(who || IsDigit(*user))
 		return who;
 
-	if(!(who = get_history(user, (long)KILLCHASETIMELIMIT)))
+	if(!(who = whowas_get_history(user, (time_t)KILLCHASETIMELIMIT)))
 	{
 		sendto_one_numeric(source_p, ERR_NOSUCHNICK, form_str(ERR_NOSUCHNICK), user);
 		return (NULL);
@@ -1092,8 +1092,8 @@ exit_generic_client(struct Client *source_p, const char *comment)
 	/* Clean up allow lists */
 	del_all_accepts(source_p);
 
-	add_history(source_p, 0);
-	off_history(source_p);
+	whowas_add_history(source_p, 0);
+	whowas_off_history(source_p);
 
 	monitor_signoff(source_p);
 	dec_global_cidr_count(source_p);
