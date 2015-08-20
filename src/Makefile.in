@@ -16,7 +16,7 @@
 
 #
 # Makefile.am: stuff for automake to vomit back up in a digested form
-# $Id: Makefile.am 28497 2015-08-06 03:35:41Z androsyn $ 
+# $Id: Makefile.am 28597 2015-08-20 17:58:12Z androsyn $ 
 #
 
 VPATH = @srcdir@
@@ -834,12 +834,9 @@ uninstall-am: uninstall-libcoreLTLIBRARIES
 .PRECIOUS: Makefile
 
 
-version.c: version.c.SH ../CREDITS
+version.c: version.c.SH ../CREDITS ../include/version.h ../include/serno.h
 	$(SHELL) ./version.c.SH
 	$(CP) version.c version.c.last
-
-version.lo: version.c ../include/version.h ../include/serno.h
-	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 install-exec-hook: install-libcoreLTLIBRARIES
 	$(RB_RM) -f version.c

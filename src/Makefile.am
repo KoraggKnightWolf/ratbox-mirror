@@ -15,13 +15,10 @@ AM_CPPFLAGS = -I../libratbox/include $(LTDLINCL) @OpenSSL_CFLAGS@ @PICFLAGS@
 
 BUILT_SOURCES = version.c
 
-version.c: version.c.SH ../CREDITS
+version.c: version.c.SH ../CREDITS ../include/version.h ../include/serno.h
 	$(SHELL) ./version.c.SH
 	$(CP) version.c version.c.last
                 
-version.lo: version.c ../include/version.h ../include/serno.h
-	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
 if MINGW
 EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
 endif

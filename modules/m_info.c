@@ -37,6 +37,7 @@
 #include "s_conf.h"
 #include "parse.h"
 #include "modules.h"
+#include "version.h"
 
 static void send_conf_options(struct Client *source_p);
 static void send_birthdate_online_time(struct Client *source_p);
@@ -910,8 +911,8 @@ mo_info(struct Client *client_p, struct Client *source_p, int parc, const char *
 static void
 send_info_text(struct Client *source_p)
 {
-	const char **text = infotext;
-
+	const char **text; 
+	ratbox_infotext(&text);
 	while(*text)
 	{
 		sendto_one_numeric(source_p, s_RPL(RPL_INFO), *text++);
@@ -930,7 +931,10 @@ send_info_text(struct Client *source_p)
 static void
 send_birthdate_online_time(struct Client *source_p)
 {
+	const char *creation, *generation;
 	char tbuf[26];		/* this needs to be 26 - see ctime_r manpage */
+
+	ratbox_version(NULL, NULL, &creation, NULL, &generation);
 	sendto_one(source_p, ":%s %d %s :Birth Date: %s, compile # %s",
 		   get_id(&me, source_p), RPL_INFO,
 		   get_id(source_p, source_p), creation, generation);

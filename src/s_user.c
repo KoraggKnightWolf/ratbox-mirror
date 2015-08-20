@@ -50,6 +50,7 @@
 #include "cache.h"
 #include "hook.h"
 #include "monitor.h"
+#include "version.h"
 
 static void report_and_set_user_flags(struct Client *, struct ConfItem *);
 void user_welcome(struct Client *source_p);
@@ -945,6 +946,8 @@ send_umode_out(struct Client *client_p, struct Client *source_p, int old)
 void
 user_welcome(struct Client *source_p)
 {
+	const char *ircd_version, *creation;
+	ratbox_version(&ircd_version, NULL, &creation, NULL, NULL);
 	SetCork(source_p);
 	sendto_one_numeric(source_p, s_RPL(RPL_WELCOME), ServerInfo.network_name, source_p->name);
 	sendto_one_numeric(source_p, s_RPL(RPL_YOURHOST), get_listener_name(source_p->localClient->listener),

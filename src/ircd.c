@@ -60,6 +60,7 @@
 #include "bandbi.h"
 #include "sslproc.h"
 #include "supported.h"
+#include "version.h"
 /*
  * Try and find the correct name to use with getrlimit() for setting the max.
  * number of files allowed to be open by this process.
@@ -186,14 +187,18 @@ get_maxrss(void)
 static void
 print_startup(int pid)
 {
-	printf("ircd: version %s\n", ircd_version);
-	printf("ircd: %s\n", rb_lib_version());
-	printf("ircd: pid %d\n", pid);
+	const char *ircd_version, *serno;
+	
+	ratbox_version(&ircd_version, &serno, NULL, NULL, NULL);
+	
+	printf("ircd-ratbox: version %s %s\n", ircd_version, serno);
+	printf("ircd-ratbox: %s\n", rb_lib_version());
+	printf("ircd-ratbox: pid %d\n", pid);
 #ifndef RATBOX_PROFILE
-	printf("ircd: running in %s mode from %s\n",
+	printf("ircd-ratbox: running in %s mode from %s\n",
 	       !server_state_foreground ? "background" : "foreground", ConfigFileEntry.dpath);
 #else
-	printf("ircd: running in foreground mode from %s for profiling\n", ConfigFileEntry.dpath);
+	printf("ircd-ratbox: running in foreground mode from %s for profiling\n", ConfigFileEntry.dpath);
 #endif
 }
 
@@ -502,9 +507,12 @@ ratbox_main(int argc, char *argv[])
 
 	if(printVersion)
 	{
-		printf("ircd: version %s\n", ircd_version);
-		printf("ircd: %s\n", rb_lib_version());
-		printf("ircd: configure options\n");
+		const char *ircd_version, *serno;
+		ratbox_version(&ircd_version, &serno, NULL, NULL, NULL);
+		
+		printf("ircd-ratbox: version %s %s\n", ircd_version, serno);
+		printf("ircd-ratbox: %s\n", rb_lib_version());
+		printf("ircd-ratbox: configure options\n");
 		puts(RATBOX_CONFIGURE_OPTS);
 		exit(EXIT_SUCCESS);
 	}

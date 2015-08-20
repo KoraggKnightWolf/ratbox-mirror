@@ -37,7 +37,7 @@
 #include <time.h>
 
 #include "serno.h"
-#include "patchlevel.h"
+#include "version.h"
 #include "stdinc.h"
 #include "rsdb.h"
 

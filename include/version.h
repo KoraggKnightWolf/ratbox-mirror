@@ -27,3 +27,7 @@
 #ifndef PATCHLEVEL
 #define PATCHLEVEL   "ircd-ratbox-3.1beta"
 #endif
+
+void ratbox_version(const char **pver, const char **pserno, const char **pgeneration, const char **pplatform, const char **pcreation);
+void ratbox_infotext(const char ***infotext);
+

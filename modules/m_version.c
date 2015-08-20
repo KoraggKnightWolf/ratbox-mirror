@@ -35,6 +35,7 @@
 #include "send.h"
 #include "parse.h"
 #include "modules.h"
+#include "version.h"
 
 static const char *confopts(void);
 
@@ -63,6 +64,7 @@ DECLARE_MODULE_AV1(version, NULL, NULL, version_clist, NULL, NULL, "$Revision$")
 static int
 m_version(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
+	const char *ircd_version, *serno;
 	static time_t last_used = 0L;
 	if(parc > 1)
 	{
@@ -78,6 +80,7 @@ m_version(struct Client *client_p, struct Client *source_p, int parc, const char
 		if(hunt_server(client_p, source_p, ":%s VERSION :%s", 1, parc, parv) != HUNTED_ISME)
 			return 0;
 	}
+	ratbox_version(&ircd_version, &serno, NULL, NULL, NULL); 
 	sendto_one_numeric(source_p, s_RPL(RPL_VERSION),
 			   ircd_version, serno, me.name, confopts(), TS_CURRENT, ServerInfo.sid);
 
@@ -96,6 +99,9 @@ mo_version(struct Client *client_p, struct Client *source_p, int parc, const cha
 {
 	if(hunt_server(client_p, source_p, ":%s VERSION :%s", 1, parc, parv) == HUNTED_ISME)
 	{
+		const char *ircd_version, *serno;
+		ratbox_version(&ircd_version, &serno, NULL, NULL, NULL);
+
 		sendto_one_numeric(source_p, s_RPL(RPL_VERSION),
 				   ircd_version, serno,
 				   me.name, confopts(), TS_CURRENT, ServerInfo.sid);

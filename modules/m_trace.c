@@ -41,6 +41,7 @@
 #include "channel.h"
 #include "s_newconf.h"
 #include "s_log.h"
+#include "version.h"
 
 static int m_trace(struct Client *, struct Client *, int, const char **);
 static int mo_etrace(struct Client *, struct Client *, int, const char **);
@@ -174,13 +175,16 @@ m_trace(struct Client *client_p, struct Client *source_p, int parc, const char *
 				/* giving this out with flattened links defeats the
 				 * object --fl
 				 */
-				if(IsOper(source_p) || IsExemptShide(source_p) ||
-				   !ConfigServerHide.flatten_links)
+				if(IsOper(source_p) || IsExemptShide(source_p) || !ConfigServerHide.flatten_links)
+				{
+					const char *ircd_version;
+					ratbox_version(&ircd_version, NULL, NULL, NULL, NULL);
 					sendto_one_numeric(source_p, RPL_TRACELINK,
 							   form_str(RPL_TRACELINK),
 							   ircd_version,
 							   ac2ptr ? ac2ptr->name : tname,
 							   ac2ptr ? ac2ptr->from->name : "EEK!");
+				}
 
 				return 0;
 			}
