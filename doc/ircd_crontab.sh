@@ -24,7 +24,7 @@ PID_FILE="etc/ircd.pid"
 
 # Leave the rest alone.
 
-test -x "${IRCD_PATH}/bin/ircd" || exit 1
+test -x "${IRCD_PATH}/bin/ircd-ratbox" || exit 1
 
 if [ -f "${IRCD_PATH}/${PID_FILE}" ] ; then
 	PID=`cat "${IRCD_PATH}/${PID_FILE}"`
@@ -34,5 +34,5 @@ if [ -f "${IRCD_PATH}/${PID_FILE}" ] ; then
 	rm -f "${IRCD_PATH}/${PID_FILE}"
 fi
 
-${IRCD_PATH}/bin/ircd -conftest &>/dev/null && ${IRCD_PATH}/bin/ircd
+${IRCD_PATH}/bin/ircd-ratbox -conftest &>/dev/null && ${IRCD_PATH}/bin/ircd-ratbox
 exit $?;

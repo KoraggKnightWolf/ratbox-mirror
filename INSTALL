@@ -29,8 +29,8 @@ An example.conf for EFnet is in doc/ with values "approved" on 12 December 2001.
 +-----------------------------------------------------------------------------+
 |                                  IMPORTANT                                  |
 | At a minimum, you really ought to use the --prefix=/some/place option.      |
-| By default, configure will select /usr/local/ircd - YOU DO *NOT* WANT THAT! |
-| You may *NOT* run the IRCD as root! The IRCD user needs to be able          |
+| By default, configure will select /usr/local/ircd-ratbox - YOU DO *NOT* WANT|
+| THAT! You may *NOT* run the IRCD as root! The IRCD user needs to be able    |
 | to write to its own directories. You have been warned!                      |
 +-----------------------------------------------------------------------------+
 
