@@ -835,8 +835,9 @@ uninstall-am: uninstall-libcoreLTLIBRARIES
 
 
 version.c: version.c.SH ../CREDITS ../include/version.h ../include/serno.h
-	$(SHELL) ./version.c.SH
+	$(SHELL) version.c.SH
 	$(CP) version.c version.c.last
+	touch version.c.SH
 
 install-exec-hook: install-libcoreLTLIBRARIES
 	$(RB_RM) -f version.c

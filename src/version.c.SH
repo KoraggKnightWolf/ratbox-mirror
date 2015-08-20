@@ -9,7 +9,7 @@ echo "Extracting $package/src/version.c..."
 
 if test -r version.c.last
 then
-   generation=`sed -n 's/^const char \*generation = \"\(.*\)\";/\1/p' < version.c.last`
+   generation=`sed -n 's/^static const char \*generation = \"\(.*\)\";/\1/p' < version.c.last`
    if test ! "$generation" ; then generation=0; fi
 else
    generation=0
