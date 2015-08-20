@@ -19,7 +19,7 @@ version.c: version.c.SH ../CREDITS
 	$(SHELL) ./version.c.SH
 	$(CP) version.c version.c.last
                 
-version.lo: version.c ../include/patchlevel.h ../include/serno.h
+version.lo: version.c ../include/version.h ../include/serno.h
 	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 if MINGW
