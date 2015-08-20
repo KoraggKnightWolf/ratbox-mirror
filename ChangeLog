@@ -1,3 +1,11 @@
+androsyn    2015/08/20 18:56:41 UTC	(20150820_9-28613)
+  Log:
+  use the correct parameter for the creation date
+
+  Modified:
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2015/08/20 18:56:30 UTC	(20150820_8-28611)
   Log:
   fix core dump
