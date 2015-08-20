@@ -1,3 +1,21 @@
+androsyn    2015/08/20 18:20:25 UTC	(20150820_3-28601)
+  Log:
+  reset of the version cleanup
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/include/ircd.h (File Modified) 
+	ircd-ratbox/trunk/include/version.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_version.c (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/version.c.SH (File Modified) 
+
+
 androsyn    2015/08/20 17:58:25 UTC	(20150820_2-28599)
   Log:
   rebuild automake
