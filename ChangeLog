@@ -1,3 +1,15 @@
+androsyn    2015/08/20 17:58:12 UTC	(20150820_1-28597)
+  Log:
+  Rework version.c a bit, next part of the patch is coming
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/patchlevel.h (File Deleted) 
+	ircd-ratbox/trunk/include/version.h (File Added) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/version.c.SH (File Modified) 
+
+
 androsyn    2015/08/20 15:54:48 UTC	(20150820_0-28595)
   Log:
   Rename whowas function to be whowas_* no functional changes otherwise.
