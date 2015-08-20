@@ -1,3 +1,12 @@
+androsyn    2015/08/20 18:28:49 UTC	(20150820_4-28603)
+  Log:
+  change default prefix to /usr/local/ircd-ratbox
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2015/08/20 18:20:25 UTC	(20150820_3-28601)
   Log:
   reset of the version cleanup
