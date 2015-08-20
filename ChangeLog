@@ -1,3 +1,13 @@
+androsyn    2015/08/20 18:34:45 UTC	(20150820_5-28605)
+  Log:
+  change binary name from ircd to ircd-ratbox
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+
+
 androsyn    2015/08/20 18:28:49 UTC	(20150820_4-28603)
   Log:
   change default prefix to /usr/local/ircd-ratbox
