@@ -19,7 +19,7 @@ AM_INIT_AUTOMAKE([subdir-objects])
 
 AM_CONFIG_HEADER(include/setup.h)
 
-AC_PREFIX_DEFAULT(/usr/local/ircd)
+AC_PREFIX_DEFAULT(/usr/local/ircd-ratbox)
 AC_GNU_SOURCE
 
 dnl Checks for programs.

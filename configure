@@ -598,7 +598,7 @@ PACKAGE_STRING='ircd-ratbox devel'
 PACKAGE_BUGREPORT=''
 PACKAGE_URL=''
 
-ac_default_prefix=/usr/local/ircd
+ac_default_prefix=/usr/local/ircd-ratbox
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
