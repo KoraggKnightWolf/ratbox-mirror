@@ -353,6 +353,7 @@ abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+ac_cv_have_struct_mallinfo = @ac_cv_have_struct_mallinfo@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -837,7 +838,7 @@ version.c: version.c.SH ../CREDITS
 	$(SHELL) ./version.c.SH
 	$(CP) version.c version.c.last
 
-version.lo: version.c ../include/patchlevel.h ../include/serno.h
+version.lo: version.c ../include/version.h ../include/serno.h
 	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 install-exec-hook: install-libcoreLTLIBRARIES
