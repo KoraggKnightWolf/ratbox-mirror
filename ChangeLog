@@ -1,3 +1,11 @@
+androsyn    2015/08/21 15:43:52 UTC	(20150821_11-28643)
+  Log:
+  style cleanups
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/08/21 15:28:20 UTC	(20150821_10-28641)
   Log:
   have the levels for sendto_realops_flags be enums rather than defines
