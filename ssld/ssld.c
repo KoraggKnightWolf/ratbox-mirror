@@ -40,39 +40,6 @@ static inline uint32_t buf_to_uint32(void *);
 static inline void uint32_to_buf(void *buf, uint32_t x);
 
 
-static inline uint32_t
-buf_to_uint32(void *buf)
-{
-	uint32_t x;
-	memcpy(&x, buf, sizeof(x));
-	return x;
-}
-
-static inline void
-uint32_to_buf(void *buf, uint32_t x)
-{
-	memcpy(buf, &x, sizeof(x));
-	return;
-}
-
-#if 0
-static inline uint16_t
-buf_to_uint16(char *buf)
-{
-	uint16_t x;
-	memcpy(&x, buf, sizeof(x));
-	return x;
-}
-
-static inline void
-uint16_to_buf(char *buf, uint16_t x)
-{
-	memcpy(buf, &x, sizeof(x));
-	return;
-}
-#endif
-
-
 typedef struct _mod_ctl_buf
 {
 	rb_dlink_node node;
@@ -183,8 +150,20 @@ static int zlib_ok = 1;
 static int zlib_ok = 0;
 #endif
 
+static inline uint32_t
+buf_to_uint32(void *buf)
+{
+	uint32_t x;
+	memcpy(&x, buf, sizeof(x));
+	return x;
+}
 
-
+static inline void
+uint32_to_buf(void *buf, uint32_t x)
+{
+	memcpy(buf, &x, sizeof(x));
+	return;
+}
 
 #ifdef HAVE_ZLIB
 static void *
