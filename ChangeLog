@@ -1,3 +1,11 @@
+androsyn    2015/08/21 02:38:12 UTC	(20150821_6-28633)
+  Log:
+  fix format specifier
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2015/08/21 01:44:36 UTC	(20150821_5-28629)
   Log:
   formatting fixup
