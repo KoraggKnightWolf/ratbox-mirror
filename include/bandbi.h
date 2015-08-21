@@ -10,7 +10,7 @@
 
 #include "bandb_defs.h"
 
-void init_bandb(void);
+void bandb_init(void);
 
 void bandb_add(bandb_type, struct Client *source_p, const char *mask1,
 	       const char *mask2, const char *reason, const char *oper_reason, int perm);

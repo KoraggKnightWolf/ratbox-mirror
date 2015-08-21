@@ -72,16 +72,16 @@ static const char bandb_del_letter[] = {
 static rb_dlink_list bandb_pending;
 
 static rb_helper *bandb_helper;
-static int start_bandb(void);
+static int bandb_start(void);
 
 static void bandb_parse(rb_helper *);
 static void bandb_restart_cb(rb_helper *);
 static char *bandb_path;
 
 void
-init_bandb(void)
+bandb_init(void)
 {
-	if(start_bandb())
+	if(bandb_start())
 	{
 		ilog(L_MAIN, "Unable to start bandb helper: %s", strerror(errno));
 		exit(0);
@@ -90,7 +90,7 @@ init_bandb(void)
 
 
 static int
-start_bandb(void)
+bandb_start(void)
 {
 	char fullpath[PATH_MAX + 1];
 #ifdef _WIN32
@@ -462,7 +462,7 @@ bandb_restart_cb(rb_helper * helper)
 		rb_helper_close(helper);
 		bandb_helper = NULL;
 	}
-	start_bandb();
+	bandb_start();
 	return;
 }
 
@@ -477,6 +477,6 @@ bandb_restart(void)
 		rb_helper_close(bandb_helper);
 		bandb_helper = NULL;
 	}
-	start_bandb();
+	bandb_start();
 	bandb_rehash_bans();
 }

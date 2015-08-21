@@ -642,7 +642,7 @@ ratbox_main(int argc, char *argv[])
 	if(ServerInfo.bandb_path == NULL)
 		ServerInfo.bandb_path = rb_strdup(DBPATH);
 
-	init_bandb();
+	bandb_init();
 	rehash_bans(0);
 
 	init_cache();
