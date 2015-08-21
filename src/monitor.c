@@ -40,12 +40,20 @@
 #include <match.h>
 #include <send.h>
 
-struct monitor *monitorTable[MONITOR_HASH_SIZE];
+#define MONITOR_HASH_BITS 16
+#define MONITOR_HASH_SIZE (1<<MONITOR_HASH_BITS)
+
+static struct monitor *monitorTable[MONITOR_HASH_SIZE];
+
+
+static rb_ev_entry *cleanup_monitor_ev;
+static void cleanup_monitor(void *unused);
+
 
 void
 init_monitor(void)
 {
-	/* nothing to do here now */
+	cleanup_monitor_ev = rb_event_addish("cleanup_monitor", cleanup_monitor, NULL, 3600);
 	return;
 }
 
@@ -150,4 +158,34 @@ clear_monitor(struct Client *client_p)
 
 	client_p->localClient->monitor_list.head = client_p->localClient->monitor_list.tail = NULL;
 	client_p->localClient->monitor_list.length = 0;
+}
+
+
+static void
+cleanup_monitor(void *unused)
+{
+	struct monitor *last_ptr = NULL;
+	struct monitor *next_ptr, *ptr;
+	int i;
+
+	for(i = 0; i < MONITOR_HASH_SIZE; i++)
+	{
+		last_ptr = NULL;
+		for(ptr = monitorTable[i]; ptr; ptr = next_ptr)
+		{
+			next_ptr = ptr->hnext;
+
+			if(!rb_dlink_list_length(&ptr->users))
+			{
+				if(last_ptr)
+					last_ptr->hnext = next_ptr;
+				else
+					monitorTable[i] = next_ptr;
+
+				free_monitor(ptr);
+			}
+			else
+				last_ptr = ptr;
+		}
+	}
 }

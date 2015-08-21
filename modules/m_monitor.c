@@ -42,11 +42,13 @@
 #include <match.h>
 #include <send.h>
 
+#define MONITOR_HASH_BITS 16
+#define MONITOR_HASH_SIZE (1<<MONITOR_HASH_BITS)
+
 static int m_monitor(struct Client *, struct Client *, int, const char **);
 
 static int modinit(void);
 static void moddeinit(void);
-static void cleanup_monitor(void *unused);
 
 struct Message monitor_msgtab = {
 	.cmd = "MONITOR",
@@ -64,11 +66,12 @@ mapi_clist_av1 monitor_clist[] = { &monitor_msgtab, NULL };
 
 DECLARE_MODULE_AV1(monitor, modinit, moddeinit, monitor_clist, NULL, NULL, "$Revision$");
 
-static rb_ev_entry *cleanup_monitor_ev;
+
+
+
 static int
 modinit(void)
 {
-	cleanup_monitor_ev = rb_event_addish("cleanup_monitor", cleanup_monitor, NULL, 3600);
 	return 0;
 
 }
@@ -76,7 +79,7 @@ modinit(void)
 static void
 moddeinit(void)
 {
-	rb_event_delete(cleanup_monitor_ev);
+	return;
 }
 
 static void
@@ -322,35 +325,6 @@ show_monitor_status(struct Client *client_p)
 		sendto_one_buffer(client_p, offbuf);
 }
 
-
-static void
-cleanup_monitor(void *unused)
-{
-	struct monitor *last_ptr = NULL;
-	struct monitor *next_ptr, *ptr;
-	int i;
-
-	for(i = 0; i < MONITOR_HASH_SIZE; i++)
-	{
-		last_ptr = NULL;
-		for(ptr = monitorTable[i]; ptr; ptr = next_ptr)
-		{
-			next_ptr = ptr->hnext;
-
-			if(!rb_dlink_list_length(&ptr->users))
-			{
-				if(last_ptr)
-					last_ptr->hnext = next_ptr;
-				else
-					monitorTable[i] = next_ptr;
-
-				free_monitor(ptr);
-			}
-			else
-				last_ptr = ptr;
-		}
-	}
-}
 
 
 static int
