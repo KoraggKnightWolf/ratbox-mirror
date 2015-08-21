@@ -1,3 +1,12 @@
+androsyn    2015/08/21 14:52:37 UTC	(20150821_9-28639)
+  Log:
+  dead_list is internal to client.c so don't export it
+
+  Modified:
+	ircd-ratbox/trunk/include/ircd.h (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2015/08/21 14:48:20 UTC	(20150821_8-28637)
   Log:
   avoid exporting monitorTable by moving cleanup_monitor to inside src/monitor.c
