@@ -1,3 +1,12 @@
+androsyn    2015/08/21 15:47:06 UTC	(20150821_12-28645)
+  Log:
+  move struct operhash_entry to be internal to src/operhash.c
+
+  Modified:
+	ircd-ratbox/trunk/include/operhash.h (File Modified) 
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 androsyn    2015/08/21 15:43:52 UTC	(20150821_11-28643)
   Log:
   style cleanups
