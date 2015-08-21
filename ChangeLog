@@ -1,3 +1,14 @@
+androsyn    2015/08/21 02:45:31 UTC	(20150821_7-28635)
+  Log:
+  suppress warnings regarding diagnostic push/pop on older gcc versions
+
+  Modified:
+	ircd-ratbox/trunk/bandb/rsdb_sqlite3.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/08/21 02:38:12 UTC	(20150821_6-28633)
   Log:
   fix format specifier
