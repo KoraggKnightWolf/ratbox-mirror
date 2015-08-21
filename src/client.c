@@ -72,7 +72,7 @@ static EVH check_pings;
 static char current_uid[IDLEN];
 static int32_t current_connid = 0;
 
-rb_dlink_list dead_list;
+static rb_dlink_list dead_list;
 #ifdef DEBUG_EXITED_CLIENTS
 static rb_dlink_list dead_remote_list;
 #endif

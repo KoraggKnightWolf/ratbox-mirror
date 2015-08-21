@@ -82,7 +82,6 @@ extern rb_dlink_list lclient_list;
 extern rb_dlink_list serv_list;
 extern rb_dlink_list global_serv_list;
 extern rb_dlink_list oper_list;
-extern rb_dlink_list dead_list;
 
 void get_current_bandwidth(struct Client *source_p, struct Client *target_p);
 
