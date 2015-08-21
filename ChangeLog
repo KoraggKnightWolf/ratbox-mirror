@@ -1,3 +1,13 @@
+androsyn    2015/08/21 14:48:20 UTC	(20150821_8-28637)
+  Log:
+  avoid exporting monitorTable by moving cleanup_monitor to inside src/monitor.c
+
+  Modified:
+	ircd-ratbox/trunk/include/monitor.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2015/08/21 02:45:31 UTC	(20150821_7-28635)
   Log:
   suppress warnings regarding diagnostic push/pop on older gcc versions
