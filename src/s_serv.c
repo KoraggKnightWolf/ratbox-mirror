@@ -86,7 +86,9 @@ static CNCB serv_connect_callback;
 static CNCB serv_connect_ssl_callback;
 
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 #pragma GCC diagnostic push
+#endif
 /*
  * hunt_server - Do the basic thing in delivering the message (command)
  *	across the relays to the specific server (server) for
@@ -207,7 +209,9 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 		sendto_one_numeric(source_p, ERR_NOSUCHSERVER, form_str(ERR_NOSUCHSERVER), parv[server]);
 	return (HUNTED_NOSUCH);
 }
+#if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 #pragma GCC diagnostic pop
+#endif
 
 /*
  * try_connections - scan through configuration and try new connections.

@@ -35,8 +35,11 @@
 
 #include <sqlite3.h>
 
+
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 #pragma GCC diagnostic push
+#endif
 static void
 mlog(rsdb_conn_t *dbconn, const char *errstr, ...)
 {
@@ -52,8 +55,9 @@ mlog(rsdb_conn_t *dbconn, const char *errstr, ...)
 	else
 		exit(1);
 }
+#if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 #pragma GCC diagnostic pop
-
+#endif
 
 rsdb_conn_t *
 rsdb_init(const char *dbpath, rsdb_error_cb * ecb, void *data)

@@ -250,9 +250,10 @@ clean_dead_conns(void *unused)
 	}
 	dead_list.tail = dead_list.head = NULL;
 }
-
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 #pragma GCC diagnostic push
+#endif
 static void
 close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 {
@@ -289,8 +290,9 @@ close_conn(conn_t * conn, int wait_plain, const char *fmt, ...)
 	len = (strlen(reason) + 1) + 5;
 	mod_cmd_write_queue(conn->ctl, buf, len);
 }
+#if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 #pragma GCC diagnostic pop
-
+#endif
 
 static conn_t *
 make_conn(mod_ctl_t * ctl, rb_fde_t *mod_fd, rb_fde_t *plain_fd)
