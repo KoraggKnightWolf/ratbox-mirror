@@ -153,7 +153,7 @@ show_ports(struct Client *source_p)
 #define RATBOX_SOMAXCONN SOMAXCONN
 #endif
 
-static int
+static bool
 inetport(struct Listener *listener)
 {
 	rb_fde_t *F;
@@ -192,7 +192,7 @@ inetport(struct Listener *listener)
 	{
 	        saved_errno = errno;
 	        log_listener("opening listener socket %s:%s", get_listener_name(listener), strerror(saved_errno));
-		return 0;
+		return false;
 	}
 	else if((maxconnections - 10) < rb_get_fd(F))	/* XXX this is kinda bogus */
 	{
@@ -200,7 +200,7 @@ inetport(struct Listener *listener)
 		log_listener("no more connections left for listener %s:%s",
 			     get_listener_name(listener), strerror(errno));
 		rb_close(F);
-		return 0;
+		return false;
 	}
 	/*
 	 * XXX - we don't want to do all this crap for a listener
@@ -212,7 +212,7 @@ inetport(struct Listener *listener)
 		log_listener("setting SO_REUSEADDR for listener %s:%s",
 			     get_listener_name(listener), strerror(saved_errno));
 		rb_close(F);
-		return 0;
+		return false;
 	}
 
 	/*
@@ -225,7 +225,7 @@ inetport(struct Listener *listener)
 		log_listener("binding listener socket %s:%s",
 			     get_listener_name(listener), strerror(errno));
 		rb_close(F);
-		return 0;
+		return false;
 	}
 
 	if((ret = rb_listen(F, RATBOX_SOMAXCONN)))
@@ -233,13 +233,13 @@ inetport(struct Listener *listener)
 		log_listener("listen failed for %s:%s",
 			     get_listener_name(listener), strerror(errno));
 		rb_close(F);
-		return 0;
+		return false;
 	}
 
 	listener->F = F;
 
 	rb_accept_tcp(listener->F, accept_precallback, accept_callback, listener);
-	return 1;
+	return true;
 }
 
 static struct Listener *
@@ -365,8 +365,8 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 
 	listener->F = NULL;
 	listener->ssl = ssl;
-	if(inetport(listener))
-		listener->active = 1;
+	if(inetport(listener) == true)
+		listener->active = true;
 	else
 		close_listener(listener);
 }
@@ -386,7 +386,7 @@ close_listener(struct Listener *listener)
 		listener->F = NULL;
 	}
 
-	listener->active = 0;
+	listener->active = false;
 
 	if(listener->ref_count)
 		return;
