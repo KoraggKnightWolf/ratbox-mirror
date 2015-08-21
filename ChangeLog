@@ -1,3 +1,11 @@
+androsyn    2015/08/21 00:21:34 UTC	(20150821_1-28619)
+  Log:
+  style changes
+
+  Modified:
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/08/21 00:19:50 UTC	(20150821_0-28617)
   Log:
   change hash_whowas_name to whowas_hash_name
