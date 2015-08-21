@@ -865,7 +865,7 @@ sendto_anywhere(struct Client *target_p, struct Client *source_p, const char *co
  * side effects - message is sent to opers with matching umodes
  */
 void
-sendto_realops_flags(int flags, int level, const char *pattern, ...)
+sendto_realops_flags(int flags, loglevel_t level, const char *pattern, ...)
 {
 	struct Client *client_p;
 	rb_dlink_node *ptr;

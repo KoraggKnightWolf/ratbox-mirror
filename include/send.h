@@ -30,6 +30,13 @@
 #include <monitor.h>
 #include <channel.h>
 
+typedef enum _loglevel {
+	L_ALL = 0,
+	L_OPER = 1,
+	L_ADMIN = 2,
+} loglevel_t;
+
+
 void send_pop_queue(struct Client *);
 void sendto_one(struct Client *target_p, const char *, ...) AFP(2, 3);
 void sendto_one_buffer(struct Client *target_p, const char *buffer);
@@ -54,17 +61,13 @@ void sendto_monitor(struct monitor *monptr, const char *, ...) AFP(2, 3);
 void sendto_anywhere(struct Client *, struct Client *, const char *,
 		  const char *, ...) AFP(4, 5);
 
-void sendto_realops_flags(int, int, const char *, ...) AFP(3, 4);
+void sendto_realops_flags(int, loglevel_t, const char *, ...) AFP(3, 4);
 void sendto_wallops_flags(int, struct Client *, const char *, ...) AFP(3, 4);
 
 void kill_client(struct Client *client_p, struct Client *diedie,
 		      const char *pattern, ...) AFP(3, 4);
 void kill_client_serv_butone(struct Client *one, struct Client *source_p,
 				  const char *pattern, ...) AFP(3, 4);
-
-#define L_ALL	0
-#define L_OPER	1
-#define L_ADMIN	2
 
 #define NOCAPS		0	/* no caps */
 
