@@ -1,3 +1,11 @@
+androsyn    2015/08/21 00:46:15 UTC	(20150821_4-28627)
+  Log:
+  boolify inetport
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2015/08/21 00:30:26 UTC	(20150821_3-28623)
   Log:
   use #include <foo.h> instead of #include "foo.h"
