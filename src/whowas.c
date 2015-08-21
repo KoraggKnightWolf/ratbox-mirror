@@ -71,7 +71,6 @@ whowas_get_list(const char *nick, rb_dlink_list *list)
 			rb_dlinkAddTailAlloc(who, list);		
 		}
 	}
-	return;
 }
 
 void
@@ -85,7 +84,6 @@ whowas_free_list(rb_dlink_list *list)
 	{
 		rb_dlinkDestroy(ptr, list);
 	}
-	return;
 }
 
 
@@ -219,7 +217,6 @@ whowas_set_size(int len)
                 
         }
         whowas_list_length = len;
-
 }
 
 void
