@@ -733,7 +733,7 @@ restart(const char *mesg)
 		abort();
 	was_here = true;
 
-	ilog(L_MAIN, "Restarting Server because: %s, memory data limit: %ld", mesg, get_maxrss());
+	ilog(L_MAIN, "Restarting Server because: %s, memory data limit: %" PRIuPTR, mesg, get_maxrss());
 
 	server_reboot();
 }
