@@ -1,3 +1,12 @@
+androsyn    2015/08/21 15:28:20 UTC	(20150821_10-28641)
+  Log:
+  have the levels for sendto_realops_flags be enums rather than defines
+
+  Modified:
+	ircd-ratbox/trunk/include/send.h (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2015/08/21 14:52:37 UTC	(20150821_9-28639)
   Log:
   dead_list is internal to client.c so don't export it
