@@ -49,7 +49,7 @@ static unsigned int whowas_list_length = NICKNAMEHISTORYLENGTH;
  */
 #define WW_MAX_BITS 16
 #define WW_MAX (1<<WW_MAX_BITS)
-#define hash_whowas_name(x) fnv_hash_upper((const unsigned char *)x, WW_MAX_BITS, 0)
+#define whowas_hash_name(x) fnv_hash_upper((const unsigned char *)x, WW_MAX_BITS, 0)
 
 
 void
@@ -61,7 +61,7 @@ whowas_get_list(const char *nick, rb_dlink_list *list)
 	if(list == NULL)
 		return;
 			
-	hashv = hash_whowas_name(nick);
+	hashv = whowas_hash_name(nick);
 
 	RB_DLINK_FOREACH(ptr, whowas_hash[hashv].head)
 	{
@@ -112,7 +112,7 @@ whowas_add_history(struct Client *client_p, int online)
         }
 
         who = rb_malloc(sizeof(whowas_t));
-	who->hashv = hash_whowas_name(client_p->name);
+	who->hashv = whowas_hash_name(client_p->name);
 	who->logoff = rb_current_time();
 
 	rb_strlcpy(who->name, client_p->name, sizeof(who->name));
@@ -170,7 +170,7 @@ whowas_get_history(const char *nick, time_t timelimit)
 	rb_dlink_node *ptr;
 
 	timelimit = rb_current_time() - timelimit;
-	hashv = hash_whowas_name(nick);
+	hashv = whowas_hash_name(nick);
 
  	RB_DLINK_FOREACH(ptr, whowas_hash[hashv].head)
 	{
