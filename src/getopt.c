@@ -24,9 +24,9 @@
  *  $Id$
  */
 #include <stdlib.h>
-#include "stdinc.h"
+#include <stdinc.h>
 
-#include "ircd_getopt.h"
+#include <ircd_getopt.h>
 
 #define OPTCHAR '-'
 

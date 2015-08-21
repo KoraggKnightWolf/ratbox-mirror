@@ -31,11 +31,11 @@
  * $Id$
  */
 #include <ratbox_lib.h>
-#include "stdinc.h"
-#include "struct.h"
-#include "match.h"
-#include "hash.h"
-#include "operhash.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <match.h>
+#include <hash.h>
+#include <operhash.h>
 
 #define OPERHASH_MAX_BITS 7
 #define OPERHASH_MAX (1<<OPERHASH_MAX_BITS)

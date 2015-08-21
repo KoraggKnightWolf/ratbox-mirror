@@ -20,15 +20,15 @@
  */
 
 /* List of ircd includes from ../include/ */
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "modules.h"
-#include "parse.h"
-#include "hook.h"
-#include "client.h"
-#include "ircd.h"
-#include "send.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <modules.h>
+#include <parse.h>
+#include <hook.h>
+#include <client.h>
+#include <ircd.h>
+#include <send.h>
 
 /* Declare the void's initially up here, as modules dont have an
  * include file, we will normally have client_p, source_p, parc

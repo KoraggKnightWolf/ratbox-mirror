@@ -22,16 +22,16 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "client.h"
-#include "parse.h"
-#include "modules.h"
-#include "numeric.h"
-#include "send.h"
-#include "s_conf.h"
-#include "ircd.h"
-#include "match.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <client.h>
+#include <parse.h>
+#include <modules.h>
+#include <numeric.h>
+#include <send.h>
+#include <s_conf.h>
+#include <ircd.h>
+#include <match.h>
 
 #define USER_COL       50	/* display | Users: %d at col 50 */
 

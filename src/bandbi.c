@@ -30,25 +30,25 @@
  *
  * $Id$
  */
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "client.h"
-#include "s_conf.h"
-#include "s_log.h"
-#include "match.h"
-#include "bandbi.h"
-#include "parse.h"
-#include "channel.h"
-#include "operhash.h"
-#include "hostmask.h"
-#include "cache.h"
-#include "s_newconf.h"
-#include "hash.h"
-#include "reject.h"
-#include "monitor.h"
-#include "send.h"
-#include "ircd.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <client.h>
+#include <s_conf.h>
+#include <s_log.h>
+#include <match.h>
+#include <bandbi.h>
+#include <parse.h>
+#include <channel.h>
+#include <operhash.h>
+#include <hostmask.h>
+#include <cache.h>
+#include <s_newconf.h>
+#include <hash.h>
+#include <reject.h>
+#include <monitor.h>
+#include <send.h>
+#include <ircd.h>
 
 
 static const char bandb_add_letter[] = {

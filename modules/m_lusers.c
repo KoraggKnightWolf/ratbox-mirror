@@ -24,16 +24,16 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "s_serv.h"		/* hunt_server */
-#include "s_user.h"		/* show_lusers */
-#include "send.h"
-#include "s_conf.h"
-#include "parse.h"
-#include "modules.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <s_serv.h>		/* hunt_server */
+#include <s_user.h>		/* show_lusers */
+#include <send.h>
+#include <s_conf.h>
+#include <parse.h>
+#include <modules.h>
 
 static int m_lusers(struct Client *, struct Client *, int, const char **);
 static int ms_lusers(struct Client *, struct Client *, int, const char **);

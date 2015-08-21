@@ -24,27 +24,27 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "client.h"		/* client struct */
-#include "channel.h"
-#include "hash.h"		/* add_to_client_hash */
-#include "match.h"
-#include "ircd.h"		/* me */
-#include "s_conf.h"		/* struct ConfItem */
-#include "s_newconf.h"
-#include "s_log.h"		/* log level defines */
-#include "s_serv.h"		/* server_estab, check_server */
-#include "scache.h"		/* find_or_add */
-#include "send.h"		/* sendto_one */
-#include "parse.h"
-#include "hook.h"
-#include "modules.h"
-#include "s_stats.h"
-#include "packet.h"
-#include "s_user.h"
-#include "reject.h"
-#include "sslproc.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <client.h>		/* client struct */
+#include <channel.h>
+#include <hash.h>		/* add_to_client_hash */
+#include <match.h>
+#include <ircd.h>		/* me */
+#include <s_conf.h>		/* struct ConfItem */
+#include <s_newconf.h>
+#include <s_log.h>		/* log level defines */
+#include <s_serv.h>		/* server_estab, check_server */
+#include <scache.h>		/* find_or_add */
+#include <send.h>		/* sendto_one */
+#include <parse.h>
+#include <hook.h>
+#include <modules.h>
+#include <s_stats.h>
+#include <packet.h>
+#include <s_user.h>
+#include <reject.h>
+#include <sslproc.h>
 
 static int mr_server(struct Client *, struct Client *, int, const char **);
 static int ms_server(struct Client *, struct Client *, int, const char **);

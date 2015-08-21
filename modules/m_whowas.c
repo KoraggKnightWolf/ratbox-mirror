@@ -24,18 +24,18 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "hash.h"
-#include "whowas.h"
-#include "client.h"
-#include "match.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "send.h"
-#include "s_conf.h"
-#include "parse.h"
-#include "modules.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <hash.h>
+#include <whowas.h>
+#include <client.h>
+#include <match.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <send.h>
+#include <s_conf.h>
+#include <parse.h>
+#include <modules.h>
 
 static int m_whowas(struct Client *, struct Client *, int, const char **);
 

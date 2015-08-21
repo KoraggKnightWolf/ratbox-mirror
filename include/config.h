@@ -108,5 +108,5 @@
  */
 #define MAX_BUFFER	60
 
-#include "defaults.h"
+#include <defaults.h>
 #endif /* INCLUDED_config_h */

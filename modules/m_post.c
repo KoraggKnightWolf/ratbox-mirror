@@ -24,13 +24,13 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "client.h"
-#include "ircd.h"
-#include "send.h"
-#include "parse.h"
-#include "modules.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <client.h>
+#include <ircd.h>
+#include <send.h>
+#include <parse.h>
+#include <modules.h>
 
 static int mr_dumb_proxy(struct Client *, struct Client *, int, const char **);
 

@@ -20,14 +20,14 @@
  * $Id$
  */
 
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "ircd_signal.h"
-#include "ircd.h"		/* dorehash */
-#include "s_log.h"
-#include "s_conf.h"
-#include "dns.h"
-#include "s_auth.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <ircd_signal.h>
+#include <ircd.h>		/* dorehash */
+#include <s_log.h>
+#include <s_conf.h>
+#include <dns.h>
+#include <s_auth.h>
 
 #ifndef _WIN32
 /*

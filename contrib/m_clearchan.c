@@ -19,23 +19,23 @@
  *
  *   $Id$
  */
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "channel.h"
-#include "client.h"
-#include "hash.h"
-#include "match.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "s_user.h"
-#include "s_conf.h"
-#include "s_newconf.h"
-#include "send.h"
-#include "s_log.h"
-#include "parse.h"
-#include "modules.h"
-#include "packet.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <channel.h>
+#include <client.h>
+#include <hash.h>
+#include <match.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <s_user.h>
+#include <s_conf.h>
+#include <s_newconf.h>
+#include <send.h>
+#include <s_log.h>
+#include <parse.h>
+#include <modules.h>
+#include <packet.h>
 
 static int mo_clearchan(struct Client *client_p, struct Client *source_p,
 			int parc, const char *parv[]);

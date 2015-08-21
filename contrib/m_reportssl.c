@@ -1,11 +1,11 @@
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "modules.h"
-#include "parse.h"
-#include "client.h"
-#include "ircd.h"
-#include "send.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <modules.h>
+#include <parse.h>
+#include <client.h>
+#include <ircd.h>
+#include <send.h>
 
 static int moper_reportssl(struct Client *client_p, struct Client *source_p, int parc,
 		      const char *parv[]);

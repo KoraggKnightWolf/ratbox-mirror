@@ -18,22 +18,22 @@
  *
  *   $Id$
  */
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "channel.h"
-#include "client.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "s_log.h"
-#include "s_serv.h"
-#include "send.h"
-#include "whowas.h"
-#include "match.h"
-#include "hash.h"
-#include "parse.h"
-#include "modules.h"
-#include "s_newconf.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <channel.h>
+#include <client.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <s_log.h>
+#include <s_serv.h>
+#include <send.h>
+#include <whowas.h>
+#include <match.h>
+#include <hash.h>
+#include <parse.h>
+#include <modules.h>
+#include <s_newconf.h>
 
 static int mo_opme(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 

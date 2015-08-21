@@ -10,20 +10,20 @@
  */
 
 /* List of ircd includes from ../include/ */
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "client.h"
-#include "ircd.h"
-#include "match.h"
-#include "numeric.h"
-#include "s_newconf.h"
-#include "s_conf.h"
-#include "s_log.h"
-#include "s_serv.h"
-#include "send.h"
-#include "parse.h"
-#include "modules.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <client.h>
+#include <ircd.h>
+#include <match.h>
+#include <numeric.h>
+#include <s_newconf.h>
+#include <s_conf.h>
+#include <s_log.h>
+#include <s_serv.h>
+#include <send.h>
+#include <parse.h>
+#include <modules.h>
 
 #include <string.h>
 

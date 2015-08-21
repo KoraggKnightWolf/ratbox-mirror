@@ -27,8 +27,8 @@
 #ifndef INCLUDED_hash_h
 #define INCLUDED_hash_h
 
-#include "cache.h"
-#include "s_newconf.h"
+#include <cache.h>
+#include <s_newconf.h>
 
 extern rb_dlink_list resvTable[];
 

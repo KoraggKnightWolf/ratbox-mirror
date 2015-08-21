@@ -31,14 +31,14 @@
  *
  * $Id$
  */
-#include "stdinc.h"
-#include "struct.h"
-#include "monitor.h"
-#include "hash.h"
-#include "numeric.h"
-#include "ircd.h"
-#include "match.h"
-#include "send.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <monitor.h>
+#include <hash.h>
+#include <numeric.h>
+#include <ircd.h>
+#include <match.h>
+#include <send.h>
 
 struct monitor *monitorTable[MONITOR_HASH_SIZE];
 

@@ -36,10 +36,10 @@
  *
  * $Id$
  */
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "hook.h"
-#include "match.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <hook.h>
+#include <match.h>
 
 struct hook_info
 {

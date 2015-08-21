@@ -27,8 +27,8 @@
 #ifndef INCLUDED_send_h
 #define INCLUDED_send_h
 
-#include "monitor.h"
-#include "channel.h"
+#include <monitor.h>
+#include <channel.h>
 
 void send_pop_queue(struct Client *);
 void

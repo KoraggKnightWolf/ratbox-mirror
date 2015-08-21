@@ -27,8 +27,8 @@
 #ifndef INCLUDED_s_user_h
 #define INCLUDED_s_user_h
 
-#include "struct.h"
-#include "client.h"
+#include <struct.h>
+#include <client.h>
 
 extern time_t LastUsedWallops;
 

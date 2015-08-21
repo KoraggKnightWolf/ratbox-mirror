@@ -24,20 +24,20 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "client.h"
-#include "hash.h"		/* for find_client() */
-#include "ircd.h"
-#include "numeric.h"
-#include "s_log.h"
-#include "s_conf.h"
-#include "send.h"
-#include "whowas.h"
-#include "match.h"
-#include "parse.h"
-#include "modules.h"
-#include "s_newconf.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <client.h>
+#include <hash.h>		/* for find_client() */
+#include <ircd.h>
+#include <numeric.h>
+#include <s_log.h>
+#include <s_conf.h>
+#include <send.h>
+#include <whowas.h>
+#include <match.h>
+#include <parse.h>
+#include <modules.h>
+#include <s_newconf.h>
 
 
 static int ms_kill(struct Client *, struct Client *, int, const char **);

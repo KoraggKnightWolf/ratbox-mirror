@@ -29,8 +29,8 @@
 
 #define MAPI_RATBOX 1
 
-#include "setup.h"
-#include "ltdl.h"
+#include <setup.h>
+#include <ltdl.h>
 
 struct module
 {

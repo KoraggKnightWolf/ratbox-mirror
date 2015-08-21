@@ -24,20 +24,20 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "whowas.h"
-#include "hash.h"
-#include "match.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "s_serv.h"
-#include "s_user.h"
-#include "send.h"
-#include "s_conf.h"
-#include "client.h"
-#include "send.h"
-#include "s_log.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <whowas.h>
+#include <hash.h>
+#include <match.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <s_serv.h>
+#include <s_user.h>
+#include <send.h>
+#include <s_conf.h>
+#include <client.h>
+#include <send.h>
+#include <s_log.h>
 
 static rb_dlink_list *whowas_list;
 static rb_dlink_list *whowas_hash;

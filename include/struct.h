@@ -26,7 +26,7 @@
 #ifndef INCLUDED_struct_h
 #define INCLUDED_struct_h
 
-#include "ratbox_lib.h"
+#include <ratbox_lib.h>
 
 /*** client.h ***/
 

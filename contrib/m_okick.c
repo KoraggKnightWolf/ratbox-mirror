@@ -23,20 +23,20 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "channel.h"
-#include "client.h"
-#include "match.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "send.h"
-#include "modules.h"
-#include "parse.h"
-#include "hash.h"
-#include "packet.h"
-#include "s_serv.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <channel.h>
+#include <client.h>
+#include <match.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <send.h>
+#include <modules.h>
+#include <parse.h>
+#include <hash.h>
+#include <packet.h>
+#include <s_serv.h>
 
 static int mo_okick(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 

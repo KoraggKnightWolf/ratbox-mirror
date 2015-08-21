@@ -24,15 +24,15 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "match.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "send.h"
-#include "parse.h"
-#include "modules.h"
-#include "hash.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <match.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <send.h>
+#include <parse.h>
+#include <modules.h>
+#include <hash.h>
 
 #include <string.h>
 

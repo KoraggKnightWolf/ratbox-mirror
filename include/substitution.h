@@ -36,7 +36,7 @@
  * $Id$
  */
 
-#include "stdinc.h"
+#include <stdinc.h>
 
 #ifndef SUBSTITUTION_H
 #define SUBSTITUTION_H

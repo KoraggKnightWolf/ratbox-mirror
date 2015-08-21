@@ -29,21 +29,21 @@
  *
  * $Id$
  */
-#include "stdinc.h"
-#include "struct.h"
-#include "send.h"
-#include "modules.h"
-#include "parse.h"
-#include "hostmask.h"
-#include "numeric.h"
-#include "s_conf.h"
-#include "s_newconf.h"
-#include "match.h"
-#include "ircd.h"
-#include "reject.h"
-#include "class.h"
-#include "channel.h"
-#include "hash.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <send.h>
+#include <modules.h>
+#include <parse.h>
+#include <hostmask.h>
+#include <numeric.h>
+#include <s_conf.h>
+#include <s_newconf.h>
+#include <match.h>
+#include <ircd.h>
+#include <reject.h>
+#include <class.h>
+#include <channel.h>
+#include <hash.h>
 
 static int mo_testline(struct Client *, struct Client *, int, const char **);
 static int mo_testgecos(struct Client *, struct Client *, int, const char **);

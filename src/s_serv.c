@@ -24,28 +24,28 @@
  *  $Id$
  */
 
-#include "stdinc.h"
+#include <stdinc.h>
 
-#include "struct.h"
-#include "s_serv.h"
-#include "class.h"
-#include "hash.h"
-#include "match.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "packet.h"
-#include "s_conf.h"
-#include "s_newconf.h"
-#include "s_log.h"
-#include "s_stats.h"
-#include "s_user.h"
-#include "scache.h"
-#include "send.h"
-#include "client.h"
-#include "channel.h"		/* chcap_usage_counts stuff... */
-#include "hook.h"
-#include "parse.h"
-#include "sslproc.h"
+#include <struct.h>
+#include <s_serv.h>
+#include <class.h>
+#include <hash.h>
+#include <match.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <packet.h>
+#include <s_conf.h>
+#include <s_newconf.h>
+#include <s_log.h>
+#include <s_stats.h>
+#include <s_user.h>
+#include <scache.h>
+#include <send.h>
+#include <client.h>
+#include <channel.h>		/* chcap_usage_counts stuff... */
+#include <hook.h>
+#include <parse.h>
+#include <sslproc.h>
 
 extern char *crypt();
 

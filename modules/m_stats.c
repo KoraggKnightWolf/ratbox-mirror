@@ -24,33 +24,33 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "ratbox_lib.h"
-#include "class.h"		/* report_classes */
-#include "client.h"		/* Client */
-#include "channel.h"
-#include "match.h"
-#include "ircd.h"		/* me */
-#include "listener.h"		/* show_ports */
-#include "s_gline.h"
-#include "hostmask.h"		/* report_mtrie_conf_links */
-#include "numeric.h"		/* ERR_xxx */
-#include "send.h"		/* sendto_one */
-#include "s_conf.h"		/* ConfItem */
-#include "s_serv.h"		/* hunt_server */
-#include "s_stats.h"		/* tstats */
-#include "s_user.h"		/* show_opers */
-#include "parse.h"
-#include "hook.h"
-#include "modules.h"
-#include "s_newconf.h"
-#include "hash.h"
-#include "dns.h"
-#include "reject.h"
-#include "whowas.h"
-#include "scache.h"
-#include "s_log.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <ratbox_lib.h>
+#include <class.h>		/* report_classes */
+#include <client.h>		/* Client */
+#include <channel.h>
+#include <match.h>
+#include <ircd.h>		/* me */
+#include <listener.h>		/* show_ports */
+#include <s_gline.h>
+#include <hostmask.h>		/* report_mtrie_conf_links */
+#include <numeric.h>		/* ERR_xxx */
+#include <send.h>		/* sendto_one */
+#include <s_conf.h>		/* ConfItem */
+#include <s_serv.h>		/* hunt_server */
+#include <s_stats.h>		/* tstats */
+#include <s_user.h>		/* show_opers */
+#include <parse.h>
+#include <hook.h>
+#include <modules.h>
+#include <s_newconf.h>
+#include <hash.h>
+#include <dns.h>
+#include <reject.h>
+#include <whowas.h>
+#include <scache.h>
+#include <s_log.h>
 
 #ifdef HAVE_STRUCT_MALLINFO
 #include <malloc.h>

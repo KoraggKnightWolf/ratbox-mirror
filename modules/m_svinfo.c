@@ -23,16 +23,16 @@
  *
  *  $Id$
  */
-#include "stdinc.h"
-#include "struct.h"
-#include "client.h"
-#include "match.h"
-#include "ircd.h"
-#include "send.h"
-#include "s_conf.h"
-#include "s_log.h"
-#include "parse.h"
-#include "modules.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <client.h>
+#include <match.h>
+#include <ircd.h>
+#include <send.h>
+#include <s_conf.h>
+#include <s_log.h>
+#include <parse.h>
+#include <modules.h>
 
 static int ms_svinfo(struct Client *, struct Client *, int, const char **);
 

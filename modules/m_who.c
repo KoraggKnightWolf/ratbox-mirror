@@ -23,22 +23,22 @@
  *
  *  $Id$
  */
-#include "stdinc.h"
-#include "struct.h"
-#include "client.h"
-#include "channel.h"
-#include "hash.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "s_serv.h"
-#include "send.h"
-#include "match.h"
-#include "s_conf.h"
-#include "s_log.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <client.h>
+#include <channel.h>
+#include <hash.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <s_serv.h>
+#include <send.h>
+#include <match.h>
+#include <s_conf.h>
+#include <s_log.h>
 
-#include "parse.h"
-#include "modules.h"
-#include "s_newconf.h"
+#include <parse.h>
+#include <modules.h>
+#include <s_newconf.h>
 
 static int m_who(struct Client *, struct Client *, int, const char **);
 

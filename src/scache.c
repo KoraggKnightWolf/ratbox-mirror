@@ -23,14 +23,14 @@
  *
  *  $Id$
  */
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "match.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "send.h"
-#include "hash.h"
-#include "scache.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <match.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <send.h>
+#include <hash.h>
+#include <scache.h>
 
 /*
  * this code intentionally leaks a little bit of memory, unless you're on a network

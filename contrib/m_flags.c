@@ -31,21 +31,21 @@
  */
 
 /* List of ircd includes from ../include/ */
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "client.h"
-#include "ircd.h"
-#include "match.h"
-#include "numeric.h"
-#include "s_conf.h"
-#include "s_log.h"
-#include "s_serv.h"
-#include "send.h"
-#include "parse.h"
-#include "modules.h"
-#include "s_user.h"		/* send_umode_out() */
-#include "s_newconf.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <client.h>
+#include <ircd.h>
+#include <match.h>
+#include <numeric.h>
+#include <s_conf.h>
+#include <s_log.h>
+#include <s_serv.h>
+#include <send.h>
+#include <parse.h>
+#include <modules.h>
+#include <s_user.h>		/* send_umode_out() */
+#include <s_newconf.h>
 
 static int m_flags(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);
 static int mo_flags(struct Client *client_p, struct Client *source_p, int parc, const char *parv[]);

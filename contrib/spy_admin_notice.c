@@ -21,14 +21,14 @@
  *
  *  $Id$
  */
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "modules.h"
-#include "hook.h"
-#include "client.h"
-#include "ircd.h"
-#include "send.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <modules.h>
+#include <hook.h>
+#include <client.h>
+#include <ircd.h>
+#include <send.h>
 
 void show_admin(hook_data *);
 

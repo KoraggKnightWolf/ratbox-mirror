@@ -26,8 +26,8 @@
 #ifndef INCLUDED_stdinc_h
 #define INCLUDE_stdinc_h 1
 
-#include "setup.h"
-#include "config.h"		/* Gotta pull in the autoconf stuff */
+#include <setup.h>
+#include <config.h>		/* Gotta pull in the autoconf stuff */
 
 /* we include common.h and ircd_defs.h down at bottom */
 
@@ -226,7 +226,7 @@ xc_strlcpy(char *dest, const char *src, size_t size)
 #endif
 
 
-#include "ratbox_lib.h"
-#include "ircd_defs.h"
+#include <ratbox_lib.h>
+#include <ircd_defs.h>
 
 #endif

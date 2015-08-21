@@ -23,18 +23,18 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "client.h"
-#include "s_conf.h"
-#include "reject.h"
-#include "s_stats.h"
-#include "ircd.h"
-#include "send.h"
-#include "numeric.h"
-#include "parse.h"
-#include "hostmask.h"
-#include "match.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <client.h>
+#include <s_conf.h>
+#include <reject.h>
+#include <s_stats.h>
+#include <ircd.h>
+#include <send.h>
+#include <numeric.h>
+#include <parse.h>
+#include <hostmask.h>
+#include <match.h>
 
 static rb_patricia_tree_t *global_tree;
 static rb_patricia_tree_t *reject_tree;

@@ -24,19 +24,19 @@
  *  $Id$
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "s_conf.h"
-#include "channel.h"
-#include "client.h"
-#include "hash.h"
-#include "match.h"
-#include "ircd.h"
-#include "numeric.h"
-#include "send.h"
-#include "cache.h"
-#include "s_newconf.h"
-#include "s_log.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <s_conf.h>
+#include <channel.h>
+#include <client.h>
+#include <hash.h>
+#include <match.h>
+#include <ircd.h>
+#include <numeric.h>
+#include <send.h>
+#include <cache.h>
+#include <s_newconf.h>
+#include <s_log.h>
 
 #define ZCONNID_MAX 64		/* i doubt we'll have this many ziplinks ;) */
 

@@ -8,7 +8,7 @@
 #ifndef INCLUDED_bandbi_h
 #define INCLUDED_bandbi_h
 
-#include "bandb_defs.h"
+#include <bandb_defs.h>
 
 void bandb_init(void);
 

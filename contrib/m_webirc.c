@@ -41,21 +41,21 @@
  * cgiirc.config
  */
 
-#include "stdinc.h"
-#include "ratbox_lib.h"
-#include "struct.h"
-#include "client.h"		/* client struct */
-#include "hostmask.h"
-#include "reject.h"
-#include "send.h"		/* sendto_one */
-#include "numeric.h"		/* ERR_xxx */
-#include "ircd.h"		/* me */
-#include "parse.h"
-#include "match.h"
-#include "modules.h"
-#include "s_serv.h"
-#include "hash.h"
-#include "s_conf.h"
+#include <stdinc.h>
+#include <ratbox_lib.h>
+#include <struct.h>
+#include <client.h>		/* client struct */
+#include <hostmask.h>
+#include <reject.h>
+#include <send.h>		/* sendto_one */
+#include <numeric.h>		/* ERR_xxx */
+#include <ircd.h>		/* me */
+#include <parse.h>
+#include <match.h>
+#include <modules.h>
+#include <s_serv.h>
+#include <hash.h>
+#include <s_conf.h>
 
 static int mr_webirc(struct Client *, struct Client *, int, const char **);
 

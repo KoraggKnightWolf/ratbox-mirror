@@ -80,16 +80,16 @@
  * T = topic search (T> T<)
  */
 
-#include "stdinc.h"
-#include "struct.h"
-#include "client.h"
-#include "numeric.h"
-#include "ircd.h"
-#include "s_conf.h"
-#include "match.h"
-#include "send.h"
-#include "channel.h"
-#include "supported.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <client.h>
+#include <numeric.h>
+#include <ircd.h>
+#include <s_conf.h>
+#include <match.h>
+#include <send.h>
+#include <channel.h>
+#include <supported.h>
 
 rb_dlink_list isupportlist;
 

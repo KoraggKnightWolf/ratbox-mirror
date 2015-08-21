@@ -21,11 +21,11 @@
  *  USA
  *  
  */
-#include "stdinc.h"
-#include "struct.h"
-#include "modules.h"
-#include "hash.h"
-#include "s_log.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <modules.h>
+#include <hash.h>
+#include <s_log.h>
 
 extern struct mapi_header_av1 m_accept_rb_mheader;
 extern struct mapi_header_av1 m_admin_rb_mheader;
