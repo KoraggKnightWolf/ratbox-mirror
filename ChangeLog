@@ -1,3 +1,11 @@
+androsyn    2015/08/25 14:46:50 UTC	(20150825_0-28647)
+  Log:
+  print ircd-ratbox instead of ircd
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2015/08/21 15:47:06 UTC	(20150821_12-28645)
   Log:
   move struct operhash_entry to be internal to src/operhash.c
