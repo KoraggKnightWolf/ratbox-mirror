@@ -1,3 +1,16 @@
+androsyn    2015/08/25 14:48:22 UTC	(20150825_1-28649)
+  Log:
+  Change LAST_BANDB_TYPE to BANDB_LAST_TYPE. Patch from jackal^@EFnet
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+	ircd-ratbox/trunk/include/bandb_defs.h (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+
+
 androsyn    2015/08/25 14:46:50 UTC	(20150825_0-28647)
   Log:
   print ircd-ratbox instead of ircd
