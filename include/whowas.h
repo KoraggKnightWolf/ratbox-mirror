@@ -47,7 +47,7 @@ typedef struct _whowas
 
 
 /*
-** initwhowas
+** whowas_init
 */
 void whowas_init(void);
 
