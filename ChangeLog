@@ -1,3 +1,12 @@
+androsyn    2015/08/25 14:48:57 UTC	(20150825_2-28651)
+  Log:
+  documentation update from jackal^@EFnet
+
+  Modified:
+	ircd-ratbox/trunk/doc/index.txt (File Modified) 
+	ircd-ratbox/trunk/tools/README (File Modified) 
+
+
 androsyn    2015/08/25 14:48:22 UTC	(20150825_1-28649)
   Log:
   Change LAST_BANDB_TYPE to BANDB_LAST_TYPE. Patch from jackal^@EFnet
