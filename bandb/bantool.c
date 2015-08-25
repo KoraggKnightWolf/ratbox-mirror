@@ -54,19 +54,19 @@ typedef enum
 	BANDB_XLINE_PERM,
 	BANDB_RESV,
 	BANDB_RESV_PERM,
-	LAST_BANDB_TYPE
+	BANDB_LAST_TYPE
 } bandb_type;
 
 
-static char bandb_letter[LAST_BANDB_TYPE] = {
+static char bandb_letter[BANDB_LAST_TYPE] = {
 	'K', 'K', 'D', 'D', 'X', 'X', 'R', 'R'
 };
 
-static const char *bandb_table[LAST_BANDB_TYPE] = {
+static const char *bandb_table[BANDB_LAST_TYPE] = {
 	"kline", "kline", "dline", "dline", "xline", "xline", "resv", "resv"
 };
 
-static const char *bandb_suffix[LAST_BANDB_TYPE] = {
+static const char *bandb_suffix[BANDB_LAST_TYPE] = {
 	"", ".perm",
 	"", ".perm",
 	"", ".perm",
@@ -236,7 +236,7 @@ main(int argc, char *argv[])
 		fprintf(stdout, "* Allowing duplicate bans...\n");
 
 	/* checking for our files to import or export */
-	for(i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < BANDB_LAST_TYPE; i++)
 	{
 		snprintf(conf, sizeof(conf), "%s/%s.conf%s",
 			    etc, bandb_table[i], bandb_suffix[i]);
@@ -744,7 +744,7 @@ check_schema(void)
 		NULL
 	};
 
-	for(i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < BANDB_LAST_TYPE; i++)
 	{
 		if(!table_exists(bandb_table[i]))
 		{
@@ -817,7 +817,7 @@ wipe_schema(void)
 {
 	int i;
 	rsdb_transaction(dbconn, RSDB_TRANS_START);
-	for(i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < BANDB_LAST_TYPE; i++)
 	{
 		rsdb_exec(dbconn, NULL, "DROP TABLE %s", bandb_table[i]);
 		i++;		/* double increment to skip over .perm */

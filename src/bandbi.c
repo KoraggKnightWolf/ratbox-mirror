@@ -56,7 +56,7 @@ static const char bandb_add_letter[] = {
 	[BANDB_DLINE] = 'D',
 	[BANDB_XLINE] = 'X',
 	[BANDB_RESV] = 'R',
-	[LAST_BANDB_TYPE] = '\0',
+	[BANDB_LAST_TYPE] = '\0',
 };
 
 static const char bandb_del_letter[] = {
@@ -64,7 +64,7 @@ static const char bandb_del_letter[] = {
 	[BANDB_DLINE] = 'd',
 	[BANDB_XLINE] = 'x',
 	[BANDB_RESV] = 'r',
-	[LAST_BANDB_TYPE] = '\0',
+	[BANDB_LAST_TYPE] = '\0',
 };
 
 

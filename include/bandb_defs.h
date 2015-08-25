@@ -7,7 +7,7 @@ typedef enum
         BANDB_DLINE = 1,
         BANDB_XLINE = 2,
         BANDB_RESV = 3,
-        LAST_BANDB_TYPE = 4
+        BANDB_LAST_TYPE = 4
 } bandb_type;
 
 

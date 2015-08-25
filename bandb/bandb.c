@@ -45,7 +45,7 @@ static const char bandb_letter[] =  {
 	[BANDB_DLINE] = 'D', 
 	[BANDB_XLINE] = 'X', 
 	[BANDB_RESV] = 'R',
-	[LAST_BANDB_TYPE] = '\0'
+	[BANDB_LAST_TYPE] = '\0'
 };
 
 static const char *bandb_table[] = {
@@ -53,7 +53,7 @@ static const char *bandb_table[] = {
 	[BANDB_DLINE] = "dline", 
 	[BANDB_XLINE] = "xline", 
 	[BANDB_RESV] = "resv",
-	[LAST_BANDB_TYPE] = NULL
+	[BANDB_LAST_TYPE] = NULL
 };
 
 
@@ -130,7 +130,7 @@ list_bans(rb_helper *helper)
 	/* schedule a clear of anything already pending */
 	rb_helper_write_queue(helper, "C");
 
-	for(i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < BANDB_LAST_TYPE; i++)
 	{
 		rsdb_exec_fetch(dbconn, &table, "SELECT mask1,mask2,oper,reason FROM %s WHERE 1",
 				bandb_table[i]);
@@ -306,7 +306,7 @@ check_schema(void)
 	struct rsdb_table table;
 	int i;
 
-	for(i = 0; i < LAST_BANDB_TYPE; i++)
+	for(i = 0; i < BANDB_LAST_TYPE; i++)
 	{
 		rsdb_exec_fetch(dbconn, &table,
 				"SELECT name FROM sqlite_master WHERE type='table' AND name='%s'",
