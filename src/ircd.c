@@ -426,7 +426,7 @@ check_pidfile(const char *filename)
 			pidfromfile = atoi(buff);
 			if(!rb_kill(pidfromfile, 0))
 			{
-				printf("ircd: daemon is already running\n");
+				printf("ircd-ratbox: daemon is already running\n");
 				exit(-1);
 			}
 		}
@@ -530,7 +530,7 @@ ratbox_main(int argc, char *argv[])
 	if(r > 0)
 	{
 		fprintf(stderr,
-			"ERROR: Unable to start ircd: found %d syntax error(s) whilst loading config file.  Try running with -conftest\n",
+			"ERROR: Unable to start ircd-ratbox: found %d syntax error(s) whilst loading config file.  Try running with -conftest\n",
 			r);
 		return 1;
 	}
@@ -543,7 +543,7 @@ ratbox_main(int argc, char *argv[])
 	if(r > 0)
 	{
 		fprintf(stderr,
-			"ERROR: Unable to start ircd: found %d error(s) whilst loading config file.  Try running with -conftest\n",
+			"ERROR: Unable to start ircd-ratbox: found %d error(s) whilst loading config file.  Try running with -conftest\n",
 			r);
 		return 1;
 	}
