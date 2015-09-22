@@ -1,3 +1,11 @@
+androsyn    2015/09/22 15:27:20 UTC	(20150922_0-28655)
+  Log:
+  document nick_delay
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 androsyn    2015/08/25 14:49:23 UTC	(20150825_3-28653)
   Log:
   comment corrections
