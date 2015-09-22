@@ -53,7 +53,7 @@ struct Message gcap_msgtab = {
 	.handlers[CLIENT_HANDLER] =		{ mm_ignore },
 	.handlers[RCLIENT_HANDLER] =		{ mm_ignore },
 	.handlers[SERVER_HANDLER] =		{ mm_ignore },
-	.handlers[ENCAP_HANDLER] =		{ me_gcap, .min_para = 2 },
+	.handlers[ENCAP_HANDLER] =		{ .handler = me_gcap, .min_para = 2 },
 	.handlers[OPER_HANDLER] =		{ mm_ignore },
 };
 
