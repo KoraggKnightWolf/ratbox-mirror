@@ -117,32 +117,35 @@ struct _ssl_ctl;
 struct LocalUser
 {
 	rb_dlink_node tnode;	/* This is the node for the local list type the client is on */
-	/*
-	 * The following fields are allocated only for local clients
-	 * (directly connected to *this* server with a socket.
-	 */
-	/* Anti flooding part, all because of lamers... */
-	time_t last_join_time;	/* when this client last 
-				   joined a channel */
-	time_t last_leave_time;	/* when this client last 
-				 * left a channel */
-	int join_leave_count;	/* count of JOIN/LEAVE in less than 
-				   MIN_JOIN_LEAVE_TIME seconds */
-	uint8_t oper_warn_count_down;	/* warn opers of this possible 
-					   spambot every time this gets to 0 */
-	time_t last_caller_id_time;
-	time_t first_received_message_time;
-	int received_number_of_privmsgs;
-	int flood_noticed;
-
-	time_t lasttime;	/* last time we parsed something */
-	time_t firsttime;	/* time client was created */
-
-	uint32_t serial;	/* used to enforce 1 send per nick */
+	rb_fde_t *F;
+	uint32_t connid;
+	uint32_t caps;
+	struct rb_sockaddr_storage ip;
 
 	/* Send and receive linebuf queues .. */
 	rb_buf_head_t *buf_sendq;
 	rb_buf_head_t *buf_recvq;
+
+	
+	char *passwd;
+	char *opername;
+	char *fullcaps;
+	char *cipher_string;
+
+	time_t last;
+
+	time_t last_caller_id_time;
+	time_t first_received_message_time;
+	int received_number_of_privmsgs;
+	int flood_noticed;
+	unsigned int number_of_nick_changes;
+	unsigned int cork_count;
+
+	time_t lasttime;	/* last time we parsed something */
+	time_t firsttime;	/* time client was created */
+
+	unsigned long serial;	/* used to enforce 1 send per nick */
+
 
 	uint64_t sendB;	/* Statistics: total bytes sent */
 	uint64_t receiveB;	/* Statistics: total bytes received */
@@ -152,26 +155,12 @@ struct LocalUser
 	struct ConfItem *att_conf;	/* attached conf */
 	struct server_conf *att_sconf;
 
-	struct rb_sockaddr_storage ip;
 	time_t last_nick_change;
-	uint16_t number_of_nick_changes;
 
-	/*
-	 * XXX - there is no reason to save this, it should be checked when it's
-	 * received and not stored, this is not used after registration
-	 */
-	char *passwd;
-	char *opername;
-	char *fullcaps;
-	char *cipher_string;
-	int caps;		/* capabilities bit-field */
-	rb_fde_t *F;
-	uint32_t connid;
-	time_t last;
 
 	/* challenge stuff */
-	time_t chal_time;
 	uint8_t *chal_resp;
+	time_t chal_time;
 	
 	/* clients allowed to talk through +g */
 	rb_dlink_list allow_list;
@@ -181,31 +170,45 @@ struct LocalUser
 
 	rb_dlink_list invited;	/* chain of invite pointer blocks */
 
+
+
 	/*
 	 * Anti-flood stuff. We track how many messages were parsed and how
 	 * many we were allowed in the current second, and apply a simple decay
 	 * to avoid flooding.
 	 *   -- adrian
 	 */
-	uint16_t allow_read;	/* how many we're allowed to read in this second */
-	int16_t actually_read;	/* how many we've actually read in this second */
-	int16_t sent_parsed;	/* how many messages we've parsed in this second */
+	unsigned int allow_read;/* how many we're allowed to read in this second */
+	int actually_read;	/* how many we've actually read in this second */
+	int sent_parsed;	/* how many messages we've parsed in this second */
+
+	int join_leave_count;	/* count of JOIN/LEAVE in less than 
+				   MIN_JOIN_LEAVE_TIME seconds */
+	time_t last_join_time;	/* when this client last 
+				   joined a channel */
 	time_t last_knock;	/* time of last knock */
+	time_t last_leave_time;	/* when this client last * left a channel */
+	unsigned int oper_warn_count_down; /* warn opers of this possible 
+					   spambot every time this gets to 0 */
+
+	uint32_t localflags;
 	uint32_t random_ping;
+	uint32_t zconnid;
+
 	struct AuthRequest *auth_request;
 	char *rblreason;
-	/* target change stuff */
-	void *targets[10];	/* targets were aware of */
-	uint8_t targinfo[2];	/* cyclic array, no in use */
-	time_t target_last;	/* last time we cleared a slot */
+
 	struct rb_sockaddr_storage *lip;	/* alloc before auth/freed after auth */
 	struct _ssl_ctl *ssl_ctl;	/* which ssl daemon we're associate with */
 	struct _ssl_ctl *z_ctl;		/* second ctl for ssl+zlib */
-	uint32_t zconnid;
-	uint32_t localflags;
 	struct ZipStats *zipstats;	/* zipstats */
-	uint16_t cork_count;	/* used for corking/uncorking connections */
 	rb_ev_entry *event;	/* used for associated events */
+
+	/* target change stuff */
+	time_t target_last;	/* last time we cleared a slot */
+	unsigned int targinfo[2];	/* cyclic array, no in use */
+	void *targets[10];	/* targets were aware of */
+
 };
 
 
