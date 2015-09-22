@@ -1,3 +1,11 @@
+androsyn    2015/09/22 18:21:39 UTC	(20150922_3-28661)
+  Log:
+  reorder struct LocalUser a little bit and save 16 bytes for our troubles on x86-64
+
+  Modified:
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+
+
 androsyn    2015/09/22 17:39:05 UTC	(20150922_2-28659)
   Log:
   have the me_gcap handler use the .handler way
