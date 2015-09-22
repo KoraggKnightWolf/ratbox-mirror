@@ -1,3 +1,11 @@
+androsyn    2015/09/22 17:39:05 UTC	(20150922_2-28659)
+  Log:
+  have the me_gcap handler use the .handler way
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_capab.c (File Modified) 
+
+
 androsyn    2015/09/22 17:24:10 UTC	(20150922_1-28657)
   Log:
   Change status values to enums from #defines
