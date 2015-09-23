@@ -5,10 +5,10 @@
 # $Id$
 
 # You will want to change this to the root directory your IRCD runs from
-IRCD_PATH="/home/user/ircd"
+IRCD_PATH="/home/user/ircd-ratbox"
 
 # The location of your pid file, relative to IRCD_PATH (you can probably leave this alone)
-PID_FILE="etc/ircd.pid"
+PID_FILE="etc/ircd-ratbox.pid"
 
 
 # run: crontab -e
