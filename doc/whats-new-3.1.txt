@@ -1,0 +1,29 @@
+The following is a list of noteworthy changes between ircd-ratbox 3.0
+and ircd-ratbox-3.1.
+
+Installation
+------------
+ o Nicklen is now a runtime configurable option(up to 30 characters)
+   Nicklens beyond 30 will need a recompile as before.
+ o The name of the  executable that is generated is now ircd-ratbox 
+   instead of ircd.
+  
+
+Config
+------
+ o Built in DNS RBL support via the blacklist {} configuration option
+ o Add ipv6_tun_remap option. This remap transitional IPv6 technologies(teredo,
+   6to4) to their IPv4 addresses for the purpose of channel bans and klines
+ o Add options to configure TLS versions and ECDH support as well. 
+ o WHOWAS history length can now be set at runtime with the whowas_length
+   option
+
+Misc
+----
+ o Improve memory usage reporting
+ o The code is much more reliant on C99 features, gcc 4.x and clang have
+   been tested.  Let us know if another compiler does not compile it.
+ o Fix time_t issues on 32bit OpenBSD with 64bit time_t
+ o General code cleanups, dead code removal
+ o Add ELIST new ELIST features C and T
+  
