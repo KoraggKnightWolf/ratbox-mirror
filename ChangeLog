@@ -1,3 +1,11 @@
+androsyn    2015/09/23 14:45:24 UTC	(20150923_0-28663)
+  Log:
+  update executable name
+
+  Modified:
+	ircd-ratbox/trunk/doc/ircd_crontab.sh (File Modified) 
+
+
 androsyn    2015/09/22 18:21:39 UTC	(20150922_3-28661)
   Log:
   reorder struct LocalUser a little bit and save 16 bytes for our troubles on x86-64
