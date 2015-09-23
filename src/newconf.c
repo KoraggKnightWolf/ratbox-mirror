@@ -1781,19 +1781,6 @@ conf_set_general_compression_level(confentry_t * entry, conf_t * conf, struct co
 
 }
 
-static void
-conf_set_general_havent_read_conf(confentry_t * entry, conf_t * conf, struct conf_items *item)
-{
-	if(entry->number)
-	{
-		conf_report_error_nl("You haven't read your config file properly.");
-		conf_report_error_nl("There is a line in the example conf that will kill your server if not removed.");
-		conf_report_error_nl("Consider actually reading/editing the conf file, and removing this line.");
-		if(!testing_conf)
-			exit(0);
-	}
-}
-
 static struct server_conf *t_server;
 static void
 conf_set_start_connect(conf_t * conf)
@@ -2474,7 +2461,6 @@ static struct conf_items conf_general_table[] =
 	{ "oper_only_umodes",	CF_STRING | CF_FLIST, conf_set_general_oper_only_umodes, 0, NULL },
 	{ "oper_umodes",	CF_STRING | CF_FLIST, conf_set_general_oper_umodes,	 0, NULL },
 	{ "compression_level",	CF_INT,	   conf_set_general_compression_level,	0, NULL },
-	{ "havent_read_conf",	CF_YESNO,  conf_set_general_havent_read_conf,	0, NULL },
 	{ "stats_k_oper_only",	CF_STRING, conf_set_general_stats_k_oper_only,	0, NULL },
 	{ "stats_i_oper_only",	CF_STRING, conf_set_general_stats_i_oper_only,	0, NULL },
 	{ "hide_error_messages",CF_STRING, conf_set_general_hide_error_messages,0, NULL },
