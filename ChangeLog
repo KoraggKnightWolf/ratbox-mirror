@@ -1,3 +1,48 @@
+androsyn    2015/09/29 15:04:13 UTC	(20150929_0-28669)
+  Log:
+  remove monitor, nobody really uses it, rebuild automake to reflect its removal as well
+
+  Modified:
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/doc/monitor.txt (File Deleted) 
+	ircd-ratbox/trunk/help/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/help/opers/monitor (File Deleted) 
+	ircd-ratbox/trunk/include/monitor.h (File Deleted) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/send.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Deleted) 
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/modules/static_modules.c (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.h (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Deleted) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+	ircd-ratbox/trunk/src/supported.c (File Modified) 
+	ircd-ratbox/trunk/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2015/09/23 15:01:49 UTC	(20150923_2-28667)
   Log:
   new whats-new for 3.1beta
