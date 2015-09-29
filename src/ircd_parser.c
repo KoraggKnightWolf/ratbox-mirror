@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.0.2.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.0.2"
+#define YYBISON_VERSION "3.0.4"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -261,7 +261,7 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE YYSTYPE;
+
 union YYSTYPE
 {
 #line 154 "ircd_parser.y" /* yacc.c:355  */
@@ -272,6 +272,8 @@ union YYSTYPE
 
 #line 274 "ircd_parser.c" /* yacc.c:355  */
 };
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -285,7 +287,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 289 "ircd_parser.c" /* yacc.c:358  */
+#line 291 "ircd_parser.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -1385,7 +1387,7 @@ yyreduce:
     { 
 		conf_start_block((yyvsp[0].string), NULL);
 	}
-#line 1389 "ircd_parser.c" /* yacc.c:1646  */
+#line 1391 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 8:
@@ -1393,7 +1395,7 @@ yyreduce:
     {
 		conf_end_block();
 	}
-#line 1397 "ircd_parser.c" /* yacc.c:1646  */
+#line 1399 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 9:
@@ -1401,7 +1403,7 @@ yyreduce:
     { 
 		conf_start_block((yyvsp[-1].string), (yyvsp[0].string));
 	}
-#line 1405 "ircd_parser.c" /* yacc.c:1646  */
+#line 1407 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 10:
@@ -1409,7 +1411,7 @@ yyreduce:
     {
 		conf_end_block();
 	}
-#line 1413 "ircd_parser.c" /* yacc.c:1646  */
+#line 1415 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 13:
@@ -1419,7 +1421,7 @@ yyreduce:
 		free_cur_list(cur_list);
 		cur_list = NULL;
 	}
-#line 1423 "ircd_parser.c" /* yacc.c:1646  */
+#line 1425 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 16:
@@ -1427,7 +1429,7 @@ yyreduce:
     {
 		add_cur_list_cpt((yyvsp[0].conf_parm));
 	}
-#line 1431 "ircd_parser.c" /* yacc.c:1646  */
+#line 1433 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 17:
@@ -1450,7 +1452,7 @@ yyreduce:
 			}
 		}
 	}
-#line 1454 "ircd_parser.c" /* yacc.c:1646  */
+#line 1456 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 18:
@@ -1460,7 +1462,7 @@ yyreduce:
 		(yyval.conf_parm)->type = CF_QSTRING;
 		(yyval.conf_parm)->v.string = rb_strdup((yyvsp[0].string));
 	}
-#line 1464 "ircd_parser.c" /* yacc.c:1646  */
+#line 1466 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 19:
@@ -1470,7 +1472,7 @@ yyreduce:
 		(yyval.conf_parm)->type = CF_TIME;
 		(yyval.conf_parm)->v.number = (yyvsp[0].number);
 	}
-#line 1474 "ircd_parser.c" /* yacc.c:1646  */
+#line 1476 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 20:
@@ -1480,7 +1482,7 @@ yyreduce:
 		(yyval.conf_parm)->type = CF_INT;
 		(yyval.conf_parm)->v.number = (yyvsp[0].number);
 	}
-#line 1484 "ircd_parser.c" /* yacc.c:1646  */
+#line 1486 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 21:
@@ -1504,7 +1506,7 @@ yyreduce:
 			(yyval.conf_parm)->v.string = rb_strdup((yyvsp[0].string));
 		}
 	}
-#line 1508 "ircd_parser.c" /* yacc.c:1646  */
+#line 1510 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 22:
@@ -1514,25 +1516,25 @@ yyreduce:
 //	load_one_module($2, 0);
 #endif
 	}
-#line 1518 "ircd_parser.c" /* yacc.c:1646  */
+#line 1520 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 291 "ircd_parser.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 1524 "ircd_parser.c" /* yacc.c:1646  */
+#line 1526 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 25:
 #line 292 "ircd_parser.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 1530 "ircd_parser.c" /* yacc.c:1646  */
+#line 1532 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 26:
 #line 293 "ircd_parser.y" /* yacc.c:1646  */
     { (yyval.number) = (yyvsp[0].number); }
-#line 1536 "ircd_parser.c" /* yacc.c:1646  */
+#line 1538 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 27:
@@ -1548,7 +1550,7 @@ yyreduce:
 
 		(yyval.number) = (yyvsp[-1].number) * t;
 	}
-#line 1552 "ircd_parser.c" /* yacc.c:1646  */
+#line 1554 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 28:
@@ -1556,7 +1558,7 @@ yyreduce:
     {
 		(yyval.number) = (yyvsp[-1].number) + (yyvsp[0].number);
 	}
-#line 1560 "ircd_parser.c" /* yacc.c:1646  */
+#line 1562 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
   case 29:
@@ -1564,11 +1566,11 @@ yyreduce:
     {
 		(yyval.number) = (yyvsp[-1].number) + (yyvsp[0].number);
 	}
-#line 1568 "ircd_parser.c" /* yacc.c:1646  */
+#line 1570 "ircd_parser.c" /* yacc.c:1646  */
     break;
 
 
-#line 1572 "ircd_parser.c" /* yacc.c:1646  */
+#line 1574 "ircd_parser.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

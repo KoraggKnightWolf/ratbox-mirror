@@ -144,7 +144,6 @@ struct config_file_entry
 	int anti_nick_flood;
 	int anti_spam_exit_message_time;
 	int max_accept;
-	int max_monitor;
 	int max_nick_time;
 	int max_nick_changes;
 	int ts_max_delta;

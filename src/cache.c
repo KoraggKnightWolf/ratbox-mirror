@@ -43,7 +43,6 @@
 #include <match.h>
 #include <ircd.h>
 #include <numeric.h>
-#include <monitor.h>
 #include <send.h>
 
 static struct cachefile *user_motd = NULL;

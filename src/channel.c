@@ -35,7 +35,6 @@
 #include <numeric.h>
 #include <s_serv.h>		/* captab */
 #include <s_user.h>
-#include <monitor.h>
 #include <send.h>
 #include <whowas.h>
 #include <s_conf.h>		/* ConfigFileEntry, ConfigChannel */

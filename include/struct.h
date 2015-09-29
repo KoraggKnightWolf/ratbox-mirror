@@ -165,9 +165,6 @@ struct LocalUser
 	/* clients allowed to talk through +g */
 	rb_dlink_list allow_list;
 
-	/* nicknames theyre monitoring */
-	rb_dlink_list monitor_list;
-
 	rb_dlink_list invited;	/* chain of invite pointer blocks */
 
 

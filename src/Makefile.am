@@ -43,7 +43,6 @@ libcore_la_SOURCES =			\
         listener.c                      \
         match.c                         \
         modules.c                       \
-        monitor.c                       \
         newconf.c                       \
         operhash.c                      \
         packet.c                        \

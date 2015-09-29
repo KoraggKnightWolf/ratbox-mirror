@@ -46,7 +46,6 @@
 #include <s_newconf.h>
 #include <hash.h>
 #include <reject.h>
-#include <monitor.h>
 #include <send.h>
 #include <ircd.h>
 
