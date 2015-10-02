@@ -45,12 +45,6 @@
 
 static rb_dlink_list monitorTable[MONITOR_HASH_SIZE];
 
-void
-init_monitor(void)
-{
-	return;
-}
-
 static inline unsigned int
 hash_monitor_nick(const char *name)
 {
