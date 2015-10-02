@@ -1,3 +1,11 @@
+androsyn    2015/10/02 20:10:33 UTC	(20151002_1-28685)
+  Log:
+  remove debugging code
+
+  Modified:
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2015/10/02 20:08:53 UTC	(20151002_0-28683)
   Log:
   Readd a slightly reworked monitor implementation
