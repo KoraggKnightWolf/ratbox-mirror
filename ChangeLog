@@ -1,3 +1,12 @@
+androsyn    2015/10/02 20:13:44 UTC	(20151002_2-28687)
+  Log:
+  remove init_monitor
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2015/10/02 20:10:33 UTC	(20151002_1-28685)
   Log:
   remove debugging code
