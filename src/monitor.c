@@ -89,7 +89,6 @@ void
 free_monitor(struct monitor *monptr)
 {
 	/* don't free if there are users attached */
-	fprintf(stderr, "Users: %lu attached to monptr: %p\n", rb_dlink_list_length(&monptr->users), monptr);
 	if(rb_dlink_list_length(&monptr->users) > 0)
 		return;
 
