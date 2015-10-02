@@ -1,3 +1,34 @@
+androsyn    2015/10/02 20:08:53 UTC	(20151002_0-28683)
+  Log:
+  Readd a slightly reworked monitor implementation
+  
+
+  Modified:
+	ircd-ratbox/trunk/doc/monitor.txt (File Added) 
+	ircd-ratbox/trunk/help/opers/monitor (File Added) 
+	ircd-ratbox/trunk/include/monitor.h (File Added) 
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/include/send.h (File Modified) 
+	ircd-ratbox/trunk/include/struct.h (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_info.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Added) 
+	ircd-ratbox/trunk/modules/m_services.c (File Modified) 
+	ircd-ratbox/trunk/modules/static_modules.c (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Added) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+	ircd-ratbox/trunk/src/supported.c (File Modified) 
+
+
 androsyn    2015/09/29 15:04:13 UTC	(20150929_0-28669)
   Log:
   remove monitor, nobody really uses it, rebuild automake to reflect its removal as well
