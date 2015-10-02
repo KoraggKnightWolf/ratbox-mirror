@@ -55,7 +55,6 @@
 #include <s_conf.h>
 #include <s_newconf.h>
 #include <cache.h>
-#include <monitor.h>
 #include <dns.h>
 #include <bandbi.h>
 #include <sslproc.h>
