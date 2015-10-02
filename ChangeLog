@@ -1,3 +1,11 @@
+androsyn    2015/10/02 20:26:14 UTC	(20151002_5-28693)
+  Log:
+  explictly test for != NULL
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+
+
 androsyn    2015/10/02 20:14:18 UTC	(20151002_4-28691)
   Log:
   update generated files
