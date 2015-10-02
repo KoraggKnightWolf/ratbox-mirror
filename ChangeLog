@@ -1,3 +1,11 @@
+androsyn    2015/10/02 20:13:56 UTC	(20151002_3-28689)
+  Log:
+  remove init_monitor
+
+  Modified:
+	ircd-ratbox/trunk/include/monitor.h (File Modified) 
+
+
 androsyn    2015/10/02 20:13:44 UTC	(20151002_2-28687)
   Log:
   remove init_monitor
