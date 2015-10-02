@@ -531,6 +531,12 @@ static struct InfoStruct info_table[] = {
 		"Maximum nicknames on accept list",
 	},
 	{
+		"max_monitor",
+		OUTPUT_DECIMAL,
+		{ &ConfigFileEntry.max_monitor },
+		"Maximum nicknames on monitor list"
+	},	
+	{
 		"max_nick_changes",
 		OUTPUT_DECIMAL,
 		{ &ConfigFileEntry.max_nick_changes }, 

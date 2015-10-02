@@ -289,6 +289,7 @@ init_isupport(void)
 	add_isupport("CPRIVMSG", isupport_string, "");
 	add_isupport("CNOTICE", isupport_string, "");
 	add_isupport("DEAF", isupport_string, "D");
+	add_isupport("MONITOR", isupport_intptr, &ConfigFileEntry.max_monitor);
 	add_isupport("FNC", isupport_string, "");
 	add_isupport("TARGMAX", isupport_targmax, NULL);
 }

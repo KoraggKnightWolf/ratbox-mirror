@@ -58,6 +58,7 @@ m_list_la_LDFLAGS =  -module $(MODULE_FLAGS)
 m_locops_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 m_lusers_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 m_map_la_LDFLAGS =  -module $(MODULE_FLAGS)  
+m_monitor_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 m_motd_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 m_names_la_LDFLAGS =  -module $(MODULE_FLAGS)  
 m_oper_la_LDFLAGS =  -module $(MODULE_FLAGS) @SSL_LIBS@
@@ -112,6 +113,7 @@ m_list_la_SOURCES =	m_list.c
 m_locops_la_SOURCES =	m_locops.c
 m_lusers_la_SOURCES =	m_lusers.c
 m_map_la_SOURCES =	m_map.c
+m_monitor_la_SOURCES =	m_monitor.c
 m_motd_la_SOURCES =	m_motd.c
 m_names_la_SOURCES =	m_names.c
 m_oper_la_SOURCES =	m_oper.c
@@ -167,6 +169,7 @@ m_list_la_LIBADD = $(MODULE_LIBS)
 m_locops_la_LIBADD = $(MODULE_LIBS)     
 m_lusers_la_LIBADD = $(MODULE_LIBS)     
 m_map_la_LIBADD = $(MODULE_LIBS)     
+m_monitor_la_LIBADD = $(MODULE_LIBS)     
 m_motd_la_LIBADD = $(MODULE_LIBS)     
 m_names_la_LIBADD = $(MODULE_LIBS)     
 m_oper_la_LIBADD = $(MODULE_LIBS)     
@@ -250,6 +253,7 @@ m_list.la	\
 m_locops.la	\
 m_lusers.la	\
 m_map.la	\
+m_monitor.la	\
 m_motd.la	\
 m_names.la	\
 m_oper.la	\
@@ -371,6 +375,7 @@ m_list.c	\
 m_locops.c	\
 m_lusers.c	\
 m_map.c	\
+m_monitor.c	\
 m_motd.c	\
 m_names.c	\
 m_oper.c	\

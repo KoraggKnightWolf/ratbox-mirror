@@ -55,6 +55,7 @@
 #include <s_conf.h>
 #include <s_newconf.h>
 #include <cache.h>
+#include <monitor.h>
 #include <dns.h>
 #include <bandbi.h>
 #include <sslproc.h>
@@ -626,6 +627,7 @@ ratbox_main(int argc, char *argv[])
 	whowas_init();
 	init_hook();
 	init_reject();
+	init_monitor();
 
 #ifdef STATIC_MODULES
 	load_static_modules();

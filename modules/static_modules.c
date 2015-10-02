@@ -51,6 +51,7 @@ extern struct mapi_header_av1 m_list_rb_mheader;
 extern struct mapi_header_av1 m_locops_rb_mheader;
 extern struct mapi_header_av1 m_lusers_rb_mheader;
 extern struct mapi_header_av1 m_map_rb_mheader;
+extern struct mapi_header_av1 m_monitor_rb_mheader;
 extern struct mapi_header_av1 m_motd_rb_mheader;
 extern struct mapi_header_av1 m_names_rb_mheader;
 extern struct mapi_header_av1 m_oper_rb_mheader;
@@ -117,6 +118,7 @@ const struct mapi_header_av1 *static_mapi_headers[] = {
 &m_locops_rb_mheader,
 &m_lusers_rb_mheader,
 &m_map_rb_mheader,
+&m_monitor_rb_mheader,
 &m_motd_rb_mheader,
 &m_names_rb_mheader,
 &m_oper_rb_mheader,

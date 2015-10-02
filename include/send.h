@@ -27,6 +27,7 @@
 #ifndef INCLUDED_send_h
 #define INCLUDED_send_h
 
+#include <monitor.h>
 #include <channel.h>
 
 typedef enum _loglevel {
@@ -55,6 +56,7 @@ void sendto_match_butone(struct Client *, struct Client *,
 			      const char *, int, const char *, ...) AFP(5, 6);
 void sendto_match_servs(struct Client *source_p, const char *mask,
 			     int capab, int, const char *, ...) AFP(5, 6);
+void sendto_monitor(struct monitor *monptr, const char *, ...) AFP(2, 3);
 
 void sendto_anywhere(struct Client *, struct Client *, const char *,
 		  const char *, ...) AFP(4, 5);

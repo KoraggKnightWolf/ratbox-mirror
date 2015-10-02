@@ -49,6 +49,7 @@
 #include <reject.h>
 #include <cache.h>
 #include <hook.h>
+#include <monitor.h>
 #include <version.h>
 
 static void report_and_set_user_flags(struct Client *, struct ConfItem *);
@@ -527,6 +528,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		USED_TARGETS(source_p) = 6;
 
 	inc_global_cidr_count(client_p);
+	monitor_signon(source_p);
 	user_welcome(source_p);
 	introduce_client(client_p, source_p);
 	return 0;

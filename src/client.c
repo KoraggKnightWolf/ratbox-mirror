@@ -49,6 +49,7 @@
 #include <listener.h>
 #include <reject.h>
 #include <hook.h>
+#include <monitor.h>
 #include <parse.h>
 #include <sslproc.h>
 
@@ -1094,6 +1095,7 @@ exit_generic_client(struct Client *source_p, const char *comment)
 	whowas_add_history(source_p, 0);
 	whowas_off_history(source_p);
 
+	monitor_signoff(source_p);
 	dec_global_cidr_count(source_p);
 	if(has_id(source_p))
 		del_from_hash(HASH_ID, source_p->id, source_p);
@@ -1319,6 +1321,7 @@ exit_local_client(struct Client *client_p, struct Client *source_p, struct Clien
 	char tbuf[26];
 	char reason[REASONLEN];
 	exit_generic_client(source_p, comment);
+	clear_monitor(source_p);
 
 	s_assert(IsClient(source_p));
 	rb_dlinkDelete(&source_p->localClient->tnode, &lclient_list);

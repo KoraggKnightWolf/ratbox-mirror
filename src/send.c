@@ -38,6 +38,7 @@
 #include <s_newconf.h>
 #include <s_log.h>
 #include <hook.h>
+#include <monitor.h>
 
 
 static uint32_t current_serial = 0L;
@@ -782,6 +783,40 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap, int nocap
 
 	rb_linebuf_donebuf(rb_linebuf_id);
 	rb_linebuf_donebuf(rb_linebuf_name);
+}
+
+/* sendto_monitor()
+ *
+ * inputs	- monitor nick to send to, format, va_args
+ * outputs	- message to local users monitoring the given nick
+ * side effects -
+ */
+void
+sendto_monitor(struct monitor *monptr, const char *pattern, ...)
+{
+	va_list args;
+	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
+	struct Client *target_p;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
+
+	rb_linebuf_newbuf(linebuf);
+
+	va_start(args, pattern);
+	rb_linebuf_putmsg(linebuf, pattern, &args, NULL);
+	va_end(args);
+
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, monptr->users.head)
+	{
+		target_p = ptr->data;
+
+		if(IsIOError(target_p))
+			continue;
+
+		send_linebuf(target_p, linebuf);
+	}
+
+	rb_linebuf_donebuf(linebuf);
 }
 
 /* sendto_anywhere()

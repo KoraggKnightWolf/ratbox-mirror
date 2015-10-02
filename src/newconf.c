@@ -275,7 +275,6 @@ conf_report_warning_nl(const char *fmt, ...)
 	ilog(L_MAIN, "Warning: %s", msg);
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Warning: %s", msg);
 }
-
 #if (((__GNUC__ * 100) + __GNUC_MINOR__) >= 406)
 #pragma GCC diagnostic pop
 #endif
@@ -1693,13 +1692,6 @@ conf_set_exempt_ip(confentry_t * entry, conf_t * conf, struct conf_items *item)
 }
 
 static void
-conf_warn_monitor(confentry_t * entry, conf_t * conf, struct conf_items *item)
-{
-	conf_report_warning_nl("general::max_monitor MONITOR command is no longer supported");
-}
-
-
-static void
 conf_set_general_kline_delay(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	ConfigFileEntry.kline_delay = entry->number;
@@ -2504,7 +2496,7 @@ static struct conf_items conf_general_table[] =
 	{ "kline_with_reason",	CF_YESNO, NULL, 0, &ConfigFileEntry.kline_with_reason	},
 	{ "map_oper_only",	CF_YESNO, NULL, 0, &ConfigFileEntry.map_oper_only	},
 	{ "max_accept",		CF_INT,	  NULL, 0, &ConfigFileEntry.max_accept		},
-	{ "max_monitor",	CF_INT,	  conf_warn_monitor, 0, NULL},
+	{ "max_monitor",	CF_INT,	  NULL, 0, &ConfigFileEntry.max_monitor		},
 	{ "max_nick_time",	CF_TIME,  NULL, 0, &ConfigFileEntry.max_nick_time	},
 	{ "max_nick_changes",	CF_INT,	  NULL, 0, &ConfigFileEntry.max_nick_changes	},
 	{ "max_targets",	CF_INT,	  NULL, 0, &ConfigFileEntry.max_targets		},

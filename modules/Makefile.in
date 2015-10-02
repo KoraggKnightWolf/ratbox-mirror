@@ -16,7 +16,7 @@
 
 #
 # Makefile.am: stuff for automake to vomit back up in a digested form
-# $Id: Makefile.am 27893 2015-04-18 05:20:22Z androsyn $ 
+# $Id: Makefile.am 28669 2015-09-29 15:04:13Z androsyn $ 
 #
 
 VPATH = @srcdir@
@@ -273,10 +273,10 @@ am__libmodules_la_SOURCES_DIST = m_accept.c m_admin.c m_adminwall.c \
 	m_away.c m_capab.c m_cap.c m_close.c m_cmessage.c m_connect.c \
 	m_dline.c m_encap.c m_gline.c m_gungline.c m_help.c m_info.c \
 	m_invite.c m_ison.c m_kline.c m_knock.c m_links.c m_list.c \
-	m_locops.c m_lusers.c m_map.c m_motd.c m_names.c m_oper.c \
-	m_operspy.c m_pass.c m_ping.c m_pong.c m_post.c m_rehash.c \
-	m_restart.c m_resv.c m_set.c m_stats.c m_svinfo.c m_tb.c \
-	m_testline.c m_testmask.c m_time.c m_topic.c m_trace.c \
+	m_locops.c m_lusers.c m_map.c m_monitor.c m_motd.c m_names.c \
+	m_oper.c m_operspy.c m_pass.c m_ping.c m_pong.c m_post.c \
+	m_rehash.c m_restart.c m_resv.c m_set.c m_stats.c m_svinfo.c \
+	m_tb.c m_testline.c m_testmask.c m_time.c m_topic.c m_trace.c \
 	m_unreject.c m_user.c m_userhost.c m_version.c m_wallops.c \
 	m_who.c m_whois.c m_whowas.c m_xline.c core/m_die.c \
 	core/m_error.c core/m_join.c core/m_kick.c core/m_kill.c \
@@ -290,11 +290,11 @@ am__libmodules_la_SOURCES_DIST = m_accept.c m_admin.c m_adminwall.c \
 @STATIC_MODULES_TRUE@	m_info.lo m_invite.lo m_ison.lo \
 @STATIC_MODULES_TRUE@	m_kline.lo m_knock.lo m_links.lo \
 @STATIC_MODULES_TRUE@	m_list.lo m_locops.lo m_lusers.lo \
-@STATIC_MODULES_TRUE@	m_map.lo m_motd.lo m_names.lo m_oper.lo \
-@STATIC_MODULES_TRUE@	m_operspy.lo m_pass.lo m_ping.lo \
-@STATIC_MODULES_TRUE@	m_pong.lo m_post.lo m_rehash.lo \
-@STATIC_MODULES_TRUE@	m_restart.lo m_resv.lo m_set.lo \
-@STATIC_MODULES_TRUE@	m_stats.lo m_svinfo.lo m_tb.lo \
+@STATIC_MODULES_TRUE@	m_map.lo m_monitor.lo m_motd.lo \
+@STATIC_MODULES_TRUE@	m_names.lo m_oper.lo m_operspy.lo \
+@STATIC_MODULES_TRUE@	m_pass.lo m_ping.lo m_pong.lo m_post.lo \
+@STATIC_MODULES_TRUE@	m_rehash.lo m_restart.lo m_resv.lo \
+@STATIC_MODULES_TRUE@	m_set.lo m_stats.lo m_svinfo.lo m_tb.lo \
 @STATIC_MODULES_TRUE@	m_testline.lo m_testmask.lo m_time.lo \
 @STATIC_MODULES_TRUE@	m_topic.lo m_trace.lo m_unreject.lo \
 @STATIC_MODULES_TRUE@	m_user.lo m_userhost.lo m_version.lo \
@@ -513,6 +513,15 @@ m_map_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(m_map_la_LDFLAGS) $(LDFLAGS) -o $@
 @STATIC_MODULES_FALSE@am_m_map_la_rpath = -rpath $(modulesdir)
+@STATIC_MODULES_FALSE@m_monitor_la_DEPENDENCIES =  \
+@STATIC_MODULES_FALSE@	$(am__DEPENDENCIES_1)
+am__m_monitor_la_SOURCES_DIST = m_monitor.c
+@STATIC_MODULES_FALSE@am_m_monitor_la_OBJECTS = m_monitor.lo
+m_monitor_la_OBJECTS = $(am_m_monitor_la_OBJECTS)
+m_monitor_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(m_monitor_la_LDFLAGS) $(LDFLAGS) -o $@
+@STATIC_MODULES_FALSE@am_m_monitor_la_rpath = -rpath $(modulesdir)
 @STATIC_MODULES_FALSE@m_motd_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__m_motd_la_SOURCES_DIST = m_motd.c
 @STATIC_MODULES_FALSE@am_m_motd_la_OBJECTS = m_motd.lo
@@ -819,21 +828,21 @@ SOURCES = $(core_m_die_la_SOURCES) $(core_m_error_la_SOURCES) \
 	$(m_knock_la_SOURCES) $(m_links_la_SOURCES) \
 	$(m_list_la_SOURCES) $(m_locops_la_SOURCES) \
 	$(m_lusers_la_SOURCES) $(m_map_la_SOURCES) \
-	$(m_motd_la_SOURCES) $(m_names_la_SOURCES) \
-	$(m_oper_la_SOURCES) $(m_operspy_la_SOURCES) \
-	$(m_pass_la_SOURCES) $(m_ping_la_SOURCES) $(m_pong_la_SOURCES) \
-	$(m_post_la_SOURCES) $(m_rehash_la_SOURCES) \
-	$(m_restart_la_SOURCES) $(m_resv_la_SOURCES) \
-	$(m_services_la_SOURCES) $(m_set_la_SOURCES) \
-	$(m_stats_la_SOURCES) $(m_svinfo_la_SOURCES) \
-	$(m_tb_la_SOURCES) $(m_testline_la_SOURCES) \
-	$(m_testmask_la_SOURCES) $(m_time_la_SOURCES) \
-	$(m_topic_la_SOURCES) $(m_trace_la_SOURCES) \
-	$(m_unreject_la_SOURCES) $(m_user_la_SOURCES) \
-	$(m_userhost_la_SOURCES) $(m_version_la_SOURCES) \
-	$(m_wallops_la_SOURCES) $(m_who_la_SOURCES) \
-	$(m_whois_la_SOURCES) $(m_whowas_la_SOURCES) \
-	$(m_xline_la_SOURCES)
+	$(m_monitor_la_SOURCES) $(m_motd_la_SOURCES) \
+	$(m_names_la_SOURCES) $(m_oper_la_SOURCES) \
+	$(m_operspy_la_SOURCES) $(m_pass_la_SOURCES) \
+	$(m_ping_la_SOURCES) $(m_pong_la_SOURCES) $(m_post_la_SOURCES) \
+	$(m_rehash_la_SOURCES) $(m_restart_la_SOURCES) \
+	$(m_resv_la_SOURCES) $(m_services_la_SOURCES) \
+	$(m_set_la_SOURCES) $(m_stats_la_SOURCES) \
+	$(m_svinfo_la_SOURCES) $(m_tb_la_SOURCES) \
+	$(m_testline_la_SOURCES) $(m_testmask_la_SOURCES) \
+	$(m_time_la_SOURCES) $(m_topic_la_SOURCES) \
+	$(m_trace_la_SOURCES) $(m_unreject_la_SOURCES) \
+	$(m_user_la_SOURCES) $(m_userhost_la_SOURCES) \
+	$(m_version_la_SOURCES) $(m_wallops_la_SOURCES) \
+	$(m_who_la_SOURCES) $(m_whois_la_SOURCES) \
+	$(m_whowas_la_SOURCES) $(m_xline_la_SOURCES)
 DIST_SOURCES = $(am__core_m_die_la_SOURCES_DIST) \
 	$(am__core_m_error_la_SOURCES_DIST) \
 	$(am__core_m_join_la_SOURCES_DIST) \
@@ -862,11 +871,11 @@ DIST_SOURCES = $(am__core_m_die_la_SOURCES_DIST) \
 	$(am__m_links_la_SOURCES_DIST) $(am__m_list_la_SOURCES_DIST) \
 	$(am__m_locops_la_SOURCES_DIST) \
 	$(am__m_lusers_la_SOURCES_DIST) $(am__m_map_la_SOURCES_DIST) \
-	$(am__m_motd_la_SOURCES_DIST) $(am__m_names_la_SOURCES_DIST) \
-	$(am__m_oper_la_SOURCES_DIST) $(am__m_operspy_la_SOURCES_DIST) \
-	$(am__m_pass_la_SOURCES_DIST) $(am__m_ping_la_SOURCES_DIST) \
-	$(am__m_pong_la_SOURCES_DIST) $(am__m_post_la_SOURCES_DIST) \
-	$(am__m_rehash_la_SOURCES_DIST) \
+	$(am__m_monitor_la_SOURCES_DIST) $(am__m_motd_la_SOURCES_DIST) \
+	$(am__m_names_la_SOURCES_DIST) $(am__m_oper_la_SOURCES_DIST) \
+	$(am__m_operspy_la_SOURCES_DIST) $(am__m_pass_la_SOURCES_DIST) \
+	$(am__m_ping_la_SOURCES_DIST) $(am__m_pong_la_SOURCES_DIST) \
+	$(am__m_post_la_SOURCES_DIST) $(am__m_rehash_la_SOURCES_DIST) \
 	$(am__m_restart_la_SOURCES_DIST) $(am__m_resv_la_SOURCES_DIST) \
 	$(am__m_services_la_SOURCES_DIST) $(am__m_set_la_SOURCES_DIST) \
 	$(am__m_stats_la_SOURCES_DIST) $(am__m_svinfo_la_SOURCES_DIST) \
@@ -1113,6 +1122,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 @STATIC_MODULES_FALSE@m_locops_la_LDFLAGS = -module $(MODULE_FLAGS)  
 @STATIC_MODULES_FALSE@m_lusers_la_LDFLAGS = -module $(MODULE_FLAGS)  
 @STATIC_MODULES_FALSE@m_map_la_LDFLAGS = -module $(MODULE_FLAGS)  
+@STATIC_MODULES_FALSE@m_monitor_la_LDFLAGS = -module $(MODULE_FLAGS)  
 @STATIC_MODULES_FALSE@m_motd_la_LDFLAGS = -module $(MODULE_FLAGS)  
 @STATIC_MODULES_FALSE@m_names_la_LDFLAGS = -module $(MODULE_FLAGS)  
 @STATIC_MODULES_FALSE@m_oper_la_LDFLAGS = -module $(MODULE_FLAGS) @SSL_LIBS@
@@ -1166,6 +1176,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 @STATIC_MODULES_FALSE@m_locops_la_SOURCES = m_locops.c
 @STATIC_MODULES_FALSE@m_lusers_la_SOURCES = m_lusers.c
 @STATIC_MODULES_FALSE@m_map_la_SOURCES = m_map.c
+@STATIC_MODULES_FALSE@m_monitor_la_SOURCES = m_monitor.c
 @STATIC_MODULES_FALSE@m_motd_la_SOURCES = m_motd.c
 @STATIC_MODULES_FALSE@m_names_la_SOURCES = m_names.c
 @STATIC_MODULES_FALSE@m_oper_la_SOURCES = m_oper.c
@@ -1219,6 +1230,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 @STATIC_MODULES_FALSE@m_locops_la_LIBADD = $(MODULE_LIBS)     
 @STATIC_MODULES_FALSE@m_lusers_la_LIBADD = $(MODULE_LIBS)     
 @STATIC_MODULES_FALSE@m_map_la_LIBADD = $(MODULE_LIBS)     
+@STATIC_MODULES_FALSE@m_monitor_la_LIBADD = $(MODULE_LIBS)     
 @STATIC_MODULES_FALSE@m_motd_la_LIBADD = $(MODULE_LIBS)     
 @STATIC_MODULES_FALSE@m_names_la_LIBADD = $(MODULE_LIBS)     
 @STATIC_MODULES_FALSE@m_oper_la_LIBADD = $(MODULE_LIBS)     
@@ -1297,6 +1309,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 @STATIC_MODULES_FALSE@m_locops.la	\
 @STATIC_MODULES_FALSE@m_lusers.la	\
 @STATIC_MODULES_FALSE@m_map.la	\
+@STATIC_MODULES_FALSE@m_monitor.la	\
 @STATIC_MODULES_FALSE@m_motd.la	\
 @STATIC_MODULES_FALSE@m_names.la	\
 @STATIC_MODULES_FALSE@m_oper.la	\
@@ -1382,6 +1395,7 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 @STATIC_MODULES_TRUE@m_locops.c	\
 @STATIC_MODULES_TRUE@m_lusers.c	\
 @STATIC_MODULES_TRUE@m_map.c	\
+@STATIC_MODULES_TRUE@m_monitor.c	\
 @STATIC_MODULES_TRUE@m_motd.c	\
 @STATIC_MODULES_TRUE@m_names.c	\
 @STATIC_MODULES_TRUE@m_oper.c	\
@@ -1733,6 +1747,9 @@ m_lusers.la: $(m_lusers_la_OBJECTS) $(m_lusers_la_DEPENDENCIES) $(EXTRA_m_lusers
 m_map.la: $(m_map_la_OBJECTS) $(m_map_la_DEPENDENCIES) $(EXTRA_m_map_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(m_map_la_LINK) $(am_m_map_la_rpath) $(m_map_la_OBJECTS) $(m_map_la_LIBADD) $(LIBS)
 
+m_monitor.la: $(m_monitor_la_OBJECTS) $(m_monitor_la_DEPENDENCIES) $(EXTRA_m_monitor_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(m_monitor_la_LINK) $(am_m_monitor_la_rpath) $(m_monitor_la_OBJECTS) $(m_monitor_la_LIBADD) $(LIBS)
+
 m_motd.la: $(m_motd_la_OBJECTS) $(m_motd_la_DEPENDENCIES) $(EXTRA_m_motd_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(m_motd_la_LINK) $(am_m_motd_la_rpath) $(m_motd_la_OBJECTS) $(m_motd_la_LIBADD) $(LIBS)
 
@@ -1855,6 +1872,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_locops.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_lusers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_map.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_monitor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_motd.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_names.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/m_oper.Plo@am__quote@

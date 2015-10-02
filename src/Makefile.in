@@ -16,7 +16,7 @@
 
 #
 # Makefile.am: stuff for automake to vomit back up in a digested form
-# $Id: Makefile.am 28607 2015-08-20 18:49:56Z androsyn $ 
+# $Id: Makefile.am 28669 2015-09-29 15:04:13Z androsyn $ 
 #
 
 VPATH = @srcdir@
@@ -143,10 +143,11 @@ am__DEPENDENCIES_1 =
 am_libcore_la_OBJECTS = bandbi.lo cache.lo channel.lo class.lo \
 	client.lo dns.lo getopt.lo hash.lo hook.lo hostmask.lo \
 	ipv4_from_ipv6.lo ircd.lo ircd_lexer.lo ircd_parser.lo \
-	ircd_signal.lo listener.lo match.lo modules.lo newconf.lo \
-	operhash.lo packet.lo parse.lo reject.lo s_auth.lo scache.lo \
-	s_conf.lo send.lo s_log.lo s_newconf.lo s_serv.lo sslproc.lo \
-	substitution.lo supported.lo s_user.lo version.lo whowas.lo
+	ircd_signal.lo listener.lo match.lo modules.lo monitor.lo \
+	newconf.lo operhash.lo packet.lo parse.lo reject.lo s_auth.lo \
+	scache.lo s_conf.lo send.lo s_log.lo s_newconf.lo s_serv.lo \
+	sslproc.lo substitution.lo supported.lo s_user.lo version.lo \
+	whowas.lo
 libcore_la_OBJECTS = $(am_libcore_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -435,6 +436,7 @@ libcore_la_SOURCES = \
         listener.c                      \
         match.c                         \
         modules.c                       \
+        monitor.c                       \
         newconf.c                       \
         operhash.c                      \
         packet.c                        \
@@ -560,6 +562,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/listener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/match.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modules.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/monitor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newconf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/operhash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/packet.Plo@am__quote@

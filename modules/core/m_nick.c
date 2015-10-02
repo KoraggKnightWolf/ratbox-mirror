@@ -44,6 +44,7 @@
 #include <modules.h>
 #include <scache.h>
 #include <s_newconf.h>
+#include <monitor.h>
 #include <reject.h>
 
 /* Give all UID nicks the same TS. This ensures nick TS is always the same on
@@ -682,6 +683,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick, 
 			source_p->tsinfo++;
 		else
 			source_p->tsinfo = rb_current_time();
+		monitor_signoff(source_p);
 		/* we only do bancache for local users -- jilles */
 		if(source_p->user)
 			invalidate_bancache_user(source_p);
@@ -713,6 +715,9 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick, 
 	del_from_hash(HASH_CLIENT, source_p->name, source_p);
 	strcpy(source_p->user->name, nick);
 	add_to_hash(HASH_CLIENT, nick, source_p);
+
+	if(!samenick)
+		monitor_signon(source_p);
 
 	/* we used to call del_all_accepts() here, but theres no real reason
 	 * to clear a clients own list of accepted clients.  So just remove
@@ -746,6 +751,7 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 	if(!samenick)
 	{
 		source_p->tsinfo = newts ? newts : rb_current_time();
+		monitor_signoff(source_p);
 	}
 
 	sendto_common_channels_local(source_p, ":%s!%s@%s NICK :%s",
@@ -772,6 +778,8 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 	strcpy(source_p->user->name, nick);
 	add_to_hash(HASH_CLIENT, nick, source_p);
 
+	if(!samenick)
+		monitor_signon(source_p);
 
 	/* remove all accepts pointing to the client */
 	del_all_accepts(source_p);
@@ -1093,6 +1101,7 @@ register_client(struct Client *client_p, struct Client *server,
 	add_to_hash(HASH_CLIENT, nick, source_p);
 	add_to_hash(HASH_HOSTNAME, source_p->host, source_p);
 	inc_global_cidr_count(source_p);
+	monitor_signon(source_p);
 
 	m = &parv[4][1];
 	while(*m)
