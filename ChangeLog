@@ -1,3 +1,11 @@
+androsyn    2015/10/02 20:45:35 UTC	(20151002_6-28695)
+  Log:
+  remove monitor.h from ircd.c
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2015/10/02 20:26:14 UTC	(20151002_5-28693)
   Log:
   explictly test for != NULL
