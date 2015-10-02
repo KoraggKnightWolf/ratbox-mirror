@@ -1,3 +1,12 @@
+androsyn    2015/10/02 20:14:18 UTC	(20151002_4-28691)
+  Log:
+  update generated files
+
+  Modified:
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+
+
 androsyn    2015/10/02 20:13:56 UTC	(20151002_3-28689)
   Log:
   remove init_monitor
