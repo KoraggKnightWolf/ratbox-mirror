@@ -18,7 +18,6 @@ struct monitor
 	char *name;
 };
 
-void init_monitor(void);
 struct monitor *find_monitor(const char *name, bool add);
 void free_monitor(struct monitor *);
 
