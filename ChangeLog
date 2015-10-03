@@ -1,3 +1,11 @@
+androsyn    2015/10/03 04:00:41 UTC	(20151003_1-28701)
+  Log:
+  don't use the pointer return from strerror as in theory this string could be overwritten by another call to strerror in further functions
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2015/10/03 02:42:08 UTC	(20151003_0-28699)
   Log:
   fix remote_client_memory_used to report valid data
