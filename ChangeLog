@@ -1,3 +1,11 @@
+androsyn    2015/10/03 02:42:08 UTC	(20151003_0-28699)
+  Log:
+  fix remote_client_memory_used to report valid data
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2015/10/02 20:45:35 UTC	(20151002_6-28695)
   Log:
   remove monitor.h from ircd.c
