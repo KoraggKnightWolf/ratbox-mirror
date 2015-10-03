@@ -1473,7 +1473,7 @@ void
 count_remote_client_memory(size_t * count, size_t * remote_client_memory_used)
 {
 	*count = rb_dlink_list_length(&global_client_list) - rb_dlink_list_length(&lclient_list);
-	*remote_client_memory_used = sizeof(struct Client);
+	*remote_client_memory_used = sizeof(struct Client) * (*count);
 }
 
 
