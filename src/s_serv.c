@@ -624,11 +624,11 @@ serv_connect_callback(rb_fde_t * F, int status, void *data)
 		}
 		else
 		{
-			const char *errstr = strerror(rb_get_sockerr(F));
+			int err = rb_get_sockerr(F);
 			sendto_realops_flags(UMODE_ALL, L_ALL,
 					     "Error connecting to %s[255.255.255.255]: %s (%s)",
-					     client_p->name, rb_errstr(status), errstr);
-			ilog(L_SERVER, "Error connecting to %s: %s (%s)", client_p->name, rb_errstr(status), errstr);
+					     client_p->name, rb_errstr(status), strerror(err));
+			ilog(L_SERVER, "Error connecting to %s: %s (%s)", client_p->name, rb_errstr(status), strerror(err));
 		}
 		exit_client(client_p, client_p, &me, rb_errstr(status));
 		return;
