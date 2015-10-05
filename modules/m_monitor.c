@@ -57,14 +57,9 @@ struct Message monitor_msgtab = {
 	.handlers[OPER_HANDLER] =		{ .handler = m_monitor, .min_para = 2 },
 };
 
-
-
 mapi_clist_av1 monitor_clist[] = { &monitor_msgtab, NULL };
 
 DECLARE_MODULE_AV1(monitor, modinit, moddeinit, monitor_clist, NULL, NULL, "$Revision$");
-
-
-
 
 static int
 modinit(void)
@@ -321,8 +316,6 @@ show_monitor_status(struct Client *client_p)
 	if(cur_offlen != mlen)
 		sendto_one_buffer(client_p, offbuf);
 }
-
-
 
 static int
 m_monitor(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
