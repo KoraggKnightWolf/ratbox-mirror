@@ -1,3 +1,11 @@
+androsyn    2015/10/05 14:25:32 UTC	(20151005_0-28711)
+  Log:
+  whitespace cleanup
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+
+
 androsyn    2015/10/03 04:00:41 UTC	(20151003_1-28701)
   Log:
   don't use the pointer return from strerror as in theory this string could be overwritten by another call to strerror in further functions
