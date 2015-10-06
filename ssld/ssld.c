@@ -128,9 +128,8 @@ typedef struct _conn
 #define connid_hash(x)	(&connid_hash_table[(x % CONN_HASH_SIZE)])
 
 
-rb_ssl_ctx *ssl_server_ctx;
-rb_ssl_ctx *ssl_client_ctx;
-
+static rb_ssl_ctx *ssl_server_ctx;
+static rb_ssl_ctx *ssl_client_ctx;
 
 static rb_dlink_list connid_hash_table[CONN_HASH_SIZE];
 static rb_dlink_list dead_list;
