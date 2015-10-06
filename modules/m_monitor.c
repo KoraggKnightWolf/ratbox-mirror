@@ -122,7 +122,7 @@ add_monitor(struct Client *client_p, const char *nicks)
 			return;
 		}
 
-		monptr = find_monitor(name, 1);
+		monptr = find_monitor(name, true);
 
 		/* already monitoring this nick */
 		if(rb_dlinkFind(client_p, &monptr->users) != NULL)
@@ -196,7 +196,7 @@ del_monitor(struct Client *client_p, const char *nicks)
 			continue;
 
 		/* not monitored */
-		if((monptr = find_monitor(name, 0)) == NULL)
+		if((monptr = find_monitor(name, false)) == NULL)
 			continue;
 
 		rb_dlinkFindDestroy(client_p, &monptr->users);

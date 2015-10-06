@@ -105,7 +105,7 @@ monitor_signon(struct Client *client_p)
 	char buf[USERHOST_REPLYLEN];
 	struct monitor *monptr;
 	
-	monptr = find_monitor(client_p->name, 0);
+	monptr = find_monitor(client_p->name, false);
 
 	/* no watchers watching this nick */
 	if(monptr == NULL)
@@ -128,7 +128,7 @@ monitor_signoff(struct Client *client_p)
 {
 	struct monitor *monptr;
 
-	monptr  = find_monitor(client_p->name, 0);
+	monptr  = find_monitor(client_p->name, false);
 
 	/* noones watching this nick */
 	if(monptr == NULL)
