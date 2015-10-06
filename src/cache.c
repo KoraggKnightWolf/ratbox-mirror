@@ -47,7 +47,7 @@
 
 static struct cachefile *user_motd = NULL;
 static struct cachefile *oper_motd = NULL;
-static struct cacheline *emptyline = NULL;
+static struct cacheline emptyline = { .data[0] = ' ', .data[1] = '\0' };
 static rb_dlink_list links_cache_list;
 static char user_motd_changed[MAX_DATE_STRING];
 
@@ -60,12 +60,7 @@ static char user_motd_changed[MAX_DATE_STRING];
 void
 init_cache(void)
 {
-	/* allocate the emptyline */
-	emptyline = rb_malloc(sizeof(struct cacheline));
-	emptyline->data[0] = ' ';
-	emptyline->data[1] = '\0';
 	user_motd_changed[0] = '\0';
-
 	cache_user_motd();
 	cache_oper_motd();
 	memset(&links_cache_list, 0, sizeof(links_cache_list));
@@ -154,7 +149,7 @@ cache_file(const char *filename, const char *shortname, int flags)
 			rb_dlinkAddTail(lineptr, &lineptr->linenode, &cacheptr->contents);
 		}
 		else
-			rb_dlinkAddTailAlloc(emptyline, &cacheptr->contents);
+			rb_dlinkAddTailAlloc(&emptyline, &cacheptr->contents);
 	}
 	if(rb_dlink_list_length(&cacheptr->contents) == 0)
 	{
@@ -216,7 +211,7 @@ free_cachefile(struct cachefile *cacheptr)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, cacheptr->contents.head)
 	{
-		if(ptr->data != emptyline)
+		if(ptr->data != &emptyline)
 			rb_free(ptr->data);
 	}
 
