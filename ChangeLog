@@ -1,3 +1,12 @@
+androsyn    2015/10/06 15:07:54 UTC	(20151006_2-28717)
+  Log:
+  use true/false for the find_monitor parameter
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2015/10/06 00:34:37 UTC	(20151006_1-28715)
   Log:
   remove AUTH_BLOCK_SIZE define that was used for balloc
