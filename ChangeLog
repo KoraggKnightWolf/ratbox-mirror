@@ -1,3 +1,11 @@
+androsyn    2015/10/06 00:06:08 UTC	(20151006_0-28713)
+  Log:
+  change ssl_{server,client}_ctx to static. no functional change, just makes me feel better
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/10/05 14:25:32 UTC	(20151005_0-28711)
   Log:
   whitespace cleanup
