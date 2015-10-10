@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Simple and straight forward openssl cert generator for ircd-ratbox
-# Copyright (C) 2008-2012 ircd-ratbox development team
+# Copyright (C) 2008-2015 ircd-ratbox development team
 # $Id$
 
 if [ $# -eq 0 ]; then
@@ -12,16 +12,12 @@ if [ $# -eq 0 ]; then
 fi
 
 SERVER="$1"
-DAYS_VALID="$2"
 
-SSL_DAYS_VALID="365"
-if [ "$DAYS_VALID" -gt "365" ]; then
-	SSL_DAYS_VALID="$DAYS_VALID"
-fi
+SSL_DAYS_VALID="${2:-365}"
 
 echo
-echo "Generating 1024-bit self-signed RSA key for ${SERVER}... "
-openssl req -new -newkey rsa:1024 -days ${SSL_DAYS_VALID} -nodes -x509 -keyout ${SERVER}.pem  -out ${SERVER}.pem
+echo "Generating 4096-bit self-signed RSA key for ${SERVER}... "
+openssl req -new -newkey rsa:4096 -days ${SSL_DAYS_VALID} -nodes -x509 -keyout ${SERVER}.pem  -out ${SERVER}.pem
 echo "Done creating self-signed cert"
 
 echo -n "Generating DH parameters file... "
