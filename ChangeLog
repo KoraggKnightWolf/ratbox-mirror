@@ -1,3 +1,11 @@
+dubkat      2015/10/10 21:16:12 UTC	(20151010_0-28731)
+  Log:
+  increase the bits from generated ssl keys from 1024 to 4096.
+
+  Modified:
+	ircd-ratbox/trunk/doc/genssl.sh (File Modified) 
+
+
 androsyn    2015/10/06 17:26:15 UTC	(20151006_3-28719)
   Log:
   initialize emptyline at compile time instead of runtime
