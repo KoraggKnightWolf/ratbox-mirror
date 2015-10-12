@@ -1,3 +1,11 @@
+androsyn    2015/10/12 17:09:05 UTC	(20151012_1-28743)
+  Log:
+  slight update to whats new
+
+  Modified:
+	ircd-ratbox/trunk/doc/whats-new-3.1.txt (File Modified) 
+
+
 androsyn    2015/10/12 16:46:12 UTC	(20151012_0-28741)
   Log:
   add isupport for ACCEPT, MAP and KEYLEN
