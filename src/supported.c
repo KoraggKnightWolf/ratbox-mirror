@@ -264,6 +264,7 @@ init_isupport(void)
 
 	static int maxmodes = MAXMODEPARAMS;
 	static int channellen = LOC_CHANNELLEN;
+	static int keylen = KEYLEN - 1;
 	static int nicklen;
 	nicklen = ServerInfo.nicklen - 1;
 	add_isupport("CHANTYPES", isupport_string, "&#");
@@ -285,11 +286,14 @@ init_isupport(void)
 	add_isupport("NICKLEN", isupport_intptr, &nicklen);
 	add_isupport("CHANNELLEN", isupport_intptr, &channellen);
 	add_isupport("TOPICLEN", isupport_intptr, &ConfigChannel.topiclen);
+	add_isupport("KEYLEN", isupport_intptr, &keylen);
 	add_isupport("ETRACE", isupport_string, "");
 	add_isupport("CPRIVMSG", isupport_string, "");
 	add_isupport("CNOTICE", isupport_string, "");
 	add_isupport("DEAF", isupport_string, "D");
 	add_isupport("MONITOR", isupport_intptr, &ConfigFileEntry.max_monitor);
+	add_isupport("ACCEPT", isupport_intptr, &ConfigFileEntry.max_accept);
 	add_isupport("FNC", isupport_string, "");
+	add_isupport("MAP", isupport_string, "");
 	add_isupport("TARGMAX", isupport_targmax, NULL);
 }
