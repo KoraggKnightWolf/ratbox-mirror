@@ -5,8 +5,10 @@ Installation
 ------------
  o Nicklen is now a runtime configurable option(up to 30 characters)
    Nicklens beyond 30 will need a recompile as before.
- o The name of the  executable that is generated is now ircd-ratbox 
-   instead of ircd.
+ o The name of the executable that is generated is now ircd-ratbox 
+   instead of ircd.  Any crontabs should be updated to reflect this change.  
+   Also you should remove any old executables in the $PREFIX/bin directory
+   named ircd, the install process will not do this for you.
   
 
 Config
