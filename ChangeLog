@@ -1,3 +1,11 @@
+androsyn    2015/10/12 16:46:12 UTC	(20151012_0-28741)
+  Log:
+  add isupport for ACCEPT, MAP and KEYLEN
+
+  Modified:
+	ircd-ratbox/trunk/src/supported.c (File Modified) 
+
+
 androsyn    2015/10/11 13:55:29 UTC	(20151011_0-28733)
   Log:
   how did you go missing free_monitor
