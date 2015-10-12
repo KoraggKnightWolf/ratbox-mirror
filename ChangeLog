@@ -1,3 +1,19 @@
+androsyn    2015/10/12 17:09:16 UTC	(20151012_2-28745)
+  Log:
+  move some old documentation to old
+
+  Modified:
+	ircd-ratbox/trunk/doc/old/technical/ (File Added) 
+	ircd-ratbox/trunk/doc/old/technical/event.txt (File Added) 
+	ircd-ratbox/trunk/doc/old/technical/fd-management.txt (File Added) 
+	ircd-ratbox/trunk/doc/old/technical/file-management.txt (File Added) 
+	ircd-ratbox/trunk/doc/old/technical/linebuf.txt (File Added) 
+	ircd-ratbox/trunk/doc/technical/event.txt (File Deleted) 
+	ircd-ratbox/trunk/doc/technical/fd-management.txt (File Deleted) 
+	ircd-ratbox/trunk/doc/technical/file-management.txt (File Deleted) 
+	ircd-ratbox/trunk/doc/technical/linebuf.txt (File Deleted) 
+
+
 androsyn    2015/10/12 17:09:05 UTC	(20151012_1-28743)
   Log:
   slight update to whats new
