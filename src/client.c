@@ -52,6 +52,7 @@
 #include <monitor.h>
 #include <parse.h>
 #include <sslproc.h>
+#include <scache.h>
 
 #define DEBUG_EXITED_CLIENTS
 
@@ -1826,3 +1827,6 @@ error_exit_client(struct Client *client_p, int error)
 
 	exit_client(client_p, client_p, &me, errmsg);
 }
+
+
+

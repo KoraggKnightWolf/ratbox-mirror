@@ -14,6 +14,9 @@
 /* Define to 1 if using `alloca.c'. */
 #undef C_ALLOCA
 
+/* enable openchanfix/fake client support code */
+#undef ENABLE_OCF_SERVICES
+
 /* ratbox-services compatibility code */
 #undef ENABLE_SERVICES
 

@@ -1226,7 +1226,7 @@ stats_memory(struct Client *source_p)
 		channel_count++;
 		channel_memory += (strlen(chptr->chname) + sizeof(struct Channel));
 
-		channel_users += rb_dlink_list_length(&chptr->members);
+		channel_users += chan_member_count(chptr);
 		channel_invites += rb_dlink_list_length(&chptr->invites);
 #define ban_size(b) sizeof(struct Ban) + strlen(b->banstr)+ 1 + strlen(b->who) + 1;
 		RB_DLINK_FOREACH(dlink, chptr->banlist.head)

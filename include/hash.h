@@ -110,5 +110,7 @@ void add_to_zconnid_hash(struct Client *client_p);
 void del_from_zconnid_hash(struct Client *client_p);
 
 void hash_stats(struct Client *);
+rb_dlink_list hash_get_channel_block(int i);
+
 
 #endif /* INCLUDED_hash_h */

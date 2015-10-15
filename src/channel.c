@@ -130,9 +130,16 @@ find_channel_membership(struct Channel *chptr, struct Client *client_p)
 	/* Pick the most efficient list to use to be nice to things like
 	 * CHANSERV which could be in a large number of channels
 	 */
-	if(rb_dlink_list_length(&chptr->members) < rb_dlink_list_length(&client_p->user->channel))
+	if(chan_member_count(chptr) < rb_dlink_list_length(&client_p->user->channel))
 	{
-		RB_DLINK_FOREACH(ptr, chptr->members.head)
+		RB_DLINK_FOREACH(ptr, chptr->members[MEMBER_NOOP].head)
+		{
+			msptr = ptr->data;
+
+			if(msptr->client_p == client_p)
+				return msptr;
+		}
+		RB_DLINK_FOREACH(ptr, chptr->members[MEMBER_OP].head)
 		{
 			msptr = ptr->data;
 
@@ -192,7 +199,7 @@ void
 add_user_to_channel(struct Channel *chptr, struct Client *client_p, int flags)
 {
 	struct membership *msptr;
-
+	rb_dlink_list *memlist;
 	s_assert(client_p->user != NULL);
 	if(client_p->user == NULL)
 		return;
@@ -204,7 +211,12 @@ add_user_to_channel(struct Channel *chptr, struct Client *client_p, int flags)
 	msptr->flags = flags;
 
 	rb_dlinkAdd(msptr, &msptr->usernode, &client_p->user->channel);
-	rb_dlinkAdd(msptr, &msptr->channode, &chptr->members);
+	if(is_chanop(msptr))
+	        memlist = &chptr->members[MEMBER_OP];
+        else
+                memlist = &chptr->members[MEMBER_NOOP];
+
+	rb_dlinkAdd(msptr, &msptr->channode, memlist);
 
 	if(MyClient(client_p))
 		rb_dlinkAdd(msptr, &msptr->locchannode, &chptr->locmembers);
@@ -221,6 +233,7 @@ remove_user_from_channel(struct membership *msptr)
 {
 	struct Client *client_p;
 	struct Channel *chptr;
+	rb_dlink_list *memlist;
 	s_assert(msptr != NULL);
 	if(msptr == NULL)
 		return;
@@ -229,12 +242,18 @@ remove_user_from_channel(struct membership *msptr)
 	chptr = msptr->chptr;
 
 	rb_dlinkDelete(&msptr->usernode, &client_p->user->channel);
-	rb_dlinkDelete(&msptr->channode, &chptr->members);
+
+	if(is_chanop(msptr))
+	        memlist = &chptr->members[MEMBER_OP];
+        else
+                memlist = &chptr->members[MEMBER_NOOP];
+
+	rb_dlinkDelete(&msptr->channode, memlist);
 
 	if(client_p->servptr == &me)
 		rb_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-	if(rb_dlink_list_length(&chptr->members) <= 0)
+        if(chan_member_count(chptr) <= 0)
 		destroy_channel(chptr);
 
 	rb_free(msptr);
@@ -255,21 +274,26 @@ remove_user_from_channels(struct Client *client_p)
 	struct membership *msptr;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-
 	if(client_p == NULL)
 		return;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->user->channel.head)
 	{
+        	rb_dlink_list *memlist;
 		msptr = ptr->data;
 		chptr = msptr->chptr;
 
-		rb_dlinkDelete(&msptr->channode, &chptr->members);
+		if(is_chanop(msptr))
+		        memlist = &chptr->members[MEMBER_OP];
+                else
+                        memlist = &chptr->members[MEMBER_NOOP];
+
+		rb_dlinkDelete(&msptr->channode, memlist);
 
 		if(client_p->servptr == &me)
 			rb_dlinkDelete(&msptr->locchannode, &chptr->locmembers);
 
-		if(rb_dlink_list_length(&chptr->members) <= 0)
+                if(chan_member_count(chptr) <= 0)
 			destroy_channel(chptr);
 
 		rb_free(msptr);
@@ -422,29 +446,32 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 
 		t = lbuf + cur_len;
 
-		RB_DLINK_FOREACH(ptr, chptr->members.head)
+		
+		for(int i = MEMBER_NOOP; i <= MEMBER_OP; i++)
 		{
-			msptr = ptr->data;
-			target_p = msptr->client_p;
-
-			if(IsInvisible(target_p) && !is_member)
+			RB_DLINK_FOREACH(ptr, chptr->members[i].head)
+			{
+				msptr = ptr->data;
+				target_p = msptr->client_p;
+				
+				if(IsInvisible(target_p) && !is_member)
 				continue;
 
-			/* space, possible "@+" prefix */
-			if(cur_len + strlen(target_p->name) + 3 >= IRCD_BUFSIZE - 3)
-			{
-				*(t - 1) = '\0';
-				sendto_one_buffer(client_p, lbuf);
-				cur_len = mlen;
-				t = lbuf + mlen;
+				/* space, possible "@+" prefix */
+				if(cur_len + strlen(target_p->name) + 3 >= IRCD_BUFSIZE - 3)
+				{
+					*(t - 1) = '\0';
+					sendto_one_buffer(client_p, lbuf);
+					cur_len = mlen;
+					t = lbuf + mlen;
+				}
+
+				tlen = sprintf(t, "%s%s ", find_channel_status(msptr, stack), target_p->name);
+
+				cur_len += tlen;
+				t += tlen;
 			}
-
-			tlen = sprintf(t, "%s%s ", find_channel_status(msptr, stack), target_p->name);
-
-			cur_len += tlen;
-			t += tlen;
 		}
-
 		/* The old behaviour here was to always output our buffer,
 		 * even if there are no clients we can show.  This happens
 		 * when a client does "NAMES" with no parameters, and all

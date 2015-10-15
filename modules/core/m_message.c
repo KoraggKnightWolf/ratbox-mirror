@@ -37,6 +37,8 @@
 #include <hash.h>
 #include <send.h>
 #include <s_newconf.h>
+#include <hook.h>
+#include <services.h>
 
 static int m_message(int, const char *, struct Client *, struct Client *, int, const char **);
 static int m_privmsg(struct Client *, struct Client *, int, const char **);
@@ -124,7 +126,7 @@ static void msg_channel_flags(int p_or_n, const char *command,
 static void msg_client(int p_or_n, const char *command,
 		       struct Client *source_p, struct Client *target_p, const char *text);
 
-static void handle_special(const char *command,
+static void handle_special(int p_or_n, const char *command,
 			   struct Client *client_p, struct Client *source_p, const char *nick,
 			   const char *text);
 
@@ -379,7 +381,7 @@ build_target_list(int p_or_n, const char *command, struct Client *client_p,
 
 		if(strchr(nick, '@') || (IsOper(source_p) && (*nick == '$')))
 		{
-			handle_special(command, client_p, source_p, nick, text);
+			handle_special(p_or_n, command, client_p, source_p, nick, text);
 			continue;
 		}
 
@@ -637,6 +639,19 @@ msg_client(int p_or_n, const char *command,
 	if(MyConnect(source_p) && (p_or_n != NOTICE) && target_p->user && target_p->user->away)
 		sendto_one_numeric(source_p, s_RPL(RPL_AWAY), target_p->name, target_p->user->away);
 
+	if(IsFake(target_p))
+	{
+		hook_service_message_data hd;  
+		hd.source_p = source_p;
+		hd.target_p = target_p;
+		hd.message = text;
+		hd.direct = 0;
+		hd.notice = p_or_n;
+                call_hook(h_service_message, &hd);
+                handle_services_message(&hd);
+                return;
+        }
+
 	if(MyClient(target_p))
 	{
 		/* XXX Controversial? allow opers always to send through a +g */
@@ -825,7 +840,7 @@ flood_attack_channel(int p_or_n, struct Client *source_p, struct Channel *chptr)
  *		  This disambiguates the syntax.
  */
 static void
-handle_special(const char *command, struct Client *client_p,
+handle_special(int p_or_n, const char *command, struct Client *client_p,
 	       struct Client *source_p, const char *nick, const char *text)
 {
 	struct Client *target_p;
@@ -887,6 +902,21 @@ handle_special(const char *command, struct Client *client_p,
 
 		if(target_p != NULL)
 		{
+			if (IsFake(target_p))
+			{
+                                hook_service_message_data hd;
+                                hd.source_p = source_p;
+                                hd.target_p = target_p;
+                                hd.message = text;
+                                hd.direct = 1;
+                                hd.notice = p_or_n;
+
+                                call_hook(h_service_message, &hd);
+                                handle_services_message(&hd);
+                                return;
+			}
+		
+		
 			if(server != NULL)
 				*server = '@';
 			if(host != NULL)
@@ -962,7 +992,7 @@ find_userhost(const char *user, const char *host, int *count)
 		RB_DLINK_FOREACH(ptr, global_client_list.head)
 		{
 			c2ptr = ptr->data;
-			if(!MyClient(c2ptr))	/* implies mine and an user */
+			if(!MyClient(c2ptr) && !IsFake(c2ptr))	/* implies mine and an user */
 				continue;
 			if((!host || match(host, c2ptr->host)) && irccmp(u, c2ptr->username) == 0)
 			{

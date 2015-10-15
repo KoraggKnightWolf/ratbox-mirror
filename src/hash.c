@@ -568,6 +568,12 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 	return chptr;
 }
 
+rb_dlink_list hash_get_channel_block(int i)
+{
+        return channelTable[i];
+}
+        
+
 /* hash_find_resv()
  *
  * hunts for a resv entry in the resv hash table

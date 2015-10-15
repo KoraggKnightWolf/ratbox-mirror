@@ -55,6 +55,9 @@ static void send_queued(struct Client *to);
 static int
 send_linebuf(struct Client *to, rb_buf_head_t * linebuf)
 {
+        if(IsFake(to))
+                return 0;
+                
 	if(IsMe(to))
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Trying to send message to myself!");
@@ -120,6 +123,9 @@ send_pop_queue(struct Client *to)
 static void
 send_rb_linebuf_remote(struct Client *to, struct Client *from, rb_buf_head_t * linebuf)
 {
+        if(IsFake(to))
+                return;
+                
 	if(to->from)
 		to = to->from;
 
@@ -218,6 +224,9 @@ void
 sendto_one_buffer(struct Client *target_p, const char *buffer)
 {
 	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
+	
+	if(IsFake(target_p))
+	        return;
 
 	if(target_p->from != NULL)
 		target_p = target_p->from;
@@ -242,6 +251,9 @@ sendto_one(struct Client *target_p, const char *pattern, ...)
 {
 	va_list args;
 	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
+
+	if(IsFake(target_p))
+	        return;
 
 	/* send remote if to->from non NULL */
 	if(target_p->from != NULL)
@@ -328,6 +340,9 @@ sendto_one_notice(struct Client *target_p, const char *pattern, ...)
 	struct Client *dest_p;
 	va_list args;
 	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
+
+	if(IsFake(target_p))
+		return;
 	
 	if(MyConnect(target_p))
 	{
@@ -374,6 +389,9 @@ sendto_one_numeric(struct Client *target_p, int numeric, const char *pattern, ..
 	va_list args;
 	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
 	const char *name;
+
+	if(IsFake(target_p))
+		return;
 
 	/* send remote if to->from non NULL */
 	if(target_p->from != NULL)
@@ -426,11 +444,10 @@ sendto_server(struct Client *one, struct Channel *chptr, unsigned long caps,
 	      unsigned long nocaps, const char *format, ...)
 {
 	va_list args;
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	rb_buf_head_t *linebuf = alloca(rb_linebuf_bufhead_size());
-
+	
 	/* noone to send to.. */
 	if(rb_dlink_list_length(&serv_list) == 0)
 		return;
@@ -445,7 +462,10 @@ sendto_server(struct Client *one, struct Channel *chptr, unsigned long caps,
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
+		
+		if(IsFake(target_p))
+		        continue;
 
 		/* check against 'one' */
 		if(one != NULL && (target_p == one->from))
@@ -505,40 +525,44 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 	rb_linebuf_putmsg(rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
 	rb_linebuf_putmsg(rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
 
-	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->members.head)
+
+	for(int i = MEMBER_NOOP; i < MEMBER_LAST; i++)
 	{
-		msptr = ptr->data;
-		target_p = msptr->client_p;
-
-		if(IsIOError(target_p->from) || target_p->from == one)
-			continue;
-
-		if(type && ((msptr->flags & type) == 0))
-			continue;
-
-		if(IsDeaf(target_p))
-			continue;
-
-		if(!MyClient(target_p))
+		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->members[i].head)
 		{
-			/* if we've got a specific type, target must support
-			 * CHW.. --fl
-			 */
-			if(type && NotCapable(target_p->from, CAP_CHW))
+			msptr = ptr->data;
+			target_p = msptr->client_p;
+
+			if(IsIOError(target_p->from) || target_p->from == one)
 				continue;
 
-			if(target_p->from->localClient->serial != current_serial)
-			{
-				if(has_id(target_p->from))
-					send_rb_linebuf_remote(target_p, source_p, rb_linebuf_id);
-				else
-					send_rb_linebuf_remote(target_p, source_p, rb_linebuf_name);
+			if(type && ((msptr->flags & type) == 0))
+				continue;
 
-				target_p->from->localClient->serial = current_serial;
+			if(IsDeaf(target_p))
+				continue;
+
+			if(!MyClient(target_p))
+			{
+				/* if we've got a specific type, target must support
+				 * CHW.. --fl
+				 */
+				if(type && NotCapable(target_p->from, CAP_CHW))
+					continue;
+
+				if(target_p->from->localClient->serial != current_serial)
+				{
+					if(has_id(target_p->from))
+						send_rb_linebuf_remote(target_p, source_p, rb_linebuf_id);
+					else
+						send_rb_linebuf_remote(target_p, source_p, rb_linebuf_name);
+
+					target_p->from->localClient->serial = current_serial;
+				}
 			}
+			else
+				send_linebuf(target_p, rb_linebuf_local);
 		}
-		else
-			send_linebuf(target_p, rb_linebuf_local);
 	}
 
 	rb_linebuf_donebuf(rb_linebuf_local);
@@ -573,6 +597,9 @@ sendto_channel_local(int type, struct Channel *chptr, const char *pattern, ...)
 	{
 		msptr = ptr->data;
 		target_p = msptr->client_p;
+		
+		if(IsFake(target_p))
+		        continue;
 
 		if(IsIOError(target_p))
 			continue;
@@ -626,6 +653,9 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 		{
 			msptr = uptr->data;
 			target_p = msptr->client_p;
+			
+			if(IsFake(target_p))
+			        continue;
 
 			if(IsIOError(target_p) || target_p->localClient->serial == current_serial)
 				continue;
@@ -686,6 +716,9 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 		{
 			target_p = ptr->data;
 
+                        if(IsFake(target_p))
+                                continue;
+			
 			if(match(mask, target_p->host))
 				send_linebuf(target_p, rb_linebuf_local);
 		}
@@ -696,6 +729,8 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 		{
 			target_p = ptr->data;
+			if(IsFake(target_p))
+				continue;
 			send_linebuf(target_p, rb_linebuf_local);
 		}
 	}
@@ -704,6 +739,9 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 	{
 		target_p = ptr->data;
 
+		if(IsFake(target_p))
+		        continue;
+		        
 		if(target_p == one)
 			continue;
 

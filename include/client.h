@@ -129,6 +129,8 @@ enum {
 #define FLAGS_EXEMPTSPAMBOT	0x01000000
 #define FLAGS_EXEMPTSHIDE	0x02000000
 #define FLAGS_EXEMPTJUPE	0x04000000
+#define FLAGS_FAKE		0x08000000
+#define FLAGS_FAKEPERSIST	0x10000000
 
 /* flags for local clients, this needs stuff moved from above to here at some point */
 #define LFLAGS_SSL		0x00000001
@@ -211,6 +213,9 @@ enum {
 #define IsTGChange(x)		((x)->flags & FLAGS_TGCHANGE)
 #define SetTGChange(x)		((x)->flags |= FLAGS_TGCHANGE)
 #define ClearTGChange(x)	((x)->flags &= ~FLAGS_TGCHANGE)
+#define IsFake(x)               ((x)->flags & FLAGS_FAKE)
+#define IsFakePersist(x)        ((x)->flags & FLAGS_FAKEPERSIST)
+
 
 /* local flags */
 
@@ -365,5 +370,11 @@ void init_uid(void);
 char *generate_uid(void);
 
 void flood_endgrace(struct Client *);
+
+extern struct Client *create_fake_client(const char *, const char *, const char *, const char *, int);
+extern void destroy_fake_client(struct Client *);
+extern struct Client *create_fake_server(const char *, const char *, int);
+extern void destroy_fake_server(struct Client *, int);
+
 
 #endif /* INCLUDED_client_h */

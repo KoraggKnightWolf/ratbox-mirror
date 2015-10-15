@@ -852,6 +852,7 @@ with_moduledir
 enable_assert
 enable_profile
 enable_services
+enable_ocf_services
 enable_backups
 '
       ac_precious_vars='build_alias
@@ -1525,6 +1526,8 @@ Optional Features:
                           hard(aborts the daemon)
   --enable-profile        Enable profiling
   --enable-services       Enable ratbox-services compatibility code.
+  --enable-ocf-services   Enable openchanfix/fake client support code - ONLY
+                          needed if you are running OCF on this ircd.
 
 
 Optional Packages:
@@ -15748,6 +15751,20 @@ else
 fi
 
 
+
+# Check whether --enable-ocf-services was given.
+if test "${enable_ocf_services+set}" = set; then :
+  enableval=$enable_ocf_services; ocf_services=$enableval
+else
+  ocf_services=no
+fi
+
+
+if test "x$ocf_services" = "xyes"; then
+
+$as_echo "#define ENABLE_OCF_SERVICES 1" >>confdefs.h
+
+fi
 
 
 cat >>confdefs.h <<_ACEOF

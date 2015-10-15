@@ -145,9 +145,9 @@ am_libcore_la_OBJECTS = bandbi.lo cache.lo channel.lo class.lo \
 	ipv4_from_ipv6.lo ircd.lo ircd_lexer.lo ircd_parser.lo \
 	ircd_signal.lo listener.lo match.lo modules.lo monitor.lo \
 	newconf.lo operhash.lo packet.lo parse.lo reject.lo s_auth.lo \
-	scache.lo s_conf.lo send.lo s_log.lo s_newconf.lo s_serv.lo \
-	sslproc.lo substitution.lo supported.lo s_user.lo version.lo \
-	whowas.lo
+	scache.lo s_conf.lo send.lo services.lo s_log.lo s_newconf.lo \
+	s_serv.lo sslproc.lo substitution.lo supported.lo s_user.lo \
+	version.lo whowas.lo
 libcore_la_OBJECTS = $(am_libcore_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -446,6 +446,7 @@ libcore_la_SOURCES = \
         scache.c                        \
         s_conf.c                        \
         send.c                          \
+        services.c			\
         s_log.c                         \
         s_newconf.c                     \
         s_serv.c                        \
@@ -576,6 +577,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/s_user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/send.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/services.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sslproc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/substitution.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/supported.Plo@am__quote@

@@ -37,6 +37,7 @@
 #include <modules.h>
 #include <hash.h>
 #include <s_newconf.h>
+#include <hook.h>
 
 static int ms_squit(struct Client *, struct Client *, int, const char **);
 static int mo_squit(struct Client *, struct Client *, int, const char **);
@@ -80,6 +81,12 @@ mo_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	if((found_squit = find_squit(client_p, source_p, parv[1])))
 	{
+	
+		if(IsFake(found_squit->target_p))
+		{
+			sendto_one(source_p, "%s NOTICE %s :Cannot SQUIT a service", me.name, source_p->name);
+			return 0;
+		}
 		if(MyConnect(found_squit->target_p))
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL,
@@ -131,6 +138,41 @@ ms_squit(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(!IsServer(target_p))
 			return 0;
 	}
+	
+	if(IsFake(target_p))
+	{
+                if (!IsFakePersist(target_p))
+                        call_hook(h_service_squit, target_p);
+                        
+                sendto_wallops_flags(UMODE_WALLOP, &me,
+                                                        "Remote SQUIT %s from %s (%s)",
+                                                        target_p->name, source_p->name, comment);
+                                                        
+                sendto_server(NULL, NULL, NOCAPS, NOCAPS,
+                                                ":%s WALLOPS :Remote SQUIT %s from %s (%s)",
+                                                me.name, target_p->name, source_p->name, comment);
+                                                
+                ilog(L_SERVER, "SQUIT From %s : %s (%s)", parv[0],
+                                target_p->name, comment);
+                                
+                sendto_server(client_p, NULL, NOCAPS, NOCAPS,
+                                                "SQUIT %s :%s",
+                                                target_p->name, me.name);
+                                                
+                if(IsFakePersist(target_p))     
+                {
+                        sendto_server(NULL, NULL, NOCAPS, NOCAPS,
+                                                        ":%s SERVER %s 2 :%s",
+                                                        me.name, target_p->name,
+                                                        target_p->info);
+                        call_hook(h_service_squit, target_p);
+                }
+                else
+                        destroy_fake_server(target_p, 1);
+                    
+                return 0;
+        } 
+	
 
 	/* Server is closing its link */
 	if(target_p == client_p)

@@ -38,7 +38,8 @@
 #include <parse.h>
 #include <modules.h>
 #include <s_newconf.h>
-
+#include <s_user.h>
+#include <hook.h>
 
 static int ms_kill(struct Client *, struct Client *, int, const char **);
 static int mo_kill(struct Client *, struct Client *, int, const char **);
@@ -115,6 +116,13 @@ mo_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 		sendto_one_notice(source_p, ":Nick %s isnt on your server", target_p->name);
 		return 0;
 	}
+
+        if(IsFake(target_p))
+        {
+                sendto_one(source_p, ":%s NOTICE %s :Cannot kill a service",
+                                me.name, source_p->name);
+             	return 0;
+        }
 
 	if(MyConnect(target_p))
 		sendto_one(target_p, ":%s!%s@%s KILL %s :%s",
@@ -216,6 +224,19 @@ ms_kill(struct Client *client_p, struct Client *source_p, int parc, const char *
 		sendto_one_notice(source_p, ":KILL changed from %s to %s", user, target_p->name);
 		chasing = 1;
 	}
+	
+        if (IsFake(target_p))
+        {
+                /* fake client was killed, reintroduce */
+                introduce_client(NULL, target_p);
+                
+                if (IsServer(source_p))
+                        call_hook(h_service_skill, target_p);
+                else
+                        call_hook(h_service_kill, target_p);
+                
+                return 0;
+        }
 
 	if(MyConnect(target_p))
 	{

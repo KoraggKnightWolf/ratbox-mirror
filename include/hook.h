@@ -24,6 +24,14 @@ extern int h_burst_channel;
 extern int h_burst_finished;
 extern int h_server_introduced;
 
+extern int h_service_kill; 
+extern int h_service_skill;
+extern int h_service_squit;  
+extern int h_service_message;  
+extern int h_service_collision;
+
+
+
 void init_hook(void);
 int register_hook(const char *name);
 void add_hook(const char *name, hookfn fn);
@@ -55,5 +63,15 @@ typedef struct
 	struct Client *client;
 	struct Channel *chptr;
 } hook_data_channel;
+
+typedef struct
+{
+        struct Client *source_p;
+        struct Client *target_p;
+        const char *message;
+        int direct;
+        int notice;
+} hook_service_message_data;
+
 
 #endif

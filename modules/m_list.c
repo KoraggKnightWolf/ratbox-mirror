@@ -145,7 +145,7 @@ list_all_channels(struct Client *source_p)
 		if(SecretChannel(chptr) && !IsMember(source_p, chptr))
 			continue;
 		sendto_one_numeric(source_p, s_RPL(RPL_LIST), chptr->chname,
-				   rb_dlink_list_length(&chptr->members),
+				   chan_member_count(chptr),
 				   chptr->topic == NULL ? "" : chptr->topic->topic);
 
 		if(count++ >= 10)
@@ -315,8 +315,8 @@ list_limit_channels(struct Client *source_p, const char *param)
 			break;
 		}
 
-		if(rb_dlink_list_length(&chptr->members) >= max ||
-		   rb_dlink_list_length(&chptr->members) <= min)
+		if(chan_member_count(chptr) >= max ||
+		   chan_member_count(chptr) <= min)
 			continue;
 
 		if(cmintime > 0 && chptr->channelts < cmintime)
@@ -339,7 +339,7 @@ list_limit_channels(struct Client *source_p, const char *param)
 			continue;
 
 		sendto_one_numeric(source_p, s_RPL(RPL_LIST), chptr->chname,
-				   rb_dlink_list_length(&chptr->members),
+				   chan_member_count(chptr),
 				   chptr->topic == NULL ? "" : chptr->topic->topic);
 
 		if(count++ >= 10)
@@ -395,7 +395,7 @@ list_named_channel(struct Client *source_p, const char *name)
 
 	if(ShowChannel(source_p, chptr))
 		sendto_one_numeric(source_p, s_RPL(RPL_LIST), chptr->chname,
-				   rb_dlink_list_length(&chptr->members),
+				   chan_member_count(chptr),
 				   chptr->topic == NULL ? "" : chptr->topic->topic);
 
 	ClearCork(source_p);

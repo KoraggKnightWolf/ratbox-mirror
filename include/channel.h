@@ -50,6 +50,13 @@ struct topic_info
 	time_t topic_time;
 };
 
+
+enum {
+	MEMBER_NOOP = 0,
+	MEMBER_OP = 1,
+	MEMBER_LAST
+};
+
 /* channel structure */
 struct Channel
 {
@@ -58,7 +65,7 @@ struct Channel
 	struct topic_info *topic;
 	time_t last_knock;	/* don't allow knock to flood */
 
-	rb_dlink_list members;	/* channel members */
+	rb_dlink_list members[2];	/* channel members */
 	rb_dlink_list locmembers;	/* local channel members */
 
 	rb_dlink_list invites;
@@ -136,6 +143,9 @@ struct ChCapCombo
 #define is_chanop_voiced(x) ((x) && (x)->flags & (CHFL_CHANOP|CHFL_VOICE))
 #define is_deop(x)	((x) && (x)->flags & CHFL_DEOPPED)
 #define can_send_banned(x) ((x) && (x)->flags & CHFL_BANNED)
+
+#define chan_member_count(x) (rb_dlink_list_length(&x->members[MEMBER_NOOP]) + rb_dlink_list_length(&x->members[MEMBER_OP]))
+
 
 /* channel modes ONLY */
 #define MODE_PRIVATE	0x0001

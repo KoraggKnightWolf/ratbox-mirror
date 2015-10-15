@@ -222,28 +222,32 @@ who_common_channel(struct Client *source_p, struct Channel *chptr,
 	struct Client *target_p;
 	rb_dlink_node *ptr;
 
-	RB_DLINK_FOREACH(ptr, chptr->members.head)
+
+	for(int i = MEMBER_NOOP; i <= MEMBER_OP; i++)
 	{
-		msptr = ptr->data;
-		target_p = msptr->client_p;
-
-		if(!IsInvisible(target_p) || IsMarked(target_p))
-			continue;
-
-		if(server_oper && !IsOper(target_p))
-			continue;
-
-		SetMark(target_p);
-
-		if(*maxmatches > 0)
+	 	RB_DLINK_FOREACH(ptr, chptr->members[i].head)
 		{
-			if((mask == NULL) ||
-			   match(mask, target_p->name) || match(mask, target_p->username) ||
-			   match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
-			   match(mask, target_p->info))
+			msptr = ptr->data;
+			target_p = msptr->client_p;
+
+			if(!IsInvisible(target_p) || IsMarked(target_p))
+				continue;
+
+			if(server_oper && !IsOper(target_p))
+				continue;
+
+			SetMark(target_p);
+
+			if(*maxmatches > 0)
 			{
-				do_who(source_p, target_p, NULL, "");
-				--(*maxmatches);
+				if((mask == NULL) ||
+				   match(mask, target_p->name) || match(mask, target_p->username) ||
+				   match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
+				   match(mask, target_p->info))
+				{
+					do_who(source_p, target_p, NULL, "");
+					--(*maxmatches);
+				}
 			}
 		}
 	}
@@ -340,17 +344,20 @@ do_who_on_channel(struct Client *source_p, struct Channel *chptr, int server_ope
 	rb_dlink_node *ptr;
 	int combine = IsCapable(source_p, CLICAP_MULTI_PREFIX);
 
-	RB_DLINK_FOREACH(ptr, chptr->members.head)
+	for(int i = MEMBER_NOOP; i <= MEMBER_OP; i++)
 	{
-		msptr = ptr->data;
-		target_p = msptr->client_p;
+	 	RB_DLINK_FOREACH(ptr, chptr->members[i].head)
+		{
+			msptr = ptr->data;
+			target_p = msptr->client_p;
+	
+			if(server_oper && !IsOper(target_p))
+				continue;
 
-		if(server_oper && !IsOper(target_p))
-			continue;
-
-		if(member || !IsInvisible(target_p))
-			do_who(source_p, target_p, chptr->chname,
-			       find_channel_status(msptr, combine));
+			if(member || !IsInvisible(target_p))
+				do_who(source_p, target_p, chptr->chname,
+				       find_channel_status(msptr, combine));
+		}
 	}
 }
 

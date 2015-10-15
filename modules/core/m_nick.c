@@ -46,6 +46,7 @@
 #include <s_newconf.h>
 #include <monitor.h>
 #include <reject.h>
+#include <hook.h>
 
 /* Give all UID nicks the same TS. This ensures nick TS is always the same on
  * all servers for each nick-user pair, also if a user with a UID nick changes
@@ -807,6 +808,18 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 				     "Nick collision on %s(%s <- %s)(both %s)",
 				     target_p->name, target_p->from->name, client_p->name, action);
 
+		if(IsFake(target_p))
+                {
+                        kill_client_serv_butone(NULL, target_p,
+                                                "%s (Nickname collision (new))", me.name);
+                                
+                        introduce_client(NULL, target_p);
+                        call_hook(h_service_collision, target_p);
+                        return 0;
+                }  
+                   
+		
+
 		if(use_save)
 		{
 			save_user(&me, &me, target_p);
@@ -873,6 +886,19 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 						     target_p->name, target_p->from->name,
 						     client_p->name, action);
 
+
+			if(IsFake(target_p))
+                	{
+				ServerStats.is_kill++;
+                        	kill_client_serv_butone(NULL, target_p,
+                                                "%s (Nickname collision (new))", me.name);
+                                
+	                        introduce_client(NULL, target_p);
+        	                call_hook(h_service_collision, target_p);
+	                        return 0;
+        	        }  
+                   
+
 			if(use_save)
 			{
 				ServerStats.is_save++;
@@ -881,6 +907,8 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 			else
 			{
 				ServerStats.is_kill++;
+				
+				
 				sendto_one_numeric(target_p, ERR_NICKCOLLISION,
 						   form_str(ERR_NICKCOLLISION), target_p->name);
 
@@ -920,7 +948,9 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 				     source_p->name, target_p->name, target_p->from->name,
 				     client_p->name, action);
 
-		if(use_save)
+		
+
+		if(use_save && !IsFake(target_p))
 		{
 			ServerStats.is_save += 2;
 			save_user(&me, &me, target_p);
@@ -932,13 +962,23 @@ perform_nickchange_collides(struct Client *source_p, struct Client *client_p,
 		}
 		else
 		{
+	
 			ServerStats.is_kill++;
-			sendto_one_numeric(target_p, ERR_NICKCOLLISION,
-					   form_str(ERR_NICKCOLLISION), target_p->name);
 
-			kill_client_serv_butone(NULL, source_p, "%s (Nick change collision)",
-						me.name);
+			if(IsFake(target_p))
+			{
+                        	kill_client_serv_butone(NULL, target_p,
+                                	                "%s (Nickname collision (new))", me.name);
+                                
+	                        introduce_client(NULL, target_p);
+        	                call_hook(h_service_collision, target_p);
+        	        }  else {
+				sendto_one_numeric(target_p, ERR_NICKCOLLISION,
+						   form_str(ERR_NICKCOLLISION), target_p->name);
 
+				kill_client_serv_butone(NULL, source_p, "%s (Nick change collision)",
+							me.name);
+			}
 			ServerStats.is_kill++;
 
 			kill_client_serv_butone(NULL, target_p, "%s (Nick change collision)",

@@ -935,8 +935,8 @@ burst_TS5(struct Client *client_p)
 	{
 		chptr = ptr->data;
 
-		s_assert(rb_dlink_list_length(&chptr->members) > 0);
-		if(rb_dlink_list_length(&chptr->members) <= 0)
+		s_assert(chan_member_count(chptr) > 0);
+		if(chan_member_count(chptr) <= 0)
 			continue;
 
 		if(*chptr->chname != '#')
@@ -948,29 +948,32 @@ burst_TS5(struct Client *client_p)
 
 		t = buf + mlen;
 
-		RB_DLINK_FOREACH(uptr, chptr->members.head)
+		for(int i = MEMBER_NOOP; i < MEMBER_LAST; i++)
 		{
-			msptr = uptr->data;
-
-			tlen = strlen(msptr->client_p->name) + 1;
-			if(is_chanop(msptr))
-				tlen++;
-			if(is_voiced(msptr))
-				tlen++;
-
-			if(cur_len + tlen >= IRCD_BUFSIZE - 3)
+			RB_DLINK_FOREACH(uptr, chptr->members[i].head)
 			{
-				t--;
-				*t = '\0';
-				sendto_one_buffer(client_p, buf);
-				cur_len = mlen;
-				t = buf + mlen;
+				msptr = uptr->data;
+
+				tlen = strlen(msptr->client_p->name) + 1;
+				if(is_chanop(msptr))
+					tlen++;
+				if(is_voiced(msptr))
+					tlen++;
+					
+				if(cur_len + tlen >= IRCD_BUFSIZE - 3)
+				{
+					t--;
+					*t = '\0';
+					sendto_one_buffer(client_p, buf);
+					cur_len = mlen;
+					t = buf + mlen;
+				}
+
+				sprintf(t, "%s%s ", find_channel_status(msptr, 1), msptr->client_p->name);
+				
+				cur_len += tlen;
+				t += tlen;
 			}
-
-			sprintf(t, "%s%s ", find_channel_status(msptr, 1), msptr->client_p->name);
-
-			cur_len += tlen;
-			t += tlen;
 		}
 
 		/* remove trailing space */
@@ -1069,8 +1072,8 @@ burst_TS6(struct Client *client_p)
 	{
 		chptr = ptr->data;
 
-		s_assert(rb_dlink_list_length(&chptr->members) > 0);
-		if(rb_dlink_list_length(&chptr->members) <= 0)
+		s_assert(chan_member_count(chptr) > 0);
+		if(chan_member_count(chptr) <= 0)
 			continue;
 
 		if(*chptr->chname != '#')
@@ -1082,28 +1085,31 @@ burst_TS6(struct Client *client_p)
 
 		t = buf + mlen;
 
-		RB_DLINK_FOREACH(uptr, chptr->members.head)
+		for(int i = MEMBER_NOOP; i < MEMBER_LAST; i++)
 		{
-			msptr = uptr->data;
-
-			tlen = strlen(use_id(msptr->client_p)) + 1;
-			if(is_chanop(msptr))
-				tlen++;
-			if(is_voiced(msptr))
-				tlen++;
-
-			if(cur_len + tlen >= IRCD_BUFSIZE - 3)
+			RB_DLINK_FOREACH(uptr, chptr->members[i].head)
 			{
-				*(t - 1) = '\0';
-				sendto_one_buffer(client_p, buf);
-				cur_len = mlen;
-				t = buf + mlen;
+				msptr = uptr->data;
+
+				tlen = strlen(use_id(msptr->client_p)) + 1;
+				if(is_chanop(msptr))
+					tlen++;
+				if(is_voiced(msptr))
+					tlen++;
+
+				if(cur_len + tlen >= IRCD_BUFSIZE - 3)
+				{
+					*(t - 1) = '\0';
+					sendto_one_buffer(client_p, buf);
+					cur_len = mlen;
+					t = buf + mlen;
+				}
+
+				sprintf(t, "%s%s ", find_channel_status(msptr, 1), use_id(msptr->client_p));
+				
+				cur_len += tlen;
+				t += tlen;
 			}
-
-			sprintf(t, "%s%s ", find_channel_status(msptr, 1), use_id(msptr->client_p));
-
-			cur_len += tlen;
-			t += tlen;
 		}
 
 		/* remove trailing space */

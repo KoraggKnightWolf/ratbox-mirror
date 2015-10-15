@@ -655,24 +655,27 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 		return 0;
 	}
 	SetCork(source_p);
-	RB_DLINK_FOREACH(ptr, chptr->members.head)
+	for(int i = MEMBER_NOOP; i < MEMBER_LAST; i++)
 	{
-		msptr = ptr->data;
-		target_p = msptr->client_p;
+		RB_DLINK_FOREACH(ptr, chptr->members[i].head)
+		{
+			msptr = ptr->data;
+			target_p = msptr->client_p;
 
-		if(EmptyString(target_p->sockhost))
-			sockhost = empty_sockhost;
-		else if(!show_ip(source_p, target_p))
-			sockhost = spoofed_sockhost;
-		else
-			sockhost = target_p->sockhost;
+			if(EmptyString(target_p->sockhost))
+				sockhost = empty_sockhost;
+			else if(!show_ip(source_p, target_p))
+				sockhost = spoofed_sockhost;
+			else
+				sockhost = target_p->sockhost;
 
-		sendto_one_numeric(source_p, s_RPL(RPL_ETRACE),
-			   IsOper(target_p) ? "Oper" : "User",
-			   /* class field -- pretend its server.. */
-			   target_p->servptr->name,
-			   target_p->name, target_p->username, target_p->host,
-			   sockhost, target_p->info);
+			sendto_one_numeric(source_p, s_RPL(RPL_ETRACE),
+				   IsOper(target_p) ? "Oper" : "User",
+				   /* class field -- pretend its server.. */
+				   target_p->servptr->name,
+				   target_p->name, target_p->username, target_p->host,
+				   sockhost, target_p->info);
+		}
 	}
 	ClearCork(source_p);
 	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFTRACE), me.name);

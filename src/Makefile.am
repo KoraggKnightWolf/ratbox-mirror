@@ -53,6 +53,7 @@ libcore_la_SOURCES =			\
         scache.c                        \
         s_conf.c                        \
         send.c                          \
+        services.c			\
         s_log.c                         \
         s_newconf.c                     \
         s_serv.c                        \

@@ -60,6 +60,14 @@ int h_burst_channel;
 int h_burst_finished;
 int h_server_introduced;
 
+int h_service_kill;
+int h_service_skill;
+int h_service_squit;
+int h_service_message;
+int h_service_collision;
+
+
+
 void
 init_hook(void)
 {
@@ -69,6 +77,13 @@ init_hook(void)
 	h_burst_channel = register_hook("burst_channel");
 	h_burst_finished = register_hook("burst_finished");
 	h_server_introduced = register_hook("server_introduced");
+
+        h_service_kill = register_hook("service_kill");
+        h_service_skill = register_hook("service_skill");
+        h_service_squit = register_hook("service_squit");
+        h_service_message = register_hook("service_message");
+        h_service_collision = register_hook("service_collision");
+	
 }
 
 /* grow_hooktable()

@@ -433,6 +433,14 @@ fi
 AM_CONDITIONAL([ENABLE_SERVICES], [test x"$M_SERVICES" != "x"])
 
 
+AC_ARG_ENABLE(ocf-services,
+AC_HELP_STRING([--enable-ocf-services],[Enable openchanfix/fake client support code - ONLY needed if you are running OCF on this ircd.]),
+[ocf_services=$enableval], [ocf_services=no])
+
+if test "x$ocf_services" = "xyes"; then
+	AC_DEFINE([ENABLE_OCF_SERVICES], 1, [enable openchanfix/fake client support code])
+fi
+
 AC_DEFINE_UNQUOTED(RATBOX_CONFIGURE_OPTS, "$ac_configure_args", [configure arguments])
 
 
