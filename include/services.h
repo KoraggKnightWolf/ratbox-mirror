@@ -77,5 +77,6 @@ void svc_set_unknown(struct Service *service_p, SVCMessageHandler unknown);
 struct SVCMessage *svc_get_cmd(struct Service *service_p, char *cmd);
 
 struct Client *create_fake_client(const char *, const char *, const char *, const char *, int);
+void init_fake_services(void);
 
 #endif

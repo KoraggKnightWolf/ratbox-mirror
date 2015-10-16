@@ -57,6 +57,7 @@
 #include <cache.h>
 #include <dns.h>
 #include <bandbi.h>
+#include <services.h>
 #include <sslproc.h>
 #include <supported.h>
 #include <version.h>
@@ -626,7 +627,7 @@ ratbox_main(int argc, char *argv[])
 	whowas_init();
 	init_hook();
 	init_reject();
-
+	init_fake_services();
 #ifdef STATIC_MODULES
 	load_static_modules();
 #else

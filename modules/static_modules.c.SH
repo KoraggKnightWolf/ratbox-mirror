@@ -27,11 +27,11 @@ cat > static_modules.c <<EOF
  *  USA
  *  
  */
-#include "stdinc.h"
-#include "struct.h"
-#include "modules.h"
-#include "hash.h"
-#include "s_log.h"
+#include <stdinc.h>
+#include <struct.h>
+#include <modules.h>
+#include <hash.h>
+#include <s_log.h>
 
 EOF
 

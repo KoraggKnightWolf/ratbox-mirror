@@ -511,6 +511,7 @@ service_cmd_parse(struct Client *client_p, const char *cmd)
 	return NULL;
 }
 
+#endif
 
 struct Client *
 create_fake_client(const char *name, const char *username, const char *host,
@@ -650,4 +651,10 @@ destroy_fake_server(struct Client *fake_p, int send_squit)
 }
 
 
+void
+init_fake_services(void)
+{
+#ifdef ENABLE_OCF_SERVICES
+	add_hook("service_message", (hookfn)handle_services_message);
 #endif
+}

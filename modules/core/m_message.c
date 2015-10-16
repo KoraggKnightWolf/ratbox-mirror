@@ -648,7 +648,7 @@ msg_client(int p_or_n, const char *command,
 		hd.direct = 0;
 		hd.notice = p_or_n;
                 call_hook(h_service_message, &hd);
-                handle_services_message(&hd);
+/*                handle_services_message(&hd); -- why wasn't this just added to the hook list? XXX -androsyn */
                 return;
         }
 
@@ -912,7 +912,8 @@ handle_special(int p_or_n, const char *command, struct Client *client_p,
                                 hd.notice = p_or_n;
 
                                 call_hook(h_service_message, &hd);
-                                handle_services_message(&hd);
+                                /*  -- why wasn't this just added to the hook list? XXX -androsyn */
+                                /* handle_services_message(&hd); */
                                 return;
 			}
 		
