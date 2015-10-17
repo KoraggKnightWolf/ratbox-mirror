@@ -1,3 +1,11 @@
+androsyn    2015/10/17 01:38:36 UTC	(20151017_0-28823)
+  Log:
+  no need to use rb_linebuf_bufhead_size now
+
+  Modified:
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2015/10/16 18:52:33 UTC	(20151016_0-28817)
   Log:
   fix some slight brain damange with the fake client stuff
