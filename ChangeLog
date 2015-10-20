@@ -1,3 +1,11 @@
+androsyn    2015/10/20 18:50:44 UTC	(20151020_7-28847)
+  Log:
+  make genssl.sh generate 2048bit DH parameters
+
+  Modified:
+	ircd-ratbox/trunk/doc/genssl.sh (File Modified) 
+
+
 androsyn    2015/10/20 18:16:20 UTC	(20151020_6-28843)
   Log:
   change helper argv[0] to be ircd-ratbox {resolver,bandb,ssld} daemon
