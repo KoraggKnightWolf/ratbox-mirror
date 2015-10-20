@@ -21,7 +21,7 @@ openssl req -new -newkey rsa:4096 -days ${SSL_DAYS_VALID} -nodes -x509 -keyout $
 echo "Done creating self-signed cert"
 
 echo -n "Generating DH parameters file... "
-openssl dhparam -out dh.pem 1024
+openssl dhparam -out dh.pem 2048
 echo "Done."
 
 echo
