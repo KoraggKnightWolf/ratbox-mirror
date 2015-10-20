@@ -568,13 +568,15 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 	return chptr;
 }
 
-rb_dlink_list hash_get_channel_block(int i)
+rb_dlink_list 
+hash_get_channel_block(int i)
 {
         return channelTable[i];
 }
         
 
-rb_dlink_list *hash_get_tablelist(int type)
+rb_dlink_list *
+hash_get_tablelist(int type)
 {
         rb_dlink_list *table = hash_function[type].table;
         rb_dlink_list *alltables;
@@ -596,7 +598,8 @@ rb_dlink_list *hash_get_tablelist(int type)
         return alltables;
 }
 
-void hash_free_tablelist(rb_dlink_list *table)
+void 
+hash_free_tablelist(rb_dlink_list *table)
 {
         rb_dlink_node *ptr, *next;
         RB_DLINK_FOREACH_SAFE(ptr, next, table->head)
