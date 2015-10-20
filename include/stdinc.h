@@ -220,12 +220,6 @@ xc_strlcpy(char *dest, const char *src, size_t size)
 #endif
 #endif          
 
-#ifdef MINGW
-#undef RBTT_FMT
-#define RBTT_FMT "ld"
-#endif
-
-
 #include <ratbox_lib.h>
 #include <ircd_defs.h>
 
