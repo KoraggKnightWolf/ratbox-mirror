@@ -121,7 +121,7 @@ bandb_start(void)
 	}
 
 
-	bandb_helper = rb_helper_start("bandb", bandb_path, bandb_parse, bandb_restart_cb);
+	bandb_helper = rb_helper_start("ircd-ratbox bandb daemon", bandb_path, bandb_parse, bandb_restart_cb);
 
 	if(bandb_helper == NULL)
 	{

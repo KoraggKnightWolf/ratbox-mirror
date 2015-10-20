@@ -225,7 +225,7 @@ start_resolver(void)
 		resolver_path = rb_strdup(fullpath);
 	}
 
-	dns_helper = rb_helper_start("resolver", resolver_path, parse_dns_reply, restart_resolver_cb);
+	dns_helper = rb_helper_start("ircd-ratbox resolver daemon", resolver_path, parse_dns_reply, restart_resolver_cb);
 
 	if(dns_helper == NULL)
 	{

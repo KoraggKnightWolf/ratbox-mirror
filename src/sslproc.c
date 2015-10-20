@@ -281,7 +281,7 @@ start_ssldaemon(int count, const char *ssl_ca_cert, const char *ssl_cert, const 
 		}
 		ssld_path = rb_strdup(fullpath);
 	}
-	rb_strlcpy(buf, "-ircd ssld daemon helper", sizeof(buf));
+	rb_strlcpy(buf, "-ircd-ratbox ssld daemon", sizeof(buf));
 	parv[0] = buf;
 	parv[1] = NULL;
 
