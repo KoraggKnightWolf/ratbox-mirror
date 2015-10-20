@@ -498,17 +498,17 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 {
 	char buf[IRCD_BUFSIZE];
 	va_list args;
-	rb_buf_head_t *rb_linebuf_local = alloca(rb_linebuf_bufhead_size());
-	rb_buf_head_t *rb_linebuf_name = alloca(rb_linebuf_bufhead_size());
-	rb_buf_head_t *rb_linebuf_id = alloca(rb_linebuf_bufhead_size());;
+	rb_buf_head_t rb_linebuf_local;
+	rb_buf_head_t rb_linebuf_name; 
+	rb_buf_head_t rb_linebuf_id;
 	struct Client *target_p;
 	struct membership *msptr;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
-	rb_linebuf_newbuf(rb_linebuf_local);
-	rb_linebuf_newbuf(rb_linebuf_name);
-	rb_linebuf_newbuf(rb_linebuf_id);
+	rb_linebuf_newbuf(&rb_linebuf_local);
+	rb_linebuf_newbuf(&rb_linebuf_name);
+	rb_linebuf_newbuf(&rb_linebuf_id);
 
 	current_serial++;
 
@@ -517,13 +517,13 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 	va_end(args);
 
 	if(IsServer(source_p))
-		rb_linebuf_putmsg(rb_linebuf_local, NULL, NULL, ":%s %s", source_p->name, buf);
+		rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL, ":%s %s", source_p->name, buf);
 	else
-		rb_linebuf_putmsg(rb_linebuf_local, NULL, NULL,
+		rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL,
 				  ":%s!%s@%s %s", source_p->name, source_p->username, source_p->host, buf);
 
-	rb_linebuf_putmsg(rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
-	rb_linebuf_putmsg(rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
+	rb_linebuf_putmsg(&rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
+	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
 
 
 	for(int i = MEMBER_NOOP; i < MEMBER_LAST; i++)
@@ -553,21 +553,21 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 				if(target_p->from->localClient->serial != current_serial)
 				{
 					if(has_id(target_p->from))
-						send_rb_linebuf_remote(target_p, source_p, rb_linebuf_id);
+						send_rb_linebuf_remote(target_p, source_p, &rb_linebuf_id);
 					else
-						send_rb_linebuf_remote(target_p, source_p, rb_linebuf_name);
+						send_rb_linebuf_remote(target_p, source_p, &rb_linebuf_name);
 
 					target_p->from->localClient->serial = current_serial;
 				}
 			}
 			else
-				send_linebuf(target_p, rb_linebuf_local);
+				send_linebuf(target_p, &rb_linebuf_local);
 		}
 	}
 
-	rb_linebuf_donebuf(rb_linebuf_local);
-	rb_linebuf_donebuf(rb_linebuf_name);
-	rb_linebuf_donebuf(rb_linebuf_id);
+	rb_linebuf_donebuf(&rb_linebuf_local);
+	rb_linebuf_donebuf(&rb_linebuf_name);
+	rb_linebuf_donebuf(&rb_linebuf_id);
 }
 
 
@@ -686,29 +686,27 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 	char buf[IRCD_BUFSIZE];
 	va_list args;
 	struct Client *target_p;
-	rb_dlink_node *ptr;
-	rb_dlink_node *next_ptr;
-	size_t bz = rb_linebuf_bufhead_size();
-	rb_buf_head_t *rb_linebuf_local = alloca(bz);
-	rb_buf_head_t *rb_linebuf_name = alloca(bz);
-	rb_buf_head_t *rb_linebuf_id = alloca(bz);
+	rb_dlink_node *ptr, *next_ptr;
+	rb_buf_head_t rb_linebuf_local;
+	rb_buf_head_t rb_linebuf_name;
+	rb_buf_head_t rb_linebuf_id;
 
-	rb_linebuf_newbuf(rb_linebuf_local);
-	rb_linebuf_newbuf(rb_linebuf_name);
-	rb_linebuf_newbuf(rb_linebuf_id);
+	rb_linebuf_newbuf(&rb_linebuf_local);
+	rb_linebuf_newbuf(&rb_linebuf_name);
+	rb_linebuf_newbuf(&rb_linebuf_id);
 
 	va_start(args, pattern);
 	vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
 	if(IsServer(source_p))
-		rb_linebuf_putmsg(rb_linebuf_local, NULL, NULL, ":%s %s", source_p->name, buf);
+		rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL, ":%s %s", source_p->name, buf);
 	else
-		rb_linebuf_putmsg(rb_linebuf_local, NULL, NULL,
+		rb_linebuf_putmsg(&rb_linebuf_local, NULL, NULL,
 				  ":%s!%s@%s %s", source_p->name, source_p->username, source_p->host, buf);
 
-	rb_linebuf_putmsg(rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
-	rb_linebuf_putmsg(rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
+	rb_linebuf_putmsg(&rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
+	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
 
 	if(what == MATCH_HOST)
 	{
@@ -720,7 +718,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
                                 continue;
 			
 			if(match(mask, target_p->host))
-				send_linebuf(target_p, rb_linebuf_local);
+				send_linebuf(target_p, &rb_linebuf_local);
 		}
 	}
 	/* what = MATCH_SERVER, if it doesnt match us, just send remote */
@@ -731,7 +729,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 			target_p = ptr->data;
 			if(IsFake(target_p))
 				continue;
-			send_linebuf(target_p, rb_linebuf_local);
+			send_linebuf(target_p, &rb_linebuf_local);
 		}
 	}
 
@@ -746,14 +744,14 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 			continue;
 
 		if(has_id(target_p))
-			send_rb_linebuf_remote(target_p, source_p, rb_linebuf_id);
+			send_rb_linebuf_remote(target_p, source_p, &rb_linebuf_id);
 		else
-			send_rb_linebuf_remote(target_p, source_p, rb_linebuf_name);
+			send_rb_linebuf_remote(target_p, source_p, &rb_linebuf_name);
 	}
 
-	rb_linebuf_donebuf(rb_linebuf_local);
-	rb_linebuf_donebuf(rb_linebuf_id);
-	rb_linebuf_donebuf(rb_linebuf_name);
+	rb_linebuf_donebuf(&rb_linebuf_local);
+	rb_linebuf_donebuf(&rb_linebuf_id);
+	rb_linebuf_donebuf(&rb_linebuf_name);
 }
 
 /* sendto_match_servs()
@@ -769,22 +767,21 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap, int nocap
 	va_list args;
 	rb_dlink_node *ptr;
 	struct Client *target_p;
-	size_t bz = rb_linebuf_bufhead_size();
-	rb_buf_head_t *rb_linebuf_id = alloca(bz);
-	rb_buf_head_t *rb_linebuf_name = alloca(bz);
+	rb_buf_head_t rb_linebuf_id;
+	rb_buf_head_t rb_linebuf_name;
 
 	if(EmptyString(mask))
 		return;
 
-	rb_linebuf_newbuf(rb_linebuf_id);
-	rb_linebuf_newbuf(rb_linebuf_name);
+	rb_linebuf_newbuf(&rb_linebuf_id);
+	rb_linebuf_newbuf(&rb_linebuf_name);
 
 	va_start(args, pattern);
 	vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
-	rb_linebuf_putmsg(rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
-	rb_linebuf_putmsg(rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
+	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s %s", use_id(source_p), buf);
+	rb_linebuf_putmsg(&rb_linebuf_name, NULL, NULL, ":%s %s", source_p->name, buf);
 
 	current_serial++;
 
@@ -813,14 +810,14 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap, int nocap
 				continue;
 
 			if(has_id(target_p->from))
-				send_linebuf(target_p->from, rb_linebuf_id);
+				send_linebuf(target_p->from, &rb_linebuf_id);
 			else
-				send_linebuf(target_p->from, rb_linebuf_name);
+				send_linebuf(target_p->from, &rb_linebuf_name);
 		}
 	}
 
-	rb_linebuf_donebuf(rb_linebuf_id);
-	rb_linebuf_donebuf(rb_linebuf_name);
+	rb_linebuf_donebuf(&rb_linebuf_id);
+	rb_linebuf_donebuf(&rb_linebuf_name);
 }
 
 /* sendto_monitor()
@@ -1019,19 +1016,18 @@ kill_client_serv_butone(struct Client *one, struct Client *target_p, const char 
 	struct Client *client_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	size_t bz = rb_linebuf_bufhead_size();
-	rb_buf_head_t *rb_linebuf_id = alloca(bz);
-	rb_buf_head_t *rb_linebuf_name = alloca(bz);
+	rb_buf_head_t rb_linebuf_id;
+	rb_buf_head_t rb_linebuf_name;
 
-	rb_linebuf_newbuf(rb_linebuf_name);
-	rb_linebuf_newbuf(rb_linebuf_id);
+	rb_linebuf_newbuf(&rb_linebuf_name);
+	rb_linebuf_newbuf(&rb_linebuf_id);
 
 	va_start(args, pattern);
 	vsnprintf(buf, sizeof(buf), pattern, args);
 	va_end(args);
 
-	rb_linebuf_putmsg(rb_linebuf_name, NULL, NULL, ":%s KILL %s :%s", me.name, target_p->name, buf);
-	rb_linebuf_putmsg(rb_linebuf_id, NULL, NULL, ":%s KILL %s :%s", use_id(&me), use_id(target_p), buf);
+	rb_linebuf_putmsg(&rb_linebuf_name, NULL, NULL, ":%s KILL %s :%s", me.name, target_p->name, buf);
+	rb_linebuf_putmsg(&rb_linebuf_id, NULL, NULL, ":%s KILL %s :%s", use_id(&me), use_id(target_p), buf);
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, serv_list.head)
 	{
@@ -1044,11 +1040,11 @@ kill_client_serv_butone(struct Client *one, struct Client *target_p, const char 
 			continue;
 
 		if(has_id(client_p))
-			send_linebuf(client_p, rb_linebuf_id);
+			send_linebuf(client_p, &rb_linebuf_id);
 		else
-			send_linebuf(client_p, rb_linebuf_name);
+			send_linebuf(client_p, &rb_linebuf_name);
 	}
 
-	rb_linebuf_donebuf(rb_linebuf_id);
-	rb_linebuf_donebuf(rb_linebuf_name);
+	rb_linebuf_donebuf(&rb_linebuf_id);
+	rb_linebuf_donebuf(&rb_linebuf_name);
 }
