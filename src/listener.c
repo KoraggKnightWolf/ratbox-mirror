@@ -45,12 +45,9 @@
 
 #define log_listener(str, name, err) do { sendto_realops_flags(UMODE_DEBUG, L_ALL, str, name, err); ilog(L_IOERROR, str, name, err); } while(0)
 
-
 static rb_dlink_list listener_list;
 static int accept_precallback(rb_fde_t * F, struct sockaddr *addr, rb_socklen_t addrlen, void *data);
 static void accept_callback(rb_fde_t * F, int status, struct sockaddr *addr, rb_socklen_t addrlen, void *data);
-
-
 
 static struct Listener *
 make_listener(struct rb_sockaddr_storage *addr)
@@ -186,7 +183,6 @@ inetport(struct Listener *listener)
 			listener->name = listener->vhost;
 		}
 	}
-
 
 	if(F == NULL)
 	{
@@ -352,6 +348,7 @@ add_listener(int port, const char *vhost_ip, int family, int ssl)
 	default:
 		break;
 	}
+
 	if((listener = find_listener(&vaddr)))
 	{
 		if(listener->F != NULL)
@@ -427,7 +424,6 @@ add_connection(struct Listener *listener, rb_fde_t * F, struct sockaddr *sai, st
 	 */
 	new_client = make_client(NULL);
 
-
 	if(listener->ssl)
 	{
 		rb_fde_t *xF[2];
@@ -464,12 +460,7 @@ add_connection(struct Listener *listener, rb_fde_t * F, struct sockaddr *sai, st
 
 	rb_inet_ntop_sock((struct sockaddr *)&new_client->localClient->ip, new_client->sockhost,
 			  sizeof(new_client->sockhost));
-
-
 	rb_strlcpy(new_client->host, new_client->sockhost, sizeof(new_client->host));
-
-	
-
 
 #ifdef RB_IPV6
 	if(GET_SS_FAMILY(&new_client->localClient->ip) == AF_INET6 && ConfigFileEntry.dot_in_ip6_addr == 1)
@@ -477,7 +468,6 @@ add_connection(struct Listener *listener, rb_fde_t * F, struct sockaddr *sai, st
 		rb_strlcat(new_client->host, ".", sizeof(new_client->host));
 	}
 #endif
-
 	new_client->localClient->F = F;
 	new_client->localClient->listener = listener;
 
@@ -532,7 +522,6 @@ accept_precallback(rb_fde_t * F, struct sockaddr *addr, rb_socklen_t addrlen, vo
         }
 
 #endif
-
 	/* Do an initial check we aren't connecting too fast or with too many
 	 * from this IP... */
 	if(aconf != NULL)
@@ -561,9 +550,6 @@ send_error:
         rb_write(F, reason, strlen(reason));
         rb_close(F);
         return 0;
-        
-
-
 }
 
 static void
