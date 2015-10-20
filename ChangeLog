@@ -1,3 +1,11 @@
+androsyn    2015/10/20 17:09:43 UTC	(20151020_4-28837)
+  Log:
+  style only changes
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2015/10/20 16:22:38 UTC	(20151020_3-28835)
   Log:
   Stop exporting resvTable from hash.c
