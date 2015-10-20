@@ -1,3 +1,11 @@
+androsyn    2015/10/20 17:42:48 UTC	(20151020_5-28839)
+  Log:
+  whitespace cleanup
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2015/10/20 17:09:43 UTC	(20151020_4-28837)
   Log:
   style only changes
