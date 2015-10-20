@@ -371,10 +371,5 @@ char *generate_uid(void);
 
 void flood_endgrace(struct Client *);
 
-extern struct Client *create_fake_client(const char *, const char *, const char *, const char *, int);
-extern void destroy_fake_client(struct Client *);
-extern struct Client *create_fake_server(const char *, const char *, int);
-extern void destroy_fake_server(struct Client *, int);
-
 
 #endif /* INCLUDED_client_h */

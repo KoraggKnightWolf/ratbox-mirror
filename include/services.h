@@ -58,7 +58,7 @@ struct SVCMessage
 typedef int (*sfn) (void *data);
 
 struct Service *create_service(const char *nick, const char *username, const char *host,
-			       const char *gecos, int opered);
+			       const char *gecos, bool opered);
 void destroy_service(struct Service *service_p);
 
 int handle_services_message(hook_service_message_data *);
@@ -76,7 +76,11 @@ void try_command(struct Client *source_p, struct Service *service_p, const char 
 void svc_set_unknown(struct Service *service_p, SVCMessageHandler unknown);
 struct SVCMessage *svc_get_cmd(struct Service *service_p, char *cmd);
 
-struct Client *create_fake_client(const char *, const char *, const char *, const char *, int);
 void init_fake_services(void);
-
 #endif
+
+extern struct Client *create_fake_client(const char *, const char *, const char *, const char *, bool opered);
+extern void destroy_fake_client(struct Client *);
+extern struct Client *create_fake_server(const char *, const char *, int);
+extern void destroy_fake_server(struct Client *, int);
+

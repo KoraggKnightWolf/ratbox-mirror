@@ -80,7 +80,7 @@ cmd_hash(const char *p)
  *
  */
 struct Service *
-create_service(const char *nick, const char *username, const char *host, const char *gecos, int opered)
+create_service(const char *nick, const char *username, const char *host, const char *gecos, bool opered)
 {
 	struct Service *service_p;
 	struct Client *client_p = create_fake_client(nick, username, host, gecos, opered);
@@ -430,33 +430,6 @@ svc_add_cmd(struct Service *service_p, struct SVCMessage *msg)
 	rb_dlinkAddAlloc(msg, &service_p->command_tbl[hashv]);
 }
 
-
-/* find_cmd()
- * 
- * inputs       - service pointer
- *              - service message
- * outputs      - dlink node
- */
-/*
-static rb_dlink_node *
-find_cmd(struct Service *service_p, struct SVCMessage *msg)
-{
-	rb_dlink_node *ptr;
-	struct SVCMessage *mptr;
-
-	RB_DLINK_FOREACH(ptr, service_p->commands.head)
-	{
-		mptr = (struct SVCMessage *) ptr->data;
-
-		if(mptr == msg)
-			return ptr;
-	}
-
-	return NULL;
-}
-*/
-
-
 /* svc_del_cmd
  *
  * inputs   - command name
@@ -515,14 +488,13 @@ service_cmd_parse(struct Client *client_p, const char *cmd)
 
 struct Client *
 create_fake_client(const char *name, const char *username, const char *host,
-               const char *gecos, int opered)
+               const char *gecos, bool opered)
 {
 	struct Client *fake_p;
 	
 	if((fake_p = find_client(name)))
 	{
-		kill_client_serv_butone(NULL, fake_p,
-								"%s (In use by services)", me.name);
+		kill_client_serv_butone(NULL, fake_p, "%s (In use by services)", me.name);
 		fake_p->flags |= FLAGS_KILLED;
 		exit_client(NULL, fake_p, &me, "In use by services");
 	}
@@ -549,7 +521,7 @@ create_fake_client(const char *name, const char *username, const char *host,
 	
 	fake_p->umodes = UMODE_INVISIBLE;
 	
-	if(opered)
+	if(opered == true)
 		fake_p->umodes |= UMODE_OPER;
 	
 	//fake_p->user->server = me.name;
