@@ -780,58 +780,64 @@ stats_ports(struct Client *source_p)
 		show_ports(source_p);
 }
 
+
 static void
-stats_tresv(struct Client *source_p)
+stats_resv_common(struct Client *source_p, bool wanttemp)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
-	int i;
+	rb_dlink_list *resv_lists;
+	char letter = 'q';
+	if(wanttemp == false)
+		letter = 'Q';
 
 	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
 	{
-		aconf = ptr->data;
-		if(aconf->flags & CONF_FLAGS_TEMPORARY)
-			sendto_one_numeric(source_p, RPL_STATSQLINE,
-					   form_str(RPL_STATSQLINE),
-					   'q', aconf->port, aconf->host, aconf->passwd);
+		struct ConfItem *aconf = ptr->data;
+		bool istemp = aconf->flags & CONF_FLAGS_TEMPORARY;
+		
+		if((istemp == true && wanttemp == false) || (istemp == false && wanttemp == true))
+			continue;
+		sendto_one_numeric(source_p, RPL_STATSQLINE,
+				   form_str(RPL_STATSQLINE),
+				   letter, aconf->port, aconf->host, aconf->passwd);
 	}
+	
+	resv_lists = hash_get_tablelist(HASH_RESV);
+	if(resv_lists == NULL)
+		return;
 
-	HASH_WALK(i, R_MAX, ptr, resvTable)
+	RB_DLINK_FOREACH(ptr, resv_lists->head)
 	{
-		aconf = ptr->data;
-		if(aconf->flags & CONF_FLAGS_TEMPORARY)
+		rb_dlink_list *list = ptr->data;
+		rb_dlink_node *lptr;
+		RB_DLINK_FOREACH(lptr, list->head)
+		{
+			struct ConfItem *aconf = lptr->data;
+			bool istemp = aconf->flags & CONF_FLAGS_TEMPORARY;
+		
+			if((istemp == true && wanttemp == false) || (istemp == false && wanttemp == true))
+				continue;
 			sendto_one_numeric(source_p, RPL_STATSQLINE,
 					   form_str(RPL_STATSQLINE),
-					   'q', aconf->port, aconf->host, aconf->passwd);
+					   letter, aconf->port, aconf->host, aconf->passwd);
+		}
 	}
-HASH_WALK_END}
+	hash_free_tablelist(resv_lists);
+}
+
+static void
+stats_tresv(struct Client *source_p)
+{
+	stats_resv_common(source_p, true);
+}
 
 
 static void
 stats_resv(struct Client *source_p)
 {
-	struct ConfItem *aconf;
-	rb_dlink_node *ptr;
-	int i;
+	stats_resv_common(source_p, false);
+}
 
-	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
-	{
-		aconf = ptr->data;
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
-			sendto_one_numeric(source_p, RPL_STATSQLINE,
-					   form_str(RPL_STATSQLINE),
-					   'Q', aconf->port, aconf->host, aconf->passwd);
-	}
-
-	HASH_WALK(i, R_MAX, ptr, resvTable)
-	{
-		aconf = ptr->data;
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
-			sendto_one_numeric(source_p, RPL_STATSQLINE,
-					   form_str(RPL_STATSQLINE),
-					   'Q', aconf->port, aconf->host, aconf->passwd);
-	}
-HASH_WALK_END}
 
 static void
 stats_usage(struct Client *source_p)

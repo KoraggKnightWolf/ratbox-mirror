@@ -54,7 +54,7 @@ static rb_dlink_list clientbyzconnidTable[ZCONNID_MAX];	/* i doubt we'll have th
 static rb_dlink_list clientTable[U_MAX];
 static rb_dlink_list channelTable[CH_MAX];
 static rb_dlink_list idTable[U_MAX];
-rb_dlink_list resvTable[R_MAX];
+static rb_dlink_list resvTable[R_MAX];
 static rb_dlink_list hostTable[HOST_MAX];
 static rb_dlink_list helpTable[HELP_MAX];
 static rb_dlink_list ndTable[U_MAX];
@@ -574,6 +574,39 @@ rb_dlink_list hash_get_channel_block(int i)
 }
         
 
+rb_dlink_list *hash_get_tablelist(int type)
+{
+        rb_dlink_list *table = hash_function[type].table;
+        rb_dlink_list *alltables;
+
+	alltables = rb_malloc(sizeof(rb_dlink_list));
+
+        for(int i = 0; i < 1<<hash_function[type].hashbits; i++)
+        {
+                if(rb_dlink_list_length(&table[i]) == 0)
+                        continue;
+                rb_dlinkAddAlloc(&table[i], alltables);
+        }
+
+        if(rb_dlink_list_length(alltables) == 0)
+        {
+                rb_free(alltables);
+                alltables = NULL;
+        }
+        return alltables;
+}
+
+void hash_free_tablelist(rb_dlink_list *table)
+{
+        rb_dlink_node *ptr, *next;
+        RB_DLINK_FOREACH_SAFE(ptr, next, table->head)
+        {
+                rb_free_rb_dlink_node(ptr);
+        }
+        rb_free(table);        
+}	
+
+
 /* hash_find_resv()
  *
  * hunts for a resv entry in the resv hash table
@@ -814,3 +847,4 @@ hash_stats(struct Client *source_p)
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");
 	count_hash(source_p, clientbyconnidTable, CLI_CONNID_MAX, "Client by connection id");
 }
+

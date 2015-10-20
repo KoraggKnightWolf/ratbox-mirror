@@ -30,8 +30,6 @@
 #include <cache.h>
 #include <s_newconf.h>
 
-extern rb_dlink_list resvTable[];
-
 /* Magic value for FNV hash functions */
 #define FNV1_32_INIT 0x811c9dc5UL
 
@@ -111,6 +109,9 @@ void del_from_zconnid_hash(struct Client *client_p);
 
 void hash_stats(struct Client *);
 rb_dlink_list hash_get_channel_block(int i);
+
+rb_dlink_list *hash_get_tablelist(int type);  
+void hash_free_tablelist(rb_dlink_list *tables);
 
 
 #endif /* INCLUDED_hash_h */

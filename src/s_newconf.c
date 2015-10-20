@@ -701,29 +701,36 @@ valid_temp_time(const char *p)
 static void
 expire_temp_rxlines(void *unused)
 {
-	struct ConfItem *aconf;
+	rb_dlink_list *resv_lists;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	int i;
 
-	HASH_WALK_SAFE(i, R_MAX, ptr, next_ptr, resvTable)
+	resv_lists = hash_get_tablelist(HASH_RESV);
+	if(resv_lists != NULL)
 	{
-		aconf = ptr->data;
-
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
+		RB_DLINK_FOREACH(ptr, resv_lists->head)
 		{
-			if(ConfigFileEntry.tkline_expire_notices)
-				sendto_realops_flags(UMODE_ALL, L_ALL, "Temporary RESV for [%s] expired", aconf->host);
+			rb_dlink_list *list = ptr->data;
+			rb_dlink_node *lptr;
+			RB_DLINK_FOREACH(lptr, list->head)
+			{
+				struct ConfItem *aconf = lptr->data;
+				if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
+				{
+					if(ConfigFileEntry.tkline_expire_notices)
+						sendto_realops_flags(UMODE_ALL, L_ALL, "Temporary RESV for [%s] expired", aconf->host);
 
-			free_conf(aconf);
-			rb_dlinkDestroy(ptr, &resvTable[i]);
+					free_conf(aconf);
+					rb_dlinkDestroy(lptr, list);
+				}
+			}
 		}
+		hash_free_tablelist(resv_lists);
 	}
-	HASH_WALK_END;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
 		{
@@ -736,7 +743,7 @@ expire_temp_rxlines(void *unused)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, xline_conf_list.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
 		{

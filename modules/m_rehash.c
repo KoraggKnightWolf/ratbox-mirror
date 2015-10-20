@@ -207,34 +207,31 @@ rehash_txlines(struct Client *source_p)
 static void
 rehash_tresvs(struct Client *source_p)
 {
-	struct ConfItem *aconf;
+        rb_dlink_list *resv_lists;
 	rb_dlink_node *ptr;
-	rb_dlink_node *next_ptr;
-	int i;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is clearing temp resvs",
 			     get_oper_name(source_p));
 
-	HASH_WALK_SAFE(i, R_MAX, ptr, next_ptr, resvTable)
-	{
-		aconf = ptr->data;
-
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
-			continue;
-
-		free_conf(aconf);
-		rb_dlinkDestroy(ptr, &resvTable[i]);
-	}
-	HASH_WALK_END RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
-	{
-		aconf = ptr->data;
-
-		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
-			continue;
-
-		free_conf(aconf);
-		rb_dlinkDestroy(ptr, &resv_conf_list);
-	}
+        resv_lists = hash_get_tablelist(HASH_RESV);
+        if(resv_lists == NULL)
+                return;
+                
+        RB_DLINK_FOREACH(ptr, resv_lists->head)
+        {
+                rb_dlink_node *lptr;
+                rb_dlink_list *list = ptr->data;
+                RB_DLINK_FOREACH(lptr, list->head)
+                {
+                        struct ConfItem *aconf = lptr->data;
+                        if((aconf->flags & CONF_FLAGS_TEMPORARY) == false)
+                                continue;
+                        free_conf(aconf);
+                        rb_dlinkDestroy(lptr, list);
+                }
+                
+        }
+        hash_free_tablelist(resv_lists);
 }
 
 static void
