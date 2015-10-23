@@ -142,11 +142,11 @@ static void conn_plain_read_cb(rb_fde_t *fd, void *data);
 static void conn_plain_read_shutdown_cb(rb_fde_t *fd, void *data);
 static void mod_cmd_write_queue(mod_ctl_t * ctl, const void *data, size_t len);
 static const char *remote_closed = "Remote host closed the connection";
-static int ssl_ok;
+static bool ssl_ok = false;
 #ifdef HAVE_ZLIB
-static int zlib_ok = 1;
+static bool zlib_ok = true;
 #else
-static int zlib_ok = 0;
+static bool zlib_ok = false;
 #endif
 
 static inline uint32_t
@@ -1087,7 +1087,7 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 					break;
 				}
 
-				if(!ssl_ok)
+				if(ssl_ok == false)
 				{
 					send_nossl_support(ctl, ctl_buf);
 					break;
@@ -1103,7 +1103,7 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 					break;
 				}
 
-				if(!ssl_ok)
+				if(ssl_ok == false)
 				{
 					send_nossl_support(ctl, ctl_buf);
 					break;
@@ -1114,7 +1114,7 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 
 		case 'K':
 			{
-				if(!ssl_ok)
+				if(ssl_ok == false)
 				{
 					send_nossl_support(ctl, ctl_buf);
 					break;
@@ -1310,7 +1310,7 @@ main(int argc, char **argv)
 	rb_event_addish("clean_dead_conns", clean_dead_conns, NULL, 10);
 	read_pipe_ctl(mod_ctl->F_pipe, NULL);
 	mod_read_ctl(mod_ctl->F, mod_ctl);
-	if(!zlib_ok && !ssl_ok)
+	if(zlib_ok == false && ssl_ok == false)
 	{
 		/* this is really useless... */
 		send_i_am_useless(mod_ctl);
@@ -1319,9 +1319,9 @@ main(int argc, char **argv)
 		exit(1);
 	}
 
-	if(!zlib_ok)
+	if(zlib_ok == false)
 		send_nozlib_support(mod_ctl, NULL);
-	if(!ssl_ok)
+	if(ssl_ok == false)
 		send_nossl_support(mod_ctl, NULL);
 	rb_lib_loop(0);
 }
