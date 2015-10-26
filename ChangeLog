@@ -1,3 +1,11 @@
+androsyn    2015/10/26 20:07:54 UTC	(20151026_2-28857)
+  Log:
+  why did i change current_serial to uint32_t, just use unsigned long
+
+  Modified:
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2015/10/26 17:13:30 UTC	(20151026_1-28855)
   Log:
   have find_hostname return a rb_dlink_list instead of the head node.  functionally the same, but I think this way is a bit more correct and follows the patterns of other code
