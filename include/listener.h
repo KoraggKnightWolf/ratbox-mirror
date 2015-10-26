@@ -34,13 +34,13 @@ struct Listener
 	char *printable_name;	/* printable listener name */
 	rb_fde_t *F;		/* file descriptor */
 	int ref_count;		/* number of connection references */
-	int active;		/* current state of listener */
-	int ssl;		/* ssl listener */
+	bool active;		/* current state of listener */
+	bool ssl;		/* ssl listener */
 	struct rb_sockaddr_storage addr;
 	char vhost[HOSTLEN + 1];	/* virtual name of listener */
 };
 
-void add_listener(int port, const char *vaddr_ip, int family, int ssl);
+void add_listener(int port, const char *vaddr_ip, int family, bool ssl);
 void close_listener(struct Listener *listener);
 void close_listeners(void);
 const char *get_listener_name(struct Listener *listener);

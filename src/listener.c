@@ -132,8 +132,8 @@ show_ports(struct Client *source_p)
 				   ntohs(((struct sockaddr_in *)&listener->addr)->sin_port),
 #endif
 				   IsOperAdmin(source_p) ? listener->name : me.name,
-				   listener->ref_count, (listener->active) ? "active" : "disabled",
-				   listener->ssl ? " ssl" : "");
+				   listener->ref_count, (listener->active == true) ? "active" : "disabled",
+				   listener->ssl == true ? " ssl" : "");
 	}
 }
 
@@ -298,7 +298,7 @@ find_listener(struct rb_sockaddr_storage *addr)
  * the format "255.255.255.255"
  */
 void
-add_listener(int port, const char *vhost_ip, int family, int ssl)
+add_listener(int port, const char *vhost_ip, int family, bool ssl)
 {
 	struct Listener *listener;
 	struct rb_sockaddr_storage vaddr;
@@ -424,7 +424,7 @@ add_connection(struct Listener *listener, rb_fde_t * F, struct sockaddr *sai, st
 	 */
 	new_client = make_client(NULL);
 
-	if(listener->ssl)
+	if(listener->ssl == true)
 	{
 		rb_fde_t *xF[2];
 		if(rb_socketpair(AF_UNIX, SOCK_STREAM, 0, &xF[0], &xF[1], "Incoming ssld Connection") == -1)
@@ -485,7 +485,7 @@ accept_precallback(rb_fde_t * F, struct sockaddr *addr, rb_socklen_t addrlen, vo
 	char reason[IRCD_BUFSIZE] = "ERROR :Connection failed\r\n";
 	struct ConfItem *aconf;
 
-	if(listener->ssl && (!ircd_ssl_ok || !get_ssld_count()))
+	if(listener->ssl == true && (!ircd_ssl_ok || !get_ssld_count()))
 	        goto send_error;
 
 	if((maxconnections - 10) < rb_get_fd(F))	/* XXX this is kinda bogus */
