@@ -41,7 +41,7 @@
 #include <monitor.h>
 
 
-static uint32_t current_serial = 0L;
+static unsigned long current_serial = 0L;
 static void send_queued_write(rb_fde_t * F, void *data);
 static void send_queued(struct Client *to);
 
@@ -642,7 +642,7 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 	rb_linebuf_putmsg(&linebuf, pattern, &args, NULL);
 	va_end(args);
 
-	++current_serial;
+	current_serial++;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, user->user->channel.head)
 	{
