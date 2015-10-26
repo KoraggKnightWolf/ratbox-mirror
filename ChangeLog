@@ -1,3 +1,13 @@
+androsyn    2015/10/26 17:13:30 UTC	(20151026_1-28855)
+  Log:
+  have find_hostname return a rb_dlink_list instead of the head node.  functionally the same, but I think this way is a bit more correct and follows the patterns of other code
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2015/10/26 15:52:53 UTC	(20151026_0-28853)
   Log:
   Port from trunk-broken, the original commit message is:
