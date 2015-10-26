@@ -465,7 +465,7 @@ find_server(struct Client *source_p, const char *name)
  * we return the full dlink list, because you can have multiple
  * entries with the same hostname
  */
-rb_dlink_node *
+rb_dlink_list *
 find_hostname(const char *hostname)
 {
 	uint32_t hashv;
@@ -475,7 +475,7 @@ find_hostname(const char *hostname)
 
 	hashv = hash_hostname(hostname);
 
-	return hostTable[hashv].head;
+	return &hostTable[hashv];
 }
 
 /* find_channel()

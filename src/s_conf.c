@@ -476,7 +476,7 @@ attach_iline(struct Client *client_p, struct ConfItem *aconf)
 		unidented = 1;
 
 	/* find_hostname() returns the head of the list to search */
-	RB_DLINK_FOREACH(ptr, find_hostname(client_p->host))
+	RB_DLINK_FOREACH(ptr, (find_hostname(client_p->host))->head )
 	{
 		target_p = ptr->data;
 

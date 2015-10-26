@@ -86,7 +86,7 @@ struct Client *find_id(const char *name);
 struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
 struct Channel *find_channel(const char *name);
 
-rb_dlink_node *find_hostname(const char *);
+rb_dlink_list *find_hostname(const char *);
 
 struct ConfItem *hash_find_resv(const char *name);
 void clear_resv_hash(void);
