@@ -1,3 +1,12 @@
+androsyn    2015/10/26 20:11:55 UTC	(20151026_3-28859)
+  Log:
+  boolify ssl and active arguments in struct Listener and its respective code
+
+  Modified:
+	ircd-ratbox/trunk/include/listener.h (File Modified) 
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2015/10/26 20:07:54 UTC	(20151026_2-28857)
   Log:
   why did i change current_serial to uint32_t, just use unsigned long
