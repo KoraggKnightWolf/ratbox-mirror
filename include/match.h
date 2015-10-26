@@ -39,6 +39,8 @@ int match(const char *mask, const char *name);
 int match_esc(const char *mask, const char *name);
 int match_cidr(const char *mask, const char *name);
 int match_ips(const char *mask, const char *addr);
+
+
 /*
  * comp_with_mask - compares to IP address
  */
@@ -55,14 +57,6 @@ int comp_with_mask_sock(struct sockaddr *addr, struct sockaddr *dest, unsigned i
 char *collapse(char *pattern);
 char *collapse_esc(char *pattern);
 
-/*
- * irccmp - case insensitive comparison of s1 and s2
- */
-int irccmp(const char *s1, const char *s2);
-/*
- * ircncmp - counted case insensitive comparison of s1 and s2
- */
-int ircncmp(const char *s1, const char *s2, size_t n);
 
 bool valid_hostname(const char *hostname);
 bool valid_username(const char *username);
@@ -71,6 +65,7 @@ bool valid_servername(const char *servername);
 
 #define EmptyString(x) ((x == NULL) || (*(x) == '\0'))
 #define CheckEmpty(x) EmptyString(x) ? "" : x
+
 
 /*
  * character macros
@@ -130,5 +125,52 @@ extern const unsigned int CharAttrs[];
 
 #define IsNonEOS(c) (CharAttrs[(unsigned char)(c)] & NONEOS_C)
 #define IsEol(c) (CharAttrs[(unsigned char)(c)] & EOL_C)
+
+
+/*
+ * irccmp - case insensitive comparison of s1 and s2
+ */
+
+/* inline versions */
+static inline int
+irccmp(const char *s1, const char *s2)
+{
+	const unsigned char *str1 = (const unsigned char *)s1;
+	const unsigned char *str2 = (const unsigned char *)s2;
+	int res;
+
+	while((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
+	{
+		if(*str1 == '\0')
+			return 0;
+		str1++;
+		str2++;
+	}
+	return (res);
+}
+
+/*
+ * ircncmp - counted case insensitive comparison of s1 and s2
+ */
+
+static inline int
+ircncmp(const char *s1, const char *s2, size_t n)
+{
+	const unsigned char *str1 = (const unsigned char *)s1;
+	const unsigned char *str2 = (const unsigned char *)s2;
+	int res;
+
+	while((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
+	{
+		str1++;
+		str2++;
+		n--;
+		if(n == 0 || (*str1 == '\0' && *str2 == '\0'))
+			return 0;
+	}
+	return (res);
+}
+
+
 
 #endif /* INCLUDED_match_h */

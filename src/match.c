@@ -474,53 +474,6 @@ collapse_esc(char *pattern)
 	return pattern;
 }
 
-/*
- * irccmp - case insensitive comparison of two 0 terminated strings.
- *
- *	returns	 0, if s1 equal to s2
- *		<0, if s1 lexicographically less than s2
- *		>0, if s1 lexicographically greater than s2
- */
-int
-irccmp(const char *s1, const char *s2)
-{
-	const unsigned char *str1 = (const unsigned char *)s1;
-	const unsigned char *str2 = (const unsigned char *)s2;
-	int res;
-
-	s_assert(s1 != NULL);
-	s_assert(s2 != NULL);
-
-	while((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
-	{
-		if(*str1 == '\0')
-			return 0;
-		str1++;
-		str2++;
-	}
-	return (res);
-}
-
-int
-ircncmp(const char *s1, const char *s2, size_t n)
-{
-	const unsigned char *str1 = (const unsigned char *)s1;
-	const unsigned char *str2 = (const unsigned char *)s2;
-	int res;
-	s_assert(s1 != NULL);
-	s_assert(s2 != NULL);
-
-	while((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
-	{
-		str1++;
-		str2++;
-		n--;
-		if(n == 0 || (*str1 == '\0' && *str2 == '\0'))
-			return 0;
-	}
-	return (res);
-}
-
 
 /* 
  * valid_hostname - check hostname for validity
