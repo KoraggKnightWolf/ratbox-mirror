@@ -1,3 +1,24 @@
+androsyn    2015/10/26 15:52:53 UTC	(20151026_0-28853)
+  Log:
+  Port from trunk-broken, the original commit message is:
+  
+  Rev 27203 - jilles - 2011-08-30 18:52:08 - Rev 27183
+  Log message:	Ensure all signals keep working after a SIGINT restart.
+  
+  After setting up signal handlers, unmask the signals we care about
+  (installed handlers for).
+  
+  When handling SIGINT, the kernel adds SIGHUP and SIGINT to the signal
+  mask (as requested in sigaction()); if execve() is called from the
+  signal handler, this change is persistent.
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd_signal.c (File Modified) 
+
+
 androsyn    2015/10/23 16:02:35 UTC	(20151023_0-28849)
   Log:
   boolify ssl_ok/zlib_ok
