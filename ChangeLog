@@ -1,3 +1,12 @@
+androsyn    2015/10/26 20:29:54 UTC	(20151026_4-28861)
+  Log:
+  inline irccmp and ircncmp
+
+  Modified:
+	ircd-ratbox/trunk/include/match.h (File Modified) 
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 androsyn    2015/10/26 20:11:55 UTC	(20151026_3-28859)
   Log:
   boolify ssl and active arguments in struct Listener and its respective code
