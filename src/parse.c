@@ -59,7 +59,7 @@ static struct Message *hash_parse(const char *);
 
 struct MessageHash *msg_hash_table[MAX_MSG_HASH];
 
-static char buffer[1024];
+static char buffer[IRCD_BUFSIZE * 2];
 
 /* turn a string into a parc/parv pair */
 
