@@ -91,7 +91,7 @@
 #include <channel.h>
 #include <supported.h>
 
-rb_dlink_list isupportlist;
+static rb_dlink_list isupportlist;
 
 struct isupportitem
 {
