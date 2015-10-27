@@ -1,3 +1,11 @@
+androsyn    2015/10/27 04:52:07 UTC	(20151027_16-28901)
+  Log:
+  get the numeric/format strings for certfp too
+
+  Modified:
+	ircd-ratbox/trunk/include/numeric.h (File Modified) 
+
+
 androsyn    2015/10/27 04:27:46 UTC	(20151027_15-28899)
   Log:
   output client certificate fingerprint in whois
