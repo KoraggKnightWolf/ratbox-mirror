@@ -86,6 +86,7 @@
 #define NUMERIC_STR_263	/*** RPL_LOAD2HI ***/		"%s :Server load is temporarily too heavy. Please wait a while and try again."
 #define NUMERIC_STR_265	/*** RPL_LOCALUSERS ***/	"%lu %lu :Current local users %lu, max %lu"
 #define NUMERIC_STR_266	/*** RPL_GLOBALUSERS ***/	"%lu %lu :Current global users %lu, max %lu"
+#define NUMERIC_STR_276	/*** RPL_WHOISCERTFP ***/	"%s :has client certificate fingerprint %s"
 #define NUMERIC_STR_281	/*** RPL_ACCEPTLIST ***/	"%s"
 #define NUMERIC_STR_282	/*** RPL_ENDOFACCEPT ***/	":End of /ACCEPT list."
 #define NUMERIC_STR_301	/*** RPL_AWAY ***/		"%s :%s"
@@ -297,6 +298,7 @@
 
 #define RPL_LOCALUSERS	     265
 #define RPL_GLOBALUSERS	     266
+#define RPL_WHOISCERTFP      276
 
 #define RPL_ACCEPTLIST	     281
 #define RPL_ENDOFACCEPT	     282
