@@ -1,3 +1,12 @@
+androsyn    2015/10/27 03:17:41 UTC	(20151027_14-28895)
+  Log:
+  a few minor include cleanups
+
+  Modified:
+	ircd-ratbox/trunk/src/bandbi.c (File Modified) 
+	ircd-ratbox/trunk/src/dns.c (File Modified) 
+
+
 androsyn    2015/10/27 03:10:30 UTC	(20151027_13-28893)
   Log:
   remove some unnecessary forward declarations
