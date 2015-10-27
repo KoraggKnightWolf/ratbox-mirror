@@ -1,3 +1,14 @@
+androsyn    2015/10/27 00:38:50 UTC	(20151027_4-28873)
+  Log:
+  make whowas_add_history take a bool for online/offline
+
+  Modified:
+	ircd-ratbox/trunk/include/whowas.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/10/27 00:32:02 UTC	(20151027_3-28871)
   Log:
   change isupportlist to static
