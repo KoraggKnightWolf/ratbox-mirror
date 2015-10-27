@@ -31,7 +31,6 @@
 #include <s_log.h>
 #include <s_conf.h>
 #include <client.h>
-#include <channel.h>
 #include <send.h>
 #include <numeric.h>
 

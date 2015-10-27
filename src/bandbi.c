@@ -38,17 +38,14 @@
 #include <s_log.h>
 #include <match.h>
 #include <bandbi.h>
+#include <send.h>
 #include <parse.h>
-#include <channel.h>
 #include <operhash.h>
 #include <hostmask.h>
-#include <cache.h>
-#include <s_newconf.h>
 #include <hash.h>
 #include <reject.h>
 #include <send.h>
 #include <ircd.h>
-
 
 static const char bandb_add_letter[] = {
 	[BANDB_KLINE] = 'K',
