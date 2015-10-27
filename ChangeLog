@@ -1,3 +1,11 @@
+androsyn    2015/10/27 04:27:46 UTC	(20151027_15-28899)
+  Log:
+  output client certificate fingerprint in whois
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+
+
 androsyn    2015/10/27 03:17:41 UTC	(20151027_14-28895)
   Log:
   a few minor include cleanups
