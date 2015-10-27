@@ -259,7 +259,8 @@ free_oper_conf(struct oper_conf *oper_p)
 	rb_free(oper_p->username);
 	rb_free(oper_p->host);
 	rb_free(oper_p->name);
-
+	rb_free(oper_p->certfp);
+	
 	if(oper_p->passwd)
 	{
 		memset(oper_p->passwd, 0, strlen(oper_p->passwd));

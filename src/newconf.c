@@ -1487,6 +1487,9 @@ conf_set_end_operator(conf_t * conf)
 		/* maybe an rsa key */
 		if(!EmptyString(t_oper->passwd))
 			tmp_oper->passwd = rb_strdup(t_oper->passwd);
+		
+		if(!EmptyString(t_oper->certfp))
+			tmp_oper->certfp = rb_strdup(t_oper->certfp);
 #ifdef USE_CHALLENGE
 		if(t_oper->rsa_pubkey_file != NULL)
 		{
@@ -1561,6 +1564,15 @@ conf_set_oper_password(confentry_t * entry, conf_t * conf, struct conf_items *it
 	}
 	t_oper->passwd = rb_strdup(entry->string);
 }
+
+static void
+conf_set_oper_certfp(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	if(t_oper->certfp != NULL)
+		rb_free(t_oper->certfp);
+	t_oper->certfp = rb_strdup(entry->string);
+}
+
 
 static void
 conf_set_oper_rsa_public_key_file(confentry_t * entry, conf_t * conf, struct conf_items *item)
@@ -2452,6 +2464,7 @@ static struct conf_items conf_operator_table[] =
 	{ "umodes",	CF_STRING | CF_FLIST, conf_set_oper_umodes,	0, NULL },
 	{ "user",	CF_QSTRING, conf_set_oper_user,		0, NULL },
 	{ "password",	CF_QSTRING, conf_set_oper_password,	0, NULL },
+	{ "certfp",	CF_QSTRING, conf_set_oper_certfp,	0, NULL },
 	{ "\0",	0, NULL, 0, NULL }
 };
 

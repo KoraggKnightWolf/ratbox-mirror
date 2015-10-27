@@ -147,6 +147,23 @@ m_oper(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		}
 		return 0;
 	}
+	
+	if(oper_p->certfp != NULL)
+	{
+		if(source_p->certfp == NULL || strcasecmp(oper_p->certfp, source_p->certfp) != 0)
+		{
+			sendto_one_numeric(source_p, s_RPL(ERR_NOOPERHOST));
+			ilog(L_FOPER, "FAILED OPER (%s) by (%s!%s@%s) -- client certificate fingerprint mismatch",
+				name, source_p->name, source_p->username, source_p->host);
+			if(ConfigFileEntry.failed_oper_notice)
+			{
+				sendto_realops_flags(UMODE_ALL, L_ALL,
+						     "Failed OPER attempt - client certificate fingerprint mismatch by  %s (%s@%s)",
+						     source_p->name, source_p->username, source_p->host);
+			}
+			return 0;
+		}
+	}
 
 	if(match_oper_password(password, oper_p))
 	{
