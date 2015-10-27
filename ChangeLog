@@ -1,3 +1,11 @@
+androsyn    2015/10/27 00:32:02 UTC	(20151027_3-28871)
+  Log:
+  change isupportlist to static
+
+  Modified:
+	ircd-ratbox/trunk/src/supported.c (File Modified) 
+
+
 androsyn    2015/10/27 00:15:20 UTC	(20151027_2-28869)
   Log:
   i think we can remove this ancient extern crypt prototype
