@@ -1,3 +1,11 @@
+androsyn    2015/10/27 01:23:26 UTC	(20151027_6-28877)
+  Log:
+  fix certfp hex mask
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2015/10/27 00:39:50 UTC	(20151027_5-28875)
   Log:
   put in missing word in comment
