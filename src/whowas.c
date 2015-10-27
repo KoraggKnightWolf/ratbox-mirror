@@ -133,7 +133,7 @@ whowas_add_history(struct Client *client_p, bool online)
 			rb_strlcpy(who->sockhost, client_p->sockhost, sizeof(who->sockhost));
 	}
 
-	/* this is safe do to the servername cache */
+	/* this is safe do to with the servername cache */
 	who->servername = client_p->servptr->name;
 
 	if(online == true)
