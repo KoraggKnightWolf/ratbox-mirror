@@ -717,6 +717,8 @@ start_ssld_accept(rb_fde_t * sslF, rb_fde_t * plainF, uint32_t id)
 	buf[0] = 'A';
 	uint32_to_buf(&buf[1], id);
 	ctl = which_ssld();
+	if(ctl == NULL)
+		return NULL;
 	ctl->cli_count++;
 	ssl_cmd_write_queue(ctl, F, 2, buf, sizeof(buf));
 	return ctl;
@@ -735,6 +737,8 @@ start_ssld_connect(rb_fde_t * sslF, rb_fde_t * plainF, uint32_t id)
 	uint32_to_buf(&buf[1], id);
 
 	ctl = which_ssld();
+	if(ctl == NULL)
+		return NULL;
 	ctl->cli_count++;
 	ssl_cmd_write_queue(ctl, F, 2, buf, sizeof(buf));
 	return ctl;
@@ -834,6 +838,8 @@ start_zlib_session(void *data)
 	server->localClient->F = xF2;
 
 	server->localClient->z_ctl = which_ssld();
+	if(server->localClient->z_ctl == NULL)
+		goto out; 
 	server->localClient->z_ctl->cli_count++;
 	ssl_cmd_write_queue(server->localClient->z_ctl, F, 2, buf, len);
 out:
