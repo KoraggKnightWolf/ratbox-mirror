@@ -198,11 +198,9 @@ whowas_init()
 void 
 whowas_set_size(int len)
 {
-        int i;
-
         if((whowas_list_length > len) && (rb_dlink_list_length(whowas_list) > len))
         {
-                for(i = rb_dlink_list_length(whowas_list) - len; i > 0; --i)
+                for(int i = rb_dlink_list_length(whowas_list) - len; i > 0; --i)
                 {
                         if(whowas_list->tail != NULL && whowas_list->tail->data != NULL)
                         {
