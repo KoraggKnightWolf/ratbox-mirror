@@ -1,3 +1,12 @@
+androsyn    2015/10/27 03:10:30 UTC	(20151027_13-28893)
+  Log:
+  remove some unnecessary forward declarations
+
+  Modified:
+	ircd-ratbox/trunk/include/s_serv.h (File Modified) 
+	ircd-ratbox/trunk/include/s_stats.h (File Modified) 
+
+
 androsyn    2015/10/27 02:58:19 UTC	(20151027_12-28891)
   Log:
   move counter declaration to the for loop in whowas_set_size
