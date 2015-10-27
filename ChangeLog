@@ -1,3 +1,11 @@
+androsyn    2015/10/27 02:58:19 UTC	(20151027_12-28891)
+  Log:
+  move counter declaration to the for loop in whowas_set_size
+
+  Modified:
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/10/27 02:50:23 UTC	(20151027_11-28889)
   Log:
   make that close_listeners(void) instead of ()
