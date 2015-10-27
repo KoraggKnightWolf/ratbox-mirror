@@ -349,7 +349,7 @@ static void
 ssl_process_certfp(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 {
 	struct Client *client_p;
-        const char *certfp;
+        uint8_t *certfp;
         char *certfp_string;
         uint32_t connid;
 
@@ -357,7 +357,7 @@ ssl_process_certfp(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
                 return;         /* bogus message..drop it.. XXX should warn here */
 
         connid = buf_to_uint32(&ctl_buf->buf[1]);
-	certfp = (const char *)&ctl_buf->buf[5];
+	certfp = (uint8_t *)&ctl_buf->buf[5];
 
 	if(EmptyString(certfp))
 		return;
