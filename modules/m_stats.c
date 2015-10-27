@@ -49,6 +49,7 @@
 #include <dns.h>
 #include <reject.h>
 #include <whowas.h>
+#include <operhash.h>
 #include <scache.h>
 #include <s_log.h>
 
@@ -1154,7 +1155,7 @@ static void
 stats_memory(struct Client *source_p)
 {
 	struct Client *target_p;
-	struct Channel *chptr;
+	//struct Channel *chptr;
 	struct Ban *actualBan;
 	rb_dlink_node *dlink;
 	rb_dlink_node *ptr;
@@ -1169,7 +1170,6 @@ stats_memory(struct Client *source_p)
 	int channel_invex = 0;
 
 	int class_count = 0;	/* classes */
-	int conf_count = 0;	/* conf lines */
 	int users_invited_count = 0;	/* users invited */
 	int user_channels = 0;	/* users in channels */
 	int aways_counted = 0;
@@ -1181,7 +1181,6 @@ stats_memory(struct Client *source_p)
 	size_t channel_invex_memory = 0;
 
 	size_t away_memory = 0;	/* memory used by aways */
-	size_t conf_memory = 0;	/* memory used by conf lines */
 	size_t mem_servers_cached;	/* memory used by scache */
 
 	size_t rb_linebuf_count = 0;
@@ -1198,9 +1197,14 @@ stats_memory(struct Client *source_p)
 	size_t whowas_memory = 0;
 	size_t whowas_count = 0;
 
+	size_t ohash_count = 0;
+	size_t ohash_mem = 0;
+
 	size_t total_memory = 0;
 
+
 	whowas_memory_usage(&whowas_count, &whowas_memory);
+	total_memory += whowas_memory;
 	
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
@@ -1224,11 +1228,14 @@ stats_memory(struct Client *source_p)
 			}
 		}
 	}
-
+	total_memory += users_counted * sizeof(struct User); 
+	total_memory += users_invited_count * sizeof(rb_dlink_node);
+	total_memory += away_memory;
+	
 	/* Count up all channels, ban lists, except lists, Invex lists */
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
-		chptr = ptr->data;
+		struct Channel *chptr = ptr->data;
 		channel_count++;
 		channel_memory += (strlen(chptr->chname) + sizeof(struct Channel));
 
@@ -1261,11 +1268,21 @@ stats_memory(struct Client *source_p)
 #undef ban_size
 	}
 
+	total_channel_memory += channel_memory + channel_ban_memory + channel_invex_memory;
+	total_channel_memory += (channel_bans + channel_invites + channel_except + channel_invex) * sizeof(rb_dlink_node);
+	total_memory += total_channel_memory;
+	
+	
 	/* count up all classes */
 
 	class_count = rb_dlink_list_length(&class_list) + 1;
 
+	total_memory += class_count * sizeof(struct Class);
+
+
 	rb_count_rb_linebuf_memory(&rb_linebuf_count, &rb_linebuf_memory_used);
+	total_memory += rb_linebuf_memory_used;
+
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :Users %u(%zu) Invites %u(%zu)",
@@ -1282,13 +1299,12 @@ stats_memory(struct Client *source_p)
 			   "z :Attached confs %u(%zu)",
 			   local_client_conf_count,
 			   local_client_conf_count * sizeof(rb_dlink_node));
-
-	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "z :Conflines %u(%zu)", conf_count, conf_memory);
+	total_memory += local_client_conf_count * sizeof(rb_dlink_node);
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :Classes %u(%zu)", class_count, class_count * sizeof(struct Class));
-
+	total_memory += class_count * sizeof(struct Class);
+	
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :Channels %u(%zu)", channel_count, channel_memory);
 
@@ -1307,11 +1323,6 @@ stats_memory(struct Client *source_p)
 			   channel_users * sizeof(rb_dlink_node),
 			   channel_invites, channel_invites * sizeof(rb_dlink_node));
 
-	total_channel_memory = channel_memory +
-		channel_ban_memory +
-		channel_users * sizeof(rb_dlink_node) + channel_invites * sizeof(rb_dlink_node);
-
-
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "z :Whowas entries: %zu, memory used: %zu",
 		 whowas_count, whowas_memory);
 
@@ -1324,22 +1335,21 @@ stats_memory(struct Client *source_p)
 			   "z :linebuf %zu(%zu)", rb_linebuf_count, rb_linebuf_memory_used);
 
 	count_scache(&number_servers_cached, &mem_servers_cached);
+	total_memory += mem_servers_cached;
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :scache %ld(%ld)",
 			   (long) number_servers_cached, (long) mem_servers_cached);
 
+	operhash_count(&ohash_count, &ohash_mem);
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "z :hostname hash %d(%ld)",
-			   HOST_MAX, (long) HOST_MAX * sizeof(rb_dlink_list));
-
-	total_memory = total_channel_memory + conf_memory +
-		class_count * sizeof(struct Class);
-
-	total_memory += mem_servers_cached;
+			   "z :Operator Hash entries: %zu memory used: %zu", ohash_count, ohash_mem); 
+			   
+	total_memory += ohash_mem;
+				 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
-			   "z :Total: channel %zu conf %zu",
-			   total_channel_memory, conf_memory);
+			   "z :Total: channel %zu",
+			   total_channel_memory);
 
 	count_local_client_memory(&local_client_count, &local_client_memory_used);
 	total_memory += local_client_memory_used;
