@@ -1,3 +1,11 @@
+androsyn    2015/10/27 00:15:20 UTC	(20151027_2-28869)
+  Log:
+  i think we can remove this ancient extern crypt prototype
+
+  Modified:
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2015/10/27 00:12:47 UTC	(20151027_1-28867)
   Log:
   try to get stats z total memory at least to add up all of the things we report line by line at least. this needs more work...
