@@ -1,3 +1,11 @@
+androsyn    2015/10/27 00:39:50 UTC	(20151027_5-28875)
+  Log:
+  put in missing word in comment
+
+  Modified:
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/10/27 00:38:50 UTC	(20151027_4-28873)
   Log:
   make whowas_add_history take a bool for online/offline
