@@ -293,7 +293,7 @@ load_all_modules(int warn)
 			load_a_module(module_fq_name, warn, 0);
 		}
 	}
-	(void)closedir(system_module_dir);
+	closedir(system_module_dir);
 }
 
 /* load_core_modules()
