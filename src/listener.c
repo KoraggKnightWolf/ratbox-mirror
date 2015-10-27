@@ -395,7 +395,7 @@ close_listener(struct Listener *listener)
  * close_listeners - close and free all listeners that are not being used
  */
 void
-close_listeners()
+close_listeners(void)
 {
 	struct Listener *listener;
 	rb_dlink_node *ptr, *next;
