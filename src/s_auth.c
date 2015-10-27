@@ -433,10 +433,6 @@ start_auth(struct Client *client)
 	SetAuth(auth);
 	SetRBL(auth);
 	
-	/*
-	if(no rbls configured)
-	        ClearRBL(auth);        
-        */
         rbl_check_rbls(auth);
 	
 	if(ConfigFileEntry.disable_auth == 0)
