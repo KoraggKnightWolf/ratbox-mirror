@@ -149,28 +149,4 @@ irccmp(const char *s1, const char *s2)
 	return (res);
 }
 
-/*
- * ircncmp - counted case insensitive comparison of s1 and s2
- */
-
-static inline int
-ircncmp(const char *s1, const char *s2, size_t n)
-{
-	const unsigned char *str1 = (const unsigned char *)s1;
-	const unsigned char *str2 = (const unsigned char *)s2;
-	int res;
-
-	while((res = ToUpper(*str1) - ToUpper(*str2)) == 0)
-	{
-		str1++;
-		str2++;
-		n--;
-		if(n == 0 || (*str1 == '\0' && *str2 == '\0'))
-			return 0;
-	}
-	return (res);
-}
-
-
-
 #endif /* INCLUDED_match_h */
