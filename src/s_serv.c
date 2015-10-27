@@ -124,7 +124,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 	int wilds;
 	rb_dlink_node *ptr;
 	const char *old;
-	char *new;
+	char *tgt;
 
 	/*
 	 * Assume it's me, if no server
@@ -133,7 +133,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 	   match(me.name, parv[server]) || match(parv[server], me.name) || (strcmp(parv[server], me.id) == 0))
 		return (HUNTED_ISME);
 
-	new = LOCAL_COPY(parv[server]);
+	tgt = LOCAL_COPY(parv[server]);
 
 	/*
 	 * These are to pickup matches that would cause the following
@@ -141,21 +141,21 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 	 * non-matching lookups.
 	 */
 	if(MyClient(source_p))
-		target_p = find_named_client(new);
+		target_p = find_named_client(tgt);
 	else
-		target_p = find_client(new);
+		target_p = find_client(tgt);
 
 	if(target_p)
 		if(target_p->from == source_p->from && !MyConnect(target_p))
 			target_p = NULL;
 
-	if(target_p == NULL && (target_p = find_server(source_p, new)))
+	if(target_p == NULL && (target_p = find_server(source_p, tgt)))
 		if(target_p->from == source_p->from && !MyConnect(target_p))
 			target_p = NULL;
 
-	collapse(new);
+	collapse(tgt);
 
-	wilds = (strpbrk(new, "?*") != NULL);
+	wilds = (strpbrk(tgt, "?*") != NULL);
 	/*
 	 * Again, if there are no wild cards involved in the server
 	 * name, use the hash lookup
@@ -176,7 +176,7 @@ hunt_server(struct Client *client_p, struct Client *source_p,
 			RB_DLINK_FOREACH(ptr, global_client_list.head)
 			{
 				struct Client *match_p = ptr->data;
-				if(IsRegistered(match_p) && match(new, match_p->name))
+				if(IsRegistered(match_p) && match(tgt, match_p->name))
 				{
 					target_p = ptr->data;
 					break;
