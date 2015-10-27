@@ -1093,7 +1093,7 @@ exit_generic_client(struct Client *source_p, const char *comment)
 	/* Clean up allow lists */
 	del_all_accepts(source_p);
 
-	whowas_add_history(source_p, 0);
+	whowas_add_history(source_p, false);
 	whowas_off_history(source_p);
 
 	monitor_signoff(source_p);

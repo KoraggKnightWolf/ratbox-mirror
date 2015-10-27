@@ -58,7 +58,7 @@ void whowas_init(void);
 **	Client must be a fully registered user (specifically,
 **	the user structure must have been allocated).
 */
-void whowas_add_history(struct Client *, int);
+void whowas_add_history(struct Client *, bool online);
 
 /*
 ** whowas_off_history

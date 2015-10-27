@@ -88,7 +88,7 @@ whowas_free_list(rb_dlink_list *list)
 
 
 void
-whowas_add_history(struct Client *client_p, int online)
+whowas_add_history(struct Client *client_p, bool online)
 {
         whowas_t *who;
 	s_assert(NULL != client_p);
@@ -136,7 +136,7 @@ whowas_add_history(struct Client *client_p, int online)
 	/* this is safe do to the servername cache */
 	who->servername = client_p->servptr->name;
 
-	if(online)
+	if(online == true)
 	{
 		who->online = client_p;
 		rb_dlinkAdd(who, &who->cnode, &client_p->whowas_clist); 
