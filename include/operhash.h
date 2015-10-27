@@ -11,5 +11,7 @@
 void init_operhash(void);
 const char *operhash_add(const char *name);
 void operhash_delete(const char *name);
+void operhash_count(size_t * number, size_t * mem);
+
 
 #endif

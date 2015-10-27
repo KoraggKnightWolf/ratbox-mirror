@@ -112,3 +112,23 @@ operhash_delete(const char *name)
 		}
 	}
 }
+
+
+void
+operhash_count(size_t * number, size_t * mem)
+{
+        int i;
+        rb_dlink_node *ptr;
+
+        *number = 0;
+        *mem = 0;
+
+        HASH_WALK(i, OPERHASH_MAX, ptr, operhash_table)
+        {
+                struct operhash_entry *ohash = ptr->data;
+                (*number)++;
+                *mem += strlen(ohash->name) + sizeof(struct operhash_entry);
+        }
+        HASH_WALK_END;
+}
+ 
