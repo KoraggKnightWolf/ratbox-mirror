@@ -1,3 +1,11 @@
+androsyn    2015/10/27 05:03:56 UTC	(20151027_17-28903)
+  Log:
+  rename the variable new to tgt
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2015/10/27 04:52:07 UTC	(20151027_16-28901)
   Log:
   get the numeric/format strings for certfp too
