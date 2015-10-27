@@ -40,10 +40,6 @@
  */
 #define STARTUP_CONNECTIONS_TIME 60
 
-struct Client;
-struct server_conf;
-struct Channel;
-
 /* Capabilities */
 struct Capability
 {

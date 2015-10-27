@@ -35,8 +35,6 @@
 #define _GMKv(x)  ( (x > _1TER) ? (float)(x/_1TER) : ((x > _1GIG) ? \
 		  (float)(x/_1GIG) : ((x > _1MEG) ? (float)(x/_1MEG) : (float)x)))
 
-struct Client;
-
 /*
  * statistics structures
  */
