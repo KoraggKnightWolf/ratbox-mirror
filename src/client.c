@@ -1664,33 +1664,42 @@ init_uid(void)
 char *
 generate_uid(void)
 {
+	static bool flipped = false;
 	int i;
 
+uid_restart:
 	for(i = 8; i > 3; i--)
 	{
 		if(current_uid[i] == 'Z')
 		{
 			current_uid[i] = '0';
-			return current_uid;
+			goto out;
 		}
 		else if(current_uid[i] != '9')
 		{
 			current_uid[i]++;
-			return current_uid;
+			goto out;
 		}
 		else
 			current_uid[i] = 'A';
 	}
 
-	/* if this next if() triggers, we're fucked. */
 	if(current_uid[3] == 'Z')
 	{
 		current_uid[i] = 'A';
-		s_assert(0);
+		flipped = true;
 	}
 	else
 		current_uid[i]++;
-
+out:
+        /* if this happens..well, i'm not sure what to say, but lets handle it correctly */
+	if(rb_unlikely(flipped == true))
+	{
+	        /* this slows down uid generation a bit... */
+		if(find_id(current_uid) != NULL)
+			goto uid_restart;
+	
+	}
 	return current_uid;
 }
 
