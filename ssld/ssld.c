@@ -978,7 +978,7 @@ ssl_new_keys(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
 	if(sctx == NULL)
 		goto invalid;
 	
-	cctx = rb_setup_ssl_client(ssl_cipher_list);
+	cctx = rb_setup_ssl_client(ssl_cipher_list, cert, key);
 	
 	if(cctx == NULL)
 		goto invalid;
