@@ -1,3 +1,11 @@
+androsyn    2015/10/28 16:23:48 UTC	(20151028_8-28929)
+  Log:
+  huh..define uptime as time_t instead of long
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2015/10/28 16:18:41 UTC	(20151028_7-28927)
   Log:
   more bool type changes
