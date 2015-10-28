@@ -1,3 +1,11 @@
+androsyn    2015/10/28 15:55:49 UTC	(20151028_5-28923)
+  Log:
+  comment typo
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/10/28 15:53:57 UTC	(20151028_4-28921)
   Log:
   include the size of the whowas table in the whowas memory usage
