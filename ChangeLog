@@ -1,3 +1,11 @@
+androsyn    2015/10/28 14:43:49 UTC	(20151028_1-28915)
+  Log:
+  set max_bans default to 100 in the source as well
+
+  Modified:
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2015/10/28 14:43:06 UTC	(20151028_0-28913)
   Log:
   update max_bans to 100
