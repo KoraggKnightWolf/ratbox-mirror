@@ -1,3 +1,11 @@
+androsyn    2015/10/28 17:57:45 UTC	(20151028_11-28935)
+  Log:
+  put operators first when outputing names/who for channels, why? why not
+
+  Modified:
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+
+
 androsyn    2015/10/28 17:46:54 UTC	(20151028_10-28933)
   Log:
   only check the MEMBER_OP list if ONLY_CHANOPS is selected for sendto_channel_flags
