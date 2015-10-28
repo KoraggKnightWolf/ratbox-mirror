@@ -1,3 +1,11 @@
+androsyn    2015/10/28 19:24:50 UTC	(20151028_14-28943)
+  Log:
+  report the CERTFP string as part of the server capabilities, I'm not sure this is the best place for it, but it'll do for now
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2015/10/28 18:52:03 UTC	(20151028_13-28939)
   Log:
   add certificate fingerprint checking for auth blocks too
