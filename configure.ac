@@ -503,9 +503,10 @@ AC_CONFIG_FILES(		\
 	doc/Makefile		\
 	help/Makefile		\
 	modules/Makefile	\
-	src/Makefile		\
-	install-mod.sh
+	src/Makefile		
 )
+
+AC_CONFIG_FILES([install-mod.sh], [chmod +x install-mod.sh])
 
 AC_OUTPUT
 

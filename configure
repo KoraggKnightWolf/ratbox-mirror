@@ -15856,7 +15856,10 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile bandb/Makefile bandb/sqlite3/Makefile ssld/Makefile resolver/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile modules/Makefile src/Makefile install-mod.sh"
+ac_config_files="$ac_config_files Makefile bandb/Makefile bandb/sqlite3/Makefile ssld/Makefile resolver/Makefile contrib/Makefile tools/Makefile doc/Makefile help/Makefile modules/Makefile src/Makefile"
+
+
+ac_config_files="$ac_config_files install-mod.sh"
 
 
 cat >confcache <<\_ACEOF
@@ -18243,6 +18246,7 @@ fi
   chmod +x "$ofile"
 
  ;;
+    "install-mod.sh":F) chmod +x install-mod.sh ;;
 
   esac
 done # for ac_tag
