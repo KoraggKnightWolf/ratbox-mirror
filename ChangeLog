@@ -1,3 +1,11 @@
+androsyn    2015/10/28 19:48:52 UTC	(20151028_18-28953)
+  Log:
+  document the blacklist::aftype stuff a little bit
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 androsyn    2015/10/28 19:46:05 UTC	(20151028_17-28951)
   Log:
   have blacklist::aftype be a regular string, not quoted
