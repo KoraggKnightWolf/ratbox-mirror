@@ -528,6 +528,11 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 
 	for(int i = MEMBER_NOOP; i < MEMBER_LAST; i++)
 	{
+		if(type == ONLY_CHANOPS && i == MEMBER_NOOP)
+		{
+			continue;
+		}
+
 		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->members[i].head)
 		{
 			msptr = ptr->data;
