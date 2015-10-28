@@ -1,3 +1,11 @@
+androsyn    2015/10/28 17:46:54 UTC	(20151028_10-28933)
+  Log:
+  only check the MEMBER_OP list if ONLY_CHANOPS is selected for sendto_channel_flags
+
+  Modified:
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2015/10/28 17:45:30 UTC	(20151028_9-28931)
   Log:
   actually move members between the MEMBER_OP and MEMBER_NOOP lists
