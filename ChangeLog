@@ -1,3 +1,11 @@
+androsyn    2015/10/28 19:43:38 UTC	(20151028_16-28949)
+  Log:
+  add aftype to blacklist to set whether a rbl support ipv4/ipv6 or both
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2015/10/28 19:30:19 UTC	(20151028_15-28947)
   Log:
   pass the cert and key parameters to rb_setup_ssl_client, currently we just use the same keys for the server, but we could change this in the future
