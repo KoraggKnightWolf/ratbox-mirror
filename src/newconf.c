@@ -2494,7 +2494,7 @@ static struct conf_items conf_blacklist_table[] =
 	{ "answer",			CF_QSTRING, conf_set_blacklist_answer, 0, NULL},
 	{ "match_other", 		CF_YESNO,   conf_set_blacklist_match_other, 0, NULL},
 	{ "match_other_answer", 	CF_QSTRING, conf_set_blacklist_match_other_answer, 0, NULL}, 
-	{ "aftype", 			CF_QSTRING, conf_set_blacklist_aftype, 0, NULL },
+	{ "aftype", 			CF_STRING, conf_set_blacklist_aftype, 0, NULL },
 	{ "\0",				0, NULL, 0, NULL}
 };
 
