@@ -365,6 +365,10 @@ show_capabilities(struct Client *target_p)
 		{
 			rb_snprintf_append(msgbuf, sizeof(msgbuf), "[%s]", target_p->localClient->cipher_string);
 		}
+		if(target_p->certfp != NULL)
+		{
+			rb_snprintf_append(msgbuf, sizeof(msgbuf), "/CERTFP[%s]", target_p->certfp);
+		}
 	}
 	if(!IsServer(target_p) || !target_p->serv->caps)	/* short circuit if no caps */
 		return msgbuf + 1;
