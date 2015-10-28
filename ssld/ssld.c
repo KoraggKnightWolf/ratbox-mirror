@@ -985,7 +985,7 @@ ssl_new_keys(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
 	
 	/* we've got useful ssl contexts now..
 	 * we can release our reference to the contexts
-	 * existing connections will survice this experience
+	 * existing connections will survive this experience
 	 */ 
 	rb_ssl_ctx_free(ssl_client_ctx);
 	rb_ssl_ctx_free(ssl_server_ctx);
