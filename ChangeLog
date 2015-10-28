@@ -1,3 +1,11 @@
+androsyn    2015/10/28 19:30:19 UTC	(20151028_15-28947)
+  Log:
+  pass the cert and key parameters to rb_setup_ssl_client, currently we just use the same keys for the server, but we could change this in the future
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/10/28 19:24:50 UTC	(20151028_14-28943)
   Log:
   report the CERTFP string as part of the server capabilities, I'm not sure this is the best place for it, but it'll do for now
