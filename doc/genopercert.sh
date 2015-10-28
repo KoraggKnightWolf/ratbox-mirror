@@ -17,7 +17,7 @@ SSL_DAYS_VALID="${2:-365}"
 
 echo
 echo "Generating 4096-bit self-signed RSA key for ${SERVER}... "
-openssl req -new -newkey rsa:4096 -days ${SSL_DAYS_VALID} -nodes -x509 -keyout ${SERVER}.pem  -out ${SERVER}.pem
+openssl req -sha256 -new -newkey rsa:4096 -days ${SSL_DAYS_VALID} -nodes -x509 -keyout ${SERVER}.pem  -out ${SERVER}.pem
 echo "Done creating self-signed cert"
 
 
