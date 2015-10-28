@@ -1408,7 +1408,7 @@ stats_ziplinks(struct Client *source_p)
 static void
 stats_servlinks(struct Client *source_p)
 {
-	long uptime;
+	time_t uptime;
 	uint64_t sent, receive;
 	struct Client *target_p;
 	rb_dlink_node *ptr;
