@@ -447,7 +447,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 		t = lbuf + cur_len;
 
 		
-		for(int i = MEMBER_NOOP; i <= MEMBER_OP; i++)
+		for(int i = MEMBER_OP; i >= MEMBER_NOOP; i--)
 		{
 			RB_DLINK_FOREACH(ptr, chptr->members[i].head)
 			{
@@ -455,7 +455,7 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 				target_p = msptr->client_p;
 				
 				if(IsInvisible(target_p) && !is_member)
-				continue;
+					continue;
 
 				/* space, possible "@+" prefix */
 				if(cur_len + strlen(target_p->name) + 3 >= IRCD_BUFSIZE - 3)
