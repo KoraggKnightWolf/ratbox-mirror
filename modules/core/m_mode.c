@@ -993,6 +993,9 @@ chm_op(struct Client *source_p, struct Channel *chptr,
 		mode_changes[mode_count].id = targ_p->id;
 		mode_changes[mode_count].arg = targ_p->name;
 		mode_changes[mode_count++].client = targ_p;
+		
+		if(!(mstptr->flags & CHFL_CHANOP))
+		        rb_dlinkMoveNode(&mstptr->channode, &chptr->members[MEMBER_NOOP], &chptr->members[MEMBER_OP]);
 
 		mstptr->flags |= CHFL_CHANOP;
 		mstptr->flags &= ~CHFL_DEOPPED;
@@ -1017,6 +1020,8 @@ chm_op(struct Client *source_p, struct Channel *chptr,
 		mode_changes[mode_count].arg = targ_p->name;
 		mode_changes[mode_count++].client = targ_p;
 
+		if(mstptr->flags & CHFL_CHANOP)
+		          rb_dlinkMoveNode(&mstptr->channode, &chptr->members[MEMBER_OP], &chptr->members[MEMBER_NOOP]);      
 		mstptr->flags &= ~CHFL_CHANOP;
 	}
 }

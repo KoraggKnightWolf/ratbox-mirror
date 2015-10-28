@@ -1148,6 +1148,8 @@ remove_our_modes(struct Channel *chptr)
 				msptr->flags &= ~CHFL_CHANOP;
 				lpara[count++] = msptr->client_p->name;
 				*mbuf++ = 'o';
+				
+				rb_dlinkMoveNode(&msptr->channode, &chptr->members[MEMBER_OP], &chptr->members[MEMBER_NOOP]);
 
 				/* +ov, might not fit so check. */
 				if(is_voiced(msptr))
