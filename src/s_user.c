@@ -367,6 +367,17 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 		}
 	}
 
+	if(!EmptyString(aconf->certfp))
+	{
+		if(EmptyString(source_p->certfp) || strcasecmp(aconf->certfp, source_p->certfp))
+		{
+			ServerStats.is_ref++;
+			sendto_one_notice(source_p, ":*** Notice -- Fingerprint mismatch");
+			exit_client(client_p, source_p, &me, "Fingerprint mismatch");
+			return (CLIENT_EXITED);
+		}		
+	}
+
 	/* password check */
 	if(!EmptyString(aconf->passwd))
 	{

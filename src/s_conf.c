@@ -145,6 +145,7 @@ free_conf(struct ConfItem *aconf)
 	rb_free(aconf->spasswd);
 	rb_free(aconf->user);
 	rb_free(aconf->host);
+	rb_free(aconf->certfp);
 
 	if(IsConfBan(aconf))
 		operhash_delete(aconf->info.oper);

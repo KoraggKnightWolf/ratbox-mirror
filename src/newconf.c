@@ -1332,6 +1332,15 @@ conf_set_auth_pass(confentry_t * entry, conf_t * conf, struct conf_items *item)
 }
 
 static void
+conf_set_auth_certfp(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	rb_free(t_aconf->certfp);
+	t_aconf->certfp = rb_strdup(entry->string);
+	return;
+}
+
+
+static void
 conf_set_auth_spoof(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	char *user = NULL, *host = NULL, *p;
@@ -2424,6 +2433,7 @@ static struct conf_items conf_auth_table[] =
 {
 	{ "user",	CF_QSTRING, conf_set_auth_user,		0, NULL },
 	{ "password",	CF_QSTRING, conf_set_auth_pass,		0, NULL },
+	{ "certfp",	CF_QSTRING, conf_set_auth_certfp,	0, NULL },
 	{ "class",	CF_QSTRING, conf_set_auth_class,	0, NULL },
 	{ "spoof",	CF_QSTRING, conf_set_auth_spoof,	0, NULL },
 	{ "redirserv",	CF_QSTRING, conf_set_auth_redirserv,	0, NULL },

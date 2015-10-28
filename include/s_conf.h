@@ -47,6 +47,7 @@ struct ConfItem
 	char *passwd;		/* doubles as kline reason *ugh* */
 	char *spasswd;		/* Password to send. */
 	char *user;		/* user part of user@host */
+	char *certfp;		/* certificate fingerprint */
 	int port;
 	time_t hold;		/* Hold action until this time (calendar time) */
 	struct Class *c_class;	/* Class of connection */
