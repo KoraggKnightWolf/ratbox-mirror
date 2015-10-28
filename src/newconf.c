@@ -2211,7 +2211,37 @@ conf_set_blacklist_match_other_answer(confentry_t * entry, conf_t * conf, struct
 	rbl_add_other_answer(t_rbl, entry->string);
 }
 
+static void
+conf_set_blacklist_aftype(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	bool ipv4 = true;
+	bool ipv6 = false;
 
+	char *aft = entry->string;
+
+#ifdef RB_IPV6
+	if(!strcasecmp(aft, "ipv6"))
+	{
+		ipv6 = true;
+		ipv4 = false;
+	} else
+#endif
+	if(!strcasecmp(aft, "ipv4"))
+	{
+		ipv6 = false;
+		ipv4 = true;
+	} 
+	else
+	if(!strcasecmp(aft, "both"))
+	{
+		ipv6 = true;
+		ipv4 = true;
+	}
+	else
+		conf_report_warning_nl("blacklist:aftype '%s' at %s:%d is unknown. assuming aftype = ipv4", aft, entry->filename, entry->line);
+
+	rbl_set_aftype(t_rbl, ipv4, ipv6);
+}
 
 static void
 add_top_conf(const char *name, void (*startfunc) (conf_t * conf), void (*endfunc) (conf_t * conf),
@@ -2460,11 +2490,12 @@ static struct conf_items conf_exempt_table[] =
 
 static struct conf_items conf_blacklist_table[] = 
 {
-	{ "match",	CF_QSTRING, conf_set_blacklist_match, 0, NULL },
-	{ "answer",	CF_QSTRING, conf_set_blacklist_answer, 0, NULL},
-	{ "match_other", CF_YESNO,  conf_set_blacklist_match_other, 0, NULL},
-	{ "match_other_answer", CF_QSTRING, conf_set_blacklist_match_other_answer, 0, NULL}, 
-	{ "\0",		0, NULL, 0, NULL}
+	{ "match",			CF_QSTRING, conf_set_blacklist_match, 0, NULL },
+	{ "answer",			CF_QSTRING, conf_set_blacklist_answer, 0, NULL},
+	{ "match_other", 		CF_YESNO,   conf_set_blacklist_match_other, 0, NULL},
+	{ "match_other_answer", 	CF_QSTRING, conf_set_blacklist_match_other_answer, 0, NULL}, 
+	{ "aftype", 			CF_QSTRING, conf_set_blacklist_aftype, 0, NULL },
+	{ "\0",				0, NULL, 0, NULL}
 };
 
 static struct conf_items conf_operator_table[] =
