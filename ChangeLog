@@ -1,3 +1,12 @@
+androsyn    2015/10/28 20:12:59 UTC	(20151028_21-28959)
+  Log:
+  set install-mod.sh to be executable
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2015/10/28 20:04:50 UTC	(20151028_20-28957)
   Log:
   add genopercert.sh
