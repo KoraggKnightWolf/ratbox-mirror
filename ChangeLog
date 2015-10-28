@@ -1,3 +1,11 @@
+androsyn    2015/10/28 18:11:06 UTC	(20151028_12-28937)
+  Log:
+  wrap init_fake_services in an ifdef
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2015/10/28 17:57:45 UTC	(20151028_11-28935)
   Log:
   put operators first when outputing names/who for channels, why? why not
