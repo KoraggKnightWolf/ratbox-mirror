@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Simple and straight forward openssl cert generator for ircd-ratbox
 # Copyright (C) 2008-2015 ircd-ratbox development team
 # $Id$
@@ -36,6 +36,12 @@ echo
 echo "ssl_private_key = \"`pwd`/${SERVER}.pem\";"
 echo "ssl_cert = \"`pwd`/${SERVER}.pem\";"
 echo "ssl_dh_params = \"`pwd`/dh.pem\";"
+echo 
+echo
+
+
+echo -n "Your certificate fingerprint is: "
+openssl x509 -sha256 -noout -fingerprint -in ${SERVER}.pem | sed -e 's/^.*=//;s/://g;y/ABCDEF/abcdef/'
 
 echo
 exit 0
