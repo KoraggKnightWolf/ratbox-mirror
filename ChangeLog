@@ -1,3 +1,11 @@
+androsyn    2015/10/28 20:04:50 UTC	(20151028_20-28957)
+  Log:
+  add genopercert.sh
+
+  Modified:
+	ircd-ratbox/trunk/doc/genopercert.sh (File Added) 
+
+
 androsyn    2015/10/28 20:01:19 UTC	(20151028_19-28955)
   Log:
   output the sha256 fingerprint for the certificate and also just use /bin/sh to run genssl.sh, i don't think we have any bashisms
