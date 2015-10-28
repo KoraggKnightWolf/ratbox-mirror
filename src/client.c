@@ -1740,7 +1740,7 @@ close_connection(struct Client *client_p)
 			 * a rehash in between, the status has been changed to
 			 * CONF_ILLEGAL). But only do this if it was a "good" link.
 			 */
-			server_p->hold = time(NULL);
+			server_p->hold = rb_current_time();
 			server_p->hold +=
 				(server_p->hold - client_p->localClient->lasttime >
 				 HANGONGOODLINK) ? HANGONRETRYDELAY : ConFreq(server_p->class);
