@@ -1,3 +1,11 @@
+androsyn    2015/10/28 19:46:05 UTC	(20151028_17-28951)
+  Log:
+  have blacklist::aftype be a regular string, not quoted
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2015/10/28 19:43:38 UTC	(20151028_16-28949)
   Log:
   add aftype to blacklist to set whether a rbl support ipv4/ipv6 or both
