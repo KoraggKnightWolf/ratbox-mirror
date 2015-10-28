@@ -257,20 +257,25 @@ comp_with_mask_sock(struct sockaddr *addr, struct sockaddr *dest, unsigned int m
 	void *iaddr = NULL;
 	void *idest = NULL;
 
-	if(addr->sa_family == AF_INET)
+	switch(addr->sa_family)
 	{
-		iaddr = &((struct sockaddr_in *)(void *)addr)->sin_addr;
-		idest = &((struct sockaddr_in *)(void *)dest)->sin_addr;
-	}
+		case AF_INET:
+		{
+			iaddr = &((struct sockaddr_in *)(void *)addr)->sin_addr;
+			idest = &((struct sockaddr_in *)(void *)dest)->sin_addr;
+			break;
+		}
 #ifdef RB_IPV6
-	else
-	{
-		iaddr = &((struct sockaddr_in6 *)(void *)addr)->sin6_addr;
-		idest = &((struct sockaddr_in6 *)(void *)dest)->sin6_addr;
-
-	}
+		case AF_INET6:
+		{
+			iaddr = &((struct sockaddr_in6 *)(void *)addr)->sin6_addr;
+			idest = &((struct sockaddr_in6 *)(void *)dest)->sin6_addr;
+			break;
+		}
 #endif
-
+		default:
+			return 0; /* don't know how this would happen */
+	}
 	return (comp_with_mask(iaddr, idest, mask));
 }
 
