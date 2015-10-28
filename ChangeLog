@@ -1,3 +1,12 @@
+androsyn    2015/10/28 20:25:40 UTC	(20151028_22-28961)
+  Log:
+  use sha256 for the cert signature
+
+  Modified:
+	ircd-ratbox/trunk/doc/genopercert.sh (File Modified) 
+	ircd-ratbox/trunk/doc/genssl.sh (File Modified) 
+
+
 androsyn    2015/10/28 20:12:59 UTC	(20151028_21-28959)
   Log:
   set install-mod.sh to be executable
