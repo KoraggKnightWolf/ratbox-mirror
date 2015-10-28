@@ -1,3 +1,14 @@
+androsyn    2015/10/28 18:52:03 UTC	(20151028_13-28939)
+  Log:
+  add certificate fingerprint checking for auth blocks too
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 androsyn    2015/10/28 18:11:06 UTC	(20151028_12-28937)
   Log:
   wrap init_fake_services in an ifdef
