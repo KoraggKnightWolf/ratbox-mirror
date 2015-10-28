@@ -1,3 +1,11 @@
+androsyn    2015/10/28 15:34:52 UTC	(20151028_3-28919)
+  Log:
+  replace a time() call with a rb_current_time() call
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2015/10/28 15:30:31 UTC	(20151028_2-28917)
   Log:
   Have generate_uid do the right thing should it ever roll over. I'm not sure how this would ever happen, but deal with it anyways.
