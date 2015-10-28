@@ -628,7 +628,9 @@ ratbox_main(int argc, char *argv[])
 	whowas_init();
 	init_hook();
 	init_reject();
+#ifdef ENABLE_OCF_SERVICES
 	init_fake_services();
+#endif
 #ifdef STATIC_MODULES
 	load_static_modules();
 #else
