@@ -1,3 +1,11 @@
+androsyn    2015/10/28 20:01:19 UTC	(20151028_19-28955)
+  Log:
+  output the sha256 fingerprint for the certificate and also just use /bin/sh to run genssl.sh, i don't think we have any bashisms
+
+  Modified:
+	ircd-ratbox/trunk/doc/genssl.sh (File Modified) 
+
+
 androsyn    2015/10/28 19:48:52 UTC	(20151028_18-28953)
   Log:
   document the blacklist::aftype stuff a little bit
