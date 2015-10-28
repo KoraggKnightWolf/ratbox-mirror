@@ -1,3 +1,11 @@
+androsyn    2015/10/28 14:43:06 UTC	(20151028_0-28913)
+  Log:
+  update max_bans to 100
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 androsyn    2015/10/27 06:29:23 UTC	(20151027_21-28911)
   Log:
   cleanup socketpairs if start_ssld fails
