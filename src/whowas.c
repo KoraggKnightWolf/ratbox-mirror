@@ -221,6 +221,6 @@ void
 whowas_memory_usage(size_t *count, size_t *memused)
 {
 	*count = rb_dlink_list_length(whowas_list);
-	*memused = *count * sizeof(whowas_t);
+	*memused = *count * sizeof(whowas_t) + sizeof(rb_dlink_list) * WW_MAX;
 }
 
