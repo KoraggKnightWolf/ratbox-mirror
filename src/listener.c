@@ -487,7 +487,7 @@ accept_precallback(rb_fde_t * F, struct sockaddr *addr, rb_socklen_t addrlen, vo
 	char reason[IRCD_BUFSIZE] = "ERROR :Connection failed\r\n";
 	struct ConfItem *aconf;
 
-	if(listener->ssl == true && (!ircd_ssl_ok || !get_ssld_count()))
+	if(listener->ssl == true && (ircd_ssl_ok == false || !get_ssld_count()))
 	        goto send_error;
 
 	if((maxconnections - 10) < rb_get_fd(F))	/* XXX this is kinda bogus */

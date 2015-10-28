@@ -97,17 +97,18 @@ const char *logFileName = LPATH;
 const char *pidFileName = PPATH;
 
 static char **myargv;
-int dorehash = 0;
-int dorehashbans = 0;
-int doremotd = 0;
-int kline_queued = 0;
-int server_state_foreground = 0;
-int printVersion = 0;
-int ircd_ssl_ok = 0;
-int zlib_ok = 1;
 
-int testing_conf = 0;
-int conf_parse_failure = 0;
+bool dorehash = false;
+bool dorehashbans = false;
+bool doremotd = false;
+bool kline_queued = false;
+bool server_state_foreground = false;
+bool printVersion = false;
+bool ircd_ssl_ok = false;
+bool zlib_ok = true;
+
+bool testing_conf = false;
+bool conf_parse_failure = false;
 time_t startup_time;
 
 /* Set to zero because it should be initialized later using
@@ -115,8 +116,8 @@ time_t startup_time;
  */
 int default_server_capabs = CAP_MASK;
 
-int splitmode;
-int splitchecking;
+bool splitmode;
+bool splitchecking;
 int split_users;
 int split_servers;
 int eob_count;
@@ -288,19 +289,19 @@ check_rehash(void *unusued)
 	/*
 	 * Check to see whether we have to rehash the configuration ..
 	 */
-	if(dorehash)
+	if(dorehash == true)
 	{
 		rehash(1);
 		dorehash = 0;
 	}
 
-	if(dorehashbans)
+	if(dorehashbans == true)
 	{
 		rehash_bans(1);
 		dorehashbans = 0;
 	}
 
-	if(doremotd)
+	if(doremotd == true)
 	{
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Got signal SIGUSR1, reloading ircd motd file");
 		cache_user_motd();
@@ -342,8 +343,8 @@ initialize_global_set_options(void)
 
 	if(split_users && split_servers && (ConfigChannel.no_create_on_split || ConfigChannel.no_join_on_split))
 	{
-		splitmode = 1;
-		splitchecking = 1;
+		splitmode = true;
+		splitchecking = true;
 	}
 
 	GlobalSetOptions.ident_timeout = IDENT_TIMEOUT;
@@ -535,7 +536,7 @@ ratbox_main(int argc, char *argv[])
 		return 1;
 	}
 
-	if(testing_conf)
+	if(testing_conf == true)
 		fprintf(stderr, "Syntax OK, doing second pass...\n");
 
 
@@ -548,14 +549,14 @@ ratbox_main(int argc, char *argv[])
 		return 1;
 	}
 
-	if(testing_conf)
+	if(testing_conf == true)
 		fprintf(stderr, "Second pass reports OK\n");
 
 	ConfigFileEntry.dpath = basedir;
 	ConfigFileEntry.configfile = configfile;	/* Server configuration file */
 
 	/* Check if there is pidfile and daemon already running */
-	if(!testing_conf)
+	if(testing_conf == false)
 	{
 		check_pidfile(pidFileName);
 
@@ -684,7 +685,7 @@ ratbox_main(int argc, char *argv[])
 	}
 	rb_strlcpy(me.info, ServerInfo.description, sizeof(me.info));
 
-	if(testing_conf)
+	if(testing_conf == true)
 	{
 		exit(conf_parse_failure ? 1 : 0);
 	}
@@ -717,7 +718,7 @@ ratbox_main(int argc, char *argv[])
 	rb_event_addonce("try_connections_startup", try_connections, NULL, 2);
 	rb_event_add("check_rehash", check_rehash, NULL, 3);
 
-	if(splitmode)
+	if(splitmode == true)
 		rb_event_add("check_splitmode", check_splitmode, NULL, 5);
 
 	rb_lib_loop(0);		/* we'll never return from here */

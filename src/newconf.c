@@ -60,7 +60,7 @@
 
 FILE *conf_fbfile_in;
 char conffilebuf[IRCD_BUFSIZE + 1];
-extern int conf_parse_failure;
+
 static rb_dlink_list conflist;
 static conf_t *curconf;
 
@@ -246,7 +246,7 @@ conf_report_error_nl(const char *fmt, ...)
 	va_end(ap);
 
 	conf_parse_failure++;
-	if(testing_conf)
+	if(testing_conf == true)
 	{
 		fprintf(stderr, "ERROR: %s\n", msg);
 		return;
@@ -266,7 +266,7 @@ conf_report_warning_nl(const char *fmt, ...)
 	vsnprintf(msg, sizeof(msg), fmt, ap);
 	va_end(ap);
 
-	if(testing_conf)
+	if(testing_conf == true)
 	{
 		fprintf(stderr, "Warning: %s\n", msg);
 		return;
@@ -492,7 +492,7 @@ yyerror(const char *msg)
 	strip_tabs(newlinebuf, yy_linebuf, sizeof(newlinebuf));
 	conf_parse_failure++;
 
-	if(testing_conf)
+	if(testing_conf == true)
 	{
 		fprintf(stderr, "\"%s\", line %d: %s\n", current_file, lineno + 1, msg);
 		return;
@@ -538,7 +538,7 @@ conf_report_error(const char *fmt, ...)
 	va_end(ap);
 
 	conf_parse_failure++;
-	if(testing_conf)
+	if(testing_conf == true)
 	{
 		fprintf(stderr, "\"%s\", line %d: %s\n", current_file, lineno + 1, msg);
 		return;
@@ -1709,7 +1709,7 @@ conf_set_general_kline_delay(confentry_t * entry, conf_t * conf, struct conf_ite
 	ConfigFileEntry.kline_delay = entry->number;
 
 	/* THIS MUST BE HERE to stop us being unable to check klines */
-	kline_queued = 0;
+	kline_queued = false;
 }
 
 static void
@@ -2315,12 +2315,12 @@ load_conf_settings(void)
 			ServerInfo.ssl_cipher_list, ServerInfo.ssl_ecdh_named_curve, ServerInfo.tls_min_ver)) == NULL)
 	{
 		ilog(L_MAIN, "WARNING: Unable to setup SSL.");
-		ircd_ssl_ok = 0;
+		ircd_ssl_ok = false;
 	}
 	else
 	{
 		ilog(L_MAIN, "SSL tests okay.");
-		ircd_ssl_ok = 1;
+		ircd_ssl_ok = true;
 		rb_ssl_ctx_free(ctx);
 		send_new_ssl_certs(ServerInfo.ssl_ca_cert, ServerInfo.ssl_cert, ServerInfo.ssl_private_key,
 				   ServerInfo.ssl_dh_params, ServerInfo.ssl_cipher_list, ServerInfo.ssl_ecdh_named_curve, ServerInfo.tls_min_ver);
@@ -2336,8 +2336,8 @@ load_conf_settings(void)
 	if(!split_users || !split_servers || (!ConfigChannel.no_create_on_split && !ConfigChannel.no_join_on_split))
 	{
 		rb_event_delete(cache_links_ev);
-		splitmode = 0;
-		splitchecking = 0;
+		splitmode = false;
+		splitchecking = false;
 	}
 	check_class();
 }

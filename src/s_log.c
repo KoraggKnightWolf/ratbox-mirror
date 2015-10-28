@@ -87,7 +87,7 @@ verify_logfile_access(const char *filename)
 	{
 		snprintf(buf, sizeof(buf), "WARNING: Unable to access logfile %s - parent directory %s does not exist",
 			 filename, dirname);
-		if(testing_conf || server_state_foreground)
+		if(testing_conf == true || server_state_foreground == true)
 			fprintf(stderr, "%s\n", buf);
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s", buf);
 		return;
@@ -100,7 +100,7 @@ verify_logfile_access(const char *filename)
 			snprintf(buf, sizeof(buf),
 				 "WARNING: Unable to access logfile %s - access to parent directory %s failed: %s",
 				 filename, dirname, strerror(errno));
-			if(testing_conf || server_state_foreground)
+			if(testing_conf == true || server_state_foreground == true)
 				fprintf(stderr, "%s\n", buf);
 			sendto_realops_flags(UMODE_ALL, L_ALL, "%s", buf);
 		}
@@ -110,7 +110,7 @@ verify_logfile_access(const char *filename)
 	if(access(filename, W_OK) == -1)
 	{
 		snprintf(buf, sizeof(buf), "WARNING: Access denied for logfile %s: %s", filename, strerror(errno));
-		if(testing_conf || server_state_foreground)
+		if(testing_conf == true || server_state_foreground == true)
 			fprintf(stderr, "%s\n", buf);
 		sendto_realops_flags(UMODE_ALL, L_ALL, "%s", buf);
 		return;

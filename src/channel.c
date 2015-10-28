@@ -736,12 +736,12 @@ check_spambot_warning(struct Client *source_p, const char *name)
 void
 check_splitmode(void *unused)
 {
-	if(splitchecking && (ConfigChannel.no_join_on_split || ConfigChannel.no_create_on_split))
+	if(splitchecking == true && (ConfigChannel.no_join_on_split || ConfigChannel.no_create_on_split))
 	{
 		/* not split, we're being asked to check now because someone
 		 * has left
 		 */
-		if(!splitmode)
+		if(splitmode == false)
 		{
 			if(eob_count < split_servers || Count.total < split_users)
 			{
@@ -753,7 +753,7 @@ check_splitmode(void *unused)
 		/* in splitmode, check whether its finished */
 		else if(eob_count >= split_servers && Count.total >= split_users)
 		{
-			splitmode = 0;
+			splitmode = false;
 
 			sendto_realops_flags(UMODE_ALL, L_ALL, "Network rejoined, deactivating splitmode");
 

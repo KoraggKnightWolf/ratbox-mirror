@@ -56,12 +56,12 @@ extern struct SetOptions GlobalSetOptions;	/* defined in ircd.c */
 
 extern const char *logFileName;
 extern const char *pidFileName;
-extern int cold_start;
-extern int dorehash;
-extern int dorehashbans;
-extern int doremotd;
-extern int kline_queued;
-extern int server_state_foreground;
+
+extern bool dorehash;
+extern bool dorehashbans;
+extern bool doremotd;
+extern bool kline_queued;
+extern bool server_state_foreground;
 
 extern struct Client me;
 extern rb_dlink_list global_client_list;
@@ -71,8 +71,8 @@ extern struct Counter Count;
 extern int default_server_capabs;
 
 extern time_t startup_time;
-extern int splitmode;
-extern int splitchecking;
+extern bool splitmode;
+extern bool splitchecking;
 extern int split_users;
 extern int split_servers;
 extern int eob_count;
@@ -90,11 +90,11 @@ void ircd_shutdown(const char *reason) RB_noreturn;
 uintptr_t get_maxrss(void);
 
 int ratbox_main(int argc, char **argv);
-extern int testing_conf;
-extern int conf_parse_failure;
+extern bool testing_conf;
+extern bool conf_parse_failure;
 extern int maxconnections;
-extern int ircd_ssl_ok;
-extern int zlib_ok;
+extern bool ircd_ssl_ok;
+extern bool zlib_ok;
 
 void restart(const char *) RB_noreturn;
 void server_reboot(void) RB_noreturn;

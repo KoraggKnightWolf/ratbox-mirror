@@ -309,7 +309,7 @@ start_ssldaemon(int count, const char *ssl_ca_cert, const char *ssl_cert, const 
 		rb_close(P1);
 		ctl = allocate_ssl_daemon(F1, P2, pid);
 
-		if(ircd_ssl_ok && ssl_cert != NULL && ssl_private_key != NULL)
+		if(ircd_ssl_ok == true && ssl_cert != NULL && ssl_private_key != NULL)
 			send_new_ssl_certs_one(ctl, ssl_ca_cert != NULL ? ssl_ca_cert : "", ssl_cert, ssl_private_key,
 					       ssl_dh_params != NULL ? ssl_dh_params : "",
 					       ssl_cipher_list != NULL ? ssl_cipher_list : "", ssl_ecdh_named_curve != NULL ? ssl_ecdh_named_curve : "", tls_min_ver);
@@ -462,7 +462,7 @@ ssl_process_cmd_recv(ssl_ctl_t * ctl)
 		switch (*ctl_buf->buf)
 		{
 		case 'N':
-			ircd_ssl_ok = 0;	/* ssld says it can't do ssl/tls */
+			ircd_ssl_ok = false;	/* ssld says it can't do ssl/tls */
 			break;
 		case 'D':
 			ssl_process_dead_connid(ctl, ctl_buf);
@@ -477,18 +477,18 @@ ssl_process_cmd_recv(ssl_ctl_t * ctl)
 			ssl_process_certfp(ctl, ctl_buf);
 			break;
 		case 'I':
-			ircd_ssl_ok = 0;
+			ircd_ssl_ok = false;
 			ilog(L_MAIN, "%s", cannot_setup_ssl);
 			sendto_realops_flags(UMODE_ALL, L_ALL, "%s", cannot_setup_ssl);
 		case 'U':
-			zlib_ok = 0;
-			ircd_ssl_ok = 0;
+			zlib_ok = false;
+			ircd_ssl_ok = false;
 			ilog(L_MAIN, "%s", no_ssl_or_zlib);
 			sendto_realops_flags(UMODE_ALL, L_ALL, "%s", no_ssl_or_zlib);
 			ssl_killall();
 			break;
 		case 'z':
-			zlib_ok = 0;
+			zlib_ok = false;
 			break;
 		default:
 			ilog(L_MAIN, "Received invalid command from ssld: %s", ctl_buf->buf);
@@ -691,7 +691,7 @@ send_new_ssl_certs(const char *ssl_ca_cert, const char *ssl_cert, const char *ss
 	rb_dlink_node *ptr;
 	if(ssl_cert == NULL || ssl_private_key == NULL)
 	{
-		ircd_ssl_ok = 0;
+		ircd_ssl_ok = false;
 		return;
 	}
 	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
