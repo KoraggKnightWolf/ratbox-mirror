@@ -1,3 +1,12 @@
+androsyn    2015/10/28 15:30:31 UTC	(20151028_2-28917)
+  Log:
+  Have generate_uid do the right thing should it ever roll over. I'm not sure how this would ever happen, but deal with it anyways.
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2015/10/28 14:43:49 UTC	(20151028_1-28915)
   Log:
   set max_bans default to 100 in the source as well
