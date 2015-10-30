@@ -931,7 +931,6 @@ check_channel_name_loc(struct Client *source_p, const char *name)
 static int
 can_join(struct Client *source_p, struct Channel *chptr, char *key)
 {
-	rb_dlink_node *lp;
 	rb_dlink_node *ptr;
 	struct Ban *invex = NULL;
 	char src_host[NICKLEN + USERLEN + HOSTLEN + 6];
@@ -947,11 +946,8 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 
 	if(chptr->mode.mode & MODE_INVITEONLY)
 	{
-		RB_DLINK_FOREACH(lp, source_p->localClient->invited.head)
-		{
-			if(lp->data == chptr)
-				break;
-		}
+		rb_dlink_node *lp = rb_dlinkFind(chptr, source_p->localClient->invited);
+
 		if(lp == NULL)
 		{
 			if(!ConfigChannel.use_invex)
