@@ -79,7 +79,7 @@ send_linebuf(struct Client *to, rb_buf_head_t * linebuf)
 			     log_client_name(to, SHOW_IP), rb_linebuf_len(to->localClient->buf_sendq), get_sendq(to));
 		}
 
-		dead_link(to, 1);
+		dead_link(to, true);
 		return -1;
 	}
 	else
@@ -187,7 +187,7 @@ send_queued(struct Client *to)
 
 		if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 		{
-			dead_link(to, 0);
+			dead_link(to, false);
 			return;
 		}
 	}

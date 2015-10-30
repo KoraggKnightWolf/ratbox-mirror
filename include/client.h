@@ -358,7 +358,7 @@ void del_from_accept(struct Client *source, struct Client *target);
 #define accept_message(s, t) ((s) == (t) || (rb_dlinkFind((s), &((t)->localClient->allow_list))))
 void del_all_accepts(struct Client *client_p);
 
-void dead_link(struct Client *client_p, int);
+void dead_link(struct Client *client_p, bool sendqex);
 int show_ip(struct Client *source_p, struct Client *target_p);
 int show_ip_conf(struct ConfItem *aconf, struct Client *target_p);
 
