@@ -1,3 +1,12 @@
+androsyn    2015/10/30 18:18:03 UTC	(20151030_5-28973)
+  Log:
+  use uint8_t for the ssl control buffers
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/10/30 17:24:21 UTC	(20151030_4-28971)
   Log:
   define loop variables within the loop scope
