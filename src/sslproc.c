@@ -51,7 +51,7 @@ static int ssld_count;
 typedef struct _ssl_ctl_buf
 {
 	rb_dlink_node node;
-	char *buf;
+	uint8_t *buf;
 	size_t buflen;
 	rb_fde_t *F[MAXPASSFD];
 	int nfds;
@@ -384,7 +384,7 @@ ssl_process_zipstats(ssl_ctl_t * ctl, ssl_ctl_buf_t * ctl_buf)
 	struct ZipStats *zips;
 	int parc;
 	char *parv[7];
-	parc = rb_string_to_array(ctl_buf->buf, parv, 6);
+	parc = rb_string_to_array((char *)ctl_buf->buf, parv, 6);
 	if(parc != 6)
 	{
 		ilog(L_MAIN, "ssld sent zipstats results with wrong number of arguments.. %d. Dropping.", parc);
@@ -426,7 +426,7 @@ ssl_process_dead_connid(ssl_ctl_t * ctl, ssl_ctl_buf_t * ctl_buf)
 		return;		/* bogus message..drop it.. XXX should warn here */
 
 	connid = buf_to_uint32(&ctl_buf->buf[1]);
-	rb_strlcpy(reason, &ctl_buf->buf[5], sizeof(reason));
+	rb_strlcpy(reason, (const char *)&ctl_buf->buf[5], sizeof(reason));
 	client_p = find_cli_connid_hash(connid);
 	if(client_p == NULL)
 		return;

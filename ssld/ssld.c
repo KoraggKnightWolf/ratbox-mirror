@@ -43,7 +43,7 @@ static inline void uint32_to_buf(void *buf, uint32_t x);
 typedef struct _mod_ctl_buf
 {
 	rb_dlink_node node;
-	char *buf;
+	uint8_t *buf;
 	size_t buflen;
 	rb_fde_t *F[MAXPASSFD];
 	int nfds;
@@ -822,7 +822,7 @@ process_stats(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 {
 	char outstat[512];
 	conn_t *conn;
-	const char *odata;
+	const uint8_t *odata;
 	uint32_t id;
 
 	id = buf_to_uint32(&ctlb->buf[1]);
