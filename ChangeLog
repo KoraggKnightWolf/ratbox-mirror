@@ -1,3 +1,11 @@
+androsyn    2015/10/30 23:16:06 UTC	(20151030_8-28979)
+  Log:
+  use designated initializers for the hash_function table, this is quite a bit more readable
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2015/10/30 22:43:02 UTC	(20151030_7-28977)
   Log:
   use bool as the sendqex parameters for dead_link
