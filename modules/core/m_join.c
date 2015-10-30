@@ -946,7 +946,7 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
 
 	if(chptr->mode.mode & MODE_INVITEONLY)
 	{
-		rb_dlink_node *lp = rb_dlinkFind(chptr, source_p->localClient->invited);
+		rb_dlink_node *lp = rb_dlinkFind(chptr, &source_p->localClient->invited);
 
 		if(lp == NULL)
 		{
