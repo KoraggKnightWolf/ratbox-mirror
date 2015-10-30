@@ -174,24 +174,32 @@ hash_help(const char *name)
 	return (h % HELP_MAX);
 }
 
-static struct _hash_function
+struct _hash_function
 {
 	uint32_t(*func) (unsigned const char *, unsigned int, unsigned int);
 	rb_dlink_list *table;
 	unsigned int hashbits;
 	unsigned int hashlen;
-} hash_function[] =
+};
+
+
+static struct _hash_function hash_function[HASH_LAST] =
 {
-	{
-	fnv_hash_upper, clientTable, U_MAX_BITS, 0},
-	{
-	fnv_hash, idTable, U_MAX_BITS, 0},
-	{
-	fnv_hash_upper_len, channelTable, CH_MAX_BITS, 30},
-	{
-	fnv_hash_upper_len, hostTable, HOST_MAX_BITS, 30},
-	{
-	fnv_hash_upper_len, resvTable, R_MAX_BITS, 30}
+	[HASH_CLIENT] = { 
+		.func = fnv_hash_upper, .table = clientTable, .hashbits = U_MAX_BITS, .hashlen = 0
+	},
+	[HASH_ID] = { 
+		.func = fnv_hash, .table = idTable, .hashbits = U_MAX_BITS, .hashlen = 0
+	},
+	[HASH_CHANNEL] = { 
+		.func = fnv_hash_upper_len, .table = channelTable, .hashbits = CH_MAX_BITS, .hashlen = 30
+	},
+	[HASH_HOSTNAME] = { 
+		.func = fnv_hash_upper_len, .table = hostTable, .hashbits = HOST_MAX_BITS, .hashlen = 30
+	},
+	[HASH_RESV] = { 
+		.func = fnv_hash_upper_len, .table = resvTable, .hashbits = R_MAX_BITS, .hashlen = 30
+	}
 };
 
 void
