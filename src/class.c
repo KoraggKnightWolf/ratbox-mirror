@@ -206,7 +206,6 @@ add_class(struct Class *classptr)
 struct Class *
 find_class(const char *classname)
 {
-	struct Class *cltmp;
 	rb_dlink_node *ptr;
 
 	if(classname == NULL)
@@ -214,7 +213,7 @@ find_class(const char *classname)
 
 	RB_DLINK_FOREACH(ptr, class_list.head)
 	{
-		cltmp = ptr->data;
+		struct Class *cltmp = ptr->data;
 
 		if(!strcmp(ClassName(cltmp), classname))
 			return cltmp;
@@ -233,13 +232,12 @@ find_class(const char *classname)
 void
 check_class()
 {
-	struct Class *cltmp;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, class_list.head)
 	{
-		cltmp = ptr->data;
+		struct Class *cltmp = ptr->data;
 
 		if(MaxUsers(cltmp) < 0)
 		{

@@ -272,7 +272,6 @@ clear_help_hash(void)
 struct Client *
 find_id(const char *name)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 
@@ -283,7 +282,7 @@ find_id(const char *name)
 
 	RB_DLINK_FOREACH(ptr, idTable[hashv].head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(strcmp(name, target_p->id) == 0)
 			return target_p;
@@ -339,7 +338,6 @@ hash_find_masked_server(struct Client *source_p, const char *name)
 struct Client *
 find_any_client(const char *name)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 
@@ -355,7 +353,7 @@ find_any_client(const char *name)
 
 	RB_DLINK_FOREACH(ptr, clientTable[hashv].head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(irccmp(name, target_p->name) == 0)
 			return target_p;
@@ -372,7 +370,6 @@ find_any_client(const char *name)
 struct Client *
 find_client(const char *name)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 
@@ -388,7 +385,7 @@ find_client(const char *name)
 
 	RB_DLINK_FOREACH(ptr, clientTable[hashv].head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(irccmp(name, target_p->name) == 0)
 			return target_p;
@@ -404,7 +401,6 @@ find_client(const char *name)
 struct Client *
 find_named_client(const char *name)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 
@@ -416,7 +412,7 @@ find_named_client(const char *name)
 
 	RB_DLINK_FOREACH(ptr, clientTable[hashv].head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(irccmp(name, target_p->name) == 0)
 			return target_p;
@@ -432,7 +428,6 @@ find_named_client(const char *name)
 struct Client *
 find_server(struct Client *source_p, const char *name)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 
@@ -441,15 +436,14 @@ find_server(struct Client *source_p, const char *name)
 
 	if((source_p == NULL || !MyClient(source_p)) && IsDigit(*name) && strlen(name) == 3)
 	{
-		target_p = find_id(name);
-		return (target_p);
+	        return find_id(name);
 	}
 
 	hashv = hash_nick(name);
 
 	RB_DLINK_FOREACH(ptr, clientTable[hashv].head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if((IsServer(target_p) || IsMe(target_p)) && irccmp(name, target_p->name) == 0)
 			return target_p;
@@ -485,7 +479,6 @@ find_hostname(const char *hostname)
 struct Channel *
 find_channel(const char *name)
 {
-	struct Channel *chptr;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 
@@ -497,7 +490,7 @@ find_channel(const char *name)
 
 	RB_DLINK_FOREACH(ptr, channelTable[hashv].head)
 	{
-		chptr = ptr->data;
+		struct Channel *chptr = ptr->data;
 
 		if(irccmp(name, chptr->chname) == 0)
 			return chptr;
@@ -617,7 +610,6 @@ hash_free_tablelist(rb_dlink_list *table)
 struct ConfItem *
 hash_find_resv(const char *name)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 
@@ -629,7 +621,7 @@ hash_find_resv(const char *name)
 
 	RB_DLINK_FOREACH(ptr, resvTable[hashv].head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if(!irccmp(name, aconf->host))
 		{
@@ -644,7 +636,6 @@ hash_find_resv(const char *name)
 struct cachefile *
 hash_find_help(const char *name, int flags)
 {
-	struct cachefile *hptr;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 
@@ -655,7 +646,7 @@ hash_find_help(const char *name, int flags)
 
 	RB_DLINK_FOREACH(ptr, helpTable[hashv].head)
 	{
-		hptr = ptr->data;
+		struct cachefile *hptr = ptr->data;
 
 		if((irccmp(name, hptr->name) == 0) && (hptr->flags & flags))
 			return hptr;
@@ -689,7 +680,6 @@ clear_resv_hash(void)
 struct nd_entry *
 hash_find_nd(const char *name)
 {
-	struct nd_entry *nd;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 
@@ -700,7 +690,7 @@ hash_find_nd(const char *name)
 
 	RB_DLINK_FOREACH(ptr, ndTable[hashv].head)
 	{
-		nd = ptr->data;
+		struct nd_entry *nd = ptr->data;
 
 		if(!irccmp(name, nd->name))
 			return nd;
@@ -761,13 +751,12 @@ del_from_cli_connid_hash(struct Client *client_p)
 struct Client *
 find_cli_connid_hash(uint32_t connid)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 	hashv = hash_cli_connid(connid);
 	RB_DLINK_FOREACH(ptr, clientbyconnidTable[hashv].head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 		if(target_p->localClient->connid == connid)
 			return target_p;
 	}
@@ -775,7 +764,7 @@ find_cli_connid_hash(uint32_t connid)
 	hashv = hash_zconnid(connid);
 	RB_DLINK_FOREACH(ptr, clientbyzconnidTable[hashv].head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 		if(target_p->localClient->zconnid == connid)
 			return target_p;
 

@@ -463,7 +463,6 @@ remove_ip_limit(struct Client *client_p, struct ConfItem *aconf)
 static int
 attach_iline(struct Client *client_p, struct ConfItem *aconf)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	int local_count = 0;
 	int global_count = 0;
@@ -479,7 +478,7 @@ attach_iline(struct Client *client_p, struct ConfItem *aconf)
 	/* find_hostname() returns the head of the list to search */
 	RB_DLINK_FOREACH(ptr, (find_hostname(client_p->host))->head )
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(irccmp(client_p->host, target_p->host) != 0)
 			continue;
@@ -961,11 +960,10 @@ expire_temp_kd(void *list)
 {
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	struct ConfItem *aconf;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, ((rb_dlink_list *) list)->head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if(aconf->hold <= rb_current_time())
 		{
@@ -997,10 +995,9 @@ expire_temp_kd(void *list)
 #undef a_string
 #undef a_x
 				ilog(L_MAIN,
-				     "WARNING: Calling delete_one_address_conf() on this and hoping for the best");
+				     "WARNING: Dropping the request to delay this DLINE");
 				sendto_realops_flags(UMODE_ALL, L_ALL,
-						     "WARNING: Calling delete_one_address_conf() on this and hoping for the best");
-				delete_one_address_conf(aconf->host, aconf);
+						     "WARNING: Dropping the request to delete this DLINE");
 			}
 			else if(aconf->status & CONF_DLINE)
 				remove_dline(aconf);
@@ -1014,12 +1011,11 @@ expire_temp_kd(void *list)
 static void
 reorganise_temp_kd(void *list)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr, *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, ((rb_dlink_list *) list)->head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if(aconf->hold < (rb_current_time() + (60 * 60)))
 		{
@@ -1138,7 +1134,6 @@ get_printable_kline(struct Client *source_p, struct ConfItem *aconf,
 static void
 clear_out_old_conf(void)
 {
-	struct Class *cltmp;
 	rb_dlink_node *ptr;
 #ifdef ENABLE_SERVICES
 	rb_dlink_node *next_ptr;
@@ -1150,7 +1145,7 @@ clear_out_old_conf(void)
 	 */
 	RB_DLINK_FOREACH(ptr, class_list.head)
 	{
-		cltmp = ptr->data;
+		struct Class *cltmp = ptr->data;
 		MaxUsers(cltmp) = -1;
 	}
 

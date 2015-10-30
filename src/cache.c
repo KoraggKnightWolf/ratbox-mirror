@@ -163,7 +163,6 @@ cache_file(const char *filename, const char *shortname, int flags)
 void
 cache_links(void *unused)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	char *links_line;
@@ -179,7 +178,7 @@ cache_links(void *unused)
 
 	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		/* skip ourselves (done in /links) and hidden servers */
 		if(IsMe(target_p) || (IsHidden(target_p) && !ConfigServerHide.disable_hidden))
@@ -297,7 +296,6 @@ load_help(void)
 void
 send_user_motd(struct Client *source_p)
 {
-	struct cacheline *lineptr;
 	rb_dlink_node *ptr;
 	if(user_motd == NULL || rb_dlink_list_length(&user_motd->contents) == 0)
 	{
@@ -309,7 +307,7 @@ send_user_motd(struct Client *source_p)
 
 	RB_DLINK_FOREACH(ptr, user_motd->contents.head)
 	{
-		lineptr = ptr->data;
+		struct cacheline *lineptr = ptr->data;
 		sendto_one_numeric(source_p, s_RPL(RPL_MOTD), lineptr->data);
 	}
 	ClearCork(source_p);
@@ -325,7 +323,6 @@ send_user_motd(struct Client *source_p)
 void
 send_oper_motd(struct Client *source_p)
 {
-	struct cacheline *lineptr;
 	rb_dlink_node *ptr;
 
 	if(oper_motd == NULL || rb_dlink_list_length(&oper_motd->contents) == 0)
@@ -335,7 +332,7 @@ send_oper_motd(struct Client *source_p)
 
 	RB_DLINK_FOREACH(ptr, oper_motd->contents.head)
 	{
-		lineptr = ptr->data;
+		struct cacheline *lineptr = ptr->data;
 		sendto_one_numeric(source_p, s_RPL(RPL_OMOTD), lineptr->data);
 	}
 	ClearCork(source_p);

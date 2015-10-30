@@ -168,11 +168,10 @@ void
 flood_recalc(void *unused)
 {
 	rb_dlink_node *ptr, *next;
-	struct Client *client_p;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, lclient_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
 
 		if(rb_unlikely(IsMe(client_p)))
 			continue;
@@ -202,7 +201,7 @@ flood_recalc(void *unused)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, unknown_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
 
 		if(client_p->localClient == NULL)
 			continue;

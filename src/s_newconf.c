@@ -127,12 +127,11 @@ clear_s_newconf(void)
 void
 clear_s_newconf_bans(void)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr, *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, xline_conf_list.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			continue;
@@ -143,7 +142,7 @@ clear_s_newconf_bans(void)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		/* temporary resv */
 		if(aconf->flags & CONF_FLAGS_TEMPORARY)
@@ -179,12 +178,11 @@ free_remote_conf(struct remote_conf *remote_p)
 int
 find_shared_conf(const char *username, const char *host, const char *server, int flags)
 {
-	struct remote_conf *shared_p;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, shared_conf_list.head)
 	{
-		shared_p = ptr->data;
+		struct remote_conf *shared_p = ptr->data;
 
 		if(match(shared_p->username, username) &&
 		   match(shared_p->host, host) && match(shared_p->server, server))
@@ -203,7 +201,6 @@ void
 cluster_generic(struct Client *source_p, const char *command, int cltype, const char *format, ...)
 {
 	char buffer[IRCD_BUFSIZE];
-	struct remote_conf *shared_p;
 	va_list args;
 	rb_dlink_node *ptr;
 
@@ -213,7 +210,7 @@ cluster_generic(struct Client *source_p, const char *command, int cltype, const 
 
 	RB_DLINK_FOREACH(ptr, cluster_conf_list.head)
 	{
-		shared_p = ptr->data;
+		struct remote_conf *shared_p = ptr->data;
 
 		if(!(shared_p->flags & cltype))
 			continue;
@@ -226,12 +223,11 @@ cluster_generic(struct Client *source_p, const char *command, int cltype, const 
 static void
 expire_glines(void *unused)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr, *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, glines.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		/* if gline_time changes, these could end up out of order */
 		if(aconf->hold > rb_current_time())
@@ -280,7 +276,6 @@ free_oper_conf(struct oper_conf *oper_p)
 struct oper_conf *
 find_oper_conf(const char *username, const char *host, const char *locip, const char *name)
 {
-	struct oper_conf *oper_p;
 	struct rb_sockaddr_storage ip, cip;
 	char addr[HOSTLEN + 1];
 	int bits, cbits;
@@ -290,7 +285,7 @@ find_oper_conf(const char *username, const char *host, const char *locip, const 
 
 	RB_DLINK_FOREACH(ptr, oper_conf_list.head)
 	{
-		oper_p = ptr->data;
+		struct oper_conf *oper_p = ptr->data;
 
 		/* name/username doesnt match.. */
 		if(irccmp(oper_p->name, name) || !match(oper_p->username, username))
@@ -450,12 +445,11 @@ add_server_conf(struct server_conf *server_p)
 struct server_conf *
 find_server_conf(const char *name)
 {
-	struct server_conf *server_p;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, server_conf_list.head)
 	{
-		server_p = ptr->data;
+		struct server_conf *server_p = ptr->data;
 
 		if(ServerConfIllegal(server_p))
 			continue;
@@ -531,12 +525,11 @@ set_server_conf_autoconn(struct Client *source_p, char *name, int newval)
 struct ConfItem *
 find_xline(const char *gecos, int counter)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, xline_conf_list.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if(match_esc(aconf->host, gecos))
 		{
@@ -552,12 +545,11 @@ find_xline(const char *gecos, int counter)
 struct ConfItem *
 find_xline_mask(const char *gecos)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, xline_conf_list.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if(!irccmp(aconf->host, gecos))
 			return aconf;
@@ -569,12 +561,11 @@ find_xline_mask(const char *gecos)
 struct ConfItem *
 find_nick_resv(const char *name)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if(match_esc(aconf->host, name))
 		{
@@ -589,12 +580,11 @@ find_nick_resv(const char *name)
 struct ConfItem *
 find_nick_resv_mask(const char *name)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if(!irccmp(aconf->host, name))
 			return aconf;
@@ -793,13 +783,12 @@ free_nd_entry(struct nd_entry *nd)
 void
 expire_nd_entries(void *unused)
 {
-	struct nd_entry *nd;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, nd_list.head)
 	{
-		nd = ptr->data;
+		struct nd_entry *nd = ptr->data;
 
 		/* this list is ordered - we can stop when we hit the first
 		 * entry that doesnt expire..

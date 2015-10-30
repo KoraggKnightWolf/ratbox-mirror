@@ -924,7 +924,6 @@ send_umode(struct Client *client_p, struct Client *source_p, int old, int sendma
 void
 send_umode_out(struct Client *client_p, struct Client *source_p, int old)
 {
-	struct Client *target_p;
 	char buf[IRCD_BUFSIZE];
 	rb_dlink_node *ptr;
 
@@ -932,7 +931,7 @@ send_umode_out(struct Client *client_p, struct Client *source_p, int old)
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if((target_p != client_p) && (target_p != source_p) && (*buf))
 		{

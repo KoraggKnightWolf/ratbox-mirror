@@ -194,11 +194,10 @@ static struct module_path *
 mod_find_path(const char *path)
 {
 	rb_dlink_node *ptr;
-	struct module_path *mpath;
 
 	RB_DLINK_FOREACH(ptr, mod_paths.head)
 	{
-		mpath = ptr->data;
+		struct module_path *mpath = ptr->data;
 
 		if(!strcmp(path, mpath->path))
 			return mpath;
@@ -357,13 +356,12 @@ load_one_module(const char *path, int coremodule)
 {
 	char modpath[MAXPATHLEN];
 	rb_dlink_node *pathst;
-	struct module_path *mpath;
 
 	struct stat statbuf;
 
 	RB_DLINK_FOREACH(pathst, mod_paths.head)
 	{
-		mpath = pathst->data;
+		struct module_path *mpath = pathst->data;
 
 		snprintf(modpath, sizeof(modpath), "%s/%s", mpath->path, path);
 		if((strstr(modpath, "../") == NULL) && (strstr(modpath, "/..") == NULL))

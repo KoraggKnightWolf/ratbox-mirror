@@ -139,12 +139,11 @@ static void
 delay_exit(void *unused)
 {
 	rb_dlink_node *ptr, *ptr_next;
-	delay_t *ddata;
 	char reasonbuf[IRCD_BUFSIZE];
 
 	RB_DLINK_FOREACH_SAFE(ptr, ptr_next, delay_exit_list.head)
 	{
-		ddata = ptr->data;
+		delay_t *ddata = ptr->data;
 
 		if(ddata->time + ConfigFileEntry.delayed_exit_time > rb_current_time())
 			continue;
@@ -161,13 +160,11 @@ static void
 reject_expires(void *unused)
 {
 	rb_dlink_node *ptr, *next;
-	rb_patricia_node_t *pnode;
-	reject_t *rdata;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
 	{
-		pnode = ptr->data;
-		rdata = pnode->data;
+		rb_patricia_node_t *pnode = ptr->data;
+		reject_t *rdata = pnode->data;
 
 		if(rdata->time + ConfigFileEntry.reject_duration > rb_current_time())
 			continue;
@@ -255,12 +252,11 @@ void
 flush_reject(void)
 {
 	rb_dlink_node *ptr, *next;
-	rb_patricia_node_t *pnode;
-	reject_t *rdata;
+
 	RB_DLINK_FOREACH_SAFE(ptr, next, reject_list.head)
 	{
-		pnode = ptr->data;
-		rdata = pnode->data;
+		rb_patricia_node_t *pnode = ptr->data;
+		reject_t *rdata = pnode->data;
 		rb_dlinkDelete(ptr, &reject_list);
 		rb_free(rdata);
 		rb_patricia_remove(reject_tree, pnode);
@@ -416,16 +412,13 @@ report_elines(struct Client *source_p)
 unsigned long
 throttle_size(void)
 {
-	unsigned long count;
+	unsigned long count = 0;
 	rb_dlink_node *ptr;
-	rb_patricia_node_t *pnode;
-	throttle_t *t;
 
-	count = 0;
 	RB_DLINK_FOREACH(ptr, throttle_list.head)
 	{
-		pnode = ptr->data;
-		t = pnode->data;
+		rb_patricia_node_t *pnode = ptr->data;
+		throttle_t *t = pnode->data;
 		if(t->count > ConfigFileEntry.throttle_count)
 			count++;
 	}
@@ -479,13 +472,11 @@ static void
 throttle_expires(void *unused)
 {
 	rb_dlink_node *ptr, *next;
-	rb_patricia_node_t *pnode;
-	throttle_t *t;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, throttle_list.head)
 	{
-		pnode = ptr->data;
-		t = pnode->data;
+		rb_patricia_node_t *pnode = ptr->data;
+		throttle_t *t = pnode->data;
 
 		if(t->last + ConfigFileEntry.throttle_duration > rb_current_time())
 			continue;
@@ -635,13 +626,12 @@ clear_cidr_tree(void *data)
 void
 rehash_global_cidr_tree(void)
 {
-	struct Client *client_p;
 	rb_dlink_node *ptr;
 	rb_destroy_patricia(global_tree, clear_cidr_tree);
 	global_tree = rb_new_patricia(PATRICIA_BITS);
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
 		if(IsMe(client_p) && IsServer(client_p))
 			continue;
 		inc_global_cidr_count(client_p);

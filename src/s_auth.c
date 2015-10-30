@@ -457,11 +457,10 @@ timeout_auth_queries_event(void *notused)
 {
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	struct AuthRequest *auth;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, auth_poll_list.head)
 	{
-		auth = ptr->data;
+		struct AuthRequest *auth = ptr->data;
 
 		if(auth->timeout < rb_current_time())
 		{

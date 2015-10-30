@@ -121,7 +121,6 @@ free_ban(struct Ban *bptr)
 struct membership *
 find_channel_membership(struct Channel *chptr, struct Client *client_p)
 {
-	struct membership *msptr;
 	rb_dlink_node *ptr;
 
 	if(!IsClient(client_p))
@@ -134,14 +133,14 @@ find_channel_membership(struct Channel *chptr, struct Client *client_p)
 	{
 		RB_DLINK_FOREACH(ptr, chptr->members[MEMBER_NOOP].head)
 		{
-			msptr = ptr->data;
+			struct membership *msptr = ptr->data;
 
 			if(msptr->client_p == client_p)
 				return msptr;
 		}
 		RB_DLINK_FOREACH(ptr, chptr->members[MEMBER_OP].head)
 		{
-			msptr = ptr->data;
+			struct membership *msptr = ptr->data;
 
 			if(msptr->client_p == client_p)
 				return msptr;
@@ -151,7 +150,7 @@ find_channel_membership(struct Channel *chptr, struct Client *client_p)
 	{
 		RB_DLINK_FOREACH(ptr, client_p->user->channel.head)
 		{
-			msptr = ptr->data;
+			struct membership *msptr = ptr->data;
 
 			if(msptr->chptr == chptr)
 				return msptr;
@@ -270,8 +269,6 @@ remove_user_from_channel(struct membership *msptr)
 void
 remove_user_from_channels(struct Client *client_p)
 {
-	struct Channel *chptr;
-	struct membership *msptr;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	if(client_p == NULL)
@@ -280,8 +277,8 @@ remove_user_from_channels(struct Client *client_p)
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->user->channel.head)
 	{
         	rb_dlink_list *memlist;
-		msptr = ptr->data;
-		chptr = msptr->chptr;
+		struct membership *msptr = ptr->data;
+		struct Channel *chptr = msptr->chptr;
 
 		if(is_chanop(msptr))
 		        memlist = &chptr->members[MEMBER_OP];
@@ -313,7 +310,6 @@ remove_user_from_channels(struct Client *client_p)
 void
 invalidate_bancache_user(struct Client *client_p)
 {
-	struct membership *msptr;
 	rb_dlink_node *ptr;
 
 	if(client_p == NULL)
@@ -321,7 +317,7 @@ invalidate_bancache_user(struct Client *client_p)
 
 	RB_DLINK_FOREACH(ptr, client_p->user->channel.head)
 	{
-		msptr = ptr->data;
+		struct membership *msptr = ptr->data;
 		msptr->ban_serial = 0;
 		msptr->flags &= ~CHFL_BANNED;
 	}
@@ -360,11 +356,10 @@ free_channel_list(rb_dlink_list * list)
 {
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	struct Ban *actualBan;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, list->head)
 	{
-		actualBan = ptr->data;
+		struct Ban *actualBan = ptr->data;
 		free_ban(actualBan);
 	}
 
@@ -426,8 +421,6 @@ channel_pub_or_secret(struct Channel *chptr)
 void
 channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eon)
 {
-	struct membership *msptr;
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	char lbuf[IRCD_BUFSIZE];
 	char *t;
@@ -451,8 +444,8 @@ channel_member_names(struct Channel *chptr, struct Client *client_p, int show_eo
 		{
 			RB_DLINK_FOREACH(ptr, chptr->members[i].head)
 			{
-				msptr = ptr->data;
-				target_p = msptr->client_p;
+				struct membership *msptr = ptr->data;
+				struct Client *target_p = msptr->client_p;
 				
 				if(IsInvisible(target_p) && !is_member)
 					continue;

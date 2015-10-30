@@ -47,8 +47,6 @@
 #include <parse.h>
 #include <sslproc.h>
 
-extern char *crypt();
-
 #define MIN_CONN_FREQ 300
 
 unsigned long MaxConnectionCount = 1;
@@ -224,8 +222,6 @@ try_connections(void *unused)
 {
 	struct Client *client_p;
 	struct server_conf *server_p = NULL;
-	struct server_conf *tmp_p;
-	struct Class *cltmp;
 	rb_dlink_node *ptr;
 	bool connecting = false;
 	int confrq;
@@ -233,7 +229,8 @@ try_connections(void *unused)
 
 	RB_DLINK_FOREACH(ptr, server_conf_list.head)
 	{
-		tmp_p = ptr->data;
+		struct server_conf *tmp_p = ptr->data;
+		struct Class *cltmp;
 
 		if(ServerConfIllegal(tmp_p) || !ServerConfAutoconn(tmp_p))
 			continue;

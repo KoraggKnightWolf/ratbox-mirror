@@ -218,18 +218,15 @@ svc_message(struct Service *service, struct Client *target_p, svc_type_t type, c
 struct Service *
 find_service(struct Client *client_p)
 {
-	struct Service *service_p;
 	rb_dlink_node *ptr;
 
 	//not a service?
 	if(!IsFake(client_p))
 		return NULL;
 
-
-
 	RB_DLINK_FOREACH(ptr, services.head)
 	{
-		service_p = (struct Service *) ptr->data;
+		struct Service *service_p = (struct Service *) ptr->data;
 
 		if(service_p->client_p == client_p)
 			return service_p;
@@ -370,14 +367,14 @@ handle_command(struct SVCMessage *mptr, struct Client *source_p,
 struct SVCMessage *
 svc_get_cmd(struct Service *service_p, char *cmd)
 {
-	struct SVCMessage *mptr;
 	rb_dlink_node *ptr;
 	uint32_t hashv;
 	
 	hashv = cmd_hash(cmd);
+	
 	RB_DLINK_FOREACH(ptr, service_p->command_tbl[hashv].head)
 	{
-		mptr = (struct SVCMessage *) ptr->data;
+		struct SVCMessage *mptr = ptr->data;
 
 		if(strcasecmp(mptr->cmd, cmd) == 0)
 			return mptr;

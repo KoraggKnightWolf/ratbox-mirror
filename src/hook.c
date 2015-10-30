@@ -187,14 +187,13 @@ void
 remove_hook(const char *name, hookfn fn)
 {
 	int i;
-	struct hook_info *info;
 	rb_dlink_node *ptr, *next;
 	if((i = find_hook(name)) < 0)
 		return;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, hooks[i].hooks.head)
 	{
-		info = ptr->data;
+		struct hook_info *info = ptr->data;
 		if(info->fn == fn)
 		{
 			rb_dlinkDelete(&info->node, &hooks[i].hooks);

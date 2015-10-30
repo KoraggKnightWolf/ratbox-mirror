@@ -113,14 +113,13 @@ static void
 free_ssl_daemon(ssl_ctl_t * ctl)
 {
 	rb_dlink_node *ptr;
-	ssl_ctl_buf_t *ctl_buf;
 	int x;
 	if(ctl->cli_count)
 		return;
 
 	RB_DLINK_FOREACH(ptr, ctl->readq.head)
 	{
-		ctl_buf = ptr->data;
+		ssl_ctl_buf_t *ctl_buf = ptr->data;
 		for(x = 0; x < ctl_buf->nfds; x++)
 			rb_close(ctl_buf->F[x]);
 
@@ -130,7 +129,7 @@ free_ssl_daemon(ssl_ctl_t * ctl)
 
 	RB_DLINK_FOREACH(ptr, ctl->writeq.head)
 	{
-		ctl_buf = ptr->data;
+		ssl_ctl_buf_t *ctl_buf = ptr->data;
 		for(x = 0; x < ctl_buf->nfds; x++)
 			rb_close(ctl_buf->F[x]);
 
@@ -154,10 +153,10 @@ static void
 ssl_killall(void)
 {
 	rb_dlink_node *ptr, *next;
-	ssl_ctl_t *ctl;
+
 	RB_DLINK_FOREACH_SAFE(ptr, next, ssl_daemons.head)
 	{
-		ctl = ptr->data;
+		ssl_ctl_t *ctl = ptr->data;
 		if(ctl->dead == true)
 			continue;
 		ctl->dead = true;
@@ -453,12 +452,12 @@ ssl_process_cmd_recv(ssl_ctl_t * ctl)
 	static const char *cannot_setup_ssl = "ssld cannot setup ssl, check your certificates and private key";
 	static const char *no_ssl_or_zlib = "ssld has neither SSL/TLS or zlib support killing all sslds";
 	rb_dlink_node *ptr, *next;
-	ssl_ctl_buf_t *ctl_buf;
+
 	if(ctl->dead == true)
 		return;
 	RB_DLINK_FOREACH_SAFE(ptr, next, ctl->readq.head)
 	{
-		ctl_buf = ptr->data;
+		ssl_ctl_buf_t *ctl_buf = ptr->data;
 		switch (*ctl_buf->buf)
 		{
 		case 'N':
@@ -540,12 +539,12 @@ ssl_read_ctl(rb_fde_t * F, void *data)
 static ssl_ctl_t *
 which_ssld(void)
 {
-	ssl_ctl_t *ctl, *lowest = NULL;
+	ssl_ctl_t *lowest = NULL;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, ssl_daemons.head)
 	{
-		ctl = ptr->data;
+		ssl_ctl_t *ctl = ptr->data;
 		if(ctl->dead == true)
 			continue;
 		if(lowest == NULL)
@@ -563,7 +562,6 @@ static void
 ssl_write_ctl(rb_fde_t * F, void *data)
 {
 	ssl_ctl_t *ctl = data;
-	ssl_ctl_buf_t *ctl_buf;
 	rb_dlink_node *ptr, *next;
 	int retlen, x;
 
@@ -572,7 +570,7 @@ ssl_write_ctl(rb_fde_t * F, void *data)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, ctl->writeq.head)
 	{
-		ctl_buf = ptr->data;
+		ssl_ctl_buf_t *ctl_buf = ptr->data;
 		/* in theory unix sock_dgram shouldn't ever short write this.. */
 		retlen = rb_send_fd_buf(ctl->F, ctl_buf->F, ctl_buf->nfds, ctl_buf->buf, ctl_buf->buflen, ctl->pid);
 		if(retlen > 0)
@@ -850,7 +848,6 @@ static void
 collect_zipstats(void *unused)
 {
 	rb_dlink_node *ptr;
-	struct Client *target_p;
 	char buf[sizeof(uint8_t) + sizeof(uint32_t) + HOSTLEN];
 	void *odata;
 	size_t len;
@@ -860,7 +857,7 @@ collect_zipstats(void *unused)
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 		if(IsCapable(target_p, CAP_ZIP))
 		{
 			len = sizeof(uint8_t) + sizeof(uint32_t);
@@ -877,10 +874,10 @@ static void
 cleanup_dead_ssl(void *unused)
 {
 	rb_dlink_node *ptr, *next;
-	ssl_ctl_t *ctl;
+
 	RB_DLINK_FOREACH_SAFE(ptr, next, ssl_daemons.head)
 	{
-		ctl = ptr->data;
+		ssl_ctl_t *ctl = ptr->data;
 		if(ctl->dead == true && ctl->cli_count == 0)
 		{
 			free_ssl_daemon(ctl);

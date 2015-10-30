@@ -54,14 +54,13 @@ hash_monitor_nick(const char *name)
 struct monitor *
 find_monitor(const char *name, bool add)
 {
-	struct monitor *monptr;
 	rb_dlink_node *ptr;
 
 	uint32_t hashv = hash_monitor_nick(name);
 
 	RB_DLINK_FOREACH(ptr, monitorTable[hashv].head)
 	{
-		monptr = ptr->data;
+		struct monitor *monptr = ptr->data;
 		if(!irccmp(monptr->name, name))
 			return monptr;
 	
@@ -69,7 +68,7 @@ find_monitor(const char *name, bool add)
 
 	if(add == true)
 	{
-		monptr = rb_malloc(sizeof(struct monitor));
+		struct monitor *monptr = rb_malloc(sizeof(struct monitor));
 		monptr->name = rb_strdup(name);
 		monptr->hashv = hashv;
 		rb_dlinkAdd(monptr, &monptr->node, &monitorTable[hashv]);
@@ -141,12 +140,11 @@ monitor_signoff(struct Client *client_p)
 void
 clear_monitor(struct Client *client_p)
 {
-	struct monitor *monptr;
 	rb_dlink_node *ptr, *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->monitor_list.head)
 	{
-		monptr = ptr->data;
+		struct monitor *monptr = ptr->data;
 		rb_dlinkFindDestroy(client_p, &monptr->users);
 
 		/* free the rb_dlink_node allocated in add_monitor -

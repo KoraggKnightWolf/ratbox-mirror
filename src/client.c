@@ -275,13 +275,12 @@ static void
 check_pings_list(rb_dlink_list * list)
 {
 	char scratch[32];	/* way too generous but... */
-	struct Client *client_p;	/* current local client_p being examined */
 	int ping = 0;		/* ping time value from client */
 	rb_dlink_node *ptr, *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, list->head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
 
 		/*
 		 ** Note: No need to notify opers here. It's
@@ -347,11 +346,10 @@ static void
 check_unknowns_list(rb_dlink_list * list)
 {
 	rb_dlink_node *ptr, *next_ptr;
-	struct Client *client_p;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, list->head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
 
 		if(IsDead(client_p) || IsClosing(client_p))
 			continue;
@@ -413,13 +411,12 @@ notify_banned_client(struct Client *client_p, struct ConfItem *aconf, int ban)
 void
 check_banned_lines(void)
 {
-	struct Client *client_p;	/* current local client_p being examined */
-	struct ConfItem *aconf = NULL;
 	rb_dlink_node *ptr, *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
+		struct ConfItem *aconf;
 
 		if(IsMe(client_p))
 			continue;
@@ -492,7 +489,7 @@ check_banned_lines(void)
 			sendto_realops_flags(UMODE_ALL, L_ALL, "XLINE active for %s",
 					     get_client_name(client_p, HIDE_IP));
 
-			(void)exit_client(client_p, client_p, &me, "Bad user info");
+			exit_client(client_p, client_p, &me, "Bad user info");
 			continue;
 		}
 	}
@@ -500,8 +497,8 @@ check_banned_lines(void)
 	/* also check the unknowns list for new dlines */
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, unknown_list.head)
 	{
-		client_p = ptr->data;
-
+		struct Client *client_p = ptr->data;
+                struct ConfItem *aconf;
 		if((aconf = find_dline((struct sockaddr *)&client_p->localClient->ip)))
 		{
 			if(aconf->status & CONF_EXEMPTDLINE)
@@ -535,15 +532,13 @@ check_klines_event(void *unused)
 void
 check_klines(void)
 {
-	struct Client *client_p;
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 	{
-		client_p = ptr->data;
-
+		struct Client *client_p = ptr->data;
+		struct ConfItem *aconf;
 		if(IsMe(client_p) || !IsClient(client_p))
 			continue;
 
@@ -825,11 +820,10 @@ static void
 free_exited_clients(void *unused)
 {
 	rb_dlink_node *ptr, *next;
-	struct Client *target_p;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, dead_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 #ifdef DEBUG_EXITED_CLIENTS
 		{
@@ -876,9 +870,9 @@ free_exited_clients(void *unused)
 #ifdef DEBUG_EXITED_CLIENTS
 	RB_DLINK_FOREACH_SAFE(ptr, next, dead_remote_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
-		if(ptr->data == NULL)
+		if(target_p == NULL)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL, "Warning: null client on dead_list!");
 			rb_dlinkDestroy(ptr, &dead_list);
@@ -942,7 +936,6 @@ recurse_send_quits(struct Client *client_p, struct Client *source_p,
 static void
 recurse_remove_clients(struct Client *source_p, const char *comment)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr, *ptr_next;
 
 	if(IsMe(source_p))
@@ -956,7 +949,7 @@ recurse_remove_clients(struct Client *source_p, const char *comment)
 	{
 		RB_DLINK_FOREACH_SAFE(ptr, ptr_next, source_p->serv->users.head)
 		{
-			target_p = ptr->data;
+			struct Client *target_p = ptr->data;
 			target_p->flags |= FLAGS_KILLED;
 			add_nd_entry(target_p->name);
 
@@ -968,7 +961,7 @@ recurse_remove_clients(struct Client *source_p, const char *comment)
 	{
 		RB_DLINK_FOREACH_SAFE(ptr, ptr_next, source_p->serv->users.head)
 		{
-			target_p = ptr->data;
+			struct Client *target_p = ptr->data;
 			target_p->flags |= FLAGS_KILLED;
 
 			if(!IsDead(target_p) && !IsClosing(target_p))
@@ -978,7 +971,7 @@ recurse_remove_clients(struct Client *source_p, const char *comment)
 
 	RB_DLINK_FOREACH_SAFE(ptr, ptr_next, source_p->serv->servers.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 		recurse_remove_clients(target_p, comment);
 		qs_server(target_p);
 	}
@@ -992,12 +985,11 @@ recurse_remove_clients(struct Client *source_p, const char *comment)
 static void
 remove_dependents(struct Client *client_p, struct Client *source_p, const char *comment, const char *comment1)
 {
-	struct Client *to;
 	rb_dlink_node *ptr, *next;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, serv_list.head)
 	{
-		to = ptr->data;
+		struct Client *to = ptr->data;
 
 		if(IsMe(to) || to == source_p->from || (to == client_p && IsCapable(to, CAP_QS)))
 			continue;
@@ -1011,11 +1003,10 @@ remove_dependents(struct Client *client_p, struct Client *source_p, const char *
 void
 exit_aborted_clients(void *unused)
 {
-	struct abort_client *abt;
 	rb_dlink_node *ptr, *next;
 	RB_DLINK_FOREACH_SAFE(ptr, next, abort_list.head)
 	{
-		abt = ptr->data;
+		struct abort_client *abt = ptr->data;
 
 #ifdef DEBUG_EXITED_CLIENTS
 		{
@@ -1510,7 +1501,6 @@ del_all_accepts(struct Client *client_p)
 {
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	struct Client *target_p;
 
 	if(MyClient(client_p) && client_p->localClient->allow_list.head)
 	{
@@ -1520,7 +1510,7 @@ del_all_accepts(struct Client *client_p)
 
 		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->localClient->allow_list.head)
 		{
-			target_p = ptr->data;
+			struct Client *target_p = ptr->data;
 			rb_dlinkFindDestroy(client_p, &target_p->on_allow_list);
 			rb_dlinkDestroy(ptr, &client_p->localClient->allow_list);
 		}
@@ -1529,7 +1519,7 @@ del_all_accepts(struct Client *client_p)
 	/* remove this client from everyones accept list */
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, client_p->on_allow_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 		rb_dlinkFindDestroy(client_p, &target_p->localClient->allow_list);
 		rb_dlinkDestroy(ptr, &client_p->on_allow_list);
 	}

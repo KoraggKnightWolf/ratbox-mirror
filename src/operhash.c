@@ -85,7 +85,6 @@ operhash_add(const char *name)
 void
 operhash_delete(const char *name)
 {
-	struct operhash_entry *ohash;
 	uint32_t hashv;
 	rb_dlink_node *ptr;
 
@@ -96,7 +95,7 @@ operhash_delete(const char *name)
 
 	RB_DLINK_FOREACH(ptr, operhash_table[hashv].head)
 	{
-		ohash = ptr->data;
+		struct operhash_entry *ohash = ptr->data;
 
 		if(irccmp(ohash->name, name))
 			continue;

@@ -501,8 +501,6 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 	rb_buf_head_t rb_linebuf_local;
 	rb_buf_head_t rb_linebuf_name; 
 	rb_buf_head_t rb_linebuf_id;
-	struct Client *target_p;
-	struct membership *msptr;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
@@ -535,8 +533,8 @@ sendto_channel_flags(struct Client *one, int type, struct Client *source_p,
 
 		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->members[i].head)
 		{
-			msptr = ptr->data;
-			target_p = msptr->client_p;
+			struct membership *msptr = ptr->data;
+			struct Client *target_p = msptr->client_p;
 
 			if(IsIOError(target_p->from) || target_p->from == one)
 				continue;
@@ -587,8 +585,6 @@ sendto_channel_local(int type, struct Channel *chptr, const char *pattern, ...)
 {
 	va_list args;
 	rb_buf_head_t linebuf;
-	struct membership *msptr;
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
@@ -600,8 +596,8 @@ sendto_channel_local(int type, struct Channel *chptr, const char *pattern, ...)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, chptr->locmembers.head)
 	{
-		msptr = ptr->data;
-		target_p = msptr->client_p;
+		struct membership *msptr = ptr->data;
+		struct Client *target_p = msptr->client_p;
 		
 		if(IsFake(target_p))
 		        continue;
@@ -636,10 +632,6 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 	rb_dlink_node *next_ptr;
 	rb_dlink_node *uptr;
 	rb_dlink_node *next_uptr;
-	struct Channel *chptr;
-	struct Client *target_p;
-	struct membership *msptr;
-	struct membership *mscptr;
 	rb_buf_head_t linebuf;;
 
 	rb_linebuf_newbuf(&linebuf);
@@ -651,13 +643,13 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, user->user->channel.head)
 	{
-		mscptr = ptr->data;
-		chptr = mscptr->chptr;
+		struct membership *mscptr = ptr->data;
+		struct Channel *chptr = mscptr->chptr;
 
 		RB_DLINK_FOREACH_SAFE(uptr, next_uptr, chptr->locmembers.head)
 		{
-			msptr = uptr->data;
-			target_p = msptr->client_p;
+			struct membership *msptr = uptr->data;
+			struct Client *target_p = msptr->client_p;
 			
 			if(IsFake(target_p))
 			        continue;
@@ -690,7 +682,6 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 {
 	char buf[IRCD_BUFSIZE];
 	va_list args;
-	struct Client *target_p;
 	rb_dlink_node *ptr, *next_ptr;
 	rb_buf_head_t rb_linebuf_local;
 	rb_buf_head_t rb_linebuf_name;
@@ -717,7 +708,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 	{
 		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 		{
-			target_p = ptr->data;
+			struct Client *target_p = ptr->data;
 
                         if(IsFake(target_p))
                                 continue;
@@ -731,7 +722,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 	{
 		RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 		{
-			target_p = ptr->data;
+			struct Client *target_p = ptr->data;
 			if(IsFake(target_p))
 				continue;
 			send_linebuf(target_p, &rb_linebuf_local);
@@ -740,7 +731,7 @@ sendto_match_butone(struct Client *one, struct Client *source_p, const char *mas
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(IsFake(target_p))
 		        continue;
@@ -771,7 +762,6 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap, int nocap
 	char buf[IRCD_BUFSIZE];
 	va_list args;
 	rb_dlink_node *ptr;
-	struct Client *target_p;
 	rb_buf_head_t rb_linebuf_id;
 	rb_buf_head_t rb_linebuf_name;
 
@@ -792,7 +782,7 @@ sendto_match_servs(struct Client *source_p, const char *mask, int cap, int nocap
 
 	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		/* dont send to ourselves, or back to where it came from.. */
 		if(IsMe(target_p) || target_p->from == source_p->from)
@@ -836,7 +826,6 @@ sendto_monitor(struct monitor *monptr, const char *pattern, ...)
 {
 	va_list args;
 	rb_buf_head_t linebuf;
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
@@ -848,7 +837,7 @@ sendto_monitor(struct monitor *monptr, const char *pattern, ...)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, monptr->users.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(IsIOError(target_p))
 			continue;
@@ -907,7 +896,6 @@ sendto_anywhere(struct Client *target_p, struct Client *source_p, const char *co
 void
 sendto_realops_flags(int flags, loglevel_t level, const char *pattern, ...)
 {
-	struct Client *client_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	va_list args;
@@ -924,7 +912,7 @@ sendto_realops_flags(int flags, loglevel_t level, const char *pattern, ...)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, oper_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
 
 		/* If we're sending it to opers and theyre an admin, skip.
 		 * If we're sending it to admins, and theyre not, skip.
@@ -951,7 +939,6 @@ sendto_realops_flags(int flags, loglevel_t level, const char *pattern, ...)
 void
 sendto_wallops_flags(int flags, struct Client *source_p, const char *pattern, ...)
 {
-	struct Client *client_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	va_list args;
@@ -971,7 +958,7 @@ sendto_wallops_flags(int flags, struct Client *source_p, const char *pattern, ..
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, oper_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
 		if(client_p->umodes & flags)
 			send_linebuf(client_p, &linebuf);
 	}
@@ -1018,7 +1005,6 @@ kill_client_serv_butone(struct Client *one, struct Client *target_p, const char 
 {
 	char buf[IRCD_BUFSIZE];
 	va_list args;
-	struct Client *client_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	rb_buf_head_t rb_linebuf_id;
@@ -1036,7 +1022,7 @@ kill_client_serv_butone(struct Client *one, struct Client *target_p, const char 
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, serv_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
 
 		/* ok, if the client we're supposed to not send to has an
 		 * ID, then we still want to issue the kill there..

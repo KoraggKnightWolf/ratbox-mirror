@@ -117,12 +117,11 @@ get_listener_name(struct Listener *listener)
 void
 show_ports(struct Client *source_p)
 {
-	struct Listener *listener;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, listener_list.head)
 	{
-		listener = ptr->data;
+		struct Listener *listener = ptr->data;
 		sendto_one_numeric(source_p, RPL_STATSPLINE, form_str(RPL_STATSPLINE), 'P',
 #ifdef RB_IPV6
 				   ntohs(GET_SS_FAMILY(&listener->addr) ==
@@ -241,13 +240,12 @@ inetport(struct Listener *listener)
 static struct Listener *
 find_listener(struct rb_sockaddr_storage *addr)
 {
-	struct Listener *listener = NULL;
 	struct Listener *last_closed = NULL;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, listener_list.head)
 	{
-		listener = ptr->data;
+		struct Listener *listener = ptr->data;
 		if(GET_SS_FAMILY(addr) != GET_SS_FAMILY(&listener->addr))
 			continue;
 
@@ -397,12 +395,11 @@ close_listener(struct Listener *listener)
 void
 close_listeners(void)
 {
-	struct Listener *listener;
 	rb_dlink_node *ptr, *next;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next, listener_list.head)
 	{
-		listener = ptr->data;
+		struct Listener *listener = ptr->data;
 		close_listener(listener);
 	}
 }

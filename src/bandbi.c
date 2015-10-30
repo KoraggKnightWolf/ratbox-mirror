@@ -330,7 +330,6 @@ bandb_handle_clear(void)
 static void
 bandb_handle_finish(void)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr, *next_ptr;
 
 	clear_out_address_conf_bans();
@@ -339,7 +338,7 @@ bandb_handle_finish(void)
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, bandb_pending.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		rb_dlinkDestroy(ptr, &bandb_pending);
 

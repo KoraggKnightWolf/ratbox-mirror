@@ -117,11 +117,10 @@ void
 delete_isupport(const char *name)
 {
 	rb_dlink_node *ptr, *next_ptr;
-	struct isupportitem *item;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, isupportlist.head)
 	{
-		item = ptr->data;
+		struct isupportitem *item = ptr->data;
 
 		if(!strcmp(item->name, name))
 		{
@@ -136,12 +135,9 @@ void
 show_isupport(struct Client *client_p)
 {
 	rb_dlink_node *ptr;
-	struct isupportitem *item;
-	const char *value;
 	char buf[IRCD_BUFSIZE];
 	int extra_space;
 	unsigned int nchars, nparams;
-	int l;
 
 	extra_space = strlen(client_p->name);
 	/* UID */
@@ -154,8 +150,9 @@ show_isupport(struct Client *client_p)
 	nchars = extra_space, nparams = 0, buf[0] = '\0';
 	RB_DLINK_FOREACH(ptr, isupportlist.head)
 	{
-		item = ptr->data;
-		value = (*item->func) (item->param);
+		struct isupportitem *item = ptr->data;
+		const char *value = (*item->func) (item->param);
+		int l;
 		if(value == NULL)
 			continue;
 		l = strlen(item->name) + (EmptyString(value) ? 0 : 1 + strlen(value));
