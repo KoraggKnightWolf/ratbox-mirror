@@ -856,7 +856,7 @@ free_exited_clients(void *unused)
 		}
 #endif
 
-		if(ptr->data == NULL)
+		if(target_p == NULL)
 		{
 			sendto_realops_flags(UMODE_ALL, L_ALL, "Warning: null client on dead_list!");
 			rb_dlinkDestroy(ptr, &dead_list);
