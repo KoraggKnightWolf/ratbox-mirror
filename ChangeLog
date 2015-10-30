@@ -1,3 +1,36 @@
+androsyn    2015/10/30 16:45:50 UTC	(20151030_3-28969)
+  Log:
+  Declare loop variable pointers within the loop
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_kill.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_message.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_mode.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_squit.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_close.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_dline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_gline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_gungline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_invite.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_kline.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_links.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_list.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_map.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_monitor.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_names.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_rehash.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_restart.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_testmask.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_trace.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_who.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_whois.c (File Modified) 
+	ircd-ratbox/trunk/modules/m_xline.c (File Modified) 
+
+
 androsyn    2015/10/30 16:40:45 UTC	(20151030_2-28967)
   Log:
   and make it compile
