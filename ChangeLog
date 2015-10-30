@@ -1,3 +1,11 @@
+androsyn    2015/10/30 16:12:42 UTC	(20151030_0-28963)
+  Log:
+  minor style cleanup, declare target_p inside the foreach loop
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_accept.c (File Modified) 
+
+
 androsyn    2015/10/28 20:25:40 UTC	(20151028_22-28961)
   Log:
   use sha256 for the cert signature
