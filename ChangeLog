@@ -1,3 +1,11 @@
+androsyn    2015/10/30 16:40:04 UTC	(20151030_1-28965)
+  Log:
+  use rb_dlinkFind instead of a hand rolled version
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+
+
 androsyn    2015/10/30 16:12:42 UTC	(20151030_0-28963)
   Log:
   minor style cleanup, declare target_p inside the foreach loop
