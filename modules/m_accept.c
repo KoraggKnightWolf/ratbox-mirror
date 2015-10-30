@@ -228,7 +228,6 @@ static void
 list_accepts(struct Client *source_p)
 {
 	rb_dlink_node *ptr;
-	struct Client *target_p;
 	char nicks[IRCD_BUFSIZE];
 	int count = 0;
 	int maxcount;
@@ -243,7 +242,8 @@ list_accepts(struct Client *source_p)
 
 	RB_DLINK_FOREACH(ptr, source_p->localClient->allow_list.head)
 	{
-		if((target_p = (struct Client *) ptr->data) != NULL)
+		struct Client *target_p = ptr->data;
+		if(target_p != NULL)
 		{
 			if(count > maxcount)
 			{
