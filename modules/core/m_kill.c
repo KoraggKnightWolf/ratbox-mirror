@@ -295,7 +295,6 @@ static void
 relay_kill(struct Client *one, struct Client *source_p,
 	   struct Client *target_p, const char *inpath, const char *reason)
 {
-	struct Client *client_p;
 	rb_dlink_node *ptr;
 	char buffer[IRCD_BUFSIZE];
 
@@ -308,7 +307,7 @@ relay_kill(struct Client *one, struct Client *source_p,
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
 
 		if(!client_p || client_p == one)
 			continue;

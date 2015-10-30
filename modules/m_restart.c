@@ -61,7 +61,6 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 {
 	char buf[IRCD_BUFSIZE];
 	rb_dlink_node *ptr;
-	struct Client *target_p;
 
 	if(!IsOperDie(source_p))
 	{
@@ -82,7 +81,7 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	RB_DLINK_FOREACH(ptr, lclient_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		sendto_one_notice(target_p, ":Server Restarting. %s",
 				  get_client_name(source_p, HIDE_IP));
@@ -90,7 +89,7 @@ mo_restart(struct Client *client_p, struct Client *source_p, int parc, const cha
 
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		sendto_one(target_p, ":%s ERROR :Restart by %s",
 			   me.name, get_client_name(source_p, HIDE_IP));

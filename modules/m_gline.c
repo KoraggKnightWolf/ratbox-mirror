@@ -538,12 +538,11 @@ invalid_gline(struct Client *source_p, const char *luser, char *lreason)
 static struct ConfItem *
 find_is_glined(const char *host, const char *user)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, glines.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 		if((!user || irccmp(aconf->user, user) == 0) &&
 		   (!host || irccmp(aconf->host, host) == 0))
 			return aconf;

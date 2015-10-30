@@ -209,7 +209,6 @@ static void
 list_monitor(struct Client *client_p)
 {
 	char buf[IRCD_BUFSIZE];
-	struct monitor *monptr;
 	char *nbuf;
 	rb_dlink_node *ptr;
 	int mlen, arglen, cur_len;
@@ -225,7 +224,7 @@ list_monitor(struct Client *client_p)
 	SetCork(client_p);
 	RB_DLINK_FOREACH(ptr, client_p->localClient->monitor_list.head)
 	{
-		monptr = ptr->data;
+		struct monitor *monptr = ptr->data;
 
 		if(cur_len + strlen(monptr->name) + 1 >= IRCD_BUFSIZE - 3)
 		{
@@ -253,8 +252,6 @@ static void
 show_monitor_status(struct Client *client_p)
 {
 	char onbuf[IRCD_BUFSIZE], offbuf[IRCD_BUFSIZE];
-	struct Client *target_p;
-	struct monitor *monptr;
 	char *onptr, *offptr;
 	int cur_onlen, cur_offlen;
 	int mlen, arglen;
@@ -268,7 +265,8 @@ show_monitor_status(struct Client *client_p)
 	SetCork(client_p);
 	RB_DLINK_FOREACH(ptr, client_p->localClient->monitor_list.head)
 	{
-		monptr = ptr->data;
+		struct monitor *monptr = ptr->data;
+		struct Client *target_p;
 
 		if((target_p = find_named_person(monptr->name)) != NULL)
 		{

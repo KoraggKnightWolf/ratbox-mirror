@@ -279,7 +279,6 @@ static void
 stats_connect(struct Client *source_p)
 {
 	char buf[5];
-	struct server_conf *server_p;
 	char *s;
 	rb_dlink_node *ptr;
 
@@ -292,7 +291,7 @@ stats_connect(struct Client *source_p)
 
 	RB_DLINK_FOREACH(ptr, server_conf_list.head)
 	{
-		server_p = ptr->data;
+		struct server_conf *server_p = ptr->data;
 
 		if(ServerConfIllegal(server_p))
 			continue;

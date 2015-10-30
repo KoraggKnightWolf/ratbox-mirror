@@ -56,14 +56,13 @@ DECLARE_MODULE_AV1(close, NULL, NULL, close_clist, NULL, NULL, "$Revision$");
 static int
 mo_close(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 	rb_dlink_node *ptr_next;
 	int closed = 0;
 
 	RB_DLINK_FOREACH_SAFE(ptr, ptr_next, unknown_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		sendto_one_numeric(source_p, s_RPL(RPL_CLOSING),
 			   get_client_name(target_p, SHOW_IP), target_p->status);

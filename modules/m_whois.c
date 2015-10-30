@@ -232,8 +232,6 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 	char buf[IRCD_BUFSIZE];
 	rb_dlink_node *ptr;
 	struct Client *a2client_p;
-	struct membership *msptr;
-	struct Channel *chptr;
 	int cur_len = 0;
 	int mlen;
 	char *t;
@@ -275,8 +273,8 @@ single_whois(struct Client *source_p, struct Client *target_p, int operspy)
 	{
 		RB_DLINK_FOREACH(ptr, target_p->user->channel.head)
 		{
-			msptr = ptr->data;
-			chptr = msptr->chptr;
+			struct membership *msptr = ptr->data;
+			struct Channel *chptr = msptr->chptr;
 
 			visible = ShowChannel(source_p, chptr);
 

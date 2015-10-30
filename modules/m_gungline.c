@@ -370,7 +370,6 @@ majority_ungline(struct Client *source_p, const char *user, const char *host, co
 static int
 remove_temp_gline(const char *user, const char *host)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 	struct rb_sockaddr_storage addr, caddr;
 	int bits, cbits;
@@ -380,7 +379,7 @@ remove_temp_gline(const char *user, const char *host)
 
 	RB_DLINK_FOREACH(ptr, glines.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		gtype = parse_netmask(aconf->host, (struct sockaddr *) &caddr, &cbits);
 

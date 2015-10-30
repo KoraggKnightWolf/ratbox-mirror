@@ -757,7 +757,6 @@ remove_perm_kline(struct Client *source_p, const char *user, const char *host)
 static int
 remove_temp_kline(struct Client *source_p, const char *user, const char *host)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 	int i;
 
@@ -765,7 +764,7 @@ remove_temp_kline(struct Client *source_p, const char *user, const char *host)
 	{
 		RB_DLINK_FOREACH(ptr, temp_klines[i].head)
 		{
-			aconf = ptr->data;
+			struct ConfItem *aconf = ptr->data;
 
 			if(aconf->user && irccmp(user, aconf->user))
 				continue;

@@ -547,14 +547,13 @@ me_etrace(struct Client *client_p, struct Client *source_p, int parc, const char
 static void
 do_etrace(struct Client *source_p, int ipv4, int ipv6)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 
 	SetCork(source_p);
 	/* report all direct connections */
 	RB_DLINK_FOREACH(ptr, lclient_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 #ifdef RB_IPV6
 		if((!ipv4 && GET_SS_FAMILY(&target_p->localClient->ip) == AF_INET) ||
@@ -617,9 +616,7 @@ do_single_etrace(struct Client *source_p, struct Client *target_p)
 static int
 mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	struct Client *target_p;
 	struct Channel *chptr;
-	struct membership *msptr;
 	const char *sockhost;
 	const char *name;
 	rb_dlink_node *ptr;
@@ -659,8 +656,8 @@ mo_chantrace(struct Client *client_p, struct Client *source_p, int parc, const c
 	{
 		RB_DLINK_FOREACH(ptr, chptr->members[i].head)
 		{
-			msptr = ptr->data;
-			target_p = msptr->client_p;
+			struct membership *msptr = ptr->data;
+			struct Client *target_p = msptr->client_p;
 
 			if(EmptyString(target_p->sockhost))
 				sockhost = empty_sockhost;
@@ -686,12 +683,12 @@ static void
 match_masktrace(struct Client *source_p, rb_dlink_list * list, const char *username,
 		const char *hostname, const char *name, const char *gecos)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
-	const char *sockhost;
+
 	RB_DLINK_FOREACH(ptr, list->head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
+		const char *sockhost;
 		if(!IsClient(target_p))
 			continue;
 

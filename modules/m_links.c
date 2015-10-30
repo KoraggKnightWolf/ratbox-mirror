@@ -90,7 +90,6 @@ static int
 mo_links(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	const char *mask = "";
-	struct Client *target_p;
 	char clean_mask[2 * HOSTLEN + 4];
 	hook_data hd;
 
@@ -121,7 +120,7 @@ mo_links(struct Client *client_p, struct Client *source_p, int parc, const char 
 	SetCork(source_p);
 	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(*mask && !match(mask, target_p->name))
 			continue;

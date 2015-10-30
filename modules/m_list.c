@@ -119,7 +119,6 @@ mo_list(struct Client *client_p, struct Client *source_p, int parc, const char *
 static void
 list_all_channels(struct Client *source_p)
 {
-	struct Channel *chptr;
 	rb_dlink_node *ptr;
 	long sendq_limit;
 	int count = 0;
@@ -133,7 +132,7 @@ list_all_channels(struct Client *source_p)
 
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
-		chptr = ptr->data;
+		struct Channel *chptr = ptr->data;
 
 		/* if theyre overflowing their sendq, stop. --fl */
 		if(rb_linebuf_len(source_p->localClient->buf_sendq) > sendq_limit)
@@ -164,7 +163,6 @@ list_all_channels(struct Client *source_p)
 static void
 list_limit_channels(struct Client *source_p, const char *param)
 {
-	struct Channel *chptr;
 	char *args;
 	char *p;
 	rb_dlink_node *ptr;
@@ -306,7 +304,7 @@ list_limit_channels(struct Client *source_p, const char *param)
 
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
-		chptr = ptr->data;
+		struct Channel *chptr = ptr->data;
 
 		/* if theyre overflowing their sendq, stop. --fl */
 		if(rb_linebuf_len(source_p->localClient->buf_sendq) > sendq_limit)

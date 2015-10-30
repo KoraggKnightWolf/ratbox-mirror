@@ -76,10 +76,9 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 {
 	static time_t last_used = 0;
 	struct Client *target_p;
-	struct membership *msptr;
 	char *mask;
 	rb_dlink_node *lp;
-	struct Channel *chptr = NULL;
+//	struct Channel *chptr = NULL;
 	int server_oper = parc > 2 ? (*parv[2] == 'o') : 0;	/* Show OPERS only */
 	int member;
 	int operspy = 0;
@@ -96,7 +95,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 
 		if((lp = source_p->user->channel.head) != NULL)
 		{
-			msptr = lp->data;
+			struct membership *msptr = lp->data;
 			SetCork(source_p);
 			do_who_on_channel(source_p, msptr->chptr, server_oper, true);
 			ClearCork(source_p);
@@ -122,7 +121,7 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	if(IsChannelName(mask))
 	{
 		/* List all users on a given channel */
-		chptr = find_channel(parv[1] + operspy);
+		struct Channel *chptr = find_channel(parv[1] + operspy);
 		if(chptr != NULL)
 		{
 			if(operspy)
@@ -143,11 +142,12 @@ m_who(struct Client *client_p, struct Client *source_p, int parc, const char *pa
 	if(((target_p = find_named_person(mask)) != NULL) && (!server_oper || IsOper(target_p)))
 	{
 		int isinvis = 0;
+		struct Channel *chptr = NULL;
 
 		isinvis = IsInvisible(target_p);
 		RB_DLINK_FOREACH(lp, target_p->user->channel.head)
 		{
-			msptr = lp->data;
+			struct membership *msptr = lp->data;
 			chptr = msptr->chptr;
 
 			member = IsMember(source_p, chptr);
@@ -218,8 +218,6 @@ static void
 who_common_channel(struct Client *source_p, struct Channel *chptr,
 		   const char *mask, int server_oper, int *maxmatches)
 {
-	struct membership *msptr;
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 
 
@@ -227,8 +225,8 @@ who_common_channel(struct Client *source_p, struct Channel *chptr,
 	{
 	 	RB_DLINK_FOREACH(ptr, chptr->members[i].head)
 		{
-			msptr = ptr->data;
-			target_p = msptr->client_p;
+			struct membership *msptr = ptr->data;
+			struct Client *target_p = msptr->client_p;
 
 			if(!IsInvisible(target_p) || IsMarked(target_p))
 				continue;
@@ -268,8 +266,6 @@ who_common_channel(struct Client *source_p, struct Channel *chptr,
 static void
 who_global(struct Client *source_p, const char *mask, int server_oper, int operspy)
 {
-	struct membership *msptr;
-	struct Client *target_p;
 	rb_dlink_node *lp, *ptr;
 	int maxmatches = 500;
 
@@ -280,7 +276,7 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 	{
 		RB_DLINK_FOREACH(lp, source_p->user->channel.head)
 		{
-			msptr = lp->data;
+			struct membership *msptr = lp->data;
 			who_common_channel(source_p, msptr->chptr, mask, server_oper, &maxmatches);
 		}
 	}
@@ -294,7 +290,7 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 	 */
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 		if(!IsClient(target_p))
 			continue;
 
@@ -339,8 +335,6 @@ who_global(struct Client *source_p, const char *mask, int server_oper, int opers
 static void
 do_who_on_channel(struct Client *source_p, struct Channel *chptr, int server_oper, int member)
 {
-	struct Client *target_p;
-	struct membership *msptr;
 	rb_dlink_node *ptr;
 	int combine = IsCapable(source_p, CLICAP_MULTI_PREFIX);
 
@@ -348,8 +342,8 @@ do_who_on_channel(struct Client *source_p, struct Channel *chptr, int server_ope
 	{
 	 	RB_DLINK_FOREACH(ptr, chptr->members[i].head)
 		{
-			msptr = ptr->data;
-			target_p = msptr->client_p;
+			struct membership *msptr = ptr->data;
+			struct Client *target_p = msptr->client_p;
 	
 			if(server_oper && !IsOper(target_p))
 				continue;

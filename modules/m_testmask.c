@@ -67,7 +67,6 @@ DECLARE_MODULE_AV1(testmask, NULL, NULL, testmask_clist, NULL, NULL, "$Revision$
 static int
 mo_testmask(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
-	struct Client *target_p;
 	int lcount = 0;
 	int gcount = 0;
 	char *name, *username, *hostname;
@@ -110,7 +109,7 @@ mo_testmask(struct Client *client_p, struct Client *source_p, int parc, const ch
 
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(!IsClient(target_p))
 			continue;

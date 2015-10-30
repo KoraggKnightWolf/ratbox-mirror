@@ -468,14 +468,13 @@ static int
 del_id(struct Channel *chptr, const char *banid, rb_dlink_list * list, long mode_type)
 {
 	rb_dlink_node *ptr;
-	struct Ban *banptr;
 
 	if(EmptyString(banid))
 		return 0;
 
 	RB_DLINK_FOREACH(ptr, list->head)
 	{
-		banptr = ptr->data;
+		struct Ban *banptr = ptr->data;
 
 		if(irccmp(banid, banptr->banstr) == 0)
 		{
@@ -739,14 +738,13 @@ chm_simple(struct Client *source_p, struct Channel *chptr,
 static void
 send_banlist(long mode_type, struct Client *source_p, struct Channel *chptr, rb_dlink_list *list)
 {
-        struct Ban *banptr;
         rb_dlink_node *ptr;
         
 #define send_bl(source, num, chptr, banptr) sendto_one_numeric(source, s_RPL(num), chptr->chname, banptr->banstr, banptr->who, banptr->when)
 
         RB_DLINK_FOREACH(ptr, list->head)
         {
-                banptr = ptr->data;
+                struct Ban *banptr = ptr->data;
 
                 switch(mode_type)
                 {

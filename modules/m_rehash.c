@@ -104,14 +104,13 @@ rehash_omotd(struct Client *source_p)
 static void
 rehash_glines(struct Client *source_p)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr, *next_ptr;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is clearing G-lines", get_oper_name(source_p));
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, glines.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		delete_one_address_conf(aconf->host, aconf);
 		rb_dlinkDestroy(ptr, &glines);

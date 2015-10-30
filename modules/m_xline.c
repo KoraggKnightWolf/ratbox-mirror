@@ -281,14 +281,13 @@ valid_xline(struct Client *source_p, const char *gecos, const char *reason, int 
 static void
 check_xlines(void)
 {
-	struct Client *client_p;
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
+		struct ConfItem *aconf;
 
 		if(IsMe(client_p) || !IsClient(client_p))
 			continue;
@@ -414,12 +413,11 @@ me_unxline(struct Client *client_p, struct Client *source_p, int parc, const cha
 static void
 remove_xline(struct Client *source_p, const char *name)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, xline_conf_list.head)
 	{
-		aconf = ptr->data;
+		struct ConfItem *aconf = ptr->data;
 
 		if(irccmp(aconf->host, name))
 			continue;

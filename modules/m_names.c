@@ -125,16 +125,13 @@ names_global(struct Client *source_p)
 	int cur_len;
 	bool dont_show = false;
 	rb_dlink_node *lp, *ptr;
-	struct Client *target_p;
-	struct Channel *chptr = NULL;
-	struct membership *msptr;
 	char buf[IRCD_BUFSIZE];
 	char *t;
 
 	/* first do all visible channels */
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
-		chptr = ptr->data;
+		struct Channel *chptr = ptr->data;
 		channel_member_names(chptr, source_p, 0);
 	}
 	cur_len = mlen = sprintf(buf, form_str(RPL_NAMREPLY), me.name, source_p->name, "*", "*");
@@ -143,7 +140,7 @@ names_global(struct Client *source_p)
 	/* Second, do all clients in one big sweep */
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 		dont_show = false;
 
 		if(!IsClient(target_p) || IsInvisible(target_p))
@@ -158,8 +155,8 @@ names_global(struct Client *source_p)
 		 */
 		RB_DLINK_FOREACH(lp, target_p->user->channel.head)
 		{
-			msptr = lp->data;
-			chptr = msptr->chptr;
+			struct membership *msptr = lp->data;
+			struct Channel *chptr = msptr->chptr;
 
 			if(PubChannel(chptr) || IsMember(source_p, chptr) || SecretChannel(chptr))
 			{

@@ -261,7 +261,6 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	/* same size as in s_misc.c */
 	const char *name;
 	struct Client *target_p;
-	struct remote_conf *hub_p;
 	hook_data_client hdata;
 	int hop;
 	int hlined = 0;
@@ -339,7 +338,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 	 */
 	RB_DLINK_FOREACH(ptr, hubleaf_conf_list.head)
 	{
-		hub_p = ptr->data;
+		struct remote_conf *hub_p = ptr->data;
 
 		if(match(hub_p->server, client_p->name) && match(hub_p->host, name))
 		{
@@ -436,7 +435,6 @@ static int
 ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	struct Client *target_p;
-	struct remote_conf *hub_p;
 	hook_data_client hdata;
 	rb_dlink_node *ptr;
 	int hlined = 0;
@@ -495,7 +493,7 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	 */
 	RB_DLINK_FOREACH(ptr, hubleaf_conf_list.head)
 	{
-		hub_p = ptr->data;
+		struct remote_conf *hub_p = ptr->data;
 
 		if(match(hub_p->server, client_p->name) && match(hub_p->host, parv[1]))
 		{
@@ -651,12 +649,11 @@ set_server_gecos(struct Client *client_p, const char *info)
 static struct Client *
 server_exists(const char *servername)
 {
-	struct Client *target_p;
 	rb_dlink_node *ptr;
 
 	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(match(target_p->name, servername) || match(servername, target_p->name))
 			return target_p;
@@ -670,7 +667,6 @@ static int
 check_server(const char *name, struct Client *client_p)
 {
 	struct server_conf *server_p = NULL;
-	struct server_conf *tmp_p;
 	rb_dlink_node *ptr;
 	int error = NO_NLINE;
 	char *crypt_passwd = NULL;
@@ -687,7 +683,7 @@ check_server(const char *name, struct Client *client_p)
 
 	RB_DLINK_FOREACH(ptr, server_conf_list.head)
 	{
-		tmp_p = ptr->data;
+		struct server_conf *tmp_p = ptr->data;
 
 		if(ServerConfIllegal(tmp_p))
 			continue;
@@ -777,7 +773,6 @@ burst_modes_TS5(struct Client *client_p, char *chname, rb_dlink_list * list, cha
 	char buf[IRCD_BUFSIZE];
 	char mbuf[MODEBUFLEN];
 	char pbuf[IRCD_BUFSIZE];
-	struct Ban *banptr;
 	rb_dlink_node *ptr;
 	int tlen;
 	int mlen;
@@ -794,7 +789,7 @@ burst_modes_TS5(struct Client *client_p, char *chname, rb_dlink_list * list, cha
 
 	RB_DLINK_FOREACH(ptr, list->head)
 	{
-		banptr = ptr->data;
+		struct Ban *banptr = ptr->data;
 		tlen = strlen(banptr->banstr) + 3;
 
 		/* uh oh */
@@ -833,7 +828,6 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr, rb_dlink_list * 
 {
 	char buf[IRCD_BUFSIZE];
 	rb_dlink_node *ptr;
-	struct Ban *banptr;
 	char *t;
 	int tlen;
 	int mlen;
@@ -845,7 +839,7 @@ burst_modes_TS6(struct Client *client_p, struct Channel *chptr, rb_dlink_list * 
 
 	RB_DLINK_FOREACH(ptr, list->head)
 	{
-		banptr = ptr->data;
+		struct Ban *banptr = ptr->data;
 
 		tlen = strlen(banptr->banstr) + 1;
 
@@ -891,9 +885,6 @@ burst_TS5(struct Client *client_p)
 {
 	char ubuf[IRCD_BUFSIZE];
 	char buf[IRCD_BUFSIZE];
-	struct Client *target_p;
-	struct Channel *chptr;
-	struct membership *msptr;
 	hook_data_client hclientinfo;
 	hook_data_channel hchaninfo;
 	rb_dlink_node *ptr;
@@ -906,7 +897,7 @@ burst_TS5(struct Client *client_p)
 
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(!IsClient(target_p))
 			continue;
@@ -933,7 +924,7 @@ burst_TS5(struct Client *client_p)
 
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
-		chptr = ptr->data;
+		struct Channel *chptr = ptr->data;
 
 		s_assert(chan_member_count(chptr) > 0);
 		if(chan_member_count(chptr) <= 0)
@@ -952,7 +943,7 @@ burst_TS5(struct Client *client_p)
 		{
 			RB_DLINK_FOREACH(uptr, chptr->members[i].head)
 			{
-				msptr = uptr->data;
+				struct membership *msptr = uptr->data;
 
 				tlen = strlen(msptr->client_p->name) + 1;
 				if(is_chanop(msptr))
@@ -1016,9 +1007,6 @@ burst_TS6(struct Client *client_p)
 {
 	char ubuf[IRCD_BUFSIZE];
 	char buf[IRCD_BUFSIZE];
-	struct Client *target_p;
-	struct Channel *chptr;
-	struct membership *msptr;
 	hook_data_client hclientinfo;
 	hook_data_channel hchaninfo;
 	rb_dlink_node *ptr;
@@ -1031,7 +1019,7 @@ burst_TS6(struct Client *client_p)
 
 	RB_DLINK_FOREACH(ptr, global_client_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(!IsClient(target_p))
 			continue;
@@ -1070,7 +1058,7 @@ burst_TS6(struct Client *client_p)
 
 	RB_DLINK_FOREACH(ptr, global_channel_list.head)
 	{
-		chptr = ptr->data;
+		struct Channel *chptr = ptr->data;
 
 		s_assert(chan_member_count(chptr) > 0);
 		if(chan_member_count(chptr) <= 0)
@@ -1089,7 +1077,7 @@ burst_TS6(struct Client *client_p)
 		{
 			RB_DLINK_FOREACH(uptr, chptr->members[i].head)
 			{
-				msptr = uptr->data;
+				struct membership *msptr = uptr->data;
 
 				tlen = strlen(use_id(msptr->client_p)) + 1;
 				if(is_chanop(msptr))
@@ -1149,7 +1137,6 @@ burst_TS6(struct Client *client_p)
 static int
 server_estab(struct Client *client_p)
 {
-	struct Client *target_p;
 	struct server_conf *server_p;
 	hook_data_client hdata;
 	const char *host;
@@ -1308,7 +1295,7 @@ server_estab(struct Client *client_p)
 	 */
 	RB_DLINK_FOREACH(ptr, serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		if(target_p == client_p)
 			continue;
@@ -1355,7 +1342,7 @@ server_estab(struct Client *client_p)
 	 */
 	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
-		target_p = ptr->data;
+		struct Client *target_p = ptr->data;
 
 		/* target_p->from == target_p for target_p == client_p */
 		if(IsMe(target_p) || target_p->from == client_p)

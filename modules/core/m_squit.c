@@ -219,7 +219,6 @@ find_squit(struct Client *client_p, struct Client *source_p, const char *server)
 {
 	static struct squit_parms found_squit;
 	struct Client *target_p = NULL;
-	struct Client *p;
 	rb_dlink_node *ptr;
 
 	/* must ALWAYS be reset */
@@ -234,7 +233,7 @@ find_squit(struct Client *client_p, struct Client *source_p, const char *server)
 
 	RB_DLINK_FOREACH(ptr, global_serv_list.head)
 	{
-		p = ptr->data;
+		struct Client *p = ptr->data;
 		if(IsServer(p) || IsMe(p))
 		{
 			if(match(server, p->name))

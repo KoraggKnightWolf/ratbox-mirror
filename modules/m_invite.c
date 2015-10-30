@@ -175,19 +175,14 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 static void
 add_invite(struct Channel *chptr, struct Client *who)
 {
-	rb_dlink_node *ptr;
-
 	/* already invited? */
-	RB_DLINK_FOREACH(ptr, who->localClient->invited.head)
-	{
-		if(ptr->data == chptr)
-			return;
-	}
+	if(rb_dlinkFind(chptr, &who->localClient->invited) != NULL)
+	        return;
 
 	/* ok, if their invite list is too long, remove the tail */
 	if(rb_dlink_list_length(&who->localClient->invited) >= ConfigChannel.max_chans_per_user)
 	{
-		ptr = who->localClient->invited.tail;
+		rb_dlink_node *ptr = who->localClient->invited.tail;
 		del_invite(ptr->data, who);
 	}
 

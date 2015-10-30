@@ -387,14 +387,13 @@ set_dline(struct Client *source_p, const char *dlhost, const char *lreason, int 
 static void
 check_dlines(void)
 {
-	struct Client *client_p;
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, lclient_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
+		struct ConfItem *aconf;
 
 		if(IsMe(client_p))
 			continue;
@@ -416,7 +415,8 @@ check_dlines(void)
 	/* dlines need to be checked against unknowns too */
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, unknown_list.head)
 	{
-		client_p = ptr->data;
+		struct Client *client_p = ptr->data;
+		struct ConfItem *aconf;
 
 		if((aconf = find_dline((struct sockaddr *) &client_p->localClient->ip)) != NULL)
 		{

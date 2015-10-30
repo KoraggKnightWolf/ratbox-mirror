@@ -515,12 +515,11 @@ msg_channel_flags(int p_or_n, const char *command, struct Client *client_p,
 static void
 expire_tgchange(void *unused)
 {
-	tgchange *target;
 	rb_dlink_node *ptr, *next_ptr;
 
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, tgchange_list.head)
 	{
-		target = ptr->data;
+		tgchange *target = ptr->data;
 
 		if(target->expiry < rb_current_time())
 		{
@@ -983,7 +982,6 @@ handle_special(int p_or_n, const char *command, struct Client *client_p,
 static struct Client *
 find_userhost(const char *user, const char *host, int *count)
 {
-	struct Client *c2ptr;
 	struct Client *res = NULL;
 	char *u = LOCAL_COPY(user);
 	rb_dlink_node *ptr;
@@ -992,7 +990,7 @@ find_userhost(const char *user, const char *host, int *count)
 	{
 		RB_DLINK_FOREACH(ptr, global_client_list.head)
 		{
-			c2ptr = ptr->data;
+			struct Client *c2ptr = ptr->data;
 			if(!MyClient(c2ptr) && !IsFake(c2ptr))	/* implies mine and an user */
 				continue;
 			if((!host || match(host, c2ptr->host)) && irccmp(u, c2ptr->username) == 0)

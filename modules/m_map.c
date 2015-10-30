@@ -102,7 +102,6 @@ static void
 dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 {
 	int cnt = 0, i = 0, len;
-	struct Client *server_p;
 	rb_dlink_node *ptr;
 	*pbuf = '\0';
 
@@ -148,7 +147,7 @@ dump_map(struct Client *client_p, struct Client *root_p, char *pbuf)
 	i = 1;
 	RB_DLINK_FOREACH(ptr, root_p->serv->servers.head)
 	{
-		server_p = ptr->data;
+		struct Client *server_p = ptr->data;
 		*pbuf = ' ';
 		if(i < cnt)
 			*(pbuf + 1) = '|';
