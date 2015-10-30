@@ -1,3 +1,11 @@
+androsyn    2015/10/30 22:35:44 UTC	(20151030_6-28975)
+  Log:
+  not sure why ptr->data was being used to check for NULL instead of target_p
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2015/10/30 18:18:03 UTC	(20151030_5-28973)
   Log:
   use uint8_t for the ssl control buffers
