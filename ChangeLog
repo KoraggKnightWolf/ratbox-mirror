@@ -1,3 +1,13 @@
+androsyn    2015/10/30 22:43:02 UTC	(20151030_7-28977)
+  Log:
+  use bool as the sendqex parameters for dead_link
+
+  Modified:
+	ircd-ratbox/trunk/include/client.h (File Modified) 
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+	ircd-ratbox/trunk/src/send.c (File Modified) 
+
+
 androsyn    2015/10/30 22:35:44 UTC	(20151030_6-28975)
   Log:
   not sure why ptr->data was being used to check for NULL instead of target_p
