@@ -1,3 +1,13 @@
+androsyn    2015/11/03 01:58:58 UTC	(20151103_0-28981)
+  Log:
+  fix/cleanup signal handling
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+	ircd-ratbox/trunk/resolver/resolver.c (File Modified) 
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/10/30 23:16:06 UTC	(20151030_8-28979)
   Log:
   use designated initializers for the hash_function table, this is quite a bit more readable
