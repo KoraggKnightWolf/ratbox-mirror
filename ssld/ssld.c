@@ -1345,9 +1345,14 @@ setup_signals()
 	act.sa_handler = SIG_IGN;
 	sigemptyset(&act.sa_mask);
 	sigaddset(&act.sa_mask, SIGPIPE);
+	sigaction(SIGPIPE, &act, 0);
 	sigaddset(&act.sa_mask, SIGALRM);
+	sigaction(SIGALRM, &act, 0);
+	sigaddset(&act.sa_mask, SIGINT);
+	sigaction(SIGINT, &act, 0); 
 #ifdef SIGTRAP
 	sigaddset(&act.sa_mask, SIGTRAP);
+	sigaction(SIGTRAP, &act, 0);
 #endif
 
 #ifdef SIGWINCH

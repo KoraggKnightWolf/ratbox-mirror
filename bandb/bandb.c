@@ -221,14 +221,6 @@ error_cb(rb_helper *helper)
 	exit(1);
 }
 
-#ifndef WINDOWS
-static void
-dummy_handler(int sig)
-{
-	return;
-}
-#endif
-
 static void
 setup_signals()
 {
@@ -239,22 +231,22 @@ setup_signals()
 	act.sa_handler = SIG_IGN;
 	sigemptyset(&act.sa_mask);
 	sigaddset(&act.sa_mask, SIGPIPE);
+	sigaction(SIGPIPE, &act, 0);
+	sigaddset(&act.sa_mask, SIGINT);
+	sigaction(SIGINT, &act, 0);
 	sigaddset(&act.sa_mask, SIGALRM);
+	sigaction(SIGALRM, &act, 0);
 #ifdef SIGTRAP
 	sigaddset(&act.sa_mask, SIGTRAP);
+	sigaction(SIGTRAP, &act, 0);
 #endif
 
 #ifdef SIGWINCH
 	sigaddset(&act.sa_mask, SIGWINCH);
 	sigaction(SIGWINCH, &act, 0);
 #endif
-	sigaction(SIGPIPE, &act, 0);
-#ifdef SIGTRAP
-	sigaction(SIGTRAP, &act, 0);
-#endif
 
-	act.sa_handler = dummy_handler;
-	sigaction(SIGALRM, &act, 0);
+
 #endif
 }
 
