@@ -627,12 +627,12 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 	/* This had to be copied here to avoid problems.. */
 	source_p->tsinfo = rb_current_time();
 	if(!EmptyString(source_p->name))
-		del_from_hash(HASH_CLIENT, source_p->name, source_p);
+		hash_del(HASH_CLIENT, source_p->name, source_p);
 
 	make_user(source_p);
 	strcpy(source_p->user->name, nick);
 	source_p->name = source_p->user->name;
-	add_to_hash(HASH_CLIENT, nick, source_p);
+	hash_add(HASH_CLIENT, nick, source_p);
 
 	snprintf(note, sizeof(note), "Nick: %s", nick);
 	rb_note(client_p->localClient->F, note);
@@ -712,9 +712,9 @@ change_local_nick(struct Client *client_p, struct Client *source_p, char *nick, 
 	}
 
 	/* Finally, add to hash */
-	del_from_hash(HASH_CLIENT, source_p->name, source_p);
+	hash_del(HASH_CLIENT, source_p->name, source_p);
 	strcpy(source_p->user->name, nick);
-	add_to_hash(HASH_CLIENT, nick, source_p);
+	hash_add(HASH_CLIENT, nick, source_p);
 
 	if(!samenick)
 		monitor_signon(source_p);
@@ -769,14 +769,14 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 		}
 	}
 
-	del_from_hash(HASH_CLIENT, source_p->name, source_p);
+	hash_del(HASH_CLIENT, source_p->name, source_p);
 
 	/* invalidate nick delay when a remote client uses the nick.. */
 	if((nd = hash_find_nd(nick)))
 		free_nd_entry(nd);
 
 	strcpy(source_p->user->name, nick);
-	add_to_hash(HASH_CLIENT, nick, source_p);
+	hash_add(HASH_CLIENT, nick, source_p);
 
 	if(!samenick)
 		monitor_signon(source_p);
@@ -1107,7 +1107,7 @@ register_client(struct Client *client_p, struct Client *server,
 		rb_strlcpy(source_p->info, parv[9], sizeof(source_p->info));
 		rb_strlcpy(source_p->sockhost, parv[7], sizeof(source_p->sockhost));
 		rb_strlcpy(source_p->id, parv[8], sizeof(source_p->id));
-		add_to_hash(HASH_ID, source_p->id, source_p);
+		hash_add(HASH_ID, source_p->id, source_p);
 	}
 	else
 	{
@@ -1137,8 +1137,8 @@ register_client(struct Client *client_p, struct Client *server,
 	if((nd = hash_find_nd(nick)))
 		free_nd_entry(nd);
 
-	add_to_hash(HASH_CLIENT, nick, source_p);
-	add_to_hash(HASH_HOSTNAME, source_p->host, source_p);
+	hash_add(HASH_CLIENT, nick, source_p);
+	hash_add(HASH_HOSTNAME, source_p->host, source_p);
 	inc_global_cidr_count(source_p);
 	monitor_signon(source_p);
 

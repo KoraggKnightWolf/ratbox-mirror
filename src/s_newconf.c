@@ -34,6 +34,7 @@
 
 #include <stdinc.h>
 #include <struct.h>
+#include <hash.h>
 #include <dns.h>
 #include <s_conf.h>
 #include <s_newconf.h>
@@ -42,7 +43,6 @@
 #include <send.h>
 #include <hostmask.h>
 #include <newconf.h>
-#include <hash.h>
 #include <ratbox_lib.h>
 #include <match.h>
 #include <ircd.h>
@@ -56,7 +56,9 @@ rb_dlink_list oper_conf_list;
 rb_dlink_list hubleaf_conf_list;
 rb_dlink_list server_conf_list;
 rb_dlink_list xline_conf_list;
-rb_dlink_list resv_conf_list;	/* nicks only! */
+rb_dlink_list resv_nick_list;	/* nicks only! */
+rb_dlink_list resv_channel_temp_list;
+rb_dlink_list resv_channel_perm_list;
 rb_dlink_list pending_glines;
 rb_dlink_list glines;
 static rb_dlink_list nd_list;	/* nick delay */
@@ -140,7 +142,7 @@ clear_s_newconf_bans(void)
 		rb_dlinkDestroy(ptr, &xline_conf_list);
 	}
 
-	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_nick_list.head)
 	{
 		struct ConfItem *aconf = ptr->data;
 
@@ -149,10 +151,15 @@ clear_s_newconf_bans(void)
 			continue;
 
 		free_conf(aconf);
-		rb_dlinkDestroy(ptr, &resv_conf_list);
+		rb_dlinkDestroy(ptr, &resv_nick_list);
 	}
 
-	clear_resv_hash();
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_channel_perm_list.head)
+	{
+		struct ConfItem *aconf = ptr->data;
+		del_channel_hash_resv(aconf);
+		free_conf(aconf);
+	}
 }
 
 struct remote_conf *
@@ -563,7 +570,7 @@ find_nick_resv(const char *name)
 {
 	rb_dlink_node *ptr;
 
-	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
+	RB_DLINK_FOREACH(ptr, resv_nick_list.head)
 	{
 		struct ConfItem *aconf = ptr->data;
 
@@ -582,7 +589,7 @@ find_nick_resv_mask(const char *name)
 {
 	rb_dlink_node *ptr;
 
-	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
+	RB_DLINK_FOREACH(ptr, resv_nick_list.head)
 	{
 		struct ConfItem *aconf = ptr->data;
 
@@ -692,34 +699,22 @@ valid_temp_time(const char *p)
 static void
 expire_temp_rxlines(void *unused)
 {
-	rb_dlink_list *resv_lists;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 
-	resv_lists = hash_get_tablelist(HASH_RESV);
-	if(resv_lists != NULL)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_channel_temp_list.head)
 	{
-		RB_DLINK_FOREACH(ptr, resv_lists->head)
+		struct ConfItem *aconf = ptr->data;
+		if(aconf->hold <= rb_current_time())
 		{
-			rb_dlink_list *list = ptr->data;
-			rb_dlink_node *lptr;
-			RB_DLINK_FOREACH(lptr, list->head)
-			{
-				struct ConfItem *aconf = lptr->data;
-				if((aconf->flags & CONF_FLAGS_TEMPORARY) && aconf->hold <= rb_current_time())
-				{
-					if(ConfigFileEntry.tkline_expire_notices)
-						sendto_realops_flags(UMODE_ALL, L_ALL, "Temporary RESV for [%s] expired", aconf->host);
-
-					free_conf(aconf);
-					rb_dlinkDestroy(lptr, list);
-				}
-			}
+			if(ConfigFileEntry.tkline_expire_notices)
+				sendto_realops_flags(UMODE_ALL, L_ALL, "Temporary RESV for [%s] expired", aconf->host);
+			del_channel_hash_resv(aconf); /* this removes the entry from the temp_list too */
+			free_conf(aconf);
 		}
-		hash_free_tablelist(resv_lists);
 	}
 
-	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_conf_list.head)
+	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, resv_nick_list.head)
 	{
 		struct ConfItem *aconf = ptr->data;
 
@@ -728,7 +723,7 @@ expire_temp_rxlines(void *unused)
 			if(ConfigFileEntry.tkline_expire_notices)
 				sendto_realops_flags(UMODE_ALL, L_ALL, "Temporary RESV for [%s] expired", aconf->host);
 			free_conf(aconf);
-			rb_dlinkDestroy(ptr, &resv_conf_list);
+			rb_dlinkDestroy(ptr, &resv_nick_list);
 		}
 	}
 

@@ -525,12 +525,12 @@ create_fake_client(const char *name, const char *username, const char *host,
 	//fake_p->servptr = find_server(NULL, me.name);
 	fake_p->servptr = &me;
 	
-	add_to_hash(HASH_HOSTNAME, fake_p->host, fake_p);
+	hash_add(HASH_HOSTNAME, fake_p->host, fake_p);
 
 	strcpy(fake_p->id, generate_uid());
 
-	add_to_hash(HASH_ID, fake_p->id, fake_p);
-	add_to_hash(HASH_CLIENT, fake_p->name, fake_p);
+	hash_add(HASH_ID, fake_p->id, fake_p);
+	hash_add(HASH_CLIENT, fake_p->name, fake_p);
 	SetClient(fake_p);
 	SetDead(fake_p);
 	
@@ -549,8 +549,8 @@ destroy_fake_client(struct Client *fake_p)
 	sendto_server(fake_p, NULL, NOCAPS, CAP_TS6,
 					":%s QUIT :Service unloaded", fake_p->name);
 
-	del_from_hash(HASH_ID, fake_p->id, fake_p);
-	del_from_hash(HASH_CLIENT, fake_p->name, fake_p);
+	hash_del(HASH_ID, fake_p->id, fake_p);
+	hash_del(HASH_CLIENT, fake_p->name, fake_p);
 	
 	rb_dlinkDelete(&fake_p->node, &global_client_list);
 	free_user(fake_p->user, fake_p);
@@ -586,7 +586,7 @@ create_fake_server(const char *name, const char *gecos, int persist)
 	if(persist)
 		fake_p->flags |= FLAGS_FAKEPERSIST;
 	
-	add_to_hash(HASH_CLIENT, fake_p->name, fake_p);
+	hash_add(HASH_CLIENT, fake_p->name, fake_p);
 	
 	SetServer(fake_p);
 	SetDead(fake_p);
@@ -609,7 +609,7 @@ destroy_fake_server(struct Client *fake_p, int send_squit)
 						":%s SQUIT %s :Service unloaded",
 						me.name, fake_p->name);
 	
-	del_from_hash(HASH_CLIENT, fake_p->name, fake_p);
+	hash_del(HASH_CLIENT, fake_p->name, fake_p);
 	
 	rb_dlinkDelete(&fake_p->node, &global_client_list);
 	rb_dlinkFindDestroy(fake_p, &global_serv_list);

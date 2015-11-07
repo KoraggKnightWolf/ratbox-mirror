@@ -496,10 +496,10 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 	if(IsAnyDead(source_p))
 		return CLIENT_EXITED;
 
-	add_to_hash(HASH_HOSTNAME, source_p->host, source_p);
+	hash_add(HASH_HOSTNAME, source_p->host, source_p);
 
 	strcpy(source_p->id, generate_uid());
-	add_to_hash(HASH_ID, source_p->id, source_p);
+	hash_add(HASH_ID, source_p->id, source_p);
 
 	if(ConfigFileEntry.default_invisible)
 	{

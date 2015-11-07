@@ -698,8 +698,8 @@ ratbox_main(int argc, char *argv[])
 	SetMe(&me);
 	make_server(&me);
 	startup_time = rb_current_time();
-	add_to_hash(HASH_CLIENT, me.name, &me);
-	add_to_hash(HASH_ID, me.id, &me);
+	hash_add(HASH_CLIENT, me.name, &me);
+	hash_add(HASH_ID, me.id, &me);
 
 	rb_dlinkAddAlloc(&me, &global_serv_list);
 

@@ -410,7 +410,7 @@ ms_server(struct Client *client_p, struct Client *source_p, int parc, const char
 
 	rb_dlinkAddTail(target_p, &target_p->node, &global_client_list);
 	rb_dlinkAddTailAlloc(target_p, &global_serv_list);
-	add_to_hash(HASH_CLIENT, target_p->name, target_p);
+	hash_add(HASH_CLIENT, target_p->name, target_p);
 	rb_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
 
 	sendto_server(client_p, NULL, NOCAPS, NOCAPS,
@@ -542,8 +542,8 @@ ms_sid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 
 	rb_dlinkAddTail(target_p, &target_p->node, &global_client_list);
 	rb_dlinkAddTailAlloc(target_p, &global_serv_list);
-	add_to_hash(HASH_CLIENT, target_p->name, target_p);
-	add_to_hash(HASH_ID, target_p->id, target_p);
+	hash_add(HASH_CLIENT, target_p->name, target_p);
+	hash_add(HASH_ID, target_p->id, target_p);
 	rb_dlinkAdd(target_p, &target_p->lnode, &target_p->servptr->serv->servers);
 
 	sendto_server(client_p, NULL, CAP_TS6, NOCAPS,
@@ -1243,9 +1243,9 @@ server_estab(struct Client *client_p)
 	rb_dlinkAddTailAlloc(client_p, &global_serv_list);
 
 	if(has_id(client_p))
-		add_to_hash(HASH_ID, client_p->id, client_p);
+		hash_add(HASH_ID, client_p->id, client_p);
 
-	add_to_hash(HASH_CLIENT, client_p->name, client_p);
+	hash_add(HASH_CLIENT, client_p->name, client_p);
 	/* doesnt duplicate client_p->serv if allocated this struct already */
 	make_server(client_p);
 

@@ -53,7 +53,7 @@ scache_add(const char *name)
 	if(EmptyString(name))
 		return NULL;
 
-	if((hnode = find_from_hash(HASH_SCACHE, name)) != NULL)
+	if((hnode = hash_find(HASH_SCACHE, name)) != NULL)
 	{
 		sc = hnode->data;
 		return sc->server_name;
@@ -61,7 +61,7 @@ scache_add(const char *name)
 
 	sc = rb_malloc(sizeof(struct scache_entry));
 	sc->server_name = rb_strdup(name);
-	add_to_hash(HASH_SCACHE, sc->server_name, sc);
+	hash_add(HASH_SCACHE, sc->server_name, sc);
 	return sc->server_name;
 }
 

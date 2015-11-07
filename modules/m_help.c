@@ -133,7 +133,7 @@ dohelp(struct Client *source_p, int flags, const char *topic)
 	if(flags & HELP_OPER)
 		htype = HASH_OHELP;
 
-	hptr = find_value_from_hash(htype, topic);
+	hptr = hash_find_data(htype, topic);
 
 	if(hptr == NULL)
 	{

@@ -392,7 +392,7 @@ destroy_channel(struct Channel *chptr)
 	free_topic(chptr);
 
 	rb_dlinkDelete(&chptr->node, &global_channel_list);
-	del_from_hash(HASH_CHANNEL, chptr->chname, chptr);
+	hash_del(HASH_CHANNEL, chptr->chname, chptr);
 	free_channel(chptr);
 }
 

@@ -1090,10 +1090,10 @@ exit_generic_client(struct Client *source_p, const char *comment)
 	monitor_signoff(source_p);
 	dec_global_cidr_count(source_p);
 	if(has_id(source_p))
-		del_from_hash(HASH_ID, source_p->id, source_p);
+		hash_del(HASH_ID, source_p->id, source_p);
 
-	del_from_hash(HASH_HOSTNAME, source_p->host, source_p);
-	del_from_hash(HASH_CLIENT, source_p->name, source_p);
+	hash_del(HASH_HOSTNAME, source_p->host, source_p);
+	hash_del(HASH_CLIENT, source_p->name, source_p);
 	remove_client_from_list(source_p);
 }
 
@@ -1154,8 +1154,8 @@ exit_unknown_client(struct Client *client_p, struct Client *source_p, const char
 		source_p->localClient->F = NULL;	
 	}
 
-	del_from_hash(HASH_HOSTNAME, source_p->host, source_p);
-	del_from_hash(HASH_CLIENT, source_p->name, source_p);
+	hash_del(HASH_HOSTNAME, source_p->host, source_p);
+	hash_del(HASH_CLIENT, source_p->name, source_p);
 	remove_client_from_list(source_p);
 	SetDead(source_p);
 	rb_dlinkAddAlloc(source_p, &dead_list);
@@ -1199,9 +1199,9 @@ exit_remote_server(struct Client *client_p, struct Client *source_p, struct Clie
 	}
 
 	if(has_id(source_p))
-		del_from_hash(HASH_ID, source_p->id, source_p);
+		hash_del(HASH_ID, source_p->id, source_p);
 
-	del_from_hash(HASH_CLIENT, source_p->name, source_p);
+	hash_del(HASH_CLIENT, source_p->name, source_p);
 	remove_client_from_list(source_p);
 
 	SetDead(source_p);
@@ -1224,9 +1224,9 @@ qs_server(struct Client *source_p)
 	rb_dlinkFindDestroy(source_p, &global_serv_list);
 
 	if(has_id(source_p))
-		del_from_hash(HASH_ID, source_p->id, source_p);
+		hash_del(HASH_ID, source_p->id, source_p);
 
-	del_from_hash(HASH_CLIENT, source_p->name, source_p);
+	hash_del(HASH_CLIENT, source_p->name, source_p);
 	remove_client_from_list(source_p);
 
 	SetDead(source_p);
@@ -1290,9 +1290,9 @@ exit_local_server(struct Client *client_p, struct Client *source_p, struct Clien
 	     source_p->name, (rb_current_time() - source_p->localClient->firsttime), sendb, recvb);
 
 	if(has_id(source_p))
-		del_from_hash(HASH_ID, source_p->id, source_p);
+		hash_del(HASH_ID, source_p->id, source_p);
 
-	del_from_hash(HASH_CLIENT, source_p->name, source_p);
+	hash_del(HASH_CLIENT, source_p->name, source_p);
 	remove_client_from_list(source_p);
 
 	SetDead(source_p);

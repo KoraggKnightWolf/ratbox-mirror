@@ -402,7 +402,7 @@ remove_resv(struct Client *source_p, const char *name)
 	{
 		hash_node *hnode;
 		
-		hnode = find_from_hash(HASH_RESV, name);
+		hnode = hash_find(HASH_RESV, name);
 		if(hnode == NULL)
 		{
 			sendto_one_notice(source_p, ":No RESV for %s", name);

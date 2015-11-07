@@ -52,7 +52,7 @@ operhash_add(const char *name)
 	if(EmptyString(name))
 		return NULL;
 
-	if((hnode = find_from_hash(HASH_OPER, name)) != NULL)
+	if((hnode = hash_find(HASH_OPER, name)) != NULL)
 	{
 		ohash = hnode->data;
 		ohash->refcount++;
@@ -63,7 +63,7 @@ operhash_add(const char *name)
 	ohash->refcount = 1;
 	ohash->name = rb_strdup(name);
 
-	add_to_hash(HASH_OPER, ohash->name, ohash);
+	hash_add(HASH_OPER, ohash->name, ohash);
 	return ohash->name;
 }
 
@@ -76,7 +76,7 @@ operhash_delete(const char *name)
 	if(EmptyString(name))
 		return;
 
-	if((hnode = find_from_hash(HASH_OPER, name)) == NULL)
+	if((hnode = hash_find(HASH_OPER, name)) == NULL)
 		return;
 
 	ohash = hnode->data;
@@ -85,7 +85,7 @@ operhash_delete(const char *name)
 	if(ohash->refcount > 0)
 		return;
 
-	del_from_hash_node(HASH_OPER, hnode);
+	hash_del_hnode(HASH_OPER, hnode);
 	rb_free(ohash->name);
 	rb_free(ohash);
 }

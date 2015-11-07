@@ -247,7 +247,7 @@ rehash_help(struct Client *source_p)
 {
 	sendto_realops_flags(UMODE_ALL, L_ALL,
 			     "%s is forcing re-reading of HELP files", get_oper_name(source_p));
-	clear_help_hash();
+	clear_help();
 	load_help();
 }
 

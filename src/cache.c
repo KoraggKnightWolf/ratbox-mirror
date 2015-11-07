@@ -217,6 +217,14 @@ free_cachefile(struct cachefile *cacheptr)
 	rb_free(cacheptr);
 }
 
+void
+clear_help(void)
+{
+	hash_destroyall(HASH_HELP, (hash_destroy_cb *)free_cachefile);
+	hash_destroyall(HASH_OHELP,(hash_destroy_cb *) free_cachefile);
+}
+
+
 /* load_help()
  *
  * inputs	-
@@ -242,7 +250,7 @@ load_help(void)
 		snprintf(filename, sizeof(filename), "%s/%s", HPATH, ldirent->d_name);
 		cacheptr = cache_file(filename, ldirent->d_name, HELP_OPER);
 		if(cacheptr != NULL) {
-			add_to_hash(HASH_OHELP, cacheptr->name, cacheptr);
+			hash_add(HASH_OHELP, cacheptr->name, cacheptr);
 		}
 	}
 
@@ -257,7 +265,7 @@ load_help(void)
 		snprintf(filename, sizeof(filename), "%s/%s", UHPATH, ldirent->d_name);
 		cacheptr = cache_file(filename, ldirent->d_name, HELP_USER);
 		if(cacheptr != NULL)
-			add_to_hash(HASH_HELP, cacheptr->name, cacheptr);
+			hash_add(HASH_HELP, cacheptr->name, cacheptr);
 	}
 
 	closedir(helpfile_dir);

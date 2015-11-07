@@ -35,7 +35,7 @@ const char *cache_user_motd_updated(void);
 
 
 void load_help(void);
-
+void clear_help(void);
 void send_user_motd(struct Client *);
 void cache_user_motd(void);
 

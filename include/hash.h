@@ -105,13 +105,16 @@ uint32_t fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned 
 
 void init_hash(void);
 
-void add_to_hash(hash_type, const char *, void *);
-void del_from_hash(hash_type, const char *, void *);
-void add_to_hash_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
-void del_from_hash_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
+void hash_add(hash_type, const char *, void *);
+void hash_del(hash_type, const char *, void *);
+void hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
+void hash_del_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
+
 
 
 typedef bool hash_cmp(const void *x, const void *y, size_t len);
+typedef void hash_destroy_cb(void *data);
+
 
 typedef struct _hash_node
 {
@@ -122,11 +125,15 @@ typedef struct _hash_node
 	uint32_t hashv;
 } hash_node;
 
-hash_node *find_from_hash(hash_type, const char *hashindex);
-void *find_value_from_hash(hash_type type, const char *hashindex);
-hash_node *find_from_hash_len(hash_type, const void *hashindex, size_t len);
-void *find_value_from_hash_len(hash_type type, const void *hashindex, size_t len);
-void del_from_hash_node(hash_type type, hash_node *node);
+hash_node *hash_find(hash_type, const char *hashindex);
+hash_node *hash_find_len(hash_type, const void *hashindex, size_t len);
+
+
+void *hash_find_data(hash_type type, const char *hashindex);
+void *hash_find_data_len(hash_type type, const void *hashindex, size_t len);
+
+
+void hash_del_hnode(hash_type type, hash_node *node);
 
 void add_channel_hash_resv(struct ConfItem *aconf);
 void del_channel_hash_resv_hnode(hash_node *hnode);
@@ -149,9 +156,8 @@ rb_dlink_list *find_hostname(const char *);
 struct ConfItem *hash_find_resv(const char *name);
 void clear_resv_hash(void);
 
-void add_to_help_hash(const char *name, struct cachefile *hptr);
-void clear_help_hash(void);
-struct cachefile *hash_find_help(const char *name, int flags);
+//void add_to_help_hash(const char *name, struct cachefile *hptr);
+//struct cachefile *hash_find_help(const char *name, int flags);
 
 void add_to_nd_hash(const char *name, struct nd_entry *nd);
 struct nd_entry *hash_find_nd(const char *name);
@@ -170,6 +176,7 @@ rb_dlink_list hash_get_channel_block(int i);
 
 rb_dlink_list *hash_get_tablelist(int type);  
 void hash_free_tablelist(rb_dlink_list *tables);
+void hash_destroyall(hash_type type, hash_destroy_cb *destroy_cb);
 
 
 #endif /* INCLUDED_hash_h */
