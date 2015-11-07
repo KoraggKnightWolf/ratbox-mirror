@@ -250,14 +250,13 @@ struct nd_entry
 	char name[NICKLEN + 1];
 	time_t expire;
 	uint32_t hashv;
-
-	rb_dlink_node hnode;	/* node in hash */
 	rb_dlink_node lnode;	/* node in ll */
 };
 
 void add_nd_entry(const char *name);
 void free_nd_entry(struct nd_entry *);
 unsigned long get_nd_count(void);
+void list_nd_entries(struct Client *);
 
 
 

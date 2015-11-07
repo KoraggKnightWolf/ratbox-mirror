@@ -157,7 +157,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 		return 0;
 	}
 
-	if(hash_find_nd(nick))
+	if(hash_find(HASH_ND, nick) != NULL)
 	{
 		sendto_one_numeric(source_p, s_RPL(ERR_UNAVAILRESOURCE), nick);
 		return 0;
@@ -217,7 +217,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		return 0;
 	}
 
-	if(hash_find_nd(nick))
+	if(hash_find(HASH_CLIENT, nick) != NULL)
 	{
 		sendto_one_numeric(source_p, s_RPL(ERR_UNAVAILRESOURCE), nick);
 		return 0;

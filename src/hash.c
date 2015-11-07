@@ -441,42 +441,27 @@ hash_destroyall(hash_type type, hash_destroy_cb *destroy_cb)
 
 }
 
-/*
-
 void
-add_to_help_hash(const char *name, struct cachefile *hptr)
+hash_walkall(hash_type type, hash_walk_cb *walk_cb, void *walk_data)
 {
-	uint32_t hashv;
-
-	if(EmptyString(name) || hptr == NULL)
-		return;
+	rb_dlink_node *ptr;
+	rb_dlink_node *next_ptr;
+	rb_dlink_list *table;
+	unsigned int i, max;
 	
-
-	hashv = hash_help(name);
-	rb_dlinkAddAlloc(hptr, &helpTable[hashv]);
-}
-*/
-void
-add_to_nd_hash(const char *name, struct nd_entry *nd)
-{
-	nd->hashv = hash_nick(name);
-	rb_dlinkAdd(nd, &nd->hnode, &ndTable[nd->hashv]);
-}
-
-void
-del_from_nd_hash(struct nd_entry *nd)
-{
-	rb_dlinkDelete(&nd->hnode, &ndTable[nd->hashv]);
+	max = 1<<hash_function[type].hashbits;
+	table = hash_function[type].table;
+	HASH_WALK_SAFE(i, max, ptr, next_ptr, table)
+	{
+		hash_node *hnode = ptr->data;
+		void *cbdata = hnode->data;
+		walk_cb(cbdata, walk_data);
+	}
+	HASH_WALK_END;
 }
 
 
 
-
-
-/* find_id()
- *
- * finds a client entry from the id hash table
- */
 struct Client *
 find_id(const char *name)
 {
@@ -820,43 +805,6 @@ del_channel_hash_resv_hnode(hash_node *hnode)
 }
 
 
-
-struct nd_entry *
-hash_find_nd(const char *name)
-{
-	rb_dlink_node *ptr;
-	uint32_t hashv;
-
-	if(EmptyString(name))
-		return NULL;
-
-	hashv = hash_nick(name);
-
-	RB_DLINK_FOREACH(ptr, ndTable[hashv].head)
-	{
-		struct nd_entry *nd = ptr->data;
-
-		if(!irccmp(name, nd->name))
-			return nd;
-	}
-
-	return NULL;
-}
-
-
-void
-list_nd_entries(struct Client *source_p)
-{
-	struct nd_entry *nd;
-	rb_dlink_node *ptr;
-	int i;
-	HASH_WALK(i, U_MAX, ptr, ndTable)
-	{
-		nd = ptr->data;
-		sendto_one_notice(source_p, "Delaying: %s for %" RBTT_FMT, nd->name, nd->expire);
-	}
-	HASH_WALK_END;
-}
 
 void
 add_to_zconnid_hash(struct Client *client_p)

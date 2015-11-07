@@ -754,7 +754,7 @@ add_nd_entry(const char *name)
 {
 	struct nd_entry *nd;
 
-	if(hash_find_nd(name) != NULL)
+	if(hash_find(HASH_ND, name) != NULL)
 		return;
 
 	nd = rb_malloc(sizeof(struct nd_entry));
@@ -764,14 +764,14 @@ add_nd_entry(const char *name)
 
 	/* this list is ordered */
 	rb_dlinkAddTail(nd, &nd->lnode, &nd_list);
-	add_to_nd_hash(name, nd);
+	hash_add(HASH_ND, name, nd);
 }
 
 void
 free_nd_entry(struct nd_entry *nd)
 {
 	rb_dlinkDelete(&nd->lnode, &nd_list);
-	del_from_nd_hash(nd);
+	hash_del(HASH_ND, nd->name, nd);
 	rb_free(nd);
 }
 
@@ -794,6 +794,25 @@ expire_nd_entries(void *unused)
 		free_nd_entry(nd);
 	}
 }
+
+static void
+list_nb_cb(void *data, void *cbptr)
+{
+	struct nd_entry *nd;
+	if(data == NULL || cbptr == NULL)
+		return;
+	
+	nd = data;
+	sendto_one_notice((struct Client *)cbptr, "Delaying: %s for %" RBTT_FMT, nd->name, nd->expire);
+
+}
+
+void
+list_nd_entries(struct Client *source_p)
+{
+	hash_walkall(HASH_ND, list_nb_cb, source_p);
+}
+
 
 void
 add_tgchange(const char *host)

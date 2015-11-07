@@ -98,6 +98,19 @@ typedef enum
 } hash_type;
 
 
+typedef struct _hash_node
+{
+	rb_dlink_node node;
+	void *key;
+	size_t keylen;
+	void *data;
+	uint32_t hashv;
+} hash_node;
+
+typedef bool hash_cmp(const void *x, const void *y, size_t len);
+typedef void hash_destroy_cb(void *data);
+typedef void hash_walk_cb(void *a, void *);
+
 uint32_t fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused);
 uint32_t fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused);
 uint32_t fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len);
@@ -110,20 +123,9 @@ void hash_del(hash_type, const char *, void *);
 void hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
 void hash_del_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
 
+void hash_walkall(hash_type type, hash_walk_cb *walk_cb, void *walk_data);
 
 
-typedef bool hash_cmp(const void *x, const void *y, size_t len);
-typedef void hash_destroy_cb(void *data);
-
-
-typedef struct _hash_node
-{
-	rb_dlink_node node;
-	void *key;
-	size_t keylen;
-	void *data;
-	uint32_t hashv;
-} hash_node;
 
 hash_node *hash_find(hash_type, const char *hashindex);
 hash_node *hash_find_len(hash_type, const void *hashindex, size_t len);
@@ -156,13 +158,6 @@ rb_dlink_list *find_hostname(const char *);
 struct ConfItem *hash_find_resv(const char *name);
 void clear_resv_hash(void);
 
-//void add_to_help_hash(const char *name, struct cachefile *hptr);
-//struct cachefile *hash_find_help(const char *name, int flags);
-
-void add_to_nd_hash(const char *name, struct nd_entry *nd);
-struct nd_entry *hash_find_nd(const char *name);
-void del_from_nd_hash(struct nd_entry *nd);
-void list_nd_entries(struct Client *);
 
 void add_to_cli_connid_hash(struct Client *client_p);
 void del_from_cli_connid_hash(struct Client *client_p);
