@@ -1,3 +1,11 @@
+androsyn    2015/11/07 01:20:21 UTC	(20151107_1-28985)
+  Log:
+  use rb_event_add for cleanup_dead_conns
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/11/07 01:19:07 UTC	(20151107_0-28983)
   Log:
   Start of a major cleanup of the hash code.  Rework some of the various other hashes in use to use the add_to_hash interface and extend that interface quite a bit....
