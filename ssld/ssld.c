@@ -1307,7 +1307,7 @@ main(int argc, char **argv)
 	mod_ctl->F_pipe = rb_open(pipefd, RB_FD_PIPE, "ircd pipe");
 	rb_set_nb(mod_ctl->F);
 	rb_set_nb(mod_ctl->F_pipe);
-	rb_event_addish("clean_dead_conns", clean_dead_conns, NULL, 10);
+	rb_event_add("clean_dead_conns", clean_dead_conns, NULL, 10);
 	read_pipe_ctl(mod_ctl->F_pipe, NULL);
 	mod_read_ctl(mod_ctl->F, mod_ctl);
 	if(zlib_ok == false && ssl_ok == false)
