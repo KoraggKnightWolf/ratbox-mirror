@@ -1,3 +1,11 @@
+androsyn    2015/11/07 01:22:29 UTC	(20151107_3-28989)
+  Log:
+  make scache use the new hashing interface
+
+  Modified:
+	ircd-ratbox/trunk/src/scache.c (File Modified) 
+
+
 androsyn    2015/11/07 01:21:49 UTC	(20151107_2-28987)
   Log:
   make operhash use the new hashing interface
