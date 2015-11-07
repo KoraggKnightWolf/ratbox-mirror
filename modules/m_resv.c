@@ -267,8 +267,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		aconf->info.oper = operhash_add(oper);
 		if(locked)
 			aconf->flags |= CONF_FLAGS_LOCKED;
-
-		add_to_hash(HASH_RESV, aconf->host, aconf);
+			
 
 		notify_resv(source_p, aconf->host, aconf->passwd, temp_time);
 
@@ -283,6 +282,8 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 				  locked);
 			aconf->hold = rb_current_time();
 		}
+		add_channel_hash_resv(aconf); /* don't add until aconf is fully filled out */
+
 	}
 	else if(clean_resv_nick(name))
 	{
@@ -317,7 +318,7 @@ parse_resv(struct Client *source_p, const char *name, const char *reason, int te
 		if(locked)
 			aconf->flags |= CONF_FLAGS_LOCKED;
 
-		rb_dlinkAddAlloc(aconf, &resv_conf_list);
+		rb_dlinkAddAlloc(aconf, &resv_nick_list);
 
 		notify_resv(source_p, aconf->host, aconf->passwd, temp_time);
 
@@ -399,11 +400,15 @@ remove_resv(struct Client *source_p, const char *name)
 
 	if(IsChannelName(name))
 	{
-		if((aconf = hash_find_resv(name)) == NULL)
+		hash_node *hnode;
+		
+		hnode = find_from_hash(HASH_RESV, name);
+		if(hnode == NULL)
 		{
 			sendto_one_notice(source_p, ":No RESV for %s", name);
 			return;
 		}
+		aconf = hnode->data;
 
 		if(IsConfLocked(aconf) && !IsOperAdmin(source_p))
 		{
@@ -415,14 +420,14 @@ remove_resv(struct Client *source_p, const char *name)
 		if((aconf->flags & CONF_FLAGS_TEMPORARY) == 0)
 			bandb_del(BANDB_RESV, aconf->host, NULL);
 
-		del_from_hash(HASH_RESV, name, aconf);
+		del_channel_hash_resv_hnode(hnode);
 		free_conf(aconf);
 	}
 	else
 	{
 		rb_dlink_node *ptr;
 
-		RB_DLINK_FOREACH(ptr, resv_conf_list.head)
+		RB_DLINK_FOREACH(ptr, resv_nick_list.head)
 		{
 			aconf = ptr->data;
 
@@ -449,7 +454,7 @@ remove_resv(struct Client *source_p, const char *name)
 			bandb_del(BANDB_RESV, aconf->host, NULL);
 
 		/* already have ptr from the loop above.. */
-		rb_dlinkDestroy(ptr, &resv_conf_list);
+		rb_dlinkDestroy(ptr, &resv_nick_list);
 		free_conf(aconf);
 	}
 

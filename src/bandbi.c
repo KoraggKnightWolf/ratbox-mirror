@@ -370,7 +370,7 @@ bandb_handle_finish(void)
 
 		case CONF_RESV_CHANNEL:
 			if(bandb_check_resv_channel(aconf))
-				add_to_hash(HASH_RESV, aconf->host, aconf);
+				add_channel_hash_resv(aconf);
 			else
 				free_conf(aconf);
 
@@ -378,7 +378,7 @@ bandb_handle_finish(void)
 
 		case CONF_RESV_NICK:
 			if(bandb_check_resv_nick(aconf))
-				rb_dlinkAddAlloc(aconf, &resv_conf_list);
+				rb_dlinkAddAlloc(aconf, &resv_nick_list);
 			else
 				free_conf(aconf);
 

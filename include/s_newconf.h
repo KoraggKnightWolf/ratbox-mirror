@@ -39,15 +39,17 @@
 #include <openssl/rsa.h>
 #endif
 
-
 extern rb_dlink_list cluster_conf_list;
 extern rb_dlink_list shared_conf_list;
 extern rb_dlink_list oper_conf_list;
 extern rb_dlink_list hubleaf_conf_list;
 extern rb_dlink_list server_conf_list;
 extern rb_dlink_list xline_conf_list;
-extern rb_dlink_list resv_conf_list;
+extern rb_dlink_list resv_nick_list;
 extern rb_dlink_list tgchange_list;
+extern rb_dlink_list resv_channel_temp_list;
+extern rb_dlink_list resv_channel_perm_list;
+
 
 extern rb_patricia_tree_t *tgchange_tree;
 
@@ -237,6 +239,8 @@ struct ConfItem *find_nick_resv(const char *name);
 struct ConfItem *find_xline_mask(const char *);
 struct ConfItem *find_nick_resv_mask(const char *name);
 
+
+
 int valid_wild_card_simple(const char *);
 int clean_resv_nick(const char *);
 time_t valid_temp_time(const char *p);
@@ -254,5 +258,7 @@ struct nd_entry
 void add_nd_entry(const char *name);
 void free_nd_entry(struct nd_entry *);
 unsigned long get_nd_count(void);
+
+
 
 #endif

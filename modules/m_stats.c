@@ -785,34 +785,23 @@ static void
 stats_resv_common(struct Client *source_p, bool wanttemp)
 {
 	rb_dlink_node *ptr;
-	rb_dlink_list *resv_lists;
+	rb_dlink_list *resv_lists[2];
 	char letter = 'q';
 	if(wanttemp == false)
 		letter = 'Q';
 
-	RB_DLINK_FOREACH(ptr, resv_conf_list.head)
-	{
-		struct ConfItem *aconf = ptr->data;
-		bool istemp = aconf->flags & CONF_FLAGS_TEMPORARY;
-		
-		if((istemp == true && wanttemp == false) || (istemp == false && wanttemp == true))
-			continue;
-		sendto_one_numeric(source_p, RPL_STATSQLINE,
-				   form_str(RPL_STATSQLINE),
-				   letter, aconf->port, aconf->host, aconf->passwd);
-	}
-	
-	resv_lists = hash_get_tablelist(HASH_RESV);
-	if(resv_lists == NULL)
-		return;
+	resv_lists[0] = &resv_nick_list;
+	if(wanttemp == true)
+		resv_lists[1] = &resv_channel_temp_list;
+	else
+		resv_lists[1] = &resv_channel_perm_list;
 
-	RB_DLINK_FOREACH(ptr, resv_lists->head)
+
+	for(int lcnt = 0; lcnt < 2; lcnt++)
 	{
-		rb_dlink_list *list = ptr->data;
-		rb_dlink_node *lptr;
-		RB_DLINK_FOREACH(lptr, list->head)
+		RB_DLINK_FOREACH(ptr, resv_lists[lcnt]->head)
 		{
-			struct ConfItem *aconf = lptr->data;
+			struct ConfItem *aconf = ptr->data;
 			bool istemp = aconf->flags & CONF_FLAGS_TEMPORARY;
 		
 			if((istemp == true && wanttemp == false) || (istemp == false && wanttemp == true))
@@ -822,7 +811,6 @@ stats_resv_common(struct Client *source_p, bool wanttemp)
 					   letter, aconf->port, aconf->host, aconf->passwd);
 		}
 	}
-	hash_free_tablelist(resv_lists);
 }
 
 static void
