@@ -1,4 +1,4 @@
-/*
+/* 
  *  ircd-ratbox: A slightly useful ircd.
  *  hash.c: Maintains hashtables.
  *
@@ -26,10 +26,10 @@
 
 #include <stdinc.h>
 #include <struct.h>
+#include <hash.h>
 #include <s_conf.h>
 #include <channel.h>
 #include <client.h>
-#include <hash.h>
 #include <match.h>
 #include <ircd.h>
 #include <numeric.h>
@@ -37,8 +37,8 @@
 #include <cache.h>
 #include <s_newconf.h>
 #include <s_log.h>
+#include <s_stats.h>
 
-#define ZCONNID_MAX 64		/* i doubt we'll have this many ziplinks ;) */
 
 #define hash_nick(x) (fnv_hash_upper((const unsigned char *)(x), U_MAX_BITS, 0))
 #define hash_id(x) (fnv_hash((const unsigned char *)(x), U_MAX_BITS, 0))
@@ -47,18 +47,21 @@
 #define hash_resv(x) (fnv_hash_upper_len((const unsigned char *)(x), R_MAX_BITS, 30))
 #define hash_cli_connid(x)	(x % CLI_CONNID_MAX)
 #define hash_zconnid(x)	(x % ZCONNID_MAX)
+// #define hash_opername(x) fnv_hash_upper((const unsigned char *)(x), OPERHASH_MAX_BITS, 0)
 
 
 static rb_dlink_list clientbyconnidTable[CLI_CONNID_MAX];
-static rb_dlink_list clientbyzconnidTable[ZCONNID_MAX];	/* i doubt we'll have this many ziplinks ;) */
+static rb_dlink_list clientbyzconnidTable[CLI_ZCONNID_MAX];	
 static rb_dlink_list clientTable[U_MAX];
 static rb_dlink_list channelTable[CH_MAX];
 static rb_dlink_list idTable[U_MAX];
 static rb_dlink_list resvTable[R_MAX];
 static rb_dlink_list hostTable[HOST_MAX];
 static rb_dlink_list helpTable[HELP_MAX];
+static rb_dlink_list ohelpTable[HELP_MAX];
 static rb_dlink_list ndTable[U_MAX];
-
+static rb_dlink_list operhash_table[OPERHASH_MAX];
+static rb_dlink_list scache_table[SCACHE_MAX];
 /*
  * Hashing.
  *
@@ -101,6 +104,25 @@ init_hash(void)
 {
 	/* nothing to do here */
 }
+
+
+/* fnv_hash_len_data hashses any data */
+static uint32_t
+fnv_hash_len_data(const unsigned char *s, unsigned int bits, unsigned int len)
+{
+	uint32_t h = FNV1_32_INIT;
+	bits = 32 - bits;
+	const unsigned char *x = s + len;
+	while(s < x)
+	{
+		h ^= *s++;
+		h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+	}
+	h = (h >> bits) ^ (h & ((2 ^ bits) - 1));
+	return h;
+}
+
+
 
 
 uint32_t
@@ -174,61 +196,229 @@ hash_help(const char *name)
 	return (h % HELP_MAX);
 }
 
+static
+bool hash_irccmp(const void *x, const void *y, size_t unusued)
+{
+	return (irccmp(x, y) != 0) ? false : true;
+}
+
+static 
+bool hash_strcmp(const void *x, const void *y, size_t unusued)
+{
+	return (strcmp(x, y) != 0) ? false : true;
+}
+
+static
+bool connid_cmp(const void *x, const void *y, size_t cmpsize)
+{
+	return (memcmp(x, y, cmpsize) != 0) ? false : true;
+}
+
+
 struct _hash_function
 {
+	const char *name;
 	uint32_t(*func) (unsigned const char *, unsigned int, unsigned int);
+	hash_cmp *cmpfunc;
 	rb_dlink_list *table;
 	unsigned int hashbits;
 	unsigned int hashlen;
 };
 
 
+/* if the cmpfunc field is not set, it is assumed hash_irccmp will be used */
+
 static struct _hash_function hash_function[HASH_LAST] =
 {
 	[HASH_CLIENT] = { 
-		.func = fnv_hash_upper, .table = clientTable, .hashbits = U_MAX_BITS, .hashlen = 0
+		.name = "NICK", .func = fnv_hash_upper, .table = clientTable, .hashbits = U_MAX_BITS, 
 	},
 	[HASH_ID] = { 
-		.func = fnv_hash, .table = idTable, .hashbits = U_MAX_BITS, .hashlen = 0
+		.name = "ID", .func = fnv_hash, .table = idTable, .hashbits = U_MAX_BITS, .cmpfunc = hash_strcmp,
 	},
 	[HASH_CHANNEL] = { 
-		.func = fnv_hash_upper_len, .table = channelTable, .hashbits = CH_MAX_BITS, .hashlen = 30
+		.name = "Channel", .func = fnv_hash_upper_len, .table = channelTable, .hashbits = CH_MAX_BITS, .hashlen = 30,
 	},
 	[HASH_HOSTNAME] = { 
-		.func = fnv_hash_upper_len, .table = hostTable, .hashbits = HOST_MAX_BITS, .hashlen = 30
+		.name = "Host", .func = fnv_hash_upper_len, .table = hostTable, .hashbits = HOST_MAX_BITS, .hashlen = 30
 	},
 	[HASH_RESV] = { 
-		.func = fnv_hash_upper_len, .table = resvTable, .hashbits = R_MAX_BITS, .hashlen = 30
+		.name = "Channel RESV", .func = fnv_hash_upper_len, .table = resvTable, .hashbits = R_MAX_BITS, .hashlen = 30
+	},
+	[HASH_OPER] = {
+		.name = "Operator", .func = fnv_hash_upper, .table = operhash_table, .hashbits = OPERHASH_MAX_BITS, .cmpfunc = hash_irccmp,
+	},
+	[HASH_SCACHE] = {
+		.name = "Server Cache", .func = fnv_hash_upper, .table = scache_table, .hashbits = OPERHASH_MAX_BITS, .cmpfunc = hash_irccmp,
+	},
+	[HASH_HELP] = {
+		.name = "Help", .func = fnv_hash_upper, .table = helpTable, .hashbits = HELP_MAX_BITS, .cmpfunc = hash_irccmp
+	},
+	[HASH_OHELP] = {
+		.name = "Operator Help", .func = fnv_hash_upper, .table = ohelpTable, .hashbits = HELP_MAX_BITS, .cmpfunc = hash_irccmp
+	},
+	[HASH_ND] = {
+		.name = "Nick Delay", .func = fnv_hash_upper, .table = ndTable, .hashbits = U_MAX_BITS, .cmpfunc = hash_irccmp
+	},
+	[HASH_CONNID] = {
+		.name = "Connection ID", .func = fnv_hash_len_data, .table = clientbyconnidTable, .hashbits = CLI_CONNID_MAX_BITS, .cmpfunc = connid_cmp, .hashlen = sizeof(uint32_t)
+	},
+	[HASH_ZCONNID] = {
+		.name = "Ziplinks ID", .func = fnv_hash_len_data, .table = clientbyzconnidTable, .hashbits = CLI_ZCONNID_MAX_BITS, .cmpfunc = connid_cmp, .hashlen = sizeof(uint32_t)
 	}
 };
+
+
+
+hash_node *find_from_hash_len(hash_type type, const void *hashindex, size_t size)
+{
+	rb_dlink_list *table = hash_function[type].table;
+	hash_cmp *hcmpfunc;
+	size_t hashlen;
+	uint32_t hashv;
+	rb_dlink_node *ptr;
+	
+	hcmpfunc = hash_function[type].cmpfunc;
+	
+	if(hashindex == NULL)
+		return NULL;
+
+	if(hcmpfunc == NULL)
+		hcmpfunc = hash_irccmp;
+
+	if(hash_function[type].hashlen == 0)
+		hashlen = size;
+	else
+		hashlen = IRCD_MIN(size, hash_function[type].hashlen);
+
+
+	/* we return the hashv regardless of true/false */	
+	hashv = hash_function[type].func((unsigned const char *)hashindex, hash_function[type].hashbits, hashlen);
+
+	/* this code assumes that the compare function will not try to mess with
+	 * the link list behind our backs.... */
+	RB_DLINK_FOREACH(ptr, table[hashv].head)
+	{
+		hash_node *hnode = ptr->data;
+		
+		if(hcmpfunc(hashindex, hnode->key, hashlen) == true)
+		{
+			return hnode;
+		}
+	}	
+	return NULL;
+}
+
+hash_node *find_from_hash(hash_type type, const char *hashindex)
+{
+	return find_from_hash_len(type, hashindex, strlen(hashindex));
+}
+
+void *
+find_value_from_hash_len(hash_type type, const void *hashindex, size_t size)
+{
+	hash_node *hnode;
+	hnode = find_from_hash_len(type, hashindex, size);	
+	if(hnode == NULL)
+		return NULL;
+	return hnode->data;
+}
+
+
+void *
+find_value_from_hash(hash_type type, const char *hashindex)
+{
+	return find_value_from_hash_len(type, hashindex, strlen(hashindex));
+}
+
+
+void
+add_to_hash_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer)
+{
+	rb_dlink_list *table = hash_function[type].table;
+	hash_node *hnode;
+	uint32_t hashv;
+
+	if(hashindex == NULL || pointer == NULL)
+		return;
+
+	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
+					    hash_function[type].hashbits, IRCD_MIN(indexlen, hash_function[type].hashlen));
+
+	hnode = rb_malloc(sizeof(hash_node));
+	hnode->key = rb_malloc(indexlen);
+	hnode->keylen = indexlen;
+	memcpy(hnode->key, hashindex, indexlen);
+	hnode->hashv = hashv;	 
+	hnode->data = pointer;
+	rb_dlinkAdd(hnode, &hnode->node, &table[hashv]);
+}
 
 void
 add_to_hash(hash_type type, const char *hashindex, void *pointer)
 {
-	rb_dlink_list *table = hash_function[type].table;
-	uint32_t hashv;
+	add_to_hash_len(type, hashindex, strlen(hashindex)+1, pointer);
+}
 
-	if(EmptyString(hashindex) || (pointer == NULL))
+static void
+free_hashnode(hash_node *hnode)
+{
+	rb_free(hnode->key);
+	rb_free(hnode);
+}
+
+void
+del_from_hash_len(hash_type type, const void *hashindex, size_t size, void *pointer)
+{
+	rb_dlink_list *table = hash_function[type].table;
+	rb_dlink_node *ptr;
+	uint32_t hashv;
+	size_t hashlen;
+
+	if(pointer == NULL || hashindex == NULL) 
 		return;
 
+	if(hash_function[type].hashlen == 0)
+		hashlen = size;
+	else
+		hashlen = IRCD_MIN(size, hash_function[type].hashlen);
+
 	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
-					    hash_function[type].hashbits, hash_function[type].hashlen);
-	rb_dlinkAddAlloc(pointer, &table[hashv]);
+					    hash_function[type].hashbits, hashlen);
+	RB_DLINK_FOREACH(ptr, table[hashv].head)
+	{
+		hash_node *hnode = ptr->data;
+		if(hnode->data == pointer)
+		{
+			rb_dlinkDelete(&hnode->node, &table[hashv]);
+			free_hashnode(hnode);
+			return;		
+		}
+	}					    
+	
+
 }
+
 
 void
 del_from_hash(hash_type type, const char *hashindex, void *pointer)
 {
-	rb_dlink_list *table = hash_function[type].table;
-	uint32_t hashv;
+	del_from_hash_len(type, hashindex, strlen(hashindex) + 1, pointer);
+}
 
-	if(EmptyString(hashindex) || (pointer == NULL))
+void
+del_from_hash_node(hash_type type, hash_node *hnode)
+{
+	rb_dlink_list *table = hash_function[type].table;
+
+	if(hnode == NULL)
 		return;
 
-	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
-					    hash_function[type].hashbits, hash_function[type].hashlen);
-	rb_dlinkFindDestroy(pointer, &table[hashv]);
+	rb_dlinkDelete(&hnode->node, &table[hnode->hashv]);
+	free_hashnode(hnode);
 }
+
+
 
 void
 add_to_help_hash(const char *name, struct cachefile *hptr)
@@ -237,6 +427,7 @@ add_to_help_hash(const char *name, struct cachefile *hptr)
 
 	if(EmptyString(name) || hptr == NULL)
 		return;
+	
 
 	hashv = hash_help(name);
 	rb_dlinkAddAlloc(hptr, &helpTable[hashv]);
@@ -280,23 +471,7 @@ clear_help_hash(void)
 struct Client *
 find_id(const char *name)
 {
-	rb_dlink_node *ptr;
-	uint32_t hashv;
-
-	if(EmptyString(name))
-		return NULL;
-
-	hashv = hash_id(name);
-
-	RB_DLINK_FOREACH(ptr, idTable[hashv].head)
-	{
-		struct Client *target_p = ptr->data;
-
-		if(strcmp(name, target_p->id) == 0)
-			return target_p;
-	}
-
-	return NULL;
+	return find_value_from_hash(HASH_ID, name);
 }
 
 /* hash_find_masked_server()
@@ -355,7 +530,7 @@ find_any_client(const char *name)
 
 	/* hunting for an id, not a nick */
 	if(IsDigit(*name))
-		return (find_id(name));
+		return find_value_from_hash(HASH_ID, name);
 
 	hashv = hash_nick(name);
 
@@ -378,28 +553,15 @@ find_any_client(const char *name)
 struct Client *
 find_client(const char *name)
 {
-	rb_dlink_node *ptr;
-	uint32_t hashv;
-
 	s_assert(name != NULL);
 	if(EmptyString(name))
 		return NULL;
 
 	/* hunting for an id, not a nick */
 	if(IsDigit(*name))
-		return (find_id(name));
+		return find_value_from_hash(HASH_ID, name);
 
-	hashv = hash_nick(name);
-
-	RB_DLINK_FOREACH(ptr, clientTable[hashv].head)
-	{
-		struct Client *target_p = ptr->data;
-
-		if(irccmp(name, target_p->name) == 0)
-			return target_p;
-	}
-
-	return NULL;
+	return find_value_from_hash(HASH_CLIENT, name);
 }
 
 /* find_named_client()
@@ -409,24 +571,11 @@ find_client(const char *name)
 struct Client *
 find_named_client(const char *name)
 {
-	rb_dlink_node *ptr;
-	uint32_t hashv;
-
 	s_assert(name != NULL);
 	if(EmptyString(name))
 		return NULL;
 
-	hashv = hash_nick(name);
-
-	RB_DLINK_FOREACH(ptr, clientTable[hashv].head)
-	{
-		struct Client *target_p = ptr->data;
-
-		if(irccmp(name, target_p->name) == 0)
-			return target_p;
-	}
-
-	return NULL;
+	return find_value_from_hash(HASH_CLIENT, name);
 }
 
 /* find_server()
@@ -436,26 +585,20 @@ find_named_client(const char *name)
 struct Client *
 find_server(struct Client *source_p, const char *name)
 {
-	rb_dlink_node *ptr;
-	uint32_t hashv;
+	struct Client *target_p;
 
 	if(EmptyString(name))
 		return NULL;
 
 	if((source_p == NULL || !MyClient(source_p)) && IsDigit(*name) && strlen(name) == 3)
 	{
-	        return find_id(name);
+	        return find_value_from_hash(HASH_ID, name);
 	}
 
-	hashv = hash_nick(name);
+	target_p = find_value_from_hash(HASH_CLIENT, name);
 
-	RB_DLINK_FOREACH(ptr, clientTable[hashv].head)
-	{
-		struct Client *target_p = ptr->data;
-
-		if((IsServer(target_p) || IsMe(target_p)) && irccmp(name, target_p->name) == 0)
-			return target_p;
-	}
+	if(target_p != NULL && (IsServer(target_p) || IsMe(target_p)))
+		return target_p;
 
 	/* wasnt found, look for a masked server */
 	return hash_find_masked_server(source_p, name);
@@ -487,24 +630,11 @@ find_hostname(const char *hostname)
 struct Channel *
 find_channel(const char *name)
 {
-	rb_dlink_node *ptr;
-	uint32_t hashv;
-
 	s_assert(name != NULL);
 	if(EmptyString(name))
 		return NULL;
 
-	hashv = hash_channel(name);
-
-	RB_DLINK_FOREACH(ptr, channelTable[hashv].head)
-	{
-		struct Channel *chptr = ptr->data;
-
-		if(irccmp(name, chptr->chname) == 0)
-			return chptr;
-	}
-
-	return NULL;
+	return find_value_from_hash(HASH_CHANNEL, name);
 }
 
 /*
@@ -522,8 +652,6 @@ struct Channel *
 get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 {
 	struct Channel *chptr;
-	rb_dlink_node *ptr;
-	uint32_t hashv;
 	size_t len;
 	const char *s = chname;
 
@@ -541,18 +669,12 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 		s = LOCAL_COPY_N(s, CHANNELLEN);
 	}
 
-	hashv = hash_channel(s);
 
-	RB_DLINK_FOREACH(ptr, channelTable[hashv].head)
+	if((chptr = find_channel(s)) != NULL)
 	{
-		chptr = ptr->data;
-
-		if(irccmp(s, chptr->chname) == 0)
-		{
-			if(isnew != NULL)
-				*isnew = 0;
-			return chptr;
-		}
+		if(isnew != NULL)
+			*isnew = 0;
+		return chptr;
 	}
 
 	if(isnew != NULL)
@@ -564,8 +686,7 @@ get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
 
 	chptr->channelts = rb_current_time();	/* doesn't hurt to set it here */
 
-	rb_dlinkAddAlloc(chptr, &channelTable[hashv]);
-
+	add_to_hash(HASH_CHANNEL, chptr->chname, chptr);
 	return chptr;
 }
 
@@ -618,27 +739,13 @@ hash_free_tablelist(rb_dlink_list *table)
 struct ConfItem *
 hash_find_resv(const char *name)
 {
-	rb_dlink_node *ptr;
-	uint32_t hashv;
+	struct ConfItem *aconf;
 
-	s_assert(name != NULL);
-	if(EmptyString(name))
-		return NULL;
+	aconf = find_value_from_hash(HASH_RESV, name);
+	if(aconf != NULL)
+		aconf->port++;
 
-	hashv = hash_resv(name);
-
-	RB_DLINK_FOREACH(ptr, resvTable[hashv].head)
-	{
-		struct ConfItem *aconf = ptr->data;
-
-		if(!irccmp(name, aconf->host))
-		{
-			aconf->port++;
-			return aconf;
-		}
-	}
-
-	return NULL;
+	return aconf;
 }
 
 struct cachefile *
@@ -666,24 +773,66 @@ hash_find_help(const char *name, int flags)
 void
 clear_resv_hash(void)
 {
-	struct ConfItem *aconf;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	int i;
 
 	HASH_WALK_SAFE(i, R_MAX, ptr, next_ptr, resvTable)
 	{
-		aconf = ptr->data;
+		hash_node *hnode = ptr->data;
+		struct ConfItem *aconf = hnode->data;
 
 		/* skip temp resvs */
 		if(aconf->flags & CONF_FLAGS_TEMPORARY)
 			continue;
 
-		free_conf(ptr->data);
-		rb_dlinkDestroy(ptr, &resvTable[i]);
+		del_channel_hash_resv_hnode(hnode);
 	}
 	HASH_WALK_END;
 }
+
+void
+add_channel_hash_resv(struct ConfItem *aconf)
+{
+	rb_dlink_list *list;
+	add_to_hash(HASH_RESV, aconf->host, aconf);
+	if(aconf->flags & CONF_FLAGS_TEMPORARY)
+		list = &resv_channel_temp_list;
+	else
+		list = &resv_channel_perm_list;
+	rb_dlinkAddAlloc(aconf, list);
+}
+
+void
+del_channel_hash_resv(struct ConfItem *aconf)
+{
+	hash_node *hnode;
+	
+	if( (hnode = find_from_hash(HASH_RESV, aconf->host)) == NULL)
+		return;
+	del_channel_hash_resv_hnode(hnode);
+}
+
+void
+del_channel_hash_resv_hnode(hash_node *hnode)
+{
+	rb_dlink_list *list;
+	struct ConfItem *aconf;
+	
+	if(hnode == NULL)
+		return;
+		
+	aconf = hnode->data;
+	if(aconf->flags & CONF_FLAGS_TEMPORARY)
+		list = &resv_channel_temp_list;
+	else
+		list = &resv_channel_perm_list;
+
+	rb_dlinkFindDestroy(aconf, list);
+	del_from_hash_node(HASH_RESV, hnode);
+}
+
+
 
 struct nd_entry *
 hash_find_nd(const char *name)
@@ -725,61 +874,45 @@ list_nd_entries(struct Client *source_p)
 void
 add_to_zconnid_hash(struct Client *client_p)
 {
-	uint32_t hashv;
-	hashv = hash_zconnid(client_p->localClient->zconnid);
-	rb_dlinkAddAlloc(client_p, &clientbyzconnidTable[hashv]);
+	add_to_hash_len(HASH_ZCONNID, &client_p->localClient->zconnid, sizeof(client_p->localClient->zconnid), client_p);
 }
 
 void
 del_from_zconnid_hash(struct Client *client_p)
 {
-	uint32_t hashv;
-	hashv = hash_cli_connid(client_p->localClient->zconnid);
-	rb_dlinkFindDestroy(client_p, &clientbyzconnidTable[hashv]);
-
+	del_from_hash_len(HASH_ZCONNID, &client_p->localClient->zconnid, sizeof(client_p->localClient->zconnid), client_p);
 }
 
 void
 add_to_cli_connid_hash(struct Client *client_p)
 {
-	uint32_t hashv;
-	hashv = hash_cli_connid(client_p->localClient->connid);
-	rb_dlinkAddAlloc(client_p, &clientbyconnidTable[hashv]);
+	add_to_hash_len(HASH_CONNID, &client_p->localClient->connid, sizeof(client_p->localClient->connid), client_p);
 }
 
 
 void
 del_from_cli_connid_hash(struct Client *client_p)
 {
-	uint32_t hashv;
-	hashv = hash_cli_connid(client_p->localClient->connid);
-	rb_dlinkFindDestroy(client_p, &clientbyconnidTable[hashv]);
+	del_from_hash_len(HASH_CONNID, &client_p->localClient->connid, sizeof(client_p->localClient->connid), client_p);
 }
 
 struct Client *
 find_cli_connid_hash(uint32_t connid)
 {
-	rb_dlink_node *ptr;
-	uint32_t hashv;
-	hashv = hash_cli_connid(connid);
-	RB_DLINK_FOREACH(ptr, clientbyconnidTable[hashv].head)
-	{
-		struct Client *target_p = ptr->data;
-		if(target_p->localClient->connid == connid)
-			return target_p;
-	}
+	struct Client *target_p;
+	
+	
 
-	hashv = hash_zconnid(connid);
-	RB_DLINK_FOREACH(ptr, clientbyzconnidTable[hashv].head)
-	{
-		struct Client *target_p = ptr->data;
-		if(target_p->localClient->zconnid == connid)
-			return target_p;
-
-	}
-
-	return NULL;
+	target_p = find_value_from_hash_len(HASH_CONNID, &connid, sizeof(connid));
+	if(target_p != NULL)
+		return target_p;
+	
+	target_p = find_value_from_hash_len(HASH_ZCONNID, &connid, sizeof(connid));
+	
+	return target_p;
 }
+
+
 
 static void
 output_hash(struct Client *source_p, const char *name, int length, int *counts, unsigned long deepest)
@@ -804,7 +937,8 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 				   "B :Average depth: %.3f%%/%.3f%% Highest depth: %lu",
 				   (float)(total / (length - counts[0])), (float)(total / length), deepest);
 	}
-	for(i = 0; i < 11; i++)
+	
+	for(i = 1; i < IRCD_MIN(11, deepest+1); i++)
 	{
 		sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :Nodes with %d entries: %d", i, counts[i]);
 	}
@@ -837,14 +971,9 @@ count_hash(struct Client *source_p, rb_dlink_list * table, int length, const cha
 void
 hash_stats(struct Client *source_p)
 {
-	count_hash(source_p, channelTable, CH_MAX, "Channel");
-	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");
-	count_hash(source_p, clientTable, U_MAX, "Client");
-	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");
-	count_hash(source_p, idTable, U_MAX, "ID");
-	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");
-	count_hash(source_p, hostTable, HOST_MAX, "Hostname");
-	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");
-	count_hash(source_p, clientbyconnidTable, CLI_CONNID_MAX, "Client by connection id");
+	for(int i = 0; i < HASH_LAST; i++)
+	{
+		count_hash(source_p, hash_function[i].table, 1<<hash_function[i].hashbits, hash_function[i].name);
+		sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");			
+	}
 }
-

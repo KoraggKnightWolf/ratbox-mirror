@@ -27,18 +27,31 @@
 #ifndef INCLUDED_hash_h
 #define INCLUDED_hash_h
 
+
+struct _hash_node;
+typedef struct _hash_node hash_node;
+
 #include <cache.h>
 #include <s_newconf.h>
 
 /* Magic value for FNV hash functions */
 #define FNV1_32_INIT 0x811c9dc5UL
 
+#define HELP_MAX_BITS 7
+#define HELP_MAX (1<<HELP_MAX_BITS)
+
+#define ND_MAX_BITS 
+
 /* Client hash table size, used in hash.c/s_debug.c */
 #define U_MAX_BITS 17
 #define U_MAX (1<<U_MAX_BITS)
 
 /* Client connid hash table size, used in hash.c */
-#define CLI_CONNID_MAX 4096
+#define CLI_CONNID_MAX_BITS 12
+#define CLI_CONNID_MAX (1<<CLI_CONNID_MAX_BITS)
+
+#define CLI_ZCONNID_MAX_BITS 7
+#define CLI_ZCONNID_MAX (1<<CLI_ZCONNID_MAX_BITS)
 
 /* Channel hash table size, hash.c/s_debug.c */
 #define CH_MAX_BITS 16
@@ -52,6 +65,16 @@
 #define R_MAX_BITS 10
 #define R_MAX (1<<R_MAX_BITS)	/* 2^10 */
 
+/* ziplinks connection id table */
+#define ZCONNID_MAX 64          /* i doubt we'll have this many ziplinks ;) */
+
+/* operhash */
+#define OPERHASH_MAX_BITS 8
+#define OPERHASH_MAX (1<<OPERHASH_MAX_BITS)
+
+/* scache hash */
+#define SCACHE_MAX_BITS 8
+#define SCACHE_MAX (1<<SCACHE_MAX_BITS)
 
 #define HASH_WALK(i, max, ptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH(ptr, table[i].head)
 #define HASH_WALK_SAFE(i, max, ptr, nptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH_SAFE(ptr, nptr, table[i].head)
@@ -63,8 +86,17 @@ typedef enum
 	HASH_ID,
 	HASH_CHANNEL,
 	HASH_HOSTNAME,
-	HASH_RESV
+	HASH_RESV,
+	HASH_OPER,
+	HASH_SCACHE,
+	HASH_HELP,
+	HASH_OHELP,
+	HASH_ND,
+	HASH_CONNID,
+	HASH_ZCONNID,
+	HASH_LAST
 } hash_type;
+
 
 uint32_t fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused);
 uint32_t fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused);
@@ -75,11 +107,37 @@ void init_hash(void);
 
 void add_to_hash(hash_type, const char *, void *);
 void del_from_hash(hash_type, const char *, void *);
+void add_to_hash_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
+void del_from_hash_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
+
+
+typedef bool hash_cmp(const void *x, const void *y, size_t len);
+
+typedef struct _hash_node
+{
+	rb_dlink_node node;
+	void *key;
+	size_t keylen;
+	void *data;
+	uint32_t hashv;
+} hash_node;
+
+hash_node *find_from_hash(hash_type, const char *hashindex);
+void *find_value_from_hash(hash_type type, const char *hashindex);
+hash_node *find_from_hash_len(hash_type, const void *hashindex, size_t len);
+void *find_value_from_hash_len(hash_type type, const void *hashindex, size_t len);
+void del_from_hash_node(hash_type type, hash_node *node);
+
+void add_channel_hash_resv(struct ConfItem *aconf);
+void del_channel_hash_resv_hnode(hash_node *hnode);
+void del_channel_hash_resv(struct ConfItem *aconf);
+
 
 struct Client *find_any_client(const char *name);
 struct Client *find_client(const char *name);
 struct Client *find_named_client(const char *name);
 struct Client *find_server(struct Client *source_p, const char *name);
+
 
 struct Client *find_id(const char *name);
 
