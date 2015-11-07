@@ -1,3 +1,13 @@
+androsyn    2015/11/07 01:31:39 UTC	(20151107_4-28991)
+  Log:
+  make help use the new cache system, split the operator help hash and user hash into their own hashes
+
+  Modified:
+	ircd-ratbox/trunk/include/cache.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_help.c (File Modified) 
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+
+
 androsyn    2015/11/07 01:22:29 UTC	(20151107_3-28989)
   Log:
   make scache use the new hashing interface
