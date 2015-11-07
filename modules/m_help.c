@@ -126,11 +126,14 @@ dohelp(struct Client *source_p, int flags, const char *topic)
 	struct cacheline *lineptr;
 	rb_dlink_node *ptr;
 	rb_dlink_node *fptr;
-
+	hash_type htype = HASH_HELP; 
 	if(EmptyString(topic))
 		topic = ntopic;
 
-	hptr = hash_find_help(topic, flags);
+	if(flags & HELP_OPER)
+		htype = HASH_OHELP;
+
+	hptr = find_value_from_hash(htype, topic);
 
 	if(hptr == NULL)
 	{

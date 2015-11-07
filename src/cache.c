@@ -231,11 +231,6 @@ load_help(void)
 	char filename[MAXPATHLEN];
 	struct cachefile *cacheptr;
 
-#if defined(S_ISLNK) && defined(HAVE_LSTAT)
-	struct stat sb;
-#endif
-
-
 	/* opers must be done first */
 	helpfile_dir = opendir(HPATH);
 
@@ -246,8 +241,9 @@ load_help(void)
 	{
 		snprintf(filename, sizeof(filename), "%s/%s", HPATH, ldirent->d_name);
 		cacheptr = cache_file(filename, ldirent->d_name, HELP_OPER);
-		if(cacheptr != NULL)
-			add_to_help_hash(cacheptr->name, cacheptr);
+		if(cacheptr != NULL) {
+			add_to_hash(HASH_OHELP, cacheptr->name, cacheptr);
+		}
 	}
 
 	closedir(helpfile_dir);
@@ -259,29 +255,9 @@ load_help(void)
 	while((ldirent = readdir(helpfile_dir)) != NULL)
 	{
 		snprintf(filename, sizeof(filename), "%s/%s", UHPATH, ldirent->d_name);
-
-#if defined(S_ISLNK) && defined(HAVE_LSTAT)
-		if(lstat(filename, &sb) < 0)
-			continue;
-
-		/* ok, if its a symlink, we work on the presumption if an
-		 * oper help exists of that name, its a symlink to that --fl
-		 */
-		if(S_ISLNK(sb.st_mode))
-		{
-			cacheptr = hash_find_help(ldirent->d_name, HELP_OPER);
-
-			if(cacheptr != NULL)
-			{
-				cacheptr->flags |= HELP_USER;
-				continue;
-			}
-		}
-#endif
-
 		cacheptr = cache_file(filename, ldirent->d_name, HELP_USER);
 		if(cacheptr != NULL)
-			add_to_help_hash(cacheptr->name, cacheptr);
+			add_to_hash(HASH_HELP, cacheptr->name, cacheptr);
 	}
 
 	closedir(helpfile_dir);

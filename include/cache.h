@@ -2,8 +2,6 @@
 #ifndef INCLUDED_CACHE_H
 #define INCLUDED_CACHE_H
 
-#define HELP_MAX	100
-
 #define CACHELINELEN	81
 #define CACHEFILELEN	30
 /* two servernames, a gecos, three spaces, ":1", '\0' */
