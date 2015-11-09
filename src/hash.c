@@ -336,7 +336,7 @@ hash_find_list(hash_type type, const char *hashindex)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_find_list_len(type, hashindex, strlen(hashindex));
+	return hash_find_list_len(type, hashindex, strlen(hashindex)+1);
 }
 
 hash_node *
@@ -377,7 +377,7 @@ hash_find(hash_type type, const char *hashindex)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_find_len(type, hashindex, strlen(hashindex));
+	return hash_find_len(type, hashindex, strlen(hashindex)+1);
 }
 
 void *
@@ -396,7 +396,7 @@ hash_find_data(hash_type type, const char *hashindex)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_find_data_len(type, hashindex, strlen(hashindex));
+	return hash_find_data_len(type, hashindex, strlen(hashindex)+1);
 }
 
 
@@ -427,7 +427,7 @@ hash_add(hash_type type, const char *hashindex, void *pointer)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_add_len(type, hashindex, strlen(hashindex), pointer);
+	return hash_add_len(type, hashindex, strlen(hashindex)+1, pointer);
 }
 
 
@@ -468,7 +468,7 @@ hash_del(hash_type type, const char *hashindex, void *pointer)
 {
 	if(EmptyString(hashindex))
 		return;
-	hash_del_len(type, hashindex, strlen(hashindex), pointer);
+	hash_del_len(type, hashindex, strlen(hashindex)+1, pointer);
 }
 
 void
