@@ -39,7 +39,7 @@
 
 struct operhash_entry
 {
-	char name[NICKLEN];
+	char *name;
 	unsigned int refcount;
 };
 
@@ -51,17 +51,16 @@ operhash_add(const char *name)
 
 	if(EmptyString(name))
 		return NULL;
-
+		
 	if((hnode = hash_find(HASH_OPER, name)) != NULL)
 	{
 		ohash = hnode->data;
 		ohash->refcount++;
 		return ohash->name;
 	}
-
 	ohash = rb_malloc(sizeof(struct operhash_entry));
 	ohash->refcount = 1;
-	rb_strlcpy(ohash->name, name, sizeof(ohash->name));
+	ohash->name = rb_strdup(name);
 
 	hash_add(HASH_OPER, ohash->name, ohash);
 	return ohash->name;
@@ -93,17 +92,8 @@ operhash_delete(const char *name)
 void
 operhash_count(size_t * number, size_t * mem)
 {
-        *number = 0;
-        *mem = 0;
-        /* XXX fix me */
-/*
-        HASH_WALK(i, OPERHASH_MAX, ptr, operhash_table)
-        {
-                struct operhash_entry *ohash = ptr->data;
-                (*number)++;
-                *mem += strlen(ohash->name) + sizeof(struct operhash_entry);
-        }
-        HASH_WALK_END;
-*/
+	/* XXX this doesn't include the strduped operhash value */
+        hash_get_memusage(HASH_OPER, mem, number);
+        *mem += *number * sizeof(struct operhash_entry);
 }
  

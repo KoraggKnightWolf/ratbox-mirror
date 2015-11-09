@@ -336,7 +336,7 @@ hash_find_list(hash_type type, const char *hashindex)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_find_list_len(type, hashindex, strlen(hashindex)+1);
+	return hash_find_list_len(type, hashindex, strlen(hashindex));
 }
 
 hash_node *
@@ -377,7 +377,7 @@ hash_find(hash_type type, const char *hashindex)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_find_len(type, hashindex, strlen(hashindex)+1);
+	return hash_find_len(type, hashindex, strlen(hashindex));
 }
 
 void *
@@ -396,7 +396,7 @@ hash_find_data(hash_type type, const char *hashindex)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_find_data_len(type, hashindex, strlen(hashindex)+1);
+	return hash_find_data_len(type, hashindex, strlen(hashindex));
 }
 
 
@@ -427,7 +427,7 @@ hash_add(hash_type type, const char *hashindex, void *pointer)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_add_len(type, hashindex, strlen(hashindex)+1, pointer);
+	return hash_add_len(type, hashindex, strlen(hashindex), pointer);
 }
 
 
@@ -468,7 +468,7 @@ hash_del(hash_type type, const char *hashindex, void *pointer)
 {
 	if(EmptyString(hashindex))
 		return;
-	hash_del_len(type, hashindex, strlen(hashindex) + 1, pointer);
+	hash_del_len(type, hashindex, strlen(hashindex), pointer);
 }
 
 void
@@ -712,3 +712,28 @@ hash_stats(struct Client *source_p)
 		sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");			
 	}
 }
+
+void
+hash_get_memusage(hash_type type, size_t *memusage, size_t *entries)
+{
+	rb_dlink_list *htable;
+	rb_dlink_node *ptr;
+	int max, i;
+	
+	max = 1<<hash_function[type].hashbits;
+	htable = hash_function[type].table;
+
+	*memusage = 0;
+	*entries = 0;
+
+	HASH_WALK(i, max, ptr, htable)
+	{
+		hash_node *hnode = ptr->data;
+		*memusage += hnode->keylen;
+		*memusage += sizeof(hash_node);	
+		*entries++;
+	
+	} 
+	HASH_WALK_END;
+}
+
