@@ -149,7 +149,7 @@ clear_monitor(struct Client *client_p)
 
 		/* free the rb_dlink_node allocated in add_monitor -
 		 * we don't use rb_dlinkDestory here as we are clearing the list anyways.. */
-		rb_free_rb_dlink_node(ptr); 
+		rb_free(ptr); 
 
 		free_monitor(monptr); /* this checks if monptr is still in use */
 	}
