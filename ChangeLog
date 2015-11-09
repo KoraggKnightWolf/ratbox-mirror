@@ -1,3 +1,11 @@
+androsyn    2015/11/09 20:56:17 UTC	(20151109_18-29037)
+  Log:
+  allocate the operhash nick with the operhash_entry
+
+  Modified:
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 androsyn    2015/11/09 20:27:13 UTC	(20151109_17-29035)
   Log:
   call whowas_trim if we're over 100 past the configured whowas length as well
