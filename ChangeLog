@@ -1,3 +1,13 @@
+androsyn    2015/11/09 15:46:07 UTC	(20151109_9-29019)
+  Log:
+  move whowas_length to general{}
+
+  Modified:
+	ircd-ratbox/trunk/include/s_conf.h (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2015/11/09 13:53:54 UTC	(20151109_8-29017)
   Log:
   allow the whowas history length to be exceeded until the whowas trim event gets run, this gets the whowas trimming out of a busy code path
