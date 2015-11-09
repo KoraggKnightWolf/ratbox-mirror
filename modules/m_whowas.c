@@ -66,7 +66,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 	char *p;
 	const char *nick;
 	char tbuf[26];
-	rb_dlink_list whowas_list;
+	rb_dlink_list *whowas_list;
 	rb_dlink_node *ptr;
 	static time_t last_used = 0L;
 
@@ -98,10 +98,9 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 	nick = parv[1];
 
 
-	memset(&whowas_list, 0, sizeof(whowas_list));
-	whowas_get_list(nick, &whowas_list);
+	whowas_list = hash_find_list(HASH_WHOWAS, nick);
 
-	if(rb_dlink_list_length(&whowas_list) == 0)
+	if(whowas_list == NULL)
 	{
 		sendto_one_numeric(source_p, s_RPL(ERR_WASNOSUCHNICK), nick);
 		sendto_one_numeric(source_p, s_RPL(RPL_ENDOFWHOWAS), parv[1]);
@@ -109,7 +108,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 	
 	}
 	
-	RB_DLINK_FOREACH(ptr, whowas_list.head)
+	RB_DLINK_FOREACH_PREV(ptr, whowas_list->tail)
 	{
 		whowas_t *temp = ptr->data;
 
@@ -133,7 +132,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(max > 0 && cur >= max)
 			break;
 	}
-	whowas_free_list(&whowas_list);
+	hash_free_list(whowas_list);
 	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFWHOWAS), parv[1]);
 	return 0;
 }

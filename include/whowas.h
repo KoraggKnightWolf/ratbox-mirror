@@ -29,10 +29,9 @@
 
 typedef struct _whowas
 {
-	rb_dlink_node node;
-	rb_dlink_node cnode;
-	rb_dlink_node whowas_node;
-	uint32_t hashv;
+	hash_node *hnode;		/* hash table node */
+	rb_dlink_node cnode;		/* node for online clients */
+	rb_dlink_node whowas_node;	/* node for the whowas linked list */
 	char name[NICKLEN+1];
         char username[USERLEN + 1];
         char hostname[HOSTLEN + 1];
@@ -42,7 +41,6 @@ typedef struct _whowas
         bool spoof;
         time_t logoff;
         struct Client *online; 	
-
 } whowas_t;
 
 
@@ -78,9 +76,6 @@ void whowas_off_history(struct Client *);
 struct Client *whowas_get_history(const char *, time_t);
 					/* Nick name */
 					/* Time limit in seconds */
-
-void whowas_get_list(const char *nick, rb_dlink_list *list);
-void whowas_free_list(rb_dlink_list *list);
 
 void whowas_set_size(int whowas_length);
 void whowas_memory_usage(size_t *count, size_t *memused);

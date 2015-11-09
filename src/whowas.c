@@ -26,8 +26,8 @@
 
 #include <stdinc.h>
 #include <struct.h>
-#include <whowas.h>
 #include <hash.h>
+#include <whowas.h>
 #include <match.h>
 #include <ircd.h>
 #include <numeric.h>
@@ -40,51 +40,7 @@
 #include <s_log.h>
 
 static rb_dlink_list *whowas_list;
-static rb_dlink_list *whowas_hash;
 static unsigned int whowas_list_length = NICKNAMEHISTORYLENGTH;
-
-/*
- * Whowas hash table size
- *
- */
-#define WW_MAX_BITS 16
-#define WW_MAX (1<<WW_MAX_BITS)
-#define whowas_hash_name(x) fnv_hash_upper((const unsigned char *)x, WW_MAX_BITS, 0)
-
-
-void
-whowas_get_list(const char *nick, rb_dlink_list *list)
-{
-	uint32_t hashv;
-	rb_dlink_node *ptr;
-
-	if(list == NULL)
-		return;
-			
-	hashv = whowas_hash_name(nick);
-
-	RB_DLINK_FOREACH(ptr, whowas_hash[hashv].head)
-	{
-		whowas_t *who = ptr->data;
-		if(!irccmp(nick, who->name))
-		{
-			rb_dlinkAddTailAlloc(who, list);		
-		}
-	}
-}
-
-void
-whowas_free_list(rb_dlink_list *list)
-{
-	rb_dlink_node *ptr, *next;
-	if(list == NULL)
-		return;
-		
-	RB_DLINK_FOREACH_SAFE(ptr, next, list->head)
-	{
-		rb_dlinkDestroy(ptr, list);
-	}
-}
 
 
 void
@@ -97,7 +53,6 @@ whowas_add_history(struct Client *client_p, bool online)
 		return;
                 
         who = rb_malloc(sizeof(whowas_t));
-	who->hashv = whowas_hash_name(client_p->name);
 	who->logoff = rb_current_time();
 
 	rb_strlcpy(who->name, client_p->name, sizeof(who->name));
@@ -131,7 +86,9 @@ whowas_add_history(struct Client *client_p, bool online)
 	else
 		who->online = NULL;
 
-	rb_dlinkAdd(who, &who->node, &whowas_hash[who->hashv]);
+//	rb_dlinkAdd(who, &who->node, &whowas_hash[who->hashv]);
+	who->hnode = hash_add(HASH_WHOWAS, client_p->name, who);
+	
 	rb_dlinkAdd(who, &who->whowas_node, whowas_list);
 }
 
@@ -151,23 +108,27 @@ whowas_off_history(struct Client *client_p)
 struct Client *
 whowas_get_history(const char *nick, time_t timelimit)
 {
-	uint32_t hashv;
+	rb_dlink_list *list;
 	rb_dlink_node *ptr;
+	struct Client *client_p = NULL;
+
+	list = hash_find_list(HASH_WHOWAS, nick);
+	if(list == NULL)
+		return NULL;
 
 	timelimit = rb_current_time() - timelimit;
-	hashv = whowas_hash_name(nick);
 
- 	RB_DLINK_FOREACH(ptr, whowas_hash[hashv].head)
+ 	RB_DLINK_FOREACH_PREV(ptr, list->tail)
 	{
 		whowas_t *who = ptr->data;
-		if(irccmp(nick, who->name))
-			continue;
-		if(who->logoff < timelimit)
-			continue;
-		return who->online;
-	
+		if(who->logoff >= timelimit)
+		{
+			client_p = who->online;
+			break;
+		}
 	}
-	return NULL;
+	hash_free_list(list);
+	return client_p;
 }
 
 static void
@@ -187,7 +148,8 @@ whowas_trim(void *unused)
 			whowas_t *twho = whowas_list->tail->data;
 			if(twho->online != NULL)
 				rb_dlinkDelete(&twho->cnode, &twho->online->whowas_clist);
-			rb_dlinkDelete(&twho->node, &whowas_hash[twho->hashv]);
+			hash_del_hnode(HASH_WHOWAS, twho->hnode);
+			//rb_dlinkDelete(&twho->node, &whowas_hash[twho->hashv]);
 			rb_dlinkDelete(&twho->whowas_node, whowas_list);
 			rb_free(twho);
 		}
@@ -198,9 +160,7 @@ whowas_trim(void *unused)
 void
 whowas_init(void)
 {
-        whowas_list = rb_malloc(sizeof(rb_dlink_list));
-	whowas_hash = rb_malloc(sizeof(rb_dlink_list) * WW_MAX);
-
+	whowas_list = rb_malloc(sizeof(rb_dlink_list));
 	if(whowas_list_length == 0)
 	{
 	        whowas_list_length = NICKNAMEHISTORYLENGTH;
@@ -212,29 +172,14 @@ whowas_init(void)
 void 
 whowas_set_size(int len)
 {
-        if((whowas_list_length > len) && (rb_dlink_list_length(whowas_list) > len))
-        {
-                for(int i = rb_dlink_list_length(whowas_list) - len; i > 0; --i)
-                {
-                        if(whowas_list->tail != NULL && whowas_list->tail->data != NULL)
-                        {
-                                whowas_t *who = whowas_list->tail->data;
-                                if(who->online != NULL)
-                                        rb_dlinkDelete(&who->cnode, &who->online->whowas_clist);
-                                rb_dlinkDelete(&who->node, &whowas_hash[who->hashv]);
-                                rb_dlinkDelete(&who->whowas_node, whowas_list);
-                                rb_free(who);
-                        }
-                }
-                
-        }
         whowas_list_length = len;
+        whowas_trim(NULL);
 }
 
 void
 whowas_memory_usage(size_t *count, size_t *memused)
 {
 	*count = rb_dlink_list_length(whowas_list);
-	*memused = *count * sizeof(whowas_t) + sizeof(rb_dlink_list) * WW_MAX;
+	*memused = *count * sizeof(whowas_t);
 }
 

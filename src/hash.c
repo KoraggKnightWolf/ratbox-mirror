@@ -52,6 +52,8 @@ static rb_dlink_list ohelpTable[HELP_MAX];
 static rb_dlink_list ndTable[U_MAX];
 static rb_dlink_list operhash_table[OPERHASH_MAX];
 static rb_dlink_list scache_table[SCACHE_MAX];
+static rb_dlink_list whowas_table[WHOWAS_MAX];
+
 /*
  * Hashing.
  *
@@ -66,7 +68,7 @@ static rb_dlink_list scache_table[SCACHE_MAX];
  *		     +-----+	+-----+	   +-----+   +-----+
  *			|	   |	      |
  *		     +-----+	+-----+	   +-----+
-d *		     |	A  |	|  C  |	   |  D	 |
+ *		     |	A  |	|  C  |	   |  D	 |
  *		     +-----+	+-----+	   +-----+
  *			|
  *		     +-----+
@@ -258,7 +260,11 @@ static struct _hash_function hash_function[HASH_LAST] =
 	},
 	[HASH_ZCONNID] = {
 		.name = "Ziplinks ID", .func = fnv_hash_len_data, .table = clientbyzconnidTable, .hashbits = CLI_ZCONNID_MAX_BITS, .cmpfunc = connid_cmp, .hashlen = sizeof(uint32_t)
-	}
+	},
+	[HASH_WHOWAS] = { 
+		.name = "WHOWAS", .func = fnv_hash_upper, .table = whowas_table, .hashbits = WHOWAS_MAX_BITS, 
+	},
+
 };
 
 
@@ -402,11 +408,9 @@ hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *point
 	uint32_t hashv;
 
 	if(hashindex == NULL || pointer == NULL)
-		return;
+		return NULL;
 
 	hashv = hfunc(type, hashindex, IRCD_MIN(indexlen, hash_function[type].hashlen));
-//	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
-//					    hash_function[type].hashbits, IRCD_MIN(indexlen, hash_function[type].hashlen));
 
 	hnode = rb_malloc(sizeof(hash_node));
 	hnode->key = rb_malloc(indexlen);
@@ -422,7 +426,7 @@ hash_node *
 hash_add(hash_type type, const char *hashindex, void *pointer)
 {
 	if(EmptyString(hashindex))
-		return;
+		return NULL;
 	return hash_add_len(type, hashindex, strlen(hashindex)+1, pointer);
 }
 
@@ -443,9 +447,6 @@ hash_del_len(hash_type type, const void *hashindex, size_t size, void *pointer)
 	else
 		hashlen = IRCD_MIN(size, hash_function[type].hashlen);
 
-
-//	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
-//					    hash_function[type].hashbits, hashlen);
 	hashv = hfunc(type, hashindex, hashlen);
 	RB_DLINK_FOREACH(ptr, table[hashv].head)
 	{

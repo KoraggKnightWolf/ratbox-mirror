@@ -65,9 +65,6 @@ typedef struct _hash_node hash_node;
 #define R_MAX_BITS 10
 #define R_MAX (1<<R_MAX_BITS)	/* 2^10 */
 
-/* ziplinks connection id table */
-#define ZCONNID_MAX 64          /* i doubt we'll have this many ziplinks ;) */
-
 /* operhash */
 #define OPERHASH_MAX_BITS 8
 #define OPERHASH_MAX (1<<OPERHASH_MAX_BITS)
@@ -75,6 +72,11 @@ typedef struct _hash_node hash_node;
 /* scache hash */
 #define SCACHE_MAX_BITS 8
 #define SCACHE_MAX (1<<SCACHE_MAX_BITS)
+
+/* whowas hash */
+#define WHOWAS_MAX_BITS 16
+#define WHOWAS_MAX (1<<WHOWAS_MAX_BITS)
+
 
 #define HASH_WALK(i, max, ptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH(ptr, table[i].head)
 #define HASH_WALK_SAFE(i, max, ptr, nptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH_SAFE(ptr, nptr, table[i].head)
@@ -94,6 +96,7 @@ typedef enum
 	HASH_ND,
 	HASH_CONNID,
 	HASH_ZCONNID,
+	HASH_WHOWAS,
 	HASH_LAST
 } hash_type;
 
