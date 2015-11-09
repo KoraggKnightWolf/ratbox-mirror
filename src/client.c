@@ -1753,8 +1753,12 @@ close_connection(struct Client *client_p)
 
 	if(client_p->localClient->F != NULL)
 	{
-		del_from_cli_connid_hash(client_p);
+		hash_del_len(HASH_CONNID, &client_p->localClient->connid, sizeof(client_p->localClient->connid), client_p);
 
+		if(IsCapable(client_p, CAP_ZIP))
+			hash_del_len(HASH_ZCONNID, &client_p->localClient->zconnid, sizeof(client_p->localClient->zconnid), client_p);
+			
+		
 		/* attempt to flush any pending linebufs. Evil, but .. -- adrian */
 
 		if(!IsIOError(client_p)) 
