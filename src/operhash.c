@@ -39,7 +39,7 @@
 
 struct operhash_entry
 {
-	char *name;
+	char name[NICKLEN];
 	unsigned int refcount;
 };
 
@@ -61,7 +61,7 @@ operhash_add(const char *name)
 
 	ohash = rb_malloc(sizeof(struct operhash_entry));
 	ohash->refcount = 1;
-	ohash->name = rb_strdup(name);
+	rb_strlcpy(ohash->name, name, sizeof(ohash->name));
 
 	hash_add(HASH_OPER, ohash->name, ohash);
 	return ohash->name;
@@ -86,7 +86,6 @@ operhash_delete(const char *name)
 		return;
 
 	hash_del_hnode(HASH_OPER, hnode);
-	rb_free(ohash->name);
 	rb_free(ohash);
 }
 
