@@ -319,6 +319,21 @@ start_ssldaemon(int count, const char *ssl_ca_cert, const char *ssl_cert, const 
 	return started;
 }
 
+static struct Client *
+find_cli_connid_hash(uint32_t connid)
+{
+	struct Client *target_p;
+
+	target_p = hash_find_data_len(HASH_CONNID, &connid, sizeof(connid));
+	if(target_p != NULL)
+		return target_p;
+	
+	target_p = hash_find_data_len(HASH_ZCONNID, &connid, sizeof(connid));
+	
+	return target_p;
+}
+
+
 static void
 ssl_process_cipher_string(ssl_ctl_t *ctl, ssl_ctl_buf_t *ctl_buf)
 {
@@ -799,7 +814,7 @@ start_zlib_session(void *data)
 
 	level = ConfigFileEntry.compression_level;
 
-	add_to_zconnid_hash(server);
+	hash_add_len(HASH_ZCONNID, &server->localClient->zconnid, sizeof(server->localClient->zconnid), server);
 
 	buf[0] = 'Z';
 	uint32_to_buf(&buf[1], server->localClient->zconnid);

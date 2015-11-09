@@ -634,50 +634,6 @@ del_channel_hash_resv_hnode(hash_node *hnode)
 }
 
 
-
-void
-add_to_zconnid_hash(struct Client *client_p)
-{
-	hash_add_len(HASH_ZCONNID, &client_p->localClient->zconnid, sizeof(client_p->localClient->zconnid), client_p);
-}
-
-void
-del_from_zconnid_hash(struct Client *client_p)
-{
-	hash_del_len(HASH_ZCONNID, &client_p->localClient->zconnid, sizeof(client_p->localClient->zconnid), client_p);
-}
-
-void
-add_to_cli_connid_hash(struct Client *client_p)
-{
-	hash_add_len(HASH_CONNID, &client_p->localClient->connid, sizeof(client_p->localClient->connid), client_p);
-}
-
-
-void
-del_from_cli_connid_hash(struct Client *client_p)
-{
-	hash_del_len(HASH_CONNID, &client_p->localClient->connid, sizeof(client_p->localClient->connid), client_p);
-}
-
-struct Client *
-find_cli_connid_hash(uint32_t connid)
-{
-	struct Client *target_p;
-	
-	
-
-	target_p = hash_find_data_len(HASH_CONNID, &connid, sizeof(connid));
-	if(target_p != NULL)
-		return target_p;
-	
-	target_p = hash_find_data_len(HASH_ZCONNID, &connid, sizeof(connid));
-	
-	return target_p;
-}
-
-
-
 static void
 output_hash(struct Client *source_p, const char *name, int length, int *counts, unsigned long deepest)
 {

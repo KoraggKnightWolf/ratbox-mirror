@@ -147,13 +147,6 @@ void del_channel_hash_resv(struct ConfItem *aconf);
 struct ConfItem *hash_find_resv(const char *name);
 void clear_resv_hash(void);
 
-void add_to_cli_connid_hash(struct Client *client_p);
-void del_from_cli_connid_hash(struct Client *client_p);
-struct Client *find_cli_connid_hash(uint32_t connid);
-
-void add_to_zconnid_hash(struct Client *client_p);
-void del_from_zconnid_hash(struct Client *client_p);
-
 void hash_stats(struct Client *);
 rb_dlink_list hash_get_channel_block(int i);
 

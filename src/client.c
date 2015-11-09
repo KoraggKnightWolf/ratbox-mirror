@@ -151,7 +151,7 @@ make_client(struct Client *from)
 			current_connid++;
 
 		client_p->localClient->zconnid = ++current_connid;
-		add_to_cli_connid_hash(client_p);
+		hash_add_len(HASH_CONNID, &client_p->localClient->connid, sizeof(client_p->localClient->connid), client_p);
 		/* as good a place as any... */
 		rb_dlinkAdd(client_p, &client_p->localClient->tnode, &unknown_list);
 	}
@@ -187,7 +187,8 @@ free_local_client(struct Client *client_p)
 		client_p->localClient->listener = 0;
 	}
 
-	del_from_cli_connid_hash(client_p);
+	hash_del_len(HASH_CONNID, &client_p->localClient->connid, sizeof(client_p->localClient->connid), client_p);
+
 	if(client_p->localClient->F != NULL)
 	{
 		rb_close(client_p->localClient->F);
@@ -211,8 +212,11 @@ free_local_client(struct Client *client_p)
 	if(IsSSL(client_p))
 		ssld_decrement_clicount(client_p->localClient->ssl_ctl);
 
-	if(IsCapable(client_p, CAP_ZIP))
+	if(IsCapable(client_p, CAP_ZIP)) 
+	{
+		hash_del_len(HASH_ZCONNID, &client_p->localClient->zconnid, sizeof(client_p->localClient->zconnid), client_p);
 		ssld_decrement_clicount(client_p->localClient->z_ctl);
+	}
 	/* not needed per-se, but in case start_auth_query never gets called... */
 	rb_free(client_p->localClient->lip);
 
