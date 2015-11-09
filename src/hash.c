@@ -718,21 +718,21 @@ hash_get_memusage(hash_type type, size_t *memusage, size_t *entries)
 {
 	rb_dlink_list *htable;
 	rb_dlink_node *ptr;
-	int max, i;
+	hash_node *hnode;
+	unsigned int max, i;
 	
 	max = 1<<hash_function[type].hashbits;
 	htable = hash_function[type].table;
 
 	*memusage = 0;
 	*entries = 0;
-
+	
 	HASH_WALK(i, max, ptr, htable)
 	{
-		hash_node *hnode = ptr->data;
-		*memusage += hnode->keylen;
-		*memusage += sizeof(hash_node);	
-		*entries++;
-	
+		hnode = ptr->data;
+		(*memusage) += hnode->keylen;
+		(*memusage) += sizeof(hash_node);	
+		(*entries)++;
 	} 
 	HASH_WALK_END;
 }
