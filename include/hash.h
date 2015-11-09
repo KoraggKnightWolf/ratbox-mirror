@@ -66,7 +66,7 @@ typedef struct _hash_node hash_node;
 #define R_MAX (1<<R_MAX_BITS)	/* 2^10 */
 
 /* operhash */
-#define OPERHASH_MAX_BITS 8
+#define OPERHASH_MAX_BITS 10
 #define OPERHASH_MAX (1<<OPERHASH_MAX_BITS)
 
 /* scache hash */
@@ -151,6 +151,8 @@ struct ConfItem *hash_find_resv(const char *name);
 void clear_resv_hash(void);
 
 void hash_stats(struct Client *);
+void hash_get_memusage(hash_type type, size_t *memusage, size_t *entries);
+
 rb_dlink_list hash_get_channel_block(int i);
 
 rb_dlink_list *hash_get_tablelist(int type);  
