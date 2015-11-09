@@ -1827,5 +1827,132 @@ error_exit_client(struct Client *client_p, int error)
 	exit_client(client_p, client_p, &me, errmsg);
 }
 
+struct Client *
+find_id(const char *name)
+{
+	return hash_find_data(HASH_ID, name);
+}
+
+/* hash_find_masked_server()
+ * 
+ * Whats happening in this next loop ? Well, it takes a name like
+ * foo.bar.edu and proceeds to earch for *.edu and then *.bar.edu.
+ * This is for checking full server names against masks although
+ * it isnt often done this way in lieu of using matches().
+ *
+ * Rewrote to do *.bar.edu first, which is the most likely case,
+ * also made const correct
+ * --Bleep
+ */
+static struct Client *
+hash_find_masked_server(struct Client *source_p, const char *name)
+{
+	char buf[HOSTLEN + 1];
+	char *p = buf;
+	char *s;
+	struct Client *server;
+
+	if('*' == *name || '.' == *name)
+		return NULL;
+
+	/* copy it across to give us a buffer to work on */
+	rb_strlcpy(buf, name, sizeof(buf));
+
+	while((s = strchr(p, '.')) != 0)
+	{
+		*--s = '*';
+		/*
+		 * Dont need to check IsServer() here since nicknames cant
+		 * have *'s in them anyway.
+		 */
+		if((server = find_server(source_p, s)))
+			return server;
+		p = s + 2;
+	}
+
+	return NULL;
+}
+
+/* find_any_client()
+ *
+ * finds a client/server/masked server entry from the hash
+ */
+struct Client *
+find_any_client(const char *name)
+{
+	struct Client *target_p;
+
+	s_assert(name != NULL);
+	if(EmptyString(name))
+		return NULL;
+
+	/* hunting for an id, not a nick */
+	if(IsDigit(*name))
+		return hash_find_data(HASH_ID, name);
+
+	if((target_p = hash_find_data(HASH_CLIENT, name)) != NULL)
+		return target_p; 
+
+	/* wasnt found, look for a masked server */
+	return hash_find_masked_server(NULL, name);
+}
+
+/* find_client()
+ *
+ * finds a client/server entry from the client hash table
+ */
+struct Client *
+find_client(const char *name)
+{
+	s_assert(name != NULL);
+	if(EmptyString(name))
+		return NULL;
+
+	/* hunting for an id, not a nick */
+	if(IsDigit(*name))
+		return hash_find_data(HASH_ID, name);
+
+	return hash_find_data(HASH_CLIENT, name);
+}
+
+/* find_named_client()
+ *
+ * finds a client/server entry from the client hash table
+ */
+struct Client *
+find_named_client(const char *name)
+{
+	s_assert(name != NULL);
+	if(EmptyString(name))
+		return NULL;
+
+	return hash_find_data(HASH_CLIENT, name);
+}
+
+/* find_server()
+ *
+ * finds a server from the client hash table
+ */
+struct Client *
+find_server(struct Client *source_p, const char *name)
+{
+	struct Client *target_p;
+
+	if(EmptyString(name))
+		return NULL;
+
+	if((source_p == NULL || !MyClient(source_p)) && IsDigit(*name) && strlen(name) == 3)
+	{
+	        return hash_find_data(HASH_ID, name);
+	}
+
+	target_p = hash_find_data(HASH_CLIENT, name);
+
+	if(target_p != NULL && (IsServer(target_p) || IsMe(target_p)))
+		return target_p;
+
+	/* wasnt found, look for a masked server */
+	return hash_find_masked_server(source_p, name);
+}
 
 

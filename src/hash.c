@@ -40,16 +40,6 @@
 #include <s_stats.h>
 
 
-#define hash_nick(x) (fnv_hash_upper((const unsigned char *)(x), U_MAX_BITS, 0))
-#define hash_id(x) (fnv_hash((const unsigned char *)(x), U_MAX_BITS, 0))
-#define hash_channel(x) (fnv_hash_upper_len((const unsigned char *)(x), CH_MAX_BITS, 30))
-#define hash_hostname(x) (fnv_hash_upper_len((const unsigned char *)(x), HOST_MAX_BITS, 30))
-#define hash_resv(x) (fnv_hash_upper_len((const unsigned char *)(x), R_MAX_BITS, 30))
-#define hash_cli_connid(x)	(x % CLI_CONNID_MAX)
-#define hash_zconnid(x)	(x % ZCONNID_MAX)
-// #define hash_opername(x) fnv_hash_upper((const unsigned char *)(x), OPERHASH_MAX_BITS, 0)
-
-
 static rb_dlink_list clientbyconnidTable[CLI_CONNID_MAX];
 static rb_dlink_list clientbyzconnidTable[CLI_ZCONNID_MAX];	
 static rb_dlink_list clientTable[U_MAX];
@@ -271,6 +261,7 @@ static struct _hash_function hash_function[HASH_LAST] =
 };
 
 
+#define hfunc(type, hashindex, hashlen) (hash_function[type].func((unsigned const char *)hashindex, hash_function[type].hashbits, hashlen))	
 
 hash_node *
 hash_find_len(hash_type type, const void *hashindex, size_t size)
@@ -295,9 +286,7 @@ hash_find_len(hash_type type, const void *hashindex, size_t size)
 		hashlen = IRCD_MIN(size, hash_function[type].hashlen);
 
 
-	/* we return the hashv regardless of true/false */	
-	hashv = hash_function[type].func((unsigned const char *)hashindex, hash_function[type].hashbits, hashlen);
-
+	hashv = hfunc(type, hashindex, hashlen);
 	/* this code assumes that the compare function will not try to mess with
 	 * the link list behind our backs.... */
 	RB_DLINK_FOREACH(ptr, table[hashv].head)
@@ -346,8 +335,9 @@ hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *point
 	if(hashindex == NULL || pointer == NULL)
 		return;
 
-	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
-					    hash_function[type].hashbits, IRCD_MIN(indexlen, hash_function[type].hashlen));
+	hashv = hfunc(type, hashindex, IRCD_MIN(indexlen, hash_function[type].hashlen));
+//	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
+//					    hash_function[type].hashbits, IRCD_MIN(indexlen, hash_function[type].hashlen));
 
 	hnode = rb_malloc(sizeof(hash_node));
 	hnode->key = rb_malloc(indexlen);
@@ -381,8 +371,10 @@ hash_del_len(hash_type type, const void *hashindex, size_t size, void *pointer)
 	else
 		hashlen = IRCD_MIN(size, hash_function[type].hashlen);
 
-	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
-					    hash_function[type].hashbits, hashlen);
+
+//	hashv = (hash_function[type].func) ((const unsigned char *)hashindex,
+//					    hash_function[type].hashbits, hashlen);
+	hashv = hfunc(type, hashindex, hashlen);
 	RB_DLINK_FOREACH(ptr, table[hashv].head)
 	{
 		hash_node *hnode = ptr->data;
@@ -462,141 +454,6 @@ hash_walkall(hash_type type, hash_walk_cb *walk_cb, void *walk_data)
 
 
 
-struct Client *
-find_id(const char *name)
-{
-	return hash_find_data(HASH_ID, name);
-}
-
-/* hash_find_masked_server()
- * 
- * Whats happening in this next loop ? Well, it takes a name like
- * foo.bar.edu and proceeds to earch for *.edu and then *.bar.edu.
- * This is for checking full server names against masks although
- * it isnt often done this way in lieu of using matches().
- *
- * Rewrote to do *.bar.edu first, which is the most likely case,
- * also made const correct
- * --Bleep
- */
-static struct Client *
-hash_find_masked_server(struct Client *source_p, const char *name)
-{
-	char buf[HOSTLEN + 1];
-	char *p = buf;
-	char *s;
-	struct Client *server;
-
-	if('*' == *name || '.' == *name)
-		return NULL;
-
-	/* copy it across to give us a buffer to work on */
-	rb_strlcpy(buf, name, sizeof(buf));
-
-	while((s = strchr(p, '.')) != 0)
-	{
-		*--s = '*';
-		/*
-		 * Dont need to check IsServer() here since nicknames cant
-		 * have *'s in them anyway.
-		 */
-		if((server = find_server(source_p, s)))
-			return server;
-		p = s + 2;
-	}
-
-	return NULL;
-}
-
-/* find_any_client()
- *
- * finds a client/server/masked server entry from the hash
- */
-struct Client *
-find_any_client(const char *name)
-{
-	rb_dlink_node *ptr;
-	uint32_t hashv;
-
-	s_assert(name != NULL);
-	if(EmptyString(name))
-		return NULL;
-
-	/* hunting for an id, not a nick */
-	if(IsDigit(*name))
-		return hash_find_data(HASH_ID, name);
-
-	hashv = hash_nick(name);
-
-	RB_DLINK_FOREACH(ptr, clientTable[hashv].head)
-	{
-		struct Client *target_p = ptr->data;
-
-		if(irccmp(name, target_p->name) == 0)
-			return target_p;
-	}
-
-	/* wasnt found, look for a masked server */
-	return hash_find_masked_server(NULL, name);
-}
-
-/* find_client()
- *
- * finds a client/server entry from the client hash table
- */
-struct Client *
-find_client(const char *name)
-{
-	s_assert(name != NULL);
-	if(EmptyString(name))
-		return NULL;
-
-	/* hunting for an id, not a nick */
-	if(IsDigit(*name))
-		return hash_find_data(HASH_ID, name);
-
-	return hash_find_data(HASH_CLIENT, name);
-}
-
-/* find_named_client()
- *
- * finds a client/server entry from the client hash table
- */
-struct Client *
-find_named_client(const char *name)
-{
-	s_assert(name != NULL);
-	if(EmptyString(name))
-		return NULL;
-
-	return hash_find_data(HASH_CLIENT, name);
-}
-
-/* find_server()
- *
- * finds a server from the client hash table
- */
-struct Client *
-find_server(struct Client *source_p, const char *name)
-{
-	struct Client *target_p;
-
-	if(EmptyString(name))
-		return NULL;
-
-	if((source_p == NULL || !MyClient(source_p)) && IsDigit(*name) && strlen(name) == 3)
-	{
-	        return hash_find_data(HASH_ID, name);
-	}
-
-	target_p = hash_find_data(HASH_CLIENT, name);
-
-	if(target_p != NULL && (IsServer(target_p) || IsMe(target_p)))
-		return target_p;
-
-	/* wasnt found, look for a masked server */
-	return hash_find_masked_server(source_p, name);
-}
 
 /* find_hostname()
  *
@@ -720,7 +577,7 @@ hash_free_tablelist(rb_dlink_list *table)
         rb_dlink_node *ptr, *next;
         RB_DLINK_FOREACH_SAFE(ptr, next, table->head)
         {
-                rb_free_rb_dlink_node(ptr);
+        	rb_free(ptr);
         }
         rb_free(table);        
 }	

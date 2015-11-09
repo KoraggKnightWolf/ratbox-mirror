@@ -142,13 +142,6 @@ void del_channel_hash_resv_hnode(hash_node *hnode);
 void del_channel_hash_resv(struct ConfItem *aconf);
 
 
-struct Client *find_any_client(const char *name);
-struct Client *find_client(const char *name);
-struct Client *find_named_client(const char *name);
-struct Client *find_server(struct Client *source_p, const char *name);
-
-
-struct Client *find_id(const char *name);
 
 struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
 struct Channel *find_channel(const char *name);

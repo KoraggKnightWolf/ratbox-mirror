@@ -371,5 +371,12 @@ char *generate_uid(void);
 
 void flood_endgrace(struct Client *);
 
+struct Client *find_any_client(const char *name);
+struct Client *find_client(const char *name);
+struct Client *find_named_client(const char *name);
+struct Client *find_server(struct Client *source_p, const char *name);
+struct Client *find_id(const char *name);
+
+
 
 #endif /* INCLUDED_client_h */
