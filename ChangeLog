@@ -1,3 +1,11 @@
+androsyn    2015/11/09 20:27:13 UTC	(20151109_17-29035)
+  Log:
+  call whowas_trim if we're over 100 past the configured whowas length as well
+
+  Modified:
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/11/09 20:26:45 UTC	(20151109_16-29033)
   Log:
   increase the size of the whowas hash table
