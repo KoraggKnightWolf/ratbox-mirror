@@ -1,3 +1,14 @@
+androsyn    2015/11/09 03:00:55 UTC	(20151109_4-29009)
+  Log:
+  hash table cleanups for the find_hostname related code
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_ison.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2015/11/09 02:37:43 UTC	(20151109_3-29007)
   Log:
   use rb_free instead of rb_free_rb_dlink_node
