@@ -86,7 +86,6 @@ whowas_add_history(struct Client *client_p, bool online)
 	else
 		who->online = NULL;
 
-//	rb_dlinkAdd(who, &who->node, &whowas_hash[who->hashv]);
 	who->hnode = hash_add(HASH_WHOWAS, client_p->name, who);
 	
 	rb_dlinkAdd(who, &who->whowas_node, whowas_list);
@@ -149,7 +148,6 @@ whowas_trim(void *unused)
 			if(twho->online != NULL)
 				rb_dlinkDelete(&twho->cnode, &twho->online->whowas_clist);
 			hash_del_hnode(HASH_WHOWAS, twho->hnode);
-			//rb_dlinkDelete(&twho->node, &whowas_hash[twho->hashv]);
 			rb_dlinkDelete(&twho->whowas_node, whowas_list);
 			rb_free(twho);
 		}
