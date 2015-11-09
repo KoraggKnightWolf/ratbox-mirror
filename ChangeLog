@@ -1,3 +1,11 @@
+androsyn    2015/11/09 22:08:51 UTC	(20151109_22-29045)
+  Log:
+  no really those +1s are meant to be there
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2015/11/09 21:49:16 UTC	(20151109_21-29043)
   Log:
   correct hash stats
