@@ -1,3 +1,12 @@
+androsyn    2015/11/09 01:27:14 UTC	(20151109_0-28999)
+  Log:
+  add two missing )'s
+  
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+
+
 androsyn    2015/11/07 03:23:05 UTC	(20151107_7-28997)
   Log:
   nick delay cleanups
