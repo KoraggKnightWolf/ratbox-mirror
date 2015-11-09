@@ -1,3 +1,11 @@
+androsyn    2015/11/09 16:00:40 UTC	(20151109_10-29021)
+  Log:
+  rework whowas_trim a little
+
+  Modified:
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/11/09 15:46:07 UTC	(20151109_9-29019)
   Log:
   move whowas_length to general{}
