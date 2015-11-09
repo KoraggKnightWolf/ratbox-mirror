@@ -96,19 +96,6 @@ whowas_add_history(struct Client *client_p, bool online)
 	if(client_p == NULL)
 		return;
                 
-        if(rb_dlink_list_length(whowas_list) >= whowas_list_length)
-        {
-                if(whowas_list->tail != NULL && whowas_list->tail->data != NULL)
-                {
-                        whowas_t *twho = whowas_list->tail->data;
-                        if(twho->online != NULL)
-                                rb_dlinkDelete(&twho->cnode, &twho->online->whowas_clist);
-                        rb_dlinkDelete(&twho->node, &whowas_hash[twho->hashv]);
-                        rb_dlinkDelete(&twho->whowas_node, whowas_list);
-                        rb_free(twho);
-                }
-        }
-
         who = rb_malloc(sizeof(whowas_t));
 	who->hashv = whowas_hash_name(client_p->name);
 	who->logoff = rb_current_time();
@@ -183,8 +170,29 @@ whowas_get_history(const char *nick, time_t timelimit)
 	return NULL;
 }
 
+static void
+whowas_trim(void *unused)
+{
+	if(rb_dlink_list_length(whowas_list) < whowas_list_length)
+		return;
+		
+	/* remove whowas entries over the configured length */
+	for(long i = 0; i < (rb_dlink_list_length(whowas_list) - whowas_list_length); i++)
+	{	 	
+		if(whowas_list->tail != NULL && whowas_list->tail->data != NULL)
+		{
+			whowas_t *twho = whowas_list->tail->data;
+			if(twho->online != NULL)
+				rb_dlinkDelete(&twho->cnode, &twho->online->whowas_clist);
+			rb_dlinkDelete(&twho->node, &whowas_hash[twho->hashv]);
+			rb_dlinkDelete(&twho->whowas_node, whowas_list);
+			rb_free(twho);
+		}
+        }
+}
+
 void
-whowas_init()
+whowas_init(void)
 {
         whowas_list = rb_malloc(sizeof(rb_dlink_list));
 	whowas_hash = rb_malloc(sizeof(rb_dlink_list) * WW_MAX);
@@ -193,6 +201,8 @@ whowas_init()
 	{
 	        whowas_list_length = NICKNAMEHISTORYLENGTH;
 	}
+
+	rb_event_add("whowas_trim", whowas_trim, NULL, 10);
 }
 
 void 
