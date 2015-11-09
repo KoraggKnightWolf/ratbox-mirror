@@ -74,7 +74,7 @@ typedef struct _hash_node hash_node;
 #define SCACHE_MAX (1<<SCACHE_MAX_BITS)
 
 /* whowas hash */
-#define WHOWAS_MAX_BITS 16
+#define WHOWAS_MAX_BITS 17
 #define WHOWAS_MAX (1<<WHOWAS_MAX_BITS)
 
 
