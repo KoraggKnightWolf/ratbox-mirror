@@ -1,3 +1,11 @@
+androsyn    2015/11/09 02:22:52 UTC	(20151109_1-29003)
+  Log:
+  use rb_free on the rb_dlink_node
+
+  Modified:
+	ircd-ratbox/trunk/src/cache.c (File Modified) 
+
+
 androsyn    2015/11/09 01:27:14 UTC	(20151109_0-28999)
   Log:
   add two missing )'s
