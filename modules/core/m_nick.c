@@ -772,9 +772,9 @@ change_remote_nick(struct Client *client_p, struct Client *source_p,
 	hash_del(HASH_CLIENT, source_p->name, source_p);
 
 	/* invalidate nick delay when a remote client uses the nick.. */
-	if((nd = hash_find_nd(nick)))
+	if((nd = hash_find_data(HASH_ND, nick)) != NULL)
 		free_nd_entry(nd);
-
+	                        
 	strcpy(source_p->user->name, nick);
 	hash_add(HASH_CLIENT, nick, source_p);
 
@@ -1134,7 +1134,8 @@ register_client(struct Client *client_p, struct Client *server,
 
 
 	/* remove any nd entries for this nick */
-	if((nd = hash_find_nd(nick)))
+
+	if((nd = hash_find_data(HASH_ND, nick)) != NULL)
 		free_nd_entry(nd);
 
 	hash_add(HASH_CLIENT, nick, source_p);
