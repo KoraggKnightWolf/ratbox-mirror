@@ -1,3 +1,15 @@
+androsyn    2015/11/09 19:23:46 UTC	(20151109_14-29029)
+  Log:
+  make whowas use the new hash code as well
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/include/whowas.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_whowas.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/11/09 16:51:08 UTC	(20151109_13-29027)
   Log:
   have hash_add return the hash_node
