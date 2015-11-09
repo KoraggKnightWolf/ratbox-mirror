@@ -126,6 +126,9 @@ void hash_del_len(hash_type type, const void *hashindex, size_t indexlen, void *
 void hash_walkall(hash_type type, hash_walk_cb *walk_cb, void *walk_data);
 
 
+rb_dlink_list *hash_find_list_len(hash_type type, const void *hashindex, size_t size);
+rb_dlink_list *hash_find_list(hash_type type, const char *hashindex);
+void hash_free_list(rb_dlink_list *list);
 
 hash_node *hash_find(hash_type, const char *hashindex);
 hash_node *hash_find_len(hash_type, const void *hashindex, size_t len);
@@ -145,8 +148,6 @@ void del_channel_hash_resv(struct ConfItem *aconf);
 
 struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
 struct Channel *find_channel(const char *name);
-
-rb_dlink_list *find_hostname(const char *);
 
 struct ConfItem *hash_find_resv(const char *name);
 void clear_resv_hash(void);

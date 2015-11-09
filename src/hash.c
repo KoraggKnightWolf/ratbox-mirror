@@ -263,6 +263,66 @@ static struct _hash_function hash_function[HASH_LAST] =
 
 #define hfunc(type, hashindex, hashlen) (hash_function[type].func((unsigned const char *)hashindex, hash_function[type].hashbits, hashlen))	
 
+void 
+hash_free_list(rb_dlink_list *table)
+{
+        rb_dlink_node *ptr, *next;
+        RB_DLINK_FOREACH_SAFE(ptr, next, table->head)
+        {
+        	rb_free(ptr);
+        }
+        rb_free(table);        
+}	
+
+rb_dlink_list *
+hash_find_list_len(hash_type type, const void *hashindex, size_t size)
+{
+	rb_dlink_list *table = hash_function[type].table;
+	rb_dlink_list *results;
+	hash_cmp *hcmpfunc;
+	size_t hashlen;
+	uint32_t hashv;
+	rb_dlink_node *ptr;
+	
+	hcmpfunc = hash_function[type].cmpfunc;
+	
+	if(hashindex == NULL)
+		return NULL;
+
+	if(hcmpfunc == NULL)
+		hcmpfunc = hash_irccmp;
+
+	if(hash_function[type].hashlen == 0)
+		hashlen = size;
+	else
+		hashlen = IRCD_MIN(size, hash_function[type].hashlen);
+
+
+	hashv = hfunc(type, hashindex, hashlen);
+
+	results = rb_malloc(sizeof(rb_dlink_list));
+	
+	RB_DLINK_FOREACH(ptr, table[hashv].head)
+	{
+		hash_node *hnode = ptr->data;
+		
+		if(hcmpfunc(hashindex, hnode->key, hashlen) == true)
+			rb_dlinkAddAlloc(hnode->data, results);
+	}	
+	if(rb_dlink_list_length(results) == 0)
+	{
+		rb_free(results);
+		return NULL;
+	}
+	return results;
+}
+
+rb_dlink_list *
+hash_find_list(hash_type type, const char *hashindex)
+{
+	return hash_find_list_len(type, hashindex, strlen(hashindex)+1);
+}
+
 hash_node *
 hash_find_len(hash_type type, const void *hashindex, size_t size)
 {
@@ -304,7 +364,7 @@ hash_find_len(hash_type type, const void *hashindex, size_t size)
 hash_node *
 hash_find(hash_type type, const char *hashindex)
 {
-	return hash_find_len(type, hashindex, strlen(hashindex));
+	return hash_find_len(type, hashindex, strlen(hashindex)+1);
 }
 
 void *
@@ -450,28 +510,6 @@ hash_walkall(hash_type type, hash_walk_cb *walk_cb, void *walk_data)
 		walk_cb(cbdata, walk_data);
 	}
 	HASH_WALK_END;
-}
-
-
-
-
-/* find_hostname()
- *
- * finds a hostname dlink list from the hostname hash table.
- * we return the full dlink list, because you can have multiple
- * entries with the same hostname
- */
-rb_dlink_list *
-find_hostname(const char *hostname)
-{
-	uint32_t hashv;
-
-	if(EmptyString(hostname))
-		return NULL;
-
-	hashv = hash_hostname(hostname);
-
-	return &hostTable[hashv];
 }
 
 /* find_channel()

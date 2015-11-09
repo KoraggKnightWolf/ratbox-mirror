@@ -32,7 +32,7 @@
 #include <send.h>
 #include <parse.h>
 #include <modules.h>
-#include <hash.h>
+#include <client.h>
 
 #include <string.h>
 

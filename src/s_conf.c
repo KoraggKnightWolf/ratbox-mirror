@@ -87,7 +87,7 @@ static void reorganise_temp_kd(void *list);
 extern char yytext[];
 
 static chk_res verify_access(struct Client *client_p, const char *username);
-static int attach_iline(struct Client *, struct ConfItem *);
+static chk_res attach_iline(struct Client *, struct ConfItem *);
 
 void
 init_s_conf(void)
@@ -460,53 +460,74 @@ remove_ip_limit(struct Client *client_p, struct ConfItem *aconf)
  * output	-
  * side effects	- do actual attach
  */
-static int
+static chk_res
 attach_iline(struct Client *client_p, struct ConfItem *aconf)
 {
 	rb_dlink_node *ptr;
+	rb_dlink_list *hostlist;
 	int local_count = 0;
 	int global_count = 0;
 	int ident_count = 0;
 	int unidented = 0;
-
+	chk_res retval = SUCCESS;
 	if(IsConfExemptLimits(aconf))
 		return (attach_conf(client_p, aconf));
 
 	if(*client_p->username == '~')
 		unidented = 1;
 
-	/* find_hostname() returns the head of the list to search */
-	RB_DLINK_FOREACH(ptr, (find_hostname(client_p->host))->head )
+
+	hostlist = hash_find_list(HASH_HOSTNAME, client_p->host);
+
+	if(hostlist != NULL)
 	{
-		struct Client *target_p = ptr->data;
-
-		if(irccmp(client_p->host, target_p->host) != 0)
-			continue;
-
-		if(MyConnect(target_p))
-			local_count++;
-
-		global_count++;
-
-		if(unidented)
+		/* find_hostname() returns the head of the list to search */
+		RB_DLINK_FOREACH(ptr, hostlist->head )
 		{
-			if(*target_p->username == '~')
-				ident_count++;
-		}
-		else if(irccmp(target_p->username, client_p->username) == 0)
-			ident_count++;
+			struct Client *target_p = ptr->data;
 
-		if(ConfMaxLocal(aconf) && local_count >= ConfMaxLocal(aconf))
-			return (TOO_MANY_LOCAL);
-		else if(ConfMaxGlobal(aconf) && global_count >= ConfMaxGlobal(aconf))
-			return (TOO_MANY_GLOBAL);
-		else if(ConfMaxIdent(aconf) && ident_count >= ConfMaxIdent(aconf))
-			return (TOO_MANY_IDENT);
+			// not needed since hash_find_list will return only matches)
+			//if(irccmp(client_p->host, target_p->host) != 0)
+			//	continue;
+
+			if(MyConnect(target_p))
+				local_count++;
+
+			global_count++;
+
+			if(unidented)
+			{
+				if(*target_p->username == '~')
+					ident_count++;
+			}
+			else if(irccmp(target_p->username, client_p->username) == 0)
+				ident_count++;
+
+			if(ConfMaxLocal(aconf) && local_count >= ConfMaxLocal(aconf)) {
+				retval = TOO_MANY_LOCAL;
+				break;
+			}
+			else if(ConfMaxGlobal(aconf) && global_count >= ConfMaxGlobal(aconf)) {
+				retval = TOO_MANY_GLOBAL;
+				break;
+			}
+			else if(ConfMaxIdent(aconf) && ident_count >= ConfMaxIdent(aconf)) {
+				retval = TOO_MANY_IDENT;
+				break;
+			}
+		}
+		hash_free_list(hostlist);
+	
+		if(retval != SUCCESS)
+			return retval;
 	}
+	
 
 	if(ConfigFileEntry.global_cidr && check_global_cidr_count(client_p) > 0)
-		return (TOO_MANY_GLOBAL_CIDR);
-	return (attach_conf(client_p, aconf));
+		return TOO_MANY_GLOBAL_CIDR;
+
+	return attach_conf(client_p, aconf);
+
 }
 
 /*
