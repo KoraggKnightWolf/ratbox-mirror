@@ -1096,3 +1096,70 @@ send_cap_mode_changes(struct Client *client_p, struct Client *source_p,
 			sendto_server(client_p, chptr, cap, nocap, "%s %s", modebuf, parabuf);
 	}
 }
+
+/* find_channel()
+ *
+ * finds a channel from the channel hash table
+ */
+struct Channel *
+find_channel(const char *name)
+{
+	s_assert(name != NULL);
+	if(EmptyString(name))
+		return NULL;
+
+	return hash_find_data(HASH_CHANNEL, name);
+}
+
+/*
+ * get_or_create_channel
+ * inputs	- client pointer
+ *		- channel name
+ *		- pointer to int flag whether channel was newly created or not
+ * output	- returns channel block or NULL if illegal name
+ *		- also modifies *isnew
+ *
+ *  Get Channel block for chname (and allocate a new channel
+ *  block, if it didn't exist before).
+ */
+struct Channel *
+get_or_create_channel(struct Client *client_p, const char *chname, int *isnew)
+{
+	struct Channel *chptr;
+	size_t len;
+	const char *s = chname;
+
+	if(EmptyString(s))
+		return NULL;
+
+	if((len = strlen(s)) > CHANNELLEN)
+	{
+		if(IsServer(client_p))
+		{
+			sendto_realops_flags(UMODE_DEBUG, L_ALL,
+					     "*** Long channel name from %s (%zd > %d): %s",
+					     client_p->name, len, CHANNELLEN, s);
+		}
+		s = LOCAL_COPY_N(s, CHANNELLEN);
+	}
+
+
+	if((chptr = find_channel(s)) != NULL)
+	{
+		if(isnew != NULL)
+			*isnew = 0;
+		return chptr;
+	}
+
+	if(isnew != NULL)
+		*isnew = 1;
+
+	chptr = allocate_channel(s);
+
+	rb_dlinkAdd(chptr, &chptr->node, &global_channel_list);
+
+	chptr->channelts = rb_current_time();	/* doesn't hurt to set it here */
+
+	hash_add(HASH_CHANNEL, chptr->chname, chptr);
+	return chptr;
+}

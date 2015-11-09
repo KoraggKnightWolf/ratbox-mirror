@@ -183,6 +183,9 @@ void init_channels(void);
 
 struct Channel *allocate_channel(const char *chname);
 void free_channel(struct Channel *chptr);
+struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
+struct Channel *find_channel(const char *name);
+
 struct Ban *allocate_ban(const char *, const char *);
 void free_ban(struct Ban *bptr);
 
@@ -195,6 +198,7 @@ int is_banned(struct Channel *chptr, struct Client *who,
 
 struct membership *find_channel_membership(struct Channel *, struct Client *);
 const char *find_channel_status(struct membership *msptr, int combine);
+
 void add_user_to_channel(struct Channel *, struct Client *, int flags);
 void remove_user_from_channel(struct membership *);
 void remove_user_from_channels(struct Client *);

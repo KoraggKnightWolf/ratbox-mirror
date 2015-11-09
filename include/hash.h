@@ -144,14 +144,8 @@ void add_channel_hash_resv(struct ConfItem *aconf);
 void del_channel_hash_resv_hnode(hash_node *hnode);
 void del_channel_hash_resv(struct ConfItem *aconf);
 
-
-
-struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
-struct Channel *find_channel(const char *name);
-
 struct ConfItem *hash_find_resv(const char *name);
 void clear_resv_hash(void);
-
 
 void add_to_cli_connid_hash(struct Client *client_p);
 void del_from_cli_connid_hash(struct Client *client_p);
