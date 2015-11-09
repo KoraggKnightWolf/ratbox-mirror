@@ -1,3 +1,12 @@
+androsyn    2015/11/09 02:37:43 UTC	(20151109_3-29007)
+  Log:
+  use rb_free instead of rb_free_rb_dlink_node
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2015/11/09 02:25:35 UTC	(20151109_2-29005)
   Log:
   move struct Client * returning functions to client.c from hash.c, otherwise slight cleanups
