@@ -170,7 +170,7 @@ cache_links(void *unused)
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, links_cache_list.head)
 	{
 		rb_free(ptr->data);
-		rb_free_rb_dlink_node(ptr);
+		rb_free(ptr);
 	}
 
 	links_cache_list.head = links_cache_list.tail = NULL;
