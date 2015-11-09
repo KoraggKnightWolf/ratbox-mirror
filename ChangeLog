@@ -1,3 +1,11 @@
+androsyn    2015/11/09 03:19:36 UTC	(20151109_7-29015)
+  Log:
+  get this del_from_cli_connid_hash gone too
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2015/11/09 03:15:05 UTC	(20151109_6-29013)
   Log:
   make the connection id hashes use the new interfaces as well
