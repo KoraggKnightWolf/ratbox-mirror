@@ -1,3 +1,11 @@
+androsyn    2015/11/09 13:53:54 UTC	(20151109_8-29017)
+  Log:
+  allow the whowas history length to be exceeded until the whowas trim event gets run, this gets the whowas trimming out of a busy code path
+
+  Modified:
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/11/09 03:19:36 UTC	(20151109_7-29015)
   Log:
   get this del_from_cli_connid_hash gone too
