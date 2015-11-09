@@ -1,3 +1,11 @@
+androsyn    2015/11/09 20:26:45 UTC	(20151109_16-29033)
+  Log:
+  increase the size of the whowas hash table
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+
+
 androsyn    2015/11/09 19:28:23 UTC	(20151109_15-29031)
   Log:
   remove comments
