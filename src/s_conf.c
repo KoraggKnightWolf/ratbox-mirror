@@ -844,7 +844,7 @@ set_default_conf(void)
 	ConfigFileEntry.global_cidr_ipv6_count = 128;
 	ConfigFileEntry.global_cidr = YES;
 	ConfigFileEntry.delayed_exit_time = DEFAULT_DELAYED_EXIT_TIME;
-
+	ConfigFileEntry.whowas_length = NICKNAMEHISTORYLENGTH;
 }
 
 #undef YES

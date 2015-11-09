@@ -1089,15 +1089,16 @@ conf_set_serverinfo_bandb_path(confentry_t * entry, conf_t * conf, struct conf_i
 }
 
 static void
-conf_set_serverinfo_whowas_length(confentry_t * entry, conf_t * conf, struct conf_items *item)
+conf_set_general_whowas_length(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	int len;
 	len = entry->number;
 	if(len < 50)
 	{
-		conf_report_error_nl("serverinfo::whowas_length -- Invalid WHOWAS length %u, must be at least 50", len);
-	} else
-		whowas_set_size(len);
+		conf_report_error_nl("general::whowas_length -- Invalid WHOWAS length %u, must be at least 50. Ignoring", len);
+		len = NICKNAMEHISTORYLENGTH;
+	} 
+	ConfigFileEntry.whowas_length = len;
 }
 
 
@@ -2378,6 +2379,7 @@ load_conf_settings(void)
 		splitmode = false;
 		splitchecking = false;
 	}
+	whowas_set_size(ConfigFileEntry.whowas_length);	
 	check_class();
 }
 
@@ -2412,7 +2414,6 @@ static struct conf_items conf_serverinfo_table[] =
 	{ "ssld_count",		CF_INT,	    NULL, 0, &ServerInfo.ssld_count },
 	{ "tls_min_ver",	CF_QSTRING, conf_set_serverinfo_tls_min_ver, 0, NULL },
 	{ "vhost_dns",		CF_QSTRING, conf_set_serverinfo_vhost_dns, 0, NULL },
-	{ "whowas_length",	CF_INT,     conf_set_serverinfo_whowas_length, 0, NULL },
 #ifdef RB_IPV6
 	{ "vhost6_dns",		CF_QSTRING, conf_set_serverinfo_vhost6_dns, 0, NULL },
 #endif
@@ -2587,6 +2588,7 @@ static struct conf_items conf_general_table[] =
 	{ "motd_path", 		CF_QSTRING, NULL, 0, &ConfigFileEntry.motd_path },
 	{ "oper_motd_path", 	CF_QSTRING, NULL, 0, &ConfigFileEntry.oper_motd_path },
 	{ "ipv6_tun_remap",	CF_YESNO, NULL, 0, &ConfigFileEntry.ipv6_tun_remap },
+	{ "whowas_length",	CF_INT,     conf_set_general_whowas_length, 0, NULL },
 	{ "\0",			0,	  NULL, 0, NULL }
 };
 

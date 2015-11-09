@@ -208,6 +208,7 @@ struct config_file_entry
 	int nicklen;
 	int delayed_exit_time;
 	int ipv6_tun_remap;
+	int whowas_length;
 };
 
 struct config_channel_entry
