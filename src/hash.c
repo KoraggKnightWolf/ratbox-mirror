@@ -204,6 +204,7 @@ bool connid_cmp(const void *x, const void *y, size_t cmpsize)
 }
 
 
+
 typedef bool hash_cmp(const void *x, const void *y, size_t len);
 
 
@@ -238,19 +239,19 @@ static struct _hash_function hash_function[HASH_LAST] =
 		.name = "Channel RESV", .func = fnv_hash_upper_len, .table = resvTable, .hashbits = R_MAX_BITS, .hashlen = 30
 	},
 	[HASH_OPER] = {
-		.name = "Operator", .func = fnv_hash_upper, .table = operhash_table, .hashbits = OPERHASH_MAX_BITS, .cmpfunc = hash_irccmp,
+		.name = "Operator", .func = fnv_hash_upper, .table = operhash_table, .hashbits = OPERHASH_MAX_BITS,
 	},
 	[HASH_SCACHE] = {
-		.name = "Server Cache", .func = fnv_hash_upper, .table = scache_table, .hashbits = OPERHASH_MAX_BITS, .cmpfunc = hash_irccmp,
+		.name = "Server Cache", .func = fnv_hash_upper, .table = scache_table, .hashbits = OPERHASH_MAX_BITS, 
 	},
 	[HASH_HELP] = {
-		.name = "Help", .func = fnv_hash_upper, .table = helpTable, .hashbits = HELP_MAX_BITS, .cmpfunc = hash_irccmp
+		.name = "Help", .func = fnv_hash_upper, .table = helpTable, .hashbits = HELP_MAX_BITS, 
 	},
 	[HASH_OHELP] = {
-		.name = "Operator Help", .func = fnv_hash_upper, .table = ohelpTable, .hashbits = HELP_MAX_BITS, .cmpfunc = hash_irccmp
+		.name = "Operator Help", .func = fnv_hash_upper, .table = ohelpTable, .hashbits = HELP_MAX_BITS, 
 	},
 	[HASH_ND] = {
-		.name = "Nick Delay", .func = fnv_hash_upper, .table = ndTable, .hashbits = U_MAX_BITS, .cmpfunc = hash_irccmp
+		.name = "Nick Delay", .func = fnv_hash_upper, .table = ndTable, .hashbits = U_MAX_BITS,
 	},
 	[HASH_CONNID] = {
 		.name = "Connection ID", .func = fnv_hash_len_data, .table = clientbyconnidTable, .hashbits = CLI_CONNID_MAX_BITS, .cmpfunc = connid_cmp, .hashlen = sizeof(uint32_t)
@@ -262,6 +263,20 @@ static struct _hash_function hash_function[HASH_LAST] =
 
 
 #define hfunc(type, hashindex, hashlen) (hash_function[type].func((unsigned const char *)hashindex, hash_function[type].hashbits, hashlen))	
+
+static inline
+bool hash_do_cmp(hash_type type, const void *x, const void *y, size_t len)
+{
+	hash_cmp *hcmpfunc = hash_function[type].cmpfunc;
+
+	/* don't use the function pointer to hash_irccmp so that we 
+	 * can get an inlined version of it */
+	if(hcmpfunc != NULL && hcmpfunc != hash_irccmp)
+		return hcmpfunc(x, y, len);
+	return hash_irccmp(x, y, len);	
+}
+
+
 
 void 
 hash_free_list(rb_dlink_list *table)
@@ -279,18 +294,12 @@ hash_find_list_len(hash_type type, const void *hashindex, size_t size)
 {
 	rb_dlink_list *table = hash_function[type].table;
 	rb_dlink_list *results;
-	hash_cmp *hcmpfunc;
 	size_t hashlen;
 	uint32_t hashv;
 	rb_dlink_node *ptr;
 	
-	hcmpfunc = hash_function[type].cmpfunc;
-	
 	if(hashindex == NULL)
 		return NULL;
-
-	if(hcmpfunc == NULL)
-		hcmpfunc = hash_irccmp;
 
 	if(hash_function[type].hashlen == 0)
 		hashlen = size;
@@ -305,8 +314,7 @@ hash_find_list_len(hash_type type, const void *hashindex, size_t size)
 	RB_DLINK_FOREACH(ptr, table[hashv].head)
 	{
 		hash_node *hnode = ptr->data;
-		
-		if(hcmpfunc(hashindex, hnode->key, hashlen) == true)
+		if(hash_do_cmp(type, hashindex, hnode->key, hashlen) == true)
 			rb_dlinkAddAlloc(hnode->data, results);
 	}	
 	if(rb_dlink_list_length(results) == 0)
@@ -320,6 +328,8 @@ hash_find_list_len(hash_type type, const void *hashindex, size_t size)
 rb_dlink_list *
 hash_find_list(hash_type type, const char *hashindex)
 {
+	if(EmptyString(hashindex))
+		return NULL;
 	return hash_find_list_len(type, hashindex, strlen(hashindex)+1);
 }
 
@@ -327,18 +337,13 @@ hash_node *
 hash_find_len(hash_type type, const void *hashindex, size_t size)
 {
 	rb_dlink_list *table = hash_function[type].table;
-	hash_cmp *hcmpfunc;
+
 	size_t hashlen;
 	uint32_t hashv;
 	rb_dlink_node *ptr;
 	
-	hcmpfunc = hash_function[type].cmpfunc;
-	
 	if(hashindex == NULL)
 		return NULL;
-
-	if(hcmpfunc == NULL)
-		hcmpfunc = hash_irccmp;
 
 	if(hash_function[type].hashlen == 0)
 		hashlen = size;
@@ -353,7 +358,7 @@ hash_find_len(hash_type type, const void *hashindex, size_t size)
 	{
 		hash_node *hnode = ptr->data;
 		
-		if(hcmpfunc(hashindex, hnode->key, hashlen) == true)
+		if(hash_do_cmp(type, hashindex, hnode->key, hashlen) == true)
 		{
 			return hnode;
 		}
@@ -364,6 +369,8 @@ hash_find_len(hash_type type, const void *hashindex, size_t size)
 hash_node *
 hash_find(hash_type type, const char *hashindex)
 {
+	if(EmptyString(hashindex))
+		return NULL;
 	return hash_find_len(type, hashindex, strlen(hashindex)+1);
 }
 
@@ -381,6 +388,8 @@ hash_find_data_len(hash_type type, const void *hashindex, size_t size)
 void *
 hash_find_data(hash_type type, const char *hashindex)
 {
+	if(EmptyString(hashindex))
+		return NULL;
 	return hash_find_data_len(type, hashindex, strlen(hashindex)+1);
 }
 
@@ -411,6 +420,8 @@ hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *point
 void
 hash_add(hash_type type, const char *hashindex, void *pointer)
 {
+	if(EmptyString(hashindex))
+		return;
 	hash_add_len(type, hashindex, strlen(hashindex)+1, pointer);
 }
 
@@ -453,6 +464,8 @@ hash_del_len(hash_type type, const void *hashindex, size_t size, void *pointer)
 void
 hash_del(hash_type type, const char *hashindex, void *pointer)
 {
+	if(EmptyString(hashindex))
+		return;
 	hash_del_len(type, hashindex, strlen(hashindex) + 1, pointer);
 }
 
