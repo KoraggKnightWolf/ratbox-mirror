@@ -1,3 +1,11 @@
+androsyn    2015/11/09 16:15:36 UTC	(20151109_12-29025)
+  Log:
+  update example.conf with the whowas_length change
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+
+
 androsyn    2015/11/09 16:01:55 UTC	(20151109_11-29023)
   Log:
   check EmptyString for the hash_ functions that accept strings.  Add hash_do_cmp so we can get the default case mostly inlined
