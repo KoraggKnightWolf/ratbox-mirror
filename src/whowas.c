@@ -41,7 +41,7 @@
 
 static rb_dlink_list *whowas_list;
 static unsigned int whowas_list_length = NICKNAMEHISTORYLENGTH;
-
+static void whowas_trim(void *unused);
 
 void
 whowas_add_history(struct Client *client_p, bool online)
@@ -51,6 +51,10 @@ whowas_add_history(struct Client *client_p, bool online)
 
 	if(client_p == NULL)
 		return;
+
+	/* trim some of the entries if we're getting well over our history length */
+	if(rb_dlink_list_length(whowas_list) > whowas_list_length + 100)
+		whowas_trim(NULL);
                 
         who = rb_malloc(sizeof(whowas_t));
 	who->logoff = rb_current_time();
