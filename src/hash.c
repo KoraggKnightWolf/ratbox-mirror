@@ -394,7 +394,7 @@ hash_find_data(hash_type type, const char *hashindex)
 }
 
 
-void
+hash_node *
 hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer)
 {
 	rb_dlink_list *table = hash_function[type].table;
@@ -415,14 +415,15 @@ hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *point
 	hnode->hashv = hashv;	 
 	hnode->data = pointer;
 	rb_dlinkAdd(hnode, &hnode->node, &table[hashv]);
+	return hnode;
 }
 
-void
+hash_node *
 hash_add(hash_type type, const char *hashindex, void *pointer)
 {
 	if(EmptyString(hashindex))
 		return;
-	hash_add_len(type, hashindex, strlen(hashindex)+1, pointer);
+	return hash_add_len(type, hashindex, strlen(hashindex)+1, pointer);
 }
 
 

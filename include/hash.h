@@ -118,9 +118,9 @@ uint32_t fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned 
 
 void init_hash(void);
 
-void hash_add(hash_type, const char *, void *);
+hash_node *hash_add(hash_type, const char *, void *);
 void hash_del(hash_type, const char *, void *);
-void hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
+hash_node *hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
 void hash_del_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer);
 
 void hash_walkall(hash_type type, hash_walk_cb *walk_cb, void *walk_data);
