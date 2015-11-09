@@ -173,11 +173,14 @@ whowas_get_history(const char *nick, time_t timelimit)
 static void
 whowas_trim(void *unused)
 {
+	long over;
+
 	if(rb_dlink_list_length(whowas_list) < whowas_list_length)
 		return;
-		
+	over = rb_dlink_list_length(whowas_list) - whowas_list_length;
+
 	/* remove whowas entries over the configured length */
-	for(long i = 0; i < (rb_dlink_list_length(whowas_list) - whowas_list_length); i++)
+	for(long i = 0; i < over; i++)
 	{	 	
 		if(whowas_list->tail != NULL && whowas_list->tail->data != NULL)
 		{
@@ -189,6 +192,7 @@ whowas_trim(void *unused)
 			rb_free(twho);
 		}
         }
+
 }
 
 void
