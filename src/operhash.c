@@ -109,12 +109,9 @@ operhash_cnt_usage(void *data, void *cbdata)
 void
 operhash_count(size_t * number, size_t * mem)
 {
-	size_t n = 0, m = 0;
 	struct ohash_usage ousage;
 	memset(&ousage, 0, sizeof(ousage));
 	
-	hash_get_memusage(HASH_OPER, &n, &m);
-	m += n * sizeof(struct operhash_entry);
         hash_walkall(HASH_OPER, operhash_cnt_usage, &ousage);
         *number = ousage.count;
         *mem = ousage.memusage;
