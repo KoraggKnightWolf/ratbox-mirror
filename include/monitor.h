@@ -10,11 +10,12 @@
 #ifndef INCLUDED_monitor_h
 #define INCLUDED_monitor_h
 
+#include <hash.h>
+
 struct monitor
 {
-	rb_dlink_node node;
+	hash_node *hnode;
 	rb_dlink_list users;
-	uint32_t hashv;
 	char *name;
 };
 

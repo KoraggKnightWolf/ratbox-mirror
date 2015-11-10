@@ -33,45 +33,27 @@
  */
 #include <stdinc.h>
 #include <struct.h>
-#include <monitor.h>
 #include <hash.h>
+#include <monitor.h>
 #include <numeric.h>
 #include <ircd.h>
 #include <match.h>
 #include <send.h>
 
-#define MONITOR_HASH_BITS 16
-#define MONITOR_HASH_SIZE (1<<MONITOR_HASH_BITS)
-
-static rb_dlink_list monitorTable[MONITOR_HASH_SIZE];
-
-static inline unsigned int
-hash_monitor_nick(const char *name)
-{
-	return fnv_hash_upper((const unsigned char *)name, MONITOR_HASH_BITS, 0);
-}
-
 struct monitor *
 find_monitor(const char *name, bool add)
 {
-	rb_dlink_node *ptr;
-
-	uint32_t hashv = hash_monitor_nick(name);
-
-	RB_DLINK_FOREACH(ptr, monitorTable[hashv].head)
-	{
-		struct monitor *monptr = ptr->data;
-		if(!irccmp(monptr->name, name))
-			return monptr;
-	
-	}
+	struct monitor *monptr;
+	hash_node *hnode;
+	if((monptr = hash_find_data(HASH_MONITOR, name)) != NULL)
+		return monptr;
 
 	if(add == true)
 	{
-		struct monitor *monptr = rb_malloc(sizeof(struct monitor));
+		monptr = rb_malloc(sizeof(struct monitor));
 		monptr->name = rb_strdup(name);
-		monptr->hashv = hashv;
-		rb_dlinkAdd(monptr, &monptr->node, &monitorTable[hashv]);
+		hnode = hash_add(HASH_MONITOR, name, monptr);
+		monptr->hnode = hnode;
 		return monptr;
 	}
 
@@ -84,8 +66,8 @@ free_monitor(struct monitor *monptr)
 	/* don't free if there are users attached */
 	if(rb_dlink_list_length(&monptr->users) > 0)
 		return;
-
-	rb_dlinkDelete(&monptr->node, &monitorTable[monptr->hashv]);	
+	
+	hash_del_hnode(HASH_MONITOR, monptr->hnode);		
 	rb_free(monptr->name);
 	rb_free(monptr);
 }

@@ -53,7 +53,7 @@ static rb_dlink_list ndTable[U_MAX];
 static rb_dlink_list operhash_table[OPERHASH_MAX];
 static rb_dlink_list scache_table[SCACHE_MAX];
 static rb_dlink_list whowas_table[WHOWAS_MAX];
-
+static rb_dlink_list monitor_table[MONITOR_MAX];
 /*
  * Hashing.
  *
@@ -263,6 +263,9 @@ static struct _hash_function hash_function[HASH_LAST] =
 	},
 	[HASH_WHOWAS] = { 
 		.name = "WHOWAS", .func = fnv_hash_upper, .table = whowas_table, .hashbits = WHOWAS_MAX_BITS, 
+	},
+	[HASH_MONITOR] = {
+		.name = "MONITOR", .func = fnv_hash_upper, .table = monitor_table, .hashbits = MONITOR_MAX_BITS
 	},
 
 };
