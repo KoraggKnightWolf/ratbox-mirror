@@ -102,7 +102,7 @@ init_hash(void)
 
 /* fnv_hash_len_data hashses any data */
 static uint32_t
-fnv_hash_len_data(const unsigned char *s, unsigned int bits, unsigned int len)
+fnv_hash_len_data(const unsigned char *s, unsigned int bits, size_t len)
 {
 	uint32_t h = FNV1_32_INIT;
 	bits = 32 - bits;
@@ -119,8 +119,8 @@ fnv_hash_len_data(const unsigned char *s, unsigned int bits, unsigned int len)
 
 
 
-uint32_t
-fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused)
+static uint32_t
+fnv_hash_upper(const unsigned char *s, unsigned int bits, size_t unused)
 {
 	uint32_t h = FNV1_32_INIT;
 	bits = 32 - bits;
@@ -133,8 +133,8 @@ fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused)
 	return h;
 }
 
-uint32_t
-fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused)
+static uint32_t
+fnv_hash(const unsigned char *s, unsigned int bits, size_t unused)
 {
 	uint32_t h = FNV1_32_INIT;
 	bits = 32 - bits;
@@ -147,8 +147,10 @@ fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused)
 	return h;
 }
 
-uint32_t
-fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len)
+#if 0 /* unused currently */
+
+static uint32_t
+fnv_hash_len(const unsigned char *s, unsigned int bits, size_t len)
 {
 	uint32_t h = FNV1_32_INIT;
 	bits = 32 - bits;
@@ -161,9 +163,10 @@ fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len)
 	h = (h >> bits) ^ (h & ((2 ^ bits) - 1));
 	return h;
 }
+#endif
 
-uint32_t
-fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len)
+static uint32_t
+fnv_hash_upper_len(const unsigned char *s, unsigned int bits, size_t len)
 {
 	uint32_t h = FNV1_32_INIT;
 	bits = 32 - bits;
@@ -213,7 +216,7 @@ typedef bool hash_cmp(const void *x, const void *y, size_t len);
 struct _hash_function
 {
 	const char *name;
-	uint32_t(*func) (unsigned const char *, unsigned int, unsigned int);
+	uint32_t(*func) (unsigned const char *, unsigned int, size_t);
 	hash_cmp *cmpfunc;
 	rb_dlink_list *table;
 	unsigned int hashbits;

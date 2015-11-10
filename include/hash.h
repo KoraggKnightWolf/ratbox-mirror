@@ -114,14 +114,11 @@ typedef struct _hash_node
 	uint32_t hashv;
 } hash_node;
 
-typedef bool hash_cmp(const void *x, const void *y, size_t len);
+
+
 typedef void hash_destroy_cb(void *data);
 typedef void hash_walk_cb(void *a, void *);
 
-uint32_t fnv_hash_upper(const unsigned char *s, unsigned int bits, unsigned int unused);
-uint32_t fnv_hash(const unsigned char *s, unsigned int bits, unsigned int unused);
-uint32_t fnv_hash_len(const unsigned char *s, unsigned int bits, unsigned int len);
-uint32_t fnv_hash_upper_len(const unsigned char *s, unsigned int bits, unsigned int len);
 
 void init_hash(void);
 
