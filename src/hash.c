@@ -714,26 +714,29 @@ hash_stats(struct Client *source_p)
 }
 
 void
-hash_get_memusage(hash_type type, size_t *memusage, size_t *entries)
+hash_get_memusage(hash_type type, size_t *entries, size_t *memusage)
 {
 	rb_dlink_list *htable;
 	rb_dlink_node *ptr;
 	hash_node *hnode;
+	size_t mem = 0, cnt = 0;
 	unsigned int max, i;
 	
 	max = 1<<hash_function[type].hashbits;
 	htable = hash_function[type].table;
 
-	*memusage = 0;
-	*entries = 0;
-	
 	HASH_WALK(i, max, ptr, htable)
 	{
 		hnode = ptr->data;
-		(*memusage) += hnode->keylen;
-		(*memusage) += sizeof(hash_node);	
-		(*entries)++;
+		mem += hnode->keylen;
+		mem += sizeof(hash_node);
+		cnt++;
 	} 
 	HASH_WALK_END;
+
+	if(memusage != NULL)
+		*memusage = mem;
+	if(entries != NULL)
+		*entries = cnt;
 }
 

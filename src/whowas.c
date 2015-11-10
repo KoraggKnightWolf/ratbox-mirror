@@ -181,7 +181,7 @@ whowas_set_size(int len)
 void
 whowas_memory_usage(size_t *count, size_t *memused)
 {
-	*count = rb_dlink_list_length(whowas_list);
-	*memused = *count * sizeof(whowas_t);
+	hash_get_memusage(HASH_WHOWAS, count, memused);
+	*memused += *count * sizeof(whowas_t);
 }
 

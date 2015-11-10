@@ -89,11 +89,34 @@ operhash_delete(const char *name)
 }
 
 
+
+struct ohash_usage
+{
+	size_t count;
+	size_t memusage;
+};
+
+static void
+operhash_cnt_usage(void *data, void *cbdata)
+{
+	struct ohash_usage *ousage = cbdata;
+	struct operhash_entry *ohash = data;
+	ousage->memusage += strlen(ohash->name) + sizeof(struct operhash_entry) + sizeof(hash_node);
+	ousage->count++;
+}
+
+
 void
 operhash_count(size_t * number, size_t * mem)
 {
-	/* XXX this doesn't include the strduped operhash value */
-        hash_get_memusage(HASH_OPER, mem, number);
-        *mem += *number * sizeof(struct operhash_entry);
+	size_t n = 0, m = 0;
+	struct ohash_usage ousage;
+	memset(&ousage, 0, sizeof(ousage));
+	
+	hash_get_memusage(HASH_OPER, &n, &m);
+	m += n * sizeof(struct operhash_entry);
+        hash_walkall(HASH_OPER, operhash_cnt_usage, &ousage);
+        *number = ousage.count;
+        *mem = ousage.memusage;
 }
  
