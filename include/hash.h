@@ -141,15 +141,7 @@ hash_node *hash_find_len(hash_type, const void *hashindex, size_t len);
 void *hash_find_data(hash_type type, const char *hashindex);
 void *hash_find_data_len(hash_type type, const void *hashindex, size_t len);
 
-
 void hash_del_hnode(hash_type type, hash_node *node);
-
-void add_channel_hash_resv(struct ConfItem *aconf);
-void del_channel_hash_resv_hnode(hash_node *hnode);
-void del_channel_hash_resv(struct ConfItem *aconf);
-
-struct ConfItem *hash_find_resv(const char *name);
-void clear_resv_hash(void);
 
 void hash_stats(struct Client *);
 void hash_get_memusage(hash_type type, size_t *memusage, size_t *entries);

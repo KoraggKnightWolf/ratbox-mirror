@@ -35,6 +35,7 @@
 #ifndef INCLUDED_s_newconf_h
 #define INCLUDED_s_newconf_h
 
+#include <hash.h>
 #ifdef USE_CHALLENGE
 #include <openssl/rsa.h>
 #endif
@@ -257,6 +258,12 @@ void add_nd_entry(const char *name);
 void free_nd_entry(struct nd_entry *);
 unsigned long get_nd_count(void);
 void list_nd_entries(struct Client *);
+
+void add_channel_hash_resv(struct ConfItem *aconf);
+void del_channel_hash_resv_hnode(hash_node *hnode);
+void del_channel_hash_resv(struct ConfItem *aconf);
+
+struct ConfItem *hash_find_resv(const char *name);
 
 
 

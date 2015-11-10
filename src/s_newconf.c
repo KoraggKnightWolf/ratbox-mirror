@@ -845,3 +845,64 @@ find_tgchange(const char *host)
 
 	return NULL;
 }
+
+
+
+/* hash_find_resv()
+ *
+ * hunts for a resv entry in the resv hash table
+ */
+struct ConfItem *
+hash_find_resv(const char *name)
+{
+	struct ConfItem *aconf;
+
+	aconf = hash_find_data(HASH_RESV, name);
+	if(aconf != NULL)
+		aconf->port++;
+
+	return aconf;
+}
+
+void
+add_channel_hash_resv(struct ConfItem *aconf)
+{
+	rb_dlink_list *list;
+	hash_add(HASH_RESV, aconf->host, aconf);
+	if(aconf->flags & CONF_FLAGS_TEMPORARY)
+		list = &resv_channel_temp_list;
+	else
+		list = &resv_channel_perm_list;
+	rb_dlinkAddAlloc(aconf, list);
+}
+
+void
+del_channel_hash_resv(struct ConfItem *aconf)
+{
+	hash_node *hnode;
+	
+	if((hnode = hash_find(HASH_RESV, aconf->host)) == NULL)
+		return;
+	del_channel_hash_resv_hnode(hnode);
+}
+
+void
+del_channel_hash_resv_hnode(hash_node *hnode)
+{
+	rb_dlink_list *list;
+	struct ConfItem *aconf;
+	
+	if(hnode == NULL)
+		return;
+		
+	aconf = hnode->data;
+	if(aconf->flags & CONF_FLAGS_TEMPORARY)
+		list = &resv_channel_temp_list;
+	else
+		list = &resv_channel_perm_list;
+
+	rb_dlinkFindDestroy(aconf, list);
+	hash_del_hnode(HASH_RESV, hnode);
+}
+
+
