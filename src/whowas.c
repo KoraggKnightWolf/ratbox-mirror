@@ -68,7 +68,6 @@ whowas_add_history(struct Client *client_p, bool online)
 	{
 		rb_strlcpy(who->sockhost, client_p->sockhost, sizeof(who->sockhost));
 		who->spoof = IsIPSpoof(client_p);
-
 	}
 	else
 	{
@@ -156,7 +155,6 @@ whowas_trim(void *unused)
 			rb_free(twho);
 		}
         }
-
 }
 
 void
