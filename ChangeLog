@@ -1,3 +1,11 @@
+androsyn    2015/11/10 01:40:04 UTC	(20151110_3-29053)
+  Log:
+  scache allocations now reflect reality(includes the size of the hash table in the scache memory counts too
+
+  Modified:
+	ircd-ratbox/trunk/src/scache.c (File Modified) 
+
+
 androsyn    2015/11/10 01:21:48 UTC	(20151110_2-29051)
   Log:
   use SCACHE_MAX values for scache
