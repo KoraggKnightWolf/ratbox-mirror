@@ -244,7 +244,7 @@ static struct _hash_function hash_function[HASH_LAST] =
 		.name = "Operator", .func = fnv_hash_upper, .table = operhash_table, .hashbits = OPERHASH_MAX_BITS,
 	},
 	[HASH_SCACHE] = {
-		.name = "Server Cache", .func = fnv_hash_upper, .table = scache_table, .hashbits = OPERHASH_MAX_BITS, 
+		.name = "Server Cache", .func = fnv_hash_upper, .table = scache_table, .hashbits = SCACHE_MAX_BITS, 
 	},
 	[HASH_HELP] = {
 		.name = "Help", .func = fnv_hash_upper, .table = helpTable, .hashbits = HELP_MAX_BITS, 
