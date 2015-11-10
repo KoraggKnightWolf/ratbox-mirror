@@ -1,3 +1,11 @@
+androsyn    2015/11/10 01:12:01 UTC	(20151110_1-29049)
+  Log:
+  get rid of redundant test code
+
+  Modified:
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 androsyn    2015/11/10 01:07:05 UTC	(20151110_0-29047)
   Log:
   make operhash and whowas hash report something resembling valid memory stats. extend the hash interface to help with this as well
