@@ -1,3 +1,14 @@
+androsyn    2015/11/10 02:39:12 UTC	(20151110_6-29059)
+  Log:
+  move the channel RESV related code out of hash.c into s_newconf.c with the rest of the resv code
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/s_newconf.c (File Modified) 
+
+
 androsyn    2015/11/10 02:26:00 UTC	(20151110_5-29057)
   Log:
   Move the fnv_ hash functions to be local to hash.c 
