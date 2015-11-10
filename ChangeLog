@@ -1,3 +1,13 @@
+androsyn    2015/11/10 02:26:00 UTC	(20151110_5-29057)
+  Log:
+  Move the fnv_ hash functions to be local to hash.c 
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2015/11/10 02:19:14 UTC	(20151110_4-29055)
   Log:
   make monitor use the hash interface too
