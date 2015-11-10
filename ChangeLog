@@ -1,3 +1,11 @@
+androsyn    2015/11/10 02:41:35 UTC	(20151110_7-29061)
+  Log:
+  whitespace cleanups
+
+  Modified:
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/11/10 02:39:12 UTC	(20151110_6-29059)
   Log:
   move the channel RESV related code out of hash.c into s_newconf.c with the rest of the resv code
