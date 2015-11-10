@@ -44,6 +44,8 @@ struct scache_entry
 	char *server_name;
 };
 
+static size_t scache_allocated = 0;
+
 const char *
 scache_add(const char *name)
 {
@@ -61,14 +63,14 @@ scache_add(const char *name)
 
 	sc = rb_malloc(sizeof(struct scache_entry));
 	sc->server_name = rb_strdup(name);
+	scache_allocated += sizeof(struct scache_entry) + strlen(sc->server_name) + 1;
 	hash_add(HASH_SCACHE, sc->server_name, sc);
 	return sc->server_name;
 }
 
 void
-count_scache(size_t * number, size_t * mem)
+count_scache(size_t *number, size_t *mem)
 {
-
-	*number = 0;
-	*mem = 0;
+	hash_get_memusage(HASH_SCACHE, number, mem);
+	(*mem) += scache_allocated;
 }
