@@ -1,3 +1,14 @@
+androsyn    2015/11/10 02:19:14 UTC	(20151110_4-29055)
+  Log:
+  make monitor use the hash interface too
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/include/monitor.h (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/monitor.c (File Modified) 
+
+
 androsyn    2015/11/10 01:40:04 UTC	(20151110_3-29053)
   Log:
   scache allocations now reflect reality(includes the size of the hash table in the scache memory counts too
