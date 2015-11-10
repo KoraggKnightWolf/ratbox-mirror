@@ -1,3 +1,11 @@
+androsyn    2015/11/10 01:21:48 UTC	(20151110_2-29051)
+  Log:
+  use SCACHE_MAX values for scache
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2015/11/10 01:12:01 UTC	(20151110_1-29049)
   Log:
   get rid of redundant test code
