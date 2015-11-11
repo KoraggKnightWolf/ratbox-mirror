@@ -134,6 +134,10 @@ for x in $WARNLIST; do
 	fi
 done
 
+if cc_accepts_flag -fno-delete-null-pointer-checks; then
+	CFLAGS="$CFLAGS -fno-delete-null-pointer-checks"
+fi
+
 
 LT_CONFIG_LTDL_DIR([libltdl])
 
