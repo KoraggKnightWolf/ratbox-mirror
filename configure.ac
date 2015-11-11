@@ -76,8 +76,8 @@ fi
 
 cc_accepts_flag()
 {
-        cc_accepts_flag_CFLAGS="$CFLAGS"
-        CFLAGS="$*" 
+        cc_accepts_flag_CFLAGS="$CFLAGS" 
+        CFLAGS="$* -Werror" 
         AC_MSG_CHECKING([whether $CC accepts $@])
         AC_COMPILE_IFELSE([AC_LANG_SOURCE([int main(){return 0;}])] ,
         [RC=0; AC_MSG_RESULT([yes])],
@@ -115,6 +115,9 @@ fi
 fi
 fi
 fi
+
+
+
   
 WARNLIST="  
 	all  
@@ -137,7 +140,6 @@ done
 if cc_accepts_flag -fno-delete-null-pointer-checks; then
 	CFLAGS="$CFLAGS -fno-delete-null-pointer-checks"
 fi
-
 
 LT_CONFIG_LTDL_DIR([libltdl])
 
