@@ -1,3 +1,12 @@
+androsyn    2015/11/17 19:30:33 UTC	(20151117_3-29093)
+  Log:
+  really fix the jemalloc/tcmalloc crap
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2015/11/17 19:28:16 UTC	(20151117_2-29091)
   Log:
   fix jemalloc/tcmalloc checks
