@@ -319,9 +319,11 @@ LIBADD_DLD_LINK = @LIBADD_DLD_LINK@
 LIBADD_DLOPEN = @LIBADD_DLOPEN@
 LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
 LIBEXEC_DIR = @LIBEXEC_DIR@
+LIBJEMALLOC = @LIBJEMALLOC@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBTCMALLOC = @LIBTCMALLOC@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -451,8 +453,8 @@ ircd_ratbox_SOURCES = main.c
 @MINGW_TRUE@EXTRA_FLAGS = -no-undefined -Wl,--enable-runtime-pseudo-reloc -export-symbols-regex '*'
 @STATIC_MODULES_FALSE@SUBDIRS = @LTDL_SUBDIR@ libratbox src modules tools doc help bandb ssld resolver
 @STATIC_MODULES_TRUE@SUBDIRS = @LTDL_SUBDIR@ libratbox modules src tools doc help bandb ssld resolver
-@STATIC_MODULES_FALSE@ircd_ratbox_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
-@STATIC_MODULES_TRUE@ircd_ratbox_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)
+@STATIC_MODULES_FALSE@ircd_ratbox_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL) @LIBJEMALLOC@ @LIBTCMALLOC@
+@STATIC_MODULES_TRUE@ircd_ratbox_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN) @LIBJEMALLOC@ @LIBTCMALLOC@
 @STATIC_MODULES_FALSE@ircd_ratbox_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 all: all-recursive
 

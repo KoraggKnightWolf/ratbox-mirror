@@ -86,6 +86,17 @@ Note: These are some special optional parameters to the configure script
   --enable-services
       If your network runs services daemon, this enables extra code to actually
       make it useful on your IRCD. Read doc/services.txt for more information.
+  --enable-jemalloc
+  --enable-tcmalloc
+  --enable-tcmalloc-minimal
+      The above options enable jemalloc or tcmalloc.  Both are an alternate
+      memory allocator. Both tend to perform faster than the default glibc
+      malloc on Linux at least.
+  --enable-ocf-services 
+      This enables the hooks required for OpenChanfix(not packaged with
+      ircd-ratbox)
+
+   
 
 #3 UPGRADING
 

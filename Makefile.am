@@ -26,13 +26,13 @@ if !STATIC_MODULES
 
 SUBDIRS = @LTDL_SUBDIR@ libratbox src modules tools doc help bandb ssld resolver
 
-ircd_ratbox_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL)
+ircd_ratbox_LDADD = libratbox/src/libratbox.la src/libcore.la $(LIBLTDL) @LIBJEMALLOC@ @LIBTCMALLOC@
 ircd_ratbox_LDFLAGS = $(EXTRA_FLAGS) -dlopen self
 
 else
 
 SUBDIRS = @LTDL_SUBDIR@ libratbox modules src tools doc help bandb ssld resolver
-ircd_ratbox_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN)
+ircd_ratbox_LDADD = libratbox/src/libratbox.la modules/libmodules.la src/libcore.la modules/static_modules.o $(LIBLTDL) $(DLOPEN) @LIBJEMALLOC@ @LIBTCMALLOC@
 
 
 endif

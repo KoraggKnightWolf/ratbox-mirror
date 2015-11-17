@@ -69,10 +69,10 @@ libcore_la_LDFLAGS = $(EXTRA_FLAGS) -avoid-version
 
 if MINGW
 libcore_la_DEPENDENCIES = $(LIBLTDL) ../libratbox/src/libratbox.la
-libcore_la_LIBADD = ../libratbox/src/libratbox.la $(LIBLTDL) @OpenSSL_LIBS@
+libcore_la_LIBADD = ../libratbox/src/libratbox.la $(LIBLTDL) @OpenSSL_LIBS@ @LIBJEMALLOC@ @LIBTCMALLOC@
 else
 libcore_la_DEPENDENCIES = ../libratbox/src/libratbox.la
-libcore_la_LIBADD = ../libratbox/src/libratbox.la $(LIBLTDL) @OpenSSL_LIBS@
+libcore_la_LIBADD = ../libratbox/src/libratbox.la $(LIBLTDL) @OpenSSL_LIBS@ @LIBJEMALLOC@ @LIBTCMALLOC@
 endif
 
 

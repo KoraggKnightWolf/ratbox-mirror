@@ -104,6 +104,15 @@
 /* Define if libdlloader will be built on this platform */
 #undef HAVE_LIBDLLOADER
 
+/* Define if you have jemalloc */
+#undef HAVE_LIBJEMALLOC
+
+/* Define if you have tcmalloc */
+#undef HAVE_LIBTCMALLOC
+
+/* Define if you have tcmalloc */
+#undef HAVE_LIBTCMALLOC_MINIMAL
+
 /* Define to 1 if you have the `lstat' function. */
 #undef HAVE_LSTAT
 

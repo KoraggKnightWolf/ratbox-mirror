@@ -195,15 +195,6 @@ AC_HEADER_TIME
 
 AC_CHECK_FUNCS([snprintf vasprintf asprintf lstat stat])
 
-AC_CHECK_TYPES([struct mallinfo],,, [#include <malloc.h>])
-
-
-if test "$ac_cv_type_struct_mallinfo" = yes; then
-  AC_SUBST(ac_cv_have_struct_mallinfo, 1)  
-else
-  AC_SUBST(ac_cv_have_struct_mallinfo, 0)
-fi
-
 dnl Networking Functions
 dnl ====================
 
@@ -236,8 +227,98 @@ AC_INCLUDES_DEFAULT
 
 AC_CHECK_SIZEOF(long)
 
+
 dnl Specialized functions checks
 dnl ============================
+
+
+AC_ARG_WITH([jemalloc],
+	    [AS_HELP_STRING([--with-jemalloc], [enable jemalloc for memory allocations])],
+	    [],
+	    [with_jemalloc=no])
+JEMALLOC=
+AS_IF([test "x$with_jemalloc" = xyes],
+	    [AC_CHECK_LIB([jemalloc], [free],
+	     [AC_SUBST([LIBJEMALLOC], ["-ljemalloc"])
+	       AC_DEFINE([HAVE_LIBJEMALLOC], [1],
+                         [Define if you have jemalloc])
+	       HAVE_LIBJEMALLOC=1
+	     ],
+	    [AC_MSG_FAILURE(
+		  [no jemalloc found (do not use --with-jemalloc)])])])
+AM_CONDITIONAL(WITH_JEMALLOC, [test "$HAVE_LIBJEMALLOC" = "1"])
+
+# tcmalloc-minimal?
+AC_ARG_WITH([tcmalloc-minimal],
+	    [AS_HELP_STRING([--with-tcmalloc-minimal], [enable minimal tcmalloc support for memory allocations])],
+	    [],
+	    [with_tcmalloc_minimal=no])
+
+AS_IF([test "x$with_jemalloc" = "xyes"],[with_tcmalloc_minimal=no],[])
+
+TCMALLOC_MINIMAL=
+AS_IF([test "x$with_tcmalloc_minimal" != xno],
+        [AC_CHECK_LIB([tcmalloc_minimal], [free],
+         [AC_SUBST([LIBTCMALLOC], ["-ltcmalloc_minimal"])
+	       AC_DEFINE([HAVE_LIBTCMALLOC_MINIMAL], [1],
+	       		 [Define if you have tcmalloc])
+	       HAVE_LIBTCMALLOC_MINIMAL=1
+	     ],
+	    [AC_MSG_FAILURE(
+		  [no tcmalloc found (do not use --with-tcmalloc-minimal)])])])
+AM_CONDITIONAL(WITH_TCMALLOC_MINIMAL, [test "$HAVE_LIBTCMALLOC_MINIMAL" = "1"])
+
+# tcmalloc?
+AC_ARG_WITH([tcmalloc],
+	    [AS_HELP_STRING([--with-tcmalloc], [enable tcmalloc for memory allocations])],
+	    [],
+	    [with_tcmalloc=no])
+
+AS_IF([test "x$with_jemalloc" = "xyes"],[with_tcmalloc=no],[])
+AS_IF([test "x$with_tcmalloc_minimal" = "xyes"],[with_tcmalloc=no],[])
+
+TCMALLOC=
+AS_IF([test "x$with_tcmalloc" != xno],
+	    [AC_CHECK_LIB([tcmalloc], [free],
+	     [AC_SUBST([LIBTCMALLOC], ["-ltcmalloc"])
+	       AC_DEFINE([HAVE_LIBTCMALLOC], [1],
+	       		 [Define if you have tcmalloc])
+	       HAVE_LIBTCMALLOC=1
+	     ],
+	    [AC_MSG_FAILURE(
+		  [no tcmalloc found (do not use --with-tcmalloc)])])])
+AM_CONDITIONAL(WITH_TCMALLOC, [test "$HAVE_LIBTCMALLOC" = "1"])
+
+# error out if --with-jemalloc and ! --without-tcmalloc
+if test "x$with_jemalloc" = "xyes"; then
+	if test "x$with_tcmalloc" != "xno"; then
+		AC_MSG_FAILURE([--with-jemalloc called with --with-tcmalloc, cannot enable both!])
+	fi
+fi
+
+
+dnl tcmalloc has mallinfo, jemalloc does not 
+if test "x$with_jemalloc" = "xyes";then
+	ac_cv_type_struct_mallinfo=no
+else
+	AC_CHECK_TYPES([struct mallinfo],,, [#include <malloc.h>])
+fi
+
+if test "$ac_cv_type_struct_mallinfo" = yes; then
+  AC_SUBST(ac_cv_have_struct_mallinfo, 1)  
+else
+  AC_SUBST(ac_cv_have_struct_mallinfo, 0)
+fi
+
+
+if test "x$with_jemalloc" = "xyes" || test "x$with_tcmalloc" = "xyes" || test "x$with_tcmalloc_minimal"; then
+	dnl assume that a compiler supporting -fno-builtin-malloc also supports the rest(aka gcc)
+	if cc_accepts_flag -fno-builtin-malloc; then
+		CFLAGS="$CFLAGS -fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free"
+	fi
+	AC_SUBST(ac_cv_have_struct_mallinfo, 0)  
+fi
+
 
 PKG_CHECK_MODULES([sqlite3], [sqlite3], [cf_enable_sqlite3=yes], [cf_enable_sqlite3=no])
 

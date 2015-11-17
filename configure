@@ -674,8 +674,16 @@ sqlite3_CFLAGS
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
-ALLOCA
 ac_cv_have_struct_mallinfo
+WITH_TCMALLOC_FALSE
+WITH_TCMALLOC_TRUE
+WITH_TCMALLOC_MINIMAL_FALSE
+WITH_TCMALLOC_MINIMAL_TRUE
+LIBTCMALLOC
+WITH_JEMALLOC_FALSE
+WITH_JEMALLOC_TRUE
+LIBJEMALLOC
+ALLOCA
 MINGW_FALSE
 MINGW_TRUE
 LTDL_SUBDIR
@@ -842,6 +850,9 @@ with_ltdl_include
 with_ltdl_lib
 enable_ltdl_install
 enable_ipv6
+with_jemalloc
+with_tcmalloc_minimal
+with_tcmalloc
 enable_openssl
 with_zlib_path
 enable_zlib
@@ -1541,6 +1552,10 @@ Optional Packages:
   --with-included-ltdl    use the GNU ltdl sources included here
   --with-ltdl-include=DIR use the ltdl headers installed in DIR
   --with-ltdl-lib=DIR     use the libltdl.la installed in DIR
+  --with-jemalloc         enable jemalloc for memory allocations
+  --with-tcmalloc-minimal enable minimal tcmalloc support for memory
+                          allocations
+  --with-tcmalloc         enable tcmalloc for memory allocations
   --with-zlib-path=DIR    Path to libz.so for ziplinks support.
   --with-confdir=DIR      Directory to install config files.
   --with-logdir=DIR       Directory where to write logfiles.
@@ -14376,27 +14391,6 @@ fi
 done
 
 
-ac_fn_c_check_type "$LINENO" "struct mallinfo" "ac_cv_type_struct_mallinfo" "#include <malloc.h>
-"
-if test "x$ac_cv_type_struct_mallinfo" = xyes; then :
-
-cat >>confdefs.h <<_ACEOF
-#define HAVE_STRUCT_MALLINFO 1
-_ACEOF
-
-
-fi
-
-
-
-if test "$ac_cv_type_struct_mallinfo" = yes; then
-  ac_cv_have_struct_mallinfo=1
-
-else
-  ac_cv_have_struct_mallinfo=0
-
-fi
-
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing socket" >&5
 $as_echo_n "checking for library containing socket... " >&6; }
@@ -14976,6 +14970,281 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+
+
+
+
+
+# Check whether --with-jemalloc was given.
+if test "${with_jemalloc+set}" = set; then :
+  withval=$with_jemalloc;
+else
+  with_jemalloc=no
+fi
+
+JEMALLOC=
+if test "x$with_jemalloc" = xyes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for free in -ljemalloc" >&5
+$as_echo_n "checking for free in -ljemalloc... " >&6; }
+if ${ac_cv_lib_jemalloc_free+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ljemalloc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char free ();
+int
+main ()
+{
+return free ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_jemalloc_free=yes
+else
+  ac_cv_lib_jemalloc_free=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_jemalloc_free" >&5
+$as_echo "$ac_cv_lib_jemalloc_free" >&6; }
+if test "x$ac_cv_lib_jemalloc_free" = xyes; then :
+  LIBJEMALLOC="-ljemalloc"
+
+
+$as_echo "#define HAVE_LIBJEMALLOC 1" >>confdefs.h
+
+	       HAVE_LIBJEMALLOC=1
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "no jemalloc found (do not use --with-jemalloc)
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+fi
+ if test "$HAVE_LIBJEMALLOC" = "1"; then
+  WITH_JEMALLOC_TRUE=
+  WITH_JEMALLOC_FALSE='#'
+else
+  WITH_JEMALLOC_TRUE='#'
+  WITH_JEMALLOC_FALSE=
+fi
+
+
+# tcmalloc-minimal?
+
+# Check whether --with-tcmalloc-minimal was given.
+if test "${with_tcmalloc_minimal+set}" = set; then :
+  withval=$with_tcmalloc_minimal;
+else
+  with_tcmalloc_minimal=no
+fi
+
+
+if test "x$with_jemalloc" = "xyes"; then :
+  with_tcmalloc_minimal=no
+fi
+
+TCMALLOC_MINIMAL=
+if test "x$with_tcmalloc_minimal" != xno; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for free in -ltcmalloc_minimal" >&5
+$as_echo_n "checking for free in -ltcmalloc_minimal... " >&6; }
+if ${ac_cv_lib_tcmalloc_minimal_free+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcmalloc_minimal  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char free ();
+int
+main ()
+{
+return free ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_tcmalloc_minimal_free=yes
+else
+  ac_cv_lib_tcmalloc_minimal_free=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tcmalloc_minimal_free" >&5
+$as_echo "$ac_cv_lib_tcmalloc_minimal_free" >&6; }
+if test "x$ac_cv_lib_tcmalloc_minimal_free" = xyes; then :
+  LIBTCMALLOC="-ltcmalloc_minimal"
+
+
+$as_echo "#define HAVE_LIBTCMALLOC_MINIMAL 1" >>confdefs.h
+
+	       HAVE_LIBTCMALLOC_MINIMAL=1
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "no tcmalloc found (do not use --with-tcmalloc-minimal)
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+fi
+ if test "$HAVE_LIBTCMALLOC_MINIMAL" = "1"; then
+  WITH_TCMALLOC_MINIMAL_TRUE=
+  WITH_TCMALLOC_MINIMAL_FALSE='#'
+else
+  WITH_TCMALLOC_MINIMAL_TRUE='#'
+  WITH_TCMALLOC_MINIMAL_FALSE=
+fi
+
+
+# tcmalloc?
+
+# Check whether --with-tcmalloc was given.
+if test "${with_tcmalloc+set}" = set; then :
+  withval=$with_tcmalloc;
+else
+  with_tcmalloc=no
+fi
+
+
+if test "x$with_jemalloc" = "xyes"; then :
+  with_tcmalloc=no
+fi
+if test "x$with_tcmalloc_minimal" = "xyes"; then :
+  with_tcmalloc=no
+fi
+
+TCMALLOC=
+if test "x$with_tcmalloc" != xno; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for free in -ltcmalloc" >&5
+$as_echo_n "checking for free in -ltcmalloc... " >&6; }
+if ${ac_cv_lib_tcmalloc_free+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcmalloc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char free ();
+int
+main ()
+{
+return free ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_tcmalloc_free=yes
+else
+  ac_cv_lib_tcmalloc_free=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_tcmalloc_free" >&5
+$as_echo "$ac_cv_lib_tcmalloc_free" >&6; }
+if test "x$ac_cv_lib_tcmalloc_free" = xyes; then :
+  LIBTCMALLOC="-ltcmalloc"
+
+
+$as_echo "#define HAVE_LIBTCMALLOC 1" >>confdefs.h
+
+	       HAVE_LIBTCMALLOC=1
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "no tcmalloc found (do not use --with-tcmalloc)
+See \`config.log' for more details" "$LINENO" 5; }
+fi
+
+fi
+ if test "$HAVE_LIBTCMALLOC" = "1"; then
+  WITH_TCMALLOC_TRUE=
+  WITH_TCMALLOC_FALSE='#'
+else
+  WITH_TCMALLOC_TRUE='#'
+  WITH_TCMALLOC_FALSE=
+fi
+
+
+# error out if --with-jemalloc and ! --without-tcmalloc
+if test "x$with_jemalloc" = "xyes"; then
+	if test "x$with_tcmalloc" != "xno"; then
+		{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "--with-jemalloc called with --with-tcmalloc, cannot enable both!
+See \`config.log' for more details" "$LINENO" 5; }
+	fi
+fi
+
+
+if test "x$with_jemalloc" = "xyes";then
+	ac_cv_type_struct_mallinfo=no
+else
+	ac_fn_c_check_type "$LINENO" "struct mallinfo" "ac_cv_type_struct_mallinfo" "#include <malloc.h>
+"
+if test "x$ac_cv_type_struct_mallinfo" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_STRUCT_MALLINFO 1
+_ACEOF
+
+
+fi
+
+fi
+
+if test "$ac_cv_type_struct_mallinfo" = yes; then
+  ac_cv_have_struct_mallinfo=1
+
+else
+  ac_cv_have_struct_mallinfo=0
+
+fi
+
+
+if test "x$with_jemalloc" = "xyes" || test "x$with_tcmalloc" = "xyes" || test "x$with_tcmalloc_minimal"; then
+		if cc_accepts_flag -fno-builtin-malloc; then
+		CFLAGS="$CFLAGS -fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free"
+	fi
+	ac_cv_have_struct_mallinfo=0
+
+fi
 
 
 
@@ -16038,6 +16307,18 @@ if test -z "${MINGW_TRUE}" && test -z "${MINGW_FALSE}"; then
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
+if test -z "${WITH_JEMALLOC_TRUE}" && test -z "${WITH_JEMALLOC_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_JEMALLOC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_TCMALLOC_MINIMAL_TRUE}" && test -z "${WITH_TCMALLOC_MINIMAL_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_TCMALLOC_MINIMAL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_TCMALLOC_TRUE}" && test -z "${WITH_TCMALLOC_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_TCMALLOC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${BUILD_SQLITE_TRUE}" && test -z "${BUILD_SQLITE_FALSE}"; then
   as_fn_error $? "conditional \"BUILD_SQLITE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
