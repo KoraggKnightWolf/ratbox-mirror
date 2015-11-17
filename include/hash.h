@@ -105,14 +105,14 @@ typedef enum
 } hash_type;
 
 
-typedef struct _hash_node
+struct _hash_node
 {
 	rb_dlink_node node;
 	void *key;
 	size_t keylen;
 	void *data;
 	uint32_t hashv;
-} hash_node;
+};
 
 
 
