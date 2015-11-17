@@ -291,8 +291,8 @@ AM_CONDITIONAL(WITH_TCMALLOC, [test "$HAVE_LIBTCMALLOC" = "1"])
 
 # error out if --with-jemalloc and ! --without-tcmalloc
 if test "x$with_jemalloc" = "xyes"; then
-	if test "x$with_tcmalloc" != "xno"; then
-		AC_MSG_FAILURE([--with-jemalloc called with --with-tcmalloc, cannot enable both!])
+	if test "x$with_tcmalloc" = "xyes" || test "x$with_tcmalloc_minimal" = "xyes"; then
+		AC_MSG_FAILURE([--with-jemalloc called with --with-tcmalloc/--with-tcmalloc-minimal, cannot enable both!])
 	fi
 fi
 

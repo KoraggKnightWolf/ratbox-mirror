@@ -15204,10 +15204,10 @@ fi
 
 # error out if --with-jemalloc and ! --without-tcmalloc
 if test "x$with_jemalloc" = "xyes"; then
-	if test "x$with_tcmalloc" != "xno"; then
+	if test "x$with_tcmalloc" = "xyes" || test "x$with_tcmalloc_minimal" = "xyes"; then
 		{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "--with-jemalloc called with --with-tcmalloc, cannot enable both!
+as_fn_error $? "--with-jemalloc called with --with-tcmalloc/--with-tcmalloc-minimal, cannot enable both!
 See \`config.log' for more details" "$LINENO" 5; }
 	fi
 fi
