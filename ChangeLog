@@ -1,3 +1,26 @@
+androsyn    2015/11/17 18:51:40 UTC	(20151117_1-29083)
+  Log:
+  add support for building against either jemalloc or tcmalloc
+
+  Modified:
+	ircd-ratbox/trunk/INSTALL (File Modified) 
+	ircd-ratbox/trunk/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/bandb/sqlite3/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+	ircd-ratbox/trunk/contrib/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/help/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/include/setup.h.in (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/resolver/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/src/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/ssld/Makefile.in (File Modified) 
+	ircd-ratbox/trunk/tools/Makefile.in (File Modified) 
+
+
 androsyn    2015/11/17 18:01:13 UTC	(20151117_0-29081)
   Log:
   don't redefine the typedef for hash_node
