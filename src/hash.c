@@ -576,17 +576,16 @@ hash_free_tablelist(rb_dlink_list *table)
 }	
 
 static void
-output_hash(struct Client *source_p, const char *name, int length, int *counts, unsigned long deepest)
+output_hash(struct Client *source_p, const char *name, unsigned long length, unsigned long *counts, unsigned long deepest)
 {
 	unsigned long total = 0;
-	int i;
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :%s Hash Statistics", name);
 
-	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :Size: %d Empty: %d (%.3f%%)",
+	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :Size: %lu Empty: %lu (%.3f%%)",
 			   length, counts[0], (float)((counts[0] * 100) / (float)length));
 
-	for(i = 1; i < 11; i++)
+	for(unsigned long i = 1; i < 11; i++)
 	{
 		total += (counts[i] * i);
 	}
@@ -599,19 +598,19 @@ output_hash(struct Client *source_p, const char *name, int length, int *counts, 
 				   (float)(total / (length - counts[0])), (float)(total / length), deepest);
 	}
 	
-	for(i = 1; i < IRCD_MIN(11, deepest+1); i++)
+	for(unsigned long i = 1; i < IRCD_MIN(11, deepest+1); i++)
 	{
-		sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :Nodes with %d entries: %d", i, counts[i]);
+		sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :Nodes with %lu entries: %lu", i, counts[i]);
 	}
 }
 
 
 static void
-count_hash(struct Client *source_p, rb_dlink_list * table, int length, const char *name)
+count_hash(struct Client *source_p, rb_dlink_list * table, unsigned int length, const char *name)
 {
-	int counts[11];
+	unsigned long counts[11];
 	unsigned long deepest = 0;
-	int i;
+	unsigned long i;
 
 	memset(counts, 0, sizeof(counts));
 
@@ -632,7 +631,7 @@ count_hash(struct Client *source_p, rb_dlink_list * table, int length, const cha
 void
 hash_stats(struct Client *source_p)
 {
-	for(int i = 0; i < HASH_LAST; i++)
+	for(unsigned int i = 0; i < HASH_LAST; i++)
 	{
 		count_hash(source_p, hash_function[i].table, 1<<hash_function[i].hashbits, hash_function[i].name);
 		sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");			
