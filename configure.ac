@@ -311,7 +311,7 @@ else
 fi
 
 
-if test "x$with_jemalloc" = "xyes" || test "x$with_tcmalloc" = "xyes" || test "x$with_tcmalloc_minimal"; then
+if test "x$with_jemalloc" = "xyes" || test "x$with_tcmalloc" = "xyes" || test "x$with_tcmalloc_minimal" = "xyes"; then
 	dnl assume that a compiler supporting -fno-builtin-malloc also supports the rest(aka gcc)
 	if cc_accepts_flag -fno-builtin-malloc; then
 		CFLAGS="$CFLAGS -fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free"
