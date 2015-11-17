@@ -1,3 +1,11 @@
+androsyn    2015/11/17 18:01:13 UTC	(20151117_0-29081)
+  Log:
+  don't redefine the typedef for hash_node
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+
+
 androsyn    2015/11/11 05:57:06 UTC	(20151111_1-29077)
   Log:
   tweak cc_accepts_flags a litle
