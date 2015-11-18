@@ -1,3 +1,12 @@
+androsyn    2015/11/18 15:14:19 UTC	(20151118_0-29099)
+  Log:
+  add connect certfp support
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2015/11/17 20:19:37 UTC	(20151117_4-29097)
   Log:
   have the hash stats code use unsigned long throughout
