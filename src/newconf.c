@@ -1931,6 +1931,13 @@ conf_set_connect_class(confentry_t * entry, conf_t * conf, struct conf_items *it
 }
 
 static void
+conf_set_connect_certfp(confentry_t * entry, conf_t * conf, struct conf_items *item)
+{
+	rb_free(t_server->certfp);
+	t_server->certfp = rb_strdup(entry->string);
+}
+
+static void
 conf_set_connect_leaf_mask(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
 	struct remote_conf *t_leaf;
@@ -2634,6 +2641,7 @@ static struct conf_items conf_connect_table[] =
 	{ "hub_mask",	CF_QSTRING, conf_set_connect_hub_mask,	0, NULL },
 	{ "leaf_mask",	CF_QSTRING, conf_set_connect_leaf_mask,	0, NULL },
 	{ "class",	CF_QSTRING, conf_set_connect_class,	0, NULL },
+	{ "certfp", 	CF_QSTRING, conf_set_connect_certfp,	0, NULL },
 	{ "\0",	0, NULL, 0, NULL }
 };
 

@@ -89,6 +89,7 @@ enum
 	INVALID_HOST = -3,
 	INVALID_SERVERNAME = -4,
 	NEED_SSL = -5,
+	INVALID_CERTFP = -6
 };
 
 
@@ -180,6 +181,16 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 				     name);
 		ilog(L_SERVER, "Access denied, requires SSL/TLS but is plaintext from %s",
 		     log_client_name(client_p, SHOW_IP));
+
+		exit_client(client_p, client_p, client_p,
+			    "Access denied, requires SSL/TLS but is plaintext");
+		return 0;
+	case INVALID_CERTFP:
+		sendto_realops_flags(UMODE_ALL, L_ALL,
+				     "Connection from servername %s has an invalid CERTFP: [%s]",
+				     name, EmptyString(client_p->certfp) ? "" : client_p->certfp);
+		ilog(L_SERVER, "Connection from server %s has an invalid CERTFP: [%s]",
+		     log_client_name(client_p, SHOW_IP), EmptyString(client_p->certfp) ? "" : client_p->certfp);
 
 		exit_client(client_p, client_p, client_p,
 			    "Access denied, requires SSL/TLS but is plaintext");
@@ -721,10 +732,19 @@ check_server(const char *name, struct Client *client_p)
 	if(server_p == NULL)
 		return error;
 
-	if(ServerConfSSL(server_p) && client_p->localClient->ssl_ctl == NULL)
+	if(ServerConfSSL(server_p) && !IsSSL(client_p))
 	{
 		return NEED_SSL;
 	}
+	
+	if(!EmptyString(server_p->certfp))
+	{
+		if(EmptyString(client_p->certfp) || strcasecmp(server_p->certfp, client_p->certfp))
+                {
+                	return INVALID_CERTFP;
+                }
+        }
+ 
 
 	attach_server_conf(client_p, server_p);
 
