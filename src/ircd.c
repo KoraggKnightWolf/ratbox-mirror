@@ -620,7 +620,6 @@ ratbox_main(int argc, char *argv[])
 	init_main_logfile(logFileName);
 	init_hash();
 	init_host_hash();
-	clear_hash_parse();
 	init_client();
 	init_channels();
 	initclass();

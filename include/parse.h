@@ -67,17 +67,8 @@ struct Message
 };
 
 
-#define MAX_MSG_HASH 512	/* don't change this unless you know what you are doing */
 #define MAXPARA	   15
 
-struct MessageHash
-{
-	char *cmd;
-	struct Message *msg;
-	struct MessageHash *next;
-};
-
-extern struct MessageHash *msg_hash_table[];
 void parse(struct Client *, char *, char *);
 int string_to_array(char *string, char *parv[]);
 void handle_encap(struct Client *, struct Client *, const char *, int, const char *parv[]);

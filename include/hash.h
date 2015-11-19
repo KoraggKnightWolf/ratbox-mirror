@@ -81,6 +81,10 @@ typedef struct _hash_node hash_node;
 #define MONITOR_MAX_BITS 16
 #define MONITOR_MAX (1<<MONITOR_MAX_BITS)
 
+/* command hash */
+#define COMMAND_MAX_BITS 9
+#define COMMAND_MAX (1<<COMMAND_MAX_BITS)
+
 #define HASH_WALK(i, max, ptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH(ptr, table[i].head)
 #define HASH_WALK_SAFE(i, max, ptr, nptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH_SAFE(ptr, nptr, table[i].head)
 #define HASH_WALK_END }
@@ -101,6 +105,7 @@ typedef enum
 	HASH_ZCONNID,
 	HASH_WHOWAS,
 	HASH_MONITOR,
+	HASH_COMMAND,
 	HASH_LAST
 } hash_type;
 

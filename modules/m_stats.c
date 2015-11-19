@@ -679,27 +679,28 @@ stats_klines(struct Client *source_p)
 	}
 }
 
+
+
+static void
+list_msg_cb(void *data, void *cbptr)
+{
+	struct Client *source_p = (struct Client *)cbptr;
+	struct Message *msg = (struct Message *)data;
+
+	if(source_p == NULL || msg == NULL)
+		return;
+
+	sendto_one_numeric(source_p, s_RPL(RPL_STATSCOMMANDS), 
+		  	   msg->cmd, msg->count, msg->bytes, msg->rcount);
+}
+
+
 static void
 stats_messages(struct Client *source_p)
 {
-	int i;
-	struct MessageHash *ptr;
-
-	for(i = 0; i < MAX_MSG_HASH; i++)
-	{
-		for(ptr = msg_hash_table[i]; ptr; ptr = ptr->next)
-		{
-			s_assert(ptr->msg != NULL);
-			s_assert(ptr->cmd != NULL);
-
-			sendto_one_numeric(source_p, RPL_STATSCOMMANDS,
-					   form_str(RPL_STATSCOMMANDS),
-					   ptr->cmd, ptr->msg->count,
-					   ptr->msg->bytes, ptr->msg->rcount);
-		}
-	}
-	send_pop_queue(source_p);
+	hash_walkall(HASH_COMMAND, list_msg_cb, source_p);
 }
+
 
 static void
 stats_oper(struct Client *source_p)

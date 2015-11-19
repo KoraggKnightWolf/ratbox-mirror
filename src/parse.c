@@ -54,11 +54,6 @@ static void do_numeric(char[], struct Client *, struct Client *, int, char **);
 
 static int handle_command(struct Message *, struct Client *, struct Client *, int, const char **);
 
-static uint32_t cmd_hash(const char *p);
-static struct Message *hash_parse(const char *);
-
-struct MessageHash *msg_hash_table[MAX_MSG_HASH];
-
 static char buffer[IRCD_BUFSIZE * 2];
 
 /* turn a string into a parc/parv pair */
@@ -214,7 +209,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 		if((s = strchr(ch, ' ')))
 			*s++ = '\0';
 
-		mptr = hash_parse(ch);
+		mptr = hash_find_data(HASH_COMMAND, ch);
 
 		/* no command or its encap only, error */
 		if(!mptr || !mptr->cmd)
@@ -366,7 +361,7 @@ handle_encap(struct Client *client_p, struct Client *source_p, const char *comma
 
 	parv[0] = source_p->name;
 
-	mptr = hash_parse(command);
+	mptr = hash_find_data(HASH_COMMAND, command);
 
 	if(mptr == NULL || mptr->cmd == NULL)
 		return;
@@ -378,21 +373,6 @@ handle_encap(struct Client *client_p, struct Client *source_p, const char *comma
 		return;
 
 	(*handler) (client_p, source_p, parc, parv);
-}
-
-/*
- * clear_hash_parse()
- *
- * inputs	-
- * output	- NONE
- * side effects - MUST MUST be called at startup ONCE before
- *		  any other keyword hash routine is used.
- *
- */
-void
-clear_hash_parse()
-{
-	memset(msg_hash_table, 0, sizeof(msg_hash_table));
 }
 
 /* mod_add_cmd
@@ -407,38 +387,17 @@ clear_hash_parse()
 void
 mod_add_cmd(struct Message *msg)
 {
-	struct MessageHash *ptr;
-	struct MessageHash *last_ptr = NULL;
-	struct MessageHash *new_ptr;
-	int msgindex;
-
 	s_assert(msg != NULL);
 	if(msg == NULL)
 		return;
 
-	msgindex = cmd_hash(msg->cmd);
-
-	for(ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
-	{
-		if(strcasecmp(msg->cmd, ptr->cmd) == 0)
-			return;	/* Its already added */
-		last_ptr = ptr;
-	}
-
-	new_ptr = rb_malloc(sizeof(struct MessageHash));
-
-	new_ptr->next = NULL;
-	new_ptr->cmd = rb_strdup(msg->cmd);
-	new_ptr->msg = msg;
-
+	if(hash_find(HASH_COMMAND, msg->cmd) != NULL)
+		return;
+	
+	hash_add(HASH_COMMAND, msg->cmd, msg);
 	msg->count = 0;
 	msg->rcount = 0;
 	msg->bytes = 0;
-
-	if(last_ptr == NULL)
-		msg_hash_table[msgindex] = new_ptr;
-	else
-		last_ptr->next = new_ptr;
 }
 
 /* mod_del_cmd
@@ -450,78 +409,14 @@ mod_add_cmd(struct Message *msg)
 void
 mod_del_cmd(struct Message *msg)
 {
-	struct MessageHash *ptr;
-	struct MessageHash *last_ptr = NULL;
-	int msgindex;
+	hash_node *hnode;
 
-	s_assert(msg != NULL);
-	if(msg == NULL)
-		return;
+	hnode = hash_find(HASH_COMMAND, msg->cmd);
 
-	msgindex = cmd_hash(msg->cmd);
-
-	for(ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
-	{
-		if(strcasecmp(msg->cmd, ptr->cmd) == 0)
-		{
-			rb_free(ptr->cmd);
-			if(last_ptr != NULL)
-				last_ptr->next = ptr->next;
-			else
-				msg_hash_table[msgindex] = ptr->next;
-			rb_free(ptr);
-			return;
-		}
-		last_ptr = ptr;
-	}
+	if(hnode != NULL)
+		hash_del_hnode(HASH_COMMAND, hnode);
+	return;
 }
-
-/* hash_parse
- *
- * inputs	- command name
- * output	- pointer to struct Message
- * side effects - 
- */
-static struct Message *
-hash_parse(const char *cmd)
-{
-	struct MessageHash *ptr;
-	int msgindex;
-
-	msgindex = cmd_hash(cmd);
-
-	for(ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
-	{
-		if(strcasecmp(cmd, ptr->cmd) == 0)
-			return (ptr->msg);
-	}
-
-	return NULL;
-}
-
-/*
- * hash
- *
- * inputs	- char string
- * output	- hash index
- * side effects - NONE
- *
- * BUGS		- This was a horrible hash function, now its an okay one...
- */
-static uint32_t
-cmd_hash(const char *p)
-{
-	uint32_t hash_val = 0, q = 1, n;
-
-	while(*p)
-	{
-		n = ToUpper(*p++);
-		hash_val += ((n) + (q++ << 1)) ^ ((n) << 2);
-	}
-	/* note that 9 comes from 2^9 = MAX_MSG_HASH */
-	return (hash_val >> (32 - 9)) ^ (hash_val & (MAX_MSG_HASH - 1));
-}
-
 
 /* cancel_clients()
  *

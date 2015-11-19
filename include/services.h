@@ -34,12 +34,12 @@ typedef enum {
 
 
 typedef int (*SVCMessageHandler) (struct Client *, struct Client *, int, const char *[], int);
-
+#define SVC_MSG_HASH 512
 /* service structure */
 struct Service
 {
 	rb_dlink_node node;
-	rb_dlink_list command_tbl[MAX_MSG_HASH]; 
+	rb_dlink_list command_tbl[SVC_MSG_HASH]; 
 	SVCMessageHandler unknown;
 	struct Client *client_p;
 };
