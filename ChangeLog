@@ -1,3 +1,11 @@
+androsyn    2015/11/19 01:59:22 UTC	(20151119_3-29107)
+  Log:
+  move various defines for hash.c into hash.c from hash.h
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2015/11/19 01:57:16 UTC	(20151119_2-29105)
   Log:
   do the cast too
