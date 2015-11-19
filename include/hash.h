@@ -34,60 +34,11 @@ typedef struct _hash_node hash_node;
 #include <cache.h>
 #include <s_newconf.h>
 
-/* Magic value for FNV hash functions */
-#define FNV1_32_INIT 0x811c9dc5UL
-
-#define HELP_MAX_BITS 7
-#define HELP_MAX (1<<HELP_MAX_BITS)
-
-#define ND_MAX_BITS 
-
-/* Client hash table size, used in hash.c/s_debug.c */
-#define U_MAX_BITS 17
-#define U_MAX (1<<U_MAX_BITS)
-
-/* Client connid hash table size, used in hash.c */
-#define CLI_CONNID_MAX_BITS 12
-#define CLI_CONNID_MAX (1<<CLI_CONNID_MAX_BITS)
-
-#define CLI_ZCONNID_MAX_BITS 7
-#define CLI_ZCONNID_MAX (1<<CLI_ZCONNID_MAX_BITS)
-
-/* Channel hash table size, hash.c/s_debug.c */
-#define CH_MAX_BITS 16
-#define CH_MAX (1<<CH_MAX_BITS)	/* 2^16 */
-
-/* hostname hash table size */
-#define HOST_MAX_BITS 17
-#define HOST_MAX (1<<HOST_MAX_BITS)	/* 2^17 */
-
-/* RESV/XLINE hash table size, used in hash.c */
-#define R_MAX_BITS 10
-#define R_MAX (1<<R_MAX_BITS)	/* 2^10 */
-
-/* operhash */
-#define OPERHASH_MAX_BITS 10
-#define OPERHASH_MAX (1<<OPERHASH_MAX_BITS)
-
-/* scache hash */
-#define SCACHE_MAX_BITS 8
-#define SCACHE_MAX (1<<SCACHE_MAX_BITS)
-
-/* whowas hash */
-#define WHOWAS_MAX_BITS 17
-#define WHOWAS_MAX (1<<WHOWAS_MAX_BITS)
-
-/* monitor hash */
-#define MONITOR_MAX_BITS 16
-#define MONITOR_MAX (1<<MONITOR_MAX_BITS)
-
-/* command hash */
-#define COMMAND_MAX_BITS 9
-#define COMMAND_MAX (1<<COMMAND_MAX_BITS)
-
 #define HASH_WALK(i, max, ptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH(ptr, table[i].head)
 #define HASH_WALK_SAFE(i, max, ptr, nptr, table) for (i = 0; i < max; i++) { RB_DLINK_FOREACH_SAFE(ptr, nptr, table[i].head)
 #define HASH_WALK_END }
+
+
 
 typedef enum
 {
@@ -109,7 +60,6 @@ typedef enum
 	HASH_LAST
 } hash_type;
 
-
 struct _hash_node
 {
 	rb_dlink_node node;
@@ -118,8 +68,6 @@ struct _hash_node
 	void *data;
 	uint32_t hashv;
 };
-
-
 
 typedef void hash_destroy_cb(void *data);
 typedef void hash_walk_cb(void *a, void *);

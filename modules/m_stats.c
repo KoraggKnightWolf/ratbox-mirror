@@ -1314,11 +1314,13 @@ stats_memory(struct Client *source_p)
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "z :Whowas entries: %zu, memory used: %zu",
 		 whowas_count, whowas_memory);
 
+/* XXX need to have the hash.c code report its memory usage 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :Hash: client %u(%zu) chan %u(%zu)",
 			   U_MAX, (U_MAX * sizeof(rb_dlink_list)),
 			   CH_MAX, (CH_MAX * sizeof(rb_dlink_list)));
-
+ */
+ 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG,
 			   "z :linebuf %zu(%zu)", rb_linebuf_count, rb_linebuf_memory_used);
 
