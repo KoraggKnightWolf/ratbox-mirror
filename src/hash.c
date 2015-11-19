@@ -239,36 +239,21 @@ free_hashnode(hash_node *hnode)
 }
 
 
-static
-bool hash_irccmp(const void *x, const void *y, size_t unusued)
-{
-	/* the size parameter is unused as it is assumed if you are using
-	 * hash_irccmp, you are using C strings... */
-	return (irccmp(x, y) != 0) ? false : true;
-}
-
-static 
-bool hash_strcmp(const void *x, const void *y, size_t unusued)
-{
-	return (strcmp(x, y) != 0) ? false : true;
-}
-
-static
-bool connid_cmp(const void *x, const void *y, size_t cmpsize)
-{
-	return (memcmp(x, y, cmpsize) != 0) ? false : true;
-}
-
-
-
 typedef bool hash_cmp(const void *x, const void *y, size_t len);
+
+typedef enum
+{
+	CMP_IRCCMP = 0,
+	CMP_STRCMP = 1,
+	CMP_MEMCMP = 2,
+} hash_cmptype;
 
 
 struct _hash_function
 {
 	const char *name;
 	uint32_t(*func) (unsigned const char *, unsigned int, size_t);
-	hash_cmp *cmpfunc;
+	hash_cmptype cmptype;
 	rb_dlink_list *table;
 	unsigned int hashbits;
 	unsigned int hashlen;
@@ -283,7 +268,7 @@ static struct _hash_function hash_function[HASH_LAST] =
 		.name = "NICK", .func = fnv_hash_upper, .table = clientTable, .hashbits = U_MAX_BITS, 
 	},
 	[HASH_ID] = { 
-		.name = "ID", .func = fnv_hash, .table = idTable, .hashbits = U_MAX_BITS, .cmpfunc = hash_strcmp,
+		.name = "ID", .func = fnv_hash, .table = idTable, .hashbits = U_MAX_BITS, .cmptype = CMP_STRCMP,
 	},
 	[HASH_CHANNEL] = { 
 		.name = "Channel", .func = fnv_hash_upper_len, .table = channelTable, .hashbits = CH_MAX_BITS, .hashlen = 30,
@@ -310,10 +295,10 @@ static struct _hash_function hash_function[HASH_LAST] =
 		.name = "Nick Delay", .func = fnv_hash_upper, .table = ndTable, .hashbits = U_MAX_BITS,
 	},
 	[HASH_CONNID] = {
-		.name = "Connection ID", .func = fnv_hash_len_data, .table = clientbyconnidTable, .hashbits = CLI_CONNID_MAX_BITS, .cmpfunc = connid_cmp, .hashlen = sizeof(uint32_t)
+		.name = "Connection ID", .func = fnv_hash_len_data, .table = clientbyconnidTable, .hashbits = CLI_CONNID_MAX_BITS, .cmptype = CMP_MEMCMP, .hashlen = sizeof(uint32_t)
 	},
 	[HASH_ZCONNID] = {
-		.name = "Ziplinks ID", .func = fnv_hash_len_data, .table = clientbyzconnidTable, .hashbits = CLI_ZCONNID_MAX_BITS, .cmpfunc = connid_cmp, .hashlen = sizeof(uint32_t)
+		.name = "Ziplinks ID", .func = fnv_hash_len_data, .table = clientbyzconnidTable, .hashbits = CLI_ZCONNID_MAX_BITS, .cmptype = CMP_MEMCMP, .hashlen = sizeof(uint32_t)
 	},
 	[HASH_WHOWAS] = { 
 		.name = "WHOWAS", .func = fnv_hash_upper, .table = whowas_table, .hashbits = WHOWAS_MAX_BITS, 
@@ -331,15 +316,20 @@ static struct _hash_function hash_function[HASH_LAST] =
 #define hfunc(type, hashindex, hashlen) (hash_function[type].func((unsigned const char *)hashindex, hash_function[type].hashbits, hashlen))	
 
 static inline
-bool hash_do_cmp(hash_type type, const void *x, const void *y, size_t len)
+int hash_do_cmp(hash_type type, const void *x, const void *y, size_t len)
 {
-	hash_cmp *hcmpfunc = hash_function[type].cmpfunc;
+	hash_cmptype cmptype = hash_function[type].cmptype;
 
-	/* don't use the function pointer to hash_irccmp so that we 
-	 * can get an inlined version of it */
-	if(hcmpfunc != NULL && hcmpfunc != hash_irccmp)
-		return hcmpfunc(x, y, len);
-	return hash_irccmp(x, y, len);	
+	switch(cmptype)
+	{
+		case CMP_IRCCMP:
+			return irccmp(x, y);
+		case CMP_STRCMP:
+			return strcmp(x, y);
+		case CMP_MEMCMP:
+			return memcmp(x, y, len);
+	}
+	return -1;
 }
 
 
@@ -380,7 +370,7 @@ hash_find_list_len(hash_type type, const void *hashindex, size_t size)
 	RB_DLINK_FOREACH(ptr, table[hashv].head)
 	{
 		hash_node *hnode = ptr->data;
-		if(hash_do_cmp(type, hashindex, hnode->key, hashlen) == true)
+		if(hash_do_cmp(type, hashindex, hnode->key, hashlen) == 0)
 			rb_dlinkAddAlloc(hnode->data, results);
 	}	
 	if(rb_dlink_list_length(results) == 0)
@@ -424,10 +414,8 @@ hash_find_len(hash_type type, const void *hashindex, size_t size)
 	{
 		hash_node *hnode = ptr->data;
 		
-		if(hash_do_cmp(type, hashindex, hnode->key, hashlen) == true)
-		{
+		if(hash_do_cmp(type, hashindex, hnode->key, hashlen) == 0)
 			return hnode;
-		}
 	}	
 	return NULL;
 }
@@ -449,7 +437,6 @@ hash_find_data_len(hash_type type, const void *hashindex, size_t size)
 		return NULL;
 	return hnode->data;
 }
-
 
 void *
 hash_find_data(hash_type type, const char *hashindex)
@@ -490,7 +477,6 @@ hash_add(hash_type type, const char *hashindex, void *pointer)
 	return hash_add_len(type, hashindex, strlen(hashindex)+1, pointer);
 }
 
-
 void
 hash_del_len(hash_type type, const void *hashindex, size_t size, void *pointer)
 {
@@ -518,8 +504,6 @@ hash_del_len(hash_type type, const void *hashindex, size_t size, void *pointer)
 			return;		
 		}
 	}					    
-	
-
 }
 
 
@@ -564,8 +548,6 @@ hash_destroyall(hash_type type, hash_destroy_cb *destroy_cb)
 		destroy_cb(cbdata);
 	}
 	HASH_WALK_END;
-
-
 }
 
 void
