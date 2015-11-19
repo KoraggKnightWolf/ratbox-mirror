@@ -1,3 +1,12 @@
+androsyn    2015/11/19 01:59:33 UTC	(20151119_4-29109)
+  Log:
+  move various defines for hash.c into hash.c from hash.h
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+
+
 androsyn    2015/11/19 01:59:22 UTC	(20151119_3-29107)
   Log:
   move various defines for hash.c into hash.c from hash.h
