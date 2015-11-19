@@ -51,7 +51,7 @@ operhash_add(const char *name)
 	if(EmptyString(name))
 		return NULL;
 		
-	if((ohash = hash_find_data(HASH_OPER, name)) != NULL)
+	if((ohash = (struct operhash_entry *)hash_find_data(HASH_OPER, name)) != NULL)
 	{
 		ohash->refcount++;
 		return ohash->name;
