@@ -1,3 +1,11 @@
+androsyn    2015/11/19 01:57:16 UTC	(20151119_2-29105)
+  Log:
+  do the cast too
+
+  Modified:
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 androsyn    2015/11/19 01:56:43 UTC	(20151119_1-29103)
   Log:
   use hash_find_data in operhash_add
