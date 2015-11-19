@@ -1,3 +1,11 @@
+androsyn    2015/11/19 04:00:12 UTC	(20151119_6-29113)
+  Log:
+  rework hash_do_cmp a little
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2015/11/19 02:50:53 UTC	(20151119_5-29111)
   Log:
   Remove string_to_array, replace with rb_string_to_array.  
