@@ -1,3 +1,17 @@
+androsyn    2015/11/19 01:43:30 UTC	(20151119_0-29101)
+  Log:
+  move command hash into the hash.c code as well
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/include/parse.h (File Modified) 
+	ircd-ratbox/trunk/include/services.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_stats.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2015/11/18 15:14:19 UTC	(20151118_0-29099)
   Log:
   add connect certfp support
