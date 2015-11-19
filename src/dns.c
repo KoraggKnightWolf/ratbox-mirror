@@ -281,19 +281,19 @@ parse_dns_reply(rb_helper * helper)
 	char *parv[MAXPARA + 1];
 	while((len = rb_helper_read(helper, dnsBuf, sizeof(dnsBuf))) > 0)
 	{
-		parc = string_to_array(dnsBuf, parv);	/* we shouldn't be using this here, but oh well */
+		parc = rb_string_to_array(dnsBuf, parv, MAXPARA+1); 
 
-		if(*parv[1] == 'R')
+		if(*parv[0] == 'R')
 		{
-			if(parc != 6)
+			if(parc != 5)
 			{
-				ilog(L_MAIN, "Resolver sent a result with wrong number of arguments");
+				ilog(L_MAIN, "Resolver sent a result with wrong number of arguments: got %d", parc);
 				restart_resolver();
 				return;
 			}
-			results_callback(parv[2], parv[3], parv[4], parv[5]);
+			results_callback(parv[1], parv[2], parv[3], parv[4]);
 		}
-		else if(*parv[1] == 'A')
+		else if(*parv[0] == 'A')
 		{
 			parse_nameservers(parv, parc);
 		}

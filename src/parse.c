@@ -56,58 +56,6 @@ static int handle_command(struct Message *, struct Client *, struct Client *, in
 
 static char buffer[IRCD_BUFSIZE * 2];
 
-/* turn a string into a parc/parv pair */
-
-
-int
-string_to_array(char *string, char **parv)
-{
-	char *p, *buf = string;
-	int x = 1;
-
-	parv[x] = NULL;
-	while(*buf == ' ')	/* skip leading spaces */
-		buf++;
-	if(*buf == '\0')	/* ignore all-space args */
-		return x;
-
-	do
-	{
-		if(*buf == ':')	/* Last parameter */
-		{
-			buf++;
-			parv[x++] = buf;
-			parv[x] = NULL;
-			return x;
-		}
-		else
-		{
-			parv[x++] = buf;
-			parv[x] = NULL;
-			if((p = strchr(buf, ' ')) != NULL)
-			{
-				*p++ = '\0';
-				buf = p;
-			}
-			else
-				return x;
-		}
-		while(*buf == ' ')
-			buf++;
-		if(*buf == '\0')
-			return x;
-	}
-	/* we can go upto parv[MAXPARA], as parv[0] is taken by source */
-	while(x < MAXPARA);
-
-	if(*p == ':')
-		p++;
-
-	parv[x++] = p;
-	parv[x] = NULL;
-	return x;
-}
-
 /* parse()
  *
  * given a raw buffer, parses it and generates parv, parc and sender
@@ -246,8 +194,13 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 	if(*end == '\r')
 		*end = '\0';
 
+
+	/* ugh. so rb_string_to_array isn't brain damaged like the original one
+	 * however..so accomdate the old behavior, pass &para[1] 
+	 * and add + 1 to i...the rest of this mess can e fixed 
+	 */
 	if(s != NULL)
-		i = string_to_array(s, para);
+		i = rb_string_to_array(s, &para[1], MAXPARA) + 1; 
 
 	if(mptr == NULL)
 	{

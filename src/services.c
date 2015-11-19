@@ -299,7 +299,7 @@ parse_services_message(struct Client *client_p, struct Client *target_p, const c
 		return;
 
 	if(s != NULL)
-		i = string_to_array(s, para);
+		i = rb_string_to_array(s, &para[1], MAXPARA) + 1;
 	para[0] = ch;
 
 	handle_command(mptr, client_p, target_p, i, /* XXX discards const!!! */ (const char **) (uintptr_t) para,
