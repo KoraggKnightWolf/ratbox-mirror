@@ -47,14 +47,12 @@ const char *
 operhash_add(const char *name)
 {
 	struct operhash_entry *ohash;
-	hash_node *hnode;
 
 	if(EmptyString(name))
 		return NULL;
 		
-	if((hnode = hash_find(HASH_OPER, name)) != NULL)
+	if((ohash = hash_find_data(HASH_OPER, name)) != NULL)
 	{
-		ohash = hnode->data;
 		ohash->refcount++;
 		return ohash->name;
 	}
