@@ -40,6 +40,56 @@
 #include <s_stats.h>
 
 
+/* Magic value for FNV hash functions */
+#define FNV1_32_INIT 0x811c9dc5UL
+
+#define HELP_MAX_BITS 7
+#define HELP_MAX (1<<HELP_MAX_BITS)
+
+/* Client hash table size, used in hash.c/s_debug.c */
+#define U_MAX_BITS 17
+#define U_MAX (1<<U_MAX_BITS)
+
+/* Client connid hash table size, used in hash.c */
+#define CLI_CONNID_MAX_BITS 12
+#define CLI_CONNID_MAX (1<<CLI_CONNID_MAX_BITS)
+
+#define CLI_ZCONNID_MAX_BITS 7
+#define CLI_ZCONNID_MAX (1<<CLI_ZCONNID_MAX_BITS)
+
+/* Channel hash table size, hash.c/s_debug.c */
+#define CH_MAX_BITS 16
+#define CH_MAX (1<<CH_MAX_BITS)	/* 2^16 */
+
+/* hostname hash table size */
+#define HOST_MAX_BITS 17
+#define HOST_MAX (1<<HOST_MAX_BITS)	/* 2^17 */
+
+/* RESV/XLINE hash table size, used in hash.c */
+#define R_MAX_BITS 10
+#define R_MAX (1<<R_MAX_BITS)	/* 2^10 */
+
+/* operhash */
+#define OPERHASH_MAX_BITS 10
+#define OPERHASH_MAX (1<<OPERHASH_MAX_BITS)
+
+/* scache hash */
+#define SCACHE_MAX_BITS 8
+#define SCACHE_MAX (1<<SCACHE_MAX_BITS)
+
+/* whowas hash */
+#define WHOWAS_MAX_BITS 17
+#define WHOWAS_MAX (1<<WHOWAS_MAX_BITS)
+
+/* monitor hash */
+#define MONITOR_MAX_BITS 16
+#define MONITOR_MAX (1<<MONITOR_MAX_BITS)
+
+/* command hash */
+#define COMMAND_MAX_BITS 9
+#define COMMAND_MAX (1<<COMMAND_MAX_BITS)
+
+
 static rb_dlink_list clientbyconnidTable[CLI_CONNID_MAX];
 static rb_dlink_list clientbyzconnidTable[CLI_ZCONNID_MAX];	
 static rb_dlink_list clientTable[U_MAX];
