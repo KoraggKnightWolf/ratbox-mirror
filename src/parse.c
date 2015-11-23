@@ -42,10 +42,8 @@
 /*
  * NOTE: parse() should not be called recursively by other functions!
  */
-static char *sender;
 
 /* parv[0] == source, and parv[LAST] == NULL */
-static char *para[MAXPARA + 2];
 
 static void cancel_clients(struct Client *, struct Client *);
 static void remove_unknown(struct Client *, char *, char *);
@@ -53,8 +51,6 @@ static void remove_unknown(struct Client *, char *, char *);
 static void do_numeric(char[], struct Client *, struct Client *, int, char **);
 
 static int handle_command(struct Message *, struct Client *, struct Client *, int, const char **);
-
-static char buffer[IRCD_BUFSIZE * 2];
 
 /* parse()
  *
@@ -64,6 +60,9 @@ void
 parse(struct Client *client_p, char *pbuffer, char *bufend)
 {
 	struct Client *from = client_p;
+	static char *para[MAXPARA + 2];
+	static char *sender;
+
 	char *ch;
 	char *s;
 	char *end;
@@ -449,7 +448,7 @@ do_numeric(char numeric[], struct Client *client_p, struct Client *source_p, int
 {
 	struct Client *target_p;
 	struct Channel *chptr;
-
+	static char buffer[IRCD_BUFSIZE * 2];
 	if(parc < 2 || !IsServer(source_p))
 		return;
 
