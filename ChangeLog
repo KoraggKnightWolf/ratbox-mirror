@@ -1,3 +1,11 @@
+androsyn    2015/11/23 04:49:30 UTC	(20151123_4-29129)
+  Log:
+  make buffer, para and sender local to the functions that use them, i'm still not sure if the static could be discarded though...
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2015/11/23 02:49:58 UTC	(20151123_3-29127)
   Log:
   move get_or_create_channel to modules/core/m_join.c, remove allocate_channel/free_channel and just use rb_malloc/rb_free for chptr/chptr->chname
