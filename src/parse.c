@@ -160,7 +160,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 		mptr = hash_find_data(HASH_COMMAND, ch);
 
 		/* no command or its encap only, error */
-		if(!mptr || !mptr->cmd)
+		if(mptr == NULL || mptr->cmd == NULL)
 		{
 			/*
 			 * Note: Give error message *only* to recognized
