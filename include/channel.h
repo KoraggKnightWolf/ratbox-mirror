@@ -181,9 +181,6 @@ struct ChCapCombo
 extern rb_dlink_list global_channel_list;
 void init_channels(void);
 
-struct Channel *allocate_channel(const char *chname);
-void free_channel(struct Channel *chptr);
-struct Channel *get_or_create_channel(struct Client *client_p, const char *chname, int *isnew);
 struct Channel *find_channel(const char *name);
 
 struct Ban *allocate_ban(const char *, const char *);
