@@ -1,3 +1,11 @@
+androsyn    2015/11/23 01:42:27 UTC	(20151123_0-29121)
+  Log:
+  cast size parameter to rb_socklen_t for rb_inet_ntop_sock
+
+  Modified:
+	ircd-ratbox/trunk/src/ipv4_from_ipv6.c (File Modified) 
+
+
 androsyn    2015/11/19 04:00:12 UTC	(20151119_6-29113)
   Log:
   rework hash_do_cmp a little
