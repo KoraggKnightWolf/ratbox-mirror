@@ -1,3 +1,13 @@
+androsyn    2015/11/23 02:49:58 UTC	(20151123_3-29127)
+  Log:
+  move get_or_create_channel to modules/core/m_join.c, remove allocate_channel/free_channel and just use rb_malloc/rb_free for chptr/chptr->chname
+
+  Modified:
+	ircd-ratbox/trunk/include/channel.h (File Modified) 
+	ircd-ratbox/trunk/modules/core/m_join.c (File Modified) 
+	ircd-ratbox/trunk/src/channel.c (File Modified) 
+
+
 androsyn    2015/11/23 02:15:05 UTC	(20151123_2-29125)
   Log:
   use == NULL instead of ! to check for null pointers
