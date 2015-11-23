@@ -69,7 +69,7 @@ const char *ipv4_from_ipv6_p(const struct sockaddr_in6 *restrict ip6, char *buf,
 	if(ipv4_from_ipv6(ip6, &in) == false)
 		return NULL;
 	
-	return rb_inet_ntop_sock((struct sockaddr *)&in, buf, bufsiz);
+	return rb_inet_ntop_sock((struct sockaddr *)&in, buf, (rb_socklen_t)bufsiz);
 }
 
 
