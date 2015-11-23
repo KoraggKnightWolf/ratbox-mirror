@@ -193,7 +193,7 @@ mr_server(struct Client *client_p, struct Client *source_p, int parc, const char
 		     log_client_name(client_p, SHOW_IP), EmptyString(client_p->certfp) ? "" : client_p->certfp);
 
 		exit_client(client_p, client_p, client_p,
-			    "Access denied, requires SSL/TLS but is plaintext");
+			    "Access denied, invalid certificate");
 		return 0;
 	default:
 		break;
