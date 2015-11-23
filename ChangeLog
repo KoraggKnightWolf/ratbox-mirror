@@ -1,3 +1,11 @@
+androsyn    2015/11/23 14:57:08 UTC	(20151123_5-29131)
+  Log:
+  return invalid certificate if certfp does not match
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_server.c (File Modified) 
+
+
 androsyn    2015/11/23 04:49:30 UTC	(20151123_4-29129)
   Log:
   make buffer, para and sender local to the functions that use them, i'm still not sure if the static could be discarded though...
