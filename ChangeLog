@@ -1,3 +1,11 @@
+androsyn    2015/11/23 01:45:47 UTC	(20151123_1-29123)
+  Log:
+  use size_t to restore the return value from strlen()
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2015/11/23 01:42:27 UTC	(20151123_0-29121)
   Log:
   cast size parameter to rb_socklen_t for rb_inet_ntop_sock
