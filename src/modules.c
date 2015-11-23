@@ -262,8 +262,7 @@ load_all_modules(int warn)
 	struct dirent *ldirent = NULL;
 	char module_fq_name[PATH_MAX + 1];
 	char module_dir_name[PATH_MAX + 1];
-	int len;
-	int ext_len = strlen(SHLIBEXT);
+	size_t ext_len = strlen(SHLIBEXT);
 	modules_init();
 
 	rb_strlcpy(module_dir_name, AUTOMODPATH, sizeof(module_dir_name));
@@ -284,7 +283,7 @@ load_all_modules(int warn)
 
 	while((ldirent = readdir(system_module_dir)) != NULL)
 	{
-		len = strlen(ldirent->d_name);
+		size_t len = strlen(ldirent->d_name);
 
 		if((len > ext_len) && !strcmp(ldirent->d_name + len - ext_len, shext))
 		{
