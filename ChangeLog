@@ -1,3 +1,11 @@
+androsyn    2015/11/23 02:15:05 UTC	(20151123_2-29125)
+  Log:
+  use == NULL instead of ! to check for null pointers
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2015/11/23 01:45:47 UTC	(20151123_1-29123)
   Log:
   use size_t to restore the return value from strlen()
