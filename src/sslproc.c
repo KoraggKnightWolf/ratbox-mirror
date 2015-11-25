@@ -783,6 +783,7 @@ void
 start_zlib_session(void *data)
 {
 	struct Client *server = (struct Client *)data;
+	char buf[READBUF_SIZE];
 	uint16_t recvqlen;
 	int8_t level;
 	void *xbuf;
@@ -810,7 +811,6 @@ start_zlib_session(void *data)
 		exit_client(server, server, server, "ssld readbuf exceeded");
 		return;
 	}
-	char *buf = rb_malloc(len);
 
 	level = ConfigFileEntry.compression_level;
 
@@ -842,7 +842,7 @@ start_zlib_session(void *data)
 		sendto_realops_flags(UMODE_ALL, L_ALL, "Error creating zlib socketpair - %s", strerror(errno));
 		ilog(L_MAIN, "Error creating zlib socketpairs - %s", strerror(errno));
 		exit_client(server, server, server, "Error creating zlib socketpair");
-		goto out;
+		return;
 	}
 
 
@@ -852,11 +852,9 @@ start_zlib_session(void *data)
 
 	server->localClient->z_ctl = which_ssld();
 	if(server->localClient->z_ctl == NULL)
-		goto out; 
+		return;
 	server->localClient->z_ctl->cli_count++;
 	ssl_cmd_write_queue(server->localClient->z_ctl, F, 2, buf, len);
-out:
-	rb_free(buf);
 }
 
 static void
