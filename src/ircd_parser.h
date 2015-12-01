@@ -64,7 +64,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 154 "ircd_parser.y" /* yacc.c:1909  */
+#line 157 "ircd_parser.y" /* yacc.c:1909  */
 
 	int 		number;
 	char 		string[IRCD_BUFSIZE + 1];

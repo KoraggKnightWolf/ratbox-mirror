@@ -87,6 +87,7 @@ conf_get_yesno_value(char *str)
 static void
 free_cur_list(conf_parm_t* list)
 {
+        conf_parm_t *next;
 	switch (list->type & CF_MTYPE)
 	{
 		case CF_STRING:
@@ -96,11 +97,13 @@ free_cur_list(conf_parm_t* list)
 		case CF_LIST:
 			free_cur_list(list->v.list);
 			break;
-		default: break;
+		default: 
+		        break;
 	}
-
-	if (list->next)
-		free_cur_list(list->next);
+	next = list->next;
+	rb_free(list);
+	if (next != NULL)
+		free_cur_list(next);
 }
 
 		

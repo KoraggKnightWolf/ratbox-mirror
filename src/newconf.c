@@ -403,7 +403,10 @@ del_entry(conf_t * conf, confentry_t * entry)
 			default:
 				break;
 			}
+			rb_free(xentry->entryname);
+			rb_free(xentry->filename);
 			rb_dlinkDelete(&xentry->node, &entry->flist);
+			rb_free(xentry);
 		}
 	}
 	else
@@ -421,6 +424,7 @@ del_entry(conf_t * conf, confentry_t * entry)
 	default:
 		break;
 	}
+	rb_free(entry->entryname);
 	rb_free(entry->filename);
 	rb_dlinkDelete(&entry->node, &conf->entries);
 
