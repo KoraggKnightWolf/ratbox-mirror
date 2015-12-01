@@ -39,13 +39,61 @@
 #include <send.h>
 #include <s_log.h>
 
+struct whowas_top
+{
+        char *name;
+        rb_dlink_list wwlist;
+        hash_node *hnode;
+};
+
 static rb_dlink_list *whowas_list;
 static unsigned int whowas_list_length = NICKNAMEHISTORYLENGTH;
 static void whowas_trim(void *unused);
 
+static void
+whowas_free_wtop(struct whowas_top *wtop)
+{
+        if(rb_dlink_list_length(&wtop->wwlist) == 0)
+        {
+                hash_del_hnode(HASH_WHOWAS, wtop->hnode);
+                rb_free(wtop->name);
+                rb_free(wtop);
+        }
+}
+
+static struct whowas_top *
+whowas_get_top(const char *name)
+{
+        hash_node *hnode;
+        struct whowas_top *wtop;
+        hnode = hash_find(HASH_WHOWAS, name);
+	
+	if(hnode != NULL)
+	{
+		return (struct whowas_top *)hnode->data;
+	}
+	
+        wtop = rb_malloc(sizeof(struct whowas_top));
+        wtop->name = rb_strdup(name);
+        hnode = hash_add(HASH_WHOWAS, name, wtop);
+        wtop->hnode = hnode;
+        return wtop;
+}
+
+rb_dlink_list *
+whowas_get_list(const char *name)
+{
+        struct whowas_top *wtop;
+        wtop = hash_find_data(HASH_WHOWAS, name);
+        if(wtop == NULL)
+                return NULL;
+        return &wtop->wwlist;
+}
+
 void
 whowas_add_history(struct Client *client_p, bool online)
 {
+	struct whowas_top *wtop;
         whowas_t *who;
 	s_assert(NULL != client_p);
 
@@ -55,8 +103,12 @@ whowas_add_history(struct Client *client_p, bool online)
 	/* trim some of the entries if we're getting well over our history length */
 	if(rb_dlink_list_length(whowas_list) > whowas_list_length + 100)
 		whowas_trim(NULL);
+
+
+        wtop = whowas_get_top(client_p->name);
                 
         who = rb_malloc(sizeof(whowas_t));
+        who->wtop = wtop;
 	who->logoff = rb_current_time();
 
 	rb_strlcpy(who->name, client_p->name, sizeof(who->name));
@@ -89,10 +141,10 @@ whowas_add_history(struct Client *client_p, bool online)
 	else
 		who->online = NULL;
 
-	who->hnode = hash_add(HASH_WHOWAS, client_p->name, who);
-	
+        rb_dlinkAdd(who, &who->wnode, &wtop->wwlist);
 	rb_dlinkAdd(who, &who->whowas_node, whowas_list);
 }
+
 
 void
 whowas_off_history(struct Client *client_p)
@@ -110,27 +162,24 @@ whowas_off_history(struct Client *client_p)
 struct Client *
 whowas_get_history(const char *nick, time_t timelimit)
 {
-	rb_dlink_list *list;
+        struct whowas_top *wtop;
 	rb_dlink_node *ptr;
-	struct Client *client_p = NULL;
 
-	list = hash_find_list(HASH_WHOWAS, nick);
-	if(list == NULL)
-		return NULL;
+	wtop = hash_find_data(HASH_WHOWAS, nick);
+	if(wtop == NULL)
+	        return NULL;
 
 	timelimit = rb_current_time() - timelimit;
 
- 	RB_DLINK_FOREACH_PREV(ptr, list->tail)
+ 	RB_DLINK_FOREACH_PREV(ptr, wtop->wwlist.tail)
 	{
 		whowas_t *who = ptr->data;
 		if(who->logoff >= timelimit)
 		{
-			client_p = who->online;
-			break;
+			return who->online;
 		}
 	}
-	hash_free_list(list);
-	return client_p;
+	return NULL;;
 }
 
 static void
@@ -150,8 +199,9 @@ whowas_trim(void *unused)
 			whowas_t *twho = whowas_list->tail->data;
 			if(twho->online != NULL)
 				rb_dlinkDelete(&twho->cnode, &twho->online->whowas_clist);
-			hash_del_hnode(HASH_WHOWAS, twho->hnode);
+			rb_dlinkDelete(&twho->wnode, &twho->wtop->wwlist);
 			rb_dlinkDelete(&twho->whowas_node, whowas_list);
+			whowas_free_wtop(twho->wtop);
 			rb_free(twho);
 		}
         }
@@ -179,7 +229,10 @@ whowas_set_size(int len)
 void
 whowas_memory_usage(size_t *count, size_t *memused)
 {
-	hash_get_memusage(HASH_WHOWAS, count, memused);
+        size_t hcount;
+	hash_get_memusage(HASH_WHOWAS, &hcount, memused);
+        *count = rb_dlink_list_length(whowas_list);
 	*memused += *count * sizeof(whowas_t);
+	*memused += sizeof(struct whowas_top) * hcount;
 }
 

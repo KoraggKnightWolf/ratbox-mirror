@@ -26,10 +26,12 @@
 #ifndef INCLUDED_whowas_h
 #define INCLUDED_whowas_h
 
+struct whowas_top;
 
 typedef struct _whowas
 {
-	hash_node *hnode;		/* hash table node */
+        struct whowas_top *wtop;
+        rb_dlink_node wnode;		/* for the wtop linked list */
 	rb_dlink_node cnode;		/* node for online clients */
 	rb_dlink_node whowas_node;	/* node for the whowas linked list */
 	char name[NICKLEN+1];
@@ -76,6 +78,8 @@ void whowas_off_history(struct Client *);
 struct Client *whowas_get_history(const char *, time_t);
 					/* Nick name */
 					/* Time limit in seconds */
+rb_dlink_list *whowas_get_list(const char *name);
+
 
 void whowas_set_size(int whowas_length);
 void whowas_memory_usage(size_t *count, size_t *memused);

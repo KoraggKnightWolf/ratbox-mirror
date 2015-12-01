@@ -98,7 +98,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 	nick = parv[1];
 
 
-	whowas_list = hash_find_list(HASH_WHOWAS, nick);
+	whowas_list = whowas_get_list(nick);
 
 	if(whowas_list == NULL)
 	{
@@ -108,7 +108,7 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 	
 	}
 	
-	RB_DLINK_FOREACH_PREV(ptr, whowas_list->tail)
+	RB_DLINK_FOREACH(ptr, whowas_list->head)
 	{
 		whowas_t *temp = ptr->data;
 
@@ -132,7 +132,6 @@ m_whowas(struct Client *client_p, struct Client *source_p, int parc, const char 
 		if(max > 0 && cur >= max)
 			break;
 	}
-	hash_free_list(whowas_list);
 	sendto_one_numeric(source_p, s_RPL(RPL_ENDOFWHOWAS), parv[1]);
 	return 0;
 }
