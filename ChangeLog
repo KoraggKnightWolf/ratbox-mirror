@@ -1,3 +1,14 @@
+androsyn    2015/12/01 20:32:10 UTC	(20151201_1-29137)
+  Log:
+  eliminate some memory leaks on rehash
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd_parser.c (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.h (File Modified) 
+	ircd-ratbox/trunk/src/ircd_parser.y (File Modified) 
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2015/12/01 18:12:23 UTC	(20151201_0-29135)
   Log:
   Do whowas a little differently.  Each nickname in the hash table gets added via a linked list off of a struct whowas_node.  This eliminates the whowas hash table getting quite deep with multiples of the same nick
