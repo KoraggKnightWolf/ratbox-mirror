@@ -1,3 +1,11 @@
+androsyn    2015/12/02 19:17:03 UTC	(20151202_7-29157)
+  Log:
+  in conf_set_generic_value_cb, if the pointer to the memory location is != NULL free the location
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2015/12/02 19:16:22 UTC	(20151202_6-29155)
   Log:
   move the memset of ServerInfo etc to before set_default_conf otherwise we end up clobbering what we just did...
