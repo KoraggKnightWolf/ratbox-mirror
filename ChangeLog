@@ -1,3 +1,16 @@
+androsyn    2015/12/02 20:25:14 UTC	(20151202_8-29159)
+  Log:
+  - Clear out old E lines(aka exempts) correctly before rehash
+  - RB_PATRICIA_WALK is not safe for removal, work around this...
+  
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/reject.c (File Modified) 
+	ircd-ratbox/trunk/src/s_conf.c (File Modified) 
+
+
 androsyn    2015/12/02 19:17:03 UTC	(20151202_7-29157)
   Log:
   in conf_set_generic_value_cb, if the pointer to the memory location is != NULL free the location
