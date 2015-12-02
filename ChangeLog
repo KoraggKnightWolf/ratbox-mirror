@@ -1,3 +1,11 @@
+androsyn    2015/12/02 17:16:35 UTC	(20151202_1-29141)
+  Log:
+  don't leak a struct module on modunload
+
+  Modified:
+	ircd-ratbox/trunk/src/modules.c (File Modified) 
+
+
 androsyn    2015/12/02 17:02:05 UTC	(20151202_0-29139)
   Log:
   eliminate more memory leaks on rehash
