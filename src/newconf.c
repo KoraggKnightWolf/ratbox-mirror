@@ -922,6 +922,8 @@ conf_set_generic_value_cb(confentry_t * entry, conf_t * conf, struct conf_items 
 		break;
 	case CF_STRING:
 	case CF_QSTRING:
+		if(*location != NULL)
+			rb_free(*location);
 		if(item->len)
 			*location = rb_strndup(entry->string, item->len);
 		else
