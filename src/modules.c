@@ -616,7 +616,8 @@ unload_one_module(struct module *mod, int warn)
 	mod_del_list(mod);
 	
 	rb_free(mod->name);
-
+	rb_free(mod);
+	
 	if(warn == 1)
 	{
 		ilog(L_MAIN, "Module %s unloaded", name);
