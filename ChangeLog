@@ -1,3 +1,11 @@
+androsyn    2015/12/02 18:55:45 UTC	(20151202_4-29151)
+  Log:
+  free memory for conf->subname
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2015/12/02 18:25:49 UTC	(20151202_3-29145)
   Log:
   remove fprintfs
