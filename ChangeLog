@@ -1,3 +1,11 @@
+androsyn    2015/12/02 18:25:49 UTC	(20151202_3-29145)
+  Log:
+  remove fprintfs
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2015/12/02 17:53:58 UTC	(20151202_2-29143)
   Log:
   - Fix memory leak in rbl rehash code
