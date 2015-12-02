@@ -658,9 +658,10 @@ rbl_destroy(rbl_t *t, bool freeing)
 		rb_dlinkDelete(&answer->node, &t->answers);
 		rbl_free_answer(answer);
 	}
-	rb_dlinkDestroy(&t->node, &rbl_lists);
-	
-	
+	rb_dlinkDelete(&t->node, &rbl_lists);
+	rb_free(t->rblname);
+	rb_free(t->mo_answer);
+	rb_free(t);
 }
 
 static char *
@@ -878,13 +879,13 @@ rbl_check_rbls(struct AuthRequest *auth)
 void
 rbl_add_rbl_to_rbllists(rbl_t *rbl)
 {
-        rb_dlinkAddAlloc(rbl, &rbl_lists);
+        rb_dlinkAdd(rbl, &rbl->node, &rbl_lists);
 }
 
 void
 rbl_del_rbl_from_rblists(rbl_t *rbl)
 {
-        rb_dlinkFindDestroy(rbl, &rbl_lists);
+        rb_dlinkFindDelete(rbl, &rbl_lists);
 }
 
 void

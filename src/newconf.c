@@ -2185,6 +2185,13 @@ conf_set_blacklist_start(conf_t * conf)
 		rb_free(t_answer);
 		t_answer = NULL;
 	}
+	if(t_match != NULL)
+	{
+		fprintf(stderr, "freeing t_match - start: %s %p\n", t_match, t_match);
+
+		rb_free(t_match);
+		t_match = NULL;
+	}
 	t_rbl = rbl_create(conf->subname);
 	rbl_set_aftype(t_rbl, true, false);	
 }
@@ -2199,6 +2206,12 @@ conf_set_blacklist_end(conf_t * conf)
 		rb_free(t_answer);
 		t_answer = NULL;
 	}
+	if(t_match != NULL)
+	{
+		fprintf(stderr, "freeing t_match - end: %s %p\n", t_match, t_match);
+		rb_free(t_match);
+		t_match = NULL;
+	}
 	
 	if(t_rbl != NULL)
 		t_rbl = NULL;
@@ -2207,14 +2220,19 @@ conf_set_blacklist_end(conf_t * conf)
 static void
 conf_set_blacklist_match(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
+	if(t_match != NULL)
+	{
+		fprintf(stderr, "freeing t_match - match: %s %p\n", t_match, t_match);
+		rb_free(t_match);
+	}
 	t_match = rb_strdup(entry->string);
+	fprintf(stderr, "allocated t_match: %s %p\n", t_match, t_match);
 }
 
 static void
 conf_set_blacklist_answer(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	t_answer = rb_strdup(entry->string);
-	rbl_add_answer(t_rbl, t_match, t_answer);
+	rbl_add_answer(t_rbl, t_match, entry->string);
 }
 
 static void
