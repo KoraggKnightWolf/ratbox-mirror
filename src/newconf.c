@@ -585,10 +585,11 @@ conf_end_block(void)
 // add_entry(conf_t *conf, const char *name, void *value, int type)
 
 static void
-add_entry_flist(conf_t * conf, const char *name, conf_parm_t * cp)
+add_entry_flist(conf_t * conf, const char *name, conf_parm_t * parm)
 {
 	confentry_t *entry = rb_malloc(sizeof(confentry_t));
 	confentry_t *sub;
+	conf_parm_t *next, *cp;
 	if(name == NULL)
 	{
 		return;
@@ -596,8 +597,8 @@ add_entry_flist(conf_t * conf, const char *name, conf_parm_t * cp)
 	entry->entryname = rb_strdup(name);
 	entry->line = lineno;
 	entry->filename = rb_strdup(current_file);
-	entry->type = cp->type | CF_FLIST;
-	for(; cp != NULL; cp = cp->next)
+	entry->type = parm->type | CF_FLIST;
+	RB_DLINK_FOREACH_SAFE(cp, next, parm)
 	{
 		sub = rb_malloc(sizeof(confentry_t));
 		sub->entryname = rb_strdup(name);
@@ -619,6 +620,7 @@ add_entry_flist(conf_t * conf, const char *name, conf_parm_t * cp)
 		case CF_STRING:
 		case CF_QSTRING:
 			sub->string = rb_strdup(cp->v.string);
+			rb_free(cp->v.string);
 			sub->type = cp->type;
 			break;
 		default:
@@ -626,6 +628,7 @@ add_entry_flist(conf_t * conf, const char *name, conf_parm_t * cp)
 			return;
 		}
 		rb_dlinkAddTail(sub, &sub->node, &entry->flist);
+		rb_free(cp);
 	}
 
 	rb_dlinkAddTail(entry, &entry->node, &conf->entries);
@@ -634,7 +637,7 @@ add_entry_flist(conf_t * conf, const char *name, conf_parm_t * cp)
 int
 conf_call_set(char *item, conf_parm_t * value, int type)
 {
-	conf_parm_t *cp;
+	conf_parm_t *cp, *next;
 	cp = value->v.list;
 
 	if(value->type & CF_FLIST)
@@ -643,13 +646,14 @@ conf_call_set(char *item, conf_parm_t * value, int type)
 		return 0;
 	}
 
-	for(; cp != NULL; cp = cp->next)
+	RB_DLINK_FOREACH_SAFE(cp, next, value->v.list)
 	{
 		switch (CF_TYPE(cp->type))
 		{
 		case CF_STRING:
 		case CF_QSTRING:
 			add_entry(curconf, item, (void *)cp->v.string, cp->type);
+			rb_free(cp->v.string);
 			break;
 		case CF_TIME:
 		case CF_INT:
@@ -662,7 +666,9 @@ conf_call_set(char *item, conf_parm_t * value, int type)
 			break;
 
 		}
+		rb_free(cp);
 	}
+
 
 	return 0;
 }
