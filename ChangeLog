@@ -1,3 +1,11 @@
+androsyn    2015/12/02 21:07:00 UTC	(20151202_10-29163)
+  Log:
+  don't add hub/leaf masks to the hubleaf list until after the connect block is ended.  Also cleanup remote_confs correctly
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2015/12/02 20:36:42 UTC	(20151202_9-29161)
   Log:
   add remove_exempts to reject.h
