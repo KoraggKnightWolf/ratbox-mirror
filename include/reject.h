@@ -37,6 +37,8 @@ int remove_reject(const char *ip);
 struct ConfItem *find_dline(struct sockaddr *addr);
 struct ConfItem *find_dline_exact(struct sockaddr *addr, unsigned int bitlen);
 void remove_dline(struct ConfItem *aconf);
+void remove_exempts(void);
+
 int add_dline(struct ConfItem *aconf);
 int add_eline(struct ConfItem *aconf);
 void report_dlines(struct Client *);
