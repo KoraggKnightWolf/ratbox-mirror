@@ -1,3 +1,17 @@
+androsyn    2015/12/02 17:53:58 UTC	(20151202_2-29143)
+  Log:
+  - Fix memory leak in rbl rehash code
+  - Fix error related to using rb_dlinkDestroy on a rb_dlink_node allocated as part of a struct.  Amazingly this code didn't blow up 
+    as it was doing an rb_free on the node, which happened to be at the top of the struct, thus free() wasn't complaining as we weren't 
+    trying to free this rbl list elsewhere....
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2015/12/02 17:16:35 UTC	(20151202_1-29141)
   Log:
   don't leak a struct module on modunload
