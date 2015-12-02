@@ -443,6 +443,7 @@ del_conf(conf_t * conf)
 	}
 	rb_free(conf->confname);
 	rb_free(conf->filename);
+	rb_free(conf->subname);
 	rb_dlinkDelete(&conf->node, &conflist);
 	rb_free(conf);
 }
