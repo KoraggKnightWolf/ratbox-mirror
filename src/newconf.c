@@ -1817,6 +1817,9 @@ conf_set_general_compression_level(confentry_t * entry, conf_t * conf, struct co
 }
 
 static struct server_conf *t_server;
+static struct remote_conf *t_hub;
+static struct remote_conf *t_leaf;
+
 static void
 conf_set_start_connect(conf_t * conf)
 {
@@ -1826,6 +1829,14 @@ conf_set_start_connect(conf_t * conf)
 	t_server = make_server_conf();
 	t_server->port = PORTNUM;
 	t_server->name = rb_strdup(conf->subname);
+	
+	if(t_hub != NULL)
+		free_remote_conf(t_hub);
+	if(t_leaf != NULL)
+		free_remote_conf(t_leaf);
+
+	t_hub = NULL;
+	t_leaf = NULL;
 }
 
 
@@ -1835,21 +1846,22 @@ conf_set_end_connect(conf_t * conf)
 	if(EmptyString(t_server->name))
 	{
 		conf_report_warning_nl("Ignoring connect block at %s:%d -- missing name", conf->filename, conf->line);
-		return;
+		goto cleanup;
 	}
 
 	if(EmptyString(t_server->passwd) || EmptyString(t_server->spasswd))
 	{
 		conf_report_warning_nl("Ignoring connect block for %s at %s:%d -- missing password",
 				       conf->subname, conf->filename, conf->line);
-		return;
+			fprintf(stderr, "ignoring connect block: %p\n", t_server);
+		goto cleanup;
 	}
 
 	if(EmptyString(t_server->host))
 	{
 		conf_report_warning_nl("Ignoring connect block for %s at %s:%d -- missing host",
 				       conf->subname, conf->filename, conf->line);
-		return;
+		goto cleanup;
 	}
 
 #ifndef HAVE_ZLIB
@@ -1859,9 +1871,28 @@ conf_set_end_connect(conf_t * conf)
 	}
 #endif
 
+	if(t_leaf != NULL) 
+		rb_dlinkAdd(t_leaf, &t_leaf->node, &hubleaf_conf_list);
+	if(t_hub != NULL)
+		rb_dlinkAdd(t_hub, &t_hub->node, &hubleaf_conf_list);
+
+	t_leaf = NULL;
+	t_hub = NULL;
+
 	add_server_conf(t_server);
 	rb_dlinkAdd(t_server, &t_server->node, &server_conf_list);
 	t_server = NULL;
+	return;
+cleanup:
+	free_server_conf(t_server);
+	if(t_hub != NULL)
+		free_remote_conf(t_hub);
+	if(t_leaf != NULL)
+		free_remote_conf(t_leaf);
+	t_server = NULL;
+	t_hub = NULL;
+	t_leaf = NULL;
+	
 }
 
 static void
@@ -1953,31 +1984,29 @@ conf_set_connect_certfp(confentry_t * entry, conf_t * conf, struct conf_items *i
 static void
 conf_set_connect_leaf_mask(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	struct remote_conf *t_leaf;
-
 	if(EmptyString(t_server->name))
 		return;
+	if(t_leaf != NULL)
+		free_remote_conf(t_leaf);
 
 	t_leaf = make_remote_conf();
 	t_leaf->flags = CONF_LEAF;
 	t_leaf->host = rb_strdup(entry->string);
 	t_leaf->server = rb_strdup(t_server->name);
-	rb_dlinkAdd(t_leaf, &t_leaf->node, &hubleaf_conf_list);
 }
 
 static void
 conf_set_connect_hub_mask(confentry_t * entry, conf_t * conf, struct conf_items *item)
 {
-	struct remote_conf *t_hub;
-
 	if(EmptyString(t_server->name))
 		return;
+	if(t_hub != NULL)
+		free_remote_conf(t_hub);
 
 	t_hub = make_remote_conf();
 	t_hub->flags = CONF_HUB;
 	t_hub->host = rb_strdup(entry->string);
 	t_hub->server = rb_strdup(t_server->name);
-	rb_dlinkAdd(t_hub, &t_hub->node, &hubleaf_conf_list);
 }
 
 
