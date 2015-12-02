@@ -1,3 +1,11 @@
+androsyn    2015/12/02 17:02:05 UTC	(20151202_0-29139)
+  Log:
+  eliminate more memory leaks on rehash
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2015/12/01 20:32:10 UTC	(20151201_1-29137)
   Log:
   eliminate some memory leaks on rehash
