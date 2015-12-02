@@ -1,3 +1,11 @@
+androsyn    2015/12/02 19:16:22 UTC	(20151202_6-29155)
+  Log:
+  move the memset of ServerInfo etc to before set_default_conf otherwise we end up clobbering what we just did...
+
+  Modified:
+	ircd-ratbox/trunk/src/ircd.c (File Modified) 
+
+
 androsyn    2015/12/02 18:58:28 UTC	(20151202_5-29153)
   Log:
   set motd_path == NULL in clear_out_old_conf
