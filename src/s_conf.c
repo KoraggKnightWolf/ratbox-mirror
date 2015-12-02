@@ -1223,7 +1223,7 @@ clear_out_old_conf(void)
 
 	
 	rb_free(ConfigFileEntry.motd_path);
-	ConfigFileEntry.motd_path;
+	ConfigFileEntry.motd_path = NULL;
 	
 	rb_free(ConfigFileEntry.oper_motd_path);
 	ConfigFileEntry.oper_motd_path = NULL;
