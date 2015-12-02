@@ -524,6 +524,11 @@ ratbox_main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	memset(&Count, 0, sizeof(Count));
+	memset(&ServerInfo, 0, sizeof(ServerInfo));
+	memset(&AdminInfo, 0, sizeof(AdminInfo));
+	memset(&ServerStats, 0, sizeof(struct ServerStatistics));
+
 	add_all_conf_settings();
 
 	r = read_config_file(configfile);
@@ -585,11 +590,6 @@ ratbox_main(int argc, char *argv[])
 	memset(&oper_list, 0, sizeof(oper_list));
 
 	rb_dlinkAddTail(&me, &me.node, &global_client_list);
-
-	memset(&Count, 0, sizeof(Count));
-	memset(&ServerInfo, 0, sizeof(ServerInfo));
-	memset(&AdminInfo, 0, sizeof(AdminInfo));
-	memset(&ServerStats, 0, sizeof(struct ServerStatistics));
 
 
 	/* Initialise the channel capability usage counts... */
