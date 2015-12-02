@@ -113,6 +113,9 @@ add_eline(struct ConfItem *aconf)
 	return 0;
 }
 
+
+
+
 unsigned long
 delay_exit_length(void)
 {
@@ -314,6 +317,30 @@ find_ipline_exact(rb_patricia_tree_t * t, struct sockaddr *addr, unsigned int bi
 }
 
 
+void
+remove_exempts(void)
+{
+	rb_patricia_node_t *pnode;
+	rb_dlink_list list;
+	rb_dlink_node *ptr, *next;
+
+	memset(&list, 0, sizeof(list));
+
+	RB_PATRICIA_WALK(eline_tree->head, pnode)
+	{
+		rb_dlinkAddAlloc(pnode->data, &list);
+	}
+	RB_PATRICIA_WALK_END;
+
+	
+	RB_DLINK_FOREACH_SAFE(ptr, next, list.head)
+	{
+		delete_ipline((struct ConfItem *)ptr->data, eline_tree);
+		rb_free(ptr); /* no need to use rb_dlinkDestroy */
+	}
+}
+
+
 struct ConfItem *
 find_dline(struct sockaddr *addr)
 {
@@ -343,15 +370,27 @@ remove_perm_dlines(void)
 {
 	rb_patricia_node_t *pnode;
 	struct ConfItem *aconf;
+	rb_dlink_list list;
+	rb_dlink_node *ptr, *next;
+
+	memset(&list, 0, sizeof(list));
+
 	RB_PATRICIA_WALK(dline_tree->head, pnode)
 	{
 		aconf = pnode->data;
 		if(!(aconf->flags & CONF_FLAGS_TEMPORARY))
 		{
+			rb_dlinkAddAlloc(aconf, &list);
 			remove_dline(aconf);
 		}
 	}
 	RB_PATRICIA_WALK_END;
+	
+	RB_DLINK_FOREACH_SAFE(ptr, next, list.head)
+	{
+		remove_dline((struct ConfItem *)ptr->data);
+		rb_free(ptr);
+	}
 }
 
 void

@@ -1170,6 +1170,7 @@ clear_out_old_conf(void)
 		MaxUsers(cltmp) = -1;
 	}
 
+	remove_exempts();
 	clear_out_address_conf();
 	clear_s_newconf();
 
@@ -1249,6 +1250,7 @@ clear_out_old_conf(void)
 	/* clear the rbl lists */
 	rbl_clear_rbllists();
 
+	
 #ifdef ENABLE_SERVICES
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
 	{
