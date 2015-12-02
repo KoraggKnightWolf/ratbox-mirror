@@ -2187,8 +2187,6 @@ conf_set_blacklist_start(conf_t * conf)
 	}
 	if(t_match != NULL)
 	{
-		fprintf(stderr, "freeing t_match - start: %s %p\n", t_match, t_match);
-
 		rb_free(t_match);
 		t_match = NULL;
 	}
@@ -2208,7 +2206,6 @@ conf_set_blacklist_end(conf_t * conf)
 	}
 	if(t_match != NULL)
 	{
-		fprintf(stderr, "freeing t_match - end: %s %p\n", t_match, t_match);
 		rb_free(t_match);
 		t_match = NULL;
 	}
@@ -2222,11 +2219,9 @@ conf_set_blacklist_match(confentry_t * entry, conf_t * conf, struct conf_items *
 {
 	if(t_match != NULL)
 	{
-		fprintf(stderr, "freeing t_match - match: %s %p\n", t_match, t_match);
 		rb_free(t_match);
 	}
 	t_match = rb_strdup(entry->string);
-	fprintf(stderr, "allocated t_match: %s %p\n", t_match, t_match);
 }
 
 static void
