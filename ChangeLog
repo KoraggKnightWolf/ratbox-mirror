@@ -1,3 +1,11 @@
+androsyn    2015/12/03 02:51:55 UTC	(20151203_0-29167)
+  Log:
+  rearrange struct server_conf to improve alignment
+
+  Modified:
+	ircd-ratbox/trunk/include/s_newconf.h (File Modified) 
+
+
 androsyn    2015/12/02 21:07:00 UTC	(20151202_10-29163)
   Log:
   don't add hub/leaf masks to the hubleaf list until after the connect block is ended.  Also cleanup remote_confs correctly
