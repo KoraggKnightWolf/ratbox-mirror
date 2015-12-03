@@ -185,25 +185,24 @@ const char *get_oper_privs(int flags);
 
 struct server_conf
 {
+	rb_dlink_node node;
 	char *name;
 	char *host;
 	char *passwd;
 	char *spasswd;
 	char *certfp;
-	
-	int port;
-	int flags;
-	int servers;
+	char *class_name;
+	struct Class *class;
 	time_t hold;
 
 	struct rb_sockaddr_storage ipnum;
 	struct rb_sockaddr_storage my_ipnum;
+	
+	int port;
+	int flags;
+	int servers;
 
-	char *class_name;
-	struct Class *class;
 	uint16_t dns_query;
-	rb_dlink_node node;
-
 };
 
 #define SERVER_ILLEGAL		0x0001
