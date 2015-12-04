@@ -1,3 +1,11 @@
+androsyn    2015/12/04 19:19:12 UTC	(20151204_0-29179)
+  Log:
+  use the listener->ssl variable to set defer_accept for rb_listen
+
+  Modified:
+	ircd-ratbox/trunk/src/listener.c (File Modified) 
+
+
 androsyn    2015/12/03 02:51:55 UTC	(20151203_0-29167)
   Log:
   rearrange struct server_conf to improve alignment
