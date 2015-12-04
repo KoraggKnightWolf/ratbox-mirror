@@ -381,7 +381,6 @@ remove_perm_dlines(void)
 		if(!(aconf->flags & CONF_FLAGS_TEMPORARY))
 		{
 			rb_dlinkAddAlloc(aconf, &list);
-			remove_dline(aconf);
 		}
 	}
 	RB_PATRICIA_WALK_END;
