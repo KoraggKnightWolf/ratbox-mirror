@@ -223,7 +223,7 @@ inetport(struct Listener *listener)
 		return false;
 	}
 
-	if((ret = rb_listen(F, RATBOX_SOMAXCONN)))
+	if((ret = rb_listen(F, RATBOX_SOMAXCONN, listener->ssl)))
 	{
 		log_listener("listen failed for %s:%s",
 			     get_listener_name(listener), strerror(errno));
