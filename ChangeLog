@@ -1,3 +1,11 @@
+androsyn    2015/12/09 18:01:37 UTC	(20151209_0-29195)
+  Log:
+  call rb_setselect to handle res_readreply rather than calling it directly to avoid a minor race condition
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+
+
 androsyn    2015/12/05 10:27:43 UTC	(20151205_0-29193)
   Log:
   swap generation and creation around
