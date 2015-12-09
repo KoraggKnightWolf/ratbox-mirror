@@ -1,3 +1,11 @@
+androsyn    2015/12/09 20:45:06 UTC	(20151209_4-29209)
+  Log:
+  only enforce nicklen minimums on local clients
+
+  Modified:
+	ircd-ratbox/trunk/modules/core/m_nick.c (File Modified) 
+
+
 androsyn    2015/12/09 20:41:13 UTC	(20151209_3-29207)
   Log:
   Add nicklen_min parameter to allow setting the minimum nicklen we require
