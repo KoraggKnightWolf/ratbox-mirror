@@ -83,6 +83,7 @@ operhash_delete(const char *name)
 		return;
 
 	hash_del_hnode(HASH_OPER, hnode);
+	rb_free(ohash->name);
 	rb_free(ohash);
 }
 
