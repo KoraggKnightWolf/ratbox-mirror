@@ -1,3 +1,11 @@
+androsyn    2015/12/09 18:43:49 UTC	(20151209_2-29201)
+  Log:
+  free ohash->name if we are freeing ohash
+
+  Modified:
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 androsyn    2015/12/09 18:22:43 UTC	(20151209_1-29199)
   Log:
   free zlib_stream_t with the rest of the conn_t
