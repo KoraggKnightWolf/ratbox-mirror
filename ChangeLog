@@ -1,3 +1,12 @@
+androsyn    2015/12/09 21:01:44 UTC	(20151209_5-29211)
+  Log:
+  update documentation on certfp somewhat, i'm a terrible documentation writer...
+
+  Modified:
+	ircd-ratbox/trunk/doc/example.conf (File Modified) 
+	ircd-ratbox/trunk/doc/whats-new-3.1.txt (File Modified) 
+
+
 androsyn    2015/12/09 20:45:06 UTC	(20151209_4-29209)
   Log:
   only enforce nicklen minimums on local clients
