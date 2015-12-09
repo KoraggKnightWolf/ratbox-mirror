@@ -100,7 +100,7 @@ DECLARE_MODULE_AV1(nick, NULL, NULL, nick_clist, NULL, NULL, "$Revision$");
 
 static int change_remote_nick(struct Client *, struct Client *, time_t, const char *, int);
 
-static int clean_nick(const char *, int loc_client);
+static int clean_nick(const char *, bool loc_client);
 static int clean_username(const char *);
 static int clean_host(const char *);
 static int clean_uid(const char *uid);
@@ -144,7 +144,7 @@ mr_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	rb_strlcpy(nick, parv[1], ServerInfo.nicklen);
 
 	/* check the nickname is ok */
-	if(!clean_nick(nick, 1))
+	if(!clean_nick(nick, true))
 	{
 		sendto_one_numeric(source_p, s_RPL(ERR_ERRONEUSNICKNAME), parv[1]);
 		return 0;
@@ -205,7 +205,7 @@ m_nick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	rb_strlcpy(nick, parv[1], ServerInfo.nicklen);
 
 	/* check the nickname is ok */
-	if(!clean_nick(nick, 1))
+	if(!clean_nick(nick, true))
 	{
 		sendto_one_numeric(source_p, s_RPL(ERR_ERRONEUSNICKNAME), nick);
 		return 0;
@@ -278,7 +278,7 @@ mc_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	time_t newts = 0;
 
 	/* if nicks erroneous, or too long, kill */
-	if(!clean_nick(parv[1], 0))
+	if(!clean_nick(parv[1], false))
 	{
 		ServerStats.is_kill++;
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
@@ -339,7 +339,7 @@ ms_nick(struct Client *client_p, struct Client *source_p, int parc, const char *
 	}
 
 	/* if nicks empty, erroneous, or too long, kill */
-	if(!clean_nick(parv[1], 0))
+	if(!clean_nick(parv[1], false))
 	{
 		ServerStats.is_kill++;
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
@@ -431,7 +431,7 @@ ms_uid(struct Client *client_p, struct Client *source_p, int parc, const char *p
 	}
 
 	/* if nicks erroneous, or too long, kill */
-	if(!clean_nick(parv[1], 0))
+	if(!clean_nick(parv[1], false))
 	{
 		ServerStats.is_kill++;
 		sendto_realops_flags(UMODE_DEBUG, L_ALL,
@@ -522,7 +522,7 @@ ms_save(struct Client *client_p, struct Client *source_p, int parc, const char *
  * side effects - 
  */
 static int
-clean_nick(const char *nick, int loc_client)
+clean_nick(const char *nick, bool loc_client)
 {
 	int len = 0;
 
@@ -530,7 +530,7 @@ clean_nick(const char *nick, int loc_client)
 	if(*nick == '-' || *nick == '\0')
 		return 0;
 
-	if(loc_client && IsDigit(*nick))
+	if(loc_client == true && IsDigit(*nick))
 		return 0;
 
 	for(; *nick; nick++)
@@ -540,7 +540,7 @@ clean_nick(const char *nick, int loc_client)
 			return 0;
 	}
 
-	if(len < ServerInfo.nicklen_min)
+	if(loc_client == true && len < ServerInfo.nicklen_min)
 		return 0;         
 
 	/* nicklen is +1 */
