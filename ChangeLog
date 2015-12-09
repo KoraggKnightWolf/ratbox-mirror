@@ -1,3 +1,11 @@
+androsyn    2015/12/09 18:22:43 UTC	(20151209_1-29199)
+  Log:
+  free zlib_stream_t with the rest of the conn_t
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/12/09 18:01:37 UTC	(20151209_0-29195)
   Log:
   call rb_setselect to handle res_readreply rather than calling it directly to avoid a minor race condition
