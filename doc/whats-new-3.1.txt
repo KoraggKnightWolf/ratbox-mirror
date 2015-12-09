@@ -3,13 +3,14 @@ and ircd-ratbox-3.1.
 
 Installation
 ------------
- o Nicklen is now a runtime configurable option(up to 30 characters)
-   Nicklens beyond 30 will need a recompile as before.
  o The name of the executable that is generated is now ircd-ratbox 
    instead of ircd.  Any crontabs should be updated to reflect this change.  
    Also you should remove any old executables in the $PREFIX/bin directory
    named ircd, the install process will not do this for you.
-  
+ o Nicklen is now a runtime configurable option(up to 30 characters)
+   Nicklens beyond 30 will need a recompile as before.
+ o Minimum nickname length is settable as well with serverinfo::nicklen_min
+ 
 
 Config
 ------
@@ -19,6 +20,8 @@ Config
  o Add options to configure TLS versions and ECDH support as well. 
  o WHOWAS history length can now be set at runtime with the whowas_length
    option
+ o CERTFP support for connect {}, operator {} and auth{}.  CERTFP acts as an
+   additional gate to these blocks and does not replace password/challenge.
 
 Misc
 ----
@@ -27,5 +30,7 @@ Misc
    been tested.  Let us know if another compiler does not compile it.
  o Fix time_t issues on 32bit OpenBSD with 64bit time_t
  o General code cleanups, dead code removal
+ o REHASH memory leaks are gone! 
  o Add ELIST new ELIST features C and T
+ 
   
