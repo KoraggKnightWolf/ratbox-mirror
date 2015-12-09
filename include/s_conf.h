@@ -205,7 +205,6 @@ struct config_file_entry
 	int global_cidr_ipv6_bitlen;
 	int global_cidr_ipv6_count;
 	int global_cidr;
-	int nicklen;
 	int delayed_exit_time;
 	int ipv6_tun_remap;
 	int whowas_length;
@@ -250,6 +249,7 @@ struct server_info
 	char *network_name;
 	char *network_desc;
 	int nicklen;
+	int nicklen_min;
 	int hub;
 	int default_max_clients;
 	struct sockaddr_in ip;

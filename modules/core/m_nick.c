@@ -540,6 +540,9 @@ clean_nick(const char *nick, int loc_client)
 			return 0;
 	}
 
+	if(len < ServerInfo.nicklen_min)
+		return 0;         
+
 	/* nicklen is +1 */
 	if(len >= ServerInfo.nicklen)
 		return 0;

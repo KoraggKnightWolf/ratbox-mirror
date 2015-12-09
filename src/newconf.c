@@ -2463,6 +2463,7 @@ static struct conf_items conf_serverinfo_table[] =
 	{ "network_name",	CF_QSTRING, conf_set_serverinfo_network_name,	0, NULL },
 	{ "name",		CF_QSTRING, conf_set_serverinfo_name,	0, NULL },
 	{ "nicklen",		CF_INT,	    conf_set_serverinfo_nicklen, 0, NULL },
+	{ "nicklen_min",	CF_INT, NULL, 0, &ServerInfo.nicklen_min },
 	{ "sid",		CF_QSTRING, conf_set_serverinfo_sid,	0, NULL },
 	{ "bandb",		CF_QSTRING, conf_set_serverinfo_bandb_path,  0, NULL },
 	{ "vhost",		CF_QSTRING, conf_set_serverinfo_vhost,	0, NULL },
