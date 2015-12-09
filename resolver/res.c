@@ -437,7 +437,7 @@ send_res_msg(void *msg, int len, struct reslist *request)
 			  (struct sockaddr *)&(irc_nsaddr_list[i]),
 			  GET_SS_LEN(&irc_nsaddr_list[i])) == len)
 			++sent;
-		res_readreply(F, NULL);
+		rb_setselect(F, RB_SELECT_READ, res_readreply, NULL);
 	}
 
 	return (sent);
