@@ -1,3 +1,11 @@
+androsyn    2015/12/10 20:31:20 UTC	(20151210_0-29225)
+  Log:
+  indent/whitespace cleanup, no code changes
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2015/12/09 21:01:44 UTC	(20151209_5-29211)
   Log:
   update documentation on certfp somewhat, i'm a terrible documentation writer...
