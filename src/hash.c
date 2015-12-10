@@ -89,9 +89,8 @@
 #define COMMAND_MAX_BITS 9
 #define COMMAND_MAX (1<<COMMAND_MAX_BITS)
 
-
 static rb_dlink_list clientbyconnidTable[CLI_CONNID_MAX];
-static rb_dlink_list clientbyzconnidTable[CLI_ZCONNID_MAX];	
+static rb_dlink_list clientbyzconnidTable[CLI_ZCONNID_MAX];
 static rb_dlink_list clientTable[U_MAX];
 static rb_dlink_list channelTable[CH_MAX];
 static rb_dlink_list idTable[U_MAX];
@@ -105,6 +104,7 @@ static rb_dlink_list scache_table[SCACHE_MAX];
 static rb_dlink_list whowas_table[WHOWAS_MAX];
 static rb_dlink_list monitor_table[MONITOR_MAX];
 static rb_dlink_list command_table[COMMAND_MAX];
+
 /*
  * Hashing.
  *
@@ -148,9 +148,6 @@ init_hash(void)
 	/* nothing to do here */
 }
 
-
-
-
 /* fnv_hash_len_data hashses any data */
 static uint32_t
 fnv_hash_len_data(const unsigned char *s, unsigned int bits, size_t len)
@@ -166,9 +163,6 @@ fnv_hash_len_data(const unsigned char *s, unsigned int bits, size_t len)
 	h = (h >> bits) ^ (h & ((2 ^ bits) - 1));
 	return h;
 }
-
-
-
 
 static uint32_t
 fnv_hash_upper(const unsigned char *s, unsigned int bits, size_t unused)
@@ -198,7 +192,7 @@ fnv_hash(const unsigned char *s, unsigned int bits, size_t unused)
 	return h;
 }
 
-#if 0 /* unused currently */
+#if 0				/* unused currently */
 
 static uint32_t
 fnv_hash_len(const unsigned char *s, unsigned int bits, size_t len)
@@ -232,12 +226,11 @@ fnv_hash_upper_len(const unsigned char *s, unsigned int bits, size_t len)
 }
 
 static void
-free_hashnode(hash_node *hnode)
+free_hashnode(hash_node * hnode)
 {
 	rb_free(hnode->key);
 	rb_free(hnode);
 }
-
 
 typedef bool hash_cmp(const void *x, const void *y, size_t len);
 
@@ -247,7 +240,6 @@ typedef enum
 	CMP_STRCMP = 1,
 	CMP_MEMCMP = 2,
 } hash_cmptype;
-
 
 struct _hash_function
 {
@@ -260,6 +252,8 @@ struct _hash_function
 };
 
 
+
+/* *INDENT-OFF* */  
 /* if the cmpfunc field is not set, it is assumed hash_irccmp will be used */
 
 static struct _hash_function hash_function[HASH_LAST] =
@@ -311,39 +305,37 @@ static struct _hash_function hash_function[HASH_LAST] =
 	},
 
 };
+/* *INDENT-ON* */  
 
+#define hfunc(type, hashindex, hashlen) (hash_function[type].func((unsigned const char *)hashindex, hash_function[type].hashbits, hashlen))
 
-#define hfunc(type, hashindex, hashlen) (hash_function[type].func((unsigned const char *)hashindex, hash_function[type].hashbits, hashlen))	
-
-static inline
-int hash_do_cmp(hash_type type, const void *x, const void *y, size_t len)
+static inline int
+hash_do_cmp(hash_type type, const void *x, const void *y, size_t len)
 {
 	hash_cmptype cmptype = hash_function[type].cmptype;
 
-	switch(cmptype)
+	switch (cmptype)
 	{
-		case CMP_IRCCMP:
-			return irccmp(x, y);
-		case CMP_STRCMP:
-			return strcmp(x, y);
-		case CMP_MEMCMP:
-			return memcmp(x, y, len);
+	case CMP_IRCCMP:
+		return irccmp(x, y);
+	case CMP_STRCMP:
+		return strcmp(x, y);
+	case CMP_MEMCMP:
+		return memcmp(x, y, len);
 	}
 	return -1;
 }
 
-
-
-void 
-hash_free_list(rb_dlink_list *table)
+void
+hash_free_list(rb_dlink_list * table)
 {
-        rb_dlink_node *ptr, *next;
-        RB_DLINK_FOREACH_SAFE(ptr, next, table->head)
-        {
-        	rb_free(ptr);
-        }
-        rb_free(table);        
-}	
+	rb_dlink_node *ptr, *next;
+	RB_DLINK_FOREACH_SAFE(ptr, next, table->head)
+	{
+		rb_free(ptr);
+	}
+	rb_free(table);
+}
 
 rb_dlink_list *
 hash_find_list_len(hash_type type, const void *hashindex, size_t size)
@@ -353,7 +345,7 @@ hash_find_list_len(hash_type type, const void *hashindex, size_t size)
 	size_t hashlen;
 	uint32_t hashv;
 	rb_dlink_node *ptr;
-	
+
 	if(hashindex == NULL)
 		return NULL;
 
@@ -366,13 +358,13 @@ hash_find_list_len(hash_type type, const void *hashindex, size_t size)
 	hashv = hfunc(type, hashindex, hashlen);
 
 	results = rb_malloc(sizeof(rb_dlink_list));
-	
+
 	RB_DLINK_FOREACH(ptr, table[hashv].head)
 	{
 		hash_node *hnode = ptr->data;
 		if(hash_do_cmp(type, hashindex, hnode->key, hashlen) == 0)
 			rb_dlinkAddAlloc(hnode->data, results);
-	}	
+	}
 	if(rb_dlink_list_length(results) == 0)
 	{
 		rb_free(results);
@@ -386,7 +378,7 @@ hash_find_list(hash_type type, const char *hashindex)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_find_list_len(type, hashindex, strlen(hashindex)+1);
+	return hash_find_list_len(type, hashindex, strlen(hashindex) + 1);
 }
 
 hash_node *
@@ -397,7 +389,7 @@ hash_find_len(hash_type type, const void *hashindex, size_t size)
 	size_t hashlen;
 	uint32_t hashv;
 	rb_dlink_node *ptr;
-	
+
 	if(hashindex == NULL)
 		return NULL;
 
@@ -406,17 +398,16 @@ hash_find_len(hash_type type, const void *hashindex, size_t size)
 	else
 		hashlen = IRCD_MIN(size, hash_function[type].hashlen);
 
-
 	hashv = hfunc(type, hashindex, hashlen);
 	/* this code assumes that the compare function will not try to mess with
 	 * the link list behind our backs.... */
 	RB_DLINK_FOREACH(ptr, table[hashv].head)
 	{
 		hash_node *hnode = ptr->data;
-		
+
 		if(hash_do_cmp(type, hashindex, hnode->key, hashlen) == 0)
 			return hnode;
-	}	
+	}
 	return NULL;
 }
 
@@ -425,14 +416,14 @@ hash_find(hash_type type, const char *hashindex)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_find_len(type, hashindex, strlen(hashindex)+1);
+	return hash_find_len(type, hashindex, strlen(hashindex) + 1);
 }
 
 void *
 hash_find_data_len(hash_type type, const void *hashindex, size_t size)
 {
 	hash_node *hnode;
-	hnode = hash_find_len(type, hashindex, size);	
+	hnode = hash_find_len(type, hashindex, size);
 	if(hnode == NULL)
 		return NULL;
 	return hnode->data;
@@ -443,9 +434,8 @@ hash_find_data(hash_type type, const char *hashindex)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_find_data_len(type, hashindex, strlen(hashindex)+1);
+	return hash_find_data_len(type, hashindex, strlen(hashindex) + 1);
 }
-
 
 hash_node *
 hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *pointer)
@@ -463,7 +453,7 @@ hash_add_len(hash_type type, const void *hashindex, size_t indexlen, void *point
 	hnode->key = rb_malloc(indexlen);
 	hnode->keylen = indexlen;
 	memcpy(hnode->key, hashindex, indexlen);
-	hnode->hashv = hashv;	 
+	hnode->hashv = hashv;
 	hnode->data = pointer;
 	rb_dlinkAdd(hnode, &hnode->node, &table[hashv]);
 	return hnode;
@@ -474,7 +464,7 @@ hash_add(hash_type type, const char *hashindex, void *pointer)
 {
 	if(EmptyString(hashindex))
 		return NULL;
-	return hash_add_len(type, hashindex, strlen(hashindex)+1, pointer);
+	return hash_add_len(type, hashindex, strlen(hashindex) + 1, pointer);
 }
 
 void
@@ -485,7 +475,7 @@ hash_del_len(hash_type type, const void *hashindex, size_t size, void *pointer)
 	uint32_t hashv;
 	size_t hashlen;
 
-	if(pointer == NULL || hashindex == NULL) 
+	if(pointer == NULL || hashindex == NULL)
 		return;
 
 	if(hash_function[type].hashlen == 0)
@@ -501,22 +491,21 @@ hash_del_len(hash_type type, const void *hashindex, size_t size, void *pointer)
 		{
 			rb_dlinkDelete(&hnode->node, &table[hashv]);
 			free_hashnode(hnode);
-			return;		
+			return;
 		}
-	}					    
+	}
 }
-
 
 void
 hash_del(hash_type type, const char *hashindex, void *pointer)
 {
 	if(EmptyString(hashindex))
 		return;
-	hash_del_len(type, hashindex, strlen(hashindex)+1, pointer);
+	hash_del_len(type, hashindex, strlen(hashindex) + 1, pointer);
 }
 
 void
-hash_del_hnode(hash_type type, hash_node *hnode)
+hash_del_hnode(hash_type type, hash_node * hnode)
 {
 	rb_dlink_list *table = hash_function[type].table;
 
@@ -527,22 +516,21 @@ hash_del_hnode(hash_type type, hash_node *hnode)
 	free_hashnode(hnode);
 }
 
-
 void
-hash_destroyall(hash_type type, hash_destroy_cb *destroy_cb)
+hash_destroyall(hash_type type, hash_destroy_cb * destroy_cb)
 {
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	rb_dlink_list *table;
 	unsigned int i, max;
-	
-	max = 1<<hash_function[type].hashbits;
+
+	max = 1 << hash_function[type].hashbits;
 	table = hash_function[type].table;
 	HASH_WALK_SAFE(i, max, ptr, next_ptr, table)
 	{
 		hash_node *hnode = ptr->data;
 		void *cbdata = hnode->data;
-				
+
 		rb_dlinkDelete(ptr, table);
 		free_hashnode(hnode);
 		destroy_cb(cbdata);
@@ -551,14 +539,14 @@ hash_destroyall(hash_type type, hash_destroy_cb *destroy_cb)
 }
 
 void
-hash_walkall(hash_type type, hash_walk_cb *walk_cb, void *walk_data)
+hash_walkall(hash_type type, hash_walk_cb * walk_cb, void *walk_data)
 {
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
 	rb_dlink_list *table;
 	unsigned int i, max;
-	
-	max = 1<<hash_function[type].hashbits;
+
+	max = 1 << hash_function[type].hashbits;
 	table = hash_function[type].table;
 	HASH_WALK_SAFE(i, max, ptr, next_ptr, table)
 	{
@@ -569,57 +557,57 @@ hash_walkall(hash_type type, hash_walk_cb *walk_cb, void *walk_data)
 	HASH_WALK_END;
 }
 
-
-rb_dlink_list 
+rb_dlink_list
 hash_get_channel_block(int i)
 {
-        return channelTable[i];
+	return channelTable[i];
 }
-        
+
 
 rb_dlink_list *
 hash_get_tablelist(int type)
 {
-        rb_dlink_list *table = hash_function[type].table;
-        rb_dlink_list *alltables;
+	rb_dlink_list *table = hash_function[type].table;
+	rb_dlink_list *alltables;
 
 	alltables = rb_malloc(sizeof(rb_dlink_list));
 
-        for(int i = 0; i < 1<<hash_function[type].hashbits; i++)
-        {
-                if(rb_dlink_list_length(&table[i]) == 0)
-                        continue;
-                rb_dlinkAddAlloc(&table[i], alltables);
-        }
+	for(int i = 0; i < 1 << hash_function[type].hashbits; i++)
+	{
+		if(rb_dlink_list_length(&table[i]) == 0)
+			continue;
+		rb_dlinkAddAlloc(&table[i], alltables);
+	}
 
-        if(rb_dlink_list_length(alltables) == 0)
-        {
-                rb_free(alltables);
-                alltables = NULL;
-        }
-        return alltables;
+	if(rb_dlink_list_length(alltables) == 0)
+	{
+		rb_free(alltables);
+		alltables = NULL;
+	}
+	return alltables;
 }
 
-void 
-hash_free_tablelist(rb_dlink_list *table)
+void
+hash_free_tablelist(rb_dlink_list * table)
 {
-        rb_dlink_node *ptr, *next;
-        RB_DLINK_FOREACH_SAFE(ptr, next, table->head)
-        {
-        	rb_free(ptr);
-        }
-        rb_free(table);        
-}	
+	rb_dlink_node *ptr, *next;
+	RB_DLINK_FOREACH_SAFE(ptr, next, table->head)
+	{
+		rb_free(ptr);
+	}
+	rb_free(table);
+}
 
 static void
-output_hash(struct Client *source_p, const char *name, unsigned long length, unsigned long *counts, unsigned long deepest)
+output_hash(struct Client *source_p, const char *name, unsigned long length, unsigned long *counts,
+	    unsigned long deepest)
 {
 	unsigned long total = 0;
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :%s Hash Statistics", name);
 
 	sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :Size: %lu Empty: %lu (%.3f%%)",
-			   length, counts[0], (float)((counts[0] * 100) / (float)length));
+			   length, counts[0], (float) ((counts[0] * 100) / (float) length));
 
 	for(unsigned long i = 1; i < 11; i++)
 	{
@@ -631,15 +619,14 @@ output_hash(struct Client *source_p, const char *name, unsigned long length, uns
 	{
 		sendto_one_numeric(source_p, RPL_STATSDEBUG,
 				   "B :Average depth: %.3f%%/%.3f%% Highest depth: %lu",
-				   (float)(total / (length - counts[0])), (float)(total / length), deepest);
+				   (float) (total / (length - counts[0])), (float) (total / length), deepest);
 	}
-	
-	for(unsigned long i = 1; i < IRCD_MIN(11, deepest+1); i++)
+
+	for(unsigned long i = 1; i < IRCD_MIN(11, deepest + 1); i++)
 	{
 		sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :Nodes with %lu entries: %lu", i, counts[i]);
 	}
 }
-
 
 static void
 count_hash(struct Client *source_p, rb_dlink_list * table, unsigned int length, const char *name)
@@ -669,21 +656,21 @@ hash_stats(struct Client *source_p)
 {
 	for(unsigned int i = 0; i < HASH_LAST; i++)
 	{
-		count_hash(source_p, hash_function[i].table, 1<<hash_function[i].hashbits, hash_function[i].name);
-		sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");			
+		count_hash(source_p, hash_function[i].table, 1 << hash_function[i].hashbits, hash_function[i].name);
+		sendto_one_numeric(source_p, RPL_STATSDEBUG, "B :--");
 	}
 }
 
 void
-hash_get_memusage(hash_type type, size_t *entries, size_t *memusage)
+hash_get_memusage(hash_type type, size_t * entries, size_t * memusage)
 {
 	rb_dlink_list *htable;
 	rb_dlink_node *ptr;
 	hash_node *hnode;
 	size_t mem = 0, cnt = 0;
 	unsigned int max, i;
-	
-	max = 1<<hash_function[type].hashbits;
+
+	max = 1 << hash_function[type].hashbits;
 	htable = hash_function[type].table;
 
 	HASH_WALK(i, max, ptr, htable)
@@ -692,7 +679,7 @@ hash_get_memusage(hash_type type, size_t *entries, size_t *memusage)
 		mem += hnode->keylen;
 		mem += sizeof(hash_node);
 		cnt++;
-	} 
+	}
 	HASH_WALK_END;
 
 	if(memusage != NULL)
@@ -700,4 +687,3 @@ hash_get_memusage(hash_type type, size_t *entries, size_t *memusage)
 	if(entries != NULL)
 		*entries = cnt;
 }
-
