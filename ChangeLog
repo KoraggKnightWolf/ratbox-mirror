@@ -1,3 +1,11 @@
+androsyn    2015/12/11 18:43:45 UTC	(20151211_0-29229)
+  Log:
+  make services.c compile again
+
+  Modified:
+	ircd-ratbox/trunk/src/services.c (File Modified) 
+
+
 androsyn    2015/12/10 20:31:20 UTC	(20151210_0-29225)
   Log:
   indent/whitespace cleanup, no code changes
