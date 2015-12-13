@@ -1,3 +1,11 @@
+androsyn    2015/12/13 00:12:21 UTC	(20151213_0-29231)
+  Log:
+  run the cleanup_dead_ssld's event a little more frequently
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2015/12/11 18:43:45 UTC	(20151211_0-29229)
   Log:
   make services.c compile again
