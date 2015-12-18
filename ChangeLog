@@ -1,3 +1,11 @@
+androsyn    2015/12/18 17:46:48 UTC	(20151218_4-29257)
+  Log:
+  port cidr mask validation changes from charybdis
+
+  Modified:
+	ircd-ratbox/trunk/src/match.c (File Modified) 
+
+
 androsyn    2015/12/18 13:26:04 UTC	(20151218_3-29243)
   Log:
   simplify scache a bit...
