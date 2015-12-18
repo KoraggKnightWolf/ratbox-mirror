@@ -38,34 +38,28 @@
  * be an issue...
  */
 
-struct scache_entry
-{
-	rb_dlink_node node;
-	char *server_name;
-};
-
 static size_t scache_allocated = 0;
 
 const char *
 scache_add(const char *name)
 {
-	struct scache_entry *sc;
-	hash_node *hnode;
+	char *sc;
+	size_t len;
 
 	if(EmptyString(name))
 		return NULL;
 
-	if((hnode = hash_find(HASH_SCACHE, name)) != NULL)
-	{
-		sc = hnode->data;
-		return sc->server_name;
-	}
+	len = strlen(name) + 1;
 
-	sc = rb_malloc(sizeof(struct scache_entry));
-	sc->server_name = rb_strdup(name);
-	scache_allocated += sizeof(struct scache_entry) + strlen(sc->server_name) + 1;
-	hash_add(HASH_SCACHE, sc->server_name, sc);
-	return sc->server_name;
+	if((sc = hash_find_data_len(HASH_SCACHE, name, len)) != NULL)
+		return sc;
+
+	sc = rb_malloc(len);
+	memcpy(sc, name, len);	
+	scache_allocated += len;
+
+	hash_add_len(HASH_SCACHE, sc, len, sc);
+	return sc;
 }
 
 void
