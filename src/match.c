@@ -304,12 +304,15 @@ match_ips(const char *s1, const char *s2)
 	*len++ = '\0';
 
 	cidrlen = atoi(len);
-	if(cidrlen == 0)
+	if(cidrlen <= 0)
 		return 0;
 
 #ifdef RB_IPV6
 	if(strchr(mask, ':') && strchr(address, ':'))
 	{
+		if(cidrlen > 128)
+			return 0;	
+        
 		aftype = AF_INET6;
 		ipptr = &((struct sockaddr_in6 *)&ipaddr)->sin6_addr;
 		maskptr = &((struct sockaddr_in6 *)&maskaddr)->sin6_addr;
@@ -318,6 +321,8 @@ match_ips(const char *s1, const char *s2)
 #endif
 	if(!strchr(mask, ':') && !strchr(address, ':'))
 	{
+		if(cidrlen > 32)
+			return 0;
 		aftype = AF_INET;
 		ipptr = &((struct sockaddr_in *)&ipaddr)->sin_addr;
 		maskptr = &((struct sockaddr_in *)&maskaddr)->sin_addr;
@@ -325,8 +330,10 @@ match_ips(const char *s1, const char *s2)
 	else
 		return 0;
 
-	rb_inet_pton(aftype, address, ipptr);
-	rb_inet_pton(aftype, mask, maskptr);
+	if(rb_inet_pton(aftype, address, ipptr) <= 0)
+		return 0;
+	if(rb_inet_pton(aftype, mask, maskptr) <= 0)
+		return 0;
 	if(comp_with_mask(ipptr, maskptr, cidrlen))
 		return 1;
 	else
@@ -401,8 +408,10 @@ match_cidr(const char *s1, const char *s2)
 	else
 		return 0;
 
-	rb_inet_pton(aftype, ip, ipptr);
-	rb_inet_pton(aftype, ipmask, maskptr);
+	if(rb_inet_pton(aftype, ip, ipptr) <= 0)
+		return 0;
+	if(rb_inet_pton(aftype, ipmask, maskptr) <= 0)
+		return 0;
 	if(comp_with_mask(ipptr, maskptr, cidrlen) && match(mask, address))
 		return 1;
 	else
