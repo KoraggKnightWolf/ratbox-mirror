@@ -39,15 +39,17 @@
 #include <match.h>
 
 #define ZIPSTATS_TIME		60
+#define MAXPASSFD 4
+#define READSIZE 1024
 
 static void collect_zipstats(void *unused);
 static void ssl_read_ctl(rb_fde_t * F, void *data);
 static int ssld_count;
+static char *ssld_path;
+static int ssld_spin_count = 0;
+static time_t last_spin;
+static int ssld_wait = 0;
 
-
-
-#define MAXPASSFD 4
-#define READSIZE 1024
 typedef struct _ssl_ctl_buf
 {
 	rb_dlink_node node;
@@ -56,7 +58,6 @@ typedef struct _ssl_ctl_buf
 	rb_fde_t *F[MAXPASSFD];
 	int nfds;
 } ssl_ctl_buf_t;
-
 
 struct _ssl_ctl
 {
@@ -142,12 +143,6 @@ free_ssl_daemon(ssl_ctl_t * ctl)
 	rb_free(ctl);
 }
 
-static char *ssld_path;
-
-static int ssld_spin_count = 0;
-static time_t last_spin;
-static int ssld_wait = 0;
-
 
 static void
 ssl_killall(void)
@@ -221,7 +216,6 @@ start_ssldaemon(int count, const char *ssl_ca_cert, const char *ssl_cert, const 
 #else
 	const char *suffix = "";
 #endif
-
 	char fullpath[PATH_MAX + 1];
 	char fdarg[6];
 	const char *parv[2];
@@ -274,7 +268,6 @@ start_ssldaemon(int count, const char *ssl_ca_cert, const char *ssl_cert, const 
 			ilog(L_MAIN, "Unable to create ssld - rb_socketpair failed: %s", strerror(errno));
 			return started;
 		}
-
 		rb_set_buffers(F1, READBUF_SIZE*32);
 		rb_set_buffers(F2, READBUF_SIZE*32);
 		snprintf(fdarg, sizeof(fdarg), "%d", rb_get_fd(F2));
@@ -292,7 +285,6 @@ start_ssldaemon(int count, const char *ssl_ca_cert, const char *ssl_cert, const 
 		SetHandleInformation((HANDLE) rb_get_fd(F2), HANDLE_FLAG_INHERIT, 1);
 		SetHandleInformation((HANDLE) rb_get_fd(P1), HANDLE_FLAG_INHERIT, 1);
 #endif
-
 		pid = rb_spawn_process(ssld_path, (const char **)parv);
 		if(pid == -1)
 		{
@@ -413,7 +405,6 @@ ssl_process_zipstats(ssl_ctl_t * ctl, ssl_ctl_buf_t * ctl_buf)
 		server->localClient->zipstats = rb_malloc(sizeof(struct ZipStats));
 
 	zips = server->localClient->zipstats;
-
 	zips->in += strtoull(parv[2], NULL, 10);
 	zips->in_wire += strtoull(parv[3], NULL, 10);
 	zips->out += strtoull(parv[4], NULL, 10);
@@ -661,7 +652,6 @@ static void zs_append(rb_zstring_t *zs, const char *str)
 		
 	rb_zstring_append_from_c(zs, (char *)&len, sizeof(uint16_t));
 	rb_zstring_append_from_c(zs, str, len);
-		
 }
 
 
@@ -673,14 +663,12 @@ send_new_ssl_certs_one(ssl_ctl_t * ctl, const char *ssl_ca_cert, const char *ssl
 	void *x;
 	char tls_ver[20];
 	size_t len;
-
 	uint8_t argcnt = 7; /* modify if you add more arguments... */
 	
 	zs = rb_zstring_alloc();
 	snprintf(tls_ver, sizeof(tls_ver), "%d", tls_min_ver);
 
 	rb_zstring_append_from_c(zs, "K", 1);
-
 	rb_zstring_append_from_c(zs, (char *)&argcnt, sizeof(uint8_t)); 
 	zs_append(zs, ssl_ca_cert);
 	zs_append(zs, ssl_cert);
@@ -762,7 +750,6 @@ ssld_decrement_clicount(ssl_ctl_t * ctl)
 {
 	if(ctl == NULL)
 		return;
-
 	ctl->cli_count--;
 	if(ctl->dead == true && ctl->cli_count == 0)
 	{
@@ -787,11 +774,9 @@ start_zlib_session(void *data)
 	uint16_t recvqlen;
 	int8_t level;
 	void *xbuf;
-
 	rb_fde_t *F[2];
 	rb_fde_t *xF1, *xF2;
 	void *recvq_start;
-
 	size_t hdr = (sizeof(uint8_t) * 2) + sizeof(uint32_t);
 	size_t len;
 	int cpylen, left;
@@ -819,7 +804,6 @@ start_zlib_session(void *data)
 	buf[0] = 'Z';
 	uint32_to_buf(&buf[1], server->localClient->zconnid);
 
-
 	buf[5] = (char)level;
 
 	recvq_start = &buf[6];
@@ -845,11 +829,10 @@ start_zlib_session(void *data)
 		return;
 	}
 
-
 	F[0] = server->localClient->F;
 	F[1] = xF1;
-	server->localClient->F = xF2;
 
+	server->localClient->F = xF2;
 	server->localClient->z_ctl = which_ssld();
 	if(server->localClient->z_ctl == NULL)
 		return;
