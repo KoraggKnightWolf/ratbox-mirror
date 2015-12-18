@@ -1,3 +1,11 @@
+androsyn    2015/12/18 00:44:00 UTC	(20151218_0-29237)
+  Log:
+  whitespace cleanup
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2015/12/13 00:12:21 UTC	(20151213_0-29231)
   Log:
   run the cleanup_dead_ssld's event a little more frequently
