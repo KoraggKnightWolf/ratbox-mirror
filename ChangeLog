@@ -1,3 +1,11 @@
+androsyn    2015/12/18 00:58:31 UTC	(20151218_2-29241)
+  Log:
+  whitespace/style cleanup
+
+  Modified:
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2015/12/18 00:48:00 UTC	(20151218_1-29239)
   Log:
   more whitespace/style cleanups
