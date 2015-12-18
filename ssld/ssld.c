@@ -78,7 +78,6 @@ typedef struct _conn
 	rb_fde_t *mod_fd;
 	rb_fde_t *plain_fd;
 	void *stream;
-
 	uint64_t mod_out;
 	uint64_t mod_in;
 	uint64_t plain_in;
@@ -313,7 +312,6 @@ conn_mod_write_sendq(rb_fde_t *fd, void *data)
 
 	while((retlen = rb_rawbuf_flush(conn->modbuf_out, fd)) > 0)
 		conn->mod_out += retlen;
-
 		
 	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 	{
@@ -508,7 +506,6 @@ conn_plain_read_cb(rb_fde_t *fd, void *data)
 			return;
 		}
 		conn->plain_in += length;
-
 #ifdef HAVE_ZLIB
 		if(IsZip(conn))
 			common_zlib_deflate(conn, inbuf, length);
@@ -616,9 +613,6 @@ conn_mod_read_cb(rb_fde_t *fd, void *data)
 			return;
 		}
 		conn->mod_in += length;
-		
-		
-		                                                                        
 #ifdef HAVE_ZLIB
 		if(IsZip(conn))
 			common_zlib_inflate(conn, inbuf, length);
@@ -646,7 +640,6 @@ conn_plain_write_sendq(rb_fde_t *fd, void *data)
 		close_conn(data, NO_WAIT, NULL);
 		return;
 	}
-
 
 	if(rb_rawbuf_length(conn->plainbuf_out) > 0)
 		rb_setselect(conn->plain_fd, RB_SELECT_WRITE, conn_plain_write_sendq, conn);
@@ -869,7 +862,6 @@ zlib_process(mod_ctl_t * ctl, mod_ctl_buf_t * ctlb)
 		return;
 	}
 
-
 	if(rb_get_type(conn->mod_fd) == RB_FD_UNKNOWN)
 		rb_set_type(conn->mod_fd, RB_FD_SOCKET);
 
@@ -947,7 +939,6 @@ ssl_new_keys(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
 	int tls_min_ver = 0;
 	rb_ssl_ctx *sctx = NULL, *cctx = NULL;
 	uint8_t argcnt;
-
 	
 	p = (uint8_t *)&ctl_buf->buf[1];
 	argcnt = *(uint8_t *)p;
@@ -972,7 +963,6 @@ ssl_new_keys(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
 		
 	if(tls_ver != NULL)
 		tls_min_ver = atoi(tls_ver);
-	
 
 	sctx = rb_setup_ssl_server(cacert, cert, key, dhparam, ssl_cipher_list, ssl_ecdh_named_curve, tls_min_ver);
 
@@ -994,7 +984,6 @@ ssl_new_keys(mod_ctl_t * ctl, mod_ctl_buf_t * ctl_buf)
 	ssl_server_ctx = sctx;
 	ssl_client_ctx = cctx;
 	goto freeall;
-
 	
 invalid:
 	mod_cmd_write_queue(ctl, inv, strlen(inv));
@@ -1156,7 +1145,6 @@ mod_process_cmd_recv(mod_ctl_t * ctl)
 		rb_free(ctl_buf->buf);
 		rb_free(ctl_buf);
 	}
-
 }
 
 
@@ -1244,7 +1232,6 @@ read_pipe_ctl(rb_fde_t *F, void *data)
 	if(retlen == 0 || (retlen < 0 && !rb_ignore_errno(errno)))
 		exit(0);
 	rb_setselect(F, RB_SELECT_READ, read_pipe_ctl, NULL);
-
 }
 
 int
@@ -1255,7 +1242,6 @@ main(int argc, char **argv)
 	mod_ctl_t *mod_ctl;
 
 	maxfd = maxconn();
-
 	s_ctlfd = getenv("CTL_FD");
 	s_pipe = getenv("CTL_PIPE");
 	s_pid = getenv("CTL_PPID");
@@ -1277,7 +1263,6 @@ main(int argc, char **argv)
 #ifndef _WIN32
 	int x;
 
-
 	for(x = 0; x < maxfd; x++)
 	{
 		if(x != ctlfd && x != pipefd && x > 2)
@@ -1298,7 +1283,6 @@ main(int argc, char **argv)
 	}
 #endif
 #endif
-
 	setup_signals();
 	rb_lib_init(NULL, NULL, NULL, 0, maxfd);
 	ssl_ok = rb_supports_ssl();
