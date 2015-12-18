@@ -1,3 +1,11 @@
+androsyn    2015/12/18 00:48:00 UTC	(20151218_1-29239)
+  Log:
+  more whitespace/style cleanups
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2015/12/18 00:44:00 UTC	(20151218_0-29237)
   Log:
   whitespace cleanup
