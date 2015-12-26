@@ -630,9 +630,7 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 	va_list args;
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
-	rb_dlink_node *uptr;
-	rb_dlink_node *next_uptr;
-	rb_buf_head_t linebuf;;
+	rb_buf_head_t linebuf;
 
 	rb_linebuf_newbuf(&linebuf);
 	va_start(args, pattern);
@@ -645,6 +643,8 @@ sendto_common_channels_local(struct Client *user, const char *pattern, ...)
 	{
 		struct membership *mscptr = ptr->data;
 		struct Channel *chptr = mscptr->chptr;
+		rb_dlink_node *uptr;
+		rb_dlink_node *next_uptr;
 
 		RB_DLINK_FOREACH_SAFE(uptr, next_uptr, chptr->locmembers.head)
 		{
