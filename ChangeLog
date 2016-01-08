@@ -1,3 +1,11 @@
+androsyn    2016/01/08 18:16:31 UTC	(20160108_1-29275)
+  Log:
+  do flexible array members the C99 way
+
+  Modified:
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 androsyn    2016/01/08 18:03:16 UTC	(20160108_0-29273)
   Log:
   use a flexible array memory for operhash
