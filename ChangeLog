@@ -1,3 +1,11 @@
+androsyn    2016/01/08 18:03:16 UTC	(20160108_0-29273)
+  Log:
+  use a flexible array memory for operhash
+
+  Modified:
+	ircd-ratbox/trunk/src/operhash.c (File Modified) 
+
+
 androsyn    2015/12/26 03:58:25 UTC	(20151226_0-29269)
   Log:
   change the scope of a few rb_dlink_nodes, no functional change
