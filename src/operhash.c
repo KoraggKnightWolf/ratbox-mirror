@@ -40,7 +40,7 @@
 struct operhash_entry
 {
 	unsigned int refcount;
-	char name[0];
+	char name[];
 };
 
 const char *
@@ -57,11 +57,11 @@ operhash_add(const char *name)
 		ohash->refcount++;
 		return ohash->name;
 	}
+
 	len = strlen(name) + 1;
 	ohash = rb_malloc(sizeof(struct operhash_entry) + len);
 	ohash->refcount = 1;
 	memcpy(ohash->name, name, len);
-
 	hash_add(HASH_OPER, ohash->name, ohash);
 	return ohash->name;
 }
