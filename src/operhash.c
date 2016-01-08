@@ -39,14 +39,15 @@
 
 struct operhash_entry
 {
-	char *name;
 	unsigned int refcount;
+	char name[0];
 };
 
 const char *
 operhash_add(const char *name)
 {
 	struct operhash_entry *ohash;
+	size_t len;
 
 	if(EmptyString(name))
 		return NULL;
@@ -56,9 +57,10 @@ operhash_add(const char *name)
 		ohash->refcount++;
 		return ohash->name;
 	}
-	ohash = rb_malloc(sizeof(struct operhash_entry));
+	len = strlen(name) + 1;
+	ohash = rb_malloc(sizeof(struct operhash_entry) + len);
 	ohash->refcount = 1;
-	ohash->name = rb_strdup(name);
+	memcpy(ohash->name, name, len);
 
 	hash_add(HASH_OPER, ohash->name, ohash);
 	return ohash->name;
@@ -83,7 +85,6 @@ operhash_delete(const char *name)
 		return;
 
 	hash_del_hnode(HASH_OPER, hnode);
-	rb_free(ohash->name);
 	rb_free(ohash);
 }
 
