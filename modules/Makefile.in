@@ -1443,10 +1443,11 @@ MODULE_FLAGS = $(EXTRA_FLAGS) -avoid-version
 @STATIC_MODULES_TRUE@core/m_squit.c	
 
 @ENABLE_SERVICES_TRUE@@STATIC_MODULES_TRUE@SERVICES_SRCS = m_services.c
-@STATIC_MODULES_TRUE@BUILT_SOURCE = static_modules.c
+@STATIC_MODULES_TRUE@BUILT_SOURCES = static_modules.c
 @STATIC_MODULES_TRUE@libmodules_la_SOURCES = $(MSRCS) $(CORE_SRCS) $(SERVICES_SRCS)
 @STATIC_MODULES_TRUE@libmodules_LTLIBRARIES = libmodules.la
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -2032,13 +2033,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LTLIBRARIES)
 installdirs:
 	for dir in "$(DESTDIR)$(coredir)" "$(DESTDIR)$(libmodulesdir)" "$(DESTDIR)$(modulesdir)" "$(DESTDIR)$(servicesdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -2070,6 +2073,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 @DISABLE_BACKUPS_TRUE@install-exec-hook:
 @STATIC_MODULES_TRUE@install-exec-hook:
 clean: clean-am
@@ -2149,7 +2153,7 @@ uninstall-am: uninstall-coreLTLIBRARIES \
 	uninstall-libmodulesLTLIBRARIES uninstall-modulesLTLIBRARIES \
 	uninstall-servicesLTLIBRARIES
 
-.MAKE: install-am install-exec-am install-strip
+.MAKE: all check install install-am install-exec-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean \
 	clean-coreLTLIBRARIES clean-generic \

@@ -424,7 +424,7 @@ if ENABLE_SERVICES
 SERVICES_SRCS = m_services.c
 endif
 
-BUILT_SOURCE = static_modules.c
+BUILT_SOURCES = static_modules.c
 static_modules.c: static_modules.c.SH
 	$(SHELL) static_modules.c.SH $(MSRCS) $(CORE_SRCS) $(SERVICES_SRCS)
 
