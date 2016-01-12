@@ -1,3 +1,12 @@
+androsyn    2016/01/12 17:06:12 UTC	(20160112_0-29277)
+  Log:
+  make that BUILT_SOURCES not BUILT_SOURCE
+
+  Modified:
+	ircd-ratbox/trunk/modules/Makefile.am (File Modified) 
+	ircd-ratbox/trunk/modules/Makefile.in (File Modified) 
+
+
 androsyn    2016/01/08 18:16:31 UTC	(20160108_1-29275)
   Log:
   do flexible array members the C99 way
