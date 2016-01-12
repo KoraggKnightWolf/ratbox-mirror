@@ -1,3 +1,11 @@
+androsyn    2016/01/12 17:14:06 UTC	(20160112_1-29279)
+  Log:
+  remove prebuilt static_modules.c to keep someone quiet :P
+
+  Modified:
+	ircd-ratbox/trunk/modules/static_modules.c (File Deleted) 
+
+
 androsyn    2016/01/12 17:06:12 UTC	(20160112_0-29277)
   Log:
   make that BUILT_SOURCES not BUILT_SOURCE
