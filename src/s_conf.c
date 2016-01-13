@@ -1245,7 +1245,7 @@ clear_out_old_conf(void)
 #ifdef ENABLE_SERVICES
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
 	{
-		free_null(ptr->data);
+		rb_free(ptr->data);
 		rb_dlinkDestroy(ptr, &service_list);
 	}
 #endif
