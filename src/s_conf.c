@@ -1145,6 +1145,9 @@ get_printable_kline(struct Client *source_p, struct ConfItem *aconf,
 		*oper_reason = aconf->spasswd;
 }
 
+/* free the memory and set the pointer to null */
+#define free_null(x) { rb_free(x); x = NULL; };
+
 /*
  * clear_out_old_conf
  *
@@ -1182,59 +1185,49 @@ clear_out_old_conf(void)
 #endif
 
 	/* clean out ServerInfo */
-	rb_free(ServerInfo.description);
-	ServerInfo.description = NULL;
-	rb_free(ServerInfo.network_name);
-	ServerInfo.network_name = NULL;
-	rb_free(ServerInfo.network_desc);
-	ServerInfo.network_desc = NULL;
+	free_null(ServerInfo.description);
+	free_null(ServerInfo.network_name);
+	free_null(ServerInfo.network_desc);
+	free_null(ServerInfo.ssl_private_key);
+	free_null(ServerInfo.ssl_ca_cert);
+	free_null(ServerInfo.ssl_cert);
+	free_null(ServerInfo.ssl_cipher_list);
+	free_null(ServerInfo.ssl_dh_params);
+	free_null(ServerInfo.ssl_ecdh_named_curve);
+	free_null(ServerInfo.vhost_dns);
+#ifdef IPV6
+	free_null(ServerInfo.vhost6_dns);
+#endif
+	free_null(ServerInfo.bandb_path);
 
-	rb_free(ServerInfo.bandb_path);
-	ServerInfo.bandb_path = NULL;
+	
+	ServerInfo.tls_min_ver = RB_TLS_VER_TLS1;
+	ServerInfo.ssld_count = 0;
+	ServerInfo.hub = 0;
+
+	memset(&ServerInfo.ip, 0, sizeof(ServerInfo.ip));
+#ifdef RB_IPV6
+	memset(&ServerInfo.ip6, 0, sizeof(ServerInfo.ip6));
+#endif
 
 	/* clean out AdminInfo */
-	rb_free(AdminInfo.name);
-	AdminInfo.name = NULL;
-	rb_free(AdminInfo.email);
-	AdminInfo.email = NULL;
-	rb_free(AdminInfo.description);
-	AdminInfo.description = NULL;
+	free_null(AdminInfo.name);
+	free_null(AdminInfo.email);
+	free_null(AdminInfo.description);
 
 	/* clean out log file names  */
-	rb_free(ConfigFileEntry.fname_userlog);
-	ConfigFileEntry.fname_userlog = NULL;
-	rb_free(ConfigFileEntry.fname_fuserlog);
-	ConfigFileEntry.fname_fuserlog = NULL;
-	rb_free(ConfigFileEntry.fname_operlog);
-	ConfigFileEntry.fname_operlog = NULL;
-	rb_free(ConfigFileEntry.fname_foperlog);
-	ConfigFileEntry.fname_foperlog = NULL;
-	rb_free(ConfigFileEntry.fname_serverlog);
-	ConfigFileEntry.fname_serverlog = NULL;
-	rb_free(ConfigFileEntry.fname_killlog);
-	ConfigFileEntry.fname_killlog = NULL;
-	rb_free(ConfigFileEntry.fname_glinelog);
-	ConfigFileEntry.fname_glinelog = NULL;
-	rb_free(ConfigFileEntry.fname_klinelog);
-	ConfigFileEntry.fname_klinelog = NULL;
-	rb_free(ConfigFileEntry.fname_operspylog);
-	ConfigFileEntry.fname_operspylog = NULL;
-	rb_free(ConfigFileEntry.fname_ioerrorlog);
-	ConfigFileEntry.fname_ioerrorlog = NULL;
-
-	
-	rb_free(ConfigFileEntry.motd_path);
-	ConfigFileEntry.motd_path = NULL;
-	
-	rb_free(ConfigFileEntry.oper_motd_path);
-	ConfigFileEntry.oper_motd_path = NULL;
-
-	rb_free(ServerInfo.vhost_dns);
-	ServerInfo.vhost_dns = NULL;
-#ifdef IPV6
-	rb_free(ServerInfo.vhost6_dns);
-	ServerInfo.vhost6_dns = NULL;
-#endif
+	free_null(ConfigFileEntry.fname_userlog);
+	free_null(ConfigFileEntry.fname_fuserlog);
+	free_null(ConfigFileEntry.fname_operlog);
+	free_null(ConfigFileEntry.fname_foperlog);
+	free_null(ConfigFileEntry.fname_serverlog);
+	free_null(ConfigFileEntry.fname_killlog);
+	free_null(ConfigFileEntry.fname_glinelog);
+	free_null(ConfigFileEntry.fname_klinelog);
+	free_null(ConfigFileEntry.fname_operspylog);
+	free_null(ConfigFileEntry.fname_ioerrorlog);
+	free_null(ConfigFileEntry.motd_path);
+	free_null(ConfigFileEntry.oper_motd_path);
 	/* operator{} and class{} blocks are freed above */
 	/* clean out listeners */
 	close_listeners();
@@ -1244,9 +1237,7 @@ clear_out_old_conf(void)
 	 */
 
 	/* clean out general */
-	rb_free(ConfigFileEntry.kline_reason);
-	ConfigFileEntry.kline_reason = NULL;
-	
+	free_null(ConfigFileEntry.kline_reason);
 	/* clear the rbl lists */
 	rbl_clear_rbllists();
 
@@ -1254,7 +1245,7 @@ clear_out_old_conf(void)
 #ifdef ENABLE_SERVICES
 	RB_DLINK_FOREACH_SAFE(ptr, next_ptr, service_list.head)
 	{
-		rb_free(ptr->data);
+		free_null(ptr->data);
 		rb_dlinkDestroy(ptr, &service_list);
 	}
 #endif
