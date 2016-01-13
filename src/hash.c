@@ -730,7 +730,6 @@ hash_get_memusage(hash_type type, size_t * entries, size_t * memusage)
 		RB_DLINK_FOREACH(ptr, htable[i]->head)
 		{
 			hnode = ptr->data;
-			fprintf(stderr, "memusage adding %zu %zu\n", hnode->keylen, sizeof(hash_node));
 			mem += hnode->keylen + sizeof(hash_node);
 			cnt++;
 		} 
