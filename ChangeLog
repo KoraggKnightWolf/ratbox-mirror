@@ -1,3 +1,12 @@
+androsyn    2016/01/13 20:55:29 UTC	(20160113_2-29317)
+  Log:
+  Have the hash tables be pointers to rb_dlink_lists, instead of directly allocated in BSS.  Each bucket now needs to have a malloc done, but we end up saving a bit of memory as most buckets are typically empty
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2016/01/13 16:42:26 UTC	(20160113_1-29285)
   Log:
   just use rb_free here
