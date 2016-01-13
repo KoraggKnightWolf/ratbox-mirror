@@ -559,13 +559,7 @@ hash_del_hnode(hash_type type, hash_node * hnode)
 void
 hash_destroyall(hash_type type, hash_destroy_cb * destroy_cb)
 {
-//	rb_dlink_list *table;
-	unsigned int i, max;
-
-	max = 1 << hash_function[type].hashbits;
-	//table = hash_function[type].htable;
-
-	for(i = 0; i < max; i++)
+	for(int i = 0; i < (1 << hash_function[type].hashbits); i++)
 	{
 		rb_dlink_list *ltable;
 		rb_dlink_node *ptr, *nptr;
@@ -589,11 +583,7 @@ hash_destroyall(hash_type type, hash_destroy_cb * destroy_cb)
 void
 hash_walkall(hash_type type, hash_walk_cb * walk_cb, void *walk_data)
 {
-	unsigned int i, max;
-
-	max = 1 << hash_function[type].hashbits;
-
-	for(unsigned int i = 0; i < max; i++)
+	for(unsigned int i = 0; i < ( 1 << hash_function[type].hashbits); i++)
 	{
 		rb_dlink_list *ltable;
 		rb_dlink_node *ptr, *next_ptr;
@@ -626,7 +616,7 @@ hash_get_tablelist(int type)
 
 	alltables = rb_malloc(sizeof(rb_dlink_list));
 
-	for(int i = 0; i < 1 << hash_function[type].hashbits; i++)
+	for(int i = 0; i < (1 << hash_function[type].hashbits); i++)
 	{
 		rb_dlink_list *table = hash_function[type].htable[i];
 		
