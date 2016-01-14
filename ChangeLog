@@ -1,3 +1,13 @@
+androsyn    2016/01/14 17:38:03 UTC	(20160114_1-29325)
+  Log:
+  move the hash_create for whowas to whowas.c
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+	ircd-ratbox/trunk/src/whowas.c (File Modified) 
+
+
 androsyn    2016/01/14 16:48:38 UTC	(20160114_0-29323)
   Log:
   The hash code gets some more changes.  There is now a hash_create function that allows for new hash creation, as named.  Ideally the initializataion of hashes will get moved towards their owner modules, but for now, we just fake it a bit with macros...
