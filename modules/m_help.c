@@ -126,7 +126,7 @@ dohelp(struct Client *source_p, int flags, const char *topic)
 	struct cacheline *lineptr;
 	rb_dlink_node *ptr;
 	rb_dlink_node *fptr;
-	hash_type htype = HASH_HELP; 
+	hash_f *htype = HASH_HELP; 
 	if(EmptyString(topic))
 		topic = ntopic;
 
