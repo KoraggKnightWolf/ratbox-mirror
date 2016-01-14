@@ -109,7 +109,6 @@ extern hash_f *hash_scache;
 extern hash_f *hash_nd;
 extern hash_f *hash_connid;
 extern hash_f *hash_zconnid;
-extern hash_f *hash_whowas;
 extern hash_f *hash_monitor;
 extern hash_f *hash_command;
 
@@ -125,7 +124,6 @@ extern hash_f *hash_command;
 #define	HASH_ND hash_nd
 #define	HASH_CONNID hash_connid
 #define	HASH_ZCONNID hash_zconnid
-#define	HASH_WHOWAS hash_whowas
 #define	HASH_MONITOR hash_monitor
 #define	HASH_COMMAND hash_command
 

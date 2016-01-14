@@ -46,8 +46,15 @@ struct whowas_top
 	hash_node *hnode;
 };
 
+
+/* whowas hash size */
+#define WHOWAS_MAX_BITS 17 /* 128kb */ 
+
+static hash_f *whowas_hash;
 static rb_dlink_list *whowas_list;
 static unsigned int whowas_list_length = NICKNAMEHISTORYLENGTH;
+
+
 static void whowas_trim(void *unused);
 
 static void
@@ -55,7 +62,7 @@ whowas_free_wtop(struct whowas_top *wtop)
 {
 	if(rb_dlink_list_length(&wtop->wwlist) == 0)
 	{
-		hash_del_hnode(HASH_WHOWAS, wtop->hnode);
+		hash_del_hnode(whowas_hash, wtop->hnode);
 		rb_free(wtop->name);
 		rb_free(wtop);
 	}
@@ -67,14 +74,14 @@ whowas_get_top(const char *name)
 	hash_node *hnode;
 	struct whowas_top *wtop;
 
-	hnode = hash_find(HASH_WHOWAS, name);
+	hnode = hash_find(whowas_hash, name);
 	if(hnode != NULL)
 	{
 		return (struct whowas_top *) hnode->data;
 	}
 	wtop = rb_malloc(sizeof(struct whowas_top));
 	wtop->name = rb_strdup(name);
-	hnode = hash_add(HASH_WHOWAS, name, wtop);
+	hnode = hash_add(whowas_hash, name, wtop);
 	wtop->hnode = hnode;
 	return wtop;
 }
@@ -83,7 +90,7 @@ rb_dlink_list *
 whowas_get_list(const char *name)
 {
 	struct whowas_top *wtop;
-	wtop = hash_find_data(HASH_WHOWAS, name);
+	wtop = hash_find_data(whowas_hash, name);
 	if(wtop == NULL)
 		return NULL;
 	return &wtop->wwlist;
@@ -162,7 +169,7 @@ whowas_get_history(const char *nick, time_t timelimit)
 	struct whowas_top *wtop;
 	rb_dlink_node *ptr;
 
-	wtop = hash_find_data(HASH_WHOWAS, nick);
+	wtop = hash_find_data(whowas_hash, nick);
 	if(wtop == NULL)
 		return NULL;
 
@@ -207,6 +214,7 @@ whowas_trim(void *unused)
 void
 whowas_init(void)
 {
+	whowas_hash = hash_create("WHOWAS", CMP_IRCCMP, WHOWAS_MAX_BITS, 0);
 	whowas_list = rb_malloc(sizeof(rb_dlink_list));
 	if(whowas_list_length == 0)
 	{
@@ -226,7 +234,7 @@ void
 whowas_memory_usage(size_t * count, size_t * memused)
 {
 	size_t hcount;
-	hash_get_memusage(HASH_WHOWAS, &hcount, memused);
+	hash_get_memusage(whowas_hash, &hcount, memused);
 	*count = rb_dlink_list_length(whowas_list);
 	*memused += *count * sizeof(whowas_t);
 	*memused += sizeof(struct whowas_top) * hcount;

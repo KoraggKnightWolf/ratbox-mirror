@@ -106,7 +106,6 @@ hash_f *hash_ohelp;
 hash_f *hash_nd;
 hash_f *hash_connid;
 hash_f *hash_zconnid;
-hash_f *hash_whowas;
 hash_f *hash_monitor;
 hash_f *hash_command;
 
@@ -130,7 +129,6 @@ init_hash(void)
 	hash_nd = hash_create("ND", CMP_IRCCMP, U_MAX_BITS, 0);
 	hash_connid = hash_create("Connection ID", CMP_MEMCMP, CLI_CONNID_MAX_BITS, sizeof(uint32_t));
 	hash_zconnid = hash_create("Ziplinks ID", CMP_MEMCMP, CLI_ZCONNID_MAX_BITS, sizeof(uint32_t));
-	hash_whowas = hash_create("WHOWAS", CMP_IRCCMP, WHOWAS_MAX_BITS, 0);
 	hash_monitor = hash_create("MONITOR", CMP_IRCCMP, MONITOR_MAX_BITS, 0);
 	hash_command = hash_create("Command", CMP_IRCCMP, COMMAND_MAX_BITS, 10);
 }
