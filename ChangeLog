@@ -1,3 +1,14 @@
+androsyn    2016/01/14 16:48:38 UTC	(20160114_0-29323)
+  Log:
+  The hash code gets some more changes.  There is now a hash_create function that allows for new hash creation, as named.  Ideally the initializataion of hashes will get moved towards their owner modules, but for now, we just fake it a bit with macros...
+  
+
+  Modified:
+	ircd-ratbox/trunk/include/hash.h (File Modified) 
+	ircd-ratbox/trunk/modules/m_help.c (File Modified) 
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2016/01/13 20:58:59 UTC	(20160113_4-29321)
   Log:
   remove debug code
