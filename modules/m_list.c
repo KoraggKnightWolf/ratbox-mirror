@@ -312,7 +312,7 @@ list_limit_channels(struct Client *source_p, const char *param)
 			sendto_one_numeric(source_p, s_RPL(ERR_TOOMANYMATCHES), "LIST");
 			break;
 		}
-		fprintf(stderr, "Channel %s, chan_member_count(%u), %u %u\n", chptr->chname, chan_member_count(chptr), min, max);
+
 		if(chan_member_count(chptr) >= max ||
 		   chan_member_count(chptr) <= min)
 			continue;
