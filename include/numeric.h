@@ -55,7 +55,7 @@
 #define NUMERIC_STR_206	/*** RPL_TRACESERVER ***/	"Serv %s %dS %dC %s %s!%s@%s %" RBTT_FMT
 #define NUMERIC_STR_208	/*** RPL_TRACENEWTYPE ***/	"<newtype> 0 %s"
 #define NUMERIC_STR_209	/*** RPL_TRACECLASS ***/	"Class %s %d"
-#define NUMERIC_STR_211	/*** RPL_STATSLINKINFO ***/	"%s %zu %u %" PRIu64 " %u %" PRIu64 " :%" RBTT_FMT "%" RBTT_FMT " %s"
+#define NUMERIC_STR_211	/*** RPL_STATSLINKINFO ***/	"%s %zu %u %" PRIu64 " %u %" PRIu64 " :%" RBTT_FMT " %" RBTT_FMT " %s"
 #define NUMERIC_STR_212	/*** RPL_STATSCOMMANDS ***/	"%s %lu %lu :%lu"
 #define NUMERIC_STR_213	/*** RPL_STATSCLINE ***/	"C %s %s %s %d %s"
 #define NUMERIC_STR_215	/*** RPL_STATSILINE ***/	"I %s * %s@%s %d %s"
