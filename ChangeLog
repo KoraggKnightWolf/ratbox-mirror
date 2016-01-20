@@ -1,3 +1,11 @@
+androsyn    2016/01/20 19:16:32 UTC	(20160120_0-29333)
+  Log:
+  fix RPL_STATSLINKINFO's format string, it was missing a space
+
+  Modified:
+	ircd-ratbox/trunk/include/numeric.h (File Modified) 
+
+
 androsyn    2016/01/19 16:57:17 UTC	(20160119_0-29331)
   Log:
   remove debug code
