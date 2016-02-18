@@ -616,7 +616,6 @@ if test "x$enable_static" = "xyes"; then
 fi
 
 echo "Modules ........................ $tmpresult"
-echo "IO Debugging hooks ............. $iodebug"
 echo "Assert debugging ............... $assert"
 echo "ratbox-services compatibility .. $ratbox_services"
 echo
