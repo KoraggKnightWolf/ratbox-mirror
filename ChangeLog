@@ -1,3 +1,11 @@
+androsyn    2016/02/18 17:14:09 UTC	(20160218_0-29337)
+  Log:
+  remove stamp-h1
+
+  Modified:
+	ircd-ratbox/trunk/libltdl/stamp-h1 (File Deleted) 
+
+
 androsyn    2016/02/13 02:43:53 UTC	(20160213_0-29335)
   Log:
   Port the following changes from the previous trunk..
