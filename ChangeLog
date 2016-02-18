@@ -1,3 +1,12 @@
+androsyn    2016/02/18 17:21:27 UTC	(20160218_1-29339)
+  Log:
+  remove IO Debugging hooks from autoconf output, it doesn't exist anymore
+
+  Modified:
+	ircd-ratbox/trunk/configure (File Modified) 
+	ircd-ratbox/trunk/configure.ac (File Modified) 
+
+
 androsyn    2016/02/18 17:14:09 UTC	(20160218_0-29337)
   Log:
   remove stamp-h1
