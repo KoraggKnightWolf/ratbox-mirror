@@ -491,7 +491,7 @@ ssl_process_cmd_recv(ssl_ctl_t * ctl)
 			ilog(L_MAIN, "%s", no_ssl_or_zlib);
 			sendto_realops_flags(UMODE_ALL, L_ALL, "%s", no_ssl_or_zlib);
 			ssl_killall();
-			break;
+			return;
 		case 'z':
 			zlib_ok = false;
 			break;
