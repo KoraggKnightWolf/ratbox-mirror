@@ -1,3 +1,15 @@
+androsyn    2016/03/20 20:44:20 UTC	(20160320_0-29344)
+  Log:
+  return after calling free_ssl_daemon() 
+  
+  Ported from charbydis
+  
+  
+
+  Modified:
+	ircd-ratbox/trunk/src/sslproc.c (File Modified) 
+
+
 androsyn    2016/02/18 17:21:27 UTC	(20160218_1-29339)
   Log:
   remove IO Debugging hooks from autoconf output, it doesn't exist anymore
