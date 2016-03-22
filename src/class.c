@@ -230,7 +230,7 @@ find_class(const char *classname)
  * side effects	- 
  */
 void
-check_class()
+check_class(void)
 {
 	rb_dlink_node *ptr;
 	rb_dlink_node *next_ptr;
@@ -256,7 +256,7 @@ check_class()
  * side effects	- 
  */
 void
-initclass()
+initclass(void)
 {
 	default_class = make_class();
 	ClassName(default_class) = rb_strdup("default");
