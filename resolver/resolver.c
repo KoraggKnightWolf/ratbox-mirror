@@ -70,7 +70,7 @@ rehash(int sig)
 
 
 static void
-setup_signals()
+setup_signals(void)
 {
 #ifndef WINDOWS
 	struct sigaction act;
