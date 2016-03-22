@@ -1,3 +1,11 @@
+androsyn    2016/03/22 18:51:08 UTC	(20160322_3-29352)
+  Log:
+  use normal ansi style declaration for setup_signals
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bandb.c (File Modified) 
+
+
 androsyn    2016/03/22 18:49:26 UTC	(20160322_2-29350)
   Log:
   make rbl_check_rbls static
