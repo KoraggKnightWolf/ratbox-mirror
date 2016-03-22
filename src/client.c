@@ -1866,7 +1866,7 @@ hash_find_masked_server(struct Client *source_p, const char *name)
 	/* copy it across to give us a buffer to work on */
 	rb_strlcpy(buf, name, sizeof(buf));
 
-	while((s = strchr(p, '.')) != 0)
+	while((s = strchr(p, '.')) != NULL)
 	{
 		*--s = '*';
 		/*
