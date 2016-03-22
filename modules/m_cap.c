@@ -131,7 +131,7 @@ clicap_find(const char *data, int *negate, int *finished, char **p)
 	while(**p && IsSpace(**p))
 		(*p)++;
 
-	if(EmptyString(p))
+	if(EmptyString(*p))
 	{
 		*finished = 1;
 		return NULL;
