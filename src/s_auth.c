@@ -834,7 +834,7 @@ cleanup:
 }
 
 #define RBL_HOSTLEN 255
-void
+static void
 rbl_check_rbls(struct AuthRequest *auth)
 {
         char hostbuf[RBL_HOSTLEN];
