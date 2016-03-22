@@ -1,3 +1,11 @@
+androsyn    2016/03/22 18:49:14 UTC	(20160322_1-29348)
+  Log:
+  use NULL instead of 0 to init pointer
+
+  Modified:
+	ircd-ratbox/trunk/src/s_auth.c (File Modified) 
+
+
 androsyn    2016/03/22 18:47:29 UTC	(20160322_0-29346)
   Log:
   use NULL instead of 0 to initialize pointers
