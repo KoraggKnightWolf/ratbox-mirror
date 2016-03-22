@@ -1320,7 +1320,7 @@ dummy_handler(int sig)
 #endif
 
 static void
-setup_signals()
+setup_signals(void)
 {
 #ifndef _WIN32
 	struct sigaction act;
