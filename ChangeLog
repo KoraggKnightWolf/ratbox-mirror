@@ -1,3 +1,11 @@
+androsyn    2016/03/22 19:28:17 UTC	(20160322_20-29388)
+  Log:
+  more 0 to NULL conversions
+
+  Modified:
+	ircd-ratbox/trunk/src/s_serv.c (File Modified) 
+
+
 androsyn    2016/03/22 19:27:28 UTC	(20160322_19-29386)
   Log:
   more () to (void) conversions on functions
