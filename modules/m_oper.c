@@ -515,7 +515,7 @@ generate_challenge(uint8_t ** r_challenge, uint8_t ** r_response, RSA * rsa)
 	ERR_load_crypto_strings();
 	while((cnt < 100) && (e = ERR_get_error()))
 	{
-		ilog(L_MAIN, "SSL error: %s", ERR_error_string(e, 0));
+		ilog(L_MAIN, "SSL error: %s", ERR_error_string(e, NULL));
 		cnt++;
 	}
 

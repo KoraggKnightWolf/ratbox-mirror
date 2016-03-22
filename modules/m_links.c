@@ -143,8 +143,8 @@ static char *
 clean_string(char *dest, const unsigned char *src, size_t len)
 {
 	char *d = dest;
-	s_assert(0 != dest);
-	s_assert(0 != src);
+	s_assert(NULL != dest);
+	s_assert(NULL != src);
 
 	if(dest == NULL || src == NULL)
 		return NULL;
