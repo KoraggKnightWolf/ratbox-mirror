@@ -1,3 +1,11 @@
+androsyn    2016/03/22 19:12:14 UTC	(20160322_11-29370)
+  Log:
+  use NULL, not 0 for localClient->listener
+
+  Modified:
+	ircd-ratbox/trunk/src/client.c (File Modified) 
+
+
 androsyn    2016/03/22 19:03:20 UTC	(20160322_10-29366)
   Log:
   use NULL instead of 0 to pass to close_conn
