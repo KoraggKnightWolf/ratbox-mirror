@@ -81,7 +81,7 @@ echo "  \"$i\"," >> version.c
 done
 $spitshell >>version.c <<!SUB!THISTOO!
   "",
-  0,
+  NULL,
 };
 
 void 
