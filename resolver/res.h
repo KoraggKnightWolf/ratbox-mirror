@@ -34,5 +34,14 @@ void gethost_byaddr(const struct rb_sockaddr_storage *, struct DNSQuery *);
 //static void add_local_domain(char *, size_t);
 //static void report_dns_servers(struct Client *);
 
+#ifdef RB_IPV6
+extern struct in6_addr ipv6_addr;
+#endif
+extern struct in_addr ipv4_addr;
+
+extern struct rb_sockaddr_storage irc_nsaddr_list[];
+extern int irc_nscount;
+extern char irc_domain[];
+
 
 #endif

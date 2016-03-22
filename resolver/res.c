@@ -61,13 +61,6 @@ static PF res_readreply;
 #define RDLENGTH_SIZE	  (size_t)2
 #define ANSWER_FIXED_SIZE (TYPE_SIZE + CLASS_SIZE + TTL_SIZE + RDLENGTH_SIZE)
 
-#ifdef RB_IPV6
-extern struct in6_addr ipv6_addr;
-#endif
-extern struct in_addr ipv4_addr;
-
-extern struct rb_sockaddr_storage irc_nsaddr_list[];
-extern int irc_nscount;
 struct reslist
 {
 	rb_dlink_node node;
