@@ -1,3 +1,11 @@
+androsyn    2016/03/22 18:47:29 UTC	(20160322_0-29346)
+  Log:
+  use NULL instead of 0 to initialize pointers
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2016/03/20 20:44:20 UTC	(20160320_0-29344)
   Log:
   return after calling free_ssl_daemon() 
