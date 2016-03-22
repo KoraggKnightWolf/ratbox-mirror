@@ -116,7 +116,7 @@ sigint_handler(int sig)
  * setup_signals - initialize signal handlers for server
  */
 void
-setup_signals()
+setup_signals(void)
 {
 	sigset_t sigs;
 	struct sigaction act;
@@ -135,45 +135,45 @@ setup_signals()
 
 #ifdef SIGWINCH
 	sigaddset(&act.sa_mask, SIGWINCH);
-	sigaction(SIGWINCH, &act, 0);
+	sigaction(SIGWINCH, &act, NULL);
 #endif
-	sigaction(SIGPIPE, &act, 0);
+	sigaction(SIGPIPE, &act, NULL);
 #ifdef SIGTRAP
-	sigaction(SIGTRAP, &act, 0);
+	sigaction(SIGTRAP, &act, NULL);
 #endif
 
 	act.sa_handler = dummy_handler;
-	sigaction(SIGALRM, &act, 0);
+	sigaction(SIGALRM, &act, NULL);
 
 	act.sa_handler = sighup_handler;
 	sigemptyset(&act.sa_mask);
 	sigaddset(&act.sa_mask, SIGHUP);
-	sigaction(SIGHUP, &act, 0);
+	sigaction(SIGHUP, &act, NULL);
 	sigaddset(&sigs, SIGHUP);
 	
 	act.sa_handler = sigint_handler;
 	sigaddset(&act.sa_mask, SIGINT);
-	sigaction(SIGINT, &act, 0);
+	sigaction(SIGINT, &act, NULL);
 	sigaddset(&sigs, SIGINT);
 
 	act.sa_handler = sigterm_handler;
 	sigaddset(&act.sa_mask, SIGTERM);
-	sigaction(SIGTERM, &act, 0);
+	sigaction(SIGTERM, &act, NULL);
 	sigaddset(&sigs, SIGTERM);
 	
 	act.sa_handler = sigusr1_handler;
 	sigaddset(&act.sa_mask, SIGUSR1);
-	sigaction(SIGUSR1, &act, 0);
+	sigaction(SIGUSR1, &act, NULL);
 	sigaddset(&sigs, SIGUSR1);
 	
 	act.sa_handler = sigusr2_handler;
 	sigaddset(&act.sa_mask, SIGUSR2);
-	sigaction(SIGUSR2, &act, 0);
+	sigaction(SIGUSR2, &act, NULL);
 	sigaddset(&sigs, SIGUSR2);
 
 	act.sa_handler = sigchld_handler;
 	sigaddset(&act.sa_mask, SIGCHLD);
-	sigaction(SIGCHLD, &act, 0);
+	sigaction(SIGCHLD, &act, NULL);
 	sigaddset(&sigs, SIGCHLD);
 }
 
@@ -181,7 +181,7 @@ setup_signals()
  * setup_reboot_signals() we need to not try to do stuff before reboot with signals
  */
 void
-setup_reboot_signals()
+setup_reboot_signals(void)
 {
 	struct sigaction act;
 
@@ -192,12 +192,12 @@ setup_reboot_signals()
 
 #ifdef SIGTRAP
 	sigaddset(&act.sa_mask, SIGTRAP);
-	sigaction(SIGTRAP, &act, 0);
+	sigaction(SIGTRAP, &act, NULL);
 #endif
 
 #ifdef SIGWINCH
 	sigaddset(&act.sa_mask, SIGWINCH);
-	sigaction(SIGWINCH, &act, 0);
+	sigaction(SIGWINCH, &act, NULL);
 #endif
 	sigaddset(&act.sa_mask, SIGALRM);
 	sigaddset(&act.sa_mask, SIGPIPE);
@@ -208,17 +208,17 @@ setup_reboot_signals()
 	sigaddset(&act.sa_mask, SIGUSR2);
 	sigaddset(&act.sa_mask, SIGCHLD);
 
-	sigaction(SIGALRM, &act, 0);
-	sigaction(SIGPIPE, &act, 0);
-	sigaction(SIGHUP, &act, 0);
-	sigaction(SIGINT, &act, 0);
-	sigaction(SIGTERM, &act, 0);
-	sigaction(SIGUSR1, &act, 0);
-	sigaction(SIGUSR2, &act, 0);
-	sigaction(SIGTERM, &act, 0);
-	sigaction(SIGUSR1, &act, 0);
-	sigaction(SIGUSR2, &act, 0);
-	sigaction(SIGCHLD, &act, 0);
+	sigaction(SIGALRM, &act, NULL);
+	sigaction(SIGPIPE, &act, NULL);
+	sigaction(SIGHUP, &act, NULL);
+	sigaction(SIGINT, &act, NULL);
+	sigaction(SIGTERM, &act, NULL);
+	sigaction(SIGUSR1, &act, NULL);
+	sigaction(SIGUSR2, &act, NULL);
+	sigaction(SIGTERM, &act, NULL);
+	sigaction(SIGUSR1, &act, NULL);
+	sigaction(SIGUSR2, &act, NULL);
+	sigaction(SIGCHLD, &act, NULL);
 
 
 
