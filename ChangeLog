@@ -1,3 +1,11 @@
+androsyn    2016/03/22 19:26:53 UTC	(20160322_18-29384)
+  Log:
+  use NULL instead of 0
+
+  Modified:
+	ircd-ratbox/trunk/src/newconf.c (File Modified) 
+
+
 androsyn    2016/03/22 19:26:34 UTC	(20160322_17-29382)
   Log:
   remove extern char conffilebuf from ircd_lexer.l and put it in newconf.h
