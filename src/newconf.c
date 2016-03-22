@@ -1524,7 +1524,7 @@ conf_set_end_operator(conf_t * conf)
 					 tmp_oper->name, conf->filename, conf->line);
 				return;
 			}
-			tmp_oper->rsa_pubkey = (RSA *) PEM_read_bio_RSA_PUBKEY(file, NULL, 0, NULL);
+			tmp_oper->rsa_pubkey = (RSA *) PEM_read_bio_RSA_PUBKEY(file, NULL, NULL, NULL);
 			BIO_free(file);
 
 			if(tmp_oper->rsa_pubkey == NULL)
