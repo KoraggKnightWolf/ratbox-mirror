@@ -1004,7 +1004,7 @@ remove_dependents(struct Client *client_p, struct Client *source_p, const char *
 	recurse_remove_clients(source_p, comment1);
 }
 
-void
+static void
 exit_aborted_clients(void *unused)
 {
 	rb_dlink_node *ptr, *next;
