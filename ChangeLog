@@ -1,3 +1,12 @@
+androsyn    2016/03/22 18:55:14 UTC	(20160322_7-29360)
+  Log:
+  move extern variables to res.h
+
+  Modified:
+	ircd-ratbox/trunk/resolver/res.c (File Modified) 
+	ircd-ratbox/trunk/resolver/res.h (File Modified) 
+
+
 androsyn    2016/03/22 18:53:11 UTC	(20160322_6-29358)
   Log:
   use normal ansi style declaration for setup_signals
