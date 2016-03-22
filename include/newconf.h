@@ -7,6 +7,8 @@
 #define _NEWCONF_H_INCLUDED
 
 extern FILE *conf_fbfile_in;
+extern char conffilebuf[];
+
 
 #define CF_QSTRING	0x01
 #define CF_INT		0x02

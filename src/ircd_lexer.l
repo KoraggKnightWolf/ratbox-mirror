@@ -63,7 +63,6 @@ void hashcomment(void);
 int ieof(void);
 int lineno_stack[MAX_INCLUDE_DEPTH];
 char conffile_stack[MAX_INCLUDE_DEPTH][IRCD_BUFSIZE];
-extern char conffilebuf[IRCD_BUFSIZE+1];
 char *current_file = conffilebuf;
 
 FILE *inc_fbfile_in[MAX_INCLUDE_DEPTH];
