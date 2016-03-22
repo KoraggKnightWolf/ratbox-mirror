@@ -1,3 +1,11 @@
+androsyn    2016/03/22 19:14:21 UTC	(20160322_13-29374)
+  Log:
+  use NULL instead of 0 as a pointer
+
+  Modified:
+	ircd-ratbox/trunk/src/version.c.SH (File Modified) 
+
+
 androsyn    2016/03/22 19:13:04 UTC	(20160322_12-29372)
   Log:
   make exit_aborted_clients static to match the previous static forward declaration
