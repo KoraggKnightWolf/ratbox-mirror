@@ -711,7 +711,7 @@ ssl_process_accept_cb(rb_fde_t *F, int status, struct sockaddr *addr, rb_socklen
 		return;
 	}
 	/* ircd doesn't care about the reason for this */
-	close_conn(conn, NO_WAIT, 0);
+	close_conn(conn, NO_WAIT, NULL);
 	return;
 }
 
