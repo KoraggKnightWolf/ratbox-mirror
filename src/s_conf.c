@@ -112,7 +112,7 @@ init_s_conf(void)
  * side effects	- none
  */
 struct ConfItem *
-make_conf()
+make_conf(void)
 {
 	struct ConfItem *aconf;
 
