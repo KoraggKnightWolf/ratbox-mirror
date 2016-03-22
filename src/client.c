@@ -184,7 +184,7 @@ free_local_client(struct Client *client_p)
 		s_assert(0 < client_p->localClient->listener->ref_count);
 		if(0 == --client_p->localClient->listener->ref_count && !client_p->localClient->listener->active)
 			free_listener(client_p->localClient->listener);
-		client_p->localClient->listener = 0;
+		client_p->localClient->listener = NULL;
 	}
 
 	hash_del_len(HASH_CONNID, &client_p->localClient->connid, sizeof(client_p->localClient->connid), client_p);
