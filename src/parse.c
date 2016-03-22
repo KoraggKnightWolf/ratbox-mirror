@@ -67,7 +67,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
 	char *s;
 	char *end;
 	int i = 1;
-	char *numeric = 0;
+	char *numeric = NULL;
 	struct Message *mptr;
 
 	s_assert(MyConnect(client_p));
@@ -249,7 +249,7 @@ static int
 handle_command(struct Message *mptr, struct Client *client_p, struct Client *from, int i, const char **hpara)
 {
 	struct MessageEntry ehandler;
-	MessageHandler handler = 0;
+	MessageHandler handler = NULL;
 	static time_t last_warning;
 
 	if(IsAnyDead(client_p))
@@ -309,7 +309,7 @@ handle_encap(struct Client *client_p, struct Client *source_p, const char *comma
 {
 	struct Message *mptr;
 	struct MessageEntry ehandler;
-	MessageHandler handler = 0;
+	MessageHandler handler = NULL;
 
 	parv[0] = source_p->name;
 
