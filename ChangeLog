@@ -1,3 +1,11 @@
+androsyn    2016/03/22 18:52:56 UTC	(20160322_5-29356)
+  Log:
+  use NULL instead of 0 for the third sigaction argument
+
+  Modified:
+	ircd-ratbox/trunk/ssld/ssld.c (File Modified) 
+
+
 androsyn    2016/03/22 18:52:04 UTC	(20160322_4-29354)
   Log:
   use NULL instead of 0 for the third sigaction argument
