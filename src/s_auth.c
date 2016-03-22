@@ -408,8 +408,8 @@ get_valid_ident(char *xbuf)
 void
 start_auth(struct Client *client)
 {
-	struct AuthRequest *auth = 0;
-	s_assert(0 != client);
+	struct AuthRequest *auth = NULL;
+	s_assert(NULL != client);
 	if(client == NULL)
 		return;
 
