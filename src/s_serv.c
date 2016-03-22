@@ -77,7 +77,7 @@ struct Capability captab[] = {
 #endif
 	{"SAVE", CAP_SAVE},
 	{"SAVETS_100", CAP_SAVETS_100},
-	{0, 0}
+	{NULL, 0}
 };
 
 static CNCB serv_connect_callback;
@@ -300,7 +300,7 @@ try_connections(void *unused)
 	sendto_realops_flags(UMODE_ALL, L_ALL, "Connection to %s activated", server_p->name);
 	ilog(L_SERVER, "Connection to %s activated", server_p->name);
 
-	serv_connect(server_p, 0);
+	serv_connect(server_p, NULL);
 }
 
 /*
