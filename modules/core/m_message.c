@@ -45,7 +45,8 @@ static int m_privmsg(struct Client *, struct Client *, int, const char **);
 static int m_notice(struct Client *, struct Client *, int, const char **);
 
 static void expire_tgchange(void *unused);
-rb_ev_entry *tgchange_ev;
+static rb_ev_entry *tgchange_ev;
+
 static int
 modinit(void)
 {
