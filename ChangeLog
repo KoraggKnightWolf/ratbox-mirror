@@ -1,3 +1,11 @@
+androsyn    2016/03/23 17:10:15 UTC	(20160323_8-29412)
+  Log:
+  no need for para to be statically allocated in parse() i don't think
+
+  Modified:
+	ircd-ratbox/trunk/src/parse.c (File Modified) 
+
+
 androsyn    2016/03/23 17:07:58 UTC	(20160323_7-29410)
   Log:
   rebuild ircd_lexer.c
