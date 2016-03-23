@@ -565,7 +565,6 @@ void hashcomment(void);
 int ieof(void);
 int lineno_stack[MAX_INCLUDE_DEPTH];
 char conffile_stack[MAX_INCLUDE_DEPTH][IRCD_BUFSIZE];
-extern char conffilebuf[IRCD_BUFSIZE+1];
 char *current_file = conffilebuf;
 
 FILE *inc_fbfile_in[MAX_INCLUDE_DEPTH];
@@ -576,7 +575,7 @@ char yy_linebuf[512];
 
 #define YY_INPUT(buf,result,max_size) \
 	(result = conf_fgets(buf, max_size, conf_fbfile_in))
-#line 580 "ircd_lexer.c"
+#line 579 "ircd_lexer.c"
 
 #define INITIAL 0
 
@@ -788,9 +787,9 @@ YY_DECL
 		}
 
 	{
-#line 86 "ircd_lexer.l"
+#line 85 "ircd_lexer.l"
 
-#line 794 "ircd_lexer.c"
+#line 793 "ircd_lexer.c"
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
@@ -855,39 +854,39 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 87 "ircd_lexer.l"
+#line 86 "ircd_lexer.l"
 { cinclude(); }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 88 "ircd_lexer.l"
+#line 87 "ircd_lexer.l"
 { ccomment(); }
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 89 "ircd_lexer.l"
+#line 88 "ircd_lexer.l"
 { strcpy(yy_linebuf, yytext+1); lineno++; yyless(1); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 91 "ircd_lexer.l"
+#line 90 "ircd_lexer.l"
 ;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 92 "ircd_lexer.l"
+#line 91 "ircd_lexer.l"
 { hashcomment(); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 94 "ircd_lexer.l"
+#line 93 "ircd_lexer.l"
 { yylval.number = atoi(yytext); return NUMBER; }
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 96 "ircd_lexer.l"
+#line 95 "ircd_lexer.l"
 {
 		if(yytext[yyleng-2] == '\\')
 		{
@@ -933,12 +932,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 140 "ircd_lexer.l"
+#line 139 "ircd_lexer.l"
 { return LOADMODULE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 141 "ircd_lexer.l"
+#line 140 "ircd_lexer.l"
 { 
 			strcpy(yylval.string, yytext);
 			yylval.string[yyleng] = '\0';
@@ -947,24 +946,24 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 147 "ircd_lexer.l"
+#line 146 "ircd_lexer.l"
 { return TWODOTS; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 148 "ircd_lexer.l"
+#line 147 "ircd_lexer.l"
 { return yytext[0]; }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 149 "ircd_lexer.l"
+#line 148 "ircd_lexer.l"
 { if (ieof()) yyterminate(); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 150 "ircd_lexer.l"
+#line 149 "ircd_lexer.l"
 ECHO;
 	YY_BREAK
-#line 968 "ircd_lexer.c"
+#line 967 "ircd_lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1920,7 +1919,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 149 "ircd_lexer.l"
+#line 148 "ircd_lexer.l"
 
 
 
