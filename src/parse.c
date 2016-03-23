@@ -60,8 +60,8 @@ void
 parse(struct Client *client_p, char *pbuffer, char *bufend)
 {
 	struct Client *from = client_p;
-	static char *para[MAXPARA + 2];
-	static char *sender;
+	char *para[MAXPARA + 2];
+	char *sender;
 
 	char *ch;
 	char *s;
