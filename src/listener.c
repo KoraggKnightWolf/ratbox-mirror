@@ -53,7 +53,7 @@ static struct Listener *
 make_listener(struct rb_sockaddr_storage *addr)
 {
 	struct Listener *listener = rb_malloc(sizeof(struct Listener));
-	s_assert(0 != listener);
+	s_assert(NULL != listener);
 	listener->name = ServerInfo.name;	/* me.name may not be valid yet -- jilles */
 	listener->F = NULL;
 	listener->printable_name = NULL;
