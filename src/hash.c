@@ -274,7 +274,7 @@ typedef bool hash_cmp(const void *x, const void *y, size_t len);
 
 struct _hash_function
 {
-	const char *name;
+	char *name;
 	uint32_t(*func) (unsigned const char *, unsigned int, size_t);
 	hash_cmptype cmptype;
 	rb_dlink_list **htable;
@@ -283,6 +283,15 @@ struct _hash_function
 };
 
 static rb_dlink_list list_of_hashes;
+
+static void
+hash_free(hash_f *hf)
+{
+	rb_dlinkFindDestroy(hf, &list_of_hashes);
+	rb_free(hf->name);
+	rb_free(hf->htable);
+	rb_free(hf);
+}
 
 hash_f *
 hash_create(const char *name, hash_cmptype cmptype, unsigned int hashbits, unsigned int maxkeylen)
@@ -646,11 +655,12 @@ hash_destroyall(hash_f *hf, hash_destroy_cb * destroy_cb)
 			
 			rb_dlinkDelete(ptr, ltable);
 			free_hashnode(hnode);
-			destroy_cb(cbdata);
+			if(destroy_cb != NULL)
+				destroy_cb(cbdata);
 		}
 		hash_free_bucket(hf, i);
 	}
-	/* XXX need to free hash_f struct too */
+	hash_free(hf);
 }
 
 void
