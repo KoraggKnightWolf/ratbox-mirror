@@ -645,8 +645,11 @@ count_hash(struct Client *source_p, rb_dlink_list ** table, unsigned int length,
 
 	for(i = 0; i < length; i++)
 	{
-		if(table[i] == NULL)
+		if(table[i] == NULL) 
+		{
+			counts[0]++;
 			continue;
+		}
 	
 		if(rb_dlink_list_length(table[i]) >= 10)
 			counts[10]++;
