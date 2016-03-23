@@ -42,23 +42,6 @@
 
 /* Magic value for FNV hash functions */
 #define FNV1_32_INIT 0x811c9dc5UL
-/*
-static rb_dlink_list *clientbyconnidTable[CLI_CONNID_MAX];
-static rb_dlink_list *clientbyzconnidTable[CLI_ZCONNID_MAX];
-static rb_dlink_list *clientTable[U_MAX];
-static rb_dlink_list *channelTable[CH_MAX];
-static rb_dlink_list *idTable[U_MAX];
-static rb_dlink_list *resvTable[R_MAX];
-static rb_dlink_list *hostTable[HOST_MAX];
-static rb_dlink_list *helpTable[HELP_MAX];
-static rb_dlink_list *ohelpTable[HELP_MAX];
-static rb_dlink_list *ndTable[U_MAX];
-static rb_dlink_list *operhash_table[OPERHASH_MAX];
-static rb_dlink_list *scache_table[SCACHE_MAX];
-static rb_dlink_list *whowas_table[WHOWAS_MAX];
-static rb_dlink_list *monitor_table[MONITOR_MAX];
-static rb_dlink_list *command_table[COMMAND_MAX];
-*/
 
 /*
  * Hashing.
@@ -93,7 +76,6 @@ static rb_dlink_list *command_table[COMMAND_MAX];
  * 
  */
 
-
 hash_f *hash_client;
 hash_f *hash_id;
 hash_f *hash_channel;
@@ -108,7 +90,6 @@ hash_f *hash_connid;
 hash_f *hash_zconnid;
 hash_f *hash_monitor;
 hash_f *hash_command;
-
 
 /* init_hash()
  *
@@ -132,58 +113,6 @@ init_hash(void)
 	hash_monitor = hash_create("MONITOR", CMP_IRCCMP, MONITOR_MAX_BITS, 0);
 	hash_command = hash_create("Command", CMP_IRCCMP, COMMAND_MAX_BITS, 10);
 }
-
-/*
-static struct _hash_function hash_function[HASH_LAST] =
-{	[HASH_CLIENT] = { 
-		.name = "NICK", .func = fnv_hash_upper, .htable = clientTable, .hashbits = U_MAX_BITS, 
-	},
-	[HASH_ID] = { 
-		.name = "ID", .func = fnv_hash, .htable = idTable, .hashbits = U_MAX_BITS, .cmptype = CMP_STRCMP,
-	},
-	[HASH_CHANNEL] = { 
-		.name = "Channel", .func = fnv_hash_upper_len, .htable = channelTable, .hashbits = CH_MAX_BITS, .hashlen = 30,
-	},
-	[HASH_HOSTNAME] = { 
-		.name = "Host", .func = fnv_hash_upper_len, .htable = hostTable, .hashbits = HOST_MAX_BITS, .hashlen = 30
-	},
-	[HASH_RESV] = { 
-		.name = "Channel RESV", .func = fnv_hash_upper_len, .htable = resvTable, .hashbits = R_MAX_BITS, .hashlen = 30
-	},
-	[HASH_OPER] = {
-		.name = "Operator", .func = fnv_hash_upper, .htable = operhash_table, .hashbits = OPERHASH_MAX_BITS,
-	},
-	[HASH_SCACHE] = {
-		.name = "Server Cache", .func = fnv_hash_upper, .htable = scache_table, .hashbits = SCACHE_MAX_BITS, 
-	},
-	[HASH_HELP] = {
-		.name = "Help", .func = fnv_hash_upper, .htable = helpTable, .hashbits = HELP_MAX_BITS, 
-	},
-	[HASH_OHELP] = {
-		.name = "Operator Help", .func = fnv_hash_upper, .htable = ohelpTable, .hashbits = HELP_MAX_BITS, 
-	},
-	[HASH_ND] = {
-		.name = "Nick Delay", .func = fnv_hash_upper, .htable = ndTable, .hashbits = U_MAX_BITS,
-	},
-	[HASH_CONNID] = {
-		.name = "Connection ID", .func = fnv_hash_len_data, .htable = clientbyconnidTable, .hashbits = CLI_CONNID_MAX_BITS, .cmptype = CMP_MEMCMP, .hashlen = sizeof(uint32_t)
-	},
-	[HASH_ZCONNID] = {
-		.name = "Ziplinks ID", .func = fnv_hash_len_data, .htable = clientbyzconnidTable, .hashbits = CLI_ZCONNID_MAX_BITS, .cmptype = CMP_MEMCMP, .hashlen = sizeof(uint32_t)
-	},
-	[HASH_WHOWAS] = { 
-		.name = "WHOWAS", .func = fnv_hash_upper, .htable = whowas_table, .hashbits = WHOWAS_MAX_BITS, 
-	},
-	[HASH_MONITOR] = {
-		.name = "MONITOR", .func = fnv_hash_upper, .htable = monitor_table, .hashbits = MONITOR_MAX_BITS
-	},
-	[HASH_COMMAND] = {
-		.name = "Command", .func = fnv_hash_upper, .htable = command_table, .hashbits = COMMAND_MAX_BITS
-	},
-}
-
-*/
-
 
 /* fnv_hash_len_data hashses any data */
 static uint32_t
@@ -333,65 +262,10 @@ hash_create(const char *name, hash_cmptype cmptype, unsigned int hashbits, unsig
 
 }
 
-/* *INDENT-OFF* */  
-/* if the cmpfunc field is not set, it is assumed hash_irccmp will be used */
-/*
-static struct _hash_function hash_function[HASH_LAST] =
-{	[HASH_CLIENT] = { 
-		.name = "NICK", .func = fnv_hash_upper, .htable = clientTable, .hashbits = U_MAX_BITS, 
-	},
-	[HASH_ID] = { 
-		.name = "ID", .func = fnv_hash, .htable = idTable, .hashbits = U_MAX_BITS, .cmptype = CMP_STRCMP,
-	},
-	[HASH_CHANNEL] = { 
-		.name = "Channel", .func = fnv_hash_upper_len, .htable = channelTable, .hashbits = CH_MAX_BITS, .hashlen = 30,
-	},
-	[HASH_HOSTNAME] = { 
-		.name = "Host", .func = fnv_hash_upper_len, .htable = hostTable, .hashbits = HOST_MAX_BITS, .hashlen = 30
-	},
-	[HASH_RESV] = { 
-		.name = "Channel RESV", .func = fnv_hash_upper_len, .htable = resvTable, .hashbits = R_MAX_BITS, .hashlen = 30
-	},
-	[HASH_OPER] = {
-		.name = "Operator", .func = fnv_hash_upper, .htable = operhash_table, .hashbits = OPERHASH_MAX_BITS,
-	},
-	[HASH_SCACHE] = {
-		.name = "Server Cache", .func = fnv_hash_upper, .htable = scache_table, .hashbits = SCACHE_MAX_BITS, 
-	},
-	[HASH_HELP] = {
-		.name = "Help", .func = fnv_hash_upper, .htable = helpTable, .hashbits = HELP_MAX_BITS, 
-	},
-	[HASH_OHELP] = {
-		.name = "Operator Help", .func = fnv_hash_upper, .htable = ohelpTable, .hashbits = HELP_MAX_BITS, 
-	},
-	[HASH_ND] = {
-		.name = "Nick Delay", .func = fnv_hash_upper, .htable = ndTable, .hashbits = U_MAX_BITS,
-	},
-	[HASH_CONNID] = {
-		.name = "Connection ID", .func = fnv_hash_len_data, .htable = clientbyconnidTable, .hashbits = CLI_CONNID_MAX_BITS, .cmptype = CMP_MEMCMP, .hashlen = sizeof(uint32_t)
-	},
-	[HASH_ZCONNID] = {
-		.name = "Ziplinks ID", .func = fnv_hash_len_data, .htable = clientbyzconnidTable, .hashbits = CLI_ZCONNID_MAX_BITS, .cmptype = CMP_MEMCMP, .hashlen = sizeof(uint32_t)
-	},
-	[HASH_WHOWAS] = { 
-		.name = "WHOWAS", .func = fnv_hash_upper, .htable = whowas_table, .hashbits = WHOWAS_MAX_BITS, 
-	},
-	[HASH_MONITOR] = {
-		.name = "MONITOR", .func = fnv_hash_upper, .htable = monitor_table, .hashbits = MONITOR_MAX_BITS
-	},
-	[HASH_COMMAND] = {
-		.name = "Command", .func = fnv_hash_upper, .htable = command_table, .hashbits = COMMAND_MAX_BITS
-	},
-
-};
-*/
-/* *INDENT-ON* */  
-
 static inline uint32_t do_hfunc(hash_f *hf, const void *hashindex, size_t hashlen)
 {
 	return hf->func((unsigned const char *)hashindex, hf->hashbits, hashlen);
 }
-
 
 static inline int
 hash_do_cmp(hash_f *hfunc, const void *x, const void *y, size_t len)
@@ -688,6 +562,7 @@ hash_walkall(hash_f *hf, hash_walk_cb * walk_cb, void *walk_data)
 rb_dlink_list
 hash_get_channel_block(int i)
 {
+	/* XXX FIX ME */
 	static rb_dlink_list moo;
 	return moo;
 //	return *channelTable[i];
