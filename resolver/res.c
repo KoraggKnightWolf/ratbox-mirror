@@ -494,7 +494,7 @@ generate_random_port(void)
 void
 gethost_byname_type(const char *name, struct DNSQuery *query, int type)
 {
-	assert(name != 0);
+	assert(name != NULL);
 	do_query_name(query, name, NULL, type);
 }
 
@@ -836,7 +836,7 @@ res_read_single_reply(rb_fde_t *F, void *data)
 	 * response for an id which we have already received an answer for
 	 * just ignore this response.
 	 */
-	if(0 == (request = find_id(header->id)))
+	if(NULL == (request = find_id(header->id)))
 		return 1;
 
 	/*
