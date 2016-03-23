@@ -1,3 +1,11 @@
+androsyn    2016/03/23 16:12:18 UTC	(20160323_0-29394)
+  Log:
+  free the hash structures in hash_destroyall
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2016/03/22 19:39:40 UTC	(20160322_22-29392)
   Log:
   more 0 to NULL conversions
