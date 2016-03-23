@@ -123,7 +123,7 @@ static int
 modinit(void)
 {
         unsigned int i;
-        if(set_hash = hash_create("SET HASH", CMP_IRCCMP, SET_HASH_SIZE, 0) == NULL)
+        if((set_hash = hash_create("SET HASH", CMP_IRCCMP, SET_HASH_SIZE, 0)) == NULL)
                 return 0;
         for(i = 0;  set_cmd_table[i].handler != NULL; i++)
         {
