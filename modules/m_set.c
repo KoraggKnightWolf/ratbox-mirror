@@ -40,7 +40,12 @@
 #include <parse.h>
 #include <modules.h>
 
+#define SET_HASH_SIZE 8
+
 static int mo_set(struct Client *, struct Client *, int, const char **);
+
+static int modinit(void);
+static void moddeinit(void);
 
 struct Message set_msgtab = {
 	.cmd = "SET",
@@ -54,7 +59,7 @@ struct Message set_msgtab = {
 
 mapi_clist_av1 set_clist[] = { &set_msgtab, NULL };
 
-DECLARE_MODULE_AV1(set, NULL, NULL, set_clist, NULL, NULL, "$Revision$");
+DECLARE_MODULE_AV1(set, modinit, moddeinit, set_clist, NULL, NULL, "$Revision$");
 
 /* Structure used for the SET table itself */
 struct SetStruct
@@ -113,6 +118,25 @@ static struct SetStruct set_cmd_table[] = {
 };
 
 
+static hash_f *set_hash;
+static int
+modinit(void)
+{
+        unsigned int i;
+        set_hash = hash_create("SET HASH", CMP_IRCCMP, SET_HASH_SIZE, 0);
+        for(i = 0;  set_cmd_table[i].handler != NULL; i++)
+        {
+                hash_add(set_hash, set_cmd_table[i].name, &set_cmd_table[i]);
+        }
+        return 1;
+}
+
+static void
+moddeinit(void)
+{
+        hash_destroyall(set_hash, NULL);
+        return;
+}
 /*
  * list_quote_commands() sends the client all the available commands.
  * Four to a line for now.
@@ -463,101 +487,91 @@ static int
 mo_set(struct Client *client_p, struct Client *source_p, int parc, const char *parv[])
 {
 	int newval;
-	int i, n;
+	int n;
 	const char *arg = NULL;
 	const char *intarg = NULL;
-
+	struct SetStruct *set = NULL;
 	if(parc > 1)
 	{
-		/*
-		 * Go through all the commands in set_cmd_table, until one is
-		 * matched.  I realize strcmp() is more intensive than a numeric
-		 * lookup, but at least it's better than a big-ass switch/case
-		 * statement.
-		 */
-		for(i = 0; set_cmd_table[i].handler; i++)
+	        if( (set = hash_find_data(set_hash, parv[1])) != NULL)
 		{
-			if(!irccmp(set_cmd_table[i].name, parv[1]))
+			/*
+			 * Command found; now execute the code
+			 */
+			n = 2;
+			if(set->wants_char)
 			{
-				/*
-				 * Command found; now execute the code
-				 */
-				n = 2;
+				arg = parv[n++];
+			}
 
-				if(set_cmd_table[i].wants_char)
+			if(set->wants_int)
+			{
+				intarg = parv[n++];
+			}
+
+			if((n - 1) > parc)
+			{
+				sendto_one_notice(source_p,
+						  ":SET %s expects (\"%s%s\") args",
+						  set->name,
+						  (set->wants_char ? "string, "
+						   : ""),
+						  (set->wants_char ? "int" :
+						   ""));
+				return 0;
+			}
+
+			if(parc <= 2)
+			{
+				arg = NULL;
+				intarg = NULL;
+			}
+
+			if(set->wants_int && (parc > 2))
+			{
+				if(intarg)
 				{
-					arg = parv[n++];
+					if(!irccmp(intarg, "yes") || !irccmp(intarg, "on"))
+						newval = 1;
+					else if(!irccmp(intarg, "no")
+						|| !irccmp(intarg, "off"))
+						newval = 0;
+					else
+						newval = atoi(intarg);
+				}
+				else
+				{
+					newval = -1;
 				}
 
-				if(set_cmd_table[i].wants_int)
-				{
-					intarg = parv[n++];
-				}
-
-				if((n - 1) > parc)
+				if(newval < 0)
 				{
 					sendto_one_notice(source_p,
-							  ":SET %s expects (\"%s%s\") args",
-							  set_cmd_table[i].name,
-							  (set_cmd_table[i].wants_char ? "string, "
-							   : ""),
-							  (set_cmd_table[i].wants_char ? "int" :
-							   ""));
+							  ":Value less than 0 illegal for %s",
+							  set->name);
 					return 0;
 				}
+			}
+			else
+				newval = -1;
 
-				if(parc <= 2)
-				{
-					arg = NULL;
-					intarg = NULL;
-				}
-
-				if(set_cmd_table[i].wants_int && (parc > 2))
-				{
-					if(intarg)
-					{
-						if(!irccmp(intarg, "yes") || !irccmp(intarg, "on"))
-							newval = 1;
-						else if(!irccmp(intarg, "no")
-							|| !irccmp(intarg, "off"))
-							newval = 0;
-						else
-							newval = atoi(intarg);
-					}
-					else
-					{
-						newval = -1;
-					}
-
-					if(newval < 0)
-					{
-						sendto_one_notice(source_p,
-								  ":Value less than 0 illegal for %s",
-								  set_cmd_table[i].name);
-						return 0;
-					}
-				}
+			if(set->wants_char)
+			{
+				if(set->wants_int)
+					set->handler(source_p, arg, newval);
 				else
-					newval = -1;
-
-				if(set_cmd_table[i].wants_char)
-				{
-					if(set_cmd_table[i].wants_int)
-						set_cmd_table[i].handler(source_p, arg, newval);
-					else
-						set_cmd_table[i].handler(source_p, arg);
-					return 0;
-				}
+					set->handler(source_p, arg);
+				return 0;
+			}
+			else
+			{
+				if(set->wants_int)
+					set->handler(source_p, newval);
 				else
-				{
-					if(set_cmd_table[i].wants_int)
-						set_cmd_table[i].handler(source_p, newval);
-					else
-						/* Just in case someone actually wants a
-						 * set function that takes no args.. *shrug* */
-						set_cmd_table[i].handler(source_p);
-					return 0;
-				}
+					/* Just in case someone actually wants a
+					 * set function that takes no args.. *shrug* */
+					set->handler(source_p);
+				return 0;
 			}
 		}
 
