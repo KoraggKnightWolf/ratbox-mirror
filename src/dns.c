@@ -108,7 +108,7 @@ lookup_hostname(const char *hostname, int aftype, DNSCB * callback, void *data)
 	int aft;
 	uint16_t nid;
 	check_resolver();
-	nid = assign_dns_id();
+
 	if((nid = assign_dns_id()) == 0)
 		return 0;
 
