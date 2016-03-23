@@ -1,3 +1,11 @@
+androsyn    2016/03/23 16:15:37 UTC	(20160323_3-29400)
+  Log:
+  handle hash_create failing
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
+
+
 androsyn    2016/03/23 16:14:45 UTC	(20160323_2-29398)
   Log:
   have the set code use the hash.c code for its sub command parser
