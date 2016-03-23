@@ -1,3 +1,11 @@
+androsyn    2016/03/23 16:14:22 UTC	(20160323_1-29396)
+  Log:
+  remove old commented out code
+
+  Modified:
+	ircd-ratbox/trunk/src/hash.c (File Modified) 
+
+
 androsyn    2016/03/23 16:12:18 UTC	(20160323_0-29394)
   Log:
   free the hash structures in hash_destroyall
