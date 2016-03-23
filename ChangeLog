@@ -1,3 +1,11 @@
+androsyn    2016/03/23 17:26:12 UTC	(20160323_10-29416)
+  Log:
+  add a second set of ()
+
+  Modified:
+	ircd-ratbox/trunk/modules/m_set.c (File Modified) 
+
+
 androsyn    2016/03/23 17:18:58 UTC	(20160323_9-29414)
   Log:
   do not call assign_dns_id twice
