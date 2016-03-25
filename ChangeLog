@@ -1,3 +1,11 @@
+androsyn    2016/03/25 15:21:35 UTC	(20160325_3-29430)
+  Log:
+  more cleanups, mostly 0 for NULL changes and a few functions declared static
+
+  Modified:
+	ircd-ratbox/trunk/bandb/bantool.c (File Modified) 
+
+
 androsyn    2016/03/25 15:08:53 UTC	(20160325_2-29428)
   Log:
   use RB_DLINK_FOREACH_SAFE when rehashing temporary resvs
