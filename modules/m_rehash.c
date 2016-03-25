@@ -207,7 +207,7 @@ static void
 rehash_tresvs(struct Client *source_p)
 {
         rb_dlink_list *resv_lists;
-	rb_dlink_node *ptr;
+	rb_dlink_node *ptr, *next;
 
 	sendto_realops_flags(UMODE_ALL, L_ALL, "%s is clearing temp resvs",
 			     get_oper_name(source_p));
@@ -216,11 +216,11 @@ rehash_tresvs(struct Client *source_p)
         if(resv_lists == NULL)
                 return;
                 
-        RB_DLINK_FOREACH(ptr, resv_lists->head)
+        RB_DLINK_FOREACH_SAFE(ptr, next, resv_lists->head)
         {
-                rb_dlink_node *lptr;
+                rb_dlink_node *lptr, *lnext;
                 rb_dlink_list *list = ptr->data;
-                RB_DLINK_FOREACH(lptr, list->head)
+                RB_DLINK_FOREACH_SAFE(lptr, lnext, list->head)
                 {
                         struct ConfItem *aconf = lptr->data;
                         if((aconf->flags & CONF_FLAGS_TEMPORARY) == false)
