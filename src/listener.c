@@ -193,7 +193,7 @@ inetport(struct Listener *listener)
 	{
 	        saved_errno = errno;
 		log_listener("no more connections left for listener %s:%s",
-			     get_listener_name(listener), strerror(errno));
+			     get_listener_name(listener), strerror(saved_errno));
 		rb_close(F);
 		return false;
 	}
