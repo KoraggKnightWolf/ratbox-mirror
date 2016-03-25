@@ -77,7 +77,7 @@ static char me[PATH_MAX];
 
 /* *INDENT-OFF* */
 /* report counters */
-struct counter
+static struct counter
 {
 	unsigned int klines;
 	unsigned int dlines;
@@ -87,7 +87,7 @@ struct counter
 } count = {0, 0, 0, 0, 0};
 
 /* flags set by command line options */
-struct flags
+static struct flags
 {
 	int none;
 	int export;
@@ -298,7 +298,7 @@ export_config(const char *conf, int id)
 	if(!table_has_rows(bandb_table[id]))
 		return;
 
-	if(strstr(conf, ".perm") != 0)
+	if(strstr(conf, ".perm") != NULL)
 		snprintf(sql, sizeof(sql),
 			    "SELECT DISTINCT mask1,mask2,reason,oper,time FROM %s WHERE perm = 1 ORDER BY time",
 			    bandb_table[id]);
@@ -412,7 +412,7 @@ import_config(const char *conf, int id)
 		return;
 	}
 
-	if(strstr(conf, ".perm") != 0)
+	if(strstr(conf, ".perm") != NULL)
 		f_perm = 1;
 
 
@@ -552,7 +552,7 @@ import_config(const char *conf, int id)
  * output	- next field
  * side effects	- field breakup for ircd.conf file.
  */
-char *
+static char *
 getfield(char *newline)
 {
 	static char *line = NULL;
@@ -831,7 +831,7 @@ wipe_schema(void)
  * remove pre-existing duplicate bans from the database.
  * we favor the new, imported ban over the one in the database
  */
-void
+static void
 drop_dupes(const char *user, const char *host, const char *t)
 {
 	rsdb_exec(dbconn, NULL, "DELETE FROM %s WHERE mask1=%Q AND mask2=%Q", t, user, host);
@@ -865,7 +865,7 @@ smalldate(const char *string)
 /**
  * you are here ->.
  */
-void
+static void
 print_help(int i_exit)
 {
 	/* *INDENT-OFF* */
