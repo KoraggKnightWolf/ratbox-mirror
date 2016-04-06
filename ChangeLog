@@ -1,3 +1,11 @@
+dubkat      2016/04/06 18:49:01 UTC	(20160406_0-29433)
+  Log:
+  Add a nice README formatted in Markdown
+
+  Modified:
+	ircd-ratbox/trunk/README.md (File Added) 
+
+
 androsyn    2016/03/25 15:21:35 UTC	(20160325_3-29430)
   Log:
   more cleanups, mostly 0 for NULL changes and a few functions declared static
