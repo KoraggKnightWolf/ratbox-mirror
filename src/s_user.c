@@ -470,6 +470,7 @@ register_local_user(struct Client *client_p, struct Client *source_p, const char
 			reason = source_p->localClient->rblreason;
 		sendto_realops_flags(UMODE_REJ, L_ALL, "RBLBAN %s %s %s %s :%s", source_p->name, source_p->username, source_p->host, source_p->sockhost, reason);	
 		exit_client(client_p, source_p, &me, reason);
+		return CLIENT_EXITED;
 	}
 
 
