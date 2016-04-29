@@ -1,3 +1,11 @@
+androsyn    2016/04/29 18:54:44 UTC	(20160429_0-29435)
+  Log:
+  return CLIENT_EXITED when exiting a RBLBANed client
+
+  Modified:
+	ircd-ratbox/trunk/src/s_user.c (File Modified) 
+
+
 dubkat      2016/04/06 18:49:01 UTC	(20160406_0-29433)
   Log:
   Add a nice README formatted in Markdown
