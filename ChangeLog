@@ -1,3 +1,13 @@
+dubkat      2016/05/29 02:29:30 UTC	(20160529_0-29437)
+  Log:
+  add logfile rotation script, updated doc/index.txt
+
+  Modified:
+	ircd-ratbox/trunk/doc/genopercert.sh (File Modified) (Property Modified)
+	ircd-ratbox/trunk/doc/index.txt (File Modified) 
+	ircd-ratbox/trunk/doc/ratbox-rotate.sh (File Added) 
+
+
 androsyn    2016/04/29 18:54:44 UTC	(20160429_0-29435)
   Log:
   return CLIENT_EXITED when exiting a RBLBANed client
