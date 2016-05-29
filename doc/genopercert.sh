@@ -1,7 +1,7 @@
 #!/bin/sh
 # Simple and straight forward openssl cert generator for ircd-ratbox
 # Copyright (C) 2008-2015 ircd-ratbox development team
-# $Id: genssl.sh 28847 2015-10-20 18:50:44Z androsyn $
+# $Id$
 
 if [ $# -eq 0 ]; then
 	echo

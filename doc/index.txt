@@ -9,6 +9,9 @@ challenge.txt           - Overview of the challenge/response system for
 example.conf            - An example ircd.conf file describing most of the
                           user settable options
 genssl.sh		- creates a self signed certificate and DH parameters file
+genopercert.sh          - Creates a self signed certificate for opers.
+ircd_crontab.sh         - Crontab script for ircd-ratbox.
+ratbox-rotate.sh        - Crontab script to rotate ratbox log files.
 hooks.txt		- Overview of the hooks available
 index.txt		- This file
 ircd.motd               - A default ircd.motd used by make install
