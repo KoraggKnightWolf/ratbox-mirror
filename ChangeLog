@@ -1,3 +1,11 @@
+dubkat      2016/07/05 02:17:01 UTC	(20160705_0-29439)
+  Log:
+  ircd-ratbox sysvinit taken from SUSE Linux.
+
+  Modified:
+	ircd-ratbox/trunk/doc/ircd-ratbox.init (File Added) 
+
+
 dubkat      2016/05/29 02:29:30 UTC	(20160529_0-29437)
   Log:
   add logfile rotation script, updated doc/index.txt
