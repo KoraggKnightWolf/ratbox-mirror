@@ -612,7 +612,7 @@ ms_sjoin(struct Client *client_p, struct Client *source_p, int parc, const char 
 		remove_our_modes(chptr);
 		sendto_channel_local(ALL_MEMBERS, chptr,
 				     ":%s NOTICE %s :*** Notice -- TS for %s changed from %"
-				     RBTT_FMT "  to %" RBTT_FMT, me.name, chptr->chname,
+				     RBTT_FMT " to %" RBTT_FMT, me.name, chptr->chname,
 				     chptr->chname, oldts, newts);
 	}
 
