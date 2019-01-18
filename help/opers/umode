@@ -26,3 +26,4 @@ Usermodes: (* designates that the umode is oper only)
        * +z     - Can see oper wallops.
        * +Z     - Can see operspy notices
          +D     - Deaf - ignores all channel messages.
+       * +S     - Service - Makes IRC Services unkickable
