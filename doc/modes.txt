@@ -23,6 +23,7 @@ User Modes:
 +y - spy        - See LINKS, STATS (if configured), TRACE notices
 +z - operwall   - See oper generated WALLOPS
 +D - deaf       - Ignore all PRIVMSG's sent to channels
++S - Service    - Makes IRC Services unkickable
 +Z - operspy    - See operspy notices
 
 Channel Modes:
