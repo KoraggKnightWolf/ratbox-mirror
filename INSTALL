@@ -34,11 +34,14 @@ An example.conf for EFnet is in doc/ with values "approved" on 12 December 2001.
 | to write to its own directories. You have been warned!                      |
 +-----------------------------------------------------------------------------+
 
-    I. ./configure --prefix=/home/user/ircd
+    I. ./configure 
+        ( ./configure --prefix /home/user/ircd is no longer needed as the default prefix has been changed to $HOME/ircd
+          see https://github.com/KoraggKnightWolf/ratbox-mirror/commit/a9030749ac52897daaf601baa43a80ba7653137b )
 
     II. Configure ircd-ratbox for running with minimal resources on a 64bit VPS.
         This creates a 32bit IRCD which takes up less memory:
-          CFLAGS="-m32" ./configure --prefix=/home/user/ircd
+          CFLAGS="-m32" ./configure 
+          (as above, specifying the prefix to /home/user/ircd is no longer necessary)
 
   2. Build:
 
