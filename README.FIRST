@@ -6,7 +6,9 @@ If you don't read this first, we won't help you.
   *********** Note for those who dont bother reading docs *****************
   * - Reading INSTALL is now a must, as the old DPATH is now specified    *
   *   when configure is run.                                              *
-  *   You now need to ./configure --prefix="/path/to/install/it"          *
+  *   You do NOT need to ./configure --prefix="/path/to/install/it" as of commit *
+  *   https://github.com/KoraggKnightWolf/ratbox-mirror/commit/a9030749ac52897daaf601baa43a80ba7653137b#diff-e2d5a00791bce9a01f99bc6fd613a39d *
+  *   Just running ./configure will do
   * - The old config format WILL NOT WORK.  Please see doc/example.conf ! *
   * - The old kline format WILL NOT WORK.  Please use bantool which       *
   *   will be installed with your ircd!					  *
