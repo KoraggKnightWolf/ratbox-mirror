@@ -7,7 +7,7 @@ NO PARAMETERS:
               the channel.
      +t     - Ops Topic.  Only opped (+o) users may set the topic.
      +s     - Secret.  Channel will not be shown in /whois and /list etc.
-     +p     - Private.  Disables /knock to the channel.
+     +p     - Private.  Disables /knock to the channel and can be set at the same time as +s.
      +m     - Moderated.  Only opped/voiced users may talk in channel.
      +i     - Invite only.  Users need to be /invite'd or match a +I to
               join the channel.
