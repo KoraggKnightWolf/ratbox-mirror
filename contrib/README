@@ -9,6 +9,13 @@ modules, or guarantee any of them will actually work.
 Modules
 -------
 
+ircd-shortcut.pl - This script generates ircd command shortcuts for use with 
+                   ratbox-services.  These are notably safer to use than users 
+		   simply  messaging the service nicknames, as they cannot be 
+		   intercepted by other users when services is split.
+
+m_42.c         - The answer to everything, 42.      
+
 m_clearchan.c  - CLEARCHAN - clears all users out of a channel and joins person
                              issuing command
                  Syntax: CLEARCHAN <channel> 
