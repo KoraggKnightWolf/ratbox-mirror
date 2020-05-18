@@ -198,6 +198,7 @@ struct config_file_entry
 	int throttle_count;
 	int throttle_duration;
 	int target_change;
+	int disable_local_channels;
 	int collision_fnc;
 	int hide_spoof_ips;
 	int global_cidr_ipv4_bitlen;
