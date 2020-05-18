@@ -693,6 +693,12 @@ static struct InfoStruct info_table[] = {
 		"Target change anti-spam system"
 	},
 	{
+		"disable_local_channels",
+		OUTPUT_BOOLEAN_YN,
+		&ConfigChannel.disable_local_channels,
+		"Disable local channels (&channels)"
+	},
+	{
 		"throttle_count",
 		OUTPUT_DECIMAL,
 		{ &ConfigFileEntry.throttle_count }, 
