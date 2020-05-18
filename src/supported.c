@@ -91,6 +91,17 @@
 #include <channel.h>
 #include <supported.h>
 
+static char allowed_chantypes[BUFSIZE];
+rb_dlink_list isupportlist;
+
+struct isupportitem
+{
+	const char *name;
+	const char *(*func)(const void *);
+	const void *param;
+	rb_dlink_node node;
+};
+
 static rb_dlink_list isupportlist;
 
 struct isupportitem
@@ -228,7 +239,7 @@ isupport_chanlimit(const void *ptr)
 {
 	static char result[30];
 
-	snprintf(result, sizeof(result), "&#:%i", ConfigChannel.max_chans_per_user);
+	snprintf(result, sizeof(result), "%s:%i", allowed_chantypes, ConfigChannel.max_chans_per_user);
 	return result;
 }
 
@@ -264,7 +275,7 @@ init_isupport(void)
 	static int keylen = KEYLEN - 1;
 	static int nicklen;
 	nicklen = ServerInfo.nicklen - 1;
-	add_isupport("CHANTYPES", isupport_string, "&#");
+	add_isupport("CHANTYPES", isupport_string, allowed_chantypes);
 	add_isupport("EXCEPTS", isupport_boolean, &ConfigChannel.use_except);
 	add_isupport("INVEX", isupport_boolean, &ConfigChannel.use_invex);
 	add_isupport("CHANMODES", isupport_chanmodes, NULL);
@@ -293,4 +304,19 @@ init_isupport(void)
 	add_isupport("FNC", isupport_string, "");
 	add_isupport("MAP", isupport_string, "");
 	add_isupport("TARGMAX", isupport_targmax, NULL);
+}
+
+void
+chantypes_update(void)
+{
+	unsigned char *p;
+	memset(allowed_chantypes, '\0', sizeof allowed_chantypes);
+
+	p = (unsigned char *) allowed_chantypes;
+
+	for (unsigned int i = 0; i < 256; i++)
+	{
+		if (IsChanPrefix(i))
+			*p++ = (unsigned char) i;
+	}
 }
